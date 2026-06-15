@@ -1,0 +1,31 @@
+#!/bin/bash
+# PrologAI launcher — thin shell wrapper (FR-PR01 option a/b hybrid)
+# Locates PROLOGAI_HOME from the script's own location and adds all pack
+# prolog/ subdirectories to the SWI-Prolog library path before loading
+# the bootstrap module and calling start_prologai/0.
+
+SCRIPT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+PROLOGAI_HOME="$(cd "$(dirname "$SCRIPT")/.." && pwd)"
+export PROLOGAI_HOME
+
+# Collect -p library=... flags for every pack's prolog/ directory.
+LIB_PATHS=()
+
+if [ -d "$PROLOGAI_HOME/syntax/prolog" ]; then
+    LIB_PATHS+=(-p "library=$PROLOGAI_HOME/syntax/prolog")
+fi
+
+if [ -d "$PROLOGAI_HOME/packs" ]; then
+    for pack_prolog in "$PROLOGAI_HOME/packs"/*/prolog; do
+        [ -d "$pack_prolog" ] && LIB_PATHS+=(-p "library=$pack_prolog")
+    done
+fi
+
+# Add the launcher directory itself so prologai_main is findable.
+LIB_PATHS+=(-p "library=$PROLOGAI_HOME/launcher")
+
+exec swipl \
+    "${LIB_PATHS[@]}" \
+    --quiet \
+    -g "use_module(library(prologai_main)), start_prologai" \
+    "$@"
