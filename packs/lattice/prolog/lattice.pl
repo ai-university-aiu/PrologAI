@@ -19,7 +19,8 @@
     lattice_dump/2,          % +Nexus, +File
     nexus_address/2,         % +Nexus, -Address
     nexus_is_open/1,         % +Nexus
-    nexus_state/2            % +Nexus, -State (open|closed)
+    nexus_state/2,           % +Nexus, -State (open|closed)
+    lattice_node_fact/5      % +Nexus, ?Id, ?Relation, ?Args, ?Referents
 ]).
 
 :- use_module(library(crypto),  [crypto_data_hash/3]).
