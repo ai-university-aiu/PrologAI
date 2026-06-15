@@ -22,7 +22,8 @@
     set_default_nexus/1,    % +Nexus
     default_nexus/1,        % -Nexus
     node_fact_nexus/2,      % +Id, -Nexus
-    node_activation/3       % ?Id, ?Timestamp, ?EdgeWeight
+    node_activation/3,      % ?Id, ?Timestamp, ?EdgeWeight
+    reindex_nexus/1         % +Nexus — rebuild vector index with current embedding hook
 ]).
 
 :- use_module(library(lattice),        [lattice_node_fact/5,
@@ -108,7 +109,7 @@ anchor_node(Relation, Args, Referents, Id) :-
     ensure_nexus_vector_index(Nexus, VH),
     term_to_atom(node_fact(Relation, Args, Referents), Term),
     ( catch(nb_getval(node_fact_vec_dim, Dim), _, Dim = 32) -> true ; Dim = 32 ),
-    hash_project(Term, Dim, Vec),
+    compute_node_vec(Term, Dim, Vec),
     vb_insert(VH, Id, Vec, []),
     % Post-anchor hook — calls ALL registered clauses (sentinel engine, pubsub, etc.)
     catch(
@@ -119,6 +120,49 @@ anchor_node(Relation, Args, Referents, Id) :-
 
 :- multifile post_anchor_node_hook/5.
 post_anchor_node_hook(_, _, _, _, _).   % default: no-op (always present so predicate exists)
+
+% ---------------------------------------------------------------------------
+% Pluggable embedding hook (PR 16)
+%
+%   External embedding providers register a clause for node_facts_embed_hook/2.
+%   When no clause is registered, anchor_node falls back to hash_project.
+%   Hook signature: node_facts_embed_hook(+TermAtom, -Vector)
+% ---------------------------------------------------------------------------
+
+:- multifile node_facts_embed_hook/2.
+:- dynamic   node_facts_embed_hook/2.
+
+compute_node_vec(TermAtom, Dim, Vec) :-
+    ( catch(node_facts_embed_hook(TermAtom, Vec), _, fail)
+    ->  true
+    ;   hash_project(TermAtom, Dim, Vec)
+    ).
+
+% ---------------------------------------------------------------------------
+% reindex_nexus/1 — rebuild vector index for a nexus using current hook
+% ---------------------------------------------------------------------------
+
+reindex_nexus(Nexus) :-
+    ( catch(nb_getval(node_fact_vec_dim, Dim), _, Dim = 32) -> true ; Dim = 32 ),
+    findall(Id-Rel-Args-Refs,
+            lattice_node_fact(Nexus, Id, Rel, Args, Refs),
+            Facts),
+    ( nexus_vector_index(Nexus, OldVH)
+    ->  retract(nexus_vector_index(Nexus, OldVH))
+    ;   true
+    ),
+    vb_create(Dim, cosine, [capacity(10000)], NewVH),
+    assertz(nexus_vector_index(Nexus, NewVH)),
+    forall(
+        member(Id-Rel-Args-Refs, Facts),
+        catch(
+            ( term_to_atom(node_fact(Rel, Args, Refs), Term),
+              compute_node_vec(Term, Dim, Vec),
+              vb_insert(NewVH, Id, Vec, [])
+            ),
+            _, true
+        )
+    ).
 
 % ---------------------------------------------------------------------------
 % prune_node/1
@@ -148,7 +192,7 @@ traverse_nexus(Nexus, Pattern, K, Results) :-
     ( nexus_vector_index(Nexus, VH),
       term_to_atom(Pattern, PatternAtom),
       ( catch(nb_getval(node_fact_vec_dim, Dim), _, Dim = 32) -> true ; Dim = 32 ),
-      hash_project(PatternAtom, Dim, QVec),
+      compute_node_vec(PatternAtom, Dim, QVec),
       vb_search(VH, QVec, K, VecResults)
     ->  maplist([Score-VId, VId-Score]>>true, VecResults, VecPairs)
     ;   VecPairs = []
