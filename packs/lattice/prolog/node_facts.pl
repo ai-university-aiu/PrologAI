@@ -83,7 +83,7 @@ next_node_id(Id) :-
 ensure_nexus_vector_index(Nexus, VH) :-
     ( nexus_vector_index(Nexus, VH)
     ->  true
-    ;   nb_getval(node_fact_vec_dim, Dim),
+    ;   ( catch(nb_getval(node_fact_vec_dim, Dim), _, Dim = 32) -> true ; Dim = 32 ),
         vb_create(Dim, cosine, [capacity(10000)], VH),
         assertz(nexus_vector_index(Nexus, VH))
     ).
@@ -107,7 +107,7 @@ anchor_node(Relation, Args, Referents, Id) :-
     % Vector index
     ensure_nexus_vector_index(Nexus, VH),
     term_to_atom(node_fact(Relation, Args, Referents), Term),
-    nb_getval(node_fact_vec_dim, Dim),
+    ( catch(nb_getval(node_fact_vec_dim, Dim), _, Dim = 32) -> true ; Dim = 32 ),
     hash_project(Term, Dim, Vec),
     vb_insert(VH, Id, Vec, []),
     % Post-anchor hook — calls ALL registered clauses (sentinel engine, pubsub, etc.)
@@ -147,7 +147,7 @@ traverse_nexus(Nexus, Pattern, K, Results) :-
     % Phase 2: vector similarity
     ( nexus_vector_index(Nexus, VH),
       term_to_atom(Pattern, PatternAtom),
-      nb_getval(node_fact_vec_dim, Dim),
+      ( catch(nb_getval(node_fact_vec_dim, Dim), _, Dim = 32) -> true ; Dim = 32 ),
       hash_project(PatternAtom, Dim, QVec),
       vb_search(VH, QVec, K, VecResults)
     ->  maplist([Score-VId, VId-Score]>>true, VecResults, VecPairs)
