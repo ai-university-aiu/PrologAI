@@ -114,7 +114,8 @@ lattice_collect_hash_data(Nexus, Data) :-
     atom_string(Atom, Data).
 
 % Hooked by PR 4 — no node_facts in this PR, so always empty.
-:- dynamic lattice_node_fact/5.  % Nexus, Id, Relation, Args, Referents
+% Declared incremental so tabled derivations in PR 15 auto-invalidate on change.
+:- dynamic lattice_node_fact/5 as incremental.  % Nexus, Id, Relation, Args, Referents
 
 % ---------------------------------------------------------------------------
 % lattice_transaction/2
