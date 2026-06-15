@@ -16,7 +16,9 @@
     sentinel_list/2,            % +Domain, -Sentinels
     sentinel_retract/1,         % +Domain
     sentinel_domain_activate/1, % +Domain
-    sentinel_domain_deactivate/1% +Domain
+    sentinel_domain_deactivate/1,% +Domain
+    pai_sentinel_entry/6,       % ?Dom,?Pri,?Pat,?Obj,?Act,?Doc  (for engine)
+    pai_sentinel_domain_active/1 % ?Domain (for engine)
 ]).
 
 % ---------------------------------------------------------------------------

@@ -109,7 +109,16 @@ anchor_node(Relation, Args, Referents, Id) :-
     term_to_atom(node_fact(Relation, Args, Referents), Term),
     nb_getval(node_fact_vec_dim, Dim),
     hash_project(Term, Dim, Vec),
-    vb_insert(VH, Id, Vec, []).
+    vb_insert(VH, Id, Vec, []),
+    % Post-anchor hook — calls ALL registered clauses (sentinel engine, pubsub, etc.)
+    catch(
+        forall(post_anchor_node_hook(Nexus, Id, Relation, Args, Referents), true),
+        _,
+        true
+    ).
+
+:- multifile post_anchor_node_hook/5.
+post_anchor_node_hook(_, _, _, _, _).   % default: no-op (always present so predicate exists)
 
 % ---------------------------------------------------------------------------
 % prune_node/1
