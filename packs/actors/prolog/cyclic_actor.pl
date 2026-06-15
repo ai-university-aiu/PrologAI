@@ -95,13 +95,15 @@ actor_loop(Name, Goal, DelayMs) :-
     ).
 
 actor_loop_body(Name, Goal, DelayMs) :-
-    ( catch(
+    catch(
         ( call(Goal) -> true ; log_actor_warn(Name, goal_failed) ),
         Err,
-        ( log_actor_error(Name, Err), increment_actor_count(Name, errors) )
-      )
-    ->  true
-    ;   true
+        % Re-throw the stop signal so the outer catch can handle it cleanly.
+        ( Err = actor_stop(Name)
+        ->  throw(Err)
+        ;   log_actor_error(Name, Err),
+            increment_actor_count(Name, errors)
+        )
     ),
     increment_actor_count(Name, cycle),
     DelayS is DelayMs / 1000.0,
