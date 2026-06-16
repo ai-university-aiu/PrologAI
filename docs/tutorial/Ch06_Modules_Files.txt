@@ -1,0 +1,228 @@
+PROLOGAI TUTORIAL
+
+Chapter 6: Modules and Loading Files
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+WHY MODULES AND FILES?
+
+When you type facts and rules at the ?- prompt, they disappear when you exit.
+
+Real programs are written in files and organized into modules.
+
+A file is a document saved on your computer that contains Prolog code.
+
+A module is a named group of predicates. Modules let you organize code and control which predicates are available to other parts of the system.
+
+PrologAI is organized into modules called packs. Each pack implements one or more work packages (PRs). When you type use_module(library(assessment)), you are loading the assessment pack's module into your session.
+
+
+WRITING YOUR FIRST .PL FILE
+
+Create a new text file on your computer. Name it my_knowledge.pl
+
+(The .pl extension tells your computer and SWI-Prolog that this is a Prolog file.)
+
+In that file, type:
+
+    :- module(my_knowledge, [adult/1, greet/1]).
+
+    age(alice, 30).
+    age(bob, 17).
+    age(carol, 25).
+
+    adult(Name) :-
+        age(Name, A),
+        A >= 18.
+
+    greet(Name) :-
+        format("Hello, ~w!~n", [Name]).
+
+Save the file.
+
+Now look at what is in this file.
+
+LINE 1: :- module(my_knowledge, [adult/1, greet/1]).
+
+This declares a module named my_knowledge. It exports (makes available to other files) the predicates adult/1 and greet/1. The :- at the start means "execute this as a directive when loading."
+
+LINES 3-5: Three facts. Just like the facts you typed at the prompt, but saved permanently.
+
+LINES 7-9: A rule. The rule body is indented for readability. Indentation does not matter to Prolog, but it makes code easier to read.
+
+LINES 11-13: Another rule. format/2 is a built-in predicate that prints formatted output. ~w prints a value. ~n prints a newline (moves to the next line).
+
+
+LOADING A FILE
+
+In your session, load the file with use_module/1 or consult/1:
+
+At the ?- prompt:
+
+    ?- consult('/path/to/my_knowledge.pl').
+
+Replace /path/to/ with the actual path to your file.
+
+Or, if you are in the same directory as the file:
+
+    ?- consult('my_knowledge.pl').
+
+After loading, you can use all the predicates in the file:
+
+    ?- adult(alice).
+    true.
+
+    ?- adult(bob).
+    false.
+
+    ?- greet(alice).
+    Hello, alice!
+    true.
+
+
+LOADING A MODULE WITH USE_MODULE
+
+If the file declares a module, you should load it with use_module/1 instead of consult/1:
+
+    ?- use_module('my_knowledge.pl').
+
+The difference: use_module/1 loads the module and imports its exported predicates. consult/1 loads the file and makes everything in it available.
+
+For PrologAI packs (like library(assessment)), always use use_module.
+
+
+DIRECTIVE SYNTAX
+
+Lines starting with :- (colon-dash) in a .pl file are directives. They are executed when the file loads.
+
+Common directives:
+
+    :- module(name, [exported/1, predicates/2]).   % Declare module.
+    :- use_module(library(lists)).                  % Load a library.
+    :- use_module('my_other_file.pl').              % Load another file.
+    :- assertz(some_fact).                          % Add a fact on load.
+
+PrologAI files also use:
+
+    :- initialization(some_goal, now).   % Run this goal immediately on load.
+    :- initialization(start_predicate, main).   % Run this when program starts.
+
+
+COMMENTS
+
+Comments in Prolog files start with a percent sign %. Everything after % on the same line is ignored.
+
+    % This is a comment.
+    bird(tweety).   % So is this.
+
+For multi-line comments, use /* and */:
+
+    /* This is a
+       multi-line comment. */
+
+IMPORTANT FOR PROLOGAI: Every line of code in PrologAI .pl files must have an ERC (English Readable Code) comment immediately above it. This is the platform's documented convention. Each comment explains what the following line does in plain English.
+
+Here is an example from the PrologAI style:
+
+    % Check if the entity is a bird.
+    bird(tweety).
+    % Check if the entity can fly.
+    can_fly(tweety).
+    % Define the rule: a flying bird is something that is a bird and can fly.
+    flying_bird(X) :- bird(X), can_fly(X).
+
+
+THE PROLOGAI PACKS
+
+PrologAI organizes its capabilities into packs. Each pack is a directory in the packs/ folder of the PrologAI repository. Each pack contains a prolog/ subdirectory with the actual code.
+
+To use a pack's predicates:
+
+1. Register its library path:
+
+    ?- assertz(user:file_search_path(library, '/path/to/PrologAI/packs/assessment/prolog')).
+
+2. Load its module:
+
+    ?- use_module(library(assessment), [assess_piaget/3, assess_all/2]).
+
+The Mentova console REPL (bin/mentova) does both steps automatically for the most commonly used packs.
+
+
+KEY PROLOGAI PACKS (PR 1 THROUGH PR 48)
+
+Here is a summary of the major packs, in dependency order.
+
+PR 1 - kernel: The PrologAI kernel defines the foundational types, the constitutional gate, and the base reasoning patterns.
+
+PR 2 - types: The type system for PrologAI terms.
+
+PR 3 - lattice: The Lattice (the knowledge store). Chapter 7 covers the Lattice in depth.
+
+PR 4 - node_facts: The predicates for storing and retrieving knowledge in the Lattice (anchor_node/4, live_node_facts/2, traverse_nexus/4).
+
+PR 5 - scopes: The nine-zone compartmentalization system that controls what the mind can see and modify.
+
+PR 6 - actors: The basic actor (individual reasoning unit).
+
+PR 7 - pubsub: Publish-subscribe messaging between actors.
+
+PR 8 - perception: The perception system (how the mind receives sensory input).
+
+PR 9 - sentinels: Automatic watchers that fire when specific conditions occur in the Lattice.
+
+PR 10 - kernel continuations: Advanced kernel features.
+
+PR 11 - sona: The episodic memory (Sparse Online Nexus Archive).
+
+PR 12 - assessment: The developmental assessment framework (Piagetian, Bayley, CHC, consciousness indicators).
+
+PR 13 - refinement: The testing and improvement harness.
+
+PR 14 - mcp_gateway: The Model Context Protocol gateway (for connecting to AI tool ecosystems).
+
+PR 15 through PR 22 - reasoning modules: Defeasible, probabilistic, Bayesian, causal, analogical, and other reasoning types.
+
+PR 23 - curiosity: The curiosity and self-directed learning system.
+
+PR 24 - somatic markers: The emotion-like influence system.
+
+PR 25 - daydream: Steered imagination and simulation.
+
+PR 26 - appraisal: Emotional appraisal and coping.
+
+PR 27 - motivation: The motivational drive system.
+
+PR 28 - embedding: Vector embedding integration.
+
+PR 29 - vector_backend: The vector search backend.
+
+PR 30 through PR 42 - higher reasoning: Abduction, induction, frames, analogical reasoning, reflection, synthesis, workspace, attention economy, attention schema, and more.
+
+PR 43 - a2a: The Agent-to-Agent protocol (A2A).
+
+PR 44 - tooling: The tool-use faculty.
+
+PR 45 - language: The language understanding layer.
+
+PR 46 - ros_bridge: The robot body (Robot Operating System version 2 bridge).
+
+PR 47 - acp: The Agent Communication Protocol (ACP) gateway.
+
+PR 48 - anp: The Agent Network Protocol (ANP) gateway with decentralized identity.
+
+Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 14).
+
+
+EXERCISE
+
+1. Create a file called family.pl with facts for at least three people (name, age, city) and one rule (same_city/2 that is true when two people live in the same city).
+
+2. Load the file: ?- consult('family.pl').
+
+3. Query it: find two people who live in the same city.
+
+4. Use findall/3 to collect all people who are adults.
+
+END OF CHAPTER 6

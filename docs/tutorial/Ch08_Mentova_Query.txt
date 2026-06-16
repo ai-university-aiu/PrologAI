@@ -1,0 +1,286 @@
+PROLOGAI TUTORIAL
+
+Chapter 8: Talking to Mentova - mentova_query/3
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+THE MAIN PREDICATE
+
+mentova_query/3 is the primary way to ask Mentova to reason about something.
+
+    mentova_query(+QueryType, +Query, -Result)
+
+Arguments:
+
+• QueryType: the type of reasoning to use (e.g., deductive, bayesian, counterfactual).
+
+• Query: what you want to know, expressed as a Prolog term.
+
+• Result: the answer, in the form answer(Conclusion, Justification).
+
+Every mentova_query result has two parts:
+• The conclusion: what Mentova thinks the answer is.
+• The justification: why Mentova thinks that (the reasoning chain, the rule used, the evidence consulted).
+
+This is what PrologAI calls "glass-box reasoning": you can see not just the answer but every step that led to it.
+
+Start your session: run bin/mentova and wait for the ?-prompt.
+
+
+DEDUCTIVE REASONING
+
+Deductive reasoning is the most basic form: if we know A and we know that A implies B, then we can deduce B.
+
+Example:
+
+    ?- mentova_query(deductive, is_a(tweety, bird), R).
+
+Answer (approximate):
+
+    R = answer(yes, just(tweety, is_a, bird, chain([tweety, bird]))).
+
+Read this: "Yes, tweety is a bird, because the chain of is_a relationships goes tweety -> bird."
+
+The Small-World dataset that Mentova loads at boot includes foundational knowledge. tweety is already known to be a bird.
+
+Try:
+
+    ?- mentova_query(deductive, capable_of(tweety, fly), R).
+
+Answer:
+
+    R = answer(yes, just(tweety, capable_of, fly, via_isa)).
+
+Mentova knows that birds can fly and tweety is a bird, so tweety can fly.
+
+
+DEFEASIBLE REASONING
+
+Defeasible reasoning handles exceptions. "Normally true, unless an exception applies."
+
+    ?- mentova_query(defeasible, flies(tweety), R).
+
+Tweety is a bird. Birds normally fly. Unless there is an exception (e.g., tweety is a penguin), tweety flies.
+
+    ?- mentova_query(defeasible, flies(penguin_pete), R).
+
+Penguins are birds that do not fly. Mentova applies the exception and returns the answer with the exception justification.
+
+
+PROBABILISTIC REASONING
+
+Some facts have a probability attached. Mentova can reason with probabilities.
+
+    ?- mentova_query(probabilistic, prob(raining), R).
+
+This asks: what is the probability that it is raining? The answer depends on what probability facts Mentova has been given.
+
+
+BAYESIAN REASONING
+
+Bayesian reasoning updates a belief when new evidence arrives.
+
+    ?- mentova_query(bayesian, update(rain, wet_grass), R).
+
+This asks: given that the grass is wet, how does our belief that it is raining change? This is Bayesian updating: posterior probability from prior and likelihood.
+
+
+CAUSAL REASONING
+
+Causal reasoning distinguishes correlation from causation.
+
+    ?- mentova_query(causal, effect_of(smoking, cancer), R).
+
+This asks about the causal effect of smoking on cancer risk.
+
+
+ANALOGICAL REASONING
+
+Analogical reasoning solves A:B :: C:? (A is to B as C is to ?).
+
+    ?- mentova_query(analogical, analogy(dog:puppy, cat:?), R).
+
+Expected answer: kitten. Mentova finds the relationship (adult:young) and applies it.
+
+
+COUNTERFACTUAL REASONING
+
+Counterfactual reasoning asks "what if?" about things that are not true.
+
+    ?- mentova_query(counterfactual, if_then(birds_cant_fly, tweety_can_fly), R).
+
+Mentova reasons within the hypothesis even though it knows birds normally can fly.
+
+
+HYPOTHETICAL REASONING
+
+Hypothetical reasoning explores "suppose this were true" without asserting it.
+
+    ?- mentova_query(hypothetical, suppose(all_metal_melts_at_100), R).
+
+Mentova explores the consequences of this supposition.
+
+
+EPISTEMIC REASONING
+
+Epistemic reasoning is about knowledge and belief.
+
+    ?- mentova_query(epistemic, believes(agent(alice), raining), R).
+
+This asks: what does Alice believe about whether it is raining?
+
+
+MODAL REASONING
+
+Modal reasoning handles necessity and possibility.
+
+    ?- mentova_query(modal, necessarily(all_bachelors_unmarried), R).
+
+This asks: is it necessarily true that all bachelors are unmarried?
+
+
+METACOGNITIVE REASONING
+
+Metacognitive reasoning is reasoning about the mind's own capabilities.
+
+    ?- mentova_query(metacognitive, can_i_do(task(formal_logic)), R).
+
+Mentova reasons about whether it can perform a given task.
+
+
+FORMAL REASONING
+
+Formal reasoning applies symbolic logic and proof rules.
+
+    ?- mentova_query(formal, prove(modus_ponens(p_implies_q, p, q)), R).
+
+Mentova checks whether q follows from p and p-implies-q by modus ponens.
+
+
+MATHEMATICAL REASONING
+
+    ?- mentova_query(mathematical, compute(factorial(5)), R).
+
+Mentova computes the factorial of 5.
+
+
+SPATIAL REASONING
+
+    ?- mentova_query(spatial, chain(marble), R).
+
+Mentova finds the full containment chain for the marble (marble is in basket, basket is in room, room is in house).
+
+
+TEMPORAL REASONING
+
+    ?- mentova_query(temporal, before(breakfast, lunch), R).
+
+Mentova reasons about temporal ordering.
+
+
+MORAL REASONING
+
+    ?- mentova_query(moral, evaluate(action(help_person_in_need)), R).
+
+Mentova applies multiple ethical frameworks (utilitarian, deontological, virtue ethics) and reports their verdicts.
+
+
+LEGAL REASONING
+
+    ?- mentova_query(legal, applies(rule(no_parking), situation(parking_at_fire_hydrant)), R).
+
+Mentova applies rules, exceptions, and precedents in a legal-reasoning framework.
+
+
+INDUCTIVE REASONING
+
+Inductive reasoning learns a rule from examples.
+
+    ?- mentova_query(inductive,
+           induce([bird(tweety), bird(robin)],
+                  [not_bird(whale)],
+                  [feathers(tweety), feathers(robin)],
+                  [feathers(eagle)]),
+           R).
+
+Mentova tries to induce: "X is a bird if X has feathers" from the positive and negative examples.
+
+
+ABDUCTIVE REASONING
+
+Abductive reasoning finds the best explanation for an observation.
+
+    ?- mentova_query(abductive, explain(wet_grass), R).
+
+Mentova proposes the best hypothesis that explains wet grass (e.g., it rained, the sprinkler was on).
+
+
+THE TRACK A ASSISTANT
+
+Track A is Mentova's transparent reasoning assistant for expert ontologies (General Ontology, GO, and Domain Ontology, DO).
+
+    ?- mentova_query(track_a, query(is_a, concept_A, concept_B), R).
+
+
+THE WORKSPACE CYCLE
+
+The workspace cycle runs Mentova's global broadcast mechanism and updates the Lattice.
+
+    ?- mentova_query(workspace, run_cycle(1), R).
+
+This runs one global workspace cycle, broadcasts the most salient content, and returns a report.
+
+
+THE ATTENTION SCHEMA
+
+The attention schema is Mentova's model of its own attention.
+
+    ?- mentova_query(attention_schema, report, R).
+
+Returns a report of what Mentova is currently attending to.
+
+
+THE GAME INTERFACE
+
+Mentova can play games and puzzles as a body.
+
+    ?- mentova_query(game, game_reason(arc_agi, deductive), R).
+
+This runs one perceive-reason-act cycle on the enrolled ARC-AGI game body.
+
+
+READING THE RESULT
+
+Every mentova_query result has the form:
+
+    answer(Conclusion, Justification)
+
+Conclusion is the answer: yes, no, a value, a list, or a structured term.
+
+Justification is the reasoning trace: what rule was applied, what facts were consulted, what chain of inference led to the conclusion.
+
+You can extract them:
+
+    ?- mentova_query(deductive, is_a(tweety, bird), answer(C, J)).
+    C = yes,
+    J = just(tweety, is_a, bird, chain([tweety, bird])).
+
+
+EXERCISE
+
+At the ?- prompt, try:
+
+1. ?- mentova_query(deductive, is_a(whale, mammal), R).
+
+2. ?- mentova_query(defeasible, flies(penguin), R).
+
+3. ?- mentova_query(analogical, analogy(father:son, mother:?), R).
+
+4. ?- mentova_query(moral, evaluate(action(lie_to_save_life)), R).
+
+5. ?- mentova_query(metacognitive, can_i_do(task(abductive_reasoning)), R).
+
+For each result, read the conclusion and the justification. Notice how the justification explains the reasoning.
+
+END OF CHAPTER 8

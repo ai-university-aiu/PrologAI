@@ -1,0 +1,181 @@
+PROLOGAI TUTORIAL
+
+Chapter 7: The Lattice - PrologAI's Knowledge Store
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+WHAT IS THE LATTICE?
+
+The Lattice is PrologAI's structured knowledge store.
+
+Think of it as the mind's long-term memory.
+
+Every piece of knowledge a PrologAI mind learns or experiences is stored in the Lattice as a node_fact.
+
+A node_fact is a single piece of knowledge: a relation type (what kind of thing this is), a payload (the actual content), a set of tags (labels for searching), and a unique identifier.
+
+The Lattice is different from the Prolog knowledge base you learned about in Chapters 3 and 4. The Prolog knowledge base is a flat collection of facts. The Lattice is structured: it has zones, it has identifiers, it has timestamps, and it is designed to persist, be searched, and be audited.
+
+
+THE NEXUS
+
+The Lattice is organized into nexuses (plural of nexus). A nexus is a named workspace within the Lattice.
+
+The default nexus is called APEX_MIND. When you call mentova_boot, the APEX_MIND nexus is opened automatically.
+
+To get the name of the default nexus:
+
+    ?- default_nexus(N).
+    N = 'APEX_MIND'.
+
+
+ANCHOR_NODE/4 - STORING KNOWLEDGE
+
+The predicate anchor_node/4 stores a new node_fact in the Lattice.
+
+    anchor_node(+RelationType, +Payload, +Tags, -Id)
+
+Arguments:
+
+• RelationType: an atom describing what kind of fact this is (e.g., percept_signal, theory_of_mind, formal_proof, assessment).
+
+• Payload: the content of the fact. Can be any Prolog term - an atom, a list, a compound term.
+
+• Tags: a list of tags for searching and filtering. Can be empty [].
+
+• Id: the unique identifier assigned to this node_fact (output argument).
+
+Example:
+
+    ?- anchor_node(bird_observation, [species(tweety), color(yellow), location(garden)], [nature], Id).
+
+This stores a node_fact with relation type bird_observation, a payload describing the observation, and a tag nature. The variable Id is bound to the assigned identifier.
+
+
+LIVE_NODE_FACTS/2 - WHAT IS IN THE LATTICE?
+
+    live_node_facts(+Nexus, -Ids)
+
+Returns a list of all node_fact identifiers currently in the nexus.
+
+    ?- default_nexus(N), live_node_facts(N, Ids), length(Ids, Count).
+    N = 'APEX_MIND', Ids = [...], Count = 12.
+
+(The exact count and IDs will vary depending on what you have stored.)
+
+
+TRAVERSE_NEXUS/4 - SEARCHING THE LATTICE
+
+traverse_nexus/4 searches the Lattice for node_facts that match a pattern.
+
+    traverse_nexus(+Nexus, +Pattern, +Limit, -Results)
+
+The Pattern is a term that matches the internal structure of node_facts. The most useful patterns look for specific relation types.
+
+    ?- default_nexus(N),
+       traverse_nexus(N, node_fact(_, percept_signal, _, _), 10, Results).
+
+This finds up to 10 node_facts of type percept_signal.
+
+
+SCOPES - THE NINE ZONES OF THE LATTICE
+
+The Lattice is divided into nine zones called scopes (PR 5).
+
+Each scope controls what kind of information can be stored there and who can access it.
+
+The nine scopes are:
+
+1. CONSTITUTION_SCOPE - the constitutional principles. Read-only after initialization. No mind can modify this.
+
+2. OVERSEER_SCOPE - the oversight monitor and safety records.
+
+3. PAST_ZONE - the sealed past. Once facts move here, they cannot be changed.
+
+4. PRESENT_ZONE - the active working memory.
+
+5. FUTURE_ZONE - planned actions and predictions.
+
+6. SELF_SCOPE - the mind's self-model.
+
+7. SOCIAL_SCOPE - knowledge about other agents.
+
+8. WORLD_SCOPE - knowledge about the external world.
+
+9. QUARANTINE_SCOPE - content from untrusted sources waiting for review.
+
+When you call anchor_node/4 without specifying a scope, the fact goes into the present zone of the APEX_MIND nexus.
+
+The scope system is one of PrologAI's safety mechanisms: dangerous content from external sources arrives in QUARANTINE_SCOPE and cannot influence the mind until explicitly promoted. This protects against prompt injection attacks.
+
+
+PRACTICAL EXAMPLE: USING THE LATTICE
+
+Let us store several facts and then inspect what is there.
+
+At the ?- prompt (after running bin/mentova):
+
+    ?- anchor_node(animal, [name(tweety), species(bird), can_fly(true)], [], _Id1).
+    true.
+
+    ?- anchor_node(animal, [name(whale), species(mammal), can_fly(false)], [], _Id2).
+    true.
+
+    ?- anchor_node(observation, [saw(tweety), at(2026, garden)], [nature, sighting], _Id3).
+    true.
+
+Now list what is in the Lattice:
+
+    ?- default_nexus(N), live_node_facts(N, Ids), length(Ids, Count).
+
+You will see Count = 3 (plus however many facts mentova_boot added automatically).
+
+Now search for animal facts:
+
+    ?- default_nexus(N),
+       traverse_nexus(N, node_fact(_, animal, _, _), 10, Results),
+       length(Results, N2).
+
+You should find N2 = 2 (tweety and whale).
+
+
+HOW THE LATTICE RELATES TO ASSESSMENT
+
+The assessment framework (PR 12, covered in Chapter 9) uses the Lattice as its evidence source.
+
+When assess_piaget/3 checks whether Level 1 (reflex coordination) is achieved, it searches the APEX_MIND nexus for a node_fact with relation type percept_signal.
+
+This is why the demo for Acc_67 anchored facts like:
+
+    anchor_node(percept_signal, [source(visual), stimulus(object_appeared)], [], _)
+
+before calling assess_piaget/3.
+
+The Lattice is the evidence base. The assessment predicates read the evidence. Your demonstrations write the evidence.
+
+
+THE RELATIONSHIP BETWEEN THE LATTICE AND PROLOG FACTS
+
+There are two places where knowledge can live in PrologAI:
+
+1. The Prolog knowledge base (assertz/1, asserted facts and rules) - fast, temporary, session-only.
+
+2. The Lattice (anchor_node/4) - structured, durable, searchable, scoped, auditable.
+
+For tutorial exercises, you will often use both. Facts you assert with assertz go into the knowledge base. Significant knowledge - observations, assessments, plans, memories - goes into the Lattice.
+
+Mentova uses the Lattice for everything important. The Prolog knowledge base holds the rules and temporary reasoning state. The Lattice holds what the mind knows about the world and about itself.
+
+
+EXERCISE
+
+1. Start a session with bin/mentova.
+
+2. Store three observations in the Lattice using anchor_node/4. Use relation type weather_observation and include payload fields like [date(today), condition(sunny), temperature(25)].
+
+3. Check how many facts are in the Lattice: default_nexus(N), live_node_facts(N, Ids), length(Ids, Count).
+
+4. Search for your observations: default_nexus(N), traverse_nexus(N, node_fact(_, weather_observation, _, _), 10, Rs).
+
+END OF CHAPTER 7
