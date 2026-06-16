@@ -18,13 +18,20 @@
         pai_type_check/2    — +Value, +Type    : check; inscribe ill_typed on mismatch
 */
 
+% Declare this file as the 'types' module and list its exported predicates.
 :- module(types, [
+    % Supply 'pai_type_declare/2' as the next argument to the expression above.
     pai_type_declare/2,
+    % Supply 'pai_type_of/2' as the next argument to the expression above.
     pai_type_of/2,
+    % Supply 'pai_type_check/2' as the next argument to the expression above.
     pai_type_check/2
+% Close the expression opened above.
 ]).
 
+% Import [anchor_node/4] from the built-in 'node_facts' library.
 :- use_module(library(node_facts), [anchor_node/4]).
+% Import [lattice_node_fact/5] from the built-in 'lattice' library.
 :- use_module(library(lattice),    [lattice_node_fact/5]).
 
 % ---------------------------------------------------------------------------
@@ -34,10 +41,15 @@
 %   Idempotent: if an identical declaration already exists, skip.
 % ---------------------------------------------------------------------------
 
+% Define a clause for 'pai type declare': succeed when the following conditions hold.
 pai_type_declare(Subject, Type) :-
+    % Execute: ( lattice_node_fact(_, _, type_of, [Subject, Type], _).
     ( lattice_node_fact(_, _, type_of, [Subject, Type], _)
+    % If the condition above succeeded, perform the following action.
     ->  true
+    % Otherwise (else branch), perform the following action.
     ;   anchor_node(type_of, [Subject, Type], [], _)
+    % Close the expression opened above.
     ).
 
 % ---------------------------------------------------------------------------
@@ -46,7 +58,9 @@ pai_type_declare(Subject, Type) :-
 %   Query all declared types.  Backtrackable.
 % ---------------------------------------------------------------------------
 
+% Define a clause for 'pai type of': succeed when the following conditions hold.
 pai_type_of(Subject, Type) :-
+    % State the fact: lattice node fact(_, _, type_of, [Subject, Type], _).
     lattice_node_fact(_, _, type_of, [Subject, Type], _).
 
 % ---------------------------------------------------------------------------
@@ -58,8 +72,13 @@ pai_type_of(Subject, Type) :-
 %   On type match: succeed silently.
 % ---------------------------------------------------------------------------
 
+% Define a clause for 'pai type check': succeed when the following conditions hold.
 pai_type_check(Value, Type) :-
+    % Execute: ( catch(must_be(Type, Value), _, fail).
     ( catch(must_be(Type, Value), _, fail)
+    % If the condition above succeeded, perform the following action.
     ->  true
+    % Otherwise (else branch), perform the following action.
     ;   catch(anchor_node(ill_typed, [Value, Type], [], _), _, true)
+    % Close the expression opened above.
     ).
