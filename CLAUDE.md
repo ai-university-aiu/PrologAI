@@ -10,7 +10,7 @@ the Architecture (docs/PrologAI_3_Architecture_Final_v8.txt) for where each piec
 
 the Refinement (docs/PrologAI_4_Refinement_Final_v7.txt) for testing and safety,
 
-the Completion (docs/PrologAI_5_Completion_Final_v8.txt) for release,
+the Completion (docs/PrologAI_5_Completion_Final_v9.txt) for release,
 
 and the Demonstration Plan (docs/PrologAI_6_Demonstration_Mentova_v4.txt) for how Mentova is born, proven, and grown on the finished platform.
 
