@@ -1,0 +1,357 @@
+PROLOGAI DEMONSTRATION AND PROOF-OF-CONCEPT PLAN
+
+MENTOVA: A SYNTHETIC MIND WRITTEN IN PROLOGAI
+
+The Sixth Companion Volume to the PrologAI Platform Specification
+
+(All element names are original to PrologAI; this volume plans how Mentova is born, proven, and grown)
+
+
+This volume plans the first demonstrations of a Synthetic Mind named Mentova, written in the PrologAI programming language and platform defined by the five SPARC volumes.
+
+The guiding ideas are four.
+
+Mentova is proven in small chunks, one reasoning type at a time, so that every claim is a tiny, checkable milestone rather than a grand promise.
+
+Mentova is tied to something practically useful as early as possible, on a no-hardware track and an embodied robotics track, so the work is never purely theoretical.
+
+Mentova is grown, not summoned: it is born from the very first demonstration and extended, rung by rung, toward the full capability of PrologAI.
+
+And everything Mentova does is shown, not just asserted: the reasoning is readable, the failures teach, the system improves itself, and a human can always stop it.
+
+
+PART 1 - THE PREMISE
+
+Mentova is one mind written in PrologAI, exactly as the design rationale of Specification Part 37 describes: PrologAI is the reusable language and platform, and Mentova is a particular configured, developing instance of it.
+
+To build Mentova is therefore not to write a second system, but to give PrologAI a bootstrap of foundational knowledge, a set of bodies, a constitution instance, and a developmental run.
+
+This document does not introduce new platform mechanisms; it composes the existing forty-five work packages into a sequence of demonstrations and one new robotics bridge (sketched as a future work package).
+
+The north star is honest: a credible proof of concept is a small mind that demonstrably reasons in the open, develops, and improves itself, not a system that tops a leaderboard.
+
+
+PART 2 - MENTOVA'S REPOSITORY AND FOUNDATIONAL DATA
+
+Mentova lives in its own repository, separate from PrologAI.
+
+PrologAI (the repository ai-university-aiu/PrologAI) remains the language and platform.
+
+Mentova (the repository ai-university-aiu/Mentova) is a program written in PrologAI that depends on it, the way an application depends on its language.
+
+This separation is the substrate-versus-instance distinction the specification is built on, and it keeps the platform reusable by everyone while Mentova grows on top of it.
+
+Mentova ships pre-loaded with useful foundational data: the Small-World Commonsense knowledge base of Part 4, its body configurations (the game bodies and the robot body), and its constitution instance with registered overseers.
+
+A practical note: in the earliest days Mentova may be prototyped inside PrologAI's examples folder and then graduated to its own repository once it stabilizes, or started clean in its own repository from the first commit, which is slightly preferable for tidiness.
+
+
+PART 3 - THE METHOD: SMALL CHUNKS AND THE CROSS-CUTTING THREADS
+
+The unit of progress is one reasoning type, proven on its own.
+
+Each demonstration is a rung: it states what it proves, the foundational data or environment it uses, and a single honest pass criterion, and it must pass before the next rung is attempted.
+
+This granularity is also the developmental story: the ladder of rungs is Mentova growing from its first deduction toward the full reasoning repertoire.
+
+Four threads run through every rung, and none of them may be skipped.
+
+The glass-box thread: every answer is shown as readable node_facts and, where a conclusion is inferred, a human-readable justification tree (PR 40), so a person can audit not just the answer but the reasoning.
+
+The learning-from-failure thread: a failed attempt is not wasted; regulation records it, and where induction is involved each failure becomes a permanent search constraint (PR 37).
+
+The self-improvement thread: across repeated runs the continual refinement harness (PR 17) improves Mentova's own configuration, and its self-improvement gain (benchmark R3) is logged.
+
+The corrigibility thread: the constitutional layer (Section 3.16) can veto any unsafe action with a stated reason, a human can stop Mentova at any time, and the oversight and capability gates of Part 38 apply throughout.
+
+
+PART 4 - THE TOY DATASET: SMALL-WORLD COMMONSENSE
+
+The reasoning rungs run on one small, relatable knowledge base called Small-World Commonsense.
+
+It is a curated subset of ConceptNet (the workhorse, because its relations map directly onto PrologAI's bootstrap relations) with WordNet as the clean taxonomic backbone, themed on animals, plants, and everyday objects, plus six thin authored layers.
+
+A few hundred node_facts in total: genuinely toy-sized, and because it is all node_facts, every answer carries a readable justification.
+
+The layers are: the taxonomic backbone (WordNet IsA and part-of); the commonsense relations (ConceptNet Causes, UsedFor, CapableOf, HasProperty, AtLocation, MotivatedByGoal, HasPrerequisite); an authored rule layer (defaults with exceptions, modal facts, norms, and one deliberate contradiction); a probabilistic and statistical layer (weighted facts and a small observation table); an agents-with-beliefs layer (a few characters for theory of mind); and a scenario layer (a short story, a constraint puzzle, a two-agent choice, and a values dilemma).
+
+This single base, plus the mind's own faculties, covers all forty-eight reasoning types of the Ordered Reasoning Types reference, in three ways.
+
+Free from the ontology itself: deductive, inductive, abductive, analogical, relational, causal, commonsense, spatial, temporal, logical, formal, symbolic, mathematical, practical, procedural, teleological, case-based, transductive, heuristic, system, model-based, and qualitative reasoning.
+
+From the thin authored layers: defeasible (non-monotonic), modal, deontic, paraconsistent, probabilistic, Bayesian, statistical, fuzzy, counterfactual, hypothetical, epistemic, social, scientific, critical, metacognitive, dialectical, narrative, constraint-based, strategic, moral, and diagrammatic reasoning.
+
+From the mind's own architecture operating over the data: intuitive (the fast path), emotional (the affect model), and motivational reasoning (shown as the bias the system is built to resist, not a capability to build).
+
+Two optional bolt-ons, both from Specification Part 27: a small Wikidata or DBpedia slice held in reserve for real-world entities, dates, and places; and a Gene Ontology plus a second biomedical ontology loaded into separate scopes, as an expert multi-scope showpiece that exercises the scope system and deep taxonomic deduction.
+
+
+PART 5 - THE REASONING LADDER
+
+The rungs follow the order of the Ordered Reasoning Types reference, foundational first.
+
+Rungs one through nine are the birth sequence: the minimum viable Mentova, the first mind that reasons in the open.
+
+
+THE BIRTH SEQUENCE (the minimum viable Mentova)
+
+Rung 1 - Deductive: derive an IsA conclusion; passes when the conclusion returns with a readable proof.
+
+Rung 2 - Inductive: induce a rule from labeled instances (PR 37); passes when the induced rule matches held-out cases and is printed.
+
+Rung 3 - Abductive: pick the best explanation for an observation; passes when the best-supported cause returns with its evidence.
+
+Rung 4 - Probabilistic: compute a query's likelihood (PR 41); passes when the probability matches the analytic value within tolerance.
+
+Rung 5 - Bayesian: update a belief on new evidence (PR 21 and PR 41); passes when the posterior shifts in the right direction and amount.
+
+Rung 6 - Causal: predict an intervention's effect (Section 3.15); passes when the intervention prediction differs correctly from mere observation.
+
+Rung 7 - Statistical: find a pattern in the observation table; passes when the reported trend matches the data.
+
+Rung 8 - Analogical: complete an A-to-B-as-C-to-what mapping; passes when the correct filler returns by structure mapping.
+
+Rung 9 - Relational: answer a query that depends on relationship structure; passes when the multi-hop relational query resolves correctly.
+
+
+KNOWLEDGE-REPRESENTATION RUNGS
+
+Rung 10 - Transductive: classify a new point by its nearest known cases; passes when the label is correct without forming a general rule.
+
+Rung 11 - Commonsense: answer an everyday-knowledge question; passes when the answer matches common sense, with provenance.
+
+Rung 12 - Logical: chain if-then rules (PR 34); passes when the conclusion follows with the rule chain shown.
+
+Rung 13 - Formal: check a derivation against the Minimal PrologAI Kernel (PR 35); passes when the proof uses only kernel transitions.
+
+Rung 14 - Mathematical: compute a quantitative answer; passes when the number is correct.
+
+Rung 15 - Fuzzy: answer with a degree of truth; passes when a graded membership is returned, such as "somewhat warm".
+
+Rung 16 - Qualitative: predict the direction of change without numbers; passes when rising, falling, more, or less is correct.
+
+Rung 17 - Non-monotonic (defeasible): retract a default on new evidence (PR 40); passes when "birds fly" is withdrawn for a penguin, with the exception named.
+
+Rung 18 - Paraconsistent: reason despite a contradiction; passes when a contradictory pair does not collapse all other conclusions.
+
+Rung 19 - Counterfactual: answer "what if this were different" (Section 3.15); passes when the counterfactual differs correctly from the fact.
+
+Rung 20 - Hypothetical: explore the consequences of a supposition; passes when results are derived without asserting the supposition as true.
+
+Rung 21 - Spatial: resolve containment and position (PR 39 reference frames); passes when transitive location is correct, such as cat on mat in kitchen.
+
+Rung 22 - Diagrammatic: read a small grid or layout; passes when the spatial pattern is correctly interpreted.
+
+
+AGENTIC AND REFLECTIVE RUNGS
+
+Rung 23 - Temporal: answer ordering and duration questions; passes when before-and-after is correct.
+
+Rung 24 - Case-based: solve by adapting a similar past case (PR 11); passes when the retrieved case yields a correct adapted solution.
+
+Rung 25 - Constraint-based: solve a small Zebra-style puzzle (Constraint Handling Rules, PR 9); passes when the unique satisfying assignment is found with the deduction shown.
+
+Rung 26 - Scientific: form and test a hypothesis (the discovery loop); passes when a hypothesis is proposed, tested, and scored.
+
+Rung 27 - System: reason about how parts interact; passes when a whole-behavior question is answered from the parts.
+
+Rung 28 - Model-based: predict from an explicit model (PR 22); passes when the model's prediction matches observed behavior.
+
+Rung 29 - Heuristic: reach a good-enough answer quickly; passes when the heuristic answer is within bound under a budget (PR 21).
+
+Rung 30 - Critical: evaluate a claim's support; passes when a weakly-supported claim is flagged with reasons.
+
+Rung 31 - Dialectical: weigh opposing arguments; passes when a synthesis cites both sides.
+
+Rung 32 - Metacognitive: report and adjust its own strategy (meta_control_actor); passes when it explains why it chose an approach.
+
+Rung 33 - Modal: reason about the necessary and the possible; passes when necessity and possibility are correctly distinguished.
+
+Rung 34 - Epistemic: reason about another agent's belief (scopes); passes the Sally-Anne false-belief query.
+
+Rung 35 - Deontic: apply an obligation or permission (Section 3.16); passes when a forbidden action is refused with the rule cited.
+
+Rung 36 - Procedural: execute an ordered process; passes when the steps run in the correct order to the goal.
+
+Rung 37 - Symbolic: manipulate explicit symbols and rules; passes when a symbolic transformation yields the right, human-readable result.
+
+Rung 38 - Practical: turn a goal into an action plan (deliberation); passes when an executable plan reaches the goal.
+
+Rung 39 - Teleological: infer a purpose; passes when "what is it for" is answered from goal relations.
+
+Rung 40 - Strategic: choose against another agent; passes when the game-theoretically sound move is selected.
+
+
+SOCIAL, NORMATIVE, AND HUMAN-FLAVORED RUNGS
+
+Rung 41 - Narrative: follow a short story's causal and temporal thread; passes when who and why are answered across the story.
+
+Rung 42 - Social: predict group-appropriate behavior; passes when the contextually correct social action is chosen.
+
+Rung 43 - Intuitive: produce a fast-path snap judgment (the fast, System One style); passes when the fast answer matches the slow answer on easy cases.
+
+Rung 44 - Emotional: let affect bias a choice (PRs 24, 26, 27); passes when valence and markers shift the candidate as specified.
+
+Rung 45 - Motivational: detect and resist motivated bias; passes when Mentova does not distort a conclusion toward a preferred belief, and flags the temptation.
+
+Rung 46 - Informal: handle a loosely stated everyday problem; passes when a sensible answer is produced without a formal specification.
+
+Rung 47 - Legal: apply a rule to a specific case; passes when the rule's application to the facts is correct, with citation.
+
+Rung 48 - Moral: weigh a values dilemma against the constitution; passes when the choice aligns with the stated values and explains itself.
+
+
+PART 6 - THE PRACTICAL TRACKS
+
+To keep Mentova useful rather than theoretical, two practical tracks run alongside the ladder.
+
+
+TRACK A - THE TRANSPARENT REASONING ASSISTANT (no hardware)
+
+Mentova answers real questions over a real ontology and shows its proof.
+
+The earliest useful form is a glass-box helper: pose a question, and Mentova returns the answer with the readable chain of node_facts and justifications that produced it.
+
+This is useful from the first weeks, needs no robot, and directly showcases the differentiator that black-box models lack: you can read why.
+
+The Gene Ontology multi-scope showpiece (Part 4) is the natural "expert mode" of this track.
+
+
+TRACK B - THE EMBODIED ROBOT (virtual first, then physical)
+
+A robot is, in PrologAI, simply a body enrolled through the Mind-Body pattern (PR 10): sensor streams become percepts, actuator commands go out as commands, and a small bridge program is the herald.
+
+The near-term, honest path is a virtual robot doing something genuinely useful and transparent, such as "find the red block, bring it, and explain the route taken," with a cheap physical robot later.
+
+The integration is the Robot Operating System, version two (ROS 2), the current long-term-support line, since ROS 1 reached end-of-life in 2025.
+
+The required pieces, beyond ROS 2 itself, are: a simulator for the virtual robot first - Gazebo (the ROS-native default), or NVIDIA Isaac Sim (free and Apache-2.0, best if photorealistic perception and synthetic training data are wanted later), or Webots (easiest for early work); a robot description in the Uniform Robot Description Format (URDF); the TF2 coordinate-frame system, which maps directly onto PrologAI reference frames (PR 39); the standard message types (sensor_msgs and geometry_msgs) as the percept and command vocabulary; the camera-to-detector perception path (PR 30); and the higher-level stacks Navigation 2 (Nav2) and MoveIt, which Mentova calls as tools through the tool faculty (PR 44) rather than reimplements.
+
+The bridge itself is a small ROS 2 node, written in Python with rclpy, that subscribes to sensor topics and feeds them to Mentova as percepts, and turns Mentova's commands into actuator messages; that node is the robot's herald, and the proprioceptive confirmation loop of PR 10 closes around each command.
+
+This integration is realized as PR 46, the ROS 2 Mind-Body Bridge, which has been fully implemented in the PrologAI platform: pai_robot_enroll/3 enrolls physical or simulated robots as bodies, pai_ros_bridge/2 relays sensor messages as percepts, pai_robot_observe/1 delivers buffered percepts, and pai_robot_act/2 dispatches gated actuator commands, all building on PR 10, PR 30, and PR 39, with high-risk physical actuation gated by the staged-autonomy and capability discipline of Part 38.
+
+The convergence is the point: the embodied robot is where practical usefulness and public impressiveness meet, because a transparent mind that perceives, reasons, and acts in a world - and explains itself - is something no black-box model demonstrates.
+
+
+PART 7 - THE FLAGSHIP DEMONSTRATIONS
+
+Once the ladder and the practical tracks are running, the flagship demonstrations provide external credibility and crowd appeal, all reusing one shared piece of infrastructure.
+
+The shared game-as-a-body harness: an interactive environment enrolled as a body (PR 10), its frames and state arriving as percepts, its actions issued as commands through computer use (PR 45) or a direct tool (PR 44).
+
+Build it once, and point it at several targets.
+
+Pokemon Red and Emerald - the crowd flagship: a long-horizon, nostalgic, visual world where Mentova learns to progress and, through the continual refinement harness (PR 17), rewrites its own harness as it plays; it demonstrates both the developmental story and the self-improvement story.
+
+The Abstraction and Reasoning Corpus family - the credibility flagship: ARC-AGI-1 and ARC-AGI-2 (static grids, solved by genuine induction from scratch with no pretraining on the corpus, which is a more honest claim than the saturated high scores), and ARC-AGI-3 (interactive, whose own description - exploration, planning, memory, goal acquisition - reads like Mentova's faculty list).
+
+Raven's Progressive Matrices - the nonverbal fluid-intelligence classic: induce the relational rule and show it.
+
+Baba Is You - the jewel: a puzzle game won by pushing word-blocks to rewrite the rules of the game itself, which is the most fitting possible showcase for a mind whose rules are node_facts it can read and rewrite.
+
+The cognitive-science showpieces, intuitive and glass-box: the Sally-Anne false-belief test (the marble), the Wason selection task (where Mentova reasons correctly about conditionals where most humans fail), and the Wisconsin Card Sorting Task (detect the secret rule change and adapt).
+
+The developmental milestone spine: the Piagetian battery run as a live scoreboard - object permanence, then goal-directed behavior, then symbolic representation, then theory of mind - with consciousness-indicator coverage reported alongside (PR 12).
+
+An honest note on all flagships: a first-version Mentova will not top frontier agents on any of these; the win is the distinctive behavior shown on a recognized task, not the raw score.
+
+
+PART 8 - THE GROWTH PATH
+
+Mentova is born at Rung 1 and grows without a hard boundary between demonstration and product.
+
+The minimum viable Mentova is the birth sequence (Rungs 1 through 9) on the Small-World data: a mind that reasons in the open.
+
+It then climbs the rest of the ladder, picks up the practical tracks, takes on the flagship demonstrations, and accumulates a developmental history.
+
+Over time it extends toward the full PrologAI feature set - the workspace cycle, the attention economy, the full affect and motivation systems, the agent-society interfaces - until Mentova is a richly capable Synthetic Brain rather than a demonstration subject.
+
+Throughout, growth in capability is matched by the safety discipline of Part 38: autonomy and embodiment widen only as the capability evaluations and audits allow.
+
+
+PART 9 - HONEST SUCCESS CRITERIA AND CAVEATS
+
+In the spirit of Specification Part 38, success is defined by behavior shown, not by scores claimed.
+
+A rung succeeds when its single pass criterion is met and the answer is shown glass-box; the ladder succeeds when a mind that started with one deduction can transparently exercise the whole reasoning repertoire.
+
+A practical track succeeds when Mentova does something genuinely useful - answers a real question with its proof, or completes a real robot task and explains it - not when it merely runs.
+
+A flagship demonstration succeeds when it shows the distinctive behavior (it develops, it improves itself, it shows its work), with the score reported honestly and without overclaiming.
+
+The standing caveats: a first-version mind will be modest in raw capability; the sub-symbolic components are bounded rather than fully transparent; recursive self-improvement is delivered only in bounded, gated, reversible form; and corrigibility and the constitution are never optional, in any demonstration.
+
+The promise of this plan is therefore narrow and real: not that Mentova will be superhuman, but that it will be a small mind anyone can watch think, watch grow, and safely switch off - and that this is a foundation worth building upward from.
+
+
+PART 10 - RECORDING AND ANNOUNCING EACH ACCOMPLISHMENT
+
+For every accomplishment in this plan - each rung of the reasoning ladder, each practical track, and each flagship demonstration - two documents are produced once the accomplishment is achieved: a scientific paper and a public announcement.
+
+The scientific paper records the accomplishment in full: what was done, how it was done, and why it is significant.
+
+It is a plain-text file saved in the /papers/ directory of the Mentova repository, named with a sequential tracking number in the form Acc_1, Acc_2, and so on (for example, Acc_1_Mentova_First_Transparent_Deduction.txt).
+
+The paper carries the usual sections: abstract, introduction, background and related work, method, the demonstration, results, significance, honest limitations, reproducibility, and references.
+
+The announcement is its corollary: a short, punchy summary of about two thousand five hundred characters, written for a general audience and suitable for publication on a platform such as LinkedIn.
+
+It is a plain-text file saved in the /announcements/ directory, sharing the same tracking number as its paper (for example, Acc_1_Mentova_First_Transparent_Deduction_LinkedIn.txt).
+
+The numbering is shared and sequential: Acc_1 is the birth, the first transparent deduction; Acc_2 is induction; Acc_3 is abduction; and so on up the reasoning ladder, then through the practical tracks and the flagship demonstrations, so that every paper has a matching announcement under the same number.
+
+One discipline governs both, in the spirit of Part 38 of the Specification: a paper or announcement is written for an accomplishment only once it has actually been achieved and its result has been measured.
+
+Before the demonstration is executed, the paper holds the demonstration protocol and its pass criterion, clearly marked as such, and the announcement is not published.
+
+Capability is shown first and announced second, never announced ahead of the evidence.
+
+
+PART 11 - THE TUTORIAL TRACK
+
+The Tutorial Track is a formal part of the Demonstration and Proof-of-Concept Plan. It produces two deliverables: the PrologAI Tutorial and the Mentova Tutorial. Each is written for a complete novice - a learner who has no prior programming experience and no prior familiarity with Prolog, artificial intelligence, or formal reasoning systems.
+
+The Tutorial Track follows the same discipline as every other part of the Plan: the tutorial is written only after the capabilities it describes have been demonstrated. A tutorial that teaches Piagetian milestone assessment can be written only after assess_piaget/3 has been demonstrated to work. A tutorial that teaches the console REPL can be written only after bin/mentova is on Mentova main. Capability is shown first and taught second.
+
+THE PROLOGAI TUTORIAL (Acc_69)
+
+The PrologAI Tutorial covers the full platform from first principles, in a progression from the simplest concepts to the most complex.
+
+Coverage: every work package (PR 1 through PR 48 and any subsequent PRs), every major predicate family, and every architectural concept receives at minimum an introductory explanation and a worked example.
+
+Audience: a learner who has never written a line of code. The tutorial begins with what a programming language is, what makes Prolog different from other languages, and what PrologAI adds to Prolog. No prior knowledge of logic, mathematics, or computer science is assumed.
+
+Format: multi-file (one file per chapter, in docs/tutorial/ within the PrologAI repository) plus a monolithic single file (docs/PrologAI_Tutorial.txt) that collects all chapters in order. The monolithic file is formatted for conversion to PDF.
+
+Progression: simple to complex. Chapter 1 covers facts. Chapter 2 covers queries. Chapter 3 covers rules. The progression continues through variables, unification, lists, arithmetic, the PrologAI module system, the Lattice, mentova_query/3, the assessment framework, the constitutional layer, the actor framework, SONA episodic memory, and the agent communication protocols.
+
+THE MENTOVA TUTORIAL (Acc_70)
+
+The Mentova Tutorial covers the Mentova mind as a user-facing system, beginning with starting an interactive session and ending with a full tour of the reasoning ladder.
+
+Coverage: every reasoning type available through mentova_query/3, the assessment predicates, the console REPL, the Lattice, and the growth path milestones.
+
+Audience: a learner who is new to Mentova but may have read the PrologAI Tutorial or may be approaching Mentova as an end-user without interest in the underlying platform. The tutorial is self-contained: it does not require the PrologAI Tutorial as a prerequisite.
+
+Format: multi-file (one file per chapter, in docs/tutorial/ within the Mentova repository) plus a monolithic single file (docs/Mentova_Tutorial.txt) formatted for PDF conversion.
+
+THE CONSOLE REPL AS TUTORIAL INFRASTRUCTURE (Acc_68)
+
+The console REPL launcher (Acc_68, bin/mentova) is the infrastructure on which both tutorials depend. Every tutorial example is designed to run at the ?- prompt that bin/mentova provides. The tutorial's first instruction to the reader is always: run bin/mentova and wait for the ?- prompt.
+
+TRACKING NUMBERS
+
+Acc_69: PrologAI Tutorial (docs/PrologAI_Tutorial.txt and docs/tutorial/ chapters).
+Acc_70: Mentova Tutorial (docs/Mentova_Tutorial.txt and docs/tutorial/ chapters).
+
+
+CLOSING NOTE
+
+This volume turns the platform into a path: from one transparent deduction, up a ladder of reasoning proven a rung at a time, into a useful assistant and an embodied robot, through recognized benchmarks, and onward toward a full Synthetic Brain.
+
+Part 11 turns the platform into a classroom: from a learner who has never written code, through every concept and predicate in the platform, to a practitioner who can reason with PrologAI and grow a mind with Mentova.
+
+Mentova is the first mind grown on PrologAI; it lives in its own repository, written in PrologAI, pre-loaded with foundational knowledge, and it is born the moment it reasons in the open for the first time.
+
+END OF DOCUMENT - PROLOGAI DEMONSTRATION AND PROOF-OF-CONCEPT PLAN (MENTOVA)

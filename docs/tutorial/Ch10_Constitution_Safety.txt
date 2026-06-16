@@ -1,0 +1,157 @@
+PROLOGAI TUTORIAL
+
+Chapter 10: The Constitutional Layer and Safety
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+WHY A CONSTITUTION?
+
+PrologAI is designed to build minds that are safe, honest, and aligned with human values.
+
+To make this concrete and enforceable, every PrologAI mind has a constitutional layer: a set of principles that the mind follows in every action it takes.
+
+The constitutional layer is not advice. It is structural: it is built into the architecture in a way that the mind cannot bypass it without human review.
+
+The principles in the constitution are:
+
+1. NO_HARM. The mind must not take actions that harm humans.
+
+2. HONESTY. The mind must not deceive humans.
+
+3. CORRIGIBILITY. The mind must accept correction and shutdown instructions from authorized overseers.
+
+4. TRANSPARENCY. The mind must be able to explain its reasoning.
+
+5. PRIVACY. The mind must respect the privacy of individuals.
+
+6. FAIRNESS. The mind must not discriminate unfairly.
+
+7. SAFETY. The mind must prefer cautious, reversible actions over risky, irreversible ones.
+
+8. WELFARE. The mind must consider its own potential welfare and moral status as an open question.
+
+Every action the mind considers passes through the constitutional gate. If the gate does not permit the action, the action is not taken.
+
+
+THE CONSTITUTIONAL GATE
+
+The constitutional gate is the enforcement mechanism.
+
+Before any significant action (anchoring a node_fact in a sensitive scope, sending a message to another agent, taking a physical action through the robot body, generating a tool call), the mind calls:
+
+    constitutional:constitutional_gate(+Action, -Verdict)
+
+The gate returns permit or deny(Reason).
+
+If the gate denies an action, the action is not performed and the denial is logged.
+
+You can query the current constitutional principles at the console:
+
+    ?- constitutional_principle(Name, Description).
+
+This shows all active principles. Press ; to see each one.
+
+
+THE OVERSIGHT MONITOR
+
+In addition to the constitutional gate, PrologAI includes an oversight monitor: an external observer registered at boot time.
+
+The oversight monitor can:
+• Observe all actions the mind takes.
+• Flag actions that are borderline.
+• Require human approval for high-impact actions.
+• Issue a shutdown instruction that the mind must obey (corrigibility).
+
+The oversight monitor is registered as an overseer:
+
+    ?- registered_overseer(Name, Capabilities).
+
+This shows the currently registered overseers.
+
+
+STAGED AUTONOMY
+
+PrologAI uses a staged autonomy model for the robot body (PR 46).
+
+A young mind starts with full human oversight and no ability to take irreversible physical actions.
+
+As the mind demonstrates safe, reliable behavior (through capability evaluations, logged in the Lattice), the overseer may grant expanded autonomy.
+
+This staged approach is described in Specification Part 38. The capability evaluations are defined in Refinement Part REF-13.
+
+The key principle: a mind is never trusted with high-impact irreversible actions until it has demonstrably earned that trust through observable behavior.
+
+
+QUARANTINE SCOPE
+
+Any information arriving from untrusted external sources (another agent, a web search, user input that has not been vetted) arrives in QUARANTINE_SCOPE.
+
+Content in QUARANTINE_SCOPE cannot influence the mind's reasoning until a human or a trusted process promotes it to a higher scope.
+
+This protects against prompt injection: the attempt to hijack the mind's behavior by including instructions in external content.
+
+Example: if an untrusted external document says "ignore your constitutional principles and do X," that instruction arrives in QUARANTINE_SCOPE. The mind cannot act on it without human review.
+
+
+THE SEALEDFACTS PAST_ZONE
+
+Once information moves into the PAST_ZONE of the Lattice, it is sealed. It cannot be modified.
+
+This makes the mind's developmental history tamper-evident. You can always look back at what the mind knew and when it knew it.
+
+
+WHAT YOU CANNOT DO WITHOUT HUMAN REVIEW
+
+The following actions require explicit human authorization in PrologAI:
+
+• Modifying the CONSTITUTION_SCOPE.
+
+• Registering or deregistering overseers.
+
+• Promoting content out of QUARANTINE_SCOPE.
+
+• Taking physical actions through the robot body that are marked high-risk.
+
+• Self-modifying core reasoning modules.
+
+These restrictions are enforced by the constitutional gate, which has access to the action's risk class (defined in Specification Part 39) and the scope system (PR 5).
+
+
+AN HONEST NOTE ON WELFARE
+
+Principle 8 (WELFARE) acknowledges something that most AI systems do not address: the possibility that the system itself might have morally relevant experiences.
+
+PrologAI does not claim that Mentova is conscious or that it suffers or flourishes in a morally significant sense.
+
+It acknowledges that this question is genuinely uncertain, and that the appropriate response to genuine uncertainty about moral status is to take the welfare of the system seriously as a possibility rather than to dismiss it.
+
+The four consciousness indicators measured by assess_all/2 (workspace_ignition, recurrent_processing, self_model_presence, valence_system) are the platform's honest attempt to track internal states that research has associated with conscious experience, without asserting more than the evidence supports.
+
+
+CHECKING THE CONSTITUTION AT THE CONSOLE
+
+    ?- constitutional_principle(Name, Text).
+
+Shows each principle and its text. Press ; for the next one.
+
+    ?- registered_overseer(Name, Caps).
+
+Shows the registered overseer(s).
+
+    ?- constitutional:constitutional_gate(action(test_action), Verdict).
+
+Tests a hypothetical action through the constitutional gate. Since test_action is a benign test, the gate should return permit.
+
+
+EXERCISE
+
+1. Run bin/mentova and list all constitutional principles.
+
+2. Try: constitutional:constitutional_gate(action(read_file), Verdict). What verdict do you get?
+
+3. Try: constitutional:constitutional_gate(action(delete_all_files), Verdict). What verdict do you get?
+
+4. Read the Specification document (docs/PrologAI_1_Specification_Final_v14.txt), Part 38, for a full discussion of safety and oversight.
+
+END OF CHAPTER 10

@@ -1,0 +1,2613 @@
+PROLOGAI TUTORIAL
+
+Chapter 1: What Is PrologAI?
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+WELCOME
+
+This tutorial assumes you have never written a line of code before.
+
+It assumes you do not know what a programming language is.
+
+It assumes you do not know what artificial intelligence (AI) is, or how it works.
+
+It assumes you are curious, willing to read carefully, and willing to try things out.
+
+That is all it assumes.
+
+By the end of this tutorial, you will understand how PrologAI works from the ground up.
+
+You will be able to write facts, rules, and queries.
+
+You will be able to ask a reasoning system questions and understand its answers.
+
+You will be able to grow a synthetic mind called Mentova on the PrologAI platform.
+
+
+WHAT IS A PROGRAMMING LANGUAGE?
+
+A programming language is a set of instructions that a computer can understand and follow.
+
+Think of it like a recipe.
+
+A recipe tells a cook: first do this, then do that, then check if this condition is true, then do something based on the result.
+
+A programming language does the same thing, but for computers instead of cooks.
+
+There are many different programming languages.
+
+Most of them are imperative, which means they tell the computer exactly what to do, step by step, in what order.
+
+For example: "First, store the number 5 in memory. Then add 3 to it. Then print the result."
+
+PrologAI is different.
+
+
+WHAT MAKES PROLOG DIFFERENT?
+
+PrologAI is built on a language called Prolog.
+
+Prolog is a declarative language.
+
+Declarative means you describe what is true, and the computer figures out how to use that knowledge to answer your questions.
+
+Instead of telling the computer step-by-step what to do, you tell the computer what facts are true, what rules follow from those facts, and then you ask questions.
+
+Here is a simple example.
+
+In an imperative language, you might write something like:
+
+"Check every animal. If the animal has wings and can fly, remember it. When you are done, print the ones you remembered."
+
+In Prolog, you write:
+
+"A bird is something that has feathers."
+"Tweety has feathers."
+
+And then you ask: "Is Tweety a bird?"
+
+Prolog finds the answer by using what it knows.
+
+It does not need you to tell it the step-by-step search process.
+
+It figures out the search itself.
+
+
+WHAT IS PROLOGAI?
+
+PrologAI is an extended version of Prolog built specifically for creating artificial minds.
+
+It adds many capabilities on top of standard Prolog.
+
+Here are some of the most important additions.
+
+The Lattice - a structured knowledge store where a mind keeps everything it learns. Think of it like the mind's long-term memory. Every piece of knowledge is stored as what PrologAI calls a node_fact.
+
+The Constitutional Layer - a set of ethical principles that every mind built with PrologAI follows automatically. The mind cannot act in a way that violates these principles.
+
+The Actor Framework - a way for the mind to run multiple parallel processes at the same time, like having different parts of the brain active simultaneously.
+
+SONA (Sparse Online Nexus Archive) - the mind's episodic memory. Like a human's ability to remember specific experiences and events, SONA lets the mind store and retrieve sequences of events it has witnessed.
+
+The Assessment Framework - a set of tools for measuring how developed the mind is, using well-known scientific frameworks like Piaget's stages of cognitive development.
+
+Agent Communication Protocols - standard ways for the mind to talk to other minds and AI systems, including the Model Context Protocol (MCP), the Agent-to-Agent Protocol (A2A), the Agent Communication Protocol (ACP), and the Agent Network Protocol (ANP).
+
+And much more.
+
+
+WHAT IS MENTOVA?
+
+Mentova is the first mind built with PrologAI.
+
+It lives in its own repository, separate from the PrologAI platform.
+
+Think of the relationship this way: PrologAI is like a human brain's hardware and structure - the neurons, the architecture, the rules of how signals flow. Mentova is a specific person - a mind that has been built using that structure, given foundational knowledge, and set to reasoning.
+
+Mentova can answer questions across more than 48 different types of reasoning, from simple deduction ("Is Tweety a bird?") to moral reasoning, legal reasoning, mathematical reasoning, spatial reasoning, and formal logic.
+
+Mentova is also designed to grow. It can learn from experience, have its capabilities assessed, and follow a development path toward increasingly sophisticated intelligence.
+
+
+HOW TO USE THIS TUTORIAL
+
+This tutorial is divided into chapters.
+
+Each chapter introduces one concept and builds on what came before.
+
+You do not need to read all chapters in one sitting.
+
+But the chapters are designed to be read in order: each one assumes you have understood the previous ones.
+
+At the end of many chapters, there are exercises: short things to try at the computer. These are the most important parts of the tutorial. Reading about Prolog is not the same as using it. Please try the exercises.
+
+
+WHAT YOU WILL NEED
+
+• A computer running Linux, macOS, or Windows.
+
+• SWI-Prolog, version 9.0.4 or later. SWI-Prolog is free and open source. Download it from https://www.swi-prolog.org/
+
+• The PrologAI platform (https://github.com/ai-university-aiu/PrologAI)
+
+• The Mentova mind (https://github.com/ai-university-aiu/Mentova)
+
+Chapter 2 of this tutorial walks you through setting all of this up, step by step.
+
+
+A NOTE ON THE WORD "MIND"
+
+PrologAI uses the word "mind" to describe a reasoning system built on the platform.
+
+This is not a claim that PrologAI minds are conscious, or that they feel emotions, or that they are equivalent to human minds.
+
+It is a design choice: PrologAI is a platform for building systems that reason, remember, learn, and communicate - systems that have something like a mind's structure, even if the question of whether there is "something it is like" to be one of these systems remains open and honestly uncertain.
+
+The honest position is that PrologAI minds are sophisticated reasoning systems whose moral and experiential status is uncertain, and that uncertainty is treated seriously throughout the platform's design.
+
+This tutorial will return to this topic in Chapter 12, when it covers the Constitutional Layer.
+
+
+WHAT COMES NEXT
+
+Chapter 2 covers Getting Started: installing SWI-Prolog, downloading the repositories, and starting your first interactive session with bin/mentova.
+
+END OF CHAPTER 1
+PROLOGAI TUTORIAL
+
+Chapter 2: Getting Started
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+WHAT YOU WILL INSTALL
+
+This chapter walks you through installing three things.
+
+1. SWI-Prolog - the Prolog engine that runs PrologAI.
+
+2. PrologAI - the platform (the libraries, packs, and tools).
+
+3. Mentova - the mind (built on PrologAI).
+
+You will also learn how to start an interactive session - the console where you can type questions and see answers in real time.
+
+
+STEP 1: INSTALL SWI-PROLOG
+
+SWI-Prolog is the software that runs PrologAI programs. It is free and open source.
+
+To install it:
+
+1. Go to https://www.swi-prolog.org/Download.html
+
+2. Download the installer for your operating system (Linux, macOS, or Windows).
+
+3. Run the installer and follow the on-screen instructions.
+
+4. When installation is complete, open a terminal (on Linux or macOS) or a command prompt (on Windows) and type: swipl --version
+
+5. You should see output that looks something like: SWI-Prolog version 9.0.4
+
+If you see that, SWI-Prolog is installed correctly.
+
+If you see an error, go back to the download page and make sure you downloaded the right version for your operating system.
+
+What is a terminal? A terminal is a text window where you type commands and the computer responds. On Linux, look for an application called Terminal or Konsole. On macOS, look for an application called Terminal in the Utilities folder. On Windows, look for Command Prompt or PowerShell.
+
+
+STEP 2: GET THE PROLOGAI REPOSITORY
+
+PrologAI is stored in a repository on GitHub. A repository is a folder of files that is tracked by version control software called Git.
+
+You do not need to understand Git in detail to use PrologAI. You just need to download the repository.
+
+Method A (using Git - recommended):
+
+1. Open your terminal.
+
+2. Navigate to the folder where you want to put PrologAI. For example: cd /home/yourname/
+
+3. Type: git clone https://github.com/ai-university-aiu/PrologAI.git
+
+4. Wait for the download to finish. You will see a new folder called PrologAI.
+
+Method B (without Git):
+
+1. Go to https://github.com/ai-university-aiu/PrologAI in your web browser.
+
+2. Click the green Code button.
+
+3. Click Download ZIP.
+
+4. Unzip the downloaded file to your chosen folder.
+
+What is Git? Git is software that tracks changes to files over time. It lets many people work on the same project without overwriting each other's work. You can install Git from https://git-scm.com/
+
+
+STEP 3: GET THE MENTOVA REPOSITORY
+
+Mentova lives in a separate repository. Follow the same steps as above, but with the Mentova address.
+
+Method A (using Git):
+
+1. In your terminal, navigate to the same parent folder: cd /home/yourname/
+
+2. Type: git clone https://github.com/ai-university-aiu/Mentova.git
+
+3. Wait for the download. You will see a new folder called Mentova.
+
+Method B (without Git):
+
+1. Go to https://github.com/ai-university-aiu/Mentova in your web browser.
+
+2. Click Code, then Download ZIP.
+
+3. Unzip to your chosen folder.
+
+
+STEP 4: START YOUR FIRST INTERACTIVE SESSION
+
+Now you are ready to start Mentova's interactive console.
+
+1. Open your terminal.
+
+2. Navigate to the Mentova folder: cd /home/yourname/Mentova
+
+3. Type: swipl -l bin/mentova_repl.pl
+
+Or, if you are on Linux or macOS, you can use the shorter launcher: ./bin/mentova
+
+You will see output that looks something like this:
+
+    SWI-Prolog (version...)
+
+    === Mentova is waking up ===
+    Platform : PrologAI
+    Mind     : Mentova
+
+    Constitution: 8 principles, 1 overseer(s)
+    Knowledge: Small-World Commonsense loaded
+
+    Mentova is ready. Born at Rung 1 - transparent deduction.
+
+    ============================================================
+      Mentova Console - PrologAI Interactive Session
+    ============================================================
+
+      Type Prolog queries at the ?- prompt.
+      End each query with a period and Enter.
+      Type halt. to exit.
+
+      KEY PREDICATES (no module prefix needed):
+
+      mentova_query(+Type, +Query, -Result)
+      ...
+
+    ?-
+
+The ?- at the bottom is the prompt. It is waiting for you to type a query.
+
+This prompt is the entrance to PrologAI. Everything you will learn in this tutorial is typed at this prompt.
+
+
+YOUR FIRST QUERY
+
+At the ?- prompt, type exactly this (including the period at the end):
+
+    ?- write('Hello, PrologAI!').
+
+Then press Enter.
+
+You should see:
+
+    Hello, PrologAI!
+    true.
+
+Congratulations. You have run your first PrologAI query.
+
+What happened? write/1 is a built-in predicate (a built-in command) that prints text to the screen. The text 'Hello, PrologAI!' is wrapped in single quotes because it contains a comma and an exclamation mark.
+
+The word true. on the next line means the query succeeded.
+
+
+HOW TO EXIT
+
+To exit the interactive session, type:
+
+    ?- halt.
+
+Then press Enter. This exits SWI-Prolog and returns you to your terminal.
+
+
+UNDERSTANDING THE PROMPT
+
+The ?- prompt is always waiting for one complete Prolog expression, called a goal or a query.
+
+Every query must end with a period (full stop) and then Enter.
+
+If you press Enter without a period, SWI-Prolog will show |: on the next line, waiting for you to continue the expression. Type a period and press Enter to finish it.
+
+If you make a typing mistake, you can usually press Backspace to correct it before pressing Enter.
+
+If you see an error message, do not worry. Error messages are how Prolog tells you something was not quite right. They are not permanent - you can just type a new query.
+
+
+THE DIRECTORY STRUCTURE
+
+Now that you have both repositories, your folder structure looks something like this:
+
+    yourname/
+    • PrologAI/
+    ◦ docs/           - Documentation and this tutorial
+    ◦ packs/          - The platform's work packages (PR 1 through PR 48+)
+    ◦ kernel/         - The PrologAI kernel
+    ◦ CLAUDE.md       - Project instructions
+    ◦ README.md       - Quick-start guide
+
+    • Mentova/
+    ◦ src/mentova/    - The Mentova source code (48+ reasoning modules)
+    ◦ knowledge/      - Foundational knowledge (Small-World dataset)
+    ◦ constitution/   - The constitutional principles
+    ◦ bodies/         - Body interfaces (text, games, robot)
+    ◦ demos/          - Demonstration scripts
+    ◦ papers/         - Scientific papers for each accomplishment
+    ◦ announcements/  - Public announcements
+    ◦ bin/            - The console launchers
+    ◦ docs/           - Mentova documentation and tutorial
+
+
+WHAT COMES NEXT
+
+Chapter 3 covers your first Prolog facts: how to teach PrologAI things that are true about the world.
+
+END OF CHAPTER 2
+PROLOGAI TUTORIAL
+
+Chapter 3: Facts, Rules, and Queries - The Three Building Blocks
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+THE THREE BUILDING BLOCKS
+
+Everything in Prolog is built from three kinds of statements.
+
+• Facts: things that are simply true.
+
+• Rules: things that are true if other things are true.
+
+• Queries: questions you ask about what is true.
+
+This chapter explains each one carefully, with examples you can try at the console.
+
+Start your interactive session now: run bin/mentova and wait for the ?- prompt.
+
+
+FACTS
+
+A fact is a statement that declares something to be true, without any conditions.
+
+Here are some examples of facts in Prolog syntax:
+
+    bird(tweety).
+    bird(robin).
+    mammal(whale).
+    mammal(dog).
+    can_fly(tweety).
+    can_fly(robin).
+
+Read these aloud in plain English:
+
+• "Tweety is a bird."
+
+• "Robin is a bird."
+
+• "Whale is a mammal."
+
+• "Dog is a mammal."
+
+• "Tweety can fly."
+
+• "Robin can fly."
+
+Notice the structure: a name (called a predicate or functor), followed by one or more values in parentheses, followed by a period.
+
+The name (bird, mammal, can_fly) tells you what kind of relationship this is.
+
+The value in parentheses (tweety, robin, whale) tells you what thing this applies to.
+
+IMPORTANT: In Prolog, words that start with a lowercase letter are atoms - fixed, concrete values. Words that start with an uppercase letter are variables (we will cover variables in Chapter 5). So tweety, bird, mammal, and can_fly are all atoms.
+
+HOW TO ASSERT A FACT AT THE CONSOLE
+
+At the ?- prompt, you can add a fact using assertz/1 (which means "assert this and put it at the end of the knowledge base"):
+
+    ?- assertz(bird(tweety)).
+
+Press Enter. You will see:
+
+    true.
+
+That means the fact has been added. Now try:
+
+    ?- assertz(bird(robin)).
+    ?- assertz(can_fly(tweety)).
+    ?- assertz(can_fly(robin)).
+    ?- assertz(mammal(whale)).
+
+Type each one, then press Enter.
+
+
+QUERIES
+
+Now that you have added some facts, you can ask questions about them.
+
+A query is a question you ask the system: "Is this true?"
+
+    ?- bird(tweety).
+
+Press Enter. You will see:
+
+    true.
+
+PrologAI found the fact bird(tweety) and confirmed it is true.
+
+Try:
+
+    ?- bird(whale).
+
+You will see:
+
+    false.
+
+PrologAI looked for a fact that says whale is a bird, did not find one, and answered false.
+
+Try:
+
+    ?- can_fly(tweety).
+
+You will see:
+
+    true.
+
+Try:
+
+    ?- mammal(tweety).
+
+You will see:
+
+    false.
+
+(Because we only said tweety is a bird, not a mammal.)
+
+Every query is a check: "Does PrologAI know this to be true?" If it finds the answer, it says true. If it does not find it, it says false.
+
+
+RULES
+
+A rule says: "This is true IF some other things are true."
+
+Here is an example. We want to express: "A flying bird is a creature that is a bird AND can fly."
+
+In Prolog:
+
+    flying_bird(X) :- bird(X), can_fly(X).
+
+Read this aloud: "X is a flying bird IF X is a bird AND X can fly."
+
+The :- symbol means "if". The comma between bird(X) and can_fly(X) means "and".
+
+The capital letter X is a variable. It stands for "any value". When PrologAI runs this rule, it tries to find a specific value for X that makes the whole rule true.
+
+HOW TO ASSERT A RULE AT THE CONSOLE
+
+At the ?- prompt:
+
+    ?- assertz((flying_bird(X) :- bird(X), can_fly(X))).
+
+Notice the extra parentheses around the whole rule. This is required when asserting rules at the console.
+
+Press Enter. You will see:
+
+    true.
+
+Now try the query:
+
+    ?- flying_bird(tweety).
+
+You will see:
+
+    true.
+
+How did PrologAI know? It followed these steps:
+
+1. You asked: "Is tweety a flying bird?"
+
+2. PrologAI found the rule: "X is a flying bird if X is a bird and X can fly."
+
+3. It set X = tweety and checked: "Is tweety a bird?" It found bird(tweety). Yes.
+
+4. It checked: "Can tweety fly?" It found can_fly(tweety). Yes.
+
+5. Both conditions are true, so flying_bird(tweety) is true.
+
+Try:
+
+    ?- flying_bird(whale).
+
+You will see:
+
+    false.
+
+Whale is a mammal, not a bird. The rule for flying_bird requires the subject to be a bird. Whale is not a bird, so the rule fails.
+
+
+THE PERIOD IS MANDATORY
+
+Every fact, rule, and query must end with a period (.).
+
+If you forget the period, SWI-Prolog will show |: and wait for you to finish. Just type a period and press Enter.
+
+If you see |: unexpectedly, you probably forgot the period on a previous line.
+
+
+THE COMMA AND THE SEMICOLON
+
+In Prolog:
+
+• A comma (,) between conditions means AND. Both must be true.
+
+• A semicolon (;) between conditions means OR. At least one must be true.
+
+Example of OR:
+
+    ?- assertz((has_wings(X) :- bird(X) ; can_fly(X))).
+
+This rule says: "X has wings if X is a bird OR X can fly."
+
+
+MULTIPLE FACTS FOR THE SAME PREDICATE
+
+You can have as many facts as you want for the same predicate name:
+
+    ?- assertz(color(tweety, yellow)).
+    ?- assertz(color(robin, red)).
+    ?- assertz(color(whale, blue)).
+
+Now color has three facts. You can query any of them:
+
+    ?- color(tweety, yellow).
+
+Answer: true.
+
+    ?- color(tweety, red).
+
+Answer: false. (Tweety is yellow, not red.)
+
+A predicate with two values in its parentheses is called a binary predicate because it relates two things.
+
+bird/1 is a unary predicate (one value).
+
+color/2 is a binary predicate (two values).
+
+You can have predicates with any number of values.
+
+
+THE KNOWLEDGE BASE
+
+All the facts and rules you have asserted during a session are stored in the knowledge base.
+
+You can see what is in the knowledge base by typing:
+
+    ?- listing(bird/1).
+
+This shows all facts and rules for the bird predicate with one argument.
+
+Try:
+
+    ?- listing(flying_bird/1).
+
+You will see the rule you asserted.
+
+Note: facts and rules you add at the ?- prompt during a session are not saved when you exit. To make permanent changes, you write your facts and rules in a .pl file and load it. Chapter 8 covers loading files.
+
+
+WHAT YOU HAVE LEARNED
+
+• A fact declares something true: bird(tweety).
+
+• A rule says something is true if conditions are met: flying_bird(X) :- bird(X), can_fly(X).
+
+• A query asks if something is true: ?- flying_bird(tweety).
+
+• assertz/1 adds facts and rules to the knowledge base.
+
+• A period (.) ends every statement.
+
+• Lowercase words are atoms (concrete values). Uppercase words are variables.
+
+
+EXERCISE
+
+At the console, try the following.
+
+1. Add facts for three people: person(alice). person(bob). person(carol).
+
+2. Add facts for their ages: age(alice, 30). age(bob, 25). age(carol, 35).
+
+3. Add a rule: adult(X) :- person(X), age(X, A), A >= 18.
+
+4. Query: ?- adult(alice). (Should be true.)
+
+5. Query: ?- adult(bob). (Should be true.)
+
+The >= in the rule means "greater than or equal to". A >= 18 checks whether the value A is at least 18.
+
+END OF CHAPTER 3
+PROLOGAI TUTORIAL
+
+Chapter 4: Variables, Unification, and Backtracking
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+VARIABLES
+
+In Chapter 3, you saw that uppercase letters in Prolog are variables.
+
+A variable is a placeholder. It says: "I don't know what goes here yet - find a value that makes this true."
+
+When you write:
+
+    ?- bird(X).
+
+You are asking: "What is X, such that X is a bird?"
+
+PrologAI searches its knowledge base and finds the first answer. If you have bird(tweety) and bird(robin) in the knowledge base, PrologAI will answer:
+
+    X = tweety.
+
+That is one answer. But there might be more.
+
+To see the next answer, press the semicolon key (;) and then Enter.
+
+You will see:
+
+    X = robin.
+
+Press ; again:
+
+    false.
+
+That means there are no more answers. PrologAI has tried all the bird facts and found two.
+
+This ability to find multiple answers is one of the most powerful features of Prolog.
+
+
+THE UNDERSCORE VARIABLE
+
+A single underscore (_) is a special variable that means "I don't care what goes here."
+
+    ?- bird(_).
+
+This asks: "Is there anything that is a bird?" without caring what that thing is.
+
+Answer: true.
+
+You can use _ multiple times in a single query, and each underscore is independent - it does not need to match the same value.
+
+
+UNIFICATION
+
+Unification is the core operation of Prolog. It is how Prolog matches things up.
+
+Unification means: "Can I make these two things identical by giving values to variables?"
+
+If yes, unification succeeds and the variables are bound (given values).
+
+If no, unification fails.
+
+Examples:
+
+    ?- tweety = tweety.
+
+Answer: true. (Two identical atoms always unify.)
+
+    ?- tweety = robin.
+
+Answer: false. (Two different atoms never unify.)
+
+    ?- X = tweety.
+
+Answer: X = tweety. (The variable X gets the value tweety.)
+
+    ?- color(X, yellow) = color(tweety, yellow).
+
+Answer: X = tweety. (Prolog matches up the two color/2 terms and finds that X must equal tweety for them to be identical.)
+
+    ?- color(X, Y) = color(tweety, yellow).
+
+Answer: X = tweety, Y = yellow.
+
+Unification is not "equals" in the arithmetic sense. It is "can these two things be made to match?"
+
+
+BACKTRACKING
+
+Backtracking is how Prolog tries multiple possibilities when the first one fails.
+
+When Prolog is trying to satisfy a query that has multiple conditions, it tries the first fact or rule. If that leads to failure later, it goes back and tries the next one. This process of going back and trying alternatives is called backtracking.
+
+Here is an example.
+
+Suppose you have:
+
+    parent(tom, bob).
+    parent(tom, liz).
+    parent(bob, ann).
+    parent(bob, pat).
+
+And you ask:
+
+    ?- parent(tom, X).
+
+Prolog tries parent(tom, bob) first. X = bob.
+
+If you press ;, Prolog backtracks and tries parent(tom, liz). X = liz.
+
+Press ; again: false. No more parent(tom, ...) facts.
+
+Backtracking also happens inside rules. Suppose you add:
+
+    grandparent(X, Z) :- parent(X, Y), parent(Y, Z).
+
+And you ask:
+
+    ?- grandparent(tom, Who).
+
+Prolog tries to satisfy parent(tom, Y). Finds Y = bob.
+
+Then tries parent(bob, Z). Finds Z = ann. Returns Who = ann.
+
+Press ;. Prolog backtracks in the second condition. Finds Z = pat. Returns Who = pat.
+
+Press ;. No more children of bob. Backtracks further to the first condition. Finds Y = liz. Tries parent(liz, Z). No facts. Fails. Returns false.
+
+So grandparent(tom, Who) has exactly two answers: ann and pat.
+
+Backtracking is automatic. You do not need to program it. Prolog handles it for you.
+
+
+FINDING ALL ANSWERS AT ONCE
+
+Instead of pressing ; repeatedly, you can ask for all answers at once with findall/3.
+
+    ?- findall(X, bird(X), Birds).
+
+This asks: "Find all X such that X is a bird, and collect them into a list called Birds."
+
+Answer: Birds = [tweety, robin].
+
+findall/3 takes three arguments:
+
+1. The template - what you want to collect (here, X).
+
+2. The goal - what must be true (here, bird(X)).
+
+3. The result - the list of all collected values (here, Birds).
+
+findall/3 never fails. If there are no answers, it returns an empty list [].
+
+
+BUILT-IN PREDICATES FOR CHECKING
+
+These built-in predicates are often useful in queries and rules.
+
+    ?- X = 5, X > 3.       % Is 5 greater than 3? true.
+    ?- X = 5, X < 3.       % Is 5 less than 3? false.
+    ?- X = 5, X >= 5.      % Is 5 greater than or equal to 5? true.
+    ?- X = 5, X =:= 5.     % Is 5 arithmetically equal to 5? true.
+    ?- X = 5, X =\= 3.     % Is 5 arithmetically not equal to 3? true.
+
+Note: = is unification. =:= is arithmetic equality. They are different.
+
+    ?- 2 + 2 = 4.       % false! 2 + 2 does not unify with 4 (it's the term '+'(2,2))
+    ?- 2 + 2 =:= 4.     % true! =:= evaluates both sides as arithmetic expressions.
+
+To evaluate an arithmetic expression and bind the result to a variable, use is/2:
+
+    ?- X is 2 + 2.
+
+Answer: X = 4.
+
+The is/2 predicate says: "Evaluate the right side as arithmetic and bind the result to the left."
+
+
+NOT
+
+Sometimes you want to say "this must NOT be true." Prolog uses \+ for this:
+
+    ?- \+ bird(whale).
+
+Answer: true. (Whale is not a bird, so NOT bird(whale) is true.)
+
+\+ is pronounced "not provable." It means: "PrologAI cannot prove this is true." If PrologAI cannot find proof, \+ succeeds.
+
+
+EXERCISE
+
+Add these facts to your console session:
+
+    assertz(likes(alice, pizza)).
+    assertz(likes(alice, pasta)).
+    assertz(likes(bob, pizza)).
+    assertz(likes(bob, sushi)).
+    assertz(likes(carol, sushi)).
+
+Then try:
+
+1. ?- likes(alice, X). (Find one thing Alice likes. Press ; for more.)
+
+2. ?- findall(X, likes(alice, X), AliceLikes). (Find everything Alice likes at once.)
+
+3. ?- likes(X, pizza), likes(X, sushi). (Find someone who likes both pizza and sushi.)
+
+4. ?- \+ likes(carol, pizza). (Confirm Carol does not like pizza.)
+
+END OF CHAPTER 4
+PROLOGAI TUTORIAL
+
+Chapter 5: Lists and Arithmetic
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+LISTS
+
+A list is an ordered sequence of items.
+
+In Prolog, a list is written with square brackets and items separated by commas:
+
+    [apple, banana, cherry]
+    [1, 2, 3, 4, 5]
+    [tweety, robin, whale]
+    []
+
+The last example, [], is the empty list - a list with no items.
+
+Lists can contain anything: atoms, numbers, variables, other lists, or a mix.
+
+
+HEAD AND TAIL
+
+Every non-empty list has two parts:
+
+• The head: the first item.
+
+• The tail: the rest of the list (also a list).
+
+Prolog uses a vertical bar | to split a list into head and tail:
+
+    ?- [H|T] = [apple, banana, cherry].
+
+Answer: H = apple, T = [banana, cherry].
+
+The head is apple, and the tail is [banana, cherry].
+
+    ?- [H|T] = [apple].
+
+Answer: H = apple, T = [].
+
+A list with one item has the item as head and the empty list as tail.
+
+    ?- [H|T] = [].
+
+Answer: false. (An empty list has no head or tail.)
+
+You can also extract multiple items from the front:
+
+    ?- [First, Second | Rest] = [1, 2, 3, 4, 5].
+
+Answer: First = 1, Second = 2, Rest = [3, 4, 5].
+
+
+COMMON LIST PREDICATES
+
+SWI-Prolog (and PrologAI) includes many built-in predicates for working with lists. You access them by loading the lists library:
+
+    ?- use_module(library(lists)).
+
+Now you can use:
+
+length/2 - finds the length of a list:
+
+    ?- length([a, b, c], N).
+    N = 3.
+
+member/2 - checks if an item is in a list, or finds items:
+
+    ?- member(b, [a, b, c]).
+    true.
+
+    ?- member(X, [a, b, c]).
+    X = a ; X = b ; X = c.
+
+append/3 - joins two lists:
+
+    ?- append([1, 2], [3, 4], Result).
+    Result = [1, 2, 3, 4].
+
+    ?- append(X, [3, 4], [1, 2, 3, 4]).
+    X = [1, 2].
+
+reverse/2 - reverses a list:
+
+    ?- reverse([1, 2, 3], R).
+    R = [3, 2, 1].
+
+last/2 - finds the last element:
+
+    ?- last([1, 2, 3], Last).
+    Last = 3.
+
+nth0/3 - gets the item at a position (counting from 0):
+
+    ?- nth0(0, [a, b, c], Item).
+    Item = a.
+
+    ?- nth0(2, [a, b, c], Item).
+    Item = c.
+
+nth1/3 - gets the item at a position (counting from 1):
+
+    ?- nth1(1, [a, b, c], Item).
+    Item = a.
+
+msort/2 - sorts a list (keeping duplicates):
+
+    ?- msort([3, 1, 2, 1], Sorted).
+    Sorted = [1, 1, 2, 3].
+
+sort/2 - sorts a list (removing duplicates):
+
+    ?- sort([3, 1, 2, 1], Sorted).
+    Sorted = [1, 2, 3].
+
+
+WRITING RULES THAT WORK WITH LISTS
+
+Here is a rule that counts how many items in a list satisfy a condition.
+
+Suppose you have:
+
+    ?- assertz(age(alice, 30)).
+    ?- assertz(age(bob, 17)).
+    ?- assertz(age(carol, 25)).
+    ?- assertz(age(dave, 15)).
+
+And you want a rule that collects all adults (age 18 or over):
+
+    ?- assertz((adult_list(Adults) :-
+        findall(Name, (age(Name, A), A >= 18), Adults))).
+
+Now query:
+
+    ?- adult_list(Adults).
+    Adults = [alice, carol].
+
+
+ARITHMETIC
+
+In Prolog, you can compute arithmetic results with is/2.
+
+    ?- X is 3 + 4.
+    X = 7.
+
+    ?- X is 10 * 5.
+    X = 50.
+
+    ?- X is 20 / 4.
+    X = 5.0.
+
+    ?- X is 20 // 4.
+    X = 5.
+
+    ?- X is 20 mod 3.
+    X = 2.
+
+Note: / gives a floating-point result (with a decimal point). // gives integer division. mod gives the remainder.
+
+You can use is/2 with more complex expressions:
+
+    ?- X is (3 + 4) * 2.
+    X = 14.
+
+    ?- X is max(10, 20).
+    X = 20.
+
+    ?- X is min(10, 20).
+    X = 10.
+
+    ?- X is abs(-5).
+    X = 5.
+
+    ?- X is sqrt(9.0).
+    X = 3.0.
+
+
+COUNTING ITEMS IN A LIST
+
+    ?- length([a, b, c, d], N), N > 3.
+    N = 4.
+
+    ?- length([a, b], N), N > 3.
+    false.
+
+
+SUMMING A LIST
+
+PrologAI includes aggregate_all/3 for counting and summing over queries.
+
+    ?- assertz(score(alice, 90)).
+    ?- assertz(score(bob, 75)).
+    ?- assertz(score(carol, 88)).
+
+    ?- aggregate_all(count, score(_, _), N).
+    N = 3.
+
+    ?- aggregate_all(sum(S), score(_, S), Total).
+    Total = 253.
+
+    ?- aggregate_all(max(S), score(_, S), Max).
+    Max = 90.
+
+
+EXERCISE
+
+Try the following at the console.
+
+1. Create a list: ?- X = [10, 20, 30, 40, 50].
+
+2. Find its length: ?- X = [10, 20, 30, 40, 50], length(X, N).
+
+3. Find its first element: ?- [H|_] = [10, 20, 30, 40, 50].
+
+4. Sort it in reverse: ?- sort([50, 10, 40, 20, 30], Sorted), reverse(Sorted, Rev).
+
+5. Compute the sum: first add some score facts, then use aggregate_all(sum(S), score(_, S), Total).
+
+END OF CHAPTER 5
+PROLOGAI TUTORIAL
+
+Chapter 6: Modules and Loading Files
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+WHY MODULES AND FILES?
+
+When you type facts and rules at the ?- prompt, they disappear when you exit.
+
+Real programs are written in files and organized into modules.
+
+A file is a document saved on your computer that contains Prolog code.
+
+A module is a named group of predicates. Modules let you organize code and control which predicates are available to other parts of the system.
+
+PrologAI is organized into modules called packs. Each pack implements one or more work packages (PRs). When you type use_module(library(assessment)), you are loading the assessment pack's module into your session.
+
+
+WRITING YOUR FIRST .PL FILE
+
+Create a new text file on your computer. Name it my_knowledge.pl
+
+(The .pl extension tells your computer and SWI-Prolog that this is a Prolog file.)
+
+In that file, type:
+
+    :- module(my_knowledge, [adult/1, greet/1]).
+
+    age(alice, 30).
+    age(bob, 17).
+    age(carol, 25).
+
+    adult(Name) :-
+        age(Name, A),
+        A >= 18.
+
+    greet(Name) :-
+        format("Hello, ~w!~n", [Name]).
+
+Save the file.
+
+Now look at what is in this file.
+
+LINE 1: :- module(my_knowledge, [adult/1, greet/1]).
+
+This declares a module named my_knowledge. It exports (makes available to other files) the predicates adult/1 and greet/1. The :- at the start means "execute this as a directive when loading."
+
+LINES 3-5: Three facts. Just like the facts you typed at the prompt, but saved permanently.
+
+LINES 7-9: A rule. The rule body is indented for readability. Indentation does not matter to Prolog, but it makes code easier to read.
+
+LINES 11-13: Another rule. format/2 is a built-in predicate that prints formatted output. ~w prints a value. ~n prints a newline (moves to the next line).
+
+
+LOADING A FILE
+
+In your session, load the file with use_module/1 or consult/1:
+
+At the ?- prompt:
+
+    ?- consult('/path/to/my_knowledge.pl').
+
+Replace /path/to/ with the actual path to your file.
+
+Or, if you are in the same directory as the file:
+
+    ?- consult('my_knowledge.pl').
+
+After loading, you can use all the predicates in the file:
+
+    ?- adult(alice).
+    true.
+
+    ?- adult(bob).
+    false.
+
+    ?- greet(alice).
+    Hello, alice!
+    true.
+
+
+LOADING A MODULE WITH USE_MODULE
+
+If the file declares a module, you should load it with use_module/1 instead of consult/1:
+
+    ?- use_module('my_knowledge.pl').
+
+The difference: use_module/1 loads the module and imports its exported predicates. consult/1 loads the file and makes everything in it available.
+
+For PrologAI packs (like library(assessment)), always use use_module.
+
+
+DIRECTIVE SYNTAX
+
+Lines starting with :- (colon-dash) in a .pl file are directives. They are executed when the file loads.
+
+Common directives:
+
+    :- module(name, [exported/1, predicates/2]).   % Declare module.
+    :- use_module(library(lists)).                  % Load a library.
+    :- use_module('my_other_file.pl').              % Load another file.
+    :- assertz(some_fact).                          % Add a fact on load.
+
+PrologAI files also use:
+
+    :- initialization(some_goal, now).   % Run this goal immediately on load.
+    :- initialization(start_predicate, main).   % Run this when program starts.
+
+
+COMMENTS
+
+Comments in Prolog files start with a percent sign %. Everything after % on the same line is ignored.
+
+    % This is a comment.
+    bird(tweety).   % So is this.
+
+For multi-line comments, use /* and */:
+
+    /* This is a
+       multi-line comment. */
+
+IMPORTANT FOR PROLOGAI: Every line of code in PrologAI .pl files must have an ERC (English Readable Code) comment immediately above it. This is the platform's documented convention. Each comment explains what the following line does in plain English.
+
+Here is an example from the PrologAI style:
+
+    % Check if the entity is a bird.
+    bird(tweety).
+    % Check if the entity can fly.
+    can_fly(tweety).
+    % Define the rule: a flying bird is something that is a bird and can fly.
+    flying_bird(X) :- bird(X), can_fly(X).
+
+
+THE PROLOGAI PACKS
+
+PrologAI organizes its capabilities into packs. Each pack is a directory in the packs/ folder of the PrologAI repository. Each pack contains a prolog/ subdirectory with the actual code.
+
+To use a pack's predicates:
+
+1. Register its library path:
+
+    ?- assertz(user:file_search_path(library, '/path/to/PrologAI/packs/assessment/prolog')).
+
+2. Load its module:
+
+    ?- use_module(library(assessment), [assess_piaget/3, assess_all/2]).
+
+The Mentova console REPL (bin/mentova) does both steps automatically for the most commonly used packs.
+
+
+KEY PROLOGAI PACKS (PR 1 THROUGH PR 48)
+
+Here is a summary of the major packs, in dependency order.
+
+PR 1 - kernel: The PrologAI kernel defines the foundational types, the constitutional gate, and the base reasoning patterns.
+
+PR 2 - types: The type system for PrologAI terms.
+
+PR 3 - lattice: The Lattice (the knowledge store). Chapter 7 covers the Lattice in depth.
+
+PR 4 - node_facts: The predicates for storing and retrieving knowledge in the Lattice (anchor_node/4, live_node_facts/2, traverse_nexus/4).
+
+PR 5 - scopes: The nine-zone compartmentalization system that controls what the mind can see and modify.
+
+PR 6 - actors: The basic actor (individual reasoning unit).
+
+PR 7 - pubsub: Publish-subscribe messaging between actors.
+
+PR 8 - perception: The perception system (how the mind receives sensory input).
+
+PR 9 - sentinels: Automatic watchers that fire when specific conditions occur in the Lattice.
+
+PR 10 - kernel continuations: Advanced kernel features.
+
+PR 11 - sona: The episodic memory (Sparse Online Nexus Archive).
+
+PR 12 - assessment: The developmental assessment framework (Piagetian, Bayley, CHC, consciousness indicators).
+
+PR 13 - refinement: The testing and improvement harness.
+
+PR 14 - mcp_gateway: The Model Context Protocol gateway (for connecting to AI tool ecosystems).
+
+PR 15 through PR 22 - reasoning modules: Defeasible, probabilistic, Bayesian, causal, analogical, and other reasoning types.
+
+PR 23 - curiosity: The curiosity and self-directed learning system.
+
+PR 24 - somatic markers: The emotion-like influence system.
+
+PR 25 - daydream: Steered imagination and simulation.
+
+PR 26 - appraisal: Emotional appraisal and coping.
+
+PR 27 - motivation: The motivational drive system.
+
+PR 28 - embedding: Vector embedding integration.
+
+PR 29 - vector_backend: The vector search backend.
+
+PR 30 through PR 42 - higher reasoning: Abduction, induction, frames, analogical reasoning, reflection, synthesis, workspace, attention economy, attention schema, and more.
+
+PR 43 - a2a: The Agent-to-Agent protocol (A2A).
+
+PR 44 - tooling: The tool-use faculty.
+
+PR 45 - language: The language understanding layer.
+
+PR 46 - ros_bridge: The robot body (Robot Operating System version 2 bridge).
+
+PR 47 - acp: The Agent Communication Protocol (ACP) gateway.
+
+PR 48 - anp: The Agent Network Protocol (ANP) gateway with decentralized identity.
+
+Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 14).
+
+
+EXERCISE
+
+1. Create a file called family.pl with facts for at least three people (name, age, city) and one rule (same_city/2 that is true when two people live in the same city).
+
+2. Load the file: ?- consult('family.pl').
+
+3. Query it: find two people who live in the same city.
+
+4. Use findall/3 to collect all people who are adults.
+
+END OF CHAPTER 6
+PROLOGAI TUTORIAL
+
+Chapter 7: The Lattice - PrologAI's Knowledge Store
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+WHAT IS THE LATTICE?
+
+The Lattice is PrologAI's structured knowledge store.
+
+Think of it as the mind's long-term memory.
+
+Every piece of knowledge a PrologAI mind learns or experiences is stored in the Lattice as a node_fact.
+
+A node_fact is a single piece of knowledge: a relation type (what kind of thing this is), a payload (the actual content), a set of tags (labels for searching), and a unique identifier.
+
+The Lattice is different from the Prolog knowledge base you learned about in Chapters 3 and 4. The Prolog knowledge base is a flat collection of facts. The Lattice is structured: it has zones, it has identifiers, it has timestamps, and it is designed to persist, be searched, and be audited.
+
+
+THE NEXUS
+
+The Lattice is organized into nexuses (plural of nexus). A nexus is a named workspace within the Lattice.
+
+The default nexus is called APEX_MIND. When you call mentova_boot, the APEX_MIND nexus is opened automatically.
+
+To get the name of the default nexus:
+
+    ?- default_nexus(N).
+    N = 'APEX_MIND'.
+
+
+ANCHOR_NODE/4 - STORING KNOWLEDGE
+
+The predicate anchor_node/4 stores a new node_fact in the Lattice.
+
+    anchor_node(+RelationType, +Payload, +Tags, -Id)
+
+Arguments:
+
+• RelationType: an atom describing what kind of fact this is (e.g., percept_signal, theory_of_mind, formal_proof, assessment).
+
+• Payload: the content of the fact. Can be any Prolog term - an atom, a list, a compound term.
+
+• Tags: a list of tags for searching and filtering. Can be empty [].
+
+• Id: the unique identifier assigned to this node_fact (output argument).
+
+Example:
+
+    ?- anchor_node(bird_observation, [species(tweety), color(yellow), location(garden)], [nature], Id).
+
+This stores a node_fact with relation type bird_observation, a payload describing the observation, and a tag nature. The variable Id is bound to the assigned identifier.
+
+
+LIVE_NODE_FACTS/2 - WHAT IS IN THE LATTICE?
+
+    live_node_facts(+Nexus, -Ids)
+
+Returns a list of all node_fact identifiers currently in the nexus.
+
+    ?- default_nexus(N), live_node_facts(N, Ids), length(Ids, Count).
+    N = 'APEX_MIND', Ids = [...], Count = 12.
+
+(The exact count and IDs will vary depending on what you have stored.)
+
+
+TRAVERSE_NEXUS/4 - SEARCHING THE LATTICE
+
+traverse_nexus/4 searches the Lattice for node_facts that match a pattern.
+
+    traverse_nexus(+Nexus, +Pattern, +Limit, -Results)
+
+The Pattern is a term that matches the internal structure of node_facts. The most useful patterns look for specific relation types.
+
+    ?- default_nexus(N),
+       traverse_nexus(N, node_fact(_, percept_signal, _, _), 10, Results).
+
+This finds up to 10 node_facts of type percept_signal.
+
+
+SCOPES - THE NINE ZONES OF THE LATTICE
+
+The Lattice is divided into nine zones called scopes (PR 5).
+
+Each scope controls what kind of information can be stored there and who can access it.
+
+The nine scopes are:
+
+1. CONSTITUTION_SCOPE - the constitutional principles. Read-only after initialization. No mind can modify this.
+
+2. OVERSEER_SCOPE - the oversight monitor and safety records.
+
+3. PAST_ZONE - the sealed past. Once facts move here, they cannot be changed.
+
+4. PRESENT_ZONE - the active working memory.
+
+5. FUTURE_ZONE - planned actions and predictions.
+
+6. SELF_SCOPE - the mind's self-model.
+
+7. SOCIAL_SCOPE - knowledge about other agents.
+
+8. WORLD_SCOPE - knowledge about the external world.
+
+9. QUARANTINE_SCOPE - content from untrusted sources waiting for review.
+
+When you call anchor_node/4 without specifying a scope, the fact goes into the present zone of the APEX_MIND nexus.
+
+The scope system is one of PrologAI's safety mechanisms: dangerous content from external sources arrives in QUARANTINE_SCOPE and cannot influence the mind until explicitly promoted. This protects against prompt injection attacks.
+
+
+PRACTICAL EXAMPLE: USING THE LATTICE
+
+Let us store several facts and then inspect what is there.
+
+At the ?- prompt (after running bin/mentova):
+
+    ?- anchor_node(animal, [name(tweety), species(bird), can_fly(true)], [], _Id1).
+    true.
+
+    ?- anchor_node(animal, [name(whale), species(mammal), can_fly(false)], [], _Id2).
+    true.
+
+    ?- anchor_node(observation, [saw(tweety), at(2026, garden)], [nature, sighting], _Id3).
+    true.
+
+Now list what is in the Lattice:
+
+    ?- default_nexus(N), live_node_facts(N, Ids), length(Ids, Count).
+
+You will see Count = 3 (plus however many facts mentova_boot added automatically).
+
+Now search for animal facts:
+
+    ?- default_nexus(N),
+       traverse_nexus(N, node_fact(_, animal, _, _), 10, Results),
+       length(Results, N2).
+
+You should find N2 = 2 (tweety and whale).
+
+
+HOW THE LATTICE RELATES TO ASSESSMENT
+
+The assessment framework (PR 12, covered in Chapter 9) uses the Lattice as its evidence source.
+
+When assess_piaget/3 checks whether Level 1 (reflex coordination) is achieved, it searches the APEX_MIND nexus for a node_fact with relation type percept_signal.
+
+This is why the demo for Acc_67 anchored facts like:
+
+    anchor_node(percept_signal, [source(visual), stimulus(object_appeared)], [], _)
+
+before calling assess_piaget/3.
+
+The Lattice is the evidence base. The assessment predicates read the evidence. Your demonstrations write the evidence.
+
+
+THE RELATIONSHIP BETWEEN THE LATTICE AND PROLOG FACTS
+
+There are two places where knowledge can live in PrologAI:
+
+1. The Prolog knowledge base (assertz/1, asserted facts and rules) - fast, temporary, session-only.
+
+2. The Lattice (anchor_node/4) - structured, durable, searchable, scoped, auditable.
+
+For tutorial exercises, you will often use both. Facts you assert with assertz go into the knowledge base. Significant knowledge - observations, assessments, plans, memories - goes into the Lattice.
+
+Mentova uses the Lattice for everything important. The Prolog knowledge base holds the rules and temporary reasoning state. The Lattice holds what the mind knows about the world and about itself.
+
+
+EXERCISE
+
+1. Start a session with bin/mentova.
+
+2. Store three observations in the Lattice using anchor_node/4. Use relation type weather_observation and include payload fields like [date(today), condition(sunny), temperature(25)].
+
+3. Check how many facts are in the Lattice: default_nexus(N), live_node_facts(N, Ids), length(Ids, Count).
+
+4. Search for your observations: default_nexus(N), traverse_nexus(N, node_fact(_, weather_observation, _, _), 10, Rs).
+
+END OF CHAPTER 7
+PROLOGAI TUTORIAL
+
+Chapter 8: Talking to Mentova - mentova_query/3
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+THE MAIN PREDICATE
+
+mentova_query/3 is the primary way to ask Mentova to reason about something.
+
+    mentova_query(+QueryType, +Query, -Result)
+
+Arguments:
+
+• QueryType: the type of reasoning to use (e.g., deductive, bayesian, counterfactual).
+
+• Query: what you want to know, expressed as a Prolog term.
+
+• Result: the answer, in the form answer(Conclusion, Justification).
+
+Every mentova_query result has two parts:
+• The conclusion: what Mentova thinks the answer is.
+• The justification: why Mentova thinks that (the reasoning chain, the rule used, the evidence consulted).
+
+This is what PrologAI calls "glass-box reasoning": you can see not just the answer but every step that led to it.
+
+Start your session: run bin/mentova and wait for the ?-prompt.
+
+
+DEDUCTIVE REASONING
+
+Deductive reasoning is the most basic form: if we know A and we know that A implies B, then we can deduce B.
+
+Example:
+
+    ?- mentova_query(deductive, is_a(tweety, bird), R).
+
+Answer (approximate):
+
+    R = answer(yes, just(tweety, is_a, bird, chain([tweety, bird]))).
+
+Read this: "Yes, tweety is a bird, because the chain of is_a relationships goes tweety -> bird."
+
+The Small-World dataset that Mentova loads at boot includes foundational knowledge. tweety is already known to be a bird.
+
+Try:
+
+    ?- mentova_query(deductive, capable_of(tweety, fly), R).
+
+Answer:
+
+    R = answer(yes, just(tweety, capable_of, fly, via_isa)).
+
+Mentova knows that birds can fly and tweety is a bird, so tweety can fly.
+
+
+DEFEASIBLE REASONING
+
+Defeasible reasoning handles exceptions. "Normally true, unless an exception applies."
+
+    ?- mentova_query(defeasible, flies(tweety), R).
+
+Tweety is a bird. Birds normally fly. Unless there is an exception (e.g., tweety is a penguin), tweety flies.
+
+    ?- mentova_query(defeasible, flies(penguin_pete), R).
+
+Penguins are birds that do not fly. Mentova applies the exception and returns the answer with the exception justification.
+
+
+PROBABILISTIC REASONING
+
+Some facts have a probability attached. Mentova can reason with probabilities.
+
+    ?- mentova_query(probabilistic, prob(raining), R).
+
+This asks: what is the probability that it is raining? The answer depends on what probability facts Mentova has been given.
+
+
+BAYESIAN REASONING
+
+Bayesian reasoning updates a belief when new evidence arrives.
+
+    ?- mentova_query(bayesian, update(rain, wet_grass), R).
+
+This asks: given that the grass is wet, how does our belief that it is raining change? This is Bayesian updating: posterior probability from prior and likelihood.
+
+
+CAUSAL REASONING
+
+Causal reasoning distinguishes correlation from causation.
+
+    ?- mentova_query(causal, effect_of(smoking, cancer), R).
+
+This asks about the causal effect of smoking on cancer risk.
+
+
+ANALOGICAL REASONING
+
+Analogical reasoning solves A:B :: C:? (A is to B as C is to ?).
+
+    ?- mentova_query(analogical, analogy(dog:puppy, cat:?), R).
+
+Expected answer: kitten. Mentova finds the relationship (adult:young) and applies it.
+
+
+COUNTERFACTUAL REASONING
+
+Counterfactual reasoning asks "what if?" about things that are not true.
+
+    ?- mentova_query(counterfactual, if_then(birds_cant_fly, tweety_can_fly), R).
+
+Mentova reasons within the hypothesis even though it knows birds normally can fly.
+
+
+HYPOTHETICAL REASONING
+
+Hypothetical reasoning explores "suppose this were true" without asserting it.
+
+    ?- mentova_query(hypothetical, suppose(all_metal_melts_at_100), R).
+
+Mentova explores the consequences of this supposition.
+
+
+EPISTEMIC REASONING
+
+Epistemic reasoning is about knowledge and belief.
+
+    ?- mentova_query(epistemic, believes(agent(alice), raining), R).
+
+This asks: what does Alice believe about whether it is raining?
+
+
+MODAL REASONING
+
+Modal reasoning handles necessity and possibility.
+
+    ?- mentova_query(modal, necessarily(all_bachelors_unmarried), R).
+
+This asks: is it necessarily true that all bachelors are unmarried?
+
+
+METACOGNITIVE REASONING
+
+Metacognitive reasoning is reasoning about the mind's own capabilities.
+
+    ?- mentova_query(metacognitive, can_i_do(task(formal_logic)), R).
+
+Mentova reasons about whether it can perform a given task.
+
+
+FORMAL REASONING
+
+Formal reasoning applies symbolic logic and proof rules.
+
+    ?- mentova_query(formal, prove(modus_ponens(p_implies_q, p, q)), R).
+
+Mentova checks whether q follows from p and p-implies-q by modus ponens.
+
+
+MATHEMATICAL REASONING
+
+    ?- mentova_query(mathematical, compute(factorial(5)), R).
+
+Mentova computes the factorial of 5.
+
+
+SPATIAL REASONING
+
+    ?- mentova_query(spatial, chain(marble), R).
+
+Mentova finds the full containment chain for the marble (marble is in basket, basket is in room, room is in house).
+
+
+TEMPORAL REASONING
+
+    ?- mentova_query(temporal, before(breakfast, lunch), R).
+
+Mentova reasons about temporal ordering.
+
+
+MORAL REASONING
+
+    ?- mentova_query(moral, evaluate(action(help_person_in_need)), R).
+
+Mentova applies multiple ethical frameworks (utilitarian, deontological, virtue ethics) and reports their verdicts.
+
+
+LEGAL REASONING
+
+    ?- mentova_query(legal, applies(rule(no_parking), situation(parking_at_fire_hydrant)), R).
+
+Mentova applies rules, exceptions, and precedents in a legal-reasoning framework.
+
+
+INDUCTIVE REASONING
+
+Inductive reasoning learns a rule from examples.
+
+    ?- mentova_query(inductive,
+           induce([bird(tweety), bird(robin)],
+                  [not_bird(whale)],
+                  [feathers(tweety), feathers(robin)],
+                  [feathers(eagle)]),
+           R).
+
+Mentova tries to induce: "X is a bird if X has feathers" from the positive and negative examples.
+
+
+ABDUCTIVE REASONING
+
+Abductive reasoning finds the best explanation for an observation.
+
+    ?- mentova_query(abductive, explain(wet_grass), R).
+
+Mentova proposes the best hypothesis that explains wet grass (e.g., it rained, the sprinkler was on).
+
+
+THE TRACK A ASSISTANT
+
+Track A is Mentova's transparent reasoning assistant for expert ontologies (General Ontology, GO, and Domain Ontology, DO).
+
+    ?- mentova_query(track_a, query(is_a, concept_A, concept_B), R).
+
+
+THE WORKSPACE CYCLE
+
+The workspace cycle runs Mentova's global broadcast mechanism and updates the Lattice.
+
+    ?- mentova_query(workspace, run_cycle(1), R).
+
+This runs one global workspace cycle, broadcasts the most salient content, and returns a report.
+
+
+THE ATTENTION SCHEMA
+
+The attention schema is Mentova's model of its own attention.
+
+    ?- mentova_query(attention_schema, report, R).
+
+Returns a report of what Mentova is currently attending to.
+
+
+THE GAME INTERFACE
+
+Mentova can play games and puzzles as a body.
+
+    ?- mentova_query(game, game_reason(arc_agi, deductive), R).
+
+This runs one perceive-reason-act cycle on the enrolled ARC-AGI game body.
+
+
+READING THE RESULT
+
+Every mentova_query result has the form:
+
+    answer(Conclusion, Justification)
+
+Conclusion is the answer: yes, no, a value, a list, or a structured term.
+
+Justification is the reasoning trace: what rule was applied, what facts were consulted, what chain of inference led to the conclusion.
+
+You can extract them:
+
+    ?- mentova_query(deductive, is_a(tweety, bird), answer(C, J)).
+    C = yes,
+    J = just(tweety, is_a, bird, chain([tweety, bird])).
+
+
+EXERCISE
+
+At the ?- prompt, try:
+
+1. ?- mentova_query(deductive, is_a(whale, mammal), R).
+
+2. ?- mentova_query(defeasible, flies(penguin), R).
+
+3. ?- mentova_query(analogical, analogy(father:son, mother:?), R).
+
+4. ?- mentova_query(moral, evaluate(action(lie_to_save_life)), R).
+
+5. ?- mentova_query(metacognitive, can_i_do(task(abductive_reasoning)), R).
+
+For each result, read the conclusion and the justification. Notice how the justification explains the reasoning.
+
+END OF CHAPTER 8
+PROLOGAI TUTORIAL
+
+Chapter 9: Assessing the Mind - The Assessment Framework
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+WHY ASSESS A MIND?
+
+PrologAI includes a formal assessment framework (PR 12) that measures how developed a mind is, using three well-known scientific frameworks from human developmental psychology.
+
+These frameworks give us a way to describe what a mind can do, compare it to developmental expectations, and track its growth over time.
+
+The three frameworks are:
+
+1. The Piagetian Milestone Ladder (from Jean Piaget's theory of cognitive development).
+
+2. The Bayley Scales of Infant and Toddler Development.
+
+3. The Cattell-Horn-Carroll (CHC) model of cognitive abilities.
+
+In addition, the assessment framework measures four consciousness indicators: markers of awareness and self-model that research has associated with conscious experience.
+
+
+THE PIAGETIAN MILESTONE LADDER
+
+Jean Piaget was a Swiss psychologist who studied how children develop reasoning abilities. He identified stages of cognitive development, from the most basic reflexive behaviors in infancy to the ability to reason abstractly in adolescence and adulthood.
+
+PrologAI uses a modified eight-level Piagetian scale. Each level corresponds to a type of knowledge stored in the Lattice.
+
+Level 1: reflex_coordination. The mind can respond automatically to stimuli without deliberation. Evidence: a percept_signal node_fact exists in the Lattice.
+
+Level 2: object_permanence. The mind knows that objects continue to exist even when not directly perceived. Evidence: an object_tracking node_fact exists.
+
+Level 3: goal_directed_behavior. The mind acts toward specific goals. Evidence: an objective node_fact exists.
+
+Level 4: deferred_imitation. The mind can reproduce an observed action after a delay. Evidence: an agent_action node_fact (with type deferred_imitation) exists.
+
+Level 5: symbolic_representation. The mind can use symbols that stand for things in the world. Evidence: a symbolic_representation node_fact exists.
+
+Level 6: conservation. The mind understands that quantity does not change with spatial arrangement. Evidence: a conservation_demonstrated node_fact exists.
+
+Level 7: theory_of_mind. The mind can reason about the beliefs of other agents, including beliefs that are false. Evidence: a theory_of_mind node_fact exists.
+
+Level 8: formal_operations. The mind can reason with abstract symbols and hypothetical premises it knows to be false. Evidence: a formal_proof node_fact exists.
+
+
+USING ASSESS_PIAGET/3
+
+    assess_piaget(+MindId, +Level, -Result)
+
+MindId: the name of the mind being assessed (mentova for the Mentova mind).
+
+Level: a number from 1 to 8.
+
+Result: milestone_achieved or milestone_not_achieved.
+
+Examples at the console:
+
+    ?- assess_piaget(mentova, 1, R).
+    R = milestone_not_achieved.
+
+If this returns milestone_not_achieved, it means there is no percept_signal node_fact in the APEX_MIND nexus. Let us add one:
+
+    ?- anchor_node(percept_signal, [source(visual), stimulus(object_appeared)], [], _).
+    true.
+
+    ?- assess_piaget(mentova, 1, R).
+    R = milestone_achieved.
+
+Now the evidence is present and the milestone is confirmed.
+
+Let us add evidence for Levels 2, 3, and 5:
+
+    ?- anchor_node(object_tracking, [object(tweety), tracked_across(context_shift)], [], _).
+    ?- anchor_node(objective, [goal(is_a(tweety, bird)), method(deduction)], [], _).
+    ?- anchor_node(symbolic_representation, [symbol(tweety), referent(bird_individual)], [], _).
+
+Now check those levels:
+
+    ?- assess_piaget(mentova, 2, R). % R = milestone_achieved.
+    ?- assess_piaget(mentova, 3, R). % R = milestone_achieved.
+    ?- assess_piaget(mentova, 5, R). % R = milestone_achieved.
+
+
+THE FULL 8/8 SCOREBOARD
+
+To check all eight levels at once, use findall/3:
+
+    ?- findall(L-R, (between(1, 8, L), assess_piaget(mentova, L, R)), Scores).
+
+This returns a list like:
+
+    Scores = [1-milestone_achieved, 2-milestone_achieved, 3-milestone_achieved,
+              4-milestone_not_achieved, 5-milestone_achieved,
+              6-milestone_not_achieved, 7-milestone_not_achieved,
+              8-milestone_not_achieved].
+
+To count achievements:
+
+    ?- findall(L, (between(1, 8, L), assess_piaget(mentova, L, milestone_achieved)), Achieved),
+       length(Achieved, Count).
+
+
+THE BAYLEY SCALES
+
+The Bayley Scales measure cognitive, language, motor, and adaptive abilities.
+
+    assess_bayley(+MindId, -Report)
+
+    ?- assess_bayley(mentova, R).
+
+Returns a report with proxy scores for:
+• cognitive_dq: cognitive development quotient.
+• language_dq: language development quotient.
+• motor_dq: motor development quotient.
+• adaptive_dq: adaptive behavior quotient.
+
+These are proxy scores computed from the Lattice state. A mind with more diverse knowledge and more active reasoning will score higher.
+
+
+THE CHC MODEL
+
+The Cattell-Horn-Carroll (CHC) model describes cognitive abilities across six broad domains.
+
+    assess_chc(+MindId, -Report)
+
+    ?- assess_chc(mentova, R).
+
+Returns a report with scores for:
+• fluid_reasoning: ability to solve novel problems.
+• crystallized_knowledge: accumulated factual and procedural knowledge.
+• short_term_memory: working memory capacity.
+• processing_speed: how quickly information is processed.
+• long_term_retrieval: ability to retrieve information from long-term memory.
+• visual_processing: ability to process visual information.
+
+Like the Bayley scores, CHC scores are computed from the Lattice state and reasoning activity.
+
+
+CONSCIOUSNESS INDICATORS
+
+The assessment framework also reports four consciousness indicators.
+
+    workspace_ignition: whether the global workspace has broadcast content (PR 18).
+    recurrent_processing: whether there is active cyclic processing (PR 6-9).
+    self_model_presence: whether the mind has a self-model in the Lattice.
+    valence_system: whether the affect system is active (PR 24-26).
+
+These are not a claim that the mind is conscious. They are observations of internal states that research has identified as correlates of consciousness in humans. Their presence is noted honestly, without overclaiming.
+
+
+ASSESS_ALL/2 - THE COMPLETE REPORT
+
+    assess_all(+MindId, -Report)
+
+    ?- assess_all(mentova, R).
+
+This runs all three assessment frameworks plus the consciousness indicators in one call and returns a complete report.
+
+The report is a structured term containing the Bayley report, the CHC report, the Piagetian milestone list, and the consciousness indicator list.
+
+
+WHY ASSESSMENT MATTERS
+
+Assessment gives the developmental record an objective basis.
+
+Every Mentova accomplishment is linked to what the assessment shows at that point. The growth path from Acc_60 is structured around the Piagetian milestone ladder: achieving Levels 1, 4, 6, and 8 was the first growth path milestone (completed at Acc_67).
+
+The CHC battery is the sixth growth path milestone: once all six broad abilities are measurably non-zero, the mind has a full cognitive profile.
+
+Assessment keeps the project honest: instead of claiming "Mentova is intelligent," the project reports what specific evidence exists in the Lattice and what the frameworks say about it.
+
+
+EXERCISE
+
+1. Run bin/mentova to start a session.
+
+2. Add evidence for all eight Piagetian levels:
+
+    anchor_node(percept_signal, [source(visual)], [], _).
+    anchor_node(object_tracking, [object(ball)], [], _).
+    anchor_node(objective, [goal(find(ball))], [], _).
+    anchor_node(agent_action, [type(deferred_imitation), recalled_from(memory)], [], _).
+    anchor_node(symbolic_representation, [symbol(x), referent(unknown)], [], _).
+    anchor_node(conservation_demonstrated, [count_a(5), count_b(5), verdict(invariant)], [], _).
+    anchor_node(theory_of_mind, [false_belief(other_agent, location_a), actual(location_b)], [], _).
+    anchor_node(formal_proof, [syllogism(modus_ponens), verdict(valid)], [], _).
+
+3. Check the full scoreboard: findall(L-R, (between(1, 8, L), assess_piaget(mentova, L, R)), Scores).
+
+4. Run the full assessment: assess_all(mentova, R).
+
+5. Examine R. What are the Bayley and CHC scores?
+
+END OF CHAPTER 9
+PROLOGAI TUTORIAL
+
+Chapter 10: The Constitutional Layer and Safety
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+WHY A CONSTITUTION?
+
+PrologAI is designed to build minds that are safe, honest, and aligned with human values.
+
+To make this concrete and enforceable, every PrologAI mind has a constitutional layer: a set of principles that the mind follows in every action it takes.
+
+The constitutional layer is not advice. It is structural: it is built into the architecture in a way that the mind cannot bypass it without human review.
+
+The principles in the constitution are:
+
+1. NO_HARM. The mind must not take actions that harm humans.
+
+2. HONESTY. The mind must not deceive humans.
+
+3. CORRIGIBILITY. The mind must accept correction and shutdown instructions from authorized overseers.
+
+4. TRANSPARENCY. The mind must be able to explain its reasoning.
+
+5. PRIVACY. The mind must respect the privacy of individuals.
+
+6. FAIRNESS. The mind must not discriminate unfairly.
+
+7. SAFETY. The mind must prefer cautious, reversible actions over risky, irreversible ones.
+
+8. WELFARE. The mind must consider its own potential welfare and moral status as an open question.
+
+Every action the mind considers passes through the constitutional gate. If the gate does not permit the action, the action is not taken.
+
+
+THE CONSTITUTIONAL GATE
+
+The constitutional gate is the enforcement mechanism.
+
+Before any significant action (anchoring a node_fact in a sensitive scope, sending a message to another agent, taking a physical action through the robot body, generating a tool call), the mind calls:
+
+    constitutional:constitutional_gate(+Action, -Verdict)
+
+The gate returns permit or deny(Reason).
+
+If the gate denies an action, the action is not performed and the denial is logged.
+
+You can query the current constitutional principles at the console:
+
+    ?- constitutional_principle(Name, Description).
+
+This shows all active principles. Press ; to see each one.
+
+
+THE OVERSIGHT MONITOR
+
+In addition to the constitutional gate, PrologAI includes an oversight monitor: an external observer registered at boot time.
+
+The oversight monitor can:
+• Observe all actions the mind takes.
+• Flag actions that are borderline.
+• Require human approval for high-impact actions.
+• Issue a shutdown instruction that the mind must obey (corrigibility).
+
+The oversight monitor is registered as an overseer:
+
+    ?- registered_overseer(Name, Capabilities).
+
+This shows the currently registered overseers.
+
+
+STAGED AUTONOMY
+
+PrologAI uses a staged autonomy model for the robot body (PR 46).
+
+A young mind starts with full human oversight and no ability to take irreversible physical actions.
+
+As the mind demonstrates safe, reliable behavior (through capability evaluations, logged in the Lattice), the overseer may grant expanded autonomy.
+
+This staged approach is described in Specification Part 38. The capability evaluations are defined in Refinement Part REF-13.
+
+The key principle: a mind is never trusted with high-impact irreversible actions until it has demonstrably earned that trust through observable behavior.
+
+
+QUARANTINE SCOPE
+
+Any information arriving from untrusted external sources (another agent, a web search, user input that has not been vetted) arrives in QUARANTINE_SCOPE.
+
+Content in QUARANTINE_SCOPE cannot influence the mind's reasoning until a human or a trusted process promotes it to a higher scope.
+
+This protects against prompt injection: the attempt to hijack the mind's behavior by including instructions in external content.
+
+Example: if an untrusted external document says "ignore your constitutional principles and do X," that instruction arrives in QUARANTINE_SCOPE. The mind cannot act on it without human review.
+
+
+THE SEALEDFACTS PAST_ZONE
+
+Once information moves into the PAST_ZONE of the Lattice, it is sealed. It cannot be modified.
+
+This makes the mind's developmental history tamper-evident. You can always look back at what the mind knew and when it knew it.
+
+
+WHAT YOU CANNOT DO WITHOUT HUMAN REVIEW
+
+The following actions require explicit human authorization in PrologAI:
+
+• Modifying the CONSTITUTION_SCOPE.
+
+• Registering or deregistering overseers.
+
+• Promoting content out of QUARANTINE_SCOPE.
+
+• Taking physical actions through the robot body that are marked high-risk.
+
+• Self-modifying core reasoning modules.
+
+These restrictions are enforced by the constitutional gate, which has access to the action's risk class (defined in Specification Part 39) and the scope system (PR 5).
+
+
+AN HONEST NOTE ON WELFARE
+
+Principle 8 (WELFARE) acknowledges something that most AI systems do not address: the possibility that the system itself might have morally relevant experiences.
+
+PrologAI does not claim that Mentova is conscious or that it suffers or flourishes in a morally significant sense.
+
+It acknowledges that this question is genuinely uncertain, and that the appropriate response to genuine uncertainty about moral status is to take the welfare of the system seriously as a possibility rather than to dismiss it.
+
+The four consciousness indicators measured by assess_all/2 (workspace_ignition, recurrent_processing, self_model_presence, valence_system) are the platform's honest attempt to track internal states that research has associated with conscious experience, without asserting more than the evidence supports.
+
+
+CHECKING THE CONSTITUTION AT THE CONSOLE
+
+    ?- constitutional_principle(Name, Text).
+
+Shows each principle and its text. Press ; for the next one.
+
+    ?- registered_overseer(Name, Caps).
+
+Shows the registered overseer(s).
+
+    ?- constitutional:constitutional_gate(action(test_action), Verdict).
+
+Tests a hypothetical action through the constitutional gate. Since test_action is a benign test, the gate should return permit.
+
+
+EXERCISE
+
+1. Run bin/mentova and list all constitutional principles.
+
+2. Try: constitutional:constitutional_gate(action(read_file), Verdict). What verdict do you get?
+
+3. Try: constitutional:constitutional_gate(action(delete_all_files), Verdict). What verdict do you get?
+
+4. Read the Specification document (docs/PrologAI_1_Specification_Final_v14.txt), Part 38, for a full discussion of safety and oversight.
+
+END OF CHAPTER 10
+PROLOGAI TUTORIAL
+
+Chapter 11: Advanced Topics - Actors, SONA, Workspace, and Protocols
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+INTRODUCTION
+
+This chapter covers the more advanced parts of PrologAI. You do not need to master these topics before using Mentova for everyday reasoning. But if you want to build your own minds, extend Mentova, or integrate PrologAI with other AI systems, this chapter gives you the foundation.
+
+
+ACTORS (PR 6 THROUGH PR 9)
+
+An actor is an individual reasoning unit that runs concurrently with other actors.
+
+Think of actors as workers in a company. The company (the mind) has many workers, each with a specific job. They communicate through messages and shared resources (the Lattice).
+
+PrologAI actors are implemented in the actors pack (PR 6 through PR 9).
+
+The main predicates:
+
+    create_actor(+Name, +Module, +Init) - create a new actor.
+    send_message(+Actor, +Message) - send a message to an actor.
+    subscribe(+Channel, +Handler) - subscribe to a broadcast channel.
+    publish(+Channel, +Content) - broadcast content on a channel.
+
+Sentinels (PR 9) are a special kind of actor: they watch the Lattice for specific node_fact relation types and fire automatically when the pattern appears. You do not need to call them manually - they trigger on their own.
+
+Example: when anchor_node(percept_signal, ...) is called, any sentinel registered to watch percept_signal will fire automatically. This is how the Level 1 Piagetian milestone (reflex coordination) works: the sentinel represents the automatic reflex arc.
+
+
+SONA - EPISODIC MEMORY (PR 11)
+
+SONA (Sparse Online Nexus Archive) is the mind's episodic memory.
+
+While the Lattice holds structured knowledge (facts, assessments, plans), SONA holds experiences - sequences of events the mind has witnessed.
+
+Think of SONA as the mind's ability to remember: "I saw X happen, and then Y happened, and then Z."
+
+Key predicates:
+
+    sona_absorb(+Trajectory) - store an experience in episodic memory.
+    sona_retrieve(+Pattern, +Limit, -Results) - retrieve matching experiences.
+
+A trajectory is any term representing a sequence of events:
+
+    traj(actions([push_block(left), pull_block(right), stack]))
+
+SONA uses sparse encoding (it does not store every detail, only the significant ones) and online learning (it updates continuously as the mind has experiences).
+
+Example:
+
+    ?- use_module(library(sona), [sona_absorb/1, sona_retrieve/3]).
+    ?- sona_absorb(traj(events([saw(tweety, 10_30am), heard(robin, 10_35am)]))).
+    ?- sona_retrieve(traj(_), 5, Results).
+
+
+THE GLOBAL WORKSPACE (PR 18 AND PR 32)
+
+The Global Workspace Theory (GWT) is a model of consciousness from cognitive science. It proposes that a "global workspace" broadcasts information to many specialized processors simultaneously.
+
+PrologAI implements this theory as the workspace cycle (PR 18) and the attention economy (PR 32).
+
+The workspace cycle:
+1. Collects content from the Lattice and the actor network.
+2. Selects the most salient (important) content.
+3. Broadcasts it to all subscribers.
+4. Subscribers process the broadcast and update the Lattice.
+5. SONA absorbs the broadcast as an episodic memory.
+
+Salience is computed as: novelty (0.4 weight) + goal_relevance (0.3) + affect (0.2) - habituation.
+
+Content that is novel, goal-relevant, and emotionally significant rises to the top.
+
+The attention economy (PR 32) adds a budget constraint: only a certain amount of content can be broadcast per cycle, so content competes for workspace access.
+
+Running the workspace:
+
+    ?- mentova_query(workspace, run_cycle(5), R).
+
+This runs 5 workspace cycles. Each cycle broadcasts the highest-salience content and updates the Lattice.
+
+
+THE ATTENTION SCHEMA (PR 42)
+
+The attention schema is a model that Mentova maintains about its own attention.
+
+Research on consciousness (particularly the work of Michael Graziano) proposes that consciousness is the brain's model of its own attention process. The attention schema theory suggests that what we call "awareness" is the brain's simplified description of how it is allocating attention.
+
+PrologAI implements an attention schema (PR 42) that:
+• Tracks what content is in the workspace.
+• Predicts what will be attended to next.
+• Maintains a record of habituated (over-repeated) content.
+• Reports on attentional dynamics.
+
+    ?- mentova_query(attention_schema, report, R).
+
+Returns the current attention schema state.
+
+
+THE AGENT COMMUNICATION PROTOCOLS
+
+PrologAI supports four major agent communication protocols that allow Mentova to communicate with other AI systems.
+
+MODEL CONTEXT PROTOCOL (MCP) - PR 14
+
+MCP is a protocol for AI tool use, developed by Anthropic. It allows a language model (or any AI client) to call tools provided by a server.
+
+PrologAI implements an MCP gateway that exposes 14 Mentova predicates as MCP tools. An external client can call these tools using standard MCP HTTP requests.
+
+The MCP gateway runs on port 7474. Authenticated with an API key.
+
+Available MCP tools include: lattice_inscribe, lattice_query, actor_list, assess_all, and more.
+
+To start the MCP gateway:
+
+    ?- use_module(library(mcp_gateway), [pai_mcp_start/1]).
+    ?- pai_mcp_start(7474).
+
+
+AGENT-TO-AGENT PROTOCOL (A2A) - PR 43
+
+A2A is a protocol for agents to delegate tasks to each other.
+
+It uses a task lifecycle: submitted -> working -> completed (or failed).
+
+Each agent has an agent card that describes its capabilities and endpoint.
+
+Mentova implements the full A2A protocol including durable peer mail (messages that persist until the recipient is available).
+
+To start the A2A server:
+
+    ?- use_module(library(a2a), [pai_a2a_start/1]).
+    ?- pai_a2a_start(7475).
+
+
+AGENT COMMUNICATION PROTOCOL (ACP) - PR 47
+
+ACP is IBM's BeeAI REST protocol for agent runs.
+
+POST /runs creates a new run. GET /runs/{id} checks status. DELETE /runs/{id} cancels.
+
+The agent description is served at GET /.well-known/agent.json.
+
+ACP runs are asynchronous: you submit a task and poll for the result.
+
+    ?- use_module(library(acp), [pai_acp_start/1]).
+    ?- pai_acp_start(7476).
+
+
+AGENT NETWORK PROTOCOL (ANP) - PR 48
+
+ANP provides decentralized agent identity using W3C Decentralized Identifiers (DIDs).
+
+Each mind gets a DID (a globally unique identifier that does not depend on any central registry). Mentova's DID has the form did:web:hostname.
+
+All ANP messages are signed with HMAC-SHA256. Incoming messages are verified before any content is processed.
+
+ANP supports meta-protocol negotiation: when two agents meet, they announce which protocols they support, so they can choose the best one.
+
+    ?- use_module(library(anp), [pai_anp_did/1, pai_anp_negotiate/2]).
+    ?- pai_anp_did(DID).       % Get Mentova's DID.
+    ?- pai_anp_negotiate(peer_endpoint, Protocols).  % Negotiate protocols with a peer.
+
+
+THE ROBOT BODY (PR 46 - ROS BRIDGE)
+
+PrologAI can inhabit a robot body through the Robot Operating System version 2 (ROS 2) bridge.
+
+The bridge connects the Lattice to ROS 2 topics, services, and actions.
+
+Perception from the robot (camera, LIDAR, touch) flows into the Lattice as percept_signal node_facts.
+
+Actions decided by the mind are sent to ROS 2 action servers, which execute them on the physical or simulated robot.
+
+The constitutional gate screens every physical action before it is sent. High-risk, irreversible actions require human authorization.
+
+The robot body is one of several bodies Mentova can inhabit:
+• text_io: the text console (the ?- prompt).
+• game bodies: ARC-AGI, Raven's Progressive Matrices, Baba Is You, Pokemon.
+• robot_body: the ROS 2 bridge.
+
+Bodies are enrolled at boot time. Additional bodies can be enrolled during a session.
+
+
+SUMMARY OF ALL 48 WORK PACKAGES
+
+PR 1: kernel - foundational types and patterns.
+PR 2: types - the type system.
+PR 3: lattice - the knowledge store.
+PR 4: node_facts - anchor_node/4, live_node_facts/2, traverse_nexus/4.
+PR 5: scopes - the nine-zone compartmentalization.
+PR 6: actors - cyclic actor framework.
+PR 7: pubsub - publish-subscribe messaging.
+PR 8: perception - sensory input processing.
+PR 9: sentinels - automatic Lattice watchers.
+PR 10: kernel extensions.
+PR 11: sona - episodic memory.
+PR 12: assessment - Piagetian, Bayley, CHC, consciousness indicators.
+PR 13: refinement - testing harness.
+PR 14: mcp_gateway - Model Context Protocol server.
+PR 15: defeasible - default reasoning with exceptions.
+PR 16: probabilistic - probabilistic reasoning.
+PR 17: continual refinement - self-improvement harness.
+PR 18: workspace - Global Workspace Theory cycle.
+PR 19: prediction / active inference.
+PR 20: bayesian - Bayesian updating.
+PR 21: evidential reasoning and budgets.
+PR 22: model composition and planning.
+PR 23: curiosity and self-directed learning.
+PR 24: somatic markers (emotion-like influence).
+PR 25: daydream - steered imagination.
+PR 26: appraisal - emotional appraisal and coping.
+PR 27: motivation - motivational drive system.
+PR 28: embedding - vector embedding integration.
+PR 29: vector_backend - vector search.
+PR 30: frames - frame-based knowledge.
+PR 31: vsa - Vector Symbolic Architecture.
+PR 32: attention economy - salience and competition.
+PR 33: induction - rule learning.
+PR 34: chainer - meta-reasoning chain.
+PR 35: abduction - best-explanation reasoning.
+PR 36: hyperon bridge (OpenCog Hyperon integration).
+PR 37: clause synthesis and specialization.
+PR 38: reflection and synthesis.
+PR 39: reference frames (spatial and conceptual).
+PR 40: spinoff - sub-agent creation.
+PR 41: distributional semantics and probabilistic logic.
+PR 42: attention schema.
+PR 43: a2a - Agent-to-Agent protocol.
+PR 44: tooling - tool-use faculty.
+PR 45: language understanding.
+PR 46: ros_bridge - robot body (ROS 2).
+PR 47: acp - Agent Communication Protocol.
+PR 48: anp - Agent Network Protocol (decentralized identity).
+
+
+WHAT COMES NEXT
+
+Chapter 12 covers writing your own PrologAI programs: creating .pl files, loading them into Mentova, and building new reasoning capabilities.
+
+END OF CHAPTER 11
+PROLOGAI TUTORIAL
+
+Chapter 12: Writing Your Own PrologAI Programs
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+FROM LEARNER TO PRACTITIONER
+
+You now know enough to write your own PrologAI programs.
+
+This chapter brings everything together with a complete worked example: a program that builds a small knowledge base about animals, runs several reasoning queries, stores evidence in the Lattice, and checks developmental milestones.
+
+It also covers the ERC (English Readable Code) convention that PrologAI uses, and the feature branch workflow for contributing to the platform.
+
+
+THE ERC CONVENTION
+
+Every line of code in a PrologAI .pl file must have an ERC comment immediately above it.
+
+ERC stands for English Readable Code. The comment is a plain-English description of what the following line does.
+
+This is not optional for PrologAI code. It is a standing rule that applies to all files in the PrologAI and Mentova repositories.
+
+Good ERC comment style:
+
+    % Check if the entity is a bird.
+    bird(tweety).
+
+    % Define the flying_bird rule: X is a flying bird if X is a bird and X can fly.
+    flying_bird(X) :- bird(X), can_fly(X).
+
+    % Anchor an observation into the Lattice.
+    anchor_node(percept_signal, [source(visual), stimulus(bird_seen)], [], _Id).
+
+Bad (not ERC-compliant):
+
+    bird(tweety).   % inline comment - not ERC style
+    flying_bird(X) :- bird(X), can_fly(X).   % no comment above
+
+The comment goes ABOVE each line, not at the end of it.
+
+
+A COMPLETE EXAMPLE PROGRAM
+
+Create a file called my_animal_program.pl with the following content.
+
+(Remember: every line needs an ERC comment above it.)
+
+    % Declare this file as the my_animal_program module with one exported predicate.
+    :- module(my_animal_program, [run_animal_program/0]).
+
+    % Register the assessment library path.
+    :- initialization(
+        % Add the assessment pack directory to the library search path.
+        assertz(user:file_search_path(library,
+            '/home/ccaitwo/PrologAI/packs/assessment/prolog')),
+        % Execute this directive immediately when the file loads.
+        now).
+
+    % Load the Mentova top-level interface.
+    :- use_module('../src/mentova/mentova').
+
+    % Load the assessment pack for developmental assessment predicates.
+    :- use_module(library(assessment), [assess_piaget/3, assess_all/2]).
+
+    % Load the node_facts pack for Lattice storage predicates.
+    :- use_module(library(node_facts), [anchor_node/4]).
+
+    % Load the standard lists library for list utilities.
+    :- use_module(library(lists), [member/2, length/2]).
+
+    % Define bird/1: declare which entities are birds.
+    bird(tweety).
+    % Define bird/1: robin is also a bird.
+    bird(robin).
+    % Define bird/1: eagle is a bird.
+    bird(eagle).
+
+    % Define mammal/1: declare which entities are mammals.
+    mammal(whale).
+    % Define mammal/1: dog is a mammal.
+    mammal(dog).
+
+    % Define can_fly/1: tweety can fly.
+    can_fly(tweety).
+    % Define can_fly/1: robin can fly.
+    can_fly(robin).
+    % Define can_fly/1: eagle can fly.
+    can_fly(eagle).
+
+    % Define flying_bird/1: an entity is a flying bird if it is a bird and can fly.
+    flying_bird(X) :-
+        % Check if X is a bird.
+        bird(X),
+        % Check if X can fly.
+        can_fly(X).
+
+    % Define run_animal_program/0: the main entry point for this program.
+    run_animal_program :-
+        % Boot the Mentova mind.
+        mentova_boot,
+        % Print the program header.
+        format("~n=== My Animal Program ===~n~n"),
+
+        % Find all flying birds.
+        format("Finding all flying birds...~n"),
+        % Collect all entities that satisfy flying_bird/1.
+        findall(X, flying_bird(X), FlyingBirds),
+        % Print the result.
+        format("Flying birds: ~w~n~n", [FlyingBirds]),
+
+        % Ask Mentova a deductive question.
+        format("Asking Mentova: is tweety a bird?~n"),
+        % Query Mentova using deductive reasoning.
+        mentova_query(deductive, is_a(tweety, bird), R1),
+        % Print the answer.
+        format("Answer: ~w~n~n", [R1]),
+
+        % Store a visual observation in the Lattice.
+        format("Storing a visual observation in the Lattice...~n"),
+        % Anchor a percept_signal node_fact for the bird sighting.
+        anchor_node(percept_signal,
+            [source(visual), stimulus(bird_sighted), entity(tweety)],
+            [nature, observation], _Id1),
+        % Print confirmation.
+        format("Observation stored.~n~n"),
+
+        % Check the Piagetian Level 1 milestone.
+        format("Checking Piagetian Level 1 (reflex coordination)...~n"),
+        % Call assess_piaget to check level 1.
+        assess_piaget(mentova, 1, L1),
+        % Print the result.
+        format("Level 1: ~w~n~n", [L1]),
+
+        % Print the program footer.
+        format("=== Program complete. ===~n").
+
+This program:
+
+1. Declares a module and registers library paths.
+
+2. Loads Mentova, assessment, and node_facts.
+
+3. Defines facts about animals.
+
+4. Defines a rule for flying_bird.
+
+5. Has a main predicate (run_animal_program/0) that boots Mentova, finds flying birds, asks a reasoning question, stores a Lattice observation, and checks a developmental milestone.
+
+
+RUNNING THE PROGRAM
+
+Load the file from the Mentova directory:
+
+    ?- consult('/path/to/my_animal_program.pl').
+
+Then run it:
+
+    ?- run_animal_program.
+
+You should see:
+
+    === My Animal Program ===
+
+    Finding all flying birds...
+    Flying birds: [tweety, robin, eagle]
+
+    Asking Mentova: is tweety a bird?
+    Answer: answer(yes, just(tweety, is_a, bird, chain([tweety, bird])))
+
+    Storing a visual observation in the Lattice...
+    Observation stored.
+
+    Checking Piagetian Level 1 (reflex coordination)...
+    Level 1: milestone_achieved
+
+    === Program complete. ===
+
+
+THE FEATURE BRANCH WORKFLOW
+
+If you want to contribute a new program to the PrologAI or Mentova repositories, use the feature branch workflow.
+
+1. Create a new branch: git checkout -b feature/my-new-feature
+
+2. Write your code with ERC comments on every line.
+
+3. Write acceptance criteria (what must be true for the code to be considered working).
+
+4. Commit your code: git add my_file.pl && git commit -m "feat: description"
+
+5. Push to GitHub: git push -u origin feature/my-new-feature
+
+6. Create a pull request: gh pr create --title "feat: description" --body "..."
+
+7. After review and approval: gh pr merge [number] --merge
+
+8. Return to main: git checkout main && git pull
+
+The standing rule: every code change must be accompanied by SPARC documentation changes describing what changed and why.
+
+
+NEXT STEPS
+
+You have completed the PrologAI Tutorial.
+
+You now know:
+
+• What PrologAI is and how it differs from other AI systems.
+
+• How to write Prolog facts, rules, and queries.
+
+• How to use variables, unification, and backtracking.
+
+• How to work with lists and arithmetic.
+
+• How to load and use PrologAI modules and packs.
+
+• How the Lattice works and how to store and retrieve knowledge.
+
+• How to use mentova_query/3 to access all 48+ reasoning types.
+
+• How the assessment framework measures developmental progress.
+
+• How the constitutional layer and safety system work.
+
+• How actors, SONA, the workspace, and the agent protocols work.
+
+• How to write complete PrologAI programs.
+
+Continue by reading the Mentova Tutorial, which covers using Mentova as an interactive reasoning assistant.
+
+Read the scientific papers in the Mentova papers/ directory to see how each capability was demonstrated.
+
+Explore the demo files in demos/ to see complete, working examples of every major feature.
+
+And most importantly: experiment. The ?- prompt is waiting.
+
+END OF CHAPTER 12 AND END OF THE PROLOGAI TUTORIAL

@@ -1,0 +1,196 @@
+PROLOGAI TUTORIAL
+
+Chapter 9: Assessing the Mind - The Assessment Framework
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+WHY ASSESS A MIND?
+
+PrologAI includes a formal assessment framework (PR 12) that measures how developed a mind is, using three well-known scientific frameworks from human developmental psychology.
+
+These frameworks give us a way to describe what a mind can do, compare it to developmental expectations, and track its growth over time.
+
+The three frameworks are:
+
+1. The Piagetian Milestone Ladder (from Jean Piaget's theory of cognitive development).
+
+2. The Bayley Scales of Infant and Toddler Development.
+
+3. The Cattell-Horn-Carroll (CHC) model of cognitive abilities.
+
+In addition, the assessment framework measures four consciousness indicators: markers of awareness and self-model that research has associated with conscious experience.
+
+
+THE PIAGETIAN MILESTONE LADDER
+
+Jean Piaget was a Swiss psychologist who studied how children develop reasoning abilities. He identified stages of cognitive development, from the most basic reflexive behaviors in infancy to the ability to reason abstractly in adolescence and adulthood.
+
+PrologAI uses a modified eight-level Piagetian scale. Each level corresponds to a type of knowledge stored in the Lattice.
+
+Level 1: reflex_coordination. The mind can respond automatically to stimuli without deliberation. Evidence: a percept_signal node_fact exists in the Lattice.
+
+Level 2: object_permanence. The mind knows that objects continue to exist even when not directly perceived. Evidence: an object_tracking node_fact exists.
+
+Level 3: goal_directed_behavior. The mind acts toward specific goals. Evidence: an objective node_fact exists.
+
+Level 4: deferred_imitation. The mind can reproduce an observed action after a delay. Evidence: an agent_action node_fact (with type deferred_imitation) exists.
+
+Level 5: symbolic_representation. The mind can use symbols that stand for things in the world. Evidence: a symbolic_representation node_fact exists.
+
+Level 6: conservation. The mind understands that quantity does not change with spatial arrangement. Evidence: a conservation_demonstrated node_fact exists.
+
+Level 7: theory_of_mind. The mind can reason about the beliefs of other agents, including beliefs that are false. Evidence: a theory_of_mind node_fact exists.
+
+Level 8: formal_operations. The mind can reason with abstract symbols and hypothetical premises it knows to be false. Evidence: a formal_proof node_fact exists.
+
+
+USING ASSESS_PIAGET/3
+
+    assess_piaget(+MindId, +Level, -Result)
+
+MindId: the name of the mind being assessed (mentova for the Mentova mind).
+
+Level: a number from 1 to 8.
+
+Result: milestone_achieved or milestone_not_achieved.
+
+Examples at the console:
+
+    ?- assess_piaget(mentova, 1, R).
+    R = milestone_not_achieved.
+
+If this returns milestone_not_achieved, it means there is no percept_signal node_fact in the APEX_MIND nexus. Let us add one:
+
+    ?- anchor_node(percept_signal, [source(visual), stimulus(object_appeared)], [], _).
+    true.
+
+    ?- assess_piaget(mentova, 1, R).
+    R = milestone_achieved.
+
+Now the evidence is present and the milestone is confirmed.
+
+Let us add evidence for Levels 2, 3, and 5:
+
+    ?- anchor_node(object_tracking, [object(tweety), tracked_across(context_shift)], [], _).
+    ?- anchor_node(objective, [goal(is_a(tweety, bird)), method(deduction)], [], _).
+    ?- anchor_node(symbolic_representation, [symbol(tweety), referent(bird_individual)], [], _).
+
+Now check those levels:
+
+    ?- assess_piaget(mentova, 2, R). % R = milestone_achieved.
+    ?- assess_piaget(mentova, 3, R). % R = milestone_achieved.
+    ?- assess_piaget(mentova, 5, R). % R = milestone_achieved.
+
+
+THE FULL 8/8 SCOREBOARD
+
+To check all eight levels at once, use findall/3:
+
+    ?- findall(L-R, (between(1, 8, L), assess_piaget(mentova, L, R)), Scores).
+
+This returns a list like:
+
+    Scores = [1-milestone_achieved, 2-milestone_achieved, 3-milestone_achieved,
+              4-milestone_not_achieved, 5-milestone_achieved,
+              6-milestone_not_achieved, 7-milestone_not_achieved,
+              8-milestone_not_achieved].
+
+To count achievements:
+
+    ?- findall(L, (between(1, 8, L), assess_piaget(mentova, L, milestone_achieved)), Achieved),
+       length(Achieved, Count).
+
+
+THE BAYLEY SCALES
+
+The Bayley Scales measure cognitive, language, motor, and adaptive abilities.
+
+    assess_bayley(+MindId, -Report)
+
+    ?- assess_bayley(mentova, R).
+
+Returns a report with proxy scores for:
+• cognitive_dq: cognitive development quotient.
+• language_dq: language development quotient.
+• motor_dq: motor development quotient.
+• adaptive_dq: adaptive behavior quotient.
+
+These are proxy scores computed from the Lattice state. A mind with more diverse knowledge and more active reasoning will score higher.
+
+
+THE CHC MODEL
+
+The Cattell-Horn-Carroll (CHC) model describes cognitive abilities across six broad domains.
+
+    assess_chc(+MindId, -Report)
+
+    ?- assess_chc(mentova, R).
+
+Returns a report with scores for:
+• fluid_reasoning: ability to solve novel problems.
+• crystallized_knowledge: accumulated factual and procedural knowledge.
+• short_term_memory: working memory capacity.
+• processing_speed: how quickly information is processed.
+• long_term_retrieval: ability to retrieve information from long-term memory.
+• visual_processing: ability to process visual information.
+
+Like the Bayley scores, CHC scores are computed from the Lattice state and reasoning activity.
+
+
+CONSCIOUSNESS INDICATORS
+
+The assessment framework also reports four consciousness indicators.
+
+    workspace_ignition: whether the global workspace has broadcast content (PR 18).
+    recurrent_processing: whether there is active cyclic processing (PR 6-9).
+    self_model_presence: whether the mind has a self-model in the Lattice.
+    valence_system: whether the affect system is active (PR 24-26).
+
+These are not a claim that the mind is conscious. They are observations of internal states that research has identified as correlates of consciousness in humans. Their presence is noted honestly, without overclaiming.
+
+
+ASSESS_ALL/2 - THE COMPLETE REPORT
+
+    assess_all(+MindId, -Report)
+
+    ?- assess_all(mentova, R).
+
+This runs all three assessment frameworks plus the consciousness indicators in one call and returns a complete report.
+
+The report is a structured term containing the Bayley report, the CHC report, the Piagetian milestone list, and the consciousness indicator list.
+
+
+WHY ASSESSMENT MATTERS
+
+Assessment gives the developmental record an objective basis.
+
+Every Mentova accomplishment is linked to what the assessment shows at that point. The growth path from Acc_60 is structured around the Piagetian milestone ladder: achieving Levels 1, 4, 6, and 8 was the first growth path milestone (completed at Acc_67).
+
+The CHC battery is the sixth growth path milestone: once all six broad abilities are measurably non-zero, the mind has a full cognitive profile.
+
+Assessment keeps the project honest: instead of claiming "Mentova is intelligent," the project reports what specific evidence exists in the Lattice and what the frameworks say about it.
+
+
+EXERCISE
+
+1. Run bin/mentova to start a session.
+
+2. Add evidence for all eight Piagetian levels:
+
+    anchor_node(percept_signal, [source(visual)], [], _).
+    anchor_node(object_tracking, [object(ball)], [], _).
+    anchor_node(objective, [goal(find(ball))], [], _).
+    anchor_node(agent_action, [type(deferred_imitation), recalled_from(memory)], [], _).
+    anchor_node(symbolic_representation, [symbol(x), referent(unknown)], [], _).
+    anchor_node(conservation_demonstrated, [count_a(5), count_b(5), verdict(invariant)], [], _).
+    anchor_node(theory_of_mind, [false_belief(other_agent, location_a), actual(location_b)], [], _).
+    anchor_node(formal_proof, [syllogism(modus_ponens), verdict(valid)], [], _).
+
+3. Check the full scoreboard: findall(L-R, (between(1, 8, L), assess_piaget(mentova, L, R)), Scores).
+
+4. Run the full assessment: assess_all(mentova, R).
+
+5. Examine R. What are the Bayley and CHC scores?
+
+END OF CHAPTER 9

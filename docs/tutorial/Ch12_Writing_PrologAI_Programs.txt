@@ -1,0 +1,240 @@
+PROLOGAI TUTORIAL
+
+Chapter 12: Writing Your Own PrologAI Programs
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+FROM LEARNER TO PRACTITIONER
+
+You now know enough to write your own PrologAI programs.
+
+This chapter brings everything together with a complete worked example: a program that builds a small knowledge base about animals, runs several reasoning queries, stores evidence in the Lattice, and checks developmental milestones.
+
+It also covers the ERC (English Readable Code) convention that PrologAI uses, and the feature branch workflow for contributing to the platform.
+
+
+THE ERC CONVENTION
+
+Every line of code in a PrologAI .pl file must have an ERC comment immediately above it.
+
+ERC stands for English Readable Code. The comment is a plain-English description of what the following line does.
+
+This is not optional for PrologAI code. It is a standing rule that applies to all files in the PrologAI and Mentova repositories.
+
+Good ERC comment style:
+
+    % Check if the entity is a bird.
+    bird(tweety).
+
+    % Define the flying_bird rule: X is a flying bird if X is a bird and X can fly.
+    flying_bird(X) :- bird(X), can_fly(X).
+
+    % Anchor an observation into the Lattice.
+    anchor_node(percept_signal, [source(visual), stimulus(bird_seen)], [], _Id).
+
+Bad (not ERC-compliant):
+
+    bird(tweety).   % inline comment - not ERC style
+    flying_bird(X) :- bird(X), can_fly(X).   % no comment above
+
+The comment goes ABOVE each line, not at the end of it.
+
+
+A COMPLETE EXAMPLE PROGRAM
+
+Create a file called my_animal_program.pl with the following content.
+
+(Remember: every line needs an ERC comment above it.)
+
+    % Declare this file as the my_animal_program module with one exported predicate.
+    :- module(my_animal_program, [run_animal_program/0]).
+
+    % Register the assessment library path.
+    :- initialization(
+        % Add the assessment pack directory to the library search path.
+        assertz(user:file_search_path(library,
+            '/home/ccaitwo/PrologAI/packs/assessment/prolog')),
+        % Execute this directive immediately when the file loads.
+        now).
+
+    % Load the Mentova top-level interface.
+    :- use_module('../src/mentova/mentova').
+
+    % Load the assessment pack for developmental assessment predicates.
+    :- use_module(library(assessment), [assess_piaget/3, assess_all/2]).
+
+    % Load the node_facts pack for Lattice storage predicates.
+    :- use_module(library(node_facts), [anchor_node/4]).
+
+    % Load the standard lists library for list utilities.
+    :- use_module(library(lists), [member/2, length/2]).
+
+    % Define bird/1: declare which entities are birds.
+    bird(tweety).
+    % Define bird/1: robin is also a bird.
+    bird(robin).
+    % Define bird/1: eagle is a bird.
+    bird(eagle).
+
+    % Define mammal/1: declare which entities are mammals.
+    mammal(whale).
+    % Define mammal/1: dog is a mammal.
+    mammal(dog).
+
+    % Define can_fly/1: tweety can fly.
+    can_fly(tweety).
+    % Define can_fly/1: robin can fly.
+    can_fly(robin).
+    % Define can_fly/1: eagle can fly.
+    can_fly(eagle).
+
+    % Define flying_bird/1: an entity is a flying bird if it is a bird and can fly.
+    flying_bird(X) :-
+        % Check if X is a bird.
+        bird(X),
+        % Check if X can fly.
+        can_fly(X).
+
+    % Define run_animal_program/0: the main entry point for this program.
+    run_animal_program :-
+        % Boot the Mentova mind.
+        mentova_boot,
+        % Print the program header.
+        format("~n=== My Animal Program ===~n~n"),
+
+        % Find all flying birds.
+        format("Finding all flying birds...~n"),
+        % Collect all entities that satisfy flying_bird/1.
+        findall(X, flying_bird(X), FlyingBirds),
+        % Print the result.
+        format("Flying birds: ~w~n~n", [FlyingBirds]),
+
+        % Ask Mentova a deductive question.
+        format("Asking Mentova: is tweety a bird?~n"),
+        % Query Mentova using deductive reasoning.
+        mentova_query(deductive, is_a(tweety, bird), R1),
+        % Print the answer.
+        format("Answer: ~w~n~n", [R1]),
+
+        % Store a visual observation in the Lattice.
+        format("Storing a visual observation in the Lattice...~n"),
+        % Anchor a percept_signal node_fact for the bird sighting.
+        anchor_node(percept_signal,
+            [source(visual), stimulus(bird_sighted), entity(tweety)],
+            [nature, observation], _Id1),
+        % Print confirmation.
+        format("Observation stored.~n~n"),
+
+        % Check the Piagetian Level 1 milestone.
+        format("Checking Piagetian Level 1 (reflex coordination)...~n"),
+        % Call assess_piaget to check level 1.
+        assess_piaget(mentova, 1, L1),
+        % Print the result.
+        format("Level 1: ~w~n~n", [L1]),
+
+        % Print the program footer.
+        format("=== Program complete. ===~n").
+
+This program:
+
+1. Declares a module and registers library paths.
+
+2. Loads Mentova, assessment, and node_facts.
+
+3. Defines facts about animals.
+
+4. Defines a rule for flying_bird.
+
+5. Has a main predicate (run_animal_program/0) that boots Mentova, finds flying birds, asks a reasoning question, stores a Lattice observation, and checks a developmental milestone.
+
+
+RUNNING THE PROGRAM
+
+Load the file from the Mentova directory:
+
+    ?- consult('/path/to/my_animal_program.pl').
+
+Then run it:
+
+    ?- run_animal_program.
+
+You should see:
+
+    === My Animal Program ===
+
+    Finding all flying birds...
+    Flying birds: [tweety, robin, eagle]
+
+    Asking Mentova: is tweety a bird?
+    Answer: answer(yes, just(tweety, is_a, bird, chain([tweety, bird])))
+
+    Storing a visual observation in the Lattice...
+    Observation stored.
+
+    Checking Piagetian Level 1 (reflex coordination)...
+    Level 1: milestone_achieved
+
+    === Program complete. ===
+
+
+THE FEATURE BRANCH WORKFLOW
+
+If you want to contribute a new program to the PrologAI or Mentova repositories, use the feature branch workflow.
+
+1. Create a new branch: git checkout -b feature/my-new-feature
+
+2. Write your code with ERC comments on every line.
+
+3. Write acceptance criteria (what must be true for the code to be considered working).
+
+4. Commit your code: git add my_file.pl && git commit -m "feat: description"
+
+5. Push to GitHub: git push -u origin feature/my-new-feature
+
+6. Create a pull request: gh pr create --title "feat: description" --body "..."
+
+7. After review and approval: gh pr merge [number] --merge
+
+8. Return to main: git checkout main && git pull
+
+The standing rule: every code change must be accompanied by SPARC documentation changes describing what changed and why.
+
+
+NEXT STEPS
+
+You have completed the PrologAI Tutorial.
+
+You now know:
+
+• What PrologAI is and how it differs from other AI systems.
+
+• How to write Prolog facts, rules, and queries.
+
+• How to use variables, unification, and backtracking.
+
+• How to work with lists and arithmetic.
+
+• How to load and use PrologAI modules and packs.
+
+• How the Lattice works and how to store and retrieve knowledge.
+
+• How to use mentova_query/3 to access all 48+ reasoning types.
+
+• How the assessment framework measures developmental progress.
+
+• How the constitutional layer and safety system work.
+
+• How actors, SONA, the workspace, and the agent protocols work.
+
+• How to write complete PrologAI programs.
+
+Continue by reading the Mentova Tutorial, which covers using Mentova as an interactive reasoning assistant.
+
+Read the scientific papers in the Mentova papers/ directory to see how each capability was demonstrated.
+
+Explore the demo files in demos/ to see complete, working examples of every major feature.
+
+And most importantly: experiment. The ?- prompt is waiting.
+
+END OF CHAPTER 12 AND END OF THE PROLOGAI TUTORIAL

@@ -1,0 +1,283 @@
+PROLOGAI TUTORIAL
+
+Chapter 3: Facts, Rules, and Queries - The Three Building Blocks
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+THE THREE BUILDING BLOCKS
+
+Everything in Prolog is built from three kinds of statements.
+
+• Facts: things that are simply true.
+
+• Rules: things that are true if other things are true.
+
+• Queries: questions you ask about what is true.
+
+This chapter explains each one carefully, with examples you can try at the console.
+
+Start your interactive session now: run bin/mentova and wait for the ?- prompt.
+
+
+FACTS
+
+A fact is a statement that declares something to be true, without any conditions.
+
+Here are some examples of facts in Prolog syntax:
+
+    bird(tweety).
+    bird(robin).
+    mammal(whale).
+    mammal(dog).
+    can_fly(tweety).
+    can_fly(robin).
+
+Read these aloud in plain English:
+
+• "Tweety is a bird."
+
+• "Robin is a bird."
+
+• "Whale is a mammal."
+
+• "Dog is a mammal."
+
+• "Tweety can fly."
+
+• "Robin can fly."
+
+Notice the structure: a name (called a predicate or functor), followed by one or more values in parentheses, followed by a period.
+
+The name (bird, mammal, can_fly) tells you what kind of relationship this is.
+
+The value in parentheses (tweety, robin, whale) tells you what thing this applies to.
+
+IMPORTANT: In Prolog, words that start with a lowercase letter are atoms - fixed, concrete values. Words that start with an uppercase letter are variables (we will cover variables in Chapter 5). So tweety, bird, mammal, and can_fly are all atoms.
+
+HOW TO ASSERT A FACT AT THE CONSOLE
+
+At the ?- prompt, you can add a fact using assertz/1 (which means "assert this and put it at the end of the knowledge base"):
+
+    ?- assertz(bird(tweety)).
+
+Press Enter. You will see:
+
+    true.
+
+That means the fact has been added. Now try:
+
+    ?- assertz(bird(robin)).
+    ?- assertz(can_fly(tweety)).
+    ?- assertz(can_fly(robin)).
+    ?- assertz(mammal(whale)).
+
+Type each one, then press Enter.
+
+
+QUERIES
+
+Now that you have added some facts, you can ask questions about them.
+
+A query is a question you ask the system: "Is this true?"
+
+    ?- bird(tweety).
+
+Press Enter. You will see:
+
+    true.
+
+PrologAI found the fact bird(tweety) and confirmed it is true.
+
+Try:
+
+    ?- bird(whale).
+
+You will see:
+
+    false.
+
+PrologAI looked for a fact that says whale is a bird, did not find one, and answered false.
+
+Try:
+
+    ?- can_fly(tweety).
+
+You will see:
+
+    true.
+
+Try:
+
+    ?- mammal(tweety).
+
+You will see:
+
+    false.
+
+(Because we only said tweety is a bird, not a mammal.)
+
+Every query is a check: "Does PrologAI know this to be true?" If it finds the answer, it says true. If it does not find it, it says false.
+
+
+RULES
+
+A rule says: "This is true IF some other things are true."
+
+Here is an example. We want to express: "A flying bird is a creature that is a bird AND can fly."
+
+In Prolog:
+
+    flying_bird(X) :- bird(X), can_fly(X).
+
+Read this aloud: "X is a flying bird IF X is a bird AND X can fly."
+
+The :- symbol means "if". The comma between bird(X) and can_fly(X) means "and".
+
+The capital letter X is a variable. It stands for "any value". When PrologAI runs this rule, it tries to find a specific value for X that makes the whole rule true.
+
+HOW TO ASSERT A RULE AT THE CONSOLE
+
+At the ?- prompt:
+
+    ?- assertz((flying_bird(X) :- bird(X), can_fly(X))).
+
+Notice the extra parentheses around the whole rule. This is required when asserting rules at the console.
+
+Press Enter. You will see:
+
+    true.
+
+Now try the query:
+
+    ?- flying_bird(tweety).
+
+You will see:
+
+    true.
+
+How did PrologAI know? It followed these steps:
+
+1. You asked: "Is tweety a flying bird?"
+
+2. PrologAI found the rule: "X is a flying bird if X is a bird and X can fly."
+
+3. It set X = tweety and checked: "Is tweety a bird?" It found bird(tweety). Yes.
+
+4. It checked: "Can tweety fly?" It found can_fly(tweety). Yes.
+
+5. Both conditions are true, so flying_bird(tweety) is true.
+
+Try:
+
+    ?- flying_bird(whale).
+
+You will see:
+
+    false.
+
+Whale is a mammal, not a bird. The rule for flying_bird requires the subject to be a bird. Whale is not a bird, so the rule fails.
+
+
+THE PERIOD IS MANDATORY
+
+Every fact, rule, and query must end with a period (.).
+
+If you forget the period, SWI-Prolog will show |: and wait for you to finish. Just type a period and press Enter.
+
+If you see |: unexpectedly, you probably forgot the period on a previous line.
+
+
+THE COMMA AND THE SEMICOLON
+
+In Prolog:
+
+• A comma (,) between conditions means AND. Both must be true.
+
+• A semicolon (;) between conditions means OR. At least one must be true.
+
+Example of OR:
+
+    ?- assertz((has_wings(X) :- bird(X) ; can_fly(X))).
+
+This rule says: "X has wings if X is a bird OR X can fly."
+
+
+MULTIPLE FACTS FOR THE SAME PREDICATE
+
+You can have as many facts as you want for the same predicate name:
+
+    ?- assertz(color(tweety, yellow)).
+    ?- assertz(color(robin, red)).
+    ?- assertz(color(whale, blue)).
+
+Now color has three facts. You can query any of them:
+
+    ?- color(tweety, yellow).
+
+Answer: true.
+
+    ?- color(tweety, red).
+
+Answer: false. (Tweety is yellow, not red.)
+
+A predicate with two values in its parentheses is called a binary predicate because it relates two things.
+
+bird/1 is a unary predicate (one value).
+
+color/2 is a binary predicate (two values).
+
+You can have predicates with any number of values.
+
+
+THE KNOWLEDGE BASE
+
+All the facts and rules you have asserted during a session are stored in the knowledge base.
+
+You can see what is in the knowledge base by typing:
+
+    ?- listing(bird/1).
+
+This shows all facts and rules for the bird predicate with one argument.
+
+Try:
+
+    ?- listing(flying_bird/1).
+
+You will see the rule you asserted.
+
+Note: facts and rules you add at the ?- prompt during a session are not saved when you exit. To make permanent changes, you write your facts and rules in a .pl file and load it. Chapter 8 covers loading files.
+
+
+WHAT YOU HAVE LEARNED
+
+• A fact declares something true: bird(tweety).
+
+• A rule says something is true if conditions are met: flying_bird(X) :- bird(X), can_fly(X).
+
+• A query asks if something is true: ?- flying_bird(tweety).
+
+• assertz/1 adds facts and rules to the knowledge base.
+
+• A period (.) ends every statement.
+
+• Lowercase words are atoms (concrete values). Uppercase words are variables.
+
+
+EXERCISE
+
+At the console, try the following.
+
+1. Add facts for three people: person(alice). person(bob). person(carol).
+
+2. Add facts for their ages: age(alice, 30). age(bob, 25). age(carol, 35).
+
+3. Add a rule: adult(X) :- person(X), age(X, A), A >= 18.
+
+4. Query: ?- adult(alice). (Should be true.)
+
+5. Query: ?- adult(bob). (Should be true.)
+
+The >= in the rule means "greater than or equal to". A >= 18 checks whether the value A is at least 18.
+
+END OF CHAPTER 3

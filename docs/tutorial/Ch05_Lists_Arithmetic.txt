@@ -1,0 +1,222 @@
+PROLOGAI TUTORIAL
+
+Chapter 5: Lists and Arithmetic
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+LISTS
+
+A list is an ordered sequence of items.
+
+In Prolog, a list is written with square brackets and items separated by commas:
+
+    [apple, banana, cherry]
+    [1, 2, 3, 4, 5]
+    [tweety, robin, whale]
+    []
+
+The last example, [], is the empty list - a list with no items.
+
+Lists can contain anything: atoms, numbers, variables, other lists, or a mix.
+
+
+HEAD AND TAIL
+
+Every non-empty list has two parts:
+
+• The head: the first item.
+
+• The tail: the rest of the list (also a list).
+
+Prolog uses a vertical bar | to split a list into head and tail:
+
+    ?- [H|T] = [apple, banana, cherry].
+
+Answer: H = apple, T = [banana, cherry].
+
+The head is apple, and the tail is [banana, cherry].
+
+    ?- [H|T] = [apple].
+
+Answer: H = apple, T = [].
+
+A list with one item has the item as head and the empty list as tail.
+
+    ?- [H|T] = [].
+
+Answer: false. (An empty list has no head or tail.)
+
+You can also extract multiple items from the front:
+
+    ?- [First, Second | Rest] = [1, 2, 3, 4, 5].
+
+Answer: First = 1, Second = 2, Rest = [3, 4, 5].
+
+
+COMMON LIST PREDICATES
+
+SWI-Prolog (and PrologAI) includes many built-in predicates for working with lists. You access them by loading the lists library:
+
+    ?- use_module(library(lists)).
+
+Now you can use:
+
+length/2 - finds the length of a list:
+
+    ?- length([a, b, c], N).
+    N = 3.
+
+member/2 - checks if an item is in a list, or finds items:
+
+    ?- member(b, [a, b, c]).
+    true.
+
+    ?- member(X, [a, b, c]).
+    X = a ; X = b ; X = c.
+
+append/3 - joins two lists:
+
+    ?- append([1, 2], [3, 4], Result).
+    Result = [1, 2, 3, 4].
+
+    ?- append(X, [3, 4], [1, 2, 3, 4]).
+    X = [1, 2].
+
+reverse/2 - reverses a list:
+
+    ?- reverse([1, 2, 3], R).
+    R = [3, 2, 1].
+
+last/2 - finds the last element:
+
+    ?- last([1, 2, 3], Last).
+    Last = 3.
+
+nth0/3 - gets the item at a position (counting from 0):
+
+    ?- nth0(0, [a, b, c], Item).
+    Item = a.
+
+    ?- nth0(2, [a, b, c], Item).
+    Item = c.
+
+nth1/3 - gets the item at a position (counting from 1):
+
+    ?- nth1(1, [a, b, c], Item).
+    Item = a.
+
+msort/2 - sorts a list (keeping duplicates):
+
+    ?- msort([3, 1, 2, 1], Sorted).
+    Sorted = [1, 1, 2, 3].
+
+sort/2 - sorts a list (removing duplicates):
+
+    ?- sort([3, 1, 2, 1], Sorted).
+    Sorted = [1, 2, 3].
+
+
+WRITING RULES THAT WORK WITH LISTS
+
+Here is a rule that counts how many items in a list satisfy a condition.
+
+Suppose you have:
+
+    ?- assertz(age(alice, 30)).
+    ?- assertz(age(bob, 17)).
+    ?- assertz(age(carol, 25)).
+    ?- assertz(age(dave, 15)).
+
+And you want a rule that collects all adults (age 18 or over):
+
+    ?- assertz((adult_list(Adults) :-
+        findall(Name, (age(Name, A), A >= 18), Adults))).
+
+Now query:
+
+    ?- adult_list(Adults).
+    Adults = [alice, carol].
+
+
+ARITHMETIC
+
+In Prolog, you can compute arithmetic results with is/2.
+
+    ?- X is 3 + 4.
+    X = 7.
+
+    ?- X is 10 * 5.
+    X = 50.
+
+    ?- X is 20 / 4.
+    X = 5.0.
+
+    ?- X is 20 // 4.
+    X = 5.
+
+    ?- X is 20 mod 3.
+    X = 2.
+
+Note: / gives a floating-point result (with a decimal point). // gives integer division. mod gives the remainder.
+
+You can use is/2 with more complex expressions:
+
+    ?- X is (3 + 4) * 2.
+    X = 14.
+
+    ?- X is max(10, 20).
+    X = 20.
+
+    ?- X is min(10, 20).
+    X = 10.
+
+    ?- X is abs(-5).
+    X = 5.
+
+    ?- X is sqrt(9.0).
+    X = 3.0.
+
+
+COUNTING ITEMS IN A LIST
+
+    ?- length([a, b, c, d], N), N > 3.
+    N = 4.
+
+    ?- length([a, b], N), N > 3.
+    false.
+
+
+SUMMING A LIST
+
+PrologAI includes aggregate_all/3 for counting and summing over queries.
+
+    ?- assertz(score(alice, 90)).
+    ?- assertz(score(bob, 75)).
+    ?- assertz(score(carol, 88)).
+
+    ?- aggregate_all(count, score(_, _), N).
+    N = 3.
+
+    ?- aggregate_all(sum(S), score(_, S), Total).
+    Total = 253.
+
+    ?- aggregate_all(max(S), score(_, S), Max).
+    Max = 90.
+
+
+EXERCISE
+
+Try the following at the console.
+
+1. Create a list: ?- X = [10, 20, 30, 40, 50].
+
+2. Find its length: ?- X = [10, 20, 30, 40, 50], length(X, N).
+
+3. Find its first element: ?- [H|_] = [10, 20, 30, 40, 50].
+
+4. Sort it in reverse: ?- sort([50, 10, 40, 20, 30], Sorted), reverse(Sorted, Rev).
+
+5. Compute the sum: first add some score facts, then use aggregate_all(sum(S), score(_, S), Total).
+
+END OF CHAPTER 5

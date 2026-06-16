@@ -1,0 +1,209 @@
+PROLOGAI TUTORIAL
+
+Chapter 2: Getting Started
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+WHAT YOU WILL INSTALL
+
+This chapter walks you through installing three things.
+
+1. SWI-Prolog - the Prolog engine that runs PrologAI.
+
+2. PrologAI - the platform (the libraries, packs, and tools).
+
+3. Mentova - the mind (built on PrologAI).
+
+You will also learn how to start an interactive session - the console where you can type questions and see answers in real time.
+
+
+STEP 1: INSTALL SWI-PROLOG
+
+SWI-Prolog is the software that runs PrologAI programs. It is free and open source.
+
+To install it:
+
+1. Go to https://www.swi-prolog.org/Download.html
+
+2. Download the installer for your operating system (Linux, macOS, or Windows).
+
+3. Run the installer and follow the on-screen instructions.
+
+4. When installation is complete, open a terminal (on Linux or macOS) or a command prompt (on Windows) and type: swipl --version
+
+5. You should see output that looks something like: SWI-Prolog version 9.0.4
+
+If you see that, SWI-Prolog is installed correctly.
+
+If you see an error, go back to the download page and make sure you downloaded the right version for your operating system.
+
+What is a terminal? A terminal is a text window where you type commands and the computer responds. On Linux, look for an application called Terminal or Konsole. On macOS, look for an application called Terminal in the Utilities folder. On Windows, look for Command Prompt or PowerShell.
+
+
+STEP 2: GET THE PROLOGAI REPOSITORY
+
+PrologAI is stored in a repository on GitHub. A repository is a folder of files that is tracked by version control software called Git.
+
+You do not need to understand Git in detail to use PrologAI. You just need to download the repository.
+
+Method A (using Git - recommended):
+
+1. Open your terminal.
+
+2. Navigate to the folder where you want to put PrologAI. For example: cd /home/yourname/
+
+3. Type: git clone https://github.com/ai-university-aiu/PrologAI.git
+
+4. Wait for the download to finish. You will see a new folder called PrologAI.
+
+Method B (without Git):
+
+1. Go to https://github.com/ai-university-aiu/PrologAI in your web browser.
+
+2. Click the green Code button.
+
+3. Click Download ZIP.
+
+4. Unzip the downloaded file to your chosen folder.
+
+What is Git? Git is software that tracks changes to files over time. It lets many people work on the same project without overwriting each other's work. You can install Git from https://git-scm.com/
+
+
+STEP 3: GET THE MENTOVA REPOSITORY
+
+Mentova lives in a separate repository. Follow the same steps as above, but with the Mentova address.
+
+Method A (using Git):
+
+1. In your terminal, navigate to the same parent folder: cd /home/yourname/
+
+2. Type: git clone https://github.com/ai-university-aiu/Mentova.git
+
+3. Wait for the download. You will see a new folder called Mentova.
+
+Method B (without Git):
+
+1. Go to https://github.com/ai-university-aiu/Mentova in your web browser.
+
+2. Click Code, then Download ZIP.
+
+3. Unzip to your chosen folder.
+
+
+STEP 4: START YOUR FIRST INTERACTIVE SESSION
+
+Now you are ready to start Mentova's interactive console.
+
+1. Open your terminal.
+
+2. Navigate to the Mentova folder: cd /home/yourname/Mentova
+
+3. Type: swipl -l bin/mentova_repl.pl
+
+Or, if you are on Linux or macOS, you can use the shorter launcher: ./bin/mentova
+
+You will see output that looks something like this:
+
+    SWI-Prolog (version...)
+
+    === Mentova is waking up ===
+    Platform : PrologAI
+    Mind     : Mentova
+
+    Constitution: 8 principles, 1 overseer(s)
+    Knowledge: Small-World Commonsense loaded
+
+    Mentova is ready. Born at Rung 1 - transparent deduction.
+
+    ============================================================
+      Mentova Console - PrologAI Interactive Session
+    ============================================================
+
+      Type Prolog queries at the ?- prompt.
+      End each query with a period and Enter.
+      Type halt. to exit.
+
+      KEY PREDICATES (no module prefix needed):
+
+      mentova_query(+Type, +Query, -Result)
+      ...
+
+    ?-
+
+The ?- at the bottom is the prompt. It is waiting for you to type a query.
+
+This prompt is the entrance to PrologAI. Everything you will learn in this tutorial is typed at this prompt.
+
+
+YOUR FIRST QUERY
+
+At the ?- prompt, type exactly this (including the period at the end):
+
+    ?- write('Hello, PrologAI!').
+
+Then press Enter.
+
+You should see:
+
+    Hello, PrologAI!
+    true.
+
+Congratulations. You have run your first PrologAI query.
+
+What happened? write/1 is a built-in predicate (a built-in command) that prints text to the screen. The text 'Hello, PrologAI!' is wrapped in single quotes because it contains a comma and an exclamation mark.
+
+The word true. on the next line means the query succeeded.
+
+
+HOW TO EXIT
+
+To exit the interactive session, type:
+
+    ?- halt.
+
+Then press Enter. This exits SWI-Prolog and returns you to your terminal.
+
+
+UNDERSTANDING THE PROMPT
+
+The ?- prompt is always waiting for one complete Prolog expression, called a goal or a query.
+
+Every query must end with a period (full stop) and then Enter.
+
+If you press Enter without a period, SWI-Prolog will show |: on the next line, waiting for you to continue the expression. Type a period and press Enter to finish it.
+
+If you make a typing mistake, you can usually press Backspace to correct it before pressing Enter.
+
+If you see an error message, do not worry. Error messages are how Prolog tells you something was not quite right. They are not permanent - you can just type a new query.
+
+
+THE DIRECTORY STRUCTURE
+
+Now that you have both repositories, your folder structure looks something like this:
+
+    yourname/
+    • PrologAI/
+    ◦ docs/           - Documentation and this tutorial
+    ◦ packs/          - The platform's work packages (PR 1 through PR 48+)
+    ◦ kernel/         - The PrologAI kernel
+    ◦ CLAUDE.md       - Project instructions
+    ◦ README.md       - Quick-start guide
+
+    • Mentova/
+    ◦ src/mentova/    - The Mentova source code (48+ reasoning modules)
+    ◦ knowledge/      - Foundational knowledge (Small-World dataset)
+    ◦ constitution/   - The constitutional principles
+    ◦ bodies/         - Body interfaces (text, games, robot)
+    ◦ demos/          - Demonstration scripts
+    ◦ papers/         - Scientific papers for each accomplishment
+    ◦ announcements/  - Public announcements
+    ◦ bin/            - The console launchers
+    ◦ docs/           - Mentova documentation and tutorial
+
+
+WHAT COMES NEXT
+
+Chapter 3 covers your first Prolog facts: how to teach PrologAI things that are true about the world.
+
+END OF CHAPTER 2

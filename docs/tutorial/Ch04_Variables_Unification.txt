@@ -1,0 +1,211 @@
+PROLOGAI TUTORIAL
+
+Chapter 4: Variables, Unification, and Backtracking
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+VARIABLES
+
+In Chapter 3, you saw that uppercase letters in Prolog are variables.
+
+A variable is a placeholder. It says: "I don't know what goes here yet - find a value that makes this true."
+
+When you write:
+
+    ?- bird(X).
+
+You are asking: "What is X, such that X is a bird?"
+
+PrologAI searches its knowledge base and finds the first answer. If you have bird(tweety) and bird(robin) in the knowledge base, PrologAI will answer:
+
+    X = tweety.
+
+That is one answer. But there might be more.
+
+To see the next answer, press the semicolon key (;) and then Enter.
+
+You will see:
+
+    X = robin.
+
+Press ; again:
+
+    false.
+
+That means there are no more answers. PrologAI has tried all the bird facts and found two.
+
+This ability to find multiple answers is one of the most powerful features of Prolog.
+
+
+THE UNDERSCORE VARIABLE
+
+A single underscore (_) is a special variable that means "I don't care what goes here."
+
+    ?- bird(_).
+
+This asks: "Is there anything that is a bird?" without caring what that thing is.
+
+Answer: true.
+
+You can use _ multiple times in a single query, and each underscore is independent - it does not need to match the same value.
+
+
+UNIFICATION
+
+Unification is the core operation of Prolog. It is how Prolog matches things up.
+
+Unification means: "Can I make these two things identical by giving values to variables?"
+
+If yes, unification succeeds and the variables are bound (given values).
+
+If no, unification fails.
+
+Examples:
+
+    ?- tweety = tweety.
+
+Answer: true. (Two identical atoms always unify.)
+
+    ?- tweety = robin.
+
+Answer: false. (Two different atoms never unify.)
+
+    ?- X = tweety.
+
+Answer: X = tweety. (The variable X gets the value tweety.)
+
+    ?- color(X, yellow) = color(tweety, yellow).
+
+Answer: X = tweety. (Prolog matches up the two color/2 terms and finds that X must equal tweety for them to be identical.)
+
+    ?- color(X, Y) = color(tweety, yellow).
+
+Answer: X = tweety, Y = yellow.
+
+Unification is not "equals" in the arithmetic sense. It is "can these two things be made to match?"
+
+
+BACKTRACKING
+
+Backtracking is how Prolog tries multiple possibilities when the first one fails.
+
+When Prolog is trying to satisfy a query that has multiple conditions, it tries the first fact or rule. If that leads to failure later, it goes back and tries the next one. This process of going back and trying alternatives is called backtracking.
+
+Here is an example.
+
+Suppose you have:
+
+    parent(tom, bob).
+    parent(tom, liz).
+    parent(bob, ann).
+    parent(bob, pat).
+
+And you ask:
+
+    ?- parent(tom, X).
+
+Prolog tries parent(tom, bob) first. X = bob.
+
+If you press ;, Prolog backtracks and tries parent(tom, liz). X = liz.
+
+Press ; again: false. No more parent(tom, ...) facts.
+
+Backtracking also happens inside rules. Suppose you add:
+
+    grandparent(X, Z) :- parent(X, Y), parent(Y, Z).
+
+And you ask:
+
+    ?- grandparent(tom, Who).
+
+Prolog tries to satisfy parent(tom, Y). Finds Y = bob.
+
+Then tries parent(bob, Z). Finds Z = ann. Returns Who = ann.
+
+Press ;. Prolog backtracks in the second condition. Finds Z = pat. Returns Who = pat.
+
+Press ;. No more children of bob. Backtracks further to the first condition. Finds Y = liz. Tries parent(liz, Z). No facts. Fails. Returns false.
+
+So grandparent(tom, Who) has exactly two answers: ann and pat.
+
+Backtracking is automatic. You do not need to program it. Prolog handles it for you.
+
+
+FINDING ALL ANSWERS AT ONCE
+
+Instead of pressing ; repeatedly, you can ask for all answers at once with findall/3.
+
+    ?- findall(X, bird(X), Birds).
+
+This asks: "Find all X such that X is a bird, and collect them into a list called Birds."
+
+Answer: Birds = [tweety, robin].
+
+findall/3 takes three arguments:
+
+1. The template - what you want to collect (here, X).
+
+2. The goal - what must be true (here, bird(X)).
+
+3. The result - the list of all collected values (here, Birds).
+
+findall/3 never fails. If there are no answers, it returns an empty list [].
+
+
+BUILT-IN PREDICATES FOR CHECKING
+
+These built-in predicates are often useful in queries and rules.
+
+    ?- X = 5, X > 3.       % Is 5 greater than 3? true.
+    ?- X = 5, X < 3.       % Is 5 less than 3? false.
+    ?- X = 5, X >= 5.      % Is 5 greater than or equal to 5? true.
+    ?- X = 5, X =:= 5.     % Is 5 arithmetically equal to 5? true.
+    ?- X = 5, X =\= 3.     % Is 5 arithmetically not equal to 3? true.
+
+Note: = is unification. =:= is arithmetic equality. They are different.
+
+    ?- 2 + 2 = 4.       % false! 2 + 2 does not unify with 4 (it's the term '+'(2,2))
+    ?- 2 + 2 =:= 4.     % true! =:= evaluates both sides as arithmetic expressions.
+
+To evaluate an arithmetic expression and bind the result to a variable, use is/2:
+
+    ?- X is 2 + 2.
+
+Answer: X = 4.
+
+The is/2 predicate says: "Evaluate the right side as arithmetic and bind the result to the left."
+
+
+NOT
+
+Sometimes you want to say "this must NOT be true." Prolog uses \+ for this:
+
+    ?- \+ bird(whale).
+
+Answer: true. (Whale is not a bird, so NOT bird(whale) is true.)
+
+\+ is pronounced "not provable." It means: "PrologAI cannot prove this is true." If PrologAI cannot find proof, \+ succeeds.
+
+
+EXERCISE
+
+Add these facts to your console session:
+
+    assertz(likes(alice, pizza)).
+    assertz(likes(alice, pasta)).
+    assertz(likes(bob, pizza)).
+    assertz(likes(bob, sushi)).
+    assertz(likes(carol, sushi)).
+
+Then try:
+
+1. ?- likes(alice, X). (Find one thing Alice likes. Press ; for more.)
+
+2. ?- findall(X, likes(alice, X), AliceLikes). (Find everything Alice likes at once.)
+
+3. ?- likes(X, pizza), likes(X, sushi). (Find someone who likes both pizza and sushi.)
+
+4. ?- \+ likes(carol, pizza). (Confirm Carol does not like pizza.)
+
+END OF CHAPTER 4

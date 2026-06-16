@@ -1,0 +1,243 @@
+PROLOGAI TUTORIAL
+
+Chapter 11: Advanced Topics - Actors, SONA, Workspace, and Protocols
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+INTRODUCTION
+
+This chapter covers the more advanced parts of PrologAI. You do not need to master these topics before using Mentova for everyday reasoning. But if you want to build your own minds, extend Mentova, or integrate PrologAI with other AI systems, this chapter gives you the foundation.
+
+
+ACTORS (PR 6 THROUGH PR 9)
+
+An actor is an individual reasoning unit that runs concurrently with other actors.
+
+Think of actors as workers in a company. The company (the mind) has many workers, each with a specific job. They communicate through messages and shared resources (the Lattice).
+
+PrologAI actors are implemented in the actors pack (PR 6 through PR 9).
+
+The main predicates:
+
+    create_actor(+Name, +Module, +Init) - create a new actor.
+    send_message(+Actor, +Message) - send a message to an actor.
+    subscribe(+Channel, +Handler) - subscribe to a broadcast channel.
+    publish(+Channel, +Content) - broadcast content on a channel.
+
+Sentinels (PR 9) are a special kind of actor: they watch the Lattice for specific node_fact relation types and fire automatically when the pattern appears. You do not need to call them manually - they trigger on their own.
+
+Example: when anchor_node(percept_signal, ...) is called, any sentinel registered to watch percept_signal will fire automatically. This is how the Level 1 Piagetian milestone (reflex coordination) works: the sentinel represents the automatic reflex arc.
+
+
+SONA - EPISODIC MEMORY (PR 11)
+
+SONA (Sparse Online Nexus Archive) is the mind's episodic memory.
+
+While the Lattice holds structured knowledge (facts, assessments, plans), SONA holds experiences - sequences of events the mind has witnessed.
+
+Think of SONA as the mind's ability to remember: "I saw X happen, and then Y happened, and then Z."
+
+Key predicates:
+
+    sona_absorb(+Trajectory) - store an experience in episodic memory.
+    sona_retrieve(+Pattern, +Limit, -Results) - retrieve matching experiences.
+
+A trajectory is any term representing a sequence of events:
+
+    traj(actions([push_block(left), pull_block(right), stack]))
+
+SONA uses sparse encoding (it does not store every detail, only the significant ones) and online learning (it updates continuously as the mind has experiences).
+
+Example:
+
+    ?- use_module(library(sona), [sona_absorb/1, sona_retrieve/3]).
+    ?- sona_absorb(traj(events([saw(tweety, 10_30am), heard(robin, 10_35am)]))).
+    ?- sona_retrieve(traj(_), 5, Results).
+
+
+THE GLOBAL WORKSPACE (PR 18 AND PR 32)
+
+The Global Workspace Theory (GWT) is a model of consciousness from cognitive science. It proposes that a "global workspace" broadcasts information to many specialized processors simultaneously.
+
+PrologAI implements this theory as the workspace cycle (PR 18) and the attention economy (PR 32).
+
+The workspace cycle:
+1. Collects content from the Lattice and the actor network.
+2. Selects the most salient (important) content.
+3. Broadcasts it to all subscribers.
+4. Subscribers process the broadcast and update the Lattice.
+5. SONA absorbs the broadcast as an episodic memory.
+
+Salience is computed as: novelty (0.4 weight) + goal_relevance (0.3) + affect (0.2) - habituation.
+
+Content that is novel, goal-relevant, and emotionally significant rises to the top.
+
+The attention economy (PR 32) adds a budget constraint: only a certain amount of content can be broadcast per cycle, so content competes for workspace access.
+
+Running the workspace:
+
+    ?- mentova_query(workspace, run_cycle(5), R).
+
+This runs 5 workspace cycles. Each cycle broadcasts the highest-salience content and updates the Lattice.
+
+
+THE ATTENTION SCHEMA (PR 42)
+
+The attention schema is a model that Mentova maintains about its own attention.
+
+Research on consciousness (particularly the work of Michael Graziano) proposes that consciousness is the brain's model of its own attention process. The attention schema theory suggests that what we call "awareness" is the brain's simplified description of how it is allocating attention.
+
+PrologAI implements an attention schema (PR 42) that:
+• Tracks what content is in the workspace.
+• Predicts what will be attended to next.
+• Maintains a record of habituated (over-repeated) content.
+• Reports on attentional dynamics.
+
+    ?- mentova_query(attention_schema, report, R).
+
+Returns the current attention schema state.
+
+
+THE AGENT COMMUNICATION PROTOCOLS
+
+PrologAI supports four major agent communication protocols that allow Mentova to communicate with other AI systems.
+
+MODEL CONTEXT PROTOCOL (MCP) - PR 14
+
+MCP is a protocol for AI tool use, developed by Anthropic. It allows a language model (or any AI client) to call tools provided by a server.
+
+PrologAI implements an MCP gateway that exposes 14 Mentova predicates as MCP tools. An external client can call these tools using standard MCP HTTP requests.
+
+The MCP gateway runs on port 7474. Authenticated with an API key.
+
+Available MCP tools include: lattice_inscribe, lattice_query, actor_list, assess_all, and more.
+
+To start the MCP gateway:
+
+    ?- use_module(library(mcp_gateway), [pai_mcp_start/1]).
+    ?- pai_mcp_start(7474).
+
+
+AGENT-TO-AGENT PROTOCOL (A2A) - PR 43
+
+A2A is a protocol for agents to delegate tasks to each other.
+
+It uses a task lifecycle: submitted -> working -> completed (or failed).
+
+Each agent has an agent card that describes its capabilities and endpoint.
+
+Mentova implements the full A2A protocol including durable peer mail (messages that persist until the recipient is available).
+
+To start the A2A server:
+
+    ?- use_module(library(a2a), [pai_a2a_start/1]).
+    ?- pai_a2a_start(7475).
+
+
+AGENT COMMUNICATION PROTOCOL (ACP) - PR 47
+
+ACP is IBM's BeeAI REST protocol for agent runs.
+
+POST /runs creates a new run. GET /runs/{id} checks status. DELETE /runs/{id} cancels.
+
+The agent description is served at GET /.well-known/agent.json.
+
+ACP runs are asynchronous: you submit a task and poll for the result.
+
+    ?- use_module(library(acp), [pai_acp_start/1]).
+    ?- pai_acp_start(7476).
+
+
+AGENT NETWORK PROTOCOL (ANP) - PR 48
+
+ANP provides decentralized agent identity using W3C Decentralized Identifiers (DIDs).
+
+Each mind gets a DID (a globally unique identifier that does not depend on any central registry). Mentova's DID has the form did:web:hostname.
+
+All ANP messages are signed with HMAC-SHA256. Incoming messages are verified before any content is processed.
+
+ANP supports meta-protocol negotiation: when two agents meet, they announce which protocols they support, so they can choose the best one.
+
+    ?- use_module(library(anp), [pai_anp_did/1, pai_anp_negotiate/2]).
+    ?- pai_anp_did(DID).       % Get Mentova's DID.
+    ?- pai_anp_negotiate(peer_endpoint, Protocols).  % Negotiate protocols with a peer.
+
+
+THE ROBOT BODY (PR 46 - ROS BRIDGE)
+
+PrologAI can inhabit a robot body through the Robot Operating System version 2 (ROS 2) bridge.
+
+The bridge connects the Lattice to ROS 2 topics, services, and actions.
+
+Perception from the robot (camera, LIDAR, touch) flows into the Lattice as percept_signal node_facts.
+
+Actions decided by the mind are sent to ROS 2 action servers, which execute them on the physical or simulated robot.
+
+The constitutional gate screens every physical action before it is sent. High-risk, irreversible actions require human authorization.
+
+The robot body is one of several bodies Mentova can inhabit:
+• text_io: the text console (the ?- prompt).
+• game bodies: ARC-AGI, Raven's Progressive Matrices, Baba Is You, Pokemon.
+• robot_body: the ROS 2 bridge.
+
+Bodies are enrolled at boot time. Additional bodies can be enrolled during a session.
+
+
+SUMMARY OF ALL 48 WORK PACKAGES
+
+PR 1: kernel - foundational types and patterns.
+PR 2: types - the type system.
+PR 3: lattice - the knowledge store.
+PR 4: node_facts - anchor_node/4, live_node_facts/2, traverse_nexus/4.
+PR 5: scopes - the nine-zone compartmentalization.
+PR 6: actors - cyclic actor framework.
+PR 7: pubsub - publish-subscribe messaging.
+PR 8: perception - sensory input processing.
+PR 9: sentinels - automatic Lattice watchers.
+PR 10: kernel extensions.
+PR 11: sona - episodic memory.
+PR 12: assessment - Piagetian, Bayley, CHC, consciousness indicators.
+PR 13: refinement - testing harness.
+PR 14: mcp_gateway - Model Context Protocol server.
+PR 15: defeasible - default reasoning with exceptions.
+PR 16: probabilistic - probabilistic reasoning.
+PR 17: continual refinement - self-improvement harness.
+PR 18: workspace - Global Workspace Theory cycle.
+PR 19: prediction / active inference.
+PR 20: bayesian - Bayesian updating.
+PR 21: evidential reasoning and budgets.
+PR 22: model composition and planning.
+PR 23: curiosity and self-directed learning.
+PR 24: somatic markers (emotion-like influence).
+PR 25: daydream - steered imagination.
+PR 26: appraisal - emotional appraisal and coping.
+PR 27: motivation - motivational drive system.
+PR 28: embedding - vector embedding integration.
+PR 29: vector_backend - vector search.
+PR 30: frames - frame-based knowledge.
+PR 31: vsa - Vector Symbolic Architecture.
+PR 32: attention economy - salience and competition.
+PR 33: induction - rule learning.
+PR 34: chainer - meta-reasoning chain.
+PR 35: abduction - best-explanation reasoning.
+PR 36: hyperon bridge (OpenCog Hyperon integration).
+PR 37: clause synthesis and specialization.
+PR 38: reflection and synthesis.
+PR 39: reference frames (spatial and conceptual).
+PR 40: spinoff - sub-agent creation.
+PR 41: distributional semantics and probabilistic logic.
+PR 42: attention schema.
+PR 43: a2a - Agent-to-Agent protocol.
+PR 44: tooling - tool-use faculty.
+PR 45: language understanding.
+PR 46: ros_bridge - robot body (ROS 2).
+PR 47: acp - Agent Communication Protocol.
+PR 48: anp - Agent Network Protocol (decentralized identity).
+
+
+WHAT COMES NEXT
+
+Chapter 12 covers writing your own PrologAI programs: creating .pl files, loading them into Mentova, and building new reasoning capabilities.
+
+END OF CHAPTER 11
