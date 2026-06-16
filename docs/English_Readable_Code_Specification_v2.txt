@@ -1,0 +1,3041 @@
+ENGLISH READABLE CODE (ERC) SPECIFICATION
+
+VERSION 2
+
+A Guide for Artificial Intelligence (AI) Coding Assistants
+
+
+This specification merges two source documents into one reference: the English Readable Code structured guide and the English Readable Code scientific paper, both by D. R. Dison (Version 3.0, October 2025).
+
+Its purpose is to guide an Artificial Intelligence (AI) coding assistant in reading, writing, validating, and translating English Readable Code.
+
+
+HOW THIS DOCUMENT IS ORGANIZED
+
+Part One is the structured guide and the full operation taxonomy: the working specification an assistant uses day to day.
+
+Part Two is the scientific paper that underpins it: the rationale, the formal properties, the positioning, and the references.
+
+The two parts describe the same system - Part One practically, Part Two academically - so some material is intentionally stated in both.
+
+
+WHAT ENGLISH READABLE CODE IS
+
+English Readable Code (ERC) is a formal notation that expresses algorithmic logic as structured English sentences that can be mechanically translated into executable code in any programming language.
+
+It sits between informal pseudocode, which cannot be mechanically translated, and a full programming language, which is harder for a newcomer to read.
+
+It rests on a three-tier operation taxonomy - Primitive operations that translate directly to code statements, Composite operations that expand deterministically into primitives, and Library operations that map to documented external framework calls - and on three formal properties: the Translation Guarantee, the Completeness Property, and the Verification Property, all defined in the parts below.
+
+
+PRINCIPLES OF ENGLISH READABLE CODE
+
+• English Readable Code (ERC) is a kind of pseudocode.
+
+• ERC is a form of precise English language.
+
+• ERC can be mechanically translated to Programming Language Code (PLC) across many target languages; this is the Translation Guarantee.
+
+• ERC can also serve as a comment: a line of ERC placed just above a line of Programming Language Code (PLC) explains what that line of code does.
+
+• Even within a multi-line block of Programming Language Code, a line of ERC can be inserted just above a code line and prefixed with the programming language's comment character, so that the programming language ignores the ERC line while a human reading the code still benefits from it.
+
+• Used this way, ERC elucidates, clarifies, and explains Programming Language Code line by line.
+
+• When a Programming Language Code (PLC) function or block spans multiple lines, each ERC comment line is indented to match the indentation of the Programming Language Code line directly beneath it, so the explanation lines up visually with the exact code it describes.
+
+Illustration (using the number sign as the comment character):
+
+# Define a function that returns the factorial of n
+def factorial(n):
+    # If n is zero, return one
+    if n == 0:
+        return 1
+    # Otherwise, return n times the factorial of n minus one
+    return n * factorial(n - 1)
+
+Each ERC comment line carries the same indentation as the Programming Language Code line immediately below it, so the alignment between the explanation and the code is preserved down the whole function.
+
+
+HOW AN AI CODING ASSISTANT SHOULD USE THIS DOCUMENT
+
+Treat Part One as the normative reference for the notation and its operation tiers.
+
+When writing ERC, prefer Primitive operations, expand Composite operations to primitives when a full translation is needed, and reference only documented interfaces for Library operations.
+
+When translating ERC to a target language, follow the Translation Guarantee process in Part One.
+
+When explaining existing Programming Language Code to a human, write ERC as comment lines just above the code lines, per the Principles above.
+
+Consult Part Two when the rationale, the formal guarantees, or the source references are needed.
+
+
+PART ONE - THE STRUCTURED GUIDE AND OPERATION TAXONOMY
+
+English Readable Code (ERC) - Structured Specification
+
+Created by D. R. Dison  
+Enhanced Version with Formal Operation Taxonomy  
+Version 3.0 - October 2025
+
+
+
+ABSTRACT
+
+English Readable Code (ERC) is a formal notation system that transforms algorithmic thinking into structured English sentences. This enhanced specification introduces a rigorous three-tier taxonomy that ensures every ERC statement can be mechanically translated to executable code.
+
+Three Operation Tiers:
+1. PRIMITIVE - Direct 1:1 or near 1:1 translation to code statements
+2. COMPOSITE - High-level operations that expand into primitive operations
+3. LIBRARY - External library/framework calls with documented interfaces
+
+
+
+CORE PRINCIPLES
+
+Translation Guarantee
+Every ERC algorithm can be mechanically translated to any programming language through the following process:
+1. Identify PRIMITIVE, COMPOSITE, and LIBRARY operations
+2. Expand all COMPOSITE operations to their primitive equivalents
+3. Translate primitives using language-specific mapping rules
+4. Map LIBRARY operations to target language libraries
+
+Completeness Property
+• Every COMPOSITE operation MUST have a complete expansion to PRIMITIVES
+• Every PRIMITIVE operation MUST have translation rules for major computer programming languages
+• No circular dependencies allowed between COMPOSITE operations
+
+Verification Property
+An ERC specification is valid if and only if:
+• All COMPOSITE operations terminate in PRIMITIVE operations
+• All PRIMITIVE operations have unambiguous computational semantics
+• All LIBRARY operations reference documented external interfaces
+
+
+
+TIER 1: PRIMITIVE OPERATIONS
+
+Primitive operations translate directly (1:1 or near 1:1) to executable code statements.
+
+GROUP: Variable Declaration and Assignment
+
+<PRIMITIVE id="P001">
+Operation: Create a number variable called [name] with initial value [value]
+
+Semantics: Declare and initialize an integer or floating-point variable
+
+Translation Rules:
+• Python: name = value
+• Java: int name = value; or double name = value;
+• JavaScript: let name = value;
+• C++: int name = value; or double name = value;
+• C#: int name = value; or double name = value;
+
+Example:
+Create a number variable called customer age with initial value eighteen.
+→ int customer_age = 18;
+</PRIMITIVE>
+
+<PRIMITIVE id="P002">
+Operation: Create a text variable called [name] with initial value [value]
+
+Semantics: Declare and initialize a string variable
+
+Translation Rules:
+• Python: name = "value"
+• Java: String name = "value";
+• JavaScript: let name = "value";
+• C++: std::string name = "value";
+• C#: string name = "value";
+
+Example:
+Create a text variable called customer name with initial value empty text.
+→ String customer_name = "";
+</PRIMITIVE>
+
+<PRIMITIVE id="P003">
+Operation: Create a boolean variable called [name] with initial value [true/false]
+
+Semantics: Declare and initialize a boolean variable
+
+Translation Rules:
+• Python: name = True or name = False
+• Java: boolean name = true; or boolean name = false;
+• JavaScript: let name = true; or let name = false;
+• C++: bool name = true; or bool name = false;
+
+Example:
+Create a boolean variable called account is active with initial value true.
+→ boolean account_is_active = true;
+</PRIMITIVE>
+
+<PRIMITIVE id="P004">
+Operation: Set [variable] to [value]
+
+Semantics: Assign a new value to an existing variable
+
+Translation Rules:
+• Universal: variable = value; (with appropriate syntax)
+
+Example:
+Set customer age to twenty five.
+→ customer_age = 25;
+</PRIMITIVE>
+
+<PRIMITIVE id="P005">
+Operation: Create a list variable called [name] with initial value empty list
+
+Semantics: Declare and initialize an empty list/array
+
+Translation Rules:
+• Python: name = []
+• Java: ArrayList<Type> name = new ArrayList<>();
+• JavaScript: let name = [];
+• C++: std::vector<Type> name;
+
+Example:
+Create a list variable called shopping cart items with initial value empty list.
+→ ArrayList<Item> shopping_cart_items = new ArrayList<>();
+</PRIMITIVE>
+
+GROUP: Basic Arithmetic Operations
+
+<PRIMITIVE id="P010">
+Operation: Calculate the sum of [operand1] and [operand2]
+
+Semantics: Add two numeric values
+
+Translation Rules:
+• Universal: result = operand1 + operand2;
+
+Example:
+Calculate the sum of item price and tax amount.
+→ total = item_price + tax_amount;
+</PRIMITIVE>
+
+<PRIMITIVE id="P011">
+Operation: Calculate the difference of [operand1] and [operand2]
+
+Semantics: Subtract operand2 from operand1
+
+Translation Rules:
+• Universal: result = operand1 - operand2;
+
+Example:
+Calculate the difference of account balance and withdrawal amount.
+→ remaining = account_balance - withdrawal_amount;
+</PRIMITIVE>
+
+<PRIMITIVE id="P012">
+Operation: Calculate the product of [operand1] and [operand2]
+
+Semantics: Multiply two numeric values
+
+Translation Rules:
+• Universal: result = operand1 * operand2;
+
+Example:
+Calculate the product of quantity and unit price.
+→ total = quantity * unit_price;
+</PRIMITIVE>
+
+<PRIMITIVE id="P013">
+Operation: Calculate the quotient of [operand1] divided by [operand2]
+
+Semantics: Divide operand1 by operand2
+
+Translation Rules:
+• Universal: result = operand1 / operand2;
+
+Example:
+Calculate the quotient of total amount divided by number of items.
+→ average = total_amount / number_of_items;
+</PRIMITIVE>
+
+<PRIMITIVE id="P014">
+Operation: Calculate the remainder of [operand1] divided by [operand2]
+
+Semantics: Modulo operation
+
+Translation Rules:
+• Universal: result = operand1 % operand2;
+
+Example:
+Calculate the remainder of total items divided by items per page.
+→ remaining = total_items % items_per_page;
+</PRIMITIVE>
+
+GROUP: Comparison Operations
+
+<PRIMITIVE id="P020">
+Operation: Check if [value1] is equal to [value2]
+
+Semantics: Boolean equality comparison
+
+Translation Rules:
+• Universal: result = (value1 == value2);
+
+Example:
+Check if customer age is equal to eighteen.
+→ is_adult = (customer_age == 18);
+</PRIMITIVE>
+
+<PRIMITIVE id="P021">
+Operation: Check if [value1] is greater than [value2]
+
+Semantics: Boolean greater-than comparison
+
+Translation Rules:
+• Universal: result = (value1 > value2);
+
+Example:
+Check if account balance is greater than minimum balance.
+→ has_sufficient_funds = (account_balance > minimum_balance);
+</PRIMITIVE>
+
+<PRIMITIVE id="P022">
+Operation: Check if [value1] is less than [value2]
+
+Semantics: Boolean less-than comparison
+
+Translation Rules:
+• Universal: result = (value1 < value2);
+
+Example:
+Check if customer age is less than eighteen.
+→ is_minor = (customer_age < 18);
+</PRIMITIVE>
+
+<PRIMITIVE id="P023">
+Operation: Check if [value1] is greater than or equal to [value2]
+
+Semantics: Boolean greater-than-or-equal comparison
+
+Translation Rules:
+• Universal: result = (value1 >= value2);
+</PRIMITIVE>
+
+<PRIMITIVE id="P024">
+Operation: Check if [value1] is less than or equal to [value2]
+
+Semantics: Boolean less-than-or-equal comparison
+
+Translation Rules:
+• Universal: result = (value1 <= value2);
+</PRIMITIVE>
+
+<PRIMITIVE id="P025">
+Operation: Check if [value1] is not equal to [value2]
+
+Semantics: Boolean inequality comparison
+
+Translation Rules:
+• Universal: result = (value1 != value2);
+</PRIMITIVE>
+
+GROUP: Logical Operations
+
+<PRIMITIVE id="P030">
+Operation: Check if both [condition1] and [condition2] are true
+
+Semantics: Boolean AND operation
+
+Translation Rules:
+• Universal: result = (condition1 && condition2); or (condition1 and condition2)
+
+Example:
+Check if both account is active and balance is positive.
+→ can_transact = (account_is_active && balance > 0);
+</PRIMITIVE>
+
+<PRIMITIVE id="P031">
+Operation: Check if either [condition1] or [condition2] is true
+
+Semantics: Boolean OR operation
+
+Translation Rules:
+• Universal: result = (condition1 || condition2); or (condition1 or condition2)
+</PRIMITIVE>
+
+<PRIMITIVE id="P032">
+Operation: Check if [condition] is not true
+
+Semantics: Boolean NOT operation
+
+Translation Rules:
+• Universal: result = !condition; or not condition
+</PRIMITIVE>
+
+GROUP: Control Flow - Conditional
+
+<PRIMITIVE id="P040">
+Operation: If [condition] is true, then perform the following actions:
+
+Semantics: Conditional execution block start
+
+Translation Rules:
+• Universal: if (condition) {
+
+Example:
+If customer age is greater than or equal to sixty five, then perform the following actions:
+→ if (customer_age >= 65) {
+</PRIMITIVE>
+
+<PRIMITIVE id="P041">
+Operation: Else if [condition] is true, then perform the following actions:
+
+Semantics: Alternative conditional block
+
+Translation Rules:
+• Universal: } else if (condition) {
+</PRIMITIVE>
+
+<PRIMITIVE id="P042">
+Operation: Otherwise, perform the following actions:
+
+Semantics: Default conditional block (else)
+
+Translation Rules:
+• Universal: } else {
+</PRIMITIVE>
+
+<PRIMITIVE id="P043">
+Operation: End the conditional block.
+
+Semantics: Close if/else structure
+
+Translation Rules:
+• Universal: }
+</PRIMITIVE>
+
+GROUP: Control Flow - Loops
+
+<PRIMITIVE id="P050">
+Operation: While [condition] remains true, repeat the following steps:
+
+Semantics: While loop start
+
+Translation Rules:
+• Universal: while (condition) {
+
+Example:
+While attempts is less than three, repeat the following steps:
+→ while (attempts < 3) {
+</PRIMITIVE>
+
+<PRIMITIVE id="P051">
+Operation: For each [item] in [collection], perform the following operations:
+
+Semantics: For-each loop start
+
+Translation Rules:
+• Python: for item in collection:
+• Java: for (Type item : collection) {
+• JavaScript: for (let item of collection) {
+
+Example:
+For each product in shopping cart, perform the following operations:
+→ for (Product product : shopping_cart) {
+</PRIMITIVE>
+
+<PRIMITIVE id="P052">
+Operation: Repeat the following steps exactly [number] times:
+
+Semantics: Count-controlled loop
+
+Translation Rules:
+• Python: for i in range(number):
+• Java: for (int i = 0; i < number; i++) {
+• JavaScript: for (let i = 0; i < number; i++) {
+
+Example:
+Repeat the following steps exactly five times:
+→ for (int i = 0; i < 5; i++) {
+</PRIMITIVE>
+
+<PRIMITIVE id="P053">
+Operation: End the loop.
+
+Semantics: Close loop structure
+
+Translation Rules:
+• Universal: }
+</PRIMITIVE>
+
+<PRIMITIVE id="P054">
+Operation: Break out of the current loop immediately.
+
+Semantics: Exit loop early
+
+Translation Rules:
+• Universal: break;
+</PRIMITIVE>
+
+<PRIMITIVE id="P055">
+Operation: Skip to the next iteration of the loop.
+
+Semantics: Continue to next loop iteration
+
+Translation Rules:
+• Universal: continue;
+</PRIMITIVE>
+
+GROUP: List/Array Operations
+
+<PRIMITIVE id="P060">
+Operation: Add [item] to the end of [list]
+
+Semantics: Append item to list
+
+Translation Rules:
+• Python: list.append(item)
+• Java: list.add(item);
+• JavaScript: list.push(item);
+• C++: list.push_back(item);
+
+Example:
+Add new customer to the end of customer list.
+→ customer_list.add(new_customer);
+</PRIMITIVE>
+
+<PRIMITIVE id="P061">
+Operation: Access the item at position [index] in [list]
+
+Semantics: Retrieve item by index
+
+Translation Rules:
+• Universal: item = list[index];
+
+Example:
+Access the item at position three in product list.
+→ item = product_list[3];
+</PRIMITIVE>
+
+<PRIMITIVE id="P062">
+Operation: Remove the item at position [index] from [list]
+
+Semantics: Delete item by index
+
+Translation Rules:
+• Python: del list[index] or list.pop(index)
+• Java: list.remove(index);
+• JavaScript: list.splice(index, 1);
+
+Example:
+Remove the item at position two from shopping cart.
+→ shopping_cart.remove(2);
+</PRIMITIVE>
+
+<PRIMITIVE id="P063">
+Operation: Insert [item] at position [index] in [list]
+
+Semantics: Insert item at specific position
+
+Translation Rules:
+• Python: list.insert(index, item)
+• Java: list.add(index, item);
+• JavaScript: list.splice(index, 0, item);
+</PRIMITIVE>
+
+<PRIMITIVE id="P064">
+Operation: Get the total number of items in [list]
+
+Semantics: Get list size/length
+
+Translation Rules:
+• Python: len(list)
+• Java: list.size()
+• JavaScript: list.length
+• C++: list.size()
+
+Example:
+Get the total number of items in shopping cart.
+→ count = shopping_cart.size();
+</PRIMITIVE>
+
+GROUP: Function Operations
+
+<PRIMITIVE id="P070">
+Operation: Define a function called [name] that performs the following operations:
+
+Semantics: Function declaration start
+
+Translation Rules:
+• Python: def name():
+• Java: void name() {
+• JavaScript: function name() {
+• C++: void name() {
+
+Example:
+Define a function called calculate total that performs the following operations:
+→ void calculate_total() {
+</PRIMITIVE>
+
+<PRIMITIVE id="P071">
+Operation: Return [value] to the calling function.
+
+Semantics: Return statement with value
+
+Translation Rules:
+• Universal: return value;
+
+Example:
+Return the calculated total to the calling function.
+→ return calculated_total;
+</PRIMITIVE>
+
+<PRIMITIVE id="P072">
+Operation: Call the function [name] with parameters [param1], [param2], etc.
+
+Semantics: Function invocation
+
+Translation Rules:
+• Universal: name(param1, param2);
+
+Example:
+Call the function calculate discount with parameters price and discount rate.
+→ calculate_discount(price, discount_rate);
+</PRIMITIVE>
+
+<PRIMITIVE id="P073">
+Operation: End the function definition.
+
+Semantics: Close function block
+
+Translation Rules:
+• Universal: }
+</PRIMITIVE>
+
+GROUP: Input/Output Operations
+
+<PRIMITIVE id="P080">
+Operation: Display [message] to the console.
+
+Semantics: Console output
+
+Translation Rules:
+• Python: print(message)
+• Java: System.out.println(message);
+• JavaScript: console.log(message);
+• C++: std::cout << message << std::endl;
+
+Example:
+Display welcome message to the console.
+→ System.out.println(welcome_message);
+</PRIMITIVE>
+
+<PRIMITIVE id="P081">
+Operation: Read a line of text from the console and store in [variable].
+
+Semantics: Console input
+
+Translation Rules:
+• Python: variable = input()
+• Java: variable = scanner.nextLine();
+• JavaScript: variable = prompt();
+• C++: std::getline(std::cin, variable);
+
+Example:
+Read a line of text from the console and store in user name.
+→ user_name = scanner.nextLine();
+</PRIMITIVE>
+
+GROUP: String Operations
+
+<PRIMITIVE id="P090">
+Operation: Get the length of [text]
+
+Semantics: String length
+
+Translation Rules:
+• Python: len(text)
+• Java: text.length()
+• JavaScript: text.length
+• C++: text.length()
+</PRIMITIVE>
+
+<PRIMITIVE id="P091">
+Operation: Concatenate [text1] and [text2]
+
+Semantics: String concatenation
+
+Translation Rules:
+• Universal: result = text1 + text2;
+</PRIMITIVE>
+
+<PRIMITIVE id="P092">
+Operation: Extract substring from [text] starting at position [start] with length [length]
+
+Semantics: Substring extraction
+
+Translation Rules:
+• Python: text[start:start+length]
+• Java: text.substring(start, start+length)
+• JavaScript: text.substring(start, start+length)
+</PRIMITIVE>
+
+<PRIMITIVE id="P093">
+Operation: Convert [text] to lowercase
+
+Semantics: Lowercase conversion
+
+Translation Rules:
+• Python: text.lower()
+• Java: text.toLowerCase()
+• JavaScript: text.toLowerCase()
+</PRIMITIVE>
+
+<PRIMITIVE id="P094">
+Operation: Convert [text] to uppercase
+
+Semantics: Uppercase conversion
+
+Translation Rules:
+• Python: text.upper()
+• Java: text.toUpperCase()
+• JavaScript: text.toUpperCase()
+</PRIMITIVE>
+
+
+
+TIER 2: COMPOSITE OPERATIONS
+
+Composite operations represent higher-level algorithms that MUST expand into primitive operations.
+
+GROUP: Searching Algorithms
+
+<COMPOSITE id="C001" complexity="O(log n)" space="O(1)">
+Operation: Perform binary search on [sorted_list] to find [target]
+
+Preconditions:
+• The list must be sorted in ascending order
+• The list must support indexed access
+
+Returns: Position of target if found, negative one if not found
+
+EXPANSION TO PRIMITIVES:
+Create a number variable called left boundary with initial value zero.
+Create a number variable called right boundary with initial value the result of getting the total number of items in sorted list minus one.
+
+While left boundary is less than or equal to right boundary, repeat the following steps:
+    Calculate the sum of left boundary and right boundary.
+    Calculate the quotient of the sum divided by two.
+    Create a number variable called middle position with initial value the quotient.
+    
+    Access the item at position middle position in sorted list.
+    Create a variable called middle item with the accessed value.
+    
+    Check if middle item is equal to target.
+    If the condition is true, then perform the following actions:
+        Return middle position to the calling function.
+    End the conditional block.
+    
+    Check if middle item is less than target.
+    If the condition is true, then perform the following actions:
+        Calculate the sum of middle position and one.
+        Set left boundary to the sum.
+    Otherwise, perform the following actions:
+        Calculate the difference of middle position and one.
+        Set right boundary to the difference.
+    End the conditional block.
+End the loop.
+
+Return negative one to the calling function.
+
+Example:
+Perform binary search on sorted customer list to find target customer.
+</COMPOSITE>
+
+<COMPOSITE id="C002" complexity="O(n)" space="O(1)">
+Operation: Perform linear search through [collection] to find [target]
+
+Preconditions: None (works on unsorted collections)
+
+Returns: Position of target if found, negative one if not found
+
+EXPANSION TO PRIMITIVES:
+Create a number variable called current position with initial value zero.
+Get the total number of items in collection.
+Create a number variable called total items with the result.
+
+While current position is less than total items, repeat the following steps:
+    Access the item at position current position in collection.
+    Create a variable called current item with the accessed value.
+    
+    Check if current item is equal to target.
+    If the condition is true, then perform the following actions:
+        Return current position to the calling function.
+    End the conditional block.
+    
+    Calculate the sum of current position and one.
+    Set current position to the sum.
+End the loop.
+
+Return negative one to the calling function.
+
+Example:
+Perform linear search through order list to find order number.
+</COMPOSITE>
+
+GROUP: Sorting Algorithms
+
+<COMPOSITE id="C010" complexity="O(n²)" space="O(1)">
+Operation: Sort [list] using bubble sort algorithm in ascending order
+
+Preconditions: List items must be comparable
+
+Modifies: The list in-place
+
+EXPANSION TO PRIMITIVES:
+Get the total number of items in list.
+Create a number variable called list length with the result.
+
+Create a number variable called outer index with initial value zero.
+Calculate the difference of list length and one.
+Create a number variable called outer limit with the result.
+
+While outer index is less than outer limit, repeat the following steps:
+    Create a number variable called inner index with initial value zero.
+    Calculate the difference of list length and outer index.
+    Calculate the difference of the result and one.
+    Create a number variable called inner limit with the result.
+    
+    While inner index is less than inner limit, repeat the following steps:
+        Access the item at position inner index in list.
+        Create a variable called first item with the accessed value.
+        
+        Calculate the sum of inner index and one.
+        Create a number variable called next position with the result.
+        Access the item at position next position in list.
+        Create a variable called second item with the accessed value.
+        
+        Check if first item is greater than second item.
+        If the condition is true, then perform the following actions:
+            Create a variable called temporary item with value first item.
+            
+            Remove the item at position inner index from list.
+            Insert second item at position inner index in list.
+            
+            Remove the item at position next position from list.
+            Insert temporary item at position next position in list.
+        End the conditional block.
+        
+        Calculate the sum of inner index and one.
+        Set inner index to the sum.
+    End the loop.
+    
+    Calculate the sum of outer index and one.
+    Set outer index to the sum.
+End the loop.
+
+Example:
+Sort customer list using bubble sort algorithm in ascending order.
+</COMPOSITE>
+
+<COMPOSITE id="C011" complexity="O(n log n)" space="O(n)">
+Operation: Sort [list] using merge sort algorithm in ascending order
+
+Preconditions: List items must be comparable
+
+Note: This is a complex recursive algorithm. Full primitive expansion would be very long.
+
+SIMPLIFIED EXPANSION STRUCTURE:
+Define a function called merge sort that takes list as parameter:
+    Get the total number of items in list.
+    Check if the result is less than or equal to one.
+    If true, then return list to the calling function.
+    
+    Calculate the quotient of list length divided by two.
+    Create a number variable called middle with the result.
+    
+    [Extract left half of list - using primitive operations]
+    [Extract right half of list - using primitive operations]
+    
+    Call merge sort function with left half as parameter.
+    Call merge sort function with right half as parameter.
+    
+    [Merge the two sorted halves - using primitive operations]
+    Return the merged list.
+End the function definition.
+
+Call merge sort function with list as parameter.
+
+Example:
+Sort transaction list using merge sort algorithm in ascending order.
+</COMPOSITE>
+
+GROUP: Data Validation
+
+<COMPOSITE id="C020" complexity="O(n)" space="O(1)">
+Operation: Validate that [email_address] is in proper email format
+
+Returns: True if valid, false otherwise
+
+EXPANSION TO PRIMITIVES:
+Create a number variable called at symbol count with initial value zero.
+Get the length of email address.
+Create a number variable called email length with the result.
+
+Create a number variable called position with initial value zero.
+While position is less than email length, repeat the following steps:
+    Extract substring from email address starting at position position with length one.
+    Create a text variable called current character with the result.
+    
+    Check if current character is equal to at symbol.
+    If the condition is true, then perform the following actions:
+        Calculate the sum of at symbol count and one.
+        Set at symbol count to the sum.
+    End the conditional block.
+    
+    Calculate the sum of position and one.
+    Set position to the sum.
+End the loop.
+
+Check if at symbol count is not equal to one.
+If the condition is true, then perform the following actions:
+    Return false to the calling function.
+End the conditional block.
+
+[Additional validation steps for local part and domain using primitives]
+
+Return true to the calling function.
+
+Example:
+Validate that user email is in proper email format.
+</COMPOSITE>
+
+<COMPOSITE id="C021" complexity="O(1)" space="O(1)">
+Operation: Validate that [age] is within valid range for adults
+
+Parameters:
+• age: numeric value to validate
+
+Returns: True if age is 18 or greater and less than 150, false otherwise
+
+EXPANSION TO PRIMITIVES:
+Check if age is greater than or equal to eighteen.
+Create a boolean variable called is old enough with the result.
+
+Check if age is less than one hundred fifty.
+Create a boolean variable called is reasonable with the result.
+
+Check if both is old enough and is reasonable are true.
+Return the result to the calling function.
+
+Example:
+Validate that customer age is within valid range for adults.
+</COMPOSITE>
+
+GROUP: Mathematical Calculations
+
+<COMPOSITE id="C030" complexity="O(n)" space="O(1)">
+Operation: Calculate the factorial of [number]
+
+Preconditions: Number must be non-negative integer
+
+Returns: Factorial value
+
+EXPANSION TO PRIMITIVES:
+Check if number is less than zero.
+If the condition is true, then perform the following actions:
+    Display error message about negative input to the console.
+    Return negative one to the calling function.
+End the conditional block.
+
+Check if number is equal to zero.
+If the condition is true, then perform the following actions:
+    Return one to the calling function.
+End the conditional block.
+
+Create a number variable called result with initial value one.
+Create a number variable called counter with initial value one.
+
+While counter is less than or equal to number, repeat the following steps:
+    Calculate the product of result and counter.
+    Set result to the product.
+    
+    Calculate the sum of counter and one.
+    Set counter to the sum.
+End the loop.
+
+Return result to the calling function.
+
+Example:
+Calculate the factorial of user input number.
+</COMPOSITE>
+
+<COMPOSITE id="C031" complexity="O(1)" space="O(1)">
+Operation: Calculate the average of numbers in [list]
+
+Preconditions: List must not be empty
+
+Returns: Average value
+
+EXPANSION TO PRIMITIVES:
+Get the total number of items in list.
+Create a number variable called count with the result.
+
+Check if count is equal to zero.
+If the condition is true, then perform the following actions:
+    Return zero to the calling function.
+End the conditional block.
+
+Create a number variable called sum with initial value zero.
+Create a number variable called index with initial value zero.
+
+While index is less than count, repeat the following steps:
+    Access the item at position index in list.
+    Create a number variable called current value with the accessed value.
+    
+    Calculate the sum of sum and current value.
+    Set sum to the sum.
+    
+    Calculate the sum of index and one.
+    Set index to the sum.
+End the loop.
+
+Calculate the quotient of sum divided by count.
+Return the quotient to the calling function.
+
+Example:
+Calculate the average of test scores in student grades list.
+</COMPOSITE>
+
+GROUP: List Processing
+
+<COMPOSITE id="C040" complexity="O(n)" space="O(1)">
+Operation: Find the maximum value in [list]
+
+Preconditions: List must not be empty and contain comparable values
+
+Returns: Maximum value found
+
+EXPANSION TO PRIMITIVES:
+Get the total number of items in list.
+Create a number variable called count with the result.
+
+Check if count is equal to zero.
+If the condition is true, then perform the following actions:
+    Display error message about empty list to the console.
+    Return negative one to the calling function.
+End the conditional block.
+
+Access the item at position zero in list.
+Create a variable called maximum value with the accessed value.
+
+Create a number variable called index with initial value one.
+
+While index is less than count, repeat the following steps:
+    Access the item at position index in list.
+    Create a variable called current value with the accessed value.
+    
+    Check if current value is greater than maximum value.
+    If the condition is true, then perform the following actions:
+        Set maximum value to current value.
+    End the conditional block.
+    
+    Calculate the sum of index and one.
+    Set index to the sum.
+End the loop.
+
+Return maximum value to the calling function.
+
+Example:
+Find the maximum value in sales figures list.
+</COMPOSITE>
+
+<COMPOSITE id="C041" complexity="O(n)" space="O(1)">
+Operation: Find the minimum value in [list]
+
+Preconditions: List must not be empty and contain comparable values
+
+Returns: Minimum value found
+
+EXPANSION TO PRIMITIVES:
+Get the total number of items in list.
+Create a number variable called count with the result.
+
+Check if count is equal to zero.
+If the condition is true, then perform the following actions:
+    Display error message about empty list to the console.
+    Return negative one to the calling function.
+End the conditional block.
+
+Access the item at position zero in list.
+Create a variable called minimum value with the accessed value.
+
+Create a number variable called index with initial value one.
+
+While index is less than count, repeat the following steps:
+    Access the item at position index in list.
+    Create a variable called current value with the accessed value.
+    
+    Check if current value is less than minimum value.
+    If the condition is true, then perform the following actions:
+        Set minimum value to current value.
+    End the conditional block.
+    
+    Calculate the sum of index and one.
+    Set index to the sum.
+End the loop.
+
+Return minimum value to the calling function.
+
+Example:
+Find the minimum value in temperature readings list.
+</COMPOSITE>
+
+<COMPOSITE id="C042" complexity="O(n)" space="O(n)">
+Operation: Reverse the order of items in [list]
+
+Modifies: The list in-place or returns new reversed list
+
+EXPANSION TO PRIMITIVES:
+Get the total number of items in list.
+Create a number variable called count with the result.
+
+Create a list variable called reversed list with initial value empty list.
+
+Calculate the difference of count and one.
+Create a number variable called index with the result.
+
+While index is greater than or equal to zero, repeat the following steps:
+    Access the item at position index in list.
+    Create a variable called current item with the accessed value.
+    
+    Add current item to the end of reversed list.
+    
+    Calculate the difference of index and one.
+    Set index to the difference.
+End the loop.
+
+Return reversed list to the calling function.
+
+Example:
+Reverse the order of items in customer queue list.
+</COMPOSITE>
+
+<COMPOSITE id="C043" complexity="O(n)" space="O(n)">
+Operation: Remove duplicate values from [list]
+
+Returns: New list with unique values only
+
+EXPANSION TO PRIMITIVES:
+Create a list variable called unique list with initial value empty list.
+Get the total number of items in list.
+Create a number variable called count with the result.
+
+Create a number variable called outer index with initial value zero.
+
+While outer index is less than count, repeat the following steps:
+    Access the item at position outer index in list.
+    Create a variable called current item with the accessed value.
+    
+    Create a boolean variable called is duplicate with initial value false.
+    Get the total number of items in unique list.
+    Create a number variable called unique count with the result.
+    Create a number variable called inner index with initial value zero.
+    
+    While inner index is less than unique count, repeat the following steps:
+        Access the item at position inner index in unique list.
+        Create a variable called unique item with the accessed value.
+        
+        Check if current item is equal to unique item.
+        If the condition is true, then perform the following actions:
+            Set is duplicate to true.
+            Break out of the current loop immediately.
+        End the conditional block.
+        
+        Calculate the sum of inner index and one.
+        Set inner index to the sum.
+    End the loop.
+    
+    Check if is duplicate is not true.
+    If the condition is true, then perform the following actions:
+        Add current item to the end of unique list.
+    End the conditional block.
+    
+    Calculate the sum of outer index and one.
+    Set outer index to the sum.
+End the loop.
+
+Return unique list to the calling function.
+
+Example:
+Remove duplicate values from product category list.
+</COMPOSITE>
+
+GROUP: String Processing
+
+<COMPOSITE id="C050" complexity="O(n)" space="O(1)">
+Operation: Count the number of words in [text]
+
+Returns: Word count
+
+EXPANSION TO PRIMITIVES:
+Create a number variable called word count with initial value zero.
+Create a boolean variable called in word with initial value false.
+Get the length of text.
+Create a number variable called text length with the result.
+
+Create a number variable called position with initial value zero.
+
+While position is less than text length, repeat the following steps:
+    Extract substring from text starting at position position with length one.
+    Create a text variable called current character with the result.
+    
+    Check if current character is equal to space character.
+    If the condition is true, then perform the following actions:
+        Set in word to false.
+    Otherwise, perform the following actions:
+        Check if in word is not true.
+        If the condition is true, then perform the following actions:
+            Calculate the sum of word count and one.
+            Set word count to the sum.
+            Set in word to true.
+        End the conditional block.
+    End the conditional block.
+    
+    Calculate the sum of position and one.
+    Set position to the sum.
+End the loop.
+
+Return word count to the calling function.
+
+Example:
+Count the number of words in customer feedback text.
+</COMPOSITE>
+
+<COMPOSITE id="C051" complexity="O(n)" space="O(1)">
+Operation: Check if [text] is a palindrome
+
+Returns: True if palindrome, false otherwise
+
+EXPANSION TO PRIMITIVES:
+Get the length of text.
+Create a number variable called text length with the result.
+
+Create a number variable called left index with initial value zero.
+Calculate the difference of text length and one.
+Create a number variable called right index with the result.
+
+While left index is less than right index, repeat the following steps:
+    Extract substring from text starting at position left index with length one.
+    Create a text variable called left character with the result.
+    
+    Extract substring from text starting at position right index with length one.
+    Create a text variable called right character with the result.
+    
+    Convert left character to lowercase.
+    Set left character to the result.
+    
+    Convert right character to lowercase.
+    Set right character to the result.
+    
+    Check if left character is not equal to right character.
+    If the condition is true, then perform the following actions:
+        Return false to the calling function.
+    End the conditional block.
+    
+    Calculate the sum of left index and one.
+    Set left index to the sum.
+    
+    Calculate the difference of right index and one.
+    Set right index to the difference.
+End the loop.
+
+Return true to the calling function.
+
+Example:
+Check if user input text is a palindrome.
+</COMPOSITE>
+
+
+
+TIER 3: LIBRARY OPERATIONS
+
+Library operations reference external libraries and frameworks. They cannot be expanded to primitives as they depend on external implementations.
+
+GROUP: Machine Learning
+
+<LIBRARY id="L001" framework="scikit-learn">
+Operation: Train the [model] using [training_data]
+
+Library Function: model.fit(training_data)
+
+Preconditions:
+• Model must be instantiated
+• Training data must be in appropriate format
+
+Parameters:
+• model: Machine learning model object
+• training_data: Feature matrix and labels
+
+Returns: Trained model
+
+Documentation Reference: https://scikit-learn.org/stable/
+
+Example:
+Train the customer churn prediction model using historical account data.
+→ model.fit(historical_account_data)
+</LIBRARY>
+
+<LIBRARY id="L002" framework="scikit-learn">
+Operation: Apply [model] to make predictions on [new_data]
+
+Library Function: predictions = model.predict(new_data)
+
+Preconditions:
+• Model must be trained
+• New data must match training data format
+
+Returns: Array of predictions
+
+Example:
+Apply the fraud detection model to make predictions on new transaction.
+→ predictions = model.predict(new_transaction)
+</LIBRARY>
+
+<LIBRARY id="L003" framework="TensorFlow/Keras">
+Operation: Initialize neural network with [architecture_specification]
+
+Library Function: model = Sequential([layers...])
+
+Preconditions: None
+
+Returns: Neural network model
+
+Documentation Reference: https://www.tensorflow.org/
+
+Example:
+Initialize neural network with three hidden layers and ReLU activation.
+→ model = Sequential([Dense(128, activation='relu'), ...])
+</LIBRARY>
+
+GROUP: Data Science and Analytics
+
+<LIBRARY id="L010" framework="pandas">
+Operation: Load data from CSV file [filename] into dataframe
+
+Library Function: dataframe = pd.read_csv(filename)
+
+Preconditions: File must exist and be valid CSV
+
+Returns: DataFrame object
+
+Documentation Reference: https://pandas.pydata.org/
+
+Example:
+Load data from CSV file customer_data.csv into dataframe.
+→ dataframe = pd.read_csv('customer_data.csv')
+</LIBRARY>
+
+<LIBRARY id="L011" framework="pandas">
+Operation: Group [dataframe] by [column] and calculate [aggregation]
+
+Library Function: result = dataframe.groupby(column).agg(aggregation)
+
+Preconditions: Column must exist in dataframe
+
+Returns: Aggregated DataFrame
+
+Example:
+Group sales dataframe by region and calculate sum of revenue.
+→ result = sales_dataframe.groupby('region').agg({'revenue': 'sum'})
+</LIBRARY>
+
+<LIBRARY id="L012" framework="matplotlib">
+Operation: Create bar chart showing [data] with [labels]
+
+Library Function: plt.bar(labels, data); plt.show()
+
+Preconditions: Data and labels must have matching dimensions
+
+Returns: Displays chart
+
+Documentation Reference: https://matplotlib.org/
+
+Example:
+Create bar chart showing monthly sales with month labels.
+→ plt.bar(month_labels, monthly_sales); plt.show()
+</LIBRARY>
+
+GROUP: Web Development
+
+<LIBRARY id="L020" framework="requests">
+Operation: Send HTTP GET request to [url]
+
+Library Function: response = requests.get(url)
+
+Preconditions: Valid URL
+
+Returns: Response object
+
+Documentation Reference: https://requests.readthedocs.io/
+
+Example:
+Send HTTP GET request to customer API endpoint.
+→ response = requests.get('https://api.example.com/customers')
+</LIBRARY>
+
+<LIBRARY id="L021" framework="requests">
+Operation: Send HTTP POST request to [url] with [data]
+
+Library Function: response = requests.post(url, json=data)
+
+Preconditions: Valid URL and properly formatted data
+
+Returns: Response object
+
+Example:
+Send HTTP POST request to payment endpoint with transaction data.
+→ response = requests.post(payment_url, json=transaction_data)
+</LIBRARY>
+
+<LIBRARY id="L022" framework="Flask/Django">
+Operation: Define REST API endpoint [path] that handles [method] requests
+
+Library Function: @app.route(path, methods=[method])
+
+Preconditions: Web framework must be initialized
+
+Returns: Route decorator
+
+Example:
+Define REST API endpoint /customers that handles GET requests.
+→ @app.route('/customers', methods=['GET'])
+</LIBRARY>
+
+GROUP: Database Operations
+
+<LIBRARY id="L030" framework="SQLAlchemy">
+Operation: Establish database connection to [database_url]
+
+Library Function: engine = create_engine(database_url)
+
+Preconditions: Valid database URL with credentials
+
+Returns: Database engine object
+
+Documentation Reference: https://www.sqlalchemy.org/
+
+Example:
+Establish database connection to PostgreSQL customer database.
+→ engine = create_engine('postgresql://user:pass@localhost/customers')
+</LIBRARY>
+
+<LIBRARY id="L031" framework="SQLAlchemy">
+Operation: Execute SQL query [query] on [connection]
+
+Library Function: result = connection.execute(query)
+
+Preconditions: Valid connection and SQL syntax
+
+Returns: Result set
+
+Example:
+Execute SQL query to retrieve active customers on database connection.
+→ result = connection.execute("SELECT * FROM customers WHERE active = true")
+</LIBRARY>
+
+GROUP: File Processing
+
+<LIBRARY id="L040" framework="openpyxl">
+Operation: Read Excel file [filename] into workbook
+
+Library Function: workbook = openpyxl.load_workbook(filename)
+
+Preconditions: File must exist and be valid Excel format
+
+Returns: Workbook object
+
+Documentation Reference: https://openpyxl.readthedocs.io/
+
+Example:
+Read Excel file monthly_report.xlsx into workbook.
+→ workbook = openpyxl.load_workbook('monthly_report.xlsx')
+</LIBRARY>
+
+<LIBRARY id="L041" framework="PyPDF2">
+Operation: Extract text from PDF file [filename]
+
+Library Function: text = PyPDF2.PdfReader(filename).pages[0].extract_text()
+
+Preconditions: File must exist and be valid PDF
+
+Returns: Extracted text string
+
+Example:
+Extract text from PDF file invoice.pdf.
+→ reader = PyPDF2.PdfReader('invoice.pdf'); text = reader.pages[0].extract_text()
+</LIBRARY>
+
+GROUP: Cryptography and Security
+
+<LIBRARY id="L050" framework="hashlib">
+Operation: Hash [password] using SHA-256 algorithm
+
+Library Function: hash_value = hashlib.sha256(password.encode()).hexdigest()
+
+Preconditions: Password must be string
+
+Returns: Hexadecimal hash string
+
+Example:
+Hash user password using SHA-256 algorithm.
+→ hash_value = hashlib.sha256(user_password.encode()).hexdigest()
+</LIBRARY>
+
+<LIBRARY id="L051" framework="bcrypt">
+Operation: Hash [password] using bcrypt with salt
+
+Library Function: hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
+Preconditions: Password must be string
+
+Returns: Salted hash bytes
+
+Documentation Reference: https://github.com/pyca/bcrypt/
+
+Example:
+Hash user password using bcrypt with salt.
+→ hashed = bcrypt.hashpw(user_password.encode(), bcrypt.gensalt())
+</LIBRARY>
+
+<LIBRARY id="L052" framework="cryptography">
+Operation: Encrypt [data] using AES encryption with [key]
+
+Library Function: cipher.encrypt(data)
+
+Preconditions: Valid encryption key
+
+Returns: Encrypted bytes
+
+Example:
+Encrypt customer personal data using AES encryption with secret key.
+→ encrypted = cipher.encrypt(customer_data)
+</LIBRARY>
+
+GROUP: Natural Language Processing
+
+<LIBRARY id="L060" framework="nltk">
+Operation: Tokenize [text] into words
+
+Library Function: tokens = nltk.word_tokenize(text)
+
+Preconditions: NLTK must be installed with tokenizer data
+
+Returns: List of word tokens
+
+Documentation Reference: https://www.nltk.org/
+
+Example:
+Tokenize customer feedback text into words.
+→ tokens = nltk.word_tokenize(customer_feedback)
+</LIBRARY>
+
+<LIBRARY id="L061" framework="nltk">
+Operation: Remove stop words from [word_list]
+
+Library Function: filtered = [w for w in word_list if w not in stopwords.words('english')]
+
+Preconditions: NLTK stopwords corpus must be downloaded
+
+Returns: Filtered word list
+
+Example:
+Remove stop words from tokenized review text.
+→ filtered = [w for w in tokens if w not in stopwords.words('english')]
+</LIBRARY>
+
+<LIBRARY id="L062" framework="transformers">
+Operation: Perform sentiment analysis on [text] using pretrained model
+
+Library Function: result = sentiment_pipeline(text)
+
+Preconditions: Model must be loaded
+
+Returns: Sentiment classification result
+
+Documentation Reference: https://huggingface.co/transformers/
+
+Example:
+Perform sentiment analysis on customer review using pretrained model.
+→ result = sentiment_pipeline(customer_review)
+</LIBRARY>
+
+GROUP: Image Processing
+
+<LIBRARY id="L070" framework="PIL/Pillow">
+Operation: Load image from file [filename]
+
+Library Function: image = Image.open(filename)
+
+Preconditions: File must exist and be valid image format
+
+Returns: Image object
+
+Documentation Reference: https://pillow.readthedocs.io/
+
+Example:
+Load image from file product_photo.jpg.
+→ image = Image.open('product_photo.jpg')
+</LIBRARY>
+
+<LIBRARY id="L071" framework="PIL/Pillow">
+Operation: Resize [image] to width [width] and height [height]
+
+Library Function: resized = image.resize((width, height))
+
+Preconditions: Valid dimensions
+
+Returns: Resized image object
+
+Example:
+Resize product image to width 800 and height 600.
+→ resized = image.resize((800, 600))
+</LIBRARY>
+
+<LIBRARY id="L072" framework="OpenCV">
+Operation: Detect faces in [image]
+
+Library Function: faces = face_cascade.detectMultiScale(image)
+
+Preconditions: Cascade classifier must be loaded
+
+Returns: Array of face coordinates
+
+Documentation Reference: https://opencv.org/
+
+Example:
+Detect faces in security camera image.
+→ faces = face_cascade.detectMultiScale(camera_image)
+</LIBRARY>
+
+GROUP: Date and Time
+
+<LIBRARY id="L080" framework="datetime">
+Operation: Get the current date and time
+
+Library Function: now = datetime.datetime.now()
+
+Preconditions: None
+
+Returns: DateTime object
+
+Example:
+Get the current date and time for timestamp.
+→ now = datetime.datetime.now()
+</LIBRARY>
+
+<LIBRARY id="L081" framework="datetime">
+Operation: Format [datetime] as text using [format_string]
+
+Library Function: formatted = datetime.strftime(format_string)
+
+Preconditions: Valid datetime object and format string
+
+Returns: Formatted string
+
+Example:
+Format transaction datetime as text using year-month-day format.
+→ formatted = transaction_datetime.strftime('%Y-%m-%d')
+</LIBRARY>
+
+GROUP: Testing
+
+<LIBRARY id="L090" framework="unittest">
+Operation: Assert that [actual_value] equals [expected_value]
+
+Library Function: self.assertEqual(actual_value, expected_value)
+
+Preconditions: Must be within test method
+
+Returns: None (raises exception if assertion fails)
+
+Example:
+Assert that calculated total equals expected total of 150.
+→ self.assertEqual(calculated_total, 150)
+</LIBRARY>
+
+<LIBRARY id="L091" framework="pytest">
+Operation: Run all tests in [test_directory]
+
+Library Function: pytest.main([test_directory])
+
+Preconditions: Test files must follow pytest conventions
+
+Returns: Exit code
+
+Documentation Reference: https://pytest.org/
+
+Example:
+Run all tests in tests directory.
+→ pytest.main(['tests/'])
+</LIBRARY>
+
+
+
+COMPLETE ALGORITHM EXAMPLES
+
+Example 1: Simple Interest Calculator (Primitives Only)
+
+The purpose of this procedure is to calculate simple interest on a loan amount.
+
+Create a number variable called principal with initial value ten thousand.
+Create a number variable called rate with initial value five.
+Create a number variable called time with initial value three.
+
+Calculate the product of principal and rate.
+Create a number variable called intermediate result with the product.
+
+Calculate the product of intermediate result and time.
+Create a number variable called product result with the product.
+
+Calculate the quotient of product result divided by one hundred.
+Create a number variable called simple interest with the quotient.
+
+Display simple interest to the console.
+
+The procedure is complete.
+
+Translation to Python:
+principal = 10000
+rate = 5
+time = 3
+
+intermediate_result = principal * rate
+product_result = intermediate_result * time
+simple_interest = product_result / 100
+
+print(simple_interest)
+
+Example 2: Find Maximum in List (Using Composite)
+
+The purpose of this procedure is to find the highest temperature from sensor readings.
+
+Create a list variable called temperature readings with initial value empty list.
+
+Add twenty three to the end of temperature readings.
+Add thirty one to the end of temperature readings.
+Add eighteen to the end of temperature readings.
+Add twenty seven to the end of temperature readings.
+
+Find the maximum value in temperature readings.
+Create a number variable called highest temperature with the result.
+
+Display highest temperature to the console.
+
+The procedure is complete.
+
+This expands to primitives as:
+[List creation and population primitives...]
+
+Get the total number of items in temperature readings.
+Create a number variable called count with the result.
+
+Access the item at position zero in temperature readings.
+Create a variable called maximum value with the accessed value.
+
+Create a number variable called index with initial value one.
+
+While index is less than count, repeat the following steps:
+    Access the item at position index in temperature readings.
+    Create a variable called current value with the accessed value.
+    
+    Check if current value is greater than maximum value.
+    If the condition is true, then perform the following actions:
+        Set maximum value to current value.
+    End the conditional block.
+    
+    Calculate the sum of index and one.
+    Set index to the sum.
+End the loop.
+
+Create a variable called highest temperature with value maximum value.
+
+Display highest temperature to the console.
+
+Example 3: Machine Learning Pipeline (Using Library Operations)
+
+The purpose of this procedure is to train a customer churn prediction model.
+
+Load data from CSV file customer_history.csv into dataframe.
+Create a variable called customer data with the result.
+
+Group customer data by account type and calculate average of monthly charges.
+Create a variable called aggregated data with the result.
+
+Initialize neural network with two hidden layers and sigmoid activation.
+Create a variable called prediction model with the result.
+
+Train the prediction model using aggregated data.
+
+Apply the prediction model to make predictions on new customer data.
+Create a variable called churn predictions with the result.
+
+Display churn predictions to the console.
+
+The procedure is complete.
+
+Translation to Python:
+customer_data = pd.read_csv('customer_history.csv')
+
+aggregated_data = customer_data.groupby('account_type').agg({'monthly_charges': 'mean'})
+
+prediction_model = Sequential([
+    Dense(64, activation='sigmoid'),
+    Dense(32, activation='sigmoid'),
+    Dense(1, activation='sigmoid')
+])
+
+prediction_model.fit(aggregated_data)
+
+churn_predictions = prediction_model.predict(new_customer_data)
+
+print(churn_predictions)
+
+
+
+FORMAL VERIFICATION RULES
+
+Completeness Verification
+
+For an ERC specification to be considered complete and valid:
+
+1. Primitive Closure: Every COMPOSITE operation must eventually decompose into only PRIMITIVE operations (no COMPOSITE may reference another COMPOSITE that doesn't fully decompose)
+
+2. Translation Completeness: Every PRIMITIVE operation must have documented translation rules for at least three major programming languages
+
+3. Library Documentation: Every LIBRARY operation must reference specific library functions with version information
+
+4. No Circular Dependencies: The dependency graph of COMPOSITE operations must be acyclic
+
+Translation Verification
+
+An ERC-to-Code translator must:
+
+1. Parse ERC statements and classify them as PRIMITIVE, COMPOSITE, or LIBRARY
+2. Recursively expand COMPOSITE operations until only PRIMITIVES remain
+3. Apply language-specific translation rules to each PRIMITIVE
+4. Map LIBRARY operations to target language library calls
+5. Preserve logical structure and control flow
+
+
+
+EDUCATIONAL PROGRESSION
+
+Level 1: Primitives Only (Beginner)
+Students learn to write algorithms using only primitive operations. This forces understanding of basic computational building blocks.
+
+Topics:
+• Variable declaration and assignment
+• Arithmetic operations
+• Conditional statements
+• Basic loops
+• List operations
+
+Level 2: Composites (Intermediate)
+Students learn common algorithms as composite operations and study how they decompose into primitives.
+
+Topics:
+• Searching algorithms
+• Sorting algorithms
+• Data validation
+• String processing
+• Mathematical calculations
+
+Level 3: Libraries (Advanced)
+Students learn when to use external libraries and how to integrate them into algorithms.
+
+Topics:
+• Machine learning frameworks
+• Data science libraries
+• Web frameworks
+• Database systems
+• Image processing
+
+
+
+TOOLING AND AUTOMATION
+
+ERC Validator
+
+A tool that verifies ERC specifications:
+• Checks syntax correctness
+• Validates operation taxonomy (P/C/L tags)
+• Verifies composite expansions terminate in primitives
+• Checks for circular dependencies
+• Validates translation rule completeness
+
+ERC Translator
+
+A tool that converts ERC to executable code:
+• Parses ERC syntax
+• Expands composites recursively
+• Applies translation rules
+• Generates idiomatic code in target language
+• Preserves comments and documentation
+
+ERC IDE Support
+
+Features for ERC development environments:
+• Syntax highlighting
+• Auto-completion for operations
+• Inline expansion preview for composites
+• Translation preview
+• Operation documentation tooltips
+
+
+
+CONCLUSION
+
+This structured specification transforms ERC from an ambiguous pseudocode system into a rigorous, mechanically-translatable algorithmic language. The three-tier taxonomy provides:
+
+1. Clarity: Explicit distinction between directly translatable operations and higher-level abstractions
+2. Verifiability: Formal rules for checking specification completeness
+3. Translatability: Clear path from ERC to executable code
+4. Teachability: Progressive learning from primitives to composites to libraries
+5. Extensibility: Framework for adding new operations while maintaining rigor
+
+The specification now fulfills its original promise: enabling line-by-line translation between natural English and programming languages while maintaining computational precision.
+
+
+PART TWO - THE SCIENTIFIC FOUNDATIONS (THE ERC PAPER)
+
+English Readable Code: A Three-Tier Formal Notation System for Mechanically Translatable Algorithmic Specification
+
+D. R. Dison
+
+Version 3.0 - October 2025
+
+Correspondence: Available via arXiv submission portal.
+
+Submitted to: arXiv cs.PL (Programming Languages) / cs.SE (Software Engineering) / cs.CY (Computers and Society)
+
+
+ABSTRACT
+
+This paper introduces English Readable Code (ERC), a formal notation system that expresses algorithmic logic as structured English sentences amenable to mechanical translation into executable code across multiple programming languages.
+
+The central contribution is a three-tier operation taxonomy: Primitive operations that translate directly (one-to-one or near one-to-one) to code statements; Composite operations that expand deterministically into sequences of primitive operations; and Library operations that map to documented external framework calls.
+
+Together, these tiers constitute a system with three formally stated properties: a Translation Guarantee (every ERC statement can be mechanically translated to any target programming language), a Completeness Property (every composite operation must have a full expansion to primitives, with no circular dependencies), and a Verification Property (an ERC specification is valid if and only if all composites terminate in primitives, all primitives have unambiguous computational semantics, and all library operations reference documented external interfaces).
+
+We present the full taxonomy of primitive operations (covering variable management, arithmetic, comparison, logic, control flow, list manipulation, function definition, input and output, and string processing), a representative set of composite operations (covering searching, sorting, data validation, mathematical calculations, list processing, and string analysis), and a library operation catalogue spanning machine learning, data science, web development, database access, file processing, cryptography, natural language processing, image processing, and time management.
+
+We further provide three worked algorithm examples demonstrating ERC at each tier, discuss a three-level educational progression scaffolded on the taxonomy, and describe a tooling ecosystem including an ERC Validator, an ERC Translator, and integrated development environment (IDE) support features.
+
+ERC occupies a position between informal pseudocode, which lacks mechanical translatability, and full programming languages, which impose high cognitive load on novice learners. We argue that its formal structure makes it valuable for programming education, algorithm communication, rapid prototyping, and as a preprocessing layer for large language model (LLM) code generation.
+
+Keywords: English Readable Code, controlled natural language, pseudocode, algorithm specification, programming education, code generation, formal notation, cognitive load, translation guarantee
+
+
+1. INTRODUCTION
+
+1.1 The Gap Between Human Thought and Machine Instruction
+
+A fundamental challenge in computing is the translation of human algorithmic intent into machine-executable form.
+
+This challenge manifests at two extremes.
+
+On one end, informal natural language is highly expressive and cognitively natural but is too ambiguous and underspecified for mechanical translation into code.
+
+On the other end, formal programming languages such as Python, Java, C++, and JavaScript offer precise, unambiguous instruction to a machine but impose significant cognitive overhead on learners and non-specialist practitioners, requiring mastery of syntax rules, type systems, scoping conventions, and language-specific idioms before any productive computation can be expressed.
+
+The field has long sought a middle ground. Pseudocode, in common use for decades in textbooks and academic papers, occupies this middle space conceptually. However, conventional pseudocode lacks the formal rigor needed for mechanical translation: different authors use inconsistent conventions, operations have no defined semantics, and there exists no guarantee that a given pseudocode statement corresponds to any executable expression.
+
+Controlled natural languages (CNLs) - subsets of natural language with restricted grammar and vocabulary designed to reduce ambiguity - have been studied since the 1960s as candidates for this middle ground (Winograd, 1971; Fuchs and Fromherz, 1994). More recently, large language models have demonstrated the capacity to interpret natural language instructions and generate code (Chen et al., 2021; Nijkamp et al., 2022), but these systems operate probabilistically and do not provide formal guarantees of translation correctness.
+
+English Readable Code (ERC) addresses this gap by providing a rigorously specified, formally structured notation that looks and reads like natural English but is defined precisely enough to be mechanically translated, step by step, into executable code in any major programming language.
+
+1.2 Motivating Example
+
+Consider the algorithmic goal of computing simple interest on a loan.
+
+In informal natural language, a specification might read: "Multiply the principal by the rate, multiply by the time, and divide by one hundred."
+
+This is clear to a human reader but contains no guidance about variable types, intermediate storage, or output method.
+
+In Python, the equivalent is:
+
+    principal = 10000
+    rate = 5
+    time = 3
+    intermediate_result = principal * rate
+    product_result = intermediate_result * time
+    simple_interest = product_result / 100
+    print(simple_interest)
+
+In ERC, the same algorithm is written as:
+
+    The purpose of this procedure is to calculate simple interest on a loan amount.
+    Create a number variable called principal with initial value ten thousand.
+    Create a number variable called rate with initial value five.
+    Create a number variable called time with initial value three.
+    Calculate the product of principal and rate.
+    Create a number variable called intermediate result with the product.
+    Calculate the product of intermediate result and time.
+    Create a number variable called product result with the product.
+    Calculate the quotient of product result divided by one hundred.
+    Create a number variable called simple interest with the quotient.
+    Display simple interest to the console.
+    The procedure is complete.
+
+Each sentence in this ERC specification corresponds to a formally defined operation with documented translation rules. The specification is readable to a non-programmer yet sufficiently precise for mechanical translation to Python, Java, JavaScript, C++, or C#.
+
+1.3 Contributions of This Paper
+
+This paper makes the following contributions:
+
+(1) A formal definition of ERC and its three core properties: Translation Guarantee, Completeness Property, and Verification Property.
+
+(2) A complete taxonomy of Primitive operations (the atomic units of ERC), covering nine operational groups and over thirty distinct operation types.
+
+(3) A representative catalogue of Composite operations that demonstrate how higher-level algorithmic concepts decompose deterministically into primitive sequences, covering searching, sorting, validation, mathematical computation, list processing, and string analysis.
+
+(4) A representative catalogue of Library operations spanning ten application domains.
+
+(5) Three worked examples demonstrating ERC at Primitive-only, Composite, and Library-integrated levels.
+
+(6) A three-level educational progression model grounded in the ERC taxonomy.
+
+(7) A description of three tooling artifacts: the ERC Validator, the ERC Translator, and ERC integrated development environment support.
+
+(8) Formal verification rules for ERC specifications.
+
+1.4 Paper Organization
+
+Section 2 reviews related work.
+
+Section 3 defines ERC and its formal properties.
+
+Section 4 presents the Primitive operation tier.
+
+Section 5 presents the Composite operation tier.
+
+Section 6 presents the Library operation tier.
+
+Section 7 presents worked algorithm examples.
+
+Section 8 discusses educational applications.
+
+Section 9 describes the ERC tooling ecosystem.
+
+Section 10 discusses the relationship of ERC to large language models.
+
+Section 11 presents formal verification rules.
+
+Section 12 discusses limitations and future work.
+
+Section 13 concludes.
+
+
+2. RELATED WORK
+
+2.1 Pseudocode and Algorithm Description Languages
+
+Pseudocode has been used in computer science education and research since the earliest textbooks on algorithms (Knuth, 1968). It serves as a lingua franca for algorithm description across language communities.
+
+However, pseudocode is informal by definition. There is no standard pseudocode syntax; each textbook, instructor, and researcher uses different conventions. This informality, while offering flexibility, means pseudocode cannot be mechanically translated without human interpretation of the intended meaning of each statement.
+
+Algorithm description languages (ADLs) have attempted to provide more structure. Systems such as ALGOL 60's influence on subsequent pseudocode traditions, and later languages such as Modula-2, which was designed partly for readability, represent steps toward more formal algorithmic notation. However, these systems are formal programming languages rather than natural-language-based notation systems.
+
+2.2 Controlled Natural Languages
+
+Controlled natural languages (CNLs) restrict natural language grammar and vocabulary to reduce ambiguity while retaining readability for domain specialists.
+
+Fuchs and Fromherz (1994) demonstrated that CNL specifications of logic programs could be automatically translated into Prolog clauses, giving combined advantages of informal readability and formal executability.
+
+The Naproche project (Cramer et al., 2009) applied CNL to mathematical proof checking, enabling proofs written in controlled English to be automatically verified.
+
+More recently, Gordon and Matskevich (2023) demonstrated translation of English descriptions of formal specifications into the Lean proof assistant, achieving correct translations using a modest controlled lexicon.
+
+ERC extends the CNL tradition specifically to the domain of general-purpose algorithmic specification and multi-language code generation.
+
+2.3 Natural Language to Code Generation
+
+The translation of natural language to executable code has been studied extensively.
+
+Early work by Winograd (1971) demonstrated natural language interfaces to block-stacking programs.
+
+The SPoC system (Kulal et al., 2019) proposed search-based pseudocode-to-code translation.
+
+The emergence of large language models trained on code (Chen et al., 2021; Nijkamp et al., 2022) dramatically expanded the capability of natural language to code translation.
+
+The CoRE system (2024) proposed using large language models as interpreters for natural language programming, pseudo-code programming, and flow-based programming of artificial intelligence (AI) agents, directly addressing the ambiguity challenge by relying on large language model inference.
+
+The approach published at the International Conference on Learning Representations (ICLR) 2025 proposed graph autoencoder-based embeddings for pseudocode and source code to bridge the gap between algorithmic descriptions and implementations.
+
+ERC differs from these approaches in a fundamental way: rather than relying on statistical inference to interpret ambiguous natural language, ERC achieves translatability through formal specification. Every ERC operation has defined semantics and documented translation rules. Translation is mechanical, not probabilistic.
+
+2.4 Programming Education and Cognitive Load
+
+Cognitive load theory (Sweller, 1988, 1994) has been extensively applied to programming education.
+
+The cognitive load experienced by learners has three components: intrinsic load, which arises from the inherent complexity of the material; extraneous load, which arises from poor instructional design; and germane load, which supports the formation of durable knowledge structures (Sweller, van Merriënboer, and Paas, 1998).
+
+Research has consistently shown that programming has high intrinsic cognitive load (Garner, 2002) and that syntax requirements add significant extraneous cognitive load for novices (Shaffer, 2003). The CORT (Code Restructuring Tool) system demonstrated that reducing extraneous load by using worked examples and part-completion techniques improves learning outcomes.
+
+Recent work on natural pseudocode (Lopez-Garcia, 2025) demonstrated that adapting pseudocode keywords to learner preferences reduces cognitive load and improves basic programming skill acquisition. Research on Python keyword recognition (2026) found that non-native English speakers experience significantly higher intrinsic cognitive load when learning programming syntax.
+
+The research context for ERC suggests that a notation grounded in plain English sentences, with a formal three-tier structure that explicitly separates atomic operations from higher-level abstractions, has the potential to reduce both intrinsic and extraneous cognitive load for novice learners.
+
+Michaelsen and Santos (2024), in a paper titled "Is English the New Programming Language?", demonstrated that structured pseudo-code engineering inputs improve the clarity of instructions for large language models, pointing to a convergence between the human-readability goal of ERC and the needs of AI-assisted programming.
+
+
+3. ENGLISH READABLE CODE: FORMAL DEFINITION
+
+3.1 Definition
+
+English Readable Code (ERC) is a controlled formal notation system in which algorithmic logic is expressed as structured English sentences, each corresponding to a formally defined operation with precisely documented computational semantics and language-specific translation rules.
+
+An ERC algorithm consists of a finite, ordered sequence of ERC statements.
+
+Each ERC statement S belongs to exactly one of three tiers:
+
+    S in PRIMITIVE, or
+    S in COMPOSITE, or
+    S in LIBRARY.
+
+3.2 The Translation Guarantee
+
+Every ERC algorithm A can be mechanically translated to executable code in any target programming language L through the following deterministic process:
+
+Step 1: Parse each statement in A and classify it as PRIMITIVE, COMPOSITE, or LIBRARY.
+
+Step 2: Expand all COMPOSITE statements by substituting their formal primitive expansion, recursively, until only PRIMITIVE and LIBRARY statements remain.
+
+Step 3: Apply the language-specific translation rule for each PRIMITIVE statement to produce a code statement in L.
+
+Step 4: Map each LIBRARY statement to the corresponding target-language library function call.
+
+Step 5: Preserve the logical structure and control flow of the original sequence.
+
+The result is a complete, executable program in L that implements the algorithm specified by A.
+
+3.3 The Completeness Property
+
+The Completeness Property has three requirements.
+
+First, every COMPOSITE operation must have a complete expansion to PRIMITIVE operations, with no COMPOSITE operations appearing in any expansion that does not itself fully resolve to PRIMITIVE operations.
+
+Second, every PRIMITIVE operation must have translation rules documented for at least three major programming languages.
+
+Third, no circular dependencies are permitted between COMPOSITE operations: the dependency graph of COMPOSITE operations must be a directed acyclic graph (DAG), meaning a graph with no loops.
+
+3.4 The Verification Property
+
+An ERC specification is valid if and only if the following three conditions hold simultaneously:
+
+(1) All COMPOSITE operations, when recursively expanded, terminate in PRIMITIVE operations only.
+
+(2) All PRIMITIVE operations have unambiguous computational semantics: each operation maps to a single, well-defined computational action with no ambiguity of interpretation.
+
+(3) All LIBRARY operations reference documented external interfaces, including library name, function name, parameter types, return type, and a documentation reference.
+
+
+4. TIER 1: PRIMITIVE OPERATIONS
+
+Primitive operations are the atomic units of ERC. Each primitive translates directly, in a one-to-one or near-one-to-one relationship, to a single code statement in a target language.
+
+Primitives are grouped into nine functional groups: Variable Declaration and Assignment (Group P00x), Basic Arithmetic Operations (Group P01x), Comparison Operations (Group P02x), Logical Operations (Group P03x), Control Flow Conditional (Group P04x), Control Flow Loops (Group P05x), List and Array Operations (Group P06x), Function Operations (Group P07x and P08x), and String Operations (Group P09x).
+
+4.1 Group: Variable Declaration and Assignment
+
+This group covers the creation and assignment of variables of all basic types.
+
+Operation P001: Create a number variable called [name] with initial value [value].
+Semantics: Declare and initialize an integer or floating-point variable.
+Translation rules: Python uses name = value; Java and C++ and C# use int name = value; or double name = value; as appropriate; JavaScript uses let name = value;.
+Example: "Create a number variable called customer age with initial value eighteen." translates to int customer_age = 18;.
+
+Operation P002: Create a text variable called [name] with initial value [value].
+Semantics: Declare and initialize a string variable.
+Translation rules: Python uses name = "value"; Java uses String name = "value";; JavaScript uses let name = "value";; C++ uses std::string name = "value";; C# uses string name = "value";.
+
+Operation P003: Create a boolean variable called [name] with initial value [true or false].
+Semantics: Declare and initialize a boolean variable. A boolean variable holds one of two values: true or false.
+Translation rules: Python uses name = True or name = False; Java, JavaScript, C++, and C# use name = true; or name = false; with appropriate type declarations.
+
+Operation P004: Set [variable] to [value].
+Semantics: Assign a new value to an existing variable.
+Translation rules: Universal across languages: variable = value; with appropriate syntax.
+
+Operation P005: Create a list variable called [name] with initial value empty list.
+Semantics: Declare and initialize an empty list or array.
+Translation rules: Python uses name = []; Java uses ArrayList<Type> name = new ArrayList<>();; JavaScript uses let name = []; C++ uses std::vector<Type> name;.
+
+4.2 Group: Basic Arithmetic Operations
+
+This group covers the five fundamental arithmetic operations.
+
+Operation P010: Calculate the sum of [operand1] and [operand2].
+Semantics: Add two numeric values.
+Translation: result = operand1 + operand2;.
+
+Operation P011: Calculate the difference of [operand1] and [operand2].
+Semantics: Subtract operand2 from operand1.
+Translation: result = operand1 - operand2;.
+
+Operation P012: Calculate the product of [operand1] and [operand2].
+Semantics: Multiply two numeric values.
+Translation: result = operand1 * operand2;.
+
+Operation P013: Calculate the quotient of [operand1] divided by [operand2].
+Semantics: Divide operand1 by operand2.
+Translation: result = operand1 / operand2;.
+
+Operation P014: Calculate the remainder of [operand1] divided by [operand2].
+Semantics: Compute the modulo (the leftover after division) of operand1 divided by operand2.
+Translation: result = operand1 % operand2;.
+
+4.3 Group: Comparison Operations
+
+This group covers six comparison operations, each yielding a boolean result.
+
+Operation P020: Check if [value1] is equal to [value2]. Translation: result = (value1 == value2);.
+Operation P021: Check if [value1] is greater than [value2]. Translation: result = (value1 > value2);.
+Operation P022: Check if [value1] is less than [value2]. Translation: result = (value1 < value2);.
+Operation P023: Check if [value1] is greater than or equal to [value2]. Translation: result = (value1 >= value2);.
+Operation P024: Check if [value1] is less than or equal to [value2]. Translation: result = (value1 <= value2);.
+Operation P025: Check if [value1] is not equal to [value2]. Translation: result = (value1 != value2);.
+
+4.4 Group: Logical Operations
+
+This group covers the three fundamental boolean logic operations.
+
+Operation P030: Check if both [condition1] and [condition2] are true.
+Semantics: Boolean AND operation: true only if both inputs are true.
+Translation: result = (condition1 && condition2); or (condition1 and condition2).
+
+Operation P031: Check if either [condition1] or [condition2] is true.
+Semantics: Boolean OR operation: true if at least one input is true.
+Translation: result = (condition1 || condition2); or (condition1 or condition2).
+
+Operation P032: Check if [condition] is not true.
+Semantics: Boolean NOT operation: reverses the truth value.
+Translation: result = !condition; or not condition.
+
+4.5 Group: Control Flow - Conditional
+
+This group covers the if-else family of conditional execution structures.
+
+Operation P040: If [condition] is true, then perform the following actions:.
+Semantics: Open a conditional execution block. The enclosed operations execute only if the condition is true.
+Translation: if (condition) {.
+
+Operation P041: Else if [condition] is true, then perform the following actions:.
+Semantics: Alternative conditional block.
+Translation: } else if (condition) {.
+
+Operation P042: Otherwise, perform the following actions:.
+Semantics: Default execution block when no preceding condition is true.
+Translation: } else {.
+
+Operation P043: End the conditional block.
+Semantics: Close the if-else structure.
+Translation: }.
+
+4.6 Group: Control Flow - Loops
+
+This group covers five loop-related primitives.
+
+Operation P050: While [condition] remains true, repeat the following steps:.
+Semantics: Open a while loop. A while loop repeats its enclosed operations as long as the condition remains true.
+Translation: while (condition) {.
+
+Operation P051: For each [item] in [collection], perform the following operations:.
+Semantics: Open a for-each loop that iterates over every item in a collection.
+Translation: Python uses for item in collection:; Java uses for (Type item : collection) {; JavaScript uses for (let item of collection) {.
+
+Operation P052: Repeat the following steps exactly [number] times:.
+Semantics: Open a count-controlled loop.
+Translation: Python uses for i in range(number):; Java and C++ and JavaScript use for (int i = 0; i < number; i++) {.
+
+Operation P053: End the loop.
+Semantics: Close the loop structure.
+Translation: }.
+
+Operation P054: Break out of the current loop immediately.
+Semantics: Exit the loop before its condition is exhausted.
+Translation: break;.
+
+Operation P055: Skip to the next iteration of the loop.
+Semantics: Advance immediately to the next loop iteration without completing the current one.
+Translation: continue;.
+
+4.7 Group: List and Array Operations
+
+This group covers five operations for manipulating ordered collections.
+
+Operation P060: Add [item] to the end of [list].
+Semantics: Append an item to a list.
+Translation: Python uses list.append(item); Java uses list.add(item);; JavaScript uses list.push(item);; C++ uses list.push_back(item);.
+
+Operation P061: Access the item at position [index] in [list].
+Semantics: Retrieve an item by its index position. Positions are counted from zero.
+Translation: item = list[index];.
+
+Operation P062: Remove the item at position [index] from [list].
+Semantics: Delete an item by its index position.
+Translation: Python uses del list[index] or list.pop(index); Java uses list.remove(index);; JavaScript uses list.splice(index, 1);.
+
+Operation P063: Insert [item] at position [index] in [list].
+Semantics: Insert an item at a specific position, shifting existing items.
+Translation: Python uses list.insert(index, item); Java uses list.add(index, item);; JavaScript uses list.splice(index, 0, item);.
+
+Operation P064: Get the total number of items in [list].
+Semantics: Retrieve the size or length of a list.
+Translation: Python uses len(list); Java uses list.size(); JavaScript and C++ use list.length or list.size().
+
+4.8 Group: Function Operations
+
+This group covers function definition, return, function call, and scope end.
+
+Operation P070: Define a function called [name] that performs the following operations:.
+Semantics: Declare a named function. A function is a reusable block of operations that can be invoked by name.
+Translation: Python uses def name():; Java uses void name() {; JavaScript uses function name() {; C++ uses void name() {.
+
+Operation P071: Return [value] to the calling function.
+Semantics: Exit the current function and provide a result to the caller.
+Translation: return value; universally.
+
+Operation P072: Call the function named [name].
+Semantics: Invoke a previously defined function by name.
+Translation: name(); universally.
+
+Operation P073: End the function definition.
+Semantics: Close the function body.
+Translation: }.
+
+4.9 Group: Input and Output
+
+This group covers basic console input and output.
+
+Operation P080: Display [value] to the console.
+Semantics: Output a value to the standard output stream.
+Translation: Python uses print(value); Java uses System.out.println(value);; JavaScript uses console.log(value);.
+
+Operation P081: Read a line of text from the console and store in [variable].
+Semantics: Accept user input from the standard input stream.
+Translation: Python uses variable = input(); Java uses variable = scanner.nextLine();; JavaScript uses variable = prompt();.
+
+4.10 Group: String Operations
+
+This group covers five common string manipulation operations. A string is a sequence of text characters.
+
+Operation P090: Get the length of [text]. Returns the number of characters.
+Operation P091: Concatenate [text1] and [text2]. Joins two text values into one. Translation: result = text1 + text2;.
+Operation P092: Extract substring from [text] starting at position [start] with length [length]. Retrieves a portion of a text value.
+Operation P093: Convert [text] to lowercase. Changes all letters to their lowercase form.
+Operation P094: Convert [text] to uppercase. Changes all letters to their uppercase form.
+
+
+5. TIER 2: COMPOSITE OPERATIONS
+
+Composite operations represent higher-level algorithmic patterns. They must expand, fully and deterministically, into sequences of primitive operations. They serve two functions: they provide concise, readable high-level statements for experienced ERC users, and they demonstrate the derivability of classical algorithms from primitive building blocks for educational purposes.
+
+Composite operations carry metadata including time complexity (expressed in Big-O notation, which describes how an algorithm's execution time grows relative to input size) and space complexity (how memory use grows with input size).
+
+5.1 Group: Searching Algorithms
+
+Composite C001: Perform binary search on [sorted_list] to find [target].
+Complexity: O(log n) time, O(1) space.
+Preconditions: The list must be sorted in ascending order.
+Returns: Position of target if found; negative one if not found.
+
+Binary search expands to a primitive sequence that creates left and right boundary variables, enters a while loop that runs while the boundaries have not crossed, computes the middle position, accesses the item at the middle position, returns immediately if the middle item matches the target, narrows the search to the left or right half based on whether the middle item is smaller or larger than the target, and returns negative one when the boundaries cross without finding the target.
+
+Composite C002: Perform linear search through [collection] to find [target].
+Complexity: O(n) time, O(1) space.
+Preconditions: None. Works on unsorted collections.
+Returns: Position of target if found; negative one if not found.
+
+Linear search expands to a primitive sequence that iterates through each position in the collection, compares the item at each position to the target, and returns the position if a match is found, or negative one if the entire collection is traversed without a match.
+
+5.2 Group: Sorting Algorithms
+
+Composite C010: Sort [list] using bubble sort algorithm in ascending order.
+Complexity: O(n squared) time, O(1) space.
+Preconditions: List items must be comparable.
+Modifies: The list in-place.
+
+Bubble sort expands to a double nested while loop. The outer loop tracks the number of passes. The inner loop compares adjacent pairs of items, swapping them when the first item is greater than the second, thereby bubbling the largest unsorted item to its correct position on each pass.
+
+Composite C011: Sort [list] using merge sort algorithm in ascending order.
+Complexity: O(n log n) time, O(n) space.
+Preconditions: List items must be comparable.
+
+Merge sort expands to a recursive structure: it defines a function that first checks whether the list has one or zero items (in which case it is already sorted and is returned), then computes the midpoint, recursively sorts the left and right halves, and merges the two sorted halves by repeatedly comparing and appending the smaller of the two current front items.
+
+5.3 Group: Data Validation
+
+Composite C020: Validate that [email_address] is in proper email format.
+Complexity: O(n) time, O(1) space.
+Returns: True if valid, false otherwise.
+
+This composite expands to a primitive sequence that counts the occurrences of the at-symbol character, returns false if the count is not exactly one, then performs additional checks on the local part and domain portions of the address using further primitive string operations.
+
+Composite C021: Validate that [age] is within valid range for adults.
+Complexity: O(1) time, O(1) space.
+Returns: True if age is eighteen or greater and less than one hundred fifty, false otherwise.
+
+This composite expands to two comparison primitives and one logical AND operation.
+
+5.4 Group: Mathematical Calculations
+
+Composite C030: Calculate the factorial of [number].
+Complexity: O(n) time, O(1) space.
+Preconditions: Number must be a non-negative integer.
+Returns: The factorial value.
+
+The factorial of a number n is the product of all positive integers from one to n. This composite expands to guard checks for negative input and for zero (which has factorial one), then a counter-controlled loop that multiplies an accumulator variable by each integer from one up to the number.
+
+Composite C031: Calculate the average of numbers in [list].
+Complexity: O(n) time, O(1) space.
+Preconditions: List must not be empty.
+Returns: The arithmetic mean value.
+
+This composite expands to a guard check for an empty list, then a summation loop over all items, followed by a division of the sum by the count.
+
+5.5 Group: List Processing
+
+Composite C040: Find the maximum value in [list].
+Complexity: O(n) time, O(1) space.
+Preconditions: List must not be empty and contain comparable values.
+Returns: The maximum value.
+
+This composite expands to an empty-list guard, initialization of the maximum with the first item, then a loop that compares each remaining item to the current maximum and updates when a larger item is found.
+
+Composite C041: Find the minimum value in [list].
+Complexity: O(n) time, O(1) space.
+Returns: The minimum value.
+
+This composite is symmetric to C040, updating when a smaller item is found.
+
+Composite C042: Reverse the order of items in [list].
+Complexity: O(n) time, O(n) space.
+Returns: A new list with items in reversed order.
+
+This composite expands to creation of an empty result list, then a loop that traverses the source list from the last index down to zero, appending each item to the result list.
+
+Composite C043: Remove duplicate values from [list].
+Complexity: O(n squared) time, O(n) space.
+Returns: A new list with unique values only.
+
+This composite expands to a nested loop structure. The outer loop visits each item in the original list. The inner loop checks whether the item already appears in the unique-values result list. If the item is not already present, it is appended to the result list.
+
+5.6 Group: String Processing
+
+Composite C050: Count the number of words in [text].
+Complexity: O(n) time, O(1) space.
+Returns: The word count.
+
+This composite expands to a character-by-character traversal that tracks whether the current position is inside a word or between words, incrementing the word count each time a non-space character is encountered after a word boundary.
+
+Composite C051: Check if [text] is a palindrome.
+Complexity: O(n) time, O(1) space.
+Returns: True if the text reads the same forwards and backwards, false otherwise.
+
+A palindrome is a word or phrase that reads identically in both directions, such as the word "racecar." This composite expands to a two-pointer approach that maintains a left index starting from position zero and a right index starting from the last position, comparing the lowercase characters at each index and moving the pointers inward, returning false at the first mismatch and true if all pairs match.
+
+
+6. TIER 3: LIBRARY OPERATIONS
+
+Library operations reference external libraries and frameworks. They cannot be expanded to primitives because they depend on external implementations that encapsulate complex functionality. Library operations carry framework metadata, precondition specifications, return type information, and documentation references.
+
+6.1 Group: Machine Learning
+
+Library L001 (scikit-learn): Train the [model] using [training_data].
+Maps to model.fit(training_data). Requires an instantiated model and appropriately formatted training data.
+
+Library L002 (scikit-learn): Apply [model] to make predictions on [new_data].
+Maps to predictions = model.predict(new_data). Requires a trained model and input data matching the training format.
+
+Library L003 (TensorFlow and Keras): Initialize neural network with [architecture_specification].
+Maps to model = Sequential([layers...]). A neural network is a computational model loosely inspired by the structure of biological brains, used for tasks such as image recognition and prediction.
+
+6.2 Group: Data Science and Analytics
+
+Library L010 (pandas): Load data from CSV file [filename] into dataframe.
+Maps to dataframe = pd.read_csv(filename). A dataframe is a two-dimensional table of data with labeled rows and columns. A Comma-Separated Values (CSV) file stores tabular data as plain text.
+
+Library L011 (pandas): Group [dataframe] by [column] and calculate [aggregation].
+Maps to result = dataframe.groupby(column).agg(aggregation).
+
+Library L012 (matplotlib): Create bar chart showing [data] with [labels].
+Maps to plt.bar(labels, data); plt.show().
+
+6.3 Group: Web Development
+
+Library L020 (requests): Send Hypertext Transfer Protocol (HTTP) GET request to [url].
+Maps to response = requests.get(url). An HTTP GET request retrieves data from a web address.
+
+Library L021 (requests): Send HTTP POST request to [url] with [data].
+Maps to response = requests.post(url, json=data). An HTTP POST request sends data to a web address.
+
+Library L022 (Flask and Django): Define Representational State Transfer (REST) Application Programming Interface (API) endpoint [path] that handles [method] requests.
+Maps to @app.route(path, methods=[method]).
+
+6.4 Group: Database Operations
+
+Library L030 (SQLAlchemy): Establish database connection to [database_url].
+Maps to engine = create_engine(database_url).
+
+Library L031 (SQLAlchemy): Execute Structured Query Language (SQL) query [query] on [connection].
+Maps to result = connection.execute(query).
+
+6.5 Group: File Processing
+
+Library L040 (openpyxl): Read Excel file [filename] into workbook.
+Maps to workbook = openpyxl.load_workbook(filename).
+
+Library L041 (PyPDF2): Extract text from Portable Document Format (PDF) file [filename].
+Maps to reader = PyPDF2.PdfReader(filename); text = reader.pages[0].extract_text().
+
+6.6 Group: Cryptography and Security
+
+Library L050 (hashlib): Hash [password] using Secure Hash Algorithm 256-bit (SHA-256) algorithm.
+Maps to hash_value = hashlib.sha256(password.encode()).hexdigest(). A hash function transforms input data into a fixed-size output in a way that is computationally infeasible to reverse.
+
+Library L051 (bcrypt): Hash [password] using bcrypt with salt.
+Maps to hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()). Salting adds random data to a password before hashing to prevent identical passwords from producing identical hash values.
+
+Library L052 (cryptography): Encrypt [data] using Advanced Encryption Standard (AES) encryption with [key].
+Maps to encrypted = cipher.encrypt(data). AES is a symmetric encryption standard widely used for securing sensitive data.
+
+6.7 Group: Natural Language Processing
+
+Library L060 (NLTK): Tokenize [text] into words.
+Maps to tokens = nltk.word_tokenize(text). Tokenization is the process of splitting text into individual units called tokens, typically words or punctuation marks. NLTK stands for Natural Language Toolkit.
+
+Library L061 (NLTK): Remove stop words from [word_list].
+Maps to filtered = [w for w in word_list if w not in stopwords.words('english')]. Stop words are common words such as "the," "and," and "is" that carry little semantic content and are often removed in text analysis tasks.
+
+Library L062 (Hugging Face Transformers): Perform sentiment analysis on [text] using pretrained model.
+Maps to result = sentiment_pipeline(text). Sentiment analysis is the automated classification of text as expressing positive, negative, or neutral opinion.
+
+6.8 Group: Image Processing
+
+Library L070 (PIL and Pillow): Load image from file [filename].
+Maps to image = Image.open(filename). PIL stands for Python Imaging Library.
+
+Library L071 (PIL and Pillow): Resize [image] to width [width] and height [height].
+Maps to resized = image.resize((width, height)).
+
+Library L072 (OpenCV): Detect faces in [image].
+Maps to faces = face_cascade.detectMultiScale(image). OpenCV stands for Open Source Computer Vision Library.
+
+6.9 Group: Date and Time
+
+Library L080 (datetime): Get the current date and time.
+Maps to now = datetime.datetime.now().
+
+Library L081 (datetime): Format [datetime] as text using [format_string].
+Maps to formatted = datetime.strftime(format_string).
+
+6.10 Group: Testing
+
+Library L090 (unittest): Assert that [actual_value] equals [expected_value].
+Maps to self.assertEqual(actual_value, expected_value). An assertion in testing is a statement that a condition must be true; if it is false, the test fails and raises an exception.
+
+Library L091 (pytest): Run all tests in [test_directory].
+Maps to pytest.main([test_directory]).
+
+
+7. WORKED ALGORITHM EXAMPLES
+
+7.1 Example 1: Simple Interest Calculator (Primitive-Only Level)
+
+The following ERC algorithm uses only Tier 1 primitive operations.
+
+--- ERC Specification ---
+
+The purpose of this procedure is to calculate simple interest on a loan amount.
+
+Create a number variable called principal with initial value ten thousand.
+Create a number variable called rate with initial value five.
+Create a number variable called time with initial value three.
+
+Calculate the product of principal and rate.
+Create a number variable called intermediate result with the product.
+
+Calculate the product of intermediate result and time.
+Create a number variable called product result with the product.
+
+Calculate the quotient of product result divided by one hundred.
+Create a number variable called simple interest with the quotient.
+
+Display simple interest to the console.
+
+The procedure is complete.
+
+--- Translation to Python ---
+
+principal = 10000
+rate = 5
+time = 3
+intermediate_result = principal * rate
+product_result = intermediate_result * time
+simple_interest = product_result / 100
+print(simple_interest)
+
+--- Translation to Java ---
+
+int principal = 10000;
+int rate = 5;
+int time = 3;
+int intermediate_result = principal * rate;
+int product_result = intermediate_result * time;
+double simple_interest = product_result / 100.0;
+System.out.println(simple_interest);
+
+This example demonstrates the Translation Guarantee: every statement in the ERC specification maps mechanically to a corresponding code statement, with no ambiguity, in both Python and Java.
+
+7.2 Example 2: Find Maximum Temperature (Composite-Expanded Level)
+
+The following ERC algorithm uses Composite operation C040.
+
+--- ERC Specification (High-Level Form) ---
+
+The purpose of this procedure is to find the highest temperature from sensor readings.
+
+Create a list variable called temperature readings with initial value empty list.
+
+Add twenty three to the end of temperature readings.
+Add thirty one to the end of temperature readings.
+Add eighteen to the end of temperature readings.
+Add twenty seven to the end of temperature readings.
+
+Find the maximum value in temperature readings.
+Create a number variable called highest temperature with the result.
+
+Display highest temperature to the console.
+
+The procedure is complete.
+
+--- Primitive Expansion of "Find the maximum value in temperature readings" ---
+
+Get the total number of items in temperature readings.
+Create a number variable called count with the result.
+
+Check if count is equal to zero.
+If the condition is true, then perform the following actions:
+    Display error message about empty list to the console.
+    Return negative one to the calling function.
+End the conditional block.
+
+Access the item at position zero in temperature readings.
+Create a variable called maximum value with the accessed value.
+
+Create a number variable called index with initial value one.
+
+While index is less than count, repeat the following steps:
+    Access the item at position index in temperature readings.
+    Create a variable called current value with the accessed value.
+    Check if current value is greater than maximum value.
+    If the condition is true, then perform the following actions:
+        Set maximum value to current value.
+    End the conditional block.
+    Calculate the sum of index and one.
+    Set index to the sum.
+End the loop.
+
+Return maximum value to the calling function.
+
+This example demonstrates the Completeness Property: the composite operation expands fully and deterministically into primitive operations with no residual ambiguity.
+
+7.3 Example 3: Machine Learning Pipeline (Library-Integrated Level)
+
+The following ERC algorithm uses Tier 3 library operations.
+
+--- ERC Specification ---
+
+The purpose of this procedure is to train a customer churn prediction model.
+
+Load data from CSV file customer_history.csv into dataframe.
+Create a variable called customer data with the result.
+
+Group customer data by account type and calculate average of monthly charges.
+Create a variable called aggregated data with the result.
+
+Initialize neural network with two hidden layers and sigmoid activation.
+Create a variable called prediction model with the result.
+
+Train the prediction model using aggregated data.
+
+Apply the prediction model to make predictions on new customer data.
+Create a variable called churn predictions with the result.
+
+Display churn predictions to the console.
+
+The procedure is complete.
+
+--- Translation to Python ---
+
+customer_data = pd.read_csv('customer_history.csv')
+
+aggregated_data = customer_data.groupby('account_type').agg({'monthly_charges': 'mean'})
+
+prediction_model = Sequential([
+    Dense(64, activation='sigmoid'),
+    Dense(32, activation='sigmoid'),
+    Dense(1, activation='sigmoid')
+])
+
+prediction_model.fit(aggregated_data)
+
+churn_predictions = prediction_model.predict(new_customer_data)
+
+print(churn_predictions)
+
+This example demonstrates library operation mapping and shows how ERC enables non-programmers to specify machine learning pipelines in readable English with a direct translation path to professional Python code.
+
+
+8. EDUCATIONAL PROGRESSION MODEL
+
+8.1 Design Rationale
+
+The three-tier taxonomy of ERC maps naturally to a three-level educational progression for programming instruction.
+
+This mapping is grounded in cognitive load theory (Sweller, 1988). By beginning with primitive operations exclusively, learners encounter only direct, one-to-one correspondences between English sentences and code statements. This minimizes extraneous cognitive load by eliminating the need to understand algorithmic decomposition or library integration while learning the fundamental mapping from intent to code.
+
+As learners progress, they encounter composite operations, which introduce the concept of algorithmic abstraction and decomposition. This corresponds to the germane cognitive load phase in which learners form durable knowledge structures (schemas) connecting high-level goals to low-level implementations.
+
+At the advanced level, library operations introduce the professional practice of leveraging existing implementations rather than rebuilding common functionality from primitives.
+
+8.2 Level 1: Primitive-Only (Beginner)
+
+Learners at Level 1 write algorithms using only Tier 1 primitive operations. Every step of every algorithm is expressed directly, with no abbreviation or abstraction.
+
+This forces learners to encounter, name, and sequence each computational building block explicitly: declaring a variable before using it, incrementing a counter manually, and writing out each step of a conditional test.
+
+Topics covered at Level 1 include variable declaration and assignment, arithmetic operations, conditional statements, basic loops, and list operations.
+
+Assessment at Level 1 can verify that learners understand the direct correspondence between ERC primitive statements and code: given a primitive ERC statement, the learner should be able to write the equivalent code in at least one language.
+
+8.3 Level 2: Composite (Intermediate)
+
+Learners at Level 2 study and use composite operations and analyze how they decompose into primitive sequences.
+
+This level introduces the central computer science concept of algorithmic abstraction: the ability to treat a complex, multi-step process as a single named operation.
+
+Topics covered at Level 2 include searching algorithms (linear search and binary search), sorting algorithms (bubble sort and merge sort), data validation routines, string processing, and mathematical calculations such as factorial and average.
+
+A key learning activity at Level 2 is performing the expansion manually: given a composite operation in ERC, the learner produces the full primitive expansion, then translates that expansion to code. This connects the high-level intent (find the maximum value in a list) to the low-level implementation (a loop with a comparison and an update).
+
+8.4 Level 3: Library (Advanced)
+
+Learners at Level 3 study and use Tier 3 library operations and learn when and why to use external libraries rather than implementing algorithms from primitives.
+
+This level mirrors professional programming practice, in which experienced practitioners regularly leverage libraries rather than reimplementing established functionality.
+
+Topics covered at Level 3 include machine learning frameworks such as scikit-learn and TensorFlow, data science libraries such as pandas and matplotlib, web development frameworks such as Flask and Django, database access through SQLAlchemy, file processing with openpyxl and PyPDF2, cryptographic libraries such as hashlib and bcrypt, natural language processing toolkits such as NLTK and Hugging Face Transformers, image processing with Pillow and OpenCV, and testing frameworks such as unittest and pytest.
+
+
+9. ERC TOOLING ECOSYSTEM
+
+The formal specification of ERC enables the development of automated tools that would not be possible for informal pseudocode. Three tools are proposed.
+
+9.1 ERC Validator
+
+The ERC Validator is a software tool that verifies the formal validity of an ERC specification without performing translation.
+
+The Validator performs the following checks:
+
+(1) Syntax correctness: Each statement conforms to the grammatical pattern of a defined ERC operation.
+
+(2) Taxonomy tagging: Each operation is correctly classified as Primitive, Composite, or Library.
+
+(3) Composite termination: All Composite operations, when recursively expanded, terminate in Primitive operations only. This check traverses the directed acyclic graph of composite dependencies.
+
+(4) Circular dependency detection: The Validator confirms that no Composite operation depends, directly or indirectly, on itself.
+
+(5) Translation completeness: Each Primitive operation has documented translation rules for at least three major programming languages.
+
+(6) Library documentation: Each Library operation references a specific library function with version information and a documentation link.
+
+A specification is declared valid by the ERC Validator if and only if all six checks pass.
+
+9.2 ERC Translator
+
+The ERC Translator is a software tool that converts a valid ERC specification into executable code in a specified target language.
+
+The Translator implements the Translation Guarantee algorithm defined in Section 3.2:
+
+Step 1: Parse the ERC specification and classify each statement.
+
+Step 2: Recursively expand all Composite statements to their Primitive equivalents.
+
+Step 3: Apply the language-specific translation rule for each Primitive to produce a code statement in the target language.
+
+Step 4: Map each Library statement to the target-language library function call.
+
+Step 5: Assemble the translated statements into a complete program, preserving control flow structure.
+
+The Translator must handle indentation (relevant to Python and YAML), bracketing (relevant to Java, C++, C#, and JavaScript), and type inference for variable declarations where the target language requires explicit type annotations.
+
+Additional features of the Translator include preservation of ERC statements as comments in the generated code, enabling side-by-side reading of the English specification and the executable code, which supports educational use.
+
+9.3 ERC Integrated Development Environment Support
+
+Integrated Development Environment (IDE) support for ERC authoring includes the following features:
+
+(1) Syntax highlighting: ERC keywords, operation types, and variable names are rendered in distinct colors.
+
+(2) Auto-completion: The IDE suggests matching operation templates as the author types, drawn from the Primitive, Composite, and Library catalogues.
+
+(3) Inline expansion preview: For any Composite operation, the IDE can display the full Primitive expansion in a side panel, allowing the author to verify the intended behavior.
+
+(4) Translation preview: The IDE can display the generated code in a selected target language in real time as the ERC specification is written.
+
+(5) Operation documentation tooltips: Hovering over any ERC operation keyword displays the operation's formal definition, semantics, translation rules, and example.
+
+(6) Validator integration: The IDE runs the ERC Validator continuously and highlights invalid statements.
+
+
+10. RELATIONSHIP TO LARGE LANGUAGE MODELS
+
+10.1 ERC as a Preprocessing Layer
+
+Large language models (LLMs) such as those studied by Chen et al. (2021) and Nijkamp et al. (2022) have demonstrated impressive natural language to code translation capabilities. However, these systems operate probabilistically and cannot provide formal guarantees of correctness.
+
+ERC can serve as a structured preprocessing layer between natural language intent and LLM code generation. A user who specifies an algorithm in ERC provides a statement that is more constrained and less ambiguous than free natural language, reducing the space of plausible interpretations for an LLM and improving the reliability of generated code.
+
+Michaelsen and Santos (2024) demonstrated empirically that structured pseudo-code engineering inputs improve the quality of LLM responses across four dimensions: understanding of intentions, interpretability, completeness, and creativity.
+
+ERC's formal structure makes it well-suited for this role: its vocabulary is controlled, its operation semantics are defined, and its hierarchical tier structure gives an LLM explicit signals about whether a statement is a direct code instruction (Primitive), a pattern to expand (Composite), or a library call to map (Library).
+
+10.2 LLMs as ERC Translators
+
+Conversely, the formal and complete translation rules specified in ERC make it a well-defined target for LLM fine-tuning. A language model trained on ERC-to-code translation pairs has a more constrained and formally grounded task than one trained on arbitrary natural language to code pairs.
+
+The CoRE system (2024) proposed using LLMs as interpreters for natural language programming, noting that natural language's inherent vagueness, ambiguity, and verbosity pose significant challenges. ERC directly addresses these challenges by restricting the natural language to a formal operation vocabulary, making ERC a strong candidate for training or prompting LLM-based code generation systems.
+
+10.3 ERC and the Democracy of Programming
+
+The CoRE paper (2024) noted that natural language programming has potential to democratize programming by lowering barriers for non-specialists.
+
+ERC contributes to this goal in a complementary direction: rather than relying on LLMs to interpret arbitrary natural language (which may fail silently and without explanation), ERC gives non-specialist users a structured notation that is both readable and formally verified. A user who learns ERC operations at Level 1 acquires a vocabulary that is both human-readable and machine-translatable, bridging the conceptual gap between intent and implementation without requiring fluency in any particular programming language syntax.
+
+
+11. FORMAL VERIFICATION RULES
+
+11.1 Completeness Verification
+
+An ERC specification is complete if it satisfies the following four conditions:
+
+Condition 1 - Primitive Closure: Every Composite operation, when recursively expanded, terminates in only Primitive operations. No Composite may reference another Composite that does not itself fully decompose to Primitives. Formally, the expansion relation on Composite operations must be well-founded (no infinite chains).
+
+Condition 2 - Translation Completeness: Every Primitive operation must have documented translation rules for at least three major programming languages.
+
+Condition 3 - Library Documentation: Every Library operation must reference a specific library function with parameter types, return type, and a version-annotated documentation URL.
+
+Condition 4 - Acyclic Dependency: The dependency graph G = (V, E), where vertices V are Composite operations and edges E connect a Composite to each Composite it references in its expansion, must be a Directed Acyclic Graph (DAG). The absence of cycles is equivalent to the existence of a topological ordering of V.
+
+11.2 Translation Verification
+
+An ERC-to-Code translator is correct if it satisfies the following five conditions:
+
+Condition 1: The translator correctly parses each ERC statement and classifies it as Primitive, Composite, or Library.
+
+Condition 2: The translator recursively expands each Composite operation using its documented primitive expansion until only Primitive and Library statements remain.
+
+Condition 3: The translator applies the language-specific translation rule to each Primitive statement, producing a syntactically correct statement in the target language.
+
+Condition 4: The translator maps each Library statement to the correct target-language library function, applying any necessary import or include declarations.
+
+Condition 5: The translator preserves the logical structure and control flow of the original ERC specification: the ordering of statements, the nesting of conditional and loop blocks, and the scoping of variables.
+
+11.3 Formal Soundness Claim
+
+Claim: If an ERC specification S satisfies the Completeness Property (Section 3.3) and the Verification Property (Section 3.4), and if a translator T satisfies all five Translation Verification conditions above, then T(S, L) is a correct implementation in language L of the algorithm specified by S, for any supported target language L.
+
+This claim is grounded in the compositional structure of ERC: the semantics of a composite are determined by the semantics of its primitive expansion, and the semantics of each primitive are defined by its formal translation rules.
+
+
+12. LIMITATIONS AND FUTURE WORK
+
+12.1 Current Limitations
+
+Scope of the Primitive Set: The current specification defines primitives for a representative but not exhaustive set of operations. Areas not yet covered include concurrent and parallel programming constructs, event-driven programming models, generic and parametric types, exception handling beyond basic guard clauses, and object-oriented class and inheritance structures.
+
+Library Coverage: The current Library tier covers ten application domains, each with a small number of representative operations. A comprehensive Library catalogue would require community-driven curation at a scale comparable to the documentation of major programming frameworks.
+
+Ambiguity in Variable Names: ERC uses natural language phrases as variable names (for example, "customer age" rather than customer_age). The specification assumes that variable names are unique and unambiguous within an algorithm, but does not yet define a formal name resolution mechanism for algorithms with many variables.
+
+Expressivity of Natural Numbers in Statements: Statements currently express numeric literals as English words (for example, "eighteen" rather than "18"), which is more readable but more verbose. A hybrid convention allowing numeric literals in parentheses may be appropriate.
+
+12.2 Future Work
+
+Formal Grammar: A context-free grammar (CFG) for ERC would enable automatic parsing and validation of ERC statements without relying on keyword matching. This is a natural next step toward the ERC Validator described in Section 9.1.
+
+Empirical Evaluation: A rigorous educational study comparing learning outcomes for students taught introductory programming via ERC versus direct programming language instruction would provide empirical evidence for the cognitive load reduction claims discussed in Section 8.
+
+Type System: A formal type system for ERC variables would enable type-checking of ERC specifications before translation, catching type mismatches that would otherwise only appear as runtime errors in the generated code.
+
+Multi-Language Expansion of Composite Primitives: The current Composite expansions are written in ERC itself. A mechanically verified mapping from each Composite to its Python, Java, and JavaScript implementations would strengthen the Translation Guarantee by allowing end-to-end automated testing.
+
+LLM Fine-Tuning Study: A study fine-tuning a large language model on ERC-to-code pairs would provide empirical evidence for the claim in Section 10.2 that ERC's formal structure improves LLM code generation reliability.
+
+Bidirectional Translation: The current specification addresses ERC-to-code translation. The reverse direction, automatically generating ERC from existing code, would enable ERC to serve as a documentation and reverse-engineering tool for legacy codebases.
+
+Multilingual ERC: The current specification is in English. Extending the controlled vocabulary and grammatical templates to other natural languages, as suggested by the work of Lopez-Garcia (2025) on mother-tongue pseudocode, would extend accessibility to non-English-speaking learner communities.
+
+
+13. CONCLUSION
+
+English Readable Code (ERC) is a formal notation system that bridges the gap between human algorithmic thinking and machine-executable code.
+
+Its three-tier taxonomy of Primitive, Composite, and Library operations provides:
+
+(1) Clarity: An explicit distinction between directly translatable atomic operations, higher-level compositional abstractions, and external library integrations.
+
+(2) Verifiability: Formal rules for checking specification completeness, including primitive closure, translation completeness, library documentation, and acyclicity of composite dependencies.
+
+(3) Translatability: A mechanical, deterministic path from any valid ERC specification to executable code in any supported target language, guaranteed by the Translation Guarantee.
+
+(4) Teachability: A three-level educational progression from Primitive-only instruction through Composite abstraction to Library integration, grounded in cognitive load theory.
+
+(5) Extensibility: A formal framework for adding new operations to each tier while maintaining the rigor of the Translation Guarantee and Completeness Property.
+
+ERC fulfills its original promise: enabling line-by-line, mechanical translation between natural English sentences and programming language statements, while maintaining computational precision and formal verifiability.
+
+In an era when large language models are reshaping the relationship between natural language and code, ERC offers a complementary and formally grounded contribution: a controlled natural language for algorithmic specification that achieves translatability not through statistical inference but through formal definition.
+
+
+REFERENCES
+
+Bruckman, A. and Edwards, E. (1999). Should we leverage natural-language knowledge? An analysis of user errors in a natural-language-style programming language. In Proceedings of the SIGCHI Conference on Human Factors in Computing Systems, pp. 207-214.
+
+Chen, M., et al. (2021). Evaluating Large Language Models Trained on Code. arXiv preprint arXiv:2107.03374.
+
+CoRE Project (2024). CoRE: LLM as Interpreter for Natural Language Programming, Pseudo-Code Programming, and Flow Programming of AI Agents. arXiv:2405.06907.
+
+Cramer, M., Fisseni, B., Koepke, P., Kuhlwein, D., Schröder, B., and Veldman, J. (2009). The Naproche Project: Controlled Natural Language Proof Checking of Mathematical Texts. In International Workshop on Controlled Natural Language, pp. 170-186.
+
+Fuchs, N. E. and Fromherz, M. (1994). Specifying Logic Programs in Controlled Natural Language. Proceedings of the Workshop on Executable Modal and Temporal Logics, IJCAI, 1994.
+
+Garner, S. (2002). Reducing the Cognitive Load on Novice Programmers. In Proceedings of the IASTED International Conference on Computers and Advanced Technology in Education.
+
+Gordon, C. S. and Matskevich, S. (2023). Trustworthy Formal Natural Language Specifications. In Proceedings of the 2023 ACM SIGPLAN International Symposium on New Ideas, New Paradigms, and Reflections on Programming and Software (Onward! 2023). ACM. https://doi.org/10.1145/3622758.3622890.
+
+ICLR 2025 Submission (2025). From Pseudo-Code to Source Code. Published at the International Conference on Learning Representations 2025. OpenReview: s0et2A33uM.
+
+Knuth, D. E. (1968). The Art of Computer Programming, Volume 1: Fundamental Algorithms. Addison-Wesley.
+
+Kulal, S., et al. (2019). SPoC: Search-Based Pseudocode to Code. In Advances in Neural Information Processing Systems, Volume 32.
+
+Lopez-Garcia, C. (2025). Improving University Students' Learning of Programming Using Customised Pseudocode. Computer Applications in Engineering Education. Wiley Online Library. https://doi.org/10.1002/cae.70061.
+
+Michaelsen, G. A. and dos Santos, R. P. (2024). Is English the New Programming Language? How About Pseudo-code Engineering? Acta Scientiae, ISSN 2178-7727. https://doi.org/10.17648/acta.scientiae.8086. arXiv:2404.08684.
+
+Nijkamp, E., et al. (2022). CodeGen: An Open Large Language Model for Code with Multi-Turn Program Synthesis. In International Conference on Learning Representations (ICLR).
+
+Shaffer, D. (2003). Applying Cognitive Load Theory to Computer Science Education. In Proceedings of the 15th Annual Workshop of the Psychology of Programming Interest Group (PPIG).
+
+Sweller, J. (1988). Cognitive Load During Problem Solving: Effects on Learning. Cognitive Science, 12(2), pp. 257-285.
+
+Sweller, J. (1994). Cognitive Load Theory, Learning Difficulty, and Instructional Design. Learning and Instruction, 4, pp. 295-312.
+
+Sweller, J., van Merriënboer, J. J. G., and Paas, F. G. W. C. (1998). Cognitive Architecture and Instructional Design. Educational Psychology Review, 10(3), pp. 251-296.
+
+Winograd, T. (1971). Procedures as a Representation for Data in a Computer Program for Understanding Natural Language. MIT AI Technical Report 235.
+
+
+APPENDIX A: COMPLETE PRIMITIVE OPERATION IDENTIFIER TABLE
+
+P001: Create a number variable called [name] with initial value [value]
+P002: Create a text variable called [name] with initial value [value]
+P003: Create a boolean variable called [name] with initial value [true or false]
+P004: Set [variable] to [value]
+P005: Create a list variable called [name] with initial value empty list
+P010: Calculate the sum of [operand1] and [operand2]
+P011: Calculate the difference of [operand1] and [operand2]
+P012: Calculate the product of [operand1] and [operand2]
+P013: Calculate the quotient of [operand1] divided by [operand2]
+P014: Calculate the remainder of [operand1] divided by [operand2]
+P020: Check if [value1] is equal to [value2]
+P021: Check if [value1] is greater than [value2]
+P022: Check if [value1] is less than [value2]
+P023: Check if [value1] is greater than or equal to [value2]
+P024: Check if [value1] is less than or equal to [value2]
+P025: Check if [value1] is not equal to [value2]
+P030: Check if both [condition1] and [condition2] are true
+P031: Check if either [condition1] or [condition2] is true
+P032: Check if [condition] is not true
+P040: If [condition] is true, then perform the following actions
+P041: Else if [condition] is true, then perform the following actions
+P042: Otherwise, perform the following actions
+P043: End the conditional block
+P050: While [condition] remains true, repeat the following steps
+P051: For each [item] in [collection], perform the following operations
+P052: Repeat the following steps exactly [number] times
+P053: End the loop
+P054: Break out of the current loop immediately
+P055: Skip to the next iteration of the loop
+P060: Add [item] to the end of [list]
+P061: Access the item at position [index] in [list]
+P062: Remove the item at position [index] from [list]
+P063: Insert [item] at position [index] in [list]
+P064: Get the total number of items in [list]
+P070: Define a function called [name] that performs the following operations
+P071: Return [value] to the calling function
+P072: Call the function named [name]
+P073: End the function definition
+P080: Display [value] to the console
+P081: Read a line of text from the console and store in [variable]
+P090: Get the length of [text]
+P091: Concatenate [text1] and [text2]
+P092: Extract substring from [text] starting at position [start] with length [length]
+P093: Convert [text] to lowercase
+P094: Convert [text] to uppercase
+
+
+APPENDIX B: COMPOSITE OPERATION SUMMARY TABLE
+
+C001: Perform binary search on [sorted_list] to find [target] - O(log n) time
+C002: Perform linear search through [collection] to find [target] - O(n) time
+C010: Sort [list] using bubble sort algorithm in ascending order - O(n squared) time
+C011: Sort [list] using merge sort algorithm in ascending order - O(n log n) time
+C020: Validate that [email_address] is in proper email format - O(n) time
+C021: Validate that [age] is within valid range for adults - O(1) time
+C030: Calculate the factorial of [number] - O(n) time
+C031: Calculate the average of numbers in [list] - O(n) time
+C040: Find the maximum value in [list] - O(n) time
+C041: Find the minimum value in [list] - O(n) time
+C042: Reverse the order of items in [list] - O(n) time
+C043: Remove duplicate values from [list] - O(n squared) time
+C050: Count the number of words in [text] - O(n) time
+C051: Check if [text] is a palindrome - O(n) time
+
+
+APPENDIX C: LIBRARY OPERATION SUMMARY TABLE
+
+L001: Train the [model] using [training_data] - scikit-learn
+L002: Apply [model] to make predictions on [new_data] - scikit-learn
+L003: Initialize neural network with [architecture_specification] - TensorFlow and Keras
+L010: Load data from CSV file [filename] into dataframe - pandas
+L011: Group [dataframe] by [column] and calculate [aggregation] - pandas
+L012: Create bar chart showing [data] with [labels] - matplotlib
+L020: Send HTTP GET request to [url] - requests
+L021: Send HTTP POST request to [url] with [data] - requests
+L022: Define REST API endpoint [path] that handles [method] requests - Flask and Django
+L030: Establish database connection to [database_url] - SQLAlchemy
+L031: Execute SQL query [query] on [connection] - SQLAlchemy
+L040: Read Excel file [filename] into workbook - openpyxl
+L041: Extract text from PDF file [filename] - PyPDF2
+L050: Hash [password] using SHA-256 algorithm - hashlib
+L051: Hash [password] using bcrypt with salt - bcrypt
+L052: Encrypt [data] using AES encryption with [key] - cryptography library
+L060: Tokenize [text] into words - NLTK
+L061: Remove stop words from [word_list] - NLTK
+L062: Perform sentiment analysis on [text] using pretrained model - Hugging Face Transformers
+L070: Load image from file [filename] - PIL and Pillow
+L071: Resize [image] to width [width] and height [height] - PIL and Pillow
+L072: Detect faces in [image] - OpenCV
+L080: Get the current date and time - datetime
+L081: Format [datetime] as text using [format_string] - datetime
+L090: Assert that [actual_value] equals [expected_value] - unittest
+L091: Run all tests in [test_directory] - pytest

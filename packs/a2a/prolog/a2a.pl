@@ -23,33 +23,52 @@
         pai_peer_mail_fetch/3  — +Recipient, +Scope, -Messages
 */
 
+% Declare this file as the 'a2a' module and list its exported predicates.
 :- module(a2a, [
+    % Supply 'pai_agent_card/1' as the next argument to the expression above.
     pai_agent_card/1,
+    % Supply 'pai_a2a_task/4' as the next argument to the expression above.
     pai_a2a_task/4,
+    % Supply 'pai_peer_mail_send/3' as the next argument to the expression above.
     pai_peer_mail_send/3,
+    % Supply 'pai_peer_mail_fetch/3' as the next argument to the expression above.
     pai_peer_mail_fetch/3
+% Close the expression opened above.
 ]).
 
+% Import [member/2, memberchk/2] from the built-in 'lists' library.
 :- use_module(library(lists),  [member/2, memberchk/2]).
+% Import [maplist/3] from the built-in 'apply' library.
 :- use_module(library(apply),  [maplist/3]).
 
 % ---------------------------------------------------------------------------
 % Agent card state
 % ---------------------------------------------------------------------------
 
+% Declare 'agent_capability/2.    % AgentId, Capability' as dynamic — its facts may be added or removed at runtime.
 :- dynamic agent_capability/2.    % AgentId, Capability
+% Declare 'agent_identity/2.      % AgentId, IdentityTerm' as dynamic — its facts may be added or removed at runtime.
 :- dynamic agent_identity/2.      % AgentId, IdentityTerm
+% Declare 'a2a_task_record/4.     % TaskId, Skill, Input, Status' as dynamic — its facts may be added or removed at runtime.
 :- dynamic a2a_task_record/4.     % TaskId, Skill, Input, Status
+% Declare 'agent_mail/5.          % MailId, To, From, Subject, Body' as dynamic — its facts may be added or removed at runtime.
 :- dynamic agent_mail/5.          % MailId, To, From, Subject, Body
 
 % Mail counter for unique IDs
+% Declare 'mail_counter/1' as dynamic — its facts may be added or removed at runtime.
 :- dynamic mail_counter/1.
+% State the fact: mail counter(0).
 mail_counter(0).
 
+% Define a clause for 'next mail id': succeed when the following conditions hold.
 next_mail_id(Id) :-
+    % Remove a single matching fact or rule from the runtime knowledge base.
     retract(mail_counter(N)),
+    % Evaluate the arithmetic expression 'N + 1' and bind the result to 'N1'.
     N1 is N + 1,
+    % Add a new fact or rule to the runtime knowledge base.
     assertz(mail_counter(N1)),
+    % Check that 'Id' is unifiable with 'mail(N1)'.
     Id = mail(N1).
 
 % ---------------------------------------------------------------------------
@@ -59,8 +78,11 @@ next_mail_id(Id) :-
 %   It never includes Lattice contents (opacity principle).
 % ---------------------------------------------------------------------------
 
+% Define a clause for 'pai agent card': succeed when the following conditions hold.
 pai_agent_card(card(identity(Id), capabilities(Caps), endpoint(local))) :-
+    % Check that '( agent_identity(_, Id) -> true ; Id' is unifiable with 'pai_agent_anonymous )'.
     ( agent_identity(_, Id) -> true ; Id = pai_agent_anonymous ),
+    % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(C, agent_capability(_, C), Caps).
 
 % ---------------------------------------------------------------------------
@@ -73,28 +95,48 @@ pai_agent_card(card(identity(Id), capabilities(Caps), endpoint(local))) :-
 %   The result is the task artifact — Lattice contents are never exposed.
 % ---------------------------------------------------------------------------
 
+% Define a clause for 'pai a2a task': succeed when the following conditions hold.
 pai_a2a_task(TaskId, Skill, Input, Status) :-
+    % Execute: ( a2a_task_record(TaskId, _, _, _).
     ( a2a_task_record(TaskId, _, _, _)
+    % If the condition above succeeded, perform the following action.
     ->  % Existing task: return current status
+        % Continue the multi-line expression started above.
         a2a_task_record(TaskId, Skill, Input, Status)
+    % Otherwise (else branch), perform the following action.
     ;   % New task: submit
+        % Continue the multi-line expression started above.
         assertz(a2a_task_record(TaskId, Skill, Input, submitted)),
+        % Continue the multi-line expression started above.
         execute_task(TaskId, Skill, Input, Status),
+        % Continue the multi-line expression started above.
         retract(a2a_task_record(TaskId, Skill, Input, _)),
+        % Continue the multi-line expression started above.
         assertz(a2a_task_record(TaskId, Skill, Input, Status))
+    % Close the expression opened above.
     ).
 
+% Define a clause for 'execute task': succeed when the following conditions hold.
 execute_task(TaskId, Skill, Input, Status) :-
+    % Execute: ( catch(dispatch_skill(Skill, Input, Result), _Err, fail).
     ( catch(dispatch_skill(Skill, Input, Result), _Err, fail)
+    % If the condition above succeeded, perform the following action.
     ->  Status = completed(artifact(TaskId, Skill, Result))
+    % Otherwise (else branch), perform the following action.
     ;   Status = failed(unknown_skill)
+    % Close the expression opened above.
     ).
 
 % Skill dispatch: skills are registered as agent capabilities
+% Define a clause for 'dispatch skill': succeed when the following conditions hold.
 dispatch_skill(Skill, Input, Result) :-
+    % Execute: ( agent_capability(_, Skill).
     ( agent_capability(_, Skill)
+    % If the condition above succeeded, perform the following action.
     ->  Result = result(Skill, Input, processed)
+    % Otherwise (else branch), perform the following action.
     ;   throw(error(unknown_skill(Skill), dispatch_skill/3))
+    % Close the expression opened above.
     ).
 
 % ---------------------------------------------------------------------------
@@ -104,9 +146,13 @@ dispatch_skill(Skill, Input, Result) :-
 %   Mail persists across sessions (dynamic fact).
 % ---------------------------------------------------------------------------
 
+% Define a clause for 'pai peer mail send': succeed when the following conditions hold.
 pai_peer_mail_send(To, Subject, Body) :-
+    % State a fact for 'next mail id' with the arguments listed below.
     next_mail_id(MailId),
+    % State a fact for 'get time' with the arguments listed below.
     get_time(Ts),
+    % Add a new fact or rule to the runtime knowledge base.
     assertz(agent_mail(MailId, To, anonymous, Subject-Ts, Body)).
 
 % ---------------------------------------------------------------------------
@@ -118,21 +164,35 @@ pai_peer_mail_send(To, Subject, Body) :-
 %   so it doesn't appear in subsequent fetches.
 % ---------------------------------------------------------------------------
 
+% Declare 'delivered_mail/1.  % MailId' as dynamic — its facts may be added or removed at runtime.
 :- dynamic delivered_mail/1.  % MailId
 
+% Define a clause for 'pai peer mail fetch': succeed when the following conditions hold.
 pai_peer_mail_fetch(Recipient, _Scope, Messages) :-
+    % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(message(MailId, To, From, Subject-Ts, Body), (
+        % Continue the multi-line expression started above.
         agent_mail(MailId, Recipient, From, Subject-Ts, Body),
+        % Continue the multi-line expression started above.
         \+ delivered_mail(MailId),
+        % Continue the multi-line expression started above.
         To = Recipient
+    % Continue the multi-line expression started above.
     ), Messages),
+    % State the fact: maplist([message(Id, _, _, _, _)]>>(assertz(delivered_mail(Id))), Messages).
     maplist([message(Id, _, _, _, _)]>>(assertz(delivered_mail(Id))), Messages).
 
 % Helper to register capabilities
+% Declare the following predicate as accepting callable (higher-order) arguments.
 :- meta_predicate pai_register_capability(+, +).
+% Define a clause for 'pai register capability': succeed when the following conditions hold.
 pai_register_capability(AgentId, Cap) :-
+    % Execute: ( agent_capability(AgentId, Cap) -> true ; assertz(agent_capability(AgentId, Cap)) )..
     ( agent_capability(AgentId, Cap) -> true ; assertz(agent_capability(AgentId, Cap)) ).
 
+% Define a clause for 'pai register identity': succeed when the following conditions hold.
 pai_register_identity(AgentId, Identity) :-
+    % Remove all matching facts from the runtime knowledge base.
     retractall(agent_identity(AgentId, _)),
+    % Add a new fact or rule to the runtime knowledge base.
     assertz(agent_identity(AgentId, Identity)).

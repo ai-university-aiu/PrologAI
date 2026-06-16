@@ -1,9 +1,9 @@
-% State the fact: name(interop).
-name(interop).
+% State the fact: name(induction).
+name(induction).
 % State the fact: version('1.0.0').
 version('1.0.0').
-% State the fact: title('PrologAI Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting (PR 36)').
-title('PrologAI Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting (PR 36)').
+% State the fact: title('PrologAI Clause Induction — ILP with learn-from-failures, metarules, and meta-interpretive learning (PR 37)').
+title('PrologAI Clause Induction — ILP with learn-from-failures, metarules, and meta-interpretive learning (PR 37)').
 % State the fact: author('PrologAI Community', 'ai.university.aiu@gmail.com').
 author('PrologAI Community', 'ai.university.aiu@gmail.com').
 % State the fact: home('https://github.com/ai-university-aiu/PrologAI').
