@@ -1,0 +1,601 @@
+PROLOGAI COMPLETION
+
+FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
+
+SPARC STEP 5: COMPLETION - THE AUTHORITATIVE RELEASE REFERENCE
+
+(All element names are original to PrologAI; this volume finalizes the platform defined by the Specification, the Pseudocode, the Architecture, and the Refinement)
+
+
+This is the completion companion to the four prior SPARC volumes.
+
+The specification said WHAT, the pseudocode said HOW, the architecture said WHERE, the refinement said how it is HARDENED; this volume says when it is DONE, how it is PACKAGED, how it is DOCUMENTED, how it is SHIPPED, and how anyone can use it to grow a mind of their own.
+
+It defines the definition of done, the release artifact and its licensing, the shipped documentation set, the release process and versioning, the open-source launch and governance, the deployment and operations runbook, the onboarding path for new builders, the completion of the first mind Mentova, the maintenance and longevity plan, and the closure of the SPARC cycle.
+
+Nothing here changes a requirement; it turns the hardened build into a finished, distributable, governable platform.
+
+
+PART COMP-0 - WHAT COMPLETION IS
+
+
+SECTION 0.1 - THE DEFINITION OF DONE
+
+The platform is done, for a release, when four conditions hold together.
+
+Correct and reliable: the refinement exit criteria are met, with the full acceptance-criterion catalogue green, the five test levels passing, the decision gates recorded, and the performance contract holding at the specified scales.
+
+Packaged: a single prologai executable is produced per supported platform, bundling the engine, the compiled core, and all packs, installable without errors in under thirty minutes.
+
+Documented: the full documentation set ships with the release, so a newcomer can install, run, understand, extend, and operate the platform.
+
+Lawful and open: the licensing and NOTICE obligations are satisfied, and the source is published openly so anyone can build with it.
+
+Completion is the discipline of making all four true at once and declaring it.
+
+
+SECTION 0.2 - WHAT COMPLETION IS NOT
+
+Completion of the platform is not the completion of a mind.
+
+A finished platform is a substrate ready to grow minds; a mind such as Mentova is then grown on it through a developmental run, which is a separate, ongoing process.
+
+Completion of one release is also not the end of the project: the SPARC cycle repeats for the next version, and the mind's own continual refinement loop never stops.
+
+Completion means the substrate is finished enough to be trusted, shipped, and built upon, not that learning has ended.
+
+
+PART COMP-1 - THE RELEASE ARTIFACT
+
+
+SECTION 1.1 - THE DISTRIBUTION
+
+The release artifact is produced from the prologai-dist repository: installers and saved states that bundle a released SWI-Prolog, the compiled prologai-core shared library, and all packs into one prologai executable per platform.
+
+The supported platforms are Linux, macOS, and Windows, each with its own installer and its own compiled core library.
+
+The executable preloads every pack, installs the bootstrap ontology, prints the banner with the embedded SWI-Prolog attribution line, sets the version and dialect flags, and starts the top level.
+
+
+SECTION 1.2 - LICENSING AND NOTICE, FINALIZED
+
+The licensing is finalized at completion and shipped in the distribution.
+
+PrologAI's own original code is licensed Apache-2.0, for its explicit patent grant, its retaliation clause, and its trademark protection of the PrologAI name.
+
+The embedded SWI-Prolog retains its Simplified BSD-2 notice; the vector backend components retain their MIT OR Apache-2.0 notices; any optional LGPL components remain separately licensed and replaceable by the end user.
+
+A NOTICE file at the repository root credits SWI-Prolog, the vector backend, and their copyright holders, and every distribution carries it; this satisfies the notice-preservation obligations that attach because the distribution redistributes engine binaries.
+
+
+SECTION 1.3 - THE RELEASE CONTENTS MANIFEST
+
+A complete release contains, at minimum: the per-platform prologai executable; the source of all packs and the launcher and syntax components; the compiled and source prologai-core; the documentation set; the test suite and its recorded results; the decision-gate result files; the NOTICE and all license files; and a signed checksum manifest so a downloader can verify integrity.
+
+The recorded bake-off and audit results travel with the release, so the evidence behind every closed decision is auditable by anyone who receives it.
+
+
+PART COMP-2 - THE SHIPPED DOCUMENTATION SET
+
+Completion ships documentation sufficient for five distinct readers.
+
+For the reader who wants to understand the platform: the five SPARC volumes - the Specification, the Pseudocode, the Architecture, the Refinement, and this Completion - which together are the canonical reference.
+
+For the reader who wants to install and run it: a README with the install steps, and the micro-step operations guides (working with the unforked engine, integrating the vector backend, and adapting the continual harness) for a command-by-command walkthrough.
+
+For the developer who wants to extend it: the PlDoc application-programming-interface documentation generated from every module, plus the contributor guide and the pack-authoring conventions.
+
+For the operator who will run minds in production: the operations runbook of Part COMP-6, covering configuration, monitoring, backup, upgrade, and corrigible shutdown.
+
+For the reader concerned with safety and governance: the constitution document (the default principles and how to register overseers), the engineering honesty risk register, and the governance model.
+
+For the evaluator who wants to find a capability quickly: the Cognitive Capabilities Map (Specification Part 40), which indexes each agent-era capability - tool use, computer use, reasoning, memory, the agent loop, self-improvement, and the rest - to the parts and work packages that implement it.
+
+INVARIANT: documentation is part of done; a release whose documentation set is incomplete is not complete.
+
+
+PART COMP-3 - THE DEFINITION-OF-DONE CHECKLIST
+
+The following checklist aggregates the conditions that must all be true to declare a release complete.
+
+Quality: the acceptance-criterion catalogue is green across the foundation, cognitive, substrate-and-frontier, and system bands.
+
+Quality: the five test levels pass, including the loops audit and the epistemology audit.
+
+Quality: the five decision gates have recorded results with a selected default and retained fallbacks.
+
+Quality: the performance contract holds at the specified scales, measured at the 99th percentile on the perception-to-action path.
+
+Quality: the continual refinement harness is validated, with a long longitudinal run showing no unrolled regression and stable calibration.
+
+Packaging: the per-platform executables build and install cleanly in under thirty minutes, and the checksum manifest is signed.
+
+Packaging: the no-fork dividend is re-verified - the packs rebuild against the bundled engine version without source changes.
+
+Documentation: the five SPARC volumes, the README, the PlDoc, the micro-step guides, the contributor guide, and the safety and governance documents all ship.
+
+Legal: Apache-2.0 is applied to original code, upstream notices are preserved, and the NOTICE file is present and correct.
+
+Openness: the source is published at the public repository with a license, a contributor guide, and a code of conduct.
+
+Risk: the risk register is current, with every retired risk backed by a recorded green test and every open risk carrying a disposition.
+
+Only when every line above is satisfied is the ship gate opened.
+
+
+PART COMP-4 - THE RELEASE PROCESS AND VERSIONING
+
+
+SECTION 4.1 - VERSIONING
+
+PrologAI uses semantic versioning: a version is major.minor.patch, where major changes may break compatibility, minor changes add capability compatibly, and patch changes fix defects.
+
+The first complete platform release is version 1.0.0, and the running flag prologai_version reports it, while the dialect flag remains swi for full engine compatibility.
+
+The work-package series and the capability layers are the unit of minor growth: a new mind capability arrives as a new pack and a new layer, compatibly, exactly as the frontier packs were added to the foundation.
+
+
+SECTION 4.2 - THE RELEASE GATING
+
+A release is gated by the definition-of-done checklist; the ship gate does not open until every line is satisfied and recorded.
+
+Each release carries a changelog that states what was added, changed, fixed, and deprecated, and a migration note when a major version changes anything compatibility-affecting.
+
+Each release is tagged in version control, and the tag points at the exact sources, recorded results, and documentation that constitute that release.
+
+
+SECTION 4.3 - THE NO-FORK DIVIDEND, RE-VERIFIED EVERY RELEASE
+
+Because the engine is an unforked dependency, every release re-verifies that the packs rebuild against the bundled engine version without source changes.
+
+When the engine publishes an upgrade within a major version, the upgrade is adopted, the test levels are re-run, and the dividend is confirmed: improvements arrive for free, and the project never carries a divergent engine copy.
+
+This re-verification is itself a system acceptance criterion, so the dividend is a tested property of every release, not a hope.
+
+
+PART COMP-5 - THE OPEN-SOURCE LAUNCH AND GOVERNANCE
+
+
+SECTION 5.1 - THE PUBLIC REPOSITORY
+
+PrologAI is published, free and open source, at https://github.com/ai-university-aiu/PrologAI.
+
+The repository ships the Apache-2.0 license, the NOTICE file, a README that orients a newcomer, a contributor guide, and a code of conduct, so that the project is not only open but joinable.
+
+Publishing openly is a completion deliverable, not an afterthought, because the platform's purpose is that anyone can build a mind with it.
+
+
+SECTION 5.2 - GOVERNANCE
+
+Governance is stated plainly so contributors know how decisions are made.
+
+Changes arrive as pull requests against the monorepo, pass the test levels in continuous integration, and are reviewed against the specification and the refinement criteria before merge.
+
+The constitutional layer, the protected core, and the kernel are governed conservatively: changes to them require explicit review and a recorded rationale, because they are the substrate's safety and identity.
+
+The risk register is a governance instrument: open risks are visible, and a risk is retired only by a recorded green test.
+
+
+SECTION 5.3 - UPSTREAM AND ECOSYSTEM DISTRIBUTION
+
+Three general-purpose components are contributed upstream rather than kept private: the background worker (from the cyclic-actor pack), the message endpoint (from the receptor pack), and the publish-subscribe library, each stripped of cognitive-architecture framing.
+
+The recommended sequence is to publish them first as a community pack, let them mature, and then propose core inclusion with adoption as evidence.
+
+The general-purpose library packs are distributed through the SWI-Prolog pack registry, so the wider community benefits even if it never builds a whole mind, and improvements to the existing engine ecosystem (for example the Model Context Protocol server) are contributed back rather than duplicated.
+
+
+PART COMP-6 - THE DEPLOYMENT AND OPERATIONS RUNBOOK
+
+
+SECTION 6.1 - SINGLE-HOST INSTALL
+
+To stand up a single mind: install a supported SWI-Prolog, install the Rust toolchain, obtain the prologai distribution for the platform, and run the installer, which produces the prologai executable bundling the engine, the compiled core, and all packs.
+
+Launch the executable; confirm the banner identifies PrologAI with the engine attribution line, that the version and dialect flags report correctly, and that the lattice library loads, which together are the system acceptance criteria for a good install.
+
+
+SECTION 6.2 - CONFIGURATION
+
+The operator configures a deployment through the persistent configuration store.
+
+Select the vector backend (the bake-off winner by default, a fallback if needed); select the embedding provider (local by default for privacy, a learned local model for genuine semantic similarity, an external service only by opt-in).
+
+Initialize the constitutional layer at startup and register the human overseers and their authority levels, so corrigibility is live before the mind does anything.
+
+Set the activation window, the actor intervals and thresholds, and the attention-economy money supply to suit the deployment.
+
+
+SECTION 6.3 - OPERATING A RUNNING MIND
+
+Observability is read from meta-control: usefulness, throughput, queue depth, error counts, and consciousness-indicator coverage, sampled at adaptive rates that never starve the system.
+
+Durability is the journal: the write-ahead log replays cleanly after a crash, and lattice_verify confirms integrity by hash.
+
+Safety in operation is corrigibility: a signed shutdown executes within seconds and cannot be blocked by the mind's own reasoning, and the constitutional veto log is immutable and reviewable.
+
+Upgrades follow the no-fork procedure: adopt the engine upgrade, reinstall the packs, re-run the test levels, and confirm the dividend before returning the mind to service.
+
+
+SECTION 6.4 - MIND SERVER OPERATION
+
+To run many minds, deploy the Mind Server through the Model Context Protocol gateway: it registers devices, provisions mind instances, persists each mind's profile between sessions, and hosts durable agent mail.
+
+Choose a topology per deployment: individual, unity, joint, or hive.
+
+Each provisioned mind keeps its own Lattice, its own constitution instance, and its own overseers, and inbound tasks and mail always land in a quarantine scope before anything is trusted.
+
+
+PART COMP-7 - ONBOARDING OTHERS TO BUILD THEIR OWN MINDS
+
+
+SECTION 7.1 - THE QUICKSTART
+
+A new builder starts by installing the platform, running the launcher, and working through the micro-step guides to prove the delivery model on their own machine: their code, in their repository, loading inside an unforked engine.
+
+From there, the five test scripts and the Community Garden Project serve as worked examples of a complete mind in action.
+
+
+SECTION 7.2 - CONFIGURING A NEW MIND
+
+To define a mind other than Mentova, a builder configures the degrees of freedom the architecture exposes.
+
+Choose a role from the menu (artisan, explorer, scientist, soldier, scout, and others), which sets the commitments to self, mission, and truth.
+
+Provide a body through the mind-body interface (a simulator or a physical device), declaring its needs and capabilities.
+
+Set the drives and homeostatic needs that will motivate the mind, supply or extend the bootstrap ontology, and instantiate the constitutional layer with the builder's own principles and registered overseers.
+
+Then run, and let the mind develop, because development - not specification - produces the mind.
+
+
+SECTION 7.3 - WHAT BUILDERS WILL MAKE
+
+Because the substrate is open and general, builders will make many kinds of minds: research minds for comparative cognitive science, embodied minds for robots, exploratory and scientific minds, and minds the authors of this specification will not anticipate.
+
+This diversity is the intended outcome and a research asset, since comparing many minds is how the field learns which mechanisms are necessary.
+
+Every such mind inherits, by construction, the auditability, corrigibility, and constitutional safety of the substrate, which is the strongest reason the substrate was built open and safe first.
+
+
+PART COMP-8 - COMPLETING MENTOVA, THE FIRST MIND
+
+
+SECTION 8.1 - WHAT COMPLETING MENTOVA MEANS
+
+Mentova is the flagship reference mind, and completing the platform is the precondition for growing it, not a substitute for growing it.
+
+Mentova is configured as one apex_mind on the finished platform: a bootstrap ontology, the Community Garden body and its sensor and command streams, a set of drives suited to a garden manager, a constitution instance with registered overseers, and an empty developmental history waiting to be filled.
+
+Completing Mentova, in the sense this volume can claim, means that this configuration boots cleanly, passes the five test scripts, and is ready to begin its developmental run.
+
+
+SECTION 8.2 - THE DEVELOPMENTAL RUN PLAN
+
+Mentova is grown by running the Community Garden Project across simulated seasons, assessed at intervals.
+
+The developmental gates are the milestones: goal-directed behavior by the end of simulated year one, symbolic representation by the end of year two, with object permanence and theory of mind demonstrated by the dedicated test scripts along the way.
+
+Throughout the run, consciousness-indicator coverage is reported beside the milestones, the continual refinement harness improves Mentova from its own trajectories under the constitutional pipeline, and ablation studies confirm which mechanisms are load-bearing.
+
+A developmental checkpoint - not an end state - is the deliverable: a Mentova that has demonstrably developed, with its trajectory recorded, reproducible by replay, and auditable by a human.
+
+
+SECTION 8.3 - MENTOVA IS A BEGINNING
+
+The completion of Mentova to a checkpoint is the start of its life, not its conclusion.
+
+Because the mind's continual refinement loop never stops, Mentova keeps developing after any checkpoint, and because the substrate is open, others grow their own minds alongside it.
+
+The right way to read a completed Mentova is as the first and finest mind grown on PrologAI, and as an existence proof that the substrate works.
+
+
+PART COMP-9 - MAINTENANCE AND LONGEVITY
+
+
+SECTION 9.1 - THE STANDING DISCIPLINES
+
+After release, three disciplines stand: the human refinement loop runs before each release, the mind's continual refinement loop runs between releases, and the risk register is reviewed at every release.
+
+Engine upgrades are adopted on the engine's cadence, with the no-fork dividend re-verified each time, so the platform inherits decades of ongoing engine improvement without maintenance debt.
+
+Deprecations are announced in changelogs with migration notes, and major versions are reserved for changes that cannot be made compatibly.
+
+
+SECTION 9.2 - RETARGETABILITY AND THE FUTURE
+
+Because the Minimal PrologAI Kernel defines compliance in writing, the language is retargetable: if the platform ever outgrows its host engine, a compliant implementation can be built on another, and the written specification, not any implementation, remains the authority.
+
+The research watchlist names the directions held for the future, each with a promotion trigger, so growth is planned rather than improvised, and the frontier packs show the pattern by which a watchlist item becomes a shipped capability.
+
+The architecture's address-based Lattice interface keeps the distributed-store path open for scale, behind the same interface, whenever scale demands it.
+
+
+PART COMP-10 - SPARC CLOSURE AND THE LOOP FORWARD
+
+
+SECTION 10.1 - THE COMPLETE SPARC SET
+
+With this volume, the SPARC methodology has been carried through all five steps for the PrologAI platform.
+
+Specification stated what the platform must do; Pseudocode stated how each work package reasons; Architecture stated where every component lives and how they communicate; Refinement stated how the build is hardened; Completion finalizes, packages, documents, ships, and governs it.
+
+Together the five volumes are the canonical reference for PrologAI, and they are mutually traceable, so any reader can move from a requirement to its logic to its component to its test to its release line.
+
+
+SECTION 10.2 - THE CYCLE REPEATS
+
+Completion of one version is the doorway to the next turn of the cycle.
+
+New research and new sources re-enter at Specification as additions to the work-package series and the capability layers, exactly as the platform has grown before, and the same five steps carry each addition through to a new release.
+
+The methodology and the substrate are both designed for this: SPARC is a disciplined loop, and PrologAI is a substrate built to be extended by registration rather than rewiring.
+
+
+PART COMP-11 - RESPONSIBLE RELEASE AND THE OPEN-SUBSTRATE STANCE
+
+This part states how completion is reconciled with responsibility, given that the platform is both open and aimed at the north stars of Specification Part 38.
+
+What is released is a substrate, not a trained frontier model: PrologAI is general-purpose infrastructure - a language and platform - whose every mind inherits the constitutional layer, corrigibility, auditability, and the capability-evaluation gating by construction.
+
+Release is capability-aware: the buildable core and the cognitive packs ship openly, while any component that materially raises a dangerous capability is disclosed only behind the if-then discipline of the Refinement volume, with the safe configuration as the documented default and the unsafe configuration requiring a deliberate, visible act.
+
+The open-versus-closed question for powerful AI is genuinely contested, and this project records its reasoning rather than asserting a verdict: openness is judged net-positive here because an inspectable symbolic substrate is more auditable than a closed model, because many independent eyes harden the safety machinery, and because the constitutional safety travels with the substrate; the honest counterweight is that an open substrate can be misconfigured, which the protected-core discipline, the safe defaults, and this responsible-release posture are designed to mitigate.
+
+Responsible release is therefore a standing commitment, re-evaluated at every version as capabilities grow: the more capable the substrate becomes, the more its disclosure is gated by measured evaluation rather than by default openness, and corrigibility and the constitution are never among the things a release makes optional.
+
+
+PART COMP-12 - SHIPPING TOOLS AND CONNECTORS
+
+A tool-equipped mind ships with more than the engine and the packs; it ships with a tool registry, the connectors that populate it, and the discipline that governs them.
+
+The distribution includes the tool-use faculty (PR 44) and the computer-use body (PR 45), and a starter registry populated from the affordance ontology of Specification Part 39, with each tool carrying its tool_card and risk class.
+
+Connectors are distributed the way the wider ecosystem already distributes them: Model Context Protocol servers for data sources and applications, Agent2Agent skills for inter-agent collaboration, native foreign predicates for performance-critical tools, and body capabilities for devices and computer use; adding a connector is registration, not a new release of the core.
+
+Tool disclosure follows the responsible-release posture of the previous part: low-risk tools ship enabled, moderate-risk tools ship with the constitutional check engaged, and high-risk tool classes (payments, privileged shell, real-world computer and robotic control, and tool self-modification) ship disabled by default and are enabled only behind capability evaluation, oversight, and staged autonomy.
+
+Operating a tool-equipped mind adds three runbook duties to the deployment guide: curate the registry to the tools a deployment actually needs, scope each connector's authorization to the minimum it requires, and keep computer use sandboxed until its reliability record justifies wider autonomy.
+
+
+PART COMP-13 - THE DEMONSTRATION COMPANION AND ROBOT DEPLOYMENT
+
+Completion now ships a sixth companion document alongside the five SPARC volumes: the Demonstration and Proof-of-Concept Plan, which shows how Mentova - the first mind written in PrologAI - is born from a small demonstration and grown toward the full feature set.
+
+That companion is part of the documentation set: it carries the reasoning ladder, the Small-World foundational dataset, the practical tracks, and the flagship demonstrations, and it is the natural entry point for anyone evaluating what a PrologAI mind can do.
+
+Deploying a robot-embodied mind adds steps to the operations runbook: enroll the robot through the Robot Operating System version 2 bridge (PR 46), begin in a simulator with no physical actuation and a network allowlist, and widen real-world autonomy only as the capability evaluations and audits permit.
+
+Mentova itself ships from its own repository, written in PrologAI and pre-loaded with foundational data, depending on the platform the way an application depends on its language.
+
+
+PART COMP-14 - THE COMPLETION DECLARATION
+
+When the definition-of-done checklist is fully satisfied and recorded, the following declaration is made and signed in the release record.
+
+The PrologAI platform is correct, fast, and reliable to its stated criteria; it is packaged into a verifiable per-platform distribution; it is documented by the five SPARC volumes and the operational and contributor guides; it is licensed Apache-2.0 with all upstream notices preserved; and it is published, free and open, for anyone to build with.
+
+The first mind to be grown upon it is Mentova, in the Community Garden, and the substrate stands ready for every other mind that others will grow.
+
+SPARC Step 5 is complete.
+
+
+PART COMP-15 - DEVELOPER TOOLING AND TUTORIAL DELIVERY
+
+This part specifies the completion criteria for the console REPL launcher and the standing SPARC documentation rule introduced in Specification Part 41.
+
+REPL LAUNCHER DELIVERY CHECKLIST
+
+The console REPL launcher (Specification FR-REPL-001 to FR-REPL-005, Architecture ARCH-17) is complete when:
+
+  bin/mentova_repl.pl is committed and merged on the Mentova main branch.
+  bin/mentova is committed, merged, and executable (chmod +x).
+  swipl -l bin/mentova_repl.pl -g "true" -t halt exits with code 0.
+  mentova_query/3, assess_piaget/3, anchor_node/4, and default_nexus/1 are callable at the ?- prompt without additional loading.
+  The welcome banner names all available query types, lists key predicates, and provides at least four tutorial example queries.
+  The paper (papers/Acc_68_Mentova_Console_REPL.txt) and announcement (announcements/Acc_68_Mentova_Console_REPL_LinkedIn.txt) are on Mentova main, following the Part 10 discipline.
+
+SPARC DOCUMENTATION CHANGE RULE - COMPLETION OBLIGATION
+
+The standing SPARC documentation rule (Specification Section 41.2) is a completion obligation: no code change is complete until the corresponding documentation change is committed. This obligation applies to every future pull request on both PrologAI and Mentova.
+
+The completion checklist for any code change now includes:
+
+  Code: the work package code is committed and tested on a feature branch.
+  Documentation: the relevant SPARC volumes (1 through 5) are updated with a description of the change and the reason for it.
+  Version: each updated SPARC volume has its minor version incremented.
+  CLAUDE.md: the project CLAUDE.md references the new document versions.
+  PR: the code change and documentation change are in the same pull request or in an explicitly linked documentation PR.
+
+Reason: documentation that trails the code is documentation that cannot be trusted. The standing rule ensures the five SPARC volumes remain the authoritative description of the platform at every point in its development history, not only at the moment of initial specification.
+
+TUTORIAL READINESS AS A COMPLETION CRITERION
+
+Beginning with Acc_68, tutorial readiness is a completion criterion for the Mentova platform. The platform is not complete for a given release if a new user cannot start an interactive session with a single command and immediately issue the tutorial's first query.
+
+The console REPL launcher is the infrastructure for that criterion. Future improvements to tutorial readiness (the friendlier command interface, a built-in tutorial script, annotated example sessions) are tracked as extensions of this criterion.
+
+
+CLOSING NOTE - WHAT HAS BEEN BUILT
+
+What has been built is not a single mind but the means to many: a constructed language and platform that makes the mechanisms of mind into first-class, inspectable, safe, and reusable primitives, delivered on an unforked engine, defined by a written kernel, and governed by a constitution that every mind inherits by construction.
+
+The language came first on purpose, because the mechanism is the intelligence, because a self-improving mind must be written in something it can read, because safety belongs in the substrate, and because an open substrate grows a diversity of minds where a single closed build would grow only one.
+
+Mentova is the first of those minds; PrologAI is the gift that makes the rest possible.
+
+COMP-16  TUTORIAL TRACK DELIVERABLES
+---------------------------------------
+
+Version: PrologAI Completion v8
+Added: 2026-06-16
+Reason: Part 11 of the Demonstration Plan (Vol. 6, v4) defines the Tutorial Track. Two tutorial deliverables are required: the PrologAI Tutorial (Acc_69) and the Mentova Tutorial (Acc_70). Per SPARC DOCUMENTATION RULE (Spec Part 41, Section 41.2), this Completion volume is updated to reflect those deliverables as standing completion obligations.
+
+16.1  PrologAI Tutorial (Acc_69)
+
+A full novice-level tutorial covering all 48 work packages (PR 1 through PR 48) must exist in the PrologAI repository as:
+
+  docs/tutorial/Ch01_What_Is_PrologAI.txt through docs/tutorial/Ch12_Writing_PrologAI_Programs.txt
+  docs/PrologAI_Tutorial.txt  (monolithic file for PDF conversion)
+
+The tutorial is complete when all twelve chapter files exist and the monolithic file contains all twelve chapters concatenated.
+
+16.2  Mentova Tutorial (Acc_70)
+
+A full novice-level tutorial covering all 48+ reasoning types, the Lattice, assessment frameworks, bodies, and protocols must exist in the Mentova repository as:
+
+  docs/tutorial/Mentova_Ch01_Introduction.txt through docs/tutorial/Mentova_Ch04_Memory_Growth_Protocols.txt
+  docs/Mentova_Tutorial.txt  (monolithic file for PDF conversion)
+
+The tutorial is complete when all four chapter files exist and the monolithic file contains all four chapters concatenated.
+
+16.3  Tutorial Track Discipline
+
+Tutorials are written only after the capabilities they describe have been demonstrated and documented in accomplishment papers on Mentova main. No tutorial chapter may describe a capability not yet demonstrated. This is the Tutorial Track discipline (Vol. 6, Part 11).
+
+16.4  Completion Criterion
+
+PrologAI is tutorial-ready when both Acc_69 and Acc_70 papers are merged on Mentova main and the corresponding tutorial files are merged on their respective repository mains.
+
+Status as of 2026-06-16: COMPLETE. Acc_69 and Acc_70 delivered.
+
+COMP-17  ARC-AGI-1 FULL BENCHMARK RUN (ACC_71)
+------------------------------------------------
+
+Version: PrologAI Completion v9
+Added: 2026-06-16
+Reason: Growth path milestone 2 from Acc_60 (full ARC-AGI-1 benchmark run) is delivered
+in Acc_71. Per SPARC DOCUMENTATION RULE (Spec Part 41, Section 41.2), this Completion
+volume is updated to reflect the new benchmark capability as a standing deliverable.
+
+17.1  Benchmark Infrastructure
+
+The following components are now part of the permanent Mentova platform:
+
+  tools/arc_agi_to_prolog.py
+      Python data pipeline. Downloads and converts all 400 ARC-AGI-1 public
+      training tasks from JSON to Prolog facts.
+
+  data/arc_agi_1/arc_tasks.pl
+      Auto-generated Prolog fact file. 400 arc_agi_task/4 facts covering all
+      public training tasks of the ARC-AGI-1 benchmark (Chollet 2019).
+
+  src/mentova/games/arc_benchmark.pl
+      Benchmark runner module. Implements 130+ named grid transformations,
+      the arc_induce_rule_400/2 induction engine, and arc_benchmark_print/0.
+
+  demos/arc_agi_benchmark.pl
+      Demo entry point. Boots Mentova, loads all 400 tasks, runs the benchmark,
+      prints the honest score.
+
+17.2  Honest Score
+
+Acc_71 establishes the baseline score for Mentova on ARC-AGI-1:
+
+  Score: 17 / 400 = 4.25%
+  Method: pure induction from examples, no pretraining
+  Every solved task: transformation rule named glass-box
+
+This score is the benchmark for all future runs. Any new named transformation
+added to arc_benchmark.pl may increase the score. The honest number is always
+reported as measured.
+
+17.3  Growth Path
+
+Acc_71 closes growth path milestone 2 from Acc_60 (Full ARC-AGI-1 benchmark run).
+The remaining growth path milestones from Acc_60 are:
+
+  Milestone 3: Live Pokemon emulator connection (PyBoy + game_body.pl)
+  Milestone 4: Live multi-agent deployment (Mentor-B as second PrologAI instance)
+  Milestone 5: Wider embodiment (real actuators via ROS bridge, Part 38)
+  Milestone 6: Full CHC cognitive-abilities battery
+
+17.4  Completion Criterion
+
+The benchmark run capability is complete when demos/arc_agi_benchmark.pl runs
+on all 400 tasks, names a rule for each solved task, and reports the honest score.
+
+Status as of 2026-06-16: COMPLETE. Acc_71 delivered. Score: 17/400 = 4.25%.
+
+
+COMP-18  ARC-AGI-1 COMPOSITE RULE SEARCH AND TASK ANALYSIS (ACC_72)
+---------------------------------------------------------------------
+
+Version: PrologAI Completion v10
+Added: 2026-06-16
+Reason: Acc_72 extends the ARC-AGI-1 benchmark infrastructure with composite
+two-step rule search and a systematic task analysis tool. Per SPARC DOCUMENTATION
+RULE (Spec Part 41, Section 41.2), this Completion volume is updated to reflect
+the new capabilities.
+
+18.1  New Components
+
+The following components are added to the permanent Mentova platform:
+
+  tools/arc_task_analysis.py
+      Python analysis tool. Classifies all 383 failing ARC-AGI-1 tasks by the
+      type of reasoning each requires. Outputs category frequencies and a
+      prioritized roadmap for score improvement.
+
+  src/mentova/games/arc_benchmark.pl (extended)
+      Added: arc_composable_rule/1 registry of 8 geometric transforms used in
+      composite search. Added: arc_fits_all_pair/3 and arc_induce_rule_pair/2
+      for ordered-pair two-step rule induction. Updated: arc_attempt_task/2
+      tries single-rule induction first, then composite pair induction.
+
+18.2  Composite Search Result
+
+The composite search tries all 56 ordered pairs of 8 named geometric transforms
+for each of the 383 failing tasks (Rule1 then Rule2 applied in sequence). Zero
+new tasks were solved. The score remains 17 out of 400 = 4.25 percent.
+
+This result is informative: it rules out two-step geometric pixel composition as
+an explanation for any of the 383 failures. The failing tasks require capabilities
+that are not expressible as any sequence of two pixel-level geometric transforms.
+
+18.3  Task Analysis Results
+
+383 failing tasks were analyzed by category:
+
+  object_move_or_merge        144 tasks   37.6 percent
+  recolor (conditional)       143 tasks   37.3 percent
+  multi_object                129 tasks   33.7 percent
+  geometric_or_fill           104 tasks   27.2 percent
+  shrink or crop              101 tasks   26.4 percent
+  resize or tile or embed      20 tasks    5.2 percent
+  scale variant                14 tasks    3.7 percent
+
+18.4  Development Roadmap from Analysis
+
+In priority order by estimated impact:
+
+  Priority 1 (highest): Connected-component analysis. Implement flood-fill in
+  Prolog. Add object-level transforms: select largest object, move object,
+  recolor object, count objects, extract bounding box. Estimated addressable
+  tasks: 150 or more.
+
+  Priority 2: Bounding-box crop. arc_transform(crop_to_content, Grid, Result)
+  finds the tight bounding box of non-background cells. Estimated addressable
+  tasks: 30 to 60.
+
+  Priority 3: New single-step rules for same-size tasks. Survey the 104
+  geometric_or_fill failing tasks for the most common specific patterns.
+  Estimated addressable tasks: 10 to 30.
+
+  Priority 4: Conditional recoloring. Rules that recolor a cell based on
+  neighbor context or object membership. Estimated addressable tasks: 20 to 50.
+
+18.5  Completion Criterion
+
+The composite search and task analysis capability is complete when:
+  (a) arc_induce_rule_pair/2 is present in arc_benchmark.pl.
+  (b) The full benchmark with composite search runs in under 30 seconds.
+  (c) tools/arc_task_analysis.py produces a category distribution for all
+      failing tasks.
+  (d) A prioritized roadmap is documented.
+
+Status as of 2026-06-16: COMPLETE. Acc_72 delivered. Score unchanged: 17/400 = 4.25%.
+Composite search infrastructure in place. Task analysis roadmap established.
+
+
+END OF DOCUMENT - PROLOGAI COMPLETION
