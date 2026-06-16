@@ -149,15 +149,15 @@ acp_execute_run(RunId, Task, _Mode, Artifact) :-
     retract(acp_run_record(RunId, Task, created, none)),
     % Record in_progress state.
     assertz(acp_run_record(RunId, Task, in_progress, none)),
-    % Execute the task body to produce a result.
-    ( catch(acp_dispatch(Task, Result), Err, (term_to_atom(Err, Result)))
-    % If dispatch succeeded, build a completed artifact.
+    % Execute the task body; convert any exception to failure so the run is marked failed.
+    ( catch(acp_dispatch(Task, Result), _Err, fail)
+    % If dispatch succeeded without exception, build a completed artifact.
     ->  Artifact = artifact(RunId, Task, Result),
         % Remove the in_progress record.
         retract(acp_run_record(RunId, Task, in_progress, none)),
         % Record the completed state with the artifact.
         assertz(acp_run_record(RunId, Task, completed, Artifact))
-    % If dispatch failed, record failure.
+    % If dispatch failed or threw an exception, record failure.
     ;   Artifact = error(dispatch_failed),
         % Remove the in_progress record.
         retract(acp_run_record(RunId, Task, in_progress, none)),
