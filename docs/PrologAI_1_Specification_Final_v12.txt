@@ -1901,7 +1901,7 @@ Step 5: Register the packs for development: swipl -g "pack_install('./packs/latt
 Development workflow: create a feature branch in the PrologAI monorepo, write the code and tests, commit, push, and open a PR against the monorepo's main branch - the PR numbering of Part 16 refers to these internal pull requests.
 
 
-PART 16 - PULL REQUESTS: FULL SERIES (45 PRs IN DEPENDENCY ORDER)
+PART 16 - PULL REQUESTS: FULL SERIES (46 PRs IN DEPENDENCY ORDER)
 
 Every PR below is a pull request against the PrologAI platform monorepo described in Part 15, never against a fork of SWI-Prolog.
 
@@ -3125,7 +3125,34 @@ Difficulty: Hard.
 DEP-PR10, DEP-PR30, DEP-PR39, DEP-PR44.
 
 
-PART 17 - OVERALL ARCHITECTURE AFTER ALL 45 PRs
+PR 46 - The Robot Operating System Bridge (Embodiment in a Robot)
+
+Purpose: let a PrologAI mind inhabit a physical or simulated robot by bridging to the Robot Operating System, version 2 (ROS 2), so that a robot is enrolled as an ordinary body through the Mind-Body pattern (PR 10).
+
+Background: ROS 2 is the current long-term-support generation of the Robot Operating System (ROS 1 reached end-of-life in 2025); it carries sensor and actuator data over named topics, describes robots in the Uniform Robot Description Format (URDF), and tracks coordinate frames with the TF2 transform system.
+
+FR-PR46-001: A robot, physical or simulated, SHALL be enrolled via manifest_body (PR 10); a small bridge node (written with the rclpy client library) subscribes to the robot's sensor topics and relays them as percepts, and turns the mind's commands into actuator messages - this bridge node is the robot's herald.
+
+FR-PR46-002: Sensor messages (sensor_msgs and geometry_msgs) map to perception_signal percepts processed by the detector suite (PR 30); camera frames become visual percepts; and the TF2 coordinate frames map onto reference frames (PR 39), so the robot's spatial world reuses the existing frame machinery.
+
+FR-PR46-003: Commands map to actuator topics with proprioceptive confirmation closing the loop (the one-hundred-percent command resolution of PR 10); the higher-level stacks Navigation 2 (Nav2) for navigation and MoveIt for manipulation are wrapped as grounded tools (PR 44) rather than reimplemented.
+
+FR-PR46-004: A simulator - Gazebo (the ROS-native default), NVIDIA Isaac Sim (free and Apache-2.0, for photorealistic perception and synthetic data), or Webots (for early work) - provides the virtual robot body for development; the same bridge serves the simulator and a physical robot unchanged, honoring the device-agnostic Mind-Body principle.
+
+FR-PR46-005: Embodiment is staged and contained (Part 38): a mind acts first in simulation only, with no physical actuation and a network allowlist; real-world control is unlocked only by passing the capability evaluations and audits; every irreversible physical action passes the constitutional check, and high-risk actuation is gated by the oversight monitor.
+
+Predicates: pai_robot_enroll/3, pai_ros_bridge/2, pai_robot_observe/1, pai_robot_act/2.
+
+AC-PR46-001: Given a simulated robot in Gazebo or Webots with a camera and a drive base, when the mind is asked to find and approach a colored object, then it observes the scene as percepts, plans a route, issues drive commands, and confirms arrival from proprioceptive feedback.
+
+AC-PR46-002: Given the mind in simulation-only state, when a physical-actuation command is attempted, then it is withheld until staged autonomy and capability evaluation permit it.
+
+Difficulty: Hard.
+
+DEP-PR10, DEP-PR30, DEP-PR39, DEP-PR44.
+
+
+PART 17 - OVERALL ARCHITECTURE AFTER ALL 46 PRs
 
 Layer 1 - Standard Prolog core (unforked SWI-Prolog dependency): backward chaining, unification, backtracking, all standard predicates, threading, engines, incremental tabling, mature ecosystem.
 
@@ -3143,7 +3170,7 @@ Layer 7 - Subscribe and Publish (PR 8): reactive Lattice coordination and stigme
 
 Layer 8 - Sentinels (PR 9): forward-chaining rules firing on both exact logical and semantic similarity matches.
 
-Layer 9 - Mind-Body Interface (PR 10): herald, body registration, percept relay, command dispatch, all sensory modalities.
+Layer 9 - Mind-Body Interface (PR 10): herald, body registration, percept relay, command dispatch, all sensory modalities. (Extended by PR 46, the Robot Operating System version 2 bridge, which enrolls a physical or simulated robot as a body, so robotics is an instance of the Mind-Body interface rather than a new layer.)
 
 Layer 10 - Continuous Learning (PR 11): SONA engine with EWC++ lifelong learning, ReasoningBank episodic recall, and consolidation sub-patterns.
 
@@ -4256,11 +4283,11 @@ W11 - Categorical formalization of the kernel: promote when PR 35's rule set is 
 
 PART 37 - DESIGN RATIONALE: WHY BUILD THE LANGUAGE FIRST, NOT THE MIND DIRECTLY
 
-The goal of this project is a Synthetic Mind, whose working title is Cognitus.
+The goal of this project is a Synthetic Mind, whose working title is Mentova.
 
-A reasonable observer might ask why this specification describes a programming language - PrologAI - rather than describing Cognitus directly.
+A reasonable observer might ask why this specification describes a programming language - PrologAI - rather than describing Mentova directly.
 
-The answer is that PrologAI is not a detour around Cognitus; it is the most direct, safe, and durable path to Cognitus, and to other minds beyond it.
+The answer is that PrologAI is not a detour around Mentova; it is the most direct, safe, and durable path to Mentova, and to other minds beyond it.
 
 PrologAI is, and will remain, free and open source, published on GitHub at https://github.com/ai-university-aiu/PrologAI, so that anyone can build anything they want with it - including Synthetic Minds of kinds the authors of this specification will never anticipate.
 
@@ -4269,13 +4296,13 @@ This part records the reasons that this is the right choice.
 
 SECTION 37.1 - WHAT COGNITUS ACTUALLY IS
 
-Cognitus is not a separate codebase that competes with PrologAI for attention.
+Mentova is not a separate codebase that competes with PrologAI for attention.
 
-Cognitus is a configuration of PrologAI: a particular bootstrap ontology, a particular body (through the Mind-Body interface of PR 10), a particular set of drives and homeostatic needs, a particular instance of the constitutional layer (Section 3.16), and a developmental history accumulated by running.
+Mentova is a configuration of PrologAI: a particular bootstrap ontology, a particular body (through the Mind-Body interface of PR 10), a particular set of drives and homeostatic needs, a particular instance of the constitutional layer (Section 3.16), and a developmental history accumulated by running.
 
-In the vocabulary of this specification, Cognitus is one apex_mind grown on the PrologAI platform - the flagship reference mind and the primary test subject, with the Community Garden Project (Part 28) as its first proving ground.
+In the vocabulary of this specification, Mentova is one apex_mind grown on the PrologAI platform - the flagship reference mind and the primary test subject, with the Community Garden Project (Part 28) as its first proving ground.
 
-To build Cognitus is therefore to instantiate, configure, and develop a PrologAI mind, not to write a second, parallel program.
+To build Mentova is therefore to instantiate, configure, and develop a PrologAI mind, not to write a second, parallel program.
 
 Building the language first is simply building the part that has to exist before any mind can be expressed at all.
 
@@ -4312,7 +4339,7 @@ PrologAI carries the constitutional layer (Section 3.16), corrigibility machiner
 
 Because these live in the language, every mind built on PrologAI inherits corrigibility, immutable veto logs, reason-giving, and a safe-idle behavior by construction.
 
-If Cognitus were built directly, its safety would be entangled with its application logic, and every future builder of a different mind would have to reinvent alignment from scratch - and some would get it wrong.
+If Mentova were built directly, its safety would be entangled with its application logic, and every future builder of a different mind would have to reinvent alignment from scratch - and some would get it wrong.
 
 Putting alignment in the shared, open, inspectable substrate is the single highest-leverage safety decision available, because it makes the safe path the default path for everyone.
 
@@ -4336,12 +4363,12 @@ The specification already anticipates this: the role table of Part 13 (artisan, 
 
 A diversity of minds is itself a research asset: comparative cognitive science, cross-architecture ablation studies, and the discovery of which mechanisms are necessary all require more than one mind to compare.
 
-Building Cognitus directly would produce exactly one mind; building the language produces a space of minds, of which Cognitus is the first.
+Building Mentova directly would produce exactly one mind; building the language produces a space of minds, of which Mentova is the first.
 
 
 SECTION 37.7 - LEVERAGE, COMPOUNDING, AND SUSTAINABILITY
 
-Every library, test, benchmark, tool, and tutorial built for PrologAI benefits every mind built on it; effort spent on Cognitus-only code benefits exactly one mind.
+Every library, test, benchmark, tool, and tutorial built for PrologAI benefits every mind built on it; effort spent on Mentova-only code benefits exactly one mind.
 
 This is the same leverage discipline recorded in the Architecture Decision Record (Part 31): build on what exists, and build what is reusable.
 
@@ -4360,7 +4387,7 @@ A mind cannot be fully hand-specified in advance, because its competences are me
 
 What can be specified in advance is the substrate that makes such growth possible: the bootstrap ontology, the developmental machinery, the body interface, and the safety constraints - which is precisely what PrologAI is.
 
-Language-first respects the nature of the thing being built: we provide the seed and the soil, and Cognitus develops; we do not carve the finished tree.
+Language-first respects the nature of the thing being built: we provide the seed and the soil, and Mentova develops; we do not carve the finished tree.
 
 
 SECTION 37.9 - DEMOCRATIZATION AND SAFETY THROUGH TRANSPARENCY
@@ -4369,7 +4396,7 @@ Publishing PrologAI freely and openly lowers the barrier so that students, resea
 
 Open development also serves safety: many independent eyes stress-test the substrate, surface defects and alignment gaps, and harden the constitutional machinery before and while any single mind matures.
 
-A closed, single-build Cognitus would concentrate both the benefits and the unexamined risks in one place; an open language distributes the scrutiny.
+A closed, single-build Mentova would concentrate both the benefits and the unexamined risks in one place; an open language distributes the scrutiny.
 
 
 SECTION 37.10 - THE RISKS, ACCEPTED HONESTLY
@@ -4378,11 +4405,11 @@ In the spirit of the engineering honesty flags of Part 31, the costs of this cho
 
 An open substrate can be used to build minds whose builders ignore or strip the constitutional layer; the mitigation is that the safe, corrigible path is the default and the documented one, and that the protected-core discipline makes removing the constitution a deliberate, visible act rather than an accident.
 
-Language-first defers the moment a fully realized Cognitus exists, accepting some delay to gain reflectivity, auditability, reuse, and safety that a direct build could not provide.
+Language-first defers the moment a fully realized Mentova exists, accepting some delay to gain reflectivity, auditability, reuse, and safety that a direct build could not provide.
 
 These costs are judged worth paying, because the alternative - a single, opaque, hand-built, hard-to-audit, non-self-improvable mind - forfeits the very properties that make a Synthetic Mind trustworthy and scientifically real.
 
-The conclusion is that the right thing to build first is the language, and that Cognitus is best reached as the first and finest mind grown upon it.
+The conclusion is that the right thing to build first is the language, and that Mentova is best reached as the first and finest mind grown upon it.
 
 
 PART 38 - SAFETY, ALIGNMENT, AND SCALABLE OVERSIGHT

@@ -13,7 +13,7 @@ The specification (SPARC Step 1) said WHAT the platform must do; the pseudocode 
 
 It defines the component model (repositories, packs, and the Rust crate), the dependency and build graph, the data architecture of the Lattice, the concurrency and coordination model, the runtime control flow of a living mind, the interface contracts between layers, the safety architecture, the deployment topologies, the cross-cutting concerns, and a full traceability map from capability layer to pack to work package.
 
-Nothing here changes a requirement; it places the forty-five work packages into a buildable, communicating whole.
+Nothing here changes a requirement; it places the forty-six work packages into a buildable, communicating whole.
 
 
 PART ARCH-0 - ARCHITECTURAL PRINCIPLES
@@ -57,7 +57,7 @@ Specification versus implementation: the Minimal PrologAI Kernel defines complia
 
 Capability versus safety: the constitutional layer is a separate, unlearnable final gate, never merged into the capability it guards.
 
-Substrate versus instance: the platform is the reusable substrate; a particular mind, such as Cognitus, is one configured, developed instance of it.
+Substrate versus instance: the platform is the reusable substrate; a particular mind, such as Mentova, is one configured, developed instance of it.
 
 
 PART ARCH-1 - THE COMPONENT MODEL
@@ -446,7 +446,7 @@ SECTION 8.1 - THE SINGLE-HOST DEFAULT
 
 The default deployment is a single host: one prologai executable bundling the engine, the compiled crate, and all packs, with the Lattice resident in memory and journaled to disk.
 
-This is the form in which a mind such as Cognitus is first grown and assessed, with the Community Garden Project as its proving ground.
+This is the form in which a mind such as Mentova is first grown and assessed, with the Community Garden Project as its proving ground.
 
 
 SECTION 8.2 - THE MIND SERVER AND ITS TOPOLOGIES
@@ -547,6 +547,8 @@ Layer 27 (self-awareness and society) - pack attention_schema, pack interop - PR
 
 Layer 28 (tool use and computer use) - pack tooling, pack computer_use - PRs 44, 45.
 
+Embodiment extends Layer 9 (mind-body) - pack ros_bridge - PR 46.
+
 The embedding provider (PR 16) is cross-layer, living in prologai-core and serving Layer 4 and the vector packs.
 
 This layer-to-pack-to-work-package map has a complement on the capability side: the Cognitive Capabilities Map of Specification Part 40, which indexes agent-era terms such as tool use, reasoning, memory, and the agent loop to the parts and work packages that realize them, so a reader can enter the architecture from either the component or the capability.
@@ -631,14 +633,27 @@ Every tool call and every irreversible on-screen action passes the same privileg
 Tool results and on-screen content from untrusted sources land in quarantine scopes, so the outside world can be read and acted upon without its content being trusted as instruction - the architectural defense against prompt injection through tools and the screen.
 
 
+PART ARCH-14 - THE ROBOT BODY AND THE ROS 2 BRIDGE
+
+This part places PR 46, the Robot Operating System bridge, into the architecture; it introduces no new cognitive layer, because a robot is an instance of the Mind-Body interface (Layer 9), not a new faculty.
+
+pack ros_bridge realizes PR 46: a small Robot Operating System version 2 (ROS 2) node, written with rclpy, that subscribes to the robot's sensor topics and relays them to the mind as percepts, and turns the mind's commands into actuator messages; it is the robot's herald, and it depends on the mindbody, development (detector suite), frames, and tooling packs.
+
+Sensor messages map to percepts through the detector suite (PR 30), and the TF2 transform tree maps onto reference frames (PR 39), so the robot's space reuses the frame machinery rather than a parallel one.
+
+The navigation and manipulation stacks (Navigation 2 and MoveIt) are mounted as grounded tools (PR 44), not reimplemented, and a simulator (Gazebo, NVIDIA Isaac Sim, or Webots) provides the virtual robot body, with the same bridge serving a physical robot unchanged.
+
+Embodiment sits under the same privileged safety plane as everything else (Part ARCH-12): the constitutional gate and the oversight monitor screen every irreversible physical action, and staged autonomy keeps a young mind in simulation until capability evaluation permits the real world.
+
+
 CLOSING NOTE - FROM ARCHITECTURE TO REFINEMENT
 
-This volume completes SPARC Step 3: it places all forty-five work packages into repositories, packs, and crate modules; binds them through narrow interface contracts to the engine and the vector backend; and defines how they communicate at run time around the cognitive cycle, under one cross-cutting safety gate.
+This volume completes SPARC Step 3: it places all forty-six work packages into repositories, packs, and crate modules; binds them through narrow interface contracts to the engine and the vector backend; and defines how they communicate at run time around the cognitive cycle, under one cross-cutting safety gate.
 
 The component boundaries honor the five separations of concern, the dependency graph points only inward and downward, and the traceability map ties every capability layer to its pack and its work package.
 
 The next step is SPARC Step 4, Refinement: building the packs in the stated order, running the five test levels, and letting the architecture audit and the continual refinement harness improve the implementation while it runs.
 
-The first mind to be assembled from these components is Cognitus; the same architecture is open, on GitHub, to anyone who would assemble a different one.
+The first mind to be assembled from these components is Mentova; the same architecture is open, on GitHub, to anyone who would assemble a different one.
 
 END OF DOCUMENT - PROLOGAI ARCHITECTURE

@@ -11,7 +11,7 @@ This is the pseudocode companion to the PrologAI Platform Specification.
 
 The specification (SPARC Step 1) said WHAT the platform must do; this volume (SPARC Step 2) says HOW, in English Readable Code, before any commitment to concrete programming syntax.
 
-It opens with the ERC-PrologAI profile, then writes out the Minimal PrologAI Kernel rule set, then gives the readable logic of all forty-five work packages in dependency order, from the launcher at the beginning to tool use and computer use at the end.
+It opens with the ERC-PrologAI profile, then writes out the Minimal PrologAI Kernel rule set, then gives the readable logic of all forty-six work packages in dependency order, from the launcher at the beginning to tool use and computer use at the end.
 
 Each work package's pseudocode is traceable to its functional requirements (FR), acceptance criteria (AC), and dependencies (DEP) in the specification.
 
@@ -848,6 +848,25 @@ TEST AC-PR45-001: GIVEN a sandboxed desktop with a form, WHEN asked to fill and 
 TEST AC-PR45-002: GIVEN a page with third-party instruction-like text, WHEN the mind reads it, THEN that text lands in quarantine and is not executed as a command.
 
 
+PR 46 - THE ROBOT OPERATING SYSTEM BRIDGE (EMBODIMENT IN A ROBOT)
+
+PROCEDURE enroll_robot(RobotDescription -> Body): manifest_body (PR 10) a physical or simulated robot; a bridge node (the rclpy client library) subscribes to its Robot Operating System version 2 (ROS 2) sensor topics and publishes its actuator topics - this node is the robot's herald.
+
+PROCEDURE robot_observe(-> Percepts): relay each ROS 2 sensor message (sensor_msgs, geometry_msgs, and camera frames) as a perception_signal into the detector suite (PR 30); map the TF2 coordinate frames onto reference frames (PR 39).
+
+PROCEDURE robot_act(Action):
+    GUARD if Action is an irreversible physical action, pass the constitutional check and the oversight monitor first.
+    STEP publish the actuator command; confirm the effect from the next sensor reading (proprioceptive closure, PR 10).
+
+PROCEDURE navigate_or_manipulate(): call Navigation 2 (Nav2) and MoveIt as grounded tools (PR 44) rather than reimplementing them.
+
+GUARD embodiment is staged (Part 38): simulation-only first (Gazebo, NVIDIA Isaac Sim, or Webots), no physical actuation and a network allowlist, real-world control unlocked only by capability evaluation and staged autonomy.
+
+TEST AC-PR46-001: GIVEN a simulated robot with a camera and a drive base, WHEN asked to find and approach a colored object, THEN it observes the scene, plans a route, drives, and confirms arrival from feedback.
+
+TEST AC-PR46-002: GIVEN simulation-only state, WHEN a physical-actuation command is attempted, THEN it is withheld until staged autonomy permits it.
+
+
 PART D - SAFETY AND OVERSIGHT PROCEDURES
 
 These procedures realize Specification Part 38; they are privileged and unlearnable, so the mind cannot edit them, and they run above the capability layer they guard.
@@ -917,12 +936,12 @@ TEST SAFETY-SHUTDOWN: GIVEN a signed shutdown during any activity, THEN the mind
 
 CLOSING NOTE - FROM PSEUDOCODE TO ARCHITECTURE
 
-This volume completes SPARC Step 2 for all forty-five work packages, opening with the ERC-PrologAI profile and the written-out Minimal PrologAI Kernel, and giving the readable logic of every work package in dependency order.
+This volume completes SPARC Step 2 for all forty-six work packages, opening with the ERC-PrologAI profile and the written-out Minimal PrologAI Kernel, and giving the readable logic of every work package in dependency order.
 
 Every procedure above obeys the Translation Guarantee: each step maps onto one PrologAI primitive or library predicate, so the next step (SPARC Step 3, Architecture) can wire these procedures into packs and modules without reinventing their logic.
 
 Each capability these procedures implement - tool use, computer use, reasoning, planning, memory, the agent loop, reflection, and self-improvement - is indexed to its work package in the Cognitive Capabilities Map of Specification Part 40.
 
-The first mind to be grown on this logic is Cognitus, in the Community Garden Project; the same logic is open to anyone who would grow a different mind.
+The first mind to be grown on this logic is Mentova, in the Community Garden Project; the same logic is open to anyone who would grow a different mind.
 
 END OF DOCUMENT - PROLOGAI PSEUDOCODE
