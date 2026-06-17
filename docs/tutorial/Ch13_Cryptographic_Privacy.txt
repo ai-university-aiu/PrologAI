@@ -1,0 +1,397 @@
+PROLOGAI TUTORIAL
+
+Chapter 13: Cryptographic Privacy - Protecting Sensitive Data in the Lattice
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+INTRODUCTION
+
+PrologAI's glass-box design is one of its greatest strengths.
+
+Everything stored in the Lattice is fully inspectable. A human overseer can read every fact, rule, plan, and assessment stored there. Nothing is hidden in the weights of a neural network, where even the developers cannot tell you why the system made a particular decision. In PrologAI, you can always ask: why did you decide that? And get a real, symbolic answer.
+
+But this transparency creates a problem the moment the mind handles private information.
+
+Passwords. Social security numbers. Credit card numbers. Medical records. Anything the user types in and expects to remain secret.
+
+If PrologAI stores these values as plain text in the Lattice, then anyone who can read the Lattice journal can read the secrets. That is a serious security problem.
+
+Chapter 13 solves it.
+
+The solution is called cryptographic privacy: instead of storing the plaintext value in the Lattice, the system encrypts it first. The encrypted value looks like meaningless gibberish to anyone who does not hold the right private key. But the system that holds the key can decrypt it instantly whenever it is needed.
+
+This is called encryption. It is the foundation of modern digital security.
+
+
+WHAT IS ENCRYPTION?
+
+Encryption is a mathematical transformation.
+
+You take a piece of information (a message, a password, a number) and you run it through a mathematical formula. The formula requires a key, which is a special value that controls how the transformation works.
+
+The result is called ciphertext. It looks like random noise. Without the key, you cannot reverse the transformation and recover the original information.
+
+With the key, you can reverse the transformation. This is called decryption.
+
+Think of it like a combination lock.
+
+The information is a letter.
+Encryption is putting the letter in a locked box.
+The key is the combination to the lock.
+Decryption is opening the box with the combination to retrieve the letter.
+
+Anyone can see the locked box. But only the person who knows the combination can read the letter.
+
+
+THE THREE KINDS OF ENCRYPTION IN PROLOGAI
+
+PrologAI supports three different encryption methods, called algorithm families.
+
+Each one is appropriate for different situations.
+
+They are listed here from oldest to newest, and from most familiar to most cutting-edge.
+
+
+ALGORITHM FAMILY 1: RSA
+
+RSA is named after its inventors: Ron Rivest, Adi Shamir, and Leonard Adleman. They published it in 1977.
+
+RSA is the most widely deployed public-key encryption algorithm in the world. Your web browser uses it (or its cousin ECC, described below) every time you visit a website that starts with https.
+
+RSA works with a key pair: two mathematically related numbers.
+
+The public key can be shared with anyone. It is used to encrypt.
+The private key is kept secret. It is used to decrypt.
+
+If Alice wants to send Bob a secret message, she asks Bob for his public key. She uses it to encrypt the message. Only Bob's private key can decrypt it. Alice does not need the private key, and Bob does not need to share it.
+
+This is called asymmetric encryption, because the key that encrypts is different from the key that decrypts.
+
+RSA in PrologAI uses a key size of at least 2048 bits (larger is safer). It uses a padding scheme called OAEP (Optimal Asymmetric Encryption Padding) which adds randomness to prevent certain mathematical attacks.
+
+
+ALGORITHM FAMILY 2: ECDH (ELLIPTIC CURVE CRYPTOGRAPHY)
+
+ECDH stands for Elliptic Curve Diffie-Hellman.
+
+Elliptic Curve Cryptography, or ECC, is a modern approach that achieves the same security as RSA with much smaller keys.
+
+An RSA key that gives a certain level of security might be 3072 bits long.
+An ECC key giving the same level of security is only 256 bits long.
+
+Smaller keys mean faster operations, less memory, and less bandwidth.
+
+ECC is based on the mathematics of elliptic curves, which are equations of the form:
+
+    y squared = x cubed + a*x + b
+
+The security of ECC comes from a mathematical problem called the elliptic curve discrete logarithm problem, which is believed to be very hard to solve even for powerful computers.
+
+PrologAI uses ECDH on a curve called prime256v1, also known as NIST P-256.
+
+A key advantage of ECDH in PrologAI is that it uses ephemeral keys: a brand-new, one-use key pair is generated for every single encryption operation. Even if an attacker somehow obtained the recipient's long-term private key, they could not decrypt past messages because each one was encrypted with a different ephemeral key. This property is called forward secrecy.
+
+
+ALGORITHM FAMILY 3: PQC (POST-QUANTUM CRYPTOGRAPHY)
+
+PQC stands for Post-Quantum Cryptography.
+
+Both RSA and ECC are secure against classical computers. But there is a theoretical concern: a large-scale quantum computer, if one is ever built, could break RSA and ECC using an algorithm called Shor's Algorithm.
+
+A quantum computer does not exist today at the scale required to break modern encryption. But organizations with long-lived secrets (government agencies, financial institutions, medical records systems) are concerned about a scenario called harvest now, decrypt later: an adversary collects encrypted data today and decrypts it years from now when quantum computers are available.
+
+Post-Quantum Cryptography (PQC) uses mathematical problems that are believed to be hard even for quantum computers.
+
+PrologAI supports ML-KEM-768, also known as CRYSTALS-Kyber. This algorithm was standardized by NIST (the National Institute of Standards and Technology) in August 2024 as FIPS 203 (Federal Information Processing Standard number 203).
+
+ML-KEM stands for Module Lattice Key Encapsulation Mechanism.
+
+It uses a type of mathematics called module lattice problems, which are believed to resist both classical and quantum attacks.
+
+Note: ML-KEM requires a software package called the OQS Provider (Open Quantum Safe Provider) to be installed alongside OpenSSL. If that package is not installed, PrologAI will tell you clearly what is missing rather than silently using a weaker algorithm.
+
+
+HYBRID ENCRYPTION: WHY WE USE BOTH SYMMETRIC AND ASYMMETRIC
+
+There is one problem with RSA, ECDH, and ML-KEM: they are slow for large data.
+
+RSA in particular can only encrypt a small amount of data directly (about 200 bytes for a 2048-bit key). That is not enough for most real payloads.
+
+The solution is hybrid encryption.
+
+Step 1: Generate a random 256-bit key (a session key) using a symmetric algorithm. Symmetric means the same key encrypts and decrypts.
+
+Step 2: Use the symmetric key to encrypt the actual payload. PrologAI uses AES-256-GCM for this step. AES-256-GCM is extremely fast and handles arbitrarily large data.
+
+Step 3: Use the asymmetric algorithm (RSA, ECDH, or ML-KEM) to encrypt the small 256-bit session key.
+
+The ciphertext bundle contains the encrypted session key and the encrypted payload. The recipient uses their private key to decrypt the session key, then uses the session key to decrypt the payload.
+
+This is exactly how your web browser works when you visit an https website. The asymmetric algorithm (RSA or ECDH) establishes a shared secret; AES encrypts the actual web traffic.
+
+PrologAI uses AES-256-GCM.
+
+AES stands for Advanced Encryption Standard. 256 means a 256-bit key. GCM stands for Galois/Counter Mode, which is an operating mode that provides both encryption and authentication.
+
+The authentication part is important: AES-256-GCM also computes an authentication tag (a short checksum) that proves the ciphertext has not been tampered with. If someone modifies the encrypted data or the tag, decryption will fail and raise an error. This prevents attackers from making undetected changes to the ciphertext.
+
+
+LOADING THE CRYPTO PACK
+
+The cryptographic privacy layer lives in pack lattice_crypto, work package PR 49.
+
+To load it:
+
+    ?- use_module(library(lattice_crypto)).
+
+You should see:
+
+    true.
+
+If that fails, make sure your library path includes packs/lattice_crypto/prolog. In a fresh session from the PrologAI repository root:
+
+    ?- assertz(file_search_path(library, 'packs/lattice_crypto/prolog')).
+    ?- use_module(library(lattice_crypto)).
+
+
+CHECKING WHAT IS AVAILABLE
+
+Before encrypting, you can ask PrologAI which algorithms are ready to use:
+
+    ?- pai_crypto_available(pai_algo_rsa).
+    true.
+
+    ?- pai_crypto_available(pai_algo_ecdh).
+    true.
+
+    ?- pai_crypto_available(pai_algo_pqc).
+    false.
+
+The first two should succeed on any standard installation. The third only succeeds if the OQS Provider is installed.
+
+
+EXAMPLE 1: ENCRYPTING A PASSWORD WITH RSA
+
+This example shows the full round-trip: generate a key pair, encrypt a password, decrypt it, and verify the result.
+
+Step 1: Generate a key pair.
+
+The key pair is written to temporary PEM files (PEM is a standard format for storing cryptographic keys as text).
+
+    ?- pai_keygen_rsa(2048, PrivFile, PubFile).
+    PrivFile = '/tmp/swipl_pai_rsa_priv_1234',
+    PubFile = '/tmp/swipl_pai_rsa_pub_5678'.
+
+The variable PrivFile now holds the path to your private key file.
+The variable PubFile holds the path to your public key file.
+
+Keep the private key secret. Distribute the public key freely.
+
+Step 2: Load the keys into Prolog.
+
+    ?- pai_pem_load_private(PrivFile, PrivKey),
+       pai_pem_load_public(PubFile, PubKey).
+    PrivKey = <ssl_key>(0x...),
+    PubKey = <ssl_key>(0x...).
+
+PrivKey and PubKey are now Prolog terms representing the loaded keys.
+
+Step 3: Encrypt the password.
+
+    ?- pai_encrypt_rsa(PubKey, 'hunter2_my_bank_password', Bundle, Tag).
+    Bundle = rsa_bundle('7f3a...', '2b9c...', 'a1d4...'),
+    Tag = '8e2f...'.
+
+Bundle is a compound term containing three hex-encoded fields:
+    the encrypted session key, the IV (initialization vector), and the ciphertext.
+
+Tag is the AES-GCM authentication tag. Store both Bundle and Tag.
+
+Note: the actual hex strings will be much longer than shown above (they are abbreviated here for readability).
+
+Step 4: Decrypt the password.
+
+    ?- pai_decrypt_rsa(PrivKey, Bundle, Tag, Plain).
+    Plain = 'hunter2_my_bank_password'.
+
+The original password is recovered.
+
+Step 5: Clean up the key files.
+
+    ?- delete_file(PrivFile), delete_file(PubFile).
+
+
+EXAMPLE 2: ENCRYPTING A SOCIAL SECURITY NUMBER WITH ECDH
+
+ECDH does not use PEM files for the recipient key. The recipient's key is stored as an integer (the private scalar) and a point on the elliptic curve (the public key).
+
+Step 1: Generate a key pair for the recipient.
+
+    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub).
+    RecipPriv = 73849201...,
+    RecipPub = point(114492..., 98234...).
+
+RecipPriv is a large integer (the private scalar). Keep it secret.
+RecipPub is a point on the P-256 curve, represented as point(X, Y) where X and Y are large integers.
+
+Step 2: Encrypt the SSN using only the public key.
+
+    ?- pai_encrypt_ecdh(RecipPub, 'SSN:123-45-6789', Bundle, Tag).
+    Bundle = ecdh_bundle(114492..., 98234..., '3f7a...', 'b2c1...'),
+    Tag = 'a9e4...'.
+
+The ECDH bundle contains:
+    EphPubX, EphPubY: the ephemeral public key (so the recipient can compute the shared secret).
+    IVHex: the initialization vector, hex-encoded.
+    CipherHex: the ciphertext, hex-encoded.
+
+Step 3: Decrypt using only the private scalar.
+
+    ?- pai_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
+    Plain = 'SSN:123-45-6789'.
+
+The SSN is recovered.
+
+Key insight: the sender never needed RecipPriv. They only needed RecipPub. The private scalar stays with the recipient forever. This is what makes asymmetric encryption so powerful.
+
+
+EXAMPLE 3: THE GENERIC INTERFACE
+
+The generic interface lets you write code that works with any algorithm.
+
+    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       pai_encrypt(pai_algo_ecdh, RecipPub, 'CreditCard:4111111111111111', Bundle, Tag),
+       pai_decrypt(pai_algo_ecdh, RecipPriv, Bundle, Tag, Plain).
+    Plain = 'CreditCard:4111111111111111'.
+
+To switch to RSA, change pai_algo_ecdh to pai_algo_rsa and supply RSA keys instead.
+
+To switch to PQC (when available), change to pai_algo_pqc and supply a PEM file path.
+
+
+WHAT HAPPENS WHEN THE TAG IS TAMPERED?
+
+AES-256-GCM protects against tampering. If the ciphertext or the tag is changed even slightly, decryption raises an error.
+
+To demonstrate:
+
+    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       pai_encrypt_ecdh(RecipPub, 'secret value', Bundle, _RealTag),
+       FakeTag = '00000000000000000000000000000000',
+       pai_decrypt_ecdh(RecipPriv, Bundle, FakeTag, Plain, prime256v1).
+    ERROR: SSL(00000000) : ...
+
+The decryption fails and raises an error. It does not silently return wrong data.
+
+This means: if an attacker modifies an encrypted bundle in the Lattice journal, the system will detect the modification when decryption is attempted. The mind will know the data has been tampered with.
+
+
+STORING AN ENCRYPTED VALUE IN THE LATTICE
+
+Encrypted bundles are ordinary Prolog compound terms. They can be stored in the Lattice exactly like any other value.
+
+    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       pai_encrypt_ecdh(RecipPub, 'my_bank_password', Bundle, Tag),
+       anchor_node(private_credential, bank_password, Bundle-Tag, []).
+
+The Lattice now contains a node_fact with relation type private_credential, key bank_password, and value Bundle-Tag.
+
+The value looks like:
+    ecdh_bundle(48392..., 91234..., '3a7f...', 'b2d1...')-'c9e4...'
+
+Anyone reading the Lattice journal sees only this encrypted blob. The plaintext password is not there.
+
+To retrieve and decrypt:
+
+    ?- live_node_facts(private_credential-bank_password, [node_fact(_,_,BundleTag,_)]),
+       BundleTag = Bundle-Tag,
+       pai_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
+    Plain = 'my_bank_password'.
+
+
+CHOOSING AN ALGORITHM
+
+Here is a practical guide to choosing the right algorithm for your situation.
+
+Use RSA if:
+    You are interfacing with external systems that only support RSA.
+    You prefer a well-established, widely-tested algorithm.
+    Forward secrecy is not required.
+    Key management via PEM files is convenient.
+
+Use ECDH if:
+    You want smaller, faster operations.
+    You want forward secrecy (each encryption uses a fresh ephemeral key).
+    You are building a new system with no legacy constraints.
+    This is the recommended default for new PrologAI deployments.
+
+Use PQC (ML-KEM-768) if:
+    You are protecting data that must remain secret for more than 10 years.
+    Your organization has a regulatory or policy requirement to use NIST PQC standards.
+    You have installed the OQS Provider and verified it works in your environment.
+    You are building a future-proof system designed to survive the eventual arrival of large-scale quantum computers.
+
+
+REAL-WORLD APPLICATIONS OF THESE TECHNIQUES
+
+The mathematics behind PrologAI's crypto pack powers the entire digital economy.
+
+When you log in to your bank's website, RSA or ECDH establishes a shared secret and AES encrypts your session. That is exactly what pai_encrypt/5 does.
+
+When your phone stores a fingerprint or face ID template, it encrypts it with a key that never leaves the secure hardware chip. That is the same asymmetric-key-wraps-symmetric-key pattern.
+
+When governments secure classified communications, they use NIST-standardized algorithms. ML-KEM-768 is one of the newest NIST standards, adopted in 2024.
+
+When researchers talk about quantum-safe cryptography, they mean algorithms like ML-KEM, FALCON, SPHINCS+, and ML-DSA that resist Shor's Algorithm on a quantum computer. PrologAI's architecture allows any of these to be added as a new algorithm family.
+
+The hybrid encryption pattern (asymmetric wraps a symmetric session key) is so universally adopted because it combines the best properties of both: the key-distribution convenience of asymmetric encryption and the speed of symmetric encryption.
+
+By learning this chapter, you have learned the same fundamental cryptographic technique used in TLS (the protocol behind HTTPS), Signal, WhatsApp, iMessage, GPG email encryption, and every modern secure communication system.
+
+
+SUMMARY
+
+In this chapter you learned:
+
+The glass-box Lattice stores everything symbolically and inspectably, which is a strength for reasoning but a risk for sensitive data.
+
+Encryption transforms plaintext into ciphertext using a mathematical key. Decryption reverses the transformation.
+
+Asymmetric encryption uses a public key to encrypt and a private key to decrypt. The two keys are different but mathematically related.
+
+PrologAI supports three algorithm families:
+    RSA-OAEP: classical, widely deployed, 2048+ bit keys.
+    ECDH / prime256v1: modern, faster, smaller keys, forward secrecy.
+    ML-KEM-768: post-quantum, resistant to quantum computers, requires OQS Provider.
+
+All three use hybrid encryption: the asymmetric algorithm wraps a 256-bit AES session key; AES-256-GCM encrypts the actual payload.
+
+AES-256-GCM also provides authenticated integrity: any tampering with the ciphertext or tag causes decryption to fail with an error.
+
+The main predicates are:
+    pai_keygen_rsa/3, pai_keygen_ecdh/3, pai_keygen_pqc/2  - key generation.
+    pai_encrypt/5, pai_decrypt/5                            - generic dispatch.
+    pai_encrypt_rsa/4, pai_decrypt_rsa/4                    - RSA convenience.
+    pai_encrypt_ecdh/4, pai_decrypt_ecdh/5                  - ECDH convenience.
+    pai_encrypt_pqc/4, pai_decrypt_pqc/4                    - PQC convenience.
+    pai_crypto_available/1                                  - availability probe.
+
+
+WHAT COMES NEXT
+
+You have now completed the PrologAI Tutorial.
+
+You have gone from having no knowledge of programming or AI, all the way through symbolic reasoning, the Lattice, assessment, safety, agent protocols, and now cryptographic privacy.
+
+The next step is to build something of your own.
+
+Read the Mentova Tutorial to see how Mentova uses all of these capabilities as a living reasoning system.
+
+Read the papers in the Mentova papers/ directory to see how each capability was demonstrated and measured.
+
+Explore the demos/ directory for complete, working examples.
+
+And experiment at the ?- prompt. Every feature you have read about in this tutorial is live and waiting for your first query.
+
+END OF CHAPTER 13 AND END OF THE PROLOGAI TUTORIAL
