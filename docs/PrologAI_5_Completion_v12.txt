@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v11)
+PROLOGAI COMPLETION  (v12)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -652,6 +652,57 @@ Status as of 2026-06-17: COMPLETE.
 All 11 acceptance-criteria tests pass.
 SPARC volumes updated: Specification v15, Pseudocode v8, Architecture v9, Refinement v8, Completion v11.
 Branch: feature/pr49-lattice-crypto. PR targeting main.
+
+
+PART COMP-20 - ARC-AGI-1 WAVE 18: BUG FIX, PERFORMANCE WAVE, SCORE 161/400 = 40.25%
+
+Date: 2026-06-17.
+
+Previous score: 98 / 400 = 24.50% (Run 31, Attempt 17).
+
+New score: 161 / 400 = 40.25% (Run 32, Attempt 18).
+
+New tasks solved: +63.
+
+Changed file: src/mentova/games/arc_benchmark.pl.
+
+What was done: Wave 18 of the ARC-AGI-1 named-rule library added five new rules, fixed a critical operator precedence bug that was causing the benchmark to hang, and applied six performance guards to previously unbounded rules.
+
+The critical bug fix: scale_shape_into_frame had a malformed if-then-else condition in its output builder. The condition was written:
+( AR =:= FMinR ; AR =:= FMaxR ; AC =:= FMinC ; AC =:= FMaxC -> OV = FrameV ; interior )
+
+Due to Prolog operator precedence (;/2 at 1100 outer-most, ->/2 at 1050 inner), this parses as:
+( AR =:= FMinR ; (AR =:= FMaxR ; (AC =:= FMinC ; (AC =:= FMaxC -> OV = FrameV ; interior))) )
+
+The first three disjuncts succeed without binding the output variable OV. OV remained free, meaning arc_transform generated infinitely many solutions when backtracked into. arc_fits_all, the training-pair verifier, backtracks into arc_transform whenever a computed output does not match the expected output. With scale_shape_into_frame generating infinite solutions, arc_fits_all never returned for any task where this rule was tried and failed. This blocked evaluation of all subsequent rules for those tasks and blocked the benchmark from advancing to later tasks, preventing discovery of 63 correct solutions.
+
+The fix: add parentheses around the compound condition and add a determinism cut (!) before the output builder maplist. The corrected condition is:
+( (AR =:= FMinR ; AR =:= FMaxR ; AC =:= FMinC ; AC =:= FMaxC) -> OV = FrameV ; interior )
+
+The six performance fixes (size guards added):
+read_color_grid_from_bands: duplicate four-way definition caused 16 rule attempts per task; non-deterministic helper predicates caused backtracking. Fixed with sort() deduplication, once() wrappers, and a ! cut.
+fill_max_zero_rect_6: O(NR^2 * NC^2) rectangle enumeration. Guard: NR =< 15, NC =< 15.
+fill_component_bbox_with_7: exponential DFS for disconnected cell pairs. Guard: NNZ =< 15.
+crop_to_colored_rect_border: O(NR * NC) per-cell iteration on large grids. Guard: NR =< 20, NC =< 20.
+scale_up_by_color_count: large output dimensions on large inputs. Guard: NR =< 15, NC =< 15.
+draw_cross_with_intersection: no size guard previously. Guard: NR =< 20, NC =< 20.
+
+The five new named rules added in wave 18 (did not solve any task in this run but are in the library):
+intersect_halves_at_5, recolor_1_to_2_extend_row_period, mark_l_shape_missing_corner, fill_hole_in_repeating_pattern, fill_span_row_col_with_2.
+
+Design principle established: every arc_transform clause must be deterministic. Non-determinism in a named rule causes arc_fits_all to hang whenever the rule fails a training pair. Determinism is enforced by:
+1. Ending every arc_transform clause with a ! cut before or at the maplist output builder.
+2. Wrapping non-deterministic sub-goals in once().
+3. Parenthesizing all compound conditions in if-then-else to prevent operator precedence misparse.
+
+Paper: papers/Climbing-ARC-AGI-1.txt updated with Attempt 18 entry and Run 32 score.
+
+
+SECTION 20.1 - COMPLETION STATUS
+
+Status as of 2026-06-17: COMPLETE.
+Branch: feature/arc-rules-wave-18. PR targeting main.
+SPARC volumes updated: Completion v12, Refinement v9.
 
 
 END OF DOCUMENT - PROLOGAI COMPLETION

@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v8)
+PROLOGAI REFINEMENT  (v9)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -561,6 +561,33 @@ AC-PR49-011: Tampered authentication tag causes decrypt failure.
     THEN the predicate throws (AES-GCM rejects the tag).
 
 Status as of 2026-06-17: COMPLETE. All 11 tests pass (swipl -s tests/pr49/test_pr49.pl).
+
+
+PART REF-PR50 - ARC-AGI-1 WAVE 18 DETERMINISM PRINCIPLE
+
+Date: 2026-06-17.
+
+Context: Wave 18 of the ARC-AGI-1 named-rule library exposed a class of correctness defect: non-deterministic arc_transform clauses. The arc_fits_all predicate backtracks into arc_transform whenever a computed output does not match the expected output. A non-deterministic rule generates multiple solutions on backtracking; if the rule generates infinitely many solutions, arc_fits_all never terminates.
+
+The specific defect found: scale_shape_into_frame used a malformed if-then-else where the condition was a semicolon-separated disjunction without enclosing parentheses. Prolog operator precedence parsed only the last disjunct as the if-then-else condition; the earlier disjuncts succeeded without binding the output variable OV. OV remained free, making every value a valid solution and generating infinite backtracking. This caused the benchmark to hang on every task where scale_shape_into_frame was tried and failed, blocking 63 correct solutions from being discovered.
+
+The determinism rule for arc_transform clauses (added to the quality standard as of 2026-06-17):
+
+Rule 1: Every arc_transform clause must end with a determinism cut (!) before or at the maplist output builder. The cut prevents Prolog from requesting more solutions after the first.
+
+Rule 2: Every compound condition in an if-then-else must be parenthesized. The construct (A ; B ; C -> Then ; Else) is NOT an if-then-else with compound condition. The correct form is ((A ; B ; C) -> Then ; Else).
+
+Rule 3: Non-deterministic sub-goals inside arc_transform must be wrapped in once(). This applies to findall helpers, recursive searches, and any predicate defined with multiple clauses.
+
+Rule 4: Every arc_transform clause must carry a size guard that fails fast for grids too large for the rule to run in bounded time. Guard forms: NR =< N, NC =< N for linear rules; NR * NC =< N for quadratic rules; cell-count guards for exponential-worst-case searches.
+
+Acceptance test for wave 18 determinism (added to PR review checklist):
+
+AC-W18-001: Every new arc_named_rule has a corresponding arc_transform clause that terminates in under 1 second on any ARC-AGI-1 grid.
+AC-W18-002: findall(_, arc_transform(Rule, SampleIn, _), Sols), length(Sols, 1) holds for every new rule applied to a representative matching input. (One solution only.)
+AC-W18-003: The full 400-task benchmark completes within 300 seconds after the wave is merged.
+
+Status as of 2026-06-17: COMPLETE. Wave 18 merged. Score: 161/400 = 40.25%.
 
 
 END OF DOCUMENT - PROLOGAI REFINEMENT
