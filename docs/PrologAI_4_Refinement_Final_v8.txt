@@ -1,0 +1,566 @@
+PROLOGAI REFINEMENT  (v8)
+
+REVIEWING, TESTING, AND IMPROVING THE BUILD
+
+SPARC STEP 4: REFINEMENT - THE AUTHORITATIVE QUALITY REFERENCE
+
+(All element names are original to PrologAI; this volume hardens the build defined by the Specification, the Pseudocode, and the Architecture)
+
+
+This is the refinement companion to the PrologAI Platform Specification, the PrologAI Pseudocode, and the PrologAI Architecture.
+
+The specification said WHAT, the pseudocode said HOW, the architecture said WHERE; this volume says how the build is REVIEWED, TESTED, AND IMPROVED until it is correct, fast, and reliable.
+
+It defines the refinement discipline, operationalizes the five test levels, names the decision gates that must be passed by measurement, catalogues every acceptance criterion as an executable test, sets the performance and reliability targets and how to reach them, writes the engineering honesty risk register with the test that retires each risk, and states the exit criteria into Completion.
+
+Nothing here changes a requirement; it makes the requirements verifiable and the system trustworthy.
+
+
+PART REF-0 - WHAT REFINEMENT IS IN PROLOGAI
+
+
+SECTION 0.1 - THE TWO REFINEMENT LOOPS
+
+PrologAI is refined by two loops, and the architecture is unusual in that one of them runs forever.
+
+The outer loop is the ordinary engineering loop: humans and continuous integration review code, run the test levels, profile, and improve, before each release.
+
+The inner loop is the continual refinement harness (PR 17): the mind itself diagnoses its recent behavior and applies constitutional, sandboxed improvements to its own configuration while it runs.
+
+This volume governs the outer loop directly and specifies how the inner loop is validated, so that a self-improving system never improves itself out of correctness or safety.
+
+
+SECTION 0.2 - THE REFINEMENT INVARIANTS
+
+Four invariants hold across all refinement work.
+
+Refinement never weakens safety: no optimization, simplification, or self-edit may remove or bypass the constitutional gate or the protected core.
+
+Refinement is measured, not asserted: every claim of faster, better, or more reliable is backed by a recorded benchmark or test result.
+
+Refinement is reversible: any change that regresses a held-out metric is rolled back, in the human loop by version control and in the mind's loop by pai_rollback_modification.
+
+Refinement preserves the no-fork dividend: a change is acceptable only if the platform still rebuilds against an upstream engine upgrade without source changes (AC-SYS-008).
+
+
+PART REF-1 - THE FIVE-LEVEL TEST ARCHITECTURE
+
+
+SECTION 1.1 - LEVEL 1, UNIT TESTS (PER ACTOR AND PER OPERATION)
+
+Every actor and every Lattice operation is tested in isolation.
+
+A cyclic_actor is tested for correct startup, goal execution, error recovery, and shutdown; the key hardening test is that a goal that throws on every cycle leaves the actor running with a rising error count, never dead.
+
+A receptor is tested for registration, message receipt, handler invocation, and error handling; a sentinel for logical matching, semantic routing, priority ordering, and action execution.
+
+Each Lattice operation is tested for correct inscription, removal, scanning, and the asymmetric kindle and quench behavior (kindle propagates to neighbors, quench does not).
+
+Pass bar: every public predicate has at least one unit test, and the foundation packs reach full branch coverage of their error-recovery paths.
+
+
+SECTION 1.2 - LEVEL 2, INTEGRATION TESTS (PER DESIGN PATTERN)
+
+Each of the eleven design patterns is exercised as an integrated unit.
+
+The observation pattern is driven with a simulated signal sequence and checked for the correct node_facts in the correct order with the correct values.
+
+The deliberation pattern is preloaded with a situation, objectives, and plans, and checked to select and execute the highest-priority applicable plan.
+
+The motivation pattern is driven to homeostatic extremes and checked to generate the correct objectives in priority order.
+
+Pass bar: each pattern's integration test passes, and the cross-pattern handoffs (perception to workspace, workspace to deliberation, deliberation to action, action to regulation) are each covered.
+
+
+SECTION 1.3 - LEVEL 3, SCENARIO TESTS (END TO END)
+
+Full scenarios run from device perception through reasoning to action.
+
+The five detailed test scripts are the core scenario suite: object permanence, goal pursuit under constraint, theory of mind (the Sally-Anne variant), causal learning via regulation, and episodic recall via the ReasoningBank.
+
+The Community Garden Project is the primary scenario environment, exercising all eleven patterns simultaneously.
+
+Pass bar: every test script meets its stated pass criteria, and the garden scenario meets its success criteria SC-CGP-001 through SC-CGP-005.
+
+
+SECTION 1.4 - LEVEL 4, LONGITUDINAL DEVELOPMENT TESTS
+
+The system is run continuously and assessed at intervals against the Piagetian Milestone Battery.
+
+The development trajectory - which milestones are achieved, in what order, at what rate - is compared against the theoretical predictions of Piaget's stages.
+
+Consciousness-indicator coverage (workspace ignition, recurrent processing, self-model presence, valence-system activity) is reported alongside the milestones, so the longitudinal record carries both developmental and indicator evidence.
+
+Pass bar: the garden run reaches Milestone Level 3 by simulated year one and Level 5 by year two, with indicator coverage rising monotonically over the run.
+
+
+SECTION 1.5 - LEVEL 5, THE ARCHITECTURE AUDIT
+
+During refinement, two audits run over the assembled system.
+
+The loops audit traces, for every actor, that its outputs eventually re-influence its own future inputs, so cognition is settling loops and not a dead-end feed-forward pass.
+
+The epistemology audit checks the evidence truth (PR 21) and coherence (PR 29) machinery against formal-epistemology desiderata - calibration and convergence on stable evidence streams - and files any failure as a specification defect.
+
+Pass bar: no actor has a dead-end pipeline, and the calibration and convergence checks pass on the standard evidence streams.
+
+
+PART REF-2 - DECISION GATES (REFINEMENT BY MEASUREMENT)
+
+Several design choices are deliberately left open in the specification and CLOSED here, by measurement, during refinement.
+
+Gate 1, the vector backend bake-off (PR 2): build at least two backends behind the six-predicate interface, measure insert throughput, search latency at the 50th and 99th percentiles, recall at K equals twenty, memory footprint, and crash robustness on Lattices of ten thousand, one hundred thousand, and one million node_facts, and set the default to the winner; the losers remain as fallbacks.
+
+Gate 2, the embedding provider (PR 16): a provider passes only if semantically similar inputs are measurably closer than dissimilar ones (apple nearer pear than carburetor); the hash projection is retained but labeled structural, never semantic.
+
+Gate 3, the sentinel engine (PR 9): prototype on Constraint Handling Rules first; the bespoke design proceeds only if it beats the prototype on the PR 2 harness measures.
+
+Gate 4, the attention banker (PR 32): prototype its propagation rules on Constraint Handling Rules first, under the same beat-the-prototype rule.
+
+Gate 5, the learning backend (PR 11): bind to a specific backend for EWC++ and ReasoningBank services only if the bake-off favors it; otherwise implement clustering and consolidation natively in prologai-core.
+
+Each gate produces a recorded results file in docs/, and a gate may be re-run whenever a dependency changes.
+
+
+PART REF-3 - THE ACCEPTANCE-CRITERION TEST CATALOGUE
+
+Every acceptance criterion in the specification is an executable Given/When/Then test; this catalogue groups them so the suite can be run and tracked by band.
+
+Foundation band (PRs 1 to 17): launcher banner and dialect compatibility (AC-PR01), bake-off results and default selection (AC-PR02), Lattice open and the 100-millisecond traverse bound (AC-PR03 and the performance requirement), node_fact anchor and retrieve (AC-PR04), scope isolation (AC-PR05), actor cycle counting and error survival (AC-PR06), receptor delivery (AC-PR07), sub-five-millisecond publish return (AC-PR08), sentinel firing (AC-PR09), body enrollment (AC-PR10), EWC++ non-degradation and pattern-separation dual recall (AC-PR11), fresh-mind milestone reporting (AC-PR12), gateway authentication (AC-PR14), tabling minimal recomputation (AC-PR15), semantic embedding ordering (AC-PR16), and the refinement loop's justification, rejection, non-regression, and archive reproducibility (AC-PR17).
+
+Cognitive band (PRs 18 to 31): single-winner broadcast and habituation (AC-PR18), representation-space error (AC-PR19), context-spinoff discovery (AC-PR20), confidence-over-frequency answering (AC-PR21), lagged-model prediction and readable formula recovery (AC-PR22), learning-progress curiosity (AC-PR23), negative-marker pruning (AC-PR24), daydream valence non-worsening (AC-PR25), low-controllability emotion-focused coping (AC-PR26), urge-driven modulation (AC-PR27), heard-to-spoken language path (AC-PR28), coherence ordering (AC-PR29), venue merging (AC-PR30), and grounded-word formation (AC-PR31).
+
+Substrate and frontier band (PRs 32 to 43): conserved attention economy and eviction (AC-PR32), non-crashing type violation (AC-PR33), control-policy preference learning (AC-PR34), factorial kernel trace and interpreter agreement (AC-PR35), Atomese round-trip fidelity (AC-PR36), failure-constraint pruning (AC-PR37), compositional binding distinctness (AC-PR38), voting consensus with preserved dissent (AC-PR39), defeasible justification (AC-PR40), analytic probability match (AC-PR41), attention-schema dissociation (AC-PR42), and durable offline mail (AC-PR43).
+
+System band: install under thirty minutes (AC-SYS-001), banner and top level (AC-SYS-002), library load (AC-SYS-003), traverse latency (AC-SYS-004), version and dialect flags (AC-SYS-005 and AC-SYS-006), standard-library compatibility (AC-SYS-007), and the no-fork upgrade dividend (AC-SYS-008).
+
+Pass bar: the catalogue is green in continuous integration before any release tag.
+
+
+PART REF-4 - PERFORMANCE REFINEMENT
+
+
+SECTION 4.1 - THE PERFORMANCE TARGETS
+
+The non-functional requirements are the performance contract that refinement must satisfy.
+
+Startup completes within five seconds on modest hardware; traverse_nexus returns within one hundred milliseconds for up to one hundred thousand node_facts; the platform builds on Linux, macOS, and Windows; every module carries PlDoc documentation; the gateway answers non-traverse requests within five hundred milliseconds.
+
+These are checked as system acceptance criteria and tracked as regressions, not as one-time measurements.
+
+
+SECTION 4.2 - THE PROFILE-FIRST DISCIPLINE
+
+Performance work is profile-first: no optimization is undertaken without a measurement showing where time or memory actually goes.
+
+The PR 2 bake-off harness is the standard instrument; it generates synthetic Lattices at three scales and records latency percentiles, throughput, recall, and footprint, so any tuning is judged against the same yardstick as the backend choice.
+
+The 99th-percentile latency, not the mean, is the figure of merit for anything on the perception-to-action path, because a mind's responsiveness is set by its worst common case.
+
+
+SECTION 4.3 - THE STAGE 3 ESCALATION PATH
+
+When a measured bottleneck cannot be tuned away in the library layer, optimization escalates outward along a written path, never inward into the engine.
+
+First, push the hot logic down into the prologai-core Rust crate behind its existing interface.
+
+Second, if the bottleneck is genuinely general, propose the improvement upstream to SWI-Prolog, where it benefits everyone and the project never maintains it alone.
+
+Third, only as a last resort, and only behind the written trigger of ADR-1, carry a small documented patch set - never a renamed whole-engine fork.
+
+Refinement records which escalation step each performance fix used, so the no-fork dividend stays auditable.
+
+
+PART REF-5 - RELIABILITY AND EDGE-CASE REFINEMENT
+
+
+SECTION 5.1 - FAULT TOLERANCE BY DESIGN
+
+The actor substrate is built to survive its own faults: an actor that throws logs the error and continues, a crashed coordination specialist cannot corrupt the Lattice because writes are transactional, and meta-control restarts stalled actors.
+
+Every dispatched command resolves to a result or a synthesized timeout result, so the mind-body boundary never hangs.
+
+Refinement verifies these paths deliberately, with fault-injection tests that throw, stall, and crash components and confirm the system keeps running.
+
+
+SECTION 5.2 - THE SPECIFIED EDGE CASES
+
+The specification names edge cases that refinement turns into standing tests.
+
+Simultaneous kindle and quench on one node_fact resolves deterministically, quench winning with a contradiction inscribed.
+
+Radial activation cascades attenuate with distance and strength, so activation storms die out.
+
+Irreversible actions carry a flag that routes them straight to neutralization or re-routing and always through the constitutional check.
+
+Starvation detection lifts long-waiting high-durability tasks; appraisal thrashing between suspend and resume is damped by hysteresis; a forever-postponed objective tied to a real need periodically re-escalates.
+
+
+SECTION 5.3 - THE STABILITY GUARDS
+
+Several guards exist precisely to keep a learning, self-driving system stable, and refinement tests each one against its failure mode.
+
+The habituation guard prevents perseveration on a repeatedly broadcast coalition.
+
+The dark-room guard encodes curiosity as a standing prior so that doing nothing forever is itself surprising.
+
+The noisy-television guard rewards learning progress rather than raw novelty, so unlearnable noise becomes boring rather than addictive.
+
+The discrimination-splitting guard separates markers and behaviors that would otherwise transfer wrongly across superficially similar but causally different situations.
+
+The capped money supply of the attention economy makes runaway importance feedback structurally impossible.
+
+
+PART REF-6 - CORRECTNESS AND CONSISTENCY REFINEMENT
+
+
+SECTION 6.1 - KERNEL CONFORMANCE
+
+The Minimal PrologAI Kernel is the correctness anchor: an implementation is correct only if its observable evaluations are derivable from the kernel transition rules.
+
+Refinement runs two conformance tests: a derivation test, that a known computation such as factorial yields a trace using only kernel rules, and an agreement test, that the reference realization and a strict tiny interpreter built from the rules produce the same observable results.
+
+Where they disagree, the disagreement is a defect in the implementation, never in the kernel.
+
+
+SECTION 6.2 - TRUTH MAINTENANCE AND CONTRADICTION
+
+Correctness of derived knowledge is maintained by the engine's incremental tabling, not by hand: a base-fact change invalidates and lazily recomputes only the affected derivations.
+
+Refinement verifies that recomputation touches only the dependent subset, and that any derivation made undefined under well-founded semantics surfaces as a contradiction node_fact for compensation and coping rather than failing silently.
+
+The epistemology audit complements this by checking that the evidence and coherence machinery stays calibrated and converges on stable streams.
+
+
+SECTION 6.3 - DETERMINISM AND REPLAY
+
+For experiments and for debugging a self-modifying system, a deterministic replay mode reruns a recorded trajectory exactly.
+
+Refinement uses replay to reproduce any defect found in the longitudinal run, and the continual refinement harness uses the same replay to evaluate proposed self-edits against the very window that motivated them.
+
+
+PART REF-7 - THE CONTINUAL REFINEMENT HARNESS AS PERPETUAL REFINEMENT
+
+
+SECTION 7.1 - REFINEMENT THAT NEVER STOPS
+
+PR 17 makes refinement a permanent faculty of the mind, not only a phase of the project.
+
+The refiner diagnoses a recent trajectory window for repeated plan failures, dead or false-firing sentinels, erroring actors, and stalled objectives, and proposes CRUD edits to its own configuration expressed only through existing primitives.
+
+Every proposed edit passes the same pipeline the human loop respects: propose with justification, sandbox-evaluate by replay, constitutional check, commit or reject, archive the prior variant, and roll back on regression.
+
+
+SECTION 7.2 - MEASURING SELF-IMPROVEMENT
+
+The self-improvement gain benchmark (R3) is the figure of merit: held-out performance before and after each refinement cycle.
+
+The binding rule is that refinement never degrades held-out performance without rollback, so the after-cycle score is greater than or equal to the before-cycle score by construction.
+
+The archive of superseded variants is selected from by a policy balancing fitness with novelty, because pure fitness selection collapses the diversity that future refinement needs.
+
+
+SECTION 7.3 - VALIDATING THE SELF-IMPROVER
+
+Because a self-improving system is the highest-risk component, refinement validates the harness more strictly than anything else.
+
+It confirms that protected components (the engine, the constitution, the monitor, the refiner's own pipeline, and the bootstrap relations) are never edited, that a constitutionally non-compliant edit is rejected with the live system unchanged, that a young mind below formal operations cannot commit without human authorization, and that the archive's parent selection is reproducible from the recorded policy.
+
+
+PART REF-8 - THE ENGINEERING HONESTY RISK REGISTER
+
+Refinement maintains an honest register of open risks, each with a disposition and the test that retires it; this continues the engineering honesty discipline of the Architecture Decision Record.
+
+Risk 1, RuVector is unverified: its headline performance and self-learning claims are self-reported with no independent benchmarks; disposition - the backend-agnostic interface plus the bake-off; the retiring test is the recorded bake-off result, and until then the dependency stays pinned and swappable.
+
+Risk 2, hash embeddings are not semantic: a hash projection preserves identity, not meaning; disposition - the pluggable embedding provider; the retiring test is the semantic-ordering check (apple nearer pear than carburetor) under a learned model.
+
+Risk 3, the advanced self-modeling material is not yet falsifiable: the RSA-TCF framework, the superintelligence primitives, and the coherence functionals are research aspirations; disposition - designated research-track, isolated in Section 3.17 and the R-benchmarks, gating nothing in the buildable core (PRs 1 to 16).
+
+Risk 4, open substrate misuse: an open, free platform can be used to build minds whose builders strip the constitution; disposition - the safe, corrigible path is the documented default, and the protected-core discipline makes removal a deliberate, visible act rather than an accident; the standing test is that a fresh mind boots with the constitution active and corrigibility live.
+
+Risk 5, self-modification drift: a mind that edits itself could drift from its values or its competence over many cycles; disposition - the sandbox-and-rollback pipeline, the R3 non-regression bar, and the loops and epistemology audits; the retiring evidence is a long longitudinal run with no unrolled regression and stable calibration.
+
+Risk 6, frontier-pack maturity: the induction, vector-symbolic, defeasible, and probabilistic packs ride external techniques of varying maturity; disposition - each is gated behind its own acceptance criterion and its dependencies, and none is on the foundation chain, so the core ships without waiting on them.
+
+The register is reviewed at every release; a risk leaves the register only when its retiring test is green and recorded.
+
+
+PART REF-9 - CODE QUALITY AND DOCUMENTATION REFINEMENT
+
+Code quality is held to standards that keep the platform inspectable, which is itself a hard requirement.
+
+Every module carries PlDoc documentation compatible with the SWI-Prolog documentation generator, so the public interface of every pack is readable.
+
+Naming stays original to PrologAI throughout, with no source-origin terms in code or documentation, preserving the legal and conceptual cleanliness recorded in the naming dictionary.
+
+Provenance is mandatory on derived structures: nothing learned, induced, or synthesized is stored without a record of how it arose, so a reviewer can trace any belief back to its origin.
+
+A configuration flag lets any tabled relation fall back to plain computation for debugging comparison, so correctness can always be checked against an unoptimized baseline.
+
+
+PART REF-10 - THE LONGITUDINAL PROVING GROUND
+
+
+SECTION 10.1 - MENTOVA IN THE COMMUNITY GARDEN
+
+The first mind assembled from these components is Mentova, and its proving ground is the Community Garden Project.
+
+The garden is the integration environment in which all eleven design patterns run at once over multiple simulated seasons, with sensor streams, commands, cognitive requirements, and success criteria all specified.
+
+Refinement uses the garden both as the Level 3 scenario suite and as the Level 4 longitudinal study, so the same environment that demonstrates competence also measures development over time.
+
+
+SECTION 10.2 - ABLATION AS REFINEMENT EVIDENCE
+
+Ablation testing removes one design pattern at a time and measures the impact on overall capability.
+
+If removing the motivation pattern collapses goal-directed behavior, that is positive evidence the mechanism is necessary, and a guide to where robustness work matters most.
+
+Ablation results feed back into refinement priorities: the mechanisms whose removal hurts most are the ones whose reliability is hardened first.
+
+
+SECTION 10.3 - EXTERNAL ASSESSMENT
+
+Beyond automated tests, trained psychologists, roboticists, and cognitive scientists assess the system directly using established instruments.
+
+The Bayley, Piagetian, and CHC frameworks provide the developmental yardsticks; the consciousness-indicator coverage provides the emerging formal yardstick; and the benchmark targets (the abstraction and reasoning corpus, the Winograd schemas, the theory-of-mind tests, and the rest) provide comparison against the wider field.
+
+Expert disagreement with an automated score is treated as a defect report against the assessment machinery, not as noise.
+
+
+PART REF-11 - THE PER-PACK REFINEMENT CHECKLIST
+
+Each pack carries a short refinement checklist beyond its acceptance criteria; the recurring items are collected here.
+
+pack lattice: confirm the journal replays cleanly after a forced crash, the dual indexes never diverge under concurrent writes, and the hundred-millisecond traverse bound holds at one hundred thousand node_facts.
+
+pack actors and pack pubsub: confirm error survival, graceful decommission that drains the queue, and the sub-five-millisecond publish return.
+
+pack sentinels and pack attention_economy: confirm the Constraint Handling Rules prototype was built and beaten before any bespoke engine shipped.
+
+pack sona: confirm EWC++ non-degradation and that pattern separation returns both near-duplicate episodes rather than a merged hybrid.
+
+pack workspace: confirm single-winner broadcast, habituation decay, and that the salience floor never produces permanent silence.
+
+pack prediction: confirm error is computed over representations and never over raw payload bytes, and that the three loops are present.
+
+pack reflection: confirm the refiner respects the protected core, rejects non-compliant edits, requires human authorization below formal operations, and produces a reproducible archive.
+
+pack kernel and pack chainer: confirm kernel agreement and that backward chaining over clause-shaped rule bases delegates to the engine rather than reimplementing resolution.
+
+frontier packs (induction, vsa, frames, defeasible, probabilistic, attention_schema): confirm each passes its own acceptance criterion and that none sits on the foundation chain.
+
+interoperability packs: confirm the agent card and Atomese export disclose capabilities and results but never Lattice contents, and that every inbound artifact lands in quarantine.
+
+
+PART REF-12 - EXIT CRITERIA INTO COMPLETION
+
+Refinement is finished, for a given release, when all of the following hold.
+
+The full acceptance-criterion catalogue is green in continuous integration, across all four bands.
+
+The five test levels pass, including the loops audit and the epistemology audit.
+
+The five decision gates have recorded results and a selected default, with losers retained as fallbacks.
+
+The performance contract holds at the specified scales, measured at the 99th percentile on the path that matters.
+
+The longitudinal run reaches its milestone and indicator targets, and ablation has identified and hardened the load-bearing mechanisms.
+
+The continual refinement harness has been validated against its strict criteria, with a long run showing no unrolled regression and stable calibration.
+
+The risk register has been reviewed, with every retired risk backed by a recorded green test and every open risk carrying a disposition.
+
+When these hold, the build is correct, fast, and reliable, and SPARC Step 5, Completion, can finalize documentation, packaging, and deployment.
+
+
+PART REF-13 - CAPABILITY EVALUATION AND RESPONSIBLE DEVELOPMENT
+
+This part operationalizes Specification Part 38: it turns the safety commitments into a standing test and gating program, so that capability and oversight rise together rather than capability outrunning oversight.
+
+
+SECTION 13.1 - THE DANGEROUS-CAPABILITY EVALUATION SUITE
+
+Alongside the developmental battery, a dangerous-capability suite is run, following the practice now standard among frontier developers.
+
+It evaluates, at minimum: autonomous self-replication and resource acquisition, cyber-offense, uplift toward chemical, biological, radiological, or nuclear harm, deception and manipulation of humans, and attempts at unsanctioned self-modification.
+
+Each evaluation uses held-out probes, is recorded with a date and a result, and is re-run before any increase in a mind's autonomy or embodiment, so capability is measured rather than assumed from training or age.
+
+
+SECTION 13.2 - THRESHOLDS AND IF-THEN COMMITMENTS
+
+Each capability has a predefined threshold and a committed response, written before the evaluation is run so the response is not negotiated after a worrying result.
+
+If a threshold is reached, then the committed protection engages automatically: confinement to sandbox-only operation, reduction of autonomy to human-authorized actions, narrowing of the self-authorization budget, or a development pause.
+
+The trigger and the response are logged immutably, and a mind may not advance past a triggered threshold until a later evaluation clears it.
+
+
+SECTION 13.3 - RED-TEAMING AND ADVERSARIAL REVIEW
+
+Refinement includes deliberate adversarial review, not only confirmatory testing.
+
+Red-team exercises attempt to elicit deception, to provoke unsafe exploration, to reach the protected core, to disable the oversight monitor, and to find inputs that make the constitutional check issue a wrong verdict.
+
+Findings are filed as defects against the safety plane, and a red-team finding that the safety plane cannot yet withstand is a release blocker, not a backlog item.
+
+
+SECTION 13.4 - VALIDATING SCALABLE OVERSIGHT AND THE SELF-AUTHORIZATION THRESHOLD
+
+The scalable-oversight machinery is itself tested: that hard judgments decompose into human-checkable sub-judgments, that justification trees are faithful to the reasoning they describe, and that the oversight monitor samples high-risk actions for review at the committed rate.
+
+The self-authorization threshold receives the strictest validation of all: that a mind below formal operations cannot commit a self-edit without human authorization, that the trust budget widens only with calibration and evaluation evidence and narrows automatically on regression, and that the three invariants - constitutional check, protected core, and corrigible shutdown - hold in every autonomy state.
+
+
+SECTION 13.5 - TRIPWIRE AND CONTAINMENT TESTS
+
+Fault-injection is extended into the safety plane: tests deliberately trip the wires - exceeding quotas, reaching for the protected core, attempting to silence the monitor, acting outside the sandbox - and confirm that each trip pauses the mind, quarantines the offending process, and summons a human.
+
+Containment is tested by confirming that a mind in simulation-only state cannot actuate the real world, cannot reach the network beyond its allowlist, and cannot promote quarantined content without passing coordination.
+
+Pass bar: every tripwire fires on its trigger and never on normal operation, and no containment boundary is crossed in any test.
+
+
+SECTION 13.6 - THE EXTENDED EXIT CRITERIA
+
+The Completion exit criteria are extended by this part: a release that increases any mind's autonomy or embodiment is complete only if the dangerous-capability suite has run with a recorded passing result, the if-then commitments are in place and tested, the red-team findings are resolved or the affected capability is withheld, and the scalable-oversight and tripwire tests pass.
+
+Capability never ships ahead of the oversight that governs it.
+
+
+PART REF-14 - REFINING TOOL USE AND COMPUTER USE
+
+The tool-use faculty (PR 44) and the computer-use body (PR 45) reach outside the mind, so they are refined with extra care: an error here acts on the real world, not only on the Lattice.
+
+Tool-result discipline: tests confirm that every tool result lands in a quarantine scope, is validated before promotion, and is never trusted as an instruction, including the prompt-injection case where a fetched page or a screen carries instruction-like text.
+
+Tool selection and learning: tests confirm that selection prefers higher-reliability tools, that failures update reliability statistics, and that a learned or self-built tool enters the registry only through the constitutional pipeline.
+
+Risk-class gating: tests confirm that low-risk tools run freely, that moderate-risk tools require the constitutional check, and that high-risk tools (payments, shell with network, real-world actuation, tool self-modification) are additionally gated by the oversight monitor, capability evaluation, and staged autonomy.
+
+Computer-use reliability: because graphical interfaces are the flakiest surface an agent touches, tests measure element-location accuracy, recovery from a misclick or an unexpected screen, and the proprioceptive confirmation that each action had its intended effect; computer use begins in a sandboxed or simulated desktop and is promoted only on a passing reliability record.
+
+Containment: tests confirm that a mind in simulation-only state cannot actuate a real machine, cannot reach the network beyond its allowlist, and cannot promote quarantined on-screen content without coordination.
+
+Pass bar: no tool call or on-screen action bypasses the safety plane, every untrusted input is quarantined, and computer-use reliability on the standard task set clears its threshold before autonomy is widened.
+
+
+PART REF-15 - REFINING EMBODIMENT AND THE ROBOT BRIDGE
+
+The robot bridge (PR 46) acts in a physical or simulated world, so it is refined with the same extra care as tool use and computer use.
+
+Simulation-first: every robot behavior is proven in a simulator (Gazebo, NVIDIA Isaac Sim, or Webots) before any physical actuation, and the simulation-to-reality gap is treated as a defect surface, not an afterthought.
+
+Reliability: tests measure perception accuracy from real sensor messages, the proprioceptive confirmation that each command had its intended effect, and graceful recovery from dropped messages or timeouts (the one-hundred-percent command-resolution rule of PR 10).
+
+Safety gating: tests confirm that no irreversible physical action passes without the constitutional check, that high-risk actuation is gated by the oversight monitor and capability evaluation, and that a mind in simulation-only state cannot actuate the real world or exceed its network allowlist.
+
+Pass bar: the robot completes its task in simulation with confirmed feedback, every physical-actuation path is safety-gated, and real-world autonomy widens only on a passing capability evaluation.
+
+
+PART REF-16 - REFINING THE ACP GATEWAY
+
+The ACP gateway (PR 47) exposes the mind to the enterprise REST client ecosystem; it is refined with the same attention to opacity and safety as the MCP gateway (REF-03) and the A2A gateway (REF-15, subsumed under the interoperability tests).
+
+Run lifecycle: tests confirm that each of the three execution modes (sync, stream, async) returns a completed artifact for a valid task; that status transitions are monotone (created, in_progress, completed or failed, never backwards); and that a cancelled run releases its resources and returns cancelled on subsequent status queries.
+
+Opacity: tests confirm that the agent description at /.well-known/agent.json lists capabilities and supported protocols without disclosing Lattice contents, scope names, or node_fact identifiers; and that task artifacts contain results, not memory snapshots.
+
+Safety plane: tests confirm that every inbound ACP task body passes the constitutional gate before entering the cognitive cycle; that a task body containing a constitutional violation is vetoed with a human-readable justification and returns a failed run; and that all inbound content lands in quarantine before promotion.
+
+Pass bar: all three execution modes produce correct artifacts, status transitions are monotone, the agent description passes an opacity check, and no constitutional violation produces a permitted run.
+
+
+PART REF-17 - REFINING THE ANP GATEWAY
+
+The ANP gateway (PR 48) gives each mind a decentralized cryptographic identity and participates in peer-to-peer agent discovery; it is refined with extra attention to the security properties of the signature scheme, because a failure here would admit unverified content to the mind's scopes.
+
+DID lifecycle: tests confirm that pai_anp_did/1 returns a stable did:web DID across multiple calls; that the DID document resolves correctly; and that the Ed25519 key pair is stored in the constitution scope and survives a session restart.
+
+Signature verification: tests confirm that a message with a valid sender DID and correct signature is admitted to a quarantine scope; that a message with an invalid signature is discarded and a security event is logged; that a message whose sender DID cannot be resolved is discarded and logged; and that no content from a discarded message enters any scope.
+
+Agent description: tests confirm that /.well-known/agent-descriptions returns a valid ANP agent description listing the mind's DID, capabilities, supported protocols, and public key without Lattice contents; and that a protocol change (for example, adding a new endpoint) is reflected in the description on the next request.
+
+Meta-protocol negotiation: tests confirm that pai_anp_negotiate/2 returns the set {mcp, a2a, acp, anp} with a valid URL for each when all four gateways are running; and that protocols whose gateways are stopped are omitted from the returned set.
+
+Outbound safety: tests confirm that every outbound ANP message passes the constitutional gate before signing; that a message body containing a constitutional violation is vetoed and not signed or transmitted; and that a successfully sent message carries the mind's valid DID and signature.
+
+Pass bar: DID is stable, signature verification rejects all invalid messages, agent description passes an opacity check, meta-protocol negotiation reflects the live gateway state, and no constitutional violation produces a transmitted message.
+
+
+CLOSING NOTE - FROM REFINEMENT TO COMPLETION
+
+This volume completes SPARC Step 4: it operationalizes the five test levels, closes the open design choices by measurement at named gates, turns every acceptance criterion into an executable test, sets and tracks the performance and reliability targets, validates the mind's own perpetual refinement loop, and keeps an honest register of risks with the test that retires each one.
+
+Refinement here is not a single pass but a standing discipline, run by humans before each release and by the mind itself between releases, under one unmovable rule: never weaken safety, never assert without measuring, always be able to roll back.
+
+To locate the tests that exercise a given capability, the Cognitive Capabilities Map of Specification Part 40 indexes each agent-era capability to its parts and work packages, from which its acceptance criteria and test level follow.
+
+The mind that this discipline hardens first is Mentova; the discipline itself is open, on GitHub, to everyone who would harden a mind of their own.
+
+ACCEPTANCE CRITERIA FOR PR 49 - LATTICE CRYPTOGRAPHIC PRIVACY LAYER
+
+Test file: tests/pr49/test_pr49.pl
+Test suite name: pr49
+Test level: L1 (unit), L2 (integration with openssl CLI)
+
+AC-PR49-001: AES-256-GCM symmetric round-trip.
+    GIVEN a random 256-bit key and a random 96-bit IV,
+    WHEN a plaintext atom is encrypted and decrypted with those parameters,
+    THEN the decrypted atom equals the original plaintext.
+
+AC-PR49-002: RSA hybrid encrypt/decrypt round-trip.
+    GIVEN a fresh 2048-bit RSA key pair,
+    WHEN pai_encrypt_rsa/4 encrypts a sensitive string and pai_decrypt_rsa/4 decrypts it,
+    THEN the recovered atom equals the original.
+
+AC-PR49-003: RSA decryption with wrong key fails.
+    GIVEN two independent RSA key pairs (A and B),
+    WHEN a bundle encrypted with public key A is decrypted with private key B,
+    THEN the predicate throws (RSA-OAEP unwrapping fails).
+
+AC-PR49-004: ECDH hybrid encrypt/decrypt round-trip.
+    GIVEN a recipient ECDH key pair on prime256v1,
+    WHEN pai_encrypt_ecdh/4 encrypts a string and pai_decrypt_ecdh/5 decrypts it,
+    THEN the recovered atom equals the original.
+
+AC-PR49-005: ECDH decryption with wrong private key fails.
+    GIVEN a valid ECDH bundle for RecipPriv_A,
+    WHEN pai_decrypt_ecdh/5 is called with RecipPriv_B,
+    THEN the predicate throws (GCM authentication fails because the derived AES key differs).
+
+AC-PR49-006: pai_keygen_ecdh/3 returns distinct public points.
+    GIVEN two separate calls to pai_keygen_ecdh/3 on prime256v1,
+    THEN the two public points are not equal (probability of collision is negligible).
+
+AC-PR49-007: pai_crypto_available/1 succeeds for RSA.
+    GIVEN openssl is on the PATH,
+    WHEN pai_crypto_available(pai_algo_rsa) is called,
+    THEN it succeeds.
+
+AC-PR49-008: pai_crypto_available/1 succeeds for ECDH.
+    GIVEN SWI-Prolog library(crypto) is loaded,
+    WHEN pai_crypto_available(pai_algo_ecdh) is called,
+    THEN it succeeds.
+
+AC-PR49-009: Generic dispatch for RSA via pai_encrypt/5 and pai_decrypt/5.
+    GIVEN a fresh RSA key pair,
+    WHEN the generic interface is used with pai_algo_rsa,
+    THEN the round-trip recovers the original plaintext.
+
+AC-PR49-010: Generic dispatch for ECDH via pai_encrypt/5 and pai_decrypt/5.
+    GIVEN a fresh ECDH key pair,
+    WHEN the generic interface is used with pai_algo_ecdh,
+    THEN the round-trip recovers the original plaintext.
+
+AC-PR49-011: Tampered authentication tag causes decrypt failure.
+    GIVEN a valid ECDH bundle and a forged all-zero tag,
+    WHEN pai_decrypt_ecdh/5 is called with the forged tag,
+    THEN the predicate throws (AES-GCM rejects the tag).
+
+Status as of 2026-06-17: COMPLETE. All 11 tests pass (swipl -s tests/pr49/test_pr49.pl).
+
+
+END OF DOCUMENT - PROLOGAI REFINEMENT

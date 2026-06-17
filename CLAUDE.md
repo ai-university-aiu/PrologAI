@@ -2,15 +2,15 @@ This repository builds PrologAI, defined by six companion volumes in the docs fo
 
 Always follow those documents.
 
-The Specification (docs/PrologAI_1_Specification_Final_v14.txt) is authoritative for what to build,
+The Specification (docs/PrologAI_1_Specification_Final_v15.txt) is authoritative for what to build,
 
-the Pseudocode (docs/PrologAI_2_Pseudocode_Final_v7.txt) for how each work package reasons,
+the Pseudocode (docs/PrologAI_2_Pseudocode_Final_v8.txt) for how each work package reasons,
 
-the Architecture (docs/PrologAI_3_Architecture_Final_v8.txt) for where each piece lives,
+the Architecture (docs/PrologAI_3_Architecture_Final_v9.txt) for where each piece lives,
 
-the Refinement (docs/PrologAI_4_Refinement_Final_v7.txt) for testing and safety,
+the Refinement (docs/PrologAI_4_Refinement_Final_v8.txt) for testing and safety,
 
-the Completion (docs/PrologAI_5_Completion_Final_v10.txt) for release,
+the Completion (docs/PrologAI_5_Completion_Final_v11.txt) for release,
 
 and the Demonstration Plan (docs/PrologAI_6_Demonstration_Mentova_v4.txt) for how Mentova is born, proven, and grown on the finished platform.
 
