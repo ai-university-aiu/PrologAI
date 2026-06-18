@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v19)
+PROLOGAI COMPLETION  (v20)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -922,6 +922,32 @@ SECTION 27.1 - COMPLETION STATUS
 Status as of 2026-06-17: COMPLETE.
 Branch: feature/arc-rules-wave-25. PR merged to main.
 SPARC volumes updated: Completion v19, Refinement v16.
+
+
+PART COMP-28: ARC-AGI-1 WAVE 26 - NINE NEW INDUCTION RULES - 219/400
+
+Overview: Wave 26 of the ARC-AGI-1 benchmark adds nine new named rules to the induction library, raising the score from 210/400 (52.50%) to 219/400 (54.75%).
+
+Rules: eight_cross_fixed_fill, hollow_1rect_to_6cross, container_fill_overflow, pointer_to_anchor, fill_largest_zero_rect_6, extract_3x3_around_8, move_blocks_up_by_height, extend_periodic_to_10, billiard_bounce.
+
+Helpers added: arc_w26_find_left_1/4, arc_w26_find_right_1/4, arc_w26_top_of_wall/4, arc_w26_top_of_wall_/4, arc_w26_bot_of_wall/5, arc_w26_bot_of_wall_/5, arc_w26_max_consec/3, arc_w26_consec_runs/2, arc_w26_consec_run_tail/4, arc_w26_extend_grid/7, arc_w26_bounce_path/10.
+
+Score: 210/400 = 52.50% to 219/400 = 54.75% (+9 tasks, Run 40, Attempt 26).
+
+New tasks solved: 272f95fa, 41e4d17e, 444801d8, 2c608aff, 3eda0437, 5117e062, 5521c0d9, 53b68214, 508bd3b6.
+
+Performance fixes: hollow_1rect_to_6cross gained OneRows/OneCols pre-filtering and a NR =< 20, NC =< 20 guard; fill_largest_zero_rect_6 gained a NR =< 8, NC =< 32 guard. Both prevent benchmark timeout on large grids without affecting correctness on their target tasks.
+
+Paper update: papers/Climbing_ARC-AGI-1.txt - Attempt 26 section, Run 40 score line, and 9 new task entries added.
+
+SPARC volumes updated: Refinement v17, Completion v20.
+
+
+SECTION 28.1 - COMPLETION STATUS
+
+Status as of 2026-06-18: COMPLETE.
+Branch: feature/arc-rules-wave-26. PR merged to main.
+SPARC volumes updated: Completion v20, Refinement v17.
 
 
 END OF DOCUMENT - PROLOGAI COMPLETION
