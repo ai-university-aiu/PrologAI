@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v24)
+PROLOGAI COMPLETION  (v25)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -1078,6 +1078,26 @@ SECTION 32.1 - COMPLETION STATUS
 Status as of 2026-06-18: COMPLETE.
 Branch: feature/arc-rules-wave-30. Mentova PR #39 merged to main.
 SPARC volumes updated: Completion v24, Refinement v21.
+
+
+SECTION 33 - WAVE 31 ARC-AGI-1 NAMED RULES (v25 addition)
+
+Wave 31 adds five new named rules solving five previously unsolved ARC-AGI-1 tasks. A systemic 0-vs-1-indexing bug was identified and corrected: arc_grid_at uses nth1 (1-based), but all wave 31 code had been written with 0-based between/3 ranges and numlist/3 starting from 0. After correction, all five rules pass.
+
+Rules and tasks: stamp_1234_around_5_blocks (95990924), fill_3x3_zero_blocks_with_1 (6cf79266), fill_below_shape_by_color_count (fcc82909), fill_horiz_gap_with_9 (ef135b50), draw_3_frame_around_2_clusters (b27ca6d3).
+
+Helpers: arc_w31_greedy_3x3/3, arc_w31_bfs2cc/6, arc_w31_expand_right/5, arc_w31_expand_down/6.
+
+Score: 251/400 = 62.75% to 256/400 = 64.00% (+5 tasks, Run 45, Wave 31).
+Mentova PR #41 merged to main on 2026-06-18.
+SPARC volumes updated: Refinement v22, Completion v25.
+
+
+SECTION 33.1 - COMPLETION STATUS
+
+Status as of 2026-06-18: COMPLETE.
+Branch: feature/wave31-arc-rules. Mentova PR #41 merged to main.
+SPARC volumes updated: Completion v25, Refinement v22.
 
 
 END OF DOCUMENT - PROLOGAI COMPLETION
