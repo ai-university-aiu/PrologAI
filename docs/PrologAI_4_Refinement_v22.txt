@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v21)
+PROLOGAI REFINEMENT  (v22)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -1209,6 +1209,47 @@ AC-W30-011: Full 400-task benchmark completes within 600 seconds. Score 251/400 
 Score improvement: 242/400 = 60.50% to 251/400 = 62.75% (+9 tasks).
 
 Status as of 2026-06-18: COMPLETE. Wave 30 merged on Mentova PR #39. Score: 251/400 = 62.75%.
+
+
+SECTION REF-W31 - WAVE 31 ARC-AGI-1 NAMED RULES (v22 addition)
+
+Wave 31 adds five new named rules to arc_benchmark.pl in the Mentova repository and four supporting helper predicates. The wave corrects a systemic 0-vs-1-indexing bug found in all five rules: arc_grid_at uses nth1 (1-based indexing), but the wave 31 code was written with 0-based between/3 ranges and numlist/3 calls. All five rules and all four helpers were corrected to use 1-indexed coordinates throughout.
+
+New helpers:
+
+arc_w31_greedy_3x3/3 - greedily selects non-overlapping 3x3 block top-left corners from a sorted candidate list; two candidates overlap when their row or column distance is less than 3.
+
+arc_w31_bfs2cc/6 - BFS over 4-connected cells of value 2; bounds check uses R >= 1, R =< NR, C >= 1, C =< NC.
+
+arc_w31_expand_right/5 - scans right while arc_grid_at returns 2; stop condition is C+1 > NC (1-indexed: C1 =< NC).
+
+arc_w31_expand_down/6 - scans down while the full column span remains 2; stop condition is R+1 > NR (1-indexed: R1 =< NR).
+
+New rules:
+
+stamp_1234_around_5_blocks (task 95990924): Locates all 2x2 blocks of 5s. For each block with top-left at (BR, BC), places marker 1 at (BR-1, BC-1), 2 at (BR-1, BC+2), 3 at (BR+2, BC-1), 4 at (BR+2, BC+2), subject to grid bounds.
+
+fill_3x3_zero_blocks_with_1 (task 6cf79266): Finds all 3x3 all-zero blocks; applies arc_w31_greedy_3x3 to select non-overlapping ones in scan order; fills selected blocks with value 1.
+
+fill_below_shape_by_color_count (task fcc82909): Finds canonical 2x2 non-zero shapes (top-left anchored: cell above and cell to the left must be 0). Counts unique colors SN in the 2x2 block. Fills the two columns of the block for SN rows below the block bottom with value 3.
+
+fill_horiz_gap_with_9 (task ef135b50): Identifies solid 2-rectangles by top-left expansion. For each pair A (left) and B (right) with non-empty row overlap and column gap, and no blocking rectangle in between, fills the row-overlap x column-gap region with value 9.
+
+draw_3_frame_around_2_clusters (task b27ca6d3): BFS identifies connected components of 2-cells with at least 2 cells. For each cluster, finds all cells one step outside the bounding box (the frame). Fills zero frame cells with value 3.
+
+Acceptance criteria for wave 31:
+
+AC-W31-001: arc_transform(stamp_1234_around_5_blocks, ...) matches all training pairs of task 95990924.
+AC-W31-002: arc_transform(fill_3x3_zero_blocks_with_1, ...) matches all training pairs of task 6cf79266.
+AC-W31-003: arc_transform(fill_below_shape_by_color_count, ...) matches all training pairs of task fcc82909.
+AC-W31-004: arc_transform(fill_horiz_gap_with_9, ...) matches all training pairs of task ef135b50.
+AC-W31-005: arc_transform(draw_3_frame_around_2_clusters, ...) matches all training pairs of task b27ca6d3.
+AC-W31-006: All wave 31 arc_transform clauses end with ! and include NR =< 30, NC =< 30 size guards.
+AC-W31-007: Full 400-task benchmark completes within 600 seconds. Score 256/400 = 64.00% confirmed.
+
+Score improvement: 251/400 = 62.75% to 256/400 = 64.00% (+5 tasks).
+
+Status as of 2026-06-18: COMPLETE. Wave 31 merged on Mentova PR #41. Score: 256/400 = 64.00%.
 
 
 END OF DOCUMENT - PROLOGAI REFINEMENT
