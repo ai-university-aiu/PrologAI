@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v14)
+PROLOGAI REFINEMENT  (v15)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -827,6 +827,55 @@ AC-W23-008: arc_transform(expand_7line_fan_8, In, Out) fires on task db3e9e38 al
 AC-W23-009: Full 400-task benchmark completes within 600 seconds. Score 194/400 = 48.50% confirmed.
 
 Status as of 2026-06-17: COMPLETE. Wave 23 merged on feature/arc-rules-wave-23. Score: 194/400 = 48.50%.
+
+
+PART REF-W24: ARC-AGI-1 WAVE 24 - EIGHT NEW INDUCTION RULES
+
+What changed: Wave 24 of the ARC-AGI-1 named-rule library adds eight new arc_transform clauses plus two helper predicates. All eight rules were verified in Python against their target tasks before Prolog implementation.
+
+New rules:
+
+1. mark_u_shape_bases_4 (54d82841): Scans for 3-wide U-shapes [V,V,V]/[V,0,V] in any two adjacent rows. Places value 4 at the last row at each U-shape center column.
+
+2. connected_8_path_between_2x2_blocks (239be575): Finds exactly two 2x2 blocks of 2s in the grid. BFS through 8-valued cells starting from cells adjacent to the first block. Output is [[8]] if any cell adjacent to the second block is reached, else [[0]].
+
+3. find_3x3_frame_interior_value (d9fac9be): Scans for a 3x3 hollow square frame where all 8 border cells share one value V and the center cell holds a different value Interior. Output is [[Interior]].
+
+4. sort_rows_by_nz_right_align (beb8660c): Collects each row's non-zero values (preserving order). Sorts rows by non-zero count ascending. Rebuilds each row right-aligned (zero-padded on the left).
+
+5. count_2x2_blocks_to_checkerboard (ff28f65a): Counts N non-overlapping 2x2 blocks of 2s using a greedy left-to-right deduplication pass. Returns a 3x3 output with 1s at the first N positions of the checkerboard sequence: (1,1), (1,3), (2,2), (3,1), (3,3).
+
+6. tile_2x_zero_to_8_by_column (f5b8619d): Tiles the input 2x in both dimensions. For each zero cell in the tiled output, if the corresponding original column had any non-zero value, replaces the zero with 8; all-zero original columns remain 0.
+
+7. find_most_impure_region (de1cd16c): Identifies the least-frequent non-zero value as the impurity color. For each other (dominant) color, finds its bounding rectangle and counts how many impurity cells fall inside. Returns [[dominant_color]] for the region with the highest impurity count.
+
+8. fan_inner_value_upward (b8cdaf2b): Bottom row outer value (at column 1) defines Vout. Inner value Vin occupies a contiguous block from column InL to InR. Bottom two rows are copied unchanged. For each free row R above, at step k = (NR-1) - R, places Vin at columns InL-k and InR+k if in bounds.
+
+Helper predicates: arc_w24_bfs8_/7 (BFS through 8-cells for connectivity test), arc_w24_dedup_corners/2 (greedy deduplication of overlapping 2x2 block corners).
+
+Acceptance tests:
+
+AC-W24-001: arc_transform(mark_u_shape_bases_4, ...) matches expected output for all training pairs and test case of task 54d82841.
+
+AC-W24-002: arc_transform(connected_8_path_between_2x2_blocks, ...) matches all 7 pairs of task 239be575.
+
+AC-W24-003: arc_transform(find_3x3_frame_interior_value, ...) matches all 5 pairs of task d9fac9be.
+
+AC-W24-004: arc_transform(sort_rows_by_nz_right_align, ...) matches all 4 pairs of task beb8660c.
+
+AC-W24-005: arc_transform(count_2x2_blocks_to_checkerboard, ...) matches all 9 pairs of task ff28f65a.
+
+AC-W24-006: arc_transform(tile_2x_zero_to_8_by_column, ...) matches all 4 pairs of task f5b8619d.
+
+AC-W24-007: arc_transform(find_most_impure_region, ...) matches all 5 pairs of task de1cd16c.
+
+AC-W24-008: arc_transform(fan_inner_value_upward, ...) matches all 5 pairs of task b8cdaf2b.
+
+AC-W24-009: Full 400-task benchmark completes within 600 seconds. Score 202/400 = 50.50% confirmed.
+
+Score improvement: 194/400 = 48.50% to 202/400 = 50.50% (+8 tasks).
+
+Status as of 2026-06-17: COMPLETE. Wave 24 merged on feature/arc-rules-wave-24. Score: 202/400 = 50.50%.
 
 
 END OF DOCUMENT - PROLOGAI REFINEMENT
