@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v18)
+PROLOGAI COMPLETION  (v19)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -896,6 +896,32 @@ SECTION 26.1 - COMPLETION STATUS
 Status as of 2026-06-17: COMPLETE.
 Branch: feature/arc-rules-wave-24. PR merged to main.
 SPARC volumes updated: Completion v18, Refinement v15.
+
+
+PART COMP-27: ARC-AGI-1 WAVE 25 - EIGHT NEW INDUCTION RULES - 210/400
+
+Overview: Wave 25 of the ARC-AGI-1 benchmark adds eight new named rules to the induction library, raising the score from 202/400 (50.50%) to 210/400 (52.50%).
+
+Rules: fill_cells_plus5, pick_hollow_shape, most_frequent_3x3, fill_zigzag_4, value_to_pattern, five_column_rank, classify_4x4_blocks, block_grid_freq.
+
+Helpers added: arc_w25_bfs8v_q/6, arc_w25_bfs8v_comps/4, arc_w25_extract_3x3/3, arc_w25_count_runs/2, arc_w25_has_interior_zero/2, arc_w25_zigzag_fills/5, arc_w25_block_bounds/3, arc_w25_build_bounds/4, arc_w25_block_type/4, arc_w25_val_pattern/2.
+
+Score: 202/400 = 50.50% to 210/400 = 52.50% (+8 tasks, Run 39, Attempt 25).
+
+New tasks solved: 54d9e175, b9b7f026, 39a8645d, 7447852a, d4469b4b, a61f2674, 995c5fa3, f8b3ba0a.
+
+Note: block_grid_freq required a post-implementation fix. Initial version used (C-1) mod 3 = 0 to detect block-start columns, which incorrectly identified separator columns. Fixed to use separator-column detection (max_list(ColVals, 0)) and then derive block-start columns as the first non-separator column of each consecutive group.
+
+Paper update: papers/Climbing_ARC-AGI-1.txt - Attempt 25 section, Run 39 score line, and 8 new task entries added.
+
+SPARC volumes updated: Refinement v16, Completion v19.
+
+
+SECTION 27.1 - COMPLETION STATUS
+
+Status as of 2026-06-17: COMPLETE.
+Branch: feature/arc-rules-wave-25. PR merged to main.
+SPARC volumes updated: Completion v19, Refinement v16.
 
 
 END OF DOCUMENT - PROLOGAI COMPLETION

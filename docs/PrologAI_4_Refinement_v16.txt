@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v15)
+PROLOGAI REFINEMENT  (v16)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -876,6 +876,49 @@ AC-W24-009: Full 400-task benchmark completes within 600 seconds. Score 202/400 
 Score improvement: 194/400 = 48.50% to 202/400 = 50.50% (+8 tasks).
 
 Status as of 2026-06-17: COMPLETE. Wave 24 merged on feature/arc-rules-wave-24. Score: 202/400 = 50.50%.
+
+
+WORK PACKAGE: ARC-AGI-1 NAMED RULE LIBRARY - WAVE 25
+
+Reference: Mentova feature/arc-rules-wave-25.
+
+What changed: Wave 25 of the ARC-AGI-1 named-rule library adds eight new arc_transform clauses plus ten helper predicates. All eight rules were verified in Python against their target tasks before Prolog implementation. One rule (block_grid_freq) required a post-implementation correction: the initial column-detection formula used a fixed modular offset; the correct implementation detects separator columns dynamically and derives block-start columns as non-separator columns with no non-separator column immediately to their left.
+
+New named rules:
+fill_cells_plus5 - separator-divided cell grid; each region's value incremented by 5.
+pick_hollow_shape - unique color whose 4-conn blob has an interior zero hole.
+most_frequent_3x3 - most-frequent 3x3 pattern among same-value 8-conn blobs.
+fill_zigzag_4 - 3-row zigzag; modular peak-index rule fills 4s.
+value_to_pattern - unique non-zero value maps to fixed 3x3 lookup pattern.
+five_column_rank - tallest 5-column becomes 1s; shortest becomes 2s.
+classify_4x4_blocks - four-wide blocks; classify by zero positions into type codes.
+block_grid_freq - 2-wide block grid; non-background values sorted by frequency desc.
+
+New shared helpers: arc_w25_bfs8v_q/6, arc_w25_bfs8v_comps/4, arc_w25_extract_3x3/3, arc_w25_count_runs/2, arc_w25_has_interior_zero/2, arc_w25_zigzag_fills/5, arc_w25_block_bounds/3, arc_w25_build_bounds/4, arc_w25_block_type/4, arc_w25_val_pattern/2.
+
+Acceptance criteria - wave 25:
+
+AC-W25-001: arc_transform(fill_cells_plus5, ...) matches all 5 pairs of task 54d9e175.
+
+AC-W25-002: arc_transform(pick_hollow_shape, ...) matches all 4 pairs of task b9b7f026.
+
+AC-W25-003: arc_transform(most_frequent_3x3, ...) matches all 4 pairs of task 39a8645d.
+
+AC-W25-004: arc_transform(fill_zigzag_4, ...) matches all 4 pairs of task 7447852a.
+
+AC-W25-005: arc_transform(value_to_pattern, ...) matches all 9 pairs of task d4469b4b.
+
+AC-W25-006: arc_transform(five_column_rank, ...) matches all 3 pairs of task a61f2674.
+
+AC-W25-007: arc_transform(classify_4x4_blocks, ...) matches all 5 pairs of task 995c5fa3.
+
+AC-W25-008: arc_transform(block_grid_freq, ...) matches all 5 pairs of task f8b3ba0a.
+
+AC-W25-009: Full 400-task benchmark completes within 600 seconds. Score 210/400 = 52.50% confirmed.
+
+Score improvement: 202/400 = 50.50% to 210/400 = 52.50% (+8 tasks).
+
+Status as of 2026-06-17: COMPLETE. Wave 25 merged on feature/arc-rules-wave-25. Score: 210/400 = 52.50%.
 
 
 END OF DOCUMENT - PROLOGAI REFINEMENT
