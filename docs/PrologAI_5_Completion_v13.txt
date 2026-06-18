@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v12)
+PROLOGAI COMPLETION  (v13)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -703,6 +703,40 @@ SECTION 20.1 - COMPLETION STATUS
 Status as of 2026-06-17: COMPLETE.
 Branch: feature/arc-rules-wave-18. PR targeting main.
 SPARC volumes updated: Completion v12, Refinement v9.
+
+
+PART COMP-21 - ARC-AGI-1 WAVE 19: FOUR NEW STRUCTURAL RULES, SCORE 165/400 = 41.25%
+
+Date: 2026-06-17.
+
+Previous score: 161 / 400 = 40.25% (Run 32, Attempt 18).
+
+New score: 165 / 400 = 41.25% (Run 33, Attempt 19).
+
+New tasks solved: +4.
+
+Changed file: src/mentova/games/arc_benchmark.pl.
+
+What was done: Wave 19 added four new named rules to the ARC-AGI-1 named-rule library. The rules were derived from analysis of unsolved tasks using ARC-AGI_Human_Steps.txt as a reference for human reasoning strategies. All four rules follow the wave-18 determinism principle (!, once(), parenthesized conditions, size guards).
+
+complete_4fold_symmetry: Detects grids with a partial 4-fold rotationally symmetric pattern around the bounding-box center and fills in missing reflected cells. The rule verifies even bounding-box dimensions, no conflicting colors among existing reflections, then generates and adds all missing reflections. Zero tasks solved in this run; retained for future specialization.
+
+concentric_swap_expand: Detects bordered rectangles (a 1-cell-wide ring of color B surrounding a solid interior of color I), swaps the colors, and extends the figure with cross arms whose depth equals the interior dimensions. Solved task 3befdf3e.
+
+stamp_key_at_8_clones: Identifies a key shape (all non-zero, non-8 cells), verifies each 4-connected component of 8-cells matches the key's normalized shape, then stamps the key at each clone position and erases the original 8 cells and key cells. Solved task 321b1fc6.
+
+fill_periodic_holes_2d: Detects 2-dimensional periodic tiling patterns with zero (hole) cells by trying all period pairs PR x PC for PR, PC in 2..10. Validates consistency (no conflicting values at the same period position) and coverage (all PR*PC period positions are occupied). Fills zero cells from the validated period lookup table. Solved tasks 0dfd9992 and 29ec7d0e.
+
+Helper predicates added: arc_cse_bordered_rect/8, arc_cse_paint_rect/11, arc_ska_ccs/2, arc_ska_bfs/4, arc_ph2d_valid/5, arc_ph2d_no_conflicts/1, arc_ph2d_build_map/6.
+
+Paper: papers/Climbing_ARC-AGI-1.txt updated with Attempt 19 entry and Run 33 score.
+
+
+SECTION 21.1 - COMPLETION STATUS
+
+Status as of 2026-06-17: COMPLETE.
+Branch: feature/arc-rules-wave-19. PR targeting main.
+SPARC volumes updated: Completion v13, Refinement v10.
 
 
 END OF DOCUMENT - PROLOGAI COMPLETION
