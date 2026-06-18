@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v13)
+PROLOGAI REFINEMENT  (v14)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -776,6 +776,57 @@ AC-W22-008: arc_transform(halve_exact_tile_2x, In, Out) fires and matches expect
 AC-W22-009: Full 400-task benchmark completes within 600 seconds. Score 186/400 = 46.50% confirmed.
 
 Status as of 2026-06-17: COMPLETE. Wave 22 merged on feature/arc-rules-wave-22. Score: 186/400 = 46.50%.
+
+
+PART REF-W23: ARC-AGI-1 WAVE 23 - EIGHT NEW INDUCTION RULES
+
+What changed: Wave 23 of the ARC-AGI-1 named-rule library adds eight new arc_transform clauses plus four helper predicates. All eight rules were verified in Python against their target tasks before Prolog implementation.
+
+Implementation location: /home/ccaitwo/Mentova/src/mentova/games/arc_benchmark.pl
+
+New rules added:
+
+mirror_bottom_to_top: verifies NR is even and all top-half rows are zero; output is reversed(bottom_half) followed by bottom_half.
+
+pick_densest_3x3_block: handles vertical (3N x 3) and horizontal (3 x 3N) block arrays; returns the unique 3x3 block with maximum non-zero cell count.
+
+fold_at_5_col_mirror: finds the unique all-5s divider column; builds output where each cell takes max(left_value, mirrored_right_value).
+
+unique_quadrant_at_zero_cross: finds the all-zero row and all-zero column; returns the unique quadrant among the four that differs from the other three.
+
+extract_2x2_rotation_seed: extracts the top-left 2x2 seed; generates four 90-degree rotations; verifies every 2x2 block belongs to that rotation set.
+
+overlay_sep2_three_sections: finds two all-2 separator columns dividing the grid into three equal sections; overlays them with left-priority (left wins if nonzero, else mid, else right).
+
+mark_weave_junctions_6: validates 3-row weave structure (middle row all 4s, outer rows complementary 4s/0s); changes value 4 to 6 at columns where (C-1) mod 3 = 0.
+
+expand_7line_fan_8: finds vertical 7-line at column CV, length L; builds fan: row R fills cols CV-D..CV+D at depth D = L - R, with value 7 at even distance, 8 at odd distance.
+
+New helper predicates: arc_w23_extract_rows_cols/4, arc_w23_rot90cw/2, arc_w23_weave_mark_row/2, arc_w23_weave_mark_/3.
+
+Score improvement: 186/400 = 46.50% to 194/400 = 48.50% (+8 tasks).
+
+Acceptance tests for wave 23:
+
+AC-W23-001: arc_transform(mirror_bottom_to_top, In, Out) fires and matches expected output on task f25ffba3 all pairs.
+
+AC-W23-002: arc_transform(pick_densest_3x3_block, In, Out) fires on task a87f7484 all pairs.
+
+AC-W23-003: arc_transform(fold_at_5_col_mirror, In, Out) fires on task e3497940 all pairs.
+
+AC-W23-004: arc_transform(unique_quadrant_at_zero_cross, In, Out) fires on task 88a62173 all pairs.
+
+AC-W23-005: arc_transform(extract_2x2_rotation_seed, In, Out) fires on task d10ecb37 all pairs.
+
+AC-W23-006: arc_transform(overlay_sep2_three_sections, In, Out) fires on task cf98881b all pairs.
+
+AC-W23-007: arc_transform(mark_weave_junctions_6, In, Out) fires on task ba26e723 all pairs.
+
+AC-W23-008: arc_transform(expand_7line_fan_8, In, Out) fires on task db3e9e38 all pairs.
+
+AC-W23-009: Full 400-task benchmark completes within 600 seconds. Score 194/400 = 48.50% confirmed.
+
+Status as of 2026-06-17: COMPLETE. Wave 23 merged on feature/arc-rules-wave-23. Score: 194/400 = 48.50%.
 
 
 END OF DOCUMENT - PROLOGAI REFINEMENT
