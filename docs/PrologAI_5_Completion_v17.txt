@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v16)
+PROLOGAI COMPLETION  (v17)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -840,6 +840,38 @@ SECTION 24.1 - COMPLETION STATUS
 Status as of 2026-06-17: COMPLETE.
 Branch: feature/arc-rules-wave-22. PR targeting main.
 SPARC volumes updated: Completion v16, Refinement v13.
+
+
+PART COMP-25: ARC-AGI-1 WAVE 23 - EIGHT NEW INDUCTION RULES - 194/400
+
+Overview: Wave 23 of the ARC-AGI-1 benchmark adds eight new named rules to the induction library, raising the score from 186/400 (46.50%) to 194/400 (48.50%).
+
+New rules:
+1. mirror_bottom_to_top - top half all-zero; output is reversed(bottom) then bottom
+2. pick_densest_3x3_block - vertical or horizontal block array; return unique densest 3x3 block
+3. fold_at_5_col_mirror - all-5s divider column; fold left/right halves with max per cell
+4. unique_quadrant_at_zero_cross - all-zero row and column divide grid into 4 quadrants; return the unique outlier
+5. extract_2x2_rotation_seed - tiled grid; verify all 2x2 blocks are rotations of the top-left seed; return seed
+6. overlay_sep2_three_sections - two all-2 separator columns; overlay three equal sections with left-priority
+7. mark_weave_junctions_6 - 3-row weave with complementary outer rows; mark 4s at columns 1,4,7... as 6
+8. expand_7line_fan_8 - vertical 7-line at column CV, length L; fan out with 7 at even distance, 8 at odd distance
+
+New helper predicates: arc_w23_extract_rows_cols/4, arc_w23_rot90cw/2, arc_w23_weave_mark_row/2, arc_w23_weave_mark_/3.
+
+Score: 186/400 = 46.50% to 194/400 = 48.50% (+8 tasks, Run 37, Attempt 23).
+
+New tasks solved: f25ffba3, a87f7484, e3497940, 88a62173, d10ecb37, cf98881b, ba26e723, db3e9e38.
+
+Paper updated: papers/Climbing_ARC-AGI-1.txt - added Attempt 23 section, Run 37 score line, and 8 new task entries in alphabetical order.
+
+SPARC volumes updated: Refinement v14, Completion v17.
+
+
+SECTION 25.1 - COMPLETION STATUS
+
+Status as of 2026-06-17: COMPLETE.
+Branch: feature/arc-rules-wave-23. PR targeting main.
+SPARC volumes updated: Completion v17, Refinement v14.
 
 
 END OF DOCUMENT - PROLOGAI COMPLETION
