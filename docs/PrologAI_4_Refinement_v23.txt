@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v22)
+PROLOGAI REFINEMENT  (v23)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -1250,6 +1250,50 @@ AC-W31-007: Full 400-task benchmark completes within 600 seconds. Score 256/400 
 Score improvement: 251/400 = 62.75% to 256/400 = 64.00% (+5 tasks).
 
 Status as of 2026-06-18: COMPLETE. Wave 31 merged on Mentova PR #41. Score: 256/400 = 64.00%.
+
+
+SECTION REF-W32 - WAVE 32 ARC-AGI-1 NAMED RULES (v23 addition)
+
+Wave 32 adds six new named rules to arc_benchmark.pl in the Mentova repository and four supporting helper predicates. All six rules were verified against full training data before insertion. Task 1b2d62fb was already solved by an existing rule (left_right_at_1col_sep_nor_to_8); the remaining five tasks are net new wins.
+
+New helpers:
+
+arc_w32_bfs_val/7 - BFS over 4-connected cells of a given value V; accumulates visited cells in Vis; terminates when the queue is empty. Used by arc_w32_val_comps.
+
+arc_w32_collect_comps/7 - iterates over all seed cells of value V; for each unseen seed, calls arc_w32_bfs_val to collect the full connected component; accumulates components in result list.
+
+arc_w32_val_comps/5 - wrapper that collects all cells of value V with findall, then calls arc_w32_collect_comps with an empty Seen list.
+
+arc_w32_rank_sizes/3 - converts a sorted-descending list of component sizes to size-rank pairs starting at rank 1; used by color_5_comps_by_size.
+
+New rules:
+
+assemble_3x3_from_5_anchors (task 137eaa0f): Finds all 5-valued anchor cells. Collects neighbor offsets DR-DC-V for non-zero, non-5 cells adjacent to any anchor. Assembles a 3x3 output with value 5 at center (2,2) and each offset filled from collected pieces.
+
+scale_5x5_by_color_count (task 469497ad): Counts unique non-zero colors K in a 5x5 input. Scales the grid K-fold to produce a K*5 x K*5 output. Cells from non-zero source tiles copy their value; scaled zero regions with diagonal offsets receive value 2 at four corner positions.
+
+extract_5frame_with_interior_8s (task 3f7978a0): Finds left and right columns containing 5-valued cells. Identifies the bounding rows of those cells. Expands one row above and below to find 8-corner cells. Extracts a frame where borders are 5 or 8 and interior 8s are preserved.
+
+unique_color_region (task 0b148d64): Finds the two colors in a binary-color grid. Computes connected components for each color. Selects the color with fewer components (the unique-component side). Crops the bounding box of that color's cells.
+
+mark_shared_zero_across_1_divider (task 1b2d62fb): Finds the column DC that contains only 1s (the divider). Verifies the left half-width equals the right half-width. For each row, checks whether the left-half cell and its mirror on the right are both 0; if so, marks the output cell 8; otherwise 0.
+
+color_5_comps_by_size (task 6e82a1ae): Finds all connected components of 5-valued cells. Ranks them by size descending (largest = rank 1). Assigns each component's rank as the new color value. Non-5 cells keep their original value.
+
+Acceptance criteria for wave 32:
+
+AC-W32-001: arc_transform(assemble_3x3_from_5_anchors, ...) matches all training pairs of task 137eaa0f.
+AC-W32-002: arc_transform(scale_5x5_by_color_count, ...) matches all training pairs of task 469497ad.
+AC-W32-003: arc_transform(extract_5frame_with_interior_8s, ...) matches all training pairs of task 3f7978a0.
+AC-W32-004: arc_transform(unique_color_region, ...) matches all training pairs of task 0b148d64.
+AC-W32-005: arc_transform(mark_shared_zero_across_1_divider, ...) matches all training pairs of task 1b2d62fb.
+AC-W32-006: arc_transform(color_5_comps_by_size, ...) matches all training pairs of task 6e82a1ae.
+AC-W32-007: All wave 32 arc_transform clauses end with ! and include NR =< 30, NC =< 30 size guards.
+AC-W32-008: Full 400-task benchmark completes within 600 seconds. Score 261/400 = 65.25% confirmed.
+
+Score improvement: 256/400 = 64.00% to 261/400 = 65.25% (+5 net tasks, Run 46, Wave 32).
+
+Status as of 2026-06-18: COMPLETE. Wave 32 merged on Mentova PR #42. Score: 261/400 = 65.25%.
 
 
 END OF DOCUMENT - PROLOGAI REFINEMENT
