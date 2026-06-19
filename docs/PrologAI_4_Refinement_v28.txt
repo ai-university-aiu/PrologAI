@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v25)
+PROLOGAI REFINEMENT  (v28)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -1420,6 +1420,65 @@ AC-W39-008: Full 400-task benchmark score 295/400 = 73.75% confirmed, Run 48.
 Score improvement: 289/400 = 72.25% to 295/400 = 73.75% (+6 net tasks, Wave 39, Run 48).
 
 Status as of 2026-06-19: COMPLETE. Wave 39 on Mentova feature/arc-wave39 branch. Score: 295/400 = 73.75%.
+
+
+Wave 40 (eight new rules, +8 net tasks, 295->303/400):
+
+Rules and tasks:
+bracket_arrows (task b7249182): two isolated colored dots on the same row or column each grow a bracket-arrow shape pointing toward the other dot; arm length = D//2-2, bar radius 2, cap one step beyond bar.
+fill_solid_rect_interior (task bb43febb): connected components of 5s whose bounding box is fully solid (all cells are 5) get their strict interior (excluding perimeter) filled with color 2; per-component BFS via cgbs_bfs.
+reflect_half_pattern (task c444b776): a cross of 4s (full-width row arm and/or full-height col arm) divides the grid into sections; markers in one section are tiled to all other sections; rhp_section_starts/4 and rhp_next_boundary/4 compute section boundaries.
+fill_hollow_rect_by_size (task c0f76784): hollow rectangular frames of 5s (perimeter=5, interior=0) get interior filled by size: 1x1 -> 6, 2x2 -> 7, 3x3 -> 8; perimeter iteration uses between/3 not =< comparison.
+l_path_connect (task d4a91cb9): two dots (color 2 and color 8) connected by an L-path of color 4; corner at (row_of_2, col_of_8); horizontal includes corner, vertical excludes both dot endpoints.
+fill_u_frame_stream (task d4f3cd78): U-shaped rectangular frame of 5s (perimeter with exactly one gap cell); interior filled with 8; gap cell and all cells outward to grid edge also filled with 8.
+column_seeds_deflect (task d9f24cd1): color-2 seeds at bottom row shoot vertical streams upward; a 5-cell blocks the stream at row R, filling col C from R+1 to NR-1; stream deflects right to col C+1, filling rows 1 to R.
+color_groups_by_size (task ea32f347): exactly three connected components of 5s (4-connected); sorted by size descending; largest -> color 1, middle -> color 4, smallest -> color 2; uses shared cgbs_components/cgbs_bfs helpers.
+
+Helpers added: rhp_section_starts/4, rhp_next_boundary/4 (section-boundary computation for cross tiling).
+Helpers reused: cgbs_components/2, cgbs_bfs/4 (from color_groups_by_size, also used by fill_solid_rect_interior).
+
+Acceptance criteria for wave 40:
+AC-W40-001: arc_transform(bracket_arrows, ...) matches all training pairs of task b7249182.
+AC-W40-002: arc_transform(fill_solid_rect_interior, ...) matches all training pairs of task bb43febb.
+AC-W40-003: arc_transform(reflect_half_pattern, ...) matches all training pairs of task c444b776.
+AC-W40-004: arc_transform(fill_hollow_rect_by_size, ...) matches all training pairs of task c0f76784.
+AC-W40-005: arc_transform(l_path_connect, ...) matches all training pairs of task d4a91cb9.
+AC-W40-006: arc_transform(fill_u_frame_stream, ...) matches all training pairs of task d4f3cd78.
+AC-W40-007: arc_transform(column_seeds_deflect, ...) matches all training pairs of task d9f24cd1.
+AC-W40-008: arc_transform(color_groups_by_size, ...) matches all training pairs of task ea32f347.
+AC-W40-009: All wave 40 arc_transform clauses end with ! and include NR =< 30, NC =< 30 size guards.
+AC-W40-010: Full 400-task benchmark score 303/400 = 75.75% confirmed, Run 49.
+
+Score improvement: 295/400 = 73.75% to 303/400 = 75.75% (+8 net tasks, Wave 40, Run 49).
+
+Status as of 2026-06-19: COMPLETE. Wave 40 on Mentova feature/arc-wave40 branch. Score: 303/400 = 75.75%.
+
+
+WAVE 41 RULE ADDITIONS (2026-06-19)
+
+Four new arc_transform rules added to arc_benchmark.pl in Mentova repo, feature/arc-wave41 branch.
+
+Rules added:
+
+l_path_2to3 (task a2fd1cf0): exactly two non-zero cells (one color 2, one color 3); draws an L-path of color 8 with corner at (row_of_2, col_of_3); horizontal arm in row of dot-2 (excluding dot-2 col), vertical arm in col of dot-3 (excluding both dot rows); variant of l_path_connect with different endpoint and path colors.
+
+eject_corner_markers (task 952a094c): a hollow rectangular frame of one color encloses exactly four non-zero cells at the four interior corners; the four corner markers are removed and placed at the four exterior corners of the frame in a 180-degree rotation: interior top-left -> exterior bottom-right, interior top-right -> exterior bottom-left, interior bottom-left -> exterior top-right, interior bottom-right -> exterior top-left.
+
+self_similar_tile (task 8f2ea7aa): all non-zero cells share one color and form a shape with a bounding box of size BS_R x BS_C; the grid is exactly BS_R x BS_C blocks wide and tall; each meta-block position (DR, DC) that matches a relative cell of the shape gets a copy of the shape; the shape tiles itself at the block positions defined by its own relative cell pattern.
+
+attract_to_center (task ae3edfdc): cells with a singleton color (appearing exactly once) act as attractors; for each attractor, the associated main color has all its cells in the same row or same column as the attractor; each main-color cell moves one step toward the attractor (to the orthogonal neighbor on the attractor's side); the original cell is cleared; the attractor itself is unchanged.
+
+Acceptance criteria for wave 41:
+AC-W41-001: arc_transform(l_path_2to3, ...) matches all training pairs of task a2fd1cf0.
+AC-W41-002: arc_transform(eject_corner_markers, ...) matches all training pairs of task 952a094c.
+AC-W41-003: arc_transform(self_similar_tile, ...) matches all training pairs of task 8f2ea7aa.
+AC-W41-004: arc_transform(attract_to_center, ...) matches all training pairs of task ae3edfdc.
+AC-W41-005: All wave 41 arc_transform clauses end with ! and include NR =< 30, NC =< 30 size guards.
+AC-W41-006: Full 400-task benchmark score 307/400 = 76.75% confirmed, Run 50.
+
+Score improvement: 303/400 = 75.75% to 307/400 = 76.75% (+4 net tasks, Wave 41, Run 50).
+
+Status as of 2026-06-19: COMPLETE. Wave 41 on Mentova feature/arc-wave41 branch. Score: 307/400 = 76.75%.
 
 
 END OF DOCUMENT - PROLOGAI REFINEMENT
