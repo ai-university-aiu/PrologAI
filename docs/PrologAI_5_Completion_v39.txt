@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v38)
+PROLOGAI COMPLETION  (v39)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -1428,5 +1428,26 @@ Score: 336/400 = 84.00% to 338/400 = 84.50% (+2 tasks, Wave 50).
 Status as of 2026-06-19: COMPLETE.
 Branch: feature/arc-wave50, merged via PR. Score: 338/400 = 84.50%.
 SPARC volumes updated: Completion v38, Refinement v35.
+
+Wave: 51. Date: 2026-06-19. Tasks solved: +2. Score: 340/400 = 85.00%.
+
+Rule 1: staircase_from_8.
+Solves task d06dbe63. Identifies the seed value 8 and grows a staircase pattern from it:
+row i (0-indexed from the seed row) gets all cells from column 0 to column i set to 8.
+
+Rule 2: mark_2x2_zero_blocks.
+Solves task a8d7556c. For each 4-connected zero component, finds the maximum area of any
+all-zero rectangle and marks those cells with 2. Uses BFS-based connected-component
+partitioning and row-pair rectangle enumeration.
+New helpers: w51b_all_comps, w51b_bfs, w51b_max_rect, w51b_runs, w51b_run_end.
+
+Rule 3 (near miss): fill_rect_frame_interior (task e73095fd).
+Passes all training pairs but fails the test case; retained for future refinement.
+
+Score: 338/400 = 84.50% to 340/400 = 85.00% (+2 tasks, Wave 51).
+
+Status as of 2026-06-19: COMPLETE.
+Branch: feature/arc-wave51, merged via PR. Score: 340/400 = 85.00%.
+SPARC volumes updated: Completion v39, Refinement v36.
 
 END OF DOCUMENT - PROLOGAI COMPLETION
