@@ -1742,11 +1742,11 @@ Mentova can play games and puzzles as a body.
 
 This runs one perceive-reason-act cycle on the enrolled ARC-AGI game body.
 
-As of wave 55 (2026-06-20), the ARC-AGI-1 named-rule library contains 351 solved tasks out of 400.
+As of wave 56 (2026-06-20), the ARC-AGI-1 named-rule library contains 352 solved tasks out of 400.
 
-Current score: 351/400 = 87.75%.
+Current score: 352/400 = 88.00%.
 
-Wave 55 added two new rules: repair_4fold_noise (identifies a sparse noise color whose removal leaves a 4-fold symmetric grid; replaces each noise cell with its first non-noise mirror partner) and downscale_3x3_block_grid (two non-zero colors where the shape color forms an organized 3x3 block grid; density-based detection identifies shape vs noise; output is 3x3 marking which blocks are majority-filled).
+Wave 56 added one new rule: fill_rect_frame_interiors (task e73095fd). Input grids contain 0s and 5s; the 5-cells form rectangular frames - either full four-sided frames or boundary-hugging frames (one open side reaches the grid edge). Interior 0-cells of each frame are replaced with 4. An exact-width guard prevents false-positive boundary frames. The old wave 51 rule fill_rect_frame_interior (same task, buggy boundary detection) was removed and replaced by this corrected rule.
 
 All rules use pure induction from training examples, with no pretraining. Each solved task has a named glass-box rule.
 
