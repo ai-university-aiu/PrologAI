@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v42)
+PROLOGAI REFINEMENT  (v43)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -2000,5 +2000,74 @@ AC-PR51-009 reconciliation integrates owned and disowned material.
 AC-PR51-010 an ungrounded otherward agent is rejected.
 
 Safety note: imaginative content is sandboxed away from observed fact by construction (the observed reality is refused), satisfying the simulation-pattern requirement that hypothetical content never leak into observed reality. Both packs leave the constitutional layer and protected core untouched.
+
+WAVE 57 RULES
+
+Wave 57 adds three new named transformation rules to arc_benchmark.pl.
+
+Rule A: fill_zero_near_one (task 9edfc990).
+
+Input: a noisy grid with non-zero values scattered throughout and some zero cells mixed in.
+
+The grid also contains value-1 cells scattered at various positions.
+
+The zero cells are 4-connected into multiple disconnected components.
+
+Each zero component is classified by whether any cell in that component has a 4-adjacent neighbor whose value is 1.
+
+If a zero component has at least one value-1 neighbor it is filled with 1 in the output.
+
+If a zero component has no value-1 neighbor it stays 0 in the output.
+
+Non-zero cells are unchanged.
+
+Rule B: gravity_to_matching_wall (task d687bc17).
+
+Input: a rectangular room with four distinct wall colors: top row (one color), bottom row (another color), left column (third color), right column (fourth color).
+
+Corner cells are 0.
+
+Interior cells (rows 2 to NR-1, cols 2 to NC-1) may contain scattered non-zero values.
+
+Each interior non-zero value is compared to the four wall colors.
+
+If the value matches the left wall color it moves to col 2 of the same row (adjacent to left wall).
+
+If it matches the right wall color it moves to col NC-1 of the same row.
+
+If it matches the top wall color it moves to row 2 of the same column.
+
+If it matches the bottom wall color it moves to row NR-1 of the same column.
+
+If it does not match any wall color it is erased (becomes 0).
+
+The wall cells themselves are unchanged.
+
+Rule C: key_masked_by_block_pattern (task 6ecd11f4).
+
+Input: a large grid with two sub-regions.
+
+The first sub-region is a regular NxM meta-grid of uniform blocks: each block is either filled entirely with a single repeated color (the block color) or is entirely 0.
+
+The block color is the most frequent non-zero value in the grid.
+
+The second sub-region is a small NxM grid of varied colored values (the key).
+
+The key and block regions are in separate areas of the grid, separated by zeros.
+
+The output is an NxM grid: for each meta-position (i,j), the output cell is key(i,j) if block(i,j) is filled, else 0.
+
+Acceptance criteria for wave 57:
+AC-W57-001: arc_transform(fill_zero_near_one, ...) matches all three training pairs of 9edfc990.
+AC-W57-002: The test case for 9edfc990 produces the correct output.
+AC-W57-003: arc_transform(gravity_to_matching_wall, ...) matches all three training pairs of d687bc17.
+AC-W57-004: The test case for d687bc17 produces the correct output.
+AC-W57-005: arc_transform(key_masked_by_block_pattern, ...) matches all three training pairs of 6ecd11f4.
+AC-W57-006: The test case for 6ecd11f4 produces the correct output.
+AC-W57-007: Full 400-task benchmark score 355/400 = 88.75% confirmed (3 new tasks, Wave 57).
+
+Score improvement: 352/400 = 88.00% to 355/400 = 88.75% (+3 tasks, Wave 57).
+
+Status as of 2026-06-20: COMPLETE. Wave 57 on Mentova feature/wave-57 branch, merged via PR.
 
 END OF DOCUMENT - PROLOGAI REFINEMENT
