@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v35)
+PROLOGAI REFINEMENT  (v36)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -1791,5 +1791,37 @@ AC-W50-004: Full 400-task benchmark score 338/400 = 84.50% confirmed.
 Score improvement: 336/400 = 84.00% to 338/400 = 84.50% (+2 tasks, Wave 50).
 
 Status as of 2026-06-19: COMPLETE. Wave 50 on Mentova feature/arc-wave50 branch, merged via PR.
+
+WAVE 51 - ARC-AGI-1 benchmark advancement
+
+Rule 1: staircase_from_8.
+Solves task d06dbe63. Identifies the seed value 8 in the input and grows a staircase pattern:
+each row i (0-indexed) from the seed row gets all cells from column 0 to column i set to 8.
+Passes all training pairs and test case.
+
+Rule 2: mark_2x2_zero_blocks.
+Solves task a8d7556c. Grid has only 0s and 5s; 5-cells are fixed. For each 4-connected zero
+component, find the maximum area of any all-zero rectangle (height >= 2, width >= 2) within
+the component using row-pair enumeration and run-finding. Mark all cells that belong to any
+rectangle achieving the maximum area with value 2. Uses connected-component BFS (w51b_bfs)
+and maximal-rectangle search (w51b_max_rect, w51b_runs).
+Passes all training pairs and test case.
+
+Rule 3: fill_rect_frame_interior (task e73095fd).
+Grid has only 0s and 5s. Fills 0-cells enclosed by a rectangular frame of 5-cells with 4.
+Grid boundary counts as a wall on the left or right side (not top or bottom). Passes all three
+training pairs but fails the test case due to a spurious boundary-adjacent enclosure in the
+test grid; does not contribute a point. Kept in code for future refinement.
+New helpers: w51c_enclosed, w51c_row_all5, w51c_col_all5, w51c_interior_all0.
+
+Acceptance criteria for wave 51:
+AC-W51-001: arc_transform(staircase_from_8, ...) matches all training pairs of task d06dbe63.
+AC-W51-002: arc_transform(mark_2x2_zero_blocks, ...) matches all training pairs of task a8d7556c.
+AC-W51-003: All wave 51 arc_transform clauses end with ! and include NR =< 30, NC =< 30 size guards.
+AC-W51-004: Full 400-task benchmark score 340/400 = 85.00% confirmed.
+
+Score improvement: 338/400 = 84.50% to 340/400 = 85.00% (+2 tasks, Wave 51).
+
+Status as of 2026-06-19: COMPLETE. Wave 51 on Mentova feature/arc-wave51 branch, merged via PR.
 
 END OF DOCUMENT - PROLOGAI REFINEMENT
