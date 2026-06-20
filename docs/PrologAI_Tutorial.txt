@@ -2375,6 +2375,33 @@ PR 46: ros_bridge - robot body (ROS 2).
 PR 47: acp - Agent Communication Protocol.
 PR 48: anp - Agent Network Protocol (decentralized identity).
 PR 49: lattice_crypto - Cryptographic Privacy Layer (RSA, ECDH, and PQC hybrid encryption for sensitive Lattice data).
+PR 50: imagination - Imaginative memory: mindscapes, tableaux, and rendered reveries.
+PR 51: awareness - Situational awareness: the ladder of regards, theory of mind, and self-reconciliation.
+
+
+IMAGINATIVE MEMORY (PR 50)
+
+Imaginative memory is the mind's inner stage. A mindscape is a compartmentalized canvas held in a non-observed reality, so nothing imagined can ever be mistaken for something perceived. On a mindscape you place a tableau: an arrangement of elements, each a vantage (a camera angle), a figure (an object, possibly grounded to a percept), or a motif (an animation resource). Rendering a mindscape produces a reverie: a deterministic, frame-by-frame animation in which each figure moves by its own velocity, letting the mind rehearse how a scene would unfold before acting.
+
+    ?- use_module(library(imagination)).
+    ?- pai_mindscape_new(imagined, M).
+    ?- pai_tableau_add(M, [element(vantage, eye_level, []),
+                           element(figure, ball, [pos(0,0), vel(2,1)])], T).
+    ?- pai_reverie_render(M, 3, R), pai_reverie_frames(R, Frames).
+
+The ball starts at (0,0) and is found at (4,2) by the third frame. Asking for a mindscape in the observed reality simply fails: imagination is sandboxed away from perceived fact.
+
+
+SITUATIONAL AWARENESS (PR 51)
+
+Awareness is engineered as a ladder of regards (viewpoints): ambient_regard (general awareness, the default), selfward_regard (self-interest), otherward_regard(Agent) (the view of another mind, for theory of mind), avowed_regard (what the mind owns), and disavowed_regard (what the mind disowns). A proposition is held under a regard, so the mind can believe something from one standpoint and deny it from another.
+
+    ?- use_module(library(awareness)).
+    ?- pai_regard_hold(selfward_regard, location(ball, box)).
+    ?- pai_tom_attribute(alice, not(location(ball, box))).
+    ?- pai_tom_divergence(alice, Divs).
+
+The divergence list reports that alice holds a false belief relative to the mind's own view - the computational core of theory of mind. pai_regard_reconcile/1 then integrates the owned and disowned regards into a single coherent self-account.
 
 
 WHAT COMES NEXT
