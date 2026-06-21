@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v51)
+PROLOGAI REFINEMENT  (v52)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -2329,5 +2329,28 @@ AC-W65-005: Full 400-task benchmark score confirmed after wave 65 (target: 2 net
 Score improvement: 368/400 = 92.00% to target 370/400 = 92.50% (+2 tasks, Wave 65).
 
 Status as of 2026-06-21: COMPLETE. Wave 65 on Mentova feature/wave-65-arc-rules branch.
+
+WAVE 66: FRAME BORDER MARKERS PROJECT BEAMS (f1cefba8)
+
+Rule: frame_border_marker_beams (task f1cefba8).
+The input contains a two-color rectangular frame with thick borders. FrameC forms the
+border region (at least 2 rows and 2 columns thick); FillC fills the interior. FillC-colored
+marker cells placed within the border rows or border columns project beams perpendicular to
+their border side. Border rows are identified as rows whose FillC cell count is less than
+half the frame width; border columns are identified as columns whose FillC count is less
+than half the frame height. Markers on border rows produce vertical beams spanning the full
+column; markers on border columns produce horizontal beams spanning the full row. Inside
+the frame bounding region, beam cells are colored FrameC; outside, beam cells are colored
+FillC. Non-beam cells inside the frame are preserved from the input. Non-beam cells outside
+the frame are set to zero.
+
+Acceptance criteria for wave 66:
+AC-W66-001: arc_transform(f1cefba8, ...) matches all three training pairs of f1cefba8.
+AC-W66-002: The test case for f1cefba8 produces the correct output.
+AC-W66-003: Full 400-task benchmark score confirmed after wave 66 (target: 1 net new task).
+
+Score improvement: 370/400 = 92.50% to target 371/400 = 92.75% (+1 task, Wave 66).
+
+Status as of 2026-06-21: COMPLETE. Wave 66 on Mentova feature/wave-66-f1cefba8 branch.
 
 END OF DOCUMENT - PROLOGAI REFINEMENT
