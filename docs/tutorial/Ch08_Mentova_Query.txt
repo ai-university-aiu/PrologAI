@@ -249,13 +249,13 @@ Mentova can play games and puzzles as a body.
 
 This runs one perceive-reason-act cycle on the enrolled ARC-AGI game body.
 
-As of wave 61 (2026-06-20), the ARC-AGI-1 named-rule library contains 363 solved tasks out of 400.
+As of wave 62 (2026-06-20), the ARC-AGI-1 named-rule library contains 365 solved tasks out of 400.
 
-Current score: 363/400 = 90.75%.
-
-Wave 60 added two new rules: extreme_region_fill (task 6455b5f5) finds all 4-connected components of 0-cells in a grid bounded by value-2 walls, then fills the largest component with 1 and the smallest with 8; diagonal_cavity_stamp (task e8dc4411) finds the cavity of 0-cells and a single non-background marker M, computes a diagonal step from centroid to M, and stamps copies of the cavity (in color M) at successive multiples of the non-overlapping step until all stamps leave the grid.
+Current score: 365/400 = 91.25%.
 
 Wave 61 added two new rules: concentric_square_rings (task 5c2c9af4) identifies dots that lie on a diagonal with equal spacing s and colors every cell whose Chebyshev distance from the center dot is divisible by s; corner_ripple_even_chebyshev (task d22278a0) assigns each cell the color of its nearest corner seed (Chebyshev primary, Manhattan tie-break) when that distance is even, else 0.
+
+Wave 62 added two new rules: graybox_hole_fill_by_unique_shape (task 228f6490) fills each interior hole in a gray rectangle with the unique-color blob whose normalized shape matches the hole, then erases the blob; corner_nested_frame (task 9d9215db) takes a sparse corner seed of corner and arm cells and expands it into a 4-fold symmetric nested rectangular frame by reflecting all cells and filling arm rows and columns at step 2.
 
 All rules use pure induction from training examples, with no pretraining. Each solved task has a named glass-box rule.
 
