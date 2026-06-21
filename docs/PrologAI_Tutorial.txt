@@ -1742,13 +1742,13 @@ Mentova can play games and puzzles as a body.
 
 This runs one perceive-reason-act cycle on the enrolled ARC-AGI game body.
 
-As of wave 63 (2026-06-20), the ARC-AGI-1 named-rule library contains 366 solved tasks out of 400.
+As of wave 64 (2026-06-20), the ARC-AGI-1 named-rule library contains 368 solved tasks out of 400.
 
-Current score: 366/400 = 91.50%.
-
-Wave 62 added two new rules: graybox_hole_fill_by_unique_shape (task 228f6490) fills each interior hole in a gray rectangle with the unique-color blob whose normalized shape matches the hole, then erases the blob; corner_nested_frame (task 9d9215db) takes a sparse corner seed of corner and arm cells and expands it into a 4-fold symmetric nested rectangular frame by reflecting all cells and filling arm rows and columns at step 2.
+Current score: 368/400 = 92.00%.
 
 Wave 63 added one net new rule: five_shape_fat_thin (task 150deff5) partitions a 5-colored shape into fat parts (2x2 all-5 blocks selected to maximize coverage while keeping every remaining thin cell connected to another thin cell) and thin parts; selected block cells become 8 and remaining 5-cells become 2.
+
+Wave 64 added two new rules: frame_stamp_at_zero_interior (task 890034e9) finds the unique color-V rectangular frame in a grid (border all V, interior all zero) and stamps a V-bordered frame around every other IH x IW all-zero region that fits within the grid; template_stamp_at_4_cluster (task 7df24a62) finds the largest 1-bordered template frame whose interior contains K 4-cells, then stamps 1-bordered frames around every scattered cluster of exactly K 4-cells whose bounding box matches the template interior (or its transpose), filling interior zero-cells with 1.
 
 All rules use pure induction from training examples, with no pretraining. Each solved task has a named glass-box rule.
 
