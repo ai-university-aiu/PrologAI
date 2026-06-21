@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v47)
+PROLOGAI COMPLETION  (v48)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -1597,5 +1597,28 @@ Score: 355/400 = 88.75% to 357/400 = 89.25% (+2 tasks, Wave 58).
 Status as of 2026-06-20: COMPLETE.
 Branch: feature/wave-58, merged via PR. Score: 357/400 = 89.25%.
 SPARC volumes updated: Completion v47, Refinement v44.
+
+
+Wave 59 release note.
+
+Two new named rules added to arc_benchmark.pl in wave 59:
+
+Rule 1: fill_frame_interior_radiate (task aba27056).
+Input has exactly one non-zero color forming a rectangular frame with one open side (a
+contiguous gap in one border wall). Output: interior cells and the opening cells become 4.
+4s radiate outward in a starburst: at each step D the opening projection is repeated and
+two boundary tracks expand by D cells per step to each perpendicular side.
+
+Rule 2: complete_rotational_symmetry (task e40b9e2f).
+Input has exactly two non-zero colors forming a shape incomplete under 4-fold (90-degree)
+rotational symmetry. Centre is found from the farthest-apart identical-row pair; the pivot
+row (or symmetric rows for half-integer centre) gives the centre column. Each non-zero
+cell's three 90-degree CW rotational images are added at the same color value.
+
+Score: 357/400 = 89.25% to 359/400 = 89.75% (+2 tasks, Wave 59).
+
+Status as of 2026-06-20: COMPLETE.
+Branch: feature/wave-59, merged via PR. Score: 359/400 = 89.75%.
+SPARC volumes updated: Completion v48, Refinement v45.
 
 END OF DOCUMENT - PROLOGAI COMPLETION
