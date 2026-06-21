@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v44)
+PROLOGAI REFINEMENT  (v45)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -2097,5 +2097,33 @@ AC-W58-005: Full 400-task benchmark score 357/400 = 89.25% confirmed (2 new task
 Score improvement: 355/400 = 88.75% to 357/400 = 89.25% (+2 tasks, Wave 58).
 
 Status as of 2026-06-20: COMPLETE. Wave 58 on Mentova feature/wave-58 branch, merged via PR.
+
+
+Part 36 Section 36.9: Wave 59 ARC-AGI-1 Rules
+
+Wave 59 added two new named rules to arc_benchmark.pl:
+
+Rule A: fill_frame_interior_radiate (task aba27056).
+
+Input: a grid with exactly one non-zero color forming a rectangular frame shape that has one open side (a contiguous run of 0-cells on one border wall of the bounding box).
+
+Output: the frame color is preserved. All 0-cells strictly inside the bounding box are filled with 4. The open-side cells (the gap in the border wall) are also filled with 4. Then 4s radiate outward from the opening in a starburst pattern: at each step D away from the opening wall, the full opening-column (or opening-row) projection is repeated, and two expanding boundary tracks add one cell per step to each perpendicular side.
+
+Rule B: complete_rotational_symmetry (task e40b9e2f).
+
+Input: a grid with exactly two non-zero colors whose shape is incomplete under 4-fold (90-degree) rotational symmetry. The rotational centre is found by locating the pair of rows with identical non-zero patterns that are farthest apart; those rows give the centre row, and the pivot row between them (or the symmetric rows themselves for half-integer centres) gives the centre column via min/max non-zero column midpoint.
+
+Output: the input is preserved. Each non-zero cell's three 90-degree CW rotational images around the computed centre are added with the same color value, filling any 0-cells at those positions.
+
+Acceptance criteria for wave 59:
+AC-W59-001: arc_transform(fill_frame_interior_radiate, ...) matches all training pairs of aba27056.
+AC-W59-002: The test case for aba27056 produces the correct output.
+AC-W59-003: arc_transform(complete_rotational_symmetry, ...) matches all training pairs of e40b9e2f.
+AC-W59-004: The test case for e40b9e2f produces the correct output.
+AC-W59-005: Full 400-task benchmark score 359/400 = 89.75% confirmed (2 new tasks, Wave 59).
+
+Score improvement: 357/400 = 89.25% to 359/400 = 89.75% (+2 tasks, Wave 59).
+
+Status as of 2026-06-20: COMPLETE. Wave 59 on Mentova feature/wave-59 branch, merged via PR.
 
 END OF DOCUMENT - PROLOGAI REFINEMENT
