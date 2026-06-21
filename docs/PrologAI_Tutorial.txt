@@ -1742,13 +1742,13 @@ Mentova can play games and puzzles as a body.
 
 This runs one perceive-reason-act cycle on the enrolled ARC-AGI game body.
 
-As of wave 65 (2026-06-21), the ARC-AGI-1 named-rule library contains 370 solved tasks out of 400.
+As of wave 66 (2026-06-21), the ARC-AGI-1 named-rule library contains 371 solved tasks out of 400.
 
-Current score: 370/400 = 92.50%.
-
-Wave 64 added two new rules: frame_stamp_at_zero_interior (task 890034e9) finds the unique color-V rectangular frame in a grid (border all V, interior all zero) and stamps a V-bordered frame around every other IH x IW all-zero region that fits within the grid; template_stamp_at_4_cluster (task 7df24a62) finds the largest 1-bordered template frame whose interior contains K 4-cells, then stamps 1-bordered frames around every scattered cluster of exactly K 4-cells whose bounding box matches the template interior (or its transpose), filling interior zero-cells with 1.
+Current score: 371/400 = 92.75%.
 
 Wave 65 added two net new rules: w65a_marker_lz_path (task 2dd70a9a) connects a 2-cell marker pair to a 3-cell marker pair via an L- or Z-shaped path of 3-cells, using the topmost clear row (vertical markers) or rightmost clear column (horizontal markers) as the bridge, with scattered 8-cells acting as obstacles; frame_edge_color_8s was enhanced with a center-adjacent rule for odd x odd templates (task 9aec4887), coloring the four interior cells adjacent to the template center with the nearest frame-edge color instead of leaving them as 8.
+
+Wave 66 added one new rule: frame_border_marker_beams (task f1cefba8) handles a two-color rectangular frame with thick borders. FillC-colored marker cells on border rows or border columns project perpendicular beams that span the full column (from top-border markers) or full row (from side-border markers); inside the frame region beams are colored FrameC, outside they are colored FillC, and all non-beam exterior cells are zero.
 
 All rules use pure induction from training examples, with no pretraining. Each solved task has a named glass-box rule.
 
