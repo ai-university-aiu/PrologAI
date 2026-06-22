@@ -249,9 +249,9 @@ Mentova can play games and puzzles as a body.
 
 This runs one perceive-reason-act cycle on the enrolled ARC-AGI game body.
 
-As of wave 69 (2026-06-22), the ARC-AGI-1 named-rule library contains 385 solved tasks out of 400.
+As of wave 70 (2026-06-22), the ARC-AGI-1 named-rule library contains 388 solved tasks out of 400.
 
-Current score: 385/400 = 96.25%.
+Current score: 388/400 = 97.00%.
 
 Wave 66 added one new rule: frame_border_marker_beams (task f1cefba8) handles a two-color rectangular frame with thick borders. FillC-colored marker cells on border rows or border columns project perpendicular beams that span the full column (from top-border markers) or full row (from side-border markers); inside the frame region beams are colored FrameC, outside they are colored FillC, and all non-beam exterior cells are zero.
 
@@ -260,6 +260,8 @@ Wave 67 added four new rules: cross_arm_gap_fill (task 50846271) fills the singl
 Wave 68 added eight new rules spanning grid geometry, object coloring, and pattern reconstruction for tasks a61ba0f2, b27ca6d5, b60334d6, bc4146bd, c074846d, ce039d91, d2acab26, and dc0a314f.
 
 Wave 69 added two rules: place_templates_at_markers received a bug fix correcting per-offset validation for task e6721834; bicolor_diagonal_rays (task d07ae81c) identifies two background colors by frequency and repaints background cells on diagonal rays from seed cells.
+
+Wave 70 added three rules: crop_mirror_horizontal (task 7468f01a) crops the non-zero bounding box and reverses each row; frame_content_align (task 846bdb03) places a content patch inside a color-4-cornered frame, flipping horizontally when the interior is narrower than the content; stamp_tile_indicators (task 045e512c) identifies a stamp (the most-frequent-color compact region) and indicator cells, then tiles the stamp outward in each indicator's direction (scaled by stamp period) replacing stamp cells with the indicator color.
 
 All rules use pure induction from training examples, with no pretraining. Each solved task has a named glass-box rule.
 
