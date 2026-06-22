@@ -249,13 +249,17 @@ Mentova can play games and puzzles as a body.
 
 This runs one perceive-reason-act cycle on the enrolled ARC-AGI game body.
 
-As of wave 67 (2026-06-21), the ARC-AGI-1 named-rule library contains 375 solved tasks out of 400.
+As of wave 69 (2026-06-22), the ARC-AGI-1 named-rule library contains 385 solved tasks out of 400.
 
-Current score: 375/400 = 93.75%.
+Current score: 385/400 = 96.25%.
 
 Wave 66 added one new rule: frame_border_marker_beams (task f1cefba8) handles a two-color rectangular frame with thick borders. FillC-colored marker cells on border rows or border columns project perpendicular beams that span the full column (from top-border markers) or full row (from side-border markers); inside the frame region beams are colored FrameC, outside they are colored FillC, and all non-beam exterior cells are zero.
 
 Wave 67 added four new rules: cross_arm_gap_fill (task 50846271) fills the single missing intersection cell of two perpendicular same-color bars to complete a plus or cross shape; complete_partial_templates (task 72322fa7) replicates a partial color template across a regular grid of 4-cell anchors using the anchor spacing as the tile period; fill_largest_zero_region_3 (task a64e4611) uses 4-connected flood fill to find the largest contiguous zero region and fills it with color value 3; arm_template_transfer (task 36d67576) identifies a template connected component (4-cells annotated with 1/2/3 marks, found by multi-value DFS flood fill) and transfers the 1 and 3 marks to each target component (4-cells with only a 2-mark) via the unique rigid transform (one of 8 isometries) that maps the template 4-shape and 2-marker offset to the target 4-shape and 2-marker offset.
+
+Wave 68 added eight new rules spanning grid geometry, object coloring, and pattern reconstruction for tasks a61ba0f2, b27ca6d5, b60334d6, bc4146bd, c074846d, ce039d91, d2acab26, and dc0a314f.
+
+Wave 69 added two rules: place_templates_at_markers received a bug fix correcting per-offset validation for task e6721834; bicolor_diagonal_rays (task d07ae81c) identifies two background colors by frequency and repaints background cells on diagonal rays from seed cells.
 
 All rules use pure induction from training examples, with no pretraining. Each solved task has a named glass-box rule.
 
