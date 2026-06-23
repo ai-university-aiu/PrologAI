@@ -1742,9 +1742,9 @@ Mentova can play games and puzzles as a body.
 
 This runs one perceive-reason-act cycle on the enrolled ARC-AGI game body.
 
-As of wave 71 (2026-06-22), the ARC-AGI-1 named-rule library contains 390 solved tasks out of 400.
+As of wave 72 (2026-06-23), the ARC-AGI-1 named-rule library contains 393 solved tasks out of 400.
 
-Current score: 390/400 = 97.50%.
+Current score: 393/400 = 98.25%.
 
 Wave 66 added one new rule: frame_border_marker_beams (task f1cefba8) handles a two-color rectangular frame with thick borders. FillC-colored marker cells on border rows or border columns project perpendicular beams that span the full column (from top-border markers) or full row (from side-border markers); inside the frame region beams are colored FrameC, outside they are colored FillC, and all non-beam exterior cells are zero.
 
@@ -1757,6 +1757,8 @@ Wave 69 added two rules: place_templates_at_markers received a bug fix that corr
 Wave 70 added three rules: crop_mirror_horizontal (task 7468f01a) crops the non-zero bounding box and reverses each row; frame_content_align (task 846bdb03) places a content patch inside a color-4-cornered frame, flipping horizontally when the interior is narrower than the content; stamp_tile_indicators (task 045e512c) identifies a stamp (the most-frequent-color compact region) and indicator cells, then tiles the stamp outward in each indicator's direction (scaled by stamp period) replacing stamp cells with the indicator color.
 
 Wave 71 added two rules: ornament_cross_in_rect (task 264363fd) finds a cross-shaped ornament inside a colored rectangle, extracts its arm colors and mark offsets, and stamps the cross pattern at each accent cell inside the rectangle; template_stamp_at_markers (task 6aa20dc0) identifies a template shape with two terminal colors and scales it to each A-marker using the 8 rigid isometries to align the B-terminal.
+
+Wave 72 added three rules: color_swap_pairs (task 0d3d703e) applies a symmetric 10-way color-swap table (1<->5, 2<->6, 3<->4, 8<->9) cell-by-cell to uniform-row 3x3 grids; marker_ring_complement (task 913fb3ed) places a 3x3 ring of complement color around each isolated non-zero marker cell (2->ring of 1, 3->ring of 6, 8->ring of 4) leaving the center cell unchanged; rotate_cluster_to_isolated (task 0e206a2e) identifies template clusters by their dominant frame color and labeled non-frame cells, then finds the rigid isometry (one of 8, via tsam_iso/4) that maps the non-frame offsets onto the matching isolated single-cell markers, and places the rotated cluster at the new centroid on an otherwise blank output grid.
 
 All rules use pure induction from training examples, with no pretraining. Each solved task has a named glass-box rule.
 
