@@ -19,7 +19,7 @@
 
 ## What is PrologAI?
 
-PrologAI is a complete cognitive architecture written in SWI-Prolog.
+PrologAI is a complete cognitive substrate written in SWI-Prolog (Sociaal-Wetenschappelijke Informatica Prolog — created at the University of Amsterdam by Jan Wielemaker in 1987; SWI is the Dutch name for the Social Scientific Informatics research group where it originated).
 
 It is not a library layered on top of an existing AI framework — it **is** the framework. A new kind of platform where you build a reasoning mind the way you build a compiler: explicitly, structurally, and verifiably.
 
