@@ -49,14 +49,14 @@ Every answer comes with a **justification tree** you can read.
 
 ```
 PrologAI/
-├── packs/       47 work packages — the complete cognitive engine (see below)
+├── packs/       48 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
 └── launcher/    Entry points and bootstrapper
 ```
 
-### The 47 Work Packages
+### The 48 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -137,6 +137,7 @@ Everything is inspectable.
 | `spinoff` | Marginal Attribution Spinoff Learning — Drescher-style discovery of rare-but-reliable action effects. PrologAI finds causal patterns hidden in low-frequency events. |
 | `embedding` | Pluggable Embedding Provider — hash_projection, local_model, and external_service backends with automatic re-embedding maintenance. |
 | `refinement` | The Continual Refinement Harness — reset-free recursive self-improvement (RSI) with a constitutional sandbox pipeline. Self-improvement without losing alignment. |
+| `dreaming` | The Dreaming Engine — three-phase idle-period dream cycle: Slow-Wave (NREM-analog) generative replay and memory consolidation; REM-analog stochastic world-model exploration generating hypothetical node pairings tagged imagined; and a fully inspectable dream journal. Inspired by Sleep Replay Consolidation, DreamerV3, and NeuroDream. |
 
 **Multi-Agent Protocols**
 

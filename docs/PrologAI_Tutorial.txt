@@ -2395,6 +2395,7 @@ PR 48: anp - Agent Network Protocol (decentralized identity).
 PR 49: lattice_crypto - Cryptographic Privacy Layer (RSA, ECDH, and PQC hybrid encryption for sensitive Lattice data).
 PR 50: imagination - Imaginative memory: mindscapes, tableaux, and rendered reveries.
 PR 51: awareness - Situational awareness: the ladder of regards, theory of mind, and self-reconciliation.
+PR 52: dreaming - The Dreaming Engine: generative replay, memory consolidation, and stochastic world-model exploration.
 
 
 IMAGINATIVE MEMORY (PR 50)
@@ -2420,6 +2421,52 @@ Awareness is engineered as a ladder of regards (viewpoints): ambient_regard (gen
     ?- pai_tom_divergence(alice, Divs).
 
 The divergence list reports that alice holds a false belief relative to the mind's own view - the computational core of theory of mind. pai_regard_reconcile/1 then integrates the owned and disowned regards into a single coherent self-account.
+
+
+DREAMING ENGINE (PR 52)
+
+Humans have dreamed for as long as there have been humans. Now dreaming is becoming an activity for machines.
+
+The dreaming pack gives PrologAI an idle-period dream cycle with three phases, each modeled on a stage of biological sleep.
+
+Phase 1 - Slow-Wave (the Non-Rapid Eye Movement, or NREM, sleep analog). During this phase, the mind replays its most important SONA (Synaptic Ontological Neural Aggregator) trajectories with a small stochastic perturbation - a replay_noise tag. This is the symbolic equivalent of generative replay, a technique in which a generative model re-simulates past experiences to prevent catastrophic forgetting. After replay, the attention-economy banker cycle runs, promoting important STI (Short-Term Importance) nodes to LTI (Long-Term Importance) storage.
+
+Phase 2 - REM (the Rapid Eye Movement analog). During this phase, the mind queries all Lattice nodes with a positive LTI value and randomly pairs them to generate hypothetical new relations. Each hypothetical is tagged imagined. Nothing from this phase is ever asserted into the observed Lattice without an explicit validation step. This is the symbolic equivalent of how DreamerV3's RSSM (Recurrent State-Space Model) imagines novel future trajectories inside a learned world model.
+
+Phase 3 - Hypnagogic and Hypnopompic (the transitions into and out of sleep). Every dream event - slow-wave, REM, or counterfactual - is recorded in the dream journal with a monotonic DreamId, a phase label, and a content descriptor. The journal is fully inspectable at any time.
+
+Example session:
+
+    ?- use_module(library(dreaming)).
+
+    % Run a full dream cycle for the mind named my_mind.
+    ?- pai_dream_cycle(my_mind, Report).
+    Report = dream_report(
+        mind(my_mind),
+        hypnagogic(dream(my_mind, 1)),
+        slow_wave(consolidated(dream(my_mind, 2), [])),
+        rem(rem(dream(my_mind, 3), [])),
+        hypnopompic(dream(my_mind, 4))
+    ).
+
+    % Inspect the dream journal afterward.
+    ?- pai_dream_journal(my_mind, Journal).
+    Journal = [
+        entry(dream(my_mind,1), hypnagogic, entering_sleep),
+        entry(dream(my_mind,2), slow_wave,  slow_wave(replayed(0), banker_cycle(done))),
+        entry(dream(my_mind,3), rem,         hypotheticals([])),
+        entry(dream(my_mind,4), hypnopompic, exiting_sleep)
+    ].
+
+    % Generate a counterfactual branch from a known Lattice node.
+    ?- pai_dream_counterfactual(my_mind, some_node_id, 3, Alternatives).
+    Alternatives = counterfactual(some_node_id, no_known_facts).
+
+The dream journal entries (hypnagogic=1, slow_wave=2, rem=3, hypnopompic=4) show the complete four-phase cycle in order. When SONA is loaded with trajectories and the attention pack holds high-LTI nodes, the slow_wave replay list and the rem hypotheticals list will be non-empty.
+
+The dreaming pack has soft dependencies on the SONA (sona), Attention (attention), and Lattice (lattice) packs. If any of these are not loaded, the corresponding phase degrades gracefully and returns empty results rather than raising an error.
+
+Scientific background: the dreaming pack is inspired by Sleep Replay Consolidation (Huszar et al., 2022), which reduces catastrophic forgetting by up to 38%; DreamerV3 (Hafner et al., 2023), which uses a world model to imagine future rollouts without environment interaction; NeuroDream (Tutuncuoglu, 2025), a two-step sleep-then-dream framework for continual learning; and Language Models Need Sleep (Xie et al., 2026), which applies NREM-style pruning and REM-style novel-connection exploration to large language models.
 
 
 WHAT COMES NEXT
