@@ -37,6 +37,8 @@
 
 % Load the built-in 'backend_prolog' library so its predicates are available here.
 :- use_module(library(backend_prolog)).
+% Load the 'backend_ruvector' module — HTTP REST client for the RuVector HNSW server.
+:- use_module(library(backend_ruvector)).
 
 % ---------------------------------------------------------------------------
 % Backend routing
@@ -48,7 +50,7 @@
 vb_active_backend(prolog).          % default: pure-Prolog fallback
 
 %! vb_set_backend(+Backend) is det.
-%  Switch the active backend.  Supported: prolog, rust (when compiled).
+%  Switch the active backend.  Supported: prolog, ruvector.
 % Define a clause for 'vb set backend': succeed when the following conditions hold.
 vb_set_backend(Backend) :-
     % Remove all matching facts from the runtime knowledge base.
@@ -134,3 +136,32 @@ vb_dispatch_update_weights(prolog, Ref, Id, Delta) :-
 vb_dispatch_close(prolog, Ref) :-
     % State the fact: vbp close(Ref).
     vbp_close(Ref).
+
+% ---------------------------------------------------------------------------
+% Dispatch to ruvector backend (HTTP REST client for the RuVector HNSW server)
+% ---------------------------------------------------------------------------
+
+% Define a clause for 'vb dispatch create' for the ruvector backend.
+vb_dispatch_create(ruvector, Name, Dim, Opts, Ref) :-
+    % Delegate to vbr_create from the backend_ruvector module.
+    vbr_create(Name, Dim, Opts, Ref).
+% Define a clause for 'vb dispatch insert' for the ruvector backend.
+vb_dispatch_insert(ruvector, Ref, Id, Vec, Meta) :-
+    % Delegate to vbr_insert from the backend_ruvector module.
+    vbr_insert(Ref, Id, Vec, Meta).
+% Define a clause for 'vb dispatch search' for the ruvector backend.
+vb_dispatch_search(ruvector, Ref, Query, K, Results) :-
+    % Delegate to vbr_search from the backend_ruvector module.
+    vbr_search(Ref, Query, K, Results).
+% Define a clause for 'vb dispatch delete' for the ruvector backend.
+vb_dispatch_delete(ruvector, Ref, Id) :-
+    % Delegate to vbr_delete from the backend_ruvector module.
+    vbr_delete(Ref, Id).
+% Define a clause for 'vb dispatch update weights' for the ruvector backend.
+vb_dispatch_update_weights(ruvector, Ref, Id, Delta) :-
+    % Delegate to vbr_update_weights (no-op — RuVector is self-learning).
+    vbr_update_weights(Ref, Id, Delta).
+% Define a clause for 'vb dispatch close' for the ruvector backend.
+vb_dispatch_close(ruvector, Ref) :-
+    % Delegate to vbr_close — drops the collection from the RuVector server.
+    vbr_close(Ref).

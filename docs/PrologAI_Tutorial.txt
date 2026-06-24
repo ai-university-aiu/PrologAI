@@ -1278,7 +1278,7 @@ PR 27 - motivation: The motivational drive system.
 
 PR 28 - embedding: Vector embedding integration.
 
-PR 29 - vector_backend: The vector search backend.
+PR 29 - vector_backend: The vector search backend. Supports two backends: the built-in pure-Prolog fallback and the RuVector HNSW (Hierarchical Navigable Small World) HTTP REST backend. See Chapter 11 for the bakeoff harness and RuVector integration guide.
 
 PR 30 through PR 42 - higher reasoning: Abduction, induction, frames, analogical reasoning, reflection, synthesis, workspace, attention economy, attention schema, and more.
 
@@ -2467,6 +2467,44 @@ The dream journal entries (hypnagogic=1, slow_wave=2, rem=3, hypnopompic=4) show
 The dreaming pack has soft dependencies on the SONA (sona), Attention (attention), and Lattice (lattice) packs. If any of these are not loaded, the corresponding phase degrades gracefully and returns empty results rather than raising an error.
 
 Scientific background: the dreaming pack is inspired by Sleep Replay Consolidation (Huszar et al., 2022), which reduces catastrophic forgetting by up to 38%; DreamerV3 (Hafner et al., 2023), which uses a world model to imagine future rollouts without environment interaction; NeuroDream (Tutuncuoglu, 2025), a two-step sleep-then-dream framework for continual learning; and Language Models Need Sleep (Xie et al., 2026), which applies NREM-style pruning and REM-style novel-connection exploration to large language models.
+
+
+RUVECTOR HTTP BACKEND (vector_backend PR 2 update)
+
+The vector_backend pack now supports two backends that can be switched at runtime without reloading Prolog.
+
+Backend 1: prolog (the default). A pure-Prolog fallback that stores vectors in memory. Fast to start, no external dependencies, and ideal for development and CI (Continuous Integration) testing. Capped at 200 vectors per index during the bakeoff to keep test runs fast.
+
+Backend 2: ruvector. An HTTP REST client for the RuVector vector database (https://github.com/ruvnet/ruvector). RuVector is written in Rust and provides HNSW (Hierarchical Navigable Small World) indexing with SIMD (Single Instruction, Multiple Data) acceleration and a self-learning GNN (Graph Neural Network) reranking layer. It is designed for large-scale vector search at thousands to millions of entries.
+
+To use the RuVector backend:
+
+Step 1 - Start the RuVector server. Run the startup script provided with PrologAI:
+
+    bash packs/vector_backend/scripts/ruvector_server.sh
+
+This script clones the RuVector repository, builds the server binary with the Rust toolchain (cargo), and starts it on port 8080. The build takes a few minutes on the first run but is instant afterward.
+
+Step 2 - Switch the active backend inside SWI-Prolog:
+
+    ?- use_module(library(vector_backend)).
+    ?- vb_set_backend(ruvector).
+
+Step 3 - Use the standard six-predicate interface exactly as you would with the prolog backend. The routing layer in vector_backend.pl dispatches each call to the correct module automatically.
+
+    ?- vb_create(my_index, 64, [], Ref).
+    ?- vb_insert(Ref, node_1, [0.1, 0.2, ...], meta(node_1)).
+    ?- vb_search(Ref, [0.1, 0.2, ...], 10, Results).
+    ?- vb_close(Ref).
+
+To run the bakeoff comparing both backends:
+
+    ?- use_module(library(bakeoff)).
+    ?- run_bakeoff([prolog, ruvector], [100, 1000]).
+
+The bakeoff harness measures insert throughput and P50/P99 (50th percentile and 99th percentile) search latency for each backend at each index size. It writes the results to docs/bakeoff_results.md and switches the active backend to the winner automatically.
+
+The RuVector backend degrades gracefully. If the server is not running, all six predicates succeed without raising an error: create returns a valid Ref term, insert and delete return silently, search returns an empty results list, and close returns immediately. This means the bakeoff can run at any time and will correctly report that the prolog backend wins when no server is present.
 
 
 WHAT COMES NEXT

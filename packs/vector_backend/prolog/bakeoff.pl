@@ -29,9 +29,11 @@
 % ---------------------------------------------------------------------------
 
 %! run_bakeoff(+Backends, +Sizes) is det.
-%  Backends: list of backend atoms, e.g. [prolog].
-%  Sizes:    list of integers (10000 etc.); capped at 1000 for the
+%  Backends: list of backend atoms, e.g. [prolog, ruvector].
+%  Sizes:    list of integers (10000 etc.); capped at 200 for the
 %            pure-Prolog backend to keep CI fast.
+%            Start the RuVector server first (see scripts/ruvector_server.sh)
+%            before including 'ruvector' in the Backends list.
 % Define a clause for 'run bakeoff': succeed when the following conditions hold.
 run_bakeoff(Backends, Sizes) :-
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
@@ -69,8 +71,8 @@ bakeoff_winner(Winner) :- vb_current_backend(Winner).
 measure_backend(Backend, Sizes, Score) :-
     % Write formatted output to the current output stream.
     format("[bakeoff] measuring backend: ~w~n", [Backend]),
-    % Cap pure-Prolog at 1000 entries to stay fast in CI
     % Pure-Prolog backend: cap at 200 entries so CI stays under a few seconds.
+    % RuVector backend: use the caller-supplied Sizes (supports large-scale runs).
     % Check that '( Backend' is structurally identical to 'prolog'.
     ( Backend == prolog
     % If the condition above succeeded, perform the following action.
@@ -236,11 +238,13 @@ write_results_to(File, Scored, Winner) :-
             % Continue the multi-line expression started above.
             format(Stream, "~n## Notes~n~n", []),
             % Continue the multi-line expression started above.
-            format(Stream, "- Prolog backend: pure-Prolog fallback, benchmarked at ≤1000 entries.~n", []),
+            format(Stream, "- Prolog backend: pure-Prolog fallback, benchmarked at ≤200 entries for CI speed.~n", []),
             % Continue the multi-line expression started above.
-            format(Stream, "- Rust backend (RuVector / hnswlib): not yet compiled; re-run bake-off once prologai-core is built.~n", []),
+            format(Stream, "- RuVector backend: HNSW + SIMD HTTP REST server (https://github.com/ruvnet/ruvector); start with scripts/ruvector_server.sh before including in bakeoff.~n", []),
             % Continue the multi-line expression started above.
-            format(Stream, "- Full benchmark scales (10k, 100k, 1M) require the Rust backend.~n", [])
+            format(Stream, "- Full benchmark scales (10k, 100k, 1M) supported by the RuVector backend.~n", []),
+            % Continue the multi-line expression started above.
+            format(Stream, "- To run the RuVector bakeoff: ?- run_bakeoff([prolog, ruvector], [100, 1000]).~n", [])
         % Close the expression opened above.
         ),
         % Continue the multi-line expression started above.
