@@ -36,7 +36,7 @@ Every answer comes with a **justification tree** you can read.
 | Benchmark / Capability | Result | Method |
 |---|---|---|
 | **ARC-AGI-1** — 400-task grid reasoning benchmark | **400 / 400 = 100.00%** | Pure symbolic induction, named glass-box rules |
-| Reasoning types | **48 / 48** | Deductive through Moral — all implemented |
+| Reasoning Types | **48/48** | Deductive, Inductive, Abductive, Probabilistic, Bayesian, Causal, Statistical, Analogical, Relational, Transductive, Commonsense, Logical, Formal, Mathematical, Fuzzy, Qualitative, Non-monotonic, Paraconsistent, Counterfactual, Hypothetical, Spatial, Diagrammatic, Temporal, Case-based, Constraint-based, Scientific, System, Model-based, Heuristic, Critical, Dialectical, Metacognitive, Modal, Epistemic, Deontic, Procedural, Symbolic, Practical, Teleological, Strategic, Narrative, Social, Intuitive, Emotional, Motivational, Informal, Legal, Moral — all 48 implemented |
 | SPARC documentation volumes | **6 / 6** | Spec, Pseudocode, Architecture, Refinement, Completion, Demonstration Plan |
 | Multi-agent protocols | **4 / 4** | MCP, A2A, ACP, ANP |
 | Piagetian cognitive levels | **8 / 8** | Sensorimotor through Formal-Operational |
