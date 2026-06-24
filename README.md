@@ -45,20 +45,113 @@ Every reasoning step PrologAI takes is a **named, inspectable Prolog predicate**
 
 ```
 PrologAI/
-├── packs/                      Work packages — one per reasoning capability
-│   ├── deductive/              Rung  1: Deductive reasoning
-│   ├── inductive/              Rung  2: Inductive reasoning
-│   ├── abductive/              Rung  3: Abductive reasoning
-│   ├── ...                     Rungs 4 – 47
-│   ├── moral/                  Rung 48: Moral reasoning
-│   └── arc_benchmark/          400 named glass-box ARC-AGI-1 rules (complete)
-├── docs/                       SPARC documentation series (6 volumes)
-│   ├── PrologAI_Tutorial.txt               12-chapter tutorial
-│   └── Certified_PrologAI_Engineer.txt     25-chapter professional textbook
-├── syntax/                     PrologAI language syntax rules
-├── tests/                      Acceptance test suite
-└── launcher/                   Entry points and bootstrapper
+├── packs/       47 work packages — the complete cognitive engine (see below)
+├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
+├── syntax/      PrologAI language syntax rules
+├── tests/       Acceptance test suite
+└── launcher/    Entry points and bootstrapper
 ```
+
+### The 47 Work Packages
+
+Every capability in PrologAI is a self-contained, versioned work package. Each pack has a `pack.pl` manifest, a `prolog/` source directory, and (where needed) a `test/` suite. Nothing is hidden. Everything is inspectable.
+
+**Core Platform**
+
+| Pack | What it does |
+|---|---|
+| `kernel` | The minimal kernel — lattice-resident rewrite rules and a kernel interpreter with full trace. The lowest layer of the cognitive stack. |
+| `lattice` | The Persistent Shared Memory Network — the unified knowledge store that every other pack reads and writes. |
+| `actors` | The Actor Framework — cyclic_actor, receptor, and pub-sub messaging. Every cognitive process runs as an actor. |
+| `sentinels` | Neuro-Symbolic Opportunistic Forward Chaining — the constitutional guard layer that monitors for violations and fires proactively. |
+| `types` | Gradual Lattice Types — an off-by-default type checker where types are first-class Lattice node_facts, not annotations. |
+
+**Perception and Attention**
+
+| Pack | What it does |
+|---|---|
+| `perception` | The Perceptual Detector Suite — specialist detectors, a locator, and a mapper that convert raw percepts into Lattice facts. |
+| `attention` | The Attention Economy (ECAN Adaptation) — STI/LTI wages, rent, spreading activation, and economic forgetting. Salience is a first-class citizen. |
+| `attention_schema` | The Attention Schema — a running model of workspace attention dynamics, giving PrologAI a built-in theory of its own attention. |
+| `workspace` | The Global Workspace — attention arbiter, coalition formation, and broadcast cycle. The hub where conscious-access broadcasting happens. |
+
+**Memory and Knowledge**
+
+| Pack | What it does |
+|---|---|
+| `beliefs` | Belief Structures and Propagators — per-node_fact scorecards with incremental local propagation. Every belief has a strength and a source. |
+| `frames` | Reference Frames and Voting Consensus — the Thousand Brains pattern applied to symbolic cognition. Multiple reference frames vote on every percept. |
+| `tabling` | Incremental Tabling Truth Maintenance — automatic, real-time consistency of all derived Lattice relations. No stale inferences. |
+| `sona` | SONA (Synaptic Ontological Neural Aggregator) — continuous learning with EWC++ catastrophic-forgetting protection, a ReasoningBank for episodic recall, and memory consolidation. |
+| `imagination` | Imaginative Memory — mindscapes, tableaux, and rendered reveries. The pack that lets PrologAI form and manipulate mental images. |
+| `acquisition` | Developmental Language Acquisition — phoneme chaining, word grounding, and tier promotion. PrologAI learns language the way a child does. |
+
+**Reasoning Engine**
+
+| Pack | What it does |
+|---|---|
+| `probabilistic` | Distribution Semantics Probabilistic Layer — ProbLog-style exact and sampled inference. Probabilities are first-class reasoning objects. |
+| `defeasible` | Justified Defeasible Reasoning — defaults with exceptions and readable justification trees. "Normally true, unless..." is a formal operation. |
+| `induction` | Clause Induction — ILP (Inductive Logic Programming) with learn-from-failures, metarules, and meta-interpretive learning. The engine behind ARC-AGI-1. |
+| `chainer` | The Generic Chainer — forward and backward inference with meta-reasoning control policies. Any knowledge base becomes an inference engine. |
+| `budget` | Resource-Bounded Reasoning — AIKR (Assumption of Insufficient Knowledge and Resources) budgets, evidence truth, and anytime answering. PrologAI knows when to stop. |
+| `prediction` | Prediction and Active Inference — hierarchical predictive processing with precision weighting. PrologAI forms and tests predictions about the world. |
+
+**Affect, Motivation, and Metacognition**
+
+| Pack | What it does |
+|---|---|
+| `motivation` | Motivational Modulation (Psi model) — a global modulator bus, affect regions, and named motives. Goals are grounded in drives, not just programmed. |
+| `appraisal` | Staged Appraisal and Coping (EMA model) — causal interpretation, appraisal variables, and coping selection. PrologAI evaluates events emotionally before deciding how to respond. |
+| `markers` | Somatic Markers — affective pre-selection for deliberation. High-stakes options are flagged before the reasoning engine even starts. |
+| `curiosity` | Curiosity — intrinsic motivation by learning progress. PrologAI seeks out situations where it is about to learn something new. |
+| `daydream` | Control-Goal Daydreaming — steered by DAYDREAMER control goals. PrologAI can simulate futures and explore counterfactuals off-line. |
+| `reflection` | Reflection Pattern Actors — motivation, daydream, regulation, compensation, coping, exploration, discovery, imitation, play, gating, impasse, and meta-control. The full repertoire of reflective behaviors. |
+| `awareness` | Situational Awareness — evolving regards, theory-of-mind, and self-reconciliation. PrologAI models its situation, the other agents around it, and its own mental state simultaneously. |
+| `assessment` | Intelligence Assessment — Bayley, Piagetian, and CHC (Cattell-Horn-Carroll) frameworks plus consciousness-indicator coverage. PrologAI can measure its own cognitive level. |
+
+**Language and Embodiment**
+
+| Pack | What it does |
+|---|---|
+| `language` | Time-Linear Language — database semantics with word_traces, hear, think_path, and speak. Language is grounded in time and memory, not in statistical patterns. |
+| `mindbody` | The Mind-Body Interface — herald protocol, body enrollment, percept relay, and command dispatch. Any body (game, robot, screen) attaches here. |
+| `ros_bridge` | The ROS 2 Bridge — robot embodiment via the Mind-Body pattern. PrologAI can reason inside a physical robot. |
+| `computer_use` | Computer Use — a screen-and-input body with sandboxed desktop control. PrologAI can perceive a screen and act on it. |
+
+**Learning and Self-Programming**
+
+| Pack | What it does |
+|---|---|
+| `synthesis` | The Self-Programming Seed — model synthesis, scoring, composition, and lifecycle management. PrologAI can write and evaluate new reasoning models. |
+| `spinoff` | Marginal Attribution Spinoff Learning — Drescher-style discovery of rare-but-reliable action effects. PrologAI finds causal patterns hidden in low-frequency events. |
+| `embedding` | Pluggable Embedding Provider — hash_projection, local_model, and external_service backends with automatic re-embedding maintenance. |
+| `refinement` | The Continual Refinement Harness — reset-free recursive self-improvement (RSI) with a constitutional sandbox pipeline. Self-improvement without losing alignment. |
+
+**Multi-Agent Protocols**
+
+| Pack | What it does |
+|---|---|
+| `mcp_gateway` | MCP (Model Context Protocol) Gateway — a compliant HTTP server exposing PrologAI's full capability to the AI agent ecosystem. |
+| `a2a` | Agent-to-Agent (A2A) Interoperability — the A2A protocol and durable agent mail. PrologAI agents communicate reliably with any A2A-compliant peer. |
+| `acp` | ACP (Agent Communication Protocol) Gateway — a REST endpoint for broadcast-style agent coordination. |
+| `anp` | ANP (Agent Network Protocol) Gateway — decentralized identity and peer discovery for open multi-agent networks. |
+
+**Data Layer**
+
+| Pack | What it does |
+|---|---|
+| `vector_backend` | The Vector Backend — a backend-agnostic six-predicate interface. Any vector store plugs in without changing the reasoning layer. |
+| `vsa` | Compositional Vector Binding (VSA — Vector Symbolic Architecture) — MAP and HRR algebras. Concepts are built by binding, not by lookup. |
+| `lattice_crypto` | Lattice Cryptographic Privacy Layer — RSA, ECDH, and post-quantum (PQC) hybrid encryption for sensitive Lattice data. |
+| `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
+
+**Platform Utilities**
+
+| Pack | What it does |
+|---|---|
+| `tooling` | Tool Use Pattern — tool registry, discovery, selection, gated invocation, and reliability learning. Every external tool is a first-class reasoning object. |
+| `libraries` | Utility Libraries — similarity, types, collections, generators, tasks, problems, config, peers, macros, and convenience predicates. The shared foundation everything else builds on. |
 
 ---
 
