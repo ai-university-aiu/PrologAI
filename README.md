@@ -197,6 +197,12 @@ PrologAI is defined by six companion volumes:
 
 **Prerequisite:** [SWI-Prolog 9.0.4+](https://www.swi-prolog.org/download/stable)
 
+No large language model (LLM) required.
+
+No pretraining required.
+
+No internet connection required.
+
 ```prolog
 % Load PrologAI
 ?- [launcher/prologai_boot].
@@ -213,6 +219,10 @@ R = answer(yes, just(tweety, is_a, bird, chain([tweety, bird]))).
 ```
 
 Every answer returns `answer(Conclusion, Justification)` — the conclusion plus a readable proof trace.
+
+No black box.
+
+No guessing.
 
 ---
 
