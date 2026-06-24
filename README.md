@@ -21,9 +21,13 @@
 
 PrologAI is a complete cognitive substrate written in SWI-Prolog (Sociaal-Wetenschappelijke Informatica Prolog — created at the University of Amsterdam by Jan Wielemaker in 1987; SWI is the Dutch name for the Social Scientific Informatics research group where it originated).
 
-It is not a library layered on top of an existing AI framework — it **is** the framework. A new kind of platform where you build a reasoning mind the way you build a compiler: explicitly, structurally, and verifiably.
+It is not a library layered on top of an existing AI framework — it **is** the framework.
 
-Every reasoning step PrologAI takes is a **named, inspectable Prolog predicate**. Every answer comes with a **justification tree** you can read.
+A new kind of platform where you build a reasoning mind the way you build a compiler: explicitly, structurally, and verifiably.
+
+Every reasoning step PrologAI takes is a **named, inspectable Prolog predicate**.
+
+Every answer comes with a **justification tree** you can read.
 
 ---
 
@@ -54,7 +58,13 @@ PrologAI/
 
 ### The 47 Work Packages
 
-Every capability in PrologAI is a self-contained, versioned work package. Each pack has a `pack.pl` manifest, a `prolog/` source directory, and (where needed) a `test/` suite. Nothing is hidden. Everything is inspectable.
+Every capability in PrologAI is a self-contained, versioned work package.
+
+Each pack has a `pack.pl` manifest, a `prolog/` source directory, and (where needed) a `test/` suite.
+
+Nothing is hidden.
+
+Everything is inspectable.
 
 **Core Platform**
 
@@ -209,7 +219,11 @@ arc_transform(Pairs, TestIn, TestOut) :-
     w75_assemble_at_joints(Pieces, TestIn, TestOut).
 ```
 
-Each of the 400 solved tasks has a human-readable named rule like this. No two rules are the same. Each one captures a distinct visual reasoning pattern.
+Each of the 400 solved tasks has a human-readable named rule like this.
+
+No two rules are the same.
+
+Each one captures a distinct visual reasoning pattern.
 
 <details>
 <summary>View the 79-wave climb summary</summary>
@@ -249,7 +263,9 @@ Achievement report: [ARC-AGI-1_Perfect_Score_Report.txt](https://github.com/ai-u
 
 ## Mentova
 
-[Mentova](https://github.com/ai-university-aiu/Mentova) is the world's first glass-box synthetic mind, built on PrologAI. It runs 48 reasoning types, achieved 400/400 = 100% on ARC-AGI-1, and is now beginning ARC-AGI-2.
+[Mentova](https://github.com/ai-university-aiu/Mentova) is the world's first glass-box synthetic mind, built on PrologAI.
+
+It runs 48 reasoning types, achieved 400/400 = 100% on ARC-AGI-1, and is now beginning ARC-AGI-2.
 
 ---
 
