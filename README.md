@@ -92,7 +92,7 @@ Everything is inspectable.
 | `beliefs` | Belief Structures and Propagators — per-node_fact scorecards with incremental local propagation. Every belief has a strength and a source. |
 | `frames` | Reference Frames and Voting Consensus — the Thousand Brains pattern applied to symbolic cognition. Multiple reference frames vote on every percept. |
 | `tabling` | Incremental Tabling Truth Maintenance — automatic, real-time consistency of all derived Lattice relations. No stale inferences. |
-| `sona` | SONA (Synaptic Ontological Neural Aggregator) — continuous learning with EWC++ catastrophic-forgetting protection, a ReasoningBank for episodic recall, and memory consolidation. |
+| `sona` | SONA (Synaptic Ontological Neural Aggregator) — continuous learning with Elastic Weight Consolidation, improved version (EWC++) catastrophic-forgetting protection, a ReasoningBank for episodic recall, and memory consolidation. |
 | `imagination` | Imaginative Memory — mindscapes, tableaux, and rendered reveries. The pack that lets PrologAI form and manipulate mental images. |
 | `acquisition` | Developmental Language Acquisition — phoneme chaining, word grounding, and tier promotion. PrologAI learns language the way a child does. |
 
@@ -102,7 +102,7 @@ Everything is inspectable.
 |---|---|
 | `probabilistic` | Distribution Semantics Probabilistic Layer — ProbLog-style exact and sampled inference. Probabilities are first-class reasoning objects. |
 | `defeasible` | Justified Defeasible Reasoning — defaults with exceptions and readable justification trees. "Normally true, unless..." is a formal operation. |
-| `induction` | Clause Induction — ILP (Inductive Logic Programming) with learn-from-failures, metarules, and meta-interpretive learning. The engine behind ARC-AGI-1. |
+| `induction` | Clause Induction — Inductive Logic Programming (ILP) with learn-from-failures, metarules, and meta-interpretive learning. The engine behind ARC-AGI-1. |
 | `chainer` | The Generic Chainer — forward and backward inference with meta-reasoning control policies. Any knowledge base becomes an inference engine. |
 | `budget` | Resource-Bounded Reasoning — AIKR (Assumption of Insufficient Knowledge and Resources) budgets, evidence truth, and anytime answering. PrologAI knows when to stop. |
 | `prediction` | Prediction and Active Inference — hierarchical predictive processing with precision weighting. PrologAI forms and tests predictions about the world. |
