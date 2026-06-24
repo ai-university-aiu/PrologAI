@@ -286,6 +286,22 @@ Example:
 The dreaming pack has soft dependencies on SONA, attention, and lattice. If any of these are not loaded, the corresponding phase degrades gracefully.
 
 
+RUVECTOR HTTP BACKEND (vector_backend PR 2 update)
+
+The vector_backend pack now supports the RuVector backend alongside the built-in pure-Prolog backend.
+
+RuVector (https://github.com/ruvnet/ruvector) is a Rust-language vector database using HNSW (Hierarchical Navigable Small World) indexing with SIMD (Single Instruction, Multiple Data) acceleration and a self-learning GNN (Graph Neural Network) reranking layer.
+
+Start the server:
+    bash packs/vector_backend/scripts/ruvector_server.sh
+
+Switch the backend and run the bakeoff:
+    ?- vb_set_backend(ruvector).
+    ?- run_bakeoff([prolog, ruvector], [100, 1000]).
+
+If the server is not running, all six backend predicates degrade gracefully: insert/delete return silently, search returns an empty list, and create still returns a valid Ref term.
+
+
 WHAT COMES NEXT
 
 Chapter 12 covers writing your own PrologAI programs: creating .pl files, loading them into Mentova, and building new reasoning capabilities.

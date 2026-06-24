@@ -164,7 +164,7 @@ Everything is inspectable.
 
 | Pack | What it does |
 |---|---|
-| `vector_backend` | The Vector Backend — a backend-agnostic six-predicate interface. Any vector store plugs in without changing the reasoning layer. |
+| `vector_backend` | The Vector Backend — a backend-agnostic six-predicate interface. Ships with two backends: the built-in pure-Prolog fallback and the RuVector HNSW (Hierarchical Navigable Small World) + SIMD HTTP REST backend. Any vector store plugs in without changing the reasoning layer. Run `vb_set_backend(ruvector)` to switch; use `run_bakeoff([prolog, ruvector], [100, 1000])` to compare. |
 | `vsa` | Compositional Vector Binding (VSA — Vector Symbolic Architecture) — MAP and HRR algebras. Concepts are built by binding, not by lookup. |
 | `lattice_crypto` | Lattice Cryptographic Privacy Layer — RSA, ECDH, and post-quantum (PQC) hybrid encryption for sensitive Lattice data. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
