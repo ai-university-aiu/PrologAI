@@ -81,7 +81,7 @@ Everything is inspectable.
 | Pack | What it does |
 |---|---|
 | `perception` | The Perceptual Detector Suite — specialist detectors, a locator, and a mapper that convert raw percepts into Lattice facts. |
-| `attention` | The Attention Economy (ECAN Adaptation) — STI/LTI wages, rent, spreading activation, and economic forgetting. Salience is a first-class citizen. |
+| `attention` | The Attention Economy (ECAN — Economic Attention Networks — Adaptation) — STI/LTI wages, rent, spreading activation, and economic forgetting. Salience is a first-class citizen. |
 | `attention_schema` | The Attention Schema — a running model of workspace attention dynamics, giving PrologAI a built-in theory of its own attention. |
 | `workspace` | The Global Workspace — attention arbiter, coalition formation, and broadcast cycle. The hub where conscious-access broadcasting happens. |
 
