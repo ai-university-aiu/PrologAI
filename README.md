@@ -256,11 +256,11 @@ Achievement report: [ARC-AGI-1_Perfect_Score_Report.txt](https://github.com/ai-u
 
 ## Glass-Box vs Black-Box
 
-| Property | PrologAI | LLM / Transformer |
+| Property | PrologAI | Large Language Model (LLM) / Transformer |
 |---|---|---|
 | Every answer is inspectable | ✅ Yes | ❌ No |
 | Reasoning is a named proof | ✅ Yes | ❌ No |
-| No pretraining required | ✅ Yes | ❌ No |
+| No large language model (LLM) required | ✅ Yes | ❌ No |
 | Hallucination possible | ❌ None by design | ✅ Frequent |
 | ARC-AGI-1 score | **100.00%** | < 50% (best frontier models) |
 | Zero-shot induction on new tasks | ✅ Yes | ❌ No |
