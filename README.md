@@ -286,7 +286,19 @@ Achievement report: [ARC-AGI-1_Perfect_Score_Report.txt](https://github.com/ai-u
 
 [Mentova](https://github.com/ai-university-aiu/Mentova) is the world's first glass-box synthetic mind, built on PrologAI.
 
-It runs 48 reasoning types, achieved 400/400 = 100% on ARC-AGI-1, and is now beginning ARC-AGI-2.
+It runs 48 reasoning types, achieved a confirmed perfect score of 400/400 = 100% on ARC-AGI-1 (Abstract Reasoning Corpus - Artificial General Intelligence - Year 1), and is now beginning ARC-AGI-2.
+
+No large language model (LLM).
+
+No neural weights.
+
+No internet knowledge.
+
+No black box.
+
+No guessing.
+
+Every answer Mentova produces comes with a readable justification tree — the conclusion and every reasoning step that led to it, always together.
 
 ---
 
