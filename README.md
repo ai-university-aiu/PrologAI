@@ -204,11 +204,17 @@ Every answer returns `answer(Conclusion, Justification)` — the conclusion plus
 
 ---
 
-## ARC-AGI-1: 400/400 = 100.00%
+## ARC-AGI-1 (Abstract Reasoning Corpus - Artificial General Intelligence - Year 1): 400/400 = 100.00%
 
-The [Abstract Reasoning Corpus for Artificial General Intelligence (ARC-AGI)](https://arcprize.org) Year 1 is a benchmark of 400 grid-transformation puzzles designed by Francois Chollet to measure fluid reasoning — the kind of intelligence that cannot be faked by memorizing training data.
+The [ARC-AGI-1](https://arcprize.org) benchmark is a set of 400 grid-transformation puzzles designed by Francois Chollet to measure fluid reasoning — the kind of intelligence that cannot be faked by memorizing training data.
 
-PrologAI solved all 400 tasks using **pure induction from each task's own training examples**:
+No large language model (LLM).
+
+No neural weights.
+
+No internet knowledge.
+
+PrologAI solved all 400 tasks using **pure symbolic induction with named glass-box rules — from scratch, on each task's own training examples**:
 
 ```prolog
 % Task 234bbc79 — assemble_3pieces_at_5_joints
@@ -224,7 +230,7 @@ Each of the 400 solved tasks has a human-readable named rule like this.
 
 No two rules are the same.
 
-Each one captures a distinct visual reasoning pattern.
+Each one captures a distinct visual reasoning pattern — pure symbolic induction, from scratch, on each task's own examples.
 
 <details>
 <summary>View the 79-wave climb summary</summary>
