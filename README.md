@@ -23,11 +23,23 @@ PrologAI is a complete cognitive substrate written in SWI-Prolog (Sociaal-Wetens
 
 It is not a library layered on top of an existing AI framework — it **is** the framework.
 
+It is not a neural network.
+
+It is not a statistical model.
+
+It does not use a large language model (LLM).
+
+It does not require pretraining, internet knowledge, or neural weights of any kind.
+
 A new kind of platform where you build a reasoning mind the way you build a compiler: explicitly, structurally, and verifiably.
 
 Every reasoning step PrologAI takes is a **named, inspectable Prolog predicate**.
 
 Every answer comes with a **justification tree** you can read.
+
+No black box.
+
+No guessing.
 
 ---
 
