@@ -12,7 +12,7 @@
 
 <p align="center">
   <strong>A cognitive architecture programming language and platform for building synthetic minds.</strong><br>
-  Pure symbolic induction &nbsp;&bull;&nbsp; Named glass-box rules &nbsp;&bull;&nbsp; No LLM &nbsp;&bull;&nbsp; No black box
+  Pure symbolic induction &nbsp;&bull;&nbsp; Named glass-box rules &nbsp;&bull;&nbsp; No Large Language Model (LLM) &nbsp;&bull;&nbsp; No black box
 </p>
 
 ---
