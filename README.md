@@ -41,7 +41,7 @@ Every answer comes with a **justification tree** you can read.
 | Multi-agent protocols | **4 / 4** | MCP (Model Context Protocol), A2A (Agent to Agent), ACP (Agent Communication Protocol), ANP (Agent Network Protocol) |
 | Piagetian cognitive levels | **8/8** | Reflex Coordination, Object Permanence, Goal-Directed Behavior, Deferred Imitation, Symbolic Representation, Conservation, Theory of Mind, Formal Operations — all 8 achieved |
 
-> PrologAI is the **first system in the world** to achieve 400/400 = 100% on the ARC-AGI-1 public training benchmark using pure symbolic induction — no pretraining, no neural weights, no internet knowledge.
+> PrologAI, through its Mentova Synthetic Mind implementation, is the **first system in the world** to achieve 400/400 = 100% on the ARC-AGI-1 public training benchmark using pure symbolic induction — no pretraining, no neural weights, no internet knowledge.
 
 ---
 
