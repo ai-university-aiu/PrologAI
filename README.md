@@ -37,7 +37,7 @@ Every answer comes with a **justification tree** you can read.
 |---|---|---|
 | **ARC-AGI-1** — 400-task grid reasoning benchmark | **400 / 400 = 100.00%** | Pure symbolic induction, named glass-box rules |
 | Reasoning types | **48 / 48** | Deductive through Moral — all implemented |
-| SPARC documentation volumes | **6 / 6** | Spec, Pseudocode, Architecture, Refinement, Completion, Demo Plan |
+| SPARC documentation volumes | **6 / 6** | Spec, Pseudocode, Architecture, Refinement, Completion, Demonstration Plan |
 | Multi-agent protocols | **4 / 4** | MCP, A2A, ACP, ANP |
 | Piagetian cognitive levels | **8 / 8** | Sensorimotor through Formal-Operational |
 
