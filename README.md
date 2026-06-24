@@ -265,6 +265,8 @@ Achievement report: [ARC-AGI-1_Perfect_Score_Report.txt](https://github.com/ai-u
 | ARC-AGI-1 score | **100.00%** | < 50% (best frontier models) |
 | Zero-shot induction on new tasks | ✅ Yes | ❌ No |
 | Justification tree readable | ✅ Yes | ❌ No |
+| Written in symbolic logic | ✅ Yes — pure Prolog | ❌ No — matrix arithmetic |
+| Can explain every step in plain language | ✅ Yes | ❌ No |
 
 ---
 
