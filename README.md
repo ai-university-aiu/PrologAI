@@ -39,7 +39,7 @@ Every answer comes with a **justification tree** you can read.
 | Reasoning Types | **48/48** | Deductive, Inductive, Abductive, Probabilistic, Bayesian, Causal, Statistical, Analogical, Relational, Transductive, Commonsense, Logical, Formal, Mathematical, Fuzzy, Qualitative, Non-monotonic, Paraconsistent, Counterfactual, Hypothetical, Spatial, Diagrammatic, Temporal, Case-based, Constraint-based, Scientific, System, Model-based, Heuristic, Critical, Dialectical, Metacognitive, Modal, Epistemic, Deontic, Procedural, Symbolic, Practical, Teleological, Strategic, Narrative, Social, Intuitive, Emotional, Motivational, Informal, Legal, Moral — all 48 implemented |
 | SPARC documentation volumes | **6 / 6** | Specification, Pseudocode, Architecture, Refinement, Completion, Demonstration Plan |
 | Multi-agent protocols | **4 / 4** | MCP (Model Context Protocol), A2A (Agent to Agent), ACP (Agent Communication Protocol), ANP (Agent Network Protocol) |
-| Piagetian cognitive levels | **8 / 8** | Sensorimotor through Formal-Operational |
+| Piagetian cognitive levels | **8/8** | Reflex Coordination, Object Permanence, Goal-Directed Behavior, Deferred Imitation, Symbolic Representation, Conservation, Theory of Mind, Formal Operations — all 8 achieved |
 
 > PrologAI is the **first system in the world** to achieve 400/400 = 100% on the ARC-AGI-1 public training benchmark using pure symbolic induction — no pretraining, no neural weights, no internet knowledge.
 
