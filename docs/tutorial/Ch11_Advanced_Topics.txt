@@ -264,6 +264,28 @@ Awareness is engineered as a ladder of regards (viewpoints): ambient_regard (gen
 The divergence list reports that alice holds a false belief relative to the mind's own view - the computational core of theory of mind. pai_regard_reconcile/1 then integrates the owned and disowned regards into a single coherent self-account.
 
 
+DREAMING ENGINE (PR 52)
+
+Humans have dreamed for as long as there have been humans. Now dreaming is becoming an activity for machines.
+
+The dreaming pack gives PrologAI an idle-period dream cycle with three phases, each modeled on a stage of biological sleep.
+
+Phase 1 - Slow-Wave (NREM analog). During this phase, the mind replays its most important SONA trajectories with a small stochastic perturbation called replay_noise. This is the symbolic equivalent of generative replay, in which an AI system re-simulates past experiences during offline periods to prevent catastrophic forgetting. After replay, the attention-economy banker cycle runs, promoting important STI (Short-Term Importance) nodes to LTI (Long-Term Importance) storage.
+
+Phase 2 - REM (Rapid Eye Movement analog). During this phase, the mind queries all Lattice nodes with a positive LTI value and randomly pairs them to generate hypothetical new relations, tagged imagined. Nothing from this phase is asserted into the observed Lattice without a separate explicit validation step. This mirrors the way DreamerV3's RSSM imagines novel trajectories inside a learned world model.
+
+Phase 3 - Hypnagogic and Hypnopompic transitions. Every dream event is recorded in the dream journal with a monotonic DreamId and a phase label.
+
+Example:
+
+    ?- use_module(library(dreaming)).
+    ?- pai_dream_cycle(my_mind, Report).
+    ?- pai_dream_journal(my_mind, Journal).
+    ?- pai_dream_counterfactual(my_mind, some_node_id, 3, Alternatives).
+
+The dreaming pack has soft dependencies on SONA, attention, and lattice. If any of these are not loaded, the corresponding phase degrades gracefully.
+
+
 WHAT COMES NEXT
 
 Chapter 12 covers writing your own PrologAI programs: creating .pl files, loading them into Mentova, and building new reasoning capabilities.
