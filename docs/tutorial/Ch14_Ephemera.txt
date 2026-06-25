@@ -208,6 +208,93 @@ The ephemera pack does not modify any global state except its own trace log and 
 All external code (Python, Bash, external Prolog) runs in a subprocess isolated from the main PrologAI process.
 
 
+SKILL PERSISTENCE: NAMING AND REUSING USEFUL EPHEMERA
+
+An ephemeron that proves useful during execution does not have to stay ephemeral.
+
+If the same computation is likely to be needed again, it can be saved as a named skill and retrieved later without re-synthesis.
+
+SAVING A SKILL
+
+ep_skill_save/4 takes four arguments: a name atom, a language atom, the source code atom, and a human-readable description.
+
+% Save a greeting skill in Python with a description.
+ep_skill_save(greet, python, 'print("Hello from Mentova")',
+              'Print a greeting from Mentova').
+
+If a skill with the same name already exists it is replaced.
+
+
+RETRIEVING A SKILL
+
+ep_skill_lookup/3 retrieves the language and code for a named skill.
+
+% Look up the greeting skill.
+ep_skill_lookup(greet, Lang, Code).
+% Lang = python
+% Code = 'print("Hello from Mentova")'
+
+It fails silently if no skill with that name exists.
+
+
+RUNNING A SAVED SKILL
+
+ep_skill_run/3 retrieves a skill by name and executes it immediately.
+
+% Run the greeting skill with a 10-second timeout.
+ep_skill_run(greet, 10, shell_result(Code, Out, _)).
+% Code = 0
+% Out  = 'Hello from Mentova\n'
+
+This is exactly equivalent to ep_skill_lookup/3 followed by ep_ephemeral/4 - ep_skill_run/3 is a thin named-dispatch convenience.
+
+
+LISTING ALL SAVED SKILLS
+
+ep_skill_list/1 returns all saved skills as a list of skill(Name, Language, Description) terms.
+
+The code body is not included in the listing - this keeps the list compact and readable.
+
+% List all saved skills.
+ep_skill_list(Skills).
+% Skills = [skill(greet, python, 'Print a greeting from Mentova')]
+
+An empty list is returned when no skills have been saved.
+
+
+FORGETTING A SKILL
+
+ep_skill_forget/1 removes a saved skill by name.
+
+% Remove the greeting skill.
+ep_skill_forget(greet).
+
+It succeeds silently even if no skill with that name exists.
+
+
+WHEN TO USE SKILL PERSISTENCE
+
+Save an ephemeron as a skill when:
+- The same computation is needed in multiple places in the same session.
+- A synthesized ephemeron has been verified correct and should not be re-synthesized each time.
+- You want to build an index of reusable utility code that grows with the session.
+
+Skills persist for the lifetime of the SWI-Prolog session. They are stored in the dynamic fact ep_skill_db/4, which is not written to disk. To persist skills across sessions, export ep_skill_db/4 facts to a file and reload them at startup.
+
+
+SAFETY PROPERTIES
+
+Every subprocess execution is bounded by the caller-supplied TimeoutSecs.
+
+If a subprocess does not finish in time, it is terminated and a shell_result with exit code -1 is returned.
+
+Temporary files created by ep_ephemeral/4 are deleted before the predicate returns, on both success and failure.
+
+The ephemera pack does not modify any global state except its own trace log, counter, and skill database.
+
+All external code (Python, Bash, external Prolog) runs in a subprocess isolated from the main PrologAI process.
+
+
 SUMMARY
 
 ep_eval/3             Evaluate a Prolog goal term with timeout.
@@ -218,6 +305,11 @@ ep_iterate/5          Synthesize-execute-check loop with step budget.
 ep_trace_record/4     Record one step to a trace log.
 ep_trace_get/2        Retrieve all entries for a trace.
 ep_next_trace_id/1    Allocate a fresh unique trace identifier.
+ep_skill_save/4       Save a useful ephemeron as a named, reusable skill.
+ep_skill_lookup/3     Retrieve a saved skill's language and code by name.
+ep_skill_run/3        Execute a saved skill by name.
+ep_skill_list/1       List all saved skills.
+ep_skill_forget/1     Remove a saved skill by name.
 
 
 WHAT COMES NEXT

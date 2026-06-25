@@ -11,6 +11,14 @@
     - Coding Design Principles: write, run, observe, improve
     - The practice of writing small ephemeral programs to solve sub-problems
 
+    Skill persistence:
+       - ep_skill_save/4 names, stores, and indexes a useful ephemeron so it
+         can be retrieved and re-run by name rather than re-synthesized.
+       - ep_skill_lookup/3 retrieves a saved skill's language and code.
+       - ep_skill_run/3 looks up a skill by name and runs it immediately.
+       - ep_skill_list/1 returns all saved skills as indexed terms.
+       - ep_skill_forget/1 removes a saved skill when it is no longer needed.
+
     Three execution modes:
 
     1. Prolog goal evaluation (ep_eval/3)
@@ -51,6 +59,11 @@
       ep_trace_record/4  -- record one step to the trace log
       ep_trace_get/2     -- retrieve all trace entries for a trace id
       ep_next_trace_id/1 -- allocate a fresh unique trace id
+      ep_skill_save/4    -- save a named, reusable skill with description
+      ep_skill_lookup/3  -- retrieve a saved skill by name
+      ep_skill_run/3     -- execute a saved skill by name
+      ep_skill_list/1    -- list all saved skills
+      ep_skill_forget/1  -- remove a saved skill by name
 */
 
 % Declare this file as the 'ephemera' module and list its exported predicates.
@@ -70,7 +83,17 @@
     % Export 'ep_trace_get/2': retrieve all trace entries for a trace id.
     ep_trace_get/2,     % +TraceId, -Entries
     % Export 'ep_next_trace_id/1': allocate a fresh unique trace id.
-    ep_next_trace_id/1  % -TraceId
+    ep_next_trace_id/1, % -TraceId
+    % Export 'ep_skill_save/4': save a named, reusable skill with description.
+    ep_skill_save/4,    % +Name, +Language, +Code, +Description
+    % Export 'ep_skill_lookup/3': retrieve a saved skill by name.
+    ep_skill_lookup/3,  % +Name, -Language, -Code
+    % Export 'ep_skill_run/3': execute a saved skill by name.
+    ep_skill_run/3,     % +Name, +TimeoutSecs, -ShellResult
+    % Export 'ep_skill_list/1': list all saved skills.
+    ep_skill_list/1,    % -Skills
+    % Export 'ep_skill_forget/1': remove a saved skill by name.
+    ep_skill_forget/1   % +Name
 % Close the module declaration.
 ]).
 
@@ -367,3 +390,105 @@ ep_iterate_loop(SynthGoal, ExecGoal, CheckGoal, MaxIter, N, _, _,
         ep_iterate_loop(SynthGoal, ExecGoal, CheckGoal, MaxIter, N1,
                         Code, Output, IterResult)
     ).
+
+% ---------------------------------------------------------------------------
+% Skill persistence -- name, save, index, retrieve, run, and forget ephemera
+%
+% An ephemeron that proves useful can be promoted to a named skill.  Skills
+% are stored in the ep_skill_db/4 dynamic fact and are retrievable by name
+% at any point in the session.  Naming a skill allows the same computation
+% to be reused without re-synthesis.
+%
+% Skill database schema:
+%   ep_skill_db(Name, Language, Code, Description)
+%     Name        -- unique atom identifying the skill
+%     Language    -- prolog | python | bash (same as ep_ephemeral/4)
+%     Code        -- the source text of the skill as an atom
+%     Description -- human-readable label for indexing and search
+% ---------------------------------------------------------------------------
+
+% Declare ep_skill_db/4 as dynamic: the in-memory skill index.
+:- dynamic ep_skill_db/4.
+
+% ---------------------------------------------------------------------------
+% ep_skill_save/4 -- save a named, reusable skill with a description
+%
+% Replaces any existing skill with the same Name so that updating a skill
+% is idempotent (save it again with corrected code and the old version is gone).
+%
+% Example:
+%   ep_skill_save(greet, python, 'print("Hello from Mentova")',
+%                 'Print a greeting from Mentova').
+% ---------------------------------------------------------------------------
+
+% Define ep_skill_save/4: replace any existing entry, then store the new one.
+ep_skill_save(Name, Language, Code, Description) :-
+    % Remove any previous skill registered under this name.
+    retractall(ep_skill_db(Name, _, _, _)),
+    % Store the new skill in the database.
+    assertz(ep_skill_db(Name, Language, Code, Description)).
+
+% ---------------------------------------------------------------------------
+% ep_skill_lookup/3 -- retrieve a saved skill's language and code by name
+%
+% Fails silently if no skill with Name has been saved.
+%
+% Example:
+%   ep_skill_lookup(greet, Lang, Code).
+%   Lang = python, Code = 'print("Hello from Mentova")'.
+% ---------------------------------------------------------------------------
+
+% Define ep_skill_lookup/3: unify Language and Code from the skill database.
+ep_skill_lookup(Name, Language, Code) :-
+    % Look up the named skill; ignore the description field.
+    ep_skill_db(Name, Language, Code, _).
+
+% ---------------------------------------------------------------------------
+% ep_skill_run/3 -- execute a saved skill by name
+%
+% Looks up the skill for Name and passes its code to ep_ephemeral/4.
+% ShellResult = shell_result(ExitCode, Stdout, Stderr).
+%
+% Example:
+%   ep_skill_run(greet, 10, shell_result(0, Out, _)).
+%   Out = 'Hello from Mentova\n'.
+% ---------------------------------------------------------------------------
+
+% Define ep_skill_run/3: look up and run a named skill as an ephemeron.
+ep_skill_run(Name, TimeoutSecs, ShellResult) :-
+    % Retrieve the skill's language and source code.
+    ep_skill_lookup(Name, Language, Code),
+    % Execute the code via the standard ephemeral path.
+    ep_ephemeral(Language, Code, TimeoutSecs, ShellResult).
+
+% ---------------------------------------------------------------------------
+% ep_skill_list/1 -- return all saved skills as a list of indexed terms
+%
+% Each element is skill(Name, Language, Description).
+% Returns an empty list when no skills have been saved.
+%
+% Example:
+%   ep_skill_list(Ss).
+%   Ss = [skill(greet, python, 'Print a greeting from Mentova')].
+% ---------------------------------------------------------------------------
+
+% Define ep_skill_list/1: collect all skill entries into a structured list.
+ep_skill_list(Skills) :-
+    % Gather every skill's name, language, and description (not code).
+    findall(skill(Name, Language, Description),
+            ep_skill_db(Name, Language, _, Description),
+            Skills).
+
+% ---------------------------------------------------------------------------
+% ep_skill_forget/1 -- remove a saved skill by name
+%
+% Succeeds silently if no skill with Name exists.
+%
+% Example:
+%   ep_skill_forget(greet).
+% ---------------------------------------------------------------------------
+
+% Define ep_skill_forget/1: retract all entries for the given skill name.
+ep_skill_forget(Name) :-
+    % Remove every fact for this skill name from the database.
+    retractall(ep_skill_db(Name, _, _, _)).
