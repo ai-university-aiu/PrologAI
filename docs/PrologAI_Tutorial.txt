@@ -5266,4 +5266,89 @@ Color:    ov_replace/4, ov_fill_bg/4
 Extrema:  ov_max/3, ov_min/3
 
 END OF CHAPTER 32
-END OF CHAPTER 32 AND END OF THE PROLOGAI TUTORIAL
+
+
+CHAPTER 33: MEASURE PACK
+
+The measure pack (module measure, prefix ms_) provides geometric measurements
+of cell regions and grids. A region is a list of r(R,C) cells. Layer 51,
+requires grid. Load with :- use_module(library(measure)).
+
+
+AREA AND BOUNDING BOX
+
+ms_area(+Region, -N)              - number of cells.
+ms_bbox(+Region, -bbox(R1,C1,R2,C2)) - tight bounding box.
+ms_bbox_size(+Region, -W, -H)    - bbox width and height.
+
+:- ms_area([r(0,0),r(0,1),r(1,0),r(1,1)], N). % N=4.
+:- ms_bbox([r(1,0),r(1,2)], B). % B=bbox(1,0,1,2).
+
+
+PERIMETER AND DIAMETER
+
+ms_perimeter(+Region, -P) - total exposed 4-connected edge faces.
+ms_diameter(+Region, -D)  - max Manhattan distance between any two cells.
+
+:- ms_perimeter([r(0,0)], P). % P=4 (single cell, 4 exposed faces).
+:- ms_diameter([r(0,0),r(0,3)], D). % D=3.
+
+
+EXTENT AND ASPECT
+
+ms_extent(+Region, -N, -D) - N=area, D=bbox_area. Fill ratio = N/D.
+ms_aspect(+Region, -N, -D) - N=max(W,H), D=min(W,H). Square has N=D.
+
+:- ms_extent([r(0,0),r(1,0),r(1,1)], N, D). % N=3, D=4 (L-shape).
+:- ms_aspect([r(1,0),r(1,1),r(1,2)], N, D). % N=3, D=1 (hline).
+
+
+SPANS AND CENTROID
+
+ms_row_span(+Region, -S) - distinct row count.
+ms_col_span(+Region, -S) - distinct column count.
+ms_centroid(+Region, -AR, -AC) - integer floor average row and column.
+
+:- ms_row_span([r(0,0),r(1,0),r(2,0)], S). % S=3 (vline).
+:- ms_centroid([r(0,0),r(2,2)], AR, AC). % AR=1, AC=1.
+
+
+RADIUS
+
+ms_radius(+Region, -Rad)
+  Max Chebyshev distance from centroid to any cell.
+  Chebyshev(r(R1,C1), r(R2,C2)) = max(|R1-R2|, |C1-C2|).
+
+:- ms_radius([r(0,0),r(0,1),r(0,2)], R). % R=1.
+
+
+INTERIOR AND BORDER
+
+ms_interior_count(+Region, -N) - cells with all 4 neighbors inside region.
+ms_border_count(+Region, -N)   - cells with at least one neighbor outside.
+Invariant: interior + border = area.
+
+Sq3 = [r(0,0)..r(2,2)] (3x3 square).
+:- ms_interior_count(Sq3, N). % N=1 (center only).
+:- ms_border_count(Sq3, N).   % N=8.
+
+
+COLOR COUNT
+
+ms_color_count(+Grid, -N) - distinct integer values in the grid.
+
+:- ms_color_count([[0,1,2],[0,1,2]], N). % N=3.
+
+
+PREDICATE SUMMARY
+
+Shape:    ms_area/2, ms_bbox/2, ms_bbox_size/3
+Edge:     ms_perimeter/2, ms_diameter/2
+Fill:     ms_extent/3, ms_aspect/3
+Layout:   ms_row_span/2, ms_col_span/2
+Center:   ms_centroid/3, ms_radius/2
+Topology: ms_interior_count/2, ms_border_count/2
+Grid:     ms_color_count/2
+
+END OF CHAPTER 33
+END OF CHAPTER 33 AND END OF THE PROLOGAI TUTORIAL
