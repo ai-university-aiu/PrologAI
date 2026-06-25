@@ -384,7 +384,177 @@ It is therefore not directly comparable to ANN-Benchmarks or Qdrant's reported n
 
 Its purpose is to characterize RuVector's fit within PrologAI's specific operational context: sequential symbolic reasoning with vector retrieval as a sub-step.
 
-5.5 Future Work
+5.5 Data Loss Risks of the In-Memory RuVector Server
+
+The ruvector-server stores all vector collections in a DashMap held in an Arc<AppState> struct.
+
+DashMap is an in-memory concurrent hash map; it writes nothing to disk.
+
+Inspection of the server source confirms that the collection creation handler sets storage_path to the literal string "memory://{name}" and the comment in that handler reads: "Use in-memory storage for server (storage path will be ignored for memory storage)."
+
+This architectural choice creates four data-loss risks that any production deployment of the RuVector backend must address.
+
+Risk 1 is server-restart total loss.
+
+If the ruvector-server process stops for any reason — a crash, a system reboot, an out-of-memory kill, or a manual restart — every vector in every collection is immediately and permanently lost from the server's memory.
+
+The HNSW index must be rebuilt from scratch on the next server start.
+
+Risk 2 is silent insert failure.
+
+The vbr_insert/4 predicate wraps the HTTP PUT in a catch/3 block that swallows all exceptions and returns true regardless of whether the PUT succeeded.
+
+If the server is down or returns an error during an insert, the Prolog session believes the insert succeeded when no vector was actually stored.
+
+The Lattice node exists but has no representation in the HNSW index.
+
+Risk 3 is ghost search results from undelivered deletions.
+
+The ruvector-server has no per-point DELETE endpoint in the version tested (2.2.3).
+
+Calling vbr_delete/2 was originally a full no-op.
+
+If a Lattice node is retracted from PrologAI, the corresponding vector persists in the HNSW index and continues appearing in search results indefinitely.
+
+Risk 4 is silent search degradation.
+
+The vbr_search/4 predicate returns an empty list on any HTTP error, including a connection-refused error caused by the server being down.
+
+Callers that rely on non-empty search results receive no candidates and no error message; they cannot distinguish "server down" from "no similar vectors in the index."
+
+It is critical to understand that the Lattice facts themselves — the node-facts, rules, reasoning trajectories, and all symbolic knowledge stored in SWI-Prolog's database — are not at risk from any of these four conditions.
+
+RuVector only stores vector representations used for similarity retrieval.
+
+If RuVector loses its index, PrologAI loses fast approximate nearest-neighbor lookup, but it does not lose any knowledge.
+
+Symbolic deduction, induction, abduction, and planning all continue to work.
+
+The system degrades gracefully to a mode where similarity retrieval returns empty results rather than crashing.
+
+
+5.6 The Shadow Store and the Rebuild Predicate
+
+To mitigate Risks 1 and 3 directly in the backend_ruvector module, a shadow store and a rebuild predicate were designed, implemented, tested, and merged immediately after the bakeoff results were confirmed.
+
+5.6.1 Shadow Store Design
+
+The shadow store is a dynamic Prolog fact:
+
+vbr_shadow(CollectionName, BaseUrl, IdAtom, FloatVec, MetaAtom)
+
+One fact is asserted for every vector that is inserted via vbr_insert/4.
+
+The fact records all five values needed to reconstruct the original insert: the collection name, the server URL, the vector identifier, the floating-point vector, and the serialized metadata atom.
+
+The shadow store is maintained automatically by three predicates.
+
+vbr_insert/4 now calls the internal predicate vbr_insert_http/5 for the HTTP PUT, then asserts a vbr_shadow/5 fact.
+
+Before asserting, it retracts any existing shadow for the same identifier, preventing duplicate entries when a vector is re-inserted with new values.
+
+vbr_delete/2, previously a complete no-op, now calls retractall to remove the shadow entry for the deleted identifier.
+
+The server-side HNSW index still retains the vector (because there is no per-point DELETE endpoint), but the shadow is removed so the vector will not be re-inserted on the next rebuild.
+
+This eliminates ghost results after the next rebuild cycle.
+
+vbr_close/1 now calls retractall to remove all shadow entries for the collection, matching the behavior of the server-side DROP (DELETE /collections/{name}).
+
+A separate internal predicate, vbr_insert_http/5, handles the raw HTTP PUT without shadow recording.
+
+This separation prevents double-shadowing when rebuild calls the insert path to re-populate the server.
+
+5.6.2 The Rebuild Predicate
+
+vbr_rebuild/1 takes a Ref term and executes the following four steps.
+
+Step 1: Drop the collection from the server via DELETE /collections/{name}, ignoring any error (the server may have been freshly restarted with no collections present).
+
+Step 2: Find any shadow entry for this collection to determine the vector dimension (using length/2 on the stored FloatVec list).
+
+If no shadows exist, log a message and return true — there is nothing to rebuild.
+
+Step 3: Recreate the collection via POST /collections with the original name and dimension.
+
+Step 4: Re-insert every shadow vector via vbr_insert_http/5 (not vbr_insert/4, to avoid modifying the shadow store during the rebuild pass).
+
+The rebuild predicate logs its progress to standard output using format/2:
+
+"[ruvector] rebuilding '{name}': re-inserting N vectors"
+
+and on completion:
+
+"[ruvector] rebuild of '{name}' complete (N vectors restored)"
+
+5.6.3 Backend-Agnostic Interface
+
+The rebuild capability is exposed through the backend-agnostic routing layer as vb_rebuild/1.
+
+This predicate dispatches to vb_dispatch_rebuild/2.
+
+For the prolog backend, vb_dispatch_rebuild(prolog, _Ref) is a no-op: the pure-Prolog backend stores all vectors as dynamic Prolog facts that survive within the session and require no rebuild.
+
+For the ruvector backend, vb_dispatch_rebuild(ruvector, Ref) delegates to vbr_rebuild/1.
+
+Future backends that also use external processes can add their own vb_dispatch_rebuild/2 clause.
+
+5.6.4 Diagnostic Predicate
+
+vbr_shadow_count/2 is exported for diagnostic use:
+
+?- vbr_shadow_count(Ref, Count).
+
+It returns the number of shadow entries currently held for a given Ref.
+
+Before any inserts, Count is 0.
+
+After N inserts, Count is N.
+
+After a close or retractall, Count returns to 0.
+
+After a rebuild, Count remains N (the rebuild reads but does not modify the shadow store).
+
+5.6.5 Remaining Limitations
+
+The shadow store mitigates Risk 1 (server restart) and Risk 3 (ghost results) but does not fully address Risks 2 and 4.
+
+Risk 2 (silent insert failure) is not fully addressed because the shadow is recorded regardless of whether the HTTP PUT succeeded.
+
+If the server returns an error, the shadow and the index diverge: the shadow says the vector is stored, but the HNSW index does not contain it.
+
+Callers can detect this by calling vbr_rebuild/1 immediately after a suspected server error, which will drop and recreate the collection and re-insert all shadows from a known-good state.
+
+Risk 4 (silent search degradation) is not addressed by the shadow store.
+
+A health-check predicate that detects empty search results from a known-non-empty collection and triggers an automatic rebuild is planned for a future release.
+
+A second remaining limitation is that the shadow store lives in the SWI-Prolog process.
+
+A Prolog session restart (as opposed to a RuVector server restart) also clears the shadow facts.
+
+In that case, PrologAI's normal startup procedures — loading the Lattice, generating embeddings, and inserting vectors — would re-populate both the index and the shadow store.
+
+Full cross-session durability of the shadow store requires persisting the facts to a file or database on session close and reloading them on startup; this is deferred to a future release.
+
+5.6.6 Acceptance Tests
+
+Five new unit tests (AC-RV-008 through AC-RV-012) were added to packs/vector_backend/test/test_backend_ruvector.pl, bringing the total to 12.
+
+All 12 tests pass with no RuVector server running, using the fake server address http://localhost:19999 (connection refused) to isolate shadow-store logic from HTTP communication.
+
+AC-RV-008 verifies that a shadow entry exists after vbr_insert/4.
+
+AC-RV-009 verifies that vbr_delete/2 removes the shadow entry.
+
+AC-RV-010 verifies that vbr_close/1 clears all shadows for the collection.
+
+AC-RV-011 verifies that vbr_rebuild/1 returns true gracefully when no shadows exist.
+
+AC-RV-012 verifies that vbr_shadow_count/2 returns the correct count after multiple inserts.
+
+
+5.7 Future Work
 
 Several extensions to this bakeoff are planned.
 
@@ -396,7 +566,9 @@ Third, connection pooling should be added to the vbr_insert/4 and vbr_search/4 p
 
 Fourth, recall at k = 20 should be measured against an exact ground truth to quantify the accuracy cost of approximate search.
 
-Fifth, the bakeoff should be extended to measure memory usage (resident set size of the ruvector-server process) as a function of collection size, to characterize the memory scaling of the HNSW index.
+Fifth, a health-check predicate that detects silent search degradation (Risk 4) and triggers automatic rebuild should be designed and implemented.
+
+Sixth, the shadow store should be persisted to disk (or to PrologAI's SONA storage layer) so that it survives Prolog session restarts as well as RuVector server restarts.
 
 
 6. CONCLUSION
