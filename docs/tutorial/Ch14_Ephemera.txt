@@ -1,0 +1,227 @@
+PROLOGAI TUTORIAL
+
+CHAPTER 14 - THE EPHEMERA PACK: WRITING AND RUNNING SHORT-LIVED PROGRAMS
+
+The ephemera pack gives PrologAI the ability to compose a small program, run it, capture its output, and then discard the program entirely.
+
+These short-lived programs are called ephemera (singular: ephemeron).
+
+They are created for a purpose, used once, and then gone - just like a scratch calculation you write on a piece of paper and then throw away.
+
+The name comes from the Greek word for "lasting only a day."
+
+
+WHY EPHEMERA EXIST
+
+Symbolic logic in Prolog is excellent for structured reasoning, but some tasks are more naturally expressed as a small, runnable program than as a set of logical facts.
+
+For example:
+- Converting between data formats
+- Performing a numerical calculation too complex for arithmetic/1
+- Calling a system tool via a shell command
+- Quickly testing whether a hypothesis holds as executable code
+
+Capable problem-solving systems - both skilled human programmers and modern AI coding agents - routinely write short throwaway programs to probe unknowns, test hypotheses, and automate mechanical steps.
+
+The ephemera pack gives PrologAI the same capability.
+
+
+LOADING THE EPHEMERA PACK
+
+Load the pack in your session or your program file:
+
+    :- use_module(library(ephemera)).
+
+This makes all ep_* predicates available.
+
+
+EVALUATING A PROLOG GOAL WITH A TIMEOUT
+
+The simplest ephemeron is a Prolog goal evaluated with a time limit.
+
+ep_eval(+GoalTerm, +TimeoutSecs, -EvalResult)
+
+Example:
+
+    ?- ep_eval((X is 3 * 7), 5, R).
+    X = 21,
+    R = success.
+
+The result can be one of four values:
+
+    success     The goal succeeded and any variables in GoalTerm are now bound.
+
+    fail        The goal deterministically failed (no solution exists).
+
+    timeout     The timeout expired before the goal finished.
+
+    error(E)    The goal threw the exception E.
+
+The variable bindings in GoalTerm are preserved after a success result, so you can extract computed values from the original goal term directly after ep_eval/3 returns.
+
+
+EVALUATING PROLOG CODE WRITTEN AS AN ATOM
+
+Sometimes the code to evaluate is built up as a text atom - for example, when it is constructed from parts at runtime.
+
+ep_scratch(+CodeAtom, +VarBindings, +TimeoutSecs, -EvalResult)
+
+CodeAtom is a Prolog goal written as a text atom, for example 'X is 2 + 2'.
+
+VarBindings is a list of pairs 'VarName'=Variable, where VarName is the name as it appears in the code atom.
+
+Example:
+
+    ?- ep_scratch('Y is 10 + 5', ['Y'=Y], 5, R).
+    Y = 15,
+    R = success(['Y'=15]).
+
+The result on success is success(UpdatedBindings), where UpdatedBindings is the same list with the variable values filled in.
+
+
+RUNNING A SHELL COMMAND
+
+ep_shell(+Argv, +TimeoutSecs, -ShellResult)
+
+Argv is a list of atoms.
+
+The first atom is the executable.
+
+The remaining atoms are its arguments.
+
+Example:
+
+    ?- ep_shell(['echo', 'hello world'], 10, R).
+    R = shell_result(0, 'hello world\n', '').
+
+The result is always a shell_result/3 term:
+
+    shell_result(ExitCode, Stdout, Stderr)
+
+ExitCode is 0 on success.
+
+Stdout and Stderr are atoms containing the captured output from each stream.
+
+You can run any command your operating system supports:
+
+    ?- ep_shell(['date'], 5, shell_result(_, Out, _)).
+    Out = 'Tue Jun 24 12:00:00 UTC 2026\n'.
+
+    ?- ep_shell(['python3', '--version'], 5, shell_result(_, Out, Err)).
+    Out = '',
+    Err = 'Python 3.12.0\n'.
+
+
+RUNNING A SCRIPT IN ANOTHER LANGUAGE
+
+ep_ephemeral(+Language, +Code, +TimeoutSecs, -ShellResult)
+
+Language is one of: prolog, python, or bash.
+
+Code is the source code of the script as an atom.
+
+The pack writes the code to a temporary file, runs it, captures output, then deletes the temporary file.
+
+Example - run a Python snippet:
+
+    ?- ep_ephemeral(python,
+           'import math\nprint(math.sqrt(144))',
+           10, R).
+    R = shell_result(0, '12.0\n', '').
+
+Example - run a Bash snippet:
+
+    ?- ep_ephemeral(bash,
+           'echo "files: $(ls | wc -l)"',
+           10, shell_result(0, Out, _)).
+
+Example - run Prolog source code as a script:
+
+    ?- ep_ephemeral(prolog,
+           ':- write(hello_from_script), nl, halt.',
+           10, shell_result(0, Out, _)).
+    Out = 'hello_from_script\n'.
+
+The temporary file is always deleted, even if the script fails or times out.
+
+
+ITERATION CYCLES: SYNTHESIZE, EXECUTE, CHECK
+
+ep_iterate(:SynthGoal, :ExecGoal, :CheckGoal, +MaxIter, -IterResult)
+
+This predicate implements a closed loop:
+
+1. Call SynthGoal to produce Code.
+2. Call ExecGoal with Code to produce Result.
+3. Call CheckGoal with Result.
+4. If CheckGoal succeeds, the loop ends with ok(Code, Result).
+5. If CheckGoal fails and the budget remains, go to step 1.
+6. If the budget is exhausted, end with exhausted(Code, Result).
+
+This is the building block for code-generation loops: the synthesizer proposes code, the executor runs it, the checker decides whether the result is good enough.
+
+Example pattern:
+
+    synth([C]>>(C = 'print(42)')).
+    run([C, R]>>(ep_ephemeral(python, C, 5, R))).
+    check([R]>>(R = shell_result(0, _, _))).
+
+    ?- ep_iterate(synth, run, check, 5, Result).
+    Result = ok('print(42)', shell_result(0, '42\n', '')).
+
+
+TRACING EXECUTION SEQUENCES
+
+When you want to review a sequence of ephemeron executions later, use the trace log.
+
+Allocate a trace identifier:
+
+    ?- ep_next_trace_id(TId).
+    TId = ep_trace_1.
+
+Record each step:
+
+    ?- ep_trace_record(TId, 1, 'X is 1', success).
+    ?- ep_trace_record(TId, 2, 'Y is 2', success).
+
+Retrieve the full trace:
+
+    ?- ep_trace_get(TId, Entries).
+    Entries = [trace(TId, 1, 'X is 1', success),
+               trace(TId, 2, 'Y is 2', success)].
+
+The trace ID is unique across all trace sessions in the current process.
+
+Each entry records: the trace ID, the step number, the code that was run, and the output or result.
+
+
+SAFETY PROPERTIES
+
+Every subprocess execution is bounded by the caller-supplied TimeoutSecs.
+
+If a subprocess does not finish in time, it is terminated and a shell_result with exit code -1 is returned.
+
+Temporary files created by ep_ephemeral/4 are deleted before the predicate returns, on both success and failure.
+
+The ephemera pack does not modify any global state except its own trace log and counter.
+
+All external code (Python, Bash, external Prolog) runs in a subprocess isolated from the main PrologAI process.
+
+
+SUMMARY
+
+ep_eval/3             Evaluate a Prolog goal term with timeout.
+ep_scratch/4          Evaluate Prolog source written as an atom.
+ep_shell/3            Run any shell command and capture output.
+ep_ephemeral/4        Write a script to a temp file, run it, delete it.
+ep_iterate/5          Synthesize-execute-check loop with step budget.
+ep_trace_record/4     Record one step to a trace log.
+ep_trace_get/2        Retrieve all entries for a trace.
+ep_next_trace_id/1    Allocate a fresh unique trace identifier.
+
+
+WHAT COMES NEXT
+
+Chapter 15 covers the Agency Pack: how PrologAI manages formal, observable, bounded goal-pursuit loops (the agentic execution loop), with budgeted steps, goal stacks, loop detection, and escalation to human oversight.
+
+END OF CHAPTER 14

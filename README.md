@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       48 work packages — the complete cognitive engine (see below)
+├── packs/       49 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -167,6 +167,7 @@ Everything is inspectable.
 | `vector_backend` | The Vector Backend — a backend-agnostic six-predicate interface. Ships with two backends: the built-in pure-Prolog fallback and the RuVector HNSW (Hierarchical Navigable Small World) + SIMD HTTP REST backend (port 6333). Any vector store plugs in without changing the reasoning layer. Run `vb_set_backend(ruvector)` to switch; use `run_bakeoff([prolog, ruvector], [100, 1000])` to compare. Includes in-process shadow store (`vbr_shadow/5`) and rebuild predicate (`vb_rebuild/1`) — if the RuVector server restarts, call `vb_rebuild(Ref)` to re-insert all shadow vectors and restore the HNSW index. Bakeoff result: ruvector scores 0.2655 vs. prolog 0.0650 at 100,000 vectors (4x advantage, HNSW sub-linear scaling confirmed). |
 | `vsa` | Compositional Vector Binding (VSA — Vector Symbolic Architecture) — MAP and HRR algebras. Concepts are built by binding, not by lookup. |
 | `lattice_crypto` | Lattice Cryptographic Privacy Layer — RSA, ECDH, and post-quantum (PQC) hybrid encryption for sensitive Lattice data. |
+| `ephemera` | Ephemeral Code Synthesis and Execution (PR 53) — compose short-lived programs in Prolog, Python, or Bash, run them with a wall-clock timeout, capture stdout and stderr, and log execution traces. The same throwaway-program strategy used by expert programmers and AI coding agents, now available to PrologAI as a first-class reasoning faculty. Key predicates: `ep_eval/3` (Prolog goal with timeout), `ep_shell/3` (shell command), `ep_ephemeral/4` (language-specific script), `ep_iterate/5` (synthesize-execute-check loop). |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**
