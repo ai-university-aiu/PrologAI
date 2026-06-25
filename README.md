@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       63 work packages — the complete cognitive engine (see below)
+├── packs/       64 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -180,6 +180,7 @@ Everything is inspectable.
 | `frame` | Rectangular Border Detection, Interior Extraction, and Frame Generation (PR 63) — detect uniform outer rings (`fr_border_color/2`, `fr_has_border/2`, `fr_border_cells/2`), extract interiors (`fr_inner/2`, `fr_interior_uniform/1`, `fr_interior_color/2`), generate framed grids (`fr_make_framed/5`, `fr_add_border/4`), test sub-region borders (`fr_region_has_border/6`, `fr_region_border_color/6`), find bounding boxes (`fr_bounding_box/6`), and analyze concentric nesting (`fr_is_nested/3`, `fr_ring_count/2`). 14 fr_* predicates, Layer 42. |
 | `path` | Path-Finding, Flood Fill, Connectivity, and Reachability (PR 64) — 4-connected neighbor enumeration (`pf_neighbors/3`), same-color flood fill (`pf_flood_fill/4`), connectivity testing (`pf_connected/4`, `pf_is_connected/2`), connected component analysis (`pf_components/3`, `pf_component_count/3`, `pf_component_size/4`, `pf_largest_component/3`), BFS shortest path (`pf_shortest_path/5`, `pf_path_length/5`, `pf_path_exists/4`), reachability without walls (`pf_reachable/4`), and flood-fill bounding box (`pf_fill_bbox/7`). 13 pf_* predicates, Layer 43. |
 | `symmetry` | Grid Symmetry Testing, Canonical Orientation, and Orbit Generation (PR 65) — individual D4 symmetry tests (`sy_is_hsymmetric/1`, `sy_is_vsymmetric/1`, `sy_is_rot180/1`, `sy_is_rot90/1`, `sy_is_diagonal/1`, `sy_is_antidiagonal/1`), symmetry group computation (`sy_group/2`), rotation and orbit enumeration (`sy_rotations/2`, `sy_orbit/2`), canonical form (`sy_canonical/2`), orbit equivalence (`sy_equivalent/2`), and symmetry order (`sy_order/2`). 12 sy_* predicates, Layer 44. |
+| `color` | Color Palette Extraction, Histogram Analysis, and Color Manipulation (PR 66) — palette extraction (`cl_palette/2`, `cl_color_count/2`, `cl_is_mono/1`, `cl_has_color/2`), color counting and histograms (`cl_count/3`, `cl_histogram/2`), palette comparison (`cl_same_palette/2`), dominant and rarest color detection (`cl_dominant/2`, `cl_rarest/2`), color replacement and remapping (`cl_replace/4`, `cl_remap/3`, `cl_swap/4`), and color filtering (`cl_isolate/4`, `cl_remove/4`). 14 cl_* predicates, Layer 45. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**
