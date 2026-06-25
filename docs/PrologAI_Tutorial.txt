@@ -6166,3 +6166,75 @@ The compare pack ships 40 PLUnit tests.
 All 40 pass under SWI-Prolog.
 
 END OF CHAPTER 39
+
+
+Chapter 40: The Spatial Pack
+
+The spatial pack (module spatial, sp_* prefix, Layer 58) gives PrologAI
+fourteen predicates for spatial reasoning about positions and regions.
+
+Where the measure pack describes the size of a region and the compare
+pack describes what changed between two grids, the spatial pack answers
+directional and positional questions: where is this cell relative to
+that one, how far apart are they, and what are their neighbors?
+
+
+40.1 Direction Between Cells
+
+sp_direction(Cell1, Cell2, Dir) gives the cardinal direction from Cell1
+to Cell2: north, south, east, west, northeast, northwest, southeast,
+southwest, or same.
+
+
+40.2 Distance Metrics
+
+sp_distance_manhattan(Cell1, Cell2, D): D = |R2-R1| + |C2-C1|.
+sp_distance_chebyshev(Cell1, Cell2, D): D = max(|R2-R1|, |C2-C1|).
+
+
+40.3 Neighbor Enumeration
+
+sp_neighbors4(Cell, Rows-Cols, Neighbors): in-bounds 4-connected neighbors.
+sp_neighbors8(Cell, Rows-Cols, Neighbors): in-bounds 8-connected neighbors.
+
+
+40.4 Adjacency, Containment, Membership
+
+sp_adjacent4/2: Manhattan distance = 1.
+sp_adjacent8/2: Chebyshev distance = 1.
+sp_bbox_contains/2: cell inside bbox(R1,C1,R2,C2).
+sp_in_region/2: deterministic member check with cut.
+
+
+40.5 Band Filtering, Nearest, Farthest, Centroid
+
+sp_row_between/4: keep cells with row in [MinR, MaxR].
+sp_col_between/4: keep cells with col in [MinC, MaxC].
+sp_closest/3: region cell with min Manhattan distance from Ref.
+sp_farthest/3: region cell with max Manhattan distance from Ref.
+sp_centroid/3: integer centroid (sum // count).
+
+
+40.6 Summary
+
+Predicate               Arity   Description
+sp_direction            3       Cardinal direction between cells
+sp_distance_manhattan   3       Manhattan (L1) distance
+sp_distance_chebyshev   3       Chebyshev (L-inf) distance
+sp_neighbors4           3       4-connected in-bounds neighbors
+sp_neighbors8           3       8-connected in-bounds neighbors
+sp_adjacent4            2       4-connected adjacency test
+sp_adjacent8            2       8-connected adjacency test
+sp_bbox_contains        2       Cell inside bounding box
+sp_in_region            2       Cell in region membership
+sp_row_between          4       Filter region by row range
+sp_col_between          4       Filter region by column range
+sp_closest              3       Nearest region cell
+sp_farthest             3       Farthest region cell
+sp_centroid             3       Integer centroid
+
+The spatial pack ships 49 PLUnit tests.
+
+All 49 pass under SWI-Prolog.
+
+END OF CHAPTER 40
