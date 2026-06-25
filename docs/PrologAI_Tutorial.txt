@@ -8852,3 +8852,61 @@ SECTION 55.7 - ACCEPTANCE TESTS
 See PrologAI_4_Refinement_v107.txt, Part 84.
 
 END OF CHAPTER 55
+
+
+CHAPTER 56 - THE HYP PACK
+
+The hyp pack (Layer 74) provides 14 hy_* predicates for applying, testing,
+and selecting rule hypotheses. A hypothesis is a 2-argument callable that
+transforms an input grid into a candidate output grid.
+
+The hyp pack requires: grid, induct.
+
+SECTION 56.1 - THE HYPOTHESIS AS A CALLABLE
+
+In PrologAI, a hypothesis is a Prolog callable of the form Goal(Input, Output).
+The simplest hypothesis is hy_identity/2. The most common is hy_color_sub(Map),
+a partial application that substitutes colors according to a map.
+
+SECTION 56.2 - COLOR SUBSTITUTION
+
+hy_color_sub(+Map, +Grid, -Grid2)
+
+Applies a color substitution map (list of Old-New pairs) to every cell.
+Cells not in Map are left unchanged (identity fallback).
+
+  hy_color_sub([1-5, 2-6], [[1,2],[2,1]], Grid2).
+  % Grid2 = [[5,6],[6,5]]
+
+hy_identity/2 returns grid unchanged. hy_from_map/3 and hy_apply_map/3
+are aliases for hy_color_sub.
+
+SECTION 56.3 - TESTING AND SELECTION
+
+hy_test/4: pixel accuracy for one pair (float).
+hy_test_all/4: mean accuracy over all pairs.
+hy_verify/3: exact-match test for one pair.
+hy_verify_all/2: exact-match test for all pairs.
+hy_rank/3: rank hypothesis list by accuracy descending.
+hy_select/3: pick the best hypothesis.
+
+SECTION 56.4 - MAP UTILITIES
+
+hy_compose/4: sequential two-map substitution.
+hy_invert_map/2: swap keys and values.
+hy_map_lookup/3: lookup with identity fallback.
+hy_describe/2: human-readable atom.
+
+SECTION 56.5 - DESIGN NOTES
+
+hy_select and hy_rank have no meta_predicate declarations because their
+output argument is plain data, not a goal. Declaring the output as a goal
+arity would cause module qualification of the returned hypothesis functor,
+breaking unification in the caller.
+
+SECTION 56.6 - ACCEPTANCE TESTS
+
+30 PLUnit tests cover all 14 predicates (AC-HY-001 through AC-HY-030).
+See PrologAI_4_Refinement_v108.txt, Part 85.
+
+END OF CHAPTER 56

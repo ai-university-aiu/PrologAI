@@ -1,0 +1,101 @@
+CHAPTER 56 - THE HYP PACK
+
+The hyp pack (Layer 74) provides 14 hy_* predicates for applying, testing,
+and selecting rule hypotheses. A hypothesis is a 2-argument callable that
+transforms an input grid into a candidate output grid.
+
+The hyp pack requires: grid, induct.
+
+SECTION 56.1 - THE HYPOTHESIS AS A CALLABLE
+
+In PrologAI, a hypothesis is a Prolog callable of the form Goal(Input, Output).
+The simplest hypothesis is hy_identity/2, which returns the input unchanged.
+The most common hypothesis is hy_color_sub(Map), a partial application that
+substitutes colors according to a map.
+
+The hyp pack treats hypotheses uniformly: any 2-argument callable can be passed
+to hy_test, hy_verify, hy_rank, or hy_select.
+
+SECTION 56.2 - COLOR SUBSTITUTION
+
+hy_color_sub(+Map, +Grid, -Grid2)
+
+Applies a color substitution map (list of Old-New pairs) to every cell.
+Cells whose color is not in the map are left unchanged.
+
+  hy_color_sub([1-5, 2-6], [[1,2],[2,1]], Grid2).
+  % Grid2 = [[5,6],[6,5]]
+
+hy_identity(+Grid, -Grid2) returns Grid unchanged.
+hy_from_map(+Map, +Grid, -Grid2) is the same as hy_color_sub; useful as a
+partial-application goal (hy_from_map([1-5]) calls like hy_color_sub([1-5])).
+
+hy_apply_map/3 is another alias for hy_color_sub.
+
+SECTION 56.3 - TESTING HYPOTHESES
+
+hy_test(+Goal, +Input, +Expected, -Acc)
+
+Apply Goal to Input and measure pixel accuracy against Expected. Acc is a
+float in [0.0, 1.0]. Uses float(Match)/float(Total) for consistent float output.
+
+hy_test_all(+Goal, +Pairs, -MeanAcc, -Accs)
+
+Test Goal on all training pairs. Returns the mean accuracy and the per-pair
+accuracy list. This is the standard ARC-AGI evaluation:
+
+  hy_test_all(hy_color_sub([1-5]), Pairs, Mean, _).
+
+SECTION 56.4 - EXACT MATCH
+
+hy_verify(+Goal, +Input, +Expected) succeeds if Goal produces Output = Expected.
+
+hy_verify_all(+Goal, +Pairs) succeeds if Goal solves every pair exactly.
+This is the ARC-AGI pass criterion.
+
+SECTION 56.5 - SELECTION AND RANKING
+
+hy_rank(+Goals, +Pairs, -Ranked) ranks a list of hypothesis goals by mean
+accuracy descending. Ranked is a list of MeanAcc-Goal pairs.
+
+hy_select(+Goals, +Pairs, -Best) picks the best hypothesis from the list.
+
+SECTION 56.6 - MAP UTILITIES
+
+hy_compose(+Map1, +Map2, +Grid, -Grid2) applies Map1 then Map2 (sequential
+color substitution). Useful for two-step color transformation.
+
+hy_invert_map(+Map, -Inverted) swaps keys and values. Used to infer the
+reverse mapping from output colors back to input colors.
+
+hy_map_lookup(+Map, +Color, -New) looks up Color in Map. Returns Color itself
+if not found (identity fallback). Useful for checking whether a color is
+in the substitution domain.
+
+SECTION 56.7 - DESCRIBING HYPOTHESES
+
+hy_describe(+Goal, -Desc) converts a hypothesis to a human-readable atom.
+Useful for logging and debugging.
+
+SECTION 56.8 - DESIGN NOTES
+
+hy_color_sub uses if-then-else in the lookup helper for determinism; no
+choicepoints from member/2.
+
+hy_test uses findall-based cell counting (hy_cell_match_) for determinism
+and float/1 conversion to avoid integer division.
+
+hy_describe uses cuts in the first two clauses to prevent the catch-all
+from leaving a choicepoint.
+
+hy_select and hy_rank have no meta_predicate declarations because their
+output argument is plain data, not a goal argument. Adding meta_predicate
+with a goal arity on the output would cause module qualification of the
+returned hypothesis functor, breaking unification in the caller.
+
+SECTION 56.9 - ACCEPTANCE TESTS
+
+30 PLUnit tests cover all 14 predicates (AC-HY-001 through AC-HY-030).
+See PrologAI_4_Refinement_v108.txt, Part 85.
+
+END OF CHAPTER 56
