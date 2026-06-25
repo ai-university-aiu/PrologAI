@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       71 work packages — the complete cognitive engine (see below)
+├── packs/       72 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -188,6 +188,7 @@ Everything is inspectable.
 | `overlay` | Grid Combination by Layering, Logic, Masking, and Priority Merge (PR 71) — transparent overlay (`ov_over/4`, `ov_blend/4`), bitwise operations (`ov_or/3`, `ov_and/3`, `ov_xor/4`), difference and intersection (`ov_diff/4`, `ov_intersect/4`), masking (`ov_mask/4`, `ov_mask_inv/4`), priority merge across multiple grids (`ov_priority/3`), color replacement (`ov_replace/4`, `ov_fill_bg/4`), and pointwise extrema (`ov_max/3`, `ov_min/3`). 14 ov_* predicates, Layer 50. |
 | `measure` | Geometric Measurement of Cell Regions and Grids (PR 72) — area (`ms_area/2`), bounding box (`ms_bbox/2`, `ms_bbox_size/3`), perimeter (`ms_perimeter/2`), diameter (`ms_diameter/2`), extent fraction (`ms_extent/3`), aspect ratio (`ms_aspect/3`), row/column spans (`ms_row_span/2`, `ms_col_span/2`), integer centroid (`ms_centroid/3`), Chebyshev radius (`ms_radius/2`), interior and border counts (`ms_interior_count/2`, `ms_border_count/2`), and distinct color count (`ms_color_count/2`). 14 ms_* predicates, Layer 51. |
 | `transform` | Grid-Level Spatial and Color Transformations (PR 73) — spatial scaling (`tr_scale_up/3`, `tr_scale_down/3`), horizontal/vertical tiling (`tr_tile_h/3`, `tr_tile_v/3`, `tr_tile/3`), transposition (`tr_transpose/2`), reflections (`tr_flip_h/2`, `tr_flip_v/2`), rotations (`tr_rot90/2`, `tr_rot180/2`), content shifting with fill (`tr_shift/5`), color-map application (`tr_apply_map/3`), single-color replacement (`tr_replace_color/4`), and mask-based selection (`tr_mask_grid/4`). 14 tr_* predicates, Layer 52. |
+| `select` | Selection and Filtering of Cell Regions by Spatial and Size Properties (PR 74) — largest and smallest region (`sl_largest/2`, `sl_smallest/2`), area-sorted list (`sl_sort_by_area/2`), area filters (`sl_filter_area/3`, `sl_filter_area_min/3`, `sl_filter_area_max/3`), border test (`sl_touches_border/3`), border/interior filters (`sl_filter_border/4`, `sl_filter_interior/4`), directional filters (`sl_above_row/3`, `sl_below_row/3`, `sl_left_of_col/3`, `sl_right_of_col/3`), and unique-area selection (`sl_unique_area/2`). 14 sl_* predicates, Layer 53. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**

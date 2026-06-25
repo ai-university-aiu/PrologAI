@@ -1,0 +1,118 @@
+Chapter 35: Select Pack
+
+The select pack (module select, prefix sl_) provides fourteen deterministic
+predicates for filtering and selecting cell regions from a list based on
+spatial position, cell count, and uniqueness. A region is a list of r(R,C)
+cells. Layer 53, requires grid.
+
+Load the pack:
+
+    :- use_module(library(select)).
+
+
+Finding Extremes
+
+sl_largest/2 returns the region with the most cells (the first one when tied).
+sl_smallest/2 returns the region with the fewest cells.
+
+    ?- sl_largest([[r(0,0)], [r(1,0),r(1,1),r(1,2)], [r(2,0),r(2,1)]], L).
+    L = [r(1,0),r(1,1),r(1,2)].   % 3 cells.
+
+    ?- sl_smallest([[r(0,0)], [r(1,0),r(1,1)]], S).
+    S = [r(0,0)].   % 1 cell.
+
+
+Sorting by Size
+
+sl_sort_by_area/2 sorts regions by cell count ascending (stable sort).
+
+    ?- sl_sort_by_area([[r(0,0),r(0,1)], [r(1,0)]], Sorted).
+    Sorted = [[r(1,0)], [r(0,0),r(0,1)]].
+
+
+Filtering by Cell Count
+
+sl_filter_area/3 keeps regions with exactly N cells.
+sl_filter_area_min/3 keeps regions with at least Min cells.
+sl_filter_area_max/3 keeps regions with at most Max cells.
+
+    ?- Regions = [[r(0,0)], [r(1,0),r(1,1)], [r(2,0),r(2,1),r(2,2)]],
+       sl_filter_area(Regions, 2, F).
+    F = [[r(1,0),r(1,1)]].
+
+    ?- Regions = [[r(0,0)], [r(1,0),r(1,1)], [r(2,0),r(2,1),r(2,2)]],
+       sl_filter_area_min(Regions, 2, F).
+    F = [[r(1,0),r(1,1)], [r(2,0),r(2,1),r(2,2)]].
+
+
+Border and Interior Filtering
+
+sl_touches_border/3 tests whether any cell of a region lies on the grid border
+(row 0, row Rows-1, col 0, or col Cols-1 of a Rows x Cols grid).
+
+sl_filter_border/4 keeps border-touching regions.
+sl_filter_interior/4 keeps non-border regions.
+
+    ?- sl_touches_border([r(0,2), r(1,2)], 5, 5).
+    true.   % r(0,2) is on row 0 border.
+
+    ?- sl_touches_border([r(2,2), r(3,2)], 5, 5).
+    false.  % all cells are interior.
+
+    ?- Regions = [[r(0,2)], [r(2,2)]],
+       sl_filter_border(Regions, 5, 5, F).
+    F = [[r(0,2)]].
+
+    ?- Regions = [[r(0,2)], [r(2,2)]],
+       sl_filter_interior(Regions, 5, 5, F).
+    F = [[r(2,2)]].
+
+
+Directional Filtering
+
+sl_above_row/3 keeps regions where every cell has row < Row.
+sl_below_row/3 keeps regions where every cell has row >= Row.
+sl_left_of_col/3 keeps regions where every cell has col < Col.
+sl_right_of_col/3 keeps regions where every cell has col >= Col.
+
+    ?- Regions = [[r(0,1)], [r(3,1)]],
+       sl_above_row(Regions, 2, F).
+    F = [[r(0,1)]].   % only the first region is entirely above row 2.
+
+    ?- Regions = [[r(0,1)], [r(3,1)]],
+       sl_below_row(Regions, 2, F).
+    F = [[r(3,1)]].   % only the second region is at or below row 2.
+
+
+Unique Area Selection
+
+sl_unique_area/2 keeps regions whose cell count appears exactly once in the
+full input list. If two regions have the same area, neither is returned.
+
+    ?- Regions = [[r(0,0)], [r(1,0),r(1,1)], [r(2,0),r(2,1)]],
+       sl_unique_area(Regions, U).
+    U = [[r(0,0)]].   % only the 1-cell region has a unique area.
+
+    ?- Regions = [[r(0,0)], [r(1,0),r(1,1),r(1,2)]],
+       sl_unique_area(Regions, U).
+    U = [[r(0,0)], [r(1,0),r(1,1),r(1,2)]].   % both areas are unique.
+
+
+Exported Predicates
+
+sl_largest/2          - region with maximum cell count
+sl_smallest/2         - region with minimum cell count
+sl_sort_by_area/2     - sort regions by cell count ascending
+sl_filter_area/3      - keep regions with exactly N cells
+sl_filter_area_min/3  - keep regions with at least Min cells
+sl_filter_area_max/3  - keep regions with at most Max cells
+sl_touches_border/3   - test border membership
+sl_filter_border/4    - keep border-touching regions
+sl_filter_interior/4  - keep non-border regions
+sl_above_row/3        - keep regions entirely above a row
+sl_below_row/3        - keep regions at or below a row
+sl_left_of_col/3      - keep regions entirely left of a column
+sl_right_of_col/3     - keep regions at or right of a column
+sl_unique_area/2      - keep regions with unique cell count
+
+END OF CHAPTER 35
