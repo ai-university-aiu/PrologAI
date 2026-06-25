@@ -7328,3 +7328,170 @@ The connect pack integrates with spatial, lookup, and fill packs:
 
 
 END OF CHAPTER 46
+CHAPTER 47: THE MORPH PACK
+
+The morph pack (prefix mo_) provides morphological operations on grids.
+Morphological operations transform the shape of a colored region by
+expanding, shrinking, outlining, or filling it. The term comes from
+mathematical morphology, a branch of image processing.
+
+All predicates live in the morph module (Layer 65).
+
+
+LOADING
+
+  :- use_module(library(morph)).
+
+
+DILATION: EXPANDING A REGION
+
+  mo_dilate4(+Grid, +Color, +BG, -Grid2)
+
+  Expand Color one step: every BG cell that has at least one Color
+  4-neighbor becomes Color. Other cells (including non-BG, non-Color
+  cells) are left unchanged.
+
+  Example:
+
+    G = [[0,0,0],[0,1,0],[0,0,0]].  % single center dot
+    mo_dilate4(G, 1, 0, G2).
+    % G2 = [[0,1,0],[1,1,1],[0,1,0]]  % cross shape
+
+  mo_dilate8(+Grid, +Color, +BG, -Grid2)
+
+  Same using 8-connected adjacency (includes diagonals).
+
+  mo_dilate4_n(+Grid, +Color, +BG, +N, -Grid2)
+
+  Apply mo_dilate4 exactly N times. N=0 returns Grid unchanged.
+
+
+EROSION: SHRINKING A REGION
+
+  mo_erode4(+Grid, +Color, +BG, -Grid2)
+
+  Shrink Color: a Color cell is kept only if ALL its in-bounds
+  4-neighbors are also Color. Cells with any out-of-bounds or non-Color
+  4-neighbor become BG.
+
+  Grid-edge Color cells always erode because they have out-of-bounds
+  neighbors (which count as non-Color).
+
+  Example:
+
+    G = [[1,1,1],[1,1,1],[1,1,1]].  % solid 3x3
+    mo_erode4(G, 1, 0, G2).
+    % G2 = [[0,0,0],[0,1,0],[0,0,0]]  % only center survives
+
+  mo_erode8(+Grid, +Color, +BG, -Grid2)
+
+  Same using 8-connected adjacency.
+
+  mo_erode4_n(+Grid, +Color, +BG, +N, -Grid2)
+
+  Apply mo_erode4 N times.
+
+
+OPENING AND CLOSING
+
+  mo_open4(+Grid, +Color, +BG, -Grid2)
+
+  Morphological open: erode once, then dilate once.
+  Removes small protrusions and isolated pixels while preserving
+  the overall shape of larger regions.
+
+  mo_close4(+Grid, +Color, +BG, -Grid2)
+
+  Morphological close: dilate once, then erode once.
+  Fills small holes and gaps within a region while preserving
+  its overall shape.
+
+
+BOUNDARY AND RING EXTRACTION
+
+  mo_boundary4(+Grid, +Color, -Cells)
+
+  Cells is the list of Color cells that are NOT fully surrounded by
+  Color in all 4 directions (or that lie on the grid edge). These
+  are the "inner contour" of the Color region.
+
+  Example:
+
+    G = [[1,1,1],[1,0,1],[1,1,1]].  % ring of 1s
+    mo_boundary4(G, 1, Cells).
+    % Cells = all 8 ring cells (each has a non-1 4-neighbor)
+
+  mo_boundary8(+Grid, +Color, -Cells)
+
+  Same using 8-connected adjacency.
+
+  mo_ring4(+Grid, +Color, +BG, -Cells)
+
+  Cells is the list of BG cells that are 4-adjacent to at least one
+  Color cell. This is the "outer contour" -- the one-cell outward
+  frame around the Color region.
+
+  Example:
+
+    G = [[0,0,0],[0,1,0],[0,0,0]].  % center dot
+    mo_ring4(G, 1, 0, Ring).
+    % Ring = [r(0,1), r(1,0), r(1,2), r(2,1)]
+
+
+FILLING HOLES
+
+  mo_fill_holes4(+Grid, +Color, +BG, -Grid2)
+
+  Fill all BG cells that are enclosed inside the Color region.
+  A BG cell is enclosed if it cannot be reached from any BG cell
+  on the grid border by stepping through BG cells.
+
+  Example:
+
+    G = [[1,1,1],[1,0,1],[1,1,1]].  % ring of 1s
+    mo_fill_holes4(G, 1, 0, G2).
+    % G2 = [[1,1,1],[1,1,1],[1,1,1]]  % hole filled
+
+
+GRID PADDING AND UNPADDING
+
+  mo_pad(+Grid, +PadColor, -Grid2)
+
+  Add a one-cell border of PadColor around all four sides. The result
+  is (Rows+2) x (Cols+2).
+
+  Useful before dilation to prevent border cells from being treated as
+  having out-of-bounds neighbors.
+
+  Example:
+
+    G = [[1,2],[3,4]].
+    mo_pad(G, 0, G2).
+    % G2 = [[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]]
+
+  mo_unpad(+Grid, -Grid2)
+
+  Remove the outermost ring from all four sides. The result is
+  (Rows-2) x (Cols-2). Inverse of mo_pad.
+
+
+COMBINING WITH OTHER PACKS
+
+The morph pack integrates naturally with the connect and fill packs:
+
+  % Find the outline (boundary) of the largest connected region.
+  cc_largest4(Grid, 1, Blob),
+  fl_fill_region(Grid, Blob, 1, BlobGrid),
+  mo_boundary4(BlobGrid, 1, Outline).
+
+  % Expand a region by 2 cells, avoiding other colors.
+  mo_dilate4_n(Grid, Color, BG, 2, Expanded).
+
+  % Fill a closed shape defined by its outline.
+  mo_fill_holes4(Grid, 1, 0, Filled).
+
+  % Erode then dilate to remove isolated dots while preserving large shapes.
+  mo_open4(Grid, 1, 0, Cleaned).
+
+
+END OF CHAPTER 47
