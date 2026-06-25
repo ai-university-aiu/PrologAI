@@ -6063,3 +6063,106 @@ The pattern pack ships 43 PLUnit tests.
 All 43 pass under SWI-Prolog.
 
 END OF CHAPTER 38
+
+
+Chapter 39: The Compare Pack
+
+The compare pack (module compare, cp_* prefix, Layer 57) gives PrologAI
+fourteen predicates for comparing two grids or two cell regions.
+
+Where the count pack answers quantitative questions about a single grid,
+the compare pack answers differential questions about two grids: what
+changed, what stayed the same, and how similar are they?
+
+
+39.1 Loading the Pack
+
+To use the compare pack in your code:
+
+:- use_module(library(compare)).
+
+
+39.2 Finding Differences and Similarities
+
+cp_diff_cells(Grid1, Grid2, Diffs) returns the list of r(R,C) cells
+where Grid1 and Grid2 have different values.
+
+cp_same_cells(Grid1, Grid2, Sames) returns the list of r(R,C) cells
+where Grid1 and Grid2 have equal values.
+
+Example:
+
+G1 = [[0,0,0],[0,1,0],[0,0,0]],
+G2 = [[0,0,0],[0,2,0],[0,0,0]],
+cp_diff_cells(G1, G2, Diffs).
+% Diffs = [r(1,1)]
+
+
+39.3 Color Gain and Loss
+
+cp_added_color(Grid1, Grid2, Color, Added) returns cells where Color
+appeared in Grid2 but was absent in Grid1.
+
+cp_removed_color(Grid1, Grid2, Color, Removed) returns cells where Color
+was present in Grid1 but absent in Grid2.
+
+
+39.4 Value Change Direction
+
+cp_changed_to(Grid1, Grid2, Color, Changed) returns cells whose value
+changed to Color.
+
+cp_changed_from(Grid1, Grid2, Color, Changed) returns cells whose value
+changed from Color.
+
+
+39.5 Difference Map
+
+cp_diff_map(Grid1, Grid2, Map) produces a grid where each cell is 1 if
+the values differ, or 0 if they are equal.
+
+
+39.6 Similarity Score
+
+cp_similarity(Grid1, Grid2, EqCount-Total) returns the number of equal
+cells and total cells as an integer-exact pair.
+
+
+39.7 Region Set Operations
+
+cp_region_diff(Region1, Region2, Diff) - cells in R1 not in R2.
+cp_region_intersect(Region1, Region2, Inter) - cells in both.
+cp_region_union(Region1, Region2, Union) - cells in either, no dups.
+cp_region_equal(Region1, Region2) - same cell set, order-independent.
+
+
+39.8 Grid Equality and Color Shifts
+
+cp_grids_equal(Grid1, Grid2) - grids are structurally identical.
+
+cp_color_shift(Grid1, Grid2, Pairs) - list of Old-New pairs for changed cells.
+
+
+39.9 Summary
+
+Predicate             Arity   Description
+cp_diff_cells         3       Cells where two grids differ
+cp_same_cells         3       Cells where two grids are equal
+cp_added_color        4       Cells where a color was gained
+cp_removed_color      4       Cells where a color was lost
+cp_changed_to         4       Cells that changed to a color
+cp_changed_from       4       Cells that changed from a color
+cp_diff_map           3       0/1 difference grid
+cp_similarity         3       EqCount-Total integer pair
+cp_region_diff        3       Region set difference
+cp_region_intersect   3       Region set intersection
+cp_region_union       3       Region set union
+cp_region_equal       2       Region equality (order-independent)
+cp_grids_equal        2       Structural grid equality
+cp_color_shift        3       Old-New color pairs for changed cells
+
+The compare pack ships 40 PLUnit tests.
+
+All 40 pass under SWI-Prolog.
+
+END OF CHAPTER 39
