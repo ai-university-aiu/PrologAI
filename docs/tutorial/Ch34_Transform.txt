@@ -1,0 +1,139 @@
+Chapter 34: Transform Pack
+
+The transform pack (module transform, prefix tr_) provides fourteen deterministic
+predicates for applying spatial and color transformations to entire grids.
+Layer 52, requires grid.
+
+Load the pack:
+
+    :- use_module(library(transform)).
+
+
+Scaling Up
+
+tr_scale_up/3 expands each cell into a Factor x Factor block.
+
+    ?- tr_scale_up([[1,2],[3,4]], 2, S).
+    S = [[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]].
+
+    ?- tr_scale_up([[7]], 3, S).
+    S = [[7,7,7],[7,7,7],[7,7,7]].
+
+
+Scaling Down
+
+tr_scale_down/3 keeps every Factor-th row and column (0-indexed).
+
+    ?- tr_scale_down([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]], 2, S).
+    S = [[1,3],[9,11]].   % rows 0,2 and cols 0,2 kept.
+
+
+Tiling
+
+tr_tile_h/3 repeats each row N times horizontally (widens the grid).
+tr_tile_v/3 repeats the grid N times vertically (heightens the grid).
+tr_tile/3 tiles in both directions.
+
+    ?- tr_tile_h([[1,2],[3,4]], 2, T).
+    T = [[1,2,1,2],[3,4,3,4]].
+
+    ?- tr_tile_v([[1,2],[3,4]], 2, T).
+    T = [[1,2],[3,4],[1,2],[3,4]].
+
+    ?- tr_tile([[1,2],[3,4]], 2, T).
+    T = [[1,2,1,2],[3,4,3,4],[1,2,1,2],[3,4,3,4]].
+
+
+Transposition
+
+tr_transpose/2 swaps rows and columns. The result has dimensions Cols x Rows.
+
+    ?- tr_transpose([[1,2,3],[4,5,6]], T).
+    T = [[1,4],[2,5],[3,6]].
+
+
+Reflections
+
+tr_flip_h/2 reverses each row (left-right mirror).
+tr_flip_v/2 reverses the row list (top-bottom mirror).
+
+    ?- tr_flip_h([[1,2,3],[4,5,6]], F).
+    F = [[3,2,1],[6,5,4]].
+
+    ?- tr_flip_v([[1,2],[3,4],[5,6]], F).
+    F = [[5,6],[3,4],[1,2]].
+
+
+Rotations
+
+tr_rot90/2 rotates 90 degrees clockwise (implemented as transpose + flip_h).
+tr_rot180/2 rotates 180 degrees (flip_v + flip_h).
+
+    ?- tr_rot90([[1,2],[3,4]], R).
+    R = [[3,1],[4,2]].
+
+    ?- tr_rot180([[1,2,3],[4,5,6],[7,8,9]], R).
+    R = [[9,8,7],[6,5,4],[3,2,1]].
+
+Four 90-degree rotations return to the original grid.
+
+
+Shifting
+
+tr_shift/5 translates grid content by DR rows and DC columns, filling vacated
+cells with Fill. DR/DC may be negative (shift up/left).
+
+    ?- tr_shift([[1,2],[3,4]], 1, 0, 0, S).
+    S = [[0,0],[1,2]].   % shifted down 1; top row filled with 0.
+
+    ?- tr_shift([[1,2],[3,4]], 0, -1, 9, S).
+    S = [[2,9],[4,9]].   % shifted left 1; right col filled with 9.
+
+
+Color Mapping
+
+tr_apply_map/3 applies a list of From-To pairs to every cell. Values absent
+from the map are left unchanged.
+
+    ?- tr_apply_map([[0,1,0],[1,0,1]], [0-9], R).
+    R = [[9,1,9],[1,9,1]].
+
+    ?- tr_apply_map([[0,1],[1,0]], [0-1, 1-0], R).
+    R = [[1,0],[0,1]].   % colors 0 and 1 swapped.
+
+tr_replace_color/4 is a convenience predicate for single-color substitution.
+
+    ?- tr_replace_color([[0,1,0],[0,0,1]], 0, 5, R).
+    R = [[5,1,5],[5,5,1]].
+
+
+Masking
+
+tr_mask_grid/4 uses a same-size Mask grid to select values. Where Mask=0, the
+result cell is Fill. Where Mask is non-zero, the result is the Grid cell value.
+
+    ?- tr_mask_grid([[1,2],[3,4]], [[1,0],[0,1]], 0, R).
+    R = [[1,0],[0,4]].
+
+    ?- tr_mask_grid([[1,2],[3,4]], [[0,0],[0,0]], 9, R).
+    R = [[9,9],[9,9]].   % all transparent mask = all Fill.
+
+
+Exported Predicates
+
+tr_scale_up/3        - expand each cell to Factor x Factor block
+tr_scale_down/3      - subsample every Factor-th row and column
+tr_tile_h/3          - tile horizontally N times
+tr_tile_v/3          - tile vertically N times
+tr_tile/3            - tile in both directions N times
+tr_transpose/2       - swap rows and columns
+tr_flip_h/2          - left-right mirror
+tr_flip_v/2          - top-bottom mirror
+tr_rot90/2           - 90-degree clockwise rotation
+tr_rot180/2          - 180-degree rotation
+tr_shift/5           - translate content with fill
+tr_apply_map/3       - apply From-To color substitution map
+tr_replace_color/4   - single-color substitution
+tr_mask_grid/4       - mask-based cell selection
+
+END OF CHAPTER 34
