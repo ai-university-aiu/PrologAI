@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       50 work packages — the complete cognitive engine (see below)
+├── packs/       51 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -169,6 +169,7 @@ Everything is inspectable.
 | `lattice_crypto` | Lattice Cryptographic Privacy Layer — RSA, ECDH, and post-quantum (PQC) hybrid encryption for sensitive Lattice data. |
 | `ephemera` | Ephemeral Code Synthesis and Execution (PR 53) — compose short-lived programs in Prolog, Python, or Bash, run them with a wall-clock timeout, capture stdout and stderr, and log execution traces. The same throwaway-program strategy used by expert programmers and AI coding agents, now available to PrologAI as a first-class reasoning faculty. Key predicates: `ep_eval/3` (Prolog goal with timeout), `ep_shell/3` (shell command), `ep_ephemeral/4` (language-specific script), `ep_iterate/5` (synthesize-execute-check loop). |
 | `agency` | Agentic Execution Loop (PR 54) — formal, observable, bounded goal-pursuit loop. Allocate a loop with a step budget, supply a reasoning goal, and let the loop execute Observe-Reason-Act-Observe steps until done, budget-exhausted, or escalated to human oversight. Full trace recording, goal stack management, loop detection, and safe escalation. Key predicates: `ag_loop_create/3`, `ag_loop_run/3`, `ag_detect_loop/2`, `ag_escalate/2`, `ag_loop_trace/2`. |
+| `refinery` | Evaluator-Optimizer and Metacognitive Quality Layer (PR 55) — critique outputs against named criteria, score them as a fraction in [0.0, 1.0], drive iterative improvement cycles with an improver goal, run full evaluator-optimizer loops, explore multiple reasoning paths and rank by score, and maintain a lesson database that records what went wrong and recalls it before future attempts. Key predicates: `rn_critique/4`, `rn_score/3`, `rn_optimize/5`, `rn_explore_paths/4`, `rn_learn/3`. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**

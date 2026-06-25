@@ -1300,7 +1300,9 @@ PR 53 - ephemera: The Ephemeral Code Synthesis and Execution pack. Write short-l
 
 PR 54 - agency: The Agentic Execution Loop pack. Formal, observable, bounded goal-pursuit with step budgets, goal stacks, loop detection, and escalation to human oversight. Chapter 15 covers this pack in full.
 
-Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 15).
+PR 55 - refinery: The Evaluator-Optimizer and Metacognitive Quality Layer. Critique outputs against criteria, score them, drive iterative improvement cycles, explore multiple reasoning paths, and maintain a lesson database. Chapter 16 covers this pack in full.
+
+Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 16).
 
 
 EXERCISE
@@ -3366,6 +3368,105 @@ You have now completed the PrologAI Tutorial.
 
 You have gone from having no knowledge of programming or AI, all the way through symbolic reasoning, the Lattice, assessment, safety, agent protocols, cryptographic privacy, ephemeral code execution, and now agentic goal pursuit.
 
+Chapter 16 covers the Refinery Pack: criterion-based critique, score-based ranking, evaluator-optimizer loops, multi-path exploration, and the lesson database.
+
+END OF CHAPTER 15
+PROLOGAI TUTORIAL
+
+Chapter 16: The Refinery Pack - Evaluator-Optimizer and Metacognitive Quality Layer
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+THE REFINERY PACK (PR 55)
+
+The refinery pack gives PrologAI the ability to improve its own outputs by applying named criteria tests, scoring results, and driving iterative improvement cycles.
+
+    :- use_module(library(refinery)).
+
+
+CRITERIA AND CRITIQUES
+
+Write criteria using YALL lambda notation so they are portable across modules:
+
+    Criteria = [criterion(non_empty, [O]>>(O \= [])),
+                criterion(short,     [O]>>(length(O, L), L < 5))].
+
+rn_critique(+Output, +Criteria, +MaxSteps, -Critique)
+
+    ?- rn_critique([a,b,c], Criteria, 5, Critique).
+    Critique = [].
+
+    ?- rn_critique([], Criteria, 5, Critique).
+    Critique = [found_issue(non_empty, fail)].
+
+
+SCORING
+
+rn_score(+Output, +Criteria, -Score)
+
+    ?- rn_score([a,b], Criteria, Score).
+    Score = 1.0.
+
+    ?- rn_score([a,b,c,d,e,f], Criteria, Score).
+    Score = 0.5.
+
+Score is a float in [0.0, 1.0].
+
+
+EVALUATOR-OPTIMIZER LOOP
+
+rn_optimize(:GeneratorGoal, :EvaluatorGoal, +QualityBar, +MaxIter, -Best)
+
+    Gen  = ([O]>>(O = [a,b,c])).
+    Eval = ([O,S]>>(length(O,L), S is float(L)/10.0)).
+
+    ?- rn_optimize(Gen, Eval, 0.3, 5, Best).
+    Best = [a, b, c].
+
+
+MULTI-PATH EXPLORATION
+
+rn_explore_paths(+Problem, :ExplorerGoal, +NumPaths, -Ranked)
+
+Explores NumPaths different approaches and returns them ranked by score (highest first):
+
+    ?- rn_explore_paths(problem, my_explorer, 3, Ranked).
+
+
+THE LESSON DATABASE
+
+    ?- rn_learn(math_problems, negative_answer, use_abs_value).
+    ?- rn_recall(math_problems, Lessons).
+    ?- rn_forget(math_problems).
+
+
+SUMMARY
+
+rn_critique/4        Critique an output against a criteria list.
+rn_score/3           Score an output (fraction of criteria that pass).
+rn_improve/5         Iterative improvement loop.
+rn_optimize/5        Evaluator-optimizer loop with run logging.
+rn_explore_paths/4   Multi-path exploration ranked by score.
+rn_learn/3           Store a lesson from a past failure.
+rn_recall/2          Recall lessons for a given problem type.
+rn_forget/1          Clear lessons for a given problem type.
+
+
+WHAT COMES NEXT
+
+You have now completed the PrologAI Tutorial.
+
+The three new packs in Chapters 14, 15, and 16 work together as a complete agentic quality system:
+
+Chapter 14 - ephemera: write and run short-lived programs.
+
+Chapter 15 - agency: pursue goals step by step with observation and control.
+
+Chapter 16 - refinery: improve outputs until they meet a quality bar.
+
+Together, these three packs give PrologAI the capability to write code, run it, observe the result, improve it, and keep going until it is good enough.
+
 The next step is to build something of your own.
 
 Read the Mentova Tutorial to see how Mentova uses all of these capabilities as a living reasoning system.
@@ -3374,6 +3475,6 @@ Read the papers in the Mentova papers/ directory to see how each capability was 
 
 Explore the demos/ directory for complete, working examples.
 
-And experiment at the ?- prompt. Every feature you have read about in this tutorial is live and waiting for your first query.
+And experiment at the ?- prompt. Every feature in this tutorial is live and waiting for your first query.
 
-END OF CHAPTER 15 AND END OF THE PROLOGAI TUTORIAL
+END OF CHAPTER 16 AND END OF THE PROLOGAI TUTORIAL
