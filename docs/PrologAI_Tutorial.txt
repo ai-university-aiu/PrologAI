@@ -6793,3 +6793,184 @@ Isolate and compare two colors:
 
 
 END OF CHAPTER 43
+CHAPTER 44: THE GENERATE PACK
+
+The generate pack (prefix ge_) provides predicates for constructing
+new grids from scratch. Instead of reading or transforming an existing
+grid, these predicates build a grid based on a pattern rule, a
+dimension specification, and one or more colors.
+
+All predicates live in the generate module (Layer 62).
+
+
+LOADING
+
+  :- use_module(library(generate)).
+
+
+UNIFORM GRIDS
+
+  ge_uniform(+Rows, +Cols, +Color, -Grid)
+
+  Creates a Rows x Cols grid filled entirely with Color.
+
+  Example:
+
+    ge_uniform(2, 3, 5, G).
+    % G = [[5,5,5],[5,5,5]]
+
+
+GRADIENTS
+
+  ge_gradient_h(+Rows, +Cols, +NColors, -Grid)
+
+  Horizontal gradient: column C gets color C mod NColors.
+  All rows are identical.
+
+  Example:
+
+    ge_gradient_h(2, 4, 3, G).
+    % G = [[0,1,2,0],[0,1,2,0]]
+
+  ge_gradient_v(+Rows, +Cols, +NColors, -Grid)
+
+  Vertical gradient: row R gets color R mod NColors.
+  All columns in a row are identical.
+
+  Example:
+
+    ge_gradient_v(4, 2, 3, G).
+    % G = [[0,0],[1,1],[2,2],[0,0]]
+
+
+CHECKERBOARD
+
+  ge_checkerboard(+Rows, +Cols, +C0, +C1, -Grid)
+
+  Alternates C0 and C1 based on the parity of R + C:
+  - (R + C) mod 2 = 0: use C0
+  - (R + C) mod 2 = 1: use C1
+
+  Example:
+
+    ge_checkerboard(3, 3, 0, 1, G).
+    % G = [[0,1,0],[1,0,1],[0,1,0]]
+
+
+STRIPES
+
+  ge_stripes_h(+Rows, +Cols, +Colors, -Grid)
+
+  Horizontal stripes: row R uses Colors[R mod length(Colors)].
+
+  Example:
+
+    ge_stripes_h(4, 3, [1,2], G).
+    % G = [[1,1,1],[2,2,2],[1,1,1],[2,2,2]]
+
+  ge_stripes_v(+Rows, +Cols, +Colors, -Grid)
+
+  Vertical stripes: column C uses Colors[C mod length(Colors)].
+
+  Example:
+
+    ge_stripes_v(2, 4, [1,2,3], G).
+    % G = [[1,2,3,1],[1,2,3,1]]
+
+
+BORDERED RECTANGLE AND FRAME
+
+  ge_border_rect(+Rows, +Cols, +BorderColor, +FillColor, -Grid)
+
+  The outermost ring uses BorderColor; the interior uses FillColor.
+
+  Example:
+
+    ge_border_rect(4, 4, 5, 0, G).
+    % G = [[5,5,5,5],[5,0,0,5],[5,0,0,5],[5,5,5,5]]
+
+  ge_frame(+Rows, +Cols, +FrameColor, +BG, -Grid)
+
+  Identical to ge_border_rect but with explicit BG parameter name.
+
+
+DIAGONAL PATTERNS
+
+  ge_diagonal(+Rows, +Cols, +DiagColor, -Grid)
+
+  Main diagonal cells (R = C) get DiagColor; all others get 0.
+
+  ge_antidiagonal(+Rows, +Cols, +DiagColor, -Grid)
+
+  Anti-diagonal cells (R + C = Cols - 1) get DiagColor; others get 0.
+
+  ge_identity_grid(+N, +One, -Grid)
+
+  N x N grid: diagonal gets One, off-diagonal gets 0.
+  Equivalent to ge_diagonal(N, N, One, Grid).
+
+  Example:
+
+    ge_identity_grid(3, 1, G).
+    % G = [[1,0,0],[0,1,0],[0,0,1]]
+
+
+CROSS PATTERN
+
+  ge_cross(+Rows, +Cols, +CrossColor, +BG, -Grid)
+
+  The middle row (Rows // 2) and middle column (Cols // 2) get
+  CrossColor. All other cells get BG.
+
+  Example:
+
+    ge_cross(5, 5, 1, 0, G).
+    % Row 2 (middle): [1,1,1,1,1]
+    % Column 2 of every row: 1
+    % All other cells: 0
+
+
+BUILDING FROM A MAP
+
+  ge_from_map(+Rows-Cols, +Map, -Grid)
+
+  Builds a Rows x Cols grid initialized to all zeros, then sets
+  each cell specified in Map. Map is a list of r(R,C)-Color pairs.
+
+  Example:
+
+    ge_from_map(3-3, [r(0,0)-5, r(1,1)-3, r(2,2)-7], G).
+    % G = [[5,0,0],[0,3,0],[0,0,7]]
+
+
+TILING A PATTERN
+
+  ge_repeat_pattern(+Pattern, +Rows, +Cols, -Grid)
+
+  Tiles Pattern to fill a Rows x Cols grid. The output at position
+  (R, C) equals Pattern[R mod PRows][C mod PCols].
+
+  Example:
+
+    P = [[1,2],[3,4]].
+    ge_repeat_pattern(P, 4, 6, G).
+    % G = [[1,2,1,2,1,2],
+    %       [3,4,3,4,3,4],
+    %       [1,2,1,2,1,2],
+    %       [3,4,3,4,3,4]]
+
+
+COMBINING WITH OTHER PACKS
+
+The generate pack works naturally with the compare and noise packs:
+
+  % Check if a grid matches a checkerboard pattern.
+  ge_checkerboard(Rows, Cols, C0, C1, Expected),
+  cp_grids_equal(Grid, Expected).
+
+  % Generate a frame and apply it as a mask.
+  ge_frame(Rows, Cols, 1, 0, FrameMask),
+  ns_mask_apply(Grid, FrameMask, FillColor, Result).
+
+
+END OF CHAPTER 44
