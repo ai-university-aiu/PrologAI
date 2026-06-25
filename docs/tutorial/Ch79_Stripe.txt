@@ -1,0 +1,177 @@
+Chapter 79: Uniform Row and Column Stripe Operations - The Stripe Pack
+
+The stripe pack (Layer 97, Work Package 118) provides 14 predicates for
+detecting rows and columns where every cell holds the same value, listing
+non-uniform rows and columns, filling individual or multiple rows and columns
+with a color, and computing or filling row-column intersections.
+
+A "stripe" in this context means any row or column where all cells are
+identical. The predicates use the sr_* prefix. Load the pack with:
+
+  :- use_module(library(prologai/stripe)).
+
+
+79.1 Testing Single Rows and Columns
+
+sr_uniform_row(+Grid, +R, -Color) succeeds if row R (0-based) has all cells
+equal to Color:
+
+  ?- sr_uniform_row([[5,5,5],[1,2,3]], 0, C).
+  C = 5.
+
+  ?- sr_uniform_row([[5,5,5],[1,2,3]], 1, C).
+  false.
+
+sr_uniform_col(+Grid, +C, -Color) tests a column:
+
+  ?- sr_uniform_col([[5,0,0],[5,1,2],[5,2,3]], 0, C).
+  C = 5.
+
+Both predicates fail immediately when the target row or column contains two or
+more distinct values.
+
+
+79.2 Finding All Uniform Rows or Columns of a Color
+
+sr_uniform_rows(+Grid, +Color, -Rows) returns the sorted list of row indices
+where every cell equals Color:
+
+  ?- sr_uniform_rows([[0,0],[1,2],[0,0]], 0, Rs).
+  Rs = [0, 2].
+
+sr_uniform_cols(+Grid, +Color, -Cols) does the same for columns:
+
+  ?- sr_uniform_cols([[0,1,0],[0,2,0],[0,3,0]], 0, Cs).
+  Cs = [0, 2].
+
+If no row or column matches, the result is the empty list.
+
+
+79.3 Finding All Stripes (Any Color)
+
+sr_all_stripe_rows(+Grid, -Pairs) returns R-Color pairs for all uniform rows:
+
+  ?- sr_all_stripe_rows([[5,5],[1,2],[3,3]], Pairs).
+  Pairs = [0-5, 2-3].
+
+Only rows 0 and 2 are uniform; row 1 contains two distinct values and is
+omitted. The pairs are in ascending row-index order.
+
+sr_all_stripe_cols(+Grid, -Pairs) does the same for columns:
+
+  ?- sr_all_stripe_cols([[0,1],[0,2],[0,3]], Pairs).
+  Pairs = [0-0].
+
+Only column 0 is uniform; columns 1 and 2 are not.
+
+
+79.4 Finding Non-Uniform Rows and Columns
+
+sr_mixed_rows(+Grid, -Rows) returns row indices that are NOT uniform:
+
+  ?- sr_mixed_rows([[0,0],[1,2],[3,3]], Rs).
+  Rs = [1].
+
+Only row 1 has two distinct values; rows 0 and 2 are uniform and excluded.
+
+sr_mixed_cols(+Grid, -Cols) does the same for columns:
+
+  ?- sr_mixed_cols([[0,1],[0,2]], Cs).
+  Cs = [1].
+
+The mixed rows and mixed columns always complement the uniform ones:
+every index appears in exactly one of the two result lists.
+
+
+79.5 Filling a Single Row or Column
+
+sr_fill_row(+Grid, +R, +Color, -Result) returns Grid with row R replaced by
+an all-Color row:
+
+  ?- sr_fill_row([[1,2,3],[4,5,6]], 0, 0, R).
+  R = [[0,0,0],[4,5,6]].
+
+sr_fill_col(+Grid, +C, +Color, -Result) fills a column:
+
+  ?- sr_fill_col([[1,2],[3,4]], 1, 9, R).
+  R = [[1,9],[3,9]].
+
+Both predicates leave all other cells unchanged.
+
+
+79.6 Filling Multiple Rows or Columns
+
+sr_fill_rows(+Grid, +Rows, +Color, -Result) fills every row index in Rows:
+
+  ?- sr_fill_rows([[1,2],[3,4],[5,6]], [0,2], 0, R).
+  R = [[0,0],[3,4],[0,0]].
+
+sr_fill_cols(+Grid, +Cols, +Color, -Result) fills multiple columns:
+
+  ?- sr_fill_cols([[1,2,3],[4,5,6]], [0,2], 9, R).
+  R = [[9,2,9],[9,5,9]].
+
+Passing an empty list leaves the grid unchanged.
+
+
+79.7 Row-Column Intersections
+
+sr_cross_cells(+Grid, +Rows, +Cols, -Cells) returns r(R,C) terms for every
+pair in the Cartesian product of Rows x Cols:
+
+  ?- sr_cross_cells([[0,1,2],[3,4,5],[6,7,8]], [0,2], [1,2], Cells).
+  Cells = [r(0,1), r(0,2), r(2,1), r(2,2)].
+
+Cells are in row-major order (all columns for the first row, then all columns
+for the second row, and so on). The grid argument is accepted for API
+consistency but is not used; the result depends only on Rows and Cols.
+
+sr_cross_fill(+Grid, +Rows, +Cols, +Color, -Result) fills all cells at the
+Rows x Cols intersections, as well as the rest of each listed row and column:
+
+  ?- sr_cross_fill([[1,2,3],[4,5,6],[7,8,9]], [1], [1], 0, R).
+  R = [[1,0,3],[0,0,0],[7,0,9]].
+
+Row 1 and column 1 are both filled with 0. The intersection r(1,1) is also 0.
+This is because sr_cross_fill first fills the listed rows, then fills the
+listed columns.
+
+
+79.8 Full Example: Identifying the Grid Skeleton
+
+This example finds all rows and columns that are a specific "separator" color
+and marks them, then identifies the remaining mixed rows:
+
+  mark_separators(Grid, SepColor, Marked) :-
+      sr_uniform_rows(Grid, SepColor, SepRows),
+      sr_uniform_cols(Grid, SepColor, SepCols),
+      sr_cross_fill(Grid, SepRows, SepCols, SepColor, Marked).
+
+  ?- mark_separators([[0,1,0],[0,0,0],[0,2,0]], 0, Marked).
+  Marked = [[0,0,0],[0,0,0],[0,0,0]].
+
+In this grid, row 1 is already all 0 and both columns 0 and 2 are all 0.
+After filling those, the entire grid becomes 0.
+
+
+79.9 Summary
+
+The stripe pack provides the basic vocabulary for row and column stripe
+analysis:
+
+  sr_uniform_row/3     - row R is all Color (test)
+  sr_uniform_col/3     - column C is all Color (test)
+  sr_uniform_rows/3    - sorted row indices uniformly Color
+  sr_uniform_cols/3    - sorted column indices uniformly Color
+  sr_all_stripe_rows/2 - R-Color pairs for all uniform rows
+  sr_all_stripe_cols/2 - C-Color pairs for all uniform columns
+  sr_mixed_rows/2      - sorted row indices NOT uniform
+  sr_mixed_cols/2      - sorted column indices NOT uniform
+  sr_fill_row/4        - fill row R with Color
+  sr_fill_col/4        - fill column C with Color
+  sr_fill_rows/4       - fill multiple rows with Color
+  sr_fill_cols/4       - fill multiple columns with Color
+  sr_cross_cells/4     - r(R,C) at Rows x Cols Cartesian product
+  sr_cross_fill/5      - fill all Rows x Cols intersections with Color
+
+END OF CHAPTER 79
