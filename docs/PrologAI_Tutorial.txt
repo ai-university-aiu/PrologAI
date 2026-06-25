@@ -11470,3 +11470,183 @@ gv_fall_color_dir/5 dispatches color-specific gravity by direction atom.
 R = [[0,0],[0,0],[1,1]].
 
 Valid direction atoms: down, up, left, right.
+Chapter 78: Value Counting and Frequency Analysis - The Count Pack
+
+The count pack (Layer 96, Work Package 117) provides 14 predicates for counting
+cell values, computing frequency histograms, and comparing two grids cell-by-cell.
+All predicates use structural equality (==) so they work with integers, atoms, or
+any other value type.
+
+The predicates are exported under the cn_* prefix. Load the pack with:
+
+  :- use_module(library(prologai/count)).
+
+
+78.1 Counting a Single Value
+
+cn_by_value(+List, +V, -N) counts how many elements in a flat list equal V:
+
+  ?- cn_by_value([0,1,0,2,0], 0, N).
+  N = 3.
+
+cn_color_count(+Grid, +Color, -N) does the same for a 2D grid by flattening it:
+
+  ?- cn_color_count([[0,1,0],[1,0,1],[0,1,0]], 0, N).
+  N = 5.
+
+Both predicates work for any value type:
+
+  ?- cn_by_value([red, blue, red, red], red, N).
+  N = 3.
+
+
+78.2 Frequency Histograms
+
+cn_histogram(+Grid, -Colors, -Counts) returns two parallel lists: Colors is the
+sorted list of distinct values, Counts is how often each appears:
+
+  ?- cn_histogram([[0,1,2],[0,1,2],[0,1,2]], Colors, Counts).
+  Colors = [0, 1, 2],
+  Counts = [3, 3, 3].
+
+  ?- cn_histogram([[0,0,0],[0,1,0],[0,0,0]], Colors, Counts).
+  Colors = [0, 1],
+  Counts = [8, 1].
+
+The colors are always returned in sorted order (ascending for numbers, alphabetical
+for atoms) because the implementation uses msort/2 on all cell values before
+grouping equal ones.
+
+
+78.3 Extremes: Most and Least Frequent
+
+cn_max_color(+Grid, -Color) returns the value with the highest count:
+
+  ?- cn_max_color([[0,0,0],[0,1,0],[0,0,0]], C).
+  C = 0.
+
+cn_min_color(+Grid, -Color) returns the value with the lowest count:
+
+  ?- cn_min_color([[0,0,0],[0,1,0],[0,0,0]], C).
+  C = 1.
+
+When two values have the same count, both predicates return the one that sorts
+first (the lowest integer, or the first atom alphabetically):
+
+  ?- cn_max_color([[0,1,2],[0,1,2]], C).
+  C = 0.    % all three have count 2; 0 sorts first
+
+
+78.4 Row and Column Presence
+
+cn_color_rows(+Grid, +Color, -N) counts how many rows contain at least one cell
+equal to Color:
+
+  ?- cn_color_rows([[0,1,2],[0,1,2],[0,0,0]], 1, N).
+  N = 2.    % rows 0 and 1 contain 1; row 2 does not
+
+cn_color_cols(+Grid, +Color, -N) counts how many columns contain Color:
+
+  ?- cn_color_cols([[0,1,0],[0,1,0],[0,1,0]], 1, N).
+  N = 1.    % only column 1 contains 1
+
+
+78.5 Distinct Values per Row or Column
+
+cn_row_distinct(+Grid, +R, -N) counts distinct values in row R (0-based):
+
+  ?- cn_row_distinct([[0,0,1,0,2,0]], 0, N).
+  N = 3.    % values 0, 1, 2
+
+cn_col_distinct(+Grid, +C, -N) counts distinct values in column C (0-based):
+
+  ?- cn_col_distinct([[0,0],[1,0],[0,0]], 0, N).
+  N = 2.    % column 0 contains 0 and 1
+
+
+78.6 Total Cell Count
+
+cn_grid_total(+Grid, -N) returns rows times columns:
+
+  ?- cn_grid_total([[1,2,3],[4,5,6]], N).
+  N = 6.    % 2 rows * 3 columns
+
+
+78.7 Comparing Two Grids
+
+cn_equal_cells(+Grid1, +Grid2, -N) counts cells where both grids have the same
+value:
+
+  ?- cn_equal_cells([[1,2],[3,4]], [[1,9],[3,4]], N).
+  N = 3.    % cells (0,0), (1,0), (1,1) match; (0,1) differs
+
+cn_diff_cells(+Grid1, +Grid2, -N) counts cells where they differ:
+
+  ?- cn_diff_cells([[1,2],[3,4]], [[1,9],[3,4]], N).
+  N = 1.
+
+Note: cn_equal_cells + cn_diff_cells always sums to cn_grid_total when both
+grids have the same dimensions.
+
+
+78.8 Region Colors and Tallies
+
+These predicates work with region data as produced by the connect pack. A region
+is a list of r(R,C) coordinate terms.
+
+cn_region_color(+Grid, +Region, -Color) looks up the grid value at the first
+cell of the region:
+
+  ?- cn_region_color([[0,1,0],[1,2,1],[0,1,0]], [r(1,1), r(0,1)], C).
+  C = 2.    % first cell r(1,1) has value 2
+
+cn_regions_per_color(+Grid, +Regions, -Pairs) produces a Color-Count tally for a
+list of regions. Each Pair has the form Color-N where N is how many regions have
+that color:
+
+  Regions = [[r(0,0), r(0,1)], [r(1,0)], [r(2,0), r(2,1)]],
+  ?- cn_regions_per_color([[0,0],[1,2],[0,0]], Regions, Pairs).
+  Pairs = [0-2, 1-1].    % two regions of color 0, one of color 1
+
+The tally order reflects the order the colors were encountered (not sorted), so
+use member/2 or sort/2 on the result if you need a particular order.
+
+
+78.9 Full Example: Dominant Color per Row
+
+This example finds the most common value in each row of a grid, using cn_histogram
+applied to each row individually:
+
+  row_dominant(Row, DomColor) :-
+      cn_histogram([Row], Colors, Counts),
+      max_list(Counts, MaxC),
+      nth0(Idx, Counts, MaxC), !,
+      nth0(Idx, Colors, DomColor).
+
+  ?- maplist(row_dominant, [[0,0,1],[1,2,2],[3,3,3]], Doms).
+  Doms = [0, 2, 3].
+
+Note that cn_histogram wraps the row in a list [[Row]] because it expects a
+2D grid. This pattern applies histogram analysis to sub-structures of any shape.
+
+
+78.10 Summary
+
+The count pack provides the basic arithmetic of value distributions in grids:
+
+  cn_by_value/3          - count a value in a flat list
+  cn_color_count/3       - count a value in a 2D grid
+  cn_histogram/3         - frequency histogram (Colors + Counts)
+  cn_max_color/2         - most frequent value
+  cn_min_color/2         - least frequent value
+  cn_color_rows/3        - number of rows containing a value
+  cn_color_cols/3        - number of columns containing a value
+  cn_row_distinct/3      - distinct values in one row
+  cn_col_distinct/3      - distinct values in one column
+  cn_grid_total/2        - total cell count
+  cn_equal_cells/3       - cells equal between two grids
+  cn_diff_cells/3        - cells different between two grids
+  cn_region_color/3      - color of a region's first cell
+  cn_regions_per_color/3 - Color-Count tally for a region list
+
+END OF CHAPTER 78
