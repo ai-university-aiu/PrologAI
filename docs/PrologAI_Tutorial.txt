@@ -4183,4 +4183,142 @@ WHAT COMES NEXT
 Chapter 23 covers the Motion Pack: gravity, sliding, and object movement.
 
 END OF CHAPTER 22
-END OF CHAPTER 22 AND END OF THE PROLOGAI TUTORIAL
+
+
+CHAPTER 23 - THE MOTION PACK: GRAVITY, SLIDING, AND OBJECT MOVEMENT
+
+Layer 41 - Spatial movement, gravity, and distance for grid-based reasoning
+
+PREREQUISITES
+
+Chapter 21 (Pattern Pack), Chapter 22 (Compose Pack), and the Grid Pack (Chapter 6).
+The motion pack also depends on the Scene Pack (Chapter 19). Make sure both grid
+and scene are on your library path.
+
+Load the pack:
+  :- use_module(library(grid)).
+  :- use_module(library(scene)).
+  :- use_module(library(motion)).
+
+
+GRAVITY ACROSS A WHOLE GRID
+
+mv_gravity_down(+Bg, +Grid, -Grid2)
+mv_gravity_up(+Bg, +Grid, -Grid2)
+mv_gravity_left(+Bg, +Grid, -Grid2)
+mv_gravity_right(+Bg, +Grid, -Grid2)
+
+Each predicate pulls all foreground cells (cells not equal to Bg) toward one
+edge. Columns are processed independently for up/down; rows for left/right.
+
+Example:
+  ?- mv_gravity_down(0, [[0,1,0],[0,0,2],[3,0,0]], G2).
+  G2 = [[0,0,0],[0,0,0],[3,1,2]].
+
+Each column's non-zero cells fall to the bottom; zeros rise to the top.
+
+
+SLIDING A WHOLE GRID (DIRECTION ATOM)
+
+mv_slide_col(+Bg, +Dir, +Grid, -Grid2)
+mv_slide_row(+Bg, +Dir, +Grid, -Grid2)
+
+Same behavior as the gravity predicates but accept an explicit direction atom:
+  Dir = down, up, left, or right.
+
+  ?- mv_slide_col(0, down, [[0,1],[2,0]], G2).
+  G2 = [[0,0],[2,1]].
+
+
+TRANSLATING THE ENTIRE GRID
+
+mv_shift_grid(+Bg, +DR, +DC, +Grid, -Grid2)
+
+Shifts every cell by row offset DR and column offset DC. Cells that fall
+outside the boundary are lost; incoming cells are filled with Bg.
+
+  ?- mv_shift_grid(0, 1, 0, [[1,2],[3,4]], G2).
+  G2 = [[0,0],[1,2]].
+
+
+WORKING WITH SCENE OBJECTS
+
+A scene has the form: scene(Rows, Cols, BgColor, Objects)
+An object has the form: obj(Color, Cells) where Cells is a sorted list of r(R,C) terms.
+
+mv_obj_translate(+DR, +DC, +Obj, -Obj2)
+  Translates one object by (DR, DC), preserving its color.
+
+  ?- mv_obj_translate(1, 2, obj(5, [r(0,0), r(0,1)]), Obj2).
+  Obj2 = obj(5, [r(1,2), r(1,3)]).
+
+mv_scene_translate(+DR, +DC, +Scene, -Scene2)
+  Translates all objects in a scene by (DR, DC).
+
+mv_scene_to_grid(+Scene, -Grid)
+  Renders a scene to a grid. Each object's cells are painted with their color.
+
+  ?- mv_scene_to_grid(scene(2,2,0,[obj(5,[r(0,0)]),obj(3,[r(1,1)])]), Grid).
+  Grid = [[5,0],[0,3]].
+
+mv_scene_gravity(+Scene, -Scene2)
+  Applies downward gravity to a scene via a grid round-trip:
+  render -> mv_gravity_down -> sc_grid_to_scene.
+  Same-color objects that fall into contact may be merged.
+
+  ?- mv_scene_gravity(scene(3,1,0,[obj(2,[r(0,0)])]), Scene2).
+  Scene2 = scene(3,1,0,[obj(2,[r(2,0)])]).
+
+
+DISTANCE AND PROXIMITY
+
+mv_distance(+CellA, +CellB, -D)
+  Manhattan distance (taxicab distance: sum of absolute coordinate differences)
+  between two r(R,C) cell terms.
+
+  ?- mv_distance(r(0,0), r(3,4), D).
+  D = 7.
+
+mv_closest_cell(+Cells, +Ref, -Closest)
+  Returns the cell in Cells with the minimum Manhattan distance to Ref.
+  On ties, the cell appearing earlier in the list wins.
+
+  ?- mv_closest_cell([r(5,5), r(1,1), r(0,1)], r(0,0), Closest).
+  Closest = r(0,1).
+
+
+COMBINING MOTION WITH COMPOSE
+
+  ?- cp_apply(mv_gravity_down(0), [[0,1,0],[0,0,2]], G2).
+  G2 = [[0,0,0],[0,1,2]].
+
+  ?- cp_pipe(mv_shift_grid(0,0,1), mv_gravity_down(0),
+             [[1,0,0],[0,0,0]], G2).
+  G2 = [[0,0,0],[0,0,1]].
+
+
+PREDICATE SUMMARY
+
+  mv_gravity_down(+Bg, +Grid, -Grid2)
+  mv_gravity_up(+Bg, +Grid, -Grid2)
+  mv_gravity_left(+Bg, +Grid, -Grid2)
+  mv_gravity_right(+Bg, +Grid, -Grid2)
+  mv_slide_col(+Bg, +Dir, +Grid, -Grid2)
+  mv_slide_row(+Bg, +Dir, +Grid, -Grid2)
+  mv_shift_grid(+Bg, +DR, +DC, +Grid, -Grid2)
+  mv_obj_translate(+DR, +DC, +Obj, -Obj2)
+  mv_scene_translate(+DR, +DC, +Scene, -Scene2)
+  mv_scene_to_grid(+Scene, -Grid)
+  mv_scene_gravity(+Scene, -Scene2)
+  mv_distance(+CellA, +CellB, -D)
+  mv_closest_cell(+Cells, +Ref, -Closest)
+
+
+WHAT COMES NEXT
+
+Chapter 24 covers the Frame Pack: predicates for detecting borders and frames
+around rectangular regions, extracting frame interiors, and matching frame
+templates in grids.
+
+END OF CHAPTER 23
+END OF CHAPTER 23 AND END OF THE PROLOGAI TUTORIAL
