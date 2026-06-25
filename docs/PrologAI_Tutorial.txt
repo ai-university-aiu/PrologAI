@@ -10208,3 +10208,162 @@ All 42 PLUnit acceptance tests are in packs/pivot/test/test_pivot.pl.
 The Specification entry is Part 98 (PV-PV-001 through PV-PV-014).
 The Architecture entry is ARCH-74.
 The Refinement entry covers AC-PV-001 through AC-PV-042.
+
+Chapter 70: Axis Projection and Shadow Casting - The Project Pack
+
+The project pack (pj_* predicate family, Layer 88) provides 14 predicates for
+shadow casting and axis-projection operations on grids.
+
+Shadow casting models the physical idea of a non-BG cell projecting its value
+through empty (BG) cells in a direction, like a light source casting a shadow.
+Axis projection collapses a 2D grid to 1D by summarizing each row or column,
+or identifies which rows and columns are occupied by non-BG cells.
+
+
+70.1 Loading the pack
+
+?- use_module(packs/project/prolog/project).
+
+
+70.2 Shadow casting
+
+pj_shadow_down/3 propagates each non-BG cell's value downward through BG cells.
+The shadow stops when it hits another non-BG cell.
+
+?- pj_shadow_down([[1,0],[0,0],[0,0]], 0, R).
+R = [[1,0],[1,0],[1,0]].
+
+?- pj_shadow_down([[0,2],[0,0],[0,3]], 0, R).
+R = [[0,2],[0,2],[0,3]].  % 2 casts to row 1; 3 starts at row 2
+
+?- pj_shadow_down([[0,0],[0,0]], 0, R).
+R = [[0,0],[0,0]].  % all BG: no shadow
+
+pj_shadow_up/3 propagates each non-BG cell's value upward through BG cells.
+
+?- pj_shadow_up([[0,0],[0,0],[1,0]], 0, R).
+R = [[1,0],[1,0],[1,0]].
+
+pj_shadow_left/3 propagates each non-BG cell's value to the LEFT (into lower
+column indices) through BG cells.
+
+?- pj_shadow_left([[0,0,2]], 0, R).
+R = [[2,2,2]].
+
+?- pj_shadow_left([[1,0,2]], 0, R).
+R = [[1,2,2]].  % 2 fills col 1; stops at 1 in col 0
+
+pj_shadow_right/3 propagates each non-BG cell's value to the RIGHT through BG cells.
+
+?- pj_shadow_right([[1,0,0]], 0, R).
+R = [[1,1,1]].
+
+?- pj_shadow_right([[1,0,2]], 0, R).
+R = [[1,1,2]].  % 1 fills col 1; stops at 2 in col 2
+
+pj_shadow_dir/4 dispatches to any of the four directions by atom name.
+
+?- pj_shadow_dir([[2,0],[0,0]], 0, down, R).
+R = [[2,0],[2,0]].
+
+?- pj_shadow_dir([[4,0,0]], 0, right, R).
+R = [[4,4,4]].
+
+
+70.3 Occupied axis detection
+
+pj_nonbg_rows/3 returns sorted row indices containing at least one non-BG cell.
+
+?- pj_nonbg_rows([[0,0],[1,0],[0,0]], 0, Rows).
+Rows = [1].
+
+?- pj_nonbg_rows([[0,0],[0,0]], 0, Rows).
+Rows = [].
+
+pj_nonbg_cols/3 returns sorted column indices containing at least one non-BG cell.
+
+?- pj_nonbg_cols([[0,1,0],[0,0,0]], 0, Cols).
+Cols = [1].
+
+?- pj_nonbg_cols([[1,0,1],[0,2,0]], 0, Cols).
+Cols = [0,1,2].
+
+
+70.4 Cell counting
+
+pj_row_counts/3 returns a list of non-BG cell counts, one per row.
+
+?- pj_row_counts([[1,0,1],[0,0,0],[0,2,0]], 0, Counts).
+Counts = [2,0,1].
+
+pj_col_counts/3 returns a list of non-BG cell counts, one per column.
+
+?- pj_col_counts([[1,0],[0,2],[0,0]], 0, Counts).
+Counts = [1,1].
+
+
+70.5 Collapse to one dimension
+
+pj_collapse_rows/3 flattens all rows to a single row.
+For each column position, the result is the first (topmost) non-BG value.
+
+?- pj_collapse_rows([[1,0],[0,2]], 0, Row).
+Row = [1,2].
+
+?- pj_collapse_rows([[0,3],[1,0]], 0, Row).
+Row = [1,3].  % col 0: first nonbg scanning down is 1; col 1 is 3
+
+pj_collapse_cols/3 flattens all columns to a single column.
+For each row, the result is the first (leftmost) non-BG value.
+
+?- pj_collapse_cols([[1,0],[0,2]], 0, Col).
+Col = [1,2].
+
+?- pj_collapse_cols([[0,3],[1,0]], 0, Col).
+Col = [3,1].  % row 0: first nonbg scanning right is 3; row 1 is 1
+
+
+70.6 Boundary finding
+
+pj_col_first/4 returns the row index of the topmost non-BG cell in a column.
+
+?- pj_col_first([[0,0],[1,0],[0,0]], 0, 0, R).
+R = 1.
+
+?- pj_col_first([[1,0],[0,0]], 0, 0, R).
+R = 0.
+
+pj_col_last/4 returns the row index of the bottommost non-BG cell in a column.
+
+?- pj_col_last([[1,0],[1,0],[0,0]], 0, 0, R).
+R = 1.
+
+?- pj_col_last([[0,0],[0,0],[1,0]], 0, 0, R).
+R = 2.
+
+pj_row_first/4 returns the column index of the leftmost non-BG cell in a row.
+
+?- pj_row_first([[0,0,1,0]], 0, 0, C).
+C = 2.
+
+?- pj_row_first([[1,0,0]], 0, 0, C).
+C = 0.
+
+
+70.7 Combining project with other packs
+
+Use pj_shadow_down after extracting objects with the scene pack to determine
+which grid cells each object "covers" when viewed from above.
+
+Use pj_nonbg_rows and pj_nonbg_cols together to identify the bounding row and
+column bands of non-BG content without computing the full bounding box.
+
+Use pj_col_counts and pj_row_counts to build a count-based profile of the grid
+that can be compared across training examples to detect regular structure.
+
+Use pj_collapse_rows followed by pj_shadow_right to fill an entire row with the
+dominant value seen in each column - useful for "flood the row" transformations.
+
+Use pj_col_first and pj_col_last together to compute the height of each column's
+non-BG stack, which is equivalent to gv_pile_height from the gravity pack but
+without modifying the grid.
