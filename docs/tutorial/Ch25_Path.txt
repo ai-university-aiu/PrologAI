@@ -1,0 +1,181 @@
+PROLOGAI TUTORIAL
+Chapter 25 - Path Pack
+Layer 43 - Path-finding, flood fill, connectivity, and reachability in grids
+
+PREREQUISITES
+
+Chapter 6 (Grid Pack). The path pack depends only on the grid pack.
+
+Load:
+  :- use_module(library(grid)).
+  :- use_module(library(path)).
+
+
+WHAT IS THE PATH PACK?
+
+The path pack (module name: path, file: packs/path/prolog/path.pl) provides
+13 pf_* predicates for navigating grids: finding connected regions, computing
+shortest paths, and testing reachability.
+
+All movement uses 4-connectivity - 4-connectivity (4-connectivity: the four
+orthogonal directions up, down, left, and right; diagonal movement is not
+included).
+
+
+NEIGHBORS
+
+pf_neighbors(+Grid, +r(R,C), -Neighbors)
+
+Return the 4-connected neighbors of a cell that lie within the grid boundary.
+
+  ?- pf_neighbors([[1,2],[3,4]], r(0,0), Ns).
+  Ns = [r(1,0), r(0,1)].
+
+  ?- pf_neighbors([[1,2,3],[4,5,6],[7,8,9]], r(1,1), Ns).
+  % Center cell has 4 neighbors.
+  length(Ns, 4).
+
+
+FLOOD FILL
+
+pf_flood_fill(+Grid, +Seed, +Color, -Region)
+
+Find all cells reachable from Seed by 4-connectivity where every cell has Color.
+Region is a sorted list of r(R,C) terms. Seed must have Color.
+
+  ?- Grid = [[2,2,0],[2,0,0],[0,0,0]],
+     pf_flood_fill(Grid, r(0,0), 2, Region).
+  Region = [r(0,0), r(0,1), r(1,0)].
+
+The flood fill is a BFS (Breadth-First Search - BFS: a graph traversal that
+visits neighbors level by level, guaranteeing the shortest path is found first).
+
+
+CONNECTIVITY
+
+pf_connected(+Grid, +CellA, +CellB, +Color)
+
+Succeed if CellA and CellB are in the same connected component of Color.
+
+  ?- pf_connected([[1,1,0],[1,0,0],[0,0,1]], r(0,0), r(1,0), 1).
+  true.
+
+  ?- pf_connected([[1,1,0],[1,0,0],[0,0,1]], r(0,0), r(2,2), 1).
+  false.
+
+
+CONNECTED COMPONENTS
+
+pf_components(+Grid, +Color, -Components)
+
+Find all connected components of Color. Returns a list of cell lists.
+
+  ?- Grid = [[1,1,0,0],[1,1,0,0],[0,0,1,1],[0,0,1,1]],
+     pf_components(Grid, 1, Comps),
+     length(Comps, N).
+  N = 2.
+
+pf_component_count(+Grid, +Color, -N)
+  N is the number of connected components.
+
+pf_component_size(+Grid, +Seed, +Color, -Size)
+  Size is the number of cells in the component containing Seed.
+
+pf_largest_component(+Grid, +Color, -Region)
+  Region is the connected component with the most cells. On ties, the
+  component whose seed appears first in row-major order wins.
+
+
+SHORTEST PATHS
+
+pf_shortest_path(+Grid, +Start, +Goal, +Wall, -Path)
+
+BFS shortest path from Start to Goal, avoiding cells of color Wall.
+Path is a list of r(R,C) cells from Start to Goal inclusive.
+Fails if no path exists.
+
+  ?- Grid = [[0,0,0],[0,1,0],[0,0,0]],
+     pf_shortest_path(Grid, r(0,0), r(2,2), 1, Path).
+  % Path goes around the wall.
+  Path = [r(0,0), r(0,1), r(0,2), r(1,2), r(2,2)].
+
+pf_path_length(+Grid, +Start, +Goal, +Wall, -Len)
+  Len is the number of steps (edges traversed). Len = 0 when Start = Goal.
+
+pf_path_exists(+Grid, +Start, +Goal, +Wall)
+  Succeed if a path exists without crossing Wall.
+
+
+REACHABILITY
+
+pf_reachable(+Grid, +Seed, +Wall, -Cells)
+
+Find all cells reachable from Seed without crossing Wall-colored cells.
+Unlike pf_flood_fill, cells of any non-Wall color are included.
+
+  ?- Grid = [[0,0,1],[0,0,1],[1,1,1]],
+     pf_reachable(Grid, r(0,0), 1, Cells).
+  Cells = [r(0,0), r(0,1), r(1,0), r(1,1)].
+
+Note: pf_flood_fill uses same-color connectivity; pf_reachable uses not-wall
+connectivity. They differ when the region contains multiple colors.
+
+
+BOUNDING BOX OF A FLOOD FILL
+
+pf_fill_bbox(+Grid, +Seed, +Color, -R0, -C0, -R1, -C1)
+
+Flood fill from Seed and return the bounding box of the filled region.
+
+  ?- Grid = [[0,0,0],[0,5,5],[0,5,0]],
+     pf_fill_bbox(Grid, r(1,1), 5, R0, C0, R1, C1).
+  R0=1, C0=1, R1=2, C1=2.
+
+
+CONNECTIVITY TEST
+
+pf_is_connected(+Grid, +Color)
+
+Succeed if all cells of Color form a single connected component.
+Also succeeds when there are 0 or 1 cells of Color (trivially connected).
+
+  ?- pf_is_connected([[1,1],[1,1]], 1).
+  true.
+
+  ?- pf_is_connected([[1,0],[0,1]], 1).
+  false.
+
+
+PREDICATE SUMMARY
+
+Navigation:
+  pf_neighbors(+Grid, +r(R,C), -Neighbors)
+
+Flood fill:
+  pf_flood_fill(+Grid, +Seed, +Color, -Region)
+
+Connectivity:
+  pf_connected(+Grid, +CellA, +CellB, +Color)
+  pf_is_connected(+Grid, +Color)
+
+Components:
+  pf_components(+Grid, +Color, -Components)
+  pf_component_count(+Grid, +Color, -N)
+  pf_component_size(+Grid, +Seed, +Color, -Size)
+  pf_largest_component(+Grid, +Color, -Region)
+
+Paths:
+  pf_shortest_path(+Grid, +Start, +Goal, +Wall, -Path)
+  pf_path_length(+Grid, +Start, +Goal, +Wall, -Len)
+  pf_path_exists(+Grid, +Start, +Goal, +Wall)
+
+Reachability:
+  pf_reachable(+Grid, +Seed, +Wall, -Cells)
+  pf_fill_bbox(+Grid, +Seed, +Color, -R0, -C0, -R1, -C1)
+
+
+WHAT COMES NEXT
+
+Chapter 26 covers the Symmetry Pack: predicates for testing and generating
+grid symmetry under reflections and rotations, computing symmetry groups,
+and finding the canonical orientation of a grid.

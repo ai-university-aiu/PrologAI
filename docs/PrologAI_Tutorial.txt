@@ -4420,3 +4420,81 @@ maze solving, flood-fill reachability, and connectivity analysis.
 
 END OF CHAPTER 24
 END OF CHAPTER 24 AND END OF THE PROLOGAI TUTORIAL
+
+
+CHAPTER 25 - THE PATH PACK: PATH-FINDING, FLOOD FILL, AND CONNECTIVITY
+
+Layer 43 - Path-finding, flood fill, connectivity, and reachability in grids
+
+PREREQUISITES
+
+Chapter 6 (Grid Pack). The path pack depends only on the grid pack.
+
+Load:
+  :- use_module(library(grid)).
+  :- use_module(library(path)).
+
+
+NEIGHBORS
+
+pf_neighbors(+Grid, +r(R,C), -Neighbors)
+  4-connected neighbors within bounds.
+
+  ?- pf_neighbors([[1,2],[3,4]], r(0,0), Ns).
+  Ns = [r(1,0), r(0,1)].
+
+
+FLOOD FILL
+
+pf_flood_fill(+Grid, +Seed, +Color, -Region)
+  All cells reachable from Seed via same-Color 4-connectivity. Sorted list.
+
+  ?- pf_flood_fill([[2,2,0],[2,0,0],[0,0,0]], r(0,0), 2, R).
+  R = [r(0,0), r(0,1), r(1,0)].
+
+
+CONNECTIVITY
+
+pf_connected(+Grid, +CellA, +CellB, +Color)
+  CellA and CellB are in the same Color component.
+
+pf_is_connected(+Grid, +Color)
+  All Color cells form one component. Trivially true for 0 or 1 cells.
+
+
+COMPONENTS
+
+pf_components(+Grid, +Color, -Components)     - list of all components
+pf_component_count(+Grid, +Color, -N)         - number of components
+pf_component_size(+Grid, +Seed, +Color, -Size)- size of one component
+pf_largest_component(+Grid, +Color, -Region)  - biggest component
+
+
+PATHS (BFS)
+
+pf_shortest_path(+Grid, +Start, +Goal, +Wall, -Path)
+  BFS shortest path avoiding Wall-colored cells. Fails if no path.
+
+pf_path_length(+Grid, +Start, +Goal, +Wall, -Len)
+  Number of steps (0 when Start = Goal).
+
+pf_path_exists(+Grid, +Start, +Goal, +Wall)
+  Test-only form of shortest path.
+
+
+REACHABILITY
+
+pf_reachable(+Grid, +Seed, +Wall, -Cells)
+  All cells reachable from Seed without crossing Wall. Any non-Wall color allowed.
+
+pf_fill_bbox(+Grid, +Seed, +Color, -R0, -C0, -R1, -C1)
+  Flood fill then return bounding box.
+
+
+WHAT COMES NEXT
+
+Chapter 26 covers the Symmetry Pack: grid symmetry testing, canonical orientation,
+and symmetry group computation under reflections and rotations.
+
+END OF CHAPTER 25
+END OF CHAPTER 25 AND END OF THE PROLOGAI TUTORIAL

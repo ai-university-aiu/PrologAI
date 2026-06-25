@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       61 work packages — the complete cognitive engine (see below)
+├── packs/       62 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -178,6 +178,7 @@ Everything is inspectable.
 | `compose` | Sequential Rule Pipelines and Transformation Composition (PR 61) — higher-order combinators for building transformation pipelines: single dispatch (`cp_apply/3`), identity (`cp_identity/2`), constant (`cp_const/3`), sequential pipeline (`cp_pipe/3`, `cp_pipe_n/4`), conditional branching (`cp_branch/5`), repetition (`cp_repeat/4`, `cp_until/4`, `cp_fixed_point/3`), row and column mapping (`cp_map_rows/3`, `cp_map_cols/3`), pairwise cell combination (`cp_zip/4`), and left-fold over a list of grids (`cp_fold/4`). 13 cp_* predicates, Layer 40. |
 | `motion` | Spatial Movement, Gravity, and Distance for Grid-Based Reasoning (PR 62) — gravity predicates that pull foreground cells toward any edge (`mv_gravity_down/3`, `mv_gravity_up/3`, `mv_gravity_left/3`, `mv_gravity_right/3`), directional sliding (`mv_slide_col/4`, `mv_slide_row/4`), whole-grid translation (`mv_shift_grid/5`), scene-level object translation (`mv_obj_translate/4`, `mv_scene_translate/4`), scene-to-grid rendering (`mv_scene_to_grid/2`), scene gravity via grid round-trip (`mv_scene_gravity/2`), and proximity computation (`mv_distance/3`, `mv_closest_cell/3`). 13 mv_* predicates, Layer 41. |
 | `frame` | Rectangular Border Detection, Interior Extraction, and Frame Generation (PR 63) — detect uniform outer rings (`fr_border_color/2`, `fr_has_border/2`, `fr_border_cells/2`), extract interiors (`fr_inner/2`, `fr_interior_uniform/1`, `fr_interior_color/2`), generate framed grids (`fr_make_framed/5`, `fr_add_border/4`), test sub-region borders (`fr_region_has_border/6`, `fr_region_border_color/6`), find bounding boxes (`fr_bounding_box/6`), and analyze concentric nesting (`fr_is_nested/3`, `fr_ring_count/2`). 14 fr_* predicates, Layer 42. |
+| `path` | Path-Finding, Flood Fill, Connectivity, and Reachability (PR 64) — 4-connected neighbor enumeration (`pf_neighbors/3`), same-color flood fill (`pf_flood_fill/4`), connectivity testing (`pf_connected/4`, `pf_is_connected/2`), connected component analysis (`pf_components/3`, `pf_component_count/3`, `pf_component_size/4`, `pf_largest_component/3`), BFS shortest path (`pf_shortest_path/5`, `pf_path_length/5`, `pf_path_exists/4`), reachability without walls (`pf_reachable/4`), and flood-fill bounding box (`pf_fill_bbox/7`). 13 pf_* predicates, Layer 43. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**
