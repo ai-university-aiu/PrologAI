@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       70 work packages — the complete cognitive engine (see below)
+├── packs/       71 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -187,6 +187,7 @@ Everything is inspectable.
 | `crop` | Subgrid Extraction, Padding, Splitting, Joining, and Embedding (PR 70) — bounding box detection (`cr_bbox/3`), rectangular extraction (`cr_crop_bbox/6`), content-aware cropping (`cr_crop_content/3`), uniform padding (`cr_pad/4`), border removal (`cr_strip_border/3`), horizontal/vertical splitting (`cr_split_h/4`, `cr_split_v/4`), row/column bands (`cr_rows/4`, `cr_cols/4`), stitching (`cr_stitch_h/3`, `cr_stitch_v/3`), subgrid embedding (`cr_embed/5`), center extraction (`cr_center/4`), and quadrant split (`cr_quadrants/5`). 14 cr_* predicates, Layer 49. |
 | `overlay` | Grid Combination by Layering, Logic, Masking, and Priority Merge (PR 71) — transparent overlay (`ov_over/4`, `ov_blend/4`), bitwise operations (`ov_or/3`, `ov_and/3`, `ov_xor/4`), difference and intersection (`ov_diff/4`, `ov_intersect/4`), masking (`ov_mask/4`, `ov_mask_inv/4`), priority merge across multiple grids (`ov_priority/3`), color replacement (`ov_replace/4`, `ov_fill_bg/4`), and pointwise extrema (`ov_max/3`, `ov_min/3`). 14 ov_* predicates, Layer 50. |
 | `measure` | Geometric Measurement of Cell Regions and Grids (PR 72) — area (`ms_area/2`), bounding box (`ms_bbox/2`, `ms_bbox_size/3`), perimeter (`ms_perimeter/2`), diameter (`ms_diameter/2`), extent fraction (`ms_extent/3`), aspect ratio (`ms_aspect/3`), row/column spans (`ms_row_span/2`, `ms_col_span/2`), integer centroid (`ms_centroid/3`), Chebyshev radius (`ms_radius/2`), interior and border counts (`ms_interior_count/2`, `ms_border_count/2`), and distinct color count (`ms_color_count/2`). 14 ms_* predicates, Layer 51. |
+| `transform` | Grid-Level Spatial and Color Transformations (PR 73) — spatial scaling (`tr_scale_up/3`, `tr_scale_down/3`), horizontal/vertical tiling (`tr_tile_h/3`, `tr_tile_v/3`, `tr_tile/3`), transposition (`tr_transpose/2`), reflections (`tr_flip_h/2`, `tr_flip_v/2`), rotations (`tr_rot90/2`, `tr_rot180/2`), content shifting with fill (`tr_shift/5`), color-map application (`tr_apply_map/3`), single-color replacement (`tr_replace_color/4`), and mask-based selection (`tr_mask_grid/4`). 14 tr_* predicates, Layer 52. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**
