@@ -1,0 +1,146 @@
+PROLOGAI TUTORIAL
+
+CHAPTER 21 - THE PATTERN PACK: PERIODIC PATTERNS, TILING, AND SCALING
+
+The pattern pack detects and generates repeating spatial structures in grids.
+It provides period detection, tile-based grid construction, integer scaling,
+horizontal and vertical repetition, mirror expansion, and constructed pattern
+generators (checkerboard, horizontal stripes, vertical stripes).
+
+The pack prefix is pt_. All operations work on standard PrologAI grids (lists
+of lists of integers). The pack depends on the grid pack (PR 56) for low-level
+grid access.
+
+LOADING
+
+    :- use_module(library(pattern)).
+
+PERIOD DETECTION
+
+pt_list_period/2 finds the shortest period of a flat list.
+
+    ?- pt_list_period([1,2,1,2,1,2], P).
+    P = 2.
+
+    ?- pt_list_period([0,0,0,0], P).
+    P = 1.
+
+    ?- pt_list_period([1,2,3,4], P).
+    P = 4.
+
+pt_row_period/3 and pt_col_period/3 apply the same detection to a specific
+row or column of a grid.
+
+    ?- Grid = [[0,1,0,1],[2,2,2,2]], pt_row_period(Grid, 0, P).
+    P = 2.
+
+    ?- Grid = [[0,1],[0,1],[0,1]], pt_col_period(Grid, 0, P).
+    P = 1.
+
+TILING
+
+pt_tile_grid/4 fills a target grid by repeating a smaller tile.
+
+    ?- Tile = [[1,2],[3,4]], pt_tile_grid(Tile, 4, 6, G).
+    G = [[1,2,1,2,1,2],[3,4,3,4,3,4],[1,2,1,2,1,2],[3,4,3,4,3,4]].
+
+pt_extract_tile/4 crops the top-left sub-grid to recover the base tile.
+
+    ?- pt_extract_tile(G, 2, 2, Tile).
+
+pt_is_tiling/3 verifies that a grid is a proper tiling of a given tile.
+
+    ?- pt_is_tiling(G, [[1,2],[3,4]], 2).
+    true.
+
+The third argument is the expected row period (equal to the tile height).
+
+SCALING
+
+pt_scale_up/3 expands each cell to a Factor x Factor block of the same color.
+
+    ?- pt_scale_up([[1,2],[3,4]], 2, Big).
+    Big = [[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]].
+
+pt_scale_down/3 collapses each Factor x Factor block to one cell, sampling
+the top-left cell of each block.
+
+    ?- pt_scale_up([[1,2],[3,4]], 3, Big), pt_scale_down(Big, 3, Small).
+    Small = [[1,2],[3,4]].
+
+Scale-up followed by scale-down with the same factor is the identity.
+
+REPETITION
+
+pt_repeat_h/3 concatenates N copies of a grid side by side.
+
+    ?- pt_repeat_h([[1,2],[3,4]], 3, G).
+    G = [[1,2,1,2,1,2],[3,4,3,4,3,4]].
+
+pt_repeat_v/3 stacks N copies of a grid vertically.
+
+    ?- pt_repeat_v([[1,2],[3,4]], 3, G).
+    G = [[1,2],[3,4],[1,2],[3,4],[1,2],[3,4]].
+
+Both predicates use append/2 (one level of list concatenation) not flatten/2,
+so the grid row structure is preserved correctly.
+
+MIRRORING
+
+pt_mirror_h/2 appends the left-right reflection of a grid to its right.
+
+    ?- pt_mirror_h([[1,2],[3,4]], G).
+    G = [[1,2,2,1],[3,4,4,3]].
+
+pt_mirror_v/2 appends the upside-down reflection below the original.
+
+    ?- pt_mirror_v([[1,2],[3,4]], G).
+    G = [[1,2],[3,4],[3,4],[1,2]].
+
+CONSTRUCTED PATTERNS
+
+pt_checkerboard/5 generates a two-color checkerboard. Cells where (R+C) is
+even get color CA; cells where (R+C) is odd get color CB.
+
+    ?- pt_checkerboard(3, 3, 0, 1, G).
+    G = [[0,1,0],[1,0,1],[0,1,0]].
+
+pt_stripe_h/4 generates horizontal stripes, cycling through a color list.
+
+    ?- pt_stripe_h(4, 3, [1,2,3], G).
+    G = [[1,1,1],[2,2,2],[3,3,3],[1,1,1]].
+
+pt_stripe_v/4 generates vertical stripes, cycling through a color list.
+
+    ?- pt_stripe_v(3, 4, [5,6], G).
+    G = [[5,6,5,6],[5,6,5,6],[5,6,5,6]].
+
+COMMON TASK PATTERNS
+
+Detect whether an output grid is a scaled copy of the input:
+
+    solve_scale(InputGrid, OutputGrid, Factor) :-
+        pt_scale_up(InputGrid, Factor, OutputGrid).
+
+Detect whether an output is a tiling of a smaller pattern found in the input:
+
+    solve_tiling(InputGrid, OutputGrid, TileH, TileW) :-
+        pt_extract_tile(InputGrid, TileH, TileW, Tile),
+        gd_size(OutputGrid, Rows, Cols),
+        pt_is_tiling(OutputGrid, Tile, TileH),
+        Rows > TileH.
+
+Detect period and extract one repeating unit from a row:
+
+    row_unit(Grid, R, Unit) :-
+        pt_row_period(Grid, R, P),
+        gd_row(Grid, R, Row),
+        length(Unit, P),
+        append(Unit, _, Row).
+
+WHAT COMES NEXT
+
+Chapter 22 covers the Compose Pack: sequential rule pipelines for applying
+multiple transformations in order.
+
+END OF CHAPTER 21
