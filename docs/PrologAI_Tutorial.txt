@@ -4498,3 +4498,77 @@ and symmetry group computation under reflections and rotations.
 
 END OF CHAPTER 25
 END OF CHAPTER 25 AND END OF THE PROLOGAI TUTORIAL
+
+
+CHAPTER 26 - THE SYMMETRY PACK: GRID SYMMETRY TESTING AND ORBIT GENERATION
+
+Layer 44 - Grid symmetry testing, canonical orientation, and orbit generation
+
+Load:
+  :- use_module(library(grid)).
+  :- use_module(library(symmetry)).
+
+
+INDIVIDUAL SYMMETRY TESTS
+
+sy_is_hsymmetric(+Grid)   - left-right symmetry (gd_reflect_v = self)
+sy_is_vsymmetric(+Grid)   - top-bottom symmetry (gd_reflect_h = self)
+sy_is_rot180(+Grid)       - 180-degree rotational symmetry
+sy_is_rot90(+Grid)        - 90-degree rotational symmetry (square only)
+sy_is_diagonal(+Grid)     - main-diagonal symmetry (square only)
+sy_is_antidiagonal(+Grid) - anti-diagonal symmetry (square only)
+
+  ?- sy_is_hsymmetric([[1,2,1],[3,4,3]]).
+  true.
+
+
+THE SYMMETRY GROUP
+
+sy_group(+Grid, -Group)
+  Group is the list of symmetry atoms that hold: h, v, rot180, rot90, diag, antidiag.
+
+  ?- sy_group([[1,1,1],[1,2,1],[1,1,1]], G).
+  G = [h, v, rot180, rot90, diag, antidiag].  % All 6.
+
+  ?- sy_group([[1,2,3],[4,5,6],[7,8,9]], G).
+  G = [].  % None.
+
+
+ORBITS
+
+sy_rotations(+Grid, -Rotations)
+  Distinct grids reachable by 0/90/180/270 rotation.
+
+sy_orbit(+Grid, -Orbit)
+  Full dihedral orbit: all distinct grids under 8 D4 transforms.
+  Maximum 8 elements; fewer for symmetric grids.
+
+
+CANONICAL FORM AND EQUIVALENCE
+
+sy_canonical(+Grid, -Canon)
+  Lex-min element of orbit. Unique per equivalence class.
+
+sy_equivalent(+GridA, +GridB)
+  Same canonical form.
+
+sy_order(+Grid, -N)
+  Symmetry order = 8 / orbit_size. Range: 1 (asymmetric) to 8 (fully symmetric).
+
+
+PREDICATE SUMMARY
+
+  sy_is_hsymmetric/1, sy_is_vsymmetric/1, sy_is_rot180/1
+  sy_is_rot90/1, sy_is_diagonal/1, sy_is_antidiagonal/1
+  sy_group/2
+  sy_rotations/2, sy_orbit/2
+  sy_canonical/2, sy_equivalent/2, sy_order/2
+
+
+WHAT COMES NEXT
+
+Chapter 27 covers the Color Pack: color mapping, palette extraction,
+recoloring, and color-based filtering of grids.
+
+END OF CHAPTER 26
+END OF CHAPTER 26 AND END OF THE PROLOGAI TUTORIAL
