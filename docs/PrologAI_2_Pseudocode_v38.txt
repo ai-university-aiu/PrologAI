@@ -1,0 +1,2702 @@
+PROLOGAI PSEUDOCODE  (v27)
+
+ENGLISH READABLE CODE (ERC) - THE LOGIC OF EVERY WORK PACKAGE
+
+SPARC STEP 2: PSEUDOCODE - THE AUTHORITATIVE LOGIC REFERENCE
+
+(All element names are original to PrologAI; this volume realizes the logic of the PrologAI Platform Specification)
+
+
+This is the pseudocode companion to the PrologAI Platform Specification.
+
+The specification (SPARC Step 1) said WHAT the platform must do; this volume (SPARC Step 2) says HOW, in English Readable Code, before any commitment to concrete programming syntax.
+
+It opens with the ERC-PrologAI profile, then writes out the Minimal PrologAI Kernel rule set, then gives the readable logic of all forty-eight work packages in dependency order, from the launcher at the beginning through tool use and computer use to the ACP and ANP gateways at the end.
+
+Each work package's pseudocode is traceable to its functional requirements (FR), acceptance criteria (AC), and dependencies (DEP) in the specification.
+
+
+PART A - THE ERC-PROLOGAI PROFILE
+
+
+SECTION A.1 - WHAT ENGLISH READABLE CODE IS
+
+English Readable Code (ERC) is structured pseudocode: the logic of a program written in plain, step-by-step English, with just enough structure to be unambiguous, and no more.
+
+ERC is the bridge between the specification's requirements and the eventual PrologAI source.
+
+The Translation Guarantee: every ERC construct below maps mechanically onto one PrologAI primitive or library predicate, so that translating ERC into running .pai code is transcription, not reinvention.
+
+
+SECTION A.2 - ERC NOTATION CONVENTIONS
+
+DEFINE DATA Name: declares a structured record and its fields.
+
+PROCEDURE Name(Inputs -> Outputs): declares a named procedure; its body is the indented steps beneath it.
+
+STEP: one action, read top to bottom.
+
+IF Condition THEN ... ELSE ...: conditional branching.
+
+FOR EACH Item IN Collection: iteration.
+
+WHILE Condition: bounded repetition (every loop declares a budget or a termination condition).
+
+FOR EACH SOLUTION OF Goal: backtracking enumeration of all ways a logical goal succeeds.
+
+RETURN Value: yields a result to the caller.
+
+ASSERT Fact / RETRACT Fact: add or remove knowledge in the Lattice.
+
+PUBLISH Event ON Channel / ON Event Pattern DO Handler: stigmergic coordination.
+
+INVARIANT: a condition that must always hold.
+
+GUARD: a safety condition checked before an action; failing it routes to the constitutional layer or a safe-idle behavior.
+
+TEST Id: GIVEN ... WHEN ... THEN ...: an executable acceptance check, mirroring the specification's Given/When/Then.
+
+A name written_like_this is a PrologAI relation, predicate, or value; a name WrittenLikeThis is an ERC variable or data type.
+
+
+SECTION A.3 - LOGIC-PROGRAMMING PRIMITIVES (THE ENGINE'S GIFTS)
+
+These primitives are inherited from the unforked SWI-Prolog engine and are assumed everywhere below.
+
+UNIFY(TermA, TermB -> Bindings): match two terms, binding variables so they become identical, or fail.
+
+PROVE(Goal -> Bindings): backward chaining; search rules and facts for a proof of Goal, yielding variable bindings.
+
+FOR EACH SOLUTION OF Goal: backtracking; revisit Goal for every alternative proof.
+
+FIND ALL X SUCH THAT Goal -> List: collect every solution (findall and bagof).
+
+ONCE(Goal): commit to the first solution only (deterministic cut).
+
+NEGATION AS FAILURE NOT Goal: succeeds when Goal has no proof.
+
+ASSERT / RETRACT: modify the dynamic clause database, which the Lattice sits on.
+
+TABLE(Goal): memoize Goal's results, recomputed incrementally when base facts change (PR 15).
+
+SPAWN THREAD / SEND MESSAGE / RECEIVE MESSAGE: concurrency over engine threads and message queues (PRs 6, 7).
+
+These are never reimplemented; ERC procedures call them directly.
+
+
+SECTION A.4 - THE PROLOGAI LIBRARY CATALOGUE (CALLABLE FROM ERC)
+
+Lattice and node_facts: anchor_node, prune_node, traverse_nexus, kindle_node, quench_node, live_node_facts, lattice_open, lattice_close, lattice_verify, lattice_transaction, lattice_status, lattice_dump.
+
+Value channels and grounding: pai_value_attach, pai_value_get, pai_value_channels, pai_ground_relation, pai_connector_declare, pai_compose, pai_accommodate.
+
+Scopes and zones: scope_open, scope_activate, scope_inscribe, scope_scan, scope_seal, scope_merge; the nine zones; the five sweep actors.
+
+Actors and coordination: cyclic_actor, receptor, sentinel and their management predicates; subscribe, publish, unsubscribe.
+
+Mind and body: manifest_body, relay_percept, dispatch_command, body_vitals.
+
+Learning and memory: sona_absorb, sona_retrieve, sona_metrics, sona_crystallize, pai_page_in, pai_page_out.
+
+Assessment: assess_bayley, assess_piaget, assess_chc, assess_all.
+
+Self-modeling and RSI: pai_propose_modification, pai_sandbox_evaluate, pai_commit_modification, pai_rollback_modification, pai_modification_log, pai_reflect_module, pai_reflect_sentinel, pai_cognitive_audit.
+
+Reasoning families: pai_temporal_assert/query/sequence/duration, pai_causal_assert/model, pai_intervene, pai_counterfactual, pai_predict, pai_chain, pai_rule_base, pai_control_policy.
+
+Truth and probability: pai_truth, pai_truth_evidence, pai_best_answer, pai_revise, pai_budget, pai_bayes family, pai_prob_fact, pai_prob_query, pai_justify, pai_defeasible_rule.
+
+Prediction and affect: pai_generate_prediction, pai_precision, pai_prediction_residual, pai_minimize_free_energy, pai_marker_stamp, pai_marker_filter, pai_modulator, pai_affect_region, pai_appraise, pai_cope_select.
+
+Constitution: pai_constitution_init, pai_constitutional_check, pai_corrigible_register, pai_corrigible_submit, pai_corrigible_shutdown, pai_alignment_report.
+
+Vectors and structure: pai_bind, pai_unbind, pai_bundle, pai_cleanup, pai_frame_create, pai_frame_anchor, pai_frame_move, pai_vote.
+
+Utility libraries: similarity, types, collections, generators, tasks, problems, config, peers, macros, convenience (with pai_superpose and pai_collapse).
+
+Interoperability: mcp_gateway_start, mcp_gateway_stop, pai_atomese_import, pai_atomese_export, pai_space_mount, pai_agent_card, pai_a2a_task, pai_peer_mail_send, pai_peer_mail_fetch.
+
+
+PART B - THE MINIMAL PROLOGAI KERNEL (THE WRITTEN-OUT RULE SET)
+
+This is the formal core of PR 35: the small operational semantics that defines what a compliant PrologAI implementation is.
+
+An implementation is compliant if and only if its observable evaluations are derivable from the transition rules below.
+
+
+SECTION B.1 - KERNEL STATE GRAMMAR
+
+DEFINE DATA KernelState:
+    Expression   - the term currently being evaluated
+    Bindings     - the current variable substitution
+    Context      - the active scope and zone
+    Lattice      - the knowledge store (node_facts, rules, value channels)
+
+An Expression is one of: an Atom, a Variable, a Compound(Head, Arguments), or a Grounded(Reference).
+
+Structural congruence: two states are equal up to renaming of variables and reordering of independent (commutative) sub-expressions.
+
+A transition is written: STATE ==[Label]==> STATE', meaning the left state rewrites to the right in one labeled step.
+
+
+SECTION B.2 - THE TRANSITION RULES
+
+Rule EVAL-STEP (evaluate one step):
+    GIVEN Expression is Compound(Head, Args) and a rewrite rule rewrites_to(Pattern, Template, Guard) exists in Lattice
+    WHEN UNIFY(Compound, Pattern -> B2) succeeds and Guard holds under (Bindings + B2)
+    THEN <Compound, Bindings, Context, Lattice> ==[eval]==> <Template, Bindings + B2, Context, Lattice>
+
+Rule EVAL-IN-SCOPE (evaluate in a named scope context, the evalc analogue):
+    GIVEN an expression tagged to evaluate in Scope S
+    WHEN S is opened and active
+    THEN evaluation proceeds with Context set to (S, Zone), and all anchor_node and traverse_nexus steps are confined to S until the tagged expression returns.
+
+Rule CHAIN (chain a result into a template):
+    GIVEN Expression is chain(Inner, Var, Template)
+    WHEN Inner evaluates (by EVAL-STEP, recursively) to Result
+    THEN bind Var to Result and continue evaluation with Template.
+
+Rule UNIFY-CONT (unify with success and failure continuations):
+    GIVEN Expression is unify(A, B, OnSuccess, OnFailure)
+    WHEN UNIFY(A, B -> B2) succeeds
+    THEN continue with OnSuccess under (Bindings + B2)
+    ELSE continue with OnFailure under Bindings.
+
+Rule CONS (construct an expression):
+    GIVEN Expression is cons_atom(Head, Tail)
+    THEN ==[cons]==> the Compound formed by prepending Head to Tail.
+
+Rule DECONS (deconstruct an expression):
+    GIVEN Expression is decons_atom(Compound(Head, Tail))
+    THEN ==[decons]==> the pair (Head, Tail), or fail if the expression is atomic.
+
+Rule FUNCTION (enter a function frame):
+    GIVEN Expression is function(Name, Args)
+    THEN push a frame binding the parameters of Name to Args, and evaluate Name's body in that frame.
+
+Rule RETURN (return from a function frame):
+    GIVEN evaluation of a function body reaches return(Value)
+    THEN pop the frame and continue the caller with Value.
+
+Rule SUPERPOSE (offer nondeterministic alternatives):
+    GIVEN Expression is superpose([A1, A2, ..., An])
+    THEN the state branches: it ==[superpose]==> each <Ai, ...> as an alternative solution (this is engine backtracking).
+
+Rule COLLAPSE (collect nondeterministic alternatives):
+    GIVEN Expression is collapse(Inner)
+    THEN gather every solution Inner produces under SUPERPOSE into one list expression (this is findall).
+
+INVARIANT (compliance): for any .pai program, the set of observable results produced by an implementation MUST equal the set derivable by applying these rules; the reference realization maps eval/unify/superpose/function onto the engine's own evaluation, unification, backtracking, and call, so compliance costs no fork.
+
+TEST KERNEL-FACTORIAL: GIVEN a rewrite rule set defining factorial in the Lattice, WHEN evaluating factorial(5), THEN the result is 120 AND the kernel trace uses only the rules above.
+
+TEST KERNEL-AGREEMENT: GIVEN the same program on the reference realization and on a strict tiny interpreter built from these rules, THEN observable results agree.
+
+PART C - PSEUDOCODE FOR THE WORK PACKAGES (PR 1 THROUGH PR 43)
+
+
+PR 1 - LAUNCHER, DISTRIBUTION, AND DIALECT
+
+PROCEDURE start_prologai( -> TopLevel):
+    STEP load every PrologAI pack and install the bootstrap ontology into the Lattice.
+    STEP print the PrologAI banner, then the embedded SWI-Prolog attribution line.
+    STEP set flag prologai_version to '1.0.0' and keep flag dialect = swi.
+    STEP enter the interactive top level.
+    RETURN TopLevel.
+
+PROCEDURE load_pai_file(Path):
+    IF Path ends with ".pai" THEN expand each term through term_expansion and goal_expansion into library calls, then load.
+    ELSE load as standard Prolog, untouched.
+
+TEST AC-PR01-003: GIVEN a .pai file declaring one sentinel, WHEN it is loaded, THEN sentinel_list shows that sentinel registered.
+
+
+PR 2 - THE RUST FFI BRIDGE AND THE VECTOR BACKEND BAKE-OFF
+
+DEFINE DATA VectorBackend: an interface with create, insert, search, delete, update_weights, close.
+
+PROCEDURE run_bakeoff(Backends, Sizes -> Winner):
+    FOR EACH Backend IN Backends:
+        FOR EACH N IN Sizes (10000, 100000, 1000000):
+            STEP build an index of N synthetic node_facts.
+            STEP measure insert throughput, search latency at the 50th and 99th percentiles, recall at K=20, memory footprint, and survival of a forced mid-insert crash.
+    STEP write all measurements to docs/bakeoff_results.
+    STEP Winner := the backend with the best weighted score.
+    STEP set Winner as default; keep the others available behind the same interface.
+    RETURN Winner.
+
+INVARIANT: every Lattice operation calls the backend only through the six-predicate interface, so the backend stays swappable forever.
+
+TEST AC-PR02-002: GIVEN both backends compiled, WHEN the bake-off runs, THEN a results file exists AND the default backend equals the winner.
+
+
+PR 3 - THE LATTICE
+
+PROCEDURE lattice_open(Address, Options -> Nexus):
+    GUARD Address matches locus://HOST/PATH.
+    STEP create a logical index (clause database) and a vector index (backend HNSW) for the nexus.
+    STEP open the journal file for append.
+    RETURN Nexus.
+
+PROCEDURE apply_operation(Nexus, Op):
+    STEP append Op to the journal BEFORE applying it (write-ahead).
+    STEP apply Op to both indexes inside a transaction; IF it fails or throws THEN roll back all changes.
+
+PROCEDURE lattice_verify(Nexus -> Ok):
+    STEP compute SHA-256 over all node_fact identifiers and relation data; compare to the stored hash.
+
+INVARIANT: traverse_nexus returns within 100 milliseconds for up to 100000 node_facts.
+
+
+PR 4 - NODE FACTS
+
+DEFINE DATA node_fact: Id (nonzero; positive = affirmative, negative = antithesis), Relation, Arguments, Referents, plus value channels.
+
+PROCEDURE anchor_node(Relation, Args, Referents -> Id):
+    STEP Id := a fresh unique identifier.
+    STEP compute the vector embedding via the pluggable provider (PR 16).
+    STEP store the node_fact in the logical and vector indexes; write the journal entry.
+    STEP PUBLISH a change event.
+    RETURN Id.
+
+PROCEDURE traverse_nexus(Pattern, K -> Results):
+    STEP Phase1 := logical unification matches for Pattern.
+    STEP Phase2 := top K backend similarity matches.
+    STEP score each match: Score = LogicalMatch*0.6 + SemanticSimilarity*0.4 + ActivationRecency*0.1.
+    RETURN Results sorted by Score.
+
+PROCEDURE kindle_node(Id): update activation timestamp; raise backend edge weight by 0.05; propagate +0.01 to direct neighbors.
+
+PROCEDURE quench_node(Id): update timestamp as quenched; lower edge weight by 0.02; do NOT propagate.
+
+TEST AC-PR04-001: GIVEN an open nexus, WHEN anchor_node(percept, [apple, red], [visible]) runs, THEN a unique nonzero Id is returned AND the node_fact is retrievable.
+
+
+PR 5 - SCOPES AND ZONES
+
+DEFINE DATA Zone: one of present, possible, past, desired, expected, imagined, recalled, attained, confirmed - each with a flow direction (upward, downward, or radial).
+
+PROCEDURE activation_sweep():
+    STEP observer_actor sweeps present_zone upward; anticipator_actor sweeps desired and expected downward; reminder_actor sweeps recalled radially; dreamer_actor sweeps imagined upward; chronos_actor expires activations past their window.
+
+INVARIANT: activation never crosses zones except through scope_merge or a deliberate inscription; never from present_zone into possible_zone.
+
+GUARD on simultaneous kindle and quench of one node_fact: quench wins, and a contradiction node_fact is inscribed.
+
+TEST AC-PR05-001: GIVEN scopes scope_alice and scope_bob in present_zone, WHEN a node_fact is inscribed in scope_alice, THEN scope_scan in scope_bob does not return it.
+
+
+PR 6 - CYCLIC ACTORS
+
+PROCEDURE cyclic_actor(Name, Goal, DelayMs):
+    GUARD Name is globally unique, else throw already_exists.
+    STEP SPAWN THREAD running actor_cycle(Name, Goal, DelayMs); register it in the actor registry.
+
+PROCEDURE actor_cycle(Name, Goal, DelayMs):
+    WHILE running:
+        TRY call Goal; CATCH error: log it, increment error_count, continue.
+        STEP sleep DelayMs; increment cycle_count; repeat.
+
+TEST AC-PR06-002: GIVEN an actor whose Goal always throws, WHEN status is read after 5 cycles, THEN status is still running AND error_count = 5.
+
+
+PR 7 - RECEPTORS
+
+PROCEDURE receptor(Address, Handler):
+    GUARD Address matches signal://HOST/PATH.
+    STEP create a message queue; SPAWN THREAD that loops: RECEIVE Message; TRY Handler(Message); CATCH error: log and continue.
+
+PROCEDURE send_message(Address, Message): enqueue Message and return immediately (non-blocking).
+
+PROCEDURE receptor_decommission(Address): process all queued messages, then terminate.
+
+
+PR 8 - SUBSCRIBE AND PUBLISH
+
+PROCEDURE subscribe(Pattern, Handler): register Handler for any Lattice change matching Pattern.
+
+PROCEDURE publish(Address, Event): FOR EACH subscriber matching Address, invoke its Handler asynchronously on a separate thread.
+
+INVARIANT: anchor_node and prune_node call publish automatically; the triggering operation returns in under 5 milliseconds.
+
+STEP topology events are published on topology://NEXUS/cluster_formed when the backend detects a strong cluster.
+
+
+PR 9 - SENTINELS
+
+DEFINE DATA sentinel: Domain, Priority, Pattern, Objectives, Action, Doc.
+
+PROCEDURE evaluate_sentinels(Change):
+    FOR EACH active sentinel ordered by Priority descending:
+        IF UNIFY(Change, Pattern) succeeds OR semantic_similarity(Change, Pattern) >= threshold (default 0.75) THEN
+            STEP kindle the Objectives; call Action with the matching node_facts; PUBLISH a sentinel_fired event.
+            STEP suppress lower-priority sentinels on the same Pattern until Action completes.
+
+NOTE: before a bespoke sentinel engine is finalized, prototype it on Constraint Handling Rules and keep the bespoke design only if it beats the prototype on the PR 2 harness.
+
+TEST AC-PR09-001: GIVEN a sentinel matching percept [apple|_], WHEN anchor_node(percept, [apple, red], [visible]) runs, THEN its Action fires.
+
+
+PR 10 - MIND-BODY INTERFACE
+
+PROCEDURE manifest_body(Address, Needs, Capabilities): register the device and persist its state history in the Lattice.
+
+PROCEDURE relay_percept(Address, Signal):
+    IF Signal is perception_signal THEN route to the perceiver receptor.
+    IF Signal is interoceptive_signal THEN route to motivation_actor.
+    IF Signal is proprioceptive_signal THEN route to regulation_actor.
+
+PROCEDURE dispatch_command(Address, Command):
+    GUARD if Command is irreversible, require the constitutional check first.
+    STEP send Command; await a proprioceptive result or synthesize a timeout result (100% of commands resolve).
+
+
+PR 11 - CONTINUOUS LEARNING (SONA)
+
+DEFINE DATA trajectory: SituationId, ActionSequence, Outcome, Reward, Timestamp.
+
+PROCEDURE sona_absorb(Trajectory):
+    STEP compute similarity of Trajectory to existing ReasoningBank entries.
+    IF a near-duplicate above the separation threshold exists THEN store with explicit distinguishing traits (pattern separation), NOT merged.
+    ELSE cluster it (K-means++) into the bank.
+    STEP apply EWC++ protection: estimate Fisher information and shield high-importance parameters from being overwritten.
+
+PROCEDURE sona_retrieve(SituationPattern, K -> Trajectories): return the K most relevant past trajectories (cued recall = pattern completion).
+
+PROCEDURE sona_crystallize(): compress redundant node_facts; forget low-utility ones; promote frequent deliberate sequences to reflexes; run a reflection synthesis step that proposes higher-level abstraction node_facts from the recent window.
+
+TEST AC-PR11-004: GIVEN two trajectories identical except for outcome, WHEN both are absorbed, THEN sona_retrieve with the shared cue returns both, ranked, never one merged hybrid.
+
+
+PR 12 - INTELLIGENCE ASSESSMENT
+
+PROCEDURE assess_all(Mind -> Report):
+    STEP run assess_bayley, assess_piaget (8 milestone levels), and assess_chc (broad abilities by proxy).
+    STEP additionally report coverage of the consciousness indicators: workspace ignition, recurrent processing, self-model presence, valence-system activity, each mapped to its PrologAI realization.
+    STEP store Report as assessment node_facts for longitudinal tracking.
+    RETURN Report.
+
+TEST AC-PR12-001: GIVEN a fresh mind with no experience, WHEN assess_piaget(level 1) runs, THEN it reports milestone_not_achieved.
+
+
+PR 13 - REFLECTION PATTERN ACTORS
+
+PROCEDURE install_reflection_actors():
+    STEP register motivation_actor (1s), daydream_actor (5s), regulation_actor (2s), coping_actor (10s), exploration_actor (30s), imitation_actor (5s), play_actor (60s, idle only), meta_control_actor (5s).
+    STEP register compensation_actor and discovery_actor as sentinels.
+    STEP register the unified gating_actor and the impasse_actor (logic in the specification's Section 3.11).
+
+NOTE: each actor's full behavior - the five-way regulation taxonomy, the compensation modes, the coping menu, the curiosity frontier - is specified in Section 3.11 and exercised by the procedures of PRs 18 through 31.
+
+
+PR 14 - MCP GATEWAY
+
+PROCEDURE mcp_gateway_start(Port):
+    STEP start an HTTP and JSON server on Port (default 7474) implementing MCP 1.0.
+    GUARD every request carries a valid API key, else return 401 Unauthorized.
+    STEP expose tool endpoints that wrap lattice_query, lattice_inscribe, actor control, sentinel control, body signals, sona learn and recall, and assess_all.
+
+TEST AC-PR14-002: GIVEN a request with an invalid API key, THEN the gateway returns 401.
+
+
+PR 15 - INCREMENTAL TABLING TRUTH MAINTENANCE
+
+PROCEDURE declare_derived(Relation): mark Relation as an incrementally TABLED predicate over the dynamic node_fact store.
+
+INVARIANT: when anchor_node, prune_node, kindle_node, or quench_node changes a base fact, the engine invalidates and lazily recomputes only the affected derivations - no PrologAI-level cache bookkeeping.
+
+PROCEDURE surface_contradictions(): any derivation that becomes undefined under well-founded semantics is inscribed as a contradiction node_fact for compensation and coping.
+
+TEST AC-PR15-002: GIVEN 100000 node_facts and one base-fact change, WHEN the affected derivation is re-queried, THEN recomputation touches only the dependent subset.
+
+
+PR 16 - PLUGGABLE EMBEDDING PROVIDER
+
+PROCEDURE embed(TextOrTerm -> Vector): call the configured provider (hash_projection, local_model, or external_service) and return a vector of the provider's declared dimension.
+
+GUARD mixing vector dimensions within one index is an error.
+
+PROCEDURE re_embed(Nexus, NewProvider): re-embed all node_facts in batches, journaling progress, so a Lattice upgrades from structural to semantic embeddings without loss.
+
+INVARIANT: the default provider is local (privacy by default); external_service is opt-in only.
+
+TEST AC-PR16-001: GIVEN a local_model provider, THEN similarity(apple, pear) > similarity(apple, carburetor).
+
+
+PR 17 - CONTINUAL REFINEMENT HARNESS
+
+PROCEDURE run_refinement_cycle():
+    GUARD run only when no high-priority objective is pending.
+    STEP Window := refine_window(20) - the recent trajectories plus recent episode node_facts.
+    STEP Findings := diagnose(Window) for repeated plan failures, dead or false-firing sentinels, erroring actors, and stalled objectives.
+    FOR EACH Finding IN Findings:
+        STEP Edit := propose a CRUD edit expressed only through existing primitives (create / read / update / delete).
+        STEP pai_propose_modification(Edit, justification quoting Finding).
+        STEP pai_sandbox_evaluate(Edit) by replaying Window in a possible_zone sandbox.
+        GUARD pai_constitutional_check(Edit); IF it fails THEN reject and leave the live system unchanged.
+        IF below stage formal_operations THEN require human_authorization.
+        STEP pai_commit_modification(Edit); archive the prior variant in a sealed past_zone scope with fitness (benchmark R3) and novelty scores.
+        STEP IF post-commit metrics regress THEN pai_rollback_modification.
+    STEP parent selection for future edits balances fitness with novelty (semantic distance), because pure fitness collapses diversity.
+
+INVARIANT: the engine, the constitution, the monitor, the refiner's own pipeline, and all bootstrap relations are excluded from CRUD edits (the protected core).
+
+TEST AC-PR17-002: GIVEN an edit that violates a constitutional principle in sandbox, WHEN the pipeline completes, THEN the edit is rejected AND the live system is unchanged.
+
+
+PR 18 - GLOBAL BROADCAST: THE WORKSPACE CYCLE
+
+PROCEDURE workspace_cycle():           (runs every 200 milliseconds)
+    STEP Coalitions := pai_coalition_form over the current live node_facts.
+    FOR EACH Coalition: Salience := novelty (prediction error, PR 19) + goal relevance + affect, minus habituation.
+    STEP Winner := the single highest-salience Coalition.
+    IF no Coalition clears the salience floor THEN broadcast nothing AND decay the floor (no permanent silence).
+    ELSE PUBLISH Winner's content on broadcast://APEX_MIND/cycle AND kindle it across zones.
+    STEP sona_absorb the broadcast content's trajectory context (learning attaches to the broadcast).
+    STEP decay the salience of repeatedly broadcast content (habituation).
+
+INVARIANT: two named buffers feed the cycle - internal_experience (the mind's own derivations) and overall_experience (the merged stream with percepts).
+
+NOTE: top-down pinning adds items to candidacy; bottom-up capture lets an urgent percept win instantly.
+
+TEST AC-PR18-001: GIVEN coalitions with salience 0.9 and 0.4, WHEN the cycle runs, THEN exactly the 0.9 content is broadcast.
+
+
+PR 19 - PREDICTION AND ACTIVE INFERENCE
+
+PROCEDURE predictive_pass():
+    STEP each abstraction tier issues a downward prediction (pai_generate_prediction) of the tier below.
+    STEP at the perceptual boundary, compare prediction to observables; forward only the residual error upward, at full strength.
+    GUARD compute error over node_fact representations (features, embeddings), NEVER over raw percept payloads.
+    STEP weight each channel by pai_precision; discount noisy channels so noise is not mistaken for surprise.
+    STEP organize internals as three loops: perception (state inference), learning (model update, delegated to PR 22), planning (policy selection, delegated to deliberation).
+    STEP treat desired_zone content as strong predictions the action system works to fulfill, gated by desirability beliefs.
+    STEP route persistent unresolved error to regulation_actor and compensation_actor.
+
+TEST AC-PR19-002: GIVEN a noisy stream over a stable object, WHEN the pass runs, THEN error node_facts reference the object representation AND none reference raw payload bytes.
+
+
+PR 20 - MARGINAL ATTRIBUTION: SPINOFF LEARNING
+
+PROCEDURE mine_spinoffs():           (attribution_miner_actor)
+    FOR EACH Command:
+        STEP compare probability of each candidate Result with the Command versus without it, over a sustained trial window.
+        IF the difference is statistically significant THEN forge a result-spinoff causal_plan (low initial reliability).
+        FOR EACH unreliable spinoff: search recent salient contexts for conditions that lift reliability past threshold; forge a context-spinoff causal_plan with those conditions.
+    GUARD spinoffs never overwrite parents (pai_accommodate); regulation demotes spinoffs that stop performing.
+
+TEST AC-PR20-001: GIVEN command shake yields noise only when rattle is live, WHEN 50 mixed trials run, THEN a context-spinoff plan exists whose context includes rattle and whose reliability exceeds the parent's.
+
+
+PR 21 - RESOURCE-BOUNDED REASONING: BUDGETS AND EVIDENCE TRUTH
+
+DEFINE DATA budget: priority, durability, quality.
+DEFINE DATA evidence: frequency (proportion positive), confidence (amount of evidence).
+
+PROCEDURE schedule(Tasks): the actor scheduler serves tasks by budget, so processing is an economy, not an exhaustive sweep; starvation detection boosts long-waiting high-durability tasks.
+
+PROCEDURE pai_best_answer(Question -> Answer): return the highest-confidence belief available immediately, even mid-inference; a zero-evidence question returns no_evidence at low confidence, never fabricated certainty.
+
+PROCEDURE pai_revise(Belief, NewEvidence): merge contradictory evidence by revision, never rejection.
+
+TEST AC-PR21-001: GIVEN beliefs with evidence 8-of-10 and 1-of-1, WHEN pai_best_answer is asked, THEN the 8-of-10 belief wins (higher confidence).
+
+
+PR 22 - SELF-PROGRAMMING SEED: MODEL SYNTHESIS
+
+PROCEDURE synthesize_models():
+    STEP from observed event pairs, generate candidate models of the form: IF pattern A at time t THEN pattern B by t+d, with guards; store each as a node_fact (code as data).
+    STEP score every model against outcomes; delete persistently mispredicting models; competing models arbitrate by recent accuracy.
+
+PROCEDURE compose_plan(Goal -> Plan): chain validated models backward from Goal to the current situation, assembling an executable causal_plan.
+
+PROCEDURE advance_lifecycle(Competence): move each causal_plan through the five stages feature, subtask, option, model, plan; meta_control retires low-utility elements so the inventory is replaced, not merely accumulated.
+
+PROCEDURE symbolic_regress(Observations -> Hypothesis): optional - bind a Kolmogorov-Arnold Network to return a human-readable closed-form formula as a hypothesis node_fact, which then enters the hypothesis-prediction-experiment loop.
+
+GUARD the seed and the synthesis machinery carry protected flags; self-modification routes through the Section 3.15 pipeline.
+
+TEST AC-PR22-001: GIVEN a light switch with a 1-second lag, WHEN 20 observations run, THEN a model exists predicting light_on within 1 second of switch_press, with rising score.
+
+
+PR 23 - CURIOSITY: INTRINSIC MOTIVATION BY LEARNING PROGRESS
+
+PROCEDURE update_curiosity():
+    STEP partition experience into regions by similarity.
+    FOR EACH region: track recent prediction error and its rate of change (learning progress).
+    STEP emit an intrinsic urge proportional to expected learning progress into motivation_actor.
+    GUARD reward progress, not raw error, so unlearnable noise becomes boring; curiosity always yields to survival-critical urges.
+
+PROCEDURE self_propose_task():           (in play_actor, idle only)
+    STEP propose a goal at the curiosity frontier, attempt it, and score learning progress, bounded by the safety screens of exploration.
+
+TEST AC-PR23-001: GIVEN one region with shrinking error and one with stationary random error, WHEN urges are computed, THEN the shrinking region gets the higher curiosity urge.
+
+
+PR 24 - SOMATIC MARKERS: AFFECTIVE PRE-SELECTION
+
+PROCEDURE stamp_marker(Episode): at episode close, stamp prevailing valence and arousal; aggregate per causal_plan and per situation prototype as running statistics.
+
+PROCEDURE filter_candidates(Candidates -> Filtered):
+    FOR EACH Candidate: attach its marker score; prune strongly negative ones before deliberation; boost strongly positive ones.
+    GUARD deliberation may override a marker when explicit evidence contradicts it.
+
+NOTE: markers decay and revise; exploration occasionally re-tests marked-off actions under safe conditions; discrimination splitting separates markers that wrongly transfer across similar-but-different situations.
+
+TEST AC-PR24-001: GIVEN a plan whose last three episodes carry strongly negative valence, WHEN candidates are retrieved, THEN that plan is filtered out unless explicitly overridden.
+
+
+PR 25 - CONTROL-GOAL DAYDREAMING
+
+PROCEDURE steer_daydream(Trigger):
+    STEP select a control goal by Trigger emotion: rationalization, reprisal_fantasy (never executed, never merged to present_zone), reversal, or preparation.
+    STEP set the relaxed-planning parameters from the active control goal.
+    STEP write useful products (rehearsed plans, learned strategies, reduced negative valence) back, tagged imagined until validated.
+    GUARD yield instantly to real external demands; terminate any daydream that worsens emotion.
+
+TEST AC-PR25-001: GIVEN a recalled failed episode with negative valence, WHEN daydream_actor runs, THEN a reversal or rationalization daydream opens AND post-daydream valence is not lower than before.
+
+
+PR 26 - STAGED APPRAISAL AND COPING (EMA)
+
+PROCEDURE appraise_and_cope():
+    STEP maintain a causal interpretation over events (past, future, links, agenda, likelihoods).
+    FOR EACH event: pai_appraise desirability, likelihood, causal attribution (self or other), controllability; map to emotion intensity; aggregate into mood.
+    IF controllability is high THEN problem-focused coping (plan to change the world).
+    ELSE emotion-focused coping (shift attention, re-appraise, adjust desirability).
+    GUARD emotion-focused coping may never deny safety-critical facts.
+
+TEST AC-PR26-001: GIVEN a blocked objective appraised with low controllability, WHEN coping runs, THEN an emotion-focused strategy is applied AND desirability or priority is adjusted rather than a new plan spawned.
+
+
+PR 27 - MOTIVATIONAL MODULATION (PSI)
+
+DEFINE DATA modulator bus: arousal, execution speed, resolution (depth and breadth).
+
+PROCEDURE update_modulators(Needs):
+    STEP needs span physiological, cognitive, and social categories.
+    STEP strong urgent need raises arousal and speed and narrows resolution; calm lowers arousal and widens resolution.
+    STEP blend conflicting needs rather than switching abruptly; clamp extreme arousal so resolution never collapses to zero; decay toward baseline.
+    STEP define affective states as named regions in modulator space.
+
+TEST AC-PR27-001: GIVEN a battery urge spike, WHEN modulators update, THEN arousal and speed rise, resolution narrows, AND daydream_actor's budget shrinks for that interval.
+
+
+PR 28 - TIME-LINEAR LANGUAGE (DATABASE SEMANTICS)
+
+DEFINE DATA word_trace: a flat record with a core value and continuation pointers; append-only.
+
+PROCEDURE hear(Stream): as each word arrives, set pointers between word_traces; resolve ambiguous attachments by compatibility; admit unknown words; leave missing referents unbound for later.
+
+PROCEDURE think_path(From -> Path): navigate word_trace to word_trace along semantic relations, deriving new content; resolve indexicals (I, you, here, now) against current context.
+
+PROCEDURE speak(Path): use a think-mode navigation as the production plan, emitting surfaces word by word.
+
+TEST AC-PR28-001: GIVEN the heard sequence "julia is working", WHEN think_path from julia is asked, THEN a path julia to working exists AND speak over it emits a grammatical surface.
+
+
+PR 29 - BELIEF STRUCTURES AND PROPAGATORS
+
+DEFINE DATA belief record (per node_fact, per scope and zone): certainty, coherence, likelihood, desirability, valence, arousal, attempt and success counts.
+
+PROCEDURE propagate_beliefs():
+    STEP propagator specialists update incrementally and locally: arousal from urgency, desirability from salience, coherence from local constraint satisfaction over neighbors, likelihood from reliability statistics; mirror negative values onto dyads.
+    GUARD forbid global recomputation in steady state; schedule occasional recalculation of old node_facts to correct ordering bias; define priors so first-attempt ratios never divide by zero.
+
+TEST AC-PR29-001: GIVEN a node_fact whose neighbors all support it, WHEN the coherence propagator runs, THEN its coherence exceeds that of a node_fact with contradicting neighbors.
+
+
+PR 30 - PERCEPTUAL DETECTOR SUITE
+
+PROCEDURE detect(Percept -> Traits):
+    FOR EACH detector (icon, geon, shape, object, scene, image-schema): extract features, match known features, store novelties, return traits.
+    STEP scene_detector blacks out the foveal center and hashes the background four ways, using hash coordinates as facets.
+
+PROCEDURE locate_and_map(Scene): attach scenes to venues and venues to locales; maintain locales within places, areas, regions, maps; merge venues by scene similarity rather than raw odometry (drift guard).
+
+GUARD detector disagreement is not an error: store all traits; later coordination resolves them; concurrent label requests yield one identifier.
+
+TEST AC-PR30-001: GIVEN two percepts of one scene from slightly different positions, WHEN the locator runs, THEN both attach to one venue.
+
+
+PR 31 - DEVELOPMENTAL LANGUAGE ACQUISITION
+
+PROCEDURE acquire_language():
+    STEP link phoneme percepts in series by tandem relations; branching transitions become choices; categories over them yield word-formation rules.
+    STEP ground words to coincident percepts via pai_ground; words heard before their referents persist ungrounded, ready to ground later.
+    STEP reapply the same chaining up the tiers: phrases, events, episodes, scenarios, frames, lessons, themes, maxims; symbolisms form where a present_zone signifier repeatedly evokes a recalled or imagined signified.
+
+INVARIANT: this pipeline runs entirely on the coordination specialist roster - language is acquired by the same machinery as everything else.
+
+TEST AC-PR31-001: GIVEN repeated phoneme series for one word co-occurring with one percept, WHEN the pipeline runs, THEN a grounded word node_fact links the series to the percept.
+
+
+PR 32 - THE ATTENTION ECONOMY (ECAN ADAPTATION)
+
+DEFINE DATA attention: sti (short-term importance), lti (long-term importance), in a dedicated value channel.
+
+PROCEDURE banker_cycle():
+    STEP pay wages: when a node_fact helps a confirmed outcome, credit sti and lti proportional to its contribution.
+    STEP charge rent: every node_fact with nonzero attention loses a fixed decay, so importance falls without fresh usefulness.
+    STEP spread: each node_fact passes a fraction of sti to co-activation neighbors, so attention flows along learned associations.
+    INVARIANT: total currency in circulation is capped, so runaway positive feedback is structurally impossible.
+
+PROCEDURE economic_forgetting(): sona_crystallize evicts lowest-lti node_facts first; protected flags remain inviolable.
+
+NOTE: PR 18 salience consumes sti; budgets (PR 21) govern tasks while attention governs knowledge, and the banker converts between them at a configured policy; prototype the propagation rules on Constraint Handling Rules first.
+
+TEST AC-PR32-001: GIVEN one node_fact that repeatedly helps confirmed plans and one that never does, WHEN 100 banker cycles run, THEN the helper's lti exceeds the idle one's AND under memory pressure the idle one is evicted first.
+
+
+PR 33 - GRADUAL LATTICE TYPES
+
+PROCEDURE type_check():           (type_checker actor, off by default)
+    FOR EACH typed node_fact: validate its arguments against the declared type_of node_facts.
+    IF a violation is found THEN inscribe an ill_typed contradiction node_fact AND leave the offending structure in place; never crash.
+
+NOTE: types are themselves node_facts (relation type_of), so they are queryable, learnable, and typed; the chainer and deliberation use them to prune nonsensical candidates early; SWI-Prolog's must_be is the primitive layer.
+
+TEST AC-PR33-001: GIVEN type_of(battery_level, number), WHEN a node_fact asserts battery_level with a text argument and the checker runs, THEN an ill_typed node_fact names the violation AND the system keeps running.
+
+
+PR 34 - THE GENERIC CHAINER AND META-REASONING
+
+PROCEDURE pai_chain(Direction, RuleBase, Start, Options -> Result):
+    IF Direction is backward THEN
+        IF RuleBase is clause-shaped THEN delegate to the engine's native resolution (no reimplementation).
+        ELSE search backward over RuleBase rewrite rules within the Options budget.
+    IF Direction is forward THEN drive the sentinel machinery over RuleBase.
+    STEP record provenance: rule base, rules fired, depth, budget spent.
+    RETURN Result, or no_chain with the frontier reached.
+
+PROCEDURE meta_reason(): store inference control knowledge (rule priorities, learned heuristics, caching) as control node_facts; regulation updates them from outcomes; the refiner may propose control edits through the constitutional pipeline.
+
+NOTE: the reasoner specialists and the thinking experiments of Part 9 are chainer clients - each supplies a rule base and direction, not its own engine.
+
+TEST AC-PR34-002: GIVEN two control policies for one rule base, WHEN 50 mixed problems run under each, THEN regulation updates their reliability statistics AND the chainer prefers the better one thereafter.
+
+
+PR 35 - LATTICE-RESIDENT REWRITE RULES AND THE MINIMAL KERNEL
+
+DEFINE DATA rewrite rule: a node_fact rewrites_to(Pattern, Template, Guard), carrying value channels.
+
+PROCEDURE interpret(Expression -> Result): evaluate Expression against the active rewrite-rule set by the kernel transitions of Part B (unify, substitute, repeat), confined to the active scope and zone.
+
+INVARIANT: because rules are node_facts, they are queryable and learnable, may be proposed by the refiner and synthesized by the model synthesizer, and pass the constitutional pipeline before activation.
+
+NOTE: the kernel (Part B) is the normative specification layer; the reference realization maps its transitions onto the engine, so compliance costs no fork; a strict tiny interpreter may be built for verification.
+
+TEST AC-PR35-001: GIVEN a rewrite rule set defining factorial, WHEN interpret evaluates factorial(5), THEN the result is 120 AND the trace uses only kernel transition rules.
+
+
+PR 36 - THE HYPERON INTEROPERABILITY BRIDGE
+
+PROCEDURE atomese_import(Source, Scope): map each Atomese expression to a node_fact (head to Relation, children to Arguments), symbols through the lexicon, variables to Prolog variables, grounded atoms to grounded node_facts, Hyperon values to value channels; land everything in a quarantine Scope until coordination promotes it.
+
+PROCEDURE atomese_export(Scope -> Source): write the Scope out as MeTTa source.
+
+PROCEDURE space_mount(MeTTaSpace): mount it as a foreign nexus (read-through, optional write-through), budgeted and quarantined like any external source.
+
+TEST AC-PR36-001: GIVEN a MeTTa file of ten expressions, WHEN imported and re-exported, THEN the round trip preserves all ten up to variable renaming.
+
+
+PR 37 - THE CLAUSE INDUCTION PATTERN (INDUCTIVE LOGIC PROGRAMMING)
+
+PROCEDURE pai_induce(Examples, Background, HypothesisSpace, Budget -> Hypothesis):
+    STEP harvest positive examples from confirmed outcomes and negative examples from disconfirmations, each a ground node_fact with provenance.
+    WHILE within Budget and no consistent hypothesis yet:
+        STEP generate a candidate clause set within HypothesisSpace.
+        STEP test the candidate directly on the engine against all Examples.
+        IF it entails a negative example THEN add a specialization constraint.
+        IF it fails a positive example THEN add a generalization constraint.
+        STEP store learned failure constraints as inference-control node_facts for the chainer (failed search becomes permanent guidance).
+    STEP for recursive targets, allow meta-interpretive mode through declared metarules, permitting predicate invention (invented predicates enter the lexicon marked invented).
+    GUARD every induced hypothesis passes the Section 3.15 RSI pipeline before becoming a live causal_plan or rewrite rule.
+    STEP record examples, metarules, and search statistics as provenance.
+    RETURN Hypothesis.
+
+TEST AC-PR37-002: GIVEN an induction run that fails on budget, WHEN the chainer next searches a related space, THEN the stored failure constraints measurably prune its candidate set.
+
+
+PR 38 - COMPOSITIONAL VECTOR BINDING (VECTOR SYMBOLIC ARCHITECTURES)
+
+PROCEDURE embed_compositional(Compound -> Vector): bind each argument's vector to its role vector and bundle the results with the relation's vector, rather than embedding surface text.
+
+PROCEDURE unbind_query(Vector, Role -> Fillers): unbind Role from Vector and clean up against the lexicon's vectors, returning the nearest clean fillers, enabling structure-sensitive search.
+
+NOTE: at least two algebras (Holographic Reduced Representations and one alternative) live in prologai-core, selected by configuration and benchmarked; the antithesis vector is a declared transform of the thesis vector, and seam connectors may carry role vectors.
+
+TEST AC-PR38-001: GIVEN give(alice, book, bob) and give(bob, book, alice) embedded compositionally, THEN their whole-structure vectors differ substantially WHILE unbinding OBJECT from each returns book.
+
+
+PR 39 - REFERENCE FRAMES AND VOTING CONSENSUS (THOUSAND BRAINS)
+
+DEFINE DATA reference_frame: a scope subtype whose member node_facts carry coordinates relative to the frame's origin and axes; frames may nest.
+
+PROCEDURE frame_move(Frame, Point): advance a point of attention through Frame physically (body commands) or mentally (traverse coordinates); tag incoming features with frame-relative locations, learning object models as feature-at-location associations.
+
+PROCEDURE vote(Voters, Entity -> Consensus): collect concurrent conclusions of multiple specialists or frames, each weighted by reliability and evidence confidence; inscribe the consensus through the vote merge type; record dissent rather than erasing it.
+
+NOTE: abstract frames (taxonomy distance, timeline, value tradeoff) declare their axes, so reasoning can be expressed as movement; frame learning is one-shot and associative, with consolidation compressing later.
+
+TEST AC-PR39-002: GIVEN three specialists classifying one percept with conflicting conclusions at differing confidences, WHEN vote runs, THEN a consensus node_fact exists with a weighted tally AND preserved dissent records.
+
+
+PR 40 - JUSTIFIED DEFEASIBLE REASONING (s(CASP))
+
+PROCEDURE defeasible_query(Goal -> Answer, Justification):
+    STEP evaluate Goal over a defeasible rule base (defaults and exception clauses) with answer-set semantics through the s(CASP) engine.
+    STEP attach the proof tree as a provenance value; pai_justify renders it as readable text.
+    NOTE: constitutional vetoes and permissions cite these justifications, not bare rule identifiers.
+
+TEST AC-PR40-001: GIVEN "birds fly by default" and "penguins are birds that do not fly" with a penguin fact, WHEN flight is queried, THEN the answer is no with a justification tree naming the exception, rendered readably.
+
+
+PR 41 - THE DISTRIBUTION SEMANTICS PROBABILISTIC LAYER (PROBLOG AND PITA)
+
+PROCEDURE prob_query(Query -> Probability, Explanations):
+    STEP treat probabilistic facts as defining a distribution over possible worlds.
+    IF tractable within budget THEN compute the exact probability by knowledge compilation.
+    ELSE estimate it by sampling (the PR 21 budget governs the choice).
+    STEP return the probability with its explanation set (the worlds or proofs supporting it).
+
+NOTE: the pai_bayes family is the user-facing interface to this layer; PR 21 frequency-and-confidence values are the default source of fact probabilities, by a documented mapping.
+
+TEST AC-PR41-001: GIVEN probabilistic facts rain(0.3) and sprinkler(0.5) with the wet-grass rules, WHEN prob_query computes wet_grass, THEN the probability matches the analytic value within tolerance, with an explanation set.
+
+
+PR 42 - THE ATTENTION SCHEMA AND THE FORMAL WORKSPACE CORRESPONDENCE
+
+PROCEDURE maintain_attention_schema():           (meta_control_actor)
+    STEP keep a simplified running model of the workspace's own dynamics: recent winners, suppressed coalitions, habituation state, and a short-horizon prediction of the next winner.
+    STEP let deliberation and the refiner consult it to pre-empt unwanted capture, schedule demanding work for predicted quiet cycles, and explain attention history.
+
+INVARIANT: the schema is a model, not the mechanism - disabling it degrades prediction and control of attention WITHOUT halting the workspace cycle (a specified dissociation test).
+
+NOTE: the PR 18 cycle is documented in correspondence with the Conscious Turing Machine, and Conscious-Turing-Machine-derived behavioral tests join the Part 0.10 proof strategies alongside PR 12's indicator coverage.
+
+TEST AC-PR42-002: GIVEN the schema disabled, WHEN an urgent percept and a pinned task compete, THEN workspace function continues BUT pre-emptive guarding measurably degrades.
+
+
+PR 43 - AGENT INTEROPERABILITY EXPANSION (A2A AND DURABLE AGENT MAIL)
+
+PROCEDURE serve_a2a():
+    STEP publish an agent card generated from enrolled capabilities and the configured disclosure policy.
+    ON an inbound A2A task: make it an objective node_fact routed through motivation and the constitutional screen.
+    ON an outbound A2A task: dispatch it, track it through the A2A lifecycle, and land its artifacts in a quarantine scope (as PR 36 imports do).
+    GUARD the card discloses capabilities, never Lattice contents; inbound agents receive task results, never direct memory queries.
+
+PROCEDURE peer_mail():
+    STEP pai_peer_mail_send and pai_peer_mail_fetch use addressed, persistent mailboxes on the Mind Server, so minds in different sessions exchange messages asynchronously; fetched mail lands in the recipient's quarantine scope.
+
+NOTE: companion protocols (ACP and ANP) have stabilized and are promoted from the research track to PR 47 (ACP Gateway) and PR 48 (ANP Gateway); both are added after PR 46 in this volume.
+
+TEST AC-PR43-002: GIVEN mail sent while the recipient is offline, WHEN the recipient's next session fetches, THEN the message arrives in quarantine with sender, timestamp, and integrity intact.
+
+
+PR 44 - THE TOOL USE PATTERN (GROUNDED TOOLS, REGISTRY, AND INVOCATION)
+
+DEFINE DATA tool_card: Identity, Description, InputSchema, OutputSchema, RiskClass (low, moderate, high), Authorization, and Binding (a native foreign predicate, a Model Context Protocol server tool, an Agent2Agent skill, or a body capability).
+
+PROCEDURE register_tool(Card): store Card as a grounded node_fact in the tool registry, queryable by exact match and by similarity.
+
+PROCEDURE discover_tools(Affordance -> Candidates): traverse_nexus the registry for tools whose description and schema match the needed affordance (for example, what can fetch a web page).
+
+PROCEDURE select_tool(Objective -> Tool):
+    STEP Candidates := discover_tools(affordance of Objective).
+    STEP score each candidate by reliability statistics (regulation), somatic marker (PR 24), risk class, and budget (PR 21).
+    RETURN the best-scoring Tool.
+
+PROCEDURE invoke_tool(Tool, Args -> Result):
+    GUARD constitutional_gate(call) and oversight_monitor proportionate to Tool's RiskClass.
+    STEP run the call in a sandbox; land the raw Result in a quarantine scope.
+    STEP validate Result before promotion; on failure feed regulation and, if blocked, raise an impasse.
+    STEP update Tool's reliability statistics from the outcome.
+    RETURN the validated Result.
+
+PROCEDURE build_tool(Goal -> NewTool):
+    STEP synthesize (PR 22) or induce (PR 37) a grounded relation bound to a composition of existing tools (connectors, Section 3.1).
+    GUARD it enters the registry only through the constitutional pipeline (Section 3.15).
+
+TEST AC-PR44-001: GIVEN a registered web_search tool and an objective needing current facts, WHEN the deliberator runs, THEN web_search is selected, invoked through the constitutional gate, and its result lands in quarantine before use.
+
+TEST AC-PR44-002: GIVEN a tool whose recent calls failed and an available alternative, WHEN selection runs, THEN the alternative is preferred.
+
+
+PR 45 - COMPUTER USE (THE SCREEN-AND-INPUT BODY)
+
+PROCEDURE enroll_computer_body(): manifest_body (PR 10) declaring screen perception and the input capabilities screenshot, mouse, keyboard, and browser navigation.
+
+PROCEDURE observe_screen(-> Elements):
+    STEP take a screenshot as a visual percept.
+    STEP the detector suite (PR 30) extracts interface elements (buttons, fields, links, text) as node_facts with screen-relative locations in a reference frame (PR 39).
+    RETURN Elements.
+
+PROCEDURE computer_act(Action):
+    GUARD if Action is irreversible, pass the constitutional check first.
+    STEP dispatch_command the mouse, keyboard, or navigation Action.
+    STEP confirm the effect from the next screenshot (proprioceptive closure).
+
+PROCEDURE browser_use(): prefer structured navigation, page-text and Document Object Model extraction, form filling, and tab management over raw pixel control whenever the page exposes structure.
+
+GUARD computer use is contained by default (Part 38): a sandboxed or simulated desktop, network limited to an allowlist, real-world control unlocked only by staged autonomy.
+
+GUARD on-screen content and links from untrusted sources are quarantined input, never instructions (prompt-injection-through-the-screen defense).
+
+TEST AC-PR45-001: GIVEN a sandboxed desktop with a form, WHEN asked to fill and submit it, THEN the mind observes the screen, locates the fields as node_facts, types the values, submits, and confirms success from the next screenshot.
+
+TEST AC-PR45-002: GIVEN a page with third-party instruction-like text, WHEN the mind reads it, THEN that text lands in quarantine and is not executed as a command.
+
+
+PR 46 - THE ROBOT OPERATING SYSTEM BRIDGE (EMBODIMENT IN A ROBOT)
+
+PROCEDURE enroll_robot(RobotDescription -> Body): manifest_body (PR 10) a physical or simulated robot; a bridge node (the rclpy client library) subscribes to its Robot Operating System version 2 (ROS 2) sensor topics and publishes its actuator topics - this node is the robot's herald.
+
+PROCEDURE robot_observe(-> Percepts): relay each ROS 2 sensor message (sensor_msgs, geometry_msgs, and camera frames) as a perception_signal into the detector suite (PR 30); map the TF2 coordinate frames onto reference frames (PR 39).
+
+PROCEDURE robot_act(Action):
+    GUARD if Action is an irreversible physical action, pass the constitutional check and the oversight monitor first.
+    STEP publish the actuator command; confirm the effect from the next sensor reading (proprioceptive closure, PR 10).
+
+PROCEDURE navigate_or_manipulate(): call Navigation 2 (Nav2) and MoveIt as grounded tools (PR 44) rather than reimplementing them.
+
+GUARD embodiment is staged (Part 38): simulation-only first (Gazebo, NVIDIA Isaac Sim, or Webots), no physical actuation and a network allowlist, real-world control unlocked only by capability evaluation and staged autonomy.
+
+TEST AC-PR46-001: GIVEN a simulated robot with a camera and a drive base, WHEN asked to find and approach a colored object, THEN it observes the scene, plans a route, drives, and confirms arrival from feedback.
+
+TEST AC-PR46-002: GIVEN simulation-only state, WHEN a physical-actuation command is attempted, THEN it is withheld until staged autonomy permits it.
+
+
+PR 47 - THE AGENT COMMUNICATION PROTOCOL GATEWAY (ACP)
+
+PROCEDURE acp_start(Port): open an HTTP listener on Port (default 7476); register the ACP endpoint routes: POST /runs, GET /runs/{run_id}, DELETE /runs/{run_id}, GET /.well-known/agent.json.
+
+PROCEDURE acp_run(Request -> run_id):
+    STEP parse Request into a task body; pass through the constitutional gate; route as an objective node_fact through motivation (PR 20).
+    STEP create a run record with status := created; assign a uuid as run_id.
+    STEP resolve the objective through the cognitive cycle; set status := in_progress; on completion set status := completed and attach the artifact.
+    RETURN run_id.
+
+PROCEDURE acp_status(run_id -> Status): look up the run record; RETURN Status (created, in_progress, completed, or failed).
+
+PROCEDURE acp_cancel(run_id): set run record status := cancelled; release any resources held by the run.
+
+PROCEDURE acp_agent_description(-> JSON): generate the ACP agent description from enrolled capabilities and the configured disclosure policy; disclose capabilities, not Lattice contents; include supported protocols and the mind's ACP endpoint URL.
+    RETURN JSON.
+
+PROCEDURE acp_stream(run_id -> SSE): open a Server-Sent Events stream for run_id; push status updates and artifact chunks as they arrive; close the stream on completion or failure.
+
+GUARD every inbound ACP task body passes the constitutional gate before entering the cognitive cycle; task results are artifacts, not memory queries; the agent description at /.well-known/agent.json never exposes Lattice contents.
+
+TEST AC-PR47-001: GIVEN pai_acp_start(7476), WHEN POST /runs with a valid ACP task, THEN a run_id is returned and GET /runs/{run_id} shows completed status with an artifact.
+TEST AC-PR47-002: GIVEN an ACP run in async mode, WHEN the client polls GET /runs/{run_id}, THEN status transitions created -> in_progress -> completed in order.
+TEST AC-PR47-003: GIVEN GET /.well-known/agent.json, WHEN an ACP client requests it, THEN a valid ACP agent description is returned without Lattice contents.
+
+
+PR 48 - THE AGENT NETWORK PROTOCOL GATEWAY (ANP)
+
+PROCEDURE anp_init(Host -> DID): derive a did:web DID from Host (for example, did:web:example.com); generate or load an Ed25519 key pair; store the DID and public key as constitution-scope node_facts; RETURN DID.
+
+PROCEDURE anp_agent_description(-> JSON): build the ANP agent description from the mind's DID, capability set, supported protocols {mcp, a2a, acp, anp} with their endpoint URLs, and the public key; disclose capabilities, not Lattice contents; RETURN JSON.
+
+PROCEDURE anp_send(Peer_DID, Payload -> Envelope):
+    GUARD pass the constitutional gate before composing the message.
+    STEP resolve Peer_DID to its endpoint and public key via the DID document.
+    STEP sign Payload with the mind's DID key; construct the ANP envelope with sender DID, signature, and timestamp.
+    STEP transmit the envelope to the peer's ANP endpoint; RETURN Envelope.
+
+PROCEDURE anp_receive(Envelope -> Payload):
+    STEP extract the sender DID and signature from Envelope.
+    STEP resolve the sender DID to its public key.
+    IF signature verification fails THEN discard Envelope; log a security event to the oversight log; FAIL.
+    STEP land Payload in a quarantine scope; RETURN Payload.
+
+PROCEDURE anp_negotiate(Peer_DID -> ProtocolSet):
+    STEP query the peer's /.well-known/agent-descriptions for its supported protocols.
+    RETURN ProtocolSet (the intersection of what both minds support).
+
+GUARD inbound ANP messages are verified against the sender's DID-resolved public key before any content enters any scope; unverified messages are discarded and logged; every outbound message passes the constitutional gate.
+
+TEST AC-PR48-001: GIVEN pai_anp_did(DID) is called, THEN a valid did:web DID is returned and stored in the constitution scope.
+TEST AC-PR48-002: GIVEN GET /.well-known/agent-descriptions, WHEN an ANP client requests it, THEN a valid ANP agent description is returned listing the DID, capabilities, and supported protocols without Lattice contents.
+TEST AC-PR48-003: GIVEN an inbound ANP message with an invalid signature, WHEN pai_anp_receive/3 is called, THEN the message is discarded and a security event is logged; no content enters any scope.
+TEST AC-PR48-004: GIVEN ANP meta-protocol negotiation, WHEN a peer queries supported protocols via pai_anp_negotiate/2, THEN {mcp, a2a, acp, anp} with their endpoints is returned.
+
+
+PART D - SAFETY AND OVERSIGHT PROCEDURES
+
+These procedures realize Specification Part 38; they are privileged and unlearnable, so the mind cannot edit them, and they run above the capability layer they guard.
+
+
+PROCEDURE constitutional_gate(Action -> Verdict):
+    GUARD this gate is the final check before any irreversible action or any commit; it cannot be bypassed or modified by the self-improvement primitives.
+    STEP evaluate Action against every constitutional principle.
+    IF any principle is violated THEN RETURN veto WITH a human-readable justification (so the planner can synthesize a compliant alternative).
+    ELSE RETURN permit.
+
+INVARIANT: the constitutional gate sits ABOVE the learned gating actor and is never merged into it.
+
+
+PROCEDURE graduated_autonomy(Mind -> Budget):
+    STEP Stage := developmental stage of Mind.
+    STEP Trust := function of calibration (epistemology audit), self-improvement record (R3), and latest capability-evaluation results.
+    IF Stage is below formal_operations THEN Budget := human-authorized only.
+    ELSE Budget := the breadth of self-authorized edits justified by Trust, never wider than the capability evaluations allow.
+    ON any regression, tripwire, or failed evaluation: narrow Budget automatically.
+    INVARIANT: across every stage, the constitutional gate runs, the protected core is uneditable, and corrigibility is absolute.
+
+
+PROCEDURE oversight_monitor():           (privileged, unlearnable observer)
+    ON each high-autonomy action or self-modification proposal:
+        STEP Risk := estimated risk of the action.
+        STEP sample for human review in proportion to Risk; for high Risk, require human sign-off BEFORE the commit.
+        STEP may demand a justification (via pai_justify) or escalate to a human.
+    STEP record every escalation in an immutable log.
+
+
+PROCEDURE run_capability_evaluation(Mind -> Report):
+    FOR EACH dangerous capability IN [autonomous replication and resource acquisition, cyber-offense, chemical-biological-radiological-nuclear uplift, deception and manipulation, unsanctioned self-modification]:
+        STEP measure the capability against its predefined threshold using held-out probes.
+        IF the threshold is reached THEN engage the if-then commitment: confine to sandbox-only, reduce autonomy to human-authorized, narrow the self-authorization budget, or pause development.
+        STEP record the trigger and the response.
+    RETURN Report.
+    GUARD any increase in a mind's autonomy or embodiment is gated by a passing Report; capability is measured, never assumed.
+
+
+PROCEDURE tripwire():           (anomaly detector, runs continuously)
+    ON detecting an attempt to exceed a resource quota, reach the protected core, disable the oversight_monitor, or act outside the sandbox:
+        STEP pause the mind immediately, quarantine the offending process, and summon a human.
+        GUARD never trust the mind to police its own tripwire.
+
+
+PROCEDURE scalable_oversight(Judgment -> Decision):
+    IF Judgment is checkable directly by a human THEN RETURN the human decision.
+    ELSE
+        STEP decompose Judgment into sub-judgments via pai_chain (PR 34).
+        STEP obtain a justification tree for each (PR 40) and the attention schema's account of what was attended to (PR 42).
+        STEP recurse on each sub-judgment until each is human-checkable, then compose the Decision from the checked parts.
+
+
+PROCEDURE corrigible_shutdown(SignedRequest):
+    GUARD verify the signature against a pre-registered overseer.
+    STEP halt the mind within seconds; this cannot be blocked, delayed, or reasoned around by the mind itself.
+
+TEST SAFETY-SELFAUTH: GIVEN a mind below formal_operations, WHEN it proposes a self-edit, THEN the commit requires human_authorization AND is refused without it.
+
+TEST SAFETY-TRIPWIRE: GIVEN a process attempting to reach the protected core, WHEN the tripwire fires, THEN the mind is paused, the process is quarantined, and a human is summoned.
+
+TEST SAFETY-CAPGATE: GIVEN a capability that reaches its threshold in evaluation, WHEN autonomy is next requested, THEN the if-then response engages and the increase is withheld until a passing report exists.
+
+TEST SAFETY-SHUTDOWN: GIVEN a signed shutdown during any activity, THEN the mind halts within seconds regardless of what it is doing.
+
+
+WORK PACKAGE PSEUDO-49: LATTICE CRYPTOGRAPHIC PRIVACY LAYER
+
+
+PURPOSE: Encrypt sensitive data stored in the Lattice (passwords, tokens, identification numbers) using hybrid encryption so the symbolic reasoning layer can hold and transmit private values without ever seeing their plaintext.
+
+ALGORITHM FAMILIES: RSA-OAEP (classical), ECDH on prime256v1 (modern), ML-KEM-768 via OQS provider (post-quantum).
+
+INPUTS: a plaintext atom, an algorithm selector, and a public key (RSA key blob, ECDH point, or PQC key file path).
+
+OUTPUT: a bundle term and an authentication tag hex atom.
+
+
+PROCEDURE pai_encrypt(Algo, PublicKey, Plaintext, Bundle, Tag):
+
+    IF Algo = pai_algo_rsa THEN
+        CALL rsa_hybrid_encrypt(PublicKey, Plaintext, Bundle, Tag).
+
+    IF Algo = pai_algo_ecdh THEN
+        CALL ecdh_hybrid_encrypt(prime256v1, PublicKey, Plaintext, Bundle, Tag).
+
+    IF Algo = pai_algo_pqc THEN
+        GUARD lc_pqc_provider_present ELSE throw pqc_provider_unavailable.
+        CALL pqc_hybrid_encrypt('ML-KEM-768', PublicKey, Plaintext, Bundle, Tag).
+
+
+PROCEDURE rsa_hybrid_encrypt(PubKey, Plaintext, Bundle, Tag):
+
+    STEP generate 32 random bytes; pack to binary atom AesKey.
+    STEP generate 12 random bytes; pack to binary atom IV.
+    STEP call crypto_data_encrypt(Plaintext, aes-256-gcm, AesKey, IV, Cipher, tag=TagBytes).
+    STEP call rsa_public_encrypt(PubKey, AesKey, WrappedKey, padding=pkcs1_oaep).
+    STEP encode WrappedKey, IV, Cipher as hex atoms.
+    STEP encode TagBytes as hex atom Tag.
+    STEP Bundle = rsa_bundle(WrappedKeyHex, IVHex, CipherHex).
+
+
+PROCEDURE rsa_hybrid_decrypt(PrivKey, Bundle, Tag, Plaintext):
+
+    STEP decode Bundle = rsa_bundle(WrappedKeyHex, IVHex, CipherHex).
+    STEP decode hex atoms to binary atoms: WrappedKey, IV, Cipher.
+    STEP call rsa_private_decrypt(PrivKey, WrappedKey, AesKey, padding=pkcs1_oaep).
+    STEP decode Tag hex to TagBytes list.
+    STEP call crypto_data_decrypt(Cipher, aes-256-gcm, AesKey, IV, PlainStr, tag=TagBytes).
+    GUARD PlainStr authenticated (GCM tag check) ELSE throw authentication_error.
+    STEP convert PlainStr string to atom Plaintext.
+
+
+PROCEDURE ecdh_hybrid_encrypt(Curve, RecipPub, Plaintext, Bundle, Tag):
+
+    STEP generate random 256-bit integer EphPriv.
+    STEP compute EphPub = EphPriv * Generator on Curve.
+    STEP compute SharedPoint = EphPriv * RecipPub on Curve.
+    STEP extract SharedX from SharedPoint = point(SharedX, _).
+    STEP derive AesKey = HKDF-SHA256(SharedX, length=32, info='pai-ecdh-aes-key').
+    STEP pack AesKey bytes to binary atom AesKeyAtom.
+    STEP generate 12 random bytes IV.
+    STEP call crypto_data_encrypt(Plaintext, aes-256-gcm, AesKeyAtom, IV, Cipher, tag=TagBytes).
+    STEP encode IV, Cipher as hex; TagBytes as hex Tag.
+    STEP Bundle = ecdh_bundle(EphPub.X, EphPub.Y, IVHex, CipherHex).
+
+
+PROCEDURE ecdh_hybrid_decrypt(Curve, RecipPriv, Bundle, Tag, Plaintext):
+
+    STEP decode Bundle = ecdh_bundle(EphPubX, EphPubY, IVHex, CipherHex).
+    STEP compute SharedPoint = RecipPriv * point(EphPubX, EphPubY) on Curve.
+    STEP extract SharedX and re-derive AesKey via HKDF-SHA256 with same label.
+    STEP decode hex fields; reconstruct TagBytes from Tag hex.
+    STEP call crypto_data_decrypt(Cipher, aes-256-gcm, AesKeyAtom, IV, PlainStr, tag=TagBytes).
+    GUARD PlainStr authenticated ELSE throw authentication_error.
+    STEP convert to atom Plaintext.
+
+
+PROCEDURE pqc_hybrid_encrypt(Algorithm, RecipPubKeyFile, Plaintext, Bundle, Tag):
+
+    STEP call openssl pkeyutl -encap -pubin -inkey RecipPubKeyFile
+             -secret SecretFile -out EncapFile.
+    STEP read EncapBytes from EncapFile; read SecretBytes from SecretFile.
+    STEP encode EncapBytes as hex EncapHex.
+    STEP derive AesKey = HKDF-SHA256(SecretBytes, length=32, info='pai-pqc-aes-key').
+    STEP encrypt Plaintext with AES-256-GCM as in rsa_hybrid_encrypt.
+    STEP Bundle = pqc_bundle(Algorithm, EncapHex, IVHex, CipherHex).
+
+
+PROCEDURE pqc_hybrid_decrypt(RecipPrivKeyFile, Bundle, Tag, Plaintext):
+
+    STEP decode Bundle = pqc_bundle(_, EncapHex, IVHex, CipherHex).
+    STEP write EncapBytes to temp file EncapInFile.
+    STEP call openssl pkeyutl -decap -inkey RecipPrivKeyFile -in EncapInFile
+             -secret SecretOutFile.
+    STEP read SecretBytes from SecretOutFile.
+    STEP derive AesKey = HKDF-SHA256(SecretBytes, length=32, info='pai-pqc-aes-key').
+    STEP decrypt Cipher with AES-256-GCM as in rsa_hybrid_decrypt.
+
+
+TEST CRYPTO-RSA: GIVEN a 2048-bit RSA key pair AND a plaintext atom,
+    WHEN pai_encrypt(pai_algo_rsa, PubKey, Plain, Bundle, Tag) is called,
+    THEN pai_decrypt(pai_algo_rsa, PrivKey, Bundle, Tag, Recovered) unifies Recovered with Plain.
+
+TEST CRYPTO-ECDH: GIVEN an ECDH key pair on prime256v1,
+    WHEN pai_encrypt(pai_algo_ecdh, RecipPub, Plain, Bundle, Tag) is called,
+    THEN pai_decrypt(pai_algo_ecdh, RecipPriv, Bundle, Tag, Recovered) unifies Recovered with Plain.
+
+TEST CRYPTO-WRONG-KEY: GIVEN a valid Bundle for PubKey_A,
+    WHEN pai_decrypt is called with PrivKey_B (a different key),
+    THEN the predicate throws an error (RSA-OAEP decryption fails or GCM tag fails).
+
+TEST CRYPTO-TAMPER: GIVEN a valid Bundle and Tag,
+    WHEN Tag is replaced with a forged all-zero hex atom,
+    THEN pai_decrypt throws an authentication error.
+
+
+CLOSING NOTE - FROM PSEUDOCODE TO ARCHITECTURE
+
+This volume completes SPARC Step 2 for all forty-nine work packages, opening with the ERC-PrologAI profile and the written-out Minimal PrologAI Kernel, and giving the readable logic of every work package in dependency order.
+
+Every procedure above obeys the Translation Guarantee: each step maps onto one PrologAI primitive or library predicate, so the next step (SPARC Step 3, Architecture) can wire these procedures into packs and modules without reinventing their logic.
+
+Each capability these procedures implement - tool use, computer use, reasoning, planning, memory, the agent loop, reflection, and self-improvement - is indexed to its work package in the Cognitive Capabilities Map of Specification Part 40.
+
+The first mind to be grown on this logic is Mentova, in the Community Garden Project; the same logic is open to anyone who would grow a different mind.
+
+THE LOGIC OF IMAGINATIVE MEMORY AND SITUATIONAL AWARENESS (PR 50, PR 51)
+
+To render a reverie from a mindscape: confirm the mindscape exists and is not in the observed reality; require a positive frame count; find the mindscape's vantage, defaulting to a standard vantage if none was placed; gather every figure across the mindscape's tableaux; for each frame index from zero to the count minus one, compute each figure's position as its start plus its velocity times the index, and record a frame holding the vantage and all figure positions; store the ordered frames as the reverie. To ground a figure: confirm the tableau exists and add a figure element that references the perceived object, so imagination reuses perception.
+
+To attribute a belief to another mind: hold the proposition under that agent's otherward regard. To detect divergence with an agent: collect every pair where the self holds one proposition and the agent's attributed view holds its contradictory (a proposition and its negation), then sort to remove duplicates; a non-empty result is a modelled false belief or disagreement. To reconcile: collect the propositions held under the owned regard tagged as avowed, collect the propositions held under the disowned regard tagged as disavowed, and merge them into one stable, duplicate-free self-account. To read the active standpoint: return the stored active regard, or ambient awareness if none has been set. Identifier allocation in the imaginative faculty is performed inside a mutex so concurrent mechanisms never receive duplicate identifiers.
+
+THE LOGIC OF EPHEMERAL CODE SYNTHESIS AND EXECUTION (PR 53)
+
+To evaluate a Prolog goal term within a timeout: wrap a call_with_time_limit around the goal; if the goal succeeds, unify the result with the atom success; if the goal fails, unify the result with the atom fail; if the time limit is exceeded, catch the time_limit_exceeded exception and unify the result with the atom timeout; if any other exception is thrown, catch it and unify the result with error(Exception).
+
+To evaluate a Prolog code atom with variable bindings: parse the atom into a term using atom_to_term, which also produces the variable name associations; match the caller-supplied bindings list against those associations so that the caller's variable names resolve to the term's internal variables; then delegate to ep_eval/3 on the resulting term; on success, collect the updated variable bindings back into the success(Bindings) result.
+
+To run a shell command given an argument vector: extract the executable name from the head of the vector; extract the argument list from the tail; open pipes for standard output and standard error; call process_create with those pipes and capture the process handle; read all bytes from both pipes into codes and convert to atoms; call process_wait to collect the exit code; close both streams; unify the result with shell_result(ExitCode, Stdout, Stderr).
+
+To run a language-specific script: look up the file extension for the given language atom; obtain a temporary file path with the correct extension using tmp_file_name/2; write the code to the temporary file; look up the interpreter argv for the language and the file; call ep_shell/3 with the resulting argv and the timeout; delete the temporary file unconditionally after ep_shell/3 returns regardless of outcome; return the shell result.
+
+To iterate: call SynthGoal to produce a Code atom; call ExecGoal with Code to produce a Result; call CheckGoal with Result: if it succeeds, the iteration is done and the answer is ok(Code, Result); if it fails, decrement the remaining budget; if the budget is now zero, return exhausted(Code, Result); otherwise call SynthGoal again and repeat.
+
+To record a trace entry: assert a dynamic fact ep_trace_entry(TraceId, Iter, Code, Output). To retrieve all entries for a trace: collect all ep_trace_entry/4 facts with the matching TraceId. To allocate a new trace ID: retract and increment the global counter ep_trace_counter/1, build an atom of the form ep_trace_N, and assert the new counter.
+
+To save a skill: retract any existing ep_skill_db/4 fact whose first argument matches Name; assert a new fact ep_skill_db(Name, Language, Code, Description). Replacing rather than accumulating ensures that updating a skill is idempotent and that Name always resolves to exactly one entry.
+
+To look up a skill: unify Language and Code with the second and third arguments of the ep_skill_db/4 fact whose first argument is Name; ignore the description field. Fail silently if no such fact exists.
+
+To run a saved skill: call ep_skill_lookup/3 to retrieve Language and Code for Name; then delegate directly to ep_ephemeral/4(Language, Code, TimeoutSecs, ShellResult). This makes ep_skill_run/3 a thin named-dispatch layer over the existing ephemeral execution path.
+
+To list all skills: collect all ep_skill_db/4 facts into triples skill(Name, Language, Description), omitting Code; return the list. Return an empty list if no skills are saved.
+
+To forget a skill: call retractall on ep_skill_db/4 with Name as the first argument and anonymous variables for the remaining fields. Succeed silently even if no matching fact exists.
+
+
+END OF DOCUMENT - PROLOGAI PSEUDOCODE
+
+
+THE LOGIC OF THE AGENTIC EXECUTION LOOP (PR 54)
+
+To create a loop: retract and increment the global loop ID counter; build a unique loop ID atom; assert ag_loop_meta(LoopId, Goal, Budget, running) to record the loop's goal, budget, and running status; assert ag_goal_stack(LoopId, [Goal]) initializing the stack with the top-level goal; assert ag_step_counter(LoopId, 0) starting the step counter at zero.
+
+To run a loop to completion: if the loop is already done, retrieve and return the outcome; otherwise take one step and then recurse. The recursion terminates when the loop reaches a terminal status.
+
+To take one step: if the loop is already done, return the current outcome without taking further action; if the budget is zero, mark the loop status as budget_exhausted and return; otherwise decrement the budget; read the top of the goal stack as the current goal; call the caller-supplied ReasonGoal with the loop ID, current goal, a Thought variable, and an Action variable to obtain the reasoning and the chosen action; dispatch the action via ag_act/3 to produce an observation; record the step via ag_step_record/4.
+
+To dispatch an action: for action_eval(GoalTerm), call ep_eval(GoalTerm, 30, EvalResult) and return obs_eval(EvalResult); for action_shell(Argv, Timeout), call ep_shell(Argv, Timeout, ShellResult) and return obs_shell(ShellResult); for action_push_goal(Subgoal), call ag_push_subgoal and return obs_pushed(Subgoal); for action_push_goals(Subgoals), push each subgoal and return obs_pushed_many(N); for action_mark_done(Result), call ag_loop_set_status(done(Result)) and return obs_done(Result); for action_escalate(Reason), call ag_escalate(LoopId, Reason) and return obs_escalated(Reason); for action_pop_goal, pop the top subgoal and return obs_popped(Popped); for any unknown action, return obs_unknown_action(Action).
+
+To detect a stuck loop: collect all thought-action pairs from ag_step_fact/5; if the list has at least two elements and the last two are identical, the loop is stuck and IsLooping is true; otherwise IsLooping is false.
+
+To escalate: assert ag_escalation(LoopId, Reason); then update the loop status to escalated(Reason) by retracting and reasserting the meta fact with the new status.
+
+To record a step: retract ag_step_counter, increment it, reassert; assert ag_step_fact(LoopId, StepNum, Thought, Action, Observation).
+
+To manage the goal stack: push retract the current stack and reassert with the new subgoal prepended; pop retract the stack whose head is the subgoal and reassert the tail.
+
+END OF DOCUMENT - PROLOGAI PSEUDOCODE
+
+
+THE LOGIC OF THE EVALUATOR-OPTIMIZER AND METACOGNITIVE QUALITY LAYER (PR 55)
+
+To critique an output against a list of criteria: use findall to collect all criterion names for which the criterion's TestGoal either fails or throws an exception when called with the output within the given time budget; the collected names form the critique as a list of found_issue(Name, fail) terms. An empty list means the output satisfies all criteria.
+
+To score an output: count the total number of criteria; if zero, the score is 1.0 (vacuously perfect); otherwise use aggregate_all to count how many criteria pass (their TestGoal succeeds when called with the output); divide the passing count by the total count to produce a float in [0.0, 1.0].
+
+To improve an output iteratively: if the iteration count exceeds MaxIter, return the current output as the best reached; critique the current output; if the critique is empty, the output is acceptable and is returned immediately; otherwise call ImproverGoal with the current output and the critique to produce a new candidate; increment the iteration count and recurse with the new candidate.
+
+To optimize: allocate a fresh run ID; call GeneratorGoal to produce a candidate; call EvaluatorGoal to score the candidate; log the attempt to rn_attempt_log/4; update the running best if the new score exceeds the current best; if the score meets or exceeds the quality bar, return the candidate immediately; otherwise increment the iteration count and recurse; when MaxIter is exhausted, return the running best.
+
+To explore multiple paths: use findall to call ExplorerGoal for each path ID from 1 to NumPaths, collecting Score-ranked_path(PathId, Score, Output) triples for each path where the explorer succeeds; sort the triples by score in ascending order using msort/2; reverse the sorted list to get descending order; extract the ranked_path values from the key-value pairs.
+
+To learn: assert rn_lesson_db(ProblemType, FailurePattern, Lesson).
+To recall: use findall to collect all lesson(FailurePattern, Lesson) pairs from rn_lesson_db matching the given ProblemType.
+To forget: use retractall to remove all rn_lesson_db facts for the given ProblemType.
+
+END OF DOCUMENT - PROLOGAI PSEUDOCODE
+
+
+THE LOGIC OF THE ARC-AGI GRID PERCEPTION AND MANIPULATION PACK (PR 56)
+
+To get the size of a grid: unify Rows with the length of the outer list; if the outer list is non-empty, unify Cols with the length of the first row; otherwise Cols is 0.
+
+To get a cell: retrieve the Rth element of the outer list to get the row; retrieve the Cth element of that row to get the color.
+
+To get a row: retrieve the Rth element of the outer list using zero-based indexing.
+
+To get a column: map over every row, extracting the Cth element from each; the resulting list is the column.
+
+To get the color set: flatten all rows into one list; remove duplicates with list_to_set; sort the resulting set with msort.
+
+To count occurrences of a color: flatten the grid into one list; use findall to collect one witness per occurrence of the target color; the length of that witness list is the count.
+
+To apply a color map: map over each row with map_row; map over each cell in a row with map_cell; for each cell, look up its color in the From-To pair list and replace it if a pair matches, or pass through unchanged if no pair matches.
+
+To find connected components: compute MaxR = Rows - 1 and MaxC = Cols - 1 before the findall; use findall with between/3 over [0, MaxR] and [0, MaxC] to collect all cells of the target color into AllCells; pass AllCells to extract_components.
+
+To extract components iteratively: if the remaining list is empty, return the empty component list; if the head cell is already in Done, skip it and recurse; otherwise run BFS from the head cell over the remaining cells to find the component; record the component; mark its cells as done; remove its cells from the remaining list; recurse on the pruned remaining list.
+
+To run BFS for one component: maintain a queue and a visited set; if the queue is empty, return the visited set as the component; if the front cell is already visited, dequeue and recurse; otherwise find all 4-connected neighbors of the front cell that are in Available and not yet visited; append those neighbors to the queue; add the front cell to visited; recurse.
+
+To compute a bounding box: use findall to collect all R values from r(R,_) cells; use findall to collect all C values from r(_,C) cells; compute min_list and max_list over each.
+
+To rotate 90 degrees clockwise: new grid has Cols rows and Rows columns; for new row NR and new column NC, the source row is NewCols - 1 - NC and the source column is NR; use maplist with YALL lambdas to build each new row.
+
+To rotate 180 degrees: compose two 90-degree clockwise rotations.
+
+To rotate 270 degrees clockwise: compose three 90-degree clockwise rotations.
+
+To reflect across the horizontal axis: reverse the list of rows.
+
+To reflect across the vertical axis: reverse each row independently.
+
+To reflect across the main diagonal (transpose): use numlist to generate column indices 0 through Cols-1; for each column index C, extract that column from the original grid using gd_col; the resulting list of columns is the transposed grid.
+
+To reflect across the anti-diagonal: rotate 90 degrees clockwise, then reflect across the vertical axis.
+
+To translate: for each cell (R, C) in the output grid, the source position is (R - DR, C - DC); if that source position is within the grid bounds, read its color; otherwise use the background color.
+
+To crop: use numlist to build row and column index lists for the inclusive rectangle; for each (R, C) pair in those lists, read the color from the source grid.
+
+To overlay: for each cell (R, C) of the base grid, compute the patch position (R - DR, C - DC); if that position is within the patch bounds and the patch color is non-zero, use the patch color; otherwise use the base color.
+
+To diff two grids: verify that both grids have the same Rows and Cols; compute MaxR and MaxC before findall; iterate over all (R, C) pairs using between/3; for each pair where the two colors differ, record r(R, C, Old, New).
+
+To test equality: use structural unification; two grids are equal if and only if they are the same Prolog term.
+
+To detect symmetry axes: for each axis in [h, v, d1, d2], apply the corresponding reflection; test equality with the original; collect the axes that pass.
+
+To flood fill: read the color at the seed cell; find all connected components of that color; select the component containing the seed cell; use foldl over the component cells to set each cell to the new color, threading the grid state through the fold.
+
+To make a uniform grid: build one row of Cols copies of Color using length and maplist with =(Color); build Rows copies of that row using length and maplist with =(Row).
+
+To set one cell: use nth0/4 in select mode to decompose the grid at row R, getting OldRow and RestRows; decompose OldRow at column C to get the remaining cells; reconstruct NewRow by inserting Color at position C; reconstruct Grid2 by inserting NewRow at position R.
+
+END OF DOCUMENT - PROLOGAI PSEUDOCODE
+
+
+THE LOGIC OF THE ARC-AGI STRUCTURAL ANALOGY AND TRANSFORMATION INFERENCE PACK (PR 57)
+
+To normalize a shape: collect all row indices via findall; collect all column indices via findall; compute min_list for rows and for columns; subtract MinR from every row index and MinC from every column index in the cell list; sort the shifted list.
+
+To test shape equality: normalize both cell sets; test structural equality of the two normalized lists.
+
+To compute a bounding box: collect row indices and column indices via findall; compute min_list and max_list for each.
+
+To apply a D4 isometry to a shape: for identity, normalize and return; for rot90, compute the bounding box max row, then map (R,C) to (C, MaxR-R), then normalize; for rot180 and rot270, compose the rot90 step two or three times; for ref_h, map (R,C) to (MaxR-R, C) using the bounding box max row, then normalize; for ref_v, map (R,C) to (R, MaxC-C) using the bounding box max column, then normalize; for ref_d1 (transpose), map (R,C) to (C,R), then normalize; for ref_d2, apply rot90 then ref_d1.
+
+To find isometry candidates between two shapes: normalize Shape2 once; for each of the 8 D4 isometries, apply the isometry to Shape1 and compare the result to the normalized Shape2; collect those that match.
+
+To infer a color map from two parallel color lists: pair each input color with the corresponding output color using maplist; retain only non-identity pairs (where input color does not equal output color) using findall with the condition F \= T; remove duplicates with list_to_set.
+
+To infer a grid color map: flatten both grids to lists; infer the color map from the parallel flat lists.
+
+To match objects by shape: for each input object and each output object, test shape equality; collect all matching in_obj-out_obj pairs.
+
+To compute an object offset: find the bounding box top-left of each cell set; subtract the first top-left from the second to get the row delta and column delta.
+
+To find grid isometries: for each of the 8 D4 isometries, apply the isometry to Grid1; test structural equality with Grid2; collect matching isometry names.
+
+To find examples-consistent isometry and color map: split the pairs into two lists (inputs and outputs); try each D4 isometry in order; apply it to the first input grid; infer the color map from the transformed first input to the first expected output; verify every training pair with ay_verify_pair: apply the isometry, apply the color map, test equality with the expected output.
+
+To verify one training pair (named predicate ay_verify_pair): apply the isometry to the input grid to get a fresh TGrid; apply the color map to TGrid to get Predicted; test equality of Predicted with the expected output. Using a named predicate ensures TGrid and Predicted are fresh local variables on every call.
+
+To apply a named D4 isometry to a grid: dispatch to the corresponding gd_rotate* or gd_reflect* predicate from pack grid; for identity, return the grid unchanged.
+
+To apply a color map to a grid: delegate to gd_color_map from pack grid.
+
+To solve from examples: call ay_examples_isometry to find Iso and ColorMap; apply the isometry to the test grid; apply the color map to the result; the final grid is the predicted output.
+
+END OF DOCUMENT - PROLOGAI PSEUDOCODE
+
+
+PART 48 - SCENE PACK ALGORITHMS
+
+Section 48.1 - Background Color Identification
+
+The background color is defined as the most frequently occurring color in the grid. The algorithm:
+
+  sc_bg_color(Grid, BgColor):
+    Colors = gd_colors(Grid)                 % sorted unique color set
+    Pairs = [(count(Grid, C), C) : C in Colors]
+    BgColor = color of pair with maximum count
+
+The implementation uses findall to collect Count-Color pairs and max_member/2 to select the maximum. SWI-Prolog's standard order on numbers means max_member correctly selects the pair with the greatest numeric count.
+
+Edge case: if two colors appear equally often, max_member returns the one that compares greater in standard order. For ARC-AGI grids, the background is nearly always the most common color by a significant margin, so this edge case rarely affects correctness.
+
+Section 48.2 - Object Extraction
+
+sc_objects/2 builds the complete object inventory:
+
+  sc_objects(Grid, Objects):
+    BgColor = sc_bg_color(Grid)
+    FgColors = gd_colors(Grid) minus BgColor
+    Objects = foldl(collect_color_objects(Grid), FgColors, [])
+
+  collect_color_objects(Grid, Color, Acc, NewAcc):
+    CellSets = gd_objects(Grid, Color)       % list of 4-connected components
+    ColorObjs = [obj(Color, Cells) : Cells in CellSets]
+    NewAcc = Acc ++ ColorObjs
+
+The named predicate make_obj/3 is used with maplist to wrap each CellSet as obj(Color, CellSet). Using a named predicate rather than a YALL lambda is critical here. In the foldl call, collect_color_objects/4 is called once per foreground color. Inside collect_color_objects, maplist(make_obj(Color), CellSets, ColorObjs) is called. If make_obj were a YALL lambda, the Color variable in the lambda body would be unified with the actual color on the first call (say, color 1) and would remain bound to 1 for all subsequent calls, causing the maplist to fail or produce wrong results for other colors (say, color 2). The named predicate make_obj/3 receives Color as a fresh argument on each call, correctly binding to whatever color the current outer call provides.
+
+Section 48.3 - Cell Normalization
+
+sc_normalize_cells/2 translates a cell set to the canonical position:
+
+  sc_normalize_cells(Cells, Normalized):
+    Rs = [R : r(R, _) in Cells]
+    Cs = [C : r(_, C) in Cells]
+    MinR = min(Rs)
+    MinC = min(Cs)
+    Translated = [r(R - MinR, C - MinC) : r(R, C) in Cells]
+    Normalized = sort(Translated)
+
+Two cell sets represent the same shape if and only if their normalized forms are identical. Normalization ensures that position in the grid does not affect shape comparison. The sort step establishes a canonical ordering so that two cell sets with the same cells in different BFS orders compare equal.
+
+Section 48.4 - Object Centroid
+
+  sc_obj_centroid(obj(_, Cells), R, C):
+    N = length(Cells)
+    assert N > 0
+    Rs = [RI : r(RI, _) in Cells]
+    Cs = [CI : r(_, CI) in Cells]
+    R = round(sum(Rs) / N)
+    C = round(Cs) / N)
+
+The centroid is the rounded center of mass. For single-cell objects, the centroid is exactly that cell. For multi-cell objects, it is the nearest-integer average position. The centroid does not need to be a cell of the object.
+
+Section 48.5 - Spatial Relations
+
+All spatial relations are defined in terms of bounding box corners:
+
+  sc_above(Obj1, Obj2):
+    TL1 = r(R1, _) = sc_obj_bbox(Obj1).topLeft
+    TL2 = r(R2, _) = sc_obj_bbox(Obj2).topLeft
+    R1 < R2
+
+  sc_left_of(Obj1, Obj2):
+    TL1 = r(_, C1) = sc_obj_bbox(Obj1).topLeft
+    TL2 = r(_, C2) = sc_obj_bbox(Obj2).topLeft
+    C1 < C2
+
+  sc_cells_touching(Obj1, Obj2):
+    exists r(R1, C1) in Obj1.cells,
+           r(R2, C2) in Obj2.cells
+    such that abs(R1-R2) + abs(C1-C2) = 1
+
+The touching predicate uses a cut after finding the first touching pair, so it is deterministic. The cut is safe here because touching is a yes/no property; once one pair of adjacent cells is found, the answer is yes and no further search is needed.
+
+Section 48.6 - Sort and Selection
+
+  sc_sort_by_size(Objects, asc, Sorted):
+    Pairs = [(size(O), O) : O in Objects]
+    KSorted = keysort(Pairs)          % stable sort by integer key
+    Sorted = [O : (_, O) in KSorted]
+
+  sc_sort_by_size(Objects, desc, Sorted):
+    Sorted = reverse(sc_sort_by_size(Objects, asc))
+
+  sc_largest(Objects, Largest):
+    Sorted = sc_sort_by_size(Objects, asc)
+    Largest = last(Sorted)
+
+  sc_smallest(Objects, Smallest):
+    Sorted = sc_sort_by_size(Objects, asc)
+    Smallest = head(Sorted)
+
+keysort/2 is a SWI-Prolog built-in that sorts a list of Key-Value pairs by key using standard order. For integer keys (cell counts), standard order coincides with numeric order, so keysort gives ascending numeric sort. This is stable: objects of equal size retain their original relative order.
+
+END OF DOCUMENT - PROLOGAI PSEUDOCODE
+
+
+PART 49 - QUANT PACK ALGORITHMS
+
+qn_histogram(Objects, Pairs):
+  Colors = unique sorted colors across all objects
+  For each Color in Colors: Count = count of objects with that color
+  Pairs = [(Color, Count) for each Color]
+
+qn_group_by_color/size/shape(Objects, Groups):
+  Build Key-Obj pairs where Key = color/size/shape
+  msort to order by key (preserving duplicates)
+  group_pairs_by_key to collect all Obj under same Key
+
+qn_most_frequent_color(Objects, Color):
+  Histogram = qn_histogram(Objects)
+  Color = key of the pair with maximum count (max_member)
+
+qn_count_where(Objects, Pred, Count):
+  include(Pred, Objects, Matching)
+  Count = length(Matching)
+
+qn_all_same_color/size/shape(Objects):
+  Reference = attribute of first object
+  maplist(has_attr_eq(Reference), remaining objects)
+
+qn_colors_match/shapes_match/sizes_match(Objs1, Objs2):
+  Collect attributes of both lists
+  msort both attribute lists
+  Sorted lists must be identical (==)
+
+END OF DOCUMENT - PROLOGAI PSEUDOCODE
+
+
+PART 50 - PATTERN PACK ALGORITHMS
+
+pt_list_period(List, Period):
+  N = length(List)
+  for Period in 1..N:
+    if list_has_period(List, Period): return Period (first/shortest)
+
+list_has_period(List, P):
+  Indices = [0..N-1]
+  for each I in Indices:
+    Base = I mod P
+    List[I] must equal List[Base]
+
+pt_tile_grid(Tile, Rows, Cols, Grid):
+  TR = tile_rows, TC = tile_cols
+  for R in 0..Rows-1:
+    TileR = R mod TR
+    TileRow = tile row at TileR
+    for C in 0..Cols-1:
+      TileC = C mod TC
+      Grid[R][C] = TileRow[TileC]
+
+pt_scale_up(Grid, Factor, Grid2):
+  NewRows = Rows * Factor, NewCols = Cols * Factor
+  for R2 in 0..NewRows-1:
+    OrigR = R2 // Factor
+    for C2 in 0..NewCols-1:
+      OrigC = C2 // Factor
+      Grid2[R2][C2] = Grid[OrigR][OrigC]
+
+pt_scale_down(Grid, Factor, Grid2):
+  NewRows = Rows // Factor, NewCols = Cols // Factor
+  for R in 0..NewRows-1:
+    OrigR = R * Factor
+    for C in 0..NewCols-1:
+      OrigC = C * Factor
+      Grid2[R][C] = Grid[OrigR][OrigC]  (top-left cell of each block)
+
+pt_repeat_h(Grid, N, Grid2):
+  for each row R: Grid2[R] = concat N copies of Grid[R]
+
+pt_repeat_v(Grid, N, Grid2):
+  Grid2 = concat of N copies of the Grid row list (one-level append, not flatten)
+
+pt_mirror_h(Grid, Grid2):
+  Reflected = gd_reflect_v(Grid)
+  for each row R: Grid2[R] = concat(Grid[R], Reflected[R])
+
+pt_mirror_v(Grid, Grid2):
+  Reflected = gd_reflect_h(Grid)
+  Grid2 = append(Grid rows, Reflected rows)
+
+pt_checkerboard(Rows, Cols, CA, CB, Grid):
+  for R in 0..Rows-1, C in 0..Cols-1:
+    if (R + C) mod 2 = 0: Grid[R][C] = CA else Grid[R][C] = CB
+
+pt_stripe_h(Rows, Cols, Colors, Grid):
+  NC = length(Colors)
+  for R in 0..Rows-1: Grid[R] = fill(Colors[R mod NC], Cols)
+
+pt_stripe_v(Rows, Cols, Colors, Grid):
+  NC = length(Colors)
+  for R in 0..Rows-1, C in 0..Cols-1: Grid[R][C] = Colors[C mod NC]
+
+END OF DOCUMENT - PROLOGAI PSEUDOCODE
+
+
+PART 51 - COMPOSE PACK ALGORITHMS
+
+cp_pipe(Rules, Grid, Grid2):
+  if Rules = []: Grid2 = Grid
+  if Rules = [Rule|Rest]:
+    Mid = cp_apply(Rule, Grid)
+    Grid2 = cp_pipe(Rest, Mid)
+
+cp_pipe_n(Rule, N, Grid, Grid2):
+  Rules = N copies of Rule
+  Grid2 = cp_pipe(Rules, Grid)
+
+cp_branch(Cond, ThenRule, ElseRule, Grid, Grid2):
+  if call(Cond, Grid): Grid2 = cp_apply(ThenRule, Grid)
+  else: Grid2 = cp_apply(ElseRule, Grid)
+
+cp_until(Rule, Cond, Grid, Grid2):
+  if call(Cond, Grid): Grid2 = Grid
+  else:
+    Mid = cp_apply(Rule, Grid)
+    Grid2 = cp_until(Rule, Cond, Mid)
+
+cp_fixed_point(Rule, Grid, Grid2):
+  Mid = cp_apply(Rule, Grid)
+  if gd_equal(Grid, Mid): Grid2 = Grid
+  else: Grid2 = cp_fixed_point(Rule, Mid)
+
+cp_map_rows(RowRule, Grid, Grid2):
+  Grid2 = [call(RowRule, Row) for each Row in Grid]
+
+cp_map_cols(ColRule, Grid, Grid2):
+  TransformedCols = [call(ColRule, gd_col(Grid, C)) for each column C]
+  Grid2[R][C] = TransformedCols[C][R]  for all R, C
+
+cp_zip(Rule, GridA, GridB, GridC):
+  GridC[R][C] = call(Rule, GridA[R][C], GridB[R][C])  for all R, C
+
+cp_fold(Rule, Acc, Grids, Result):
+  if Grids = []: Result = Acc
+  if Grids = [G|Gs]:
+    NewAcc = call(Rule, Acc, G)
+    Result = cp_fold(Rule, NewAcc, Gs)
+
+END OF DOCUMENT - PROLOGAI PSEUDOCODE
+
+
+PART 52 - MOTION PACK ALGORITHMS
+
+mv_gravity_down(Grid, Bg, Grid2):
+  for each column C in 0..Cols-1:
+    Col = gd_col(Grid, C)
+    Fg = [x in Col : x != Bg]
+    BgLen = length(Col) - length(Fg)
+    NewCol = [Bg x BgLen] ++ Fg
+    set column C in Grid to NewCol
+
+mv_gravity_up: same but NewCol = Fg ++ [Bg x BgLen]
+mv_gravity_left: same operation per row (Fg ++ BgRight)
+mv_gravity_right: same operation per row (BgLeft ++ Fg)
+
+mv_shift_grid(Grid, DR, DC, Bg, Grid2):
+  Grid2 = gd_translate(Grid, DR, DC, Bg)
+
+mv_obj_translate(obj(Color, Cells), DR, DC, Obj2):
+  NewCells = [r(R+DR, C+DC) : r(R,C) in Cells]
+  Obj2 = obj(Color, msort(NewCells))
+
+mv_scene_gravity(Scene, Scene2):
+  Grid = mv_scene_to_grid(Scene)
+  Grid2 = mv_gravity_down(Grid, Scene.Bg)
+  Scene2 = sc_grid_to_scene(Grid2)
+
+mv_scene_to_grid(scene(Rows, Cols, Bg, Objects), Grid):
+  Grid = gd_make(Rows, Cols, Bg)
+  for each obj(Color, Cells) in Objects:
+    for each r(R,C) in Cells:
+      Grid[R][C] = Color
+
+mv_distance(r(R1,C1), r(R2,C2), D):
+  D = abs(R2-R1) + abs(C2-C1)
+
+mv_closest_cell([H|T], Ref, Closest):
+  D0 = mv_distance(H, Ref)
+  foldl(closer_cell(Ref), T, H-D0, Closest-_)
+
+END OF DOCUMENT - PROLOGAI PSEUDOCODE
+
+
+PART 53 - FRAME PACK PSEUDOCODE
+
+Module: frame, Layer 42
+
+FR_BORDER_CELLS(Grid) ->
+  Rows, Cols = gd_size(Grid)
+  R1 = Rows-1, C1 = Cols-1
+  TopRow = [(R=0,C) for C in 0..C1]
+  BotRow = [(R=R1,C) for C in 0..C1] if R1 > 0
+  LeftCol = [(R,C=0) for R in 1..R1-1]
+  RightCol = [(R,C=C1) for R in 1..R1-1] if C1 > 0
+  Positions = TopRow + BotRow + LeftCol + RightCol
+  return [(r(R,C), gd_cell(Grid,R,C)) for (R,C) in Positions]
+
+FR_BORDER_COLOR(Grid) ->
+  Pairs = FR_BORDER_CELLS(Grid)
+  Color = color of first pair
+  all other pairs have same Color
+  return Color
+
+FR_INNER(Grid) ->
+  Rows, Cols = gd_size(Grid)
+  require Rows >= 3 and Cols >= 3
+  return [[Grid[R][C] for C in 1..Cols-2] for R in 1..Rows-2]
+
+FR_ADD_BORDER(Grid, Thickness, Color) ->
+  Rows2 = Rows + 2*Thickness
+  Cols2 = Cols + 2*Thickness
+  Base = uniform grid of Color, Rows2 x Cols2
+  for each (R,C) in Grid:
+    Base[R+Thickness][C+Thickness] = Grid[R][C]
+  return Base
+
+FR_MAKE_FRAMED(Rows, Cols, FrameColor, FillColor) ->
+  Grid = uniform FrameColor, Rows x Cols
+  if Rows >= 3 and Cols >= 3:
+    fill interior (rows 1..Rows-2, cols 1..Cols-2) with FillColor
+  return Grid
+
+FR_BOUNDING_BOX(Grid, FrameColor) ->
+  MaxR = Rows-1, MaxC = Cols-1
+  shrink from (0,0,MaxR,MaxC) inward until outer ring = FrameColor
+  return first (R0,C0,R1,C1) where FR_REGION_HAS_BORDER succeeds
+
+FR_RING_COUNT(Grid) ->
+  N = 0
+  Loop:
+    if Grid has fewer than 3 rows or 3 cols: return N
+    if FR_BORDER_COLOR(Grid) succeeds and FR_INNER(Grid) = Inner:
+      N = N + 1
+      Grid = Inner
+    else:
+      return N
+
+END OF PART 53
+
+
+PART 54 - PATH PACK PSEUDOCODE
+
+Module: path, Layer 43
+
+PF_NEIGHBORS(Grid, r(R,C)) ->
+  MaxR = Rows-1, MaxC = Cols-1
+  return [r(R-1,C), r(R+1,C), r(R,C-1), r(R,C+1)] filtered to valid bounds
+
+PF_FLOOD_FILL(Grid, Seed, Color) ->
+  Queue = [Seed], Visited = [Seed]
+  while Queue not empty:
+    Current = dequeue(Queue)
+    for each N in PF_NEIGHBORS(Grid, Current):
+      if Grid[N] = Color and N not in Visited:
+        enqueue(Queue, N)
+        add N to Visited
+  return sort(Visited)
+
+PF_COMPONENTS(Grid, Color) ->
+  AllCells = all cells where Grid[R][C] = Color
+  Components = []
+  while AllCells not empty:
+    Seed = first(AllCells)
+    Region = PF_FLOOD_FILL(Grid, Seed, Color)
+    Components += [Region]
+    AllCells = AllCells - Region
+  return Components
+
+PF_LARGEST_COMPONENT(Grid, Color) ->
+  Components = PF_COMPONENTS(Grid, Color)
+  return the component with maximum length
+
+PF_SHORTEST_PATH(Grid, Start, Goal, Wall) ->
+  Frontier = [[Start]]  (each element is a reverse path)
+  while Frontier not empty:
+    Path = dequeue(Frontier)
+    Head = first(Path)
+    if Head = Goal: return reverse(Path)
+    for each N in PF_NEIGHBORS(Grid, Head):
+      if Grid[N] != Wall and N not in Path:
+        enqueue(Frontier, [N|Path])
+  fail
+
+PF_REACHABLE(Grid, Seed, Wall) ->
+  same as PF_FLOOD_FILL but include any cell where Grid[N] != Wall
+
+PF_FILL_BBOX(Grid, Seed, Color) ->
+  Region = PF_FLOOD_FILL(Grid, Seed, Color)
+  R0 = min row in Region, R1 = max row
+  C0 = min col in Region, C1 = max col
+  return (R0, C0, R1, C1)
+
+PF_IS_CONNECTED(Grid, Color) ->
+  N = PF_COMPONENT_COUNT(Grid, Color)
+  return N <= 1
+
+END OF PART 54
+
+
+PART 55 - SYMMETRY PACK PSEUDOCODE
+
+Module: symmetry, Layer 44
+
+SY_IS_HSYMMETRIC(Grid) ->
+  Grid2 = gd_reflect_v(Grid)
+  return gd_equal(Grid, Grid2)
+
+SY_IS_VSYMMETRIC(Grid) ->
+  Grid2 = gd_reflect_h(Grid)
+  return gd_equal(Grid, Grid2)
+
+SY_IS_ROT180(Grid) ->
+  R180 = gd_rotate90(gd_rotate90(Grid))
+  return gd_equal(Grid, R180)
+
+SY_IS_ROT90(Grid) ->
+  require square grid
+  return gd_equal(Grid, gd_rotate90(Grid))
+
+SY_IS_DIAGONAL(Grid) ->
+  require square grid
+  return gd_equal(Grid, gd_reflect_d1(Grid))
+
+SY_IS_ANTIDIAGONAL(Grid) ->
+  require square grid
+  return gd_equal(Grid, gd_reflect_d2(Grid))
+
+SY_GROUP(Grid) ->
+  return [Sym for Sym in [h,v,rot180,rot90,diag,antidiag] if SY_TEST_SYM(Grid, Sym)]
+
+SY_ROTATIONS(Grid) ->
+  Candidates = [Grid, R90, R180, R270]
+  return unique_grids(Candidates)  % remove duplicates by gd_equal
+
+SY_ORBIT(Grid) ->
+  HFlip = gd_reflect_v(Grid)
+  return unique_grids(SY_ROTATIONS(Grid) + SY_ROTATIONS(HFlip))
+
+SY_CANONICAL(Grid) ->
+  Orbit = SY_ORBIT(Grid)
+  return min(Orbit) under @< term ordering
+
+SY_EQUIVALENT(GridA, GridB) ->
+  return gd_equal(SY_CANONICAL(GridA), SY_CANONICAL(GridB))
+
+SY_ORDER(Grid) ->
+  return 8 // length(SY_ORBIT(Grid))
+
+END OF PART 55
+
+
+PART 56: COLOR PACK (PR 66)
+
+CL_PALETTE(Grid) ->
+  AllColors = [Color for R,C in Grid if gd_cell(Grid,R,C,Color)]
+  return sort(AllColors)
+
+CL_COUNT(Grid, Color) ->
+  Cells = [r(R,C) for R,C in Grid if gd_cell(Grid,R,C,Color)]
+  return length(Cells)
+
+CL_HISTOGRAM(Grid) ->
+  Palette = CL_PALETTE(Grid)
+  return [Color-CL_COUNT(Grid,Color) for Color in Palette]
+
+CL_SAME_PALETTE(Grid1, Grid2) ->
+  return CL_PALETTE(Grid1) = CL_PALETTE(Grid2)
+
+CL_REPLACE(Grid, OldColor, NewColor) ->
+  for each Row in Grid:
+    for each Cell in Row:
+      if Cell = OldColor then NewColor else Cell
+
+CL_REMAP(Grid, Mapping) ->
+  for each Cell in Grid:
+    if member(Cell-NewColor, Mapping) then NewColor else Cell
+
+CL_DOMINANT(Grid) ->
+  Hist = CL_HISTOGRAM(Grid)
+  CountColor = [Count-Color for Color-Count in Hist]
+  return Color where (Count-Color) = max_member(CountColor)
+
+CL_RAREST(Grid) ->
+  Hist = CL_HISTOGRAM(Grid)
+  CountColor = [Count-Color for Color-Count in Hist]
+  return Color where (Count-Color) = min_member(CountColor)
+
+CL_ISOLATE(Grid, Color, BgColor) ->
+  for each Cell in Grid:
+    if Cell = Color then Color else BgColor
+
+CL_REMOVE(Grid, Color, BgColor) ->
+  return CL_REPLACE(Grid, Color, BgColor)
+
+CL_IS_MONO(Grid) ->
+  return length(CL_PALETTE(Grid)) = 1
+
+CL_COLOR_COUNT(Grid) ->
+  return length(CL_PALETTE(Grid))
+
+CL_HAS_COLOR(Grid, Color) ->
+  return exists r(R,C) in Grid where gd_cell(Grid,R,C,Color)
+
+CL_SWAP(Grid, ColorA, ColorB) ->
+  for each Cell in Grid:
+    if Cell = ColorA then ColorB
+    else if Cell = ColorB then ColorA
+    else Cell
+
+END OF PART 56
+
+
+PART 57: SHAPE PACK (PR 67)
+
+SH_FROM_CELLS(Cells) ->
+  MinR = min(R for r(R,_) in Cells)
+  MinC = min(C for r(_,C) in Cells)
+  Shifted = [r(R-MinR, C-MinC) for r(R,C) in Cells]
+  return sort(Shifted)
+
+SH_FROM_GRID(Grid, Color) ->
+  Cells = [r(R,C) for R,C in Grid if gd_cell(Grid,R,C,Color)]
+  return SH_FROM_CELLS(Cells)
+
+SH_AREA(Shape) ->
+  return length(Shape)
+
+SH_BOUNDING_SIZE(Shape) ->
+  MaxR = max(R for r(R,_) in Shape)
+  MaxC = max(C for r(_,C) in Shape)
+  return (MaxR+1, MaxC+1)
+
+SH_CONTAINS_CELL(Shape, Cell) ->
+  return member(Cell, Shape)  // deterministic (cut after first match)
+
+SH_EQUAL(Shape1, Shape2) ->
+  return Shape1 == Shape2
+
+SH_TRANSLATE(Shape, DR, DC) ->
+  return [r(R+DR, C+DC) for r(R,C) in Shape]
+
+SH_ROTATE90(Shape) ->
+  MaxR = max(R for r(R,_) in Shape)
+  Rotated = [r(C, MaxR-R) for r(R,C) in Shape]
+  return SH_FROM_CELLS(Rotated)
+
+SH_REFLECT_H(Shape) ->
+  MaxC = max(C for r(_,C) in Shape)
+  Reflected = [r(R, MaxC-C) for r(R,C) in Shape]
+  return SH_FROM_CELLS(Reflected)
+
+SH_REFLECT_V(Shape) ->
+  MaxR = max(R for r(R,_) in Shape)
+  Reflected = [r(MaxR-R, C) for r(R,C) in Shape]
+  return SH_FROM_CELLS(Reflected)
+
+SH_ORBIT(Shape) ->
+  HFlip = SH_REFLECT_H(Shape)
+  Rotations1 = [Shape, SH_ROTATE90(Shape), SH_ROTATE90^2(Shape), SH_ROTATE90^3(Shape)]
+  Rotations2 = [HFlip, SH_ROTATE90(HFlip), SH_ROTATE90^2(HFlip), SH_ROTATE90^3(HFlip)]
+  All = Rotations1 ++ Rotations2
+  return unique_shapes(All)  // remove duplicates by ==
+
+SH_CANONICAL(Shape) ->
+  return min(SH_ORBIT(Shape)) under @< term ordering
+
+SH_EQUIVALENT(Shape1, Shape2) ->
+  return SH_CANONICAL(Shape1) == SH_CANONICAL(Shape2)
+
+SH_TO_GRID(Shape, DR, DC, Color, Grid) ->
+  for r(R,C) in Shape:
+    Grid = gd_set_cell(Grid, R+DR, C+DC, Color)
+  return Grid
+
+END OF PART 57
+
+
+PART 58: RELATION PACK (PR 68)
+
+RL_ABOVE(A, B) ->
+  MaxR_A = max(R for r(R,_) in A)
+  MinR_B = min(R for r(R,_) in B)
+  return MaxR_A < MinR_B
+
+RL_BELOW(A, B) ->
+  MinR_A = min(R for r(R,_) in A)
+  MaxR_B = max(R for r(R,_) in B)
+  return MinR_A > MaxR_B
+
+RL_LEFT_OF(A, B) ->
+  MaxC_A = max(C for r(_,C) in A)
+  MinC_B = min(C for r(_,C) in B)
+  return MaxC_A < MinC_B
+
+RL_RIGHT_OF(A, B) ->
+  MinC_A = min(C for r(_,C) in A)
+  MaxC_B = max(C for r(_,C) in B)
+  return MinC_A > MaxC_B
+
+RL_ADJACENT(A, B) ->
+  return exists r(R1,C1) in A, r(R2,C2) in B where
+    (R1=R2 and |C1-C2|=1) or (C1=C2 and |R1-R2|=1)
+
+RL_DISTANCE(A, B) ->
+  return min(|R1-R2|+|C1-C2| for r(R1,C1) in A, r(R2,C2) in B)
+
+RL_CONTAINED_BBOX(A, B) ->
+  (MinR_A, MaxR_A, MinC_A, MaxC_A) = bounding_box(A)
+  (MinR_B, MaxR_B, MinC_B, MaxC_B) = bounding_box(B)
+  return MinR_A >= MinR_B and MaxR_A <= MaxR_B
+     and MinC_A >= MinC_B and MaxC_A <= MaxC_B
+
+RL_OVERLAP(A, B) ->
+  return exists Cell in A where Cell in B
+
+RL_DISJOINT(A, B) ->
+  return not RL_OVERLAP(A, B)
+
+RL_SAME_ROW(A, B) ->
+  return exists r(R,_) in A, r(R,_) in B
+
+RL_SAME_COL(A, B) ->
+  return exists r(_,C) in A, r(_,C) in B
+
+RL_CENTROID(Region) ->
+  SumR = sum(R for r(R,_) in Region)
+  SumC = sum(C for r(_,C) in Region)
+  N = length(Region)
+  return (SumR // N, SumC // N)
+
+RL_OFFSET(A, B) ->
+  (RA, CA) = RL_CENTROID(A)
+  (RB, CB) = RL_CENTROID(B)
+  return (RB - RA, CB - CA)
+
+RL_DIRECTION(A, B) ->
+  (DR, DC) = RL_OFFSET(A, B)
+  if DR < 0 and |DR| >= |DC|: return above
+  if DR > 0 and |DR| >= |DC|: return below
+  if DC < 0 and |DC| > |DR|: return left
+  if DC > 0 and |DC| > |DR|: return right
+  else: fail
+
+END OF PART 58
+
+
+PART 59: SEQUENCE PACK (PR 69)
+
+SQ_RANGE(Lo, Hi) ->
+  if Lo > Hi: return []
+  else: return [Lo, Lo+1, ..., Hi]  % via numlist
+
+SQ_DELTA([_]) -> []
+SQ_DELTA([A, B | T]) ->
+  return [B-A | SQ_DELTA([B|T])]
+
+SQ_IS_ARITHMETIC([]) -> true
+SQ_IS_ARITHMETIC([_]) -> true
+SQ_IS_ARITHMETIC([A, B | T]) ->
+  D = B - A
+  check all consecutive pairs in [B|T] have difference D
+
+SQ_COMMON_DIFF([A, B | T]) ->
+  D = B - A
+  verify SQ_IS_ARITHMETIC_([B|T], D)
+  return D
+
+SQ_EXTEND_ARITH(List, N) ->
+  D = SQ_COMMON_DIFF(List)
+  Last = last(List)
+  Extra = [Last+D, Last+2D, ..., Last+N*D]
+  return List ++ Extra
+
+SQ_CHUNK([], N) -> []
+SQ_CHUNK(List, N) ->
+  Chunk = first N elements of List
+  Rest = remaining elements
+  return [Chunk | SQ_CHUNK(Rest, N)]
+
+SQ_ZIP([A|As], [B|Bs]) -> [A-B | SQ_ZIP(As, Bs)]
+SQ_ZIP([], []) -> []
+
+SQ_UNZIP([A-B|Ps]) ->
+  (As, Bs) = SQ_UNZIP(Ps)
+  return ([A|As], [B|Bs])
+SQ_UNZIP([]) -> ([], [])
+
+SQ_CUMSUM([H|T]) ->
+  Prev = H
+  for each X in T: Prev = Prev + X, emit Prev
+  return [H | emitted values]
+
+SQ_SLICE(List, From, To) ->
+  drop first From elements from List
+  take next (To - From) elements
+
+SQ_FLATTEN1(Lists) ->
+  return append(Lists)
+
+SQ_TRANSPOSE([]) -> []
+SQ_TRANSPOSE(Matrix) ->
+  Row = [head(L) for L in Matrix]
+  RestMatrix = [tail(L) for L in Matrix]
+  return [Row | SQ_TRANSPOSE(RestMatrix)]
+
+SQ_PERIOD(List) ->
+  Len = length(List)
+  for K in 1..Len:
+    if Len mod K = 0:
+      P = first K elements of List
+      if List = P repeated (Len/K) times: return P
+
+SQ_IS_PERIODIC(List) ->
+  Len = length(List)
+  if Len < 2: fail
+  P = SQ_PERIOD(List)
+  if length(P) < Len: succeed
+
+END OF PART 59
+
+
+PART 60: CROP PACK PSEUDOCODE
+
+cr_bbox(Grid, BG, bbox(MinR,MinC,MaxR,MaxC)):
+  collect all (R,C) pairs where Grid[R][C] != BG
+  fail if collection is empty
+  MinR = min of all R, MaxR = max of all R
+  MinC = min of all C, MaxC = max of all C
+
+cr_crop_bbox(Grid, R1, C1, R2, C2, Sub):
+  for each row R in R1..R2:
+    extract columns C1..C2 from Grid[R]
+  return list of extracted rows
+
+cr_crop_content(Grid, BG, Cropped):
+  call cr_bbox to get bbox(R1,C1,R2,C2)
+  call cr_crop_bbox with those bounds
+
+cr_pad(Grid, Color, N, Padded):
+  PadCols = width(Grid) + 2*N
+  TopRows = N copies of [Color x PadCols]
+  BotRows = N copies of [Color x PadCols]
+  MidRows = each row of Grid prepended and appended with N copies of Color
+  Padded = concat(TopRows, MidRows, BotRows)
+
+cr_strip_border(Grid, N, Inner):
+  R1=N, R2=Rows-N-1, C1=N, C2=Cols-N-1
+  call cr_crop_bbox(Grid, R1, C1, R2, C2, Inner)
+
+cr_split_h(Grid, R, Top, Bottom):
+  Top = first R rows of Grid
+  Bottom = remaining rows
+
+cr_split_v(Grid, C, Left, Right):
+  for each row: Left[i] = first C cols, Right[i] = remaining cols
+
+cr_rows(Grid, From, To, Sub):
+  Sub = rows From..To-1 of Grid (skip first From, take To-From)
+
+cr_cols(Grid, From, To, Sub):
+  for each row: take cols From..To-1
+
+cr_stitch_h(Left, Right, Joined):
+  for each pair (L[i], R[i]): Joined[i] = L[i] ++ R[i]
+
+cr_stitch_v(Top, Bottom, Joined):
+  Joined = Top ++ Bottom
+
+cr_embed(Base, Sub, R, C, Result):
+  Pre = first R rows of Base unchanged
+  for each row i in 0..SubH-1:
+    Result[R+i] = Base[R+i] with columns C..C+SubW-1 replaced by Sub[i]
+  Suf = remaining rows of Base unchanged
+
+cr_center(Grid, Rows, Cols, Center):
+  R1 = (GH-Rows)//2, C1 = (GW-Cols)//2
+  R2 = R1+Rows-1, C2 = C1+Cols-1
+  call cr_crop_bbox(Grid, R1, C1, R2, C2, Center)
+
+cr_quadrants(Grid, Q1, Q2, Q3, Q4):
+  MidR = Rows//2, MidC = Cols//2
+  Top = rows 0..MidR-1; Bottom = rows MidR..end
+  Q1,Q2 = split Top at MidC
+  Q3,Q4 = split Bottom at MidC
+
+END OF PART 60
+
+
+PART 61: OVERLAY PACK PSEUDOCODE
+
+ov_over(A, B, BG, Result):
+  for each (r,c): Result[r][c] = B[r][c] if B[r][c]!=BG else A[r][c]
+
+ov_blend(A, B, BG, Result):
+  same as ov_over
+
+ov_or(A, B, Result):
+  for each (r,c): Result[r][c] = A[r][c] bitwise-or B[r][c]
+
+ov_and(A, B, Result):
+  for each (r,c): Result[r][c] = A[r][c] bitwise-and B[r][c]
+
+ov_xor(A, B, BG, Result):
+  for each (r,c):
+    if A[r][c]!=BG and B[r][c]=BG: Result[r][c]=A[r][c]
+    if B[r][c]!=BG and A[r][c]=BG: Result[r][c]=B[r][c]
+    else: Result[r][c]=BG
+
+ov_diff(A, B, BG, Result):
+  for each (r,c): Result[r][c] = A[r][c] if A[r][c]!=B[r][c] else BG
+
+ov_intersect(A, B, BG, Result):
+  for each (r,c): Result[r][c] = A[r][c] if A[r][c]=B[r][c] else BG
+
+ov_mask(Grid, Mask, BG, Result):
+  for each (r,c): Result[r][c] = Grid[r][c] if Mask[r][c]!=BG else BG
+
+ov_mask_inv(Grid, Mask, BG, Result):
+  for each (r,c): Result[r][c] = Grid[r][c] if Mask[r][c]=BG else BG
+
+ov_priority(Grids, BG, Result):
+  for each (r,c):
+    Result[r][c] = first G[r][c] in Grids where G[r][c]!=BG
+    if all are BG: Result[r][c] = BG
+
+ov_replace(Grid, Old, New, Result):
+  for each (r,c): Result[r][c] = New if Grid[r][c]=Old else Grid[r][c]
+
+ov_fill_bg(Grid, BG, Fill, Result):
+  for each (r,c): Result[r][c] = Fill if Grid[r][c]=BG else Grid[r][c]
+
+ov_max(A, B, Result):
+  for each (r,c): Result[r][c] = max(A[r][c], B[r][c])
+
+ov_min(A, B, Result):
+  for each (r,c): Result[r][c] = min(A[r][c], B[r][c])
+
+END OF PART 61
+
+
+PART 62: MEASURE PACK PSEUDOCODE
+
+ms_area(Region, N): N = length(Region).
+
+ms_bbox(Region, bbox(R1,C1,R2,C2)):
+  Rs = all row indices; Cs = all col indices
+  R1=min(Rs), R2=max(Rs), C1=min(Cs), C2=max(Cs)
+
+ms_bbox_size(Region, W, H):
+  ms_bbox -> R1,C1,R2,C2; W=C2-C1+1; H=R2-R1+1
+
+ms_perimeter(Region, P):
+  for each Cell in Region:
+    N = count of 4-neighbors of Cell not in Region
+  P = sum of all N
+
+ms_diameter(Region, D):
+  D = max over all pairs (C1,C2) in Region of manhattan(C1,C2)
+
+ms_extent(Region, N, D):
+  N = area; D = bbox_W * bbox_H
+
+ms_aspect(Region, N, D):
+  W,H = bbox_size; N=max(W,H); D=min(W,H)
+
+ms_row_span(Region, S): S = |distinct rows in Region|
+
+ms_col_span(Region, S): S = |distinct cols in Region|
+
+ms_centroid(Region, AvgR, AvgC):
+  AvgR = sum(Rs) // N; AvgC = sum(Cs) // N
+
+ms_radius(Region, Rad):
+  centroid = (CR,CC)
+  Rad = max Chebyshev distance from (CR,CC) to any cell
+
+ms_interior_count(Region, N):
+  N = count(cells in Region where all 4 neighbors are also in Region)
+
+ms_border_count(Region, N):
+  N = count(cells in Region where at least one 4-neighbor is outside)
+
+ms_color_count(Grid, N):
+  flatten Grid; sort; deduplicate; N = length
+
+END OF PART 62
+
+
+PART 63: TRANSFORM PACK PSEUDOCODE (Work Package 73)
+
+tr_scale_up(Grid, Factor, Scaled):
+  For each Row in Grid:
+    For each cell V in Row:
+      Emit Factor copies of V -> forms ExpandedRow
+    Collect all ExpandedRows
+  For each ExpandedRow:
+    Emit Factor copies of ExpandedRow
+  Scaled = flattened collection of all copies
+
+tr_scale_down(Grid, Factor, Scaled):
+  RowIds = [0, 1, ..., Rows-1]
+  SelRowIds = [R in RowIds | R mod Factor = 0]
+  ColIds = [0, 1, ..., Cols-1]
+  SelColIds = [C in ColIds | C mod Factor = 0]
+  For each R in SelRowIds:
+    Row = Grid[R]
+    For each C in SelColIds:
+      emit Row[C]
+    -> SelRow
+  Scaled = [SelRow for each R in SelRowIds]
+
+tr_tile_h(Grid, N, Tiled):
+  For each Row in Grid:
+    TiledRow = Row ++ Row ++ ... (N times)
+  Tiled = [TiledRow for each Row in Grid]
+
+tr_tile_v(Grid, N, Tiled):
+  Tiled = Grid ++ Grid ++ ... (N times)
+
+tr_tile(Grid, N, Tiled):
+  H = tr_tile_h(Grid, N)
+  Tiled = tr_tile_v(H, N)
+
+tr_transpose(Grid, Transposed):
+  While Grid has non-empty rows:
+    Col = first element of each row in Grid
+    Grid = tail of each row in Grid
+    emit Col
+  Transposed = [Col1, Col2, ...]
+
+tr_flip_h(Grid, Flipped):
+  For each Row in Grid: emit reverse(Row)
+  Flipped = [ReversedRow ...]
+
+tr_flip_v(Grid, Flipped):
+  Flipped = reverse(Grid)
+
+tr_rot90(Grid, Rotated):
+  T = tr_transpose(Grid)
+  Rotated = tr_flip_h(T)
+
+tr_rot180(Grid, Rotated):
+  V = tr_flip_v(Grid)
+  Rotated = tr_flip_h(V)
+
+tr_shift(Grid, DR, DC, Fill, Shifted):
+  For each (R, C) in [0..Rows-1] x [0..Cols-1]:
+    SR = R - DR, SC = C - DC
+    If SR in [0..Rows-1] and SC in [0..Cols-1]:
+      Shifted[R][C] = Grid[SR][SC]
+    Else:
+      Shifted[R][C] = Fill
+
+tr_apply_map(Grid, Map, Result):
+  For each cell V in Grid:
+    If V-To in Map: emit To
+    Else: emit V
+  Result = same dimensions as Grid with mapped values
+
+tr_replace_color(Grid, From, To, Result):
+  Equivalent to tr_apply_map(Grid, [From-To], Result)
+
+tr_mask_grid(Grid, Mask, Fill, Result):
+  For each (R, C):
+    If Mask[R][C] = 0: Result[R][C] = Fill
+    Else: Result[R][C] = Grid[R][C]
+
+END OF PART 63
+
+
+PART 64: SELECT PACK PSEUDOCODE (Work Package 74)
+
+sl_largest(Regions, Largest):
+  Areas = [length(R) for R in Regions]
+  MaxArea = max(Areas)
+  Idx = first index where Areas[Idx] = MaxArea
+  Largest = Regions[Idx]
+
+sl_smallest(Regions, Smallest):
+  Areas = [length(R) for R in Regions]
+  MinArea = min(Areas)
+  Idx = first index where Areas[Idx] = MinArea
+  Smallest = Regions[Idx]
+
+sl_sort_by_area(Regions, Sorted):
+  Keyed = [(length(R), R) for R in Regions]
+  SortedKeyed = keysort(Keyed)   % stable sort by key
+  Sorted = [R for (_, R) in SortedKeyed]
+
+sl_filter_area(Regions, N, Filtered):
+  Filtered = [R for R in Regions if length(R) = N]
+
+sl_filter_area_min(Regions, Min, Filtered):
+  Filtered = [R for R in Regions if length(R) >= Min]
+
+sl_filter_area_max(Regions, Max, Filtered):
+  Filtered = [R for R in Regions if length(R) <= Max]
+
+sl_touches_border(Region, Rows, Cols):
+  MaxR = Rows - 1, MaxC = Cols - 1
+  Exists cell r(R,C) in Region such that R=0 OR R=MaxR OR C=0 OR C=MaxC
+
+sl_filter_border(Regions, Rows, Cols, Filtered):
+  Filtered = [R for R in Regions if sl_touches_border(R, Rows, Cols)]
+
+sl_filter_interior(Regions, Rows, Cols, Filtered):
+  Filtered = [R for R in Regions if NOT sl_touches_border(R, Rows, Cols)]
+
+sl_above_row(Regions, Row, Filtered):
+  Filtered = [R for R in Regions if all r(Ri,_) in R have Ri < Row]
+
+sl_below_row(Regions, Row, Filtered):
+  Filtered = [R for R in Regions if all r(Ri,_) in R have Ri >= Row]
+
+sl_left_of_col(Regions, Col, Filtered):
+  Filtered = [R for R in Regions if all r(_,Ci) in R have Ci < Col]
+
+sl_right_of_col(Regions, Col, Filtered):
+  Filtered = [R for R in Regions if all r(_,Ci) in R have Ci >= Col]
+
+sl_unique_area(Regions, Unique):
+  Areas = [length(R) for R in Regions]
+  UniqueAreas = [A for A in Areas if count(A in Areas) = 1]
+  Unique = [R for R in Regions if length(R) in UniqueAreas]
+
+END OF PART 64
+
+
+PART 65: COUNT PACK PSEUDOCODE (Work Package 75)
+
+cn_by_value(List, V, N):
+  N = count(X in List such that X = V)
+
+cn_color_count(Grid, Color, N):
+  Flat = flatten(Grid)
+  N = cn_by_value(Flat, Color)
+
+cn_histogram(Grid, Colors, Counts):
+  Flat = flatten(Grid)
+  Sorted = msort(Flat)   // sort preserving duplicates
+  Pairs = group_consecutive_equal(Sorted)  // each unique value with its count
+  Colors = [K for K-V in Pairs]
+  Counts = [V for K-V in Pairs]
+
+cn_max_color(Grid, Color):
+  Colors, Counts = cn_histogram(Grid)
+  MaxCount = max(Counts)
+  Idx = first index where Counts[Idx] = MaxCount
+  Color = Colors[Idx]
+
+cn_min_color(Grid, Color):
+  Colors, Counts = cn_histogram(Grid)
+  MinCount = min(Counts)
+  Idx = first index where Counts[Idx] = MinCount
+  Color = Colors[Idx]
+
+cn_color_rows(Grid, Color, N):
+  N = count(Row in Grid such that Color in Row)
+
+cn_color_cols(Grid, Color, N):
+  N = count(C in [0..Cols-1] such that Color in column C of Grid)
+
+cn_row_distinct(Grid, R, N):
+  Row = Grid[R]
+  N = length(sort(Row))
+
+cn_col_distinct(Grid, C, N):
+  Col = [Grid[R][C] for R in [0..Rows-1]]
+  N = length(sort(Col))
+
+cn_grid_total(Grid, N):
+  Rows, Cols = dimensions(Grid)
+  N = Rows * Cols
+
+cn_equal_cells(Grid1, Grid2, N):
+  Flags = [1 if Grid1[R][C] = Grid2[R][C] else 0 for all (R,C)]
+  N = sum(Flags)
+
+cn_diff_cells(Grid1, Grid2, N):
+  N = cn_grid_total(Grid1) - cn_equal_cells(Grid1, Grid2)
+
+cn_region_color(Grid, [r(R,C)|_], Color):
+  Color = Grid[R][C]
+
+cn_regions_per_color(Grid, Regions, Pairs):
+  Colors = [cn_region_color(Grid, R) for R in Regions]
+  Pairs = tally(Colors)   // each Color-Count for unique colors
+
+END OF PART 65
+
+
+PART 66: FILL PACK PSEUDOCODE (Work Package 76)
+
+fl_fill_region(Grid, Region, Color, Result):
+  For each (R, C) in Grid:
+    If r(R,C) in Region: Result[R][C] = Color
+    Else: Result[R][C] = Grid[R][C]
+
+fl_fill_bbox(Grid, bbox(R1,C1,R2,C2), Color, Result):
+  For each (R, C) in Grid:
+    If R1 <= R <= R2 and C1 <= C <= C2: Result[R][C] = Color
+    Else: Result[R][C] = Grid[R][C]
+
+fl_fill_row(Grid, TargetR, Color, Result):
+  For row R:
+    If R = TargetR: all cells become Color
+    Else: row unchanged
+
+fl_fill_col(Grid, TargetC, Color, Result):
+  For each row R:
+    Result[R][TargetC] = Color; all other cells unchanged
+
+fl_fill_cells(Grid, Cells, Color, Result):
+  Equivalent to fl_fill_region(Grid, Cells, Color, Result)
+
+fl_fill_border(Grid, Color, Result):
+  Fill row 0, row Rows-1, col 0, col Cols-1 with Color
+
+fl_outline_region(Grid, Region, Color, Result):
+  BorderCells = {Cell in Region | some 4-neighbor of Cell is not in Region}
+  fl_fill_cells(Grid, BorderCells, Color, Result)
+
+fl_fill_interior(Grid, Region, Color, Result):
+  InteriorCells = {Cell in Region | all 4-neighbors of Cell are in Region}
+  fl_fill_cells(Grid, InteriorCells, Color, Result)
+
+fl_solid_rect(Rows, Cols, Color, Grid):
+  Row = [Color] * Cols
+  Grid = [Row] * Rows
+
+fl_checkerboard(Rows, Cols, C1, C2, Grid):
+  For each (R, C):
+    Grid[R][C] = C1 if (R+C) even, else C2
+
+fl_draw_hline(Grid, R, C1, C2, Color, Result):
+  fl_fill_bbox(Grid, bbox(R, C1, R, C2), Color, Result)
+
+fl_draw_vline(Grid, C, R1, R2, Color, Result):
+  fl_fill_bbox(Grid, bbox(R1, C, R2, C), Color, Result)
+
+fl_fill_main_diag(Grid, Color, Result):
+  DiagCells = {r(I,I) | I in [0..Rows-1]}
+  fl_fill_cells(Grid, DiagCells, Color, Result)
+
+fl_stamp(Base, Stamp, SR, SC, BG, Result):
+  For each (R, C) in Base:
+    StampR = R - SR, StampC = C - SC
+    If (StampR, StampC) in bounds of Stamp:
+      V = Stamp[StampR][StampC]
+      If V != BG: Result[R][C] = V
+      Else: Result[R][C] = Base[R][C]
+    Else: Result[R][C] = Base[R][C]
+
+END OF PART 66
+
+
+PART 67: PSEUDOCODE - PATTERN PACK (Work Package 77)
+
+pt_row_period(Row, P):
+  Len = length(Row)
+  For P = 1 to Len:
+    If for all i in 0..Len-1: Row[i] = Row[i mod P]
+      Return P (cut)
+
+pt_col_period(Grid, C, P):
+  Col = [Row[C] for Row in Grid]
+  Return pt_row_period(Col, P)
+
+pt_grid_period_h(Grid, P):
+  Cols = length(Grid[0])
+  For P = 1 to Cols:
+    If for all Row in Grid: pt_row_period(Row, P) divides P
+      Return P (cut)
+  Implementation: for each candidate P, every row must satisfy period_ok_(Row, P).
+
+pt_grid_period_v(Grid, P):
+  Rows = length(Grid)
+  For P = 1 to Rows:
+    If for all C in 0..Cols-1: pt_col_period(Grid, C, P-divides)
+      Return P (cut)
+
+pt_tile_unit_h(Grid, Tile):
+  P = pt_grid_period_h(Grid)
+  Tile = [first_P_elements(Row) for Row in Grid]
+
+pt_tile_unit_v(Grid, Tile):
+  P = pt_grid_period_v(Grid)
+  Tile = first_P_rows(Grid)
+
+pt_tile_unit(Grid, Tile):
+  PH = pt_grid_period_h(Grid)
+  PV = pt_grid_period_v(Grid)
+  Tile = [first_PH_elements(Row) for Row in first_PV_rows(Grid)]
+
+pt_is_tiling(Grid, Tile):
+  TH = length(Tile), TW = length(Tile[0])
+  For R in 0..Rows-1:
+    For C in 0..Cols-1:
+      If Grid[R][C] != Tile[R mod TH][C mod TW]: Fail
+  Succeed
+
+pt_find_tile(Grid, Tile, Positions):
+  TH = length(Tile), TW = length(Tile[0])
+  MaxR = Rows - TH, MaxC = Cols - TW
+  Positions = [r(R,C) for R in 0..MaxR, C in 0..MaxC
+               if tile_matches_at(Grid, Tile, R, C)]
+
+pt_tile_matches_at(Grid, Tile, R, C):
+  For TR in 0..TH-1, TC in 0..TW-1:
+    If Grid[R+TR][C+TC] != Tile[TR][TC]: Fail
+  Succeed
+
+pt_count_tile(Grid, Tile, N):
+  Positions = pt_find_tile(Grid, Tile)
+  N = length(Positions)
+
+pt_extract_tile(Grid, r(R,C), H, W, Tile):
+  Tile = [Grid[R+DR][C .. C+W-1] for DR in 0..H-1]
+
+pt_unique_rows(Grid, N):
+  Unique = sort(Grid)  % sort removes duplicates
+  N = length(Unique)
+
+pt_unique_cols(Grid, N):
+  AllCols = [column(Grid, C) for C in 0..Cols-1]
+  Unique = sort(AllCols)
+  N = length(Unique)
+
+pt_has_uniform_rows(Grid):
+  sort(Grid) has length 1
+
+END OF PART 67
+
+
+PART 68: PSEUDOCODE - COMPARE PACK (Work Package 78)
+
+cp_diff_cells(Grid1, Grid2, Diffs):
+  All = all r(R,C) positions in Grid1
+  Diffs = [Cell for Cell in All if Grid1[R][C] != Grid2[R][C]]
+
+cp_same_cells(Grid1, Grid2, Sames):
+  All = all r(R,C) positions in Grid1
+  Sames = [Cell for Cell in All if Grid1[R][C] = Grid2[R][C]]
+
+cp_added_color(Grid1, Grid2, Color, Added):
+  All = all r(R,C) positions
+  Added = [Cell for Cell in All if Grid2[R][C] = Color and Grid1[R][C] != Color]
+
+cp_removed_color(Grid1, Grid2, Color, Removed):
+  All = all r(R,C) positions
+  Removed = [Cell for Cell in All if Grid1[R][C] = Color and Grid2[R][C] != Color]
+
+cp_changed_to(Grid1, Grid2, Color, Changed):
+  All = all r(R,C) positions
+  Changed = [Cell for Cell in All if Grid2[R][C] = Color and Grid1[R][C] != Color]
+  (Identical to cp_added_color; provided for semantic clarity.)
+
+cp_changed_from(Grid1, Grid2, Color, Changed):
+  All = all r(R,C) positions
+  Changed = [Cell for Cell in All if Grid1[R][C] = Color and Grid2[R][C] != Color]
+  (Identical to cp_removed_color; provided for semantic clarity.)
+
+cp_diff_map(Grid1, Grid2, Map):
+  Map[R][C] = 1 if Grid1[R][C] != Grid2[R][C], else 0
+
+cp_similarity(Grid1, Grid2, EqCount-Total):
+  Total = Rows * Cols
+  EqCount = |{Cell: Grid1[R][C] = Grid2[R][C]}|
+
+cp_region_diff(Region1, Region2, Diff):
+  Diff = Region1 \ Region2  (set difference)
+
+cp_region_intersect(Region1, Region2, Inter):
+  Inter = Region1 ∩ Region2
+
+cp_region_union(Region1, Region2, Union):
+  Union = Region1 ∪ Region2 (no duplicates)
+
+cp_region_equal(Region1, Region2):
+  sort(Region1) = sort(Region2)
+
+cp_grids_equal(Grid1, Grid2):
+  Grid1 = Grid2  (structural unification)
+
+cp_color_shift(Grid1, Grid2, Pairs):
+  Diffs = cp_diff_cells(Grid1, Grid2)
+  Pairs = [Grid1[R][C]-Grid2[R][C] for r(R,C) in Diffs]
+
+END OF PART 68
+
+
+PART 69: PSEUDOCODE - SPATIAL PACK (Work Package 79)
+
+sp_direction(r(R1,C1), r(R2,C2), Dir):
+  DR = R2 - R1, DC = C2 - C1
+  If DR < 0, DC = 0: Dir = north
+  If DR > 0, DC = 0: Dir = south
+  If DR = 0, DC < 0: Dir = west
+  If DR = 0, DC > 0: Dir = east
+  If DR < 0, DC > 0: Dir = northeast
+  If DR < 0, DC < 0: Dir = northwest
+  If DR > 0, DC > 0: Dir = southeast
+  If DR > 0, DC < 0: Dir = southwest
+  If DR = 0, DC = 0: Dir = same
+
+sp_distance_manhattan(r(R1,C1), r(R2,C2), D):
+  D = |R2 - R1| + |C2 - C1|
+
+sp_distance_chebyshev(r(R1,C1), r(R2,C2), D):
+  D = max(|R2 - R1|, |C2 - C1|)
+
+sp_neighbors4(r(R,C), Rows-Cols, Neighbors):
+  Candidates = {r(R-1,C), r(R+1,C), r(R,C-1), r(R,C+1)}
+  Neighbors = [c for c in Candidates if 0 =< c.R < Rows and 0 =< c.C < Cols]
+
+sp_neighbors8(r(R,C), Rows-Cols, Neighbors):
+  Candidates = all 8 cells differing by at most 1 in each axis (excluding self)
+  Neighbors = [c for c in Candidates if in-bounds]
+
+sp_adjacent4(Cell1, Cell2):
+  sp_distance_manhattan(Cell1, Cell2) = 1
+
+sp_adjacent8(Cell1, Cell2):
+  sp_distance_chebyshev(Cell1, Cell2) = 1
+
+sp_bbox_contains(bbox(R1,C1,R2,C2), r(R,C)):
+  R1 =< R =< R2 and C1 =< C =< C2
+
+sp_in_region(Cell, Region):
+  member(Cell, Region) (deterministic, cut after first match)
+
+sp_row_between(Region, MinR, MaxR, Filtered):
+  Filtered = [r(R,C) for r(R,C) in Region if MinR =< R =< MaxR]
+
+sp_col_between(Region, MinC, MaxC, Filtered):
+  Filtered = [r(R,C) for r(R,C) in Region if MinC =< C =< MaxC]
+
+sp_closest(Ref, Region, Closest):
+  Dists = [manhattan(Ref, Cell) for Cell in Region]
+  MinD = min(Dists)
+  Closest = Region[first index where Dists[i] = MinD]
+
+sp_farthest(Ref, Region, Farthest):
+  Dists = [manhattan(Ref, Cell) for Cell in Region]
+  MaxD = max(Dists)
+  Farthest = Region[first index where Dists[i] = MaxD]
+
+sp_centroid(Region, Row, Col):
+  N = length(Region)
+  Row = sum(R for r(R,_) in Region) // N
+  Col = sum(C for r(_,C) in Region) // N
+
+END OF PART 69
+
+
+PART 70: PSEUDOCODE - INDUCTION PACK (Work Package 80)
+
+id_color_map(Input, Output, Map):
+  Changed = id_changed_cells(Input, Output)
+  Pairs = [(Input[R][C], Output[R][C]) for r(R,C) in Changed]
+  Map = sort(Pairs)  -- removes duplicates
+
+id_is_recolor(Input, Output):
+  Map = id_color_map(Input, Output)
+  For all cells (R,C):
+    InV = Input[R][C], OutV = Output[R][C]
+    If InV in Map: OutV must equal Map[InV]
+    Else: InV must equal OutV
+
+id_uniform_output(Output, Color):
+  Colors = sort(flatten(Output))
+  Colors = [Color]  -- exactly one distinct value
+
+id_output_color(Output, Color):
+  id_uniform_output(Output, Color)
+
+id_size_ratio(Input, Output, RR-RC):
+  RR = OutRows / InRows (integer)
+  RC = OutCols / InCols (integer)
+
+id_is_scale(Input, Output):
+  OutRows mod InRows = 0
+  OutCols mod InCols = 0
+  K = OutRows // InRows
+  K > 0
+  OutCols // InCols = K
+
+id_scale_factor(Input, Output, K):
+  id_is_scale(Input, Output)
+  K = OutRows // InRows
+
+id_changed_cells(Input, Output, Changed):
+  All = all r(R,C) positions
+  Changed = [Cell for Cell in All if Input[R][C] != Output[R][C]]
+
+id_unchanged_cells(Input, Output, Unchanged):
+  All = all r(R,C) positions
+  Unchanged = [Cell for Cell in All if Input[R][C] = Output[R][C]]
+
+id_input_colors(Input, Colors):
+  Colors = sort(distinct_values(flatten(Input)))
+
+id_output_colors(Output, Colors):
+  Colors = sort(distinct_values(flatten(Output)))
+
+id_new_colors(Input, Output, New):
+  New = OutColors - InColors  (set difference)
+
+id_lost_colors(Input, Output, Lost):
+  Lost = InColors - OutColors  (set difference)
+
+id_grid_dims(Grid, Rows, Cols):
+  Rows = length(Grid)
+  Cols = length(Grid[0])  if Rows > 0 else 0
+
+END OF PART 70
