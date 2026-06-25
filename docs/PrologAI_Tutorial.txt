@@ -12649,3 +12649,205 @@ bounding box, corners, color testing, overlap, and scaling. All 42 PLUnit
 acceptance tests pass with no choicepoint warnings.
 
 END OF CHAPTER 83
+Chapter 84: Spatial Proximity and Grouping - The Cluster Pack
+
+The cluster pack (Layer 102, Work Package 123) provides 14 predicates for
+working with the spatial relationships between sets of R-C cells. It computes
+three distance metrics, filters by proximity, finds the nearest or farthest cell
+to a query point, computes the centroid and spread of a set, groups cells by
+their color in a grid, sorts by distance, finds the closest and farthest pair
+of cells, and filters by a bounding band.
+
+All predicates use the cl_* prefix. Coordinates are 0-based integers.
+
+
+84.1 What Problem Does the Cluster Pack Solve?
+
+Many visual reasoning tasks require comparing the spatial arrangement of cells or
+objects: how close are two groups? What is the center of mass of a set of cells?
+Which cells are near a particular anchor point? Which cells share a color? The
+cluster pack provides symbolic, deterministic answers to all of these questions
+without requiring neural approximation or statistical methods.
+
+
+84.2 Distance Metrics
+
+Three distance functions measure how far apart two cells are.
+
+cl_chebyshev(+R1, +C1, +R2, +C2, -D) computes the Chebyshev (L-infinity)
+distance: D = max(|R2-R1|, |C2-C1|). This is the number of king moves on a
+chessboard. It treats diagonal steps as equal in cost to horizontal or vertical.
+
+cl_manhattan(+R1, +C1, +R2, +C2, -D) computes the Manhattan (L-1) distance:
+D = |R2-R1| + |C2-C1|. This is the minimum number of 4-connected grid steps.
+
+cl_euclidean_sq(+R1, +C1, +R2, +C2, -DSq) computes the squared Euclidean
+distance: DSq = (R2-R1)^2 + (C2-C1)^2. This avoids the square root while
+still allowing distance comparisons with integer arithmetic.
+
+Example:
+
+?- cl_chebyshev(0, 0, 2, 3, D).
+D = 3.
+
+?- cl_manhattan(0, 0, 2, 3, D).
+D = 5.
+
+?- cl_euclidean_sq(0, 0, 3, 4, DSq).
+DSq = 25.
+
+
+84.3 Proximity Filtering
+
+cl_within(+R, +C, +D, +Cells, -Near) filters a cell list to those within
+Chebyshev distance D of the point (R,C).
+
+Example:
+
+?- cl_within(2, 2, 1, [1-1,2-2,2-3,4-4], Near).
+Near = [1-1,2-2,2-3].
+
+?- cl_within(0, 0, 0, [1-0,0-1,1-1], Near).
+Near = [].
+
+
+84.4 Nearest and Farthest Cell
+
+cl_nearest(+R, +C, +Cells, -Nearest) returns the cell in Cells with the
+smallest Chebyshev distance to (R,C). Ties go to the first cell in the list.
+
+cl_farthest(+R, +C, +Cells, -Farthest) returns the cell with the largest
+Chebyshev distance.
+
+Example:
+
+?- cl_nearest(0, 0, [3-3,1-1,5-5], Nearest).
+Nearest = 1-1.
+
+?- cl_farthest(0, 0, [1-1,3-3,2-2], Farthest).
+Farthest = 3-3.
+
+
+84.5 Centroid and Spread
+
+cl_center(+Cells, -CR, -CC) computes the integer centroid of a non-empty cell
+set. CR = round(mean of row indices), CC = round(mean of column indices).
+
+cl_spread(+Cells, -DR, -DC) computes the bounding box dimensions.
+DR = max_row - min_row; DC = max_col - min_col.
+
+Example:
+
+?- cl_center([0-0,0-2,2-0,2-2], CR, CC).
+CR = 1, CC = 1.
+
+?- cl_spread([0-0,2-4], DR, DC).
+DR = 2, DC = 4.
+
+?- cl_spread([3-3], DR, DC).
+DR = 0, DC = 0.
+
+
+84.6 Diameter
+
+cl_diameter(+Cells, -D) computes the maximum pairwise Chebyshev distance
+within a cell set. For a single-element set, D = 0.
+
+Example:
+
+?- cl_diameter([0-0,0-4,3-0,3-4], D).
+D = 4.
+
+?- cl_diameter([0-0,0-3], D).
+D = 3.
+
+
+84.7 Color Grouping
+
+cl_group_by_color(+Grid, +Cells, -Colors, -Groups) groups a list of R-C cells
+by the color each cell has in Grid. Colors is a sorted list of distinct color
+values; Groups is a parallel list where Groups[i] contains all cells with color
+Colors[i].
+
+Example:
+
+?- Grid = [[1,2],[1,1]],
+   cl_group_by_color(Grid, [0-0,0-1,1-0,1-1], Colors, Groups).
+Colors = [1, 2],
+Groups = [[0-0,1-0,1-1], [0-1]].
+
+
+84.8 Sort by Distance
+
+cl_sort_by_dist(+R, +C, +Cells, -Sorted) returns Cells sorted by ascending
+Chebyshev distance to (R,C). Uses SWI-Prolog's stable keysort so ties preserve
+relative order.
+
+Example:
+
+?- cl_sort_by_dist(0, 0, [3-3,1-1,2-2], Sorted).
+Sorted = [1-1, 2-2, 3-3].
+
+
+84.9 Nearest and Farthest Pair
+
+cl_nearest_pair(+Cells, -Cell1, -Cell2) finds the pair of cells with the
+minimum pairwise Chebyshev distance. Cells must have at least 2 elements.
+
+cl_farthest_pair(+Cells, -Cell1, -Cell2) finds the pair with the maximum
+pairwise Chebyshev distance.
+
+Example:
+
+?- cl_nearest_pair([0-0,0-1,5-5], C1, C2).
+C1 = 0-0, C2 = 0-1.
+
+?- cl_farthest_pair([0-0,0-1,5-5], C1, C2).
+C1 = 0-0, C2 = 5-5.
+
+
+84.10 Band Filtering
+
+cl_cells_in_band(+R1, +R2, +C1, +C2, +Cells, -Band) filters Cells to those
+whose row index is in [R1,R2] and column index is in [C1,C2]. All bounds are
+inclusive.
+
+Example:
+
+?- cl_cells_in_band(1, 3, 1, 3, [0-0,1-1,2-2,4-4,3-3], Band).
+Band = [1-1,2-2,3-3].
+
+?- cl_cells_in_band(5, 7, 5, 7, [0-0,1-1], Band).
+Band = [].
+
+
+84.11 Implementation Notes
+
+All foldover predicates (cl_nearest_helper_, cl_farthest_helper_, cl_min_pair_,
+cl_max_pair_) use if-then-else for determinism and cuts on their base cases to
+prevent backtracking after the accumulator is returned.
+
+The pair predicates (cl_nearest_pair, cl_farthest_pair, cl_diameter) use the
+internal cl_all_pairs_ helper to enumerate all unordered pairs. cl_all_pairs_
+cuts on both base cases (empty list and singleton list) to prevent choicepoints.
+
+Pair destructuring uses the pattern (PR1-PC1)-(PR2-PC2) because the pair is
+stored as CellA-CellB where each cell is also an R-C pair. The outer - operator
+takes (PR1-PC1) as its first argument and (PR2-PC2) as its second.
+
+Built-ins used without import: sort/2, keysort/2, length/2.
+Imported from library(lists): nth0/3, member/2, max_list/2, min_list/2,
+sum_list/2, append/2, append/3.
+Imported from library(apply): maplist/2, maplist/3, include/3.
+
+
+84.12 Summary
+
+The cluster pack adds Layer 102 to the PrologAI substrate with 14 cl_* predicates
+covering spatial proximity and grouping. Three distance metrics, proximity
+filtering, nearest/farthest queries, centroid, diameter, spread, color grouping,
+sorted ordering, pair extremes, and band filtering give Mentova a complete
+symbolic vocabulary for reasoning about spatial arrangement. All 42 PLUnit
+acceptance tests pass with no choicepoint warnings.
+
+END OF CHAPTER 84
