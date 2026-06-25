@@ -8670,3 +8670,109 @@ The context pack integrates naturally with the pipeline, obj, and rewrite packs:
 
 
 END OF CHAPTER 53
+
+
+CHAPTER 54 - THE SCORE PACK
+
+The score pack (Layer 72) provides 14 sc_* predicates for measuring how well
+a candidate grid matches an expected output grid. This is the evaluation
+substrate for hypothesis selection: after a rule generates one or more
+candidate grids, the score pack ranks them and picks the best one.
+
+The score pack requires: grid.
+
+SECTION 54.1 - WHY SCORING MATTERS
+
+In compositional reasoning, a rule generates a candidate grid. The system
+needs to know how close that candidate is to the expected output. The score
+pack provides several metrics:
+
+  Pixel accuracy - what fraction of cells match?
+  Color recall   - what fraction of expected color cells were produced?
+  Color precision - what fraction of produced color cells are correct?
+  Color F1       - harmonic mean of recall and precision.
+
+These metrics let the system rank hypotheses and select the best one.
+
+SECTION 54.2 - BASIC ACCURACY
+
+sc_accuracy(+Grid1, +Grid2, -Acc)
+
+Acc is a float in [0.0, 1.0]. 1.0 means all cells match; 0.0 means none.
+
+Example:
+
+  sc_accuracy([[1,2],[3,4]], [[1,2],[3,4]], Acc).
+  % Acc = 1.0
+
+  sc_accuracy([[1,2],[3,4]], [[1,9],[3,9]], Acc).
+  % Acc = 0.5
+
+sc_cell_match(+Grid1, +Grid2, -N) counts the matching cells.
+sc_cell_total(+Grid, -N) counts all cells (Rows * Cols).
+sc_exact(+Grid1, +Grid2) succeeds if grids are identical.
+
+SECTION 54.3 - COLOR METRICS
+
+sc_color_recall(+Produced, +Expected, +Color, -Recall)
+
+Recall = (cells produced with Color that are also in Expected) /
+         (cells in Expected with Color).
+
+Returns 1.0 if Expected has no cells of Color (vacuously correct).
+
+sc_color_precision(+Produced, +Expected, +Color, -Precision)
+
+Precision = (cells produced with Color that match Expected) /
+            (cells produced with Color).
+
+Returns 1.0 if Produced has no cells of Color.
+
+sc_color_f1(+Produced, +Expected, +Color, -F1)
+
+F1 = 2 * P * R / (P + R). Returns 0.0 if P + R = 0.
+
+SECTION 54.4 - PAIR SCORING
+
+sc_pair_score(+Pair, +Goal, -Acc)
+
+Pair is Input-Expected. Goal is a 2-argument callable Goal(Input, Actual).
+The predicate applies Goal to Input, then calls sc_accuracy(Actual, Expected).
+
+sc_pairs_score(+Pairs, +Goal, -MeanAcc) computes the arithmetic mean accuracy
+over all pairs in the list. This is the standard ARC-AGI evaluation metric.
+
+SECTION 54.5 - EXACTNESS TESTS
+
+sc_perfect(+Input, +Expected, +Goal) succeeds if Goal produces an exact match.
+
+sc_pairs_perfect(+Pairs, +Goal) succeeds only if every pair is solved exactly.
+This is the ARC-AGI pass criterion: all training pairs solved perfectly.
+
+SECTION 54.6 - RANKING AND SELECTION
+
+sc_rank(+Candidates, +Expected, -Ranked)
+
+Ranked is a list of Acc-Grid pairs sorted by accuracy descending. The best
+candidate is first.
+
+sc_best(+Candidates, +Expected, -Best)
+
+Best is the highest-accuracy candidate grid.
+
+sc_threshold(+Candidates, +Expected, +MinAcc, -Filtered)
+
+Filtered is the subset of Candidates whose accuracy >= MinAcc. Pass
+MinAcc = 1.0 to keep only perfect solutions.
+
+SECTION 54.7 - DESIGN NOTES
+
+sc_accuracy uses float(Match) / float(Total) to guarantee float output.
+Without this, integer division (4/4 = 1 not 1.0) would break sc_rank.
+
+SECTION 54.8 - ACCEPTANCE TESTS
+
+39 PLUnit tests cover all 14 predicates (AC-SC-001 through AC-SC-039).
+See PrologAI_4_Refinement_v106.txt, Part 83.
+
+END OF CHAPTER 54
