@@ -1,0 +1,163 @@
+Chapter 66: The Morph Pack - Morphological Grid Operations
+
+The morph pack (mo_* predicate family, Layer 84) provides morphological
+operations on grids: expanding and shrinking object regions, extracting
+perimeters and interiors, computing distances, growing regions from seeds,
+and filling enclosed holes.
+
+Load the pack with:
+
+    :- use_module(library(morph)).
+
+Basic Dilation and Erosion
+
+mo_dilate/3 expands all non-background regions by one 4-connected step.
+Each background cell adjacent to a non-background cell receives the value
+of its first non-background 4-neighbor.
+
+    ?- mo_dilate([[0,0,0],[0,1,0],[0,0,0]], 0, R).
+    R = [[0,1,0],[1,1,1],[0,1,0]].
+
+mo_erode/3 shrinks all non-background regions by one step. Each non-background
+cell adjacent to a background cell becomes background.
+
+    ?- mo_erode([[0,1,0],[1,1,1],[0,1,0]], 0, R).
+    R = [[0,0,0],[0,1,0],[0,0,0]].
+
+A solid block with no in-bounds background 4-neighbors is not affected by
+erosion:
+
+    ?- mo_erode([[1,1,1],[1,1,1],[1,1,1]], 0, R).
+    R = [[1,1,1],[1,1,1],[1,1,1]].
+
+Repeated Operations
+
+mo_dilate_n/4 and mo_erode_n/4 apply the operation N times. N=0 returns
+the input unchanged:
+
+    ?- mo_dilate_n([[0,0,0,0,0],[0,0,0,0,0],[0,0,1,0,0],
+                    [0,0,0,0,0],[0,0,0,0,0]], 0, 2, R).
+    R = [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]].
+
+Compound Operations
+
+mo_open/3 applies erosion then dilation. This removes small protrusions and
+isolated pixels while preserving larger objects:
+
+    ?- mo_open([[0,0,0],[0,1,0],[0,0,0]], 0, R).
+    R = [[0,0,0],[0,0,0],[0,0,0]].    % isolated dot removed
+
+    ?- mo_open([[0,1,0],[1,1,1],[0,1,0]], 0, R).
+    R = [[0,1,0],[1,1,1],[0,1,0]].    % cross survives
+
+mo_close/3 applies dilation then erosion. This fills small gaps and connects
+nearby regions:
+
+    ?- mo_close([[1,0,1]], 0, R).
+    R = [[1,1,1]].    % one-cell gap filled
+
+mo_smooth/3 applies open then close, combining protrusion removal with gap
+filling:
+
+    ?- mo_smooth([[0,1,0],[1,1,1],[0,1,0]], 0, R).
+    R = [[1,1,1],[1,1,1],[1,1,1]].    % cross smoothed to solid block
+
+Boundary and Interior
+
+mo_boundary/3 keeps only perimeter cells (non-background cells that are on
+the grid edge or have a background 4-neighbor). Interior cells become
+background:
+
+    ?- mo_boundary([[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],
+                    [0,1,1,1,0],[0,0,0,0,0]], 0, R).
+    R = [[0,0,0,0,0],[0,1,1,1,0],[0,1,0,1,0],[0,1,1,1,0],[0,0,0,0,0]].
+
+mo_interior/3 keeps only cells that are not on the perimeter:
+
+    ?- mo_interior([[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],
+                    [0,1,1,1,0],[0,0,0,0,0]], 0, R).
+    R = [[0,0,0,0,0],[0,0,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,0]].
+
+Value-Fixed Dilation
+
+mo_dilate_val/4 dilates using a fixed fill value rather than the neighbor's
+color. This is useful for marking a border zone around objects:
+
+    ?- mo_dilate_val([[0,0,0],[0,1,0],[0,0,0]], 0, 9, R).
+    R = [[0,9,0],[9,1,9],[0,9,0]].
+
+Region Growing
+
+mo_grow_from/5 performs BFS from a list of seed cells into adjacent background
+territory. All reachable background cells are marked with a value:
+
+    ?- mo_grow_from([[0,1,0],[0,1,0],[0,1,0]], [0-0], 0, 5, R).
+    R = [[5,1,0],[5,1,0],[5,1,0]].
+
+The vertical wall of 1s blocks the flood from reaching the right column.
+
+Empty seeds produce no change:
+
+    ?- mo_grow_from(Grid, [], 0, 5, R), R = Grid.
+
+Distance to Background
+
+mo_dist_to_bg/3 computes the L1 Manhattan distance from each non-background
+cell to the nearest background cell. Background cells have distance 0:
+
+    ?- mo_dist_to_bg([[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],
+                      [0,1,1,1,0],[0,0,0,0,0]], 0, D).
+    D = [[0,0,0,0,0],[0,1,1,1,0],[0,1,2,1,0],[0,1,1,1,0],[0,0,0,0,0]].
+
+The center cell (2,2) is 2 steps from the nearest background cell.
+
+Dilation Rings
+
+mo_ring/4 extracts the cells added at exactly the Nth dilation step. N=0
+returns all background:
+
+    ?- mo_ring([[0,0,0],[0,1,0],[0,0,0]], 0, 1, R).
+    R = [[0,1,0],[1,0,1],[0,1,0]].    % the 4 cardinal neighbors
+
+    ?- mo_ring([[0,0,0,0,0],[0,0,0,0,0],[0,0,1,0,0],
+                [0,0,0,0,0],[0,0,0,0,0]], 0, 2, R).
+    R = [[0,0,1,0,0],[0,1,0,1,0],[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0]].
+
+The N=2 ring is the 8-cell shell at L1 distance 2.
+
+Filling Enclosed Holes
+
+mo_fill_holes/4 fills all background regions that are not reachable from the
+grid border through background connectivity. These are interior holes:
+
+    ?- mo_fill_holes([[1,1,1],[1,0,1],[1,1,1]], 0, 5, R).
+    R = [[1,1,1],[1,5,1],[1,1,1]].
+
+Multiple holes in a single grid are all filled:
+
+    ?- mo_fill_holes([[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],
+                      [0,0,0,0,0],[0,0,0,0,0]], 0, 5, R).
+    R = [[1,1,1,1,1],[1,5,1,5,1],[1,1,1,1,1],[0,0,0,0,0],[0,0,0,0,0]].
+
+The background cells in rows 3 and 4 are reachable from the border and are
+not filled; only the two enclosed cells at (1,1) and (1,3) become 5.
+
+Predicate Summary
+
+mo_dilate/3          expand non-Bg regions by one 4-connected step
+mo_erode/3           shrink non-Bg regions by one 4-connected step
+mo_dilate_n/4        dilate N times (N=0 returns input)
+mo_erode_n/4         erode N times (N=0 returns input)
+mo_open/3            morphological opening: erode then dilate
+mo_close/3           morphological closing: dilate then erode
+mo_smooth/3          morphological smoothing: open then close
+mo_boundary/3        keep only perimeter (boundary) non-Bg cells
+mo_interior/3        keep only non-perimeter non-Bg cells
+mo_dilate_val/4      dilate using a fixed fill value
+mo_grow_from/5       BFS flood from seeds into background territory
+mo_dist_to_bg/3      L1 distance from each non-Bg cell to nearest Bg
+mo_ring/4            cells added at exactly the Nth dilation step
+mo_fill_holes/4      fill enclosed background regions with a value
+
+See Chapter 65 (Label Pack) for connected component labeling. See Chapter 56
+(Grid Pack) for basic grid creation and manipulation.

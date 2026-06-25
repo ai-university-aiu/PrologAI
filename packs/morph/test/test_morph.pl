@@ -1,274 +1,292 @@
-% PLUnit tests for the morph pack (mo_* predicates).
-:- use_module(library(plunit)).
-:- use_module(library(morph)).
+% test_morph.pl - Acceptance tests for the morph pack (Layer 84).
+% 42 PLUnit tests: 3 per predicate across 14 predicates.
+:- use_module('../prolog/morph.pl').
 
-% Test grids.
-% grid_cross: 1-colored cross in 5x5 BG=0 grid.
-%   0 0 1 0 0
-%   0 0 1 0 0
-%   1 1 1 1 1
-%   0 0 1 0 0
-%   0 0 1 0 0
-grid_cross([[0,0,1,0,0],[0,0,1,0,0],[1,1,1,1,1],[0,0,1,0,0],[0,0,1,0,0]]).
+% Tests for mo_dilate/3: expand non-Bg regions by one 4-connected step.
+:- begin_tests(morph_dilate).
 
-% grid_dot: single 1 in center of 3x3.
-%   0 0 0
-%   0 1 0
-%   0 0 0
-grid_dot([[0,0,0],[0,1,0],[0,0,0]]).
+% Single center cell dilates into a cross shape.
+test(dilate_dot_to_cross) :-
+    mo_dilate([[0,0,0],[0,1,0],[0,0,0]], 0, R),
+    R = [[0,1,0],[1,1,1],[0,1,0]].
 
-% grid_ring: 3x3 ring of 1s enclosing a 0.
-%   1 1 1
-%   1 0 1
-%   1 1 1
-grid_ring([[1,1,1],[1,0,1],[1,1,1]]).
+% All-fg grid has no Bg cells to fill; unchanged.
+test(dilate_all_fg_unchanged) :-
+    mo_dilate([[1,1],[1,1]], 0, R),
+    R = [[1,1],[1,1]].
 
-% grid_small: 3x3 uniform 1s.
-%   1 1 1
-%   1 1 1
-%   1 1 1
-grid_small([[1,1,1],[1,1,1],[1,1,1]]).
+% Non-zero Bg value: color 2 dilates outward, Bg=9 cells adjacent to 2 become 2.
+test(dilate_non_zero_bg) :-
+    mo_dilate([[9,9,9],[9,2,9],[9,9,9]], 9, R),
+    R = [[9,2,9],[2,2,2],[9,2,9]].
 
-% grid_nw: 1s in top-left 2x2 corner of 4x4.
-%   1 1 0 0
-%   1 1 0 0
-%   0 0 0 0
-%   0 0 0 0
-grid_nw([[1,1,0,0],[1,1,0,0],[0,0,0,0],[0,0,0,0]]).
+:- end_tests(morph_dilate).
 
-:- begin_tests(morph_mo_dilate4).
+% Tests for mo_erode/3: shrink non-Bg regions by one 4-connected step.
+:- begin_tests(morph_erode).
 
-test(dilate4_dot) :-
-    % Single 1 at center of 3x3: after one dilate, cross shape.
-    grid_dot(G),
-    mo_dilate4(G, 1, 0, G2),
-    % Center and 4 cardinal neighbors become 1.
-    nth0(0, G2, R0), nth0(1, R0, V01), V01 =:= 1,  % r(0,1) from up-neighbor
-    nth0(1, G2, R1), nth0(1, R1, V11), V11 =:= 1,  % center
-    nth0(2, G2, R2), nth0(1, R2, V21), V21 =:= 1.  % r(2,1)
+% Cross shape erodes to single center cell (all arms have Bg neighbors).
+test(erode_cross_to_dot) :-
+    mo_erode([[0,1,0],[1,1,1],[0,1,0]], 0, R),
+    R = [[0,0,0],[0,1,0],[0,0,0]].
 
-test(dilate4_nw_expands) :-
-    % 2x2 block in top-left: dilate adds one ring around it.
-    grid_nw(G),
-    mo_dilate4(G, 1, 0, G2),
-    % r(0,2) and r(2,0) should become 1.
-    nth0(0, G2, R0), nth0(2, R0, V02), V02 =:= 1,
-    nth0(2, G2, R2), nth0(0, R2, V20), V20 =:= 1.
+% Single dot has Bg neighbors; erodes to all-Bg.
+test(erode_dot_to_empty) :-
+    mo_erode([[0,0,0],[0,1,0],[0,0,0]], 0, R),
+    R = [[0,0,0],[0,0,0],[0,0,0]].
 
-test(dilate4_preserves_other_colors) :-
-    % If some cells are color 2 (not BG 0, not target 1), they stay 2.
-    G = [[2,0,0],[0,1,0],[0,0,2]],
-    mo_dilate4(G, 1, 0, G2),
-    nth0(0, G2, R0), nth0(0, R0, V00), V00 =:= 2,
-    nth0(2, G2, R2), nth0(2, R2, V22), V22 =:= 2.
+% Solid 3x3 block: no cell has an in-bounds Bg 4-neighbor; unchanged.
+test(erode_solid_unchanged) :-
+    mo_erode([[1,1,1],[1,1,1],[1,1,1]], 0, R),
+    R = [[1,1,1],[1,1,1],[1,1,1]].
 
-:- end_tests(morph_mo_dilate4).
+:- end_tests(morph_erode).
 
-:- begin_tests(morph_mo_dilate8).
+% Tests for mo_dilate_n/4: dilate N times.
+:- begin_tests(morph_dilate_n).
 
-test(dilate8_dot) :-
-    % Dilate8 from center 1 in 3x3: all 8 neighbors plus center = all 1s.
-    grid_dot(G),
-    mo_dilate8(G, 1, 0, G2),
-    G2 = [[1,1,1],[1,1,1],[1,1,1]].
+% N=0: predicate returns the input grid unchanged.
+test(dilate_n_zero_unchanged) :-
+    mo_dilate_n([[0,1,0],[1,1,1],[0,1,0]], 0, 0, R),
+    R = [[0,1,0],[1,1,1],[0,1,0]].
 
-:- end_tests(morph_mo_dilate8).
+% N=1: result matches a single mo_dilate call.
+test(dilate_n_one_matches_dilate) :-
+    G = [[0,0,0],[0,1,0],[0,0,0]],
+    mo_dilate_n(G, 0, 1, R),
+    R = [[0,1,0],[1,1,1],[0,1,0]].
 
-:- begin_tests(morph_mo_erode4).
-
-test(erode4_small_all_interior) :-
-    % Solid 3x3 of 1s: erode removes all grid-edge cells; only center survives.
-    grid_small(G),
-    mo_erode4(G, 1, 0, G2),
-    % Only center r(1,1) survives.
-    nth0(1, G2, R1), nth0(1, R1, V11), V11 =:= 1,
-    nth0(0, G2, R0), nth0(0, R0, V00), V00 =:= 0.
-
-test(erode4_dot) :-
-    % Single 1 in center: all 4-neighbors are BG -> eroded to BG.
-    grid_dot(G),
-    mo_erode4(G, 1, 0, G2),
-    % All zeros.
-    G2 = [[0,0,0],[0,0,0],[0,0,0]].
-
-:- end_tests(morph_mo_erode4).
-
-:- begin_tests(morph_mo_erode8).
-
-test(erode8_small) :-
-    % Solid 3x3: erode8 removes edge cells (OOB 8-neighbors), but center survives.
-    % Center (1,1) has all 8 in-bounds neighbors = 1, so it is kept.
-    grid_small(G),
-    mo_erode8(G, 1, 0, G2),
-    % Center survives.
-    nth0(1, G2, R1), nth0(1, R1, V11), V11 =:= 1,
-    % Corner erodes (has OOB 8-neighbors).
-    nth0(0, G2, R0), nth0(0, R0, V00), V00 =:= 0.
-
-:- end_tests(morph_mo_erode8).
-
-:- begin_tests(morph_mo_dilate4_n).
-
-test(dilate4_n_zero) :-
-    % Zero rounds: unchanged.
-    grid_dot(G),
-    mo_dilate4_n(G, 1, 0, 0, G2),
-    G2 = G.
-
-test(dilate4_n_two) :-
-    % Two rounds from center dot in 5x5 BG: diamond of radius 2.
+% N=2 from center dot in 5x5 grid: L1-diamond of radius 2 expands.
+test(dilate_n_two_from_center) :-
     G = [[0,0,0,0,0],[0,0,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,0]],
-    mo_dilate4_n(G, 1, 0, 2, G2),
-    % r(0,2) should be 1 after 2 dilations.
-    nth0(0, G2, R0), nth0(2, R0, V), V =:= 1.
+    mo_dilate_n(G, 0, 2, R),
+    R = [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]].
 
-:- end_tests(morph_mo_dilate4_n).
+:- end_tests(morph_dilate_n).
 
-:- begin_tests(morph_mo_erode4_n).
+% Tests for mo_erode_n/4: erode N times.
+:- begin_tests(morph_erode_n).
 
-test(erode4_n_zero) :-
-    % Zero rounds: unchanged.
-    grid_small(G),
-    mo_erode4_n(G, 1, 0, 0, G2),
-    G2 = G.
+% N=0: predicate returns the input grid unchanged.
+test(erode_n_zero_unchanged) :-
+    mo_erode_n([[0,1,0],[1,1,1],[0,1,0]], 0, 0, R),
+    R = [[0,1,0],[1,1,1],[0,1,0]].
 
-test(erode4_n_one) :-
-    % One round on small: center only survives.
-    grid_small(G),
-    mo_erode4_n(G, 1, 0, 1, G2),
-    nth0(1, G2, R1), nth0(1, R1, V11), V11 =:= 1.
+% N=1: result matches a single mo_erode call.
+test(erode_n_one_matches_erode) :-
+    mo_erode_n([[0,1,0],[1,1,1],[0,1,0]], 0, 1, R),
+    R = [[0,0,0],[0,1,0],[0,0,0]].
 
-:- end_tests(morph_mo_erode4_n).
+% N=2 from single dot: erode once removes dot; erode again keeps all-Bg.
+test(erode_n_two_empties_dot) :-
+    mo_erode_n([[0,0,0],[0,1,0],[0,0,0]], 0, 2, R),
+    R = [[0,0,0],[0,0,0],[0,0,0]].
 
-:- begin_tests(morph_mo_open4).
+:- end_tests(morph_erode_n).
 
-test(open4_dot) :-
-    % Single dot: erode removes it, dilate does nothing -> all zeros.
-    grid_dot(G),
-    mo_open4(G, 1, 0, G2),
-    G2 = [[0,0,0],[0,0,0],[0,0,0]].
+% Tests for mo_open/3: morphological opening (erode then dilate).
+:- begin_tests(morph_open).
 
-test(open4_small_unchanged) :-
-    % Solid 3x3: erode keeps center, dilate restores -> center only or original?
-    % After erode: only r(1,1) = 1. After dilate: cross around center.
-    % So result is NOT identical to input (open removes protrusions).
-    grid_small(G),
-    mo_open4(G, 1, 0, G2),
-    % Center survives.
-    nth0(1, G2, R1), nth0(1, R1, V11), V11 =:= 1.
+% Single dot: erode removes it; dilate of empty grid stays empty.
+test(open_dot_to_empty) :-
+    mo_open([[0,0,0],[0,1,0],[0,0,0]], 0, R),
+    R = [[0,0,0],[0,0,0],[0,0,0]].
 
-:- end_tests(morph_mo_open4).
+% Cross shape: erode to center, dilate back to cross; cross is preserved.
+test(open_cross_survives) :-
+    mo_open([[0,1,0],[1,1,1],[0,1,0]], 0, R),
+    R = [[0,1,0],[1,1,1],[0,1,0]].
 
-:- begin_tests(morph_mo_close4).
+% All-Bg grid: opening of empty stays empty.
+test(open_all_bg_unchanged) :-
+    mo_open([[0,0],[0,0]], 0, R),
+    R = [[0,0],[0,0]].
 
-test(close4_dot) :-
-    % Single dot: dilate expands to cross, erode shrinks back to center.
-    grid_dot(G),
-    mo_close4(G, 1, 0, G2),
-    nth0(1, G2, R1), nth0(1, R1, V11), V11 =:= 1.
+:- end_tests(morph_open).
 
-:- end_tests(morph_mo_close4).
+% Tests for mo_close/3: morphological closing (dilate then erode).
+:- begin_tests(morph_close).
 
-:- begin_tests(morph_mo_boundary4).
+% Single dot: dilate to cross, erode back to center; dot is preserved.
+test(close_dot_survives) :-
+    mo_close([[0,0,0],[0,1,0],[0,0,0]], 0, R),
+    R = [[0,0,0],[0,1,0],[0,0,0]].
 
-test(boundary4_ring) :-
-    % Ring of 1s: all 8 cells are boundary (each has a non-1 neighbor).
-    grid_ring(G),
-    mo_boundary4(G, 1, Cells),
-    length(Cells, N), N =:= 8.
+% Two-cell gap [[1,0,1]]: dilate connects them; erode yields solid bar.
+test(close_fills_gap) :-
+    mo_close([[1,0,1]], 0, R),
+    R = [[1,1,1]].
 
-test(boundary4_small) :-
-    % Solid 3x3: 8 cells are boundary (grid-edge); center (1,1) is not boundary.
-    % Center has all 4 in-bounds neighbors = 1, so mo_all4_color_ succeeds.
-    grid_small(G),
-    mo_boundary4(G, 1, Cells),
-    length(Cells, N), N =:= 8.
+% All-Bg grid: closing of empty stays empty.
+test(close_all_bg_unchanged) :-
+    mo_close([[0,0],[0,0]], 0, R),
+    R = [[0,0],[0,0]].
 
-test(boundary4_none) :-
-    % Color not in grid: empty.
-    grid_dot(G),
-    mo_boundary4(G, 9, Cells),
-    Cells = [].
+:- end_tests(morph_close).
 
-:- end_tests(morph_mo_boundary4).
+% Tests for mo_smooth/3: morphological smoothing (open then close).
+:- begin_tests(morph_smooth).
 
-:- begin_tests(morph_mo_boundary8).
+% Single dot: open removes it; close of empty stays empty.
+test(smooth_dot_removed) :-
+    mo_smooth([[0,0,0],[0,1,0],[0,0,0]], 0, R),
+    R = [[0,0,0],[0,0,0],[0,0,0]].
 
-test(boundary8_small) :-
-    % Solid 3x3: 8 cells are boundary (grid-edge); center (1,1) is not boundary.
-    % Center has all 8 in-bounds neighbors = 1, so mo_all8_color_ succeeds.
-    grid_small(G),
-    mo_boundary8(G, 1, Cells),
-    length(Cells, N), N =:= 8.
+% Solid 3x3 block: erode/dilate/dilate/erode cycle leaves it unchanged.
+test(smooth_solid_unchanged) :-
+    mo_smooth([[1,1,1],[1,1,1],[1,1,1]], 0, R),
+    R = [[1,1,1],[1,1,1],[1,1,1]].
 
-:- end_tests(morph_mo_boundary8).
+% Cross: open preserves cross; close fills corners; result is 3x3 solid block.
+test(smooth_cross_fills) :-
+    mo_smooth([[0,1,0],[1,1,1],[0,1,0]], 0, R),
+    R = [[1,1,1],[1,1,1],[1,1,1]].
 
-:- begin_tests(morph_mo_ring4).
+:- end_tests(morph_smooth).
 
-test(ring4_dot) :-
-    % Dot at center of 3x3: ring = 4 cardinal BG cells.
-    grid_dot(G),
-    mo_ring4(G, 1, 0, Ring),
-    length(Ring, N), N =:= 4,
-    msort(Ring, S),
-    S = [r(0,1), r(1,0), r(1,2), r(2,1)].
+% Tests for mo_boundary/3: keep only perimeter non-Bg cells.
+:- begin_tests(morph_boundary).
 
-test(ring4_none) :-
-    % No Color in grid: no ring.
-    grid_dot(G),
-    mo_ring4(G, 9, 0, Ring),
-    Ring = [].
+% 3x3 inner block in 5x5: center cell (2,2) is interior; all others are boundary.
+test(boundary_inner_block_5x5) :-
+    G = [[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],[0,1,1,1,0],[0,0,0,0,0]],
+    mo_boundary(G, 0, R),
+    R = [[0,0,0,0,0],[0,1,1,1,0],[0,1,0,1,0],[0,1,1,1,0],[0,0,0,0,0]].
 
-:- end_tests(morph_mo_ring4).
+% Solid 3x3: only center cell (1,1) is not on edge and has no Bg neighbors; it becomes Bg.
+test(boundary_solid_3x3) :-
+    mo_boundary([[1,1,1],[1,1,1],[1,1,1]], 0, R),
+    R = [[1,1,1],[1,0,1],[1,1,1]].
 
-:- begin_tests(morph_mo_fill_holes4).
+% Single dot: dot has Bg neighbors so it is a boundary cell; result unchanged.
+test(boundary_dot_is_boundary) :-
+    mo_boundary([[0,0,0],[0,1,0],[0,0,0]], 0, R),
+    R = [[0,0,0],[0,1,0],[0,0,0]].
 
-test(fill_holes4_ring) :-
-    % Ring of 1s with enclosed 0 at center: fill hole -> all 1s.
-    grid_ring(G),
-    mo_fill_holes4(G, 1, 0, G2),
-    G2 = [[1,1,1],[1,1,1],[1,1,1]].
+:- end_tests(morph_boundary).
 
-test(fill_holes4_no_holes) :-
-    % No enclosed BG: unchanged.
-    grid_dot(G),
-    mo_fill_holes4(G, 1, 0, G2),
-    G2 = G.
+% Tests for mo_interior/3: keep only non-perimeter non-Bg cells.
+:- begin_tests(morph_interior).
 
-:- end_tests(morph_mo_fill_holes4).
+% 3x3 inner block in 5x5: only center cell (2,2) is interior.
+test(interior_inner_block_5x5) :-
+    G = [[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],[0,1,1,1,0],[0,0,0,0,0]],
+    mo_interior(G, 0, R),
+    R = [[0,0,0,0,0],[0,0,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,0]].
 
-:- begin_tests(morph_mo_pad).
+% Solid 3x3: center (1,1) has no Bg neighbors and is not on edge; only interior.
+test(interior_solid_3x3) :-
+    mo_interior([[1,1,1],[1,1,1],[1,1,1]], 0, R),
+    R = [[0,0,0],[0,1,0],[0,0,0]].
 
-test(pad_dot) :-
-    % Pad 3x3 dot: result is 5x5.
-    grid_dot(G),
-    mo_pad(G, 0, G2),
-    length(G2, Rows), Rows =:= 5,
-    G2 = [R0|_], length(R0, Cols), Cols =:= 5.
+% Single dot: dot is a boundary cell; interior is all-Bg.
+test(interior_dot_is_empty) :-
+    mo_interior([[0,0,0],[0,1,0],[0,0,0]], 0, R),
+    R = [[0,0,0],[0,0,0],[0,0,0]].
 
-test(pad_colors) :-
-    % Top row all PadColor.
-    grid_dot(G),
-    mo_pad(G, 9, G2),
-    G2 = [TopRow|_],
-    maplist(==(9), TopRow).
+:- end_tests(morph_interior).
 
-:- end_tests(morph_mo_pad).
+% Tests for mo_dilate_val/4: dilate using a fixed fill value.
+:- begin_tests(morph_dilate_val).
 
-:- begin_tests(morph_mo_unpad).
+% Dot with Val=9: adjacent Bg cells become 9, original non-Bg cell keeps its value.
+test(dilate_val_dot_to_cross) :-
+    mo_dilate_val([[0,0,0],[0,1,0],[0,0,0]], 0, 9, R),
+    R = [[0,9,0],[9,1,9],[0,9,0]].
 
-test(unpad_recovers) :-
-    % pad then unpad returns original grid.
-    grid_dot(G),
-    mo_pad(G, 0, G2),
-    mo_unpad(G2, G3),
-    G3 = G.
+% All-fg grid: no Bg cells to fill; unchanged regardless of Val.
+test(dilate_val_all_fg_unchanged) :-
+    mo_dilate_val([[1,1],[1,1]], 0, 5, R),
+    R = [[1,1],[1,1]].
 
-test(unpad_size) :-
-    % 5x5 -> unpad -> 3x3.
-    G = [[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]],
-    mo_unpad(G, G2),
-    length(G2, R), R =:= 3,
-    G2 = [Row|_], length(Row, C), C =:= 3.
+% Two different fg colors; both Bg cells between them get Val, not neighbor's color.
+test(dilate_val_fixed_not_neighbor_color) :-
+    mo_dilate_val([[2,0,3]], 0, 5, R),
+    R = [[2,5,3]].
 
-:- end_tests(morph_mo_unpad).
+:- end_tests(morph_dilate_val).
+
+% Tests for mo_grow_from/5: BFS flood from seeds into connected Bg territory.
+:- begin_tests(morph_grow_from).
+
+% All-Bg 3x3 with seed at center: BFS reaches and marks all cells with Val.
+test(grow_from_center_all_bg) :-
+    mo_grow_from([[0,0,0],[0,0,0],[0,0,0]], [1-1], 0, 3, R),
+    R = [[3,3,3],[3,3,3],[3,3,3]].
+
+% Vertical wall of 1s blocks flood: only left column Bg cells are reached.
+test(grow_from_blocked_by_wall) :-
+    mo_grow_from([[0,1,0],[0,1,0],[0,1,0]], [0-0], 0, 5, R),
+    R = [[5,1,0],[5,1,0],[5,1,0]].
+
+% Empty seed list: no BFS expansion; result equals input.
+test(grow_from_empty_seeds_unchanged) :-
+    G = [[0,1,0],[1,1,1],[0,1,0]],
+    mo_grow_from(G, [], 0, 9, R),
+    R = G.
+
+:- end_tests(morph_grow_from).
+
+% Tests for mo_dist_to_bg/3: L1 Manhattan distance to nearest Bg cell.
+:- begin_tests(morph_dist_to_bg).
+
+% Single non-Bg dot: nearest Bg is 1 step away; dist=1.
+test(dist_to_bg_single_dot) :-
+    mo_dist_to_bg([[0,0,0],[0,1,0],[0,0,0]], 0, D),
+    D = [[0,0,0],[0,1,0],[0,0,0]].
+
+% 3x3 block in 5x5: center cell (2,2) is 2 steps from nearest Bg.
+test(dist_to_bg_inner_block) :-
+    G = [[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],[0,1,1,1,0],[0,0,0,0,0]],
+    mo_dist_to_bg(G, 0, D),
+    D = [[0,0,0,0,0],[0,1,1,1,0],[0,1,2,1,0],[0,1,1,1,0],[0,0,0,0,0]].
+
+% All-Bg grid: no non-Bg cells; all distances are 0.
+test(dist_to_bg_all_bg_zero) :-
+    mo_dist_to_bg([[0,0],[0,0]], 0, D),
+    D = [[0,0],[0,0]].
+
+:- end_tests(morph_dist_to_bg).
+
+% Tests for mo_ring/4: cells at exactly N dilation steps from non-Bg cells.
+:- begin_tests(morph_ring).
+
+% Ring at N=0 is all-Bg (no cells are "newly added" at step 0).
+test(ring_n0_all_bg) :-
+    mo_ring([[0,1,0],[1,1,1],[0,1,0]], 0, 0, R),
+    R = [[0,0,0],[0,0,0],[0,0,0]].
+
+% Ring at N=1 from center dot in 3x3: 4 cardinal neighbors; center excluded.
+test(ring_n1_from_dot) :-
+    mo_ring([[0,0,0],[0,1,0],[0,0,0]], 0, 1, R),
+    R = [[0,1,0],[1,0,1],[0,1,0]].
+
+% Ring at N=2 from center of 5x5: L1-diamond shell at distance 2.
+test(ring_n2_from_center_5x5) :-
+    G = [[0,0,0,0,0],[0,0,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+    mo_ring(G, 0, 2, R),
+    R = [[0,0,1,0,0],[0,1,0,1,0],[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0]].
+
+:- end_tests(morph_ring).
+
+% Tests for mo_fill_holes/4: fill enclosed background regions.
+:- begin_tests(morph_fill_holes).
+
+% 3x3 ring of 1s encloses a single Bg cell; that cell becomes FillVal.
+test(fill_holes_single_hole) :-
+    mo_fill_holes([[1,1,1],[1,0,1],[1,1,1]], 0, 5, R),
+    R = [[1,1,1],[1,5,1],[1,1,1]].
+
+% Open cross: all Bg cells are reachable from the border; nothing is filled.
+test(fill_holes_no_interior_bg) :-
+    G = [[0,1,0],[1,1,1],[0,1,0]],
+    mo_fill_holes(G, 0, 5, R),
+    R = G.
+
+% 5x5 grid with two enclosed holes and open exterior Bg at bottom.
+test(fill_holes_two_holes) :-
+    G = [[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[0,0,0,0,0],[0,0,0,0,0]],
+    mo_fill_holes(G, 0, 5, R),
+    R = [[1,1,1,1,1],[1,5,1,5,1],[1,1,1,1,1],[0,0,0,0,0],[0,0,0,0,0]].
+
+:- end_tests(morph_fill_holes).
