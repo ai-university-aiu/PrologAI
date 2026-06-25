@@ -1,0 +1,226 @@
+PROLOGAI TUTORIAL
+
+CHAPTER 16 - THE REFINERY PACK: EVALUATOR-OPTIMIZER AND METACOGNITIVE QUALITY LAYER
+
+The refinery pack gives PrologAI the ability to improve its own outputs.
+
+It does this by applying a list of named tests (called criteria) to an output, counting how many pass, generating a critique of what failed, and either returning the output if it is good enough or driving an improvement cycle until it is.
+
+The name refinery reflects the process: raw outputs go in, refined outputs come out.
+
+
+WHY A REFINERY?
+
+In any problem-solving system, the first answer is rarely the best answer.
+
+A human expert will check their work against a list of requirements, notice what is wrong, revise, and re-check.
+
+The refinery pack gives PrologAI this same inner quality loop.
+
+Two key patterns from agentic AI engineering are built into the refinery:
+
+Reflection: the ability to critique one's own output.
+
+Evaluator-Optimizer: the ability to generate candidates, score them, and keep improving until a quality bar is met.
+
+Additionally, the refinery implements multi-path reasoning (Tree of Thoughts): try several approaches to the same problem and pick the one that scores highest.
+
+And it provides a lesson database: record what went wrong, recall it before the next attempt.
+
+
+LOADING THE REFINERY PACK
+
+    :- use_module(library(refinery)).
+
+
+CRITERIA AND CRITIQUES
+
+A criterion is a named test.
+
+Each criterion is written as:
+
+    criterion(Name, TestGoal)
+
+TestGoal is called as call(TestGoal, Output).
+
+If TestGoal succeeds, the criterion passes.
+
+If TestGoal fails or throws, the criterion fails.
+
+Use YALL (Yet Another Lambda Library, using >>) notation to write portable TestGoals:
+
+    criterion(non_empty, [O]>>(O \= []))
+    criterion(short,     [O]>>(length(O, L), L < 5))
+
+This lambda notation ensures the goal works correctly regardless of which module calls it.
+
+A criteria list is just a list of criterion/2 terms:
+
+    Criteria = [criterion(non_empty, [O]>>(O \= [])),
+                criterion(short,     [O]>>(length(O, L), L < 5))].
+
+
+CRITIQUING AN OUTPUT
+
+rn_critique(+Output, +Criteria, +MaxSteps, -Critique)
+
+    ?- rn_critique([a, b, c], Criteria, 5, Critique).
+    Critique = [].
+
+All criteria passed. The critique is empty.
+
+    ?- rn_critique([], Criteria, 5, Critique).
+    Critique = [found_issue(non_empty, fail)].
+
+The non_empty criterion failed for an empty list.
+
+MaxSteps is a time budget (in seconds) for the total evaluation.
+
+Each entry in the critique is found_issue(Name, fail).
+
+
+SCORING AN OUTPUT
+
+rn_score(+Output, +Criteria, -Score)
+
+    ?- rn_score([a, b], Criteria, Score).
+    Score = 1.0.
+
+    ?- rn_score([a, b, c, d, e, f], Criteria, Score).
+    Score = 0.5.
+
+Score is a float between 0.0 and 1.0.
+
+0.0 means no criteria passed.
+
+1.0 means all criteria passed.
+
+0.5 means half the criteria passed.
+
+An empty criteria list returns 1.0 (vacuously perfect).
+
+
+ITERATIVE IMPROVEMENT
+
+rn_improve(+Output, +Criteria, :ImproverGoal, +MaxIter, -Improved)
+
+ImproverGoal is called as call(ImproverGoal, CurrentOutput, Critique, ImprovedOutput).
+
+    Improver = [O, _C, I]>>(append(O, [better], I)).
+
+    ?- rn_improve([], Criteria, Improver, 5, Best).
+    Best = [better].
+
+The predicate critiques the output, applies the improver if there are issues, then re-critiques the improved output.
+
+If the critique becomes empty before MaxIter, it returns early.
+
+If MaxIter is exhausted, it returns the best output reached so far.
+
+
+EVALUATOR-OPTIMIZER LOOP
+
+rn_optimize(:GeneratorGoal, :EvaluatorGoal, +QualityBar, +MaxIter, -Best)
+
+GeneratorGoal produces a candidate: call(GeneratorGoal, Candidate).
+
+EvaluatorGoal scores it: call(EvaluatorGoal, Candidate, Score).
+
+The loop keeps going until Score >= QualityBar or MaxIter is reached.
+
+    Gen  = ([O]>>(O = [a, b, c])).
+    Eval = ([O, S]>>(length(O, L), S is float(L)/10.0)).
+
+    ?- rn_optimize(Gen, Eval, 0.3, 5, Best).
+    Best = [a, b, c].
+
+Every attempt is logged to rn_attempt_log/4 (RunId, Iter, Candidate, Score) for later inspection.
+
+
+MULTI-PATH EXPLORATION (TREE OF THOUGHTS)
+
+rn_explore_paths(+Problem, :ExplorerGoal, +NumPaths, -Ranked)
+
+ExplorerGoal is called as: call(ExplorerGoal, Problem, PathId, Output, Score).
+
+The predicate calls it for each PathId from 1 to NumPaths, scores each, and returns them ranked from highest score to lowest.
+
+    ?- rn_explore_paths(my_problem, my_explorer, 3, Ranked).
+    Ranked = [ranked_path(2, 0.9, output_b),
+              ranked_path(1, 0.7, output_a),
+              ranked_path(3, 0.4, output_c)].
+
+Use this when you want to explore multiple approaches and pick the best.
+
+
+THE LESSON DATABASE
+
+Lessons are short-term memories of past failures that can inform future attempts.
+
+Store a lesson:
+
+    ?- rn_learn(math_problems, answer_was_negative, use_abs_value_at_end).
+
+Recall lessons before tackling a problem type:
+
+    ?- rn_recall(math_problems, Lessons).
+    Lessons = [lesson(answer_was_negative, use_abs_value_at_end)].
+
+Clear lessons that are no longer needed:
+
+    ?- rn_forget(math_problems).
+    ?- rn_recall(math_problems, Lessons).
+    Lessons = [].
+
+The lesson database uses dynamic facts that persist for the lifetime of the process.
+
+
+BRINGING IT ALL TOGETHER
+
+A typical quality-improvement workflow:
+
+1. Generate an initial candidate.
+2. Critique it: find what is wrong.
+3. Score it: measure how good it is.
+4. If it does not meet the quality bar, improve it using the critique.
+5. If still not good enough after MaxIter improvements, try rn_explore_paths to find a better starting point.
+6. Record what went wrong as a lesson for next time.
+
+The refinery pack does all of this in a composable, symbolic, fully inspectable way.
+
+
+SUMMARY
+
+rn_critique/4        Critique an output against a criteria list.
+rn_score/3           Score an output (fraction of criteria that pass).
+rn_improve/5         Iterative improvement loop using a critique-based improver.
+rn_optimize/5        Full evaluator-optimizer loop with run logging.
+rn_explore_paths/4   Multi-path exploration ranked by score.
+rn_learn/3           Store a lesson from a past failure.
+rn_recall/2          Recall lessons for a given problem type.
+rn_forget/1          Clear lessons for a given problem type.
+
+
+WHAT COMES NEXT
+
+You have now completed the PrologAI Tutorial.
+
+The three new packs you have learned in Chapters 14, 15, and 16 work together as a complete agentic quality system:
+
+Chapter 14 - ephemera: write and run short-lived programs.
+Chapter 15 - agency: pursue goals step by step with observation and control.
+Chapter 16 - refinery: improve outputs until they meet a quality bar.
+
+Together, these three packs bring PrologAI from a symbolic knowledge platform to a self-improving, self-correcting, goal-directed reasoning system.
+
+The next step is to build something of your own.
+
+Read the Mentova Tutorial to see how Mentova uses all of these capabilities as a living reasoning system.
+
+Read the papers in the Mentova papers/ directory to see how each capability was demonstrated and measured.
+
+Explore the demos/ directory for complete, working examples.
+
+And experiment at the ?- prompt. Every feature in this tutorial is live and waiting.
+
+END OF CHAPTER 16 AND END OF THE PROLOGAI TUTORIAL
