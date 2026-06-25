@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       81 work packages — the complete cognitive engine (see below)
+├── packs/       82 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -198,6 +198,7 @@ Everything is inspectable.
 | `gravity` | Directional Gravity and Settling Operations (PR 81) — column value extraction (`gv_col_values/3`), column replacement (`gv_set_col/4`), compacting all non-background cells to column bottoms (`gv_compact_col/3`, `gv_fall_down/3`), column tops (`gv_fall_up/3`), row lefts (`gv_compact_row/3`, `gv_fall_left/3`), row rights (`gv_fall_right/3`), settling a specific color to the column bottom past background with other cells as obstacles (`gv_settle_color/4`, `gv_stack_down/4`), floating a color to the column top (`gv_float_color/4`, `gv_stack_up/4`), and custom column or row transforms (`gv_apply_col/4`, `gv_apply_row/4`). 14 gv_* predicates, Layer 60. |
 | `noise` | Binary Mask Operations and Grid Noise Analysis (PR 82) — mask application with fill color (`ns_mask_apply/4`), mask inversion (`ns_mask_invert/3`), pointwise AND and OR (`ns_mask_and/3`, `ns_mask_or/3`), building masks from color criteria (`ns_mask_from_color/3`), converting masks to region lists (`ns_mask_to_region/2`) and back (`ns_region_to_mask/4`), identifying cells deviating from the majority color (`ns_noise_cells/3`), replacing noise with the majority color (`ns_denoise/3`), finding the most frequent color (`ns_majority_color/2`), counting a specific color (`ns_color_count/3`), finding cells of rare colors (`ns_sparse_cells/3`), finding cells of common colors (`ns_dense_cells/3`), and isolating one color by zeroing all others (`ns_isolate_color/3`). 14 ns_* predicates, Layer 61. |
 | `generate` | Grid Construction from Visual Patterns (PR 83) — uniform fill (`ge_uniform/4`), horizontal and vertical gradients (`ge_gradient_h/4`, `ge_gradient_v/4`), checkerboard (`ge_checkerboard/5`), horizontal and vertical stripes (`ge_stripes_h/4`, `ge_stripes_v/4`), bordered rectangle and frame (`ge_border_rect/5`, `ge_frame/5`), main and anti-diagonal patterns (`ge_diagonal/4`, `ge_antidiagonal/4`), identity matrix pattern (`ge_identity_grid/3`), cross through center (`ge_cross/5`), build from cell-color map (`ge_from_map/3`), and tile a pattern to fill a larger grid (`ge_repeat_pattern/4`). 14 ge_* predicates, Layer 62. |
+| `lookup` | Association List Operations and Grid Index Maps (PR 84) — key lookup (`lk_get/3`), add or replace pair (`lk_put/4`), extract keys and values (`lk_keys/2`, `lk_values/2`), membership test (`lk_has_key/2`), removal (`lk_delete/3`), value transformation (`lk_map_values/3`), pair building (`lk_from_pairs/2`), grid row/column/cell access (`lk_grid_row/3`, `lk_grid_col/3`, `lk_grid_cell/4`), Color-to-positions index map (`lk_color_positions/3`), position-to-Color index map (`lk_position_color/3`), and association list inversion (`lk_invert/2`). 14 lk_* predicates, Layer 63. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**
