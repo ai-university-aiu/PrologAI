@@ -1,0 +1,135 @@
+Chapter 32: Overlay Pack
+
+The overlay pack (module overlay, prefix ov_) provides operations for combining
+two or more grids at the cell level: transparent layering, logical operations,
+masking, priority merge, color replacement, and pointwise extrema. It lives at
+Layer 50 and requires the grid pack.
+
+Load the pack:
+
+    :- use_module(library(overlay)).
+
+
+Transparent Overlay
+
+ov_over/4 places grid B on top of grid A. Cells of B that equal the background
+color BG are treated as transparent and show A underneath. Non-BG cells of B
+overwrite the corresponding A cells.
+
+    ?- ov_over([[1,0],[0,1]], [[0,2],[2,0]], 0, R).
+    R = [[1,2],[2,1]].
+
+    ?- ov_over([[1,2],[3,4]], [[0,0],[0,0]], 0, R).
+    R = [[1,2],[3,4]].   % all-BG in B: A shows through everywhere.
+
+ov_blend/4 is an alias for ov_over with the same semantics.
+
+
+Bitwise Operations
+
+ov_or/3 and ov_and/3 compute the pointwise bitwise OR and AND of two
+same-size grids.
+
+    ?- ov_or([[1,0],[0,1]], [[0,1],[1,0]], R).
+    R = [[1,1],[1,1]].
+
+    ?- ov_and([[3,5],[7,6]], [[5,3],[6,7]], R).
+    R = [[V00,V01],[V10,V11]].   % each cell is the bitwise AND.
+
+
+XOR with Background
+
+ov_xor/4 returns the non-BG value where exactly one of the two grids has a
+non-BG value; BG where both or neither are non-BG.
+
+    ?- ov_xor([[1,0],[0,1]], [[0,2],[2,0]], 0, R).
+    R = [[1,2],[2,1]].
+
+    ?- ov_xor([[1,2],[0,0]], [[3,4],[0,0]], 0, R).
+    R = [[0,0],[0,0]].   % both non-BG: result is BG.
+
+
+Difference and Intersection
+
+ov_diff/4 keeps A's value where A and B differ; BG where they agree.
+
+    ?- ov_diff([[1,2],[3,4]], [[1,0],[3,0]], 0, R).
+    R = [[0,2],[0,4]].
+
+ov_intersect/4 keeps A's value where A equals B; BG where they differ.
+
+    ?- ov_intersect([[1,2],[3,4]], [[1,0],[3,0]], 0, R).
+    R = [[1,0],[3,0]].
+
+
+Masking
+
+ov_mask/4 keeps Grid's value where the Mask grid is non-BG; BG where Mask is BG.
+
+    ?- ov_mask([[1,2,3],[4,5,6]], [[0,1,0],[1,0,1]], 0, R).
+    R = [[0,2,0],[4,0,6]].
+
+ov_mask_inv/4 is the complement: it keeps Grid's value where Mask equals BG.
+
+    ?- ov_mask_inv([[1,2,3],[4,5,6]], [[0,1,0],[1,0,1]], 0, R).
+    R = [[1,0,3],[0,5,0]].
+
+Together, ov_mask and ov_mask_inv partition Grid: their bitwise OR recovers
+the original grid.
+
+
+Priority Merge
+
+ov_priority/3 takes a list of grids and returns the first non-BG value at
+each position scanning the list in order.
+
+    ?- ov_priority([[[1,0],[0,1]], [[0,2],[2,0]]], 0, R).
+    R = [[1,2],[2,1]].
+
+    ?- ov_priority([[[1,0],[0,0]], [[0,2],[0,0]], [[0,0],[3,4]]], 0, R).
+    R = [[1,2],[3,4]].
+
+
+Color Replacement
+
+ov_replace/4 replaces every cell equal to Old with New.
+
+    ?- ov_replace([[1,2,1],[2,1,2]], 1, 9, R).
+    R = [[9,2,9],[2,9,2]].
+
+ov_fill_bg/4 replaces every background cell with a fill color.
+
+    ?- ov_fill_bg([[1,0,0],[0,2,0]], 0, 9, R).
+    R = [[1,9,9],[9,2,9]].
+
+
+Pointwise Extrema
+
+ov_max/3 and ov_min/3 return the pointwise maximum and minimum of two
+same-size grids.
+
+    ?- ov_max([[1,5],[3,2]], [[4,2],[1,6]], R).
+    R = [[4,5],[3,6]].
+
+    ?- ov_min([[1,5],[3,2]], [[4,2],[1,6]], R).
+    R = [[1,2],[1,2]].
+
+
+Exported Predicates
+
+ov_over/4       - transparent overlay (B over A, BG = transparent)
+ov_blend/4      - alias for ov_over
+ov_or/3         - pointwise bitwise OR
+ov_and/3        - pointwise bitwise AND
+ov_xor/4        - XOR with BG-as-zero
+ov_diff/4       - keep A where A != B; BG elsewhere
+ov_intersect/4  - keep A where A = B; BG elsewhere
+ov_mask/4       - keep Grid where Mask is non-BG
+ov_mask_inv/4   - keep Grid where Mask is BG (inverse mask)
+ov_priority/3   - first non-BG value across a list of grids
+ov_replace/4    - replace all occurrences of one color with another
+ov_fill_bg/4    - replace BG cells with a fill color
+ov_max/3        - pointwise maximum
+ov_min/3        - pointwise minimum
+
+END OF CHAPTER 32
