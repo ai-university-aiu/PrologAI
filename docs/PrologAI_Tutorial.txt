@@ -12429,3 +12429,223 @@ alignment testing, collinearity, endpoint extraction, gap queries, and type
 classification. All 42 PLUnit acceptance tests pass with no choicepoint warnings.
 
 END OF CHAPTER 82
+Chapter 83: Rectangle Detection and Drawing - The Rect Pack
+
+The rect pack (Layer 101, Work Package 122) provides 14 predicates for working
+with axis-aligned rectangles in 2D integer-coordinate grids. It covers cell
+enumeration for solid rectangles, frames, and interiors; grid drawing for each
+region type; containment tests; bounding box computation; corner extraction;
+solid and frame color verification; overlap detection; and integer scaling.
+
+All predicates use the rt_* prefix. Coordinates are 0-based integers.
+
+
+83.1 What Problem Does the Rect Pack Solve?
+
+Rectangles are the most common structural element in visual reasoning puzzles.
+Objects are typically rectangular. Borders are rectangular frames. Regions are
+often defined by bounding boxes. The rect pack provides a clean symbolic
+vocabulary for all rectangle operations, from enumerating the cells to testing
+whether a region is uniformly filled.
+
+
+83.2 Cell Enumeration
+
+rt_cells(+R1, +C1, +R2, +C2, -Cells) lists all cells in the solid rectangle
+with top-left corner (R1,C1) and bottom-right corner (R2,C2). Cells are returned
+in row-major order.
+
+Example:
+
+?- rt_cells(0, 0, 2, 2, Cells).
+Cells = [0-0,0-1,0-2,1-0,1-1,1-2,2-0,2-1,2-2]
+
+?- rt_cells(1, 1, 1, 1, Cells).
+Cells = [1-1]
+
+rt_border(+R1, +C1, +R2, +C2, -Cells) lists only the frame cells: top row,
+bottom row, left column, and right column (excluding the corners already in the
+top and bottom rows). Cells are sorted in row-major order.
+
+Example:
+
+?- rt_border(0, 0, 2, 2, Cells).
+Cells = [0-0,0-1,0-2,1-0,1-2,2-0,2-1,2-2]
+
+rt_interior(+R1, +C1, +R2, +C2, -Cells) lists cells strictly inside the frame.
+Requires at least 3 rows and 3 columns; for thinner rectangles Cells = [].
+
+Example:
+
+?- rt_interior(0, 0, 2, 2, Cells).
+Cells = [1-1]
+
+?- rt_interior(0, 0, 1, 1, Cells).
+Cells = []
+
+
+83.3 Grid Drawing
+
+rt_draw(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) fills the solid rectangle
+with Color.
+
+rt_draw_border(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) draws only the frame.
+
+rt_draw_interior(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) fills only the
+interior. If the rectangle has no interior, Result = Grid unchanged.
+
+Example:
+
+?- Grid = [[0,0,0],[0,0,0],[0,0,0]],
+   rt_draw_border(Grid, 0, 0, 2, 2, 1, Result).
+Result = [[1,1,1],[1,0,1],[1,1,1]]
+
+?- Grid = [[1,1,1],[1,0,1],[1,1,1]],
+   rt_draw_interior(Grid, 0, 0, 2, 2, 9, Result).
+Result = [[1,1,1],[1,9,1],[1,1,1]]
+
+
+83.4 Area
+
+rt_area(+R1, +C1, +R2, +C2, -Area) computes the number of cells in the
+rectangle as (R2 - R1 + 1) * (C2 - C1 + 1).
+
+Example:
+
+?- rt_area(0, 0, 2, 2, Area).
+Area = 9
+
+?- rt_area(0, 0, 1, 3, Area).
+Area = 8
+
+
+83.5 Containment
+
+rt_contains(+R1, +C1, +R2, +C2, +R, +C) succeeds if cell (R,C) lies within
+the rectangle. Inclusion is inclusive on all four sides.
+
+Example:
+
+?- rt_contains(0, 0, 2, 2, 1, 1).
+true.
+
+?- rt_contains(0, 0, 2, 2, 0, 0).
+true.
+
+?- rt_contains(0, 0, 2, 2, 3, 1).
+false.
+
+
+83.6 Corners
+
+rt_corners(+R1, +C1, +R2, +C2, -Corners) returns a list of four corner cells
+in top-left, top-right, bottom-left, bottom-right order.
+
+Example:
+
+?- rt_corners(0, 0, 2, 3, Corners).
+Corners = [0-0, 0-3, 2-0, 2-3].
+
+?- rt_corners(1, 1, 1, 1, Corners).
+Corners = [1-1, 1-1, 1-1, 1-1].
+
+
+83.7 Bounding Box
+
+rt_bbox(+Cells, -MinR, -MinC, -MaxR, -MaxC) computes the bounding box of a
+non-empty list of R-C cells. Cells need not form a rectangle; rt_bbox works on
+any non-empty cell list.
+
+Example:
+
+?- rt_bbox([0-0, 1-2, 3-1], MinR, MinC, MaxR, MaxC).
+MinR = 0, MinC = 0, MaxR = 3, MaxC = 2.
+
+?- rt_bbox([2-3], MinR, MinC, MaxR, MaxC).
+MinR = 2, MinC = 3, MaxR = 2, MaxC = 3.
+
+
+83.8 Color Tests
+
+rt_is_solid(+Grid, +R1, +C1, +R2, +C2, -Color) succeeds if every cell in the
+rectangle has the same color. Color is unified with the value of the first cell.
+
+Example:
+
+?- rt_is_solid([[5,5,5],[5,5,5],[5,5,5]], 0, 0, 2, 2, Color).
+Color = 5.
+
+?- rt_is_solid([[5,5,5],[5,3,5],[5,5,5]], 0, 0, 2, 2, _).
+false.
+
+rt_is_frame(+Grid, +R1, +C1, +R2, +C2, -Color) succeeds if every border cell
+of the rectangle has the same color. It does not constrain the interior.
+
+Example:
+
+?- rt_is_frame([[1,1,1],[1,0,1],[1,1,1]], 0, 0, 2, 2, Color).
+Color = 1.
+
+
+83.9 Overlap
+
+rt_overlap(+R1a, +C1a, +R2a, +C2a, +R1b, +C1b, +R2b, +C2b) succeeds if two
+rectangles share at least one cell. The test uses interval arithmetic: the row
+intervals must overlap and the column intervals must overlap.
+
+Example:
+
+?- rt_overlap(0, 0, 2, 2, 1, 1, 3, 3).
+true.
+
+?- rt_overlap(0, 0, 4, 4, 1, 1, 3, 3).
+true.
+
+?- rt_overlap(0, 0, 1, 1, 2, 2, 3, 3).
+false.
+
+
+83.10 Scaling
+
+rt_scale(+R1, +C1, +R2, +C2, +Factor, -R2New, -C2New) scales the rectangle by
+an integer Factor from its top-left corner. The top-left stays fixed at (R1,C1).
+The new bottom-right is:
+  R2New = R1 + (R2 - R1) * Factor
+  C2New = C1 + (C2 - C1) * Factor
+
+Example:
+
+?- rt_scale(0, 0, 2, 2, 2, R2, C2).
+R2 = 4, C2 = 4.
+
+?- rt_scale(1, 1, 2, 3, 3, R2, C2).
+R2 = 4, C2 = 7.
+
+
+83.11 Implementation Notes
+
+Determinism is maintained throughout. rt_cells uses maplist/4 (three levels of
+mapping) with unification lambdas [C, RC]>>(RC = R-C) to avoid the false
+choicepoints that arise from [C, R-C]>>true. rt_border uses if-then-else guards
+for each of its four sides and sort/2 to produce canonical output. rt_interior
+uses a single if-then-else. rt_fill_cells_ uses if-then-else for its base vs.
+recursive case. rt_replace_nth_ and rt_set_cell_ use cuts on their base cases.
+
+The bounding box predicate rt_bbox uses unification lambdas [RC, R]>>(RC = R-_)
+to extract row indices because _ in a lambda body creates a fresh anonymous
+variable each call, making the extraction deterministic.
+
+Built-ins used without import: sort/2, forall/2, length/2.
+Imported from library(lists): nth0/3, numlist/3, append/2, append/3, member/2,
+min_list/2, max_list/2.
+Imported from library(apply): maplist/2, maplist/3, maplist/4.
+
+
+83.12 Summary
+
+The rect pack adds Layer 101 to the PrologAI substrate with 14 rt_* predicates
+covering the full rectangle operation lifecycle: enumeration, drawing, containment,
+bounding box, corners, color testing, overlap, and scaling. All 42 PLUnit
+acceptance tests pass with no choicepoint warnings.
+
+END OF CHAPTER 83
