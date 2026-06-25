@@ -9794,3 +9794,57 @@ All 42 PLUnit acceptance tests are in packs/tile/test/test_tile.pl.
 The Specification entry is Part 92 (TI-TI-001 through TI-TI-014).
 The Architecture entry is ARCH-68.
 The Refinement entry covers AC-TI-001 through AC-TI-042.
+
+
+CHAPTER 64: THE TRACE PACK - PATH TRACING, RAYS, AND GRID BOUNDARIES
+
+The trace pack (Layer 82, Work Package 103) provides 14 predicates under the
+tr_* prefix for run detection, ray casting, line enumeration, path operations,
+boundary identification, and position arithmetic.
+
+Run detection:
+  tr_runs_row(+Row, +Bg, -Runs)      contiguous non-Bg runs in a row
+  tr_spans_h(+Grid, +Bg, -Spans)     per-row run lists
+  tr_spans_v(+Grid, +Bg, -Spans)     per-column run lists
+
+Ray casting:
+  tr_ray_h(+Grid, +R, +C, +Dir, +Bg, -HR-HC)  horizontal ray
+  tr_ray_v(+Grid, +R, +C, +Dir, +Bg, -HR-HC)  vertical ray
+
+Line enumeration:
+  tr_line_h(+R, +C0, +C1, -Cells)   cells in a horizontal line
+  tr_line_v(+C, +R0, +R1, -Cells)   cells in a vertical line
+
+Path operations:
+  tr_path_vals(+Grid, +Cells, -Vals)       extract values along a path
+  tr_draw_path(+Grid, +Cells, +Val, -Result)  paint a value along a path
+
+Boundary operations:
+  tr_bbox_border(+R0,+C0,+R1,+C1,-Cells)  border of a bounding rectangle
+  tr_perimeter(+Grid, +Bg, -Cells)         non-Bg cells on object perimeter
+  tr_outline(+Grid, +Bg, -Cells)           Bg cells adjacent to objects
+  tr_edge_cells(+Grid, -Cells)             grid boundary cells
+
+Position arithmetic:
+  tr_midpoint(+R1-C1, +R2-C2, -RM-CM)     floor midpoint
+
+Example: find runs in a row:
+  tr_runs_row([1,0,1,1,0], 0, Runs).
+  % Runs = [0-0, 2-3]
+
+Example: cast a horizontal ray right:
+  tr_ray_h([[0,0,1,0]], 0, 1, 1, 0, H).
+  % H = 0-2
+
+Example: draw along a path:
+  tr_draw_path([[0,0,0],[0,0,0]], [0-0, 0-2, 1-1], 1, R).
+  % R = [[1,0,1],[0,1,0]]
+
+Example: find perimeter of a 2x2 inner block:
+  tr_perimeter([[0,0,0,0],[0,1,1,0],[0,1,1,0],[0,0,0,0]], 0, Cells).
+  % Cells = [1-1, 1-2, 2-1, 2-2]
+
+All 42 PLUnit acceptance tests are in packs/trace/test/test_trace.pl.
+The Specification entry is Part 93 (TR-TR-001 through TR-TR-014).
+The Architecture entry is ARCH-69.
+The Refinement entry covers AC-TR-001 through AC-TR-042.

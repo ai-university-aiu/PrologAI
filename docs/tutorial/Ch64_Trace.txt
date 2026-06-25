@@ -1,0 +1,179 @@
+Chapter 64: The Trace Pack - Path Tracing, Rays, and Grid Boundaries
+
+The trace pack (Layer 82, Work Package 103) provides 14 predicates under the
+tr_* prefix for detecting contiguous runs in rows and columns, casting rays to
+find the first non-background cell in a direction, enumerating cells along
+lines, reading and painting values along paths, identifying boundary cells,
+and computing midpoints.
+
+
+Overview of Predicates
+
+Run detection:
+  tr_runs_row/3   find contiguous non-Bg runs in a single row
+  tr_spans_h/3    per-row run lists for the whole grid
+  tr_spans_v/3    per-column run lists for the whole grid
+
+Ray casting:
+  tr_ray_h/6      horizontal ray: first non-Bg cell in a row direction
+  tr_ray_v/6      vertical ray: first non-Bg cell in a column direction
+
+Line enumeration:
+  tr_line_h/4     list of R-C pairs along a horizontal line
+  tr_line_v/4     list of R-C pairs along a vertical line
+
+Path operations:
+  tr_path_vals/3   extract grid values along a list of R-C positions
+  tr_draw_path/4   paint a value at each R-C position in a list
+
+Boundary operations:
+  tr_bbox_border/5  border cells of a bounding rectangle
+  tr_perimeter/3    non-Bg cells touching Bg or on the grid edge
+  tr_outline/3      Bg cells touching non-Bg cells
+  tr_edge_cells/2   all cells on the grid boundary
+
+Position arithmetic:
+  tr_midpoint/3   floor midpoint of two R-C positions
+
+
+Run Detection
+
+tr_runs_row(+Row, +Bg, -Runs) identifies maximal contiguous non-Bg segments
+in a row. Each run is a Start-End pair where Row[Start..End] are all non-Bg.
+A run starts after a Bg boundary and ends before the next one.
+
+  tr_runs_row([1,0,1,1,0], 0, Runs).
+  % Runs = [0-0, 2-3]
+
+  tr_runs_row([0,0,0], 0, Runs).
+  % Runs = []
+
+tr_spans_h(+Grid, +Bg, -Spans) applies tr_runs_row to each row. Spans[I]
+is the run list for row I.
+
+  tr_spans_h([[1,0],[0,1]], 0, Spans).
+  % Spans = [[0-0],[1-1]]
+
+tr_spans_v(+Grid, +Bg, -Spans) applies tr_runs_row to each column.
+Internally it transposes the grid so columns become rows.
+
+  tr_spans_v([[1,0],[0,1],[1,0]], 0, Spans).
+  % Spans = [[0-0,2-2],[1-1]]
+
+
+Ray Casting
+
+tr_ray_h(+Grid, +R, +C, +Dir, +Bg, -HR-HC) casts a horizontal ray from (R,C)
+in direction Dir (+1 = right, -1 = left). It finds the first non-Bg cell in
+that direction and returns its position HR-HC. Fails if the ray leaves the
+grid without hitting a non-Bg cell.
+
+  tr_ray_h([[0,0,1,0]], 0, 1, 1, 0, H).
+  % H = 0-2
+
+  tr_ray_h([[0,1,0,0]], 0, 3, -1, 0, H).
+  % H = 0-1
+
+tr_ray_v(+Grid, +R, +C, +Dir, +Bg, -HR-HC) casts a vertical ray from (R,C)
+in direction Dir (+1 = down, -1 = up).
+
+  tr_ray_v([[0],[0],[1],[0]], 0, 0, 1, 0, H).
+  % H = 2-0
+
+
+Line Enumeration
+
+tr_line_h(+R, +C0, +C1, -Cells) lists all R-C pairs from (R,C0) to (R,C1)
+inclusive. If C0 > C1 the list is in descending column order.
+
+  tr_line_h(2, 1, 3, Cells).
+  % Cells = [2-1, 2-2, 2-3]
+
+  tr_line_h(1, 3, 1, Cells).
+  % Cells = [1-3, 1-2, 1-1]
+
+tr_line_v(+C, +R0, +R1, -Cells) lists all R-C pairs from (R0,C) to (R1,C)
+inclusive. If R0 > R1 the list is in descending row order.
+
+  tr_line_v(2, 0, 2, Cells).
+  % Cells = [0-2, 1-2, 2-2]
+
+
+Path Operations
+
+tr_path_vals(+Grid, +Cells, -Vals) extracts the grid value at each R-C
+position in Cells.
+
+  tr_path_vals([[1,2],[3,4]], [0-0, 0-1, 1-0], Vals).
+  % Vals = [1,2,3]
+
+tr_draw_path(+Grid, +Cells, +Val, -Result) sets every cell in Cells to Val.
+Later cells overwrite earlier ones if positions overlap.
+
+  tr_draw_path([[0,0,0],[0,0,0]], [0-0, 0-2, 1-1], 1, R).
+  % R = [[1,0,1],[0,1,0]]
+
+
+Boundary Operations
+
+tr_bbox_border(+R0, +C0, +R1, +C1, -Cells) returns a sorted deduplicated
+list of R-C pairs on the border of the rectangle R0..R1 x C0..C1.
+
+  tr_bbox_border(0, 0, 2, 2, Cells).
+  % Cells = [0-0, 0-1, 0-2, 1-0, 1-2, 2-0, 2-1, 2-2]
+
+tr_perimeter(+Grid, +Bg, -Cells) returns non-Bg cells that are on the grid
+boundary or touch at least one Bg cell by 4-connectivity.
+
+  tr_perimeter([[0,0,0],[0,1,0],[0,0,0]], 0, Cells).
+  % Cells = [1-1]
+
+  tr_perimeter([[0,0,0,0],[0,1,1,0],[0,1,1,0],[0,0,0,0]], 0, Cells).
+  % Cells = [1-1, 1-2, 2-1, 2-2]
+
+tr_outline(+Grid, +Bg, -Cells) returns Bg cells that touch at least one
+non-Bg cell by 4-connectivity (the exterior halo of objects).
+
+  tr_outline([[0,0,0],[0,1,0],[0,0,0]], 0, Cells).
+  % Cells = [0-1, 1-0, 1-2, 2-1]
+
+tr_edge_cells(+Grid, -Cells) returns all cells on the grid boundary
+(first/last row, first/last column). Delegates to tr_bbox_border.
+
+  tr_edge_cells([[1,2,3],[4,5,6],[7,8,9]], Cells).
+  % Cells = [0-0, 0-1, 0-2, 1-0, 1-2, 2-0, 2-1, 2-2]
+
+
+Position Arithmetic
+
+tr_midpoint(+R1-C1, +R2-C2, -RM-CM) computes the floor midpoint of two
+positions. RM = (R1+R2)//2, CM = (C1+C2)//2.
+
+  tr_midpoint(0-0, 4-4, M).
+  % M = 2-2
+
+  tr_midpoint(0-0, 3-3, M).
+  % M = 1-1
+
+
+Design Notes
+
+tr_runs_row uses findall with a start condition (first non-Bg after Bg) and
+an end condition (last non-Bg before Bg), plus a forall to verify no Bg cells
+exist between start and end. This gives exactly one result per run.
+
+tr_ray_h and tr_ray_v build candidate lists with numlist/3 (reversing for
+the negative direction) and use member/2 with a cut to stop at the first hit.
+
+tr_line_h and tr_line_v build the index sequence with numlist, reversing
+when the start is greater than the end, then map to R-C pairs via a closure.
+
+tr_bbox_border, tr_perimeter, and tr_outline all use findall with sort to
+deduplicate results. The duplication arises because corners qualify via
+multiple conditions (e.g., top row AND left column), or cells qualify via
+multiple neighbors.
+
+tr_draw_path uses foldl over a private tr_set_cell_ helper that rebuilds
+the grid with one cell changed per iteration.
+
+END OF CHAPTER 64
