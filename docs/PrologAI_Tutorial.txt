@@ -9101,3 +9101,166 @@ SECTION 58.7 - ACCEPTANCE TESTS
 See PrologAI_4_Refinement_v110.txt, Part 87.
 
 END OF CHAPTER 58
+Chapter 59: Color Remapping and Palette Manipulation - The Remap Pack
+
+This chapter covers the remap pack (rm_* predicates, Layer 77), which provides
+14 predicates for replacing, swapping, normalizing, and transforming cell values
+in grids. The remap pack is the value-transformation layer of PrologAI: once a
+rule has been discovered, remap predicates apply it.
+
+59.1 Loading the Pack
+
+:- use_module(library(remap)).
+
+59.2 Single-Value Replacement
+
+rm_replace(+Grid, +Old, +New, -Grid2)
+  Replace every occurrence of Old with New.
+
+Example:
+  ?- rm_replace([[1,0],[0,1]], 0, 9, G).
+  G = [[1,9],[9,1]].
+
+rm_swap(+Grid, +A, +B, -Grid2)
+  Swap A and B: every A becomes B and every B becomes A.
+
+Example:
+  ?- rm_swap([[1,2],[2,1]], 1, 2, G).
+  G = [[2,1],[1,2]].
+
+Note: rm_swap is its own inverse. Swapping twice returns the original.
+
+59.3 Map-Based Recoloring
+
+rm_apply_map(+Map, +Grid, -Grid2)
+  Map is a list of Old-New pairs. Each cell is looked up; unmapped cells
+  remain unchanged.
+
+Example:
+  ?- rm_apply_map([1-9, 2-8], [[1,2],[3,4]], G).
+  G = [[9,8],[3,4]].
+
+rm_apply_map_to(+Map, +Val, +Grid, -Grid2)
+  Apply Map only to cells whose current value equals Val.
+
+Example:
+  ?- rm_apply_map_to([1-9], 1, [[1,2],[1,3]], G).
+  G = [[9,2],[9,3]].
+
+59.4 Map Operations
+
+rm_invert_map(+Map, -Inverted)
+  Swap keys and values in a map.
+
+Example:
+  ?- rm_invert_map([1-9, 2-8], Inv).
+  Inv = [9-1, 8-2].
+
+rm_compose_maps(+Map1, +Map2, -Composed)
+  Apply Map1 then Map2: if Map1 maps K to V1 and Map2 maps V1 to V2,
+  Composed maps K to V2. Missing entries in Map2 use identity.
+
+Example:
+  ?- rm_compose_maps([1-2, 3-4], [2-9, 4-8], C).
+  C = [1-9, 3-8].
+
+59.5 Palette Normalization
+
+rm_normalize(+Grid, -Grid2)
+  Replace the i-th distinct value (in sorted order) with integer i.
+  The smallest value becomes 1, the next becomes 2, and so on.
+
+Example:
+  ?- rm_normalize([[3,1],[5,3]], G).
+  G = [[2,1],[3,2]].
+
+Explanation: distinct values in sort order are [1,3,5]; 1->1, 3->2, 5->3.
+
+rm_palette(+Grid, -Palette)
+  Palette is the sorted list of distinct values in Grid.
+
+Example:
+  ?- rm_palette([[1,0],[2,1]], Pal).
+  Pal = [0,1,2].
+
+rm_reindex(+Grid, +OldPalette, -Grid2)
+  Replace the i-th value in OldPalette with i (1-based) across Grid.
+  Similar to rm_normalize but uses a caller-supplied palette.
+
+Example:
+  ?- rm_reindex([[3,1],[5,3]], [1,3,5], G).
+  G = [[2,1],[3,2]].
+
+59.6 Numeric Operations
+
+rm_shift(+Grid, +Delta, -Grid2)
+  Add Delta to every cell value. Delta may be negative.
+
+Example:
+  ?- rm_shift([[1,2],[3,4]], 10, G).
+  G = [[11,12],[13,14]].
+
+rm_clamp(+Grid, +Lo, +Hi, -Grid2)
+  Clamp every cell value to [Lo, Hi].
+
+Example:
+  ?- rm_clamp([[0,5],[10,3]], 1, 8, G).
+  G = [[1,5],[8,3]].
+
+59.7 Conditional and Binary Operations
+
+rm_conditional(+Goal, +Grid, +Bg, -Grid2)
+  For each cell: if call(Goal, Cell) succeeds, set to Bg; else keep Cell.
+  Goal is a 1-argument predicate.
+
+Example:
+  ?- rm_conditional([X]>>(X =:= 0), [[1,0],[0,1]], 9, G).
+  G = [[1,9],[9,1]].
+
+rm_binarize(+Grid, +Bg, +Fg, -Grid2)
+  Replace every non-Bg cell with Fg; Bg cells stay as Bg.
+
+Example:
+  ?- rm_binarize([[0,1],[2,0]], 0, 1, G).
+  G = [[0,1],[1,0]].
+
+rm_remap_bg(+Grid, +OldBg, +NewBg, -Grid2)
+  Replace every OldBg cell with NewBg; all other cells unchanged.
+  This is a convenience wrapper for rm_replace.
+
+Example:
+  ?- rm_remap_bg([[0,1],[0,2]], 0, 9, G).
+  G = [[9,1],[9,2]].
+
+59.8 Common Patterns
+
+Pattern: Normalize then compare
+  rm_palette(G1, P), rm_normalize(G1, G1N), rm_normalize(G2, G2N).
+  If G1N = G2N, the grids have the same structure with possibly different
+  palettes.
+
+Pattern: Learn and apply a color map
+  % Discover what color map transforms example_in to example_out:
+  rm_palette(ExIn, P), rm_reindex(ExIn, P, ExInN), rm_reindex(ExOut, P2, ExOutN),
+  % Then apply learned map to test input.
+  rm_apply_map(LearnedMap, TestIn, TestOut).
+
+Pattern: Background isolation
+  rm_binarize(Grid, Bg, 1, Mask).  % 1 where foreground
+  rm_conditional([X]>>(X =\= Bg), Grid, Bg, BgOnly). % keep only Bg
+
+59.9 Summary
+
+The remap pack's 14 predicates cover the full lifecycle of value transformation:
+
+Discovery:   rm_palette/2, rm_normalize/2, rm_reindex/3
+Single ops:  rm_replace/4, rm_swap/4
+Map ops:     rm_apply_map/3, rm_apply_map_to/4, rm_invert_map/2,
+             rm_compose_maps/3
+Numeric:     rm_shift/3, rm_clamp/4
+Conditional: rm_conditional/4, rm_binarize/4, rm_remap_bg/4
+
+All 38 PLUnit acceptance tests are in packs/remap/test/test_remap.pl.
+The Specification entry is Part 88 (RM-RM-001 through RM-RM-014).
+The Architecture entry is ARCH-64.
+The Refinement entry covers AC-RM-001 through AC-RM-038.
