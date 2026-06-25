@@ -14261,4 +14261,154 @@ The hull pack provides convex hull computation and polygon geometry:
 All predicates are deterministic. No floating-point arithmetic is used.
 The cross product and shoelace formula work entirely in integers.
 
-Next chapter: Chapter 90 covers the next perceptual or structural pack.
+Next chapter: Chapter 90 covers the Patch Pack.
+
+
+Chapter 90: The Patch Pack - Sub-Grid Extraction and Template Matching
+
+The patch pack (Layer 108, Work Package 129) gives PrologAI the ability to
+extract rectangular regions from grids, find where a small pattern occurs
+inside a larger grid (template matching), enumerate all possible sub-regions,
+compare patches, and apply 2D geometric operations.
+
+All 14 predicates use the pa_* prefix.
+
+
+Loading the Pack
+
+:- use_module(library(prologai/patch)).
+
+
+90.1 Extracting a Patch - pa_extract/6
+
+pa_extract(+Grid, +R0, +C0, +H, +W, -Patch)
+
+Patch is the H x W sub-grid starting at (R0, C0). All indices 0-based.
+
+Grid = [[1,2,3],[4,5,6],[7,8,9]].
+pa_extract(Grid, 0, 0, 2, 2, P).  % P = [[1,2],[4,5]]
+pa_extract(Grid, 1, 1, 2, 2, P).  % P = [[5,6],[8,9]]
+pa_extract(Grid, 1, 1, 1, 1, P).  % P = [[5]]
+
+
+90.2 Patch Dimensions - pa_dims/3
+
+pa_dims(+Patch, -H, -W)
+
+H is the row count, W is the column count. Empty patch gives 0, 0.
+
+pa_dims([[1,2,3],[4,5,6]], H, W).  % H=2, W=3
+pa_dims([], H, W).                 % H=0, W=0
+
+
+90.3 Template Matching - pa_match/4
+
+pa_match(+Grid, +Patch, -R0, -C0)
+
+Non-deterministically find all positions where Patch occurs exactly in Grid.
+Use once/1 for first match, findall/3 to collect all.
+
+Grid = [[1,2,1],[1,2,3],[4,5,6]].
+once(pa_match(Grid, [[1,2]], R0, C0)).     % R0=0, C0=0
+pa_match(Grid, [[9,9]], _, _).             % fails
+findall(R-C, pa_match(Grid, [[5]], R, C), L). % L = [1-1]
+
+
+90.4 All Matches and Count
+
+pa_match_all(+Grid, +Patch, -Positions) - list of R0-C0 pairs (or [])
+pa_match_count(+Grid, +Patch, -N) - count of matches (0 if none)
+
+pa_match_all([[1,0,1],[0,0,0],[1,0,0]], [[1]], Pos).
+% sort(Pos, S), S = [0-0, 0-2, 2-0]
+
+pa_match_count([[0,0,0],[0,0,0],[0,0,0]], [[0,0],[0,0]], N).
+% N = 4
+
+
+90.5 Wildcard Matching - pa_match_bg/4
+
+pa_match_bg(+Grid, +Patch, +Bg, -Positions)
+
+Bg cells in Patch match any grid cell; non-Bg must match exactly.
+
+Grid = [[1,2,3],[4,5,6],[7,8,9]].
+pa_match_bg(Grid, [[0,2],[0,5]], 0, Pos).
+% Pos = [0-0]  (0 is wildcard; 2 and 5 must match exactly)
+
+
+90.6 Sliding Window - pa_slides/4
+
+pa_slides(+Grid, +H, +W, -Patches)
+
+All H x W sub-patches as R0-C0-Patch triples, row-major order.
+
+pa_slides([[1,2,3],[4,5,6],[7,8,9]], 2, 2, P).
+% length(P, 4)
+% P = [0-0-[[1,2],[4,5]], 0-1-[[2,3],[5,6]], 1-0-..., 1-1-...]
+
+
+90.7 Unique Patches and Most Common
+
+pa_unique_patches(+Grid, +H, +W, -Unique)
+Sorted list of distinct H x W patches (no duplicates).
+
+pa_most_common_patch(+Grid, +H, +W, -Patch, -Count)
+Most frequent H x W patch and its count. Ties go to first in sort order.
+
+pa_unique_patches([[1,1,1],[1,1,1],[1,1,1]], 2, 2, U).
+% length(U, 1)
+
+pa_most_common_patch([[1],[1],[2]], 1, 1, Patch, Count).
+% Patch = [[1]], Count = 2
+
+
+90.8 Patch Comparison - pa_diff/3
+
+pa_diff(+PatchA, +PatchB, -Cells)
+
+Cells where PatchA and PatchB differ (sorted R-C list, [] if identical).
+
+pa_diff([[1,2],[3,4]], [[1,2],[3,9]], C).  % C = [1-1]
+pa_diff([[1,2],[3,4]], [[1,2],[3,4]], C).  % C = []
+
+
+90.9 Uniformity - pa_is_uniform/2
+
+pa_is_uniform(+Patch, -Color)
+
+Succeed if all cells are Color. Fails for mixed patches.
+
+pa_is_uniform([[1,1],[1,1]], Color).  % Color = 1
+pa_is_uniform([[1,2],[3,4]], _).      % fails
+
+
+90.10 Geometric Operations
+
+pa_flip_h(+Patch, -Flipped) - reverse each row (left-right mirror)
+pa_flip_v(+Patch, -Flipped) - reverse row order (top-bottom mirror)
+pa_rot90(+Patch, -Rotated)  - 90 degrees CW; H x W → W x H
+
+pa_flip_h([[1,2,3]], F).            % F = [[3,2,1]]
+pa_flip_v([[1,2],[3,4]], F).        % F = [[3,4],[1,2]]
+pa_rot90([[1,2,3],[4,5,6]], R).     % R = [[4,1],[5,2],[6,3]]
+
+
+90.11 Summary
+
+- pa_extract         - extract H x W sub-patch
+- pa_dims            - patch dimensions
+- pa_match           - find matching positions (non-deterministic)
+- pa_match_all       - all matches as list
+- pa_match_count     - count of matches
+- pa_match_bg        - match with wildcard background
+- pa_slides          - all H x W sub-patches
+- pa_unique_patches  - distinct patches in a grid
+- pa_most_common_patch - most frequent patch
+- pa_diff            - cells where two patches differ
+- pa_is_uniform      - test uniform color
+- pa_flip_h          - horizontal flip
+- pa_flip_v          - vertical flip
+- pa_rot90           - 90-degree clockwise rotation
+
+Next chapter: Chapter 91 covers the next perceptual or structural pack.
