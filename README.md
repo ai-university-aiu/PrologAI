@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       66 work packages — the complete cognitive engine (see below)
+├── packs/       67 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -183,6 +183,7 @@ Everything is inspectable.
 | `color` | Color Palette Extraction, Histogram Analysis, and Color Manipulation (PR 66) — palette extraction (`cl_palette/2`, `cl_color_count/2`, `cl_is_mono/1`, `cl_has_color/2`), color counting and histograms (`cl_count/3`, `cl_histogram/2`), palette comparison (`cl_same_palette/2`), dominant and rarest color detection (`cl_dominant/2`, `cl_rarest/2`), color replacement and remapping (`cl_replace/4`, `cl_remap/3`, `cl_swap/4`), and color filtering (`cl_isolate/4`, `cl_remove/4`). 14 cl_* predicates, Layer 45. |
 | `shape` | Normalized Shape Extraction, Comparison, Transformation, and D4 Orbit Reasoning (PR 67) — shape creation from cell lists (`sh_from_cells/2`) and grids (`sh_from_grid/3`), shape properties (`sh_area/2`, `sh_bounding_size/3`, `sh_contains_cell/2`, `sh_equal/2`), spatial transformations (`sh_translate/4`, `sh_rotate90/2`, `sh_reflect_h/2`, `sh_reflect_v/2`), D4 orbit and canonical form (`sh_orbit/2`, `sh_canonical/2`, `sh_equivalent/2`), and grid placement (`sh_to_grid/6`). A shape is a sorted list of r(R,C) cells normalized to the origin. 14 sh_* predicates, Layer 46. |
 | `relation` | Spatial Relations Between Cell Regions (PR 68) — positional ordering (`rl_above/2`, `rl_below/2`, `rl_left_of/2`, `rl_right_of/2`), 4-connected adjacency (`rl_adjacent/2`), minimum Manhattan distance (`rl_distance/3`), bounding box containment (`rl_contained_bbox/2`), set relations (`rl_overlap/2`, `rl_disjoint/2`), row and column alignment (`rl_same_row/2`, `rl_same_col/2`), integer centroid (`rl_centroid/3`), centroid offset (`rl_offset/4`), and cardinal direction (`rl_direction/3`). A region is any list of r(R,C) cells. 14 rl_* predicates, Layer 47. |
+| `sequence` | Arithmetic Sequence Analysis, List Structure, and Period Detection (PR 69) — integer range generation (`sq_range/3`), first differences (`sq_delta/2`), arithmetic detection and extension (`sq_is_arithmetic/1`, `sq_common_diff/2`, `sq_extend_arith/3`), chunking (`sq_chunk/3`), zip/unzip (`sq_zip/3`, `sq_unzip/3`), cumulative sums (`sq_cumsum/2`), 0-indexed slicing (`sq_slice/4`), one-level flatten (`sq_flatten1/2`), matrix transposition (`sq_transpose/2`), and period detection (`sq_period/2`, `sq_is_periodic/1`). 14 sq_* predicates, Layer 48. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**
