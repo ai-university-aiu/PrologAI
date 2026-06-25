@@ -7813,3 +7813,243 @@ The run pack integrates naturally with the grid, compare, and rewrite packs:
 
 
 END OF CHAPTER 49
+CHAPTER 50 - THE ARITH PACK
+
+
+OVERVIEW
+
+The arith pack (ar_* predicate family, Layer 68) provides 14 predicates for
+cell-wise arithmetic operations on list-of-lists grids. It covers cell-wise
+addition, subtraction, and multiplication of two grids of the same dimensions;
+cell-wise modulo with a scalar; scalar addition and multiplication; row and
+column sums; grid-wide maximum and minimum; value clamping to a range; and
+cell-wise absolute difference.
+
+Pack metadata: name(arith), version('1.0.0'), requires([grid]).
+
+
+LOADING THE PACK
+
+  :- use_module(library(arith)).
+
+
+PREDICATE REFERENCE
+
+
+Cell-Wise Binary Grid Operations
+
+ar_cell_add(+Grid1, +Grid2, -Grid3)
+
+  Grid3[R][C] = Grid1[R][C] + Grid2[R][C] for every cell.
+  Grid1 and Grid2 must have identical dimensions.
+
+  % Add two 2x2 grids.
+  ar_cell_add([[1,2],[3,4]], [[5,6],[7,8]], G3).
+  % G3 = [[6,8],[10,12]]
+
+  % Adding a zero grid leaves the grid unchanged.
+  ar_cell_add([[1,2],[3,4]], [[0,0],[0,0]], G3).
+  % G3 = [[1,2],[3,4]]
+
+ar_cell_sub(+Grid1, +Grid2, -Grid3)
+
+  Grid3[R][C] = Grid1[R][C] - Grid2[R][C] for every cell.
+  Subtraction can produce negative values.
+
+  % Subtract two grids.
+  ar_cell_sub([[5,6],[7,8]], [[1,2],[3,4]], G3).
+  % G3 = [[4,4],[4,4]]
+
+  % A grid minus itself gives all zeros.
+  ar_cell_sub([[3,4],[5,6]], [[3,4],[5,6]], G3).
+  % G3 = [[0,0],[0,0]]
+
+ar_cell_mul(+Grid1, +Grid2, -Grid3)
+
+  Grid3[R][C] = Grid1[R][C] * Grid2[R][C] for every cell.
+
+  % Multiply two grids.
+  ar_cell_mul([[1,2],[3,4]], [[2,3],[4,5]], G3).
+  % G3 = [[2,6],[12,20]]
+
+  % Multiplying by a grid of ones is the identity.
+  ar_cell_mul([[3,4],[5,6]], [[1,1],[1,1]], G3).
+  % G3 = [[3,4],[5,6]]
+
+ar_cell_abs_diff(+Grid1, +Grid2, -Grid3)
+
+  Grid3[R][C] = |Grid1[R][C] - Grid2[R][C]| for every cell.
+  The result is always non-negative.
+
+  % Absolute difference is symmetric.
+  ar_cell_abs_diff([[1,5],[3,2]], [[4,2],[1,7]], G3).
+  % G3 = [[3,3],[2,5]]
+
+  % A grid minus itself gives all zeros.
+  ar_cell_abs_diff([[3,4],[5,6]], [[3,4],[5,6]], G3).
+  % G3 = [[0,0],[0,0]]
+
+
+Scalar Operations
+
+ar_cell_mod(+Grid, +N, -Grid2)
+
+  Grid2[R][C] = Grid[R][C] mod N for every cell.
+
+  % Modulo 3.
+  ar_cell_mod([[5,6],[7,8]], 3, G2).
+  % G2 = [[2,0],[1,2]]
+
+  % Modulo larger than all values: unchanged.
+  ar_cell_mod([[1,2],[3,4]], 10, G2).
+  % G2 = [[1,2],[3,4]]
+
+ar_scalar_add(+Grid, +N, -Grid2)
+
+  Grid2[R][C] = Grid[R][C] + N for every cell.
+
+  % Add 5 to every cell.
+  ar_scalar_add([[1,2],[3,4]], 5, G2).
+  % G2 = [[6,7],[8,9]]
+
+  % Negative N subtracts.
+  ar_scalar_add([[5,6],[7,8]], -3, G2).
+  % G2 = [[2,3],[4,5]]
+
+ar_scalar_mul(+Grid, +N, -Grid2)
+
+  Grid2[R][C] = Grid[R][C] * N for every cell.
+
+  % Multiply every cell by 3.
+  ar_scalar_mul([[1,2],[3,4]], 3, G2).
+  % G2 = [[3,6],[9,12]]
+
+  % Multiply by 0 zeroes out the grid.
+  ar_scalar_mul([[5,6],[7,8]], 0, G2).
+  % G2 = [[0,0],[0,0]]
+
+ar_cell_clamp(+Grid, +Lo, +Hi, -Grid2)
+
+  Grid2[R][C] = max(Lo, min(Hi, Grid[R][C])) for every cell.
+  Values below Lo become Lo; values above Hi become Hi.
+  Values already within [Lo, Hi] are unchanged.
+
+  % Clamp a row to the range [2, 8].
+  ar_cell_clamp([[0,3,7,10]], 2, 8, G2).
+  % G2 = [[2,3,7,8]]
+
+  % Clamp all values that are too high.
+  ar_cell_clamp([[7,8],[9,10]], 1, 5, G2).
+  % G2 = [[5,5],[5,5]]
+
+
+Row and Column Sums
+
+ar_row_sum(+Grid, +R, -Sum)
+
+  Sum is the arithmetic total of all cell values in row R (0-indexed).
+
+  % Row 1 sums to 4+5+6 = 15.
+  ar_row_sum([[1,2,3],[4,5,6],[7,8,9]], 1, Sum).
+  % Sum = 15
+
+  % Row of zeros sums to 0.
+  ar_row_sum([[0,0,0],[1,2,3]], 0, Sum).
+  % Sum = 0
+
+ar_col_sum(+Grid, +C, -Sum)
+
+  Sum is the arithmetic total of all cell values in column C (0-indexed).
+
+  % Column 2 sums to 3+6+9 = 18.
+  ar_col_sum([[1,2,3],[4,5,6],[7,8,9]], 2, Sum).
+  % Sum = 18
+
+ar_row_sums(+Grid, -Sums)
+
+  Sums is a list where Sums[i] is the sum of all values in row i.
+
+  % Sum every row.
+  ar_row_sums([[1,2],[3,4],[5,6]], Sums).
+  % Sums = [3, 7, 11]
+
+ar_col_sums(+Grid, -Sums)
+
+  Sums is a list where Sums[j] is the sum of all values in column j.
+
+  % Sum every column.
+  ar_col_sums([[1,2,3],[4,5,6]], Sums).
+  % Sums = [5, 7, 9]
+
+
+Grid-Wide Extremes
+
+ar_cell_max(+Grid, -Max)
+
+  Max is the largest cell value anywhere in Grid.
+
+  % Maximum of [[1,5],[3,2]] is 5.
+  ar_cell_max([[1,5],[3,2]], Max).
+  % Max = 5
+
+  % Maximum of negative values.
+  ar_cell_max([[-3,-1],[-5,-2]], Max).
+  % Max = -1
+
+ar_cell_min(+Grid, -Min)
+
+  Min is the smallest cell value anywhere in Grid.
+
+  % Minimum of [[4,1],[3,2]] is 1.
+  ar_cell_min([[4,1],[3,2]], Min).
+  % Min = 1
+
+
+IMPLEMENTATION NOTES
+
+Binary grid operations (ar_cell_add, ar_cell_sub, ar_cell_mul, ar_cell_abs_diff)
+use maplist/4 over row pairs, then maplist/4 over cell pairs. This avoids
+explicit indexing.
+
+Scalar operations (ar_cell_mod, ar_scalar_add, ar_scalar_mul, ar_cell_clamp) use
+maplist(maplist(F)), threading the scalar via partial application.
+
+ar_col_sums builds a column-index list via numlist/3 and maps ar_col_sum/3 over
+it. ar_col_sum extracts a column via maplist(nth0(C), Grid, Col).
+
+ar_cell_max and ar_cell_min flatten the grid with append/2 and delegate to
+max_list/2 and min_list/2.
+
+ar_cell_clamp uses a three-way if-then-else for determinism (no choicepoints).
+
+
+COMBINING WITH OTHER PACKS
+
+The arith pack integrates naturally with the grid, compare, and rewrite packs:
+
+  % Find how many cells exceed a threshold after scaling.
+  ar_scalar_mul(Grid, 2, Scaled),
+  ar_cell_max(Scaled, Max),
+  ar_cell_clamp(Scaled, 0, Max, Clamped),
+  ar_cell_max(Clamped, _).
+
+  % Compute absolute difference between input and output grids.
+  ar_cell_abs_diff(InputGrid, OutputGrid, Diff),
+  ar_cell_max(Diff, MaxChange).
+
+  % Scale a grid and then replace background with a different value.
+  ar_scalar_add(Grid, 1, Shifted),
+  ar_cell_clamp(Shifted, 0, 9, Final).
+
+  % Check whether all rows have equal sums (a balanced grid).
+  ar_row_sums(Grid, Sums),
+  sort(Sums, Sorted),
+  Sorted = [_].   % single unique sum => all rows equal
+
+  % Column sums as a signature for comparing two grids structurally.
+  ar_col_sums(Grid1, Sig1),
+  ar_col_sums(Grid2, Sig2),
+  Sig1 = Sig2.    % same column sums => structural match
+
+
+END OF CHAPTER 50
