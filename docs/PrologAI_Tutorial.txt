@@ -7495,3 +7495,158 @@ The morph pack integrates naturally with the connect and fill packs:
 
 
 END OF CHAPTER 47
+CHAPTER 48 - THE REWRITE PACK
+
+The rewrite pack (Layer 66, prefix rw_) provides 14 predicates for transforming grid
+cell values by rule. It covers color substitution, region painting, masking, overlay
+composition, patch stamping, diff application, color normalization, color inversion,
+background remapping, border painting, rectangle fill, and conditional recoloring.
+
+Load the pack:
+
+  :- use_module(library(rewrite)).
+
+
+COLOR SUBSTITUTION
+
+rw_map_color/3 applies a list of OldColor-NewColor pairs to every cell:
+
+  % Replace 1 with 9 and 0 with 5 everywhere.
+  rw_map_color([[1,0],[0,1]], [1-9, 0-5], G2).
+  % G2 = [[9,5],[5,9]]
+
+Cells not in the map are left unchanged:
+
+  % Only 1 is remapped; 2 stays 2.
+  rw_map_color([[1,2,0]], [1-9], G2).
+  % G2 = [[9,2,0]]
+
+rw_replace_color/4 is a one-color shortcut:
+
+  % Replace all 1s with 5.
+  rw_replace_color([[1,0,1]], 1, 5, G2).
+  % G2 = [[5,0,5]]
+
+rw_swap_colors/4 exchanges two colors simultaneously:
+
+  % Swap 0 and 1.
+  rw_swap_colors([[1,0,2]], 1, 0, G2).
+  % G2 = [[0,1,2]]
+
+
+REGION AND RECTANGLE PAINTING
+
+rw_set_region/4 sets a list of r(R,C) cells to a chosen color:
+
+  % Paint two cells red (color 2).
+  rw_set_region([[0,0],[0,0]], [r(0,0), r(1,1)], 2, G2).
+  % G2 = [[2,0],[0,2]]
+
+rw_fill_rect/7 fills an axis-aligned rectangle:
+
+  % Fill rows 1-2, columns 1-2 with color 7 in a 4x4 grid.
+  G = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+  rw_fill_rect(G, 1, 1, 2, 2, 7, G2).
+  % Interior 2x2 block becomes 7.
+
+rw_set_border/3 sets the outermost ring to a color:
+
+  % Frame a 3x3 grid with color 1.
+  rw_set_border([[5,5,5],[5,5,5],[5,5,5]], 1, G2).
+  % G2 = [[1,1,1],[1,5,1],[1,1,1]]
+
+
+MASKING AND OVERLAY
+
+rw_mask_apply/5 uses a binary mask to select which cells get a fill color:
+
+  % Where Mask=1, set Fill=9; where Mask=0, keep original.
+  Grid = [[1,2],[3,4]],
+  Mask = [[1,0],[0,1]],
+  rw_mask_apply(Grid, Mask, 1, 9, G2).
+  % G2 = [[9,2],[3,9]]
+
+rw_overlay/4 composites two grids: non-background cells from Grid2 overwrite Grid1:
+
+  % BG=0; Grid2 cell 9 overwrites Grid1 cell 1 at position (0,1).
+  rw_overlay([[1,1,1]], [[0,9,0]], 0, G3).
+  % G3 = [[1,9,1]]
+
+
+PATCH STAMPING AND DIFFS
+
+rw_stamp/5 pastes a smaller grid (Patch) into a larger grid at a given offset:
+
+  % Stamp [[1,2],[3,4]] at (0,0) in a 3x3 zero grid.
+  rw_stamp([[0,0,0],[0,0,0],[0,0,0]], [[1,2],[3,4]], 0, 0, G2).
+  % G2 = [[1,2,0],[3,4,0],[0,0,0]]
+
+Cells outside the target grid are silently ignored.
+
+rw_diff_apply/3 applies a list of r(R,C)-Color edits to a grid:
+
+  % Apply two cell edits.
+  rw_diff_apply([[1,1],[1,1]], [r(0,0)-9, r(1,1)-8], G2).
+  % G2 = [[9,1],[1,8]]
+
+Out-of-bounds r(R,C) entries are silently ignored.
+
+
+NORMALIZATION AND INVERSION
+
+rw_normalize/3 renumbers non-background colors to 1, 2, 3, ... in row-major
+order of first appearance:
+
+  % Colors 3 and 7 appear (BG=0). 3 appears first so 3->1, 7->2.
+  rw_normalize([[3,0,7],[0,3,7]], 0, G2).
+  % G2 = [[1,0,2],[0,1,2]]
+
+rw_invert_colors/3 replaces each value V with MaxColor - V:
+
+  % Invert 0..5 range.
+  rw_invert_colors([[0,1,2],[3,4,5]], 5, G2).
+  % G2 = [[5,4,3],[2,1,0]]
+
+rw_remap_bg/4 replaces one background color with another:
+
+  % Change background from 0 to 9.
+  rw_remap_bg([[0,1,0],[2,0,2]], 0, 9, G2).
+  % G2 = [[9,1,9],[2,9,2]]
+
+
+CONDITIONAL RECOLORING
+
+rw_conditional/5 applies a Goal to each cell (R, C, V). Cells where Goal
+succeeds get ColorTrue; all others get ColorFalse:
+
+  % Helper: true if the cell is in row 0.
+  in_top_row_(R, _C, _V) :- R =:= 0.
+
+  % Paint row 0 with color 1 and all other rows with color 0.
+  rw_conditional([[5,5],[5,5]], in_top_row_, 1, 0, G2).
+  % G2 = [[1,1],[0,0]]
+
+Goal is a 3-argument predicate or closure called as call(Goal, R, C, V).
+
+
+COMBINING WITH OTHER PACKS
+
+The rewrite pack integrates naturally with the connect, morph, and induction packs:
+
+  % Recolor all cells belonging to the largest connected blob.
+  cc_largest4(Grid, 1, BlobRegion),
+  rw_set_region(Grid, BlobRegion, 2, Grid2).
+
+  % Normalize colors after a morphological transformation.
+  mo_open4(Grid, 1, 0, Cleaned),
+  rw_normalize(Cleaned, 0, Grid2).
+
+  % Apply the inferred recolor map from the induction pack.
+  id_color_map(Pairs, ColorMap),
+  rw_map_color(Grid, ColorMap, Grid2).
+
+  % Overlay a mask-selected fill onto a base grid.
+  rw_mask_apply(Grid, MaskGrid, 1, 9, Highlighted).
+
+
+END OF CHAPTER 48
