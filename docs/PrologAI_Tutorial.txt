@@ -4044,4 +4044,82 @@ WHAT COMES NEXT
 Chapter 21 covers the Pattern Pack: periodic pattern detection and tiling.
 
 END OF CHAPTER 20
-END OF CHAPTER 20 AND END OF THE PROLOGAI TUTORIAL
+
+
+CHAPTER 21 - THE PATTERN PACK: PERIODIC PATTERNS, TILING, AND SCALING
+
+The pattern pack detects and generates repeating spatial structures in grids.
+It provides period detection, tile-based grid construction, integer scaling,
+horizontal and vertical repetition, mirror expansion, and constructed pattern
+generators (checkerboard, horizontal stripes, vertical stripes).
+
+The pack prefix is pt_. All operations work on standard PrologAI grids (lists
+of lists of integers). The pack depends on the grid pack (PR 56) for low-level
+grid access.
+
+LOADING
+
+    :- use_module(library(pattern)).
+
+PERIOD DETECTION
+
+pt_list_period/2 finds the shortest period of a flat list.
+
+    ?- pt_list_period([1,2,1,2,1,2], P).
+    P = 2.
+
+    ?- pt_list_period([0,0,0,0], P).
+    P = 1.
+
+    ?- pt_list_period([1,2,3,4], P).
+    P = 4.
+
+pt_row_period/3 and pt_col_period/3 apply the same detection to a specific
+row or column of a grid.
+
+    ?- Grid = [[0,1,0,1],[2,2,2,2]], pt_row_period(Grid, 0, P).
+    P = 2.
+
+TILING
+
+pt_tile_grid/4 fills a target grid by repeating a smaller tile.
+
+    ?- Tile = [[1,2],[3,4]], pt_tile_grid(Tile, 4, 6, G).
+    G = [[1,2,1,2,1,2],[3,4,3,4,3,4],[1,2,1,2,1,2],[3,4,3,4,3,4]].
+
+pt_extract_tile/4 crops the top-left sub-grid to recover the base tile.
+pt_is_tiling/3 verifies that a grid is a proper tiling of a given tile.
+
+SCALING
+
+pt_scale_up/3 expands each cell to a Factor x Factor block.
+
+    ?- pt_scale_up([[1,2],[3,4]], 2, Big).
+    Big = [[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]].
+
+pt_scale_down/3 collapses each Factor x Factor block to one cell.
+Scale-up then scale-down with the same factor is the identity.
+
+REPETITION
+
+pt_repeat_h/3 concatenates N copies of a grid side by side.
+pt_repeat_v/3 stacks N copies of a grid vertically.
+Both use append/2 (one level of list concatenation) to preserve row structure.
+
+MIRRORING
+
+pt_mirror_h/2 appends the left-right reflection to the right of the original.
+pt_mirror_v/2 appends the upside-down reflection below the original.
+
+CONSTRUCTED PATTERNS
+
+pt_checkerboard/5(Rows, Cols, CA, CB, Grid): two-color checkerboard.
+pt_stripe_h/4(Rows, Cols, Colors, Grid): horizontal stripes.
+pt_stripe_v/4(Rows, Cols, Colors, Grid): vertical stripes.
+
+WHAT COMES NEXT
+
+Chapter 22 covers the Compose Pack: sequential rule pipelines.
+
+END OF CHAPTER 21
+END OF CHAPTER 21 AND END OF THE PROLOGAI TUTORIAL
