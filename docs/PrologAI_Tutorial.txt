@@ -9439,3 +9439,159 @@ All 42 PLUnit acceptance tests are in packs/logic/test/test_logic.pl.
 The Specification entry is Part 89 (LG-LG-001 through LG-LG-014).
 The Architecture entry is ARCH-65.
 The Refinement entry covers AC-LG-001 through AC-LG-042.
+Chapter 61: Sliding Window and Neighborhood Operations - The Window Pack
+
+This chapter covers the window pack (wn_* predicates, Layer 79), which provides
+14 predicates for neighborhood enumeration, sub-grid extraction, sliding windows,
+padding, local extrema detection, halo computation, convolution, and spatial
+distance operations.
+
+61.1 Loading the Pack
+
+:- use_module(library(window)).
+
+61.2 Neighbor Enumeration
+
+wn_neighbors4(+Grid, +R, +C, -Ns)
+  Ns is a list of R2-C2-V triples for in-bounds 4-connected (cardinal) neighbors.
+  Corner cells return 2 neighbors; edge cells return 3; interior cells return 4.
+
+Example:
+  ?- wn_neighbors4([[1,2,3],[4,5,6],[7,8,9]], 1, 1, Ns).
+  Ns = [0-1-2, 2-1-8, 1-0-4, 1-2-6].
+
+wn_neighbors8(+Grid, +R, +C, -Ns)
+  Ns is a list of R2-C2-V triples for in-bounds 8-connected (including diagonal) neighbors.
+  Corner cells return 3; edge cells return 5; interior cells return 8.
+
+Example:
+  ?- wn_neighbors8([[1,2,3],[4,5,6],[7,8,9]], 0, 0, Ns).
+  Ns = [0-1-2, 1-0-4, 1-1-5].
+
+61.3 Neighbor Counting
+
+wn_count4(+Grid, +R, +C, +Val, -N)
+  N is the number of 4-connected neighbors equal to Val.
+
+Example:
+  ?- wn_count4([[0,1,0],[1,0,1],[0,1,0]], 1, 1, 1, N).
+  N = 4.
+
+wn_count8(+Grid, +R, +C, +Val, -N)
+  N is the number of 8-connected neighbors equal to Val.
+
+Example:
+  ?- wn_count8([[1,1,1],[1,0,1],[1,1,1]], 1, 1, 1, N).
+  N = 8.
+
+61.4 Window Extraction and Sliding
+
+wn_extract(+Grid, +R0, +C0, +H, +W, -Sub)
+  Sub is the H x W sub-grid starting at row R0, column C0.
+
+Example:
+  ?- wn_extract([[1,2,3],[4,5,6],[7,8,9]], 0, 0, 2, 2, Sub).
+  Sub = [[1,2],[4,5]].
+
+wn_slide(+Grid, +H, +W, -Windows)
+  Windows is a list of R0-C0-Sub triples for every valid H x W placement.
+  For a 3x3 grid with a 2x2 window, returns 4 windows.
+
+Example:
+  ?- wn_slide([[1,2,3],[4,5,6],[7,8,9]], 2, 2, [W1|_]).
+  W1 = 0-0-[[1,2],[4,5]].
+
+61.5 Grid Padding
+
+wn_pad(+Grid, +PadVal, +N, -Padded)
+  Add N layers of PadVal on all four sides.
+  When N=0, Padded = Grid.
+
+Example:
+  ?- wn_pad([[5]], 0, 1, P).
+  P = [[0,0,0],[0,5,0],[0,0,0]].
+
+Use case: pad a grid before convolution to preserve output dimensions.
+
+61.6 Local Extrema
+
+wn_local_max4(+Grid, +R, +C)
+  True if Grid[R,C] is >= all in-bounds 4-connected neighbor values.
+  Values must be numeric. Border cells are compared only against existing neighbors.
+
+Example:
+  ?- wn_local_max4([[1,2,1],[2,5,2],[1,2,1]], 1, 1).
+  true.
+
+wn_local_min4(+Grid, +R, +C)
+  True if Grid[R,C] is =< all in-bounds 4-connected neighbor values.
+
+Example:
+  ?- wn_local_min4([[5,2,5],[2,1,2],[5,2,5]], 1, 1).
+  true.
+
+Pattern: find all local maxima:
+  findall(R-C, (nth0(R, Grid, Row), nth0(C, Row, _), wn_local_max4(Grid, R, C)), Maxima).
+
+61.7 Halo Computation
+
+wn_halo4(+Grid, +Val, -Cells)
+  Cells is the sorted list of R-C pairs that are NOT Val but are 4-adjacent to a Val cell.
+  This is the "border" of the Val region from the outside.
+
+Example:
+  ?- wn_halo4([[0,0,0],[0,1,0],[0,0,0]], 1, Cells).
+  Cells = [0-1, 1-0, 1-2, 2-1].
+
+61.8 Convolution
+
+wn_convolve(+Grid, +Kernel, -Grid2)
+  Grid2 is the valid (same-as-PyTorch default) integer convolution.
+  Output dimensions: (NRows - KH + 1) x (NCols - KW + 1).
+  Each output cell is the sum of element-wise products of the window and kernel.
+  Returns [] if the kernel is larger than the grid in either dimension.
+
+Example (identity-like kernel):
+  ?- wn_convolve([[1,2,3],[4,5,6],[7,8,9]], [[1,0],[0,1]], G).
+  G = [[6,8],[12,14]].
+
+Example (doubling kernel):
+  ?- wn_convolve([[1,2],[3,4]], [[2]], G).
+  G = [[2,4],[6,8]].
+
+61.9 Spatial Utilities
+
+wn_center(+Grid, -R, -C)
+  R = NRows // 2, C = NCols // 2. Floor-center of the grid.
+
+Example:
+  ?- wn_center([[1,2,3],[4,5,6],[7,8,9]], R, C).
+  R = 1, C = 1.
+
+wn_manhattan(+R1, +C1, +R2, +C2, -D)
+  D is the Manhattan (L1) distance between two grid positions.
+
+Example:
+  ?- wn_manhattan(0, 0, 2, 3, D).
+  D = 5.
+
+wn_cells_at_dist(+Grid, +R, +C, +D, -Cells)
+  Cells is the list of in-bounds R2-C2 pairs at Manhattan distance exactly D from (R,C).
+
+Example:
+  ?- wn_cells_at_dist([[1,2,3],[4,5,6],[7,8,9]], 1, 1, 1, Cells).
+  Cells = [0-1, 1-0, 1-2, 2-1].
+
+61.10 Summary
+
+The window pack's 14 predicates organize into four groups:
+
+Neighborhood:  wn_neighbors4/4, wn_neighbors8/4, wn_count4/5, wn_count8/5
+Window ops:    wn_extract/6, wn_slide/4, wn_pad/4
+Local ops:     wn_local_max4/3, wn_local_min4/3, wn_halo4/3, wn_convolve/3
+Spatial:       wn_center/3, wn_manhattan/5, wn_cells_at_dist/5
+
+All 42 PLUnit acceptance tests are in packs/window/test/test_window.pl.
+The Specification entry is Part 90 (WN-WN-001 through WN-WN-014).
+The Architecture entry is ARCH-66.
+The Refinement entry covers AC-WN-001 through AC-WN-042.
