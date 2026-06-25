@@ -24,7 +24,7 @@
 
 set -euo pipefail
 
-PORT="${1:-8080}"
+PORT="${1:-6333}"
 RUVECTOR_DIR="${HOME}/.prologai/ruvector"
 REPO_URL="https://github.com/ruvnet/ruvector"
 

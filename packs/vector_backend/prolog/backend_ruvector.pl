@@ -9,19 +9,27 @@
 
     Start the RuVector server before using this backend:
         bash packs/vector_backend/scripts/ruvector_server.sh
-    or, if you have the ruvector-server binary:
-        ruvector-server --port 8080
+    The server defaults to port 6333.
 
-    Then register and run the bakeoff:
+    Then switch backend and run the bakeoff:
         ?- vb_set_backend(ruvector).
         ?- run_bakeoff([prolog, ruvector], [100, 1000]).
 
-    HTTP API used (ruvector-server, port 8080 by default):
-        POST   /collections                      — create collection
-        POST   /collections/{name}/vectors       — insert vector
-        POST   /collections/{name}/search        — k-NN search
-        DELETE /collections/{name}/vectors/{id}  — delete vector
-        DELETE /collections/{name}               — drop collection (close)
+    Verified HTTP API (ruvector-server crate, default port 6333):
+        POST   /collections                              — create collection
+        DELETE /collections/{name}                       — drop collection
+        PUT    /collections/{name}/points                — upsert batch of points
+        POST   /collections/{name}/points/search         — k-NN search
+        GET    /collections/{name}/points/{id}           — get one point
+        (no per-point DELETE endpoint in this version of the server)
+
+    Request shapes:
+        Create:  {"name":"...","dimension":N}
+        Upsert:  {"points":[{"id":"...","vector":[...],"metadata":{...}}]}
+        Search:  {"vector":[...],"k":N}
+
+    Response shapes:
+        Search:  {"results":[{"id":"...","score":0.95,...}]}
 
     Predicate naming: vbr_* (vector backend ruvector).
 */
@@ -35,19 +43,21 @@
     % Supply 'vbr_search/4' as the next argument to the expression above.
     vbr_search/4,           % +Ref, +QueryVec, +K, -Results
     % Supply 'vbr_delete/2' as the next argument to the expression above.
-    vbr_delete/2,           % +Ref, +Id
+    vbr_delete/2,           % +Ref, +Id  (no-op: no per-point DELETE in server)
     % Supply 'vbr_update_weights/3' as the next argument to the expression above.
-    vbr_update_weights/3,   % +Ref, +Id, +Delta  (no-op: RuVector manages its own weights)
+    vbr_update_weights/3,   % +Ref, +Id, +Delta  (no-op: RuVector self-learning)
     % Supply 'vbr_close/1' as the next argument to the expression above.
-    vbr_close/1             % +Ref  (drops the collection from the server)
+    vbr_close/1             % +Ref  (drops the collection via DELETE /collections/{name})
 % Close the expression opened above.
 ]).
 
-% Import [http_post/4, http_open/3] from the HTTP client library.
-:- use_module(library(http/http_client), [http_post/4, http_open/3]).
-% Import [atom_json_dict/3] from the JSON library.
+% Import [http_post/4] from the HTTP client library.
+:- use_module(library(http/http_client), [http_post/4]).
+% Import [http_open/3] from the HTTP open library (http_open is not in http_client).
+:- use_module(library(http/http_open), [http_open/3]).
+% Import [atom_json_dict/3, json_read_dict/2] from the JSON library.
 :- use_module(library(http/json),        [atom_json_dict/3, json_read_dict/2]).
-% Import [atomic_list_concat/2, atomic_list_concat/3] from the built-in library.
+% Import [member/2] from the built-in lists library.
 :- use_module(library(lists),            [member/2]).
 
 % ---------------------------------------------------------------------------
@@ -56,8 +66,8 @@
 
 % Declare 'ruvector_base_url/1' as dynamic so callers can override the server address.
 :- dynamic ruvector_base_url/1.
-% Default: RuVector server at localhost port 8080.
-ruvector_base_url('http://localhost:8080').
+% Default: RuVector server at localhost port 6333 (ruvector-server default).
+ruvector_base_url('http://localhost:6333').
 
 % ---------------------------------------------------------------------------
 % vbr_create/4
@@ -71,10 +81,10 @@ vbr_create(Name, Dim, _Opts, Ref) :-
     ruvector_base_url(BaseUrl),
     % Build the collections endpoint URL.
     atomic_list_concat([BaseUrl, '/collections'], Url),
-    % Convert the index name to a string suitable for JSON.
+    % Convert the index name to an atom suitable for JSON.
     term_to_atom(Name, NameAtom),
-    % Build the JSON request body as a Prolog dict.
-    Body = _{name: NameAtom, dimensions: Dim, distance_metric: "cosine"},
+    % Build the JSON request body using 'dimension' (singular) as required by the server.
+    Body = _{name: NameAtom, dimension: Dim},
     % Encode the dict to a JSON atom.
     atom_json_dict(BodyAtom, Body, []),
     % POST the JSON body to the collections endpoint; ignore the response body.
@@ -88,29 +98,36 @@ vbr_create(Name, Dim, _Opts, Ref) :-
 
 % ---------------------------------------------------------------------------
 % vbr_insert/4
-% Insert one vector into the RuVector collection.
+% Insert one vector into the RuVector collection via the batch upsert endpoint.
+% RuVector uses PUT /collections/{name}/points with a {"points":[...]} body.
 % ---------------------------------------------------------------------------
 
-% Define a clause for 'vbr insert': POST /collections/{name}/vectors.
+% Define a clause for 'vbr insert': PUT /collections/{name}/points.
 vbr_insert(rv_ref(CollName, BaseUrl), Id, Vec, Meta) :-
-    % Build the vector insertion endpoint URL.
-    atomic_list_concat([BaseUrl, '/collections/', CollName, '/vectors'], Url),
-    % Convert the numeric or atom Id to a string.
+    % Build the points upsert endpoint URL.
+    atomic_list_concat([BaseUrl, '/collections/', CollName, '/points'], Url),
+    % Convert the numeric or atom Id to a string atom.
     term_to_atom(Id, IdAtom),
-    % Convert the Prolog float list to a JSON-encodable list.
+    % Convert the Prolog float list to a JSON-encodable float list.
     maplist(vbr_coerce_float, Vec, FloatVec),
-    % Convert the metadata term to a string for JSON storage.
+    % Convert the metadata term to an atom for storage in the metadata dict.
     term_to_atom(Meta, MetaAtom),
-    % Build the JSON insertion body.
-    Body = _{id: IdAtom, vector: FloatVec, metadata: _{prologai_meta: MetaAtom}},
+    % Build the JSON upsert body: a points array with one entry.
+    Body = _{points: [_{id: IdAtom, vector: FloatVec,
+                        metadata: _{prologai_meta: MetaAtom}}]},
     % Encode the body to a JSON atom.
     atom_json_dict(BodyAtom, Body, []),
-    % POST the vector to the server; ignore the response.
+    % PUT the vector to the server; ignore the response.
     catch(
-        http_post(Url, atom('application/json', BodyAtom), _Reply, []),
+        http_open(Url, Stream,
+                  [method(put),
+                   post(atom('application/json', BodyAtom)),
+                   header(content_type, 'application/json')]),
         _,
-        true
-    ).
+        Stream = []
+    ),
+    % Close the stream if it was opened successfully.
+    ( Stream = [] -> true ; close(Stream) ).
 
 % Define a clause for 'vbr coerce float': ensure a number is a float.
 vbr_coerce_float(N, F) :-
@@ -123,10 +140,10 @@ vbr_coerce_float(N, F) :-
 % Returns Results as a list of result(Id, Score) terms.
 % ---------------------------------------------------------------------------
 
-% Define a clause for 'vbr search': POST /collections/{name}/search.
+% Define a clause for 'vbr search': POST /collections/{name}/points/search.
 vbr_search(rv_ref(CollName, BaseUrl), QueryVec, K, Results) :-
-    % Build the search endpoint URL.
-    atomic_list_concat([BaseUrl, '/collections/', CollName, '/search'], Url),
+    % Build the search endpoint URL (note: /points/search not /search).
+    atomic_list_concat([BaseUrl, '/collections/', CollName, '/points/search'], Url),
     % Coerce the query vector elements to floats.
     maplist(vbr_coerce_float, QueryVec, FloatVec),
     % Build the JSON search body.
@@ -150,30 +167,20 @@ vbr_search(rv_ref(CollName, BaseUrl), QueryVec, K, Results) :-
 
 % Define a clause for 'vbr parse result': convert a RuVector result dict to result(Id, Score).
 vbr_parse_result(RDict, result(Id, Score)) :-
-    % Extract the id field from the result dict.
+    % Extract the id field from the result dict and convert to atom.
     atom_string(Id, RDict.id),
     % Extract the score field from the result dict.
     Score = RDict.score.
 
 % ---------------------------------------------------------------------------
 % vbr_delete/2
-% Remove one vector from the collection by Id.
+% The ruvector-server does not expose a per-point DELETE endpoint in this
+% version.  This predicate is a no-op so the bakeoff and interface contract
+% are satisfied without error.
 % ---------------------------------------------------------------------------
 
-% Define a clause for 'vbr delete': DELETE /collections/{name}/vectors/{id}.
-vbr_delete(rv_ref(CollName, BaseUrl), Id) :-
-    % Convert the Id to an atom for URL embedding.
-    term_to_atom(Id, IdAtom),
-    % Build the deletion endpoint URL.
-    atomic_list_concat([BaseUrl, '/collections/', CollName, '/vectors/', IdAtom], Url),
-    % Open the URL with the DELETE method; close the stream immediately.
-    catch(
-        (   http_open(Url, Stream, [method(delete)]),
-            close(Stream)
-        ),
-        _,
-        true
-    ).
+% Define a clause for 'vbr delete': no-op — no per-point delete in ruvector-server.
+vbr_delete(_Ref, _Id) :- true.
 
 % ---------------------------------------------------------------------------
 % vbr_update_weights/3
@@ -187,7 +194,7 @@ vbr_update_weights(_Ref, _Id, _Delta) :- true.
 
 % ---------------------------------------------------------------------------
 % vbr_close/1
-% Drop the collection from the RuVector server (frees server-side memory).
+% Drop the collection from the RuVector server via DELETE /collections/{name}.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'vbr close': DELETE /collections/{name}.
