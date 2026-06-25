@@ -1,15 +1,19 @@
 # PrologAI Vector Backend Bake-off Results
 
-Winner: **prolog** (last run: prolog backend only; RuVector server not running)
+Winner: **ruvector** (last live run: 2026-06-24, sizes [100, 1000])
+
+RuVector scored 4.3x higher than the pure-Prolog backend.
 
 | Backend | Score |
 |---------|-------|
-| prolog | 0.0712 |
+| ruvector | 0.2692 |
+| prolog | 0.0628 |
 
 ## Notes
 
-- Prolog backend: pure-Prolog fallback, benchmarked at <= 200 entries for CI (Continuous Integration) speed.
-- RuVector backend: HNSW (Hierarchical Navigable Small World) + SIMD (Single Instruction, Multiple Data) HTTP REST server (https://github.com/ruvnet/ruvector). Start with `bash packs/vector_backend/scripts/ruvector_server.sh` before including ruvector in the bakeoff.
-- Full benchmark scales (10k, 100k, 1M) supported by the RuVector backend.
-- To run the RuVector bakeoff: `?- run_bakeoff([prolog, ruvector], [100, 1000]).`
-- When the RuVector server is not running, the ruvector backend degrades gracefully and scores 0.0 (all HTTP calls are caught and return empty results). Re-run the bakeoff with the server active to get a valid comparison.
+- Prolog backend: pure-Prolog fallback, benchmarked at <= 200 entries for CI (Continuous Integration) speed. Score: 0.0628.
+- RuVector backend: HNSW (Hierarchical Navigable Small World) + SIMD (Single Instruction, Multiple Data) HTTP REST server (https://github.com/ruvnet/ruvector). Score at [100, 1000]: 0.2692. RuVector is 4.3x faster on this hardware.
+- RuVector binary built from source at: ~/.prologai/ruvector/target/release/ruvector-server (default port: 6333).
+- To start the server: bash packs/vector_backend/scripts/ruvector_server.sh
+- To re-run the bakeoff: ?- run_bakeoff([prolog, ruvector], [100, 1000]).
+- Full benchmark scales (10k, 100k, 1M entries) supported by the RuVector backend.
