@@ -1,7 +1,5 @@
 name(pattern).
 version('1.0.0').
-title('Periodic Pattern Detection, Tiling, and Repetition').
+title('Pattern Detection, Tiling Period, and Motif Extraction in Grids').
 author('D. R. Dison').
-home('https://github.com/ai-university-aiu/PrologAI').
-download('https://github.com/ai-university-aiu/PrologAI/releases').
-requires(grid).
+requires([grid]).
