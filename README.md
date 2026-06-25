@@ -61,14 +61,14 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       55 work packages — the complete cognitive engine (see below)
+├── packs/       57 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
 └── launcher/    Entry points and bootstrapper
 ```
 
-### The 55 Work Packages
+### The 57 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
