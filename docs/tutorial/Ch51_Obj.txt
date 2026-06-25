@@ -1,0 +1,228 @@
+CHAPTER 51 - THE OBJ PACK
+
+
+OVERVIEW
+
+The obj pack (obj_* predicate family, Layer 69) provides 14 predicates for
+object-level reasoning over list-of-lists grids. An object is a 4-connected
+region of cells that all share the same color. The pack represents each object
+as the term obj(Color, SortedCells), where SortedCells is a sorted list of
+r(R,C) terms.
+
+The pack covers object construction, property extraction (color, cells, size,
+bounding box, center, normalized shape), inventory extraction from a grid (all
+objects of one color, or all non-zero colors at once), counting, largest and
+smallest selection, cell-to-object lookup, and size sorting.
+
+Pack metadata: name(obj), version('1.0.0'), requires([grid, connect]).
+
+
+LOADING THE PACK
+
+  :- use_module(library(obj)).
+
+
+THE OBJECT TERM
+
+Every object in the obj pack is represented as obj(Color, SortedCells).
+
+  Color       is a non-negative integer (the ARC-AGI color value, 0-9).
+  SortedCells is the sorted list of r(R,C) cells in the region.
+
+  % An L-shaped object of color 1, bottom-left corner at (2,3).
+  Obj = obj(1, [r(2,3), r(3,3), r(4,3), r(4,4)]).
+
+The cell list is always sorted in standard Prolog term order (row first, then
+column), so two objects with the same cells in different orders will compare
+equal.
+
+
+PREDICATE REFERENCE
+
+
+Object Construction
+
+obj_from_cells(+Color, +Cells, -Obj)
+
+  Construct an object term. Cells is sorted internally so order does not matter.
+
+  % Build an object from an unsorted cell list.
+  obj_from_cells(3, [r(1,0), r(0,0)], Obj).
+  % Obj = obj(3, [r(0,0), r(1,0)])
+
+
+Property Extraction
+
+obj_color(+Obj, -Color)
+
+  Extract the color.
+
+  obj_color(obj(5, [r(0,0)]), C).
+  % C = 5
+
+obj_cells(+Obj, -Cells)
+
+  Extract the sorted cell list.
+
+  obj_from_cells(1, [r(2,1), r(1,0)], Obj), obj_cells(Obj, Cs).
+  % Cs = [r(1,0), r(2,1)]
+
+obj_size(+Obj, -N)
+
+  N is the number of cells in the object.
+
+  obj_from_cells(2, [r(0,0), r(0,1), r(1,0)], Obj), obj_size(Obj, N).
+  % N = 3
+
+obj_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC)
+
+  The axis-aligned bounding box. MinR and MinC are the top-left corner;
+  MaxR and MaxC are the bottom-right corner.
+
+  % L-shape at rows 2-4, cols 3-4.
+  obj_from_cells(1, [r(2,3),r(3,3),r(4,3),r(4,4)], Obj),
+  obj_bbox(Obj, MinR, MinC, MaxR, MaxC).
+  % MinR=2, MinC=3, MaxR=4, MaxC=4
+
+obj_center(+Obj, -CR, -CC)
+
+  Integer centroid: floor of the arithmetic mean of all row coordinates (CR)
+  and all column coordinates (CC).
+
+  % Three cells in a row: mean col = (0+1+2)/3 = 1.
+  obj_from_cells(1, [r(0,0),r(0,1),r(0,2)], Obj),
+  obj_center(Obj, CR, CC).
+  % CR=0, CC=1
+
+obj_shape(+Obj, -Shape)
+
+  Shape is a list of r(DR, DC) offsets where DR = R - MinR and DC = C - MinC.
+  The shape is translation-independent: two objects at different positions
+  have the same shape iff they have the same normalized offsets.
+
+  % L-shape anywhere normalizes to the same offsets.
+  obj_from_cells(1, [r(5,7),r(6,7),r(7,7),r(7,8)], Obj),
+  obj_shape(Obj, Shape),
+  msort(Shape, Sorted).
+  % Sorted = [r(0,0), r(1,0), r(2,0), r(2,1)]
+
+
+Grid Inventory
+
+obj_inventory(+Grid, +Color, -Objects)
+
+  Objects is the list of all 4-connected objects of Color in Grid.
+  Uses the connect pack's cc_components4/3 internally.
+
+  Grid = [[1,1,0],[1,0,1]],
+  obj_inventory(Grid, 1, Objs).
+  % Objs: two objects - one with cells {r(0,0),r(0,1),r(1,0)} and one with {r(1,2)}.
+
+  % Absent color: empty list.
+  obj_inventory([[0,0],[0,0]], 5, Objs).
+  % Objs = []
+
+obj_all(+Grid, -Objects)
+
+  All objects of all non-zero colors, in ascending color order.
+
+  Grid = [[1,0,2],[1,2,2]],
+  obj_all(Grid, Objs).
+  % Objs: one color-1 object + one color-2 object = 2 total
+
+
+Counting, Selection
+
+obj_count(+Grid, +Color, -N)
+
+  N is the number of 4-connected objects of Color (0 if absent).
+
+  obj_count([[1,0,1],[0,0,0]], 1, N).
+  % N = 2
+
+obj_largest(+Grid, +Color, -Obj)
+
+  The largest (most cells) object of Color. Ties: first largest returned.
+
+  % Two 1-objects of sizes 3 and 1: largest has size 3.
+  obj_largest([[1,1,0],[1,0,1]], 1, Obj),
+  obj_size(Obj, N).
+  % N = 3
+
+obj_smallest(+Grid, +Color, -Obj)
+
+  The smallest (fewest cells) object of Color. Ties: first smallest returned.
+
+  obj_smallest([[1,1,0],[1,0,1]], 1, Obj),
+  obj_size(Obj, N).
+  % N = 1
+
+
+Lookup and Sorting
+
+obj_at_cell(+Objects, +Cell, -Obj)
+
+  The first object in the list that contains Cell. Fails if no object contains it.
+
+  obj_from_cells(1, [r(0,0), r(0,1)], OA),
+  obj_from_cells(2, [r(1,0)], OB),
+  obj_at_cell([OA, OB], r(0,1), Found).
+  % Found = OA
+
+obj_sort_size(+Objects, +Order, -Sorted)
+
+  Sort a list of objects by size. Order is either asc (smallest first) or
+  desc (largest first).
+
+  obj_from_cells(1, [r(0,0)], O1),             % size 1
+  obj_from_cells(2, [r(0,0),r(0,1)], O2),      % size 2
+  obj_from_cells(3, [r(0,0),r(0,1),r(0,2)], O3), % size 3
+  obj_sort_size([O3, O1, O2], asc, Sorted),
+  maplist(obj_size, Sorted, Sizes).
+  % Sizes = [1, 2, 3]
+
+
+IMPLEMENTATION NOTES
+
+Binary operations on the cell list (obj_bbox, obj_center, obj_shape) use maplist
+to extract coordinates, then min_list/max_list for extremes and a recursive
+obj_list_sum_ for sums.
+
+obj_all uses findall twice: once to collect all cell values from the grid
+(avoiding choicepoints from append/2), and once to flatten the per-color object
+lists into a single list.
+
+obj_sort_size pairs each object with its size as a key (Size-Obj), sorts by
+msort (which is stable by standard term order), then strips the keys and
+optionally reverses for descending order.
+
+
+COMBINING WITH OTHER PACKS
+
+The obj pack integrates naturally with the compare, transform, shape, and
+spatial packs:
+
+  % Find the shape of the largest object and check if it appears elsewhere.
+  obj_largest(Grid, 1, Big),
+  obj_shape(Big, TargetShape),
+  obj_inventory(Grid, 2, OtherObjs),
+  include([O]>>(obj_shape(O, S), msort(S, SS), msort(TargetShape, SS)),
+          OtherObjs, Matches).
+
+  % Sort all non-zero objects by size to find the single smallest.
+  obj_all(Grid, AllObjs),
+  obj_sort_size(AllObjs, asc, [Smallest|_]).
+
+  % Find which object a given changed cell belongs to.
+  cp_diff_cells(InputGrid, OutputGrid, Changed),
+  obj_all(OutputGrid, Objs),
+  Changed = [Cell|_],
+  obj_at_cell(Objs, Cell, TargetObj).
+
+  % Check all objects of a color have the same shape.
+  obj_inventory(Grid, Color, Objs),
+  maplist(obj_shape, Objs, Shapes),
+  sort(Shapes, [_]).  % one unique shape = all same
+
+
+END OF CHAPTER 51
