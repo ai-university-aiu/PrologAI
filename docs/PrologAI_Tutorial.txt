@@ -7156,3 +7156,175 @@ The lookup pack integrates with the grid, spatial, and induction packs:
 
 
 END OF CHAPTER 45
+CHAPTER 46: THE CONNECT PACK
+
+The connect pack (prefix cc_) provides predicates for flood fill,
+connected component analysis, and region topology. A connected
+component is a maximal group of cells that share a color and are
+all reachable from each other by stepping through adjacent cells.
+
+The connect pack answers three classes of questions:
+
+1. Reachability: which cells can I reach from a given seed cell,
+   stepping only through cells of the same color?
+
+2. Component structure: how many separate groups of a color exist?
+   Which is the largest? What are their sizes?
+
+3. Topology: which cells in a region are on its boundary? Which cells
+   are in its interior? Which background cells are enclosed inside a
+   closed shape?
+
+All predicates live in the connect module (Layer 64).
+
+
+LOADING
+
+  :- use_module(library(connect)).
+
+
+FLOOD FILL
+
+  cc_flood4(+Grid, +r(R0,C0), +Color, -Region)
+
+  Find all cells with Color reachable from r(R0,C0) through
+  4-connected (up/down/left/right) steps.
+
+  Example:
+
+    G = [[1,1,0],[1,0,0],[0,0,1]].
+    cc_flood4(G, r(0,0), 1, R).
+    % R = [r(1,0), r(0,1), r(0,0)]  (order depends on DFS)
+
+  If the seed cell does not have Color, Region = [].
+
+  cc_flood8(+Grid, +r(R0,C0), +Color, -Region)
+
+  Same as cc_flood4 but allows diagonal steps (8-connected).
+
+  Example:
+
+    G = [[1,0,0],[0,1,0],[0,0,1]].
+    cc_flood8(G, r(0,0), 1, R).
+    % R contains r(0,0), r(1,1), r(2,2) -- diagonal chain connected.
+
+
+CONNECTED COMPONENTS
+
+  cc_components4(+Grid, +Color, -Components)
+
+  Components is the list of all 4-connected regions of Color.
+  Each element is a list of r(R,C) cells.
+
+  Example:
+
+    G = [[1,0,1],[0,0,0],[1,0,1]].
+    cc_components4(G, 1, Comps).
+    % Comps = [[r(0,0)], [r(0,2)], [r(2,0)], [r(2,2)]]
+    % (order may vary)
+
+  cc_components8(+Grid, +Color, -Components)
+
+  Same using 8-connected adjacency.
+
+  cc_count4(+Grid, +Color, -N)
+  cc_count8(+Grid, +Color, -N)
+
+  N is the number of connected components.
+
+  Example:
+
+    G = [[1,0,1],[0,0,0],[1,0,1]].
+    cc_count4(G, 1, N).  % N = 4
+    cc_count8(G, 1, N).  % N = 4 (no diagonal links between corners)
+
+  cc_sizes4(+Grid, +Color, -Sizes)
+  cc_sizes8(+Grid, +Color, -Sizes)
+
+  Sizes is the msort-ascending list of component sizes.
+
+  Example:
+
+    G = [[1,1,0],[1,0,0],[0,0,1]].
+    cc_sizes4(G, 1, S).  % S = [1, 3]
+
+
+FINDING LARGEST AND SMALLEST COMPONENTS
+
+  cc_largest4(+Grid, +Color, -Largest)
+  cc_largest8(+Grid, +Color, -Largest)
+
+  Largest is the biggest connected component. Fails if no cells
+  of Color exist.
+
+  cc_smallest4(+Grid, +Color, -Smallest)
+
+  Smallest is the smallest non-empty component.
+
+  Example:
+
+    G = [[1,1,0],[1,0,0],[0,0,1]].
+    cc_largest4(G, 1, L).   % L = [r(0,0), r(0,1), r(1,0)]
+    cc_smallest4(G, 1, S).  % S = [r(2,2)]
+
+
+REGION TOPOLOGY
+
+  cc_border_cells(+Grid, +Region, -Border)
+
+  Border is the subset of Region where at least one 4-neighbor
+  is either out of the grid bounds or not in Region.
+
+  cc_interior_cells(+Grid, +Region, -Interior)
+
+  Interior is the subset of Region where all 4-neighbors are
+  in bounds AND in Region. Grid-edge cells are never interior.
+
+  Example:
+
+    G = [[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]].
+    cc_components4(G, 1, [All]).
+    cc_border_cells(G, All, Border).    % 16 cells (outer ring)
+    cc_interior_cells(G, All, Interior). % 9 cells (inner 3x3)
+
+
+ENCLOSED CELLS
+
+  cc_enclosed(+Grid, +BG, -Enclosed)
+
+  Enclosed is the list of BG-colored cells that are completely
+  surrounded by non-BG cells -- they cannot be reached from any
+  BG cell on the grid border.
+
+  This predicate identifies the "fill target" inside a closed shape.
+
+  Example:
+
+    G = [[1,1,1],[1,0,1],[1,1,1]].  % ring of 1s
+    cc_enclosed(G, 0, Enclosed).
+    % Enclosed = [r(1,1)]   -- the center 0 is trapped inside.
+
+    G = [[1,0,1],[0,0,0],[1,0,1]].  % isolated 1s
+    cc_enclosed(G, 0, Enclosed).
+    % Enclosed = []          -- all 0s reach the border.
+
+
+COMBINING WITH OTHER PACKS
+
+The connect pack integrates with spatial, lookup, and fill packs:
+
+  % Find the largest blob and fill it with color 3.
+  cc_largest4(Grid, 1, Blob),
+  fl_fill_region(Grid, Blob, 3, NewGrid).
+
+  % Find enclosed holes and index their positions.
+  cc_enclosed(Grid, 0, Holes),
+  lk_position_color(Grid, 0, PosMap).
+
+  % Count isolated cells (components of size 1).
+  cc_sizes4(Grid, 1, Sizes),
+  include(==(1), Sizes, SingleCells),
+  length(SingleCells, IsolatedCount).
+
+
+END OF CHAPTER 46
