@@ -1,0 +1,228 @@
+PROLOGAI TUTORIAL
+
+CHAPTER 18 - THE ANALOGY PACK: ARC-AGI STRUCTURAL ANALOGY AND TRANSFORMATION INFERENCE
+
+The analogy pack gives PrologAI the ability to reason by analogy.
+
+Given a set of (input, output) grid pairs that all follow the same transformation rule, the analogy pack infers what that rule is and applies it to a new test grid.
+
+This is how ARC-AGI works: you see a few examples of a pattern, you figure out the rule, and you apply it to a new case.
+
+
+WHY AN ANALOGY PACK?
+
+Many ARC-AGI puzzles follow rules that can be expressed as a combination of two things: a spatial transformation and a color substitution.
+
+A spatial transformation is one of the 8 rigid motions of the square (the D4 dihedral group): rotate 90/180/270 degrees, or flip across the horizontal axis, vertical axis, main diagonal, or anti-diagonal.
+
+A color substitution maps some colors to other colors.
+
+The analogy pack finds which combination of these two components explains all the training pairs, then applies that combination to produce the answer.
+
+
+LOADING THE ANALOGY PACK
+
+    :- use_module(library(analogy)).
+
+The analogy pack depends on the grid pack (Chapter 17). Both must be on the library path.
+
+    :- use_module(library(grid)).
+    :- use_module(library(analogy)).
+
+
+THE D4 ISOMETRY NAMES
+
+The 8 spatial transformations (isometries) are named:
+
+    identity     No change.
+    rot90        Rotate 90 degrees clockwise.
+    rot180       Rotate 180 degrees.
+    rot270       Rotate 270 degrees clockwise (same as 90 counter-clockwise).
+    ref_h        Flip upside-down (reflect across horizontal axis).
+    ref_v        Flip left-right (reflect across vertical axis).
+    ref_d1       Transpose (reflect across main diagonal).
+    ref_d2       Reflect across anti-diagonal.
+
+
+SHAPES AND SHAPE NORMALIZATION
+
+A shape is a set of cells that represents an object, regardless of where it is in the grid.
+
+ay_normalize_shape(+Cells, -NormCells)
+
+Translates the cell set so its top-left corner is at row 0, column 0, and sorts the result.
+
+    ?- ay_normalize_shape([r(3,5), r(3,6), r(4,5)], N).
+    N = [r(0,0), r(0,1), r(1,0)].
+
+ay_shape_equal(+Cells1, +Cells2)
+
+Succeeds when both cell sets have the same shape (after normalization).
+
+    ?- ay_shape_equal([r(0,0), r(1,0)],
+                      [r(5,3), r(6,3)]).
+    true.
+
+ay_shape_isometry(+Cells, +Iso, -Cells2)
+
+Applies one of the 8 D4 isometries to a cell set and returns the normalized result.
+
+    ?- ay_shape_isometry([r(0,0), r(0,1), r(0,2)], ref_d1, Trans).
+    Trans = [r(0,0), r(1,0), r(2,0)].
+
+The main diagonal transpose converts a horizontal bar into a vertical bar.
+
+ay_isometry_candidates(+Shape1, +Shape2, -Isometries)
+
+Finds all D4 isometries that map Shape1 to Shape2.
+
+    ?- ay_shape_isometry([r(0,0), r(0,1)], rot90, S2),
+       ay_isometry_candidates([r(0,0), r(0,1)], S2, Isos).
+    Isos = [rot90].
+
+
+COLOR MAP INFERENCE
+
+ay_infer_color_map(+InColors, +OutColors, -Map)
+
+Infers a From-To color substitution map from two parallel lists of colors.
+
+    ?- ay_infer_color_map([1, 2, 0], [3, 2, 0], Map).
+    Map = [1-3].
+
+Identity pairs (colors that map to themselves) are omitted.
+
+ay_grid_color_map(+Grid1, +Grid2, -Map)
+
+Infers the color map from two grids by comparing corresponding cells.
+
+    ?- ay_grid_color_map([[1,0],[0,1]], [[2,0],[0,2]], Map).
+    Map = [1-2].
+
+
+OBJECT MATCHING
+
+ay_match_objects(+InObjects, +OutObjects, -Pairs)
+
+Finds pairs of input and output objects with matching shapes.
+
+    ?- In1  = [r(0,0), r(0,1)],
+       Out1 = [r(2,3), r(2,4)],
+       ay_match_objects([In1], [Out1], Pairs).
+    Pairs = [in_obj([r(0,0),r(0,1)])-out_obj([r(2,3),r(2,4)])].
+
+ay_object_offset(+Cells1, +Cells2, -offset(DR, DC))
+
+Computes the translation vector between two cell sets.
+
+    ?- ay_object_offset([r(0,0), r(0,1)],
+                        [r(3,2), r(3,3)],
+                        Offset).
+    Offset = offset(3,2).
+
+
+GRID-LEVEL ISOMETRY DETECTION
+
+ay_grid_isometry(+Grid1, +Grid2, -Isometries)
+
+Finds all D4 isometries mapping Grid1 to Grid2.
+
+    ?- G1 = [[1,2],[3,4]],
+       gd_rotate90(G1, G2),
+       ay_grid_isometry(G1, G2, Isos).
+    Isos = [rot90].
+
+ay_apply_isometry(+Grid, +Iso, -Grid2)
+
+Applies a named D4 isometry to a full grid.
+
+    ?- ay_apply_isometry([[1,2],[3,4]], rot90, G2).
+    G2 = [[3,1],[4,2]].
+
+ay_apply_color_map(+Grid, +Map, -Grid2)
+
+Applies a From-To color substitution to a grid.
+
+    ?- ay_apply_color_map([[1,0],[0,2]], [1-5, 2-6], G2).
+    G2 = [[5,0],[0,6]].
+
+
+SOLVING ARC-AGI TASKS FROM EXAMPLES
+
+The main entry point is ay_solve_from_examples/3.
+
+ay_solve_from_examples(+TrainPairs, +TestGrid, -OutputGrid)
+
+Given a list of training pairs and a test grid, infers the transformation rule and applies it.
+
+Training pairs are written as in(InputGrid)-out(OutputGrid) terms.
+
+    % A training pair where the rule is rot90.
+    ?- G1in  = [[1,0],[0,2]],
+       gd_rotate90(G1in, G1out),
+       Train  = [in(G1in)-out(G1out)],
+       GTest  = [[3,0],[0,4]],
+       ay_solve_from_examples(Train, GTest, Answer).
+    Answer = [[0,3],[4,0]].   % = gd_rotate90(GTest)
+
+With two training pairs:
+
+    ?- Train = [in([[1,0],[0,0]])-out([[0,0],[0,1]]),
+                in([[0,1],[0,0]])-out([[0,0],[1,0]])],
+       GTest = [[1,1],[0,0]],
+       ay_solve_from_examples(Train, GTest, Answer).
+
+The predicate tries all 8 D4 isometries in order and finds the one that is consistent with all training pairs. It then infers the color map and applies both to the test grid.
+
+If no single D4 isometry plus color map explains all training pairs, the predicate fails.
+
+
+HOW THE INFERENCE WORKS
+
+Step 1: Try each D4 isometry.
+
+Apply the isometry to the first training input grid.
+
+Step 2: Infer the color map.
+
+Compare the transformed first input to the first expected output. Find the From-To color pairs that explain the difference.
+
+Step 3: Verify against all training pairs.
+
+Apply the isometry and color map to every training input. Check that the result matches the expected output in every case.
+
+If all pairs pass, the rule is found.
+
+Step 4: Apply to the test grid.
+
+Apply the same isometry and color map to the test grid. This is the predicted output.
+
+
+SUMMARY
+
+ay_normalize_shape/2       Normalize a cell set to canonical position.
+ay_shape_equal/2           Test shape equality (position-independent).
+ay_shape_size/2            Number of cells in a shape.
+ay_shape_bbox/3            Bounding box of a cell set.
+ay_shape_isometry/3        Apply a D4 isometry to a cell set.
+ay_isometry_candidates/3   Find D4 isometries mapping one shape to another.
+ay_infer_color_map/3       Infer color substitution from parallel color lists.
+ay_match_objects/3         Match input and output objects by shape.
+ay_object_offset/3         Translation vector between two cell sets.
+ay_grid_isometry/3         Find D4 isometries mapping one grid to another.
+ay_grid_color_map/3        Infer color map from two grids.
+ay_examples_isometry/3     Find isometry + color map consistent with all training pairs.
+ay_apply_isometry/3        Apply a D4 isometry to a grid.
+ay_apply_color_map/3       Apply a color map to a grid.
+ay_solve_from_examples/3   Infer and apply the transformation rule from training examples.
+
+
+WHAT COMES NEXT
+
+The analogy pack handles ARC-AGI tasks that follow a single D4 isometry combined with a color substitution. More complex tasks, which require understanding object-level structure, multi-step rules, or in-context symbol definitions, are addressed by higher-level packs.
+
+The grid pack (Chapter 17) provides all the primitive operations that the analogy pack builds on.
+
+Together, the grid and analogy packs form the perceptual and inferential foundation for ARC-AGI solving in PrologAI.
+
+END OF CHAPTER 18
