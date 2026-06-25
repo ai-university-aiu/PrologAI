@@ -3632,9 +3632,82 @@ gd_fill/5, gd_make/4, gd_set_cell/5.
 
 WHAT COMES NEXT
 
+Chapter 18 covers the Analogy Pack: inferring ARC-AGI transformation rules from training examples.
+
+END OF CHAPTER 17
+
+
+CHAPTER 18 - THE ANALOGY PACK: ARC-AGI STRUCTURAL ANALOGY AND TRANSFORMATION INFERENCE
+
+The analogy pack infers the transformation rule from a set of ARC-AGI training pairs and applies it to a test grid.
+
+Given (input, output) examples, the pack finds which D4 isometry (one of 8 spatial transformations) combined with which color substitution explains all the pairs, then applies that rule to the test input.
+
+
+LOADING THE ANALOGY PACK
+
+    :- use_module(library(grid)).
+    :- use_module(library(analogy)).
+
+
+SHAPE OPERATIONS
+
+ay_normalize_shape/2: translate a cell set so its top-left is at (0,0), sorted.
+ay_shape_equal/2: test shape equality (position-independent).
+ay_shape_size/2: count cells in a shape.
+ay_shape_bbox/3: bounding box of a cell set.
+ay_shape_isometry/3: apply a D4 isometry to a cell set.
+ay_isometry_candidates/3: find which D4 isometries map one shape to another.
+
+
+COLOR MAP INFERENCE
+
+ay_infer_color_map/3: infer From-To color pairs from parallel color lists.
+ay_grid_color_map/3: infer color map from two grids by comparing cells.
+
+
+OBJECT MATCHING
+
+ay_match_objects/3: match input and output objects by shape.
+ay_object_offset/3: translation vector between two cell sets.
+
+
+GRID ISOMETRY
+
+ay_grid_isometry/3: find D4 isometries mapping one grid to another.
+ay_apply_isometry/3: apply a named D4 isometry to a grid.
+ay_apply_color_map/3: apply a color substitution map to a grid.
+
+
+SOLVING FROM EXAMPLES
+
+ay_solve_from_examples(+TrainPairs, +TestGrid, -OutputGrid)
+
+    Train = [in([[1,0],[0,2]])-out([[0,1],[2,0]]),
+             in([[0,1],[2,0]])-out([[2,0],[0,1]])],
+    ay_solve_from_examples(Train, [[3,0],[0,4]], Answer).
+    % Answer = [[0,3],[4,0]]   (rot90 rule)
+
+The D4 isometry names: identity, rot90, rot180, rot270, ref_h, ref_v, ref_d1, ref_d2.
+
+The pack tries all 8 isometries in order. For each, it infers the color map from the first training pair, then verifies that the rule is consistent with all pairs.
+
+
+SUMMARY
+
+ay_normalize_shape/2, ay_shape_equal/2, ay_shape_size/2, ay_shape_bbox/3,
+ay_shape_isometry/3, ay_isometry_candidates/3,
+ay_infer_color_map/3, ay_grid_color_map/3,
+ay_match_objects/3, ay_object_offset/3,
+ay_grid_isometry/3, ay_apply_isometry/3, ay_apply_color_map/3,
+ay_examples_isometry/3, ay_solve_from_examples/3.
+
+
+WHAT COMES NEXT
+
 You have now completed the PrologAI Tutorial.
 
-The grid pack is the perceptual foundation for ARC-AGI solving. The packs you have learned work together as a complete cognitive substrate.
+The grid pack (Chapter 17) and analogy pack (Chapter 18) form the perceptual and inferential foundation for ARC-AGI solving in PrologAI.
 
 Read the Mentova Tutorial to see how Mentova uses all of these capabilities as a living reasoning system.
 
@@ -3644,4 +3717,4 @@ Explore the demos/ directory for complete, working examples.
 
 And experiment at the ?- prompt. Every feature in this tutorial is live and waiting for your first query.
 
-END OF CHAPTER 17 AND END OF THE PROLOGAI TUTORIAL
+END OF CHAPTER 18 AND END OF THE PROLOGAI TUTORIAL
