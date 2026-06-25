@@ -11,6 +11,11 @@
         AC-EP-008: ep_shell/3 captures exit code zero on success
         AC-EP-009: ep_next_trace_id/1 returns unique IDs on successive calls
         AC-EP-010: ep_trace_record/4 and ep_trace_get/2 round-trip correctly
+        AC-EP-011: ep_skill_save/4 stores a skill in the database
+        AC-EP-012: ep_skill_lookup/3 retrieves language and code by name
+        AC-EP-013: ep_skill_run/3 executes a saved skill by name
+        AC-EP-014: ep_skill_list/1 lists all saved skills
+        AC-EP-015: ep_skill_forget/1 removes a skill; second lookup fails
 */
 
 % Declare this file as the 'test_ephemera' module.
@@ -107,6 +112,56 @@ test(trace_roundtrip,
     % Retrieve the trace and check it has exactly two entries.
     ep_trace_get(TId, Entries),
     length(Entries, 2).
+
+% AC-EP-011: ep_skill_save/4 stores a skill in the database.
+test(skill_save,
+     [cleanup(ep_skill_forget(test_skill_011))]) :-
+    % Save a Python skill with a description.
+    ep_skill_save(test_skill_011, python, 'print("ok")', 'Test skill 011'),
+    % Verify the fact is present in the database.
+    ephemera:ep_skill_db(test_skill_011, python, 'print("ok")', 'Test skill 011').
+
+% AC-EP-012: ep_skill_lookup/3 retrieves language and code by name.
+test(skill_lookup,
+     [setup(ep_skill_save(test_skill_012, bash, 'echo found', 'Test skill 012')),
+      cleanup(ep_skill_forget(test_skill_012))]) :-
+    % Retrieve the stored skill.
+    ep_skill_lookup(test_skill_012, Lang, Code),
+    % Verify the language.
+    Lang = bash,
+    % Verify the code.
+    Code = 'echo found'.
+
+% AC-EP-013: ep_skill_run/3 executes a saved skill by name.
+test(skill_run,
+     [setup(ep_skill_save(test_skill_013, python, 'print("skill_run_ok")', 'Test skill 013')),
+      cleanup(ep_skill_forget(test_skill_013))]) :-
+    % Run the saved skill.
+    ep_skill_run(test_skill_013, 10, shell_result(Code, Out, _)),
+    % Verify exit code zero.
+    Code =:= 0,
+    % Verify the output contains the expected text.
+    atom_codes(Out, OutCodes),
+    atom_codes('skill_run_ok', ExpCodes),
+    append(ExpCodes, _, OutCodes).
+
+% AC-EP-014: ep_skill_list/1 lists all saved skills (at least the saved one).
+test(skill_list,
+     [setup(ep_skill_save(test_skill_014, bash, 'echo list', 'Test skill 014')),
+      cleanup(ep_skill_forget(test_skill_014))]) :-
+    % Retrieve the full skill list.
+    ep_skill_list(Skills),
+    % The saved skill must appear in the list.
+    member(skill(test_skill_014, bash, 'Test skill 014'), Skills).
+
+% AC-EP-015: ep_skill_forget/1 removes a skill; lookup afterwards fails.
+test(skill_forget,
+     [setup(ep_skill_save(test_skill_015, python, 'print("bye")', 'Test skill 015')),
+      cleanup(true)]) :-
+    % Forget the skill.
+    ep_skill_forget(test_skill_015),
+    % Lookup must now fail.
+    \+ ep_skill_lookup(test_skill_015, _, _).
 
 % End the test suite.
 :- end_tests(ephemera).

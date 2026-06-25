@@ -3267,6 +3267,40 @@ TRACING EXECUTION SEQUENCES
     ?- ep_trace_get(TId, Entries).
 
 
+SKILL PERSISTENCE: NAMING AND REUSING USEFUL EPHEMERA
+
+An ephemeron that proves useful during execution does not have to stay ephemeral.
+
+If the same computation is likely to be needed again, it can be saved as a named skill and retrieved later without re-synthesis.
+
+ep_skill_save/4 saves a named skill with a description.
+
+% Save a Python greeting skill.
+ep_skill_save(greet, python, 'print("Hello from Mentova")',
+              'Print a greeting from Mentova').
+
+ep_skill_lookup/3 retrieves the language and code for a named skill.
+
+ep_skill_lookup(greet, Lang, Code).
+% Lang = python, Code = 'print("Hello from Mentova")'
+
+ep_skill_run/3 retrieves and executes a skill by name.
+
+ep_skill_run(greet, 10, shell_result(0, Out, _)).
+% Out = 'Hello from Mentova\n'
+
+ep_skill_list/1 returns all saved skills as skill(Name, Language, Description) terms.
+
+ep_skill_list(Skills).
+% Skills = [skill(greet, python, 'Print a greeting from Mentova')]
+
+ep_skill_forget/1 removes a saved skill by name.
+
+ep_skill_forget(greet).
+
+Skills persist for the lifetime of the session in the dynamic fact ep_skill_db/4.
+
+
 SUMMARY
 
 ep_eval/3             Evaluate a Prolog goal term with timeout.
@@ -3277,6 +3311,11 @@ ep_iterate/5          Synthesize-execute-check loop with step budget.
 ep_trace_record/4     Record one step to a trace log.
 ep_trace_get/2        Retrieve all entries for a trace.
 ep_next_trace_id/1    Allocate a fresh unique trace identifier.
+ep_skill_save/4       Save a useful ephemeron as a named, reusable skill.
+ep_skill_lookup/3     Retrieve a saved skill's language and code by name.
+ep_skill_run/3        Execute a saved skill by name.
+ep_skill_list/1       List all saved skills.
+ep_skill_forget/1     Remove a saved skill by name.
 
 
 WHAT COMES NEXT
