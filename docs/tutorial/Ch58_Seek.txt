@@ -1,0 +1,151 @@
+CHAPTER 58 - THE SEEK PACK
+
+The seek pack (Layer 76) provides 14 sk_* predicates for spatial pattern
+search, sub-grid matching, template matching, D4 transform discovery, and
+grid scaling. These are general-purpose search operations used whenever
+you need to find where a pattern appears, how well it fits, or what
+spatial relationship connects two grids.
+
+The seek pack requires: grid.
+
+SECTION 58.1 - POSITION FINDING
+
+sk_positions(+Grid, +Val, -Cells)
+
+Returns all (R,C) positions where Grid has value Val, as a list of R-C pairs
+in row-major order.
+
+  sk_positions([[0,1],[1,0]], 1, Cells).
+  % Cells = [0-1, 1-0]
+
+  sk_positions([[0,0],[0,0]], 1, Cells).
+  % Cells = []
+
+sk_rows_with(+Grid, +Val, -RowIdxs)
+
+Returns all 0-indexed row numbers containing Val at least once.
+
+  sk_rows_with([[1,0],[0,0],[1,1]], 1, RowIdxs).
+  % RowIdxs = [0, 2]
+
+sk_cols_with(+Grid, +Val, -ColIdxs)
+
+Returns all 0-indexed column numbers containing Val at least once.
+
+  sk_cols_with([[1,0,1],[0,1,0]], 1, ColIdxs).
+  % ColIdxs = [0, 1, 2]
+
+sk_border_cells(+Grid, -Cells) - list of R-C pairs on the outermost ring.
+sk_interior_cells(+Grid, -Cells) - list of R-C pairs strictly inside the border.
+
+  sk_border_cells([[1,2,3],[4,5,6],[7,8,9]], Cells).
+  % Cells has 8 elements; (1,1) is the only interior cell.
+
+  sk_interior_cells([[1,2],[3,4]], Cells).
+  % Cells = []  (2x2 grid has no interior)
+
+SECTION 58.2 - SUB-GRID SEARCH
+
+sk_fits(+Grid, +Sub, +R0, +C0)
+
+Succeeds if Sub exactly matches the region of Grid starting at row R0,
+column C0. Every cell of Sub must equal the corresponding cell of Grid.
+
+  sk_fits([[1,2,3],[4,5,6],[7,8,9]], [[5,6],[8,9]], 1, 1).
+  % Succeeds: [[5,6],[8,9]] matches Grid at (1,1)
+
+sk_find_sub(+Grid, +Sub, -R0, -C0)
+
+Nondeterministically produces each (R0,C0) position where Sub fits in Grid.
+Use sk_all_subs/3 to collect all positions at once.
+
+  findall(R-C, sk_find_sub([[1,1,0],[0,1,1],[1,1,0]], [[1,1]], R, C), Ps).
+  % Ps = [0-0, 1-1, 2-0]
+
+sk_all_subs(+Grid, +Sub, -Cells) - collect all fitting positions as R0-C0 list.
+sk_count_sub(+Grid, +Sub, -N) - count how many positions Sub fits.
+
+  sk_count_sub([[1,1,0],[0,1,1],[1,1,0]], [[1,1]], N).
+  % N = 3
+
+SECTION 58.3 - TEMPLATE MATCHING
+
+sk_match_count(+Grid, +Sub, +R0, +C0, -N)
+
+N is the number of cells that agree when Sub is placed at (R0,C0).
+Unlike sk_fits, this does not require Sub to be fully contained in Grid
+and counts partial matches.
+
+  sk_match_count([[1,2],[3,4]], [[1,9],[9,4]], 0, 0, N).
+  % N = 2  (cells (0,0) and (1,1) agree)
+
+sk_best_fit(+Grid, +Sub, -R0, -C0)
+
+Finds the position (R0,C0) that maximises sk_match_count. Useful for finding
+where a template approximately appears in a grid.
+
+  sk_best_fit([[1,1,0],[1,1,0],[0,0,0]], [[1,1],[1,1]], R0, C0).
+  % R0 = 0, C0 = 0  (top-left has all 4 cells matching)
+
+SECTION 58.4 - TRANSFORM DISCOVERY
+
+sk_find_d4(+Grid1, +Grid2, -Name)
+
+Finds the first D4 transform name that maps Grid1 to Grid2. The 8 D4
+elements are tried in order: identity, reflect_h, reflect_v, transpose,
+rotate90, rotate180, rotate270, anti_diag. Fails if no element applies.
+
+  sk_find_d4([[1,2],[3,4]], [[2,1],[4,3]], Name).
+  % Name = reflect_h
+
+  sk_find_d4([[1,2],[3,4]], [[3,1],[4,2]], Name).
+  % Name = rotate90
+
+Rotation conventions:
+  rotate90:  transpose then reflect_h (90 degrees clockwise)
+  rotate180: reflect_v then reflect_h
+  rotate270: reflect_h then transpose (270 CW = 90 CCW)
+  anti_diag: rotate90 then reflect_v (anti-diagonal reflection)
+
+SECTION 58.5 - SCALING
+
+sk_upscale(+Grid, +Factor, -Scaled)
+
+Each cell of Grid becomes a Factor x Factor block in Scaled. Row count
+and column count are both multiplied by Factor.
+
+  sk_upscale([[1,2],[3,4]], 2, Scaled).
+  % Scaled = [[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]]
+
+  sk_upscale([[1]], 3, Scaled).
+  % Scaled = [[1,1,1],[1,1,1],[1,1,1]]
+
+sk_find_scale(+Grid1, +Grid2, -Factor)
+
+Finds the positive integer Factor such that sk_upscale(Grid1, Factor, Grid2)
+holds. Fails if no such integer exists.
+
+  sk_upscale([[1,2],[3,4]], 2, Grid2),
+  sk_find_scale([[1,2],[3,4]], Grid2, Factor).
+  % Factor = 2
+
+SECTION 58.6 - DESIGN NOTES
+
+sk_border_cells uses once/1 inside findall to avoid collecting corner cells
+multiple times. A 2x2 corner satisfies both R=0 and C=0; without once/1
+it would appear twice.
+
+sk_find_d4 uses once/1 to commit to the first matching transform, making
+the predicate deterministic when Name is unbound. D4 transforms are
+implemented directly (no sym dependency) using maplist(reverse,...) for
+reflect_h and reverse/2 for reflect_v.
+
+sk_upscale uses findall(Cell, (member(Cell, Row), between(1, Factor, _)),
+TiledRow) to tile each row, then sk_repeat_rows_/3 to tile vertically.
+
+SECTION 58.7 - ACCEPTANCE TESTS
+
+49 PLUnit tests cover all 14 predicates (AC-SK-001 through AC-SK-049).
+See PrologAI_4_Refinement_v110.txt, Part 87.
+
+END OF CHAPTER 58
