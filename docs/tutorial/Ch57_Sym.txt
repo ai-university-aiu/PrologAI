@@ -1,0 +1,113 @@
+CHAPTER 57 - THE SYM PACK
+
+The sym pack (Layer 75) provides 14 sy_* predicates for spatial symmetry
+transforms and symmetry testing. Symmetry is a fundamental property of
+structured visual reasoning. The pack covers all 8 elements of the dihedral
+group D4 (the symmetry group of a square), symmetry detection predicates,
+symmetrization operations, and full orbit computation.
+
+The sym pack requires: grid.
+
+SECTION 57.1 - THE SIX SPATIAL TRANSFORMS
+
+sy_reflect_h(+Grid, -Grid2)
+
+Reflects the grid left-right by reversing each row.
+
+  sy_reflect_h([[1,2,3],[4,5,6]], Grid2).
+  % Grid2 = [[3,2,1],[6,5,4]]
+
+sy_reflect_v(+Grid, -Grid2)
+
+Reflects the grid top-bottom by reversing the row order.
+
+  sy_reflect_v([[1,2],[3,4]], Grid2).
+  % Grid2 = [[3,4],[1,2]]
+
+sy_transpose(+Grid, -Grid2)
+
+Reflects across the main diagonal (rows become columns, columns become rows).
+For an MxN grid, the result is NxM.
+
+  sy_transpose([[1,2,3]], Grid2).
+  % Grid2 = [[1],[2],[3]]
+
+sy_rotate90(+Grid, -Grid2)
+
+Rotates 90 degrees clockwise. Implemented as transpose then reflect_h.
+
+  sy_rotate90([[1,2],[3,4]], Grid2).
+  % Grid2 = [[3,1],[4,2]]
+
+sy_rotate180(+Grid, -Grid2) - rotate 180 degrees (reflect_v then reflect_h).
+sy_rotate270(+Grid, -Grid2) - rotate 270 CW / 90 CCW (reflect_h then transpose).
+
+The three rotations are defined compositionally from the two reflections and
+transpose. Applying rotate90 four times returns the original grid.
+
+SECTION 57.2 - SYMMETRY TESTS
+
+sy_has_h_symm(+Grid) - succeed if the grid is its own horizontal reflection.
+sy_has_v_symm(+Grid) - succeed if the grid is its own vertical reflection.
+sy_has_rot2_symm(+Grid) - succeed if the grid is invariant under 180-degree rotation.
+sy_has_rot4_symm(+Grid) - succeed if the grid is invariant under 90-degree rotation.
+
+All four tests use structural unification: sy_reflect_h(Grid, Grid).
+
+sy_symmetries(+Grid, -Symms)
+
+Returns the list of all symmetry names present: h, v, rot2, rot4.
+Uses findall over the four symmetry tests.
+
+  sy_symmetries([[5,5],[5,5]], Symms).
+  % Symms = [h, v, rot2, rot4] (all-same grid has all symmetries)
+
+  sy_symmetries([[1,2],[3,4]], Symms).
+  % Symms = [] (asymmetric grid has none)
+
+SECTION 57.3 - SYMMETRIZATION
+
+sy_make_h_symm(+Grid, -Grid2) makes Grid horizontally symmetric by taking
+the left half of each row and mirroring it to the right. For odd-width rows,
+the center element is preserved.
+
+  sy_make_h_symm([[1,2,3,4]], [[1,2,2,1]]).
+  sy_make_h_symm([[1,2,3]], [[1,2,1]]).
+
+sy_make_v_symm(+Grid, -Grid2) similarly mirrors the top half to the bottom.
+
+SECTION 57.4 - D4 ORBIT
+
+sy_d4_orbit(+Grid, -Orbit)
+
+Computes all distinct grids reachable from Grid by the 8 elements of the
+dihedral group D4: identity, rotate90, rotate180, rotate270, reflect_h,
+reflect_v, transpose, anti-diagonal. Deduplicates with sort.
+
+For a fully symmetric grid (all same color), the orbit has 1 element.
+For a generic asymmetric grid, the orbit has up to 8 elements.
+
+  sy_d4_orbit([[5,5],[5,5]], Orbit).
+  % Orbit = [[[5,5],[5,5]]]  (length 1)
+
+SECTION 57.5 - DESIGN NOTES
+
+Rotations are defined compositionally:
+  rotate90  = transpose + reflect_h
+  rotate180 = reflect_v + reflect_h
+  rotate270 = reflect_h + transpose
+
+Anti-diagonal reflection (the 8th D4 element) = rotate90 + reflect_v.
+
+sy_transpose has a base clause for the empty grid because numlist/3 fails
+for length 0.
+
+sy_make_h_symm uses if-then-else for the odd-width center element to avoid
+choicepoints.
+
+SECTION 57.6 - ACCEPTANCE TESTS
+
+43 PLUnit tests cover all 14 predicates (AC-SY-001 through AC-SY-043).
+See PrologAI_4_Refinement_v109.txt, Part 86.
+
+END OF CHAPTER 57
