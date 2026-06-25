@@ -1,0 +1,161 @@
+Chapter 73: Grid Assembly, Concatenation, and Composition - The Assemble Pack
+
+The assemble pack (as_* predicate family, Layer 91) provides 14 predicates for
+joining, scaling, framing, positioning, and compositing grids. It fills the
+gap between existing packs that manipulate a single grid and the need to build
+larger grids from multiple pieces.
+
+
+73.1 Loading the pack
+
+?- use_module(packs/assemble/prolog/assemble).
+
+
+73.2 Horizontal and vertical concatenation
+
+as_hcat/2 joins a list of same-height grids side by side.
+
+?- as_hcat([[[1,2],[3,4]], [[5,6],[7,8]]], R).
+R = [[1,2,5,6],[3,4,7,8]].
+
+?- as_hcat([[[1],[2]], [[3],[4]], [[5],[6]]], R).
+R = [[1,3,5],[2,4,6]].
+
+as_vcat/2 stacks a list of same-width grids top to bottom.
+
+?- as_vcat([[[1,2],[3,4]], [[5,6],[7,8]]], R).
+R = [[1,2],[3,4],[5,6],[7,8]].
+
+as_grid_of/2 assembles a 2D matrix of grids: each inner list is a row of
+same-height grids; the outer list is a column of such rows.
+
+?- as_grid_of([[[[1]],[[2]]],[[[3]],[[4]]]], R).
+R = [[1,2],[3,4]].
+
+
+73.3 Downscaling
+
+as_downscale/3 reduces each K x K non-overlapping block to one cell using
+majority vote. This is the inverse of the sk_upscale predicate in the seek
+pack.
+
+?- as_downscale([[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, R).
+R = [[1,2],[3,4]].
+
+?- as_downscale([[5,5],[5,5]], 2, R).
+R = [[5]].
+
+
+73.4 Border and centering
+
+as_border/4 surrounds a grid with a W-cell wide frame of a chosen color.
+
+?- as_border([[5]], 1, 0, R).
+R = [[0,0,0],[0,5,0],[0,0,0]].
+
+?- as_border([[1,2],[3,4]], 1, 9, R).
+R = [[9,9,9,9],[9,1,2,9],[9,3,4,9],[9,9,9,9]].
+
+as_center_in/5 embeds a smaller grid at the integer floor center of a canvas
+filled with a background color.
+
+?- as_center_in([[5]], 3, 3, 0, R).
+R = [[0,0,0],[0,5,0],[0,0,0]].
+
+?- as_center_in([[7]], 5, 5, 0, R).
+R = [[0,0,0,0,0],[0,0,0,0,0],[0,0,7,0,0],[0,0,0,0,0],[0,0,0,0,0]].
+
+
+73.5 Quadrant extraction
+
+as_quarter/3 extracts one of four named quadrants from a grid. Q is one of
+the atoms tl, tr, bl, br (top-left, top-right, bottom-left, bottom-right).
+The split is at the floor midpoint of each dimension.
+
+?- as_quarter([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]], tl, R).
+R = [[1,2],[5,6]].
+
+?- as_quarter([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]], br, R).
+R = [[11,12],[15,16]].
+
+
+73.6 Mirror concatenation
+
+as_flip_h_cat/2 concatenates a grid with its own left-right mirror.
+The result has twice the column count.
+
+?- as_flip_h_cat([[1,2],[3,4]], R).
+R = [[1,2,2,1],[3,4,4,3]].
+
+?- as_flip_h_cat([[1,2,3]], R).
+R = [[1,2,3,3,2,1]].
+
+as_flip_v_cat/2 stacks a grid with its own top-bottom mirror.
+The result has twice the row count.
+
+?- as_flip_v_cat([[1,2],[3,4]], R).
+R = [[1,2],[3,4],[3,4],[1,2]].
+
+?- as_flip_v_cat([[1],[2],[3]], R).
+R = [[1],[2],[3],[3],[2],[1]].
+
+
+73.7 Interleaving
+
+as_zip_h/3 interleaves columns from two same-size grids. Column 0 from G1,
+column 0 from G2, column 1 from G1, column 1 from G2, and so on.
+
+?- as_zip_h([[1,2],[3,4]], [[5,6],[7,8]], R).
+R = [[1,5,2,6],[3,7,4,8]].
+
+as_zip_v/3 interleaves rows from two same-size grids.
+
+?- as_zip_v([[1,2],[3,4]], [[5,6],[7,8]], R).
+R = [[1,2],[5,6],[3,4],[7,8]].
+
+
+73.8 Paste and mask
+
+as_paste/5 unconditionally pastes a sub-grid into a base grid at a given
+row and column offset. Unlike gd_overlay in the grid pack, as_paste always
+overwrites regardless of cell value.
+
+?- as_paste([[0,0,0],[0,0,0],[0,0,0]], [[5]], 1, 1, R).
+R = [[0,0,0],[0,5,0],[0,0,0]].
+
+?- as_paste([[0,0,0],[0,0,0],[0,0,0]], [[1,2],[3,4]], 0, 0, R).
+R = [[1,2,0],[3,4,0],[0,0,0]].
+
+as_mask_fill/4 replaces cells with Fill wherever the corresponding mask cell
+is non-zero.
+
+?- as_mask_fill([[1,2],[3,4]], [[0,1],[1,0]], 9, R).
+R = [[1,9],[9,4]].
+
+
+73.9 Crop or pad to size
+
+as_crop_to/5 produces a grid of exactly NR rows and NC columns. If the input
+is smaller, cells beyond its bounds are filled with Bg. If the input is larger,
+cells beyond NR rows or NC columns are discarded.
+
+?- as_crop_to([[1,2,3,4],[5,6,7,8]], 2, 2, 0, R).
+R = [[1,2],[5,6]].
+
+?- as_crop_to([[1,2],[3,4]], 4, 4, 0, R).
+R = [[1,2,0,0],[3,4,0,0],[0,0,0,0],[0,0,0,0]].
+
+
+73.10 Common patterns
+
+Build a bordered pattern from a motif and its mirror:
+?- as_flip_h_cat(Motif, Wide), as_border(Wide, 1, 0, Framed).
+
+Assemble four different grids into a 2x2 layout:
+?- as_grid_of([[TL, TR], [BL, BR]], Combined).
+
+Center a small decoded symbol in a fixed-size output canvas:
+?- as_center_in(Symbol, 10, 10, 0, Output).
+
+Downscale a large grid to reveal the underlying pattern:
+?- as_downscale(LargeGrid, 3, SmallGrid).
