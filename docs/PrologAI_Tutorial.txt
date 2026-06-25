@@ -10830,3 +10830,185 @@ Center a small decoded symbol in a fixed-size output canvas:
 
 Downscale a large grid to reveal the underlying pattern:
 ?- as_downscale(LargeGrid, 3, SmallGrid).
+Chapter 74: Grid Region Extraction by Separator Lines - The Region Pack
+
+The region pack (rg_* predicate family, Layer 92) provides 14 predicates for
+dividing a grid into rectangular sections. The division is content-driven: a
+row becomes a separator row when every cell in that row equals a designated
+separator value (Sep). A column becomes a separator column when every cell in
+that column equals Sep. The resulting rectangular areas between separators are
+the sections.
+
+This approach differs from the crop pack (Layer 45), which splits at a fixed
+index, and the tile pack (Layer 81), which splits into equal bands. The region
+pack splits at CONTENT-defined separators.
+
+
+74.1 Loading the pack
+
+?- use_module(packs/region/prolog/region).
+
+
+74.2 Finding separators
+
+rg_is_sep_row/3 checks whether a single row is a separator.
+
+?- rg_is_sep_row([[1,2],[0,0],[3,4]], 1, 0).
+true.
+
+?- rg_is_sep_row([[1,2],[0,1],[3,4]], 1, 0).
+false.
+
+rg_is_sep_col/3 checks whether a single column is a separator.
+
+?- rg_is_sep_col([[0,1],[0,2],[0,3]], 0, 0).
+true.
+
+rg_sep_rows/3 collects all separator row indices into a sorted list.
+
+?- rg_sep_rows([[1,2],[0,0],[3,4],[0,0],[5,6]], 0, L).
+L = [1,3].
+
+?- rg_sep_rows([[1,2],[3,4]], 0, L).
+L = [].
+
+rg_sep_cols/3 collects all separator column indices.
+
+?- rg_sep_cols([[1,0,2],[3,0,4]], 0, L).
+L = [1].
+
+
+74.3 Computing section spans
+
+rg_spans_h/3 returns a list of R0-R1 inclusive row bounds, one per horizontal
+section.
+
+?- rg_spans_h([[1,2],[0,0],[3,4],[5,6]], 0, Spans).
+Spans = [0-0, 2-3].
+
+?- rg_spans_h([[1,2],[0,0],[3,4],[0,0],[5,6]], 0, Spans).
+Spans = [0-0, 2-2, 4-4].
+
+?- rg_spans_h([[1,2],[3,4]], 0, Spans).
+Spans = [0-1].
+
+rg_spans_v/3 returns a list of C0-C1 inclusive column bounds.
+
+?- rg_spans_v([[1,0,2,0,3]], 0, Spans).
+Spans = [0-0, 2-2, 4-4].
+
+
+74.4 Cutting grids
+
+rg_cut_h/3 splits a grid at its separator rows. The result is a list of
+sub-grids; separator rows are excluded.
+
+?- rg_cut_h([[1,2],[0,0],[3,4],[5,6]], 0, Parts).
+Parts = [[[1,2]], [[3,4],[5,6]]].
+
+?- rg_cut_h([[0,0],[1,2],[3,4]], 0, Parts).
+Parts = [[[1,2],[3,4]]].
+
+rg_cut_v/3 splits a grid at its separator columns.
+
+?- rg_cut_v([[1,0,2],[3,0,4]], 0, Parts).
+Parts = [[[1],[3]], [[2],[4]]].
+
+?- rg_cut_v([[1,0,2,0,3]], 0, Parts).
+Parts = [[[1]], [[2]], [[3]]].
+
+
+74.5 2D section matrix
+
+rg_sections/3 cuts in both directions. The result is a 2D list: the outer list
+is indexed by horizontal section, the inner list by vertical section.
+
+?- rg_sections([[1,0,2],[0,0,0],[3,0,4]], 0, M).
+M = [[[[1]],[[2]]], [[[3]],[[4]]]].
+
+?- rg_sections([[1,2],[0,0],[3,4]], 0, M).
+M = [[[[1,2]]], [[[3,4]]]].
+
+rg_section_h/4 retrieves a specific horizontal section by 1-indexed number.
+
+?- rg_section_h([[1,2],[0,0],[3,4]], 0, 1, R).
+R = [[1,2]].
+
+?- rg_section_h([[1,2],[0,0],[3,4]], 0, 2, R).
+R = [[3,4]].
+
+rg_section_v/4 retrieves a specific vertical section.
+
+?- rg_section_v([[1,0,2],[3,0,4]], 0, 2, R).
+R = [[2],[4]].
+
+
+74.6 Counting sections
+
+rg_count_h/3 and rg_count_v/3 return the number of sections along each axis.
+
+?- rg_count_h([[1,2],[0,0],[3,4],[0,0],[5,6]], 0, N).
+N = 3.
+
+?- rg_count_v([[1,0,2,0,3]], 0, N).
+N = 3.
+
+?- rg_count_h([[1,2],[3,4]], 0, N).
+N = 1.
+
+
+74.7 Region query
+
+rg_region/5 extracts the sub-grid of the section that contains a given cell
+coordinate (R, C). Fails if (R, C) is itself a separator position.
+
+?- rg_region([[1,0,2],[0,0,0],[3,0,4]], 0, 0, 0, R).
+R = [[1]].
+
+?- rg_region([[1,0,2],[0,0,0],[3,0,4]], 0, 2, 2, R).
+R = [[4]].
+
+?- rg_region([[1,0,2],[0,0,0],[3,0,4]], 0, 2, 0, R).
+R = [[3]].
+
+
+74.8 Combining region with other packs
+
+Find how many horizontal sections a grid has and retrieve the second:
+
+?- rg_count_h(Grid, 0, N), rg_section_h(Grid, 0, 2, Section).
+
+Use rg_sections to build a 2D matrix, then use the assemble pack to stitch
+modified sub-grids back together:
+
+?- rg_sections(Grid, 0, M),
+   maplist(maplist([Sub, Result]>>(process(Sub, Result))), M, Processed),
+   maplist(as_hcat, Processed, HRows),
+   as_vcat(HRows, Output).
+
+Use rg_region to identify the content region around a specific cell, then use
+the scene pack to analyze objects within that region:
+
+?- rg_region(Grid, 0, R, C, Region),
+   sc_objects(Region, 0, Objs).
+
+
+74.9 Summary
+
+Predicate           Arity   Purpose
+rg_sep_rows         3       sorted list of separator row indices
+rg_sep_cols         3       sorted list of separator column indices
+rg_is_sep_row       3       test whether one row is all-Sep
+rg_is_sep_col       3       test whether one column is all-Sep
+rg_spans_h          3       R0-R1 spans of horizontal sections
+rg_spans_v          3       C0-C1 spans of vertical sections
+rg_cut_h            3       split into list of row-strip sub-grids
+rg_cut_v            3       split into list of column-strip sub-grids
+rg_sections         3       2D matrix of all sub-grid sections
+rg_section_h        4       N-th horizontal section (1-indexed)
+rg_section_v        4       N-th vertical section (1-indexed)
+rg_count_h          3       count of horizontal sections
+rg_count_v          3       count of vertical sections
+rg_region           5       sub-grid of section containing cell (R,C)
+
+The region pack lives at Layer 92, above the assemble pack (Layer 91).
