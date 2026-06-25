@@ -9901,3 +9901,101 @@ All 42 PLUnit acceptance tests are in packs/label/test/test_label.pl.
 The Specification entry is Part 94 (LB-LB-001 through LB-LB-014).
 The Architecture entry is ARCH-70.
 The Refinement entry covers AC-LB-001 through AC-LB-042.
+
+
+Chapter 66: The Morph Pack - Morphological Grid Operations
+
+The morph pack (mo_* predicate family, Layer 84) provides morphological
+operations on grids: expanding and shrinking object regions, extracting
+perimeters and interiors, computing distances, growing regions from seeds,
+and filling enclosed holes.
+
+Load the pack with:
+
+    :- use_module(library(morph)).
+
+Basic Dilation and Erosion
+
+mo_dilate/3 expands all non-background regions by one 4-connected step.
+Each background cell adjacent to a non-background cell receives the value
+of its first non-background 4-neighbor.
+
+    ?- mo_dilate([[0,0,0],[0,1,0],[0,0,0]], 0, R).
+    R = [[0,1,0],[1,1,1],[0,1,0]].
+
+mo_erode/3 shrinks all non-background regions by one step. Each non-background
+cell adjacent to a background cell becomes background.
+
+    ?- mo_erode([[0,1,0],[1,1,1],[0,1,0]], 0, R).
+    R = [[0,0,0],[0,1,0],[0,0,0]].
+
+Repeated Operations
+
+mo_dilate_n/4 and mo_erode_n/4 apply the operation N times. N=0 returns
+the input unchanged.
+
+    ?- mo_dilate_n([[0,0,0,0,0],[0,0,0,0,0],[0,0,1,0,0],
+                    [0,0,0,0,0],[0,0,0,0,0]], 0, 2, R).
+    R = [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]].
+
+Compound Operations
+
+mo_open/3 applies erosion then dilation (removes small protrusions).
+mo_close/3 applies dilation then erosion (fills small gaps).
+mo_smooth/3 applies open then close (combines both effects).
+
+    ?- mo_close([[1,0,1]], 0, R).
+    R = [[1,1,1]].
+
+    ?- mo_smooth([[0,1,0],[1,1,1],[0,1,0]], 0, R).
+    R = [[1,1,1],[1,1,1],[1,1,1]].
+
+Boundary and Interior
+
+mo_boundary/3 keeps only perimeter non-background cells.
+mo_interior/3 keeps only non-perimeter non-background cells.
+
+    ?- mo_boundary([[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],
+                    [0,1,1,1,0],[0,0,0,0,0]], 0, R).
+    R = [[0,0,0,0,0],[0,1,1,1,0],[0,1,0,1,0],[0,1,1,1,0],[0,0,0,0,0]].
+
+Value-Fixed Dilation
+
+mo_dilate_val/4 dilates with a fixed fill value:
+
+    ?- mo_dilate_val([[0,0,0],[0,1,0],[0,0,0]], 0, 9, R).
+    R = [[0,9,0],[9,1,9],[0,9,0]].
+
+Region Growing
+
+mo_grow_from/5 performs BFS from seed cells into adjacent background territory:
+
+    ?- mo_grow_from([[0,1,0],[0,1,0],[0,1,0]], [0-0], 0, 5, R).
+    R = [[5,1,0],[5,1,0],[5,1,0]].
+
+Distance to Background
+
+mo_dist_to_bg/3 computes L1 Manhattan distance to nearest background cell:
+
+    ?- mo_dist_to_bg([[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],
+                      [0,1,1,1,0],[0,0,0,0,0]], 0, D).
+    D = [[0,0,0,0,0],[0,1,1,1,0],[0,1,2,1,0],[0,1,1,1,0],[0,0,0,0,0]].
+
+Dilation Rings
+
+mo_ring/4 extracts cells added at exactly the Nth dilation step:
+
+    ?- mo_ring([[0,0,0],[0,1,0],[0,0,0]], 0, 1, R).
+    R = [[0,1,0],[1,0,1],[0,1,0]].
+
+Filling Enclosed Holes
+
+mo_fill_holes/4 fills background regions not reachable from the grid border:
+
+    ?- mo_fill_holes([[1,1,1],[1,0,1],[1,1,1]], 0, 5, R).
+    R = [[1,1,1],[1,5,1],[1,1,1]].
+
+All 42 PLUnit acceptance tests are in packs/morph/test/test_morph.pl.
+The Specification entry is Part 95 (MO-MO-001 through MO-MO-014).
+The Architecture entry is ARCH-71.
+The Refinement entry covers AC-MO-001 through AC-MO-042.
