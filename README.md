@@ -61,14 +61,14 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       75 work packages — the complete cognitive engine (see below)
+├── packs/       76 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
 └── launcher/    Entry points and bootstrapper
 ```
 
-### The 75 Work Packages
+### The 76 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -192,6 +192,7 @@ Everything is inspectable.
 | `count` | Counting Cells, Colors, and Regions in Grids (PR 75) — color cell count (`cn_color_count/3`), color histogram (`cn_histogram/3`), most/least frequent colors (`cn_max_color/2`, `cn_min_color/2`), rows/columns containing a color (`cn_color_rows/3`, `cn_color_cols/3`), row/column value diversity (`cn_row_distinct/3`, `cn_col_distinct/3`), total cells (`cn_grid_total/2`), grid comparison counts (`cn_equal_cells/3`, `cn_diff_cells/3`), region color lookup (`cn_region_color/3`), per-color region tally (`cn_regions_per_color/3`), and flat-list value count (`cn_by_value/3`). 14 cn_* predicates, Layer 54. |
 | `fill` | Pattern-Based Region and Grid Filling (PR 76) — fill a region list (`fl_fill_region/4`), fill a bounding box (`fl_fill_bbox/4`), fill entire rows or columns (`fl_fill_row/4`, `fl_fill_col/4`), fill explicit cell lists (`fl_fill_cells/4`), fill the outermost grid ring (`fl_fill_border/3`), fill only boundary cells of a region (`fl_outline_region/4`), fill only interior cells (`fl_fill_interior/4`), create uniform-color grids (`fl_solid_rect/4`), create checkerboard grids (`fl_checkerboard/5`), draw horizontal and vertical line segments (`fl_draw_hline/6`, `fl_draw_vline/6`), fill the main diagonal (`fl_fill_main_diag/3`), and overlay a subgrid with transparency (`fl_stamp/6`). 14 fl_* predicates, Layer 55. |
 | `pattern` | Pattern Detection, Tiling Period, and Motif Extraction (PR 77) — tiling period of a row (`pt_row_period/2`), tiling period of a column (`pt_col_period/3`), horizontal grid tiling period (`pt_grid_period_h/2`), vertical grid tiling period (`pt_grid_period_v/2`), minimal horizontal tile (`pt_tile_unit_h/2`), minimal vertical tile (`pt_tile_unit_v/2`), minimal 2D tile (`pt_tile_unit/2`), exact tiling test (`pt_is_tiling/2`), tile match counting (`pt_count_tile/3`), tile match position list (`pt_find_tile/3`), subgrid extraction at position (`pt_extract_tile/5`), distinct row count (`pt_unique_rows/2`), distinct column count (`pt_unique_cols/2`), and uniform-row test (`pt_has_uniform_rows/1`). 14 pt_* predicates, Layer 56. |
+| `compare` | Grid and Region Comparison, Difference Detection, and Similarity Scoring (PR 78) — cells where two grids differ (`cp_diff_cells/3`), cells where they agree (`cp_same_cells/3`), cells where a color was gained (`cp_added_color/4`) or lost (`cp_removed_color/4`), cells that changed to (`cp_changed_to/4`) or from (`cp_changed_from/4`) a color, 0/1 difference map (`cp_diff_map/3`), integer-exact similarity score (`cp_similarity/3`), region set difference (`cp_region_diff/3`), intersection (`cp_region_intersect/3`), union (`cp_region_union/3`), order-independent region equality (`cp_region_equal/2`), structural grid equality (`cp_grids_equal/2`), and Old-New color pairs for changed cells (`cp_color_shift/3`). 14 cp_* predicates, Layer 57. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**
