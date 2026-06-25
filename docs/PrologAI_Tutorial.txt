@@ -4773,4 +4773,112 @@ WHAT COMES NEXT
 Chapter 28 covers the next cognitive pack in the PrologAI stack.
 
 END OF CHAPTER 27
-END OF CHAPTER 27 AND END OF THE PROLOGAI TUTORIAL
+
+
+CHAPTER 28: THE SHAPE PACK
+
+
+OVERVIEW
+
+The shape pack (module shape, prefix sh_) provides normalized shape
+extraction, comparison, spatial transformation, and D4 orbit reasoning
+over cell sets. It lives in Layer 46 of the PrologAI cognitive stack and
+depends only on the grid pack.
+
+A shape is a sorted list of r(R,C) cells where the minimum row and minimum
+column are both 0. This is the canonical representation for an extracted,
+position-independent cell pattern.
+
+Predicates: 14
+Layer: 46
+Module: shape
+Prefix: sh_
+Depends on: grid
+
+
+WHAT IS A SHAPE?
+
+A shape is a sorted list of r(R,C) terms satisfying two invariants:
+1. min(R) = 0 and min(C) = 0 (the shape touches the origin)
+2. The list is sorted in standard term order
+
+For example, an L-shaped pattern at r(2,3), r(3,3), r(4,3), r(4,4)
+becomes normalized shape [r(0,0), r(1,0), r(2,0), r(2,1)].
+
+
+CREATING SHAPES
+
+sh_from_cells(+Cells, -Shape) - normalize raw cells to a shape.
+sh_from_grid(+Grid, +Color, -Shape) - extract and normalize color cells.
+
+% Normalize an L-shape.
+:- sh_from_cells([r(2,3), r(3,3), r(4,3), r(4,4)], Shape).
+% Shape = [r(0,0), r(1,0), r(2,0), r(2,1)].
+
+% Extract from grid.
+Grid = [[1,0,0],[1,0,0],[1,1,0]].
+:- sh_from_grid(Grid, 1, Shape).
+% Shape = [r(0,0), r(1,0), r(2,0), r(2,1)].
+
+
+SHAPE PROPERTIES
+
+sh_area/2 - cell count.
+sh_bounding_size/3 - bounding box Rows x Cols.
+sh_contains_cell/2 - membership test (deterministic).
+sh_equal/2 - identity test (same normalized list).
+
+
+SPATIAL TRANSFORMATIONS
+
+sh_translate(+Shape, +DR, +DC, -Shape2) - shift without renormalizing.
+sh_rotate90(+Shape, -Shape2) - 90-degree CW rotation, then renormalize.
+sh_reflect_h(+Shape, -Shape2) - horizontal flip, then renormalize.
+sh_reflect_v(+Shape, -Shape2) - vertical flip, then renormalize.
+
+
+D4 ORBIT AND CANONICAL FORM
+
+sh_orbit(+Shape, -Orbit) - all distinct D4 orientations (1 to 8).
+sh_canonical(+Shape, -Canon) - lex-min D4 orientation.
+sh_equivalent(+Shape1, +Shape2) - same D4 canonical form.
+
+% An L-shape and its rotation are equivalent.
+:- sh_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
+   sh_rotate90(S, R90),
+   sh_equivalent(S, R90).
+% Succeeds.
+
+
+PLACING SHAPES
+
+sh_to_grid(+Shape, +DR, +DC, +Color, +Grid, -Grid2) - place shape on grid.
+
+% Place shape at row 1, col 2 with color 5.
+:- sh_to_grid(Shape, 1, 2, 5, Grid, Grid2).
+
+
+PREDICATE SUMMARY
+
+Creation:
+  sh_from_cells/2, sh_from_grid/3
+
+Properties:
+  sh_area/2, sh_bounding_size/3, sh_contains_cell/2, sh_equal/2
+
+Transformation:
+  sh_translate/4, sh_rotate90/2, sh_reflect_h/2, sh_reflect_v/2
+
+D4 orbit:
+  sh_orbit/2, sh_canonical/2, sh_equivalent/2
+
+Placement:
+  sh_to_grid/6
+
+
+WHAT COMES NEXT
+
+Chapter 29 covers the next cognitive pack in the PrologAI stack.
+
+END OF CHAPTER 28
+END OF CHAPTER 28 AND END OF THE PROLOGAI TUTORIAL
