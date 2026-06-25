@@ -1,0 +1,137 @@
+Chapter 72: Object Spatial Ordering and Ranking - The Order Pack
+
+The order pack (od_* predicate family, Layer 90) provides 14 predicates for
+sorting, selecting, and ranking objects by their spatial position or color.
+
+All predicates work with obj(Color, Cells) terms where Cells is a list of
+r(R, C) cell coordinates. The key concept is the centroid: the integer floor
+average of all row and column coordinates in the object's cell list.
+
+
+72.1 Loading the pack
+
+?- use_module(packs/order/prolog/order).
+
+
+72.2 Computing the centroid
+
+od_centroid/3 computes the integer floor centroid of an object.
+
+?- od_centroid(obj(1, [r(0,0), r(2,2)]), CR, CC).
+CR = 1, CC = 1.
+
+?- od_centroid(obj(2, [r(0,0)]), CR, CC).
+CR = 0, CC = 0.
+
+?- od_centroid(obj(3, [r(0,0), r(0,4), r(4,0), r(4,4)]), CR, CC).
+CR = 2, CC = 2.
+
+
+72.3 Sorting by spatial position
+
+od_sort_row/2 sorts objects from topmost to bottommost centroid row.
+
+?- od_sort_row([obj(1,[r(5,0)]), obj(2,[r(1,0)]), obj(3,[r(3,0)])], S).
+S = [obj(2,[r(1,0)]), obj(3,[r(3,0)]), obj(1,[r(5,0)])].
+
+od_sort_col/2 sorts objects from leftmost to rightmost centroid column.
+
+?- od_sort_col([obj(1,[r(0,5)]), obj(2,[r(0,1)]), obj(3,[r(0,3)])], S).
+S = [obj(2,[r(0,1)]), obj(3,[r(0,3)]), obj(1,[r(0,5)])].
+
+od_reading_order/2 sorts first by row, then by column within the same row.
+
+?- od_reading_order([obj(1,[r(0,3)]), obj(2,[r(0,1)]), obj(3,[r(1,2)])], S).
+S = [obj(2,[r(0,1)]), obj(1,[r(0,3)]), obj(3,[r(1,2)])].
+
+od_sort_color/2 sorts objects by their color value ascending.
+
+?- od_sort_color([obj(3,[r(0,0)]), obj(1,[r(1,0)]), obj(2,[r(2,0)])], S).
+S = [obj(1,[r(1,0)]), obj(2,[r(2,0)]), obj(3,[r(0,0)])].
+
+
+72.4 Selecting extreme objects
+
+od_topmost/2 returns the object with the smallest centroid row.
+
+?- od_topmost([obj(1,[r(4,0)]), obj(2,[r(0,0)])], T).
+T = obj(2,[r(0,0)]).
+
+od_bottommost/2 returns the object with the largest centroid row.
+
+?- od_bottommost([obj(1,[r(4,0)]), obj(2,[r(0,0)])], B).
+B = obj(1,[r(4,0)]).
+
+od_leftmost/2 returns the object with the smallest centroid column.
+
+?- od_leftmost([obj(1,[r(0,5)]), obj(2,[r(0,1)])], L).
+L = obj(2,[r(0,1)]).
+
+od_rightmost/2 returns the object with the largest centroid column.
+
+?- od_rightmost([obj(1,[r(0,5)]), obj(2,[r(0,1)])], R).
+R = obj(1,[r(0,5)]).
+
+
+72.5 Selecting by index
+
+od_nth_row/3 selects the Nth object in row-ascending order. N is 1-indexed.
+
+?- Objs = [obj(1,[r(6,0)]), obj(2,[r(0,0)]), obj(3,[r(3,0)])],
+   od_nth_row(Objs, 1, Obj).
+Obj = obj(2,[r(0,0)]).
+
+?- Objs = [obj(1,[r(6,0)]), obj(2,[r(0,0)]), obj(3,[r(3,0)])],
+   od_nth_row(Objs, 2, Obj).
+Obj = obj(3,[r(3,0)]).
+
+od_nth_col/3 selects the Nth object in column-ascending order.
+
+?- Objs = [obj(1,[r(0,6)]), obj(2,[r(0,0)]), obj(3,[r(0,3)])],
+   od_nth_col(Objs, 1, Obj).
+Obj = obj(2,[r(0,0)]).
+
+
+72.6 Selecting by proximity
+
+od_nearest/4 finds the object closest to a reference grid position.
+
+?- od_nearest([obj(1,[r(0,0)]), obj(2,[r(8,8)])], 0, 0, Near).
+Near = obj(1,[r(0,0)]).
+
+?- od_nearest([obj(1,[r(0,0)]), obj(2,[r(8,8)])], 7, 7, Near).
+Near = obj(2,[r(8,8)]).
+
+od_farthest/4 finds the object farthest from a reference position.
+
+?- od_farthest([obj(1,[r(0,0)]), obj(2,[r(9,9)])], 0, 0, Far).
+Far = obj(2,[r(9,9)]).
+
+
+72.7 Ranking objects
+
+od_rank_row/3 gives the 1-based rank of an object in row-ascending order.
+
+?- Objs = [obj(1,[r(0,0)]), obj(2,[r(5,0)]), obj(3,[r(9,0)])],
+   od_rank_row(Objs, obj(1,[r(0,0)]), Rank).
+Rank = 1.
+
+?- Objs = [obj(1,[r(0,0)]), obj(2,[r(5,0)]), obj(3,[r(9,0)])],
+   od_rank_row(Objs, obj(3,[r(9,0)]), Rank).
+Rank = 3.
+
+
+72.8 Combining with the obj pack
+
+A typical workflow extracts objects with obj_all/2 from the obj pack, then
+uses the order pack to select or sort them.
+
+Find all objects, then get the topmost:
+?- obj_all(Grid, AllObjs), od_topmost(AllObjs, TopObj).
+
+Get objects sorted in reading order for sequential processing:
+?- obj_all(Grid, AllObjs), od_reading_order(AllObjs, Ordered).
+
+Identify the rightmost object and compute its centroid:
+?- obj_all(Grid, AllObjs), od_rightmost(AllObjs, Right),
+   od_centroid(Right, CR, CC).
