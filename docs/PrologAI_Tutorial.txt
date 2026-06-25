@@ -11227,3 +11227,124 @@ nb_flood_fill         5      4-connected flood fill from seed; returns modified 
 nb_dilate             4      expand Color region by one 4-connected layer
 
 The neighbor pack lives at Layer 93, above the region pack (Layer 92).
+Chapter 76: Row and Column Permutation - The Permute Pack
+
+The permute pack (pm_* predicate family, Layer 94) provides 14 predicates for
+arbitrary reordering of grid rows and columns. Reordering means placing rows or
+columns into any desired order, swapping two of them, shifting them cyclically,
+sorting them, or adding and removing them entirely.
+
+This is different from the flip pack (Layer 20), which mirrors in a fixed
+direction, and the rotate pack (Layer 21), which turns by 90-degree increments.
+The permute pack handles general index permutations specified by the caller.
+
+
+76.1 Loading the pack
+
+?- use_module(packs/permute/prolog/permute).
+
+
+76.2 Direct permutation
+
+pm_permute_rows/3 reorders rows by an explicit index list. Result row i comes
+from Grid row Perm[i].
+
+?- pm_permute_rows([[1,2],[3,4],[5,6]], [2,0,1], R).
+R = [[5,6],[1,2],[3,4]].
+
+?- pm_permute_rows([[1,2],[3,4]], [1,0], R).
+R = [[3,4],[1,2]].
+
+pm_permute_cols/3 does the same for columns.
+
+?- pm_permute_cols([[1,2,3],[4,5,6]], [2,0,1], R).
+R = [[3,1,2],[6,4,5]].
+
+
+76.3 Pairwise swap
+
+pm_swap_rows/4 exchanges exactly two rows.
+
+?- pm_swap_rows([[1,2],[3,4],[5,6]], 0, 2, R).
+R = [[5,6],[3,4],[1,2]].
+
+pm_swap_cols/4 exchanges exactly two columns.
+
+?- pm_swap_cols([[1,2,3],[4,5,6]], 0, 2, R).
+R = [[3,2,1],[6,5,4]].
+
+Swapping a row or column with itself returns the grid unchanged.
+
+
+76.4 Cyclic shifting
+
+pm_cycle_rows/3 moves the last N rows to the front.
+
+?- pm_cycle_rows([[1,2],[3,4],[5,6]], 1, R).
+R = [[5,6],[1,2],[3,4]].
+
+?- pm_cycle_rows([[1,2],[3,4],[5,6],[7,8]], 2, R).
+R = [[5,6],[7,8],[1,2],[3,4]].
+
+N is reduced modulo the number of rows, so N=0 returns the grid unchanged.
+
+pm_cycle_cols/3 moves the last N columns to the left.
+
+?- pm_cycle_cols([[1,2,3],[4,5,6]], 1, R).
+R = [[3,1,2],[6,4,5]].
+
+?- pm_cycle_cols([[1,2,3,4],[5,6,7,8]], 2, R).
+R = [[3,4,1,2],[7,8,5,6]].
+
+
+76.5 Permutation discovery
+
+pm_find_row_perm/3 finds the permutation that maps Grid1 rows to Grid2 rows.
+
+?- pm_find_row_perm([[1,2],[3,4],[5,6]], [[5,6],[1,2],[3,4]], P).
+P = [2,0,1].
+
+pm_find_col_perm/3 finds the permutation that maps Grid1 columns to Grid2 columns.
+
+?- pm_find_col_perm([[1,2,3],[4,5,6]], [[3,1,2],[6,4,5]], P).
+P = [2,0,1].
+
+Both predicates fail if any row or column of Grid2 does not appear in Grid1.
+
+
+76.6 Lexicographic sorting
+
+pm_sort_rows/2 sorts rows in ascending lexicographic order. Duplicate rows
+are preserved (msort, not sort).
+
+?- pm_sort_rows([[5,6],[1,2],[3,4]], R).
+R = [[1,2],[3,4],[5,6]].
+
+pm_sort_cols/2 sorts columns in ascending lexicographic order.
+
+?- pm_sort_cols([[3,1,2],[6,4,5]], R).
+R = [[1,2,3],[4,5,6]].
+
+
+76.7 Structural editing
+
+pm_insert_row/4 inserts a new row before position R.
+
+?- pm_insert_row([[1,2],[3,4]], 1, [9,9], R).
+R = [[1,2],[9,9],[3,4]].
+
+pm_delete_row/3 removes row R.
+
+?- pm_delete_row([[1,2],[3,4],[5,6]], 1, R).
+R = [[1,2],[5,6]].
+
+pm_insert_col/4 inserts a column of values before position C. The new column
+must have one value per row.
+
+?- pm_insert_col([[1,2],[3,4]], 0, [9,9], R).
+R = [[9,1,2],[9,3,4]].
+
+pm_delete_col/3 removes column C from every row.
+
+?- pm_delete_col([[1,2,3],[4,5,6]], 1, R).
+R = [[1,3],[4,6]].
