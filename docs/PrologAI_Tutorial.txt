@@ -11827,3 +11827,171 @@ analysis:
   sr_cross_fill/5      - fill all Rows x Cols intersections with Color
 
 END OF CHAPTER 79
+Chapter 80: Diagonal Line Extraction and Filling - The Diagonal Pack
+
+The diagonal pack (Layer 98, Work Package 119) provides 14 predicates for
+extracting cell values along diagonals and anti-diagonals, filling individual
+diagonals with a color, computing the diagonal membership index of any cell,
+and testing whether a diagonal is uniform (all one value).
+
+A "diagonal" is the set of cells where C - R is constant (same column-minus-row
+offset). A "anti-diagonal" is the set of cells where R + C is constant (same
+row-plus-column sum). The predicates use the dg_* prefix. Load the pack with:
+
+  :- use_module(library(prologai/diagonal)).
+
+
+80.1 Definitions
+
+For any grid with NR rows and NC columns (all 0-based):
+
+Main diagonal: cells where C == R (offset = 0). Runs from top-left to bottom-right.
+N-th diagonal: cells where C - R = N. N > 0 is above and right of main; N < 0 is below.
+Main anti-diagonal: cells where R + C = NC - 1 (passes through top-right corner).
+N-th anti-diagonal: cells where R + C = N. N = 0 is the top-left corner alone.
+
+
+80.2 Extracting Diagonal Values
+
+dg_main_diag(+Grid, -Diag) extracts the main diagonal:
+
+  ?- dg_main_diag([[1,2,3],[4,5,6],[7,8,9]], D).
+  D = [1, 5, 9].
+
+For a non-square grid, the diagonal is truncated at min(NR, NC) elements:
+
+  ?- dg_main_diag([[1,2,3],[4,5,6]], D).
+  D = [1, 5].    % 2 rows, so only cells (0,0) and (1,1)
+
+dg_anti_diag(+Grid, -Diag) extracts the main anti-diagonal:
+
+  ?- dg_anti_diag([[1,2,3],[4,5,6],[7,8,9]], D).
+  D = [3, 5, 7].    % cells (0,2), (1,1), (2,0)
+
+dg_nth_diag(+Grid, +N, -Diag) extracts any diagonal:
+
+  ?- dg_nth_diag([[1,2,3],[4,5,6],[7,8,9]], 1, D).
+  D = [2, 6].    % N=1: cells (0,1), (1,2)
+
+  ?- dg_nth_diag([[1,2,3],[4,5,6],[7,8,9]], -1, D).
+  D = [4, 8].    % N=-1: cells (1,0), (2,1)
+
+dg_nth_anti_diag(+Grid, +N, -Diag) extracts any anti-diagonal:
+
+  ?- dg_nth_anti_diag([[1,2,3],[4,5,6],[7,8,9]], 2, D).
+  D = [3, 5, 7].    % N=2: cells (0,2), (1,1), (2,0) — the main anti-diagonal
+
+
+80.3 Enumerating All Diagonals
+
+dg_all_diags(+Grid, -Diags) returns all diagonals in offset order from -(NR-1) to NC-1:
+
+  ?- dg_all_diags([[1,2],[3,4]], Diags).
+  Diags = [[3], [1,4], [2]].
+  % offset -1: [3], offset 0: [1,4], offset 1: [2]
+
+dg_all_anti_diags(+Grid, -ADiags) returns all anti-diagonals in sum order from 0 to NR+NC-2:
+
+  ?- dg_all_anti_diags([[1,2],[3,4]], ADiags).
+  ADiags = [[1], [2,3], [4]].
+  % sum 0: [1], sum 1: [2,3], sum 2: [4]
+
+
+80.4 Filling Diagonals with a Color
+
+dg_fill_main(+Grid, +Color, -Result) fills the main diagonal:
+
+  ?- dg_fill_main([[1,2,3],[4,5,6],[7,8,9]], 0, R).
+  R = [[0,2,3],[4,0,6],[7,8,0]].
+
+dg_fill_anti(+Grid, +Color, -Result) fills the main anti-diagonal:
+
+  ?- dg_fill_anti([[1,2,3],[4,5,6],[7,8,9]], 0, R).
+  R = [[1,2,0],[4,0,6],[0,8,9]].
+
+dg_fill_nth_diag(+Grid, +N, +Color, -Result) fills any diagonal:
+
+  ?- dg_fill_nth_diag([[1,2,3],[4,5,6],[7,8,9]], 1, 0, R).
+  R = [[1,0,3],[4,5,0],[7,8,9]].
+
+dg_fill_nth_anti_diag(+Grid, +N, +Color, -Result) fills any anti-diagonal:
+
+  ?- dg_fill_nth_anti_diag([[1,2,3],[4,5,6],[7,8,9]], 2, 0, R).
+  R = [[1,2,0],[4,0,6],[0,8,9]].    % same as fill_anti for a 3x3 grid
+
+
+80.5 Cell Diagonal Membership
+
+dg_cell_diag(+R, +C, -N) computes which diagonal cell (R,C) belongs to:
+
+  ?- dg_cell_diag(1, 3, N).
+  N = 2.    % C - R = 3 - 1 = 2
+
+  ?- dg_cell_diag(2, 0, N).
+  N = -2.    % C - R = 0 - 2 = -2
+
+dg_cell_anti_diag(+R, +C, -N) computes which anti-diagonal cell (R,C) belongs to:
+
+  ?- dg_cell_anti_diag(2, 3, N).
+  N = 5.    % R + C = 2 + 3 = 5
+
+
+80.6 Testing Diagonal Uniformity
+
+dg_uniform_diag(+Grid, +N, -Color) succeeds if the N-th diagonal is all one value:
+
+  ?- dg_uniform_diag([[5,1],[2,5]], 0, C).
+  C = 5.    % main diagonal is [5,5]
+
+  ?- dg_uniform_diag([[1,2,3],[4,5,6],[7,8,9]], 0, _).
+  false.    % main diagonal is [1,5,9] - not uniform
+
+dg_uniform_anti_diag(+Grid, +N, -Color) tests an anti-diagonal:
+
+  ?- dg_uniform_anti_diag([[1,5],[5,2]], 1, C).
+  C = 5.    % anti-diagonal sum 1: cells (0,1)=5 and (1,0)=5
+
+
+80.7 Full Example: X Pattern Detection
+
+This example tests whether a grid has the same value on both diagonals (an "X"):
+
+  has_x_pattern(Grid, Color) :-
+      dg_uniform_diag(Grid, 0, Color),
+      dg_uniform_anti_diag(Grid, _, Color).
+
+  ?- has_x_pattern([[1,0,1],[0,1,0],[1,0,1]], 1).
+  false.    % main diagonal is [1,1,1]=uniform; anti-diag sum 2 = [1,1,1]=uniform
+            % but has_x_pattern also needs to match the same Color
+
+  Revised version that checks both diagonals share the same value:
+
+  has_x_pattern(Grid, Color) :-
+      Grid = [FR|_], length(FR, NC), NC1 is NC - 1,
+      dg_uniform_diag(Grid, 0, Color),
+      dg_uniform_anti_diag(Grid, NC1, Color).
+
+  ?- has_x_pattern([[1,0,1],[0,1,0],[1,0,1]], 1).
+  true.
+
+
+80.8 Summary
+
+The diagonal pack covers extraction, filling, and testing of diagonal lines:
+
+  dg_main_diag/2          - main diagonal values (C == R)
+  dg_anti_diag/2          - main anti-diagonal values (R+C = NC-1)
+  dg_nth_diag/3           - N-th diagonal values (C-R = N)
+  dg_nth_anti_diag/3      - N-th anti-diagonal values (R+C = N)
+  dg_all_diags/2          - all diagonals, sorted by offset
+  dg_all_anti_diags/2     - all anti-diagonals, sorted by sum
+  dg_fill_main/3          - fill main diagonal with Color
+  dg_fill_anti/3          - fill main anti-diagonal with Color
+  dg_fill_nth_diag/4      - fill N-th diagonal with Color
+  dg_fill_nth_anti_diag/4 - fill N-th anti-diagonal with Color
+  dg_cell_diag/3          - diagonal index of (R,C): N = C-R
+  dg_cell_anti_diag/3     - anti-diagonal index of (R,C): N = R+C
+  dg_uniform_diag/3       - succeed if N-th diagonal is all Color
+  dg_uniform_anti_diag/3  - succeed if N-th anti-diagonal is all Color
+
+END OF CHAPTER 80
