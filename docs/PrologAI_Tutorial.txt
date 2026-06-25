@@ -1296,6 +1296,8 @@ PR 48 - anp: The Agent Network Protocol (ANP) gateway with decentralized identit
 
 PR 49 - lattice_crypto: The Cryptographic Privacy Layer. Hybrid encryption (RSA, ECDH, and Post-Quantum) for sensitive data stored in the Lattice. Chapter 13 covers this pack in full.
 
+PR 53 - ephemera: The Ephemeral Code Synthesis and Execution pack. Write short-lived programs in Prolog, Python, or Bash, run them with a timeout, capture output, and log traces. Chapter 14 covers this pack in full.
+
 Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 14).
 
 
@@ -2554,6 +2556,8 @@ Chapter 12 covers writing your own PrologAI programs: creating .pl files, loadin
 
 Chapter 13 covers the Cryptographic Privacy Layer: how to encrypt passwords, identification numbers, and other sensitive values stored in the Lattice, using RSA, ECDH, and Post-Quantum Cryptography.
 
+Chapter 14 covers the Ephemera Pack: how PrologAI can compose and execute short-lived programs in Prolog, Python, and Bash to solve sub-problems that are most naturally expressed as runnable code.
+
 END OF CHAPTER 11
 PROLOGAI TUTORIAL
 
@@ -3173,9 +3177,109 @@ The main predicates are:
 
 WHAT COMES NEXT
 
+Chapter 14 covers the Ephemera Pack: how PrologAI can compose and execute short-lived programs in Prolog, Python, and Bash, run them with a timeout, capture output, and log traces.
+
+END OF CHAPTER 13
+PROLOGAI TUTORIAL
+
+Chapter 14: The Ephemera Pack - Writing and Running Short-Lived Programs
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+THE EPHEMERA PACK (PR 53)
+
+The ephemera pack gives PrologAI the ability to compose a small program, run it, capture its output, and then discard the program entirely.
+
+These short-lived programs are called ephemera (singular: ephemeron).
+
+They are created for a purpose, used once, and then gone.
+
+Some tasks are more naturally expressed as a small, runnable program than as a set of logical facts: converting between data formats, performing a numerical calculation, calling a system tool, or quickly testing whether a hypothesis holds as executable code.
+
+The ephemera pack gives PrologAI the same strategy that capable human programmers and AI coding agents use every day: write a small throwaway program, run it, read the output, and move on.
+
+
+LOADING THE EPHEMERA PACK
+
+    :- use_module(library(ephemera)).
+
+
+EVALUATING A PROLOG GOAL WITH A TIMEOUT
+
+ep_eval(+GoalTerm, +TimeoutSecs, -EvalResult)
+
+    ?- ep_eval((X is 3 * 7), 5, R).
+    X = 21, R = success.
+
+Results: success, fail, timeout, or error(E).
+
+Variable bindings in GoalTerm are preserved on success.
+
+
+EVALUATING PROLOG CODE WRITTEN AS AN ATOM
+
+ep_scratch(+CodeAtom, +VarBindings, +TimeoutSecs, -EvalResult)
+
+    ?- ep_scratch('Y is 10 + 5', ['Y'=Y], 5, R).
+    Y = 15, R = success(['Y'=15]).
+
+
+RUNNING A SHELL COMMAND
+
+ep_shell(+Argv, +TimeoutSecs, -ShellResult)
+
+    ?- ep_shell(['echo', 'hello world'], 10, R).
+    R = shell_result(0, 'hello world\n', '').
+
+Result: shell_result(ExitCode, Stdout, Stderr).
+
+
+RUNNING A SCRIPT IN ANOTHER LANGUAGE
+
+ep_ephemeral(+Language, +Code, +TimeoutSecs, -ShellResult)
+
+Language: prolog, python, or bash.
+
+    ?- ep_ephemeral(python, 'import math\nprint(math.sqrt(144))', 10, R).
+    R = shell_result(0, '12.0\n', '').
+
+The temporary file is always deleted after the subprocess exits.
+
+
+ITERATION CYCLES: SYNTHESIZE, EXECUTE, CHECK
+
+ep_iterate(:SynthGoal, :ExecGoal, :CheckGoal, +MaxIter, -IterResult)
+
+Calls SynthGoal to produce Code, ExecGoal to run it, CheckGoal to verify the result.
+
+Returns ok(Code, Result) or exhausted(Code, Result).
+
+
+TRACING EXECUTION SEQUENCES
+
+    ?- ep_next_trace_id(TId).
+    ?- ep_trace_record(TId, 1, 'X is 1', success).
+    ?- ep_trace_get(TId, Entries).
+
+
+SUMMARY
+
+ep_eval/3             Evaluate a Prolog goal term with timeout.
+ep_scratch/4          Evaluate Prolog source written as an atom.
+ep_shell/3            Run any shell command and capture output.
+ep_ephemeral/4        Write a script to a temp file, run it, delete it.
+ep_iterate/5          Synthesize-execute-check loop with step budget.
+ep_trace_record/4     Record one step to a trace log.
+ep_trace_get/2        Retrieve all entries for a trace.
+ep_next_trace_id/1    Allocate a fresh unique trace identifier.
+
+
+WHAT COMES NEXT
+
 You have now completed the PrologAI Tutorial.
 
-You have gone from having no knowledge of programming or AI, all the way through symbolic reasoning, the Lattice, assessment, safety, agent protocols, and now cryptographic privacy.
+You have gone from having no knowledge of programming or AI, all the way through symbolic reasoning, the Lattice, assessment, safety, agent protocols, cryptographic privacy, and now ephemeral code execution.
 
 The next step is to build something of your own.
 
@@ -3187,4 +3291,4 @@ Explore the demos/ directory for complete, working examples.
 
 And experiment at the ?- prompt. Every feature you have read about in this tutorial is live and waiting for your first query.
 
-END OF CHAPTER 13 AND END OF THE PROLOGAI TUTORIAL
+END OF CHAPTER 14 AND END OF THE PROLOGAI TUTORIAL
