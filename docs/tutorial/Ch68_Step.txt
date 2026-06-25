@@ -1,0 +1,171 @@
+Chapter 68: Directional Grid Movement - The Step Pack
+
+The step pack (st_* predicate family, Layer 86) provides 14 predicates for
+moving through a grid in any of 8 directions, casting rays, following paths,
+and computing direction arithmetic.
+
+Direction-based reasoning is at the heart of many grid transformation tasks:
+finding what lies in a given direction from a cell, tracing a line until you
+hit a boundary or a value, rotating a direction to turn a corner, or measuring
+how far a cell is from an edge. The step pack supplies all of these operations
+as composable, general-purpose building blocks.
+
+
+68.1 Loading the pack
+
+?- use_module(packs/step/prolog/step).
+
+
+68.2 Single-step movement
+
+st_step/3 takes one step from a cell in a direction. It performs no bounds
+checking, so the result may lie outside the grid.
+
+?- st_step(1-1, (-1)-0, R2-C2).
+R2 = 0, C2 = 1.
+
+?- st_step(0-0, 1-1, R2-C2).
+R2 = 1, C2 = 1.
+
+st_step_in/4 does the same but fails if the new position is outside the grid.
+
+?- st_step_in([[a,b,c],[d,e,f],[g,h,i]], 1-1, 0-1, R2-C2).
+R2 = 1, C2 = 2.
+
+?- st_step_in([[a,b,c],[d,e,f],[g,h,i]], 1-2, 0-1, _).
+false.
+
+
+68.3 Rays
+
+st_ray/4 collects all in-bounds cells in a direction from a starting cell.
+The starting cell itself is not included.
+
+?- st_ray([[1,2,3],[4,5,6],[7,8,9]], 2-1, (-1)-0, Cells).
+Cells = [1-1, 0-1].
+
+?- st_ray([[1,2,3],[4,5,6],[7,8,9]], 0-0, 1-1, Cells).
+Cells = [1-1, 2-2].
+
+st_ray_to/5 extends this by stopping before the first cell whose value matches
+a given stop value.
+
+?- st_ray_to([[1,2,3,4]], 0-0, 0-1, 3, Cells).
+Cells = [0-1].
+
+?- st_ray_to([[1,2,3]], 0-0, 0-1, 9, Cells).
+Cells = [0-1, 0-2].
+
+st_walk/4 is the same as st_ray/4 but includes the starting cell.
+
+?- st_walk([[1,2,3],[4,5,6],[7,8,9]], 0-1, 1-0, Cells).
+Cells = [0-1, 1-1, 2-1].
+
+
+68.4 Direction constants
+
+st_dirs4/1 returns the four cardinal directions: up, down, left, right.
+
+?- st_dirs4(Dirs).
+Dirs = [(-1)-0, 1-0, 0-(-1), 0-1].
+
+st_dirs8/1 adds the four diagonals.
+
+?- st_dirs8(Dirs).
+Dirs = [(-1)-0, 1-0, 0-(-1), 0-1, (-1)-(-1), (-1)-1, 1-(-1), 1-1].
+
+You can iterate over all 4-connected neighbors of a cell like this:
+
+?- st_dirs4(Dirs), member(DR-DC, Dirs),
+   st_step_in([[1,2],[3,4]], 0-0, DR-DC, N).
+N = 1-0 ; N = 0-1.
+
+
+68.5 Direction arithmetic
+
+st_rotate_cw/2 rotates a direction 90 degrees clockwise.
+
+?- st_rotate_cw((-1)-0, D).
+D = 0-1.
+
+?- st_rotate_cw(0-1, D).
+D = 1-0.
+
+st_rotate_ccw/2 rotates counter-clockwise.
+
+?- st_rotate_ccw((-1)-0, D).
+D = 0-(-1).
+
+st_opposite/2 reverses a direction entirely.
+
+?- st_opposite(1-0, D).
+D = (-1)-0.
+
+?- st_opposite(1-1, D).
+D = (-1)-(-1).
+
+st_normalize/3 computes the unit step direction between two cells.
+
+?- st_normalize(0-0, 0-5, D).
+D = 0-1.
+
+?- st_normalize(3-3, 1-1, D).
+D = (-1)-(-1).
+
+?- st_normalize(2-2, 2-2, D).
+D = 0-0.
+
+
+68.6 Path following
+
+st_path/3 follows a list of direction steps from a starting cell. The result
+includes the starting position.
+
+?- st_path(0-0, [0-1, 0-1, 1-0], Cells).
+Cells = [0-0, 0-1, 0-2, 1-2].
+
+?- st_path(1-1, [], Cells).
+Cells = [1-1].
+
+
+68.7 First-value finding and edge distance
+
+st_first/5 finds the first cell in a direction whose grid value matches a
+target value. It fails if no such cell exists before the boundary.
+
+?- st_first([[1,2,3,2,1]], 0-0, 0-1, 3, Found).
+Found = 0-2.
+
+?- st_first([[1,0],[5,0],[1,0]], 0-0, 1-0, 5, Found).
+Found = 1-0.
+
+?- st_first([[1,2],[3,4]], 0-0, 0-1, 9, _).
+false.
+
+st_to_edge/4 counts how many steps can be taken in a direction before leaving
+the grid. Returns 0 when already at the boundary in that direction.
+
+?- st_to_edge([[1,2,3]], 0-0, 0-1, Steps).
+Steps = 2.
+
+?- st_to_edge([[1,2,3]], 0-2, 0-1, Steps).
+Steps = 0.
+
+?- st_to_edge([[1,2,3],[4,5,6],[7,8,9]], 2-1, (-1)-0, Steps).
+Steps = 2.
+
+
+68.8 Combining step with other packs
+
+The step pack integrates naturally with the scene pack (sc_*) for object-
+centric spatial reasoning and the walk pack (wk_*) for full-grid traversal.
+Use st_dirs4 with member/2 to probe all 4-connected neighbors; use st_ray
+to find what lies in a specific direction from an object; use st_to_edge
+to determine whether a cell is near a boundary.
+
+Example: count the number of in-bounds neighbors of cell (1,1) in a 3x3 grid.
+
+?- st_dirs4(Dirs),
+   findall(N, (member(D, Dirs), st_step_in([[_,_,_],[_,_,_],[_,_,_]], 1-1, D, N)), Ns),
+   length(Ns, Count).
+Count = 4.

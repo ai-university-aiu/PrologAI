@@ -10063,3 +10063,92 @@ All 42 PLUnit acceptance tests are in packs/walk/test/test_walk.pl.
 The Specification entry is Part 96 (WK-WK-001 through WK-WK-014).
 The Architecture entry is ARCH-72.
 The Refinement entry covers AC-WK-001 through AC-WK-042.
+
+
+Chapter 68: Directional Grid Movement - The Step Pack
+
+The step pack (st_* predicate family, Layer 86) provides 14 predicates for
+moving through a grid in any of 8 directions, casting rays, following paths,
+and computing direction arithmetic.
+
+Direction-based reasoning is at the heart of many grid transformation tasks:
+finding what lies in a given direction from a cell, tracing a line until you
+hit a boundary or a value, rotating a direction to turn a corner, or measuring
+how far a cell is from an edge. The step pack supplies all of these operations
+as composable, general-purpose building blocks.
+
+68.1 Loading the pack
+
+?- use_module(packs/step/prolog/step).
+
+68.2 Single-step movement
+
+st_step/3 takes one step from a cell in a direction. No bounds checking.
+
+?- st_step(1-1, (-1)-0, R2-C2).
+R2 = 0, C2 = 1.
+
+st_step_in/4 fails if the new position is outside the grid.
+
+?- st_step_in([[a,b,c],[d,e,f],[g,h,i]], 1-1, 0-1, R2-C2).
+R2 = 1, C2 = 2.
+
+?- st_step_in([[a,b,c],[d,e,f],[g,h,i]], 1-2, 0-1, _).
+false.
+
+68.3 Rays
+
+st_ray/4 collects all in-bounds cells in a direction (start cell excluded).
+
+?- st_ray([[1,2,3],[4,5,6],[7,8,9]], 2-1, (-1)-0, Cells).
+Cells = [1-1, 0-1].
+
+st_ray_to/5 stops before the first cell matching a stop value.
+
+?- st_ray_to([[1,2,3,4]], 0-0, 0-1, 3, Cells).
+Cells = [0-1].
+
+st_walk/4 includes the starting cell.
+
+?- st_walk([[1,2,3],[4,5,6],[7,8,9]], 0-1, 1-0, Cells).
+Cells = [0-1, 1-1, 2-1].
+
+68.4 Direction constants
+
+?- st_dirs4(Dirs).
+Dirs = [(-1)-0, 1-0, 0-(-1), 0-1].
+
+?- st_dirs8(Dirs).
+Dirs = [(-1)-0, 1-0, 0-(-1), 0-1, (-1)-(-1), (-1)-1, 1-(-1), 1-1].
+
+68.5 Direction arithmetic
+
+?- st_rotate_cw((-1)-0, D).    % up -> right
+D = 0-1.
+
+?- st_rotate_ccw((-1)-0, D).   % up -> left
+D = 0-(-1).
+
+?- st_opposite(1-0, D).        % down -> up
+D = (-1)-0.
+
+?- st_normalize(3-3, 1-1, D).  % direction from (3,3) toward (1,1)
+D = (-1)-(-1).
+
+68.6 Path following
+
+?- st_path(0-0, [0-1, 0-1, 1-0], Cells).
+Cells = [0-0, 0-1, 0-2, 1-2].
+
+68.7 First-value finding and edge distance
+
+?- st_first([[1,2,3,2,1]], 0-0, 0-1, 3, Found).
+Found = 0-2.
+
+?- st_to_edge([[1,2,3]], 0-0, 0-1, Steps).
+Steps = 2.
+
+All 42 PLUnit acceptance tests are in packs/step/test/test_step.pl.
+The Specification entry is Part 97 (ST-ST-001 through ST-ST-014).
+The Architecture entry is ARCH-73.
+The Refinement entry covers AC-ST-001 through AC-ST-042.
