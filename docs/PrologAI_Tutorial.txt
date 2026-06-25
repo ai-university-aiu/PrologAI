@@ -3503,10 +3503,138 @@ Chapter 14 - ephemera: write and run short-lived programs.
 Chapter 15 - agency: pursue goals step by step with observation and control.
 
 Chapter 16 - refinery: improve outputs until they meet a quality bar.
+Chapter 17 - grid: perceive, transform, and reason about ARC-AGI grids.
 
-Together, these three packs give PrologAI the capability to write code, run it, observe the result, improve it, and keep going until it is good enough.
+Together, these four packs give PrologAI the capability to write code, run it, observe the result, improve it, perceive structured visual grids, and reason about spatial transformations.
 
-The next step is to build something of your own.
+END OF CHAPTER 16
+
+
+CHAPTER 17 - THE GRID PACK: ARC-AGI GRID PERCEPTION AND MANIPULATION
+
+The grid pack gives PrologAI native perception and manipulation of the rectangular color grids used in the ARC-AGI benchmark.
+
+ARC-AGI (Abstraction and Reasoning Corpus for Artificial General Intelligence) is a benchmark of visual reasoning puzzles. Each puzzle shows a few input-output grid pairs and asks the solver to find the transformation rule and apply it to a new input grid. Grids are rectangular arrays of colored cells. Colors are integers 0 through 9 (where 0 is black).
+
+The grid pack represents grids as Prolog lists of lists. Every grid operation is a pure Prolog predicate with no side effects. All indices are zero-based.
+
+
+GRID REPRESENTATION
+
+A grid is a list of rows. Each row is a list of color integers.
+
+Example: a 3-by-3 grid
+
+    G = [[0,1,2],
+         [3,4,5],
+         [6,7,8]]
+
+Row 0 is [0,1,2]. Column 0 is [0,3,6]. Cell (1,2) is 5.
+
+
+LOADING THE GRID PACK
+
+    :- use_module(library(grid)).
+
+
+GRID DIMENSIONS
+
+gd_size(+Grid, -Rows, -Cols)
+
+    ?- gd_size([[1,2,3],[4,5,6]], Rows, Cols).
+    Rows = 2, Cols = 3.
+
+
+CELL ACCESS
+
+gd_cell(+Grid, +R, +C, -Color)
+
+    ?- gd_cell([[0,1,2],[3,4,5],[6,7,8]], 1, 2, Color).
+    Color = 5.
+
+gd_row(+Grid, +R, -Row) and gd_col(+Grid, +C, -Col) extract rows and columns.
+
+
+COLOR ANALYSIS
+
+gd_colors(+Grid, -ColorSet) returns a sorted list of distinct colors.
+
+gd_color_count(+Grid, +Color, -Count) counts cells of a given color.
+
+gd_color_map(+Grid, +Map, -Grid2) substitutes colors using a From-To pair list.
+
+    ?- gd_color_map([[1,2],[2,1]], [1-3, 2-4], G2).
+    G2 = [[3,4],[4,3]].
+
+
+OBJECT EXTRACTION
+
+gd_objects(+Grid, +Color, -Objects) finds all maximal 4-connected regions of Color. Each object is a list of r(Row, Col) terms.
+
+gd_bounding_box(+Cells, -TopLeft, -BottomRight) computes the smallest axis-aligned rectangle containing a cell set.
+
+
+SPATIAL TRANSFORMATIONS
+
+gd_rotate90(+Grid, -Grid2): rotate 90 degrees clockwise.
+gd_rotate180(+Grid, -Grid2): rotate 180 degrees.
+gd_rotate270(+Grid, -Grid2): rotate 270 degrees clockwise.
+gd_reflect_h(+Grid, -Grid2): flip upside-down.
+gd_reflect_v(+Grid, -Grid2): flip left-right.
+gd_reflect_d1(+Grid, -Grid2): transpose (main diagonal flip).
+gd_reflect_d2(+Grid, -Grid2): anti-diagonal flip.
+
+    ?- gd_rotate90([[1,2,3],[4,5,6]], G2).
+    G2 = [[4,1],[5,2],[6,3]].
+
+
+TRANSLATION, CROP, AND OVERLAY
+
+gd_translate(+Grid, +DR, +DC, +Background, -Grid2): shift grid; fill gaps with Background.
+
+gd_crop(+Grid, +R0, +C0, +R1, +C1, -Grid2): extract rectangular sub-grid (zero-based inclusive bounds).
+
+gd_overlay(+Base, +Patch, +DR, +DC, -Grid2): composite Patch onto Base at offset; zero patch cells are transparent.
+
+
+COMPARISON AND SYMMETRY
+
+gd_diff(+Grid1, +Grid2, -Diffs): list of r(R,C,Old,New) differing cells.
+
+gd_equal(+Grid1, +Grid2): succeed when grids are identical.
+
+gd_symmetry(+Grid, -Axes): detect symmetry axes (subset of [h, v, d1, d2]).
+
+    ?- gd_symmetry([[1,2,1],[2,3,2],[1,2,1]], Axes).
+    Axes = [h, v].
+
+
+FLOOD FILL AND CONSTRUCTION
+
+gd_fill(+Grid, +R, +C, +Color, -Grid2): flood-fill connected region with Color.
+
+gd_make(+Rows, +Cols, +Color, -Grid): create uniform grid.
+
+gd_set_cell(+Grid, +R, +C, +Color, -Grid2): set one cell (functional update).
+
+
+SUMMARY
+
+gd_size/3, gd_cell/4, gd_row/3, gd_col/3,
+gd_colors/2, gd_color_count/3, gd_color_map/3,
+gd_objects/3, gd_connected/3, gd_bounding_box/3,
+gd_rotate90/2, gd_rotate180/2, gd_rotate270/2,
+gd_reflect_h/2, gd_reflect_v/2, gd_reflect_d1/2, gd_reflect_d2/2,
+gd_translate/5, gd_crop/6, gd_overlay/5,
+gd_diff/3, gd_equal/2, gd_symmetry/2,
+gd_fill/5, gd_make/4, gd_set_cell/5.
+
+
+WHAT COMES NEXT
+
+You have now completed the PrologAI Tutorial.
+
+The grid pack is the perceptual foundation for ARC-AGI solving. The packs you have learned work together as a complete cognitive substrate.
 
 Read the Mentova Tutorial to see how Mentova uses all of these capabilities as a living reasoning system.
 
@@ -3516,4 +3644,4 @@ Explore the demos/ directory for complete, working examples.
 
 And experiment at the ?- prompt. Every feature in this tutorial is live and waiting for your first query.
 
-END OF CHAPTER 16 AND END OF THE PROLOGAI TUTORIAL
+END OF CHAPTER 17 AND END OF THE PROLOGAI TUTORIAL

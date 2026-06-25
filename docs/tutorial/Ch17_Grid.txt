@@ -1,0 +1,321 @@
+PROLOGAI TUTORIAL
+
+CHAPTER 17 - THE GRID PACK: ARC-AGI GRID PERCEPTION AND MANIPULATION
+
+The grid pack gives PrologAI native perception and manipulation of the rectangular color grids used in the ARC-AGI (Abstraction and Reasoning Corpus for Artificial General Intelligence) benchmark.
+
+ARC-AGI is a benchmark of visual reasoning puzzles. Each puzzle shows a few input-output grid pairs and asks the solver to find the transformation rule and apply it to a new input grid. Grids are rectangular arrays of colored cells. Colors are integers 0 through 9 (where 0 is black).
+
+The grid pack represents grids as Prolog lists of lists. Every grid operation is a pure Prolog predicate with no side effects. All indices are zero-based.
+
+
+WHY A GRID PACK?
+
+Solving ARC-AGI requires perceiving objects, measuring symmetry, tracking color, rotating shapes, and comparing grid states. Doing this correctly, cleanly, and efficiently in Prolog requires a single canonical toolkit so that every higher-level rule uses the same primitives.
+
+The grid pack is that toolkit. It is the perceptual foundation of PrologAI's ARC-AGI solving capability.
+
+
+GRID REPRESENTATION
+
+A grid is a list of rows. Each row is a list of color integers.
+
+Example: a 3-by-3 grid
+
+    G = [[0,1,2],
+         [3,4,5],
+         [6,7,8]]
+
+Row 0 is [0,1,2]. Column 0 is [0,3,6]. Cell (1,2) is 5.
+
+All indices are zero-based throughout the grid pack.
+
+
+LOADING THE GRID PACK
+
+    :- use_module(library(grid)).
+
+This makes all gd_* predicates available.
+
+
+GRID DIMENSIONS
+
+gd_size(+Grid, -Rows, -Cols)
+
+    ?- gd_size([[1,2,3],[4,5,6]], Rows, Cols).
+    Rows = 2, Cols = 3.
+
+
+CELL ACCESS
+
+gd_cell(+Grid, +R, +C, -Color)
+
+    ?- gd_cell([[0,1,2],[3,4,5],[6,7,8]], 1, 2, Color).
+    Color = 5.
+
+gd_row(+Grid, +R, -Row)
+
+    ?- gd_row([[0,1,2],[3,4,5],[6,7,8]], 1, Row).
+    Row = [3,4,5].
+
+gd_col(+Grid, +C, -Col)
+
+    ?- gd_col([[0,1,2],[3,4,5],[6,7,8]], 2, Col).
+    Col = [2,5,8].
+
+
+COLOR ANALYSIS
+
+gd_colors(+Grid, -ColorSet)
+
+Returns a sorted list of distinct colors present in the grid.
+
+    ?- gd_colors([[1,2,1],[2,0,2]], Colors).
+    Colors = [0,1,2].
+
+gd_color_count(+Grid, +Color, -Count)
+
+Counts how many cells have the given color.
+
+    ?- gd_color_count([[1,1,0],[1,0,0]], 1, Count).
+    Count = 3.
+
+gd_color_map(+Grid, +Map, -Grid2)
+
+Substitutes colors. Map is a list of From-To pairs.
+
+    ?- gd_color_map([[1,2],[2,1]], [1-3, 2-4], G2).
+    G2 = [[3,4],[4,3]].
+
+Colors not in Map pass through unchanged.
+
+
+OBJECT EXTRACTION
+
+gd_objects(+Grid, +Color, -Objects)
+
+Finds all maximal 4-connected regions of Color. Returns a list of cell sets. Each cell is r(Row, Col).
+
+    ?- gd_objects([[1,0,1],[1,0,0],[0,0,0]], 1, Objects).
+    Objects = [[r(0,0), r(1,0)], [r(0,2)]].
+
+The first object is the two 1-cells connected vertically. The second is the isolated 1-cell.
+
+gd_connected/3 is an alias for gd_objects/3.
+
+gd_bounding_box(+Cells, -TopLeft, -BottomRight)
+
+Finds the smallest axis-aligned rectangle containing the cell set.
+
+    ?- gd_bounding_box([r(1,2), r(3,4)], TL, BR).
+    TL = r(1,2), BR = r(3,4).
+
+
+SPATIAL TRANSFORMATIONS
+
+gd_rotate90(+Grid, -Grid2)
+
+Rotate 90 degrees clockwise.
+
+    ?- gd_rotate90([[1,2,3],[4,5,6]], G2).
+    G2 = [[4,1],[5,2],[6,3]].
+
+gd_rotate180(+Grid, -Grid2)
+
+Rotate 180 degrees.
+
+gd_rotate270(+Grid, -Grid2)
+
+Rotate 270 degrees clockwise (same as 90 degrees counter-clockwise).
+
+Verify that 4 rotations return to the original:
+
+    ?- gd_rotate90(G, R1), gd_rotate90(R1, R2),
+       gd_rotate90(R2, R3), gd_rotate90(R3, G2),
+       gd_equal(G, G2).
+
+gd_reflect_h(+Grid, -Grid2)
+
+Flip upside-down (reverse row order).
+
+    ?- gd_reflect_h([[1,2],[3,4],[5,6]], G2).
+    G2 = [[5,6],[3,4],[1,2]].
+
+gd_reflect_v(+Grid, -Grid2)
+
+Flip left-right (reverse each row).
+
+    ?- gd_reflect_v([[1,2,3],[4,5,6]], G2).
+    G2 = [[3,2,1],[6,5,4]].
+
+gd_reflect_d1(+Grid, -Grid2)
+
+Transpose (main diagonal flip). Rows become columns.
+
+    ?- gd_reflect_d1([[1,2,3],[4,5,6]], G2).
+    G2 = [[1,4],[2,5],[3,6]].
+
+gd_reflect_d2(+Grid, -Grid2)
+
+Anti-diagonal flip.
+
+
+TRANSLATION AND CROPPING
+
+gd_translate(+Grid, +DR, +DC, +Background, -Grid2)
+
+Shift the grid by DR rows and DC columns. Cells shifted outside the boundary are filled with Background.
+
+    ?- gd_translate([[1,1],[1,1]], 0, 1, 0, G2).
+    G2 = [[0,1],[0,1]].
+
+gd_crop(+Grid, +R0, +C0, +R1, +C1, -Grid2)
+
+Extract a rectangular sub-grid. Bounds are zero-based and inclusive.
+
+    ?- gd_crop([[0,1,2],[3,4,5],[6,7,8]], 0, 1, 1, 2, G2).
+    G2 = [[1,2],[4,5]].
+
+gd_overlay(+Base, +Patch, +DR, +DC, -Grid2)
+
+Composite Patch onto Base at the given row and column offset. Patch cells with color 0 are transparent; non-zero patch cells replace the corresponding base cell.
+
+    ?- gd_overlay([[0,0,0],[0,0,0],[0,0,0]],
+                  [[1,2],[3,4]], 1, 1, G2).
+    % Cell (1,1) = 1, cell (1,2) = 2, cell (2,1) = 3, cell (2,2) = 4.
+    % All other cells remain 0.
+
+
+COMPARISON AND EQUALITY
+
+gd_diff(+Grid1, +Grid2, -Diffs)
+
+Returns a list of r(R, C, OldColor, NewColor) terms for every cell where the two grids differ.
+
+    ?- gd_diff([[0,0],[0,0]], [[0,0],[0,1]], D).
+    D = [r(1,1,0,1)].
+
+gd_equal(+Grid1, +Grid2)
+
+Succeeds when both grids are structurally identical.
+
+    ?- gd_equal([[1,2],[3,4]], [[1,2],[3,4]]).
+    true.
+
+
+SYMMETRY DETECTION
+
+gd_symmetry(+Grid, -Axes)
+
+Returns the list of symmetry axes from [h, v, d1, d2] that the grid has.
+
+    ?- gd_symmetry([[1,2,1],[3,4,3],[1,2,1]], Axes).
+    Axes = [h, v].
+
+A grid has the h axis if flipping it upside-down produces the same grid.
+
+A grid has the v axis if flipping it left-right produces the same grid.
+
+A grid has the d1 axis if transposing it produces the same grid (only possible for square grids).
+
+A grid has the d2 axis if applying the anti-diagonal flip produces the same grid.
+
+
+FLOOD FILL
+
+gd_fill(+Grid, +R, +C, +Color, -Grid2)
+
+Replaces the 4-connected region containing cell (R, C) with Color.
+
+    ?- gd_fill([[1,1,0],[1,0,0],[0,0,0]], 0, 0, 3, G2).
+    % The three 1-cells become 3; the zero-cells are unchanged.
+
+
+BUILDING AND MUTATING GRIDS
+
+gd_make(+Rows, +Cols, +Color, -Grid)
+
+Creates a uniform grid filled with Color.
+
+    ?- gd_make(3, 3, 0, G).
+    G = [[0,0,0],[0,0,0],[0,0,0]].
+
+gd_set_cell(+Grid, +R, +C, +Color, -Grid2)
+
+Sets one cell to Color without modifying the original.
+
+    ?- gd_make(2, 2, 0, G), gd_set_cell(G, 0, 1, 5, G2).
+    G2 = [[0,5],[0,0]].
+
+
+A COMPLETE EXAMPLE: FIND AND COUNT OBJECTS
+
+    ?- G = [[1,0,1,0],
+            [1,0,0,0],
+            [0,0,1,1],
+            [0,0,1,0]],
+       gd_objects(G, 1, Objects),
+       length(Objects, N),
+       write(N), write(' objects of color 1').
+    3 objects of color 1.
+
+    ?- G = [[1,0,1,0],[1,0,0,0],[0,0,1,1],[0,0,1,0]],
+       gd_objects(G, 1, Objects),
+       member(Obj, Objects),
+       gd_bounding_box(Obj, TL, BR),
+       write(bounding_box(TL, BR)), nl, fail ; true.
+    bounding_box(r(0,0), r(1,0))
+    bounding_box(r(0,2), r(0,2))
+    bounding_box(r(2,2), r(3,3))
+
+
+SUMMARY
+
+gd_size/3          Query grid dimensions (Rows, Cols).
+gd_cell/4          Access one cell by zero-based (R, C).
+gd_row/3           Extract one row.
+gd_col/3           Extract one column.
+gd_colors/2        Sorted unique color set.
+gd_color_count/3   Count cells of a given color.
+gd_color_map/3     Remap colors via a substitution list.
+gd_objects/3       Connected objects of a given color.
+gd_connected/3     Same as gd_objects/3.
+gd_bounding_box/3  Axis-aligned bounding box of a cell set.
+gd_rotate90/2      Rotate 90 degrees clockwise.
+gd_rotate180/2     Rotate 180 degrees.
+gd_rotate270/2     Rotate 270 degrees clockwise.
+gd_reflect_h/2     Flip upside-down.
+gd_reflect_v/2     Flip left-right.
+gd_reflect_d1/2    Transpose (main diagonal flip).
+gd_reflect_d2/2    Anti-diagonal flip.
+gd_translate/5     Shift grid by (DR, DC) with background fill.
+gd_crop/6          Crop rectangular sub-grid.
+gd_overlay/5       Composite patch onto base at offset.
+gd_diff/3          List of differing cells between two grids.
+gd_equal/2         Test grid identity.
+gd_symmetry/2      Detect symmetry axes.
+gd_fill/5          Flood-fill a connected region.
+gd_make/4          Create a uniform grid.
+gd_set_cell/5      Set one cell (functional update).
+
+
+WHAT COMES NEXT
+
+You have now completed the PrologAI Tutorial.
+
+The grid pack is the perceptual foundation for ARC-AGI solving. The packs you have learned work together as a complete cognitive substrate:
+
+Chapter 14 - ephemera: write and run short-lived programs.
+Chapter 15 - agency: pursue goals step by step with observation and control.
+Chapter 16 - refinery: improve outputs until they meet a quality bar.
+Chapter 17 - grid: perceive, transform, and reason about ARC-AGI grids.
+
+Read the Mentova Tutorial to see how Mentova uses all of these capabilities as a living reasoning system.
+
+Read the papers in the Mentova papers/ directory to see how each capability was demonstrated and measured.
+
+Explore the demos/ directory for complete, working examples.
+
+And experiment at the ?- prompt. Every feature in this tutorial is live and waiting.
+
+END OF CHAPTER 17 AND END OF THE PROLOGAI TUTORIAL
