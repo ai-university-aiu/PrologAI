@@ -4122,4 +4122,65 @@ WHAT COMES NEXT
 Chapter 22 covers the Compose Pack: sequential rule pipelines.
 
 END OF CHAPTER 21
-END OF CHAPTER 21 AND END OF THE PROLOGAI TUTORIAL
+
+
+CHAPTER 22 - THE COMPOSE PACK: SEQUENTIAL RULE PIPELINES AND COMBINATORS
+
+The compose pack provides higher-order predicates for building transformation
+pipelines. Instead of writing individual transformation rules in isolation, you
+compose them: chain in sequence, branch on conditions, repeat, or map across
+every row or column.
+
+The pack prefix is cp_. Transformation rules are callable terms (predicate
+names or partial applications) that accept two arguments: input and output grid.
+
+LOADING
+
+    :- use_module(library(compose)).
+
+BASIC APPLICATION
+
+cp_apply/3 dispatches to any rule. cp_identity/2 is the identity.
+cp_const/3 always returns its first argument regardless of input.
+
+    ?- cp_apply(gd_reflect_h, [[1,2],[3,4]], G).
+    G = [[3,4],[1,2]].
+
+SEQUENTIAL PIPELINES
+
+cp_pipe/3 applies a list of rules in order. Empty list = identity.
+
+    ?- cp_pipe([gd_rotate90, gd_rotate90], [[1,2],[3,4]], G).
+    G = [[4,3],[2,1]].
+
+cp_pipe_n/4 and cp_repeat/4 repeat a rule exactly N times.
+
+CONDITIONAL BRANCHING
+
+cp_branch/5(Cond, ThenRule, ElseRule, Grid, Grid2): applies ThenRule when
+call(Cond, Grid) succeeds, otherwise applies ElseRule.
+
+REPETITION UNTIL CONVERGENCE
+
+cp_until/4: apply Rule until call(Cond, Grid) succeeds.
+cp_fixed_point/3: apply Rule until the grid stops changing.
+
+ROW AND COLUMN MAPPING
+
+cp_map_rows/3: apply a row-list rule to each row independently.
+cp_map_cols/3: apply a column-list rule to each column independently.
+
+PAIRWISE GRID COMBINATION
+
+cp_zip/4(Rule, GridA, GridB, GridC): cell-by-cell combination.
+
+FOLD OVER A LIST OF GRIDS
+
+cp_fold/4(Rule, Init, Grids, Result): left-fold Rule over Grids.
+
+WHAT COMES NEXT
+
+Chapter 23 covers the Motion Pack: gravity, sliding, and object movement.
+
+END OF CHAPTER 22
+END OF CHAPTER 22 AND END OF THE PROLOGAI TUTORIAL
