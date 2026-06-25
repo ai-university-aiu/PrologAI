@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       51 work packages — the complete cognitive engine (see below)
+├── packs/       52 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -170,6 +170,7 @@ Everything is inspectable.
 | `ephemera` | Ephemeral Code Synthesis, Execution, and Skill Persistence (PR 53) — compose short-lived programs in Prolog, Python, or Bash, run them with a wall-clock timeout, capture stdout and stderr, and log execution traces. Useful ephemera can be named, saved, indexed, retrieved by name, and re-run as skills without re-synthesis. Key predicates: `ep_eval/3` (Prolog goal with timeout), `ep_shell/3` (shell command), `ep_ephemeral/4` (language-specific script), `ep_iterate/5` (synthesize-execute-check loop), `ep_skill_save/4`, `ep_skill_run/3`, `ep_skill_list/1`. |
 | `agency` | Agentic Execution Loop (PR 54) — formal, observable, bounded goal-pursuit loop. Allocate a loop with a step budget, supply a reasoning goal, and let the loop execute Observe-Reason-Act-Observe steps until done, budget-exhausted, or escalated to human oversight. Full trace recording, goal stack management, loop detection, and safe escalation. Key predicates: `ag_loop_create/3`, `ag_loop_run/3`, `ag_detect_loop/2`, `ag_escalate/2`, `ag_loop_trace/2`. |
 | `refinery` | Evaluator-Optimizer and Metacognitive Quality Layer (PR 55) — critique outputs against named criteria, score them as a fraction in [0.0, 1.0], drive iterative improvement cycles with an improver goal, run full evaluator-optimizer loops, explore multiple reasoning paths and rank by score, and maintain a lesson database that records what went wrong and recalls it before future attempts. Key predicates: `rn_critique/4`, `rn_score/3`, `rn_optimize/5`, `rn_explore_paths/4`, `rn_learn/3`. |
+| `grid` | ARC-AGI Grid Perception and Manipulation (PR 56) — native grid operations for the ARC-AGI benchmark: dimensions (`gd_size/3`), zero-based cell access (`gd_cell/4`, `gd_row/3`, `gd_col/3`), color analysis (`gd_colors/2`, `gd_color_count/3`, `gd_color_map/3`), 4-connected object extraction (`gd_objects/3`, `gd_connected/3`), bounding box (`gd_bounding_box/3`), seven spatial transformations (rotate 90/180/270, reflect h/v/d1/d2), translation, cropping, overlay compositing, diff, symmetry detection (`gd_symmetry/2`), flood fill (`gd_fill/5`), uniform grid construction (`gd_make/4`), and single-cell mutation (`gd_set_cell/5`). The perceptual foundation for ARC-AGI solving. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**
