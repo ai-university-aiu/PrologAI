@@ -4322,3 +4322,101 @@ templates in grids.
 
 END OF CHAPTER 23
 END OF CHAPTER 23 AND END OF THE PROLOGAI TUTORIAL
+
+
+CHAPTER 24 - THE FRAME PACK: RECTANGULAR BORDER DETECTION AND FRAME GENERATION
+
+Layer 42 - Rectangular border detection, interior extraction, and frame generation
+
+PREREQUISITES
+
+Chapter 6 (Grid Pack). The frame pack depends only on the grid pack.
+
+Load:
+  :- use_module(library(grid)).
+  :- use_module(library(frame)).
+
+
+DETECTING A UNIFORM BORDER
+
+fr_border_color(+Grid, -Color)
+fr_has_border(+Grid, -Color)
+
+Succeed if the outer ring of Grid is all one color (and bind that color).
+
+  ?- fr_border_color([[1,1,1,1],[1,2,2,1],[1,2,2,1],[1,1,1,1]], Color).
+  Color = 1.
+
+fr_border_cells(+Grid, -Pairs)
+  Returns all (r(R,C)-Color) pairs on the outer ring.
+
+
+EXTRACTING THE INTERIOR
+
+fr_inner(+Grid, -Inner)
+  Remove the single-cell outer border. Fails if Grid < 3 rows or < 3 cols.
+
+  ?- fr_inner([[1,1,1],[1,7,1],[1,1,1]], Inner).
+  Inner = [[7]].
+
+fr_interior_uniform(+Grid)
+  Succeeds if the interior is a single color.
+
+fr_interior_color(+Grid, -Color)
+  Binds Color to the uniform interior color.
+
+
+GENERATING FRAMES
+
+fr_make_framed(+Rows, +Cols, +FrameColor, +FillColor, -Grid)
+  Build a new grid with outer ring FrameColor, interior FillColor.
+
+fr_add_border(+Grid, +Thickness, +Color, -Grid2)
+  Wrap a grid with a new border of given Thickness and Color.
+
+  ?- fr_add_border([[7]], 1, 5, Grid2).
+  Grid2 = [[5,5,5],[5,7,5],[5,5,5]].
+
+
+SUB-REGION BORDERS
+
+fr_region_has_border(+Grid, +R0, +C0, +R1, +C1, -Color)
+fr_region_border_color(+Grid, +R0, +C0, +R1, +C1, -Color)
+  Test or return the uniform outer ring of the sub-rectangle (R0,C0)-(R1,C1).
+
+
+BOUNDING BOX
+
+fr_bounding_box(+Grid, +FrameColor, -R0, -C0, -R1, -C1)
+  Find the outermost ring of FrameColor; return its corners.
+
+
+NESTING
+
+fr_is_nested(+Grid, -ColorA, -ColorB)
+  Outer ring = ColorA, second ring = ColorB, ColorA not equal to ColorB.
+
+fr_ring_count(+Grid, -N)
+  Count concentric rings (each must have an extractable interior).
+
+  ?- fr_ring_count([[1,1,1,1,1],[1,2,2,2,1],[1,2,3,2,1],[1,2,2,2,1],[1,1,1,1,1]], N).
+  N = 2.
+
+
+PREDICATE SUMMARY
+
+  fr_border_cells/2, fr_border_color/2, fr_has_border/2
+  fr_inner/2, fr_interior_uniform/1, fr_interior_color/2
+  fr_make_framed/5, fr_add_border/4
+  fr_region_has_border/6, fr_region_border_color/6
+  fr_bounding_box/6
+  fr_is_nested/3, fr_ring_count/2
+
+
+WHAT COMES NEXT
+
+Chapter 25 covers the Path Pack: predicates for finding paths through grids,
+maze solving, flood-fill reachability, and connectivity analysis.
+
+END OF CHAPTER 24
+END OF CHAPTER 24 AND END OF THE PROLOGAI TUTORIAL
