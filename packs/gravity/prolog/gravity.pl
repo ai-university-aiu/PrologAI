@@ -1,228 +1,228 @@
-% Module declaration: gravity pack, Layer 60.
+% gravity.pl - Layer 95: Directional Cell-Sliding and Gravity Operations (gv_* prefix).
+% Non-Bg cells slide through background in a chosen direction until hitting a wall or boundary.
+% Color-specific variants let only one color move; other non-Bg cells act as immovable walls.
 :- module(gravity, [
-    % gv_compact_col/3: move all non-background values to the bottom of each column.
-    gv_compact_col/3,
-    % gv_compact_row/3: move all non-background values to the left of each row.
-    gv_compact_row/3,
-    % gv_fall_down/3: each non-background cell falls as far down as possible.
-    gv_fall_down/3,
-    % gv_fall_up/3: each non-background cell rises as far up as possible.
-    gv_fall_up/3,
-    % gv_fall_left/3: each non-background cell shifts as far left as possible.
-    gv_fall_left/3,
-    % gv_fall_right/3: each non-background cell shifts as far right as possible.
-    gv_fall_right/3,
-    % gv_settle_color/4: let cells of a specific color fall to bottom past background.
-    gv_settle_color/4,
-    % gv_float_color/4: let cells of a specific color rise to top past background.
-    gv_float_color/4,
-    % gv_stack_down/4: stack cells of a color at the bottom, preserving order.
-    gv_stack_down/4,
-    % gv_stack_up/4: stack cells of a color at the top, preserving order.
-    gv_stack_up/4,
-    % gv_apply_col/4: apply a list transform to each column of a grid.
-    gv_apply_col/4,
-    % gv_apply_row/4: apply a list transform to each row of a grid.
-    gv_apply_row/4,
-    % gv_col_values/3: extract all values in a given column as a list.
-    gv_col_values/3,
-    % gv_set_col/4: replace a column in a grid with a given list.
-    gv_set_col/4
+    gv_fall_down/3, gv_fall_up/3,
+    gv_fall_left/3, gv_fall_right/3,
+    gv_fall_dir/4,
+    gv_fall_color_down/4, gv_fall_color_up/4,
+    gv_fall_color_left/4, gv_fall_color_right/4,
+    gv_fall_color_dir/5,
+    gv_pack_row_left/3, gv_pack_row_right/3,
+    gv_pack_col_up/3, gv_pack_col_down/3
 ]).
+% Import nth0/3 for indexed column extraction; numlist/3 for column index ranges.
+:- use_module(library(lists), [nth0/3, numlist/3, append/2, append/3]).
+% Import include/3 for separating Bg from non-Bg; maplist/2,3 for bulk row/column processing.
+:- use_module(library(apply), [maplist/2, maplist/3, include/3]).
 
-% Import list and apply utilities.
-:- use_module(library(lists),  [member/2, nth0/3, numlist/3]).
-:- use_module(library(apply),  [maplist/2, maplist/3, include/3, foldl/4]).
+% gv_transpose_: internal helper to transpose Grid from row-major to column-major form.
+% Each column C of Grid becomes row C of the transposed result.
+gv_transpose_(Grid, T) :-
+% Extract the width of the grid from the first row.
+    Grid = [FirstRow|_], length(FirstRow, NC), NC1 is NC - 1,
+% Build the list of column indices 0 through NC-1.
+    numlist(0, NC1, ColIdxs),
+% For each column index C, collect all nth0(C) values across rows into Col.
+    maplist([C, Col]>>(maplist([Row, V]>>(nth0(C, Row, V)), Grid, Col)), ColIdxs, T).
 
-% gv_grid_dims_(+Grid, -Rows, -Cols): dimensions of a grid.
-gv_grid_dims_(Grid, Rows, Cols) :-
-    % Count rows.
-    length(Grid, Rows),
-    % Count columns from first row.
-    ( Rows > 0 -> Grid = [R0|_], length(R0, Cols) ; Cols = 0 ).
+% gv_pack_row_left(+Row, +Bg, -Result): compact all non-Bg values to the left end.
+% Bg cells are padded on the right. Relative order of non-Bg values is preserved.
+gv_pack_row_left(Row, Bg, Result) :-
+% Collect all non-Bg values in left-to-right order.
+    include([V]>>(V \== Bg), Row, NonBg),
+% Compute the number of Bg pad cells to restore the row length.
+    length(Row, N), length(NonBg, NNB), NPad is N - NNB,
+% Build the background padding list.
+    length(Pad, NPad), maplist(=(Bg), Pad),
+% Non-Bg values first (left), then Bg padding (right).
+    append(NonBg, Pad, Result).
 
-% gv_col_values(+Grid, +C, -Values): list of values in column C, top to bottom.
-gv_col_values(Grid, C, Values) :-
-    % Map each row to its C-th element.
-    maplist(gv_row_nth_(C), Grid, Values).
+% gv_pack_row_right(+Row, +Bg, -Result): compact all non-Bg values to the right end.
+% Bg cells are padded on the left. Relative order of non-Bg values is preserved.
+gv_pack_row_right(Row, Bg, Result) :-
+% Collect all non-Bg values in left-to-right order.
+    include([V]>>(V \== Bg), Row, NonBg),
+% Compute the number of Bg pad cells to restore the row length.
+    length(Row, N), length(NonBg, NNB), NPad is N - NNB,
+% Build the background padding list.
+    length(Pad, NPad), maplist(=(Bg), Pad),
+% Bg padding first (left), then non-Bg values (right).
+    append(Pad, NonBg, Result).
 
-% gv_row_nth_(+C, +Row, -V): value at column C in Row.
-gv_row_nth_(C, Row, V) :-
-    % Access element by index.
-    nth0(C, Row, V).
+% gv_pack_col_up(+Col, +Bg, -Result): compact all non-Bg values to the top (start).
+% Bg cells are padded at the bottom. Relative order of non-Bg values is preserved.
+gv_pack_col_up(Col, Bg, Result) :-
+% Collect all non-Bg values in top-to-bottom order.
+    include([V]>>(V \== Bg), Col, NonBg),
+% Compute the number of Bg pad cells to restore the column length.
+    length(Col, N), length(NonBg, NNB), NPad is N - NNB,
+% Build the background padding list.
+    length(Pad, NPad), maplist(=(Bg), Pad),
+% Non-Bg values at top (front), Bg padding at bottom (end).
+    append(NonBg, Pad, Result).
 
-% gv_set_col(+Grid, +C, +Values, -Result): replace column C with Values.
-gv_set_col(Grid, C, Values, Result) :-
-    % Pair each row with its new column value.
-    maplist(gv_replace_col_(C), Grid, Values, Result).
+% gv_pack_col_down(+Col, +Bg, -Result): compact all non-Bg values to the bottom (end).
+% Bg cells are padded at the top. Relative order of non-Bg values is preserved.
+gv_pack_col_down(Col, Bg, Result) :-
+% Collect all non-Bg values in top-to-bottom order.
+    include([V]>>(V \== Bg), Col, NonBg),
+% Compute the number of Bg pad cells to restore the column length.
+    length(Col, N), length(NonBg, NNB), NPad is N - NNB,
+% Build the background padding list.
+    length(Pad, NPad), maplist(=(Bg), Pad),
+% Bg padding at top (front), non-Bg values at bottom (end).
+    append(Pad, NonBg, Result).
 
-% gv_replace_col_(+C, +Row, +V, -NewRow): set element C of Row to V.
-gv_replace_col_(C, Row, V, NewRow) :-
-    % Build prefix, skip old element, attach new value and suffix.
-    length(Pre, C),
-    append(Pre, [_|Suf], Row),
-    append(Pre, [V|Suf], NewRow).
+% gv_fall_left(+Grid, +Bg, -Result): all non-Bg cells slide left within their row.
+% Each row is packed independently; no inter-row interaction.
+gv_fall_left(Grid, Bg, Result) :-
+% Apply left-packing to each row independently.
+    maplist([Row, Res]>>(gv_pack_row_left(Row, Bg, Res)), Grid, Result).
 
-% gv_is_bg_(+BG, +V): V equals BG.
-gv_is_bg_(BG, V) :- V =:= BG, !.
+% gv_fall_right(+Grid, +Bg, -Result): all non-Bg cells slide right within their row.
+% Each row is packed independently; no inter-row interaction.
+gv_fall_right(Grid, Bg, Result) :-
+% Apply right-packing to each row independently.
+    maplist([Row, Res]>>(gv_pack_row_right(Row, Bg, Res)), Grid, Result).
 
-% gv_not_bg_(+BG, +V): V does not equal BG.
-gv_not_bg_(BG, V) :- V =\= BG, !.
+% gv_fall_down(+Grid, +Bg, -Result): all non-Bg cells fall downward within their column.
+% Transposes to column-as-row form, packs right (= down), then transposes back.
+gv_fall_down(Grid, Bg, Result) :-
+% Transpose so each column becomes a row for uniform row-level processing.
+    gv_transpose_(Grid, T),
+% Pack each column (now a row) with non-Bg to the right end (= bottom in column space).
+    maplist([Row, Res]>>(gv_pack_row_right(Row, Bg, Res)), T, T2),
+% Transpose back to restore the original row-major orientation.
+    gv_transpose_(T2, Result).
 
-% gv_eq_(+X, +Y): Y equals X.
-gv_eq_(X, Y) :- Y =:= X, !.
+% gv_fall_up(+Grid, +Bg, -Result): all non-Bg cells rise upward within their column.
+% Transposes to column-as-row form, packs left (= up), then transposes back.
+gv_fall_up(Grid, Bg, Result) :-
+% Transpose so each column becomes a row for uniform row-level processing.
+    gv_transpose_(Grid, T),
+% Pack each column (now a row) with non-Bg to the left end (= top in column space).
+    maplist([Row, Res]>>(gv_pack_row_left(Row, Bg, Res)), T, T2),
+% Transpose back to restore the original row-major orientation.
+    gv_transpose_(T2, Result).
 
-% gv_is_other_(+Color, +BG, +V): V is neither Color nor BG.
-gv_is_other_(Color, BG, V) :- V =\= Color, V =\= BG, !.
+% gv_fall_dir(+Grid, +Bg, +Dir, -Result): dispatch gravity by direction atom.
+% Dir must be one of the atoms: down, up, left, right.
+gv_fall_dir(Grid, Bg, Dir, Result) :-
+% Use if-then-else to dispatch deterministically on Dir.
+    (Dir == down -> gv_fall_down(Grid, Bg, Result)
+    ; Dir == up   -> gv_fall_up(Grid, Bg, Result)
+    ; Dir == left -> gv_fall_left(Grid, Bg, Result)
+    ;                gv_fall_right(Grid, Bg, Result)).
 
-% gv_compact_list_bottom_(+BG, +List, -Compacted): non-BG values sink to end.
-gv_compact_list_bottom_(BG, List, Compacted) :-
-    % Separate BG and non-BG values.
-    include(gv_is_bg_(BG), List, Bgs),
-    include(gv_not_bg_(BG), List, Vals),
-    % Background at top, values at bottom.
-    append(Bgs, Vals, Compacted).
+% gv_take_seg_: collect a contiguous prefix of Bg or Color cells.
+% Terminates at the first cell that is neither Bg nor Color (a wall cell).
+gv_take_seg_([], _, _, [], []) :- !.
+gv_take_seg_([H|T], Bg, Color, [H|Seg], Rest) :-
+% H is Bg or Color: include it in the current segment and continue.
+    (H == Bg ; H == Color), !,
+    gv_take_seg_(T, Bg, Color, Seg, Rest).
+% H is a wall: the segment ends here; Rest retains H.
+gv_take_seg_(L, _, _, [], L).
 
-% gv_compact_list_top_(+BG, +List, -Compacted): non-BG values rise to start.
-gv_compact_list_top_(BG, List, Compacted) :-
-    % Separate non-BG and BG values.
-    include(gv_not_bg_(BG), List, Vals),
-    include(gv_is_bg_(BG), List, Bgs),
-    % Values at top, background at bottom.
-    append(Vals, Bgs, Compacted).
+% gv_pack_seg_right_: pack a Bg/Color segment with Color values at the right end.
+% Bg padding occupies the left portion; Color values occupy the right portion.
+gv_pack_seg_right_(Seg, Bg, Color, Result) :-
+% Extract Color cells from the segment.
+    include([V]>>(V == Color), Seg, Colors),
+% Compute the number of Bg pad cells needed to fill the segment.
+    length(Seg, N), length(Colors, NC), NPad is N - NC,
+    length(Pad, NPad), maplist(=(Bg), Pad),
+% Bg padding first, then Color values.
+    append(Pad, Colors, Result).
 
-% gv_compact_col(+Grid, +BG, -Result): compact each column so non-BG sinks to bottom.
-gv_compact_col(Grid, BG, Result) :-
-    % Get grid column count.
-    gv_grid_dims_(Grid, _Rows, Cols),
-    % Enumerate column indices.
-    ( Cols > 0 -> C1 is Cols - 1, numlist(0, C1, ColIds) ; ColIds = [] ),
-    % Fold over column indices, compacting each one.
-    foldl(gv_compact_one_col_bottom_(BG), ColIds, Grid, Result).
+% gv_pack_seg_left_: pack a Bg/Color segment with Color values at the left end.
+% Color values occupy the left portion; Bg padding occupies the right portion.
+gv_pack_seg_left_(Seg, Bg, Color, Result) :-
+% Extract Color cells from the segment.
+    include([V]>>(V == Color), Seg, Colors),
+% Compute the number of Bg pad cells needed to fill the segment.
+    length(Seg, N), length(Colors, NC), NPad is N - NC,
+    length(Pad, NPad), maplist(=(Bg), Pad),
+% Color values first, then Bg padding.
+    append(Colors, Pad, Result).
 
-% gv_compact_one_col_bottom_(+BG, +C, +G, -G2): compact column C toward bottom.
-gv_compact_one_col_bottom_(BG, C, G, G2) :-
-    % Extract column, compact, write back.
-    gv_col_values(G, C, ColVals),
-    gv_compact_list_bottom_(BG, ColVals, Compacted),
-    gv_set_col(G, C, Compacted, G2).
+% gv_split_pack_right_: recursively process a row, packing Color right within each segment.
+% Wall cells (neither Bg nor Color) are kept in place; they bound each gravity segment.
+gv_split_pack_right_([], _, _, Acc, Acc) :- !.
+gv_split_pack_right_([H|T], Bg, Color, Acc, Result) :-
+    (H \== Bg, H \== Color ->
+% Wall cell: append it as-is and continue with the remainder.
+        append(Acc, [H], Acc2),
+        gv_split_pack_right_(T, Bg, Color, Acc2, Result)
+    ;
+% Start of a Bg/Color segment: collect the full contiguous segment.
+        gv_take_seg_([H|T], Bg, Color, Seg, Rest),
+% Pack the segment with Color to the right.
+        gv_pack_seg_right_(Seg, Bg, Color, Packed),
+        append(Acc, Packed, Acc2),
+        gv_split_pack_right_(Rest, Bg, Color, Acc2, Result)
+    ).
 
-% gv_compact_col_top_(+BG, +C, +G, -G2): compact column C toward top.
-gv_compact_col_top_(BG, C, G, G2) :-
-    % Extract column, compact upward, write back.
-    gv_col_values(G, C, ColVals),
-    gv_compact_list_top_(BG, ColVals, Compacted),
-    gv_set_col(G, C, Compacted, G2).
+% gv_split_pack_left_: recursively process a row, packing Color left within each segment.
+% Wall cells (neither Bg nor Color) are kept in place; they bound each gravity segment.
+gv_split_pack_left_([], _, _, Acc, Acc) :- !.
+gv_split_pack_left_([H|T], Bg, Color, Acc, Result) :-
+    (H \== Bg, H \== Color ->
+% Wall cell: append it as-is and continue with the remainder.
+        append(Acc, [H], Acc2),
+        gv_split_pack_left_(T, Bg, Color, Acc2, Result)
+    ;
+% Start of a Bg/Color segment: collect the full contiguous segment.
+        gv_take_seg_([H|T], Bg, Color, Seg, Rest),
+% Pack the segment with Color to the left.
+        gv_pack_seg_left_(Seg, Bg, Color, Packed),
+        append(Acc, Packed, Acc2),
+        gv_split_pack_left_(Rest, Bg, Color, Acc2, Result)
+    ).
 
-% gv_compact_row_left_(+BG, +Row, -Compacted): non-BG values move to front.
-gv_compact_row_left_(BG, Row, Compacted) :-
-    gv_compact_list_top_(BG, Row, Compacted).
+% gv_fall_color_left(+Grid, +Bg, +Color, -Result):
+% Only Color cells slide left. Other non-Bg cells act as immovable walls.
+% Color cells move left within each segment between wall cells.
+gv_fall_color_left(Grid, Bg, Color, Result) :-
+% Apply leftward color-specific gravity to each row independently.
+    maplist([Row, Res]>>(gv_split_pack_left_(Row, Bg, Color, [], Res)), Grid, Result).
 
-% gv_compact_row_right_(+BG, +Row, -Compacted): non-BG values move to end.
-gv_compact_row_right_(BG, Row, Compacted) :-
-    gv_compact_list_bottom_(BG, Row, Compacted).
+% gv_fall_color_right(+Grid, +Bg, +Color, -Result):
+% Only Color cells slide right. Other non-Bg cells act as immovable walls.
+% Color cells move right within each segment between wall cells.
+gv_fall_color_right(Grid, Bg, Color, Result) :-
+% Apply rightward color-specific gravity to each row independently.
+    maplist([Row, Res]>>(gv_split_pack_right_(Row, Bg, Color, [], Res)), Grid, Result).
 
-% gv_compact_row(+Grid, +BG, -Result): compact each row so non-BG shifts left.
-gv_compact_row(Grid, BG, Result) :-
-    % Apply compact-left to every row.
-    maplist(gv_compact_row_left_(BG), Grid, Result).
+% gv_fall_color_down(+Grid, +Bg, +Color, -Result):
+% Only Color cells fall downward. Other non-Bg cells act as immovable walls.
+% Uses transpose to apply row-level color gravity to each column.
+gv_fall_color_down(Grid, Bg, Color, Result) :-
+% Transpose so columns become rows for uniform row-level processing.
+    gv_transpose_(Grid, T),
+% Apply rightward color-specific gravity (= downward in column space) to each column.
+    maplist([Row, Res]>>(gv_split_pack_right_(Row, Bg, Color, [], Res)), T, T2),
+% Transpose back to restore the original row-major orientation.
+    gv_transpose_(T2, Result).
 
-% gv_fall_down(+Grid, +BG, -Result): non-BG cells fall to bottom of their column.
-gv_fall_down(Grid, BG, Result) :-
-    gv_compact_col(Grid, BG, Result).
+% gv_fall_color_up(+Grid, +Bg, +Color, -Result):
+% Only Color cells rise upward. Other non-Bg cells act as immovable walls.
+% Uses transpose to apply row-level color gravity to each column.
+gv_fall_color_up(Grid, Bg, Color, Result) :-
+% Transpose so columns become rows for uniform row-level processing.
+    gv_transpose_(Grid, T),
+% Apply leftward color-specific gravity (= upward in column space) to each column.
+    maplist([Row, Res]>>(gv_split_pack_left_(Row, Bg, Color, [], Res)), T, T2),
+% Transpose back to restore the original row-major orientation.
+    gv_transpose_(T2, Result).
 
-% gv_fall_up(+Grid, +BG, -Result): non-BG cells rise to top of their column.
-gv_fall_up(Grid, BG, Result) :-
-    % Get column count.
-    gv_grid_dims_(Grid, _Rows, Cols),
-    ( Cols > 0 -> C1 is Cols - 1, numlist(0, C1, ColIds) ; ColIds = [] ),
-    % Compact each column toward top.
-    foldl(gv_compact_col_top_(BG), ColIds, Grid, Result).
-
-% gv_fall_left(+Grid, +BG, -Result): non-BG cells shift to left of their row.
-gv_fall_left(Grid, BG, Result) :-
-    maplist(gv_compact_row_left_(BG), Grid, Result).
-
-% gv_fall_right(+Grid, +BG, -Result): non-BG cells shift to right of their row.
-gv_fall_right(Grid, BG, Result) :-
-    maplist(gv_compact_row_right_(BG), Grid, Result).
-
-% gv_settle_col_vals_(+Color, +BG, +List, -Settled): Color sinks to bottom past BG.
-% Non-BG non-Color cells act as obstacles and maintain relative order above Colors.
-% Output order: [Others...] [BGs...] [Colors...]  total = NO + NB + NC = len(List).
-gv_settle_col_vals_(Color, BG, List, Settled) :-
-    % Gather each category.
-    include(gv_eq_(Color), List, Colors),
-    include(gv_is_other_(Color, BG), List, Others),
-    include(gv_is_bg_(BG), List, Bgs),
-    % Colors sink to bottom; BGs fill gap above Colors; Others stay above.
-    append(Others, Bgs, Top),
-    append(Top, Colors, Settled).
-
-% gv_settle_color(+Grid, +Color, +BG, -Result): cells of Color fall to bottom past BG.
-gv_settle_color(Grid, Color, BG, Result) :-
-    % Process each column independently.
-    gv_grid_dims_(Grid, _Rows, Cols),
-    ( Cols > 0 -> C1 is Cols - 1, numlist(0, C1, ColIds) ; ColIds = [] ),
-    foldl(gv_settle_color_col_(Color, BG), ColIds, Grid, Result).
-
-% gv_settle_color_col_(+Color, +BG, +C, +G, -G2): settle Color in column C.
-gv_settle_color_col_(Color, BG, C, G, G2) :-
-    gv_col_values(G, C, ColVals),
-    gv_settle_col_vals_(Color, BG, ColVals, Settled),
-    gv_set_col(G, C, Settled, G2).
-
-% gv_float_col_vals_(+Color, +BG, +List, -Floated): Color rises to top past BG.
-% Output order: [Colors...] [Others...] [BGs...]  total = NC + NO + NB = len(List).
-gv_float_col_vals_(Color, BG, List, Floated) :-
-    % Gather each category.
-    include(gv_eq_(Color), List, Colors),
-    include(gv_is_other_(Color, BG), List, Others),
-    include(gv_is_bg_(BG), List, Bgs),
-    % Colors float to top; Others stay in middle; BGs sink to bottom.
-    append(Colors, Others, Top),
-    append(Top, Bgs, Floated).
-
-% gv_float_color(+Grid, +Color, +BG, -Result): cells of Color rise to top past BG.
-gv_float_color(Grid, Color, BG, Result) :-
-    gv_grid_dims_(Grid, _Rows, Cols),
-    ( Cols > 0 -> C1 is Cols - 1, numlist(0, C1, ColIds) ; ColIds = [] ),
-    foldl(gv_float_color_col_(Color, BG), ColIds, Grid, Result).
-
-% gv_float_color_col_(+Color, +BG, +C, +G, -G2): float Color in column C.
-gv_float_color_col_(Color, BG, C, G, G2) :-
-    gv_col_values(G, C, ColVals),
-    gv_float_col_vals_(Color, BG, ColVals, Floated),
-    gv_set_col(G, C, Floated, G2).
-
-% gv_stack_down(+Grid, +Color, +BG, -Result): Color cells stack at the bottom.
-gv_stack_down(Grid, Color, BG, Result) :-
-    gv_settle_color(Grid, Color, BG, Result).
-
-% gv_stack_up(+Grid, +Color, +BG, -Result): Color cells stack at the top.
-gv_stack_up(Grid, Color, BG, Result) :-
-    gv_float_color(Grid, Color, BG, Result).
-
-% gv_apply_col(+Grid, +BG, :Pred, -Result): apply Pred/3 to each column list.
-% Pred(+BG, +ColIn, -ColOut).
-gv_apply_col(Grid, BG, Pred, Result) :-
-    % Enumerate column indices.
-    gv_grid_dims_(Grid, _Rows, Cols),
-    ( Cols > 0 -> C1 is Cols - 1, numlist(0, C1, ColIds) ; ColIds = [] ),
-    % Apply Pred to each column via foldl.
-    foldl(gv_apply_one_col_(BG, Pred), ColIds, Grid, Result).
-
-% gv_apply_one_col_(+BG, :Pred, +C, +G, -G2): apply Pred to column C.
-gv_apply_one_col_(BG, Pred, C, G, G2) :-
-    gv_col_values(G, C, ColVals),
-    call(Pred, BG, ColVals, NewVals),
-    gv_set_col(G, C, NewVals, G2).
-
-% gv_apply_row(+Grid, +BG, :Pred, -Result): apply Pred/3 to each row list.
-% Pred(+BG, +RowIn, -RowOut).
-gv_apply_row(Grid, BG, Pred, Result) :-
-    maplist(gv_apply_one_row_(BG, Pred), Grid, Result).
-
-% gv_apply_one_row_(+BG, :Pred, +Row, -NewRow): apply Pred to one row.
-gv_apply_one_row_(BG, Pred, Row, NewRow) :-
-    call(Pred, BG, Row, NewRow).
+% gv_fall_color_dir(+Grid, +Bg, +Color, +Dir, -Result):
+% Dispatch color-specific gravity by direction atom.
+% Dir must be one of: down, up, left, right.
+gv_fall_color_dir(Grid, Bg, Color, Dir, Result) :-
+% Use if-then-else to dispatch deterministically on Dir.
+    (Dir == down  -> gv_fall_color_down(Grid, Bg, Color, Result)
+    ; Dir == up   -> gv_fall_color_up(Grid, Bg, Color, Result)
+    ; Dir == left -> gv_fall_color_left(Grid, Bg, Color, Result)
+    ;                gv_fall_color_right(Grid, Bg, Color, Result)).
