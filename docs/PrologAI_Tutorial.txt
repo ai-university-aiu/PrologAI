@@ -1298,7 +1298,9 @@ PR 49 - lattice_crypto: The Cryptographic Privacy Layer. Hybrid encryption (RSA,
 
 PR 53 - ephemera: The Ephemeral Code Synthesis and Execution pack. Write short-lived programs in Prolog, Python, or Bash, run them with a timeout, capture output, and log traces. Chapter 14 covers this pack in full.
 
-Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 14).
+PR 54 - agency: The Agentic Execution Loop pack. Formal, observable, bounded goal-pursuit with step budgets, goal stacks, loop detection, and escalation to human oversight. Chapter 15 covers this pack in full.
+
+Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 15).
 
 
 EXERCISE
@@ -3277,9 +3279,92 @@ ep_next_trace_id/1    Allocate a fresh unique trace identifier.
 
 WHAT COMES NEXT
 
+Chapter 15 covers the Agency Pack: formal, observable, bounded goal-pursuit loops with step budgets, goal stacks, loop detection, and escalation to human oversight.
+
+END OF CHAPTER 14
+PROLOGAI TUTORIAL
+
+Chapter 15: The Agency Pack - The Agentic Execution Loop
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator of PrologAI and Mentova. ORCID: 0009-0001-9246-5758. linkedin.com/in/d-r-dison/
+
+
+THE AGENCY PACK (PR 54)
+
+The agency pack gives PrologAI a formal, observable, and bounded loop for pursuing goals through sequences of reasoning and action steps.
+
+At each step: observe the current goal, reason about what to do, act, observe what happened, repeat.
+
+    :- use_module(library(ephemera)).
+    :- use_module(library(agency)).
+
+
+LOOP LIFECYCLE
+
+Step 1 - Create a loop:
+
+    ?- ag_loop_create(my_goal, 20, LoopId).
+
+Step 2 - Run the loop (my_reasoner is a Prolog predicate you write):
+
+    ?- ag_loop_run(LoopId, my_reasoner, Outcome).
+
+Your reasoner is called as: call(my_reasoner, LoopId, CurrentGoal, Thought, Action).
+
+Step 3 - Inspect outcome and trace:
+
+    ?- ag_loop_outcome(LoopId, Outcome).
+    ?- ag_loop_trace(LoopId, Steps).
+
+
+THE SEVEN ACTION TYPES
+
+action_eval(GoalTerm)          Evaluate a Prolog goal via ephemera.
+action_shell(Argv, Timeout)    Run a shell command via ephemera.
+action_push_goal(Subgoal)      Add one subgoal to the goal stack.
+action_push_goals(Subgoals)    Add multiple subgoals at once.
+action_mark_done(Result)       Declare the loop complete.
+action_escalate(Reason)        Request human oversight and halt safely.
+action_pop_goal                Remove the current subgoal from the stack.
+
+
+BUDGET AND LOOP DETECTION
+
+    ?- ag_budget_remaining(LoopId, N).
+
+    ?- ag_detect_loop(LoopId, IsLooping).
+
+When IsLooping is true, two consecutive steps had the same thought and action. The reasoner should change strategy or escalate.
+
+
+ESCALATION
+
+    Action = action_escalate(need_credentials)
+
+    ?- ag_loop_outcome(LoopId, escalated(need_credentials)).
+
+
+SUMMARY
+
+ag_loop_create/3      Allocate a loop with a goal and step budget.
+ag_loop_run/3         Run the loop to completion.
+ag_loop_step/3        Execute a single step.
+ag_loop_done/1        Check whether the loop has reached a terminal state.
+ag_loop_outcome/2     Retrieve the final status.
+ag_loop_trace/2       Retrieve the full step-by-step trace.
+ag_push_subgoal/2     Add a subgoal to the goal stack.
+ag_pop_subgoal/2      Remove the top subgoal.
+ag_budget_remaining/2 Query remaining steps.
+ag_detect_loop/2      Detect repeated thought-action pairs.
+ag_escalate/2         Record escalation and halt the loop safely.
+ag_step_record/4      Record one step manually.
+
+
+WHAT COMES NEXT
+
 You have now completed the PrologAI Tutorial.
 
-You have gone from having no knowledge of programming or AI, all the way through symbolic reasoning, the Lattice, assessment, safety, agent protocols, cryptographic privacy, and now ephemeral code execution.
+You have gone from having no knowledge of programming or AI, all the way through symbolic reasoning, the Lattice, assessment, safety, agent protocols, cryptographic privacy, ephemeral code execution, and now agentic goal pursuit.
 
 The next step is to build something of your own.
 
@@ -3291,4 +3376,4 @@ Explore the demos/ directory for complete, working examples.
 
 And experiment at the ?- prompt. Every feature you have read about in this tutorial is live and waiting for your first query.
 
-END OF CHAPTER 14 AND END OF THE PROLOGAI TUTORIAL
+END OF CHAPTER 15 AND END OF THE PROLOGAI TUTORIAL
