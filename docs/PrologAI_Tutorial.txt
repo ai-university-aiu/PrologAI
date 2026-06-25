@@ -4954,7 +4954,126 @@ Geometry: rl_centroid/3, rl_offset/4, rl_direction/3
 
 WHAT COMES NEXT
 
-Chapter 30 covers the next cognitive pack in the PrologAI stack.
+Chapter 30 covers the Sequence Pack: arithmetic sequences, chunking, zipping,
+cumulative sums, slicing, transposition, and period detection.
 
 END OF CHAPTER 29
-END OF CHAPTER 29 AND END OF THE PROLOGAI TUTORIAL
+
+
+CHAPTER 30: SEQUENCE PACK
+
+The sequence pack (module sequence, prefix sq_) provides arithmetic sequence
+analysis, list chunking and zipping, cumulative sums, slicing, transposition,
+and period detection. It lives at Layer 48 and has no dependencies on other
+PrologAI packs.
+
+Load the pack:
+
+    :- use_module(library(sequence)).
+
+
+INTEGER RANGES
+
+sq_range(+Lo, +Hi, -List) generates [Lo, Lo+1, ..., Hi].
+Returns [] when Lo > Hi.
+
+:- sq_range(1, 5, L). % L = [1,2,3,4,5].
+:- sq_range(3, 3, L). % L = [3].
+:- sq_range(7, 4, L). % L = [].
+
+
+FIRST DIFFERENCES
+
+sq_delta(+List, -Deltas). Deltas[i] = List[i+1] - List[i].
+
+:- sq_delta([1,3,6,10], D). % D = [2,3,4].
+:- sq_delta([2,4,6,8], D).  % D = [2,2,2].
+:- sq_delta([5], D).         % D = [].
+
+
+ARITHMETIC SEQUENCES
+
+sq_is_arithmetic/1 - all consecutive differences equal.
+sq_common_diff/2   - extract the common difference (fails if not arithmetic).
+sq_extend_arith/3  - append N more terms.
+
+:- sq_is_arithmetic([2,4,6,8,10]).      % succeeds.
+:- sq_is_arithmetic([1,3,6,10]).         % fails.
+:- sq_common_diff([10,7,4,1], D).        % D = -3.
+:- sq_extend_arith([1,3,5], 2, Ext).    % Ext = [1,3,5,7,9].
+
+
+CHUNKING
+
+sq_chunk(+List, +N, -Chunks) groups List into N-element sublists.
+Fails if length(List) is not divisible by N.
+
+:- sq_chunk([1,2,3,4,5,6], 2, C). % C = [[1,2],[3,4],[5,6]].
+:- sq_chunk([1,2,3,4,5], 2, _).   % fails.
+
+
+ZIPPING AND UNZIPPING
+
+sq_zip(+As, +Bs, -Pairs) produces [A1-B1, A2-B2, ...].
+sq_unzip(+Pairs, -As, -Bs) reverses the operation.
+
+:- sq_zip([1,2,3], [a,b,c], P). % P = [1-a,2-b,3-c].
+:- sq_unzip([1-a,2-b,3-c], As, Bs). % As=[1,2,3], Bs=[a,b,c].
+
+
+CUMULATIVE SUMS
+
+sq_cumsum/2. Result[i] = List[0] + ... + List[i].
+
+:- sq_cumsum([1,2,3,4], S). % S = [1,3,6,10].
+
+
+SLICING
+
+sq_slice(+List, +From, +To, -Sub). 0-indexed, From inclusive, To exclusive.
+
+:- sq_slice([a,b,c,d,e], 1, 3, Sub). % Sub = [b,c].
+:- sq_slice([1,2,3], 2, 2, Sub).      % Sub = [].
+
+
+ONE-LEVEL FLATTEN
+
+sq_flatten1/2 concatenates a list of sublists. Equivalent to append/2.
+
+:- sq_flatten1([[1,2],[3,4],[5]], F). % F = [1,2,3,4,5].
+
+
+MATRIX TRANSPOSITION
+
+sq_transpose/2 transposes a rectangular list-of-lists.
+
+:- sq_transpose([[1,2,3],[4,5,6]], T). % T = [[1,4],[2,5],[3,6]].
+
+
+PERIOD DETECTION
+
+sq_period(+List, -Period) finds the smallest repeating unit.
+Every list has at least the trivial period (itself).
+
+sq_is_periodic/1 succeeds only when the period is strictly shorter than List.
+
+:- sq_period([1,2,1,2,1,2], P). % P = [1,2].
+:- sq_period([5,5,5,5], P).      % P = [5].
+:- sq_period([1,2,3], P).        % P = [1,2,3] (trivial).
+:- sq_is_periodic([1,2,1,2]).    % succeeds.
+:- sq_is_periodic([1,2,3]).      % fails.
+
+
+PREDICATE SUMMARY
+
+Range:       sq_range/3
+Differences: sq_delta/2
+Arithmetic:  sq_is_arithmetic/1, sq_common_diff/2, sq_extend_arith/3
+Structure:   sq_chunk/3, sq_zip/3, sq_unzip/3
+Aggregation: sq_cumsum/2, sq_flatten1/2
+Navigation:  sq_slice/4
+Matrix:      sq_transpose/2
+Period:      sq_period/2, sq_is_periodic/1
+
+END OF CHAPTER 30
+END OF CHAPTER 30 AND END OF THE PROLOGAI TUTORIAL
