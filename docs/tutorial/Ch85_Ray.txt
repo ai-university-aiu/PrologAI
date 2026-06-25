@@ -1,0 +1,309 @@
+Chapter 85: The Ray Pack - Directional Ray Casting and Line-of-Sight
+
+The ray pack (Layer 103, Work Package 124) gives PrologAI the ability to cast
+directional rays through 2D grids. A ray starts at an origin cell and travels
+in a given direction one step at a time until it either hits an obstacle cell
+(a cell whose value differs from the background color) or leaves the grid.
+
+This chapter covers all 14 predicates of the ray pack (ry_* prefix).
+
+
+What Is a Ray?
+
+A ray is a sequence of cells obtained by starting just beyond an origin cell
+and stepping repeatedly in a fixed direction (DR, DC) - where DR is the row
+increment and DC is the column increment per step. For example:
+
+Direction right:  DR = 0, DC = 1
+Direction down:   DR = 1, DC = 0
+Direction up:     DR = -1, DC = 0
+Direction left:   DR = 0, DC = -1
+Diagonal down-right: DR = 1, DC = 1
+
+The ray stops when the next step would leave the grid boundary.
+
+
+Loading the Pack
+
+:- use_module(library(prologai/ray)).
+
+All predicates use the ry_* prefix.
+
+
+85.1 Bounds Checking - ry_in_bounds/3
+
+ry_in_bounds(+Grid, +R, +C)
+
+Succeed if row R and column C are valid 0-based indices into Grid.
+
+Example:
+
+Grid = [[0,0,0],[0,0,0],[0,0,0]],
+ry_in_bounds(Grid, 1, 2).   % succeeds
+\+ ry_in_bounds(Grid, 3, 0).   % row 3 does not exist
+
+
+85.2 Enumerating Ray Cells - ry_cells_in_dir/6
+
+ry_cells_in_dir(+Grid, +R, +C, +DR, +DC, -Cells)
+
+Collect all in-bounds cells starting one step beyond (R,C) in direction
+(DR,DC). The origin cell itself is not included. Cells is a list of R-C pairs
+in step order.
+
+Example:
+
+Grid = [[0,0,0],[0,0,0],[0,0,0]],
+ry_cells_in_dir(Grid, 0, 0, 0, 1, Cells).
+% Cells = [0-1, 0-2]
+
+ry_cells_in_dir(Grid, 0, 2, 1, 0, Cells).
+% Cells = [1-2, 2-2]
+
+ry_cells_in_dir(Grid, 2, 2, 0, 1, Cells).
+% Cells = []   (next step is out of bounds)
+
+
+85.3 First Obstacle - ry_first_hit/7
+
+ry_first_hit(+Grid, +R, +C, +DR, +DC, +Bg, -Hit)
+
+Find the first cell in direction (DR,DC) from (R,C) whose grid value is not
+equal to Bg (the background color). Hit is the R-C coordinate of that cell.
+Fails if the direction is clear all the way to the grid boundary.
+
+Example:
+
+Grid = [[0,0,1],[0,0,0],[0,0,0]],
+ry_first_hit(Grid, 0, 0, 0, 1, 0, Hit).
+% Hit = 0-2   (column 2 has value 1)
+
+
+85.4 Clear Path - ry_cast_clear/7
+
+ry_cast_clear(+Grid, +R, +C, +DR, +DC, +Bg, -Clear)
+
+Collect the background cells in direction (DR,DC) that appear before the
+first obstacle. The obstacle cell itself is not included. Returns [] if the
+cell immediately in the direction is already an obstacle.
+
+Example:
+
+Grid = [[0,0,1]],
+ry_cast_clear(Grid, 0, 0, 0, 1, 0, Clear).
+% Clear = [0-1]   (0-2 is the obstacle, not included)
+
+Grid = [[0,1,0]],
+ry_cast_clear(Grid, 0, 0, 0, 1, 0, Clear).
+% Clear = []   (0-1 is an obstacle immediately)
+
+
+85.5 Distance to Obstacle - ry_distance_to_hit/7
+
+ry_distance_to_hit(+Grid, +R, +C, +DR, +DC, +Bg, -D)
+
+How many steps from (R,C) to the first non-background cell in direction
+(DR,DC)? D = 1 means the immediately adjacent cell is the obstacle. Fails
+if the direction is clear to the boundary.
+
+Example:
+
+Grid = [[0,0,0,1]],
+ry_distance_to_hit(Grid, 0, 0, 0, 1, 0, D).
+% D = 3   (obstacle at column 3, 3 steps away)
+
+
+85.6 Distance to Edge - ry_distance_to_edge/6
+
+ry_distance_to_edge(+Grid, +R, +C, +DR, +DC, -D)
+
+How many in-bounds steps are available from (R,C) in direction (DR,DC) before
+the ray would leave the grid? This equals the number of cells in
+ry_cells_in_dir. Returns 0 if the first step is already out of bounds.
+
+Example:
+
+Grid = [[0,0,0],[0,0,0],[0,0,0]],
+ry_distance_to_edge(Grid, 0, 0, 0, 1, D).
+% D = 2   (columns 1 and 2 remain to the right)
+
+ry_distance_to_edge(Grid, 0, 2, 0, 1, D).
+% D = 0   (already at the right edge)
+
+
+85.7 Clearance Test - ry_is_clear/6
+
+ry_is_clear(+Grid, +R, +C, +DR, +DC, +Bg)
+
+Succeed if every cell in direction (DR,DC) from (R,C) until the boundary has
+value Bg. Trivially succeeds if the direction exits the grid immediately
+(there are no cells to check).
+
+Example:
+
+Grid = [[0,0,0]],
+ry_is_clear(Grid, 0, 0, 0, 1, 0).   % succeeds
+
+Grid = [[0,1,0]],
+\+ ry_is_clear(Grid, 0, 0, 0, 1, 0).   % fails (0-1 is 1)
+
+
+85.8 Projecting a Point - ry_project/8
+
+ry_project(+Grid, +R, +C, +DR, +DC, +N, -NewR, -NewC)
+
+Compute the cell that is exactly N steps from (R,C) in direction (DR,DC):
+NewR = R + DR*N, NewC = C + DC*N. Fails if the result is outside the grid.
+
+Example:
+
+Grid = [[0,0,0],[0,0,0],[0,0,0]],
+ry_project(Grid, 0, 0, 0, 1, 2, NR, NC).
+% NR = 0, NC = 2
+
+\+ ry_project(Grid, 0, 0, 0, 1, 3, _, _).   % column 3 is out of bounds
+
+
+85.9 Named Directions - ry_dir_to_delta/3
+
+ry_dir_to_delta(+Dir, -DR, -DC)
+
+Map a direction name atom to its row and column increment pair. Available
+names and their deltas:
+
+up    -> (-1, 0)
+down  -> (1, 0)
+left  -> (0, -1)
+right -> (0, 1)
+ul    -> (-1, -1)   (up-left diagonal)
+ur    -> (-1, 1)    (up-right diagonal)
+dl    -> (1, -1)    (down-left diagonal)
+dr    -> (1, 1)     (down-right diagonal)
+
+Example:
+
+ry_dir_to_delta(right, DR, DC).
+% DR = 0, DC = 1
+
+ry_dir_to_delta(dr, DR, DC).
+% DR = 1, DC = 1
+
+
+85.10 Direction Reflection - ry_reflect_h/4 and ry_reflect_v/4
+
+ry_reflect_h(+DR, +DC, -RDR, -RDC)
+
+Reflect a direction across a horizontal axis (like bouncing off a floor or
+ceiling). The row component reverses sign; the column component is unchanged.
+
+RDR = -DR, RDC = DC
+
+ry_reflect_v(+DR, +DC, -RDR, -RDC)
+
+Reflect a direction across a vertical axis (like bouncing off a left or right
+wall). The column component reverses sign; the row component is unchanged.
+
+RDR = DR, RDC = -DC
+
+Example:
+
+ry_reflect_h(-1, 0, RDR, RDC).   % upward ray hits ceiling
+% RDR = 1, RDC = 0   (now going down)
+
+ry_reflect_v(0, 1, RDR, RDC).   % rightward ray hits right wall
+% RDR = 0, RDC = -1   (now going left)
+
+
+85.11 Line-of-Sight Test - ry_los/6
+
+ry_los(+Grid, +R1, +C1, +R2, +C2, +Bg)
+
+Succeed if the path between (R1,C1) and (R2,C2) is clear: every cell strictly
+between them on the same line has value Bg. The two cells must lie on the same
+row, column, main diagonal (where R-C is constant), or anti-diagonal (where
+R+C is constant). Trivially succeeds for adjacent cells.
+
+Example:
+
+Grid = [[0,0,0]],
+ry_los(Grid, 0, 0, 0, 2, 0).   % succeeds: (0,1) between them is 0
+
+Grid = [[0,1,0]],
+\+ ry_los(Grid, 0, 0, 0, 2, 0).   % fails: (0,1) is 1
+
+
+85.12 Interior Cells on a Segment - ry_los_cells/6
+
+ry_los_cells(+Grid, +R1, +C1, +R2, +C2, -Cells)
+
+Return the cells strictly between (R1,C1) and (R2,C2) on the same line,
+excluding both endpoints. Grid is accepted but not accessed during computation.
+
+Example:
+
+ry_los_cells(_, 0, 0, 0, 3, Cells).
+% Cells = [0-1, 0-2]   (horizontal, columns 1 and 2 between)
+
+ry_los_cells(_, 0, 0, 3, 0, Cells).
+% Cells = [1-0, 2-0]   (vertical, rows 1 and 2 between)
+
+ry_los_cells(_, 0, 0, 3, 3, Cells).
+% Cells = [1-1, 2-2]   (diagonal, two interior cells)
+
+
+85.13 Multi-Direction Cast - ry_cast_all_4/5
+
+ry_cast_all_4(+Grid, +R, +C, +Bg, -Hits)
+
+Cast rays from (R,C) simultaneously in all 4 compass directions and return
+the results as a list of 4 terms: [up-Ru, down-Rd, left-Rl, right-Rr].
+
+Each result is either the R-C coordinate of the first obstacle found or the
+atom none if the direction is clear to the grid boundary.
+
+Example:
+
+Grid = [[0,0,0],[1,0,1],[0,0,0]],
+ry_cast_all_4(Grid, 1, 1, 0, Hits).
+% Hits = [up-none, down-none, left-(1-0), right-(1-2)]
+
+In this example the center cell (1,1) has obstacles to its left (1,0) and
+right (1,2) but clear paths upward and downward.
+
+
+85.14 Combining Ray Predicates
+
+The ray predicates compose naturally. To find whether object A can see object
+B and how far away B is:
+
+can_see_and_dist(Grid, R1, C1, R2, C2, Bg, D) :-
+    ry_los(Grid, R1, C1, R2, C2, Bg),
+    ry_distance_to_hit(Grid, R1, C1, DR, DC, Bg, D),
+    ry_dir_to_delta(right, DR, DC).   % example: only looking right
+
+A more complete version would use ry_los_cells to enumerate what lies between
+the two cells and ry_project to navigate to specific positions.
+
+
+85.15 Summary
+
+The ray pack provides a complete toolkit for directional perception in 2D grids:
+
+• ry_in_bounds     - cell validity check
+• ry_cells_in_dir  - enumerate all cells in a direction
+• ry_first_hit     - find the first obstacle
+• ry_cast_clear    - collect the unobstructed prefix of a ray
+• ry_distance_to_hit - step count to obstacle
+• ry_distance_to_edge - step count to grid boundary
+• ry_is_clear      - test that a direction is obstacle-free
+• ry_project       - coordinates N steps in a direction
+• ry_dir_to_delta  - name atom to step pair
+• ry_reflect_h     - bounce off horizontal boundary
+• ry_reflect_v     - bounce off vertical boundary
+• ry_los           - line-of-sight test
+• ry_los_cells     - interior cells on a line segment
+• ry_cast_all_4    - cast rays in all 4 compass directions at once
+
+All predicates are deterministic and have no side effects.
+
+Next chapter: Chapter 86 covers the next ARC-AGI-2 perceptual pack.
