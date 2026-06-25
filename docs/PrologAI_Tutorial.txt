@@ -9999,3 +9999,67 @@ All 42 PLUnit acceptance tests are in packs/morph/test/test_morph.pl.
 The Specification entry is Part 95 (MO-MO-001 through MO-MO-014).
 The Architecture entry is ARCH-71.
 The Refinement entry covers AC-MO-001 through AC-MO-042.
+
+
+CHAPTER 67: GRID TRAVERSAL PATTERNS - THE WALK PACK
+
+The walk pack (wk_* predicate family, Layer 85) provides 14 predicates for
+traversing every cell in a grid in a chosen order, extracting diagonal values,
+and painting values at arbitrary positions.
+
+Why traversal order matters: when you scan a grid row by row you see pixels
+the way you would read a page; when you scan diagonal by diagonal you expose
+stripe patterns that row-major order hides; when you spiral inward you visit
+the perimeter before the core. Choosing the right traversal order is often
+the first step in recognizing a grid transformation pattern.
+
+Loading: use_module(packs/walk/prolog/walk).
+
+Row-major scan:
+wk_row_scan([[a,b],[c,d]], Cells) binds Cells = [0-0,0-1,1-0,1-1].
+Row 0 left-to-right, then Row 1 left-to-right, and so on.
+
+Column-major scan:
+wk_col_scan([[a,b],[c,d]], Cells) binds Cells = [0-0,1-0,0-1,1-1].
+Column 0 top-to-bottom, then Column 1 top-to-bottom, and so on.
+
+Zigzag scan:
+wk_zigzag_scan([[1,2,3],[4,5,6]], Cells) binds Cells = [0-0,0-1,0-2,1-2,1-1,1-0].
+Even rows go left-to-right; odd rows go right-to-left.
+
+Diagonal scan:
+wk_diag_scan([[1,2,3],[4,5,6],[7,8,9]], Cells) groups by D = C - R.
+Result: [2-0,1-0,2-1,0-0,1-1,2-2,0-1,1-2,0-2].
+
+Anti-diagonal scan:
+wk_antidiag_scan([[1,2,3],[4,5,6],[7,8,9]], Cells) groups by D = R + C.
+Result: [0-0,0-1,1-0,0-2,1-1,2-0,1-2,2-1,2-2].
+
+Spiral:
+wk_spiral_in([[1,2,3],[4,5,6],[7,8,9]], Cells) visits outer ring first.
+Result: [0-0,0-1,0-2,1-2,2-2,2-1,2-0,1-0,1-1].
+
+Border walk:
+wk_border_walk([[1,2,3],[4,5,6],[7,8,9]], Cells) is just the outer ring.
+Result: [0-0,0-1,0-2,1-2,2-2,2-1,2-0,1-0].
+
+Diagonal extraction:
+wk_diag_extract([[1,2,3],[4,5,6],[7,8,9]], 0, Vals) = [1,5,9] (main diagonal).
+wk_antidiag_extract([[1,2,3],[4,5,6],[7,8,9]], 2, Vals) = [3,5,7] (anti-diagonal).
+
+Diagonal membership:
+wk_diag_of(1-3, D) = 2 (D = C - R = 3 - 1).
+wk_antidiag_of(1-3, D) = 4 (D = R + C = 1 + 3).
+
+Value extraction and painting:
+wk_cells_to_vals(Grid, [0-0,2-2,1-1], Vals) = [Grid[0][0], Grid[2][2], Grid[1][1]].
+wk_vals_to_cells(Grid, [1-1], [9], Result) sets Grid[1][1] = 9.
+
+Inner cells:
+wk_inner_cells([[1,2,3],[4,5,6],[7,8,9]], Cells) = [1-1] (only center is non-border).
+wk_inner_cells([[1,2,3],[4,5,6]], Cells) = [] (2-row grid has no inner rows).
+
+All 42 PLUnit acceptance tests are in packs/walk/test/test_walk.pl.
+The Specification entry is Part 96 (WK-WK-001 through WK-WK-014).
+The Architecture entry is ARCH-72.
+The Refinement entry covers AC-WK-001 through AC-WK-042.

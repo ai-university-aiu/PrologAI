@@ -1,0 +1,175 @@
+Chapter 67: Grid Traversal Patterns - The Walk Pack
+
+The walk pack (wk_* predicate family, Layer 85) provides 14 predicates for
+traversing every cell in a grid in a chosen order, extracting diagonal values,
+and painting values at arbitrary positions.
+
+Why traversal order matters: when you scan a grid row by row you see pixels
+the way you would read a page; when you scan diagonal by diagonal you expose
+stripe patterns that row-major order hides; when you spiral inward you visit
+the perimeter before the core. Choosing the right traversal order is often
+the first step in recognizing a grid transformation pattern.
+
+
+67.1 Loading the pack
+
+?- use_module(packs/walk/prolog/walk).
+
+
+67.2 Row-major and column-major scans
+
+wk_row_scan visits row 0 left-to-right, then row 1 left-to-right, and so on.
+wk_col_scan visits column 0 top-to-bottom, then column 1, and so on.
+
+?- wk_row_scan([[a,b],[c,d]], Cells).
+Cells = [0-0, 0-1, 1-0, 1-1].
+
+?- wk_col_scan([[a,b],[c,d]], Cells).
+Cells = [0-0, 1-0, 0-1, 1-1].
+
+Both return R-C position pairs, not values. To get values use wk_cells_to_vals.
+
+?- wk_row_scan([[a,b],[c,d]], Cells),
+   wk_cells_to_vals([[a,b],[c,d]], Cells, Vals).
+Vals = [a, b, c, d].
+
+
+67.3 Zigzag (boustrophedon) scan
+
+wk_zigzag_scan alternates direction on each row: even rows left-to-right,
+odd rows right-to-left.
+
+?- wk_zigzag_scan([[1,2,3],[4,5,6]], Cells).
+Cells = [0-0, 0-1, 0-2, 1-2, 1-1, 1-0].
+
+This traversal is common in image compression and raster scanning systems.
+
+
+67.4 Diagonal and anti-diagonal scans
+
+wk_diag_scan groups cells by the main diagonal index D = C - R.
+All cells where C - R = D lie on the same diagonal. Diagonals are enumerated
+from -(NRows-1) to NCols-1; within each diagonal, cells appear top-to-bottom.
+
+?- wk_diag_scan([[1,2,3],[4,5,6],[7,8,9]], Cells).
+Cells = [2-0, 1-0,2-1, 0-0,1-1,2-2, 0-1,1-2, 0-2].
+
+wk_antidiag_scan groups by anti-diagonal index D = R + C.
+All cells where R + C = D share the same anti-diagonal.
+
+?- wk_antidiag_scan([[1,2,3],[4,5,6],[7,8,9]], Cells).
+Cells = [0-0, 0-1,1-0, 0-2,1-1,2-0, 1-2,2-1, 2-2].
+
+
+67.5 Diagonal extraction
+
+To get the values on a specific diagonal without scanning the whole grid:
+
+?- wk_diag_extract([[1,2,3],[4,5,6],[7,8,9]], 0, Vals).
+Vals = [1, 5, 9].   % main diagonal
+
+?- wk_diag_extract([[1,2,3],[4,5,6],[7,8,9]], 1, Vals).
+Vals = [2, 6].      % one above main
+
+?- wk_antidiag_extract([[1,2,3],[4,5,6],[7,8,9]], 2, Vals).
+Vals = [3, 5, 7].   % main anti-diagonal of a 3x3 grid
+
+To find which diagonal a cell belongs to:
+
+?- wk_diag_of(1-3, D).
+D = 2.              % cell (1,3) is on diagonal D=2
+
+?- wk_antidiag_of(1-3, D).
+D = 4.              % cell (1,3) is on anti-diagonal D=4
+
+
+67.6 Spiral and border traversal
+
+wk_border_walk returns the clockwise perimeter of the grid starting at (0,0):
+
+?- wk_border_walk([[1,2,3],[4,5,6],[7,8,9]], Cells).
+Cells = [0-0, 0-1, 0-2, 1-2, 2-2, 2-1, 2-0, 1-0].
+
+wk_spiral_in extends this by recursively peeling rings inward:
+
+?- wk_spiral_in([[1,2,3],[4,5,6],[7,8,9]], Cells).
+Cells = [0-0, 0-1, 0-2, 1-2, 2-2, 2-1, 2-0, 1-0, 1-1].
+
+The outer ring (8 cells) appears first; the center (1-1) appears last.
+For a 4x4 grid there would be two rings before the innermost 2x2 ring.
+
+
+67.7 Inner cells
+
+wk_inner_cells returns all non-border cells in row-major order:
+
+?- wk_inner_cells([[1,2,3],[4,5,6],[7,8,9]], Cells).
+Cells = [1-1].
+
+?- wk_inner_cells([[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]], Cells).
+Cells = [1-1, 1-2, 2-1, 2-2].
+
+?- wk_inner_cells([[1,2,3],[4,5,6]], Cells).
+Cells = [].   % 2-row grid has no non-border rows
+
+
+67.8 Painting values at positions
+
+wk_vals_to_cells sets grid cells at a list of positions:
+
+?- wk_vals_to_cells([[1,2,3],[4,5,6],[7,8,9]], [0-0, 2-2], [8, 8], Result).
+Result = [[8,2,3],[4,5,6],[7,8,8]].
+
+?- wk_vals_to_cells([[0,0,0],[0,0,0],[0,0,0]], [1-0,1-1,1-2], [5,5,5], R).
+R = [[0,0,0],[5,5,5],[0,0,0]].
+
+Combining wk_row_scan + wk_cells_to_vals + wk_vals_to_cells gives a
+full read-modify-write cycle over any traversal order.
+
+
+67.9 Complete predicate reference
+
+wk_row_scan(+Grid, -Cells)
+  All R-C positions in row-major order.
+
+wk_col_scan(+Grid, -Cells)
+  All R-C positions in column-major order.
+
+wk_zigzag_scan(+Grid, -Cells)
+  All R-C positions in boustrophedon (zigzag) order.
+
+wk_diag_scan(+Grid, -Cells)
+  All R-C positions grouped by main diagonal D = C - R.
+
+wk_antidiag_scan(+Grid, -Cells)
+  All R-C positions grouped by anti-diagonal D = R + C.
+
+wk_spiral_in(+Grid, -Cells)
+  All R-C positions in clockwise inward spiral order.
+
+wk_border_walk(+Grid, -Cells)
+  Outer border R-C positions in clockwise order.
+
+wk_diag_extract(+Grid, +D, -Vals)
+  Values on main diagonal D in top-to-bottom order.
+
+wk_antidiag_extract(+Grid, +D, -Vals)
+  Values on anti-diagonal D in top-to-bottom order.
+
+wk_diag_of(+R-C, -D)
+  Main diagonal index D = C - R for cell (R,C).
+
+wk_antidiag_of(+R-C, -D)
+  Anti-diagonal index D = R + C for cell (R,C).
+
+wk_cells_to_vals(+Grid, +Cells, -Vals)
+  Extract grid values at each R-C position in Cells.
+
+wk_vals_to_cells(+Grid, +Cells, +Vals, -Result)
+  Paint Vals[i] at Cells[i] in Grid, returning Result.
+
+wk_inner_cells(+Grid, -Cells)
+  All non-border R-C positions in row-major order.
+
+
+End of Chapter 67.
