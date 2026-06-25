@@ -31,7 +31,9 @@
     % Continue the multi-line expression started above.
     vb_set_backend/1,      % +BackendAtom
     % Continue the multi-line expression started above.
-    vb_current_backend/1   % -BackendAtom
+    vb_current_backend/1,  % -BackendAtom
+    % Continue the multi-line expression started above.
+    vb_rebuild/1           % +Ref  (backend-agnostic rebuild; ruvector only for now)
 % Close the expression opened above.
 ]).
 
@@ -108,6 +110,16 @@ vb_close(Ref) :-
     % State the fact: vb dispatch close(B, Ref).
     vb_dispatch_close(B, Ref).
 
+%! vb_rebuild(+Ref) is det.
+%  Rebuild the server-side vector index from the in-process shadow store.
+%  For backends that do not support rebuild, this predicate succeeds silently.
+% Define a clause for 'vb rebuild': dispatch rebuild to the active backend.
+vb_rebuild(Ref) :-
+    % Retrieve the currently active backend atom.
+    vb_active_backend(B),
+    % Dispatch to the backend-specific rebuild implementation.
+    vb_dispatch_rebuild(B, Ref).
+
 % ---------------------------------------------------------------------------
 % Dispatch to prolog backend
 % ---------------------------------------------------------------------------
@@ -136,6 +148,8 @@ vb_dispatch_update_weights(prolog, Ref, Id, Delta) :-
 vb_dispatch_close(prolog, Ref) :-
     % State the fact: vbp close(Ref).
     vbp_close(Ref).
+% Define a clause for 'vb dispatch rebuild' for the prolog backend: no-op (pure-Prolog is always in-memory and intact).
+vb_dispatch_rebuild(prolog, _Ref) :- true.
 
 % ---------------------------------------------------------------------------
 % Dispatch to ruvector backend (HTTP REST client for the RuVector HNSW server)
@@ -165,3 +179,7 @@ vb_dispatch_update_weights(ruvector, Ref, Id, Delta) :-
 vb_dispatch_close(ruvector, Ref) :-
     % Delegate to vbr_close — drops the collection from the RuVector server.
     vbr_close(Ref).
+% Define a clause for 'vb dispatch rebuild' for the ruvector backend.
+vb_dispatch_rebuild(ruvector, Ref) :-
+    % Delegate to vbr_rebuild — recreates the collection and re-inserts all shadows.
+    vbr_rebuild(Ref).

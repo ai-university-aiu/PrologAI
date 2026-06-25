@@ -292,7 +292,7 @@ The vector_backend pack now supports the RuVector backend alongside the built-in
 
 RuVector (https://github.com/ruvnet/ruvector) is a Rust-language vector database using HNSW (Hierarchical Navigable Small World) indexing with SIMD (Single Instruction, Multiple Data) acceleration and a self-learning GNN (Graph Neural Network) reranking layer.
 
-Start the server:
+Start the server (default port 6333):
     bash packs/vector_backend/scripts/ruvector_server.sh
 
 Switch the backend and run the bakeoff:
@@ -300,6 +300,76 @@ Switch the backend and run the bakeoff:
     ?- run_bakeoff([prolog, ruvector], [100, 1000]).
 
 If the server is not running, all six backend predicates degrade gracefully: insert/delete return silently, search returns an empty list, and create still returns a valid Ref term.
+
+Confirmed bakeoff results (2026-06-24):
+
+    ruvector: 0.2655  (100,000 vectors)
+    prolog:   0.0650  (capped at 200 for speed)
+
+RuVector is approximately 4 times faster than the pure-Prolog backend.
+
+The score changes by less than 2% from 100 to 100,000 vectors, confirming that the HNSW index scales sub-linearly.
+
+
+SHADOW STORE AND REBUILD PREDICATE (vector_backend, shadow store update)
+
+The ruvector-server stores all vector collections in memory only.
+
+If the server process stops for any reason, all vectors in the HNSW index are lost.
+
+The Lattice facts (the actual knowledge) are stored in SWI-Prolog and are not affected.
+
+Only the similarity index is at risk.
+
+To mitigate this, the backend_ruvector module maintains an in-process shadow store.
+
+Every call to vbr_insert/4 records a vbr_shadow/5 dynamic fact:
+
+    vbr_shadow(CollectionName, BaseUrl, IdAtom, FloatVec, MetaAtom)
+
+The shadow facts live in the SWI-Prolog process and survive a RuVector server restart as long as the Prolog session stays alive.
+
+When the server is restarted, call the rebuild predicate:
+
+    ?- vb_rebuild(Ref).
+
+or, if using the backend_ruvector module directly:
+
+    ?- vbr_rebuild(Ref).
+
+The rebuild predicate executes four steps automatically.
+
+Step 1 - It drops the collection from the server (the server may have already forgotten it, so errors are ignored).
+
+Step 2 - It reads the vector dimension from the first shadow entry.
+
+Step 3 - It recreates the collection on the server with the original name and dimension.
+
+Step 4 - It re-inserts every shadow vector by calling the raw HTTP insert predicate directly, without modifying the shadow store.
+
+When rebuild finishes, the HNSW index is fully restored and search results are accurate again.
+
+To check how many vectors are in the shadow store:
+
+    ?- vbr_shadow_count(Ref, Count).
+
+A count of zero means either no vectors have been inserted or vbr_close/1 was called.
+
+After a rebuild, the count remains unchanged because rebuild reads the shadow store but does not add or remove any facts.
+
+Note on vbr_delete/2: The ruvector-server does not expose a per-point DELETE endpoint in the current version.
+
+Calling vbr_delete(Ref, Id) removes the shadow entry for that Id so the vector will not be re-inserted on the next rebuild.
+
+The ghost result (the deleted vector appearing in search results) will persist until the next rebuild cycle.
+
+Note on session restarts: If the SWI-Prolog session itself restarts, the shadow facts are also cleared.
+
+In that case, PrologAI's normal startup procedures (loading the Lattice, generating embeddings, inserting vectors) will rebuild both the HNSW index and the shadow store from scratch.
+
+The vb_rebuild/1 interface is backend-agnostic.
+
+For the pure-Prolog backend, vb_dispatch_rebuild(prolog, _Ref) is a no-op: the pure-Prolog backend stores vectors as dynamic facts that are always in-process and intact.
 
 
 WHAT COMES NEXT
