@@ -8910,3 +8910,43 @@ SECTION 56.6 - ACCEPTANCE TESTS
 See PrologAI_4_Refinement_v108.txt, Part 85.
 
 END OF CHAPTER 56
+
+
+CHAPTER 57 - THE SYM PACK
+
+The sym pack (Layer 75) provides 14 sy_* predicates for spatial symmetry
+transforms and symmetry testing. Covers all 8 elements of the D4 dihedral
+group, symmetry detection, symmetrization, and orbit computation.
+
+The sym pack requires: grid.
+
+SECTION 57.1 - TRANSFORMS
+
+sy_reflect_h: reverse each row (left-right mirror).
+sy_reflect_v: reverse row order (top-bottom mirror).
+sy_transpose: swap rows and columns (main diagonal reflection).
+sy_rotate90: rotate 90 CW = transpose + reflect_h.
+sy_rotate180: rotate 180 = reflect_v + reflect_h.
+sy_rotate270: rotate 270 CW = reflect_h + transpose.
+
+SECTION 57.2 - SYMMETRY TESTS
+
+sy_has_h_symm(+Grid): grid equals its horizontal reflection.
+sy_has_v_symm(+Grid): grid equals its vertical reflection.
+sy_has_rot2_symm(+Grid): grid invariant under 180-degree rotation.
+sy_has_rot4_symm(+Grid): grid invariant under 90-degree rotation.
+
+sy_symmetries(+Grid, -Symms): list of all symmetry names present (h, v, rot2, rot4).
+
+SECTION 57.3 - SYMMETRIZATION AND ORBIT
+
+sy_make_h_symm: mirror left half to right (center preserved for odd width).
+sy_make_v_symm: mirror top half to bottom (center row preserved for odd height).
+sy_d4_orbit: all distinct grids reachable by the 8 D4 group elements.
+
+SECTION 57.4 - ACCEPTANCE TESTS
+
+43 PLUnit tests cover all 14 predicates (AC-SY-001 through AC-SY-043).
+See PrologAI_4_Refinement_v109.txt, Part 86.
+
+END OF CHAPTER 57
