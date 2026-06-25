@@ -1,0 +1,182 @@
+CHAPTER 42: THE GRAVITY PACK
+
+The gravity pack (prefix gv_) provides directional settling operations
+on grids. Cells can be made to "fall" in any direction, as if gravity
+is pulling them toward a boundary. Specific colors can be singled out
+to fall through background cells while being blocked by other colors.
+
+All predicates live in the gravity module (Layer 60).
+
+
+LOADING
+
+  :- use_module(library(gravity)).
+
+
+KEY CONCEPTS
+
+A grid is a list of lists of integers, following the standard
+list-of-lists convention.
+
+The background color (BG) is typically 0 but can be any integer. Any
+cell with the background color is considered "air" that other cells
+can fall through.
+
+"Falling" is compaction: all non-BG values in a column or row are
+gathered together and placed at one end, with BG filling the other end.
+Relative order of non-BG values is preserved.
+
+
+COLUMN UTILITIES
+
+  gv_col_values(+Grid, +C, -Values)
+
+  Returns the list of values in column C, from row 0 downward.
+
+  Example:
+
+    gv_col_values([[1,2],[3,4],[5,6]], 0, V).
+    % V = [1, 3, 5]
+
+  gv_set_col(+Grid, +C, +Values, -Result)
+
+  Returns a new grid where column C has been replaced by Values.
+
+  Example:
+
+    gv_set_col([[1,2],[3,4]], 1, [9,9], R).
+    % R = [[1,9],[3,9]]
+
+
+FALLING DOWN AND UP
+
+  gv_fall_down(+Grid, +BG, -Result)
+  gv_compact_col(+Grid, +BG, -Result)
+
+  Non-BG cells fall to the bottom of their column. BG fills the top.
+  gv_compact_col is an alias.
+
+  Example:
+
+    gv_fall_down([[0,1],[2,0],[0,3]], 0, R).
+    % Column 0: [0,2,0] -> [0,0,2]
+    % Column 1: [1,0,3] -> [0,1,3]
+    % R = [[0,0],[0,1],[2,3]]
+
+  gv_fall_up(+Grid, +BG, -Result)
+
+  Non-BG cells rise to the top of their column. BG sinks to the bottom.
+
+  Example:
+
+    gv_fall_up([[0,0],[2,0],[0,3]], 0, R).
+    % Column 0: [0,2,0] -> [2,0,0]
+    % Column 1: [0,0,3] -> [3,0,0]
+    % R = [[2,3],[0,0],[0,0]]
+
+
+FALLING LEFT AND RIGHT
+
+  gv_fall_left(+Grid, +BG, -Result)
+  gv_compact_row(+Grid, +BG, -Result)
+
+  Non-BG cells shift to the left of their row. BG fills the right.
+  gv_compact_row is an alias.
+
+  Example:
+
+    gv_fall_left([[0,1,0,2]], 0, R).
+    % R = [[1,2,0,0]]
+
+  gv_fall_right(+Grid, +BG, -Result)
+
+  Non-BG cells shift to the right of their row.
+
+  Example:
+
+    gv_fall_right([[0,1,0,2]], 0, R).
+    % R = [[0,0,1,2]]
+
+
+SETTLING A SPECIFIC COLOR
+
+  gv_settle_color(+Grid, +Color, +BG, -Result)
+
+  Cells of Color fall to the bottom of their column. Other non-BG cells
+  act as obstacles and stay in relative order above the Color cells.
+  BG cells fill the gap between obstacles and Color cells.
+
+  Per-column output order: [Others] ++ [BGs] ++ [Colors]
+
+  Example:
+
+    % Color 1 falls; Other (cell 3) stays above it.
+    G = [[0,0],[0,0],[3,0],[1,0]].
+    gv_settle_color(G, 1, 0, R).
+    % Column 0: [0,0,3,1] -> Others=[3], BGs=[0,0], Colors=[1]
+    %   -> [3,0,0,1]
+    % R = [[3,0],[0,0],[0,0],[1,0]]
+
+  gv_float_color(+Grid, +Color, +BG, -Result)
+
+  Cells of Color rise to the top of their column. Others stay below.
+
+  Per-column output order: [Colors] ++ [Others] ++ [BGs]
+
+  Example:
+
+    G = [[0,0],[0,0],[3,0],[1,0]].
+    gv_float_color(G, 1, 0, R).
+    % Column 0: [0,0,3,1] -> Colors=[1], Others=[3], BGs=[0,0]
+    %   -> [1,3,0,0]
+    % R = [[1,0],[3,0],[0,0],[0,0]]
+
+
+STACK ALIASES
+
+  gv_stack_down(+Grid, +Color, +BG, -Result)
+
+  Same as gv_settle_color. Stacks Color cells at the bottom.
+
+  gv_stack_up(+Grid, +Color, +BG, -Result)
+
+  Same as gv_float_color. Stacks Color cells at the top.
+
+
+CUSTOM TRANSFORMS
+
+  gv_apply_col(+Grid, +BG, :Pred, -Result)
+
+  Applies Pred(+BG, +ColIn, -ColOut) to each column. Lets you plug in
+  any column-level transform.
+
+  Example using built-in compact_bottom:
+
+    gv_apply_col(Grid, 0, gv_compact_list_bottom_, Result).
+    % Equivalent to gv_fall_down(Grid, 0, Result).
+
+  gv_apply_row(+Grid, +BG, :Pred, -Result)
+
+  Applies Pred(+BG, +RowIn, -RowOut) to each row.
+
+  Example using built-in compact_top:
+
+    gv_apply_row(Grid, 0, gv_compact_list_top_, Result).
+    % Equivalent to gv_fall_left(Grid, 0, Result).
+
+
+PUTTING IT TOGETHER
+
+Combining the gravity pack with the fill and compare packs gives a
+complete toolkit for physics-like grid transformations:
+
+  % Apply gravity then compare with expected output.
+  gv_fall_down(Input, 0, Settled),
+  cp_grids_equal(Settled, ExpectedOutput).
+
+  % Check if output is just the input after falling.
+  gv_fall_down(Input, 0, R),
+  id_is_recolor(R, Output).  % Would fail; fall changes positions
+
+
+END OF CHAPTER 42
