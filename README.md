@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       72 work packages — the complete cognitive engine (see below)
+├── packs/       73 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -189,6 +189,7 @@ Everything is inspectable.
 | `measure` | Geometric Measurement of Cell Regions and Grids (PR 72) — area (`ms_area/2`), bounding box (`ms_bbox/2`, `ms_bbox_size/3`), perimeter (`ms_perimeter/2`), diameter (`ms_diameter/2`), extent fraction (`ms_extent/3`), aspect ratio (`ms_aspect/3`), row/column spans (`ms_row_span/2`, `ms_col_span/2`), integer centroid (`ms_centroid/3`), Chebyshev radius (`ms_radius/2`), interior and border counts (`ms_interior_count/2`, `ms_border_count/2`), and distinct color count (`ms_color_count/2`). 14 ms_* predicates, Layer 51. |
 | `transform` | Grid-Level Spatial and Color Transformations (PR 73) — spatial scaling (`tr_scale_up/3`, `tr_scale_down/3`), horizontal/vertical tiling (`tr_tile_h/3`, `tr_tile_v/3`, `tr_tile/3`), transposition (`tr_transpose/2`), reflections (`tr_flip_h/2`, `tr_flip_v/2`), rotations (`tr_rot90/2`, `tr_rot180/2`), content shifting with fill (`tr_shift/5`), color-map application (`tr_apply_map/3`), single-color replacement (`tr_replace_color/4`), and mask-based selection (`tr_mask_grid/4`). 14 tr_* predicates, Layer 52. |
 | `select` | Selection and Filtering of Cell Regions by Spatial and Size Properties (PR 74) — largest and smallest region (`sl_largest/2`, `sl_smallest/2`), area-sorted list (`sl_sort_by_area/2`), area filters (`sl_filter_area/3`, `sl_filter_area_min/3`, `sl_filter_area_max/3`), border test (`sl_touches_border/3`), border/interior filters (`sl_filter_border/4`, `sl_filter_interior/4`), directional filters (`sl_above_row/3`, `sl_below_row/3`, `sl_left_of_col/3`, `sl_right_of_col/3`), and unique-area selection (`sl_unique_area/2`). 14 sl_* predicates, Layer 53. |
+| `count` | Counting Cells, Colors, and Regions in Grids (PR 75) — color cell count (`cn_color_count/3`), color histogram (`cn_histogram/3`), most/least frequent colors (`cn_max_color/2`, `cn_min_color/2`), rows/columns containing a color (`cn_color_rows/3`, `cn_color_cols/3`), row/column value diversity (`cn_row_distinct/3`, `cn_col_distinct/3`), total cells (`cn_grid_total/2`), grid comparison counts (`cn_equal_cells/3`, `cn_diff_cells/3`), region color lookup (`cn_region_color/3`), per-color region tally (`cn_regions_per_color/3`), and flat-list value count (`cn_by_value/3`). 14 cn_* predicates, Layer 54. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**
