@@ -13759,3 +13759,285 @@ The spread pack provides a complete BFS vocabulary for grid reasoning:
 All predicates are deterministic. BFS traverses only 4-adjacent Bg cells.
 
 Next chapter: Chapter 88 covers the next perceptual or structural pack.
+Chapter 88: The Enclosure Pack - Interior and Exterior Classification
+
+The enclosure pack (Layer 106, Work Package 127) gives PrologAI the ability
+to classify background cells in a 2D grid as exterior (reachable from the
+grid border) or interior (enclosed by non-background walls). It also finds
+the boundary and interior of a color region and tests whether a cell is
+surrounded by a given wall color.
+
+All 14 predicates use the en_* prefix.
+
+
+Loading the Pack
+
+:- use_module(library(prologai/enclosure)).
+
+
+The Core Idea: Exterior vs. Interior
+
+In grid problems, a background cell is "exterior" if you can reach the edge
+of the grid by walking through other background cells (4-connected). A
+background cell is "interior" if all paths to the grid border are blocked
+by non-background walls.
+
+The enclosure pack computes this with a BFS starting from all border
+background cells. Reached cells are exterior; everything else is interior.
+
+Example: in the grid below, Bg=0 and walls=1:
+
+  1 1 1 1
+  1 0 0 1
+  1 0 0 1
+  1 1 1 1
+
+The border cells are all 1s. No 0 appears on the border. So no 0 is
+exterior. All four 0s are interior (enclosed).
+
+In contrast, in:
+
+  0 1 0
+  1 1 1
+  0 1 0
+
+The four corner 0s are on the border and exterior; there are no interior 0s.
+
+
+88.1 Border Cells - en_border_cells/2
+
+en_border_cells(+Grid, -Cells)
+
+All cells on the four edges of the grid (row 0, last row, col 0, last col),
+returned as a sorted list of R-C pairs.
+
+Example:
+
+en_border_cells([[1,1,1],[1,0,1],[1,1,1]], Cells).
+% Cells = [0-0,0-1,0-2,1-0,1-2,2-0,2-1,2-2]
+
+
+88.2 Exterior Background Cells - en_outer_cells/3
+
+en_outer_cells(+Grid, +Bg, -Cells)
+
+All background cells reachable from the grid border by 4-connected Bg steps.
+Returned as a sorted list. If no Bg cell lies on the border, the result is [].
+
+Example:
+
+en_outer_cells([[1,1,1],[1,0,1],[1,1,1]], 0, Outer).
+% Outer = []  (no Bg cell touches the border)
+
+en_outer_cells([[0,1,0]], 0, Outer).
+% Outer = [0-0, 0-2]  (both 0s are on the border; wall at (0,1) separates them)
+
+
+88.3 Interior Background Cells - en_inner_cells/3
+
+en_inner_cells(+Grid, +Bg, -Cells)
+
+All Bg cells that are NOT reachable from the grid border. These are the
+enclosed cells. Returned as a sorted list.
+
+Example:
+
+en_inner_cells([[1,1,1],[1,0,1],[1,1,1]], 0, Inner).
+% Inner = [1-1]
+
+en_inner_cells([[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,1,1,1]], 0, Inner).
+% Inner = [1-1, 1-2, 2-1, 2-2]
+
+
+88.4 Testing Individual Cells - en_is_inner/4 and en_is_outer/4
+
+en_is_inner(+Grid, +R, +C, +Bg)
+en_is_outer(+Grid, +R, +C, +Bg)
+
+Deterministic tests. en_is_inner succeeds if (R,C) is a Bg cell not
+reachable from the border. en_is_outer succeeds if (R,C) is a Bg cell
+reachable from the border. Both fail if (R,C) is not a Bg cell.
+
+Example:
+
+en_is_inner([[1,1,1],[1,0,1],[1,1,1]], 1, 1, 0).  % succeeds
+en_is_inner([[0,1,0]], 0, 0, 0).                   % fails (outer cell)
+en_is_outer([[0,1,0]], 0, 0, 0).                   % succeeds
+
+
+88.5 Filling Enclosed Cells - en_fill_inner/4
+
+en_fill_inner(+Grid, +Bg, +Color, -Out)
+
+Paint all enclosed Bg cells with Color. Returns Grid unchanged if there
+are no enclosed Bg cells.
+
+Example:
+
+en_fill_inner([[1,1,1],[1,0,1],[1,1,1]], 0, 2, Out).
+% Out = [[1,1,1],[1,2,1],[1,1,1]]
+
+en_fill_inner([[0,1,0]], 0, 2, Out).
+% Out = [[0,1,0]]  (no inner cells; grid unchanged)
+
+
+88.6 Counting and Testing - en_inner_count/3 and en_has_inner/2
+
+en_inner_count(+Grid, +Bg, -N)
+en_has_inner(+Grid, +Bg)
+
+en_inner_count gives the number of enclosed Bg cells.
+en_has_inner succeeds if there is at least one.
+
+Example:
+
+en_inner_count([[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,1,1,1]], 0, N).  % N=4
+en_has_inner([[1,1,1],[1,0,1],[1,1,1]], 0).                         % succeeds
+\+ en_has_inner([[0,1,0]], 0).                                       % succeeds
+
+
+88.7 Connected Components - en_inner_components/3 and en_outer_components/3
+
+en_inner_components(+Grid, +Bg, -Comps)
+en_outer_components(+Grid, +Bg, -Comps)
+
+Partition the interior (or exterior) Bg cells into their 4-connected
+components. Each element of Comps is a list of R-C cells forming one
+component.
+
+Example:
+
+% Grid with two separate enclosed holes:
+en_inner_components([[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1]], 0, Comps).
+% Comps = [[1-1], [1-3]]  (two singleton components)
+
+% Grid with one connected exterior region:
+en_outer_components([[0,0,0],[0,1,0],[0,0,0]], 0, Comps).
+% Comps = [[...8 cells...]]  (one big exterior component)
+
+
+88.8 Filling a Specific Hole - en_fill_hole/6
+
+en_fill_hole(+Grid, +Bg, +R, +C, +Color, -Out)
+
+Fill only the enclosed Bg component that contains cell (R,C). If Grid has
+multiple enclosed components, only the one containing (R,C) is painted.
+Fails if (R,C) is not an enclosed Bg cell.
+
+Example:
+
+en_fill_hole([[1,1,1],[1,0,1],[1,1,1]], 0, 1, 1, 5, Out).
+% Out = [[1,1,1],[1,5,1],[1,1,1]]
+
+% en_fill_hole fails when called on an outer cell:
+\+ en_fill_hole([[0,1,0]], 0, 0, 0, 2, _).  % succeeds (fill_hole fails)
+
+
+88.9 Color Region Boundary - en_boundary_cells/3
+
+en_boundary_cells(+Grid, +Color, -Cells)
+
+Within the set of Color cells, find those on the boundary: a Color cell is
+a boundary cell if it lies on the grid edge (fewer than 4 in-bounds
+neighbors) or has at least one in-bounds neighbor with a different value.
+
+Example:
+
+% Single Color cell surrounded by non-Color:
+en_boundary_cells([[0,0,0],[0,1,0],[0,0,0]], 1, Cells).
+% Cells = [1-1]  (the sole Color cell is a boundary cell)
+
+% 3x3 all-Color grid: center is interior, all 8 perimeter cells are boundary:
+en_boundary_cells([[1,1,1],[1,1,1],[1,1,1]], 1, Cells).
+% Cells = [0-0,0-1,0-2,1-0,1-2,2-0,2-1,2-2]
+
+
+88.10 Color Region Interior - en_interior_cells/3
+
+en_interior_cells(+Grid, +Color, -Cells)
+
+Within the Color region, find cells strictly interior: a Color cell is
+interior if it has exactly 4 in-bounds neighbors and all 4 are also Color.
+Interior cells are the complement of boundary cells within the Color region.
+
+Example:
+
+% 3x3 all-Color grid: only the center has all 4 Color neighbors:
+en_interior_cells([[1,1,1],[1,1,1],[1,1,1]], 1, Cells).
+% Cells = [1-1]
+
+% No interior cells if any Color cell borders a non-Color cell or grid edge:
+en_interior_cells([[1,1,1],[1,0,1],[1,1,1]], 1, Cells).
+% Cells = []
+
+
+88.11 Surround Test - en_is_surrounded/4
+
+en_is_surrounded(+Grid, +R, +C, +WallColor)
+
+Succeed if every 4-adjacent neighbor of cell (R,C) is either out of bounds
+or has value WallColor. Fails if any in-bounds neighbor has a different value.
+
+Example:
+
+% Center of a ring: all 4 neighbors are walls:
+en_is_surrounded([[1,1,1],[1,0,1],[1,1,1]], 1, 1, 1).  % succeeds
+
+% Corner cell: 2 out-of-bounds neighbors, 2 neighbors are walls:
+en_is_surrounded([[1,1,1],[1,0,1],[1,1,1]], 0, 0, 1).  % succeeds
+
+% Fails when a neighbor is not WallColor:
+\+ en_is_surrounded([[1,1,1],[1,0,1],[1,1,1]], 0, 1, 1).  % (1,1)=0 not 1
+
+
+88.12 Common Patterns
+
+Count enclosed holes:
+
+count_holes(Grid, Bg, N) :-
+    en_inner_count(Grid, Bg, N).
+
+Fill all holes with a color:
+
+fill_all_holes(Grid, Bg, Color, Out) :-
+    en_fill_inner(Grid, Bg, Color, Out).
+
+Test if a color region is a solid block (no holes inside its bounding box):
+
+no_holes_in_region(Grid, Color, Bg) :-
+    \+ en_has_inner(Grid, Bg).
+
+Find the eroded (interior) subset of a color region:
+
+erode_color(Grid, Color, Interior) :-
+    en_interior_cells(Grid, Color, Interior).
+
+Find cells on the perimeter of a color region:
+
+region_border(Grid, Color, Border) :-
+    en_boundary_cells(Grid, Color, Border).
+
+
+88.13 Summary
+
+The enclosure pack provides inside/outside reasoning for 2D grids:
+
+- en_border_cells      - cells on the four grid edges
+- en_outer_cells       - Bg cells reachable from the border (exterior)
+- en_inner_cells       - Bg cells not reachable from the border (interior)
+- en_is_inner          - test if a cell is enclosed
+- en_is_outer          - test if a cell is exterior
+- en_fill_inner        - paint all enclosed Bg cells
+- en_inner_count       - count enclosed Bg cells
+- en_has_inner         - test for any enclosed Bg cell
+- en_inner_components  - 4-connected components of enclosed Bg cells
+- en_outer_components  - 4-connected components of exterior Bg cells
+- en_fill_hole         - fill one enclosed component at a given cell
+- en_boundary_cells    - Color cells on the boundary of a Color region
+- en_interior_cells    - Color cells strictly interior to a Color region
+- en_is_surrounded     - test if all orthogonal neighbors are a given color
+
+All predicates are deterministic. BFS traverses only 4-adjacent background
+cells to compute exterior/interior classification.
+
+Next chapter: Chapter 89 covers the next perceptual or structural pack.
