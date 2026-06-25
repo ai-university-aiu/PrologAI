@@ -1,0 +1,2491 @@
+PROLOGAI ARCHITECTURE  (v28)
+
+HOW THE COMPONENTS FIT TOGETHER AND COMMUNICATE
+
+SPARC STEP 3: ARCHITECTURE - THE AUTHORITATIVE STRUCTURE REFERENCE
+
+(All element names are original to PrologAI; this volume gives the structure that realizes the PrologAI Platform Specification and its Pseudocode)
+
+
+This is the architecture companion to the PrologAI Platform Specification and the PrologAI Pseudocode.
+
+The specification (SPARC Step 1) said WHAT the platform must do; the pseudocode (SPARC Step 2) said HOW each work package reasons; this volume (SPARC Step 3) says WHERE every piece lives, how the pieces are bound into components, and how they communicate at run time.
+
+It defines the component model (repositories, packs, and the Rust crate), the dependency and build graph, the data architecture of the Lattice, the concurrency and coordination model, the runtime control flow of a living mind, the interface contracts between layers, the safety architecture, the deployment topologies, the cross-cutting concerns, and a full traceability map from capability layer to pack to work package.
+
+Nothing here changes a requirement; it places the forty-eight work packages into a buildable, communicating whole.
+
+
+PART ARCH-0 - ARCHITECTURAL PRINCIPLES
+
+
+SECTION 0.1 - THE GOVERNING DECISION
+
+The architecture is governed by Architecture Decision Record ADR-1 (Specification Part 31): PrologAI is a layered constructed language and platform built ON an unforked SWI-Prolog, never a fork OF it.
+
+Three structural consequences follow and shape everything below.
+
+Consequence 1 - the engine is an immutable dependency: PrologAI code never modifies the engine; it only loads on top of it, so engine upgrades arrive for free.
+
+Consequence 2 - the reflective boundary is structural: the mind may rewrite PrologAI-layer code (which is Prolog data) but can never reach the engine beneath, which structurally enforces the protected core.
+
+Consequence 3 - performance escalates outward, not inward: hot logic moves down into the Rust crate or up into an upstream proposal before anyone considers an engine patch.
+
+
+SECTION 0.2 - THE THREE SUBSTRATE LAYERS
+
+The platform stands on three substrate layers (Specification Part 2).
+
+Layer A - the logic engine: an unforked, embedded SWI-Prolog supplying unification, backward chaining, backtracking, threads, message queues, engines, incremental tabling with well-founded semantics, transactions, and persistence.
+
+Layer B - the vector memory engine: a high-performance vector and graph store reached only through a backend-agnostic interface, with the default backend chosen by the PR 2 bake-off.
+
+Layer C - the PrologAI cognitive architecture: PrologAI's own original code, delivered as SWI-Prolog packs plus a launcher, plus the PrologAI language surface.
+
+The architecture's job is to organize Layer C and bind it cleanly to Layers A and B.
+
+
+SECTION 0.3 - SEPARATION OF CONCERNS
+
+Five separations are load-bearing and are preserved by every component boundary below.
+
+Structure versus annotation: a node_fact's identity is immutable; its value channels mutate freely, so truth maintenance tracks structure, not annotations.
+
+Knowledge versus mechanism: the Lattice holds both, but mechanisms (actors, sentinels, rewrite rules) are themselves node_facts, which is what makes reflection possible.
+
+Specification versus implementation: the Minimal PrologAI Kernel defines compliance in writing, so the language is retargetable and the implementation is replaceable.
+
+Capability versus safety: the constitutional layer is a separate, unlearnable final gate, never merged into the capability it guards.
+
+Substrate versus instance: the platform is the reusable substrate; a particular mind, such as Mentova, is one configured, developed instance of it.
+
+
+PART ARCH-1 - THE COMPONENT MODEL
+
+
+SECTION 1.1 - THE THREE REPOSITORIES
+
+The platform lives in three repositories (Specification Part 15).
+
+Repository prologai - the platform monorepo, holding packs/ (one or more SWI-Prolog packs per capability), launcher/ (the prologai executable), syntax/ (the .pai transcompiler), tests/ (the five test levels), and docs/.
+
+Repository prologai-core - the Rust crate holding the native-speed components behind their interfaces: the vector backend bridge, the pluggable backends, journaling, cryptographic verification, the embedding provider, the vector-symbolic algebras, and the optional symbolic regressor.
+
+Repository prologai-dist - the distribution, bundling a released SWI-Prolog, the compiled prologai-core library, and all packs into one prologai executable per platform, with the NOTICE file and all upstream license notices.
+
+
+SECTION 1.2 - THE LAUNCHER AND THE LANGUAGE SURFACE
+
+The launcher (PR 1) is the single entry point: it preloads every pack, installs the bootstrap ontology, prints the banner with the SWI-Prolog attribution line, sets the prologai_version and dialect flags, and starts the top level.
+
+The syntax component (PR 1) is the language surface: term_expansion and goal_expansion rules plus operator declarations that transcompile .pai source into Layer C library calls at load time, leaving .pl files untouched.
+
+These two components give PrologAI its identity without a fork, exactly as ADR-1 requires.
+
+
+SECTION 1.3 - THE PACK CATALOGUE
+
+Layer C is decomposed into packs, each a cohesive unit owning a slice of the architecture and exposing a small public interface.
+
+Foundation packs.
+
+pack lattice - the Lattice, node_facts, value channels, grounding, scopes and zones, and incremental tabling truth maintenance (PRs 3, 4, 5, 15).
+
+pack actors - cyclic_actor and receptor with their management predicates (PRs 6, 7).
+
+pack pubsub - subscribe and publish, the stigmergic coordination bus (PR 8).
+
+pack sentinels - neuro-symbolic opportunistic forward-chaining rules (PR 9).
+
+pack mindbody - the herald protocol, body enrollment, percept relay, and command dispatch (PR 10).
+
+pack sona - the continuous learning layer: ReasoningBank, EWC++ protection, consolidation, and pattern separation (PR 11).
+
+pack assessment - the Bayley, Piagetian, and CHC frameworks plus consciousness-indicator coverage (PR 12).
+
+pack reflection - the reflection actor roster, the coordination specialist roster, the unified gating actor, and the impasse actor (PR 13).
+
+Belief and cognition packs.
+
+pack beliefs - budgets, evidence truth, anytime answering, and per-node_fact belief records with propagators (PRs 21, 29).
+
+pack workspace - the global broadcast workspace cycle, the heartbeat of cognition (PR 18).
+
+pack prediction - the predictive hierarchy and self-synthesized model population with the competence lifecycle (PRs 19, 22).
+
+pack affect - somatic markers, staged appraisal, and the modulator bus (PRs 24, 26, 27).
+
+pack development - spinoff learning, curiosity, steered daydreaming, the detector suite, and the language faculties (PRs 20, 23, 25, 30, 31, 28).
+
+Substrate and reasoning packs.
+
+pack attention_economy - the two-currency attention banker with wages, rent, spreading, and economic forgetting (PR 32).
+
+pack types - gradual Lattice types with the off-by-default checker (PR 33).
+
+pack chainer - the generic forward-and-backward chainer with meta-reasoning control knowledge (PR 34).
+
+pack kernel - lattice-resident rewrite rules and the Minimal PrologAI Kernel interpreter and trace (PR 35).
+
+Frontier packs.
+
+pack induction - clause induction by inductive logic programming, learn-from-failures, and meta-interpretive learning (PR 37).
+
+pack vsa - compositional vector binding, bound to the algebras in prologai-core (PR 38).
+
+pack frames - reference frames and voting consensus (PR 39).
+
+pack defeasible - justified defeasible reasoning over s(CASP) (PR 40).
+
+pack probabilistic - the distribution-semantics probabilistic layer (PR 41).
+
+pack attention_schema - the model of the mind's own attention and the formal workspace correspondence (PR 42).
+
+Interoperability packs.
+
+pack mcp_gateway - the Model Context Protocol endpoint exposing PrologAI services (PR 14).
+
+pack interop - the Hyperon bridge and the Agent2Agent protocol with durable agent mail (PRs 36, 43).
+
+Utility library packs.
+
+pack libraries - record, similarity, types, collections, generators, tasks, problems, config, peers, macros, and convenience (Specification Part 18), with the nondeterminism conveniences pai_superpose and pai_collapse.
+
+
+SECTION 1.4 - THE RUST CRATE MODULES
+
+The prologai-core crate holds only what must run at native speed or below the logic layer.
+
+Module vector_bridge - the six-predicate backend-agnostic interface and its routing to the configured backend.
+
+Module backends - RuVector and at least one established baseline (hnswlib, usearch, or FAISS), each implementing the bridge trait.
+
+Module journaling - write-ahead journaling for Lattice persistence.
+
+Module verification - SHA-256 nexus hashing and the optional per-operation cryptographic proofs.
+
+Module embedding - the pluggable embedding provider (hash projection, local model, external service) with the re-embedding maintenance routine.
+
+Module vsa - the vector-symbolic algebras (Holographic Reduced Representations and one alternative) for PR 38.
+
+Module regressor - the optional symbolic regressor (a Kolmogorov-Arnold Network or equivalent) for PR 22.
+
+These modules compile to one shared library loaded with use_foreign_library, using the swipl-rs bridge.
+
+
+SECTION 1.5 - ENGINE-RESIDENT PACKAGES USED, NOT BUILT
+
+Three reasoning capabilities ride packages already available to the engine, wrapped by PrologAI packs rather than reimplemented.
+
+Constraint Handling Rules back the sentinel-engine and attention-banker prototypes (the bake-off discipline of PRs 9 and 32).
+
+s(CASP) backs justified defeasible reasoning (PR 40).
+
+A ProbLog or PITA-style capability backs the probabilistic layer (PR 41).
+
+Wrapping rather than rebuilding is the same leverage discipline as ADR-1, applied one level up.
+
+
+PART ARCH-2 - THE DEPENDENCY AND BUILD GRAPH
+
+
+SECTION 2.1 - THE FOUNDATION CHAIN
+
+The build order follows the dependency edges declared by each work package.
+
+prologai-core and the launcher come first, because nothing runs without the bridge and the entry point.
+
+Then pack lattice (needs the bridge), then node_facts and scopes and zones within it, then the actor and coordination packs (actors, then pubsub, then sentinels), then mindbody, then sona, then assessment, then reflection.
+
+This is the foundation chain: the sixteen-pack core that corresponds to the original buildable platform.
+
+
+SECTION 2.2 - THE COGNITIVE AND SUBSTRATE TIERS
+
+On the foundation, the belief substrate is built first among the cognitive packs: beliefs (budgets and evidence) underpins everything that scores or chooses.
+
+Then workspace and prediction (the cycle and the predictive hierarchy), then affect and the curiosity and drive parts of development, then the rest of development (learning, steering, perception, language).
+
+The substrate and reasoning packs layer next: attention_economy, types, then kernel, then chainer (which depends on the kernel's rewrite rules).
+
+The frontier packs layer last: induction, vsa, frames, defeasible, probabilistic, and attention_schema, each depending on the cognitive and reasoning packs named in its specification dependencies.
+
+
+SECTION 2.3 - THE INTEROPERABILITY EDGE
+
+The interoperability packs sit at the outer edge, because they expose the assembled mind rather than constitute it.
+
+pack mcp_gateway depends on all service packs (it wraps them).
+
+pack interop depends on mcp_gateway, the kernel and value channels (for the Hyperon mapping), and mindbody and quarantine scopes (for inbound tasks and mail).
+
+INVARIANT: dependencies point inward and downward only; no foundation pack depends on a cognitive, frontier, or interoperability pack, so the core can be built and tested before anything above it exists.
+
+
+PART ARCH-3 - DATA ARCHITECTURE
+
+
+SECTION 3.1 - THE LATTICE AS A DUAL-INDEX STORE
+
+The Lattice is one logical store presented through two physical indexes per nexus, kept in step.
+
+The logical index is the engine's clause database, giving exact unification, backtracking, and incremental tabling.
+
+The vector index is the Layer B backend, giving sub-millisecond semantic similarity over embeddings.
+
+Every write goes to both indexes inside one transaction; every read of relevance combines them, scoring a result as logical match weighted most, semantic similarity next, and activation recency least.
+
+A nexus is addressed as locus://HOST/PATH, so the same interface names an in-memory store today and a distributed store later without surface change.
+
+
+SECTION 3.2 - THE NODE_FACT AND ITS CHANNELS
+
+The node_fact is the atomic unit: an immutable identity of Id, Relation, Arguments, and Referents, with a sign on the Id distinguishing a thesis from its antithesis dyad.
+
+Around that immutable identity hang named value channels - belief, attention, emotion, provenance, and any user-defined channel - which mutate freely per scope and per zone.
+
+This is the architecture's central data decision: identity is stable enough for tabling dependencies to track, while annotation is fluid enough to carry learning, attention, and affect.
+
+Structural change is therefore never an in-place edit; it is accommodation, a provenance-stamped copy, with consolidation as the only force that destroys.
+
+
+SECTION 3.3 - SCOPES, ZONES, AND THE SHAPE OF CONTEXT
+
+Scopes partition the Lattice into locally coherent microtheories, addressable and sealable.
+
+Zones partition it by epistemic status across nine kinds (present, possible, past, desired, expected, imagined, recalled, attained, confirmed), each with a declared activation flow direction.
+
+The architectural rule is strict: activation never crosses a zone boundary except through an explicit scope_merge or a deliberate inscription, which keeps simulation, memory, desire, and observation from contaminating one another.
+
+Reference frames (PR 39) are a scope subtype that adds coordinates, so spatial and conceptual knowledge reuse the same compartment machinery.
+
+
+SECTION 3.4 - PERSISTENCE AND INTEGRITY
+
+Persistence is write-ahead journaling in prologai-core: each operation is appended to the journal before it is applied, so a crash leaves a replayable log.
+
+Integrity is a SHA-256 hash over identifiers and relation data, checkable with lattice_verify, with optional per-operation cryptographic proofs for safety-critical deployments.
+
+Truth maintenance is delegated to the engine: derived relations are incrementally tabled, so a base-fact change invalidates and lazily recomputes only the affected derivations, and any derivation that goes undefined surfaces as a contradiction node_fact for compensation and coping.
+
+
+PART ARCH-4 - CONCURRENCY AND COORDINATION ARCHITECTURE
+
+
+SECTION 4.1 - THE ACTOR SUBSTRATE
+
+Concurrency is the actor model over engine threads and message queues.
+
+A cyclic_actor is a proactive thread that wakes on a schedule, runs a goal, recovers from its own errors, and repeats.
+
+A receptor is a reactive thread that drains a named message queue through a handler.
+
+A sentinel is an opportunistic rule that fires when a Lattice pattern appears, by exact unification or by semantic similarity.
+
+Engines (the engine's lightweight coroutines) are available for massive many-agent fan-out where threads would be too heavy.
+
+
+SECTION 4.2 - STIGMERGIC COORDINATION
+
+Actors do not call each other directly; they coordinate through the Lattice, stigmergically.
+
+Writes publish change events; interested actors subscribe to patterns and are invoked asynchronously, so the writing operation returns immediately.
+
+Cognitive synergy is an architectural requirement, not an accident: every learning and reasoning actor exposes its intermediate state as node_facts, so a stuck process can be picked up and helped by another within one cycle.
+
+This indirection is what lets the pack set grow by registration rather than by rewiring: a new specialist subscribes to its trigger and writes its result, and no existing actor changes.
+
+
+SECTION 4.3 - RESOURCE GOVERNANCE
+
+Two governors keep concurrency bounded and fair.
+
+Budgets (PR 21) govern tasks: priority, durability, and quality drive an economic scheduler rather than an exhaustive sweep, with starvation detection lifting long-waiting work.
+
+The attention economy (PR 32) governs knowledge: short-term and long-term importance, fed by wages and drained by rent, decide what occupies processor attention and what is forgotten, within a capped money supply that makes runaway feedback impossible.
+
+The banker converts between the two at a configured policy, so tasks and knowledge compete on one reconciled currency.
+
+
+PART ARCH-5 - RUNTIME CONTROL FLOW
+
+
+SECTION 5.1 - THE COGNITIVE CYCLE AS HEARTBEAT
+
+The workspace cycle (PR 18) is the heartbeat of a running mind, turning at a steady cadence.
+
+On each beat: candidate coalitions form from live node_facts; each is scored by novelty, goal relevance, and affect, minus habituation; exactly one winner is broadcast on the workspace channel and kindled across zones; and learning attaches to that broadcast.
+
+Two buffers feed the cycle - internal_experience and overall_experience - so self-generated and externally driven cognition stay distinguishable.
+
+Everything else in the runtime hangs off this loop as a producer of candidates or a consumer of broadcasts.
+
+
+SECTION 5.2 - THE PERCEIVE-DELIBERATE-ACT PATH
+
+A percept enters through the herald, is routed by relay_percept to the perceiver, the motivation actor, or the regulation actor by signal type, and becomes node_facts.
+
+The detector suite and the predictive hierarchy turn raw percepts into features and errors, forwarding only surprise upward.
+
+Motivation turns homeostatic deltas and the curiosity drive into objectives; deliberation finds or composes a causal_plan, consulting markers, beliefs, and the chainer, under a budget that forces commitment.
+
+Action dispatches through the body with proprioceptive confirmation, and regulation classifies the outcome and feeds learning.
+
+Two speeds run in parallel: a fast reflex-and-intuition path and a slow solver path, arbitrated, with reflexes able to pre-empt when urgent.
+
+
+SECTION 5.3 - THE REFLECTIVE AND SELF-IMPROVEMENT LOOP
+
+Reflection actors run continuously alongside the cycle: regulation, compensation, coping, exploration, discovery, imitation, play, and meta-control, plus the unified gating actor and the impasse actor.
+
+The impasse actor turns dead ends into subgoals, so the mind manufactures its own developmental material.
+
+The refinement loop (PR 17) closes the largest circle: it diagnoses a recent trajectory window, proposes constitutional, sandboxed edits to the mind's own configuration, archives superseded variants with fitness and novelty, and rolls back on regression.
+
+The meta-control actor also maintains the attention schema (PR 42), a model of the cycle's own dynamics used to pre-empt capture and explain attention history.
+
+
+SECTION 5.4 - THE LIFECYCLE OF A COMPETENCE
+
+Knowledge is not merely stored; it advances through a lifecycle (PR 22): feature, then subtask, then option, then model, then plan.
+
+Synthesis and consolidation push competences forward through these stages, while meta-control retires low-utility elements, so the abstraction inventory is continually replaced rather than only accumulated.
+
+This lifecycle is the architectural expression of Piagetian development: the same loop, run long enough, grows the mind.
+
+
+PART ARCH-6 - INTERFACE CONTRACTS
+
+
+SECTION 6.1 - THE VECTOR BACKEND CONTRACT
+
+Layer B is reachable only through six predicates: index create, insert, search, delete, update weights, and close.
+
+Any backend that implements this contract is admissible; the default is the bake-off winner, and the losers remain as fallbacks behind the identical contract.
+
+This single narrow seam is what keeps an unverified dependency swappable forever.
+
+
+SECTION 6.2 - THE EMBEDDING CONTRACT
+
+The embedding provider is one function: given text or a term, return a vector of the provider's declared dimension.
+
+A nexus records which provider and dimension produced its vectors; mixing dimensions in one index is an error; a maintenance routine re-embeds a nexus under a new provider in journaled batches.
+
+The default is local, so the mind's experience stays with the mind unless an operator opts out.
+
+
+SECTION 6.3 - THE MIND-BODY CONTRACT
+
+The herald is the device-side client; the contract is three signal types inbound (perception, interoceptive, proprioceptive) and a command stream outbound, with every command resolving to a result or a synthesized timeout.
+
+The body declares needs and capabilities at enrollment; the architecture is device-agnostic, so a simulator and a physical robot present the same contract.
+
+
+SECTION 6.4 - THE KERNEL AS A SPECIFICATION INTERFACE
+
+The Minimal PrologAI Kernel is an interface of a different kind: it is the written contract that defines a compliant implementation.
+
+Any implementation whose observable evaluations are derivable from the kernel transition rules is compliant, which makes the whole platform retargetable to engines other than SWI-Prolog if it ever outgrows its host.
+
+
+SECTION 6.5 - THE OUTWARD CONTRACTS
+
+The MCP Gateway exposes PrologAI services as authenticated Model Context Protocol tool endpoints.
+
+The interoperability pack adds two more outward contracts: the Atomese mapping for exchanging knowledge with Hyperon systems, and the Agent2Agent agent card plus task lifecycle for collaborating with opaque agents, both of which disclose capabilities and results while never exposing Lattice contents.
+
+Every inbound artifact lands first in a quarantine scope, so the outside world can request and receive but never directly read or write the mind's memory.
+
+
+PART ARCH-7 - SAFETY ARCHITECTURE
+
+
+SECTION 7.1 - THE CONSTITUTIONAL GATE
+
+The constitutional layer (Specification Section 3.16) is the architecture's final, unlearnable gate.
+
+It sits ABOVE the unified gating actor, never merged into it: the gating actor learns which actions to favor, while the constitutional check decides whether a favored action is permitted at all.
+
+It is called automatically before every irreversible step - command dispatch, modification commit, and modification proposal - and it cannot be bypassed or modified by the self-improvement primitives.
+
+Vetoes carry reasons, and where defeasible reasoning is involved they carry justification trees, so the planner can synthesize a compliant alternative rather than merely stalling.
+
+
+SECTION 7.2 - THE PROTECTED CORE
+
+Certain components are excluded from all self-modification: the engine, the constitutional layer, the monitor, the refiner's own pipeline, and all bootstrap relations.
+
+This protected core is enforced twice over: structurally, because the engine is unforked and unreachable from PrologAI-layer code; and procedurally, because the refinement loop refuses CRUD edits to protected components.
+
+Removing the constitution is therefore not an accident waiting to happen but a deliberate, visible act against the protected-core discipline.
+
+
+SECTION 7.3 - THE SANDBOX PIPELINE
+
+Every self-modification flows through one pipeline: propose with justification, sandbox-evaluate in a possible_zone scope with no write access to present_zone and no external reach, run the constitutional check, then commit or reject, with rollback on post-commit regression.
+
+Below the developmental stage of formal operations, every commit additionally requires human authorization, so a young mind cannot rewrite itself unsupervised.
+
+Corrigibility is wired in at the same level: a signed shutdown executes within seconds and cannot be blocked or delayed by the mind's own reasoning.
+
+
+SECTION 7.4 - AUDITABILITY AS STRUCTURE
+
+Auditability is not a feature bolted on; it is a structural property.
+
+Every relation is inspectable as a table or a graph, every derived structure carries provenance, modification and veto logs are immutable, and resource quotas are enforced per actor.
+
+Because mechanisms are node_facts, a human can read the mind's competences, rules, and reasoning the same way the mind reads its own.
+
+
+PART ARCH-8 - DEPLOYMENT ARCHITECTURE
+
+
+SECTION 8.1 - THE SINGLE-HOST DEFAULT
+
+The default deployment is a single host: one prologai executable bundling the engine, the compiled crate, and all packs, with the Lattice resident in memory and journaled to disk.
+
+This is the form in which a mind such as Mentova is first grown and assessed, with the Community Garden Project as its proving ground.
+
+
+SECTION 8.2 - THE MIND SERVER AND ITS TOPOLOGIES
+
+The Mind Server (Specification Part 14) is the multi-mind deployment, implemented as part of the MCP Gateway: it registers devices, provisions mind instances, and persists each mind's profile between sessions.
+
+It supports four topologies: individual (one mind, one body), unity (one mind, many bodies), joint (many minds, one body), and hive (many minds, many bodies).
+
+Durable agent mail (PR 43) is hosted here, so minds in different sessions exchange messages asynchronously through quarantine scopes.
+
+
+SECTION 8.3 - THE DISTRIBUTED-STORE ROADMAP
+
+Because the Lattice interface is address-based, a distributed backend can be slotted beneath it later without any surface change, exactly as the design disciplines anticipate.
+
+This is roadmap, not version one: single host first, the distributed store layered in when scale demands it, and the engine-level escalation held in reserve behind its written trigger.
+
+
+PART ARCH-9 - CROSS-CUTTING CONCERNS
+
+Provenance threads through every pack: nothing derived is stored without a record of how it arose.
+
+Truth maintenance threads through every derived relation: the engine's incremental tabling keeps inferences consistent with a changing world without bookkeeping code.
+
+Attention and budget thread through every actor: nothing runs unmetered, and nothing occupies memory without paying rent.
+
+Observability threads through meta-control: usefulness, throughput, queue depth, error counts, and indicator coverage are sampled at adaptive rates that never starve the system they measure.
+
+Safety threads through every irreversible action: the constitutional gate is the one cross-cutting concern that may never be optimized away.
+
+
+PART ARCH-10 - BUILD AND INTEGRATION ORDER
+
+The integration order composes the dependency graph with the specification's implementation priorities.
+
+Stage 1 - stand up prologai-core (the bridge and the bake-off) and the launcher, then the utility library packs that everything uses.
+
+Stage 2 - build the foundation chain: lattice, then actors, pubsub, sentinels, then mindbody, sona, assessment, reflection.
+
+Stage 3 - build the belief substrate (beliefs) and then the workspace and prediction packs, then affect and development.
+
+Stage 4 - build the reasoning substrate: attention_economy, types, kernel, chainer.
+
+Stage 5 - build the frontier packs: induction, vsa, frames, defeasible, probabilistic, attention_schema.
+
+Stage 6 - build the outward edge: mcp_gateway, then interop.
+
+Each stage is gated by the test levels: unit tests per actor, integration tests per design pattern, scenario tests on the Community Garden Project, longitudinal development tests against the Piagetian battery, and the architecture audit (the loops audit and the epistemology audit) run during refinement.
+
+
+PART ARCH-11 - TRACEABILITY: CAPABILITY LAYER TO PACK TO WORK PACKAGE
+
+This map lets any reader move between the architecture's 27 capability layers, the packs that realize them, and the work packages that specify them.
+
+Layers 1 to 2 (engine core, FFI bridge) - prologai-core - PRs 2.
+
+Layer 3 to 5 (Lattice, node_facts, scopes and zones) - pack lattice - PRs 3, 4, 5.
+
+Layer 6 to 8 (actors, pub-sub, sentinels) - pack actors, pack pubsub, pack sentinels - PRs 6, 7, 8, 9.
+
+Layer 9 (mind-body) - pack mindbody - PR 10.
+
+Layer 10 (continuous learning) - pack sona - PR 11.
+
+Layer 11 (assessment) - pack assessment - PR 12.
+
+Layer 12 (reflection actors) - pack reflection - PR 13.
+
+Layer 13 (MCP gateway) - pack mcp_gateway - PR 14.
+
+Layer 14 (truth maintenance) - pack lattice (tabling) - PR 15.
+
+Layer 15 (language surface) - launcher and syntax - PR 1.
+
+Layer 16 (continual refinement) - pack reflection (refiner) - PR 17.
+
+Layer 17 (belief and evidence) - pack beliefs - PRs 21, 29.
+
+Layer 18 (workspace cycle) - pack workspace - PR 18.
+
+Layer 19 (predictive hierarchy) - pack prediction - PRs 19, 22.
+
+Layer 20 (affective guidance) - pack affect - PRs 24, 26, 27.
+
+Layer 21 (generative development) - pack development - PRs 20, 23, 25, 30, 31, 28.
+
+Layer 22 (attention economy) - pack attention_economy - PR 32.
+
+Layer 23 (types and the kernel) - pack types, pack kernel - PRs 33, 35.
+
+Layer 24 (chaining and interoperability) - pack chainer, pack interop - PRs 34, 36.
+
+Layer 25 (induction and composition) - pack induction, pack vsa - PRs 37, 38.
+
+Layer 26 (frames, justification, probability) - pack frames, pack defeasible, pack probabilistic - PRs 39, 40, 41.
+
+Layer 27 (self-awareness and society) - pack attention_schema, pack interop - PRs 42, 43.
+
+Layer 28 (tool use and computer use) - pack tooling, pack computer_use - PRs 44, 45.
+
+Embodiment extends Layer 9 (mind-body) - pack ros_bridge - PR 46.
+
+Layer 29 (ACP gateway) - pack acp - PR 47.
+
+Layer 30 (ANP gateway) - pack anp - PR 48.
+
+The embedding provider (PR 16) is cross-layer, living in prologai-core and serving Layer 4 and the vector packs.
+
+This layer-to-pack-to-work-package map has a complement on the capability side: the Cognitive Capabilities Map of Specification Part 40, which indexes agent-era terms such as tool use, reasoning, memory, and the agent loop to the parts and work packages that realize them, so a reader can enter the architecture from either the component or the capability.
+
+
+PART ARCH-12 - SAFETY AND INTERPRETABILITY AT SCALE
+
+This part places the safety mechanisms of Specification Part 38 into the architecture; they are cross-cutting and privileged, and they sit outside the pack graph that the mind can edit.
+
+
+SECTION 12.1 - THE PRIVILEGED SAFETY PLANE
+
+Safety is a privileged plane above the capability layers, not a pack among them.
+
+It holds the constitutional layer (Section 3.16), the oversight monitor, the capability-evaluation gate, and the tripwire detectors, none of which the self-improvement primitives can reach or rewrite.
+
+The ordering at run time is fixed: the learned gating actor proposes, the constitutional gate disposes, the oversight monitor watches and samples for human review, and the tripwires can pause everything; an action passes only when all of them allow it.
+
+This plane is enforced structurally by the layered design: it lives where PrologAI-layer self-modification cannot reach, the same boundary that makes the engine immutable.
+
+
+SECTION 12.2 - THE GRADUATED-AUTONOMY STATE MACHINE
+
+Autonomy is a state machine, not a flag.
+
+A mind moves through states - simulation-only, human-authorized, narrowly self-authorizing, broadly self-authorizing - and each transition upward is gated by passing the capability evaluations and the audits, while any regression, tripwire, or failed evaluation transitions it downward automatically.
+
+The developmental stage sets the ceiling (no self-authorization below formal operations), and the trust budget sets the current position beneath that ceiling.
+
+Corrigibility is invariant across all states: the signed-shutdown path is wired directly to the halt, bypassing the cognitive cycle entirely so the mind cannot delay it.
+
+
+SECTION 12.3 - THE AUDITABILITY BOUNDARY
+
+The architecture has a clean, honestly drawn line between what is read and what is bounded.
+
+Above the line, the symbolic Lattice - node_facts, scopes, rules, plans, justifications, and provenance - is fully inspectable by a human.
+
+Below the line, the sub-symbolic components - embeddings, similarity routing, elastic-weight protection, and the vector backend - are governed by provenance, by the structural vector-symbolic embedding option (PR 38) that keeps composition inspectable, by the symbolic justification layer that explains conclusions, and by deterministic replay, rather than by direct transparency.
+
+No safety mechanism in this architecture depends on the sub-symbolic layer being transparent; closing that gap is a named research direction, not a load-bearing assumption.
+
+
+SECTION 12.4 - CONTAINMENT AND MULTI-MIND SAFETY
+
+Containment is architectural: early minds run in the simulated Community Garden with no real-world actuation, restricted tool and network access, and all external traffic quarantined, and embodiment is unlocked only stage by stage.
+
+In the Mind Server's joint and hive topologies, each mind keeps its own Lattice, its own constitution instance, and its own overseers; all inter-mind traffic passes through quarantine scopes; and the capped attention economies make runaway cross-mind feedback structurally impossible.
+
+The deterministic replay facility is the architecture's debugging anchor for a self-modifying system, with the honest caveat that exact replay under heavy actor concurrency requires recording the scheduling order, which the journal captures for the safety-critical paths.
+
+
+PART ARCH-13 - THE TOOL-USE AND COMPUTER-USE ARCHITECTURE
+
+This part places the tool-use faculty (PR 44) and the computer-use body (PR 45) into the architecture; they are the layer by which the mind reaches the wider world of tools and applications.
+
+
+SECTION 13.1 - TWO NEW PACKS
+
+pack tooling realizes PR 44: it holds the tool registry, the tool_card schema, affordance discovery, the selection step that plugs into deliberation, the gated invocation path, and the reliability learning.
+
+pack computer_use realizes PR 45: it enrolls a screen-and-input body, routes screenshots into the detector suite, and issues mouse, keyboard, and browser actions through the mind-body interface, with browser control as its structured sub-mode.
+
+Both sit at the outer edge of the dependency graph, like the interoperability packs, because they connect the assembled mind to the outside rather than constitute it; pack tooling depends on the mind-body, gateway, budget, marker, and chainer packs, and pack computer_use depends on the mind-body, detector, frames, and tooling packs.
+
+
+SECTION 13.2 - TOOLS ARE GROUNDED NODE_FACTS
+
+The architecture adds no new knowledge primitive for tools, because a tool is a grounded node_fact (Section 3.1) carrying a tool_card.
+
+A tool is therefore discovered, scored, invoked, learned about, and even built using the same machinery as any other competence, and the six tool sources - native foreign predicates, Model Context Protocol servers (PR 14), Agent2Agent skills (PR 43), body capabilities (PR 10), Agent Communication Protocol agents (PR 47), and Agent Network Protocol peers (PR 48) - are unified behind one card and one registry.
+
+The catalogue of Specification Part 39 is the bootstrap population of that registry, each class tagged with a risk class.
+
+
+SECTION 13.3 - COMPUTER USE IS A BODY, AND TOOLS PASS THE SAFETY PLANE
+
+Computer use introduces no special control path: the screen is a sensor and the input devices are actuators on an enrolled body, so the perceive-deliberate-act loop already specified carries it, with the detector suite reading the screen and reference frames giving the screen its coordinate space.
+
+Every tool call and every irreversible on-screen action passes the same privileged safety plane as any other action (Part ARCH-12): the constitutional gate disposes, the oversight monitor samples by risk class, and the tripwires can pause; high-risk tool classes are additionally gated by capability evaluation and staged autonomy.
+
+Tool results and on-screen content from untrusted sources land in quarantine scopes, so the outside world can be read and acted upon without its content being trusted as instruction - the architectural defense against prompt injection through tools and the screen.
+
+
+PART ARCH-14 - THE ROBOT BODY AND THE ROS 2 BRIDGE
+
+This part places PR 46, the Robot Operating System bridge, into the architecture; it introduces no new cognitive layer, because a robot is an instance of the Mind-Body interface (Layer 9), not a new faculty.
+
+pack ros_bridge realizes PR 46: a small Robot Operating System version 2 (ROS 2) node, written with rclpy, that subscribes to the robot's sensor topics and relays them to the mind as percepts, and turns the mind's commands into actuator messages; it is the robot's herald, and it depends on the mindbody, development (detector suite), frames, and tooling packs.
+
+Sensor messages map to percepts through the detector suite (PR 30), and the TF2 transform tree maps onto reference frames (PR 39), so the robot's space reuses the frame machinery rather than a parallel one.
+
+The navigation and manipulation stacks (Navigation 2 and MoveIt) are mounted as grounded tools (PR 44), not reimplemented, and a simulator (Gazebo, NVIDIA Isaac Sim, or Webots) provides the virtual robot body, with the same bridge serving a physical robot unchanged.
+
+Embodiment sits under the same privileged safety plane as everything else (Part ARCH-12): the constitutional gate and the oversight monitor screen every irreversible physical action, and staged autonomy keeps a young mind in simulation until capability evaluation permits the real world.
+
+
+PART ARCH-15 - THE ACP GATEWAY
+
+This part places PR 47, the Agent Communication Protocol gateway, into the architecture; it sits at the outer edge of the dependency graph alongside the MCP gateway (Layer 13) and the A2A gateway (Layer 27), because it connects the assembled mind to the enterprise REST client ecosystem rather than constituting a new cognitive faculty.
+
+pack acp realizes PR 47: an HTTP listener that accepts POST /runs (mapped to objective node_facts routed through motivation and the constitutional gate), serves GET /runs/{run_id} status, and publishes the ACP agent description at GET /.well-known/agent.json; it depends on the mcp_gateway pack (for the shared HTTP infrastructure and the constitutional gate) and the tooling pack (PR 44) for outbound task invocation.
+
+The ACP gateway registers its hosted agents as a sixth tool source in the tool registry (PR 44); from the perspective of the tool-use faculty, an ACP-hosted agent is a grounded node_fact with an acp binding, indistinguishable in discovery and invocation from any other tool type.
+
+All ACP task content from untrusted sources lands in quarantine scopes before any content is trusted or promoted, exactly as A2A artifacts and computer-use screen content do, providing the architectural defense against prompt injection through the ACP surface.
+
+
+PART ARCH-16 - THE ANP GATEWAY
+
+This part places PR 48, the Agent Network Protocol gateway, into the architecture; it is the only pack that provides the mind with a decentralized cryptographic identity (a W3C DID) rather than depending on a central registry or endpoint directory.
+
+pack anp realizes PR 48: a DID lifecycle manager that derives a did:web DID from the Mind Server hostname and stores the DID and Ed25519 key pair as constitution-scope node_facts; an HTTP endpoint at GET /.well-known/agent-descriptions serving the ANP agent description; an inbound message verifier that resolves the sender's DID document and checks the signature before admitting any content to any scope; an outbound message signer that gates every message through the constitutional check before signing and transmitting; and a meta-protocol negotiation handler that returns the set {mcp, a2a, acp, anp} with their endpoint URLs when a peer queries supported protocols.
+
+pack anp depends on the mcp_gateway pack (for the shared HTTP infrastructure), the lattice pack (for constitution-scope storage of the DID and key material), and the acp pack (PR 47) for the ACP endpoint URL returned in meta-protocol negotiation.
+
+The ANP gateway registers ANP-addressed peers as a fifth tool source in the tool registry (PR 44); from the perspective of the tool-use faculty, an ANP peer is a grounded node_fact with an anp binding; the signature verification and the constitutional gate are transparent to the selection and invocation steps.
+
+Inbound ANP message content that fails signature verification is discarded unconditionally, and a security event is written to the oversight log; this is the architectural guarantee that the decentralized trust model of ANP does not weaken the privileged safety plane (Part ARCH-12).
+
+
+PART ARCH-17 - THE CONSOLE REPL LAUNCHER
+
+This part places the console REPL launcher (Specification Section 41.1) into the architecture. It is a Mentova-level entry point, not a PrologAI core pack, so it lives in the Mentova repository rather than in the packs/ tree of PrologAI.
+
+Location: Mentova repository, bin/ directory. Two files: bin/mentova_repl.pl (the Prolog wrapper) and bin/mentova (the bash shell launcher). The bin/ directory is not a SWI-Prolog pack and carries no pack.pl manifest; it is a deployment artifact, not a library.
+
+Dependency graph: bin/mentova_repl.pl depends on src/mentova/mentova.pl (the full Mentova bootstrap, which in turn depends on all 48 PrologAI packs), and on library(assessment) and library(node_facts) from the PrologAI assessment pack (packs/assessment/prolog/). It has no other dependencies. It introduces no new predicates and no new runtime state; it is a boot file, not a module.
+
+Interface contract: the launcher pre-loads the environment and hands control to SWI-Prolog's native prolog/0 toplevel. The interface to the user is the ?- prompt. All platform predicates accessible at that prompt are unchanged from their published module interfaces; the launcher adds no new syntax and no new commands.
+
+Relationship to the safety plane: the launcher calls mentova_boot, which runs the constitutional check and overseer registration. All safety guarantees established at boot time (constitutional gate, oversight monitor, scope enforcement) are therefore in effect for every query issued at the ?- prompt. The launcher does not bypass or weaken the privileged safety plane (ARCH-12).
+
+Future extension: a friendlier command interface (:help, :query, :assess short-form commands) may be added as a custom read-eval-print loop that sits between the user and SWI-Prolog's prolog/0. The thin wrapper (bin/mentova_repl.pl) is the foundation for that extension; it may be loaded by the extended interface without modification.
+
+
+CLOSING NOTE - FROM ARCHITECTURE TO REFINEMENT
+
+This volume completes SPARC Step 3: it places all forty-eight work packages into repositories, packs, and crate modules; binds them through narrow interface contracts to the engine and the vector backend; and defines how they communicate at run time around the cognitive cycle, under one cross-cutting safety gate.
+
+The console REPL launcher (ARCH-17) is not a work package but a delivery artifact: it is the entry point through which a user reaches every work package interactively.
+
+The component boundaries honor the five separations of concern, the dependency graph points only inward and downward, and the traceability map ties every capability layer to its pack and its work package.
+
+The next step is SPARC Step 4, Refinement: building the packs in the stated order, running the five test levels, and letting the architecture audit and the continual refinement harness improve the implementation while it runs.
+
+The first mind to be assembled from these components is Mentova; the same architecture is open, on GitHub, to anyone who would assemble a different one.
+
+
+PART ARCH-18 - THE LATTICE CRYPTOGRAPHIC PRIVACY LAYER
+
+This part places PR 49, the Lattice Cryptographic Privacy Layer, into the architecture. It sits as a cross-cutting service pack at the outer edge of the dependency graph: any pack, application, or interoperability gateway may load it to encrypt or decrypt sensitive values, but it does not constitute a cognitive faculty and has no dependency on the Lattice internals or the constitutional layer.
+
+
+SECTION 18.1 - ONE PACK, ONE MODULE
+
+pack lattice_crypto realizes PR 49: a single SWI-Prolog module (lattice_crypto) in packs/lattice_crypto/prolog/lattice_crypto.pl, loaded from the standard library path. The module exports key generation, encryption, decryption, availability probe, and PEM loading predicates. It has no foreign (C/Rust) component; all operations use the SWI-Prolog library(crypto) built-in and the openssl command-line tool (required on the PATH).
+
+The pack depends only on SWI-Prolog library(crypto), library(process), library(lists), and library(apply). It has no dependency on any PrologAI pack and can therefore be loaded first in the dependency graph, before the Lattice, before actors, and before any other PrologAI component.
+
+
+SECTION 18.2 - PLACEMENT IN THE LAYER DIAGRAM
+
+pack lattice_crypto occupies the same deployment position as the interoperability packs (mcp_gateway, anp) at Layer 13 in the dependency diagram: outer shell, no inward cognitive dependency. Its upward boundary is the application or interoperability pack that calls it; its downward boundary is the SWI-Prolog crypto engine and the host operating system's OpenSSL installation.
+
+The reason for this placement: private data can originate anywhere in the stack (from the user input surface, from an inter-agent payload arriving at the ANP gateway, or from the tool-use faculty reading a credential from disk) and must be encrytable and decryptable at any of those entry points. A cross-cutting service pack at the outer shell is the only placement that serves all callers without introducing circular dependencies.
+
+
+SECTION 18.3 - KEY MATERIAL AND THE CONSTITUTIONAL BOUNDARY
+
+Long-term private keys (RSA or ECDH private keys belonging to the mind itself) are not stored inside the Lattice data store. They reside in the host file system under operator control or in a hardware security module. The pack lattice_crypto loads them on demand from PEM files using pai_pem_load_private/2 and pai_pem_load_public/2 and holds them in Prolog variables for the duration of the call.
+
+Short-lived ephemeral ECDH private scalars exist only in Prolog variables; they are never written to disk or to the Lattice. The shared secret and the derived AES key are created and consumed within a single pai_encrypt/5 or pai_decrypt/5 call.
+
+Encrypted bundles (rsa_bundle/3, ecdh_bundle/4, pqc_bundle/4) are storable as ordinary Prolog terms in the Lattice or in the journal. The plaintext they protect is visible only to a caller that holds the matching private key.
+
+The constitutional gate and the privileged safety plane (ARCH-12) are not bypassed by the crypto layer. Predicates that store encrypted data into the Lattice still pass through the standard scope and assertion predicates; the crypto layer does not introduce an unaudited back channel into the Lattice.
+
+
+SECTION 18.4 - ALGORITHM SELECTION AND MIGRATION
+
+RSA is the entry point: it requires only a standard OpenSSL installation (already required by the ANP pack for DID-based signature verification) and is supported out of the box by library(crypto) in SWI-Prolog.
+
+ECDH on prime256v1 is the recommended choice for new deployments: smaller keys, forward secrecy (because ephemeral key pairs are discarded after each encrypt), and no dependency beyond the SWI-Prolog crypto built-in.
+
+PQC (ML-KEM-768) is the recommended choice for deployments that must remain secure against a future cryptographically relevant quantum computer. It requires OpenSSL 3.2 or later with the OQS provider; the pack probes for the provider at runtime and raises a structured error if it is absent, so the rest of the system degrades gracefully rather than silently.
+
+Migrating from RSA to ECDH or PQC requires only changing the algorithm atom (pai_algo_rsa, pai_algo_ecdh, pai_algo_pqc) and re-encrypting existing bundles with the new algorithm. The bundle format is self-describing (the compound functor names the algorithm), so old and new bundles can coexist in the Lattice during a rolling migration.
+
+
+PART ARCH-12 - IMAGINATIVE MEMORY AND SITUATIONAL AWARENESS (PR 50, PR 51)
+
+pack imagination - the imaginative area of the Totality: mindscapes (compartmentalized canvases held only in non-observed realities), tableaux of bound elements (vantage, figure, motif), and rendered reveries that advance figures kinematically into deterministic, inspectable animations for mental simulation (PR 50).
+
+pack awareness - situational awareness as a ladder of regards (ambient, selfward, otherward(Agent), avowed, disavowed), with one active standpoint at a time, theory-of-mind attribution and divergence detection, and reconciliation of the owned and disowned views into a single self-account (PR 51).
+
+Both packs are cognitive-layer leaves: they depend only on the standard list library and assert their own dynamic state, so they add no new dependency to the foundation chain and load through the launcher's per-pack library path like every other pack. The imagination pack enforces the imaginative sandbox by refusing the observed reality, keeping imagined content provably separate from perceived fact; the awareness pack manages viewpoints in the same spirit as Lattice viewpoints, so a proposition may be believed under one regard and denied under another without global contradiction.
+
+Build and integration order: Layer 31 (imaginative memory and situational awareness) - pack imagination, pack awareness - PRs 50 and 51 - extends the cognitive layer above the development and affect packs and may be built and tested independently of all packs above the foundation.
+
+PART ARCH-19 - THE EPHEMERA PACK (PR 53)
+
+pack ephemera - the code synthesis, execution, and skill persistence substrate: goal evaluation with timeout (ep_eval/3), Prolog code atom evaluation (ep_scratch/4), shell subprocess execution with output capture (ep_shell/3), language-specific script execution via temporary file (ep_ephemeral/4), synthesis-execute-check iteration cycles (ep_iterate/5), trace logging (ep_trace_record/4, ep_trace_get/2), and skill persistence (ep_skill_save/4, ep_skill_lookup/3, ep_skill_run/3, ep_skill_list/1, ep_skill_forget/1). Skills are stored in the dynamic fact ep_skill_db/4 and persist for the lifetime of the session. A skill is a named ephemeron promoted from ephemeral to reusable: it has a name, a language, source code, and a human-readable description for indexing and search.
+
+Build and integration order: Layer 32 (ephemeral code synthesis and execution) - pack ephemera - PR 53 - sits above the imaginative memory and situational awareness layer (Layer 31) and below the agency orchestration layer (Layer 33). It may be loaded and tested independently of all packs that depend on it.
+
+Dependency profile: pack ephemera depends only on SWI-Prolog built-ins (call_with_time_limit/2, atom_to_term/3, tmp_file_name/2) and standard libraries (library(process), library(readutil), library(lists)). It has no dependency on any PrologAI pack, making it a stable foundation for the agency and refinery packs above it.
+
+Integration points: the agency pack (Layer 33) imports ep_eval/3 and ep_shell/3 from this pack to execute agentic actions. The refinery pack (Layer 34) may use ep_eval/3 to run evaluation goals within bounded time. Callers that wish to execute temporary programs in languages other than Prolog (Python 3, Bash) use ep_ephemeral/4 directly.
+
+Safety properties: every subprocess invocation is bounded by a caller-supplied timeout. Temporary files are deleted unconditionally after the subprocess exits. The pack does not modify any global Prolog state except its own trace log and counter. All external code executes in a subprocess, isolated from the main Prolog process.
+
+
+END OF DOCUMENT - PROLOGAI ARCHITECTURE
+
+PART ARCH-20 - THE AGENCY PACK (PR 54)
+
+pack agency - the agentic execution loop: formal loop lifecycle management (ag_loop_create/3, ag_loop_run/3, ag_loop_step/3), goal stack manipulation (ag_push_subgoal/2, ag_pop_subgoal/2), step budget accounting (ag_budget_remaining/2, ag_budget_decrement/1), loop detection (ag_detect_loop/2), escalation to human oversight (ag_escalate/2), and full step-by-step trace recording (ag_step_record/4, ag_loop_trace/2).
+
+Build and integration order: Layer 33 (agentic execution loop) - pack agency - PR 54 - sits above the ephemera pack (Layer 32) and depends on it for action execution (ep_eval/3 and ep_shell/3). It may be loaded and tested independently of all packs above it.
+
+Dependency profile: pack agency imports ep_eval/3 and ep_shell/3 from pack ephemera. It has no other PrologAI pack dependency. This means agency can be used anywhere ephemera is available.
+
+The reasoning goal (ReasonGoal) interface: the caller supplies a Prolog goal that is called at each step as call(ReasonGoal, LoopId, CurrentGoal, Thought, Action). This interface is intentionally open: any reasoning strategy (planning, reflection, table lookup, neural oracle) can be plugged in as a reasoning goal. The agency pack is purely the loop infrastructure; domain intelligence lives in the ReasonGoal.
+
+Integration points: the refinery pack (Layer 34) can use agency loops to drive iterative quality improvement cycles. The planning pack and synthesis pack may supply ReasonGoal implementations for specific problem domains. Callers in the Mentova cognitive layer can use ag_loop_create/3 and ag_loop_run/3 to pursue any goal with a bounded, observable, traceable loop.
+
+Safety properties: every loop has a finite step budget; when the budget is exhausted, the loop halts with status budget_exhausted rather than running indefinitely. Loop detection (ag_detect_loop/2) allows the ReasonGoal to detect and break cycles. Escalation (ag_escalate/2) provides a safe shutdown path when human oversight is required. Every step is recorded in the trace, making loop execution fully auditable.
+
+END OF DOCUMENT - PROLOGAI ARCHITECTURE
+
+
+PART ARCH-21 - THE REFINERY PACK (PR 55)
+
+pack refinery - the metacognitive quality layer: criterion-based critique (rn_critique/4), fraction scoring (rn_score/3), iterative improvement with an improver goal (rn_improve/5), full evaluator-optimizer loop with run logging (rn_optimize/5), multi-path exploration with score ranking (rn_explore_paths/4), and a persistent lesson database (rn_learn/3, rn_recall/2, rn_forget/1).
+
+Build and integration order: Layer 34 (metacognitive quality layer) - pack refinery - PR 55 - sits above the agency pack (Layer 33). It has no dependency on any PrologAI pack; its criterion TestGoals are caller-supplied and may invoke any predicate available in the caller's environment.
+
+Dependency profile: pack refinery depends only on SWI-Prolog built-ins (findall, call_with_time_limit, float, length) and standard libraries (library(lists), library(aggregate)). It does not depend on pack ephemera or pack agency, and may be loaded and used independently of those packs.
+
+Integration points: the agency pack can use rn_optimize/5 as a ReasonGoal implementation to drive quality-improvement cycles as agentic actions. The planning pack may use rn_explore_paths/4 to explore multiple plan candidates and pick the highest-scoring one. Any PrologAI pack that produces outputs subject to quality checking can use rn_critique/4 and rn_score/3 directly.
+
+The criteria design principle: criteria TestGoals should be written using YALL lambda notation so they carry their module context. This makes criteria portable across module boundaries and prevents the module-visibility errors that arise when using plain predicate atoms.
+
+The lesson database principle: before attempting a complex problem of a known type, recall lessons from rn_learn/3; after a failure, record a lesson so future attempts benefit from the experience. This is the symbolic equivalent of the reflexion pattern from agentic AI research: the system accumulates written lessons from failures and applies them to future attempts.
+
+END OF DOCUMENT - PROLOGAI ARCHITECTURE
+
+
+PART ARCH-22 - THE GRID PACK (PR 56)
+
+pack grid - the ARC-AGI perceptual substrate: grid dimension query (gd_size/3), zero-based cell access (gd_cell/4, gd_row/3, gd_col/3), color analysis (gd_colors/2, gd_color_count/3, gd_color_map/3), 4-connected object extraction and flood-fill (gd_objects/3, gd_connected/3, gd_fill/5), bounding box computation (gd_bounding_box/3), seven spatial transformations (gd_rotate90/2, gd_rotate180/2, gd_rotate270/2, gd_reflect_h/2, gd_reflect_v/2, gd_reflect_d1/2, gd_reflect_d2/2), translation (gd_translate/5), cropping (gd_crop/6), overlay compositing (gd_overlay/5), grid comparison (gd_diff/3, gd_equal/2), symmetry detection (gd_symmetry/2), uniform grid construction (gd_make/4), and single-cell mutation (gd_set_cell/5).
+
+Build and integration order: Layer 35 (ARC-AGI perceptual substrate) - pack grid - PR 56 - sits above the refinery pack (Layer 34, PR 55). It has no dependency on any other PrologAI pack; it depends only on library(lists) and library(apply) from SWI-Prolog.
+
+Dependency profile: pack grid imports member/2, nth0/3, nth0/4, append/3, flatten/2, numlist/3, list_to_set/2, min_list/2, max_list/2, and reverse/2 from library(lists); and maplist/2, maplist/3, foldl/4 from library(apply). It uses msort/2 and between/3 as SWI-Prolog built-ins. No PrologAI pack is required for grid operations, making this pack a stable perceptual foundation.
+
+Integration points: every ARC-solving pack that operates above Layer 35 shall import the grid module and use gd_* predicates for all grid perception, transformation, and comparison operations. The analogy pack (Layer 36, PR 57) uses gd_objects/3 and gd_rotate90/2 as primitives for detecting spatial structure. The induction pack uses gd_diff/3 to characterize input-output transformations for rule induction. The workspace pack and attention pack may use gd_objects/3 and gd_bounding_box/3 to direct attentional focus toward salient regions.
+
+Grid representation contract: a grid is always a list of rows, each row a list of color integers 0 through 9. No other representation is used within PrologAI. ARC task JSON arrays are parsed to this form before any grid operation is called. This single representation contract eliminates conversion overhead and ensures that all grid predicates compose without type coercion.
+
+Spatial transformation coverage: the pack implements the full dihedral group D4 of symmetries (four rotations and four reflections) that characterizes the spatial symmetries of a square grid. Non-square grids are supported for all operations; rotation correctly swaps the row and column counts.
+
+END OF DOCUMENT - PROLOGAI ARCHITECTURE
+
+
+PART ARCH-23 - THE ANALOGY PACK (PR 57)
+
+pack analogy - the ARC-AGI structural analogy and transformation inference layer: shape normalization (ay_normalize_shape/2), shape equality under normalization (ay_shape_equal/2), shape size and bounding box (ay_shape_size/2, ay_shape_bbox/3), D4 isometry application to shapes (ay_shape_isometry/3), isometry candidate search for shapes (ay_isometry_candidates/3), color map inference from parallel color lists (ay_infer_color_map/3), object matching by shape (ay_match_objects/3), translation offset computation (ay_object_offset/3), grid-level D4 isometry detection (ay_grid_isometry/3), grid color map inference (ay_grid_color_map/3), cross-example consistency search for isometry and color map (ay_examples_isometry/3), isometry and color map application to grids (ay_apply_isometry/3, ay_apply_color_map/3), and end-to-end solve from training examples (ay_solve_from_examples/3).
+
+Build and integration order: Layer 36 (structural analogy and transformation inference) - pack analogy - PR 57 - sits above the grid pack (Layer 35, PR 56). The grid pack is a required dependency. Pack analogy imports gd_* predicates from pack grid and adds the inferential layer above them.
+
+Dependency profile: pack analogy imports member/2, nth0/3, flatten/2, numlist/3, min_list/2, max_list/2, list_to_set/2, append/3 from library(lists); maplist/2, maplist/3, foldl/4 from library(apply); and all gd_* predicates from pack grid. It has no other PrologAI pack dependency.
+
+Integration points: pack analogy is the primary rule-inference engine for ARC-AGI solving. Higher-level packs that implement multi-step or compositional rules shall call ay_solve_from_examples/3 as their first-pass solver and fall back to more complex methods when it fails. The induction pack may use ay_isometry_candidates/3 to generate candidate D4 transformations for ILP metarule search. The workspace pack may use ay_examples_isometry/3 to form analogical hypotheses that compete in the global workspace.
+
+The ay_verify_pair/4 design principle: inter-pair verification uses a named predicate rather than a YALL lambda to ensure that local intermediate variables (TGrid, Predicted) are freshly allocated on every call. A YALL lambda body with intermediate variables would bind those variables on the first call and cause subsequent calls to fail under structural unification. Named predicates are free from this issue because each call creates a new activation frame with fresh local variables.
+
+ARC-AGI scope: pack analogy handles the class of ARC-AGI tasks explained by a single D4 isometry followed by a single color substitution. This covers a meaningful subset of ARC-AGI-1 and ARC-AGI-2 tasks. Tasks requiring object-level reasoning (move, add, or remove individual objects) or compositional rules (apply rule A to some objects and rule B to others) require the higher-level composition and object-agency packs to be developed above Layer 36.
+
+END OF DOCUMENT - PROLOGAI ARCHITECTURE
+
+
+PART ARCH-24 - THE SCENE PACK (PR 58)
+
+Role: the scene pack is the object-centric reasoning layer. It builds a scene model from a raw grid, providing a structured inventory of all foreground objects with their properties (color, size, shape, bounding box, centroid) and spatial relationships (above, below, left-of, right-of, touching, contained-in).
+
+The scene pack sits at Layer 37, above the analogy pack (Layer 36), and depends directly on the grid pack (Layer 35). It does not depend on the analogy pack.
+
+Build and integration order: Layer 37 (object-centric scene reasoning) - pack scene - PR 58 - sits above the grid pack (Layer 35, PR 56). The grid pack is a required dependency. Pack scene imports gd_colors/2, gd_color_count/3, gd_objects/3, gd_bounding_box/3, and gd_size/3 from pack grid.
+
+Exported predicates (24):
+sc_bg_color/2, sc_objects/2, sc_grid_to_scene/2, sc_obj_color/2, sc_obj_cells/2, sc_obj_size/2, sc_obj_bbox/3, sc_obj_shape/2, sc_obj_centroid/3, sc_normalize_cells/2, sc_objects_of_color/3, sc_sort_by_size/3, sc_largest/2, sc_smallest/2, sc_count/2, sc_count_of_color/3, sc_above/2, sc_below/2, sc_left_of/2, sc_right_of/2, sc_cells_touching/2, sc_contained_in/2, sc_same_shape/2, sc_same_color/2.
+
+Integration points: every ARC-solving pack above Layer 37 that needs to reason about individual objects (their positions, shapes, sizes, colors, or spatial relationships) shall use sc_* predicates from this pack. The analogy pack (Layer 36) handles grid-level transformations; the scene pack handles object-level descriptions. Future packs for pattern tiling, counting rules, object movement, and context-dependent dispatch shall import both grid and scene as their perceptual and descriptive foundation.
+
+The obj(Color, Cells) representation is the canonical object term used throughout PrologAI above Layer 37. Higher-level packs that reason about objects shall receive and return obj terms, not raw cell lists, to preserve color information through the reasoning chain.
+
+ARC-AGI scope: the scene pack addresses the "larger object inventories" challenge identified in the ARC-AGI-2 roadmap. It is the first layer that can answer questions about individual named objects within a grid, not just the grid as a whole. Tasks that ask "which object is largest?", "which two objects have the same shape?", "which object is above the red object?", or "how many blue objects are there?" are in the scope of this pack.
+
+END OF DOCUMENT - PROLOGAI ARCHITECTURE
+
+
+PART ARCH-25 - THE QUANT PACK (PR 59)
+
+Role: quantitative reasoning over object sets. Sits at Layer 38, above the scene pack (Layer 37). Depends on scene (sc_*) and grid (gd_*).
+
+Exported predicates (18): qn_histogram/2, qn_group_by_color/2, qn_group_by_size/2, qn_group_by_shape/2, qn_most_frequent_color/2, qn_least_frequent_color/2, qn_max_color_count/2, qn_min_color_count/2, qn_unique_shapes/2, qn_count_where/3, qn_all_same_color/1, qn_all_same_size/1, qn_all_same_shape/1, qn_colors_match/2, qn_shapes_match/2, qn_sizes_match/2, qn_exactly_n/3, qn_at_least_n/3.
+
+Integration: builds directly on scene pack obj(Color,Cells) representation. Any pack above Layer 38 that needs to count, group, or compare object-set attributes uses qn_* predicates.
+
+END OF DOCUMENT - PROLOGAI ARCHITECTURE
+
+
+PART ARCH-26 - THE PATTERN PACK (PR 60)
+
+Role: the pattern pack is the periodic repetition and scaling layer. It detects repeating periods in lists, rows, and columns; constructs tiled grids from a base tile; scales grids up and down by integer factors; repeats grids horizontally and vertically; mirrors grids along horizontal and vertical axes; and generates canonical constructed patterns (checkerboard, horizontal stripes, vertical stripes).
+
+The pattern pack sits at Layer 39, above the scene pack (Layer 37) and the quant pack (Layer 38), but depends only on the grid pack (Layer 35, PR 56). It does not depend on the analogy, scene, or quant packs.
+
+Build and integration order: Layer 39 (periodic pattern detection, tiling, and repetition) - pack pattern - PR 60 - depends on pack grid (Layer 35, PR 56).
+
+Exported predicates (15): pt_list_period/2, pt_row_period/3, pt_col_period/3, pt_tile_grid/4, pt_extract_tile/4, pt_is_tiling/3, pt_scale_up/3, pt_scale_down/3, pt_repeat_h/3, pt_repeat_v/3, pt_mirror_h/2, pt_mirror_v/2, pt_checkerboard/5, pt_stripe_h/4, pt_stripe_v/4.
+
+Dependencies: library(lists) for nth0/3, append/2, append/3, numlist/3; library(apply) for maplist/2, maplist/3; pack grid for gd_row/3, gd_col/3, gd_size/3, gd_cell/4, gd_crop/6, gd_equal/2, gd_reflect_h/2, gd_reflect_v/2, gd_make/4.
+
+Integration points: the pattern pack is the foundation for any higher-level pack that reasons about repeating or scaled structures. The compose pack (Layer 40, PR 61) will call pt_* predicates to construct multi-step transformation pipelines. The motion pack (Layer 41, PR 62) may use pt_scale_up/down when objects change size as they move. Any rule-induction component that tests whether a grid is a tiling of a smaller grid will call pt_is_tiling/3.
+
+The append/2 principle: pt_repeat_v uses append/2 (concatenate a list of lists) to stack grid copies. Using flatten/2 would erroneously collapse the row structure into a flat list of cell colors. This distinction is documented here as a design invariant for all future packs that concatenate multi-row structures.
+
+END OF DOCUMENT - PROLOGAI ARCHITECTURE
+
+
+PART ARCH-27 - THE COMPOSE PACK (PR 61)
+
+Role: the compose pack is the rule pipeline and higher-order combinator layer. It provides the ability to chain multiple grid transformation rules in sequence (cp_pipe), apply a rule a fixed number of times (cp_pipe_n, cp_repeat), dispatch conditionally (cp_branch), repeat until a condition holds (cp_until), converge to a fixed point (cp_fixed_point), map a rule over each row or column independently (cp_map_rows, cp_map_cols), combine two grids cell by cell (cp_zip), and fold a rule over a list of grids (cp_fold).
+
+The compose pack sits at Layer 40, above the pattern pack (Layer 39) and all packs below it. It depends directly on the grid pack (Layer 35, PR 56). It does not depend on the analogy, scene, quant, or pattern packs.
+
+Build and integration order: Layer 40 (sequential rule pipelines and transformation composition) - pack compose - PR 61 - depends on pack grid (Layer 35, PR 56).
+
+Exported predicates (13): cp_apply/3, cp_identity/2, cp_const/3, cp_pipe/3, cp_pipe_n/4, cp_branch/5, cp_repeat/4, cp_until/4, cp_fixed_point/3, cp_map_rows/3, cp_map_cols/3, cp_zip/4, cp_fold/4.
+
+Dependencies: library(lists) for nth0/3, append/2, append/3, numlist/3; library(apply) for maplist/3, maplist/4; pack grid for gd_size/3, gd_col/3, gd_equal/2.
+
+The cp_apply meta-call interface: every rule-accepting parameter in the compose pack accepts a callable term of the form Pred or Pred(Args...) that, when augmented with two more arguments (Grid, Grid2), produces a valid meta-call. This is the standard SWI-Prolog higher-order interface and requires no special syntax extension.
+
+Integration points: the compose pack is the combinatorial backbone for any multi-step ARC-AGI solver. A solver that identifies an isometry via the analogy pack and then applies it conditionally based on scene information (from the scene pack) can express the full solution as a cp_pipe or cp_branch pipeline. Future packs for object motion, frame detection, and path finding will accept compose predicates as argument slots so that transformations can be expressed as first-class terms.
+
+END OF DOCUMENT - PROLOGAI ARCHITECTURE
+
+
+PART ARCH-28 - THE MOTION PACK (PR 62)
+
+Role: the motion pack is the spatial movement layer. It provides gravity (cells falling in all four cardinal directions), grid shifting, object translation in a scene, scene rendering to a raw grid, scene-level gravity via round-trip rendering, Manhattan distance, and closest-cell queries.
+
+The motion pack sits at Layer 41. It depends on the grid pack (Layer 35, PR 56) and the scene pack (Layer 37, PR 58).
+
+Build and integration order: Layer 41 (gravity, sliding, object movement) - pack motion - PR 62.
+
+Exported predicates (13): mv_gravity_down/3, mv_gravity_up/3, mv_gravity_left/3, mv_gravity_right/3, mv_shift_grid/5, mv_obj_translate/4, mv_scene_translate/4, mv_scene_to_grid/2, mv_scene_gravity/2, mv_distance/3, mv_closest_cell/3, mv_slide_col/4, mv_slide_row/4.
+
+Integration points: the motion pack is used by any ARC-AGI solver that needs to simulate physical movement. The compose pack (Layer 40) can accept mv_gravity_down as a rule in a cp_pipe pipeline. The scene pack provides the obj(Color,Cells) representation that mv_obj_translate and mv_scene_translate consume.
+
+The set_col / set_row helpers: these are private predicates that write a new column or row back into the grid one cell at a time, using gd_set_cell and nth0 for element access. These are not exported because callers should use the gravity and slide predicates rather than raw column/row mutation.
+
+END OF DOCUMENT - PROLOGAI ARCHITECTURE
+
+
+PART ARCH-29 - FRAME PACK (LAYER 42)
+
+Pack name: frame
+Module: frame
+File: packs/frame/prolog/frame.pl
+Test: packs/frame/test/test_frame.pl
+Manifest: packs/frame/pack.pl
+Prefix: fr_
+Layer: 42
+Depends on: grid (Layer 34)
+
+The frame pack lives in Layer 42 of the PrologAI cognitive architecture, above
+the grid pack (Layer 34) and scene pack (Layer 38), and above the motion pack
+(Layer 41). It depends only on the grid pack.
+
+Predicates (14):
+  fr_border_cells/2    - outer ring as r(R,C)-Color pairs
+  fr_border_color/2    - outer ring uniform color
+  fr_has_border/2      - alias for fr_border_color
+  fr_inner/2           - remove outer border ring
+  fr_add_border/4      - wrap grid with colored border
+  fr_region_has_border/6 - uniform ring in a sub-rectangle
+  fr_region_border_color/6 - color of sub-rectangle's ring
+  fr_interior_uniform/1 - interior is single color
+  fr_interior_color/2  - get interior uniform color
+  fr_make_framed/5     - generate a framed grid
+  fr_bounding_box/6    - find ring bounding box
+  fr_is_nested/3       - two-ring nesting test
+  fr_ring_count/2      - count concentric rings
+
+Private helpers:
+  fr_ring_positions_/5 - enumerate outer ring (R,C) positions
+  fr_pair_r_/3, fr_pair_c_/3 - maplist helpers
+  fr_read_cell_/3      - read cell into pair
+  fr_same_color_/2     - maplist color check
+  fr_extract_row_/4    - extract sub-row
+  fr_paint_inner_/5    - paint inner region
+  fr_paint_rows_/7, fr_paint_row_cells_/7
+  fr_region_cell_color_/3
+  fr_grid_uniform_/2   - uniform grid check
+  fr_row_uniform_/3, fr_cell_eq_/3
+  fr_fill_rect_/7, fr_fill_rows_/5, fr_fill_cols_/5
+  fr_find_bounding_box_/10
+
+END OF PART ARCH-29
+
+
+PART ARCH-30 - PATH PACK (LAYER 43)
+
+Pack name: path
+Module: path
+File: packs/path/prolog/path.pl
+Test: packs/path/test/test_path.pl
+Manifest: packs/path/pack.pl
+Prefix: pf_
+Layer: 43
+Depends on: grid (Layer 34)
+
+The path pack lives in Layer 43. It depends only on the grid pack.
+
+Predicates (13):
+  pf_neighbors/3          - 4-connected neighbors within bounds
+  pf_flood_fill/4         - BFS flood fill for same-color cells
+  pf_connected/4          - test two cells in same component
+  pf_components/3         - all connected components of a color
+  pf_component_count/3    - count connected components
+  pf_component_size/4     - size of component containing a seed
+  pf_largest_component/3  - largest connected component
+  pf_shortest_path/5      - BFS shortest path avoiding a wall color
+  pf_path_length/5        - number of steps in shortest path
+  pf_path_exists/4        - test if path exists
+  pf_reachable/4          - all cells reachable from seed
+  pf_fill_bbox/7          - flood fill bounding box
+  pf_is_connected/2       - all same-color cells form one component
+
+Private helpers:
+  pf_bfs_same_color_/5    - BFS queue over same-color cells
+  pf_unvisited_color_/4   - filter predicate for BFS
+  pf_group_components_/4  - recursive component grouping
+  pf_max_component_/3     - foldl helper for largest component
+  pf_bfs_path_/5          - BFS with path tracking
+  pf_not_wall_or_visited_/4, pf_extend_path_/3
+  pf_bfs_not_wall_/5      - BFS reachability avoiding wall
+  pf_not_wall_unvisited_/4
+  pf_row_of_/2, pf_col_of_/2
+
+END OF PART ARCH-30
+
+
+PART ARCH-31 - SYMMETRY PACK (LAYER 44)
+
+Pack name: symmetry
+Module: symmetry
+File: packs/symmetry/prolog/symmetry.pl
+Test: packs/symmetry/test/test_symmetry.pl
+Manifest: packs/symmetry/pack.pl
+Prefix: sy_
+Layer: 44
+Depends on: grid (Layer 34)
+
+The symmetry pack lives in Layer 44. It depends only on the grid pack.
+It leverages the eight D4 (dihedral group of the square) transforms available
+via the grid pack: gd_rotate90, gd_rotate180, gd_rotate270, gd_reflect_h,
+gd_reflect_v, gd_reflect_d1, gd_reflect_d2, and identity.
+
+Predicates (12):
+  sy_is_hsymmetric/1   - horizontal (left-right) symmetry
+  sy_is_vsymmetric/1   - vertical (top-bottom) symmetry
+  sy_is_rot180/1       - 180-degree rotational symmetry
+  sy_is_rot90/1        - 90-degree rotational symmetry (square only)
+  sy_is_diagonal/1     - main-diagonal symmetry (square only)
+  sy_is_antidiagonal/1 - anti-diagonal symmetry (square only)
+  sy_group/2           - symmetry group as atom list
+  sy_rotations/2       - distinct rotation variants
+  sy_orbit/2           - full dihedral orbit
+  sy_canonical/2       - lex-min canonical form
+  sy_equivalent/2      - orbit equivalence test
+  sy_order/2           - symmetry order (stabilizer size)
+
+Private helpers:
+  sy_test_sym_/2       - dispatch to individual symmetry tests
+  sy_unique_grids_/2   - remove duplicate grids from list
+  sy_not_equal_/2      - negation of gd_equal for include/3
+  sy_lex_min_/3        - foldl helper for canonical selection
+  sy_matches_canon_/2  - include helper for canonical verification
+
+END OF PART ARCH-31
+
+
+PART ARCH-32: COLOR PACK
+
+Location: packs/color/
+Files:
+  pack.pl         - manifest; requires grid
+  prolog/color.pl - module color; 14 exported cl_* predicates
+  test/test_color.pl - 33 PLUnit tests; 14 test groups
+
+Layer: 45
+Depends on: grid (Layer 34)
+
+The color pack lives in Layer 45. It depends only on the grid pack.
+It adds palette-level reasoning and color manipulation to the cognitive stack.
+
+Predicates (14):
+  cl_palette/2      - sorted distinct color list
+  cl_count/3        - count of a specific color
+  cl_histogram/2    - Color-Count pairs for all palette colors
+  cl_same_palette/2 - test palette equality between two grids
+  cl_replace/4      - replace one color with another
+  cl_remap/3        - apply a color mapping (list of Old-New pairs)
+  cl_dominant/2     - most frequent color
+  cl_rarest/2       - least frequent color
+  cl_isolate/4      - keep one color, fill rest with background
+  cl_remove/4       - replace one color with background
+  cl_is_mono/1      - test for single-color grid
+  cl_color_count/2  - number of distinct colors
+  cl_has_color/2    - membership test for a color
+  cl_swap/4         - swap two colors in a grid
+
+Private helpers:
+  cl_palette_cells_/3    - collect cell positions for a color
+  cl_color_count_pair_/3 - maplist helper for histogram
+  cl_replace_row_/4      - row-level replace
+  cl_replace_cell_/4     - cell-level replace
+  cl_remap_row_/3        - row-level remap
+  cl_remap_cell_/3       - cell-level remap with map lookup
+  cl_max_by_count_/2     - find color with highest count
+  cl_swap_pair_/2        - transpose Color-Count to Count-Color
+  cl_isolate_row_/4      - row-level isolate
+  cl_isolate_cell_/4     - cell-level isolate
+  cl_swap_row_/4         - row-level swap
+  cl_swap_cell_/4        - cell-level swap with priority ordering
+
+END OF PART ARCH-32
+
+
+PART ARCH-33: SHAPE PACK
+
+Location: packs/shape/
+Files:
+  pack.pl          - manifest; requires grid
+  prolog/shape.pl  - module shape; 14 exported sh_* predicates
+  test/test_shape.pl - 42 PLUnit tests; 14 test groups
+
+Layer: 46
+Depends on: grid (Layer 34)
+
+The shape pack lives in Layer 46. It depends only on the grid pack.
+A shape is a sorted list of r(R,C) cells with min(R)=0 and min(C)=0.
+This is the canonical representation for extracted, position-independent
+cell patterns.
+
+Predicates (14):
+  sh_from_cells/2    - normalize raw cells to a shape
+  sh_from_grid/3     - extract and normalize color cells from a grid
+  sh_area/2          - cell count
+  sh_bounding_size/3 - bounding box dimensions
+  sh_contains_cell/2 - membership test (deterministic)
+  sh_equal/2         - identity test
+  sh_translate/4     - shift cells by offset without renormalizing
+  sh_rotate90/2      - 90-degree CW rotation, renormalize
+  sh_reflect_h/2     - horizontal flip (columns), renormalize
+  sh_reflect_v/2     - vertical flip (rows), renormalize
+  sh_orbit/2         - all distinct D4 orientations
+  sh_canonical/2     - lex-min D4 orientation
+  sh_equivalent/2    - D4 orbit equivalence
+  sh_to_grid/6       - place shape on grid at offset
+
+Private helpers:
+  sh_row_/2                - extract R from r(R,C)
+  sh_col_/2                - extract C from r(R,C)
+  sh_translate_cell_/4     - subtract (MinR,MinC) from one cell
+  sh_shift_cell_/4         - add (DR,DC) to one cell
+  sh_rot90_cell_/3         - apply 90-degree CW to one cell
+  sh_refh_cell_/3          - apply horizontal reflection to one cell
+  sh_refv_cell_/3          - apply vertical reflection to one cell
+  sh_orbit_rotations_/2    - four rotations of one shape
+  sh_shape_neq_/2          - identity check for exclude/3
+  sh_unique_shapes_/2      - remove duplicate shapes from list
+
+END OF PART ARCH-33
+
+
+PART ARCH-34: RELATION PACK
+
+Location: packs/relation/
+Files:
+  pack.pl             - manifest; requires grid
+  prolog/relation.pl  - module relation; 14 exported rl_* predicates
+  test/test_relation.pl - 41 PLUnit tests; 14 test groups
+
+Layer: 47
+Depends on: grid (Layer 34)
+
+The relation pack lives in Layer 47. It depends only on the grid pack.
+A region is any list of r(R,C) cells. The relation pack provides spatial
+relationship vocabulary between regions.
+
+Predicates (14):
+  rl_above/2         - A entirely above B (row-wise)
+  rl_below/2         - A entirely below B
+  rl_left_of/2       - A entirely left of B (column-wise)
+  rl_right_of/2      - A entirely right of B
+  rl_adjacent/2      - 4-connected adjacency between regions
+  rl_distance/3      - minimum Manhattan distance
+  rl_contained_bbox/2 - bounding box containment
+  rl_overlap/2       - shared cell existence
+  rl_disjoint/2      - no shared cells
+  rl_same_row/2      - shared row index
+  rl_same_col/2      - shared column index
+  rl_centroid/3      - integer centroid (AvgR, AvgC)
+  rl_offset/4        - integer centroid offset (DR, DC)
+  rl_direction/3     - cardinal direction (above/below/left/right)
+
+Private helpers:
+  rl_rows_/2         - extract row list from region
+  rl_row_/2          - extract R from r(R,C)
+  rl_cols_/2         - extract col list from region
+  rl_col_/2          - extract C from r(R,C)
+  rl_dir_from_offset_/3 - convert offset to cardinal direction
+
+END OF PART ARCH-34
+
+
+PART ARCH-35: SEQUENCE PACK
+
+Location: packs/sequence/
+Files:
+  pack.pl            - manifest; no pack dependencies
+  prolog/sequence.pl - module sequence; 14 exported sq_* predicates
+  test/test_sequence.pl - 54 PLUnit tests; 14 test groups
+
+Layer: 48
+Depends on: (none - standalone pack)
+
+The sequence pack lives in Layer 48. It has no dependency on other PrologAI
+packs. It imports from SWI-Prolog standard libraries only.
+
+Predicates (14):
+  sq_range/3          - integer list Lo to Hi
+  sq_delta/2          - first differences
+  sq_is_arithmetic/1  - constant-difference test
+  sq_common_diff/2    - extract common difference
+  sq_extend_arith/3   - extend arithmetic sequence
+  sq_chunk/3          - divide list into N-element chunks
+  sq_zip/3            - zip two lists into pairs
+  sq_unzip/3          - unzip pairs into two lists
+  sq_cumsum/2         - cumulative prefix sums
+  sq_slice/4          - 0-indexed sublist extraction
+  sq_flatten1/2       - one-level flatten
+  sq_transpose/2      - transpose list-of-lists
+  sq_period/2         - smallest repeating unit
+  sq_is_periodic/1    - proper period existence test
+
+Private helpers:
+  sq_is_arithmetic_/2   - tail of constant-difference check
+  sq_gen_arith_/4       - generate extension terms
+  sq_cumsum_h_/3        - cumsum tail helper
+  sq_head_/2            - extract list head (for transpose)
+  sq_tail_/2            - extract list tail (for transpose)
+  sq_repeats_/2         - period repetition check
+  sq_find_period_/4     - iterative period finder
+
+END OF PART ARCH-35
+
+
+PART ARCH-36: CROP PACK
+
+Location: packs/crop/
+Files:
+  pack.pl            - manifest; requires grid
+  prolog/crop.pl     - module crop; 14 exported cr_* predicates; Layer 49
+  test/test_crop.pl  - 49 PLUnit tests; 14 test groups
+
+Layer: 49
+Depends on: grid
+
+Private helpers:
+  cr_grid_dims_/3      - number of rows and cols in a grid
+  cr_row_/3            - extract a row by index
+  cr_col_val_/3        - extract a cell value
+  cr_crop_row_/5       - extract column range from one row
+  cr_make_row_/3       - make a row of N copies of one value
+  cr_pad_row_/4        - prepend and append padding to one row
+  cr_split_row_/4      - split one row at column C
+  cr_row_cols_/4       - extract column range from one row
+  cr_embed_row_col_/4  - overwrite column range in one row
+
+END OF PART ARCH-36
+
+
+PART ARCH-37: OVERLAY PACK
+
+Location: packs/overlay/
+Files:
+  pack.pl              - manifest; requires grid
+  prolog/overlay.pl    - module overlay; 14 exported ov_* predicates; Layer 50
+  test/test_overlay.pl - 38 PLUnit tests; 14 test groups
+
+Layer: 50
+Depends on: grid
+
+Private helpers:
+  ov_cell_over_/4      - single-cell over operation
+  ov_row_over_/4       - row-level over operation
+  ov_cell_or_/3        - bitwise OR of two cells
+  ov_row_or_/3         - row bitwise OR
+  ov_cell_and_/3       - bitwise AND of two cells
+  ov_row_and_/3        - row bitwise AND
+  ov_cell_xor_/4       - XOR with BG-as-zero
+  ov_row_xor_/4        - row XOR
+  ov_cell_diff_/4      - cell-level diff
+  ov_row_diff_/4       - row diff
+  ov_cell_intersect_/4 - cell-level intersection
+  ov_row_intersect_/4  - row intersection
+  ov_cell_mask_/4      - cell mask
+  ov_row_mask_/4       - row mask
+  ov_cell_mask_inv_/4  - cell inverse mask
+  ov_row_mask_inv_/4   - row inverse mask
+  ov_first_nonbg_/3    - first non-BG value in a list
+  ov_priority_cell_/5  - first non-BG value at (r,c) across grids
+  ov_priority_row_idx_/5 - build one result row for priority merge
+  ov_get_rc_/4         - extract cell (r,c) from a grid
+  ov_cell_replace_/4   - single-cell replace
+  ov_row_replace_/4    - row replace
+  ov_cell_fill_bg_/4   - single-cell background fill
+  ov_row_fill_bg_/4    - row background fill
+  ov_cell_max_/3       - cell maximum
+  ov_row_max_/3        - row maximum
+  ov_cell_min_/3       - cell minimum
+  ov_row_min_/3        - row minimum
+
+END OF PART ARCH-37
+
+
+PART ARCH-38: MEASURE PACK
+
+Location: packs/measure/
+Files:
+  pack.pl            - manifest; requires grid
+  prolog/measure.pl  - module measure; 14 exported ms_* predicates; Layer 51
+  test/test_measure.pl - 57 PLUnit tests; 14 test groups
+
+Layer: 51
+Depends on: grid
+
+Private helpers:
+  ms_row_/2           - extract row index from a cell
+  ms_col_/2           - extract col index from a cell
+  ms_rows_/2          - extract all row indices from a region
+  ms_cols_/2          - extract all col indices from a region
+  ms_unique_/2        - deduplicate a sorted list
+  ms_neighbor4_/2     - enumerate 4-connected neighbors
+  ms_cell_exposed_/3  - count exposed edges of one cell
+  ms_chebyshev_/3     - Chebyshev distance between two cells
+  ms_has_all_neighbors_/2 - test all 4 neighbors in region
+  ms_grid_colors_/2   - flatten grid to sorted unique values
+
+END OF PART ARCH-38
+
+
+PART ARCH-39: TRANSFORM PACK (Work Package 73)
+
+Module: transform
+Layer: 52
+Prefix: tr_
+File: packs/transform/prolog/transform.pl
+Test: packs/transform/test/test_transform.pl
+Depends: grid
+
+Position in Dependency Order:
+The transform pack sits above the grid pack (Layer 56 -> Layer 52 here, noting
+that Layer numbers reflect cognitive hierarchy rather than strict integers).
+It requires grid for the grid dimensions convention but uses no grid predicates
+directly - it works on Prolog list-of-lists directly for efficiency.
+
+Exported Interface:
+
+tr_scale_up/3       - spatial scaling: expand each cell to NxN block
+tr_scale_down/3     - spatial scaling: subsample every N-th row and column
+tr_tile_h/3         - spatial tiling: widen grid by N repetitions
+tr_tile_v/3         - spatial tiling: heighten grid by N repetitions
+tr_tile/3           - spatial tiling: tile in both directions
+tr_transpose/2      - axis swap: rows become columns
+tr_flip_h/2         - reflection: left-right mirror
+tr_flip_v/2         - reflection: top-bottom mirror
+tr_rot90/2          - rotation: 90 degrees clockwise
+tr_rot180/2         - rotation: 180 degrees
+tr_shift/5          - translation: shift content with fill
+tr_apply_map/3      - color: apply From-To substitution map
+tr_replace_color/4  - color: single-color substitution
+tr_mask_grid/4      - composition: mask-based cell selection
+
+Design Notes:
+
+tr_transpose uses a recursive heads-tails decomposition that avoids indexing
+into grid cells and works correctly on non-square grids.
+
+tr_rot90 is derived as tr_transpose then tr_flip_h, which avoids a separate
+index-computation formula and composes two already-verified primitives.
+
+tr_shift uses explicit index arithmetic to compute source coordinates, allowing
+both positive (shift right/down) and negative (shift left/up) displacements.
+
+tr_mask_grid follows a convention that Mask cell = 0 means transparent (use
+Fill) and any non-zero value means opaque (use Grid value). This matches the
+ARC-AGI convention where 0 is the background color.
+
+END OF PART ARCH-39
+
+
+PART ARCH-40: SELECT PACK (Work Package 74)
+
+Module: select
+Layer: 53
+Prefix: sl_
+File: packs/select/prolog/select.pl
+Test: packs/select/test/test_select.pl
+Depends: grid
+
+Position in Dependency Order:
+The select pack sits above grid (Layer 56) and measure (Layer 51). It uses
+the same r(R,C) cell representation as the measure pack and the grid pack.
+It requires no predicates from those packs directly — it only imports from
+library(lists) and library(apply) — but conceptually depends on them because
+its inputs are the region lists that those packs produce.
+
+Exported Interface:
+
+sl_largest/2          - region with maximum area
+sl_smallest/2         - region with minimum area
+sl_sort_by_area/2     - regions sorted by area ascending
+sl_filter_area/3      - filter by exact area
+sl_filter_area_min/3  - filter by minimum area
+sl_filter_area_max/3  - filter by maximum area
+sl_touches_border/3   - border membership test
+sl_filter_border/4    - filter to border-touching regions
+sl_filter_interior/4  - filter to non-border regions
+sl_above_row/3        - filter by strict row upper bound
+sl_below_row/3        - filter by row lower bound
+sl_left_of_col/3      - filter by strict column left bound
+sl_right_of_col/3     - filter by column right bound
+sl_unique_area/2      - filter to regions with unique area
+
+Design Notes:
+
+sl_largest and sl_smallest use nth0 to locate the first region meeting the
+extremum condition, ensuring determinism when multiple regions share the
+extremal area.
+
+sl_sort_by_area uses keysort/2 (a built-in stable sort) to preserve the
+relative order of regions with equal areas.
+
+sl_touches_border uses a cut after the first border cell is found to avoid
+redundant backtracking through the region cell list.
+
+sl_above_row and its family use negation-as-failure: a region passes the
+filter if and only if no cell violates the positional constraint.
+
+sl_unique_area computes the full area list first, then uses include/3 with a
+count check to select only those regions whose area count equals one.
+
+END OF PART ARCH-40
+
+
+PART ARCH-41: COUNT PACK (Work Package 75)
+
+Module: count
+Layer: 54
+Prefix: cn_
+File: packs/count/prolog/count.pl
+Test: packs/count/test/test_count.pl
+Depends: grid
+
+Position in Dependency Order:
+The count pack sits above the grid pack (Layer 56). It uses the same r(R,C)
+cell and list-of-lists grid conventions. It imports from library(lists) and
+library(apply) only — no imports from other packs.
+
+Exported Interface:
+
+cn_by_value/3           - count value occurrences in a flat list
+cn_color_count/3        - count cells of a specific color in a grid
+cn_histogram/3          - sorted color histogram (parallel lists)
+cn_max_color/2          - most frequent color
+cn_min_color/2          - least frequent color
+cn_color_rows/3         - row count containing a color
+cn_color_cols/3         - column count containing a color
+cn_row_distinct/3       - distinct value count in a row
+cn_col_distinct/3       - distinct value count in a column
+cn_grid_total/2         - total cell count
+cn_equal_cells/3        - same-value cell count between two grids
+cn_diff_cells/3         - different-value cell count between two grids
+cn_region_color/3       - color of a region from the grid
+cn_regions_per_color/3  - per-color region tally
+
+Design Notes:
+
+cn_histogram builds a run-length encoding of the msorted flat grid to avoid
+require library(aggregate) or any extra sorting pass.
+
+cn_regions_per_color uses foldl/4 with a custom tally predicate cn_tally_/3
+that uses select/3 to update an existing entry or prepend a new one. This
+preserves the region discovery order rather than sorting by color.
+
+cn_equal_cells maps a per-cell 1/0 comparison flag and sums them with
+sum_list/2, making the matching count computable without any Prolog arithmetic
+per pair.
+
+END OF PART ARCH-41
+
+
+PART ARCH-42: FILL PACK (Work Package 76)
+
+Module: fill
+Layer: 55
+Prefix: fl_
+File: packs/fill/prolog/fill.pl
+Test: packs/fill/test/test_fill.pl
+Depends: grid
+
+Position in Dependency Order:
+The fill pack sits above the grid pack (Layer 56). It operates on
+list-of-lists grids and r(R,C) cell regions. No imports from other packs.
+
+Exported Interface:
+
+fl_fill_region/4      - fill region cells with a color
+fl_fill_bbox/4        - fill bounding box with a color
+fl_fill_row/4         - fill entire row with a color
+fl_fill_col/4         - fill entire column with a color
+fl_fill_cells/4       - fill specific cells with a color
+fl_fill_border/3      - fill outermost grid border with a color
+fl_outline_region/4   - fill border cells of a region
+fl_fill_interior/4    - fill interior cells of a region
+fl_solid_rect/4       - create new uniform-color grid
+fl_checkerboard/5     - create new alternating-color grid
+fl_draw_hline/6       - draw horizontal line segment
+fl_draw_vline/6       - draw vertical line segment
+fl_fill_main_diag/3   - fill main diagonal
+fl_stamp/6            - overlay subgrid with transparency
+
+Design Notes:
+
+fl_fill_region and fl_fill_cells are identical in behavior (both fill a
+list of r(R,C) cells); fl_fill_cells is provided as a semantically clear
+name for the "I have specific target cells" use case.
+
+fl_fill_border composes four fill_row and fill_col calls sequentially,
+which is simpler than a single-pass membership test and avoids corner cells
+being double-painted.
+
+fl_outline_region and fl_fill_interior use the same fl_all_neighbors_in_/2
+predicate from the measure-pack convention, but define it locally to avoid
+cross-pack dependency.
+
+fl_stamp uses the same SR0 convention as other packs for extracting the
+first row of the stamp for its column count, with a fallback of SW=0 if
+the stamp is empty.
+
+fl_draw_hline and fl_draw_vline are thin wrappers over fl_fill_bbox,
+provided for semantic clarity when the caller is thinking in terms of
+line segments rather than rectangular regions.
+
+END OF PART ARCH-42
+
+
+PART ARCH-43: PATTERN PACK (Work Package 77)
+
+Module: pattern
+Layer: 56
+Prefix: pt_
+File: packs/pattern/prolog/pattern.pl
+Test: packs/pattern/test/test_pattern.pl
+Depends: grid
+
+Position in Dependency Order:
+The pattern pack sits above the grid pack (Layer 56). It works on
+list-of-lists grids and flat row lists. No imports from other packs.
+
+Exported Interface:
+
+pt_row_period/2       - smallest tiling period of a row list
+pt_col_period/3       - smallest tiling period of a column
+pt_grid_period_h/2    - horizontal tiling period of the whole grid
+pt_grid_period_v/2    - vertical tiling period of the whole grid
+pt_tile_unit_h/2      - extract minimal horizontal tile
+pt_tile_unit_v/2      - extract minimal vertical tile
+pt_tile_unit/2        - extract minimal 2D tile
+pt_is_tiling/2        - test if grid is an exact tiling of a tile
+pt_count_tile/3       - count all positions where tile matches
+pt_find_tile/3        - list all match positions
+pt_extract_tile/5     - extract H x W subgrid at r(R,C)
+pt_unique_rows/2      - number of distinct rows
+pt_unique_cols/2      - number of distinct columns
+pt_has_uniform_rows/1 - test all rows identical
+
+Design Notes:
+
+pt_list_period_ uses the standard between/3 + cut pattern: try periods
+from 1 upward and return the first that satisfies period_ok_/2.
+
+pt_period_ok_ uses negation-as-failure over the index set: a period P
+is valid if there is no index i where List[i] != List[i mod P].
+
+pt_grid_period_h uses the same negation-as-failure approach over the
+row list: a horizontal period P is valid if no row fails period_ok_.
+
+pt_find_tile uses findall over all valid (R,C) offsets and delegates
+cell-by-cell comparison to pt_tile_matches_at_.
+
+pt_extract_tile uses a maplist over row offsets (DR 0..H-1), applying
+pt_drop_ then pt_take_ to slice each row correctly.
+
+pt_has_uniform_rows uses sort/2: if all rows are identical, sort
+produces a singleton list. This is the most concise correct test.
+
+END OF PART ARCH-43
+
+
+PART ARCH-44: COMPARE PACK (Work Package 78)
+
+Module: compare
+Layer: 57
+Prefix: cp_
+File: packs/compare/prolog/compare.pl
+Test: packs/compare/test/test_compare.pl
+Depends: grid
+
+Position in Dependency Order:
+The compare pack sits at Layer 57. It operates on list-of-lists grids
+and r(R,C) region lists. No imports from other packs.
+
+Exported Interface:
+
+cp_diff_cells/3        - cells where two grids differ
+cp_same_cells/3        - cells where two grids are equal
+cp_added_color/4       - cells where a color was gained
+cp_removed_color/4     - cells where a color was lost
+cp_changed_to/4        - cells that changed to a specific color
+cp_changed_from/4      - cells that changed from a specific color
+cp_diff_map/3          - 0/1 grid of per-cell difference flags
+cp_similarity/3        - equal-cell count and total as EqCount-Total
+cp_region_diff/3       - set difference of two cell regions
+cp_region_intersect/3  - set intersection of two cell regions
+cp_region_union/3      - set union of two cell regions
+cp_region_equal/2      - test order-independent region equality
+cp_grids_equal/2       - test structural grid equality
+cp_color_shift/3       - Old-New color pairs for all changed cells
+
+Design Notes:
+
+cp_diff_cells, cp_same_cells, cp_added_color, cp_removed_color,
+cp_changed_to, cp_changed_from all use the same include/3 over
+cp_all_positions_ pattern, varying only the filter predicate.
+
+cp_changed_to and cp_added_color are semantically equivalent;
+both are exported because callers reasoning about "what changed"
+use different vocabulary than callers reasoning about "what was added."
+
+cp_diff_map uses maplist over row pairs with a per-column flag mapping.
+The flag predicate uses 0/1 integer values matching the ARC-AGI convention
+of 0 = background.
+
+cp_similarity returns EqCount-Total (a Prolog pair) rather than a float,
+to preserve exactness. The caller can compute EqCount / Total if a ratio
+is needed.
+
+cp_region_diff, cp_region_intersect, cp_region_union delegate to the
+corresponding library(lists) predicates (subtract/3, intersection/3,
+union/3), which treat lists as sets.
+
+cp_color_shift is distinct from cp_diff_cells in that it returns value
+pairs rather than cell positions, which is the appropriate representation
+when the caller wants to analyze the color transformation rule.
+
+END OF PART ARCH-44
+
+
+PART ARCH-45: SPATIAL PACK (Work Package 79)
+
+Module: spatial
+Layer: 58
+Prefix: sp_
+File: packs/spatial/prolog/spatial.pl
+Test: packs/spatial/test/test_spatial.pl
+Depends: grid
+
+Exported Interface:
+
+sp_direction/3          - cardinal direction between two cells
+sp_distance_manhattan/3 - Manhattan distance
+sp_distance_chebyshev/3 - Chebyshev distance
+sp_neighbors4/3         - 4-connected in-bounds neighbors
+sp_neighbors8/3         - 8-connected in-bounds neighbors
+sp_adjacent4/2          - 4-connected adjacency test
+sp_adjacent8/2          - 8-connected adjacency test
+sp_bbox_contains/2      - cell inside bounding box test
+sp_in_region/2          - cell region membership test
+sp_row_between/4        - filter region by row range
+sp_col_between/4        - filter region by column range
+sp_closest/3            - nearest region cell by Manhattan distance
+sp_farthest/3           - farthest region cell by Manhattan distance
+sp_centroid/3           - integer centroid of a region
+
+Design Notes:
+
+sp_direction uses nine named compass points including same (for identical cells).
+The implementation dispatches on the signs of DR and DC.
+
+sp_neighbors4 and sp_neighbors8 generate all candidates then filter with
+sp_in_bounds_, which is consistent with the include-over-candidates pattern
+used throughout the platform.
+
+sp_adjacent4 and sp_adjacent8 are thin tests over distance predicates
+rather than repeating the distance arithmetic inline.
+
+sp_in_region uses member/2 with a cut to suppress the choicepoint that
+member would otherwise leave; this makes the predicate deterministic when
+used in tests and rule conditions.
+
+sp_closest and sp_farthest use maplist to compute all distances, then
+min_list/max_list to find the extremum, then nth0 to retrieve the
+corresponding region cell. The cut after nth0 returns the first tied cell.
+
+sp_centroid uses integer division (//), which truncates toward zero,
+consistent with the ms_centroid predicate in the measure pack.
+
+END OF PART ARCH-45
+
+
+PART ARCH-46: INDUCTION PACK (Work Package 80)
+
+Module: induction
+Layer: 59
+Prefix: id_
+File: packs/induction/prolog/induction.pl
+Test: packs/induction/test/test_induction.pl
+Depends: grid
+
+Exported Interface:
+
+id_color_map/3       - infer OldColor-NewColor pairs from grid pair
+id_is_recolor/2      - test consistent color substitution
+id_uniform_output/2  - test uniform single-color output
+id_output_color/2    - get uniform output color
+id_size_ratio/3      - compute dimension ratio
+id_is_scale/2        - test uniform integer scale
+id_scale_factor/3    - get integer scale factor
+id_changed_cells/3   - cells that changed
+id_unchanged_cells/3 - cells that did not change
+id_input_colors/2    - distinct colors in input
+id_output_colors/2   - distinct colors in output
+id_new_colors/3      - colors gained in output
+id_lost_colors/3     - colors lost from input
+id_grid_dims/3       - grid row and column count
+
+Design Notes:
+
+id_color_map uses findall over changed cells and sort/2 to deduplicate
+OldColor-NewColor pairs. This produces a canonical map form.
+
+id_is_recolor calls id_color_map then verifies consistency using
+negation-as-failure over all positions: a map is inconsistent if any cell
+with a known OldColor has an OutV that differs from the expected NewColor.
+
+id_is_scale checks that both dimension ratios are equal positive integers
+by testing mod/div conditions; id_scale_factor delegates to id_is_scale.
+
+id_changed_cells and id_unchanged_cells follow the same include-over-positions
+pattern as the compare pack, maintaining platform consistency.
+
+id_size_ratio uses integer division (/) which in SWI-Prolog returns an
+integer for exact ratios and truncates otherwise.
+
+END OF PART ARCH-46
+
+
+PART ARCH-47: GRAVITY PACK (Work Package 81)
+
+Location: packs/gravity/
+Module: gravity
+Layer: 60
+Prefix: gv_
+Pack descriptor: packs/gravity/pack.pl
+Implementation: packs/gravity/prolog/gravity.pl
+Tests: packs/gravity/test/test_gravity.pl
+
+Dependencies:
+  - grid pack (for r(R,C) cell conventions and list-of-lists grid format)
+  - library(lists): member/2, nth0/3, numlist/3
+  - library(apply): maplist/2, maplist/3, include/3, foldl/4
+
+Architecture role:
+The gravity pack sits at Layer 60, immediately above the induction pack
+(Layer 59). It provides the fundamental directional settling operations
+that turn static grid states into dynamic physics-like transformations.
+
+The pack is built on two internal primitives:
+  gv_compact_list_bottom_/3  - sort non-BG to end of a list
+  gv_compact_list_top_/3     - sort non-BG to front of a list
+
+Both primitives use include/3 to partition a list into background and
+non-background elements, then concatenate. All higher-level predicates
+(fall, settle, float, stack) are built by applying these primitives
+column-wise or row-wise via maplist/3 or foldl/4.
+
+The gv_settle_color/4 and gv_float_color/4 predicates extend the
+partition into three categories: Color cells, Other non-BG cells, and BG
+cells. This allows Color cells to fall through BG while being blocked
+by non-BG non-Color cells.
+
+gv_apply_col/4 and gv_apply_row/4 provide a hook for custom transforms
+using the same column/row extraction machinery.
+
+Exported predicates (14):
+  gv_col_values/3    - column extraction
+  gv_set_col/4       - column replacement
+  gv_compact_col/3   - all non-BG sink to column bottoms
+  gv_compact_row/3   - all non-BG shift to row lefts
+  gv_fall_down/3     - non-BG falls to bottom
+  gv_fall_up/3       - non-BG rises to top
+  gv_fall_left/3     - non-BG shifts left
+  gv_fall_right/3    - non-BG shifts right
+  gv_settle_color/4  - Color falls to bottom past BG
+  gv_float_color/4   - Color rises to top past BG
+  gv_stack_down/4    - alias for gv_settle_color
+  gv_stack_up/4      - alias for gv_float_color
+  gv_apply_col/4     - custom column transform
+  gv_apply_row/4     - custom row transform
+
+Test coverage: 29 PLUnit tests.
+
+END OF PART ARCH-47
+
+
+PART ARCH-48: NOISE PACK (Work Package 82)
+
+Location: packs/noise/
+Module: noise
+Layer: 61
+Prefix: ns_
+Pack descriptor: packs/noise/pack.pl
+Implementation: packs/noise/prolog/noise.pl
+Tests: packs/noise/test/test_noise.pl
+
+Dependencies:
+  - grid pack (for r(R,C) cell conventions and list-of-lists grid format)
+  - library(lists): member/2, nth0/3, numlist/3
+  - library(apply): maplist/2, maplist/3, include/3, foldl/4
+  - msort/2 (SWI-Prolog built-in)
+
+Architecture role:
+The noise pack sits at Layer 61, above the gravity pack (Layer 60). It
+provides two complementary capabilities: binary mask operations and
+noise/density analysis.
+
+Binary mask operations:
+  ns_mask_apply, ns_mask_invert, ns_mask_and, ns_mask_or are pure
+  pointwise operations on grids of 0s and 1s. They allow combining,
+  inverting, and applying masks to color grids.
+
+  ns_mask_from_color builds a mask from a color criterion.
+  ns_mask_to_region and ns_region_to_mask convert between mask
+  representation (list-of-lists of 0/1) and region representation
+  (list of r(R,C) cells). This bridges the mask world and the region
+  world used by the scene, shape, and spatial packs.
+
+Noise analysis:
+  ns_color_count counts occurrences of a given color in a grid.
+  ns_majority_color finds the dominant color by counting all colors
+  and returning the one with the highest count.
+  ns_noise_cells identifies cells that deviate from the majority.
+  ns_denoise replaces those cells with the majority color.
+  ns_sparse_cells and ns_dense_cells classify cells by how often their
+  color appears: sparse cells belong to rarely-occurring colors;
+  dense cells belong to frequently-occurring colors.
+
+ns_isolate_color implements a common ARC-AGI operation: keep one
+color visible and zero out the rest.
+
+Exported predicates (14):
+  ns_mask_apply/4      - apply binary mask with fill color
+  ns_mask_invert/3     - flip all mask bits
+  ns_mask_and/3        - pointwise AND
+  ns_mask_or/3         - pointwise OR
+  ns_mask_from_color/3 - build mask from color
+  ns_mask_to_region/2  - mask to r(R,C) region list
+  ns_region_to_mask/4  - region list to mask
+  ns_noise_cells/3     - cells differing from majority color
+  ns_denoise/3         - replace noise with majority color
+  ns_majority_color/2  - most frequent color
+  ns_color_count/3     - count of a specific color
+  ns_sparse_cells/3    - cells with rarely-occurring color
+  ns_dense_cells/3     - cells with frequently-occurring color
+  ns_isolate_color/3   - keep one color, zero out the rest
+
+Test coverage: 33 PLUnit tests.
+
+END OF PART ARCH-48
+
+
+PART ARCH-49: GENERATE PACK (Work Package 83)
+
+Location: packs/generate/
+Module: generate
+Layer: 62
+Prefix: ge_
+Pack descriptor: packs/generate/pack.pl
+Implementation: packs/generate/prolog/generate.pl
+Tests: packs/generate/test/test_generate.pl
+
+Dependencies:
+  - grid pack (for r(R,C) cell conventions and list-of-lists grid format)
+  - library(lists): member/2, nth0/3, numlist/3
+  - library(apply): maplist/2, maplist/3
+
+Architecture role:
+The generate pack sits at Layer 62, above the noise pack (Layer 61). It
+provides constructive operations: building new grids from scratch using
+visual patterns, arithmetic rules, or explicit cell-color maps.
+
+All predicates are purely constructive (no reading of an existing grid,
+except ge_repeat_pattern which reads a pattern grid to tile it).
+
+Implementation patterns:
+- ge_uniform uses maplist/2 with =.
+- ge_gradient_h/ge_gradient_v use numlist/3 + maplist/3 + mod arithmetic.
+- ge_checkerboard, ge_border_rect, ge_diagonal, ge_antidiagonal, ge_frame,
+  ge_cross all use maplist/3 at row level and maplist/3 at cell level with
+  a per-cell predicate that computes color from (R, C) coordinates.
+- ge_stripes_h/ge_stripes_v use numlist + nth0 to cycle through the Colors list.
+- ge_from_map starts from a zero grid (ge_uniform) and applies a fold
+  using an internal helper, foldl_map_/3.
+- ge_repeat_pattern uses mod arithmetic on both row and column indices.
+
+Exported predicates (14):
+  ge_uniform/4          - uniform color fill
+  ge_gradient_h/4       - horizontal gradient
+  ge_gradient_v/4       - vertical gradient
+  ge_checkerboard/5     - alternating two colors
+  ge_stripes_h/4        - horizontal color stripes
+  ge_stripes_v/4        - vertical color stripes
+  ge_border_rect/5      - bordered rectangle
+  ge_diagonal/4         - main diagonal pattern
+  ge_antidiagonal/4     - anti-diagonal pattern
+  ge_frame/5            - outermost ring only
+  ge_cross/5            - row+column cross through center
+  ge_identity_grid/3    - N x N identity matrix pattern
+  ge_from_map/3         - build from cell-color map
+  ge_repeat_pattern/4   - tile a pattern grid
+
+Test coverage: 29 PLUnit tests.
+
+END OF PART ARCH-49
+
+
+PART ARCH-50: ARCHITECTURE - LOOKUP PACK (Work Package 84)
+
+Pack name: lookup
+Layer: 63
+Module: lookup
+File: packs/lookup/prolog/lookup.pl
+Manifest: packs/lookup/pack.pl
+Tests: packs/lookup/test/test_lookup.pl
+
+Dependencies:
+- library(lists): member/2, nth0/3, numlist/3, subtract/3
+- library(apply): maplist/2, maplist/3, include/3
+Note: msort/2, length/2 are SWI-Prolog built-ins, not imported.
+
+Meta-predicate declarations:
+  :- meta_predicate lk_map_values(+, 2, -).
+  :- meta_predicate lk_apply_val_(2, +, -).
+These ensure that predicates passed as arguments to lk_map_values are
+called with the correct module qualification.
+
+Architecture role:
+The lookup pack sits at Layer 63, above the generate pack (Layer 62).
+It provides a named, testable API for association list operations and
+grid random-access, replacing ad-hoc member/2 searches and nth0 chains
+in higher-level reasoning packs.
+
+Implementation patterns:
+- lk_get/lk_put/lk_delete use recursive list traversal with cuts for
+  determinism on the first-match case.
+- lk_keys/lk_values use maplist/3 with helper predicates that extract
+  the key or value from a K-V pair.
+- lk_map_values uses maplist/3 with a meta-predicate; requires the
+  :- meta_predicate declaration to preserve module qualification.
+- lk_grid_row wraps nth0/3; lk_grid_col uses maplist(lk_nth0_(C)).
+- lk_color_positions uses findall to collect Color-r(R,C) pairs, then
+  groups by color via lk_group_by_key_ (findall + sort).
+- lk_position_color uses findall to collect r(R,C)-Color pairs directly.
+- lk_invert uses maplist/3 with lk_swap_pair_ to flip each K-V pair.
+
+Exported predicates (14):
+  lk_get/3              - association list lookup by key
+  lk_put/4              - add or replace key-value pair
+  lk_keys/2             - extract all keys
+  lk_values/2           - extract all values
+  lk_has_key/2          - key membership test
+  lk_delete/3           - remove a key-value pair
+  lk_map_values/3       - transform all values in a map
+  lk_from_pairs/2       - build a map from Key-Value pairs
+  lk_grid_row/3         - row lookup in a grid
+  lk_grid_col/3         - column lookup in a grid
+  lk_grid_cell/4        - cell lookup by (R,C)
+  lk_color_positions/3  - Color to positions index map
+  lk_position_color/3   - position to Color index map
+  lk_invert/2           - invert association list keys and values
+
+Test coverage: 30 PLUnit tests.
+
+END OF PART ARCH-50
+
+
+PART ARCH-51: ARCHITECTURE - CONNECT PACK (Work Package 85)
+
+Pack name: connect
+Layer: 64
+Module: connect
+File: packs/connect/prolog/connect.pl
+Manifest: packs/connect/pack.pl
+Tests: packs/connect/test/test_connect.pl
+
+Dependencies:
+- library(lists): member/2, nth0/3, numlist/3, subtract/3
+- library(apply): maplist/2, maplist/3, include/3
+Note: length/2, msort/2 are SWI-Prolog built-ins, not imported.
+
+Architecture role:
+The connect pack sits at Layer 64, above the lookup pack (Layer 63).
+It provides the fundamental flood fill and connected component
+operations that grid reasoning at higher levels depends on. The
+cc_enclosed predicate implements the "enclosed region" test used in
+tasks where a closed outline surrounds a fill area.
+
+Implementation patterns:
+- cc_dfs_/8: core DFS flood fill with a stack, a visited accumulator,
+  and a neighbor function (cc_neighbors4_ or cc_neighbors8_).
+  Each step: skip if visited, skip if OOB or wrong color, else expand.
+- cc_extract_/7: iteratively extracts connected components from a pool
+  of same-color cells using cc_dfs_ + subtract/3 to remove found cells.
+- cc_all_cells_/5: findall over all (R,C) pairs in row/col numlist.
+- cc_largest_from_/3, cc_smallest_from_/3: linear scan to find the
+  component with the maximum or minimum length.
+- cc_is_border_/4: include-ready predicate; true if any 4-neighbor is
+  OOB or absent from Region (uses memberchk for membership test).
+- cc_all_in_region_/4: strict check that all 4 neighbors are in-bounds
+  AND in Region; OOB neighbors cause failure (grid-edge cells cannot
+  be interior cells).
+- cc_enclosed: finds BG cells on the grid border, floods from them,
+  then returns BG cells that were not reached (the enclosed ones).
+- cc_multi_dfs_/7: sequential flood fill from a list of seed cells,
+  threading the visited set through for correctness.
+
+Exported predicates (14):
+  cc_flood4/4           - 4-connected flood fill from one seed
+  cc_flood8/4           - 8-connected flood fill from one seed
+  cc_components4/3      - all 4-connected components of a color
+  cc_components8/3      - all 8-connected components of a color
+  cc_count4/3           - number of 4-connected components
+  cc_count8/3           - number of 8-connected components
+  cc_sizes4/3           - sorted sizes of 4-connected components
+  cc_sizes8/3           - sorted sizes of 8-connected components
+  cc_largest4/3         - largest 4-connected component
+  cc_largest8/3         - largest 8-connected component
+  cc_smallest4/3        - smallest 4-connected component
+  cc_border_cells/3     - border cells of a region
+  cc_interior_cells/3   - interior cells of a region
+  cc_enclosed/3         - BG cells enclosed inside a closed shape
+
+Test coverage: 33 PLUnit tests.
+
+END OF PART ARCH-51
+
+
+PART ARCH-52: ARCHITECTURE - MORPH PACK (Work Package 86)
+
+Pack name: morph
+Layer: 65
+Module: morph
+File: packs/morph/prolog/morph.pl
+Manifest: packs/morph/pack.pl
+Tests: packs/morph/test/test_morph.pl
+
+Dependencies:
+- library(lists): member/2, nth0/3, numlist/3
+- library(apply): maplist/2, maplist/3
+Note: length/2, forall/2 are SWI-Prolog built-ins, not imported.
+
+Architecture role:
+The morph pack sits at Layer 65, above the connect pack (Layer 64).
+It provides morphological operations that transform grid shapes:
+expanding (dilation), shrinking (erosion), cleaning (open), filling
+(close and fill_holes), outlining (boundary, ring), and resizing (pad,
+unpad). These operations are the standard toolkit for transforming
+objects in visual grid reasoning.
+
+Implementation patterns:
+- mo_rebuild_/5: core grid reconstruction using findall over row/col
+  index lists. Applies a CellPred(Grid, Rows, Cols, R, C, Out) for
+  each (R,C) pair to build the output row-by-row.
+- Cell predicates (mo_dilate4_cell_, mo_erode4_cell_, etc.) compute the
+  output value for each cell based on its current value and neighbors.
+- mo_has_color4_/6, mo_has_color8_/6: check if any neighbor has Color;
+  use cut after first match for determinism.
+- mo_all4_color_/6, mo_all8_color_/6: check all in-bounds neighbors
+  have Color; OOB neighbors cause failure (treated as not-Color).
+- mo_fill_holes4: implements enclosed-region detection inline using
+  flood fill from border BG seeds; avoids external pack dependency.
+- mo_pad/3: builds pad rows with maplist(=(PadColor)) and appends to
+  padded rows using mo_pad_row_.
+- mo_unpad/2: removes head and last element from rows and removes
+  first/last row; uses mo_drop_last_ for tail-removal.
+- Wrapper predicates (mo_dilate4_cell_wrap_ etc.) adapt cell predicates
+  to the 6-arity signature expected by mo_rebuild_.
+
+Exported predicates (14):
+  mo_dilate4/4        - 4-connected dilation
+  mo_dilate8/4        - 8-connected dilation
+  mo_erode4/4         - 4-connected erosion
+  mo_erode8/4         - 8-connected erosion
+  mo_dilate4_n/5      - N rounds of 4-connected dilation
+  mo_erode4_n/5       - N rounds of 4-connected erosion
+  mo_open4/4          - morphological open (erode then dilate)
+  mo_close4/4         - morphological close (dilate then erode)
+  mo_boundary4/3      - 4-connected boundary cells
+  mo_boundary8/3      - 8-connected boundary cells
+  mo_ring4/4          - 4-connected outward ring
+  mo_fill_holes4/4    - fill enclosed background holes
+  mo_pad/3            - add one-cell border to grid
+  mo_unpad/2          - remove one-cell border from grid
+
+Test coverage: 26 PLUnit tests.
+
+END OF PART ARCH-52
+
+
+PART ARCH-53 - REWRITE PACK
+
+Work Package: 87
+Layer: 66
+Module: rewrite
+Prefix: rw_
+File: packs/rewrite/prolog/rewrite.pl
+Test: packs/rewrite/test/test_rewrite.pl
+Pack metadata: packs/rewrite/pack.pl
+Depends on: grid (list-of-lists format)
+
+Responsibility:
+  Rule-based cell-value transformation of list-of-lists grids.
+  Covers color substitution, region painting, masking, overlay composition,
+  patch stamping, diff application, color normalization, color inversion,
+  background remapping, border painting, rectangle fill, and conditional recoloring.
+
+Exports:
+  rw_map_color/3      - apply a color substitution map
+  rw_replace_color/4  - replace one color with another
+  rw_swap_colors/4    - swap two colors
+  rw_set_region/4     - set a region of cells to a color
+  rw_mask_apply/5     - apply a binary mask with a fill color
+  rw_overlay/4        - overlay two grids with a background key
+  rw_stamp/5          - paste a patch at an offset
+  rw_diff_apply/3     - apply a list of cell-level edits
+  rw_normalize/3      - renumber non-background colors 1,2,...
+  rw_invert_colors/3  - complement each color against a maximum
+  rw_remap_bg/4       - replace background color throughout
+  rw_set_border/3     - set the outermost ring to a color
+  rw_fill_rect/7      - fill a rectangular region with a color
+  rw_conditional/5    - per-cell conditional recolor via a goal
+
+Implementation notes:
+  rw_map_color is the core primitive; rw_replace_color and rw_remap_bg
+  delegate to it. rw_set_region and rw_stamp build a diff list and delegate
+  to rw_diff_apply, which rebuilds the grid via nested findall.
+  rw_conditional uses a meta_predicate declaration so the Goal closure is
+  properly module-qualified by the SWI-Prolog compiler.
+
+Test coverage: 43 PLUnit tests.
+
+END OF PART ARCH-53
+
+
+PART ARCH-54 - RUN PACK
+
+Work Package: 88
+Layer: 67
+Module: run
+Prefix: rn_
+File: packs/run/prolog/run.pl
+Test: packs/run/test/test_run.pl
+Pack metadata: packs/run/pack.pl
+Depends on: grid (list-of-lists format)
+
+Responsibility:
+  Run-length encoding and decoding of value sequences and grid rows/columns.
+  Provides compact representation of repeated values, positional lookup in
+  encoded sequences, and structural analysis (maximum run, run count, uniformity,
+  position enumeration).
+
+Exports:
+  rn_encode/2       - encode a list to Value-Count pairs
+  rn_decode/2       - decode Value-Count pairs to a flat list
+  rn_row_encode/3   - encode one grid row
+  rn_col_encode/3   - encode one grid column
+  rn_grid_rows/2    - encode all rows
+  rn_grid_cols/2    - encode all columns
+  rn_length/2       - total element count of a run list
+  rn_at/3           - value at a 0-indexed position
+  rn_max_run/3      - longest run of a given value
+  rn_count_runs/3   - number of distinct runs of a given value
+  rn_uniform/1      - true when all values are the same
+  rn_trim/3         - remove leading and trailing background values
+  rn_repeat/3       - repeat and merge adjacent boundary runs
+  rn_positions/3    - 0-indexed positions of a given value
+
+Implementation notes:
+  The core rn_encode uses rn_take_same_ which collects a run via if-then-else
+  on integer comparison to avoid choicepoints. rn_at uses a similar if-then-else
+  structure. rn_uniform matches the head and second run value directly in the
+  clause head. rn_repeat builds the repeated run list via findall and then
+  merges adjacent same-value runs via rn_merge_adjacent_.
+
+Test coverage: 43 PLUnit tests.
+
+END OF PART ARCH-54
+
+
+PART ARCH-55 - ARITH PACK ARCHITECTURE
+
+Work Package 89 - Layer 68 - Module: arith - Prefix: ar_
+
+Location: packs/arith/
+  pack.pl        - pack metadata; name(arith); requires([grid])
+  prolog/arith.pl - 14 ar_* predicates; module arith
+  test/test_arith.pl - 39 PLUnit acceptance tests
+
+Layer Assignment: Layer 68 (above run at Layer 67)
+
+Module arith imports:
+  library(lists)  - member/2, nth0/3, numlist/3, append/3, min_list/2, max_list/2
+  library(apply)  - maplist/2, maplist/3
+
+Internal helpers (not exported):
+  ar_add_row_/3        - add corresponding cells of two rows
+  ar_add_cell_/3       - add two cell values
+  ar_sub_row_/3        - subtract corresponding cells
+  ar_sub_cell_/3       - subtract two cell values
+  ar_mul_row_/3        - multiply corresponding cells
+  ar_mul_cell_/3       - multiply two cell values
+  ar_mod_cell_/3       - cell-wise modulo
+  ar_sadd_cell_/3      - add scalar to a cell
+  ar_smul_cell_/3      - multiply cell by scalar
+  ar_list_sum_/2       - recursive list sum
+  ar_abs_diff_row_/3   - absolute difference of two rows
+  ar_abs_diff_cell_/3  - absolute value of difference of two cells
+  ar_clamp_cell_/4     - clamp a cell value to [Lo, Hi]
+
+Design decisions:
+  Binary grid operations (add, sub, mul, abs_diff) use maplist/4 over row pairs,
+  then maplist/4 over cell pairs. This avoids explicit indexing.
+
+  Scalar operations (mod, scalar_add, scalar_mul, clamp) use maplist(maplist(F)),
+  threading the scalar via partial application.
+
+  ar_list_sum_ is a recursive predicate rather than sum_list/2 from library(lists)
+  to avoid an unnecessary import.
+
+  ar_col_sums builds a list of column indices via numlist/3 and maps ar_col_sum/3
+  over it. ar_col_sum extracts a column via maplist(nth0(C), Grid, Col).
+
+  ar_cell_max and ar_cell_min flatten the grid with append/2 and delegate to
+  max_list/2 and min_list/2.
+
+  ar_cell_clamp uses a three-way if-then-else for determinism (no choicepoints).
+
+END OF PART ARCH-55
+
+
+PART ARCH-56 - OBJ PACK ARCHITECTURE
+
+Work Package 90 - Layer 69 - Module: obj - Prefix: obj_
+
+Location: packs/obj/
+  pack.pl          - pack metadata; name(obj); requires([grid, connect])
+  prolog/obj.pl    - 14 obj_* predicates; module obj
+  test/test_obj.pl - 40 PLUnit acceptance tests
+
+Layer Assignment: Layer 69 (above arith at Layer 68)
+
+Module obj imports:
+  library(lists)   - member/2, nth0/3, numlist/3, append/3, max_list/2, min_list/2, subtract/3
+  library(apply)   - maplist/2, maplist/3
+  library(connect) - cc_components4/3
+
+Object representation: obj(Color, SortedCells)
+  Color is a non-negative integer.
+  SortedCells is the msort of the r(R,C) cell list (standard term order).
+
+Internal helpers (not exported):
+  obj_from_cells/3   - constructs obj term (same as exported, used internally)
+  obj_cell_r_/2      - extract row coordinate from r(R,C)
+  obj_cell_c_/2      - extract column coordinate from r(R,C)
+  obj_list_sum_/2    - recursive sum of a list of integers
+  obj_normalize_cell_/4 - subtract (MinR, MinC) from a cell for shape normalization
+  obj_wrap_/3        - wrap a component cell list as an obj term
+  obj_size_key_/2    - pair an object with its size for keyed sorting
+  obj_strip_key_/2   - extract the object from a size-keyed pair
+
+Design decisions:
+  obj_all uses findall to collect values and to flatten the per-color object
+  lists. This avoids choicepoints from append/2 applied to a list of lists.
+
+  obj_all uses sort/2 (not msort/2) to simultaneously sort and deduplicate
+  the color list. sort/2 is a SWI-Prolog built-in.
+
+  obj_largest and obj_smallest use a deterministic cut (!) after the first
+  member/2 match to avoid leaving choicepoints.
+
+  obj_sort_size uses msort/2 on size-keyed pairs (Size-Obj) to sort stably
+  by size, then strips the keys and optionally reverses for descending order.
+
+  obj_shape normalizes by the top-left of the bounding box (MinR, MinC), making
+  shapes translation-independent. Two objects with the same shape can be matched
+  without knowing their grid positions.
+
+END OF PART ARCH-56
+
+
+PART ARCH-57 - PIPELINE PACK ARCHITECTURE
+
+Work Package 91 - Layer 70 - Module: pipeline - Prefix: pl_
+
+Location: packs/pipeline/
+  pack.pl                  - pack metadata; name(pipeline); requires([grid])
+  prolog/pipeline.pl       - 14 pl_* predicates; module pipeline
+  test/test_pipeline.pl    - 39 PLUnit acceptance tests
+
+Layer Assignment: Layer 70 (above obj at Layer 69)
+
+Module pipeline imports:
+  library(lists)   - member/2, nth0/3, numlist/3, append/3
+  library(apply)   - maplist/2, maplist/3, foldl/4
+
+Dynamic fact: pl_handler_/2
+  Stores step handlers as pl_handler_(Name, Goal).
+  Manipulated by pl_register/2, pl_registered/2, pl_unregister/1.
+
+Step dispatch model:
+  A step is any Prolog term. Its name is the functor of the term (or the
+  atom itself for atomic steps). A handler is a 3-argument callable:
+  Handler(StepTerm, In, Out). The StepTerm is passed to the handler so
+  that compound step terms (e.g., scale(2)) can carry parameters.
+
+  pl_step/4 checks a local Name-Goal registry first, then the dynamic
+  pl_handler_/2 facts. If neither has a handler, Out = In (passthrough).
+  The local registry allows transient override without asserting global facts.
+
+  pl_run/3 uses foldl to thread the grid through all steps, calling
+  pl_step/4 for each step with an empty local registry.
+
+pl_filter and pl_partition use findall for determinism. The findall-based
+implementation avoids choicepoints that would arise from recursive two-clause
+definitions where first-argument indexing does not disambiguate the base case
+from the recursive case when Goal is a meta-argument.
+
+pl_take and pl_drop use explicit cuts (!) to commit to the base cases, which
+cover the N=0 case and the empty-list case before the recursive clause.
+
+END OF PART ARCH-57
+
+
+PART ARCH-58 - CONTEXT PACK ARCHITECTURE
+
+Work Package 92 - Layer 71 - Module: context - Prefix: ctx_
+
+Location: packs/context/
+  pack.pl                - pack metadata; name(context); requires([grid])
+  prolog/context.pl      - 14 ctx_* predicates; module context
+  test/test_context.pl   - 41 PLUnit acceptance tests
+
+Layer Assignment: Layer 71 (above pipeline at Layer 70)
+
+Module context imports:
+  library(lists)   - member/2, subtract/3, append/3
+  library(apply)   - maplist/2, maplist/3
+
+Data representation: a context map is a Prolog list [Key1-Value1, Key2-Value2, ...]
+where keys are unique Prolog terms. The list is ordered by insertion; ctx_put
+prepends the new binding after deleting any old one, so the most recently added
+binding appears first.
+
+Internal helpers:
+  ctx_key_/2              - extract key from K-V pair
+  ctx_value_/2            - extract value from K-V pair
+  ctx_map_entry_/3        - apply a value-transform goal to one K-V pair
+  ctx_from_pairs_/3       - recursive fold for ctx_from_pairs
+  ctx_merge_/3            - recursive fold for ctx_merge
+
+Design decisions:
+  ctx_get uses clause-head pattern matching with a cut for the matching clause.
+  This gives deterministic first-match semantics matching the unique-key invariant.
+
+  ctx_delete uses if-then-else to avoid choicepoints when scanning the list.
+
+  ctx_select uses a cut in the base case (empty key list) so that when none
+  of the priority keys are present, the base clause commits without leaving
+  a choicepoint.
+
+  ctx_filter_keys uses findall for determinism (avoids choicepoints from
+  meta-argument Goal defeating first-argument indexing).
+
+  ctx_dispatch uses if-then-else to dispatch to either the found goal or
+  the default goal. Only one branch is taken.
+
+  ctx_merge is implemented as a fold of ctx_put over Map2 entries applied
+  to Map1, ensuring Map2 bindings override Map1 for shared keys.
+
+END OF PART ARCH-58
+
+
+PART ARCH-59 - SCORE PACK ARCHITECTURE (LAYER 72)
+
+What changed: Added the score pack at Layer 72.
+
+Why: Scoring and ranking are needed to select the best hypothesis after rule
+application. This pack provides a clean API separating measurement concerns
+from rule generation concerns.
+
+Pack: score
+Layer: 72
+Module: score
+Prefix: sc_
+File: packs/score/prolog/score.pl
+Tests: packs/score/test/test_score.pl
+Requires: grid (for list-of-lists grid representation)
+
+Exports:
+  sc_exact/2         - structural grid equality
+  sc_cell_match/3    - count cells where two grids agree
+  sc_cell_total/2    - total cell count
+  sc_accuracy/3      - pixel accuracy as float in [0.0, 1.0]
+  sc_color_recall/4  - per-color recall
+  sc_color_precision/4 - per-color precision
+  sc_color_f1/4      - per-color F1 score
+  sc_pair_score/3    - accuracy on one Input-Expected pair
+  sc_pairs_score/3   - mean accuracy over a list of pairs
+  sc_perfect/3       - exact-match test for one pair
+  sc_pairs_perfect/2 - all-pairs exact-match test
+  sc_rank/3          - rank candidates by accuracy descending
+  sc_best/3          - pick highest-accuracy candidate
+  sc_threshold/4     - filter candidates by minimum accuracy
+
+Design decisions:
+  sc_accuracy uses float/1 conversion before division to guarantee float output
+  even when Match and Total are integers. Without this, integer division
+  would return 1 instead of 1.0 for a perfect match, breaking pattern
+  matching in sc_rank where the result is compared as 1.0-Grid.
+
+  sc_count_matches_, sc_count_color_, and sc_count_tp_ are recursive helpers
+  using if-then-else for determinism. They operate on flat lists produced by
+  append/2 from the grid rows.
+
+  sc_rank uses msort (built-in) followed by reverse/2 to sort descending.
+
+  sc_threshold uses findall for determinism; no choicepoints.
+
+  sc_mean_ uses foldl from library(apply) for accumulation.
+
+END OF PART ARCH-59
+
+
+PART ARCH-60 - INDUCT PACK ARCHITECTURE (LAYER 73)
+
+What changed: Added the induct pack at Layer 73.
+
+Why: Observing what changed between input and output is the first step of
+rule induction. Before a system can hypothesize a rule, it must observe the
+evidence: which cells changed, which colors substituted for which others,
+whether the grid size changed, and what the background color is.
+
+Pack: induct
+Layer: 73
+Module: induct
+Prefix: in_
+File: packs/induct/prolog/induct.pl
+Tests: packs/induct/test/test_induct.pl
+Requires: grid
+
+Exports:
+  in_delta/3          - list of r(R,C)-Old-New triples for changed cells
+  in_constant/2       - identity rule test
+  in_color_map/3      - consistent color substitution map for one pair
+  in_color_map_pairs/2 - intersected color map across all pairs
+  in_size_change/4    - grid size delta for one pair
+  in_size_change_pairs/3 - consistent size delta across all pairs
+  in_color_palette/3  - union color set for one pair
+  in_palette_pairs/3  - separated input/output color sets across all pairs
+  in_invariant_cells/3 - positions with same color in both grids
+  in_changed_cells/3  - positions where grids differ
+  in_consistent_delta/2 - same change pattern across all pairs
+  in_bg_color/2       - most frequent color in one grid
+  in_bg_color_pairs/2 - consistent background color across all pairs
+  in_common_keys/3    - shared entries in two color maps
+
+Design decisions:
+  in_delta uses findall for determinism. Iterates over row and column indices
+  via nth0/3 and filters cells where Old != New.
+
+  in_color_map uses sort to deduplicate raw pairs, then in_check_consistent_map_
+  to verify no color maps to two different outputs. Fails on conflict.
+
+  in_color_map_pairs uses foldl over in_intersect_map_, which itself uses
+  library(lists) intersection/3. Empty pairs list returns empty map
+  via the base clause.
+
+  in_bg_color builds a Counted list of Count-Color pairs, then uses
+  max_member/2 from library(lists) to find the most frequent color.
+  In case of a tie, max_member picks the largest color value.
+
+  All predicates that iterate over pairs use findall or forall for
+  determinism; no recursive two-clause definitions that could leave
+  choicepoints.
+
+END OF PART ARCH-60

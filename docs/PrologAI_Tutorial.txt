@@ -8776,3 +8776,79 @@ SECTION 54.8 - ACCEPTANCE TESTS
 See PrologAI_4_Refinement_v106.txt, Part 83.
 
 END OF CHAPTER 54
+
+
+CHAPTER 55 - THE INDUCT PACK
+
+The induct pack (Layer 73) provides 14 in_* predicates for inferring structure
+from input-output grid pairs. It is the observation layer for rule induction:
+before generating a hypothesis, the system must observe what changed, what
+stayed the same, and what patterns are consistent across all training pairs.
+
+The induct pack requires: grid.
+
+SECTION 55.1 - WHY OBSERVATION COMES FIRST
+
+In compositional reasoning, a rule is induced from training pairs. Each pair
+shows an Input grid and the correct Output grid. The induct pack extracts the
+evidence from those pairs:
+
+  What cells changed? (in_delta, in_changed_cells)
+  What color substitutions occurred? (in_color_map)
+  Did the grid size change? (in_size_change)
+  What is the background? (in_bg_color)
+  Are all pairs consistent? (in_consistent_delta, in_size_change_pairs)
+
+These observations become the inputs to hypothesis generation.
+
+SECTION 55.2 - CELL-LEVEL CHANGE
+
+in_delta(+Input, +Output, -Delta)
+
+Delta is a list of r(R,C)-OldColor-NewColor triples for cells that changed.
+
+  in_delta([[1,2],[3,4]], [[1,9],[3,9]], Delta).
+  % Delta = [r(0,1)-2-9, r(1,1)-4-9]
+
+in_changed_cells/3 lists positions that changed. in_invariant_cells/3 lists
+positions that stayed the same. in_constant/2 tests identity.
+
+SECTION 55.3 - COLOR MAPS
+
+in_color_map(+Input, +Output, -Map)
+
+Map is a list of OldColor-NewColor pairs for all changed cells.
+Fails if a color maps to two different outputs.
+
+  in_color_map([[1,2],[1,2]], [[5,6],[5,6]], Map).
+  % Map = [1-5, 2-6]
+
+in_color_map_pairs/2 intersects per-pair maps for cross-pair consistency.
+in_common_keys/3 extracts shared entries from two maps.
+
+SECTION 55.4 - SIZE AND BACKGROUND
+
+in_size_change/4: DRows and DCols for one pair (negative means shrinkage).
+in_size_change_pairs/3: consistent size delta across all pairs or fails.
+in_bg_color/2: most frequent color in one grid.
+in_bg_color_pairs/2: consistent background across all pairs or fails.
+
+SECTION 55.5 - COLOR SETS AND CONSISTENCY
+
+in_color_palette/3: sorted union of all colors in one pair.
+in_palette_pairs/3: separate input and output color sets across all pairs.
+in_consistent_delta/2: all pairs share the same delta or fails.
+
+SECTION 55.6 - DESIGN NOTES
+
+All cell-iteration predicates use findall for determinism.
+in_color_map uses intersection/3 for set operations.
+in_bg_color uses max_member/2 from library(lists) for the argmax.
+In case of a tie, max_member picks the largest color value.
+
+SECTION 55.7 - ACCEPTANCE TESTS
+
+35 PLUnit tests cover all 14 predicates (AC-IN-001 through AC-IN-035).
+See PrologAI_4_Refinement_v107.txt, Part 84.
+
+END OF CHAPTER 55
