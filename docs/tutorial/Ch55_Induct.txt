@@ -1,0 +1,105 @@
+CHAPTER 55 - THE INDUCT PACK
+
+The induct pack (Layer 73) provides 14 in_* predicates for inferring structure
+from input-output grid pairs. It is the observation layer for rule induction:
+before generating a hypothesis, the system must observe what changed, what
+stayed the same, and what patterns are consistent across all training pairs.
+
+The induct pack requires: grid.
+
+SECTION 55.1 - WHY OBSERVATION COMES FIRST
+
+In compositional reasoning, a rule is induced from training pairs. Each pair
+shows an Input grid and the correct Output grid. The induct pack extracts the
+evidence from those pairs:
+
+  What cells changed? (in_delta, in_changed_cells)
+  What color substitutions occurred? (in_color_map)
+  Did the grid size change? (in_size_change)
+  What is the background? (in_bg_color)
+  Are all pairs consistent? (in_consistent_delta, in_size_change_pairs)
+
+These observations become the inputs to hypothesis generation.
+
+SECTION 55.2 - CELL-LEVEL CHANGE
+
+in_delta(+Input, +Output, -Delta)
+
+Delta is a list of r(R,C)-OldColor-NewColor triples for cells that changed.
+If no cells changed, Delta = [].
+
+  in_delta([[1,2],[3,4]], [[1,9],[3,9]], Delta).
+  % Delta = [r(0,1)-2-9, r(1,1)-4-9]
+
+in_changed_cells(+Input, +Output, -Cells) lists r(R,C) positions that changed.
+in_invariant_cells(+Input, +Output, -Cells) lists positions that stayed the same.
+in_constant(+Input, +Output) succeeds if Output is identical to Input.
+
+SECTION 55.3 - COLOR MAPS
+
+in_color_map(+Input, +Output, -Map)
+
+Map is a list of OldColor-NewColor pairs for all changed cells. Deduplicates
+across cells. Fails if a color maps to two different outputs (conflict).
+
+  in_color_map([[1,2],[1,2]], [[5,6],[5,6]], Map).
+  % Map = [1-5, 2-6]
+
+in_color_map_pairs(+Pairs, -Map) intersects per-pair maps to find the color
+substitutions that are consistent across all training pairs.
+
+in_common_keys(+Map1, +Map2, -Common) extracts shared entries from two maps.
+
+SECTION 55.4 - SIZE ANALYSIS
+
+in_size_change(+Input, +Output, -DRows, -DCols)
+
+DRows = Rows(Output) - Rows(Input). Negative means shrinkage.
+
+  in_size_change([[1,2],[3,4]], [[1,2],[3,4],[5,6]], DR, DC).
+  % DR = 1, DC = 0
+
+in_size_change_pairs(+Pairs, -DRows, -DCols) verifies all pairs have the same
+size change and returns that change. Fails if inconsistent.
+
+SECTION 55.5 - COLOR SETS
+
+in_color_palette(+Input, +Output, -Palette) returns the sorted union of all
+colors appearing in either grid.
+
+in_palette_pairs(+Pairs, -InColors, -OutColors) separately accumulates colors
+from all input grids and all output grids. Useful for detecting which colors
+are introduced or eliminated by the rule.
+
+SECTION 55.6 - BACKGROUND COLOR
+
+in_bg_color(+Grid, -BgColor)
+
+BgColor is the most frequently occurring color in Grid. In case of a tie,
+returns the largest color value (max_member behavior).
+
+in_bg_color_pairs(+Pairs, -BgColor) verifies all input grids agree on the
+same background color and returns it. Fails if inconsistent.
+
+SECTION 55.7 - CROSS-PAIR CONSISTENCY
+
+in_consistent_delta(+Pairs, -Delta) succeeds if all pairs share the same
+delta (same positions change, same old colors, same new colors). Returns
+that shared delta.
+
+in_size_change_pairs/3 and in_bg_color_pairs/2 provide similar cross-pair
+consistency checks for size and background respectively.
+
+SECTION 55.8 - DESIGN NOTES
+
+in_delta and all cell-iteration predicates use findall for determinism.
+in_color_map uses intersection/3 from library(lists) for set operations.
+in_check_consistent_map_ uses member/2 to check for conflicting mappings.
+in_bg_color uses max_member/2 from library(lists) for the argmax.
+
+SECTION 55.9 - ACCEPTANCE TESTS
+
+35 PLUnit tests cover all 14 predicates (AC-IN-001 through AC-IN-035).
+See PrologAI_4_Refinement_v107.txt, Part 84.
+
+END OF CHAPTER 55
