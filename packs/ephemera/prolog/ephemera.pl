@@ -295,8 +295,8 @@ ep_ephemeral(Language, Code, TimeoutSecs, ShellResult) :-
 ep_temp_path(Language, TmpPath) :-
     % Look up the file extension for this language.
     ep_language_ext(Language, Ext),
-    % Generate a unique temp file name (SWI-Prolog built-in).
-    tmp_file_name(prologai_ep, Base),
+    % Generate a unique temp file path (SWI-Prolog built-in tmp_file/2).
+    tmp_file(prologai_ep, Base),
     % Append the extension to make the final path.
     atomic_list_concat([Base, '.', Ext], TmpPath).
 
