@@ -8281,3 +8281,192 @@ spatial packs:
 
 
 END OF CHAPTER 51
+CHAPTER 52 - THE PIPELINE PACK
+
+
+OVERVIEW
+
+The pipeline pack (pl_* predicate family, Layer 70) provides 14 predicates for
+sequential data flow, list processing, and dynamic step dispatch. It is the
+compositional layer needed for ARC-AGI-2 reasoning: rather than applying a
+single named rule end-to-end, a pipeline applies a sequence of named steps
+in order, with the output of each step becoming the input of the next.
+
+The pack has two parts:
+
+1. Step dispatch (pl_register, pl_registered, pl_unregister, pl_step, pl_run):
+   named steps are registered as handlers, and pl_run threads any value
+   through an ordered list of steps.
+
+2. List utilities (pl_map, pl_filter, pl_fold, pl_zip, pl_unzip, pl_take,
+   pl_drop, pl_partition): general-purpose list operations that complement
+   the step dispatch mechanism.
+
+Pack metadata: name(pipeline), version('1.0.0'), requires([grid]).
+
+
+LOADING THE PACK
+
+  :- use_module(library(pipeline)).
+
+
+THE STEP DISPATCH MECHANISM
+
+A step is any Prolog term: an atom like add_one, or a compound like scale(2).
+The step name is the functor of the term (or the atom itself).
+
+A handler is a 3-argument predicate: handler(StepTerm, Input, Output).
+The StepTerm is passed to the handler so compound steps can carry parameters.
+
+pl_register(+Name, +Goal)
+
+  Register a handler for step Name. Goal is a 3-argument callable.
+  Replaces any existing handler for Name.
+
+  % Register an add-one step handler.
+  :- pl_register(add_one, [_, Grid, Grid2]>>(
+         maplist(maplist([V, V2]>>(V2 is V + 1)), Grid, Grid2)
+     )).
+
+pl_registered(+Name, -Goal)
+
+  Query which handler is registered for Name.
+
+  pl_registered(add_one, Goal).
+  % Goal = the lambda registered above
+
+pl_unregister(+Name)
+
+  Remove the handler for Name. Succeeds even if none exists.
+
+  pl_unregister(add_one).
+
+pl_step(+StepTerm, +In, -Out, +Registry)
+
+  Apply one step. Registry is a list of Name-Goal pairs checked before
+  the dynamic handler facts. If no handler is found, Out = In (passthrough).
+
+  % Apply a step using a local registry.
+  pl_step(double, [[1,2]], Out, [double-[_, G, G2]>>(maplist(maplist([V,V2]>>(V2 is V*2)), G, G2))]).
+  % Out = [[2,4]]
+
+pl_run(+Steps, +Input, -Output)
+
+  Apply each step in Steps to Input in sequence.
+
+  pl_register(double, [_, Grid, Grid2]>>(maplist(maplist([V,V2]>>(V2 is V*2)), Grid, Grid2))).
+  pl_register(add_one, [_, Grid, Grid2]>>(maplist(maplist([V,V2]>>(V2 is V+1)), Grid, Grid2))).
+
+  % Apply double then add_one to [[1,2],[3,4]].
+  pl_run([double, add_one], [[1,2],[3,4]], Out).
+  % Out = [[3,5],[7,9]]
+
+  % Empty step list: output = input.
+  pl_run([], [[5,6]], Out).
+  % Out = [[5,6]]
+
+  % Unknown step name: passthrough.
+  pl_run([unknown_step], [[1,2]], Out).
+  % Out = [[1,2]]
+
+
+LIST UTILITIES
+
+pl_map(+Goal, +List, -Results)
+
+  Apply a 2-argument Goal(Element, Result) to every element. Delegates
+  to maplist/3.
+
+  pl_map([X, Y]>>(Y is X * 3), [1,2,3], Rs).
+  % Rs = [3, 6, 9]
+
+pl_filter(+Goal, +List, -Kept)
+
+  Keep only elements for which Goal(Element) succeeds.
+
+  % Keep only even numbers.
+  pl_filter([X]>>(0 is X mod 2), [1,2,3,4,5,6], Kept).
+  % Kept = [2, 4, 6]
+
+pl_fold(+Goal, +List, +Acc0, -AccN)
+
+  Fold Goal(Element, AccIn, AccOut) over List with initial accumulator.
+
+  % Sum a list.
+  pl_fold([X, A, B]>>(B is A + X), [1,2,3,4], 0, Sum).
+  % Sum = 10
+
+  % Reverse a list.
+  pl_fold([X, A, [X|A]]>>true, [1,2,3], [], Rev).
+  % Rev = [3,2,1]
+
+pl_zip(+List1, +List2, -Pairs)
+
+  Pair corresponding elements from two equal-length lists.
+
+  pl_zip([1,2,3], [a,b,c], Pairs).
+  % Pairs = [1-a, 2-b, 3-c]
+
+pl_unzip(+Pairs, -List1, -List2)
+
+  Split a list of L-R pairs into two parallel lists.
+
+  pl_unzip([1-a, 2-b, 3-c], Ls, Rs).
+  % Ls = [1,2,3], Rs = [a,b,c]
+
+pl_take(+N, +List, -Taken)
+
+  Taken is the first N elements of List.
+
+  pl_take(3, [a,b,c,d,e], Taken).
+  % Taken = [a,b,c]
+
+  % Requesting more than available returns the full list.
+  pl_take(10, [1,2,3], Taken).
+  % Taken = [1,2,3]
+
+pl_drop(+N, +List, -Remaining)
+
+  Remaining is List with the first N elements removed.
+
+  pl_drop(2, [a,b,c,d,e], Rest).
+  % Rest = [c,d,e]
+
+pl_partition(+Goal, +List, -Satisfied, -Rejected)
+
+  Split List based on whether Goal(Element) succeeds. Preserves order.
+
+  pl_partition([X]>>(X > 3), [1,2,3,4,5,6], Big, Small).
+  % Big = [4,5,6], Small = [1,2,3]
+
+
+COMBINING WITH OTHER PACKS
+
+The pipeline pack enables multi-step reasoning by chaining other pack
+predicates into named steps:
+
+  % Register a step that recolors background to 1.
+  pl_register(bg_to_one, [_, G, G2]>>(rw_replace_color(G, 0, 1, G2))).
+
+  % Register a step that scales all values by 2.
+  pl_register(scale2, [_, G, G2]>>(ar_scalar_mul(G, 2, G2))).
+
+  % Apply both steps in sequence.
+  pl_run([bg_to_one, scale2], InputGrid, OutputGrid).
+
+  % Pipeline with a context-dependent step.
+  % The step handler reads a color from the step term.
+  pl_register(fill_color, [fill_color(C), G, G2]>>(ar_scalar_add(G, C, G2))).
+  pl_run([fill_color(3)], [[0,0],[0,0]], Out).
+  % Out = [[3,3],[3,3]]
+
+  % Filter to keep only objects larger than a threshold.
+  obj_all(Grid, AllObjs),
+  pl_filter([Obj]>>(obj_size(Obj, N), N > 2), AllObjs, BigObjs).
+
+  % Zip input-output grid pairs and process each.
+  pl_zip(InputGrids, OutputGrids, Pairs),
+  pl_map([In-Out, Rule]>>(induce_rule(In, Out, Rule)), Pairs, Rules).
+
+
+END OF CHAPTER 52
