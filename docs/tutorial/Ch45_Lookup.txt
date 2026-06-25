@@ -1,0 +1,182 @@
+CHAPTER 45: THE LOOKUP PACK
+
+The lookup pack (prefix lk_) provides predicates for association list
+operations and grid random-access lookups. An association list is a
+list of Key-Value pairs written as Key-Value in Prolog (using the
+infix minus operator). The lookup pack gives higher-level reasoning
+packs a named, testable API for map operations and grid index queries,
+replacing ad-hoc member/2 searches and nth0 chains.
+
+All predicates live in the lookup module (Layer 63).
+
+
+LOADING
+
+  :- use_module(library(lookup)).
+
+
+ASSOCIATION LIST BASICS
+
+  lk_get(+Key, +Map, -Value)
+
+  Look up the first value associated with Key in a Key-Value list.
+
+  Example:
+
+    lk_get(b, [a-1, b-2, c-3], V).
+    % V = 2
+
+  lk_has_key(+Key, +Map)
+
+  Succeeds if Key is present in Map.
+
+  Example:
+
+    lk_has_key(a, [a-1, b-2]).  % succeeds
+    lk_has_key(z, [a-1, b-2]).  % fails
+
+  lk_keys(+Map, -Keys)
+  lk_values(+Map, -Values)
+
+  Extract all keys or all values from a map, preserving order.
+
+  Example:
+
+    lk_keys([a-1, b-2, c-3], Ks).
+    % Ks = [a, b, c]
+
+    lk_values([a-1, b-2, c-3], Vs).
+    % Vs = [1, 2, 3]
+
+
+ADDING AND REMOVING ENTRIES
+
+  lk_put(+Key, +Value, +MapIn, -MapOut)
+
+  Add a new key-value pair or replace the value for an existing key.
+
+  Example:
+
+    lk_put(b, 99, [a-1, b-2, c-3], M).
+    % M = [a-1, b-99, c-3]
+
+    lk_put(d, 4, [a-1, b-2, c-3], M).
+    % M = [a-1, b-2, c-3, d-4]
+
+  lk_delete(+Key, +MapIn, -MapOut)
+
+  Remove the first occurrence of Key from Map. No-op if Key is absent.
+
+  Example:
+
+    lk_delete(b, [a-1, b-2, c-3], M).
+    % M = [a-1, c-3]
+
+  lk_from_pairs(+Pairs, -Map)
+
+  Identity predicate: a list of Key-Value pairs is already a map.
+  Provided for explicit documentation of intent.
+
+  Example:
+
+    lk_from_pairs([x-1, y-2], Map).
+    % Map = [x-1, y-2]
+
+
+TRANSFORMING VALUES
+
+  lk_map_values(+Map, :Pred, -NewMap)
+
+  Apply Pred(+V, -NewV) to every value in Map, keeping keys unchanged.
+  Pred must be a 2-arity callable.
+
+  Example:
+
+    double(V, D) :- D is V * 2.
+    lk_map_values([a-1, b-2, c-3], double, NewM).
+    % NewM = [a-2, b-4, c-6]
+
+  lk_invert(+Map, -Inverted)
+
+  Swap all Key-Value pairs to Value-Key.
+
+  Example:
+
+    lk_invert([a-1, b-2, c-3], Inv).
+    % Inv = [1-a, 2-b, 3-c]
+
+
+GRID RANDOM ACCESS
+
+  lk_grid_row(+Grid, +R, -Row)
+
+  Return row R of a grid (0-indexed).
+
+  Example:
+
+    lk_grid_row([[1,2],[3,4],[5,6]], 1, Row).
+    % Row = [3, 4]
+
+  lk_grid_col(+Grid, +C, -Col)
+
+  Return column C of a grid as a list (0-indexed).
+
+  Example:
+
+    lk_grid_col([[1,2,3],[4,5,6]], 1, Col).
+    % Col = [2, 5]
+
+  lk_grid_cell(+Grid, +R, +C, -Value)
+
+  Return the value at row R, column C of a grid.
+
+  Example:
+
+    lk_grid_cell([[0,1,0],[2,0,1],[0,2,0]], 1, 2, V).
+    % V = 1
+
+
+COLOR AND POSITION INDEX MAPS
+
+  lk_color_positions(+Grid, +BG, -Map)
+
+  Build a Color->[r(R,C)...] map for all non-background cells.
+  Each key is a color; each value is the list of positions that color
+  occupies.
+
+  Example:
+
+    G = [[0,1,0],[2,0,1],[0,2,0]].
+    lk_color_positions(G, 0, Map).
+    % Map = [1-[r(0,1),r(1,2)], 2-[r(1,0),r(2,1)]]
+
+  lk_position_color(+Grid, +BG, -Map)
+
+  Build a r(R,C)->Color map for all non-background cells.
+  Each key is a position; each value is the color at that position.
+
+  Example:
+
+    G = [[0,1,0],[2,0,1],[0,2,0]].
+    lk_position_color(G, 0, Map).
+    % Map = [r(0,1)-1, r(1,0)-2, r(1,2)-1, r(2,1)-2]
+
+
+COMBINING WITH OTHER PACKS
+
+The lookup pack integrates with the grid, spatial, and induction packs:
+
+  % Find where color 3 appears, then use spatial reasoning.
+  lk_color_positions(Grid, 0, ColorMap),
+  lk_get(3, ColorMap, Positions),
+  sp_bounding_box(Positions, BBox).
+
+  % Build a position-to-color index for fast lookup.
+  lk_position_color(Grid, 0, PosMap),
+  lk_get(r(2, 3), PosMap, Color).
+
+  % Transform a frequency map to doubled values.
+  lk_map_values(FreqMap, double, DoubledFreqs).
+
+
+END OF CHAPTER 45
