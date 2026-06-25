@@ -9848,3 +9848,56 @@ All 42 PLUnit acceptance tests are in packs/trace/test/test_trace.pl.
 The Specification entry is Part 93 (TR-TR-001 through TR-TR-014).
 The Architecture entry is ARCH-69.
 The Refinement entry covers AC-TR-001 through AC-TR-042.
+
+
+Chapter 65: The Label Pack - Connected Component Labeling and Region Queries
+
+The label pack (Layer 83, Work Package 104) provides 14 predicates under the
+lb_* prefix for assigning unique integer labels to connected regions, querying
+region properties, filtering by size, recoloring components, and extracting
+individual regions from a grid.
+
+Core labeling:
+  lb_label(+Grid, +Bg, -LabelGrid)      assign labels to connected components
+  lb_components(+Grid, +Bg, -Comps)     list of cell lists per component
+  lb_count(+Grid, +Bg, -N)              count components
+
+Per-component queries:
+  lb_size_of(+LG, +Label, -Size)        cell count of a label
+  lb_sizes_all(+LG, +Bg, -Sizes)        sorted Label-Size pairs
+  lb_cells_of(+LG, +Label, -Cells)      cells carrying a label
+  lb_bbox_of(+LG, +Label, -TL, -BR)     bounding box as two R-C pairs
+  lb_neighbors_of(+LG, +L, +Bg, -Ns)   adjacent foreground labels
+
+Grid transformations:
+  lb_fill_label(+LG, +Label, +Val, -G)  replace a label with a value
+  lb_keep_largest(+Grid, +Bg, -Result)  keep only the largest component
+  lb_remove_small(+Grid, +Bg, +Min, -R) remove small components
+  lb_color_labels(+LG, +Bg, +Cols, -G)  color labels from a palette
+  lb_merge_two(+LG, +L1, +L2, -NewG)   merge two labels into one
+  lb_select_label(+Grid, +LG, +L, -R)  extract one component
+
+Example: label a grid with isolated corners:
+  lb_label([[1,0,1],[0,0,0],[1,0,1]], 0, LG).
+  % LG = [[1,0,2],[0,0,0],[3,0,4]]
+
+Example: count components:
+  lb_count([[1,0,1],[0,0,0],[1,0,1]], 0, N).
+  % N = 4
+
+Example: find bounding box of label 1:
+  lb_bbox_of([[1,1,0],[0,0,0],[0,2,2]], 1, TL, BR).
+  % TL = 0-0, BR = 0-1
+
+Example: keep only the largest component:
+  lb_keep_largest([[1,0,1],[1,1,0],[0,0,1]], 0, R).
+  % R = [[1,0,0],[1,1,0],[0,0,0]]
+
+Example: color all components from a palette:
+  lb_color_labels([[1,0,2],[0,0,0],[3,0,4]], 0, [7,8,9], G).
+  % G = [[7,0,8],[0,0,0],[9,0,7]]
+
+All 42 PLUnit acceptance tests are in packs/label/test/test_label.pl.
+The Specification entry is Part 94 (LB-LB-001 through LB-LB-014).
+The Architecture entry is ARCH-70.
+The Refinement entry covers AC-LB-001 through AC-LB-042.
