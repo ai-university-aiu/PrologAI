@@ -1,0 +1,140 @@
+PROLOGAI TUTORIAL
+
+CHAPTER 22 - THE COMPOSE PACK: SEQUENTIAL RULE PIPELINES AND COMBINATORS
+
+The compose pack provides higher-order predicates for building transformation
+pipelines. Instead of writing individual transformation rules in isolation, you
+compose them: chain them in sequence, branch on conditions, repeat a fixed
+number of times, or map a rule across every row or column.
+
+The pack prefix is cp_. All operations work on standard PrologAI grids (lists
+of lists of integers). The pack depends on the grid pack (PR 56) for low-level
+grid access. Transformation rules are callable terms (predicate names or partial
+applications) that accept two arguments: an input grid and an output grid.
+
+LOADING
+
+    :- use_module(library(compose)).
+
+BASIC APPLICATION
+
+cp_apply/3 is the fundamental dispatch predicate.
+
+    ?- cp_apply(gd_reflect_h, [[1,2],[3,4]], G).
+    G = [[3,4],[1,2]].
+
+cp_identity/2 returns the grid unchanged.
+
+    ?- cp_identity([[1,2],[3,4]], G).
+    G = [[1,2],[3,4]].
+
+cp_const/3 always returns the same grid regardless of the input. This is
+useful when a pipeline step needs to reset a grid to a known value.
+
+    ?- cp_apply(cp_const([[0,0],[0,0]]), [[1,2],[3,4]], G).
+    G = [[0,0],[0,0]].
+
+SEQUENTIAL PIPELINES
+
+cp_pipe/3 applies a list of rules in order. The output of each step becomes
+the input of the next.
+
+    ?- cp_pipe([gd_rotate90, gd_rotate90], [[1,2],[3,4]], G).
+    G = [[4,3],[2,1]].
+
+An empty list is the identity:
+
+    ?- cp_pipe([], Grid, Grid2).
+    Grid2 = Grid.
+
+cp_pipe_n/4 repeats a single rule exactly N times.
+
+    ?- cp_pipe_n(gd_rotate90, 4, [[1,2,3],[4,5,6],[7,8,9]], G).
+    G = [[1,2,3],[4,5,6],[7,8,9]].
+
+cp_repeat/4 is an alias for cp_pipe_n.
+
+CONDITIONAL BRANCHING
+
+cp_branch/5 applies ThenRule when a condition holds, and ElseRule otherwise.
+The condition is a predicate that accepts one argument (the grid).
+
+    is_tall(Grid) :- gd_size(Grid, Rows, Cols), Rows > Cols.
+
+    ?- cp_branch(is_tall, gd_rotate90, cp_identity, Grid, Grid2).
+
+If Grid has more rows than columns, it gets rotated. Otherwise it passes
+through unchanged.
+
+REPETITION UNTIL CONVERGENCE
+
+cp_until/4 applies a rule repeatedly until a condition holds on the result.
+
+    ?- cp_until(gd_rotate90, gd_equal([[1,2,3],[4,5,6],[7,8,9]]),
+                SomeGrid, G).
+
+cp_fixed_point/3 applies a rule until the grid stops changing.
+
+    ?- cp_fixed_point(some_stabilizing_rule, Grid, StableGrid).
+
+Both predicates are deterministic and terminate when the condition is
+first satisfied.
+
+ROW AND COLUMN MAPPING
+
+cp_map_rows/3 applies a rule to each row independently. The rule is a
+predicate that maps one row list to another row list.
+
+    reverse_row(Row, Row2) :- reverse(Row, Row2).
+
+    ?- cp_map_rows(reverse_row, [[1,2,3],[4,5,6]], G).
+    G = [[3,2,1],[6,5,4]].
+
+cp_map_cols/3 applies a rule to each column independently. The rule is a
+predicate that maps one column list to another column list.
+
+    ?- cp_map_cols(reverse, [[1,2],[3,4]], G).
+    G = [[3,4],[1,2]].   % same as gd_reflect_h for a 2x2 grid
+
+PAIRWISE GRID COMBINATION
+
+cp_zip/4 combines two same-size grids cell by cell. The rule receives the
+cell value from each grid and produces the output cell value.
+
+    max_cell(A, B, C) :- C is max(A, B).
+
+    ?- cp_zip(max_cell, [[1,4],[3,2]], [[2,3],[1,5]], G).
+    G = [[2,4],[3,5]].
+
+FOLDING OVER A LIST OF GRIDS
+
+cp_fold/4 left-folds a rule over a list of grids. The rule combines an
+accumulator grid with the current list element to produce a new accumulator.
+
+    overlay_grids(Base, Patch, Result) :-
+        gd_size(Patch, R, C), R1 is R-1, C1 is C-1,
+        gd_crop(Patch, 0, 0, R1, C1, P),
+        gd_overlay(Base, P, 0, 0, Result).
+
+    ?- cp_fold(overlay_grids, BaseGrid, [Patch1, Patch2], Result).
+
+BUILDING SOLVERS WITH COMPOSE
+
+A common ARC-AGI solution pattern: try an isometry, then verify.
+
+    try_isometry(Examples, TestInput, Output) :-
+        ay_examples_isometry(Examples, Iso, ColorMap),
+        cp_pipe([ay_apply_isometry(Iso), ay_apply_color_map(ColorMap)],
+                TestInput, Output).
+
+A pipeline that applies a rule conditionally:
+
+    solve_conditional(Grid, Out) :-
+        cp_branch(is_tall, gd_rotate90, cp_identity, Grid, Mid),
+        cp_apply(some_color_rule, Mid, Out).
+
+WHAT COMES NEXT
+
+Chapter 23 covers the Motion Pack: gravity, sliding, and object movement.
+
+END OF CHAPTER 22

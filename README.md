@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       58 work packages — the complete cognitive engine (see below)
+├── packs/       59 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -175,6 +175,7 @@ Everything is inspectable.
 | `scene` | ARC-AGI Scene Model and Object-Centric Reasoning (PR 58) — builds a structured object inventory from a grid. Identifies the background color, extracts all foreground objects as `obj(Color, Cells)` terms, and provides 24 predicates for object properties (size, shape, bounding box, centroid), filtering, sorting, counting, and spatial relations. Key predicates: `sc_grid_to_scene/3`, `sc_objects/2`, `sc_largest/2`, `sc_same_shape/2`, `sc_cells_touching/2`, `sc_contained_in/2`. The object-centric reasoning layer for ARC-AGI-2. |
 | `quant` | Quantitative Reasoning over Object Sets (PR 59) — counts, groups, and compares collections of `obj(Color, Cells)` terms. Provides histogram (`qn_histogram/2`), grouping by color/size/shape (`qn_group_by_color/2`, `qn_group_by_size/2`, `qn_group_by_shape/2`), frequency extremes (`qn_most_frequent_color/2`, `qn_least_frequent_color/2`), unique shape enumeration (`qn_unique_shapes/2`), conditional counting (`qn_count_where/3`), uniformity tests (`qn_all_same_color/1`, `qn_all_same_size/1`, `qn_all_same_shape/1`), multiset matching (`qn_colors_match/2`, `qn_shapes_match/2`, `qn_sizes_match/2`), and threshold predicates (`qn_exactly_n/3`, `qn_at_least_n/3`). 18 qn_* predicates, Layer 38. |
 | `pattern` | Periodic Pattern Detection, Tiling, and Repetition (PR 60) — detects repeating periods in lists, rows, and columns (`pt_list_period/2`, `pt_row_period/3`, `pt_col_period/3`); constructs tiled grids from a base tile (`pt_tile_grid/4`, `pt_extract_tile/4`, `pt_is_tiling/3`); scales grids by integer factors (`pt_scale_up/3`, `pt_scale_down/3`); repeats grids horizontally and vertically (`pt_repeat_h/3`, `pt_repeat_v/3`); mirrors grids (`pt_mirror_h/2`, `pt_mirror_v/2`); and generates checkerboard and stripe patterns (`pt_checkerboard/5`, `pt_stripe_h/4`, `pt_stripe_v/4`). 15 pt_* predicates, Layer 39. |
+| `compose` | Sequential Rule Pipelines and Transformation Composition (PR 61) — higher-order combinators for building transformation pipelines: single dispatch (`cp_apply/3`), identity (`cp_identity/2`), constant (`cp_const/3`), sequential pipeline (`cp_pipe/3`, `cp_pipe_n/4`), conditional branching (`cp_branch/5`), repetition (`cp_repeat/4`, `cp_until/4`, `cp_fixed_point/3`), row and column mapping (`cp_map_rows/3`, `cp_map_cols/3`), pairwise cell combination (`cp_zip/4`), and left-fold over a list of grids (`cp_fold/4`). 13 cp_* predicates, Layer 40. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**
