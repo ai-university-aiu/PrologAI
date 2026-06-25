@@ -5737,3 +5737,160 @@ cn_regions_per_color/3 - per-color region tally
 cn_by_value/3          - value count in a flat list
 
 END OF CHAPTER 36
+
+
+Chapter 37: The Fill Pack
+
+The fill pack (module fill, fl_* prefix, Layer 55) gives PrologAI fourteen
+predicates for painting colors into grids.
+
+Where the transform pack moves or scales the entire grid, and the select pack
+chooses regions by size or position, the fill pack changes what is inside the grid
+by setting cells to new color values.
+
+
+37.1 Loading the Pack
+
+To use the fill pack in your code:
+
+:- use_module(library(fill)).
+
+
+37.2 Filling Regions and Bounding Boxes
+
+fl_fill_region(Grid, Region, Color, Result) fills every r(R,C) cell in Region
+with Color and returns the updated grid in Result.
+
+Example:
+
+G = [[0,0,0],[0,0,0],[0,0,0]],
+Region = [r(0,0), r(1,1), r(2,2)],
+fl_fill_region(G, Region, 5, Result).
+% Result = [[5,0,0],[0,5,0],[0,0,5]]
+
+fl_fill_bbox(Grid, bbox(R1,C1,R2,C2), Color, Result) fills all cells whose row is
+between R1 and R2 inclusive and whose column is between C1 and C2 inclusive.
+
+Example:
+
+G = [[0,0,0],[0,0,0],[0,0,0]],
+fl_fill_bbox(G, bbox(0,1,1,2), 3, Result).
+% Result = [[0,3,3],[0,3,3],[0,0,0]]
+
+
+37.3 Row, Column, and Cell Filling
+
+fl_fill_row(Grid, R, Color, Result) replaces every cell in row R with Color.
+
+fl_fill_col(Grid, C, Color, Result) replaces every cell in column C with Color.
+
+fl_fill_cells(Grid, Cells, Color, Result) fills a specific list of r(R,C) cells.
+This is semantically identical to fl_fill_region but communicates intent clearly
+when the caller is working with an explicit list of target cells.
+
+
+37.4 Border and Outline Operations
+
+fl_fill_border(Grid, Color, Result) fills the four outermost edges of the grid
+with Color.
+
+Example:
+
+G = [[0,0,0],[0,0,0],[0,0,0]],
+fl_fill_border(G, 1, Result).
+% Result = [[1,1,1],[1,0,1],[1,1,1]]
+
+fl_outline_region(Grid, Region, Color, Result) fills only the boundary cells of
+a region with Color, leaving interior cells unchanged.
+
+A cell is a boundary cell if at least one of its four orthogonal neighbors is not
+in the region.
+
+fl_fill_interior(Grid, Region, Color, Result) fills only the interior cells.
+
+A cell is an interior cell if all four orthogonal neighbors are in the region.
+
+
+37.5 Creating New Grids
+
+fl_solid_rect(Rows, Cols, Color, Grid) creates a brand-new grid of given
+dimensions filled entirely with Color.
+
+Example:
+
+fl_solid_rect(2, 3, 7, Grid).
+% Grid = [[7,7,7],[7,7,7]]
+
+fl_checkerboard(Rows, Cols, C1, C2, Grid) creates a new grid where cells
+alternate between C1 and C2 based on whether (R + C) is even or odd.
+
+Example:
+
+fl_checkerboard(3, 3, 0, 1, Grid).
+% Grid = [[0,1,0],[1,0,1],[0,1,0]]
+
+
+37.6 Line Segments
+
+fl_draw_hline(Grid, R, C1, C2, Color, Result) fills cells in row R from column
+C1 to column C2.
+
+fl_draw_vline(Grid, C, R1, R2, Color, Result) fills cells in column C from row R1
+to row R2.
+
+Both are thin wrappers around fl_fill_bbox.
+
+
+37.7 Diagonal Filling
+
+fl_fill_main_diag(Grid, Color, Result) fills cells r(I,I) for all valid I.
+
+Example:
+
+G = [[0,0,0],[0,0,0],[0,0,0]],
+fl_fill_main_diag(G, 9, Result).
+% Result = [[9,0,0],[0,9,0],[0,0,9]]
+
+
+37.8 Stamp Overlay
+
+fl_stamp(Base, Stamp, SR, SC, BG, Result) overlays the Stamp grid onto Base
+starting at row SR, column SC.
+
+Stamp cells equal to BG are treated as transparent: the corresponding Base
+cell is kept.
+
+Stamp cells not equal to BG replace the Base cell.
+
+Example:
+
+Base = [[0,0,0],[0,0,0],[0,0,0]],
+Stamp = [[0,1],[1,0]],
+fl_stamp(Base, Stamp, 0, 0, 0, Result).
+% Stamp has 0 as BG; only the 1-cells are applied.
+% Result = [[0,1,0],[1,0,0],[0,0,0]]
+
+
+37.9 Summary
+
+Predicate           Arity   Description
+fl_fill_region      4       Fill r(R,C) region cells
+fl_fill_bbox        4       Fill rectangular bounding box
+fl_fill_row         4       Fill entire row
+fl_fill_col         4       Fill entire column
+fl_fill_cells       4       Fill explicit cell list
+fl_fill_border      3       Fill outermost grid ring
+fl_outline_region   4       Fill region boundary cells
+fl_fill_interior    4       Fill region interior cells
+fl_solid_rect       4       Create uniform-color grid
+fl_checkerboard     5       Create alternating-color grid
+fl_draw_hline       6       Draw horizontal line segment
+fl_draw_vline       6       Draw vertical line segment
+fl_fill_main_diag   3       Fill main diagonal
+fl_stamp            6       Overlay subgrid with transparency
+
+The fill pack ships 46 PLUnit tests.
+
+All 46 pass under SWI-Prolog.
+
+END OF CHAPTER 37
