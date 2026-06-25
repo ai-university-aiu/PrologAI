@@ -6596,3 +6596,200 @@ complete toolkit for physics-like grid transformations:
 
 
 END OF CHAPTER 42
+CHAPTER 43: THE NOISE PACK
+
+The noise pack (prefix ns_) provides two complementary capabilities:
+binary mask operations and noise analysis.
+
+A binary mask is a grid of 0s and 1s with the same dimensions as the
+grid being analyzed. Noise analysis identifies and removes cells that
+deviate from the dominant (majority) color in a grid.
+
+All predicates live in the noise module (Layer 61).
+
+
+LOADING
+
+  :- use_module(library(noise)).
+
+
+BINARY MASKS
+
+A binary mask is a list-of-lists of 0s and 1s. A 1 means "selected"
+and a 0 means "not selected."
+
+Building a mask:
+
+  ns_mask_from_color(+Grid, +Color, -Mask)
+
+  Creates a mask where every cell with Color becomes 1, and all other
+  cells become 0.
+
+  Example:
+
+    G = [[1,2,1],[2,1,2]].
+    ns_mask_from_color(G, 2, M).
+    % M = [[0,1,0],[1,0,1]]
+
+Applying a mask:
+
+  ns_mask_apply(+Grid, +Mask, +FillColor, -Result)
+
+  Replaces all cells where Mask=1 with FillColor. Mask=0 cells are
+  unchanged.
+
+  Example:
+
+    G = [[1,2,3],[4,5,6]].
+    M = [[1,0,1],[0,1,0]].
+    ns_mask_apply(G, M, 0, R).
+    % R = [[0,2,0],[4,0,6]]
+
+Inverting a mask:
+
+  ns_mask_invert(+Mask, +_Rows, -Inverted)
+
+  Flips every bit: 0 becomes 1 and 1 becomes 0.
+
+  Example:
+
+    M = [[1,0],[0,1]].
+    ns_mask_invert(M, 2, I).
+    % I = [[0,1],[1,0]]
+
+Combining masks:
+
+  ns_mask_and(+Mask1, +Mask2, -Result)
+
+  Pointwise AND: result is 1 only where both masks are 1.
+
+  ns_mask_or(+Mask1, +Mask2, -Result)
+
+  Pointwise OR: result is 1 where either mask is 1.
+
+  Example:
+
+    M1 = [[1,0],[0,1]].
+    M2 = [[1,1],[0,0]].
+    ns_mask_and(M1, M2, A).  % A = [[1,0],[0,0]]
+    ns_mask_or(M1, M2, O).   % O = [[1,1],[0,1]]
+
+
+CONVERTING BETWEEN MASKS AND REGIONS
+
+  ns_mask_to_region(+Mask, -Region)
+
+  Extracts all r(R,C) cells where the mask is 1.
+
+  Example:
+
+    M = [[1,0],[0,1]].
+    ns_mask_to_region(M, Region).
+    % Region = [r(0,0), r(1,1)]
+
+  ns_region_to_mask(+Region, +Rows, +Cols, -Mask)
+
+  Builds a binary mask from a list of r(R,C) cells.
+
+  Example:
+
+    ns_region_to_mask([r(0,0), r(1,1)], 2, 2, M).
+    % M = [[1,0],[0,1]]
+
+
+NOISE ANALYSIS
+
+  ns_majority_color(+Grid, -Color)
+
+  Returns the most frequently occurring color value in the grid.
+
+  Example:
+
+    G = [[5,5,5],[5,3,5],[5,5,5]].
+    ns_majority_color(G, C).
+    % C = 5
+
+  ns_color_count(+Grid, +Color, -Count)
+
+  Counts the number of cells with the given Color.
+
+  ns_noise_cells(+Grid, +_BG, -Cells)
+
+  Returns the list of r(R,C) cells whose value differs from the
+  majority color.
+
+  Example:
+
+    G = [[5,5,5],[5,3,5],[5,5,5]].
+    ns_noise_cells(G, 0, Cells).
+    % Cells = [r(1,1)]
+
+  ns_denoise(+Grid, +_BG, -Result)
+
+  Replaces all non-majority cells with the majority color. Equivalent
+  to removing noise and returning a clean version.
+
+  Example:
+
+    G = [[5,5,5],[5,3,5],[5,5,5]].
+    ns_denoise(G, 0, R).
+    % R = [[5,5,5],[5,5,5],[5,5,5]]
+
+
+SPARSE AND DENSE CELLS
+
+  ns_sparse_cells(+Grid, +N, -Cells)
+
+  Returns cells whose color appears fewer than N times in the entire
+  grid. These are the "rare" colors - likely noise or exceptions.
+
+  Example:
+
+    G = [[5,5,5],[5,3,5],[5,5,5]].
+    ns_sparse_cells(G, 2, Sparse).
+    % Sparse = [r(1,1)]  (color 3 appears only once)
+
+  ns_dense_cells(+Grid, +N, -Cells)
+
+  Returns cells whose color appears N or more times. These belong to
+  the dominant or common colors.
+
+
+COLOR ISOLATION
+
+  ns_isolate_color(+Grid, +Color, -Result)
+
+  Keeps cells with Color and replaces all other cells with 0. Useful
+  for pulling out one layer of a multi-color grid.
+
+  Example:
+
+    G = [[1,2,1],[2,1,2]].
+    ns_isolate_color(G, 2, R).
+    % R = [[0,2,0],[2,0,2]]
+
+
+TYPICAL WORKFLOWS
+
+Detect and remove noise:
+
+  ns_noise_cells(Grid, 0, Noise),
+  length(Noise, NCount),
+  ( NCount < 3
+  -> ns_denoise(Grid, 0, Clean)
+  ;  Clean = Grid
+  ).
+
+Build a mask from a region and apply it:
+
+  ns_region_to_mask(Region, Rows, Cols, Mask),
+  ns_mask_apply(Grid, Mask, 0, Cleared).
+
+Isolate and compare two colors:
+
+  ns_isolate_color(Grid, Color1, Layer1),
+  ns_isolate_color(Grid, Color2, Layer2),
+  cp_grids_equal(Layer1, Layer2).
+
+
+END OF CHAPTER 43
