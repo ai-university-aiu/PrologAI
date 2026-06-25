@@ -9743,3 +9743,54 @@ All 42 PLUnit acceptance tests are in packs/sort/test/test_sort.pl.
 The Specification entry is Part 91 (SO-SO-001 through SO-SO-014).
 The Architecture entry is ARCH-67.
 The Refinement entry covers AC-SO-001 through AC-SO-042.
+
+
+CHAPTER 63: THE TILE PACK - TILING, STAMPING, AND PERIOD DETECTION
+
+The tile pack (Layer 81, Work Package 102) provides 14 predicates under the
+ti_* prefix for composing grids from repeating motifs, splitting grids into
+sub-grids, stamping shapes onto a base grid, and detecting how often a pattern
+repeats.
+
+Tiling predicates:
+  ti_tile_h(+Tile, +N, -Grid)      repeat Tile N times side-by-side
+  ti_tile_v(+Tile, +N, -Grid)      repeat Tile N times top-to-bottom
+  ti_tile(+Tile, +NR, +NC, -Grid)  tile Tile into NR rows of NC copies
+
+Splitting predicates:
+  ti_split_rows(+Grid, +TH, -Bands)       split into horizontal TH-row bands
+  ti_split_cols(+Grid, +TW, -Stripes)     split into vertical TW-col stripes
+  ti_split(+Grid, +TH, +TW, -TileGrid)   split into list-of-tile-rows
+  ti_flatten_tiles(+TileGrid, -Grid)      reassemble tiles into one grid
+
+Stamping predicates:
+  ti_stamp(+Base, +Motif, +R, +C, -Result)        overlay Motif at (R,C)
+  ti_stamp_all(+Base, +Motif, +Positions, -Result) stamp at all positions
+
+Extraction and verification:
+  ti_extract_tile(+Grid, +TH, +TW, +TR, +TC, -Tile)  extract tile at (TR,TC)
+  ti_is_tiling(+Grid, +TH, +TW)                       check if Grid tiles by one motif
+
+Period detection:
+  ti_find_period_h(+Grid, -PH)   smallest horizontal period in columns
+  ti_find_period_v(+Grid, -PV)   smallest vertical period in rows
+
+Pattern generation:
+  ti_checkerboard(+H, +W, +V1, +V2, -Grid)   H x W checkerboard
+
+Example: tile [[1,0],[0,1]] into a 4x4 grid:
+  ti_tile([[1,0],[0,1]], 2, 2, G).
+  % G = [[1,0,1,0],[0,1,0,1],[1,0,1,0],[0,1,0,1]]
+
+Example: detect horizontal period:
+  ti_find_period_h([[1,0,1,0],[0,1,0,1]], P).
+  % P = 2
+
+Example: stamp a motif at multiple positions:
+  ti_stamp_all([[0,0,0],[0,0,0]], [[1]], [0-0, 0-2, 1-1], R).
+  % R = [[1,0,1],[0,1,0]]
+
+All 42 PLUnit acceptance tests are in packs/tile/test/test_tile.pl.
+The Specification entry is Part 92 (TI-TI-001 through TI-TI-014).
+The Architecture entry is ARCH-68.
+The Refinement entry covers AC-TI-001 through AC-TI-042.
