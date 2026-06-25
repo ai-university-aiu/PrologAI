@@ -7650,3 +7650,166 @@ The rewrite pack integrates naturally with the connect, morph, and induction pac
 
 
 END OF CHAPTER 48
+CHAPTER 49 - THE RUN PACK
+
+The run pack (Layer 67, prefix rn_) provides 14 predicates for run-length encoding
+and decoding of value sequences, grid rows, and grid columns. Run-length encoding
+represents a list like [1,1,2,2,2,1] as [(1-2), (2-3), (1-1)]: a compact list of
+Value-Count pairs that captures repeating patterns efficiently.
+
+Load the pack:
+
+  :- use_module(library(run)).
+
+
+ENCODING AND DECODING
+
+rn_encode/2 converts a flat list to Value-Count pairs:
+
+  % [1,1,2,2,2,1] encodes to [1-2, 2-3, 1-1].
+  rn_encode([1,1,2,2,2,1], Runs).
+  % Runs = [1-2, 2-3, 1-1]
+
+  % Uniform list collapses to a single run.
+  rn_encode([3,3,3], Runs).
+  % Runs = [3-3]
+
+rn_decode/2 converts Value-Count pairs back to a flat list:
+
+  % Decode [1-2, 2-3] -> [1,1,2,2,2].
+  rn_decode([1-2, 2-3], List).
+  % List = [1,1,2,2,2]
+
+Encoding and decoding are inverses:
+
+  % Encode then decode recovers the original.
+  rn_encode([1,2,2,3], Runs),
+  rn_decode(Runs, List).
+  % List = [1,2,2,3]
+
+
+GRID ROW AND COLUMN ENCODING
+
+rn_row_encode/3 encodes a single grid row:
+
+  G = [[0,0,0],[1,1,2],[0,0,0]],
+  rn_row_encode(G, 1, Runs).
+  % Runs = [1-2, 2-1]
+
+rn_col_encode/3 encodes a single grid column:
+
+  G = [[1,0],[1,0],[2,0]],
+  rn_col_encode(G, 0, Runs).
+  % Runs = [1-2, 2-1]
+
+rn_grid_rows/2 encodes all rows:
+
+  G = [[1,1,2],[3,3,3]],
+  rn_grid_rows(G, RowRuns).
+  % RowRuns = [[1-2, 2-1], [3-3]]
+
+rn_grid_cols/2 encodes all columns:
+
+  G = [[1,2,1],[1,2,1]],
+  rn_grid_cols(G, ColRuns).
+  % ColRuns = [[1-2], [2-2], [1-2]]
+
+
+ANALYSIS PREDICATES
+
+rn_length/2 gives the total element count of a run list:
+
+  % [1-2, 2-3, 1-1] represents 2+3+1=6 elements.
+  rn_length([1-2, 2-3, 1-1], N).
+  % N = 6
+
+rn_at/3 looks up the value at a 0-indexed position:
+
+  % Position 2 falls in the second run of [1-2, 2-3].
+  rn_at([1-2, 2-3], 2, V).
+  % V = 2
+
+rn_max_run/3 finds the longest run of a given color:
+
+  % Longest run of 2 in [1-2, 2-3, 2-1] is 3.
+  rn_max_run([1-2, 2-3, 2-1], 2, N).
+  % N = 3
+
+  % Color absent: max run is 0.
+  rn_max_run([1-2, 2-3], 9, N).
+  % N = 0
+
+rn_count_runs/3 counts distinct runs of a color:
+
+  % Color 1 appears in 2 runs in [1-2, 2-3, 1-1].
+  rn_count_runs([1-2, 2-3, 1-1], 1, N).
+  % N = 2
+
+rn_uniform/1 tests whether all values are the same:
+
+  % All runs have value 5: uniform.
+  rn_uniform([5-3, 5-2, 5-1]).
+  % succeeds
+
+  % Different values: not uniform.
+  \+ rn_uniform([1-2, 2-3]).
+  % succeeds (\+ means "not provable")
+
+
+STRUCTURAL OPERATIONS
+
+rn_trim/3 removes leading and trailing occurrences of a background value:
+
+  % Remove 0s from both ends; interior 0 is kept.
+  rn_trim([0,1,0,2,0], 0, Trimmed).
+  % Trimmed = [1,0,2]
+
+rn_repeat/3 repeats a sequence N times, merging same-value runs at boundaries:
+
+  % No boundary merging needed.
+  rn_repeat([1-2, 2-1], 2, Runs).
+  % Runs = [1-2, 2-1, 1-2, 2-1]
+
+  % Boundary merge: [1-3] repeated twice merges to [1-6].
+  rn_repeat([1-3], 2, Runs).
+  % Runs = [1-6]
+
+rn_positions/3 returns the 0-indexed positions of all cells with a given value:
+
+  % Color 1 appears at positions 0, 1, and 5.
+  rn_positions([1-2, 2-3, 1-1], 1, Ps).
+  % Ps = [0, 1, 5]
+
+  % Color absent: empty list.
+  rn_positions([1-2, 2-3], 9, Ps).
+  % Ps = []
+
+
+COMBINING WITH OTHER PACKS
+
+The run pack integrates naturally with the grid, compare, and rewrite packs:
+
+  % Find rows that have the same run-length pattern as a target.
+  rn_row_encode(TargetGrid, 0, Pattern),
+  findall(R,
+    (nth0(R, TestGrid, _),
+     rn_row_encode(TestGrid, R, Pattern)),
+    MatchingRows).
+
+  % Check whether a column is a periodic pattern.
+  rn_col_encode(Grid, 0, ColRuns),
+  rn_uniform(ColRuns).  % true if all column cells are the same color
+
+  % Get the dominant stripe color (the color with the longest max run in a row).
+  rn_row_encode(Grid, 2, Runs),
+  rn_max_run(Runs, 1, MaxLen).
+
+  % Trim noise from a 1D row and check if it is uniform.
+  rn_row_encode(Grid, R, _Runs),
+  nth0(R, Grid, Row),
+  rn_trim(Row, 0, Trimmed),
+  rn_encode(Trimmed, TrimmedRuns),
+  rn_uniform(TrimmedRuns).
+
+
+END OF CHAPTER 49
