@@ -1,0 +1,179 @@
+Chapter 31: Crop Pack
+
+The crop pack (module crop, prefix cr_) provides operations for extracting
+rectangular subgrids, padding grids, splitting them into parts, joining parts
+back together, and embedding one grid inside another. It lives at Layer 49 and
+requires the grid pack.
+
+Load the pack:
+
+    :- use_module(library(crop)).
+
+All row and column indices are 0-indexed throughout.
+
+
+Bounding Box
+
+cr_bbox/3 finds the tight bounding box of all cells that differ from a
+background color. The result is bbox(MinR, MinC, MaxR, MaxC). The predicate
+fails if every cell equals the background.
+
+    ?- cr_bbox([[0,0,0],[0,1,0],[0,0,0]], 0, Box).
+    Box = bbox(1,1,1,1).
+
+    ?- cr_bbox([[0,0],[0,0]], 0, _).
+    false.
+
+
+Extracting a Rectangle
+
+cr_crop_bbox/6 extracts a rectangular subgrid by inclusive row/col bounds.
+
+    ?- cr_crop_bbox([[1,2,3],[4,5,6],[7,8,9]], 0, 1, 1, 2, Sub).
+    Sub = [[2,3],[5,6]].
+
+    ?- cr_crop_bbox([[1,2,3],[4,5,6]], 1, 2, 1, 2, Sub).
+    Sub = [[6]].
+
+
+Cropping to Content
+
+cr_crop_content/3 combines bbox and crop: it removes background borders from
+all four sides, returning only the content region.
+
+    ?- cr_crop_content([[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]], 0, Cropped).
+    Cropped = [[1,2],[3,4]].
+
+    ?- cr_crop_content([[0,0,0],[0,1,0],[0,0,0]], 0, Cropped).
+    Cropped = [[1]].
+
+
+Padding
+
+cr_pad/4 adds a uniform N-cell border of a given color around the entire grid.
+
+    ?- cr_pad([[1,2],[3,4]], 0, 1, Padded).
+    Padded = [[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]].
+
+    ?- cr_pad([[1,2],[3,4]], 0, 0, Padded).
+    Padded = [[1,2],[3,4]].
+
+
+Removing the Border
+
+cr_strip_border/3 removes N rows and columns from each side of a grid.
+It is the inverse of cr_pad. Fails if the grid is not wide or tall enough.
+
+    ?- cr_strip_border([[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]], 1, Inner).
+    Inner = [[1,2],[3,4]].
+
+    ?- cr_strip_border([[1,2],[3,4]], 2, _).
+    false.
+
+
+Splitting a Grid
+
+cr_split_h/4 splits a grid horizontally at row R: the top part has rows 0..R-1
+and the bottom part has rows R..end. R must be between 1 and Rows-1.
+
+    ?- cr_split_h([[1,2],[3,4],[5,6],[7,8]], 2, Top, Bottom).
+    Top = [[1,2],[3,4]],
+    Bottom = [[5,6],[7,8]].
+
+cr_split_v/4 splits a grid vertically at column C: the left part has columns
+0..C-1 and the right part has columns C..end.
+
+    ?- cr_split_v([[1,2,3,4],[5,6,7,8]], 2, Left, Right).
+    Left = [[1,2],[5,6]],
+    Right = [[3,4],[7,8]].
+
+
+Row and Column Bands
+
+cr_rows/4 extracts a band of rows by 0-indexed From (inclusive) and To
+(exclusive). cr_cols/4 does the same for columns.
+
+    ?- cr_rows([[1,2],[3,4],[5,6],[7,8]], 1, 3, Sub).
+    Sub = [[3,4],[5,6]].
+
+    ?- cr_cols([[1,2,3,4],[5,6,7,8]], 1, 3, Sub).
+    Sub = [[2,3],[6,7]].
+
+
+Joining Grids
+
+cr_stitch_h/3 places two grids side by side (both must have the same height).
+cr_stitch_v/3 places two grids top to bottom (both must have the same width).
+
+    ?- cr_stitch_h([[1,2],[3,4]], [[5,6],[7,8]], Joined).
+    Joined = [[1,2,5,6],[3,4,7,8]].
+
+    ?- cr_stitch_v([[1,2],[3,4]], [[5,6],[7,8]], Joined).
+    Joined = [[1,2],[3,4],[5,6],[7,8]].
+
+Round-trip guarantee:
+
+    ?- G = [[1,2,3,4],[5,6,7,8]],
+       cr_split_v(G, 2, Left, Right),
+       cr_stitch_h(Left, Right, G).
+    true.
+
+
+Embedding a Subgrid
+
+cr_embed/5 places a subgrid into a base grid starting at row R, column C,
+overwriting the cells at those positions.
+
+    ?- cr_embed([[0,0,0],[0,0,0],[0,0,0]], [[1,2],[3,4]], 1, 1, Result).
+    Result = [[0,0,0],[0,1,2],[0,3,4]].
+
+    ?- cr_embed([[0,0,0],[0,0,0],[0,0,0]], [[7]], 1, 1, Result).
+    Result = [[0,0,0],[0,7,0],[0,0,0]].
+
+
+Center Extraction
+
+cr_center/4 extracts the central Rows x Cols subgrid. The offset is computed
+as (GridHeight - Rows) // 2 and (GridWidth - Cols) // 2.
+
+    ?- cr_center([[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],
+                  [16,17,18,19,20],[21,22,23,24,25]], 3, 3, Center).
+    Center = [[7,8,9],[12,13,14],[17,18,19]].
+
+    ?- cr_center([[1,2,3],[4,5,6],[7,8,9]], 1, 1, Center).
+    Center = [[5]].
+
+
+Quadrant Split
+
+cr_quadrants/5 splits a grid into four quadrants at the midpoint row and
+column (Rows//2, Cols//2). Q1=top-left, Q2=top-right, Q3=bottom-left,
+Q4=bottom-right.
+
+    ?- cr_quadrants([[1,2],[3,4]], Q1, Q2, Q3, Q4).
+    Q1 = [[1]], Q2 = [[2]], Q3 = [[3]], Q4 = [[4]].
+
+    ?- cr_quadrants([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]],
+                    Q1, Q2, Q3, Q4).
+    Q1 = [[1,2],[5,6]],  Q2 = [[3,4],[7,8]],
+    Q3 = [[9,10],[13,14]], Q4 = [[11,12],[15,16]].
+
+
+Exported Predicates
+
+cr_bbox/3         - tight bounding box of non-background cells
+cr_crop_bbox/6    - extract subgrid by inclusive row/col bounds
+cr_crop_content/3 - crop to content bounding box
+cr_pad/4          - add uniform N-cell border
+cr_strip_border/3 - remove N rows/cols from every side
+cr_split_h/4      - horizontal split at row R
+cr_split_v/4      - vertical split at column C
+cr_rows/4         - row band extraction (0-indexed, exclusive end)
+cr_cols/4         - column band extraction (0-indexed, exclusive end)
+cr_stitch_h/3     - join two grids side by side
+cr_stitch_v/3     - join two grids top to bottom
+cr_embed/5        - embed subgrid at (R,C) in base grid
+cr_center/4       - extract centered subgrid
+cr_quadrants/5    - split into four quadrants
+
+END OF CHAPTER 31
