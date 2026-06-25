@@ -1,0 +1,215 @@
+Chapter 75: Cell Neighborhood Analysis - The Neighbor Pack
+
+The neighbor pack (nb_* predicate family, Layer 93) provides 14 predicates for
+local cell-level analysis. Every predicate reasons about a cell and its
+immediate surroundings: the cells directly adjacent to it in 4-connected
+(up, down, left, right) or 8-connected (including diagonals) directions.
+
+This differs from the connect pack (Layer 64), which computes connected
+components across many hops. The neighbor pack answers questions about one
+cell's immediate neighborhood.
+
+
+75.1 Loading the pack
+
+?- use_module(packs/neighbor/prolog/neighbor).
+
+
+75.2 Raw neighbor access
+
+nb_4neighbors/4 returns a list of nb(Row,Col,Val) terms for each valid
+4-connected neighbor. Out-of-bounds directions are omitted.
+
+?- nb_4neighbors([[0,0,0],[0,1,0],[0,0,0]], 1, 1, N).
+N = [nb(0,1,0), nb(2,1,0), nb(1,0,0), nb(1,2,0)].
+
+?- nb_4neighbors([[1,2],[3,4]], 0, 0, N).
+N = [nb(1,0,3), nb(0,1,2)].
+
+A corner cell has 2 neighbors; an edge cell has 3; an interior cell has 4.
+
+nb_8neighbors/4 returns up to 8 neighbors including diagonals.
+
+?- nb_8neighbors([[1,2,3],[4,5,6],[7,8,9]], 0, 0, N).
+N = [nb(0,1,2), nb(1,0,4), nb(1,1,5)].
+
+
+75.3 Boundary and interior classification
+
+A cell is a boundary cell if it is non-Bg and at least one 4-neighbor is
+Bg or out of bounds.
+
+?- nb_is_boundary([[0,0,0],[0,1,0],[0,0,0]], 1, 1, 0).
+true.
+
+?- nb_is_boundary([[1,1],[1,1]], 0, 0, 0).
+true.
+
+?- nb_is_boundary([[1,1,1],[1,1,1],[1,1,1]], 1, 1, 0).
+false.
+
+A cell is an interior cell if it is non-Bg and all 4-neighbors are within
+bounds and non-Bg.
+
+?- nb_is_interior([[1,1,1],[1,1,1],[1,1,1]], 1, 1, 0).
+true.
+
+nb_boundary_cells/3 collects all boundary cells in a grid as sorted R-C pairs.
+
+?- nb_boundary_cells([[1,1],[1,1]], 0, Cells).
+Cells = [0-0, 0-1, 1-0, 1-1].
+
+?- nb_boundary_cells([[0,0,0],[0,1,0],[0,0,0]], 0, Cells).
+Cells = [1-1].
+
+nb_interior_cells/3 collects all interior cells.
+
+?- nb_interior_cells([[1,1,1],[1,1,1],[1,1,1]], 0, Cells).
+Cells = [1-1].
+
+?- nb_interior_cells([[1,1,1,1],[1,1,1,1],[1,1,1,1],[1,1,1,1]], 0, Cells).
+Cells = [1-1, 1-2, 2-1, 2-2].
+
+
+75.4 Neighbor value analysis
+
+nb_count_same/4 counts 4-neighbors with the same value as the cell.
+
+?- nb_count_same([[1,1,1],[1,1,1],[1,1,1]], 1, 1, N).
+N = 4.
+
+?- nb_count_same([[1,0,1],[0,1,0],[1,0,1]], 1, 1, N).
+N = 0.
+
+nb_count_diff/4 counts 4-neighbors with a different value.
+
+?- nb_count_diff([[0,0,0],[0,1,0],[0,0,0]], 1, 1, N).
+N = 4.
+
+nb_adjacent_colors/4 returns the sorted set of distinct values found among
+4-neighbors.
+
+?- nb_adjacent_colors([[1,2,3],[4,5,6],[7,8,9]], 1, 1, Colors).
+Colors = [2, 4, 6, 8].
+
+?- nb_adjacent_colors([[0,0,0],[0,1,0],[0,0,0]], 1, 1, Colors).
+Colors = [0].
+
+
+75.5 Contour of a color
+
+nb_contour/3 finds all cells of a specific Color that are adjacent to
+something different (a different color or the grid boundary).
+
+?- nb_contour([[0,0,0],[0,1,0],[0,0,0]], 1, Cells).
+Cells = [1-1].
+
+?- nb_contour([[1,1,1],[1,1,1],[1,1,1]], 1, Cells).
+Cells = [0-0, 0-1, 0-2, 1-0, 1-2, 2-0, 2-1, 2-2].
+
+The center cell (1,1) is not in the contour because all 4-neighbors have
+color 1.
+
+?- nb_contour([[1,1],[1,1]], 1, Cells).
+Cells = [0-0, 0-1, 1-0, 1-1].
+
+
+75.6 Color contact queries
+
+nb_color_touches/3 succeeds if any cell of ColorA is 4-adjacent to any
+cell of ColorB.
+
+?- nb_color_touches([[1,2],[0,0]], 1, 2).
+true.
+
+?- nb_color_touches([[1,0],[0,2]], 1, 2).
+false.
+
+nb_touching_pairs/4 enumerates all such 4-adjacency pairs.
+
+?- nb_touching_pairs([[1,2],[0,0]], 1, 2, Pairs).
+Pairs = [(0-0)-(0-1)].
+
+?- nb_touching_pairs([[1,0],[0,2]], 1, 2, Pairs).
+Pairs = [].
+
+
+75.7 Flood fill
+
+nb_flood_fill/5 replaces the 4-connected region containing seed cell (R, C)
+with FillVal. The modified grid is returned. If the seed cell already has
+value FillVal, the grid is returned unchanged.
+
+?- nb_flood_fill([[1,1],[1,1]], 0, 0, 9, R).
+R = [[9,9],[9,9]].
+
+?- nb_flood_fill([[1,0,1],[1,0,1]], 0, 0, 2, R).
+R = [[2,0,1],[2,0,1]].
+
+The right column is unreachable from (0,0) because column 1 is 0.
+
+?- nb_flood_fill([[1,1],[1,1]], 0, 0, 1, R).
+R = [[1,1],[1,1]].
+
+
+75.8 Dilation
+
+nb_dilate/4 expands a Color region by one cell in all 4-connected directions.
+Every Bg cell adjacent to any Color cell is set to Color.
+
+?- nb_dilate([[0,0,0],[0,1,0],[0,0,0]], 0, 1, R).
+R = [[0,1,0],[1,1,1],[0,1,0]].
+
+?- nb_dilate([[0,0,0],[1,1,1],[0,0,0]], 0, 1, R).
+R = [[1,1,1],[1,1,1],[1,1,1]].
+
+Non-Bg cells of other colors are not overwritten.
+
+?- nb_dilate([[0,2,0],[0,1,0],[0,0,0]], 0, 1, R),
+   nth0(0, R, Row0), nth0(1, Row0, V).
+V = 2.
+
+
+75.9 Combining neighbor predicates
+
+Determine whether a region has any interior cells (solid fill) or only
+boundary cells (hollow ring):
+
+?- nb_interior_cells(Grid, 0, Interior),
+   (Interior = [] -> write(hollow) ; write(solid)).
+
+Find where two colors meet and highlight the contact zone:
+
+?- nb_touching_pairs(Grid, 1, 2, Pairs),
+   maplist([(R-_)-_]>>(write(R)), Pairs).
+
+Erode a region by removing its contour:
+
+?- nb_contour(Grid, 1, ContourCells),
+   foldl([R-C, G0, G1]>>(nb_set_cell_(G0,R,C,0,G1)), ContourCells, Grid, Eroded).
+
+Compute the outline of a color and then dilate back to recover the original:
+
+?- nb_contour(Grid, 1, Outline),
+   nb_dilate(OutlineGrid, 0, 1, Recovered).
+
+
+75.10 Summary
+
+Predicate             Arity  Purpose
+nb_4neighbors         4      nb(R,C,V) list of valid 4-neighbors
+nb_8neighbors         4      nb(R,C,V) list of valid 8-neighbors
+nb_is_boundary        4      test: non-Bg cell with Bg/OOB 4-neighbor
+nb_is_interior        4      test: non-Bg cell with all in-bounds non-Bg 4-neighbors
+nb_boundary_cells     3      sorted R-C pairs of all boundary cells
+nb_interior_cells     3      sorted R-C pairs of all interior cells
+nb_count_same         4      count of 4-neighbors with same color
+nb_count_diff         4      count of 4-neighbors with different color
+nb_adjacent_colors    4      sorted distinct colors among 4-neighbors
+nb_contour            3      sorted R-C pairs of Color cells touching non-Color
+nb_color_touches      3      succeed if ColorA 4-adjacent to ColorB anywhere
+nb_touching_pairs     4      sorted (R1-C1)-(R2-C2) pairs of color adjacencies
+nb_flood_fill         5      4-connected flood fill from seed; returns modified grid
+nb_dilate             4      expand Color region by one 4-connected layer
+
+The neighbor pack lives at Layer 93, above the region pack (Layer 92).
