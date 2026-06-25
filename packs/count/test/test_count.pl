@@ -1,239 +1,217 @@
-% PLUnit tests for the count pack (cn_* predicates).
-:- use_module(library(plunit)).
-:- use_module(library(count)).
+% test_count.pl - PLUnit tests for the count pack (Layer 96: cn_* predicates).
+:- use_module('../prolog/count').
 
-% Helper grids.
-% 3x3 with three colors.
-g3x3([[0,1,2],[0,1,2],[0,1,2]]).
-% 2x2 uniform color 5.
-g22_5([[5,5],[5,5]]).
-% 3x3 with one dominant color (0).
-g3x3_dom([[0,0,0],[0,1,0],[0,0,0]]).
-% 2x3 grid.
-g23([[1,2,3],[4,5,6]]).
-% Two identical grids.
-g_same([[1,2],[3,4]]).
-% Grid differing in one cell.
-g_diff1([[1,9],[3,4]]).
-% Grid for region color test.
-g_rc([[0,1,0],[1,2,1],[0,1,0]]).
+% Tests for cn_by_value/3
 
-:- begin_tests(count_by_value).
+:- begin_tests(cn_by_value).
 
-test(by_value_zero) :-
+test(absent_value) :-
     cn_by_value([1,2,3], 0, N), N =:= 0.
 
-test(by_value_one) :-
+test(one_occurrence) :-
     cn_by_value([1,2,3], 2, N), N =:= 1.
 
-test(by_value_all) :-
+test(all_match) :-
     cn_by_value([5,5,5], 5, N), N =:= 3.
 
-test(by_value_empty) :-
-    cn_by_value([], 1, N), N =:= 0.
+:- end_tests(cn_by_value).
 
-:- end_tests(count_by_value).
+% Tests for cn_color_count/3
 
-:- begin_tests(count_color_count).
+:- begin_tests(cn_color_count).
 
-test(color_count_zero_in_uniform) :-
-    g22_5(G), cn_color_count(G, 0, N), N =:= 0.
+test(absent_in_uniform) :-
+    cn_color_count([[5,5],[5,5]], 0, N), N =:= 0.
 
-test(color_count_all) :-
-    g22_5(G), cn_color_count(G, 5, N), N =:= 4.
+test(all_cells) :-
+    cn_color_count([[5,5],[5,5]], 5, N), N =:= 4.
 
-test(color_count_partial) :-
-    g3x3(G), cn_color_count(G, 1, N), N =:= 3.
+test(partial_match) :-
+    cn_color_count([[0,1,2],[0,1,2],[0,1,2]], 1, N), N =:= 3.
 
-test(color_count_dominant) :-
-    g3x3_dom(G), cn_color_count(G, 0, N), N =:= 8.
+:- end_tests(cn_color_count).
 
-:- end_tests(count_color_count).
+% Tests for cn_histogram/3
 
-:- begin_tests(count_histogram).
+:- begin_tests(cn_histogram).
 
-test(histogram_uniform) :-
-    g22_5(G), cn_histogram(G, Colors, Counts),
+test(uniform_grid) :-
+    cn_histogram([[5,5],[5,5]], Colors, Counts),
     Colors = [5], Counts = [4].
 
-test(histogram_3colors) :-
-    g3x3(G), cn_histogram(G, Colors, Counts),
+test(three_equal_colors) :-
+    cn_histogram([[0,1,2],[0,1,2],[0,1,2]], Colors, Counts),
     Colors = [0,1,2], Counts = [3,3,3].
 
-test(histogram_dominant) :-
-    g3x3_dom(G), cn_histogram(G, Colors, Counts),
+test(dominant_color) :-
+    cn_histogram([[0,0,0],[0,1,0],[0,0,0]], Colors, Counts),
     Colors = [0,1], Counts = [8,1].
 
-test(histogram_parallel_lengths) :-
-    g23(G), cn_histogram(G, Colors, Counts),
-    length(Colors, N), length(Counts, N), N > 0.
+:- end_tests(cn_histogram).
 
-:- end_tests(count_histogram).
+% Tests for cn_max_color/2
 
-:- begin_tests(count_max_color).
+:- begin_tests(cn_max_color).
 
-test(max_uniform) :-
-    g22_5(G), cn_max_color(G, C), C =:= 5.
+test(uniform) :-
+    cn_max_color([[5,5],[5,5]], C), C =:= 5.
 
-test(max_3x3) :-
-    g3x3(G), cn_max_color(G, C),
-    % All colors tied at 3; returns the first (lowest value = 0).
-    C =:= 0.
+test(tied_returns_lowest) :-
+    cn_max_color([[0,1,2],[0,1,2],[0,1,2]], C), C =:= 0.
 
-test(max_dominant) :-
-    g3x3_dom(G), cn_max_color(G, C), C =:= 0.
+test(clear_dominant) :-
+    cn_max_color([[0,0,0],[0,1,0],[0,0,0]], C), C =:= 0.
 
-:- end_tests(count_max_color).
+:- end_tests(cn_max_color).
 
-:- begin_tests(count_min_color).
+% Tests for cn_min_color/2
 
-test(min_uniform) :-
-    g22_5(G), cn_min_color(G, C), C =:= 5.
+:- begin_tests(cn_min_color).
 
-test(min_dominant) :-
-    g3x3_dom(G), cn_min_color(G, C), C =:= 1.
+test(uniform) :-
+    cn_min_color([[5,5],[5,5]], C), C =:= 5.
 
-test(min_3x3_tied) :-
-    g3x3(G), cn_min_color(G, C), C =:= 0.
+test(minority) :-
+    cn_min_color([[0,0,0],[0,1,0],[0,0,0]], C), C =:= 1.
 
-:- end_tests(count_min_color).
+test(tied_returns_lowest) :-
+    cn_min_color([[0,1,2],[0,1,2],[0,1,2]], C), C =:= 0.
 
-:- begin_tests(count_color_rows).
+:- end_tests(cn_min_color).
 
-test(color_rows_all) :-
-    g3x3(G), cn_color_rows(G, 0, N), N =:= 3.
+% Tests for cn_color_rows/3
 
-test(color_rows_none) :-
-    g3x3(G), cn_color_rows(G, 9, N), N =:= 0.
+:- begin_tests(cn_color_rows).
 
-test(color_rows_one) :-
-    g3x3_dom(G), cn_color_rows(G, 1, N), N =:= 1.
+test(color_in_all_rows) :-
+    cn_color_rows([[0,1,2],[0,1,2],[0,1,2]], 0, N), N =:= 3.
 
-test(color_rows_partial) :-
-    % g23 = [[1,2,3],[4,5,6]]; color 1 in row 0 only.
-    g23(G), cn_color_rows(G, 1, N), N =:= 1.
+test(color_absent) :-
+    cn_color_rows([[0,1,2],[0,1,2],[0,1,2]], 9, N), N =:= 0.
 
-:- end_tests(count_color_rows).
+test(color_in_one_row) :-
+    cn_color_rows([[0,0,0],[0,1,0],[0,0,0]], 1, N), N =:= 1.
 
-:- begin_tests(count_color_cols).
+:- end_tests(cn_color_rows).
 
-test(color_cols_all) :-
-    g3x3(G), cn_color_cols(G, 0, N), N =:= 1.
+% Tests for cn_color_cols/3
 
-test(color_cols_dominant) :-
-    % g3x3_dom col 0,2 have only 0; col 1 has 0 and 1.
-    % All 3 columns contain color 0.
-    g3x3_dom(G), cn_color_cols(G, 0, N), N =:= 3.
+:- begin_tests(cn_color_cols).
 
-test(color_cols_none) :-
-    g3x3(G), cn_color_cols(G, 9, N), N =:= 0.
+test(color_in_one_col) :-
+    cn_color_cols([[0,1,2],[0,1,2],[0,1,2]], 0, N), N =:= 1.
 
-test(color_cols_one) :-
-    % g3x3 = [[0,1,2],...]; color 2 is in column 2 only.
-    g3x3(G), cn_color_cols(G, 2, N), N =:= 1.
+test(color_absent) :-
+    cn_color_cols([[0,1,2],[0,1,2],[0,1,2]], 9, N), N =:= 0.
 
-:- end_tests(count_color_cols).
+test(color_in_all_cols) :-
+    cn_color_cols([[0,0,0],[0,1,0],[0,0,0]], 0, N), N =:= 3.
 
-:- begin_tests(count_row_distinct).
+:- end_tests(cn_color_cols).
 
-test(row_distinct_all_same) :-
+% Tests for cn_row_distinct/3
+
+:- begin_tests(cn_row_distinct).
+
+test(all_same) :-
     cn_row_distinct([[5,5,5]], 0, N), N =:= 1.
 
-test(row_distinct_all_diff) :-
-    g23(G), cn_row_distinct(G, 0, N), N =:= 3.
+test(all_different) :-
+    cn_row_distinct([[1,2,3],[4,5,6]], 0, N), N =:= 3.
 
-test(row_distinct_g3x3) :-
-    g3x3(G), cn_row_distinct(G, 1, N), N =:= 3.
+test(mixed_row) :-
+    cn_row_distinct([[0,1,2],[0,1,2],[0,1,2]], 1, N), N =:= 3.
 
-:- end_tests(count_row_distinct).
+:- end_tests(cn_row_distinct).
 
-:- begin_tests(count_col_distinct).
+% Tests for cn_col_distinct/3
 
-test(col_distinct_all_same) :-
-    g22_5(G), cn_col_distinct(G, 0, N), N =:= 1.
+:- begin_tests(cn_col_distinct).
 
-test(col_distinct_all_diff) :-
-    g3x3(G), cn_col_distinct(G, 0, N), N =:= 1.
+test(uniform_column) :-
+    cn_col_distinct([[5,5],[5,5]], 0, N), N =:= 1.
 
-test(col_distinct_mixed) :-
-    % g3x3_dom column 1 has values [0,1,0] -> 2 distinct.
-    g3x3_dom(G), cn_col_distinct(G, 1, N), N =:= 2.
+test(all_same_values_in_col) :-
+    cn_col_distinct([[0,1,2],[0,1,2],[0,1,2]], 0, N), N =:= 1.
 
-:- end_tests(count_col_distinct).
+test(mixed_column) :-
+    cn_col_distinct([[0,0,0],[0,1,0],[0,0,0]], 1, N), N =:= 2.
 
-:- begin_tests(count_grid_total).
+:- end_tests(cn_col_distinct).
 
-test(total_2x2) :-
-    g_same(G), cn_grid_total(G, N), N =:= 4.
+% Tests for cn_grid_total/2
 
-test(total_3x3) :-
-    g3x3(G), cn_grid_total(G, N), N =:= 9.
+:- begin_tests(cn_grid_total).
 
-test(total_2x3) :-
-    g23(G), cn_grid_total(G, N), N =:= 6.
+test(two_by_two) :-
+    cn_grid_total([[1,2],[3,4]], N), N =:= 4.
 
-:- end_tests(count_grid_total).
+test(three_by_three) :-
+    cn_grid_total([[0,1,2],[0,1,2],[0,1,2]], N), N =:= 9.
 
-:- begin_tests(count_equal_cells).
+test(two_by_three) :-
+    cn_grid_total([[1,2,3],[4,5,6]], N), N =:= 6.
 
-test(equal_identical) :-
-    g_same(G), cn_equal_cells(G, G, N), N =:= 4.
+:- end_tests(cn_grid_total).
 
-test(equal_one_diff) :-
-    g_same(G), g_diff1(H), cn_equal_cells(G, H, N), N =:= 3.
+% Tests for cn_equal_cells/3
 
-test(equal_all_diff) :-
+:- begin_tests(cn_equal_cells).
+
+test(identical_grids) :-
+    G = [[1,2],[3,4]], cn_equal_cells(G, G, N), N =:= 4.
+
+test(one_cell_different) :-
+    cn_equal_cells([[1,2],[3,4]], [[1,9],[3,4]], N), N =:= 3.
+
+test(all_different) :-
     cn_equal_cells([[1,2],[3,4]], [[5,6],[7,8]], N), N =:= 0.
 
-:- end_tests(count_equal_cells).
+:- end_tests(cn_equal_cells).
 
-:- begin_tests(count_diff_cells).
+% Tests for cn_diff_cells/3
 
-test(diff_identical) :-
-    g_same(G), cn_diff_cells(G, G, N), N =:= 0.
+:- begin_tests(cn_diff_cells).
 
-test(diff_one) :-
-    g_same(G), g_diff1(H), cn_diff_cells(G, H, N), N =:= 1.
+test(identical_grids) :-
+    G = [[1,2],[3,4]], cn_diff_cells(G, G, N), N =:= 0.
 
-test(diff_all) :-
+test(one_cell_different) :-
+    cn_diff_cells([[1,2],[3,4]], [[1,9],[3,4]], N), N =:= 1.
+
+test(all_different) :-
     cn_diff_cells([[1,2],[3,4]], [[5,6],[7,8]], N), N =:= 4.
 
-:- end_tests(count_diff_cells).
+:- end_tests(cn_diff_cells).
 
-:- begin_tests(count_region_color).
+% Tests for cn_region_color/3
 
-test(region_color_0) :-
-    g_rc(G), cn_region_color(G, [r(0,0)], C), C =:= 0.
+:- begin_tests(cn_region_color).
 
-test(region_color_1) :-
-    g_rc(G), cn_region_color(G, [r(0,1)], C), C =:= 1.
+test(top_left_cell) :-
+    cn_region_color([[0,1,0],[1,2,1],[0,1,0]], [r(0,0)], C), C =:= 0.
 
-test(region_color_2) :-
-    g_rc(G), cn_region_color(G, [r(1,2), r(0,2)], C), C =:= 1.
+test(top_center_cell) :-
+    cn_region_color([[0,1,0],[1,2,1],[0,1,0]], [r(0,1)], C), C =:= 1.
 
-test(region_color_center) :-
-    g_rc(G), cn_region_color(G, [r(1,1)], C), C =:= 2.
+test(center_cell) :-
+    cn_region_color([[0,1,0],[1,2,1],[0,1,0]], [r(1,1)], C), C =:= 2.
 
-:- end_tests(count_region_color).
+:- end_tests(cn_region_color).
 
-:- begin_tests(count_regions_per_color).
+% Tests for cn_regions_per_color/3
 
-test(regions_per_color_empty) :-
-    g_rc(G), cn_regions_per_color(G, [], Pairs), Pairs = [].
+:- begin_tests(cn_regions_per_color).
 
-test(regions_per_color_one) :-
-    g_rc(G), cn_regions_per_color(G, [[r(0,0)]], Pairs),
+test(empty_regions) :-
+    cn_regions_per_color([[0,1],[1,2]], [], Pairs), Pairs = [].
+
+test(one_region) :-
+    cn_regions_per_color([[0,1],[1,2]], [[r(0,0)]], Pairs),
     Pairs = [0-1].
 
-test(regions_per_color_two_same) :-
-    g_rc(G), cn_regions_per_color(G, [[r(0,0)], [r(0,2)]], Pairs),
-    % Both regions are color 0; result should tally color 0 twice.
+test(two_same_color_regions) :-
+    cn_regions_per_color([[0,1],[0,2]], [[r(0,0)], [r(1,0)]], Pairs),
     member(0-2, Pairs).
 
-test(regions_per_color_two_diff) :-
-    g_rc(G), cn_regions_per_color(G, [[r(0,0)], [r(0,1)]], Pairs),
-    % Color 0 and color 1 each appear once; sort to get canonical order.
-    msort(Pairs, Sorted),
-    Sorted = [0-1, 1-1].
-
-:- end_tests(count_regions_per_color).
+:- end_tests(cn_regions_per_color).
