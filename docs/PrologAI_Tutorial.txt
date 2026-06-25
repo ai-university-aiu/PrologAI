@@ -4881,4 +4881,80 @@ WHAT COMES NEXT
 Chapter 29 covers the next cognitive pack in the PrologAI stack.
 
 END OF CHAPTER 28
-END OF CHAPTER 28 AND END OF THE PROLOGAI TUTORIAL
+
+
+CHAPTER 29: THE RELATION PACK
+
+
+OVERVIEW
+
+The relation pack (module relation, prefix rl_) provides spatial relations
+between cell regions. Layer 47, depends only on grid.
+
+A region is any list of r(R,C) cells (not necessarily at the origin).
+
+Predicates: 14
+Layer: 47
+Module: relation
+Prefix: rl_
+Depends on: grid
+
+
+POSITIONAL ORDERING
+
+rl_above/2 - every row of A < every row of B.
+rl_below/2 - every row of A > every row of B.
+rl_left_of/2 - every col of A < every col of B.
+rl_right_of/2 - every col of A > every col of B.
+
+% block at rows 0-1 is above block at rows 3-4.
+:- rl_above([r(0,0),r(1,0)], [r(3,0),r(4,0)]).
+
+
+ADJACENCY AND DISTANCE
+
+rl_adjacent/2 - any 4-connected neighbor pair between A and B.
+rl_distance/3 - minimum Manhattan distance (0 if overlap).
+
+:- rl_adjacent([r(0,0),r(1,0)], [r(2,0)]).
+:- rl_distance([r(0,0)], [r(0,1)], D). % D = 1.
+
+
+CONTAINMENT AND SET RELATIONS
+
+rl_contained_bbox/2 - bounding box of A inside bounding box of B.
+rl_overlap/2 - A and B share at least one cell.
+rl_disjoint/2 - A and B share no cells.
+
+
+ROW AND COLUMN ALIGNMENT
+
+rl_same_row/2 - at least one shared row index.
+rl_same_col/2 - at least one shared column index.
+
+
+CENTROID, OFFSET, AND DIRECTION
+
+rl_centroid(+Region, -AvgR, -AvgC) - integer floor centroid.
+rl_offset(+A, +B, -DR, -DC) - integer centroid-to-centroid offset.
+rl_direction(+A, +B, -Dir) - above/below/left/right.
+
+:- rl_direction([r(5,5)], [r(2,5)], Dir). % Dir = above.
+:- rl_direction([r(2,1)], [r(2,5)], Dir). % Dir = right.
+
+
+PREDICATE SUMMARY
+
+Ordering: rl_above/2, rl_below/2, rl_left_of/2, rl_right_of/2
+Proximity: rl_adjacent/2, rl_distance/3
+Containment: rl_contained_bbox/2, rl_overlap/2, rl_disjoint/2
+Alignment: rl_same_row/2, rl_same_col/2
+Geometry: rl_centroid/3, rl_offset/4, rl_direction/3
+
+
+WHAT COMES NEXT
+
+Chapter 30 covers the next cognitive pack in the PrologAI stack.
+
+END OF CHAPTER 29
+END OF CHAPTER 29 AND END OF THE PROLOGAI TUTORIAL
