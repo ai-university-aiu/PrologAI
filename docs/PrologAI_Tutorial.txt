@@ -15675,3 +15675,47 @@ Library imports: library(lists): member/2, nth0/3, sum_list/2.
 Built-ins: length/2, between/3, findall/3.
 
 Predicate count: 14 (vt_* prefix). Tests: 42/42. Layer: 138.
+
+Chapter 121: Value Co-Occurrence and Adjacency Analysis Pack (Layer 139, co_* prefix)
+
+The cooccur pack provides 14 predicates for collecting ordered horizontal,
+vertical, and diagonal adjacent value pairs; counting directed and undirected
+adjacencies; testing universal and empty adjacency; detecting isolated cells;
+enumerating border values; testing shared borders; building horizontal
+transition frequency tables; and finding the most co-adjacent value.
+
+Predicates:
+co_h_pairs/2, co_v_pairs/2, co_d_pairs_dr/2, co_d_pairs_dl/2,
+co_count_h/4, co_count_v/4, co_count_adj4/4,
+co_always_adj4/3, co_never_adj4/3,
+co_isolated4/3, co_border_vals/3, co_shared_border/3,
+co_row_transitions/2, co_most_common_adj4/3.
+
+Usage examples:
+G = [[1,1,1],[1,2,1],[1,1,1]].
+co_h_pairs(G, P).             % P=[1-1,1-1,1-2,2-1,1-1,1-1]
+co_count_adj4(G, 1, 2, N).    % N=4 (four 1-2 edges)
+co_count_adj4(G, 1, 1, N).    % N=8 (eight 1-1 edges)
+co_always_adj4(G, 2, 1).      % succeeds: center 2 surrounded by 1s
+co_never_adj4(G, 2, 2).       % succeeds: no 2-2 adjacency
+co_isolated4(G, 2, C).        % C=[1-1]
+co_border_vals(G, 2, V).      % V=[1]
+co_row_transitions(G, T).     % T=[1-1-4,2-1-1,1-2-1]
+co_most_common_adj4(G, 1, W). % W=2
+G3=[[1,2,3],[4,5,6],[7,8,9]].
+co_v_pairs(G3, P).            % P=[1-4,4-7,2-5,5-8,3-6,6-9] (col-major)
+co_d_pairs_dr(G3, P).         % P=[1-5,2-6,4-8,5-9]
+co_border_vals(G3, 5, V).     % V=[2,4,6,8]
+co_never_adj4(G3, 1, 9).      % succeeds: opposite corners
+
+Key implementation patterns:
+co_v_pairs: column-major order (all pairs for col 0 before col 1).
+co_count_adj4: sums directed V1-V2 and V2-V1 for undirected count.
+co_shared_border: cut after first match for determinism.
+co_most_common_adj4: msort+last; ties resolved by largest value.
+
+Library imports: library(lists): member/2, nth0/3, last/2, append/3.
+                 library(apply): include/3.
+Built-ins: sort/2, msort/2, length/2, between/3, findall/3.
+
+Predicate count: 14 (co_* prefix). Tests: 42/42. Layer: 139.
