@@ -68,6 +68,20 @@ PrologAI/
 └── launcher/    Entry points and bootstrapper
 ```
 
+### How Layers Work
+
+Every pack in PrologAI carries a layer number - a positive integer that encodes its position in the dependency order.
+
+A pack at layer N may call predicates from any pack at a layer strictly below N, and from nothing at the same level or above.
+
+This guarantees the dependency graph is acyclic: packs build from the bottom up, like floors in a building, and each new pack rests on a fully tested foundation.
+
+The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
+
+Layer 60 and above is the Data Layer: the 160+ perception, analysis, and transformation packs that handle structured data.
+
+The full layer table is in Architecture Section 0.4.
+
 ### The 220 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
@@ -353,9 +367,9 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v185` | Authoritative statement of what to build |
+| 1 | `PrologAI_1_Specification_v186` | Authoritative statement of what to build |
 | 2 | `PrologAI_2_Pseudocode_v178` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v179` | Where each piece lives |
+| 3 | `PrologAI_3_Architecture_v180` | Where each piece lives |
 | 4 | `PrologAI_4_Refinement_v233` | Testing protocols and safety criteria |
 | 5 | `PrologAI_5_Completion_v236` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |

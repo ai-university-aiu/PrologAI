@@ -18,6 +18,64 @@ A module is a named group of predicates. Modules let you organize code and contr
 PrologAI is organized into modules called packs. Each pack implements one or more work packages (PRs). When you type use_module(library(assessment)), you are loading the assessment pack's module into your session.
 
 
+THE LAYER SYSTEM: WHY PACKS COME IN ORDER
+
+Think of PrologAI as a tall building.
+
+Each floor is a layer.
+
+Each pack lives on exactly one floor.
+
+You build from the bottom up.
+
+A pack on floor 50 is allowed to call predicates from any pack on floors 1 through 49.
+
+A pack on floor 50 is NOT allowed to call predicates from a pack on floor 50 or higher.
+
+This is the layering rule, and it applies to every single pack in PrologAI without exception.
+
+
+Why does this matter to you as a learner?
+
+It explains why this tutorial introduces packs in a specific sequence.
+
+When you read Chapter 100, every predicate called inside that chapter's pack already exists and is tested, because it lives on a lower floor.
+
+You can rely on it.
+
+If someone tried to place a pack on floor 100 that depended on a pack on floor 150, the pack on floor 150 would not exist yet.
+
+The code would break.
+
+This is why you cannot drop a pack in anywhere.
+
+Its floor number must be higher than the floor number of everything it calls.
+
+
+The two tiers of the layer system:
+
+Tier 1 is the Cognitive Stack (layers 1 through 59).
+
+These are the core platform layers: the memory engine, the shared knowledge store called the Lattice, the actor framework, the reasoning engine, the episodic memory, and so on.
+
+These layers are the foundation of the building itself.
+
+Tier 2 is the Data Layer (layers 60 and above).
+
+These are the perception, analysis, and transformation packs: color, shape, symmetry, fill, compare, grid operations, and everything that processes structured data.
+
+As of this writing, the highest Data Layer pack is gridnbr on layer 199.
+
+New packs always receive a layer number higher than all existing packs they depend on.
+
+
+When you load a pack in your code, Prolog resolves dependencies in order.
+
+If you load a pack at layer 120, all packs it depends on at layers 60 through 119 must already be available.
+
+The layer system makes this predictable and verifiable.
+
+
 WRITING YOUR FIRST .PL FILE
 
 Create a new text file on your computer. Name it my_knowledge.pl
