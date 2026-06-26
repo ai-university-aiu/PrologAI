@@ -1,0 +1,60 @@
+Chapter 140: Link Pack (lk_*)
+
+The link pack builds and manipulates correspondence links between two lists
+of obj(Color, Cells) terms. A link is an O1-O2 pair.
+
+1. Building Links
+
+lk_by_position(+Objs1, +Objs2, -Links): zip two lists element-wise.
+The Nth link is Objs1[N]-Objs2[N]. Truncates at the shorter list.
+
+  ?- lk_by_position(
+       [obj(red,[r(0,0)]), obj(blue,[r(1,0)])],
+       [obj(green,[r(0,0)]), obj(yellow,[r(1,0)])],
+       Links).
+  Links = [obj(red,[r(0,0)])-obj(green,[r(0,0)]),
+           obj(blue,[r(1,0)])-obj(yellow,[r(1,0)])].
+
+lk_by_nearest(+Objs1, +Objs2, -Links): each O1 linked to its centroid-nearest O2.
+
+lk_by_color(+Objs1, +Objs2, -Links): all pairs sharing the same color atom.
+
+lk_by_size(+Objs1, +Objs2, -Links): all pairs with the same cell count.
+
+lk_by_form(+Objs1, +Objs2, -Links): all pairs with the same normalized shape.
+
+2. Extracting Sources and Targets
+
+lk_source(+Links, -Sources): list of O1 from each link.
+lk_target(+Links, -Targets): list of O2 from each link.
+
+3. Link Manipulation
+
+lk_invert(+Links, -Inverted): swap O1 and O2 in every link.
+lk_count(+Links, -N): number of links.
+
+4. Applying Correspondence
+
+lk_apply_color(+Links, -Result): recolor each O1 with O2's color; keep O1's cells.
+
+  ?- lk_apply_color(
+       [obj(red,[r(0,0)])-obj(blue,[r(1,0)])],
+       Result).
+  Result = [obj(blue,[r(0,0)])].
+
+lk_apply_cells(+Links, -Result): replace O1's cells with O2's cells; keep O1's color.
+
+5. Filtering
+
+lk_filter_same_color(+Links, -Same): keep links where O1 and O2 share a color.
+lk_filter_diff_color(+Links, -Diff): keep links where O1 and O2 differ in color.
+
+6. Unlinked Objects
+
+lk_unlinked(+Objs, +Links, -Unlinked): objects from Objs not appearing as O1 in any link.
+
+  ?- lk_unlinked(
+       [obj(red,[r(0,0)]), obj(green,[r(1,0)])],
+       [obj(red,[r(0,0)])-obj(blue,[r(0,1)])],
+       Unlinked).
+  Unlinked = [obj(green,[r(1,0)])].
