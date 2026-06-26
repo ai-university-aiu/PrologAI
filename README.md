@@ -61,14 +61,14 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       219 work packages — the complete cognitive engine (see below)
+├── packs/       220 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
 └── launcher/    Entry points and bootstrapper
 ```
 
-### The 219 Work Packages
+### The 220 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -307,6 +307,7 @@ Everything is inspectable.
 | `objdelta` | Object-Pair Change Analysis and Rule Application (PR 285) |
 | `objcopy` | Object Tiling and Multi-Copy Layout (PR 286) |
 | `objmatch` | Object-List Correspondence and Matching (PR 287) |
+| `gridnbr` | Grid Neighbor Analysis: Cell Adjacency, Morphological Ops, and Neighbor Counts (gn_*, Layer 199) (PR 308) |
 | `gridtask` | Grid Task: End-to-End Raw Grid Task Solver (gt_*, Layer 198) (PR 307) |
 | `gridparse` | Grid Parse: Conversion between Raw Grid Format and obj Scene Representation (PR 306) |
 | `gridquery` | Grid Query and Manipulation: Size, Color, Region, Diff, Structural Ops (PR 305) |
@@ -352,11 +353,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v184` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v177` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v178` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v232` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v235` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v185` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v178` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v179` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v233` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v236` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---

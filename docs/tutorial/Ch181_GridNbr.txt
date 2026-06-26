@@ -1,0 +1,199 @@
+Chapter 181: gridnbr Pack - Grid Neighbor Analysis (gn_*, Layer 199)
+
+
+Overview
+
+The gridnbr pack analyzes the neighborhood of cells in raw grid format
+(list-of-lists of color atoms). It provides predicates for reading neighbor
+values, counting specific colors in neighborhoods, testing neighborhood
+conditions, applying morphological dilation and erosion, and running
+Conway-style cellular automaton steps.
+
+Layer 199. Pack prefix: gn_*. Work Package 220.
+
+
+Exported Predicates
+
+
+gn_nbr4(+Grid, +R, +C, -Vals)
+
+Vals is the list of cell values at the 4-connected (cardinal) neighbors of
+(R,C): up, down, left, right. Out-of-bounds positions are omitted. For a
+corner cell the list has 2 elements; for an edge cell 3; for an interior cell 4.
+
+Example:
+
+% Center of 3x3 grid has 4 neighbors
+gn_nbr4([[r,r,r],[r,b,r],[r,r,r]], 1, 1, Vals).
+% Vals = [r, r, r, r]  (up, down, left, right)
+
+% Corner has 2 neighbors
+gn_nbr4([[r,r,r],[r,b,r],[r,r,r]], 0, 0, Vals).
+% length(Vals, 2)
+
+
+gn_nbr8(+Grid, +R, +C, -Vals)
+
+Like gn_nbr4 but includes the 4 diagonal neighbors as well. List length is
+3, 5, or 8 depending on position.
+
+
+gn_count4(+Grid, +R, +C, +Color, -N)
+
+N is the count of 4-connected neighbors of (R,C) whose value equals Color.
+
+Example:
+
+gn_count4([[r,r,r],[r,b,r],[r,r,r]], 1, 1, r, N).
+% N = 4  (all 4 neighbors are r)
+
+
+gn_count8(+Grid, +R, +C, +Color, -N)
+
+Like gn_count4 but counts among all 8 neighbors.
+
+
+gn_count4_grid(+Grid, +Color, -CountGrid)
+
+CountGrid is a raw grid of the same dimensions where each cell holds the
+count of Color in its 4-connected neighbors.
+
+Example:
+
+gn_count4_grid([[r,r],[r,r]], b, CG).
+% CG = [[0,0],[0,0]]
+
+
+gn_count8_grid(+Grid, +Color, -CountGrid)
+
+Like gn_count4_grid but uses 8-connected neighborhoods.
+
+
+gn_any4(+Grid, +R, +C, +Color)
+
+Succeed (deterministically) if at least one 4-connected neighbor of (R,C)
+has value Color.
+
+Example:
+
+gn_any4([[r,r,r],[r,b,r],[r,r,r]], 1, 1, r).  % succeeds
+\+ gn_any4([[r,r,r],[r,b,r],[r,r,r]], 1, 1, b).  % no b neighbor
+
+
+gn_all4(+Grid, +R, +C, +Color)
+
+Succeed if every 4-connected neighbor of (R,C) has value Color. Fails if
+the cell has no 4-neighbors (1x1 grid).
+
+Example:
+
+% Ring grid: r at center, b everywhere else
+gn_all4([[b,b,b],[b,r,b],[b,b,b]], 1, 1, b).  % all 4 neighbors are b
+
+
+gn_mark_border(+Grid, +Bg, -MarkedGrid)
+
+MarkedGrid is Grid with every non-background cell that has at least one Bg
+4-neighbor replaced by the atom border. All other cells are left unchanged.
+A "border cell" is a foreground cell that touches the background.
+
+Example:
+
+gn_mark_border([[r,r,r],[r,b,r],[r,r,r]], r, MG).
+% MG = [[r,r,r],[r,border,r],[r,r,r]]  (b at center touches r)
+
+
+gn_mark_isolated(+Grid, +Bg, -MarkedGrid)
+
+MarkedGrid is Grid with every non-background cell that has NO same-color
+4-neighbor replaced by the atom isolated. A "connected" foreground cell
+touches another cell of the same color.
+
+Example:
+
+% Two isolated b cells that don't touch each other
+gn_mark_isolated([[r,r,r],[b,r,b],[r,r,r]], r, MG).
+% MG = [[r,r,r],[isolated,r,isolated],[r,r,r]]
+
+
+gn_expand_color(+Grid, +Color, -Expanded)
+
+Expanded is Grid after morphological dilation of Color: every background
+cell with at least one Color 4-neighbor is set to Color. The background is
+the most frequent color.
+
+Example:
+
+gn_expand_color([[r,r,r],[r,b,r],[r,r,r]], b, E).
+% E = [[r,r,r],[b,b,b],[r,r,r]]  (left and right of b are filled)
+
+
+gn_shrink_color(+Grid, +Color, -Shrunk)
+
+Shrunk is Grid after morphological erosion of Color: every Color cell with
+at least one non-Color 4-neighbor is set to the background color.
+
+Example:
+
+% 5x5 grid with 3x3 b block: outer ring of b eroded away
+gn_shrink_color(G5x5, b, Shrunk).
+% Only the center cell remains b; outer b cells become r
+
+
+gn_majority_nbr4(+Grid, +R, +C, -Maj)
+
+Maj is the most frequently occurring color among the 4-connected neighbors.
+Ties broken by standard term order (smallest atom wins). Fails for cells
+with no 4-neighbors.
+
+
+gn_conway_step(+Grid, +Color, +N, -NewGrid)
+
+NewGrid is Grid after one cellular automaton step: every Color cell with
+exactly N Color 4-neighbors is replaced by the background color. All other
+cells are unchanged. The background is the most frequent color.
+
+Example:
+
+% Isolated b (0 b-neighbors) is killed by rule N=0
+gn_conway_step([[r,r,r],[r,b,r],[r,r,r]], b, 0, NG).
+% NG = [[r,r,r],[r,r,r],[r,r,r]]
+
+
+Typical Use Cases
+
+Detecting isolated foreground cells (noise removal):
+  gn_mark_isolated(Grid, Bg, MG)
+
+Detecting object borders:
+  gn_mark_border(Grid, Bg, MG)
+
+Morphological dilation (grow objects by one layer):
+  gn_expand_color(Grid, Color, Expanded)
+
+Morphological erosion (shrink objects by one layer):
+  gn_shrink_color(Grid, Color, Shrunk)
+
+Counting-based grid transformation:
+  gn_count4_grid(Grid, TargetColor, CountGrid)
+
+
+Dependencies
+
+None. Uses library(lists) and built-in predicates.
+
+
+Test Coverage
+
+All 51 acceptance criteria (AC-GN-001 through AC-GN-051) defined in
+Refinement v233 Part 210 are exercised in packs/gridnbr/test/test_gridnbr.pl.
+All 51 tests pass.
+
+
+Summary
+
+The gridnbr pack provides the cell-neighborhood foundation for ARC-AGI-2
+tasks that require counting colored neighbors, detecting isolated or border
+cells, and applying morphological grow and shrink operations to raw grids.
+
+Continue to Chapter 182 for the next pack in the PrologAI Layer sequence.
