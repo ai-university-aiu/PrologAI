@@ -1,0 +1,183 @@
+Chapter 178: gridquery Pack - Grid Query and Manipulation (gq_*, Layer 196)
+
+
+Overview
+
+The gridquery pack provides predicates for querying and modifying raw grids.
+A raw grid is a list of rows, where each row is a list of color atoms. This is
+the native format used in ARC-style reasoning tasks before conversion to
+obj(Color, Cells) scene representation.
+
+Layer 196. Pack prefix: gq_*. Work Package 217.
+
+Positions are 0-indexed: row 0 is the top row, column 0 is the leftmost column.
+
+
+Exported Predicates
+
+
+gq_size(+Grid, -H, -W)
+
+H is the number of rows; W is the number of columns.
+
+Example:
+
+gq_size([[r,b],[g,r]], H, W).
+% H = 2, W = 2
+
+
+gq_at(+Grid, +R, +C, -Color)
+
+Color is the value at row R, column C.
+
+Example:
+
+gq_at([[r,b],[g,r]], 0, 1, Color).
+% Color = b
+
+
+gq_row(+Grid, +R, -Row)
+
+Row is the Rth row of Grid.
+
+Example:
+
+gq_row([[r,b],[g,r]], 1, Row).
+% Row = [g, r]
+
+
+gq_col(+Grid, +C, -Col)
+
+Col is the Cth column, as a top-to-bottom list.
+
+Example:
+
+gq_col([[r,b],[g,r]], 0, Col).
+% Col = [r, g]
+
+
+gq_colors(+Grid, -Colors)
+
+Sorted list of distinct color atoms in Grid.
+
+Example:
+
+gq_colors([[r,b],[g,r]], Colors).
+% Colors = [b, g, r]
+
+
+gq_n_cells(+Grid, +Color, -N)
+
+N is the number of cells equal to Color. Returns 0 if Color is absent.
+
+Example:
+
+gq_n_cells([[r,r],[r,b]], r, N).
+% N = 3
+
+
+gq_most_freq_color(+Grid, -Color)
+
+Color is the most frequent cell value. Ties broken by standard term order.
+Often the background color in ARC tasks.
+
+Example:
+
+gq_most_freq_color([[r,b,r],[r,g,r]], Color).
+% Color = r  (appears 4 times)
+
+
+gq_region(+Grid, +R0, +C0, +R1, +C1, -SubGrid)
+
+SubGrid is the rectangular sub-grid covering rows R0..R1 and columns C0..C1.
+All bounds are inclusive and 0-indexed.
+
+Example:
+
+gq_region([[r,b,g],[b,r,b],[g,b,r]], 0, 0, 1, 1, Sub).
+% Sub = [[r, b], [b, r]]
+
+
+gq_diff(+Grid1, +Grid2, -Cells)
+
+Cells is a list of r(R,C) positions where Grid1 and Grid2 have different values.
+Both grids must have the same dimensions.
+
+Example:
+
+gq_diff([[r,b],[g,r]], [[r,b],[g,y]], Cells).
+% Cells = [r(1,1)]
+
+
+gq_n_diff(+Grid1, +Grid2, -N)
+
+N is the count of differing cells. N=0 for identical grids.
+
+
+gq_same_size(+Grid1, +Grid2)
+
+Succeed if both grids have the same height and width.
+
+
+gq_transpose(+Grid, -Transposed)
+
+Transposed has rows and columns swapped: element at (R,C) moves to (C,R).
+
+Example:
+
+gq_transpose([[r,b],[g,r]], T).
+% T = [[r, g], [b, r]]
+
+
+gq_replace(+Grid, +R, +C, +Color, -NewGrid)
+
+NewGrid is Grid with the cell at (R,C) replaced by Color. All other cells unchanged.
+
+Example:
+
+gq_replace([[r,b],[g,r]], 0, 0, y, NewGrid).
+% NewGrid = [[y, b], [g, r]]
+
+
+gq_fill_region(+Grid, +R0, +C0, +R1, +C1, +Color, -NewGrid)
+
+NewGrid is Grid with every cell in rows R0..R1 and columns C0..C1 set to Color.
+
+Example:
+
+gq_fill_region([[r,r],[r,r]], 0, 0, 0, 1, b, NewGrid).
+% NewGrid = [[b, b], [r, r]]
+
+
+Bridging to Scene Format
+
+gridquery works at the raw grid level. To convert cells to obj terms, use the
+canvas pack (cv_extract/3, cv_paint_all/3) or the connect pack (cc_components4/3).
+
+Typical pipeline:
+1. gq_most_freq_color: find background
+2. gq_colors: find object colors
+3. connect cc_components4: segment each color into connected regions
+4. Build obj(Color, Cells) from each region
+
+
+Dependencies
+
+None. Uses library(lists) and library(apply).
+
+
+Test Coverage
+
+All 45 acceptance criteria (AC-GQ-001 through AC-GQ-045) defined in
+Refinement v230 Part 207 are exercised in packs/gridquery/test/test_gridquery.pl.
+All 45 tests pass.
+
+
+Summary
+
+The gridquery pack is the primary interface for querying raw grid data before
+or instead of converting to scene format. It supports ARC-AGI-2 tasks directly,
+providing size queries, color statistics, region extraction, difference detection,
+and structural operations.
+
+Continue to Chapter 179 for the next pack in the PrologAI Layer sequence.
