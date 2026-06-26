@@ -14592,3 +14592,49 @@ pn_quadrants computes midpoints with integer division.
 pn_col_slices uses pn_cumsum_ to compute running totals from width list.
 
 Predicate count: 14 (pn_* prefix). Tests: 42/42. Layer: 114.
+
+Next chapter: Chapter 97 covers the Scan Pack (grid cell enumeration and manipulation).
+
+Chapter 97: Grid Cell Enumeration and Manipulation - The Scan Pack (sn_* prefix)
+
+The scan pack (WP 136, Layer 115) provides 14 predicates for visiting every
+cell in various traversal orders and for reading, writing, mapping, and filtering
+individual cells.
+
+:- use_module(packs/scan/prolog/scan).
+
+sn_row_major(Grid, Cells).   % R-C-V triples in row-major order
+sn_col_major(Grid, Cells).   % R-C-V triples in column-major order
+sn_cells_of(Grid, V, Cells). % R-C positions of all cells equal to V
+sn_index_of(Grid, V, R, C).  % first occurrence of V (row-major, cut)
+
+sn_set_cell(Grid, R, C, V, New).    % new grid with one cell changed
+sn_update_cells(Grid, Updates, New). % batch R-C-V cell updates
+
+sn_map_cells(Grid, Goal, New).       % apply Goal(R,C,OldV,NewV) to all cells
+sn_filter_cells(Grid, Pred, Cells).  % keep cells satisfying Pred(R,C,V)
+
+sn_zigzag(Grid, Cells).           % boustrophedon: even rows L->R, odd rows R->L
+sn_spiral_in(Grid, Cells).        % clockwise spiral from outer ring inward
+sn_border_traversal(Grid, Cells). % outer border cells clockwise
+sn_diag_traversal_ne(Grid, Cells). % NE diagonals (R+C = constant)
+sn_diag_traversal_se(Grid, Cells). % SE diagonals (C-R = constant)
+
+sn_grid_from_cells(H, W, Cells, Bg, Grid). % build grid from sparse R-C-V list
+
+Examples:
+sn_row_major([[1,2],[3,4]], C).            % C = [0-0-1,0-1-2,1-0-3,1-1-4]
+sn_cells_of([[1,0,1],[0,1,0]], 1, C).     % C = [0-0,0-2,1-1]
+sn_set_cell([[1,2],[3,4]], 0, 1, 9, New). % New = [[1,9],[3,4]]
+sn_zigzag([[1,2,3],[4,5,6]], C).          % C = [0-0-1,0-1-2,0-2-3,1-2-6,1-1-5,1-0-4]
+sn_spiral_in([[1,2,3],[4,5,6],[7,8,9]], C). % 9-cell spiral inward
+sn_grid_from_cells(2, 2, [0-0-1,1-1-4], 0, G). % G = [[1,0],[0,4]]
+
+sn_spiral_ uses a recursive helper with nested if-then-else: T > B or L > R
+  terminates; otherwise one ring is collected and bounds are shrunk.
+sn_border_traversal uses if-then-else on H > 1 and W > 1.
+sn_diag_traversal_ne enumerates D = R+C from 0 to H+W-2 with between/3.
+sn_diag_traversal_se enumerates D = C-R from -(H-1) to W-1.
+sn_index_of uses cut for determinism after the first row-major match.
+
+Predicate count: 14 (sn_* prefix). Tests: 42/42. Layer: 115.
