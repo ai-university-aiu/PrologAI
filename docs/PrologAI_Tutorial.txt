@@ -1146,7 +1146,7 @@ Tier 2 is the Data Layer (layers 60 and above).
 
 These are the perception, analysis, and transformation packs: color, shape, symmetry, fill, compare, grid operations, and everything that processes structured data.
 
-As of this writing, the highest Data Layer pack is gridscale on layer 202.
+As of this writing, the highest Data Layer pack is gridrun on layer 203.
 
 New packs always receive a layer number higher than all existing packs they depend on.
 
@@ -18460,3 +18460,36 @@ gsc_pad([[r,b],[b,r]], 1, g, P).
 
 14 gsc_* predicates. 60 tests pass. Layer 202.
 All 60 tests pass. See docs/tutorial/Ch184_GridScale.txt for the full chapter.
+
+
+Chapter 174: gridrun Pack - Grid Run-Length Encoding and Stripe Analysis (grl_*, Layer 203)
+
+The gridrun pack provides run-length encoding and stripe analysis for raw grids.
+A run is a maximal sequence of identical adjacent cells, encoded as Color-Len.
+
+:- use_module(pack(gridrun/prolog/gridrun)).
+
+% Encode row 0 of a 3-row grid:
+grl_row_runs([[r,r,b,g,g],[b,b,b,r,r],[g,r,g,r,g]], 0, R).
+% R = [r-2, b-1, g-2]
+
+% Decode back:
+grl_decode([r-2, b-1, g-2], L).
+% L = [r,r,b,g,g]
+
+% Detect horizontal stripes:
+grl_is_striped_h([[r,r,r],[b,b,b],[g,g,g]]).  % succeeds
+
+% Get stripe colors:
+grl_stripe_colors_h([[r,r,r],[b,b,b],[g,g,g]], C).
+% C = [r,b,g]
+
+% Find longest run in row 1:
+grl_max_run([[r,r,b,g,g],[b,b,b,r,r]], 1, C, L).
+% C = b, L = 3
+
+% Detect alternating pattern:
+grl_alternating([[r,b,r,b,r,b]], 0).  % succeeds
+
+14 grl_* predicates. 55 tests pass. Layer 203.
+All 55 tests pass. See docs/tutorial/Ch185_GridRun.txt for the full chapter.

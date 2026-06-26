@@ -992,3 +992,20 @@ Grid Block-Pixel Scaling: Upsample, Downsample, Scale Factor, Tile Inference, Pa
     gsc_subsample/3: stride-N sampling; Sub[BR][BC] = Grid[BR*N][BC*N]; output is (H//N) x (W//N)
     gsc_pad/4: surround Grid with N-cell wide border of Color; output is (H+2N) x (W+2N); N=0 is no-op
     gsc_crop_to_factor/3: crop to largest dimensions divisible by N; CH=(H//N)*N, CW=(W//N)*N, top-left region
+
+gridrun
+Grid Run-Length Encoding and Stripe Analysis: Row/Column Runs, Uniformity, Striped Grids, and Alternating Patterns (grl_*, Layer 203)
+    grl_row_runs/3: run-length encoding of row R as list of Color-Len pairs (maximal same-color runs)
+    grl_col_runs/3: run-length encoding of column C as list of Color-Len pairs
+    grl_all_row_runs/2: list of run-length encodings for every row (one per row)
+    grl_all_col_runs/2: list of run-length encodings for every column (one per column)
+    grl_decode/2: recover flat color list from run-length encoding (each Color-Len contributes Len copies of Color)
+    grl_run_count/3: number of distinct runs in row R; uniform row has count 1
+    grl_uniform_row/3: succeed if row R is all one Color (single run); fail otherwise
+    grl_uniform_col/3: succeed if column C is all one Color; fail otherwise
+    grl_is_striped_h/1: succeed if every row is uniform (horizontal solid-color bands)
+    grl_is_striped_v/1: succeed if every column is uniform (vertical solid-color bands)
+    grl_stripe_colors_h/2: list of row colors for horizontally striped grid; fail if any row non-uniform
+    grl_stripe_colors_v/2: list of column colors for vertically striped grid; fail if any column non-uniform
+    grl_max_run/4: Color and Len of longest run in row R; ties broken by term order on Color
+    grl_alternating/2: succeed if row R alternates exactly 2 colors with all run lengths 1 and >= 2 cells
