@@ -15433,3 +15433,41 @@ Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2,
   Built-ins: length/2, between/3.
 
 Predicate count: 14 (gr_* prefix). Tests: 42/42. Layer: 132.
+
+
+CHAPTER 115: 2D GRID EXTREMA, LOCAL PEAKS, AND THRESHOLD FILTERING (ex_*)
+
+The extrema pack (Layer 133, module extrema, prefix ex_*) provides 14
+predicates for finding maximum and minimum values and their positions, local
+maxima/minima detection, row/column argmax/argmin, threshold filtering, range,
+and sparse cell enumeration in 2D grids.
+
+Load: :- use_module('packs/extrema/prolog/extrema.pl').
+
+Example queries:
+ex_max_val([[1,2,3],[4,5,6],[7,8,9]],V). % V=9
+ex_min_val([[0,1],[1,0]],V). % V=0
+ex_max_cells([[1,2,3],[4,5,6],[7,8,9]],C). % C=[2-2]
+ex_min_cells([[0,1],[1,0]],C). % C=[0-0,1-1]
+ex_row_argmax([[1,2,3],[4,5,6],[7,8,9]],R). % R=2
+ex_col_argmax([[1,2,3],[4,5,6],[7,8,9]],C). % C=2
+ex_row_argmin([[1,2,3],[4,5,6],[7,8,9]],R). % R=0
+ex_col_argmin([[1,2,3],[4,5,6],[7,8,9]],C). % C=0
+ex_local_max4([[1,2,1],[2,4,2],[1,2,1]],C). % C=[1-1]
+ex_local_min4([[1,2,1],[2,4,2],[1,2,1]],C),length(C,N). % N=4
+ex_above([[1,2,3],[4,5,6],[7,8,9]],5,C),length(C,N). % N=4
+ex_below([[0,1],[1,0]],1,C),length(C,N). % N=2
+ex_range([[1,2,3],[4,5,6],[7,8,9]],R). % R=8
+ex_nonzero([[0,1],[1,0]],C). % C=[0-1,1-0]
+
+Key implementation patterns:
+ex_flat_vals_: findall(V, (member(Row,Grid), member(V,Row)), Vals).
+ex_argmax_acc_/ex_argmin_acc_: recursive with strict > / < for first-win ties.
+ex_check_nbr_lt_/gt_: if-then-else for bounds check, then V < / > comparison.
+ex_all_nbr4_lt_/gt_: computes RU/RD/CL/CR offsets, calls check for each.
+ex_col_sum_: findall + sum_list for each column.
+
+Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2,
+  sum_list/2. Built-ins: length/2, between/3.
+
+Predicate count: 14 (ex_* prefix). Tests: 42/42. Layer: 133.
