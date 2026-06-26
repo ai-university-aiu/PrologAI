@@ -10614,3 +10614,75 @@ PROCEDURE dn_scale_factor(Obj1, Obj2, N):
     Shrunken <- dn_obj_shrink(Obj2, N)
     Norm2 <- normalize_to_origin(Shrunken.Cells)
     IF Norm1 = Norm2: RETURN N
+
+Part 176: Objmorph Pack Pseudocode (om_*, Layer 165)
+
+Section 176.1: Neighborhood Generation
+
+PROCEDURE om_neighbors4(r(R, C), Neighbors):
+  Neighbors <- [r(R-1,C), r(R+1,C), r(R,C-1), r(R,C+1)]
+
+PROCEDURE om_neighbors8(r(R, C), Neighbors):
+  Neighbors <- [r(R-1,C-1), r(R-1,C), r(R-1,C+1),
+                r(R,  C-1),            r(R,  C+1),
+                r(R+1,C-1), r(R+1,C), r(R+1,C+1)]
+
+Section 176.2: Boundary and Interior
+
+PROCEDURE om_boundary4(obj(Color, Cells), obj(Color, Boundary)):
+  S <- sort(Cells)
+  Boundary <- [r(R,C) IN S WHERE NOT ALL(n IN om_neighbors4(r(R,C)) -> n IN S)]
+
+PROCEDURE om_interior4(obj(Color, Cells), obj(Color, Interior)):
+  S <- sort(Cells)
+  Interior <- [r(R,C) IN S WHERE ALL(n IN om_neighbors4(r(R,C)) -> n IN S)]
+
+PROCEDURE om_boundary8(obj(Color, Cells), obj(Color, Boundary)):
+  S <- sort(Cells)
+  Boundary <- [r(R,C) IN S WHERE NOT ALL(n IN om_neighbors8(r(R,C)) -> n IN S)]
+
+PROCEDURE om_interior8(obj(Color, Cells), obj(Color, Interior)):
+  S <- sort(Cells)
+  Interior <- [r(R,C) IN S WHERE ALL(n IN om_neighbors8(r(R,C)) -> n IN S)]
+
+Section 176.3: Dilation and Erosion
+
+PROCEDURE om_dilate4(obj(Color, Cells), obj(Color, Dilated)):
+  S <- sort(Cells)
+  NewCells <- FLATTEN([om_neighbors4(c) FOR c IN S])
+  Dilated <- sort(S ++ NewCells)
+
+PROCEDURE om_erode4(Obj, Eroded):
+  Eroded <- om_interior4(Obj)
+
+PROCEDURE om_dilate8(obj(Color, Cells), obj(Color, Dilated)):
+  S <- sort(Cells)
+  NewCells <- FLATTEN([om_neighbors8(c) FOR c IN S])
+  Dilated <- sort(S ++ NewCells)
+
+PROCEDURE om_erode8(Obj, Eroded):
+  Eroded <- om_interior8(Obj)
+
+Section 176.4: Iterated Operations
+
+PROCEDURE om_dilate4_n(Obj, 0, Obj): RETURN Obj
+PROCEDURE om_dilate4_n(Obj, N, Result):
+  REQUIRE N > 0
+  Step <- om_dilate4(Obj)
+  Result <- om_dilate4_n(Step, N-1)
+
+PROCEDURE om_erode4_n(Obj, 0, Obj): RETURN Obj
+PROCEDURE om_erode4_n(Obj, N, Result):
+  REQUIRE N > 0
+  Step <- om_erode4(Obj)
+  Result <- om_erode4_n(Step, N-1)
+
+Section 176.5: Compound Operations
+
+PROCEDURE om_open4(Obj, Result):
+  Eroded <- om_erode4(Obj)
+  Result <- om_dilate4(Eroded)
+
+PROCEDURE om_close4(Obj, Result):
+  Dilated <- om_dilate4(Obj)
+  Result <- om_erode4(Dilated)
