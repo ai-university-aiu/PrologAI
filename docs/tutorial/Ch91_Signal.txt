@@ -1,0 +1,120 @@
+Chapter 91: 1D Signal Analysis - The Signal Pack (sg_* prefix)
+
+The signal pack (Work Package 130, Layer 109) provides 14 predicates for
+analyzing integer lists as 1-dimensional signals. It finds local extrema,
+tests monotone order, computes consecutive differences and slope signs,
+locates the index of the maximum or minimum value, partitions values by
+threshold, and extracts row, column, and cross-shaped value profiles from
+a grid.
+
+
+1. Loading the Pack
+
+:- use_module(packs/signal/prolog/signal).
+
+
+2. Finding Local Extrema
+
+sg_peaks(+List, -PeakIdxs) returns the 0-based indices of strict interior
+local maxima. An interior peak at index I requires List[I] > both neighbors
+and I is not the first or last element. sg_valleys works identically for
+strict interior minima.
+
+?- sg_peaks([1,3,1,3,1], Peaks).
+Peaks = [1, 3].
+
+?- sg_valleys([5,1,5,1,5], Valleys).
+Valleys = [1, 3].
+
+Both predicates return [] for lists shorter than 3 or when no interior
+extremum exists.
+
+
+3. Finding the Maximum and Minimum Index
+
+sg_argmax(+List, -Idx) binds Idx to the 0-based index of the maximum value.
+On ties, the first (leftmost) occurrence wins. sg_argmin works identically
+for the minimum.
+
+?- sg_argmax([0, 0, 5], Idx).
+Idx = 2.
+
+?- sg_argmin([3, 1, 2], Idx).
+Idx = 1.
+
+
+4. Consecutive Differences and Slope Signs
+
+sg_diffs(+List, -Diffs) computes element-wise differences: Diffs[i] =
+List[i+1] - List[i]. The result has one fewer element than the input.
+
+sg_slope_signs(+List, -Signs) maps each difference to its sign: 1 for
+positive, -1 for negative, 0 for zero.
+
+?- sg_diffs([1, 3, 6], D).
+D = [2, 3].
+
+?- sg_slope_signs([1, 3, 3, 1], S).
+S = [1, 0, -1].
+
+
+5. Monotone Order Tests
+
+Four predicates test ordering properties. All are vacuously true for lists
+of length 0 or 1.
+
+sg_is_increasing(+List): strictly increasing (A < B for each consecutive pair).
+sg_is_decreasing(+List): strictly decreasing (A > B).
+sg_is_nondecreasing(+List): A =< B for each pair (equal elements allowed).
+sg_is_nonincreasing(+List): A >= B for each pair.
+
+?- sg_is_nondecreasing([1, 1, 2, 3]).
+true.
+
+?- sg_is_increasing([1, 1, 2]).
+false.
+
+
+6. Threshold Partitioning
+
+sg_threshold(+List, +T, -AboveIdxs, -BelowOrEqIdxs) partitions 0-based
+indices by whether List[I] > T (above) or List[I] =< T (at or below).
+
+?- sg_threshold([1, 5, 3, 7, 2], 4, Above, Below).
+Above = [1, 3],
+Below = [0, 2, 4].
+
+
+7. Grid Profiles
+
+Three predicates extract value lists (profiles) from integer grids.
+
+sg_row_profile(+Grid, +R, -Values): all values in row R (0-based).
+sg_col_profile(+Grid, +C, -Values): all values in column C across all rows.
+sg_cross_profile(+Grid, +R, +C, -RowVals, -ColVals): row and column profiles
+  together for position (R, C).
+
+?- sg_col_profile([[1,2,3],[4,5,6],[7,8,9]], 1, V).
+V = [2, 5, 8].
+
+?- sg_cross_profile([[1,2,3],[4,5,6],[7,8,9]], 1, 1, Row, Col).
+Row = [4, 5, 6],
+Col = [2, 5, 8].
+
+sg_col_profile uses a YALL lambda to capture the column index C inside
+maplist: maplist([Row, V]>>(nth0(C, Row, V)), Grid, Values).
+
+
+8. Summary
+
+The signal pack bridges the gap between raw grid data and higher-level
+pattern analysis. Extracting a row or column profile turns a 2D reasoning
+problem into a 1D signal analysis problem, where monotone order, peaks,
+valleys, and thresholds become accessible through simple predicate calls.
+
+Predicate count: 14 (sg_peaks/2, sg_valleys/2, sg_argmax/2, sg_argmin/2,
+sg_diffs/2, sg_slope_signs/2, sg_is_increasing/1, sg_is_decreasing/1,
+sg_is_nondecreasing/1, sg_is_nonincreasing/1, sg_threshold/4,
+sg_row_profile/3, sg_col_profile/3, sg_cross_profile/5).
+Tests: 42/42 pass.
+Layer: 109.
