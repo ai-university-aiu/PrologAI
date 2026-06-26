@@ -1,0 +1,112 @@
+Chapter 94: Grid Shifting and Circular Rolling - The Offset Pack (od_* prefix)
+
+The offset pack (Work Package 133, Layer 112) provides 14 predicates for
+grid shifting and circular rolling. It shifts grids in four directions with
+background fill, rolls circularly in four directions, provides single-row
+equivalents, shifts one specific color within a grid, and infers the shift
+displacement between two grids.
+
+
+1. Loading the Pack
+
+:- use_module(packs/offset/prolog/offset).
+
+
+2. Shifting (Non-Circular)
+
+A shift moves all content in a direction. Vacated cells become background;
+content that moves off an edge is dropped.
+
+od_shift_row(+Row, +N, +Bg, -Shifted): shift row rightward by N cells.
+od_shift_row_left(+Row, +N, +Bg, -Shifted): shift row leftward by N cells.
+od_shift_right(+Grid, +N, +Bg, -Shifted): shift every row rightward.
+od_shift_left(+Grid, +N, +Bg, -Shifted): shift every row leftward.
+od_shift_down(+Grid, +N, +Bg, -Shifted): shift content downward by N rows.
+od_shift_up(+Grid, +N, +Bg, -Shifted): shift content upward by N rows.
+
+For N=0, the result is identical to the input.
+For N >= grid dimension, the entire grid becomes background.
+
+?- od_shift_row([1,2,3,4], 1, 0, S).
+S = [0,1,2,3].   % 1 shifted right; 4 dropped; 0 prepended
+
+?- od_shift_right([[1,2,3],[4,5,6]], 1, 0, S).
+S = [[0,1,2],[0,4,5]].
+
+?- od_shift_down([[1,2],[3,4],[5,6]], 1, 0, S).
+S = [[0,0],[1,2],[3,4]].
+
+od_shift_dir(+Grid, +Dir, +N, +Bg, -Shifted) dispatches by direction atom:
+right, left, down, or up.
+
+?- od_shift_dir([[1,2,3]], right, 1, 0, S).
+S = [[0,1,2]].
+
+
+3. Circular Rolling
+
+A roll is a circular shift: content that goes off one edge wraps to the
+other edge. No content is lost.
+
+od_roll_row(+Row, +N, -Rolled): circular right shift; N mod length cells wrap.
+od_roll_right(+Grid, +N, -Rolled): circular right shift each row.
+od_roll_left(+Grid, +N, -Rolled): circular left shift each row.
+od_roll_down(+Grid, +N, -Rolled): last N rows wrap to top.
+od_roll_up(+Grid, +N, -Rolled): first N rows wrap to bottom.
+
+?- od_roll_row([1,2,3,4], 1, R).
+R = [4,1,2,3].   % 4 wraps to front
+
+?- od_roll_down([[1],[2],[3],[4]], 1, R).
+R = [[4],[1],[2],[3]].   % last row wraps to top
+
+?- od_roll_row([1,2,3,4], 4, R).
+R = [1,2,3,4].   % full cycle is identity
+
+
+4. Color-Specific Shifting
+
+od_shift_color(+Grid, +Color, +DR, +DC, +Bg, -Result) translates all cells
+equal to Color by (DR rows, DC columns). Positive DR = downward, positive
+DC = rightward.
+
+For each output cell (R, C):
+- If the source position (R-DR, C-DC) is in bounds and holds Color: output Color.
+- Else if (R, C) held Color but receives no shifted Color: output Bg.
+- Else: output the original cell value.
+
+?- od_shift_color([[0,1,0]], 1, 0, 1, 0, R).
+R = [[0,0,1]].   % 1 at position 1 moved right to position 2
+
+?- od_shift_color([[2],[0],[0]], 2, 1, 0, 0, R).
+R = [[0],[2],[0]].   % 2 moved down by 1
+
+?- od_shift_color([[1,0]], 1, 0, 2, 0, R).
+R = [[0,0]].   % 1 shifts past right edge: clipped to background
+
+
+5. Inferring the Shift
+
+od_infer_shift(+GridA, +GridB, +Bg, -DR, -DC) finds the (DR, DC) displacement
+such that shifting GridA by that amount gives GridB. Positive DR = downward,
+positive DC = rightward.
+
+Searches all integer displacements up to the grid dimensions and commits to
+the first match. Handles identity (DR=DC=0) as a special case naturally.
+
+?- od_infer_shift([[0,1,0],[0,0,0]], [[0,0,1],[0,0,0]], 0, DR, DC).
+DR = 0, DC = 1.
+
+?- od_infer_shift([[1,2],[3,4]], [[1,2],[3,4]], 0, DR, DC).
+DR = 0, DC = 0.
+
+
+6. Summary
+
+The offset pack provides complete shift and roll capabilities. Shifts are
+useful when a transformation moves content in one direction with loss; rolls
+are useful for wrapping transformations. od_shift_color enables color-specific
+translation within a grid without disturbing other colors. od_infer_shift
+detects the displacement between two related grids.
+
+Predicate count: 14 (od_* prefix). Tests: 42/42. Layer: 112.
