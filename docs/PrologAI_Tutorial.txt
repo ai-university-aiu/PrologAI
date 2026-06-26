@@ -15820,3 +15820,92 @@ Library imports: library(lists): member/2, nth0/3, reverse/2, last/2.
 Built-ins: sort/2, msort/2, length/2, between/3, findall/3.
 
 Predicate count: 14 (rs_* prefix). Tests: 47/47. Layer: 140.
+
+Chapter 123: Grid Collection Operations Pack (Layer 141, go_* prefix)
+
+The gridops pack provides 14 predicates for reasoning across a collection of
+multiple 2D integer grids simultaneously: position-set queries (always, never,
+sometimes), per-cell value counting, modal value per cell, stable and unstable
+cell detection, grid equality testing, and elementwise arithmetic (add, subtract,
+max, min, overlay, intersect).
+
+Predicates:
+
+go_always(+Grids, +V, -Cells)
+  Cells is the sorted list of R-C positions where EVERY grid has value V.
+
+go_never(+Grids, +V, -Cells)
+  Cells is the sorted list of R-C positions where NO grid has value V.
+
+go_sometimes(+Grids, +V, -Cells)
+  Cells is the sorted list of R-C positions where SOME (>=1) grid has value V
+  but NOT all grids do.
+
+go_count_v(+Grids, +V, -CountGrid)
+  CountGrid is a grid; each cell (R,C) holds the count of grids having V there.
+
+go_modal(+Grids, -ModalGrid)
+  ModalGrid[R][C] = most frequent value across grids at (R,C). Smallest wins ties.
+
+go_stable(+Grids, -Triples)
+  R-C-V triples for positions where ALL grids agree on value V.
+
+go_unstable(+Grids, -Cells)
+  R-C positions where grids disagree (not all have the same value).
+
+go_eq(+G1, +G2)
+  Succeeds if G1 and G2 are cell-for-cell identical.
+
+go_add(+G1, +G2, -G)
+  G[R][C] = G1[R][C] + G2[R][C].
+
+go_sub(+G1, +G2, -G)
+  G[R][C] = G1[R][C] - G2[R][C].
+
+go_emax(+G1, +G2, -G)
+  G[R][C] = max(G1[R][C], G2[R][C]).
+
+go_emin(+G1, +G2, -G)
+  G[R][C] = min(G1[R][C], G2[R][C]).
+
+go_overlay(+Grids, +Bg, -G)
+  G[R][C] = first non-Bg value at (R,C) across Grids in order; else Bg.
+
+go_intersect(+Grids, +Bg, -G)
+  G[R][C] = V if ALL grids have same non-Bg value V at (R,C); else Bg.
+
+Usage examples:
+
+Gs = [[[1,2],[3,0]], [[1,5],[3,0]]].
+go_always(Gs, 1, C).    % C=[0-0]
+go_never(Gs, 0, C).     % C=[0-0,0-1,1-0]
+go_sometimes(Gs, 2, C). % C=[0-1]
+go_count_v(Gs, 0, CG).  % CG=[[0,0],[0,2]]
+go_modal(Gs, MG).       % MG=[[1,2],[3,0]]
+go_stable(Gs, T).       % T=[0-0-1,1-0-3,1-1-0]
+go_unstable(Gs, C).     % C=[0-1]
+
+go_add([[1,2],[3,4]], [[10,20],[30,40]], G). % G=[[11,22],[33,44]]
+go_emax([[1,5],[3,2]], [[4,2],[1,5]], G).    % G=[[4,5],[3,5]]
+go_overlay([[[1,0],[0,2]],[[0,3],[4,0]]], 0, G). % G=[[1,3],[4,2]]
+go_intersect([[[1,0],[0,2]],[[1,3],[4,0]]], 0, G). % G=[[1,0],[0,0]]
+
+Key implementation notes:
+
+go_always uses forall; go_never uses \+exists; go_sometimes uses sort to
+  deduplicate positions found across multiple source grids.
+
+go_modal uses go_mode_ which builds Count-Value pairs, msorts ascending,
+  then picks last for max count; ties resolved by smallest V (first in sorted
+  order within same count).
+
+go_stable uses the first grid's value as anchor, then forall tests all rest.
+
+go_overlay and go_intersect use SWI-Prolog if-then-else (Cond -> True ; False)
+  for deterministic selection without needing cut.
+
+Library imports: library(lists): member/2, nth0/3, last/2.
+                 library(apply): maplist/3, maplist/4, include/3.
+Built-ins: sort/2, msort/2, length/2, between/3, forall/2, findall/3.
+
+Predicate count: 14 (go_* prefix). Tests: 42/42. Layer: 141.
