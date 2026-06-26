@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       158 work packages — the complete cognitive engine (see below)
+├── packs/       159 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -274,6 +274,7 @@ Everything is inspectable.
 | `median` | Integer Median Computation for Lists and 2D Grids (PR 241) — lower (floor) median of an integer list (`md_median/2`), per-row and per-column medians (`md_row/3`, `md_col/3`, `md_row_medians/2`, `md_col_medians/2`), grid-wide median (`md_grid/2`), 4-connected and 8-connected median filters where each output cell is the median of the cell and its in-bounds neighbors (`md_filter4/2`, `md_filter8/2`), and above/below median cell selection at grid, row, and column level (`md_above/2`, `md_below/2`, `md_row_above/3`, `md_row_below/3`, `md_col_above/3`, `md_col_below/3`). Uses msort/2 to preserve duplicates for correct computation. 14 md_* predicates, Layer 135. |
 | `nmode` | Neighborhood Mode Filter for 2D Grids (PR 242) — mode (most frequent value, smallest-value tie-breaking) of an integer list (`nm_mode/2`), all tied-for-top values (`nm_mode_all/2`), mode with count (`nm_mode_count/3`), per-row and per-column modes (`nm_row/3`, `nm_col/3`, `nm_row_modes/2`, `nm_col_modes/2`), grid-wide mode (`nm_grid/2`), 4-connected and 8-connected mode filters (`nm_filter4/2`, `nm_filter8/2`), uniform neighborhood detection (`nm_uniform4/2`, `nm_uniform8/2`), and outlier detection where the cell differs from its neighborhood mode (`nm_outlier4/2`, `nm_outlier8/2`). 14 nm_* predicates, Layer 136. |
 | `rank` | Dense Ranking of Integer Values in Lists and 2D Grids (PR 243) — 1-based dense rank of a value in a list (`rk_rank_of/3`), replace each element with its dense rank (`rk_dense/2`), 0-based argsort ascending and descending (`rk_argsort_asc/2`, `rk_argsort_desc/2`), per-row dense rank grid (`rk_row_dense/2`), per-column dense rank grid (`rk_col_dense/2`), grid-wide dense rank grid (`rk_grid_dense/2`), cell-level row/column/grid rank queries (`rk_row_rank_of/4`, `rk_col_rank_of/4`, `rk_grid_rank_of/4`), and top-N and bottom-N cell selection by distinct value plus rank-threshold filtering (`rk_top_n/3`, `rk_bottom_n/3`, `rk_above_rank/3`, `rk_below_rank/3`). 14 rk_* predicates, Layer 137. |
+| `varstat` | Mean, Sum, and Deviation Statistics for Integer Lists and 2D Grids (PR 244) — integer sum of a list (`vt_sum/2`), floor mean (`vt_mean_floor/2`), rounded mean (`vt_mean_round/2`), per-element signed deviation from floor mean (`vt_deviation/2`), absolute deviation (`vt_abs_deviation/2`), per-row sums and means (`vt_row_sums/2`, `vt_row_means/2`), per-column sums and means (`vt_col_sums/2`, `vt_col_means/2`), global floor mean (`vt_global_mean/2`), and position lists for cells above or below the global mean, row mean, or column mean (`vt_above_mean/2`, `vt_below_mean/2`, `vt_row_above_mean/2`, `vt_col_above_mean/2`). 14 vt_* predicates, Layer 138. |
 | `interop` | Hyperon Interoperability Bridge — bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems. |
 
 **Platform Utilities**
