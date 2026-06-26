@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       153 work packages — the complete cognitive engine (see below)
+├── packs/       154 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
