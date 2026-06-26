@@ -14562,3 +14562,33 @@ findall + between + mod arithmetic; il_rows_n uses between + member for round-ro
 il_block_rows uses length + append with if-then-else for partial last blocks.
 
 Predicate count: 14 (il_* prefix). Tests: 42/42. Layer: 113.
+
+Next chapter: Chapter 96 covers the Panel Pack (grid panel detection and splitting).
+
+
+Chapter 96: Grid Panel Detection and Splitting - The Panel Pack (pn_* prefix)
+
+The panel pack (Work Package 135, Layer 114) provides 14 predicates for
+detecting and splitting grids at all-background divider rows and columns.
+
+pn_is_divider_row([[1,2],[0,0],[3,4]], 1, 0).     % true: row 1 is all-0
+pn_is_divider_col([[1,0,2],[3,0,4]], 1, 0).       % true: column 1 is all-0
+pn_divider_rows([[1],[0],[2],[0],[3]], 0, Rows).   % Rows = [1,3]
+pn_divider_cols([[0,1,0],[0,2,0]], 0, Cols).       % Cols = [0,2]
+pn_auto_split_rows([[1,2],[3,4],[0,0],[5,6],[7,8]], 0, Parts).
+  % Parts = [[[1,2],[3,4]], [[5,6],[7,8]]]
+pn_auto_split_cols([[1,0,2],[3,0,4]], 0, Parts).  % Parts = [[[1],[3]],[[2],[4]]]
+pn_strip_rows([[1,2],[0,0],[3,4],[0,0],[5,6]], 0, S). % S = [[1,2],[3,4],[5,6]]
+pn_strip_cols([[1,0,2],[3,0,4]], 0, S).            % S = [[1,2],[3,4]]
+pn_quadrants([[1,2,3,4],[5,6,7,8],[a,b,c,d],[e,f,g,h]], TL, TR, BL, BR).
+  % TL=[[1,2],[5,6]], TR=[[3,4],[7,8]], BL=[[a,b],[e,f]], BR=[[c,d],[g,h]]
+pn_n_col_parts([[1,2,3,4,5,6]], 3, Parts). % Parts = [[[1,2]],[[3,4]],[[5,6]]]
+pn_col_slices([[1,2,3,4,5,6]], [2,3,1], Parts). % Parts=[[[1,2]],[[3,4,5]],[[6]]]
+pn_has_dividers([[1,2],[0,0],[3,4]], 0).          % true
+
+pn_split_rows uses a two-clause recursive helper with cut on the base case.
+pn_slice_row_ uses length/2 + append/3 for column range extraction.
+pn_quadrants computes midpoints with integer division.
+pn_col_slices uses pn_cumsum_ to compute running totals from width list.
+
+Predicate count: 14 (pn_* prefix). Tests: 42/42. Layer: 114.
