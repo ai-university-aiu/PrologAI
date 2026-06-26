@@ -1,0 +1,174 @@
+Chapter 95: Row and Column Interleaving - The Interleave Pack (il_* prefix)
+
+The interleave pack (Work Package 134, Layer 113) provides 14 predicates for
+merging two grids by alternating rows or columns, splitting interleaved grids
+back apart, inserting or removing separator rows/columns (weaving), extracting
+every Nth row or column (stride), selecting specific rows or columns by index
+list, round-robin interleaving from multiple grids, and partitioning rows into
+fixed-size blocks.
+
+
+1. Loading the Pack
+
+:- use_module(packs/interleave/prolog/interleave).
+
+
+2. Merging Two Grids
+
+il_rows(+GridA, +GridB, -Result) merges two same-height grids by alternating
+rows. Row 0 comes from GridA, row 1 from GridB, row 2 from GridA, and so on.
+The result has twice as many rows as either input.
+
+?- il_rows([[1,2],[3,4]], [[5,6],[7,8]], R).
+R = [[1,2],[5,6],[3,4],[7,8]].
+
+?- il_rows([[a,b,c]], [[d,e,f]], R).
+R = [[a,b,c],[d,e,f]].
+
+il_cols(+GridA, +GridB, -Result) merges two same-height grids by alternating
+columns. Each row's elements are interleaved: A[0], B[0], A[1], B[1], ...
+The result has the same height and twice the width.
+
+?- il_cols([[1,2],[3,4]], [[5,6],[7,8]], R).
+R = [[1,5,2,6],[3,7,4,8]].
+
+?- il_cols([[1,2,3]], [[4,5,6]], R).
+R = [[1,4,2,5,3,6]].
+
+
+3. Splitting an Interleaved Grid
+
+il_derows(+Grid, -Even, -Odd) is the inverse of il_rows. It splits Grid into
+rows at even indices (0, 2, 4, ...) and rows at odd indices (1, 3, 5, ...).
+
+?- il_derows([[a],[b],[c],[d]], E, O).
+E = [[a],[c]], O = [[b],[d]].
+
+?- il_derows([[r0],[r1],[r2]], E, O).
+E = [[r0],[r2]], O = [[r1]].
+
+il_decols(+Grid, -Even, -Odd) is the inverse of il_cols. It splits each row
+into elements at even column indices and elements at odd column indices.
+
+?- il_decols([[1,2,3,4]], E, O).
+E = [[1,3]], O = [[2,4]].
+
+?- il_decols([[a,b,c],[d,e,f]], E, O).
+E = [[a,c],[d,f]], O = [[b],[e]].
+
+
+4. Weaving: Inserting Separators
+
+il_weave_rows(+Grid, +Bg, -Woven) inserts a row of background values between
+every pair of adjacent rows. A grid with H rows becomes a grid with 2*H-1
+rows. A single-row or empty grid is returned unchanged.
+
+?- il_weave_rows([[1,2],[3,4],[5,6]], 0, W).
+W = [[1,2],[0,0],[3,4],[0,0],[5,6]].
+
+?- il_weave_rows([[1,2,3]], 0, W).
+W = [[1,2,3]].    % single row: no separator added
+
+il_weave_cols(+Grid, +Bg, -Woven) inserts Bg between every pair of adjacent
+column values in each row. A row of width W becomes width 2*W-1.
+
+?- il_weave_cols([[1,2,3],[4,5,6]], 0, W).
+W = [[1,0,2,0,3],[4,0,5,0,6]].
+
+?- il_weave_cols([[1,2]], 0, W).
+W = [[1,0,2]].
+
+
+5. Unweaving: Removing Separators
+
+il_unweave_rows(+Grid, -Core) removes the odd-indexed rows (the separators
+inserted by il_weave_rows), returning only the even-indexed rows.
+
+?- il_unweave_rows([[1,2],[0,0],[3,4],[0,0],[5,6]], Core).
+Core = [[1,2],[3,4],[5,6]].
+
+il_unweave_cols(+Grid, -Core) removes the odd-indexed columns.
+
+?- il_unweave_cols([[1,0,2,0,3]], Core).
+Core = [[1,2,3]].
+
+
+6. Stride Selection
+
+il_stride_rows(+Grid, +Step, +Start0, -SubGrid) extracts every Step-th row
+starting at 0-based index Start0. The selected indices are
+Start0, Start0+Step, Start0+2*Step, ...
+
+?- il_stride_rows([[r0],[r1],[r2],[r3]], 2, 0, S).
+S = [[r0],[r2]].    % rows 0 and 2
+
+?- il_stride_rows([[r0],[r1],[r2],[r3]], 2, 1, S).
+S = [[r1],[r3]].    % rows 1 and 3
+
+il_stride_cols(+Grid, +Step, +Start0, -SubGrid) does the same for columns.
+
+?- il_stride_cols([[1,2,3,4]], 2, 0, S).
+S = [[1,3]].    % columns 0 and 2
+
+?- il_stride_cols([[1,2,3],[4,5,6]], 1, 0, S).
+S = [[1,2,3],[4,5,6]].    % all columns (step 1)
+
+
+7. Index-List Selection
+
+il_select_rows(+Grid, +Indices, -SubGrid) extracts rows at the given 0-based
+index list. The result has one row per element of Indices.
+
+?- il_select_rows([[r0],[r1],[r2]], [0,2], S).
+S = [[r0],[r2]].
+
+?- il_select_rows([[x],[y],[z]], [0,1,2], S).
+S = [[x],[y],[z]].
+
+il_select_cols(+Grid, +Indices, -SubGrid) extracts specific columns.
+
+?- il_select_cols([[a,b,c]], [0,2], S).
+S = [[a,c]].
+
+?- il_select_cols([[1,2,3],[4,5,6]], [1], S).
+S = [[2],[5]].
+
+
+8. Round-Robin Multi-Grid Interleaving
+
+il_rows_n(+Grids, -Result) interleaves rows from a list of grids in
+round-robin order. With three grids [G1, G2, G3] each of H rows, the result
+is G1[0], G2[0], G3[0], G1[1], G2[1], G3[1], ..., G1[H-1], G2[H-1], G3[H-1].
+
+?- il_rows_n([[[a],[b]],[[c],[d]],[[e],[f]]], R).
+R = [[a],[c],[e],[b],[d],[f]].
+
+?- il_rows_n([[[1,2]],[[3,4]]], R).
+R = [[1,2],[3,4]].
+
+?- il_rows_n([], R).
+R = [].
+
+
+9. Block Partitioning
+
+il_block_rows(+Grid, +N, -Blocks) partitions rows into consecutive groups of
+N rows. If the total row count is not divisible by N, the last block holds the
+remaining rows (fewer than N).
+
+?- il_block_rows([[r0],[r1],[r2],[r3],[r4],[r5]], 2, Bs).
+Bs = [[[r0],[r1]],[[r2],[r3]],[[r4],[r5]]].
+
+?- il_block_rows([[a],[b],[c],[d],[e]], 2, Bs).
+Bs = [[[a],[b]],[[c],[d]],[[e]]].    % last block is partial
+
+?- il_block_rows([[1,2],[3,4],[5,6]], 3, Bs).
+Bs = [[[1,2],[3,4],[5,6]]].    % one full block
+
+
+10. Summary
+
+The 14 il_* predicates cover the full lifecycle of row/column interleaving:
+merge, split, weave, unweave, stride, index-select, multi-grid round-robin,
+and block partition. Together they enable bidirectional transformations between
+interleaved and de-interleaved grid representations.
