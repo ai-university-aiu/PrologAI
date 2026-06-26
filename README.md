@@ -61,14 +61,14 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       211 work packages — the complete cognitive engine (see below)
+├── packs/       212 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
 └── launcher/    Entry points and bootstrapper
 ```
 
-### The 211 Work Packages
+### The 212 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -307,6 +307,7 @@ Everything is inspectable.
 | `objdelta` | Object-Pair Change Analysis and Rule Application (PR 285) |
 | `objcopy` | Object Tiling and Multi-Copy Layout (PR 286) |
 | `objmatch` | Object-List Correspondence and Matching (PR 287) |
+| `gridsolve` | End-to-End Scene Puzzle Solver (PR 300) |
 | `colortable` | Color Substitution Table Learning and Application (PR 299) |
 | `scenerank` | Rule Hypothesis Ranking for Scene Lists (PR 298) |
 | `scenepair` | Holistic Before-After Scene Pair Analysis (PR 297) |
@@ -344,11 +345,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v176` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v169` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v170` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v224` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v227` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v177` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v170` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v171` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v225` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v228` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---
