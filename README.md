@@ -61,14 +61,14 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       198 work packages — the complete cognitive engine (see below)
+├── packs/       199 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
 └── launcher/    Entry points and bootstrapper
 ```
 
-### The 198 Work Packages
+### The 199 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -306,6 +306,7 @@ Everything is inspectable.
 | `objseq` | Object Sequence and Progression Analysis (PR 284) |
 | `objdelta` | Object-Pair Change Analysis and Rule Application (PR 285) |
 | `objcopy` | Object Tiling and Multi-Copy Layout (PR 286) |
+| `objmatch` | Object-List Correspondence and Matching (PR 287) |
 | `objbound` | Object Shape Classification and Bounding Box Analysis (PR 277) |
 | `objsym` | Object Symmetry Analysis for obj(Color, Cells) Terms (PR 276) |
 | `objchain` | Linear Chain Analysis for obj(Color, Cells) Sequences (PR 275) |
@@ -331,11 +332,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v163` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v156` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v157` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v211` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v214` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v164` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v157` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v158` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v212` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v215` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---

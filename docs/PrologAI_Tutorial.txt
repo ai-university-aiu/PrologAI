@@ -17657,3 +17657,34 @@ tc_spread_v/4: redistribute at fixed row intervals.
 tc_center/4: center in H x W canvas.
 tc_flip_h/3: reflect within canvas width W.
 
+
+Chapter 149: Object-List Correspondence and Matching (objmatch Pack, mx_*, Layer 178)
+
+The objmatch pack finds correspondences between two obj(Color, Cells) term
+lists using four matching strategies and provides delta analysis on pairs.
+
+1. Matching Strategies
+mx_by_color/3: match by same color.
+mx_by_size/3: match by same cell count.
+mx_by_form/3: match by same normalized shape (color and position ignored).
+mx_by_nearest/3: greedy nearest-centroid matching.
+
+2. Unmatched Objects
+mx_unmatched/5: extract objects from each list not appearing in any pair.
+
+3. Pair Filtering
+mx_filter_changed_color/2: keep only pairs where color changed.
+mx_filter_same_color/2: keep only pairs where color is unchanged.
+
+4. Delta Extraction
+mx_color_deltas/2: c1-c2 color change per pair.
+mx_pos_deltas/2: dr(DR,DC) centroid displacement per pair.
+mx_size_deltas/2: N2-N1 size change per pair.
+
+5. Uniformity Tests
+mx_all_same_color_delta/1: all pairs share the same color change.
+mx_all_same_pos_delta/1: all pairs share the same positional delta.
+mx_all_same_size_delta/1: all pairs share the same size change.
+
+6. Positional Zip
+mx_zip/3: index-wise pairing of two equal-length lists.
