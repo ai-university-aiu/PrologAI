@@ -17985,3 +17985,38 @@ xc_split_size([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], 1, gt, Match, NoM
 
 14 xc_* predicates. 41 tests pass. Layer 187.
 All 41 tests pass. See docs/tutorial/Ch169_CondXf.txt for the full chapter.
+
+
+Chapter 159: scenepair Pack - Holistic Before-After Scene Pair Analysis (ps_*, Layer 188)
+
+The scenepair pack analyzes a Before and After scene pair holistically, computing
+scene-level observables useful for transformation rule hypothesis ranking.
+
+:- use_module(pack(scenepair/prolog/scenepair)).
+
+% Count change
+ps_same_n_objs([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(g,[r(0,0)]),obj(b,[r(0,1)])]).
+
+% Added/removed objects (matched by color+form)
+ps_added_objs([obj(r,[r(0,0)])], [obj(r,[r(0,0)]),obj(b,[r(0,1)])], Added).
+% Added = [obj(b,[r(0,1)])]
+
+% Color set observables
+ps_color_set_before([obj(r,[r(0,0)]),obj(b,[r(0,1)])], Colors).
+% Colors = [b, r]
+ps_same_color_set([obj(r,[r(0,0)])], [obj(r,[r(1,0)])]).
+
+% Color delta (position-matched)
+ps_color_delta([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(g,[r(0,0)]),obj(b,[r(0,1)])], Delta).
+% Delta = [r-g]
+
+% Transformation detectors
+ps_is_recolor([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(g,[r(0,0)]),obj(b,[r(0,1)])]).
+ps_is_recolor_all([obj(r,[r(0,0)])], [obj(g,[r(0,0)])]).
+ps_is_shift([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(r,[r(1,1)]),obj(b,[r(1,2)])], DR, DC).
+% DR = 1, DC = 1
+ps_is_to_origin([obj(r,[r(2,3)])], [obj(r,[r(0,0)])]).
+ps_size_preserved([obj(r,[r(0,0)])], [obj(g,[r(0,0)])]).
+
+14 ps_* predicates. 41 tests pass. Layer 188.
+All 41 tests pass. See docs/tutorial/Ch170_ScenePair.txt for the full chapter.
