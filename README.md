@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       204 work packages — the complete cognitive engine (see below)
+├── packs/       205 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -307,6 +307,7 @@ Everything is inspectable.
 | `objdelta` | Object-Pair Change Analysis and Rule Application (PR 285) |
 | `objcopy` | Object Tiling and Multi-Copy Layout (PR 286) |
 | `objmatch` | Object-List Correspondence and Matching (PR 287) |
+| `scenexf` | Scene-Level Uniform Transformation of All Objects (PR 293) |
 | `objlocate` | Object-List Spatial and Attribute Query Against a Reference Object (PR 292) |
 | `scenecmp` | Scene-Level Comparison of Two Object Lists (PR 291) |
 | `objgroup` | Object-List Grouping by Shared Attribute (PR 290) |
@@ -337,11 +338,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v169` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v162` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v163` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v217` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v220` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v170` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v163` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v164` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v218` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v221` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---
