@@ -61,14 +61,14 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       194 work packages — the complete cognitive engine (see below)
+├── packs/       195 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
 └── launcher/    Entry points and bootstrapper
 ```
 
-### The 190 Work Packages
+### The 195 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -302,6 +302,7 @@ Everything is inspectable.
 | `wavefront` | Wavefront BFS Propagation Through Passable Cells (PR 274) |
 | `objfilter` | Object List Filtering and Selection for obj(Color, Cells) Terms (PR 281) |
 | `objrel` | Object Pair Relation Analysis for obj(Color, Cells) Terms (PR 280) |
+| `canvas` | Grid Canvas and Object Rendering (PR 283) |
 | `objbound` | Object Shape Classification and Bounding Box Analysis (PR 277) |
 | `objsym` | Object Symmetry Analysis for obj(Color, Cells) Terms (PR 276) |
 | `objchain` | Linear Chain Analysis for obj(Color, Cells) Sequences (PR 275) |
@@ -327,11 +328,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v159` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v152` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v153` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v207` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v210` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v160` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v153` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v154` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v208` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v211` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---

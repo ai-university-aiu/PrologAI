@@ -1,0 +1,151 @@
+Chapter 156: Grid Canvas and Object Rendering (canvas Pack, cv_*, Layer 174)
+
+Author: D. R. Dison, Founder of AIU, Creator of PrologAI and Mentova,
+ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
+
+156.1 Overview
+
+The canvas pack bridges the obj(Color, Cells) world and the 2D grid world.
+It provides predicates for creating blank grid canvases, painting obj terms
+onto them, erasing objects, extracting objects from grids, and pasting
+subgrids at arbitrary positions.
+
+The pack has 14 exported predicates (cv_* prefix) and 2 private helpers.
+It has no cross-pack dependencies.
+
+Layer: 174. No dependencies on other packs.
+
+156.2 Creating a Canvas
+
+cv_blank(+H, +W, +Bg, -Grid)
+
+Create an H x W grid where every cell equals Bg.
+
+    cv_blank(3, 3, 0, Grid).
+    % Grid = [[0,0,0],[0,0,0],[0,0,0]]
+
+cv_size(+Grid, -H, -W)
+
+Get the height and width of a grid.
+
+    cv_size(Grid, H, W).
+
+156.3 Painting Objects
+
+cv_paint(+Grid, +Obj, -Grid2)
+
+Paint one obj(Color, Cells) onto Grid. All cells listed in Obj become Color;
+other cells are unchanged.
+
+    cv_blank(3, 3, 0, G0),
+    cv_paint(G0, obj(r, [r(0,0)]), G1).
+    % G1 = [[r,0,0],[0,0,0],[0,0,0]]
+
+cv_paint_all(+Grid, +Objs, -Grid2)
+
+Paint every obj in Objs in list order. Later objects overwrite earlier ones
+at shared cell positions.
+
+    cv_paint_all(G0, [obj(r,[r(0,0)]), obj(b,[r(1,0),r(1,1)])], G1).
+
+cv_paint_at(+Grid, +Obj, +DR, +DC, -Grid2)
+
+Translate each cell r(R,C) by (DR,DC) then paint. No bounds checking.
+
+    cv_blank(4, 4, 0, G0),
+    cv_paint_at(G0, obj(r,[r(0,0)]), 2, 2, G1).
+    % Places the cell at r(2,2) in G1.
+
+cv_paint_clip(+Grid, +Obj, -Grid2)
+
+Same as cv_paint but silently skips cells outside the grid bounds.
+
+    cv_blank(3, 3, 0, G0),
+    cv_paint_clip(G0, obj(9,[r(0,0),r(5,5)]), G1).
+    % r(5,5) is out of bounds and ignored.
+
+cv_paint_bg(+Grid, +Obj, +Bg, -Grid2)
+
+Paint only cells that currently equal Bg. Occupied (non-Bg) cells are
+left unchanged.
+
+    cv_paint_bg(G1, obj(9,[r(0,0),r(0,1)]), 0, G2).
+    % Only paints cells where G1[R][C] = 0.
+
+156.4 Erasing Objects
+
+cv_erase(+Grid, +Obj, +Bg, -Grid2)
+
+Fill all cells of Obj with Bg. The color field of Obj is ignored.
+
+    cv_erase(Grid, Obj, 0, Grid2).
+
+156.5 Extracting Objects from a Grid
+
+cv_extract(+Grid, +Color, -Obj)
+
+Collect all cells with value Color as obj(Color, Cells) in row-major order.
+Cells is empty if Color is absent.
+
+    cv_extract(Grid, b, obj(b, Cells)).
+
+cv_extract_all(+Grid, +Bg, -Objs)
+
+Extract all non-Bg objects. Returns one obj per distinct color in sorted
+color order.
+
+    cv_extract_all(Grid, 0, Objs).
+
+156.6 Rendering a Complete Scene
+
+cv_render(+H, +W, +Bg, +Objs, -Grid)
+
+Convenience predicate: create a blank canvas and paint all objects.
+
+    cv_render(10, 10, 0, [Obj1, Obj2, Obj3], Grid).
+
+156.7 Moving Objects
+
+cv_move(+Grid, +Obj, +DR, +DC, +Bg, -Grid2)
+
+Erase Obj from its current position, then repaint at offset (DR, DC).
+
+    cv_move(Grid, Obj, 0, 3, 0, Grid2).   % shift right by 3 columns
+
+156.8 Stamping and Blitting
+
+cv_stamp(+Obj, +Bg, -Patch)
+
+Extract Obj as a minimal bounding-box grid. Obj cells hold Color; all
+other bbox cells hold Bg.
+
+    cv_stamp(obj(p, [r(0,0),r(1,0),r(1,1)]), 0, Patch).
+    % Patch = [[p,0],[p,p]]  (2x2 bounding box)
+
+cv_blit(+Canvas, +Patch, +R0, +C0, -Grid2)
+
+Paste Patch onto Canvas with its top-left corner at (R0, C0). Each Patch
+cell overwrites the corresponding Canvas cell. Patch cells outside the
+canvas are silently ignored.
+
+    cv_blit(Canvas, Patch, 3, 5, Grid2).
+
+156.9 Summary
+
+Predicate            Description
+cv_blank/4           create H x W canvas filled with Bg
+cv_size/3            get grid dimensions
+cv_paint/3           paint one obj term onto grid
+cv_paint_all/3       paint list of obj terms onto grid
+cv_paint_at/5        translate obj by (DR,DC) then paint
+cv_paint_clip/3      paint with bounds clipping
+cv_paint_bg/4        paint only onto background cells
+cv_erase/4           erase obj cells (fill with Bg)
+cv_extract/3         extract obj by color from grid
+cv_extract_all/3     extract all non-bg objs from grid
+cv_render/5          blank canvas + paint all (convenience)
+cv_move/6            erase then repaint at offset
+cv_stamp/3           extract obj as tight bounding-box grid
+cv_blit/5            paste subgrid at position
+
+This is WP 195, PrologAI Layer 174.
