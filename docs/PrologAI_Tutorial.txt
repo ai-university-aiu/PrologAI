@@ -1146,7 +1146,7 @@ Tier 2 is the Data Layer (layers 60 and above).
 
 These are the perception, analysis, and transformation packs: color, shape, symmetry, fill, compare, grid operations, and everything that processes structured data.
 
-As of this writing, the highest Data Layer pack is gridperiod on layer 201.
+As of this writing, the highest Data Layer pack is gridscale on layer 202.
 
 New packs always receive a layer number higher than all existing packs they depend on.
 
@@ -18427,3 +18427,36 @@ gper_shift_wrap_rows([[r,r,r],[b,b,b],[g,g,g]], 1, S).
 
 14 gper_* predicates. 51 tests pass. Layer 201.
 All 51 tests pass. See docs/tutorial/Ch183_GridPeriod.txt for the full chapter.
+
+
+Chapter 173: gridscale Pack - Grid Block-Pixel Scaling (gsc_*, Layer 202)
+
+The gridscale pack provides integer block-pixel scaling operations on raw grid
+format: upsample, downsample, majority-vote downscaling, scale-factor detection,
+tile inference, nearest-neighbor resize, stride subsampling, border padding, and
+factor-aligned cropping.
+
+:- use_module(pack(gridscale/prolog/gridscale)).
+
+% Upsample 2x2 checkerboard by 2 to 4x4:
+gsc_upsample([[r,b],[b,r]], 2, S).
+% S = [[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]]
+
+% Downsample back (fails if blocks are not uniform):
+gsc_downsample([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2, D).
+% D = [[r,b],[b,r]]
+
+% Detect scale factor between two grids:
+gsc_scale_factor([[r,b],[b,r]], [[r,r,r,b,b,b],[r,r,r,b,b,b],[r,r,r,b,b,b],[b,b,b,r,r,r],[b,b,b,r,r,r],[b,b,b,r,r,r]], N).
+% N = 3
+
+% Infer the smallest tile of a repeated-tile grid:
+gsc_infer_tile([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], T).
+% T = [[r,b],[b,r]]
+
+% Pad with a border of color g:
+gsc_pad([[r,b],[b,r]], 1, g, P).
+% P = [[g,g,g,g],[g,r,b,g],[g,b,r,g],[g,g,g,g]]
+
+14 gsc_* predicates. 60 tests pass. Layer 202.
+All 60 tests pass. See docs/tutorial/Ch184_GridScale.txt for the full chapter.
