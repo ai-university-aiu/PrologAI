@@ -1,0 +1,136 @@
+Chapter 148: Voronoi Pack (vn_*, Layer 166)
+
+The voronoi pack (vn_* prefix, Layer 166) provides 14 predicates for
+nearest-color painting and Voronoi partitioning of 2D grids. Given a grid
+that contains some non-background colored cells and some background cells
+(identified by a caller-supplied Bg value), the pack can: find the nearest
+non-background color to any cell, paint all background cells with their
+nearest color, compute the full distance transform, partition the background
+into per-color Voronoi regions, detect equidistant medial-axis cells, and
+expand color regions by N steps into the background.
+
+148.1 Loading
+
+:- use_module(pack(voronoi)).
+
+148.2 Source Queries
+
+vn_non_bg_cells(+Grid, +Bg, -Cells) returns all non-background cell positions.
+
+    ?- vn_non_bg_cells([[1,0,0],[0,0,0],[0,0,2]], 0, Cells).
+    Cells = [r(0,0), r(2,2)].
+
+vn_non_bg_colors(+Grid, +Bg, -Colors) returns all distinct non-background values.
+
+    ?- vn_non_bg_colors([[a,0,0,0,b]], 0, Colors).
+    Colors = [a, b].
+
+148.3 Nearest Color and Distance
+
+vn_nearest_dist(+Grid, +Bg, +R, +C, -Dist): Manhattan distance from r(R,C) to
+the nearest non-background cell.
+
+    ?- vn_nearest_dist([[0,0,0],[0,1,0],[0,0,0]], 0, 0, 0, D).
+    D = 2.  % corner is distance 2 from center
+
+vn_nearest_color(+Grid, +Bg, +R, +C, -Color): color of the nearest non-Bg cell.
+Ties are broken by standard term order.
+
+    ?- vn_nearest_color([[a,0,0,0,b]], 0, 0, 1, Color).
+    Color = a.  % col 1 is closer to a (at col 0) than b (at col 4)
+
+148.4 Painting the Background
+
+vn_paint_bg(+Grid, +Bg, -Painted): replace every background cell with the
+color of its nearest non-background cell.
+
+    ?- vn_paint_bg([[0,0,0],[0,1,0],[0,0,0]], 0, P).
+    P = [[1,1,1],[1,1,1],[1,1,1]].
+
+    ?- vn_paint_bg([[a,0,0,0,b]], 0, [R]).
+    % R = [a, a, a_or_b, b, b]  (center cell ties)
+
+148.5 Distance Transform
+
+vn_dist_map(+Grid, +Bg, -DGrid): each cell becomes its distance to the
+nearest non-background cell (0 for non-Bg cells).
+
+    ?- vn_dist_map([[0,0,0],[0,1,0],[0,0,0]], 0, D).
+    D = [[2,1,2],[1,0,1],[2,1,2]].
+
+148.6 Voronoi Regions
+
+vn_region_cells(+Grid, +Bg, +Color, -Cells): which background cells belong to
+the Voronoi region of Color.
+
+    ?- vn_region_cells([[0,0,0],[0,1,0],[0,0,0]], 0, 1, Cells).
+    Cells = [r(0,0),r(0,1),r(0,2),r(1,0),r(1,2),r(2,0),r(2,1),r(2,2)].
+
+vn_regions(+Grid, +Bg, -Pairs): all Color-[Cells] pairs.
+
+    ?- vn_regions([[a,0,0,0,b]], 0, P).
+    P = [a-[r(0,1),r(0,2)], b-[r(0,3)]].  % center tie goes to a
+
+148.7 Distance-Based Queries
+
+vn_max_dist(+Grid, +Bg, -MaxDist): farthest background cell distance.
+
+vn_at_dist(+Grid, +Bg, +D, -Cells): background cells at exactly distance D.
+
+vn_within_dist(+Grid, +Bg, +D, -Cells): background cells at distance =< D.
+
+    ?- vn_at_dist([[0,0,0],[0,1,0],[0,0,0]], 0, 1, Cells).
+    Cells = [r(0,1),r(1,0),r(1,2),r(2,1)].  % 4 orthogonal neighbors of center
+
+148.8 Medial Axis
+
+vn_medial(+Grid, +Bg, -Cells): background cells that are equidistant from two
+or more distinct colors (the Voronoi boundary / medial axis).
+
+    ?- vn_medial([[a,0,0,0,b]], 0, M).
+    M = [r(0,2)].  % center col is equidistant from a and b
+
+148.9 Expansion
+
+vn_expand1(+Grid, +Bg, +Color, -Cells): background cells that are 4-adjacent to
+any cell of Color.
+
+    ?- vn_expand1([[0,0,0],[0,1,0],[0,0,0]], 0, 1, Cells).
+    Cells = [r(0,1),r(1,0),r(1,2),r(2,1)].
+
+vn_expand_n(+Grid, +Bg, +Color, +N, -Cells): background cells within Manhattan
+distance N of any Color cell. N=0 gives an empty list.
+
+    ?- vn_expand_n([[0,0,0],[0,1,0],[0,0,0]], 0, 1, 2, Cells).
+    % All 8 background cells are within distance 2 of r(1,1).
+    length(Cells, 8).
+
+148.10 Predicate Reference
+
+Source queries:
+  vn_non_bg_cells(+Grid, +Bg, -Cells)
+  vn_non_bg_colors(+Grid, +Bg, -Colors)
+
+Nearest color and distance:
+  vn_nearest_dist(+Grid, +Bg, +R, +C, -Dist)
+  vn_nearest_color(+Grid, +Bg, +R, +C, -Color)
+
+Painting and distance transform:
+  vn_paint_bg(+Grid, +Bg, -Painted)
+  vn_dist_map(+Grid, +Bg, -DGrid)
+
+Voronoi regions:
+  vn_region_cells(+Grid, +Bg, +Color, -Cells)
+  vn_regions(+Grid, +Bg, -Pairs)
+
+Distance-based queries:
+  vn_max_dist(+Grid, +Bg, -MaxDist)
+  vn_at_dist(+Grid, +Bg, +D, -Cells)
+  vn_within_dist(+Grid, +Bg, +D, -Cells)
+
+Medial axis:
+  vn_medial(+Grid, +Bg, -Cells)
+
+Expansion:
+  vn_expand1(+Grid, +Bg, +Color, -Cells)
+  vn_expand_n(+Grid, +Bg, +Color, +N, -Cells)

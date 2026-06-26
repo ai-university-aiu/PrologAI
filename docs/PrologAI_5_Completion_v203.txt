@@ -6378,3 +6378,22 @@ Tests: 46 PLUnit tests, all pass, no warnings.
 SPARC: Spec v151, Pseudo v144, Arch v145, Refinement v199, Completion v202.
 
 Summary: Morphological operations directly on obj(Color, Cells) terms without requiring a grid. Two neighborhood generators: om_neighbors4 (4 orthogonal neighbors) and om_neighbors8 (8 directional neighbors including diagonals). Boundary extraction: om_boundary4 keeps cells with at least one 4-neighbor outside the set; om_boundary8 uses 8-connectivity. Interior extraction: om_interior4 keeps cells where all 4 neighbors are inside; om_interior8 uses all 8 neighbors (stricter). Dilation: om_dilate4 and om_dilate8 expand by one step; implemented via findall over neighbor lists then append+sort union. Erosion: om_erode4 delegates to om_interior4; om_erode8 delegates to om_interior8. Iterated forms: om_dilate4_n and om_erode4_n recurse with N countdown. Compound operations: om_open4 = erode4 then dilate4 (removes thin protrusions); om_close4 = dilate4 then erode4 (fills small gaps). Key implementation: boundary uses \+ forall(member(N,Nbrs), member(N,S)); interior uses forall(member(N,Nbrs), member(N,S)).
+
+WP-187 Completion Record
+
+Work Package: 187
+Pack: voronoi
+Module: voronoi
+Prefix: vn_
+Layer: 166
+Branch: feature/wp187-voronoi-pack
+PR: 272
+Merged: 2026-06-26
+
+Predicates (14): vn_non_bg_cells/3, vn_non_bg_colors/3, vn_nearest_dist/5, vn_nearest_color/5, vn_paint_bg/3, vn_dist_map/3, vn_region_cells/4, vn_regions/3, vn_max_dist/3, vn_at_dist/4, vn_within_dist/4, vn_medial/3, vn_expand1/4, vn_expand_n/5.
+
+Tests: 49 PLUnit tests, all pass, no warnings.
+
+SPARC: Spec v152, Pseudo v145, Arch v146, Refinement v200, Completion v203.
+
+Summary: Nearest-color painting and Voronoi partitioning for 2D grids. Distinguishes background cells from non-background cells using a caller-supplied Bg value. Source queries: vn_non_bg_cells and vn_non_bg_colors collect sources from the grid. Nearest queries: vn_nearest_dist (min of findall Manhattan distances) and vn_nearest_color (sort D-V pairs, take first). Painting: vn_paint_bg maps each Bg cell to its nearest color; leaves non-Bg unchanged. Distance transform: vn_dist_map returns 0 for non-Bg cells, Manhattan distance for Bg cells. Voronoi regions: vn_region_cells and vn_regions partition Bg cells by their nearest color. Distance queries: vn_max_dist, vn_at_dist, vn_within_dist. Medial axis: vn_medial finds Bg cells equidistant from 2+ distinct colors by collecting all colors that achieve the minimum distance and requiring at least a 2-element sorted list. Expansion: vn_expand1 finds Bg cells 4-adjacent to a specific color; vn_expand_n uses Manhattan distance cutoff N.
