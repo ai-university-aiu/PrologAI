@@ -1,0 +1,98 @@
+Chapter 118: Neighborhood Mode Filter for 2D Grids Pack (Layer 136, nm_* prefix)
+
+The nmode pack provides 14 predicates for computing the mode (most frequent
+value) of integer lists, grid rows, columns, the whole grid, and per-cell
+4/8-connected neighborhoods.  It also detects cells with uniform neighborhoods
+and cells that are outliers relative to their neighborhood mode.
+
+Ties in frequency are broken by returning the smallest tied value.
+
+Predicates:
+
+nm_mode(+List, -M)
+  Mode of a non-empty integer list; ties broken by smallest value.
+
+nm_mode_all(+List, -Ms)
+  Sorted list of ALL values tied for the highest frequency.
+
+nm_mode_count(+List, -M, -Count)
+  Mode M and its frequency Count.
+
+nm_row(+Grid, +R, -M)
+  Mode of row R (0-based) of Grid.
+
+nm_col(+Grid, +C, -M)
+  Mode of column C (0-based) of Grid.
+
+nm_row_modes(+Grid, -Ms)
+  List of per-row modes, one per row.
+
+nm_col_modes(+Grid, -Ms)
+  List of per-column modes, one per column.
+
+nm_grid(+Grid, -M)
+  Mode of all cell values in Grid.
+
+nm_filter4(+Grid, -OutGrid)
+  4-connected mode filter: each output cell is the mode of the cell and
+  its in-bounds 4-neighbors.  Useful for denoising and pattern completion.
+
+nm_filter8(+Grid, -OutGrid)
+  8-connected mode filter: each output cell is the mode of the cell and
+  its in-bounds 8-neighbors.
+
+nm_uniform4(+Grid, -Cells)
+  Sorted R-C positions whose in-bounds 4-neighbors all share one value.
+
+nm_uniform8(+Grid, -Cells)
+  Sorted R-C positions whose in-bounds 8-neighbors all share one value.
+
+nm_outlier4(+Grid, -Cells)
+  Sorted R-C positions whose value differs from their 4-neighbor mode
+  (cell excluded from the mode computation).
+
+nm_outlier8(+Grid, -Cells)
+  Sorted R-C positions whose value differs from their 8-neighbor mode
+  (cell excluded from the mode computation).
+
+Usage examples:
+
+nm_mode([1,2,3], M). % M=1 (all tied; smallest wins)
+nm_mode([1,1,2,3], M). % M=1 (highest frequency)
+nm_mode([1,1,2,2], M). % M=1 (tied at 2; smallest wins)
+nm_mode_all([1,1,2,2], Ms). % Ms=[1,2]
+nm_mode_count([1,1,2,3], M, C). % M=1, C=2
+nm_grid([[1,2,3],[4,5,6],[7,8,9]], M). % M=1 (all distinct; smallest)
+nm_row_modes([[1,2,3],[4,5,6],[7,8,9]], Ms). % Ms=[1,4,7]
+nm_col_modes([[1,2,3],[4,5,6],[7,8,9]], Ms). % Ms=[1,2,3]
+nm_filter4([[1,2,3],[4,5,6],[7,8,9]], F).
+  % F=[[1,1,2],[1,2,3],[4,5,6]]
+nm_filter8([[1,2,1],[2,1,2],[1,2,1]], F).
+  % F=[[1,1,1],[1,1,1],[1,1,1]] (checkerboard collapses to uniform)
+nm_uniform4([[1,1,1],[1,1,1],[1,1,1]], C).
+  % C=[0-0,0-1,...,2-2] (all 9 cells)
+nm_uniform4([[1,2,3],[4,5,6],[7,8,9]], C).
+  % C=[] (all neighbors differ in a sequential grid)
+nm_outlier4([[1,2,1],[2,1,2],[1,2,1]], C).
+  % C=[0-0,0-1,...,2-2] (checkerboard: every cell disagrees with neighbors)
+nm_outlier8([[1,2,1],[2,1,2],[1,2,1]], C).
+  % C=[0-0,0-1,0-2,1-0,1-2,2-0,2-1,2-2] (center 1-1 agrees with 8-nbr mode)
+
+Key implementation notes:
+
+Mode computation uses nm_freq_pairs_/2, which converts an msort-sorted list
+(duplicates preserved) into Value-Count pairs by grouping consecutive equal
+elements.  The private helper nm_count_prefix_/4 has a cut in its empty-list
+base case to prevent the catch-all clause from also matching, which would
+cause duplicate solutions inside findall.
+
+nm_uniform4/8 uses sort(NbrVals, [_]) as a one-step test: sort/2 removes
+duplicates, so [_] matches iff all neighbor values are identical.
+
+nm_outlier4/8 computes the mode of NEIGHBORS ONLY (not including the cell
+itself), then checks if the cell's own value differs numerically (=\=/2).
+
+Library imports: library(lists): member/2, nth0/3, max_list/2.
+Built-ins: msort/2, sort/2, length/2, between/3, findall/3.
+
+Predicate count: 14 (nm_* prefix). Tests: 42/42. Layer: 136.

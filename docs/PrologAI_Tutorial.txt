@@ -15552,3 +15552,42 @@ md_above/below: compute grid median first; findall+nth0 with V>Median or V<Media
 Library imports: library(lists): member/2, nth0/3. Built-ins: msort/2, length/2.
 
 Predicate count: 14 (md_* prefix). Tests: 42/42. Layer: 135.
+
+PROLOGAI TUTORIAL
+
+Chapter 118: Neighborhood Mode Filter for 2D Grids Pack (Layer 136, nm_* prefix)
+
+The nmode pack provides the mode (most frequent value, smallest-value tie-breaking)
+for lists, grid rows, columns, the entire grid, and per-cell 4/8-connected
+neighborhood filters.  It also detects uniform and outlier cells.
+
+Predicates: nm_mode/2, nm_mode_all/2, nm_mode_count/3, nm_row/3, nm_col/3,
+  nm_row_modes/2, nm_col_modes/2, nm_grid/2, nm_filter4/2, nm_filter8/2,
+  nm_uniform4/2, nm_uniform8/2, nm_outlier4/2, nm_outlier8/2.
+
+Usage examples:
+
+nm_mode([1,2,3],M). % M=1 (all distinct; smallest wins)
+nm_mode([1,1,2,2],M). % M=1 (tied; smallest wins)
+nm_mode_all([1,1,2,2],Ms). % Ms=[1,2]
+nm_mode_count([1,1,2,3],M,C). % M=1, C=2
+nm_row_modes([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[1,4,7]
+nm_col_modes([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[1,2,3]
+nm_grid([[1,2,3],[4,5,6],[7,8,9]],M). % M=1
+nm_filter4([[1,2,3],[4,5,6],[7,8,9]],F). % F=[[1,1,2],[1,2,3],[4,5,6]]
+nm_filter8([[1,2,1],[2,1,2],[1,2,1]],F). % F=[[1,1,1],[1,1,1],[1,1,1]]
+nm_uniform4([[1,1,1],[1,1,1],[1,1,1]],C). % C=[0-0,...,2-2] all 9 cells
+nm_uniform4([[1,2,3],[4,5,6],[7,8,9]],C). % C=[] (all neighbors distinct)
+nm_outlier4([[1,2,1],[2,1,2],[1,2,1]],C). % C=all 9 cells (checkerboard)
+nm_outlier8([[1,2,1],[2,1,2],[1,2,1]],C). % C=all except center 1-1
+
+Key implementation pattern:
+nm_mode builds Value-Count pairs from an msort-sorted list. nm_count_prefix_
+clause 1 (empty list) has a cut to prevent duplicate solutions in findall.
+nm_uniform4/8 uses sort(NbrVals,[_]) as a one-step uniformity test.
+nm_outlier4/8 computes the mode of NEIGHBORS ONLY (cell excluded).
+
+Library imports: library(lists): member/2, nth0/3, max_list/2.
+Built-ins: msort/2, sort/2, length/2, between/3, findall/3.
+
+Predicate count: 14 (nm_* prefix). Tests: 42/42. Layer: 136.
