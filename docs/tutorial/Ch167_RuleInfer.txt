@@ -1,0 +1,244 @@
+Chapter 167: ruleinfer Pack - Scene-Level Transformation Rule Inference (ri_*, Layer 185)
+
+
+Overview
+
+The ruleinfer pack infers which scene-level transformation was applied to a
+Before scene to produce an After scene. Given a list of Before-After training
+pairs, it determines what rule was used and verifies that the rule is consistent
+across all pairs.
+
+This pack bridges the gap between scenecmp (sm_*) — which detects that something
+changed — and scenexf (sx_*) — which applies changes. The ruleinfer pack answers
+the question: "What exactly was the rule?"
+
+Layer 185. Pack prefix: ri_*. Work Package 206.
+
+
+What the Pack Does
+
+Two categories of predicates:
+
+Inference predicates (detect rule from one Before-After pair):
+  ri_infer_recolor/4       - one color changed to another
+  ri_infer_recolor_all/3   - all objects set to the same color
+  ri_infer_color_map/3     - full color substitution map
+  ri_infer_keep_color/3    - keep_color filter applied
+  ri_infer_remove_color/3  - remove_color filter applied
+  ri_infer_shift/4         - uniform spatial shift
+  ri_infer_to_origin/2     - shift to origin
+
+Consistency predicates (verify rule across multiple pairs):
+  ri_consistent_recolor/3        - recolor rule
+  ri_consistent_color_map/2      - color map rule
+  ri_consistent_keep_color/2     - keep_color rule
+  ri_consistent_remove_color/2   - remove_color rule
+  ri_consistent_shift/3          - shift rule
+
+Cross-pair queries:
+  ri_all_same_n_objs/1    - all pairs preserve object count
+  ri_all_same_colors/1    - all pairs preserve color sets
+
+
+Loading the Pack
+
+:- use_module(pack(ruleinfer/prolog/ruleinfer)).
+
+
+Pairs Representation
+
+Pairs are expressed as Before-After terms. A single pair is:
+
+  Pair = BeforeScene - AfterScene
+
+A list of pairs:
+
+  Pairs = [Before1-After1, Before2-After2, ...]
+
+Each scene is a list of obj(Color, Cells) terms.
+
+
+Inference Predicates
+
+ri_infer_recolor(+Before, +After, -Old, -New)
+
+Infer that all objects of color Old were changed to New, and no other color
+changed. Succeeds only when exactly one color appears in Before but not After
+(Old) and exactly one color appears in After but not Before (New). Verifies
+that the count of Old-colored objects in Before equals the count of New-colored
+objects in After.
+
+  :- ri_infer_recolor([obj(r,[r(0,0)]), obj(b,[r(0,1)])],
+                      [obj(g,[r(0,0)]), obj(b,[r(0,1)])],
+                      Old, New).
+  Old = r, New = g.
+
+ri_infer_recolor_all(+Before, +After, -New)
+
+Infer that every object was set to the same color New. Succeeds when the After
+scene has exactly one distinct color.
+
+  :- ri_infer_recolor_all([obj(r,[r(0,0)]), obj(b,[r(0,1)])],
+                          [obj(g,[r(0,0)]), obj(g,[r(0,1)])],
+                          New).
+  New = g.
+
+ri_infer_color_map(+Before, +After, -Map)
+
+Infer a full color substitution map by comparing position-matched objects.
+Requires Before and After to have the same length. Map contains one Old-New pair
+per position where the color changed. Positions where color is unchanged are
+omitted.
+
+  :- ri_infer_color_map([obj(r,[r(0,0)]), obj(b,[r(0,1)])],
+                        [obj(b,[r(0,0)]), obj(r,[r(0,1)])],
+                        Map).
+  Map = [r-b, b-r].
+
+ri_infer_keep_color(+Before, +After, -Color)
+
+Infer that a keep_color filter was applied, retaining only Color objects. Succeeds
+when After has exactly one distinct color, Before has more objects than After,
+and the count of Color-colored objects in Before equals the length of After.
+
+  :- ri_infer_keep_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])],
+                         [obj(r,[r(0,0)]), obj(r,[r(0,2)])],
+                         Color).
+  Color = r.
+
+ri_infer_remove_color(+Before, +After, -Color)
+
+Infer that color Color was removed from the scene. Color is the single color
+present in Before that is absent from After.
+
+  :- ri_infer_remove_color([obj(r,[r(0,0)]), obj(b,[r(0,1)])],
+                           [obj(b,[r(0,1)])],
+                           Color).
+  Color = r.
+
+ri_infer_shift(+Before, +After, -DR, -DC)
+
+Infer the uniform shift applied to all objects. Uses the first object in Before
+as a reference: finds the matching object in After (same color and normalized
+form), computes DR and DC from the position difference, then verifies the entire
+scene matches when shifted by that amount.
+
+  :- ri_infer_shift([obj(r,[r(0,0)])], [obj(r,[r(2,3)])], DR, DC).
+  DR = 2, DC = 3.
+
+ri_infer_to_origin(+Before, +After)
+
+Succeed if After equals Before shifted so the scene bounding box top-left is
+at r(0,0). Computes the minimum row and column across all objects in Before,
+shifts by their negatives, and compares (as sorted sets) to After.
+
+  :- ri_infer_to_origin([obj(r,[r(3,4)])], [obj(r,[r(0,0)])]).
+  true.
+
+
+Consistency Predicates
+
+After inferring a candidate rule from one pair, use consistency predicates to
+verify it works across all training pairs.
+
+ri_consistent_recolor(+Old, +New, +Pairs)
+
+Verify that applying recolor(Old, New) to each Before scene produces the
+corresponding After scene. Scene order may differ; comparison is msort-based.
+
+  :- P1 = [obj(r,[r(0,0)])] - [obj(g,[r(0,0)])],
+     P2 = [obj(r,[r(1,1)])] - [obj(g,[r(1,1)])],
+     ri_consistent_recolor(r, g, [P1, P2]).
+  true.
+
+ri_consistent_color_map(+Map, +Pairs)
+
+Verify that applying the color map to each Before scene produces the
+corresponding After scene. Unmatched colors pass through unchanged.
+
+ri_consistent_keep_color(+Color, +Pairs)
+
+Verify that keeping only Color objects from each Before produces the
+corresponding After.
+
+ri_consistent_remove_color(+Color, +Pairs)
+
+Verify that removing all Color objects from each Before produces the
+corresponding After.
+
+ri_consistent_shift(+DR, +DC, +Pairs)
+
+Verify that shifting each Before scene by (DR, DC) produces the corresponding
+After scene.
+
+
+Cross-pair Queries
+
+ri_all_same_n_objs(+Pairs)
+
+Succeed if every Before-After pair preserves the object count.
+
+  :- P = [obj(r,[r(0,0)]), obj(b,[r(0,1)])] - [obj(g,[r(0,0)]), obj(y,[r(0,1)])],
+     ri_all_same_n_objs([P]).
+  true.
+
+ri_all_same_colors(+Pairs)
+
+Succeed if every Before-After pair preserves the set of distinct colors.
+
+  :- ri_all_same_colors([]).  % vacuously true
+  true.
+
+
+Extended Example: Rule Discovery Pipeline
+
+A typical rule discovery session:
+
+  discover_rule(Pairs, Rule) :-
+      % Step 1: check cross-pair properties
+      (   ri_all_same_n_objs(Pairs)
+      ->  true
+      ;   true  % object count may change — filtering rule
+      ),
+
+      % Step 2: try inference on first pair
+      Pairs = [Before-After | _],
+
+      % Step 3: find first consistent rule
+      (   ri_infer_recolor(Before, After, Old, New),
+          ri_consistent_recolor(Old, New, Pairs)
+      ->  Rule = recolor(Old, New)
+
+      ;   ri_infer_shift(Before, After, DR, DC),
+          ri_consistent_shift(DR, DC, Pairs)
+      ->  Rule = shift(DR, DC)
+
+      ;   ri_infer_keep_color(Before, After, Color),
+          ri_consistent_keep_color(Color, Pairs)
+      ->  Rule = keep_color(Color)
+
+      ;   ri_infer_remove_color(Before, After, Color),
+          ri_consistent_remove_color(Color, Pairs)
+      ->  Rule = remove_color(Color)
+
+      ;   Rule = unknown
+      ).
+
+
+Test Coverage
+
+All 41 acceptance criteria (AC-RI-001 through AC-RI-041) defined in
+Refinement v219 Part 196 are exercised in packs/ruleinfer/test/test_ruleinfer.pl.
+All 41 tests pass.
+
+
+Summary
+
+The ruleinfer pack provides the inference layer that connects example pairs to
+symbolic transformation rules. It works with the scenexf pack (which applies
+rules) and the scenecmp pack (which detects differences) to form a complete
+scene-level reasoning toolkit: observe that something changed, infer what rule
+was applied, verify that rule across all examples, then apply it to the test
+input.
+
+Continue to Chapter 168 for the next pack in the PrologAI Layer sequence.
