@@ -17772,3 +17772,29 @@ og_all_same_size/1: all groups have the same member count.
 og_sort_desc/2: sort groups by member count descending.
 og_flat/2: flatten groups back to a single obj list.
 og_filter_size/4: keep groups with member count in Min..Max inclusive.
+
+
+Chapter 153: Scene-Level Comparison of Two Object Lists (scenecmp, sm_*, Layer 182)
+
+The scenecmp pack compares two obj(Color, Cells) lists (Before and After) at the
+inventory level without requiring object-to-object matching.
+
+1. Introspection (Single Scene)
+sm_n_objs/2: count of objects.
+sm_total_cells/2: total cell count.
+sm_colors/2: sorted distinct colors.
+sm_forms/2: sorted distinct normalized shapes.
+
+2. Symmetric Comparison
+sm_same_n_objs/2: same object count.
+sm_same_total_cells/2: same total cell count.
+sm_same_colors/2: same color set.
+sm_same_forms/2: same form set.
+
+3. Asymmetric Comparison
+sm_added_colors/3: colors in After not in Before.
+sm_removed_colors/3: colors in Before not in After.
+sm_added_forms/3: forms in After not in Before.
+sm_removed_forms/3: forms in Before not in After.
+sm_n_color_change/3: |added colors| + |removed colors|.
+sm_any_change/2: any difference in count, color, or form; fails if none.

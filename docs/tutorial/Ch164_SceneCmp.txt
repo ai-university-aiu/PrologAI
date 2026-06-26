@@ -1,0 +1,151 @@
+Chapter 164: Scene-Level Comparison of Two Object Lists (scenecmp Pack, sm_* Prefix, Layer 182)
+
+Author: D. R. Dison, Founder of AIU, Creator of PrologAI and Mentova,
+ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
+
+
+Overview
+
+The scenecmp pack (Layer 182) compares two lists of obj(Color, Cells) terms at the
+inventory level. Given a Before scene and an After scene, it answers: did the number
+of objects change? Did new colors appear? Did new shapes appear?
+
+The pack does not require an explicit object-to-object matching. It compares global
+inventories: the color set, the form set, and object and cell counts.
+
+The pack exports 14 predicates under the sm_* prefix.
+
+
+Predicate Reference
+
+The predicates fall into three groups: introspection (single scene), symmetric
+comparison (same question for both), and asymmetric comparison (what changed).
+
+
+Introspection Predicates
+
+sm_n_objs(+Objs, -N)
+    Count of objects in the list.
+
+    ?- sm_n_objs([obj(r,[r(0,0)]), obj(b,[r(0,1)])], N).
+    N = 2.
+
+sm_total_cells(+Objs, -N)
+    Total cell count across all objects.
+
+    ?- sm_total_cells([obj(r,[r(0,0)]), obj(r,[r(0,0),r(0,1),r(0,2)])], N).
+    N = 4.
+
+sm_colors(+Objs, -Colors)
+    Sorted list of distinct colors in the object list.
+
+    ?- sm_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], C).
+    C = [b, r].
+
+sm_forms(+Objs, -Forms)
+    Sorted list of distinct normalized shapes. Each form is a sorted cell list
+    translated to the origin.
+
+    ?- sm_forms([obj(r,[r(0,0)]), obj(b,[r(0,1)])], F).
+    F = [[r(0,0)]].   % both are single-cell dots at origin after normalization
+
+
+Symmetric Comparison Predicates
+
+sm_same_n_objs(+Before, +After)
+    Succeeds iff both lists have the same number of objects.
+
+sm_same_total_cells(+Before, +After)
+    Succeeds iff both lists have the same total cell count.
+
+sm_same_colors(+Before, +After)
+    Succeeds iff both lists have exactly the same sorted color set.
+
+    ?- sm_same_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)])],
+                       [obj(r,[r(1,0)]), obj(b,[r(1,1)])]).
+    true.
+
+sm_same_forms(+Before, +After)
+    Succeeds iff both lists have exactly the same sorted form set.
+
+
+Asymmetric Comparison Predicates
+
+sm_added_colors(+Before, +After, -Added)
+    Colors present in After but not in Before.
+
+    ?- sm_added_colors([obj(r,[r(0,0)])], [obj(r,[r(0,0)]), obj(b,[r(0,1)])], A).
+    A = [b].
+
+sm_removed_colors(+Before, +After, -Removed)
+    Colors present in Before but not in After.
+
+sm_added_forms(+Before, +After, -Added)
+    Normalized forms present in After but not in Before.
+
+sm_removed_forms(+Before, +After, -Removed)
+    Normalized forms present in Before but not in After.
+
+sm_n_color_change(+Before, +After, -N)
+    N = |added colors| + |removed colors|. Zero means the same palette. One means
+    exactly one color was added with none removed, or vice versa. Two means a color
+    swap (one added, one removed).
+
+    ?- sm_n_color_change([obj(r,[r(0,0)]), obj(b,[r(0,1)])],
+                          [obj(r,[r(0,0)]), obj(g,[r(1,0)])], N).
+    N = 2.   % b removed, g added
+
+sm_any_change(+Before, +After)
+    True iff the object count, color set, or form set differs between Before and
+    After. Fails (does not raise an error) when no difference is detected.
+
+    ?- sm_any_change([obj(r,[r(0,0)])], [obj(r,[r(0,0)]), obj(b,[r(0,1)])]).
+    true.   % count changed from 1 to 2
+
+
+Worked Example: Detecting a Recoloring
+
+Suppose the input scene has two dots - one red, one blue - and the output scene
+has two dots - one red, one green. Has anything changed?
+
+  Before = [obj(r,[r(0,0)]), obj(b,[r(0,1)])]
+  After  = [obj(r,[r(0,0)]), obj(g,[r(1,0)])]
+
+  ?- sm_same_n_objs(Before, After).
+  true.   % both have 2 objects
+
+  ?- sm_same_forms(Before, After).
+  true.   % both have only the dot form
+
+  ?- sm_same_colors(Before, After).
+  false.  % Before: {r,b}; After: {r,g}
+
+  ?- sm_added_colors(Before, After, Added).
+  Added = [g].
+
+  ?- sm_removed_colors(Before, After, Removed).
+  Removed = [b].
+
+  ?- sm_n_color_change(Before, After, N).
+  N = 2.  % one color replaced by another
+
+  ?- sm_any_change(Before, After).
+  true.
+
+
+Test Coverage
+
+All 41 acceptance criteria (AC-SM-001 through AC-SM-041) defined in
+Refinement v216 Part 193 are exercised in packs/scenecmp/test/test_scenecmp.pl.
+All 41 tests pass.
+
+
+Summary
+
+The scenecmp pack gives a reasoner a fast, high-level view of what changed between
+two scenes. It does not find which specific objects changed, but it detects whether
+anything changed, what colors appeared or disappeared, and what forms appeared or
+disappeared. This makes it a useful first filter before more detailed analysis with
+objmatch or objdelta.
+
+Continue to Chapter 165 for the next pack in the PrologAI Layer sequence.
