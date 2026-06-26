@@ -15232,3 +15232,42 @@ Library imports: library(lists): member/2, nth0/3, numlist/3, append/3, max_list
   library(apply): maplist/3, include/3. Built-ins: length/2, between/3, forall/2.
 
 Predicate count: 14 (bk_* prefix). Tests: 42/42. Layer: 127.
+
+
+CHAPTER 110: EDGE DETECTION AND BOUNDARY ANALYSIS (ed_*)
+
+The edge pack (Layer 128, module edge, prefix ed_*) provides 14 predicates
+for detecting boundaries between regions of different values in a 2D grid.
+An edge exists wherever two adjacent cells carry different values.
+A boundary cell has at least one 4-connected neighbor with a different value.
+
+Load: :- use_module('packs/edge/prolog/edge.pl').
+
+Examples:
+ed_h_edges([[0,0,0],[1,1,1],[0,0,0]],E).      % E=[0-0,0-1,0-2,1-0,1-1,1-2]
+ed_v_edges([[0,0,1,1],[0,0,1,1]],E).           % E=[0-1,1-1]
+ed_h_edge([[0,0,0],[1,1,1],[0,0,0]],0,0,B).   % B=1
+ed_v_edge([[0,0,1,1],[0,0,1,1]],0,1,B).       % B=1
+ed_all_edges([[1,1],[1,1]],E).                 % E=[]
+ed_boundary_cells([[0,0,0],[0,1,0],[0,0,0]],1,C). % C=[1-1]
+ed_outer_boundary([[2,2,2],[2,2,2],[2,2,2]],C),length(C,N). % N=8
+ed_inner_cells([[2,2,2],[2,2,2],[2,2,2]],2,C),length(C,N). % N=9
+ed_edge_count([[0,1,0],[1,0,1],[0,1,0]],N).   % N=12
+ed_is_smooth([[2,2,2],[2,2,2],[2,2,2]]).       % succeeds
+ed_label_edges([[0,0,0],[0,1,0],[0,0,0]],0,G2). % G2=[[0,1,0],[1,1,1],[0,1,0]]
+ed_has_edge([[0,0,0],[0,1,0],[0,0,0]],1,1,B). % B=1
+ed_corners([[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]],C),length(C,N). % N=3
+ed_corner_count([[0,1,0],[1,0,1],[0,1,0]],N). % N=4
+
+Key implementation patterns:
+ed_h_edges/ed_v_edges: findall with between for dimension iteration;
+  H2=H-2 (not H1=H-1) to avoid singleton warnings since H1 is unused.
+ed_boundary_cells: disjunctive findall body; uses C0 is C-1 (not C-1 directly).
+ed_inner_cells: delegates to ed_boundary_cells then filters with \+member.
+ed_label_edges: outer findall over rows; inner findall over columns;
+  private ed_has_diff_nbr_/6 helper for four-direction if-then-else.
+ed_corners: findall over 2x2 top-left positions; \+ uniformity test.
+
+Library imports: library(lists): member/2, nth0/3. Built-ins: length/2, between/3.
+
+Predicate count: 14 (ed_* prefix). Tests: 42/42. Layer: 128.
