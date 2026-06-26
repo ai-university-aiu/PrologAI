@@ -6397,3 +6397,22 @@ Tests: 49 PLUnit tests, all pass, no warnings.
 SPARC: Spec v152, Pseudo v145, Arch v146, Refinement v200, Completion v203.
 
 Summary: Nearest-color painting and Voronoi partitioning for 2D grids. Distinguishes background cells from non-background cells using a caller-supplied Bg value. Source queries: vn_non_bg_cells and vn_non_bg_colors collect sources from the grid. Nearest queries: vn_nearest_dist (min of findall Manhattan distances) and vn_nearest_color (sort D-V pairs, take first). Painting: vn_paint_bg maps each Bg cell to its nearest color; leaves non-Bg unchanged. Distance transform: vn_dist_map returns 0 for non-Bg cells, Manhattan distance for Bg cells. Voronoi regions: vn_region_cells and vn_regions partition Bg cells by their nearest color. Distance queries: vn_max_dist, vn_at_dist, vn_within_dist. Medial axis: vn_medial finds Bg cells equidistant from 2+ distinct colors by collecting all colors that achieve the minimum distance and requiring at least a 2-element sorted list. Expansion: vn_expand1 finds Bg cells 4-adjacent to a specific color; vn_expand_n uses Manhattan distance cutoff N.
+
+WP-188 Completion Record
+
+Work Package: 188
+Pack: objcomp
+Module: objcomp
+Prefix: oc_
+Layer: 167
+Branch: feature/wp188-objcomp-pack
+PR: 273
+Merged: 2026-06-26
+
+Predicates (14): oc_touches/2, oc_touching_pairs/2, oc_adj_list/2, oc_degree/3, oc_isolated/2, oc_connected/3, oc_components/2, oc_num_components/2, oc_largest_component/2, oc_smallest_component/2, oc_singleton_components/2, oc_shared_components/2, oc_max_degree/2, oc_sort_by_degree/2.
+
+Tests: 40 PLUnit tests, all pass, no warnings.
+
+SPARC: Spec v153, Pseudo v146, Arch v147, Refinement v201, Completion v204.
+
+Summary: Adjacency and connected-component analysis over obj(Color, Cells) collections. Two objects touch if any cell of the first is 4-adjacent to any cell of the second; oc_touches uses a cut after the first found pair. oc_touching_pairs uses nth0 I < J to enumerate each unordered pair once without the == ambiguity of a structural-match loop. oc_connected does BFS: Queue starts at [Obj]; each step adds unvisited neighbors; oc_bfs_ base case returns accumulated Visited. oc_components repeatedly extracts one component at a time via subtract/3. oc_largest/smallest use msort on N-C pairs then last/first element. oc_singleton/shared filter component list by length. oc_max_degree uses max_list on collected degrees. oc_sort_by_degree builds D-Obj keysort pairs.

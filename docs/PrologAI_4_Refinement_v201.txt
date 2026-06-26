@@ -14824,3 +14824,46 @@ AC-VN-046: vn_expand_n with N=1 returns the same result as vn_expand1.
 AC-VN-047: vn_expand_n with N=2 on a 3x3 with center non-Bg returns all 8 Bg cells.
 AC-VN-048: vn_expand_n correctly includes only Bg cells within the specified distance.
 AC-VN-049: vn_expand_n with N=2 on a 1x5 grid from color a includes cells 1 and 2.
+
+Part 178: Objcomp Pack Acceptance Criteria (oc_*, Layer 167)
+
+AC-OC-001: oc_touches succeeds when two single-cell objects are in the same row with adjacent columns.
+AC-OC-002: oc_touches succeeds when two single-cell objects are in the same column with adjacent rows.
+AC-OC-003: oc_touches fails when two objects have no 4-adjacent cell pairs.
+AC-OC-004: oc_touches is symmetric: oc_touches(A,B) iff oc_touches(B,A).
+AC-OC-005: oc_touching_pairs returns the correct pair when exactly two objects touch.
+AC-OC-006: oc_touching_pairs returns 4 pairs for a chain A-B-F-C with D attached and E isolated.
+AC-OC-007: oc_touching_pairs does not include the isolated object in any pair.
+AC-OC-008: oc_touching_pairs returns an empty list when a list has only one object.
+AC-OC-009: oc_adj_list returns a list of length equal to the number of input objects.
+AC-OC-010: oc_adj_list entry for a hub object contains all its touching neighbors.
+AC-OC-011: oc_adj_list entry for an isolated object has an empty neighbor list.
+AC-OC-012: oc_degree of an object touching 2 others returns 2.
+AC-OC-013: oc_degree of an isolated object returns 0.
+AC-OC-014: oc_degree of an object touching only one other returns 1.
+AC-OC-015: oc_isolated returns only the isolated objects.
+AC-OC-016: oc_isolated returns an empty list when all objects touch at least one other.
+AC-OC-017: oc_isolated returns the single object when a list contains one element.
+AC-OC-018: oc_connected from a chain endpoint includes the full chain.
+AC-OC-019: oc_connected from an isolated object returns only that object.
+AC-OC-020: oc_connected gives the same component from different starting points in the same group.
+AC-OC-021: oc_components returns 2 components for the 6-object test collection.
+AC-OC-022: oc_components returns sizes [1,5] for the test collection.
+AC-OC-023: oc_num_components returns 1 for a single object.
+AC-OC-024: oc_num_components returns 2 when one isolated object exists.
+AC-OC-025: oc_largest_component returns the 5-object component for the test collection.
+AC-OC-026: oc_largest_component returns the single object from a 1-element list.
+AC-OC-027: oc_smallest_component returns the isolated single-element component.
+AC-OC-028: oc_singleton_components returns a list containing the isolated component.
+AC-OC-029: oc_singleton_components returns an empty list when no object is isolated.
+AC-OC-030: oc_shared_components returns exactly 1 entry for the test collection.
+AC-OC-031: oc_shared_components returns an empty list when all objects are isolated.
+AC-OC-032: oc_max_degree returns 2 when the maximum touch degree is 2.
+AC-OC-033: oc_max_degree returns 0 for a single-object list.
+AC-OC-034: oc_sort_by_degree places the isolated object first.
+AC-OC-035: oc_sort_by_degree returns a list of the same length as the input.
+AC-OC-036: oc_touching_pairs returns no pair involving the isolated object.
+AC-OC-037: oc_connected from any member of a component returns the full component.
+AC-OC-038: oc_adj_list for objects with multiple neighbors lists all correctly.
+AC-OC-039: oc_singleton_components list contains exactly one element for the test collection.
+AC-OC-040: oc_shared_components list contains exactly one element for the test collection.
