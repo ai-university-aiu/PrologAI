@@ -15179,3 +15179,56 @@ Library imports: library(lists): member/2, memberchk/2, nth0/3, append/3.
   library(apply): maplist/3. Built-in: sort/2.
 
 Predicate count: 14 (cm_* prefix). Tests: 42/42. Layer: 126.
+
+Next chapter: Chapter 109 covers the Rectangular Sub-Grid Block Decomposition Pack.
+
+Chapter 109: Rectangular Sub-Grid Block Decomposition - The block Pack (bk_* prefix)
+
+The block pack provides 14 predicates for splitting grids into uniform
+rectangular blocks and performing block-level operations.
+
+Predicates:
+bk_extract(+Grid,+R0,+C0,+R1,+C1,-Block). % extract rectangular sub-grid
+bk_dims(+Grid,+BH,+BW,-NR,-NC).           % block grid dimensions
+bk_split_h(+Grid,+BH,-Strips).             % horizontal strips of height BH
+bk_split_v(+Grid,+BW,-Strips).             % vertical strips of width BW
+bk_tile_h(+Grid,+N,-Tiled).               % stack N copies vertically
+bk_tile_v(+Grid,+N,-Tiled).               % extend each row N times
+bk_count_h(+Grid,+BH,-N).                 % number of horizontal strips
+bk_count_v(+Grid,+BW,-N).                 % number of vertical strips
+bk_map(+Blocks,+Goal,-Blocks2).            % apply Goal to each block
+bk_uniform(+Grid,+R,+C,-V).              % value at cell (R,C)
+bk_mode_color(+Grid,+R0,+C0,-V).         % most frequent in 2x2 block
+bk_border_color(+Grid,+R0,+C0,-Bg).      % most frequent border in 3x3 nbr
+bk_is_solid(+Grid,+Color,-Bool).          % 1 iff all cells equal Color
+bk_is_border(+Grid,+R,+C,-Bool).         % 1 iff (R,C) is on outer border
+
+Examples:
+bk_extract([[1,2,3],[4,5,6],[7,8,9]],0,0,1,1,B). % B=[[1,2],[4,5]]
+bk_dims([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]],2,2,NR,NC). % NR=2,NC=2
+bk_split_h([[1,2],[3,4],[5,6],[7,8]],2,S). % S=[[[1,2],[3,4]],[[5,6],[7,8]]]
+bk_split_v([[1,2,3,4],[5,6,7,8]],2,S).    % S=[[[1,2],[5,6]],[[3,4],[7,8]]]
+bk_tile_h([[1,2],[3,4]],2,T).              % T=[[1,2],[3,4],[1,2],[3,4]]
+bk_tile_v([[1,2],[3,4]],2,T).              % T=[[1,2,1,2],[3,4,3,4]]
+bk_count_h([[1],[2],[3],[4]],2,N).         % N=2
+bk_count_v([[1,2,3,4,5,6]],2,N).          % N=3
+bk_map([[[1,2],[3,4]],[[5,6],[7,8]]],length,Ns). % Ns=[2,2]
+bk_uniform([[1,2],[3,9]],1,1,V).           % V=9
+bk_mode_color([[1,1],[1,2]],0,0,V).        % V=1
+bk_border_color([[0,0,0],[0,1,0],[0,0,0]],1,1,Bg). % Bg=0
+bk_is_solid([[3,3],[3,3]],3,Bool).         % Bool=1
+bk_is_border([[1,2,3],[4,5,6],[7,8,9]],0,0,Bool). % Bool=1
+
+Key implementation patterns:
+bk_extract: nested findall+between+nth0 (row sweep then col sweep).
+bk_split_h/v: findall over strip index Si; inner findall slices rows/cols.
+bk_tile_h: findall over between(1,N,_) + member replicates rows.
+bk_tile_v: maplist+helper capturing N; findall over between+member in row.
+bk_mode_color/border_color: bk_mode_ helper uses include+length+max_list+sort.
+bk_is_solid: forall+member+member checks all cells.
+bk_is_border: if-then-else with four border conditions.
+
+Library imports: library(lists): member/2, nth0/3, numlist/3, append/3, max_list/2.
+  library(apply): maplist/3, include/3. Built-ins: length/2, between/3, forall/2.
+
+Predicate count: 14 (bk_* prefix). Tests: 42/42. Layer: 127.
