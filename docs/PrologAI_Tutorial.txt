@@ -15125,3 +15125,57 @@ Library imports: library(apply): maplist/3, maplist/4.
   library(lists): member/2, append/2.
 
 Predicate count: 14 (gm_* prefix). Tests: 42/42. Layer: 125.
+
+Next chapter: Chapter 108 covers the Color Lookup Table and Palette Substitution Pack.
+
+Chapter 108: Color Lookup Table and Palette Substitution - The colormap Pack (cm_* prefix)
+
+The colormap pack provides 14 predicates for mapping, substituting, and
+analyzing color (value) labels in grids and lists. A "map" is a list of
+Old-New pairs.
+
+Predicates:
+cm_apply(+Map, +Grid, -Grid2).           % substitute cells; preserve unmatched
+cm_apply_default(+Map, +Bg, +Grid, -G2). % substitute cells; replace unmatched with Bg
+cm_invert(+Map, +Grid, -Grid2).          % apply inverse map (swap Old-New)
+cm_compose(+MapA, +MapB, -MapAB).        % compose: MapAB[k] = MapB[MapA[k]]
+cm_from_grids(+GridA, +GridB, -Map).     % derive map from cell correspondences
+cm_identity(+Palette, -Map).             % identity map V-V for each palette value
+cm_remap(+OldVals, +NewVals, -Map).      % build map from parallel lists
+cm_remap_list(+Map, +List, -List2).      % apply map to 1D list
+cm_palette(+Map, -Palette).              % sorted keys of Map
+cm_used(+Grid, -UsedVals).              % sorted distinct values in Grid
+cm_has_key(+Map, +K).                   % succeeds iff K is a key in Map
+cm_lookup(+Map, +K, -V).               % look up value for key K; fails if absent
+cm_restrict(+Map, +Keys, -Map2).        % keep only entries with key in Keys
+cm_expand(+Map, +Bg, +Palette, -Map2).  % add K-Bg for missing palette keys
+
+Examples:
+cm_apply([1-9,2-8],[[1,2],[3,1]],G).    % G=[[9,8],[3,9]]
+cm_apply_default([1-9],0,[[1,3]],G).    % G=[[9,0]]
+cm_invert([1-9,2-8],[[9,8]],G).         % G=[[1,2]]
+cm_compose([1-2,3-4],[2-9,4-7],M).      % M=[1-9,3-7]
+cm_from_grids([[1,2]],[[5,6]],M).       % M=[1-5,2-6]
+cm_identity([0,1,2],M).                 % M=[0-0,1-1,2-2]
+cm_remap([1,2,3],[9,8,7],M).            % M=[1-9,2-8,3-7]
+cm_remap_list([1-9,2-8],[1,2,3,1],L).   % L=[9,8,3,9]
+cm_palette([3-0,1-0,2-0],P).            % P=[1,2,3]
+cm_used([[3,1],[2,1]],U).               % U=[1,2,3]
+cm_has_key([1-9,2-8],1).                % true
+cm_lookup([1-9,2-8],2,V).              % V=8
+cm_restrict([1-9,2-8,3-7],[1,3],M).    % M=[1-9,3-7]
+cm_expand([1-9],0,[1,2,3],M).           % M=[1-9,2-0,3-0]
+
+Key implementation patterns:
+cm_apply/apply_default/remap_list: nested maplist/3 + cm_apply_cell_ helper
+  using if-then-else with memberchk for deterministic lookup.
+cm_invert: findall swaps O-N to N-O then delegates to cm_apply.
+cm_compose: findall iterates MapA; for each K-V1 looks up V1 in MapB.
+cm_from_grids: nth0 aligned collection + sort/2 deduplication.
+cm_palette/used: findall collects keys/values + sort/2.
+cm_expand: findall + \+ memberchk finds missing keys + append/3.
+
+Library imports: library(lists): member/2, memberchk/2, nth0/3, append/3.
+  library(apply): maplist/3. Built-in: sort/2.
+
+Predicate count: 14 (cm_* prefix). Tests: 42/42. Layer: 126.
