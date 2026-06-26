@@ -17455,3 +17455,32 @@ os_symmetries(+Obj, -List): list of symmetry atoms [h, v, rot180, rot90] that ho
 
 4. D4 Equivalence
 os_equivalent(+Obj1, +Obj2): same shape under any of 8 D4 orientations (color ignored).
+
+Chapter 143: Object Shape Classification (objbound pack, ob_* prefix, Layer 171)
+
+The objbound pack classifies the shape of individual obj(Color, Cells) terms
+without requiring a grid argument.
+
+1. Bounding Box Dimensions
+ob_bbox_h(+Obj, -H): bounding box height (MaxR - MinR + 1).
+ob_bbox_w(+Obj, -W): bounding box width (MaxC - MinC + 1).
+ob_bbox_area(+Obj, -Area): H * W.
+
+2. Shape Type Tests
+ob_is_rect(+Obj): cell count = bbox area (no holes).
+ob_is_hline(+Obj): H = 1.
+ob_is_vline(+Obj): W = 1.
+ob_is_single(+Obj): H = 1 and W = 1.
+ob_is_square_bbox(+Obj): H = W.
+
+3. Holes and Hollow Objects
+ob_holes(+Obj, -HoleCells): bbox cells not in the object.
+ob_n_holes(+Obj, -N): hole count.
+ob_is_hollow(+Obj): N > 0.
+
+4. Frame Detection
+ob_is_frame(+Obj): H>=3, W>=3, all border cells present, no interior cells.
+
+5. Perimeter and Hull
+ob_perimeter(+Obj, -P): total exposed cell edges.
+ob_dense_hull(+Obj, -HullObj): solid bbox rectangle with same color.
