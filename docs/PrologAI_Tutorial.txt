@@ -18061,3 +18061,198 @@ rk_top_n_rules([recolor(r,g), shift(1,0), recolor(r,b)], Pairs, 2, TopN).
 
 14 rk_* predicates. 41 tests pass. Layer 189.
 All 41 tests pass. See docs/tutorial/Ch171_SceneRank.txt for the full chapter.
+
+
+Chapter 161: colortable Pack - Color Substitution Table Learning and Application (ct_*, Layer 190)
+
+The colortable pack learns and applies color substitution tables from obj(Color,
+Cells) scene pairs. A table is a list of From-To color pairs.
+
+:- use_module(pack(colortable/prolog/colortable)).
+
+% Infer a color map from one Before-After scene pair
+ct_infer_from_pair([obj(r,[r(0,0)])], [obj(b,[r(0,0)])], Map).
+% Map contains r-b
+
+% Learn a consistent map from multiple pairs
+ct_learn_map(Pairs, Map, Stats).
+
+% Apply a learned map to a new scene
+ct_apply_map(Map, [obj(r,[r(0,0)])], Out).
+% Out = [obj(b,[r(0,0)])]
+
+14 ct_* predicates. 44 tests pass. Layer 190.
+All 44 tests pass. See docs/tutorial/Ch172_ColorTable.txt for the full chapter.
+
+
+Chapter 162: gridsolve Pack - End-to-End Scene Puzzle Solver (gs_*, Layer 191)
+
+The gridsolve pack integrates rule inference, ranking, and application into a
+single end-to-end scene puzzle solver. Given a list of obj-list training pairs,
+it selects and applies the best transformation rule.
+
+:- use_module(pack(gridsolve/prolog/gridsolve)).
+
+% Infer and apply the best rule to test input
+gs_solve(TrainingPairs, TestScene, OutputScene, Rule).
+
+% Check how many pairs a rule explains
+gs_coverage(Rule, Pairs, N).
+
+% Verify a rule is consistent with all training pairs
+gs_consistent(Rule, Pairs).
+
+14 gs_* predicates. 41 tests pass. Layer 191.
+All 41 tests pass. See docs/tutorial/Ch173_GridSolve.txt for the full chapter.
+
+
+Chapter 163: transformgen Pack - Scene Rule Candidate Generation (tg_*, Layer 192)
+
+The transformgen pack systematically generates candidate transformation rule terms
+from a scene. These candidates are then ranked and tested by gridsolve or scenerank.
+
+:- use_module(pack(transformgen/prolog/transformgen)).
+
+% Collect all distinct colors in a scene
+tg_scene_colors([obj(r,[r(0,0)]),obj(b,[r(1,0)])], Colors).
+% Colors = [b, r]
+
+% Generate recolor-all candidates
+tg_recolor_candidates([obj(r,[r(0,0)])], Cands).
+
+% Generate full candidate set (recolor, shift, etc.)
+tg_candidates(Scene, Pairs, Cands).
+
+14 tg_* predicates. 42 tests pass. Layer 192.
+All 42 tests pass. See docs/tutorial/Ch174_TransformGen.txt for the full chapter.
+
+
+Chapter 164: multicolor Pack - Multi-Color Scene Analysis (mc_*, Layer 193)
+
+The multicolor pack provides frequency analysis, color partitioning, and
+color-indexed queries over obj(Color,Cells) scene lists.
+
+:- use_module(pack(multicolor/prolog/multicolor)).
+
+% Count objects per color
+mc_color_counts([obj(r,[r(0,0)]),obj(r,[r(1,0)]),obj(b,[r(0,1)])], Counts).
+% Counts = [b-1, r-2]
+
+% How many objects of a given color
+mc_count_of_color([obj(r,[r(0,0)])], r, N).
+% N = 1
+
+% The color appearing most often
+mc_majority_color(Scene, Color).
+
+14 mc_* predicates. 42 tests pass. Layer 193.
+All 42 tests pass. See docs/tutorial/Ch175_MultiColor.txt for the full chapter.
+
+
+Chapter 165: sceneinv Pack - Scene Invariant Detection (si_*, Layer 194)
+
+The sceneinv pack detects invariant properties of a scene across all training
+Before-After pairs: properties that hold in every Before or every After.
+
+:- use_module(pack(sceneinv/prolog/sceneinv)).
+
+% Count of Before objects invariant across all pairs
+si_n_before(Pairs, N).
+
+% Count of After objects invariant across all pairs
+si_n_after(Pairs, N).
+
+% Colors invariant in all Before scenes
+si_colors_before(Pairs, Colors).
+
+14 si_* predicates. 46 tests pass. Layer 194.
+All 46 tests pass. See docs/tutorial/Ch176_SceneInv.txt for the full chapter.
+
+
+Chapter 166: seqinfer Pack - Sequential Rule Inference (sq_*, Layer 195)
+
+The seqinfer pack searches for a sequence of transformation steps that maps each
+Before scene to its corresponding After scene, supporting multi-step explanations.
+
+:- use_module(pack(seqinfer/prolog/seqinfer)).
+
+% Apply a sequence of rules to a scene
+sq_apply(Scene, [recolor(r,b), shift(1,0)], OutScene).
+
+% Verify a rule sequence explains all training pairs
+sq_verify(Pairs, Seq, Stats).
+
+% Search for a short rule sequence explaining all pairs
+sq_infer(Pairs, Seq).
+
+14 sq_* predicates. 44 tests pass. Layer 195.
+All 44 tests pass. See docs/tutorial/Ch177_SeqInfer.txt for the full chapter.
+
+
+Chapter 167: gridquery Pack - Grid Query and Manipulation (gq_*, Layer 196)
+
+The gridquery pack provides read and manipulation operations directly on raw grid
+format (list of rows, each a list of color atoms).
+
+:- use_module(pack(gridquery/prolog/gridquery)).
+
+% Grid dimensions
+gq_size([[r,b],[r,r],[r,r]], H, W).
+% H = 3, W = 2
+
+% Cell value at (R, C)
+gq_at([[r,b],[r,r]], 0, 1, V).
+% V = b
+
+% Most frequent color
+gq_majority([[r,b],[r,r]], C).
+% C = r
+
+14 gq_* predicates. 45 tests pass. Layer 196.
+All 45 tests pass. See docs/tutorial/Ch178_GridQuery.txt for the full chapter.
+
+
+Chapter 168: gridparse Pack - Grid Parse and Object Extraction (gp_*, Layer 197)
+
+The gridparse pack converts between raw grid format and the obj(Color,Cells) scene
+representation. It provides 4-connected flood fill for object segmentation.
+
+:- use_module(pack(gridparse/prolog/gridparse)).
+
+% Identify the background color
+gp_bg_color([[r,r,r],[r,b,r],[r,r,r]], BgColor).
+% BgColor = r
+
+% Convert raw grid to scene (obj list)
+gp_grid_to_scene([[r,r,r],[r,b,r],[r,r,r]], r, Scene).
+% Scene = [obj(b, [r(1,1)])]
+
+% Convert scene back to grid
+gp_scene_to_grid([obj(b,[r(1,1)])], 3, 3, r, Grid).
+% Grid = [[r,r,r],[r,b,r],[r,r,r]]
+
+14 gp_* predicates. 43 tests pass. Layer 197.
+All 43 tests pass. See docs/tutorial/Ch179_GridParse.txt for the full chapter.
+
+
+Chapter 169: gridtask Pack - Grid Task End-to-End Solver (gt_*, Layer 198)
+
+The gridtask pack infers and applies simple transformation rules directly on raw
+grid format, without converting to obj terms first.
+
+:- use_module(pack(gridtask/prolog/gridtask)).
+
+% Count differing cells
+gt_n_changed([[r,r],[r,r]], [[r,b],[r,r]], N).
+% N = 1
+
+% Infer strategy and apply to test grid
+gt_solve([[[r,r]]-[[b,b]]], [[r,r]], Out, Rule).
+% Rule = color_map([r-b]), Out = [[b,b]]
+
+% Pixel accuracy of a rule on one pair
+gt_pair_score(identity, [[r,r]], [[r,r]], Score).
+% Score = 1.0
+
+14 gt_* predicates. 51 tests pass. Layer 198.
+All 51 tests pass. See docs/tutorial/Ch180_GridTask.txt for the full chapter.
