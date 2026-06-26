@@ -17688,3 +17688,32 @@ mx_all_same_size_delta/1: all pairs share the same size change.
 
 6. Positional Zip
 mx_zip/3: index-wise pairing of two equal-length lists.
+
+Chapter 150: Object Merging, Set Operations, and Component Splitting (objmerge Pack, mg_*, Layer 179)
+
+The objmerge pack provides cell-set operations and structural operations on
+obj(Color, Cells) terms.
+
+1. Cell-Set Operations
+mg_union_cells/4: sorted union of two obj cell sets.
+mg_intersect_cells/4: sorted intersection.
+mg_diff_cells/4: O1 minus O2 cell set.
+mg_sym_diff_cells/4: symmetric difference.
+
+2. Concatenation
+mg_concat_h/4: place O2 right of O1 bbox with Gap.
+mg_concat_v/4: place O2 below O1 bbox with Gap.
+
+3. List Operations
+mg_merge_list/3: union of all cells in a list of objs.
+mg_subtract_list/4: remove cells of any obj in list from base.
+
+4. Bounding-Box Operations
+mg_expand_bbox/2: fill bounding box with obj's color.
+mg_hollow_bbox/2: 1-cell-wide outer frame of bounding box.
+mg_pad/4: add P layers of border cells with new color.
+
+5. Connected Components
+mg_split_cc4/2: split into 4-connected component objs.
+mg_split_cc8/2: split into 8-connected component objs.
+mg_n_components4/2: count 4-connected components.
