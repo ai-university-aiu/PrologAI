@@ -17826,3 +17826,41 @@ lq_aligned_v/3: same top-left column as Ref.
 lq_nearest/3: single object with smallest squared centroid distance to Ref.
 lq_farthest/3: single object with largest squared centroid distance to Ref.
 lq_n_touching4/3: count of 4-touching objects.
+
+
+Chapter 155: scenexf Pack - Scene-Level Uniform Transformation (sx_*, Layer 184)
+
+The scenexf pack applies transformations uniformly to every object in a scene
+(a list of obj(Color, Cells) terms). Where objxf transforms a single object,
+scenexf applies the same operation to the entire list. Layer 184, WP 205.
+
+Loading:
+:- use_module(pack(scenexf/prolog/scenexf)).
+
+14 exported predicates:
+
+1. Color Transformations
+sx_recolor/4: replace objects of OldColor with NewColor (atom equality).
+sx_recolor_all/3: set all objects to NewColor.
+sx_apply_color_map/3: apply Old-New color pairs; unmatched objects unchanged.
+
+2. Spatial Transformations
+sx_shift/4: translate all objects by (DR, DC); DR/DC may be negative.
+sx_to_origin/2: shift scene so bounding-box top-left is at r(0,0).
+sx_reflect_h/3: flip all objects horizontally; r(R,C) -> r(R, Width-1-C).
+sx_reflect_v/3: flip all objects vertically; r(R,C) -> r(Height-1-R, C).
+
+3. Filtering
+sx_remove_color/3: discard all objects of Color.
+sx_keep_color/3: keep only objects of Color.
+
+4. Ordering
+sx_sort_size_desc/2: sort by cell count descending (negated-count key + msort).
+sx_sort_size_asc/2: sort by cell count ascending.
+sx_sort_pos/2: sort by top-left position row-major ascending.
+
+5. Selection and Deduplication
+sx_top_n/3: the N largest objects; if N > length, returns all sorted desc.
+sx_dedup_form/2: keep first object of each distinct normalized shape.
+
+All 41 tests pass. See docs/tutorial/Ch166_SceneXf.txt for the full chapter.

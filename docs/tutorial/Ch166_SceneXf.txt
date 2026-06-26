@@ -1,0 +1,214 @@
+Chapter 166: scenexf Pack - Scene-Level Uniform Transformation of All Objects (sx_*, Layer 184)
+
+
+Overview
+
+The scenexf pack applies transformations uniformly to every object in a scene.
+A scene is a list of obj(Color, Cells) terms. Where the objxf pack (ox_*) transforms
+a single object, scenexf applies the same class of operation to the entire list in
+one call, producing a transformed scene.
+
+Layer 184. Pack prefix: sx_*. Work Package 205.
+
+
+What the Pack Does
+
+scenexf provides 14 predicates organized into five categories:
+
+Color transformations:
+  sx_recolor/4        - replace objects of one color with another color
+  sx_recolor_all/3    - set all objects to a single new color
+  sx_apply_color_map/3 - apply a list of color-substitution pairs
+
+Spatial transformations:
+  sx_shift/4          - translate every object by a row/col offset
+  sx_to_origin/2      - shift scene so bounding box starts at r(0,0)
+  sx_reflect_h/3      - flip all objects horizontally within a given width
+  sx_reflect_v/3      - flip all objects vertically within a given height
+
+Filtering predicates:
+  sx_remove_color/3   - discard all objects of a given color
+  sx_keep_color/3     - keep only objects of a given color
+
+Ordering predicates:
+  sx_sort_size_desc/2 - sort objects by cell count, largest first
+  sx_sort_size_asc/2  - sort objects by cell count, smallest first
+  sx_sort_pos/2       - sort objects by top-left position, row-major
+
+Selection and deduplication:
+  sx_top_n/3          - the N largest objects
+  sx_dedup_form/2     - keep one object per distinct normalized shape
+
+
+Key Concepts
+
+obj(Color, Cells) term: Color is a color atom (r, b, g, etc.). Cells is a list
+of r(Row, Col) terms giving each occupied cell.
+
+Normalized form: to check if two objects have the same shape, each is translated
+so its top-left corner is at r(0,0) and its cell list is sorted. Two objects with
+the same normalized form have identical shapes regardless of position or color.
+
+Scene bounding box: the smallest rectangle covering all cells of all objects.
+sx_to_origin uses this to shift the entire scene to the origin.
+
+
+Loading the Pack
+
+:- use_module(pack(scenexf/prolog/scenexf)).
+
+
+Predicate Reference
+
+sx_recolor(+Scene, +OldColor, +NewColor, -Scene2)
+
+Replace every object whose color equals OldColor with NewColor. Objects of
+other colors pass through unchanged. Uses atom equality (==) not numeric
+comparison.
+
+  :- sx_recolor([obj(r,[r(0,0)]), obj(b,[r(0,1)])], r, g, Out).
+  Out = [obj(g,[r(0,0)]), obj(b,[r(0,1)])].
+
+sx_recolor_all(+Scene, +NewColor, -Scene2)
+
+Set every object in the scene to NewColor regardless of current color.
+
+  :- sx_recolor_all([obj(r,[r(0,0)]), obj(b,[r(1,0)])], g, Out).
+  Out = [obj(g,[r(0,0)]), obj(g,[r(1,0)])].
+
+sx_apply_color_map(+Scene, +Map, -Scene2)
+
+Apply a list of Old-New color pairs to the scene. Each object is recolored to
+the New color if its current color matches Old. If no pair matches, the object
+color is unchanged.
+
+  :- sx_apply_color_map([obj(r,[r(0,0)]), obj(b,[r(0,1)])], [r-g, b-y], Out).
+  Out = [obj(g,[r(0,0)]), obj(y,[r(0,1)])].
+
+  % Swap two colors:
+  :- sx_apply_color_map([obj(r,[r(0,0)]), obj(b,[r(0,1)])], [r-b, b-r], Out).
+  Out = [obj(b,[r(0,0)]), obj(r,[r(0,1)])].
+
+sx_shift(+Scene, +DR, +DC, -Scene2)
+
+Translate every object by DR rows and DC columns. Each cell r(R,C) becomes
+r(R+DR, C+DC). DR and DC can be negative.
+
+  :- sx_shift([obj(r,[r(0,0)]), obj(b,[r(0,1)])], 2, 3, Out).
+  Out = [obj(r,[r(2,3)]), obj(b,[r(2,4)])].
+
+sx_to_origin(+Scene, -Scene2)
+
+Shift the entire scene so the scene bounding box top-left is at r(0,0). Finds
+the minimum row and column across all objects, then subtracts them from every
+cell. Returns the empty scene unchanged.
+
+  :- sx_to_origin([obj(r,[r(3,4)]), obj(b,[r(3,5)])], Out).
+  Out = [obj(r,[r(0,0)]), obj(b,[r(0,1)])].
+
+sx_reflect_h(+Scene, +Width, -Scene2)
+
+Reflect all objects horizontally within a canvas of the given Width. Each cell
+r(R,C) becomes r(R, Width-1-C).
+
+  :- sx_reflect_h([obj(r,[r(0,0)])], 5, Out).
+  Out = [obj(r,[r(0,4)])].
+
+sx_reflect_v(+Scene, +Height, -Scene2)
+
+Reflect all objects vertically within a canvas of the given Height. Each cell
+r(R,C) becomes r(Height-1-R, C).
+
+  :- sx_reflect_v([obj(r,[r(0,0)])], 5, Out).
+  Out = [obj(r,[r(4,0)])].
+
+sx_remove_color(+Scene, +Color, -Scene2)
+
+Remove all objects whose color equals Color. Remaining objects keep their order.
+
+  :- sx_remove_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(1,0)])], r, Out).
+  Out = [obj(b,[r(0,1)])].
+
+sx_keep_color(+Scene, +Color, -Scene2)
+
+Keep only objects whose color equals Color. All others are discarded.
+
+  :- sx_keep_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(1,0)])], r, Out).
+  Out = [obj(r,[r(0,0)]), obj(r,[r(1,0)])].
+
+sx_sort_size_desc(+Scene, -Sorted)
+
+Sort scene objects by cell count descending. The largest object comes first.
+Uses a negated-count key with msort to preserve stable ordering for ties.
+
+  :- sx_sort_size_desc([obj(r,[r(0,0)]), obj(b,[r(0,0),r(0,1),r(0,2)])], Out).
+  Out = [obj(b,[r(0,0),r(0,1),r(0,2)]), obj(r,[r(0,0)])].
+
+sx_sort_size_asc(+Scene, -Sorted)
+
+Sort scene objects by cell count ascending. The smallest object comes first.
+
+  :- sx_sort_size_asc([obj(b,[r(0,0),r(0,1)]), obj(r,[r(0,0)])], Out).
+  Out = [obj(r,[r(0,0)]), obj(b,[r(0,0),r(0,1)])].
+
+sx_sort_pos(+Scene, -Sorted)
+
+Sort scene objects by top-left position in row-major order. Primary key is the
+minimum row; secondary key is the minimum column of that row.
+
+  :- sx_sort_pos([obj(g,[r(1,0)]), obj(b,[r(0,1)]), obj(r,[r(0,0)])], Out).
+  Out = [obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])].
+
+sx_top_n(+Scene, +N, -TopN)
+
+Return the N largest objects by cell count. If N exceeds the number of objects
+in the scene, all objects are returned sorted by size descending.
+
+  :- sx_top_n([obj(r,[r(0,0)]), obj(b,[r(0,0),r(0,1)]), obj(g,[r(1,0),r(1,1),r(1,2)])], 2, Top).
+  Top = [obj(g,[r(1,0),r(1,1),r(1,2)]), obj(b,[r(0,0),r(0,1)])].
+
+sx_dedup_form(+Scene, -Deduped)
+
+Remove objects with duplicate normalized forms. The first object of each
+distinct shape is kept; later duplicates are discarded. Two objects have the
+same form if their cells, when translated to the origin and sorted, are equal.
+
+  :- sx_dedup_form([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(3,3),r(3,4)])], Out).
+  % obj(r) and obj(b) are both single-cell (same form); obj(g) is a 2-cell bar
+  Out = [obj(r,[r(0,0)]), obj(g,[r(3,3),r(3,4)])].
+
+
+Extended Example: Scene Normalization Pipeline
+
+The scenexf predicates compose naturally. Here is a pipeline that normalizes a
+raw scene for comparison: keep only objects of a specified color, shift to the
+origin, remove duplicates, and sort by position.
+
+  normalize_scene(RawScene, Color, Normalized) :-
+      sx_keep_color(RawScene, Color, Filtered),
+      sx_to_origin(Filtered, AtOrigin),
+      sx_dedup_form(AtOrigin, Deduped),
+      sx_sort_pos(Deduped, Normalized).
+
+  :- RawScene = [obj(r,[r(2,3)]), obj(b,[r(1,1)]), obj(r,[r(2,4)])],
+     normalize_scene(RawScene, r, N).
+  % Keeps red objects, shifts to origin (min row=2 col=3 -> subtract),
+  % deduplicates single-cell forms (keeps first), sorts by position.
+
+
+Test Coverage
+
+All 41 acceptance criteria (AC-SX-001 through AC-SX-041) defined in
+Refinement v218 Part 195 are exercised in packs/scenexf/test/test_scenexf.pl.
+All 41 tests pass.
+
+
+Summary
+
+The scenexf pack is the scene-level transformation layer. It takes the operations
+available on individual objects and scales them up to operate on entire scenes at
+once. Color swapping, spatial shifting, filtering, sorting, and deduplication all
+work on the full list with a single predicate call, making scenexf the natural
+preprocessing step before scene comparison or rule application.
+
+Continue to Chapter 167 for the next pack in the PrologAI Layer sequence.
