@@ -16292,3 +16292,161 @@ Library imports: library(apply): maplist/2, maplist/3.
 Built-ins: length/2, findall/3, between/3.
 
 42/42 PLUnit tests pass.
+
+
+Chapter 130: Objop Pack
+
+The objop pack (oo_*, Layer 148) provides 14 predicates for object-level manipulation
+within the full 2D grid representation. Where the cellset pack (cs_*) operates on
+sparse R-C position lists, objop accepts and returns complete grids, identifying
+objects by their color value automatically. This pack covers the workflow of "find
+the colored object and transform it."
+
+The central private helper oo_set_cells_ scans the full grid, replacing any cell
+at a position in the Cells list with Val and keeping all others unchanged.
+
+
+Identifying Object Cells and Bounding Boxes
+
+oo_cells_of(+Grid, +V, -Cells): sorted list of R-C pairs where the grid holds V.
+
+    oo_cells_of([[1,0,1],[0,1,0],[1,0,0]], 1, Cells).
+    % Cells = [0-0, 0-2, 1-1, 2-0]
+
+    oo_cells_of([[2,2],[2,2]], 2, Cells).
+    % Cells = [0-0, 0-1, 1-0, 1-1]
+
+    oo_cells_of([[0,0],[0,0]], 5, Cells).
+    % Cells = []  (color absent)
+
+oo_bbox(+Cells, -R0, -C0, -R1, -C1): bounding box of a cell list.
+
+    oo_bbox([0-0, 0-2, 1-1, 2-0], R0, C0, R1, C1).
+    % R0=0, C0=0, R1=2, C1=2
+
+    oo_bbox([2-3], R0, C0, R1, C1).
+    % R0=2, C0=3, R1=2, C1=3  (single cell)
+
+
+Counting, Size, and Center
+
+oo_count(+Grid, +V, -N): number of cells with value V.
+
+    oo_count([[1,0],[1,0],[1,0]], 1, N).   % N = 3
+    oo_count([[0,0],[0,0]], 5, N).         % N = 0
+
+oo_size(+Grid, +V, -H, -W): height H and width W of V cells' bounding box.
+
+    oo_size([[1,1,1],[1,1,1],[0,0,0]], 1, H, W).
+    % H=2, W=3
+
+    oo_size([[1],[1],[1]], 1, H, W).
+    % H=3, W=1
+
+oo_center(+Grid, +V, -R, -C): center of V cells' bounding box (integer division).
+
+    oo_center([[1,1,1],[1,1,1],[1,1,1]], 1, R, C).
+    % R=1, C=1
+
+    oo_center([[1,1,1]], 1, R, C).
+    % R=0, C=1
+
+
+Erasing, Repainting, and Swapping
+
+oo_erase(+Grid, +V, +Bg, -Out): replace all V cells with Bg.
+
+    oo_erase([[1,2,1],[2,1,2],[1,2,1]], 1, 0, Out).
+    % Out = [[0,2,0],[2,0,2],[0,2,0]]
+
+oo_repaint(+Grid, +V, +NewV, -Out): replace all V cells with NewV.
+
+    oo_repaint([[1,0,1],[0,1,0]], 1, 9, Out).
+    % Out = [[9,0,9],[0,9,0]]
+
+oo_swap(+Grid, +V1, +V2, -Out): exchange all V1 and V2 cells (assumes no overlap).
+
+    oo_swap([[1,2],[2,1]], 1, 2, Out).
+    % Out = [[2,1],[1,2]]
+
+    oo_swap([[1,1],[2,2]], 1, 2, Out).
+    % Out = [[2,2],[1,1]]
+
+
+Moving and Copying
+
+oo_move(+Grid, +V, +DR, +DC, +Bg, -Out): translate V cells by (DR, DC). Original
+cells become Bg; cells translated outside the grid are clipped.
+
+    oo_move([[1,0,0],[0,0,0]], 1, 0, 2, 0, Out).
+    % Out = [[0,0,1],[0,0,0]]  (moved right 2)
+
+    oo_move([[1,1],[0,0],[0,0]], 1, 2, 0, 0, Out).
+    % Out = [[0,0],[0,0],[1,1]]  (moved down 2)
+
+    oo_move([[0,1],[0,0]], 1, 0, 2, 0, Out).
+    % Out = [[0,0],[0,0]]  (out of bounds, clipped)
+
+oo_copy(+Grid, +V, +DR, +DC, -Out): copy V cells to offset (DR, DC); originals stay.
+
+    oo_copy([[1,0,0],[0,0,0]], 1, 0, 1, Out).
+    % Out = [[1,1,0],[0,0,0]]
+
+    oo_copy([[1,0],[0,0]], 1, 1, 1, Out).
+    % Out = [[1,0],[0,1]]
+
+
+In-Place Transformations
+
+All transformation predicates erase the original V cells, compute new positions
+based on the bounding box, and paint V at the new positions.
+
+oo_rotate90(+Grid, +V, +Bg, -Out): rotate V cells 90 CW around the bbox top-left.
+Formula: normalized (r,c) maps to (c, H-1-r) where H is the bbox height.
+
+    oo_rotate90([[1,0],[1,0],[0,0]], 1, 0, Out).
+    % Out = [[1,1],[0,0],[0,0]]  (2x1 column becomes 1x2 row)
+
+    oo_rotate90([[1,0],[1,1],[0,0]], 1, 0, Out).
+    % Out = [[1,1],[1,0],[0,0]]  (L-shape rotated 90 CW)
+
+oo_rotate180(+Grid, +V, +Bg, -Out): rotate V cells 180 degrees within the bbox.
+Formula: normalized (r,c) maps to (H-1-r, W-1-c).
+
+    oo_rotate180([[0,0,0,0],[1,1,0,1],[0,0,0,0]], 1, 0, Out).
+    % Out = [[0,0,0,0],[1,0,1,1],[0,0,0,0]]
+
+oo_mirror_h(+Grid, +V, +Bg, -Out): flip V cells left-right within the bbox.
+Formula: normalized column c maps to W-1-c.
+
+    oo_mirror_h([[1,0],[1,1]], 1, 0, Out).
+    % Out = [[0,1],[1,1]]
+
+    oo_mirror_h([[0,1,0,1,1],[0,0,0,0,0]], 1, 0, Out).
+    % Out = [[0,1,1,0,1],[0,0,0,0,0]]
+
+oo_mirror_v(+Grid, +V, +Bg, -Out): flip V cells top-bottom within the bbox.
+Formula: normalized row r maps to H-1-r.
+
+    oo_mirror_v([[1,1],[0,1],[0,0]], 1, 0, Out).
+    % Out = [[0,1],[1,1],[0,0]]
+
+
+Combined Workflow Example
+
+Rotate the red (color 1) L-shape, then move it right by 3:
+
+    Grid = [[1,0,0,0,0,0],
+            [1,1,0,0,0,0],
+            [0,0,0,0,0,0]].
+
+    oo_rotate90(Grid, 1, 0, G1).
+    % G1: L rotated 90 CW
+
+    oo_move(G1, 1, 0, 3, 0, Out).
+    % Out: rotated L moved 3 columns right
+
+Library imports: library(lists): member/2, memberchk/2, nth0/3, min_list/2, max_list/2.
+Built-ins: length/2, findall/3, between/3, sort/2.
+
+42/42 PLUnit tests pass.
