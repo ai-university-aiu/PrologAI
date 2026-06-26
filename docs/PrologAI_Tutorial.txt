@@ -16670,3 +16670,144 @@ Built-ins: findall/3, sort/2, keysort/2, length/2.
 
 42/42 PLUnit tests pass.
 
+Chapter 133: Xform Pack
+
+The xform pack (xf_*, Layer 151) provides 14 predicates for transforming individual
+obj(Color, Cells) terms and for inferring what transformation connects two obj terms.
+All predicates operate on obj(Color, Cells) terms where Cells is a sorted list of
+r(R,C) terms. The pack is divided into applied transformations (producing new obj terms)
+and comparison/inference predicates (testing or discovering what changed between objs).
+
+
+Applied Transformations
+
+xf_recolor(+Obj, +Color, -Out): create a new obj with a different color, same cells.
+
+    xf_recolor(obj(1, [r(0,0), r(0,1)]), 5, Out).
+    % Out = obj(5, [r(0,0), r(0,1)])
+
+xf_translate(+Obj, +r(DR,DC), -Out): shift every cell by the given row-column offset.
+
+    xf_translate(obj(1, [r(0,0), r(0,1)]), r(0,3), Out).
+    % Out = obj(1, [r(0,3), r(0,4)])
+
+xf_normalize(+Obj, -Out): translate an obj so that its minimum row = 0 and minimum
+column = 0 (i.e., the top-left cell of the bounding box is at the origin).
+
+    xf_normalize(obj(2, [r(3,4), r(3,5), r(4,4)]), Out).
+    % Out = obj(2, [r(0,0), r(0,1), r(1,0)])
+
+xf_d4(+Obj, +Op, -Out): apply a named D4 symmetry operation to an obj. The result is
+placed at the same top-left corner as the input. Op must be one of:
+id, r90, r180, r270, fh, fv, fd1, fd2.
+
+    xf_d4(obj(1, [r(0,0), r(0,1)]), r90, Out).
+    % r90 rotates a horizontal pair to vertical
+    % Out = obj(1, [r(0,0), r(1,0)])
+
+    xf_d4(obj(2, [r(0,0), r(1,0), r(1,1)]), fh, Out).
+    % fh flips the L-shape horizontally
+    % Out = obj(2, [r(0,1), r(1,0), r(1,1)])
+
+
+Cell Identity and Offset
+
+xf_same_cells(+Obj1, +Obj2): succeed if both obj terms have the same sorted cell set
+(ignoring color). Implemented via Prolog unification on the Cells argument.
+
+    xf_same_cells(obj(1, [r(0,0), r(0,1)]), obj(5, [r(0,0), r(0,1)])).
+    % succeeds (same cells, different colors)
+
+xf_cell_offset(+Obj1, +Obj2, -r(DR,DC)): find the translation vector from Obj1 to Obj2.
+Succeeds only when both objs have the same normalized shape (pure translation). Returns
+DR = min_row(Obj2) - min_row(Obj1), DC = min_col(Obj2) - min_col(Obj1).
+
+    xf_cell_offset(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,3),r(0,4)]), Off).
+    % Off = r(0,3)
+
+    xf_cell_offset(obj(1,[r(0,0),r(1,0)]), obj(1,[r(2,3),r(3,3)]), Off).
+    % Off = r(2,3)
+
+xf_is_recolor(+Obj1, +Obj2): succeed when Obj1 and Obj2 have the same cells but
+different colors.
+
+    xf_is_recolor(obj(1, [r(0,0), r(0,1)]), obj(5, [r(0,0), r(0,1)])).
+    % succeeds
+
+
+Cell Set Arithmetic
+
+xf_cells_added(+Obj1, +Obj2, -Added): cells in Obj2 not present in Obj1.
+Uses subtract/3 from library(lists).
+
+    xf_cells_added(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,0),r(0,1),r(0,2)]), Added).
+    % Added = [r(0,2)]
+
+xf_cells_removed(+Obj1, +Obj2, -Removed): cells in Obj1 not present in Obj2.
+
+    xf_cells_removed(obj(1,[r(0,0),r(0,1),r(0,2)]), obj(1,[r(0,0),r(0,1)]), Rem).
+    % Rem = [r(0,2)]
+
+xf_cells_kept(+Obj1, +Obj2, -Kept): cells present in both Obj1 and Obj2.
+
+    xf_cells_kept(obj(1,[r(0,0),r(0,1),r(0,2)]),
+                  obj(2,[r(0,1),r(0,2),r(0,3)]), Kept).
+    % Kept = [r(0,1), r(0,2)]
+
+xf_overlap_count(+Obj1, +Obj2, -N): number of cells shared by both obj terms.
+
+    xf_overlap_count(obj(1,[r(0,0),r(0,1),r(0,2)]),
+                     obj(2,[r(0,1),r(0,2),r(0,3)]), N).
+    % N = 2
+
+
+Transformation Inference
+
+xf_any_d4(+Obj1, +Obj2, -Op): find the first D4 operation Op such that applying Op
+to the normalized form of Obj1 gives the normalized form of Obj2. Tries ops in order:
+id, r90, r180, r270, fh, fv, fd1, fd2. Cuts after the first match.
+
+    xf_any_d4(obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(0,1)]), Op).
+    % Op = id
+
+    xf_any_d4(obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(1,0)]), Op).
+    % Op = r90  (horizontal pair and vertical pair are r90-related)
+
+xf_scale_factor(+Obj1, +Obj2, -N): find integer N >= 1 such that Obj2 has N times
+as many cells as Obj1. Fails if the ratio is not a positive integer.
+
+    xf_scale_factor(obj(1,[r(0,0),r(0,1)]),
+                    obj(1,[r(0,0),r(0,1),r(0,2),r(0,3)]), N).
+    % N = 2  (4 cells = 2 * 2 cells)
+
+    % xf_scale_factor(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,0),r(0,1),r(0,2)]), _).
+    % fails (3 cells is not a multiple of 2)
+
+xf_merge(+Obj1, +Obj2, -Out): merge two same-color obj terms into one with the union
+cell set. Colors must be identical. Duplicates are removed by sort/2.
+
+    xf_merge(obj(3,[r(0,0),r(0,1)]), obj(3,[r(1,0),r(1,1)]), Out).
+    % Out = obj(3, [r(0,0), r(0,1), r(1,0), r(1,1)])
+
+    xf_merge(obj(2,[r(0,0),r(0,1)]), obj(2,[r(0,1),r(0,2)]), Out).
+    % Out = obj(2, [r(0,0), r(0,1), r(0,2)])  (r(0,1) deduplicated)
+
+
+D4 Operations Reference
+
+The same 8 D4 operations as in the pair pack, applied on cells in a normalized
+(origin-anchored) shape with H1=max row, W1=max col:
+
+    id   (identity):           (R,C) -> (R,C)
+    r90  (90 CW):              (R,C) -> (C, H1-R)
+    r180 (180 degrees):        (R,C) -> (H1-R, W1-C)
+    r270 (270 CW):             (R,C) -> (W1-C, R)
+    fh   (horizontal flip):    (R,C) -> (R, W1-C)
+    fv   (vertical flip):      (R,C) -> (H1-R, C)
+    fd1  (diagonal transpose): (R,C) -> (C, R)
+    fd2  (anti-diagonal):      (R,C) -> (W1-C, H1-R)
+
+Library imports: library(lists): member/2, min_list/2, max_list/2, subtract/3, memberchk/2.
+Built-ins: findall/3, sort/2, length/2, append/3.
+
+42/42 PLUnit tests pass.
