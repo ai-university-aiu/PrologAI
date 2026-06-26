@@ -17427,3 +17427,31 @@ lt_is_diagonal_dl(+Objs): R+C constant (downward-left diagonal).
 7. Uniform Spacing
 lt_gap_h(+Objs, -Gap): uniform horizontal centroid gap (fails if non-uniform).
 lt_gap_v(+Objs, -Gap): uniform vertical centroid gap.
+
+Chapter 142: Object Symmetry Analysis (objsym pack, os_* prefix, Layer 170)
+
+The objsym pack provides bounding-box-relative symmetry operations for individual
+obj(Color, Cells) terms. All transforms are computed relative to the object's own
+bounding box, so no prior normalization is required.
+
+1. Bounding Box
+os_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC): bounding box of the object's cell set.
+os_normalize(+Obj, -NormObj): translate so bbox top-left is at r(0,0).
+os_translate(+Obj, +DR, +DC, -Moved): shift all cells by (DR, DC).
+
+2. Reflection and Rotation
+os_reflect_h(+Obj, -Reflected): mirror left-right about vertical center (new C = MinC+MaxC-C).
+os_reflect_v(+Obj, -Reflected): mirror top-bottom about horizontal center (new R = MinR+MaxR-R).
+os_rotate180(+Obj, -Rotated): rotate 180 degrees (apply both flips).
+os_rotate90(+Obj, -Rotated): rotate 90 degrees CW, normalized to origin (new NR=C-MinC, NC=MaxR-R).
+
+3. Symmetry Tests
+os_is_hsymm(+Obj): sorted cells == sorted cells of reflect_h.
+os_is_vsymm(+Obj): sorted cells == sorted cells of reflect_v.
+os_is_rot180(+Obj): sorted cells == sorted cells of rotate180.
+os_is_rot90(+Obj): sorted normalized cells == sorted normalized cells after rotate90.
+os_has_symmetry(+Obj): any symmetry test passes (cut on first).
+os_symmetries(+Obj, -List): list of symmetry atoms [h, v, rot180, rot90] that hold.
+
+4. D4 Equivalence
+os_equivalent(+Obj1, +Obj2): same shape under any of 8 D4 orientations (color ignored).
