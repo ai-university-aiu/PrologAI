@@ -15271,3 +15271,43 @@ ed_corners: findall over 2x2 top-left positions; \+ uniformity test.
 Library imports: library(lists): member/2, nth0/3. Built-ins: length/2, between/3.
 
 Predicate count: 14 (ed_* prefix). Tests: 42/42. Layer: 128.
+
+
+CHAPTER 111: CELL DISTANCE AND PROXIMITY COMPUTATION (dt_*)
+
+The distance pack (Layer 129, module distance, prefix dt_*) provides 14
+predicates for computing distances between grid cells, building distance
+transform grids, and performing proximity queries. Three metrics are
+supported: Manhattan (L1), Chebyshev (L-inf), and squared Euclidean.
+
+Load: :- use_module('packs/distance/prolog/distance.pl').
+
+Examples:
+dt_manhattan(0,0,2,2,D).                      % D=4
+dt_chebyshev(0,0,2,2,D).                      % D=2
+dt_euclidean_sq(0,0,1,1,DSq).                 % DSq=2
+dt_nearest([[0,0,0],[0,1,0],[0,0,0]],1,0-0,R-C). % R=1,C=1
+dt_farthest([[1,0,0],[0,0,0],[0,0,1]],1,1-1,R-C). % R=2,C=2
+dt_all_at([[1,0,0],[0,0,0],[0,0,1]],1,1-1,2,C). % C=[0-0,2-2]
+dt_within_manhattan([[0,0,0],[0,0,0],[0,0,0]],1,1,1,C),length(C,N). % N=5
+dt_within_chebyshev([[0,0,0],[0,0,0],[0,0,0]],1,1,1,C),length(C,N). % N=9
+dt_map_manhattan([[0,0,0],[0,1,0],[0,0,0]],1,M). % M=[[2,1,2],[1,0,1],[2,1,2]]
+dt_map_chebyshev([[0,0,0],[0,1,0],[0,0,0]],1,M). % M=[[1,1,1],[1,0,1],[1,1,1]]
+dt_ring_manhattan([[0,0,0],[0,0,0],[0,0,0]],1,1,1,C). % C=[0-1,1-0,1-2,2-1]
+dt_centroid([[1,0,0],[0,0,0],[0,0,1]],1,RC).   % RC=1-1
+dt_diameter_manhattan([0-0,2-2],_,D).          % D=4
+dt_diameter_chebyshev([0-0,2-2],_,D).          % D=2
+
+Key implementation patterns:
+dt_nearest/dt_farthest: findall D-R-C triples; private min_list_key_/max_list_key_
+  accumulators use @< / @> term ordering for row-major tie-breaking.
+dt_map_manhattan/chebyshev: pre-collect all Val-cell positions; nested findall;
+  min_list/2 per cell; if-then-else returns -1 if Val absent.
+dt_centroid: two separate findall for rows and columns; sumlist_ accumulator;
+  integer floor division.
+dt_diameter_*: enumerate unordered pairs with A @< B guard; max_list_key_.
+
+Library imports: library(lists): member/2, nth0/3, min_list/2, max_list/2.
+  library(apply): maplist/3. Built-ins: length/2, between/3, abs/1, max/2.
+
+Predicate count: 14 (dt_* prefix). Tests: 42/42. Layer: 129.
