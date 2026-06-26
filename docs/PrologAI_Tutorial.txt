@@ -15073,3 +15073,55 @@ Library imports: library(apply): maplist/3.
   Built-ins: length/2, between/3, forall/2.
 
 Predicate count: 14 (nr_* prefix). Tests: 42/42. Layer: 124.
+
+Next chapter: Chapter 107 covers the Cell-Wise Arithmetic on 2D Grids Pack.
+
+Chapter 107: Cell-Wise Arithmetic on 2D Grids - The gridmath Pack (gm_* prefix)
+
+The gridmath pack provides 14 predicates for applying arithmetic operations
+to 2D grids cell by cell. It extends numseq (nr_*) into two dimensions.
+
+Predicates:
+gm_add(+GridA, +GridB, -GridC).          % cell-wise A+B
+gm_sub(+GridA, +GridB, -GridC).          % cell-wise A-B
+gm_mul(+GridA, +GridB, -GridC).          % cell-wise A*B
+gm_max(+GridA, +GridB, -GridC).          % cell-wise max(A,B)
+gm_min(+GridA, +GridB, -GridC).          % cell-wise min(A,B)
+gm_scale(+Grid, +K, -Grid2).             % every cell * K
+gm_offset(+Grid, +D, -Grid2).            % every cell + D
+gm_abs(+Grid, -Grid2).                   % abs of every cell
+gm_eq_mask(+GridA, +GridB, -Mask).       % 1 where cells equal
+gm_diff_mask(+GridA, +GridB, -Mask).     % 1 where cells differ
+gm_clamp(+Grid, +Lo, +Hi, -Grid2).       % clamp to [Lo,Hi]
+gm_modulo(+Grid, +M, -Grid2).            % every cell mod M
+gm_sum(+Grid, -Sum).                     % sum of all cells
+gm_product(+Grid, -Prod).                % product of all cells
+
+Examples:
+gm_add([[1,2],[3,4]], [[5,6],[7,8]], C). % C=[[6,8],[10,12]]
+gm_sub([[5,6],[7,8]], [[1,2],[3,4]], C). % C=[[4,4],[4,4]]
+gm_mul([[1,2],[3,4]], [[5,6],[7,8]], C). % C=[[5,12],[21,32]]
+gm_max([[1,5],[3,2]], [[4,2],[1,6]], C). % C=[[4,5],[3,6]]
+gm_min([[1,5],[3,2]], [[4,2],[1,6]], C). % C=[[1,2],[1,2]]
+gm_scale([[1,2],[3,4]], 2, G).           % G=[[2,4],[6,8]]
+gm_offset([[1,2],[3,4]], 10, G).         % G=[[11,12],[13,14]]
+gm_abs([[-1,2],[-3,4]], G).              % G=[[1,2],[3,4]]
+gm_eq_mask([[1,2],[3,4]],[[1,5],[3,6]],M). % M=[[1,0],[1,0]]
+gm_diff_mask([[1,2]],[[1,5]],M).         % M=[[0,1]]
+gm_clamp([[0,-1],[8,3]],1,5,G).          % G=[[1,1],[5,3]]
+gm_modulo([[11,22],[33,44]],10,G).       % G=[[1,2],[3,4]]
+gm_sum([[1,2],[3,4]], S).                % S=10
+gm_product([[1,2],[3,4]], P).            % P=24
+
+Key implementation patterns:
+gm_add/sub/mul/max/min/eq_mask/diff_mask: outer maplist/4 pairs rows;
+  inner maplist/4 pairs cells; named helpers ensure compatibility.
+gm_scale/offset/abs/clamp/modulo: outer maplist/3 pairs grid rows;
+  row-level helper captures scalar; inner maplist/3 pairs cells.
+gm_eq_: two-clause cut pattern (X,X,1):-!. (_,_,0). for determinism.
+gm_sum/product: findall+member+member flattens all cells; recursive acc.
+
+Library imports: library(apply): maplist/3, maplist/4.
+  library(lists): member/2, append/2.
+
+Predicate count: 14 (gm_* prefix). Tests: 42/42. Layer: 125.
