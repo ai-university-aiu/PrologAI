@@ -1,0 +1,164 @@
+Chapter 177: seqinfer Pack - Sequential Rule Inference (sq_*, Layer 195)
+
+
+Overview
+
+The seqinfer pack finds ordered rule sequences - Rule1 then Rule2 then Rule3 -
+that transform every Before scene into its corresponding After scene. Single-rule
+solvers handle simple transformations; seqinfer handles the cases that require
+multiple successive steps.
+
+Layer 195. Pack prefix: sq_*. Work Package 216.
+
+
+The Core Idea
+
+Many reasoning tasks require more than one step:
+- First recolor objects, then shift them to a new position.
+- First sort by size, then remove the smallest.
+
+seqinfer searches the space of candidate rule sequences and finds the one with
+the highest coverage on the training pairs.
+
+
+Exported Predicates
+
+
+sq_apply(+Rules, +Scene, -Result)
+
+Apply a list of rule terms left-to-right to Scene. Returns the final Result.
+
+Example:
+
+sq_apply([recolor(r, b), shift(1, 0)], [obj(r, [r(0,0)])], Result).
+% Applies recolor first, then shift.
+% Result = [obj(b, [r(1,0)])]
+
+Supported rule terms:
+  identity               - do nothing
+  recolor(C1, C2)        - change all objects of color C1 to C2
+  recolor_all(C)         - change every object to color C
+  shift(DR, DC)          - translate all cells by (DR, DC)
+  to_origin              - translate each object so its top-left is at r(0,0)
+  reflect_h              - reflect each object within its horizontal bounding box
+  reflect_v              - reflect each object within its vertical bounding box
+  remove_color(C)        - remove all objects of color C
+  keep_color(C)          - keep only objects of color C
+  sort_size_desc         - sort objects by cell count, largest first
+  sort_size_asc          - sort objects by cell count, smallest first
+  top_n(N)               - keep only the N largest objects
+  color_map(Map)         - apply a color substitution table (list of C1-C2 pairs)
+
+
+sq_verify(+Rules, +Before, +After)
+
+Succeed if applying Rules to Before produces After (order-independent comparison).
+
+
+sq_consistent(+Rules, +Pairs)
+
+Succeed if Rules correctly transforms every pair in Pairs.
+Succeeds vacuously for empty Pairs.
+
+
+sq_coverage(+Rules, +Pairs, -N)
+
+N is the count of pairs that Rules correctly transforms.
+
+
+sq_infer_2step(+Candidates, +Pairs, -BestSeq)
+
+Find the 2-element rule sequence [R1, R2] from Candidates with the highest
+coverage on Pairs. Enumerates all ordered pairs from the candidate list.
+Fails if no combination has positive coverage.
+
+Example:
+
+sq_infer_2step([recolor(r,b), shift(1,0), identity], Pairs, BestSeq).
+% Tries all ordered pairs; returns the best-coverage sequence.
+
+
+sq_infer_3step(+Candidates, +Pairs, -BestSeq)
+
+Find the 3-element sequence with highest coverage.
+Note: enumerates O(|Candidates|^3) combinations; use small candidate lists.
+
+
+sq_default_rules(-Rules)
+
+Standard single-step rule candidates: identity, recolor pairs for r/b/g/y,
+recolor_all, shifts in 8 directions, to_origin, reflect_h, reflect_v,
+remove_color/keep_color for r/b/g, sort_size_desc, sort_size_asc.
+
+
+sq_solve(+Pairs, +Candidates, -BestSeq)
+
+Attempts to find the best rule sequence. Tries 2-step first (requires full
+coverage); falls back to best single-step rule if 2-step search fails.
+
+Example:
+
+sq_default_rules(Rules),
+sq_solve(TrainingPairs, Rules, BestSeq),
+sq_apply(BestSeq, TestScene, Output).
+
+
+sq_coverage_ratio(+Rules, +Pairs, -Num/Den)
+
+Coverage as an integer fraction Num/Den. Den is the total number of pairs.
+
+
+sq_rank_seqs(+Seqs, +Pairs, -Ranked)
+
+Ranked is Seqs sorted by coverage descending (highest coverage first).
+
+
+sq_all_consistent(+Seqs, +Pairs, -Consistent)
+
+Consistent is the sub-list of Seqs that fully explain all Pairs.
+
+
+sq_n_pairs(+Pairs, -N)
+
+Number of pairs in the list.
+
+
+sq_explain(+Rules, +Pairs, -Coverage)
+
+Returns the coverage count for Rules on Pairs.
+
+
+sq_verify_all(+Rules, +Pairs)
+
+Alias for sq_consistent/2. Succeeds if Rules transforms every pair.
+
+
+Combining with Other Packs
+
+A typical usage flow:
+
+1. Use sceneinv (si_*) to find invariants.
+2. Use transformgen (tg_*) to generate candidate single rules.
+3. Use sq_infer_2step to find the best 2-step sequence.
+4. Use sq_apply to apply it to the test scene.
+
+
+Dependencies
+
+None. Uses library(lists) and library(apply).
+
+
+Test Coverage
+
+All 44 acceptance criteria (AC-SQ-001 through AC-SQ-044) defined in
+Refinement v229 Part 206 are exercised in packs/seqinfer/test/test_seqinfer.pl.
+All 44 tests pass.
+
+
+Summary
+
+The seqinfer pack adds multi-step transformation search to the PrologAI solving
+pipeline. By exhaustively searching ordered rule pairs and triples, it can discover
+composite transformations that no single-rule solver would find.
+
+Continue to Chapter 178 for the next pack in the PrologAI Layer sequence.

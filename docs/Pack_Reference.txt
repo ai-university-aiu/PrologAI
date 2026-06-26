@@ -856,3 +856,20 @@ Scene Invariant Detection across Training Pairs (si_*, Layer 194)
     si_colors_preserved/1: Before and After have the same color set in every pair
     si_total_cells_before/2: total cell count across all Before objects in one pair
     si_cells_preserved/1: total cell count is the same in Before and After for every pair
+
+seqinfer
+Sequential Rule Inference: Multi-Step Scene Transformation Search (sq_*, Layer 195)
+    sq_apply/3: apply a list of rules in sequence to a scene
+    sq_verify/3: succeed if applying Rules to Before produces After
+    sq_consistent/2: Rules correctly transform every pair in the list
+    sq_coverage/3: count of pairs correctly transformed by Rules
+    sq_rank_seqs/3: sort rule sequences by coverage descending
+    sq_all_consistent/3: rule sequences that fully explain all pairs
+    sq_infer_2step/3: find the best 2-step rule sequence from candidates
+    sq_infer_3step/3: find the best 3-step rule sequence from candidates
+    sq_default_rules/1: standard single-step rule candidates
+    sq_solve/3: find the best single or two-step rule from default candidates
+    sq_coverage_ratio/3: coverage as Num/Den integer fraction
+    sq_n_pairs/2: number of pairs in the list
+    sq_explain/3: return coverage count for a rule sequence on a pair list
+    sq_verify_all/2: succeed if Rules correctly transforms every pair
