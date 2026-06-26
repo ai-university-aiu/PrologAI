@@ -14966,3 +14966,54 @@ mk_any: member/2 with cut on first 1 found.
 mk_all: forall/2 (built-in) over all rows and cells.
 
 Predicate count: 14 (mk_* prefix). Tests: 42/42. Layer: 122.
+
+Next chapter: Chapter 105 covers the Grid-as-Table Operations Pack.
+
+Chapter 105: Grid-as-Table Operations - The table Pack (tb_* prefix)
+
+The table pack treats a 2D grid as a table of rows and provides tabular
+operations: transpose, sort, filter, group, count, deduplicate, column
+manipulation, row manipulation, and extremum row queries.
+Layer 123, Work Package 144.
+
+Public predicates:
+tb_transpose(+Grid, -TGrid).             % rows become columns
+tb_sort_rows(+Grid, +C, -Sorted).        % sort rows by column C value
+tb_filter_rows(+Grid, +C, +V, -Filtered). % keep rows where col C = V
+tb_group_by(+Grid, +C, -Groups).         % V-Rows pairs per unique col C value
+tb_count_by(+Grid, +C, -Counts).         % V-N pairs counting rows per col C value
+tb_unique_rows(+Grid, -UniqueGrid).      % deduplicate rows preserving order
+tb_select_cols(+Grid, +ColIdxs, -Sub).   % extract columns by index list
+tb_drop_col(+Grid, +C, -Grid2).          % remove column C
+tb_add_col(+Grid, +NewCol, -Grid2).      % append list as new rightmost column
+tb_insert_row(+Grid, +Row, +R, -Grid2).  % insert Row before position R
+tb_delete_row(+Grid, +R, -Grid2).        % delete row at position R
+tb_swap_rows(+Grid, +R1, +R2, -Grid2).   % swap rows R1 and R2
+tb_col_max_row(+Grid, +C, -R).           % first row with max column C value
+tb_col_min_row(+Grid, +C, -R).           % first row with min column C value
+
+Examples:
+tb_transpose([[1,2,3],[4,5,6]], T).       % T=[[1,4],[2,5],[3,6]]
+tb_sort_rows([[3,a],[1,b],[2,c]], 0, S).  % S=[[1,b],[2,c],[3,a]]
+tb_filter_rows([[1,a],[2,b],[1,c]], 0, 1, F). % F=[[1,a],[1,c]]
+tb_group_by([[1,a],[2,b],[1,c]], 0, G).   % G=[1-[[1,a],[1,c]], 2-[[2,b]]]
+tb_count_by([[1,a],[2,b],[1,c]], 0, C).   % C=[1-2, 2-1]
+tb_unique_rows([[1,2],[3,4],[1,2]], U).   % U=[[1,2],[3,4]]
+tb_select_cols([[1,2,3]], [2,0], Sub).    % Sub=[[3,1]]  (reorder columns)
+tb_drop_col([[1,2,3],[4,5,6]], 1, G).    % G=[[1,3],[4,6]]
+tb_add_col([[1,2],[3,4]], [5,6], G).     % G=[[1,2,5],[3,4,6]]
+tb_insert_row([[1,2],[5,6]], [3,4], 1, G). % G=[[1,2],[3,4],[5,6]]
+tb_delete_row([[1,2],[3,4],[5,6]], 1, G). % G=[[1,2],[5,6]]
+tb_swap_rows([[1,2],[3,4],[5,6]], 0, 2, G). % G=[[5,6],[3,4],[1,2]]
+tb_col_max_row([[1,5],[3,2],[2,8]], 1, R). % R=2
+tb_col_min_row([[9,0],[1,0],[3,0]], 0, R). % R=1
+
+tb_transpose: findall over col indices; member+nth0 collects each column.
+tb_sort_rows: V-Row pairs + keysort/2 (built-in) + unwrap.
+tb_group_by: sort unique keys first; then per-key findall for row lists.
+tb_unique_rows: recursive accumulator with \+member/2 duplicate test.
+tb_insert_row: two-clause recursion (R=0 prepends; else recurse on tail).
+tb_swap_rows: pre-fetch both rows; rebuild with if-then-else.
+tb_col_max_row/min_row: max_list/min_list then nth0+cut for first match.
+
+Predicate count: 14 (tb_* prefix). Tests: 42/42. Layer: 123.
