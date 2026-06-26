@@ -14772,3 +14772,55 @@ AC-OM-043: om_open4 of a thin horizontal line returns empty.
 AC-OM-044: om_close4 of a single cell returns [r(0,0)] (dilate to plus, erode back).
 AC-OM-045: om_close4 of a 3x3 square returns 9 cells.
 AC-OM-046: om_close4 of a horizontal line of 3 returns the same 3 cells.
+
+Part 177: Voronoi Pack Acceptance Criteria (vn_*, Layer 166)
+
+AC-VN-001: vn_non_bg_cells on a 3x3 grid with 2 non-Bg cells returns exactly those 2 cells.
+AC-VN-002: vn_non_bg_cells on a grid with all non-Bg cells returns all 9 cells.
+AC-VN-003: vn_non_bg_cells on an all-Bg grid returns an empty list.
+AC-VN-004: vn_non_bg_cells on a single-cell non-Bg grid returns that one cell.
+AC-VN-005: vn_non_bg_colors on a grid with 2 distinct non-Bg colors returns both in sorted order.
+AC-VN-006: vn_non_bg_colors on an atom-valued grid returns sorted atom list.
+AC-VN-007: vn_non_bg_colors on an all-Bg grid returns an empty list.
+AC-VN-008: vn_non_bg_colors on a grid with one color returns a singleton list.
+AC-VN-009: vn_nearest_dist at a non-Bg cell itself returns 0.
+AC-VN-010: vn_nearest_dist at the center of a 3x3 with one non-Bg cell at a corner returns 2.
+AC-VN-011: vn_nearest_dist at a cell adjacent to a non-Bg cell returns 1.
+AC-VN-012: vn_nearest_dist at a corner cell in a 3x3 with center non-Bg returns 2.
+AC-VN-013: vn_nearest_color returns the color of the single nearest non-Bg cell.
+AC-VN-014: vn_nearest_color at a cell closer to color a than b returns a.
+AC-VN-015: vn_nearest_color at a cell closer to color b than a returns b.
+AC-VN-016: vn_nearest_color at a cell equidistant from a and b returns a or b deterministically.
+AC-VN-017: vn_nearest_color returns the correct color for a cell adjacent to a single non-Bg cell.
+AC-VN-018: vn_paint_bg paints all cells when there is one non-Bg cell and all others are Bg.
+AC-VN-019: vn_paint_bg leaves non-Bg cells unchanged.
+AC-VN-020: vn_paint_bg on a grid with no Bg cells returns the original grid.
+AC-VN-021: vn_paint_bg on a 1x5 grid with a and b at ends produces correct split.
+AC-VN-022: vn_dist_map on a 3x3 with one non-Bg cell at center returns the expected Manhattan distances.
+AC-VN-023: vn_dist_map sets non-Bg cells to 0.
+AC-VN-024: vn_dist_map on an all-non-Bg grid returns all zeros.
+AC-VN-025: vn_dist_map on a single-cell grid with a non-Bg cell returns [[0]].
+AC-VN-026: vn_region_cells for the only color on a 3x3 returns all 8 Bg cells.
+AC-VN-027: vn_region_cells for a color whose region is a subset returns the correct cells.
+AC-VN-028: vn_regions on a 2-color grid returns a list of length 2.
+AC-VN-029: vn_regions on a 1-color grid returns a list of length 1 with all Bg cells.
+AC-VN-030: vn_regions on an all-non-Bg grid returns pairs with empty cell lists.
+AC-VN-031: vn_max_dist on a 3x3 with center non-Bg returns 2.
+AC-VN-032: vn_max_dist on a 1x5 with non-Bg at col 0 and col 4 returns 2.
+AC-VN-033: vn_at_dist on a 3x3 with center non-Bg at D=1 returns 4 cells.
+AC-VN-034: vn_at_dist on a 3x3 with center non-Bg at D=2 returns 4 cells (corners).
+AC-VN-035: vn_at_dist at D=0 returns an empty list (no Bg cell is at dist 0 from non-Bg).
+AC-VN-036: vn_within_dist on a 3x3 with center non-Bg at D=1 returns 4 cells.
+AC-VN-037: vn_within_dist at D=2 returns all 8 Bg cells for a 3x3 with center non-Bg.
+AC-VN-038: vn_within_dist at D=0 returns an empty list.
+AC-VN-039: vn_medial on a 1x5 grid with a at col 0 and b at col 4 includes the center cell.
+AC-VN-040: vn_medial on a 1-color grid returns an empty list.
+AC-VN-041: vn_medial on a 3x3 grid with 2 diagonal colors includes the center cell.
+AC-VN-042: vn_expand1 returns the 4 orthogonal Bg neighbors of a center non-Bg cell.
+AC-VN-043: vn_expand1 on a grid with no Bg cells returns an empty list.
+AC-VN-044: vn_expand1 returns only Bg cells adjacent to the specified color.
+AC-VN-045: vn_expand_n with N=0 returns an empty list.
+AC-VN-046: vn_expand_n with N=1 returns the same result as vn_expand1.
+AC-VN-047: vn_expand_n with N=2 on a 3x3 with center non-Bg returns all 8 Bg cells.
+AC-VN-048: vn_expand_n correctly includes only Bg cells within the specified distance.
+AC-VN-049: vn_expand_n with N=2 on a 1x5 grid from color a includes cells 1 and 2.

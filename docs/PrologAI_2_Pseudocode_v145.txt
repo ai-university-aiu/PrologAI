@@ -10686,3 +10686,75 @@ PROCEDURE om_open4(Obj, Result):
 PROCEDURE om_close4(Obj, Result):
   Dilated <- om_dilate4(Obj)
   Result <- om_erode4(Dilated)
+
+Part 177: Voronoi Pack Pseudocode (vn_*, Layer 166)
+
+Section 177.1: Source Cell Collection
+
+PROCEDURE vn_non_bg_cells(Grid, Bg, Cells):
+  Cells <- sort([r(R,C) FOR r(R,C) IN grid_positions(Grid) WHERE Grid[R][C] != Bg])
+
+PROCEDURE vn_non_bg_colors(Grid, Bg, Colors):
+  Colors <- sort([Grid[R][C] FOR r(R,C) IN grid_positions(Grid) WHERE Grid[R][C] != Bg])
+
+Section 177.2: Nearest Distance and Color
+
+PROCEDURE vn_nearest_dist(Grid, Bg, R, C, Dist):
+  NonBg <- vn_non_bg_cells(Grid, Bg)
+  Dists <- [|NR-R| + |NC-C| FOR r(NR,NC) IN NonBg]
+  Dist <- min(Dists)
+
+PROCEDURE vn_nearest_color(Grid, Bg, R, C, Color):
+  Pairs <- [(|NR-R|+|NC-C|)-V FOR r(NR,NC) at value V in Grid WHERE V != Bg]
+  Color <- V IN sort(Pairs)[0]
+
+Section 177.3: Painting and Distance Transform
+
+PROCEDURE vn_paint_bg(Grid, Bg, Painted):
+  FOR each cell (R,C) in Grid:
+    IF Grid[R][C] != Bg: Painted[R][C] <- Grid[R][C]
+    ELSE: Painted[R][C] <- vn_nearest_color(Grid, Bg, R, C)
+
+PROCEDURE vn_dist_map(Grid, Bg, DGrid):
+  NonBg <- vn_non_bg_cells(Grid, Bg)
+  FOR each cell (R,C) in Grid:
+    IF Grid[R][C] != Bg: DGrid[R][C] <- 0
+    ELSE: DGrid[R][C] <- min([|NR-R|+|NC-C| FOR r(NR,NC) IN NonBg])
+
+Section 177.4: Voronoi Regions
+
+PROCEDURE vn_region_cells(Grid, Bg, Color, Cells):
+  Cells <- sort([r(R,C) FOR r(R,C) Bg cell WHERE vn_nearest_color(Grid,Bg,R,C)=Color])
+
+PROCEDURE vn_regions(Grid, Bg, Pairs):
+  Colors <- vn_non_bg_colors(Grid, Bg)
+  Pairs <- [Color-vn_region_cells(Grid,Bg,Color) FOR Color IN Colors]
+
+Section 177.5: Distance Queries
+
+PROCEDURE vn_max_dist(Grid, Bg, MaxDist):
+  Dists <- [vn_nearest_dist(Grid,Bg,R,C) FOR r(R,C) Bg cell]
+  MaxDist <- max(Dists)
+
+PROCEDURE vn_at_dist(Grid, Bg, D, Cells):
+  Cells <- sort([r(R,C) FOR r(R,C) Bg cell WHERE vn_nearest_dist(Grid,Bg,R,C)=D])
+
+PROCEDURE vn_within_dist(Grid, Bg, D, Cells):
+  Cells <- sort([r(R,C) FOR r(R,C) Bg cell WHERE vn_nearest_dist(Grid,Bg,R,C)<=D])
+
+Section 177.6: Medial Axis and Expansion
+
+PROCEDURE vn_medial(Grid, Bg, Cells):
+  Cells <- sort([r(R,C) FOR r(R,C) Bg cell
+                 WHERE |{V : r(NR,NC) non-Bg at V, dist(R,C,NR,NC)=vn_nearest_dist(...)}| >= 2])
+
+PROCEDURE vn_expand1(Grid, Bg, Color, Cells):
+  ColorCells <- {r(R,C) : Grid[R][C]=Color}
+  Cells <- sort([r(BR,BC) : r(BR,BC) Bg, r(CR,CC) IN ColorCells,
+                 4-adjacent(r(BR,BC), r(CR,CC))])
+
+PROCEDURE vn_expand_n(Grid, Bg, Color, N, Cells):
+  ColorCells <- {r(CR,CC) : Grid[CR][CC]=Color}
+  Cells <- sort([r(BR,BC) : r(BR,BC) Bg,
+                 r(CR,CC) IN ColorCells,
+                 |BR-CR|+|BC-CC| <= N])

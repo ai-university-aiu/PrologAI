@@ -14369,3 +14369,43 @@ om_close4(+Obj, -Result): Morphological closing = dilate4 then erode4. Fills sma
 Section 176.3: Layer Assignment
 
 Layer 165. Depends on no other packs. Uses member/2 from library(lists); built-ins sort/2, findall/3, forall/2.
+
+Part 177: Voronoi Pack Specification (vn_*, Layer 166)
+
+Section 177.1: Purpose
+
+The voronoi pack provides nearest-color painting and Voronoi partitioning for 2D grids. Given a grid with non-background colored cells and background cells (identified by a distinguished background value), the pack computes: the nearest non-background color to any background cell by Manhattan distance; the distance transform (distance from each cell to nearest non-background cell); the Voronoi partition (which background cells belong to which color's region); the medial axis (background cells equidistant from two or more colors); and color expansion (background cells reachable within N steps of a specific color).
+
+Section 177.2: Predicate Specifications
+
+vn_non_bg_cells(+Grid, +Bg, -Cells): sorted list of r(R,C) positions whose value differs from Bg.
+
+vn_non_bg_colors(+Grid, +Bg, -Colors): sorted list of distinct non-background values in Grid.
+
+vn_nearest_dist(+Grid, +Bg, +R, +C, -Dist): minimum Manhattan distance from r(R,C) to any non-background cell. Fails if no non-Bg cells exist.
+
+vn_nearest_color(+Grid, +Bg, +R, +C, -Color): color of the non-background cell nearest to r(R,C). Ties broken by standard term order.
+
+vn_paint_bg(+Grid, +Bg, -Painted): replace every Bg cell with the color of the nearest non-Bg cell. Non-Bg cells are unchanged.
+
+vn_dist_map(+Grid, +Bg, -DGrid): same dimensions as Grid. Each Bg cell becomes the Manhattan distance to the nearest non-Bg cell; each non-Bg cell becomes 0.
+
+vn_region_cells(+Grid, +Bg, +Color, -Cells): sorted list of Bg cells whose nearest non-Bg color is Color.
+
+vn_regions(+Grid, +Bg, -Pairs): sorted list of Color-[Cells] pairs for every distinct non-Bg color.
+
+vn_max_dist(+Grid, +Bg, -MaxDist): maximum distance of any Bg cell from its nearest non-Bg cell. Fails if no Bg cells.
+
+vn_at_dist(+Grid, +Bg, +D, -Cells): sorted list of Bg cells whose nearest non-Bg cell is at distance exactly D.
+
+vn_within_dist(+Grid, +Bg, +D, -Cells): sorted list of Bg cells at distance =< D from the nearest non-Bg cell.
+
+vn_medial(+Grid, +Bg, -Cells): sorted list of Bg cells equidistant from non-Bg cells of two or more distinct colors (the Voronoi edge / medial axis).
+
+vn_expand1(+Grid, +Bg, +Color, -Cells): sorted list of Bg cells that are 4-connected to at least one non-Bg cell of Color.
+
+vn_expand_n(+Grid, +Bg, +Color, +N, -Cells): sorted list of Bg cells within Manhattan distance N of any Color cell. N=0 gives an empty list.
+
+Section 177.3: Layer Assignment
+
+Layer 166. Depends on no other packs. Uses member/2, nth0/3, min_list/2, max_list/2, append/3 from library(lists); built-ins sort/2, findall/3.
