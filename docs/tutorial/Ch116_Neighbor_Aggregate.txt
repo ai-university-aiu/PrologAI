@@ -1,0 +1,93 @@
+Chapter 116: Per-Cell Neighborhood Value Aggregation Pack (Layer 134, na_* prefix)
+
+The naggr pack provides 14 predicates for computing per-cell aggregate statistics
+over in-bounds 4-connected and 8-connected neighborhoods in 2D grids.
+
+Where the automaton pack (at_*, Layer 120) provides count-based neighbor operations
+such as counting how many neighbors have a specific value, the naggr pack provides
+value-based aggregation: sum, maximum, minimum, mean, range, value spread, and
+difference count.
+
+Every predicate produces an output grid of the same dimensions as the input.
+Out-of-bounds neighbors are omitted.  Cells with no in-bounds neighbors receive
+sentinel value 0.
+
+Predicates:
+
+na_sum4(+Grid, -SumGrid)
+  Each output cell is the sum of in-bounds 4-neighbor values.
+
+na_sum8(+Grid, -SumGrid)
+  Each output cell is the sum of in-bounds 8-neighbor values.
+
+na_max4(+Grid, -MaxGrid)
+  Each output cell is the maximum in-bounds 4-neighbor value; 0 if none.
+
+na_max8(+Grid, -MaxGrid)
+  Each output cell is the maximum in-bounds 8-neighbor value; 0 if none.
+
+na_min4(+Grid, -MinGrid)
+  Each output cell is the minimum in-bounds 4-neighbor value; 0 if none.
+
+na_min8(+Grid, -MinGrid)
+  Each output cell is the minimum in-bounds 8-neighbor value; 0 if none.
+
+na_mean4(+Grid, -MeanGrid)
+  Each output cell is floor(sum/count) of in-bounds 4-neighbors; 0 if none.
+
+na_mean8(+Grid, -MeanGrid)
+  Each output cell is floor(sum/count) of in-bounds 8-neighbors; 0 if none.
+
+na_range4(+Grid, -RangeGrid)
+  Each output cell is max - min of in-bounds 4-neighbors; 0 if fewer than 2.
+
+na_range8(+Grid, -RangeGrid)
+  Each output cell is max - min of in-bounds 8-neighbors; 0 if fewer than 2.
+
+na_spread4(+Grid, -SpreadGrid)
+  Each output cell is the count of distinct values among 4-neighbors.
+
+na_spread8(+Grid, -SpreadGrid)
+  Each output cell is the count of distinct values among 8-neighbors.
+
+na_diff4(+Grid, -DiffGrid)
+  Each output cell is the count of 4-neighbors whose value differs from the cell.
+
+na_diff8(+Grid, -DiffGrid)
+  Each output cell is the count of 8-neighbors whose value differs from the cell.
+
+Example:
+
+?- na_sum4([[1,2,3],[4,5,6],[7,8,9]], S).
+S = [[6,9,8],[13,20,17],[12,21,14]].
+
+?- na_max4([[1,2,3],[4,5,6],[7,8,9]], M).
+M = [[4,5,6],[7,8,9],[8,9,8]].
+
+?- na_mean4([[1,2,3],[4,5,6],[7,8,9]], M).
+M = [[3,3,4],[4,5,5],[6,7,7]].
+
+?- na_range4([[1,2,3],[4,5,6],[7,8,9]], R).
+R = [[2,4,4],[6,6,6],[4,4,2]].
+
+?- na_spread4([[1,2,3],[4,5,6],[7,8,9]], S).
+S = [[2,3,2],[3,4,3],[2,3,2]].
+
+?- na_diff4([[1,2,1],[2,1,2],[1,2,1]], D).
+D = [[2,3,2],[3,4,3],[2,3,2]].
+
+Implementation notes:
+
+Both private helpers na_nbr4_vals_ and na_nbr8_vals_ use findall over member
+of offset lists with explicit bounds guards NR>=0, NR<H, NC>=0, NC<W.
+
+All 14 public predicates use nested findall: outer collects one row per row
+index R, inner collects one aggregate value per column index C.
+
+na_spread4 and na_spread8 call sort/2 (built-in) to deduplicate neighbor values
+before measuring the length of the unique set.
+
+na_diff4 and na_diff8 retrieve the cell value via nth0, then count same-valued
+neighbors via a nested findall with =:= comparison, and subtract from total.
+
+All 42 acceptance tests pass under SWI-Prolog.
