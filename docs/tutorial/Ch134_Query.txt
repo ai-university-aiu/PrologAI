@@ -1,0 +1,170 @@
+Chapter 134: Aggregate Queries over Object Lists (query pack, qu_* prefix, Layer 152)
+
+The query pack answers aggregate questions about lists of obj(Color, Cells) terms.
+It provides counting by attribute, finding extremes, computing totals and averages,
+testing for uniformity, and enumerating distinct values.
+
+All predicates are deterministic.
+
+
+Object Term Format
+
+The query pack operates on obj(Color, Cells) terms where Color is an integer and
+Cells is a sorted list of r(Row, Col) cell coordinates. These terms are produced by
+the scene pack (Layer 37).
+
+
+Form vs Shape
+
+The query pack uses the concept of "form" - the origin-normalized cell list of an
+object. Normalization translates the cell set so that the minimum row and minimum
+column are both zero, then sorts the cells. This is an exact structural match.
+
+Two objects with the same D4 shape but different orientations have different forms.
+For example, a horizontal 2-cell bar [r(0,0),r(0,1)] and a vertical 2-cell bar
+[r(0,0),r(1,0)] are D4-equivalent but have different forms.
+
+
+Counting by Attribute
+
+qu_count_by_color(+Objs, -Counts): sorted Color-N pairs giving the number of objs
+with each color.
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])],
+    qu_count_by_color(Objs, Counts).
+    % Counts = [1-2, 2-1]  (color 1 appears twice, color 2 once)
+
+qu_count_by_size(+Objs, -Counts): sorted Size-N pairs giving the number of objs
+with each cell count.
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(0,1),r(0,2)]), obj(3,[r(1,0)])],
+    qu_count_by_size(Objs, Counts).
+    % Counts = [1-2, 2-1]  (two single-cell objs, one two-cell obj)
+
+qu_count_by_form(+Objs, -Counts): sorted Form-N pairs giving the number of objs
+with each origin-normalized shape.
+
+    Objs = [obj(1,[r(0,0),r(0,1)]), obj(2,[r(3,4),r(3,5)])],
+    qu_count_by_form(Objs, Counts).
+    % Counts = [[r(0,0),r(0,1)]-2]  (both normalize to the same horizontal bar)
+
+
+Finding Extreme Colors
+
+qu_most_frequent_color(+Objs, -Color): the color appearing in the most objs.
+On ties, returns the smallest color value.
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])],
+    qu_most_frequent_color(Objs, Color).
+    % Color = 1  (appears twice)
+
+    qu_most_frequent_color([obj(2,[r(0,0)]), obj(5,[r(0,1)])], Color).
+    % Color = 2  (tie; smallest color wins)
+
+qu_least_frequent_color(+Objs, -Color): the color appearing in the fewest objs.
+On ties, returns the smallest color value.
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])],
+    qu_least_frequent_color(Objs, Color).
+    % Color = 2  (appears once)
+
+
+Finding Extreme Objects
+
+qu_largest_obj(+Objs, -Obj): the obj with the most cells.
+On ties, returns the first obj in input order.
+
+    O1 = obj(1,[r(0,0),r(0,1),r(0,2)]),
+    O2 = obj(2,[r(1,0)]),
+    qu_largest_obj([O1,O2], Obj).
+    % Obj = obj(1, [r(0,0),r(0,1),r(0,2)])
+
+qu_smallest_obj(+Objs, -Obj): the obj with the fewest cells.
+On ties, returns the first obj in input order.
+
+    O1 = obj(1,[r(0,0)]),
+    O2 = obj(2,[r(1,0),r(1,1),r(1,2)]),
+    qu_smallest_obj([O1,O2], Obj).
+    % Obj = obj(1, [r(0,0)])
+
+
+Totals and Averages
+
+qu_total_cells(+Objs, -N): total cell count across all obj terms.
+
+    Objs = [obj(1,[r(0,0),r(0,1),r(0,2)]), obj(2,[r(1,0),r(1,1)])],
+    qu_total_cells(Objs, N).
+    % N = 5
+
+qu_avg_size(+Objs, -N): floor-average cell count per obj (integer division).
+
+    Objs = [obj(1,[r(0,0),r(0,1),r(0,2)]), obj(2,[r(1,0)])],
+    qu_avg_size(Objs, N).
+    % N = 2  (4 cells // 2 objs)
+
+    Objs2 = [obj(1,[r(0,0)]), obj(2,[r(0,1),r(0,2)]), obj(3,[r(1,0),r(1,1),r(1,2)])],
+    qu_avg_size(Objs2, N2).
+    % N2 = 2  (6 cells // 3 objs, floor)
+
+
+Uniformity Tests
+
+These predicates succeed if all objs in the list share a single value for the tested
+attribute, and fail otherwise.
+
+qu_all_same_color(+Objs): succeed if all objs have the same color.
+
+    qu_all_same_color([obj(3,[r(0,0)]), obj(3,[r(1,0)]), obj(3,[r(2,0)])]).
+    % succeeds
+
+    qu_all_same_color([obj(1,[r(0,0)]), obj(2,[r(1,0)])]).
+    % fails (two different colors)
+
+qu_all_same_size(+Objs): succeed if all objs have the same cell count.
+
+    qu_all_same_size([obj(1,[r(0,0),r(0,1)]), obj(2,[r(1,0),r(1,1)])]).
+    % succeeds (both have 2 cells)
+
+qu_all_same_form(+Objs): succeed if all objs have the same origin-normalized shape.
+Objs may be at different positions and have different colors.
+
+    qu_all_same_form([obj(1,[r(0,0),r(0,1)]), obj(2,[r(3,4),r(3,5)])]).
+    % succeeds (both normalize to [r(0,0),r(0,1)])
+
+    qu_all_same_form([obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(1,0)])]).
+    % fails (horizontal bar vs vertical bar - different forms)
+
+
+Enumerating Distinct Values
+
+qu_colors(+Objs, -Colors): sorted list of distinct color values.
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])],
+    qu_colors(Objs, Colors).
+    % Colors = [1, 2]
+
+qu_sizes(+Objs, -Sizes): sorted list of distinct cell counts.
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(0,1),r(0,2)]), obj(3,[r(1,0)])],
+    qu_sizes(Objs, Sizes).
+    % Sizes = [1, 2]  (sizes 1 and 2; no duplicates)
+
+
+Design Notes
+
+Two-phase count pattern: qu_count_by_color, qu_count_by_size, and qu_count_by_form
+all use: (1) findall distinct keys -> sort; (2) for each key, findall objs matching
+that key -> length. This produces sorted output without dynamic state.
+
+Tie-breaking for extremes: The Color-N list from qu_count_by_color is sorted by color
+ascending. member+cut finds the first match, which is the smallest color at the target
+count. For qu_largest_obj and qu_smallest_obj, findall preserves input list order, so
+member+cut finds the first object in input order.
+
+Uniformity test pattern: findall values -> sort/2 (deduplicates) -> require singleton
+[_]. One line per test predicate.
+
+Library imports: library(lists): member/2, min_list/2, max_list/2, sum_list/2.
+Built-ins: findall/3, sort/2, length/2.
+
+42/42 PLUnit tests pass.
