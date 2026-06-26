@@ -17899,3 +17899,41 @@ ri_all_same_n_objs/1: all pairs preserve object count.
 ri_all_same_colors/1: all pairs preserve color sets.
 
 All 41 tests pass. See docs/tutorial/Ch167_RuleInfer.txt for the full chapter.
+
+
+Chapter 157: sceneapply Pack - Scene-Level Rule Term Evaluation Engine (sa_*, Layer 186)
+
+The sceneapply pack applies symbolic rule terms to obj(Color, Cells) scene lists.
+Companion to ruleinfer (ri_*): ruleinfer infers the rule, sceneapply executes it.
+Layer 186, WP 207.
+
+Loading:
+:- use_module(pack(sceneapply/prolog/sceneapply)).
+
+Rule terms: recolor(Old,New), recolor_all(New), color_map(Map), shift(DR,DC),
+to_origin, reflect_h(Width), reflect_v(Height), remove_color(Color),
+keep_color(Color), sort_size_desc, sort_size_asc, sort_pos, top_n(N), dedup_form.
+
+14 exported predicates:
+
+1. Application
+sa_apply/3: dispatch on rule term; apply to scene.
+sa_apply_seq/3: apply list of rules in order (recursive descent).
+
+2. Verification
+sa_verify/3: rule transforms Before to After (msort-insensitive).
+sa_verify_seq/3: rule sequence transforms Before to After.
+sa_verify_all/2: rule works on all Before-After pairs.
+sa_verify_seq_all/2: rule sequence works on all pairs.
+
+3. Classification
+sa_rule_type/2: color|spatial|filter|order|dedup.
+sa_is_color_rule/1, sa_is_spatial_rule/1, sa_is_filter_rule/1: type tests.
+
+4. Utilities
+sa_colors_affected/2: color atoms referenced in rule.
+sa_compose/3: make two-step sequence [Rule1, Rule2].
+sa_seq_len/2: length of rule sequence.
+sa_rule_invertible/1: recolor, shift, reflect_h, reflect_v are invertible.
+
+All 46 tests pass. See docs/tutorial/Ch168_SceneApply.txt for the full chapter.
