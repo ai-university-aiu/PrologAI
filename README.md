@@ -61,14 +61,14 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       207 work packages — the complete cognitive engine (see below)
+├── packs/       208 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
 └── launcher/    Entry points and bootstrapper
 ```
 
-### The 200 Work Packages
+### The 208 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -307,6 +307,7 @@ Everything is inspectable.
 | `objdelta` | Object-Pair Change Analysis and Rule Application (PR 285) |
 | `objcopy` | Object Tiling and Multi-Copy Layout (PR 286) |
 | `objmatch` | Object-List Correspondence and Matching (PR 287) |
+| `condxf` | Conditional and Selective Scene Transformation (PR 296) |
 | `sceneapply` | Scene-Level Rule Term Evaluation Engine (PR 295) |
 | `ruleinfer` | Scene-Level Transformation Rule Inference from Object-List Pairs (PR 294) |
 | `scenexf` | Scene-Level Uniform Transformation of All Objects (PR 293) |
@@ -340,11 +341,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v172` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v165` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v166` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v220` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v223` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v173` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v166` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v167` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v221` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v224` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---
