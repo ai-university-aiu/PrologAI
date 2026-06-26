@@ -17864,3 +17864,38 @@ sx_top_n/3: the N largest objects; if N > length, returns all sorted desc.
 sx_dedup_form/2: keep first object of each distinct normalized shape.
 
 All 41 tests pass. See docs/tutorial/Ch166_SceneXf.txt for the full chapter.
+
+
+Chapter 156: ruleinfer Pack - Scene-Level Transformation Rule Inference (ri_*, Layer 185)
+
+The ruleinfer pack infers which scene-level transformation was applied to a
+Before scene to produce an After scene. Layer 185, WP 206.
+
+Loading:
+:- use_module(pack(ruleinfer/prolog/ruleinfer)).
+
+Pairs are Before-After terms. A list of pairs: [B1-A1, B2-A2, ...].
+
+14 exported predicates:
+
+1. Inference (from one Before-After pair)
+ri_infer_recolor/4: exactly one color changed (Old->New); count preserved.
+ri_infer_recolor_all/3: all After objects have same color New.
+ri_infer_color_map/3: full color substitution map from position-matched objects.
+ri_infer_keep_color/3: After keeps only Color objects from Before.
+ri_infer_remove_color/3: After is Before minus all Color objects.
+ri_infer_shift/4: uniform shift DR/DC; verified via msort on shifted Before.
+ri_infer_to_origin/2: After == Before shifted so scene bbox at r(0,0).
+
+2. Consistency (verify rule across multiple pairs)
+ri_consistent_recolor/3: recolor(Old,New) applies to all pairs.
+ri_consistent_color_map/2: color map applies to all pairs.
+ri_consistent_keep_color/2: keep_color(Color) applies to all pairs.
+ri_consistent_remove_color/2: remove_color(Color) applies to all pairs.
+ri_consistent_shift/3: shift(DR,DC) applies to all pairs.
+
+3. Cross-pair queries
+ri_all_same_n_objs/1: all pairs preserve object count.
+ri_all_same_colors/1: all pairs preserve color sets.
+
+All 41 tests pass. See docs/tutorial/Ch167_RuleInfer.txt for the full chapter.
