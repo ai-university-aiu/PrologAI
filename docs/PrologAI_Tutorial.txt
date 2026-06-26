@@ -16178,3 +16178,37 @@ Library imports: library(apply): maplist/2, maplist/3.
 Built-ins: between/3, length/2, findall/3, msort/2.
 
 Predicate count: 14 (ro_* prefix). Tests: 46/46. Layer: 144.
+
+Chapter 127: Warp Pack (Layer 145, wr_* prefix)
+
+The warp pack provides 14 predicates for shear transformations, cyclic (toroidal)
+shifts, per-row arbitrary offset warping, anti-diagonal transposition, and detection
+of shear relationships between grids. These predicates support visual reasoning tasks
+involving staircase patterns, toroidal wrapping, and skewed grids.
+
+wr_shift_row(+Grid, +R, +N, +Bg, -Out): shift row R right by N cells; fill with Bg.
+wr_shift_col(+Grid, +C, +N, +Bg, -Out): shift column C down by N cells; fill with Bg.
+wr_shear_h(+Grid, +Step, +Bg, -Out): row I shifts right by I*Step; fill with Bg.
+wr_shear_v(+Grid, +Step, +Bg, -Out): column J shifts down by J*Step; fill with Bg.
+wr_unshear_h(+Grid, +Step, +Bg, -Out): undo horizontal shear (row I shifts left).
+wr_unshear_v(+Grid, +Step, +Bg, -Out): undo vertical shear (column J shifts up).
+wr_cyclic_h(+Grid, +N, -Out): cyclically shift all rows right by N (toroidal).
+wr_cyclic_v(+Grid, +N, -Out): cyclically shift all columns down by N (toroidal).
+wr_cyclic_shear_h(+Grid, +Step, -Out): row I wraps right by I*Step.
+wr_cyclic_shear_v(+Grid, +Step, -Out): column J wraps down by J*Step.
+wr_skew_offsets(+Grid, +Offsets, +Bg, -Out): row I shifts right by Offsets[I].
+wr_transpose_anti(+Grid, -Out): anti-diagonal transpose; Out[W-1-C][H-1-R]=Grid[R][C].
+wr_find_shear_h(+GridA, +GridB, +Bg, -Step): find shear step mapping A to B.
+wr_find_shear_v(+GridA, +GridB, +Bg, -Step): find vertical shear step mapping A to B.
+
+Example: wr_shear_h([[a,b,c],[d,e,f],[g,h,i]], 1, 0, Out).
+         Out = [[a,b,c],[0,d,e],[0,0,g]].
+
+Example: wr_transpose_anti([[a,b],[c,d]], Out).
+         Out = [[d,b],[c,a]].
+
+Library imports: library(lists): member/2, nth0/3, numlist/3, append/2, reverse/2.
+Library imports: library(apply): maplist/2, maplist/3.
+Built-ins: between/3, length/2, findall/3.
+
+42/42 PLUnit tests pass.
