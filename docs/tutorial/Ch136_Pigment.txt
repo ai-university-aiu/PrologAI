@@ -1,0 +1,148 @@
+Chapter 136: Bulk Color Operations on Object Scenes (pigment pack, pg_* prefix, Layer 154)
+
+The pigment pack manipulates colors across entire scenes (lists of obj(Color, Cells)
+terms). It covers uniform recoloring, single-color replacement, color swapping,
+color table application, color table inference, zip-based recoloring, frequency-targeted
+recoloring, and color table utilities.
+
+
+Object Term Format
+
+The pigment pack operates on obj(Color, Cells) terms where Color is an integer.
+A scene is a list of such terms.
+
+
+Uniform and Targeted Recoloring
+
+pg_recolor_all(+Objs, +Color, -Out): set every obj's color to Color. Cell lists are preserved.
+
+    pg_recolor_all([obj(1,[r(0,0)]), obj(2,[r(0,1)])], 5, Out).
+    % Out = [obj(5,[r(0,0)]), obj(5,[r(0,1)])]
+
+pg_recolor_one(+Objs, +From, +To, -Out): change all From-colored objs to To; keep others.
+
+    pg_recolor_one([obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])], 1, 5, Out).
+    % Out = [obj(5,[r(0,0)]), obj(2,[r(0,1)]), obj(5,[r(1,0)])]
+
+pg_swap(+Objs, +C1, +C2, -Out): exchange colors C1 and C2 throughout the scene.
+
+    pg_swap([obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])], 1, 2, Out).
+    % Out = [obj(2,[r(0,0)]), obj(1,[r(0,1)]), obj(2,[r(1,0)])]
+
+
+Color Table Operations
+
+A color table is a list of From-To pairs, e.g. [1-5, 2-6]. The -/2 functor (minus)
+is used as the pair separator.
+
+pg_apply_table(+Objs, +Table, -Out): apply the color table. Objs not in the table
+keep their original color (lenient mode).
+
+    pg_apply_table([obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(3,[r(1,0)])],
+                   [1-5, 2-6], Out).
+    % Out = [obj(5,[r(0,0)]), obj(6,[r(0,1)]), obj(3,[r(1,0)])]
+    % (obj(3,...) is not in the table; color 3 is kept)
+
+pg_apply_table_strict(+Objs, +Table, -Out): apply the color table. Objs not in the
+table are excluded from Out (strict mode).
+
+    pg_apply_table_strict([obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(3,[r(1,0)])],
+                          [1-5, 2-6], Out).
+    % Out = [obj(5,[r(0,0)]), obj(6,[r(0,1)])]
+    % (obj(3,...) has no table entry and is excluded)
+
+pg_infer_table(+Objs1, +Objs2, -Table): infer the color mapping from two scenes.
+For each pair of obj terms with identical cell sets (same position), records the
+Old-New color pair. Deduplicates with sort/2.
+
+    Objs1 = [obj(1,[r(0,0),r(0,1)]), obj(2,[r(1,0)])],
+    Objs2 = [obj(3,[r(0,0),r(0,1)]), obj(4,[r(1,0)])],
+    pg_infer_table(Objs1, Objs2, Table).
+    % Table = [1-3, 2-4]
+
+
+Zip-Based Recoloring
+
+pg_zip_recolor(+Objs, +Colors, -Out): recolor each obj with the corresponding entry
+in the Colors list. Stops when either list ends (truncation semantics).
+
+    pg_zip_recolor([obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(3,[r(1,0)])], [5,6,7], Out).
+    % Out = [obj(5,[r(0,0)]), obj(6,[r(0,1)]), obj(7,[r(1,0)])]
+
+    pg_zip_recolor([obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(3,[r(1,0)])], [5,6], Out).
+    % Out = [obj(5,[r(0,0)]), obj(6,[r(0,1)])]  (truncated to 2 entries)
+
+
+Frequency-Targeted Recoloring
+
+These predicates recolor only the objects that belong to a certain color-frequency
+category. Other objects are kept unchanged.
+
+pg_majority_to(+Objs, +Color, -Out): recolor all objs with the most frequent color
+to Color. On ties, the smallest color value is treated as the majority.
+
+    pg_majority_to([obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])], 9, Out).
+    % Out = [obj(9,[r(0,0)]), obj(2,[r(0,1)]), obj(9,[r(1,0)])]
+    % (color 1 appears twice, is the majority)
+
+pg_minority_to(+Objs, +Color, -Out): recolor all objs with the least frequent color.
+On ties, smallest color treated as minority.
+
+    pg_minority_to([obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])], 9, Out).
+    % Out = [obj(1,[r(0,0)]), obj(9,[r(0,1)]), obj(1,[r(1,0)])]
+    % (color 2 appears once, is the minority)
+
+pg_unique_to(+Objs, +Color, -Out): recolor objs whose color appears exactly once.
+
+    pg_unique_to([obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])], 9, Out).
+    % Out = [obj(1,[r(0,0)]), obj(9,[r(0,1)]), obj(1,[r(1,0)])]
+    % (color 2 is the unique color)
+
+pg_shared_to(+Objs, +Color, -Out): recolor objs whose color appears more than once.
+
+    pg_shared_to([obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])], 9, Out).
+    % Out = [obj(9,[r(0,0)]), obj(2,[r(0,1)]), obj(9,[r(1,0)])]
+    % (color 1 is shared; color 2 is unique and kept)
+
+
+Color Table Utilities
+
+pg_invert_table(+Table, -Inv): swap From-To to To-From in each pair.
+
+    pg_invert_table([1-5, 2-6], Inv).
+    % Inv = [5-1, 6-2]
+
+pg_table_from(+Table, -Froms): sorted list of From colors in the table.
+
+    pg_table_from([3-9, 1-5], Froms).
+    % Froms = [1, 3]  (sorted)
+
+pg_consistent(+Table): succeed if the table has no contradictory mappings.
+(Same From color should not map to two different To colors.)
+
+    pg_consistent([1-5, 2-6]).
+    % succeeds
+
+    pg_consistent([1-5, 1-6]).
+    % fails (color 1 maps to both 5 and 6)
+
+
+Design Notes
+
+pg_apply_table vs pg_apply_table_strict: two useful behaviors. Lenient mode
+preserves all objects; strict mode filters out unmapped objects. Choose based
+on whether unmapped objects should pass through or be removed.
+
+pg_infer_table matches by identical cell sets (same position). It does not use
+D4-equivalence: objects must be at exactly the same location in both scenes.
+
+pg_zip_recolor stops at the shorter list. To apply a fixed set of colors to a
+fixed set of objects, both lists must have the same length.
+
+Frequency predicates (majority_to/minority_to/unique_to/shared_to) all use
+findall + if-then-else to apply conditional recoloring in a single pass.
+
+Library imports: library(lists): member/2, memberchk/2, min_list/2, max_list/2.
+Built-ins: findall/3, sort/2, length/2.
+
+42/42 PLUnit tests pass.
