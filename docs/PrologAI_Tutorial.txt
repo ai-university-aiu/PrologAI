@@ -17574,3 +17574,32 @@ cv_render/5: create blank canvas and paint all objects.
 cv_move/6: erase obj at current position, repaint at offset.
 cv_stamp/3: extract obj as minimal bounding-box grid.
 cv_blit/5: paste a subgrid at a given position.
+
+Chapter 146: Object Sequence and Progression Analysis (objseq Pack, oq_*, Layer 175)
+
+1. Color and Size Sequences
+oq_color_seq/2: extract color list in list order.
+oq_size_seq/2: extract cell-count list in list order.
+
+2. Centroid and Step Sequences
+oq_centroid_seq/2: centroid sequence as r(R,C) terms.
+oq_step_seq/2: consecutive centroid deltas as dr(DR,DC) terms.
+
+3. Monotone Tests
+oq_is_growing/1: sizes strictly increasing.
+oq_is_shrinking/1: sizes strictly decreasing.
+
+4. Constant Step Analysis
+oq_const_step/3: all centroid steps equal (DR, DC).
+oq_const_row_step/2: all row steps equal DR.
+oq_const_col_step/2: all col steps equal DC.
+
+5. Periodic Sequences
+oq_color_period/3: minimal color-sequence period P and unit cycle.
+oq_size_period/3: minimal size-sequence period P and unit cycle.
+
+6. Collinearity and Prediction
+oq_collinear/1: all centroids on a straight line.
+oq_next_centroid/2: predict next position from constant step.
+oq_zip_colors/3: zip two obj lists into C1-C2 color pairs.
+
