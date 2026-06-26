@@ -1,0 +1,72 @@
+Chapter 151: Object Chain Pack (ch_*)
+
+The objchain pack (Layer 169) provides predicates for detecting and operating on
+linear chains of obj(Color, Cells) terms. A chain is a set of objects whose
+4-adjacency touching graph is a simple path: exactly two endpoints (degree 1)
+and all interior objects (degree 2). A cycle is when all objects have degree 2.
+
+14 predicates, prefix ch_*. 48 tests pass.
+
+Basic Touching and Degree
+
+    % ch_touches(+Obj1, +Obj2): 4-adjacency test
+    A = obj(a,[r(0,0)]), B = obj(b,[r(0,1)]),
+    ch_touches(A, B).  % true
+
+    % ch_degree(+Obj, +Objs, -N)
+    ch_degree(A, [A,B,C], D).  % D = 1 (A is an endpoint)
+    ch_degree(B, [A,B,C], D).  % D = 2 (B is interior)
+
+Chain Detection
+
+    % ch_is_chain(+Objs): is this set of objects a linear path?
+    ch_is_chain([]).          % true (empty)
+    ch_is_chain([A]).         % true (trivial)
+    ch_is_chain([A,B]).       % true if A touches B
+    ch_is_chain([A,B,C,D,E]). % true if forms a linear path
+
+    % ch_has_cycle(+Objs): do objects form a closed cycle?
+    ch_has_cycle([A,B,C,D]).  % true if all degrees = 2 and N >= 3
+
+Finding Endpoints and Linearizing
+
+    % ch_endpoints(+Objs, -E1, -E2): the two degree-1 endpoints
+    ch_endpoints([A,B,C,D,E], E1, E2).
+    % {E1, E2} = {A, E}
+
+    % ch_linearize(+Objs, -Ordered): put objects in path order
+    ch_linearize([E,C,A,D,B], Ordered).
+    % Ordered = [A,B,C,D,E] or [E,D,C,B,A]
+
+    % ch_from_endpoint(+Objs, +Start, -Ordered): order from specific endpoint
+    ch_from_endpoint([A,B,C], A, Ord).
+    % Ord = [A,B,C]
+
+Indexing and Sequences
+
+    % ch_nth(+Ordered, +N, -Obj): 0-based indexing
+    ch_nth([A,B,C,D,E], 2, Obj).  % Obj = C
+
+    % ch_color_seq(+Ordered, -Colors): color of each object in order
+    ch_color_seq([A,B,C], Colors).  % Colors = [a,b,c]
+
+    % ch_sub(+Ordered, +I, +J, -Sub): sub-chain (0-based, inclusive)
+    ch_sub([A,B,C,D,E], 1, 3, Sub).  % Sub = [B,C,D]
+
+Other Operations
+
+    % ch_reverse(+Ordered, -Rev)
+    ch_reverse([A,B,C], Rev).  % Rev = [C,B,A]
+
+    % ch_length(+Objs, -N)
+    ch_length([A,B,C,D,E], N).  % N = 5
+
+    % ch_is_linear_path(+Ordered): verify ordered sequence is valid
+    ch_is_linear_path([A,B,C,D,E]).  % true if all consecutive pairs touch
+
+Direction Analysis
+
+    % ch_direction(+Ordered, -Dir): h, v, or other
+    ch_direction([A,B,C,D,E], Dir).  % Dir = h if all in same row
+    ch_direction([V1,V2,V3], Dir).   % Dir = v if all in same col
+    ch_direction([P,Q,S], Dir).      % Dir = other for L-shape
