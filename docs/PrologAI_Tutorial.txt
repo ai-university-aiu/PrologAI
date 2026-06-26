@@ -14729,3 +14729,46 @@ cs_rotate_90: maplist with cs_rot90_ (new_R=C, new_C=H1-R), then sort.
 cs_mirror_h: maplist with cs_mirh_ (new_C=W1-C), then sort.
 
 Predicate count: 14 (cs_* prefix). Tests: 42/42. Layer: 117.
+
+
+Next chapter: Chapter 100 covers the Locate Pack (pattern location and subgrid matching).
+
+Chapter 100: Pattern Location and Subgrid Matching - The Locate Pack (lc_* prefix)
+
+The locate pack (Work Package 139, Layer 118) provides 14 predicates for
+finding sub-patterns, matching row/column sequences, and locating unique markers.
+
+Predicates:
+lc_subgrid_at(+Grid, +Sub, +R0, +C0).   % test if Sub appears at (R0,C0)
+lc_find_sub(+Grid, +Sub, -R0, -C0).     % first position where Sub matches
+lc_all_sub(+Grid, +Sub, -Positions).    % all R0-C0 where Sub matches
+lc_subgrid_count(+Grid, +Sub, -N).      % count of Sub occurrences
+lc_row_pattern(+Grid, +Pattern, -R).    % first row index matching Pattern
+lc_all_row_pattern(+Grid, +Pattern, -Rows). % all row indices matching Pattern
+lc_col_pattern(+Grid, +Pattern, -C).    % first column index matching Pattern
+lc_all_col_pattern(+Grid, +Pattern, -Cols). % all column indices matching Pattern
+lc_row_prefix(+Grid, +R, +Prefix, -Rest). % row R = Prefix ++ Rest
+lc_row_suffix(+Grid, +R, +Suffix).      % row R ends with Suffix
+lc_anchor(+Grid, +V, -R, -C).           % unique cell with value V (exactly 1)
+lc_row_count(+Grid, +V, -Counts).       % list of V counts per row
+lc_row_contains(+Grid, +V, -Rows).      % sorted rows containing V
+lc_col_contains(+Grid, +V, -Cols).      % sorted columns containing V
+
+Examples:
+lc_subgrid_at([[1,2,3],[4,5,6],[7,8,9]], [[5,6],[8,9]], 1, 1). % true
+lc_find_sub([[0,0,0],[0,1,0],[0,0,0]], [[1]], R, C).  % R=1, C=1
+lc_all_sub([[1,0,1],[0,0,0],[1,0,1]], [[1]], P).      % P=[0-0,0-2,2-0,2-2]
+lc_row_pattern([[0,0],[1,2],[0,0]], [1,2], R).         % R=1
+lc_col_pattern([[1,0],[2,0],[3,0]], [1,2,3], C).       % C=0
+lc_anchor([[0,0,0],[0,9,0],[0,0,0]], 9, R, C).         % R=1, C=1
+lc_row_count([[1,0,1],[0,0,0],[1,1,0]], 1, Counts).    % Counts=[2,0,2]
+lc_col_contains([[1,0,1],[0,1,0]], 1, Cols).           % Cols=[0,1,2]
+
+lc_subgrid_at: forall/2 over all Sub positions; each checks Grid offset cell.
+lc_find_sub: between/3 enumeration + lc_subgrid_at + cut.
+lc_col_pattern: inner findall extracts column values; unifies with Pattern; cut.
+lc_all_col_pattern: outer findall where inner findall unifies column with Pattern.
+lc_row_suffix: append(_, Suffix, Row) + cut for deterministic existence test.
+lc_anchor: findall of all V cells; single-element [R-C] pattern for uniqueness.
+
+Predicate count: 14 (lc_* prefix). Tests: 42/42. Layer: 118.
