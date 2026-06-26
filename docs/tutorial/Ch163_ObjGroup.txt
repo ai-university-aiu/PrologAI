@@ -1,0 +1,189 @@
+Chapter 163: Object-List Grouping by Shared Attribute (objgroup Pack, og_* Prefix, Layer 181)
+
+Author: D. R. Dison, Founder of AIU, Creator of PrologAI and Mentova,
+ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
+
+
+Overview
+
+The objgroup pack (Layer 181) partitions a list of obj(Color, Cells) terms into groups
+that share a common attribute value.
+
+Where objfilter selects individual objects and objattr aggregates over all objects,
+objgroup organizes objects into named bins. Each bin is a Key-ObjList pair: Key is the
+shared attribute value and ObjList contains all objects with that attribute, in their
+original input order.
+
+The pack exports 14 predicates under the og_* prefix.
+
+
+The Group Representation
+
+A group list produced by any og_by_* predicate is a list of Key-ObjList terms, sorted
+by Key. For example:
+
+  og_by_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], Groups)
+  Groups = [b-[obj(b,[r(0,1)])], r-[obj(r,[r(0,0)]), obj(r,[r(0,2)])]]
+
+Keys are sorted (alphabetical for color, numeric ascending for size and row/col).
+Within each bin, objects appear in their original input order.
+
+
+Predicate Reference
+
+
+og_by_color(+Objs, -Groups)
+
+Partitions Objs into Color-ObjList groups.
+
+  ?- og_by_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], G).
+  G = [b-[obj(b,[r(0,1)])], r-[obj(r,[r(0,0)]), obj(r,[r(0,2)])]].
+
+
+og_by_size(+Objs, -Groups)
+
+Partitions Objs into Size-ObjList groups, where Size is the cell count. Groups are
+sorted by Size ascending.
+
+  ?- og_by_size([obj(r,[r(0,0)]), obj(b,[r(0,1),r(0,2)]), obj(g,[r(1,0)])], G).
+  G = [1-[obj(r,[r(0,0)]), obj(g,[r(1,0)])], 2-[obj(b,[r(0,1),r(0,2)])]].
+
+
+og_by_form(+Objs, -Groups)
+
+Partitions Objs by normalized shape. Normalization translates each object so its
+top-left cell is at r(0,0) and sorts the cell list. Two objects fall in the same
+group iff their normalized shapes are identical. Color and position are ignored.
+
+  ?- og_by_form([obj(p,[r(0,0),r(1,0),r(1,1)]),   % L-shape at origin
+                  obj(b,[r(3,4),r(4,4),r(4,5)]),   % L-shape far away
+                  obj(r,[r(0,0)])], G).             % single dot
+  % Two groups: L-shape group (2 members) and dot group (1 member).
+
+
+og_by_row(+Objs, -Groups)
+
+Partitions Objs by the row of the top-left corner, sorted ascending.
+
+  ?- og_by_row([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])], G).
+  G = [0-[obj(r,[r(0,0)]), obj(b,[r(0,1)])], 1-[obj(g,[r(1,0)])]].
+
+
+og_by_col(+Objs, -Groups)
+
+Partitions Objs by the column of the top-left corner, sorted ascending.
+
+
+og_n_groups(+Groups, -N)
+
+Unifies N with the number of groups.
+
+  ?- og_n_groups([r-[_], b-[_]], N).
+  N = 2.
+
+
+og_n_members(+Groups, +N, -Selected)
+
+Filters Groups to those with exactly N members.
+
+  ?- og_n_members([r-[A,B,C], b-[D]], 3, Selected).
+  Selected = [r-[A,B,C]].
+
+
+og_singletons(+Groups, -Singletons)
+
+Filters Groups to those with exactly 1 member. Equivalent to og_n_members(Groups, 1, Singletons).
+
+  ?- og_singletons([r-[A,B], b-[C]], Singletons).
+  Singletons = [b-[C]].
+
+
+og_largest(+Groups, -Group)
+
+Unifies Group with the group that has the most members. If two groups tie, the one
+that appears first in sorted key order wins.
+
+  ?- og_largest([r-[A,B,C], b-[D]], Group).
+  Group = r-[A,B,C].
+
+
+og_smallest(+Groups, -Group)
+
+Unifies Group with the group that has the fewest members.
+
+  ?- og_smallest([r-[A,B], b-[C]], Group).
+  Group = b-[C].
+
+
+og_all_same_size(+Groups)
+
+Succeeds iff all groups have the same member count. Succeeds vacuously for empty input.
+
+  ?- og_all_same_size([r-[A], b-[B], g-[C]]).
+  true.   % all have 1 member
+
+
+og_sort_desc(+Groups, -Sorted)
+
+Unifies Sorted with Groups sorted by member count descending (largest group first).
+
+  ?- og_sort_desc([r-[A], b-[B,C,D]], Sorted).
+  Sorted = [b-[B,C,D], r-[A]].
+
+
+og_flat(+Groups, -Objs)
+
+Flattens groups into a single list of obj terms, in group order.
+
+  ?- og_flat([r-[A,B], b-[C]], Objs).
+  Objs = [A, B, C].
+
+
+og_filter_size(+Groups, +Min, +Max, -Filtered)
+
+Keeps only groups whose member count is between Min and Max inclusive.
+
+  ?- og_filter_size([r-[A,B,C], b-[D]], 2, 5, Filtered).
+  Filtered = [r-[A,B,C]].
+
+
+Worked Example: Scene Grouping
+
+Suppose a scene has objects of different colors and sizes:
+
+  Objs = [obj(r, [r(0,0)]),
+          obj(b, [r(0,1)]),
+          obj(r, [r(0,0),r(0,1),r(0,2)]),
+          obj(g, [r(1,0)]),
+          obj(r, [r(0,0),r(0,1),r(1,0),r(1,1)])]
+
+Find the dominant color group, the singleton groups, and check uniformity:
+
+  ?- og_by_color(Objs, Groups),
+     og_largest(Groups, LargestGroup),
+     og_singletons(Groups, Singletons),
+     og_all_same_size(Groups).
+
+  Groups = [b-[obj(b,[r(0,1)])],
+            g-[obj(g,[r(1,0)])],
+            r-[obj(r,[r(0,0)]), obj(r,[r(0,0),r(0,1),r(0,2)]), obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)])]],
+  LargestGroup = r-[...],
+  Singletons = [b-[obj(b,[r(0,1)])], g-[obj(g,[r(1,0)])]],
+  false.   % groups differ in size (r has 3, b/g have 1 each)
+
+
+Test Coverage
+
+All 41 acceptance criteria (AC-OG-001 through AC-OG-041) defined in
+Refinement v215 Part 192 are exercised in packs/objgroup/test/test_objgroup.pl.
+All 41 tests pass.
+
+
+Summary
+
+The objgroup pack gives a reasoner a way to organize objects into bins before
+further analysis. After grouping, predicates like og_largest, og_singletons,
+og_all_same_size, and og_sort_desc reveal the structure of the scene at the
+group level. og_flat collapses groups back to a flat list when needed.
+
+Continue to Chapter 164 for the next pack in the PrologAI Layer sequence.
