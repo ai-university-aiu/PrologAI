@@ -17516,3 +17516,32 @@ or_aligned_v/2: same centroid column.
 6. Bounding Box Gaps
 or_gap_rows/3: empty rows between bounding boxes (0 if touching/overlap).
 or_gap_cols/3: empty columns between bounding boxes.
+
+Chapter 145: Object List Filtering (objfilter Pack, of_*, Layer 173)
+
+The objfilter pack selects objects from a list of obj(Color, Cells) terms
+by color, size, or shape. No cross-pack dependencies.
+
+1. Color Filters
+of_by_color/3: objects of a given color.
+of_not_color/3: objects excluding a given color.
+
+2. Size Filters
+of_exact_size/3: objects with exactly N cells.
+of_min_size/3: objects with >= N cells.
+of_max_size/3: objects with <= N cells.
+
+3. Shape Filters
+of_is_rect/2: objects filling their bounding box (no holes).
+of_is_hline/2: objects spanning a single row (bbox height = 1).
+of_is_vline/2: objects spanning a single column (bbox width = 1).
+of_is_single/2: single-cell objects.
+of_is_hollow/2: objects with at least one hole in bbox (L-shapes, frames).
+
+4. Aggregate Selection
+of_largest/2: object with the most cells (first on ties).
+of_smallest/2: object with the fewest cells (first on ties).
+
+5. Generic Meta-Predicates
+of_filter/3: include(Goal, Objs, Filtered) — custom test per object.
+of_partition/4: partition(Goal, Objs, In, Out) — split by goal.
