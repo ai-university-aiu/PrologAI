@@ -1,0 +1,259 @@
+PrologAI Tutorial
+Chapter 110: Edge Detection and Boundary Analysis (ed_*)
+
+D. R. Dison, Founder of AIU, Creator of PrologAI and Mentova,
+ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
+
+
+Overview
+
+The edge pack (Layer 128, prefix ed_*) provides 14 predicates for
+detecting boundaries between regions of different values in a 2D grid.
+
+An edge exists wherever two adjacent cells carry different values.
+
+A boundary cell is one that has at least one 4-connected neighbor
+with a different value.
+
+Load the pack:
+
+% Load the edge pack module.
+:- use_module('packs/edge/prolog/edge.pl').
+
+
+Grids Used in This Chapter
+
+% G2: 2x2 uniform grid - no edges.
+G2 = [[1,1],[1,1]]
+
+% G3b: 3x3 two-color horizontal stripe.
+G3b = [[0,0,0],[1,1,1],[0,0,0]]
+
+% G4: 4x4 two-color left-right split.
+G4 = [[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]]
+
+% G3m: 3x3 border of 0s surrounding a single 1 at center.
+G3m = [[0,0,0],[0,1,0],[0,0,0]]
+
+% G3s: 3x3 smooth (all same value).
+G3s = [[2,2,2],[2,2,2],[2,2,2]]
+
+% G3c: 3x3 checkerboard.
+G3c = [[0,1,0],[1,0,1],[0,1,0]]
+
+
+1. ed_h_edges/2 - Horizontal Edge Positions
+
+ed_h_edges(+Grid, -Edges) collects all R-C pairs where Grid[R][C]
+differs from Grid[R+1][C].
+
+% Uniform grid has no horizontal edges.
+?- ed_h_edges([[1,1],[1,1]], E).
+E = [].
+
+% Stripe grid has 6 horizontal edges (3 at boundary R=0 and 3 at R=1).
+?- ed_h_edges([[0,0,0],[1,1,1],[0,0,0]], E), msort(E, S).
+S = [0-0,0-1,0-2,1-0,1-1,1-2].
+
+
+2. ed_v_edges/2 - Vertical Edge Positions
+
+ed_v_edges(+Grid, -Edges) collects all R-C pairs where Grid[R][C]
+differs from Grid[R][C+1].
+
+% Left-right split has 4 vertical edges (one per row at C=1).
+?- ed_v_edges([[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]], E), msort(E, S).
+S = [0-1,1-1,2-1,3-1].
+
+
+3. ed_h_edge/4 and ed_v_edge/4 - Single-Position Edge Test
+
+ed_h_edge(+Grid, +R, +C, -Bool) returns 1 if there is a horizontal
+edge between row R and row R+1 at column C; 0 otherwise.
+
+ed_v_edge(+Grid, +R, +C, -Bool) returns 1 if there is a vertical
+edge between column C and column C+1 at row R; 0 otherwise.
+
+% Test for a horizontal edge at (0,0) in stripe grid.
+?- ed_h_edge([[0,0,0],[1,1,1],[0,0,0]], 0, 0, B).
+B = 1.
+
+% No horizontal edge in uniform grid.
+?- ed_h_edge([[1,1],[1,1]], 0, 0, B).
+B = 0.
+
+% Test for a vertical edge at (0,1) in the split grid.
+?- ed_v_edge([[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]], 0, 1, B).
+B = 1.
+
+
+4. ed_all_edges/2 - All Edges Combined
+
+ed_all_edges(+Grid, -Edges) returns a sorted list of all edges as
+h-R-C (horizontal) and v-R-C (vertical) terms.
+
+% Uniform grid has no edges.
+?- ed_all_edges([[1,1],[1,1]], E).
+E = [].
+
+% Split grid has 4 vertical edges only.
+?- ed_all_edges([[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]], E).
+E = [v-0-1,v-1-1,v-2-1,v-3-1].
+
+
+5. ed_boundary_cells/3 - Boundary Cells of a Specific Value
+
+ed_boundary_cells(+Grid, +Val, -Cells) returns R-C pairs (sorted) of
+all cells with value Val that have at least one 4-connected neighbor
+with a different value.
+
+% The single 1 in G3m is a boundary cell (surrounded by 0s).
+?- ed_boundary_cells([[0,0,0],[0,1,0],[0,0,0]], 1, Cells).
+Cells = [1-1].
+
+% The 0-cells in G3m that are boundary cells are the 4 orthogonal
+% neighbors of the center (the 4 cells touching the 1).
+?- ed_boundary_cells([[0,0,0],[0,1,0],[0,0,0]], 0, Cells), length(Cells, N).
+N = 4.
+
+% Uniform grid has no boundary cells.
+?- ed_boundary_cells([[2,2,2],[2,2,2],[2,2,2]], 2, Cells).
+Cells = [].
+
+
+6. ed_outer_boundary/2 - Outer Grid Border
+
+ed_outer_boundary(+Grid, -Cells) returns R-C pairs (sorted) of all
+cells on the outer border of the grid.
+
+% 3x3 grid has 8 outer-border cells.
+?- ed_outer_boundary([[2,2,2],[2,2,2],[2,2,2]], Cells), length(Cells, N).
+N = 8.
+
+% The corners are always outer-border cells.
+?- ed_outer_boundary([[2,2,2],[2,2,2],[2,2,2]], Cells),
+   member(0-0, Cells), member(2-2, Cells).
+Cells = [0-0,0-1,0-2,1-0,1-2,2-0,2-1,2-2].
+
+
+7. ed_inner_cells/3 - Interior Cells of a Value
+
+ed_inner_cells(+Grid, +Val, -Cells) returns R-C pairs (sorted) of
+all cells with value Val that are NOT in ed_boundary_cells. A cell
+is interior if none of its 4-connected neighbors has a different value.
+
+% In a smooth 3x3 grid, all 9 cells are interior to their value.
+?- ed_inner_cells([[2,2,2],[2,2,2],[2,2,2]], 2, Cells), length(Cells, N).
+N = 9.
+
+% The center 1 in G3m has all different neighbors, so it is not inner.
+?- ed_inner_cells([[0,0,0],[0,1,0],[0,0,0]], 1, Cells).
+Cells = [].
+
+
+8. ed_edge_count/2 - Total Edge Count
+
+ed_edge_count(+Grid, -N) returns N, the total number of edges
+(horizontal plus vertical) in Grid.
+
+% Checkerboard 3x3 has 12 edges (6 horizontal + 6 vertical).
+?- ed_edge_count([[0,1,0],[1,0,1],[0,1,0]], N).
+N = 12.
+
+% Smooth grid has zero edges.
+?- ed_edge_count([[2,2,2],[2,2,2],[2,2,2]], N).
+N = 0.
+
+
+9. ed_is_smooth/1 - Smooth (Edge-Free) Test
+
+ed_is_smooth(+Grid) succeeds iff Grid has zero edges.
+
+% Smooth grid succeeds.
+?- ed_is_smooth([[2,2,2],[2,2,2],[2,2,2]]).
+true.
+
+% Checkerboard fails.
+?- ed_is_smooth([[0,1,0],[1,0,1],[0,1,0]]).
+false.
+
+
+10. ed_label_edges/3 - Edge Label Grid
+
+ed_label_edges(+Grid, +Bg, -Grid2) produces a same-size grid where
+each cell is 1 if it is a boundary cell and Bg otherwise.
+
+% Uniform grid produces all-Bg output.
+?- ed_label_edges([[1,1],[1,1]], 0, G2).
+G2 = [[0,0],[0,0]].
+
+% G3m: the center 1 and its 4 orthogonal 0-neighbors are all boundary.
+?- ed_label_edges([[0,0,0],[0,1,0],[0,0,0]], 0, G2).
+G2 = [[0,1,0],[1,1,1],[0,1,0]].
+
+
+11. ed_has_edge/4 - Single-Cell Boundary Test
+
+ed_has_edge(+Grid, +R, +C, -Bool) returns 1 iff cell (R,C) is a
+boundary cell; 0 otherwise.
+
+% Center of G3m has a different neighbor (the 0s).
+?- ed_has_edge([[0,0,0],[0,1,0],[0,0,0]], 1, 1, Bool).
+Bool = 1.
+
+% Center of smooth grid has no different neighbor.
+?- ed_has_edge([[2,2,2],[2,2,2],[2,2,2]], 1, 1, Bool).
+Bool = 0.
+
+
+12. ed_corners/2 - Corner Positions
+
+ed_corners(+Grid, -Corners) returns R-C pairs (sorted, 0-indexed
+top-left corner of each 2x2 block) where the four cells in the 2x2
+block are not all the same value.
+
+% Uniform grid has no corners.
+?- ed_corners([[1,1],[1,1]], C).
+C = [].
+
+% Checkerboard 3x3 has 4 corner positions.
+?- ed_corners([[0,1,0],[1,0,1],[0,1,0]], C), length(C, N).
+N = 4.
+
+% Split grid has 3 corner positions (one per adjacent row pair at C=1).
+?- ed_corners([[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]], C), length(C, N).
+N = 3.
+
+
+13. ed_corner_count/2 - Corner Count
+
+ed_corner_count(+Grid, -N) returns N, the number of corner positions.
+
+% Smooth grid has zero corners.
+?- ed_corner_count([[2,2,2],[2,2,2],[2,2,2]], N).
+N = 0.
+
+% Split grid has 3 corners.
+?- ed_corner_count([[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]], N).
+N = 3.
+
+
+Summary of ed_* Predicates
+
+ed_h_edges/2 - horizontal edge R-C pairs
+ed_v_edges/2 - vertical edge R-C pairs
+ed_h_edge/4 - single horizontal edge test (Bool)
+ed_v_edge/4 - single vertical edge test (Bool)
+ed_all_edges/2 - all edges as dir-R-C terms, sorted
+ed_boundary_cells/3 - boundary cells of a value, sorted
+ed_outer_boundary/2 - outer-border cells, sorted
+ed_inner_cells/3 - interior cells of a value, sorted
+ed_edge_count/2 - total edge count
+ed_is_smooth/1 - succeeds iff no edges
+ed_label_edges/3 - edge-label mask grid
+ed_has_edge/4 - single-cell boundary test (Bool)
+ed_corners/2 - corner positions (2x2 mixed-value blocks), sorted
+ed_corner_count/2 - corner count
+
+
+END OF CHAPTER 110
