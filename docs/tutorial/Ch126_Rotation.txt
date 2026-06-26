@@ -1,0 +1,141 @@
+Chapter 126: Grid Rotation and Rotational Symmetry Detection (rotation pack)
+
+The rotation pack (ro_* prefix, Layer 144, Work Package 165) provides 14 predicates
+for rotating 2D grids by multiples of 90 degrees clockwise, testing and detecting
+rotational symmetry, rotating lists of cell coordinates, combining grids through
+rotation-based overlay (spin), and finding which rotation maps one grid to another.
+
+
+Rotation Conventions
+
+All rotations are clockwise. The three basic non-trivial rotations:
+
+  90 CW:  (R,C) -> (C, H-1-R). Output is W rows by H cols (dimensions swap).
+  180:    (R,C) -> (H-1-R, W-1-C). Output is H rows by W cols (same).
+  270 CW: (R,C) -> (W-1-C, R). Output is W rows by H cols (dimensions swap).
+
+
+Basic Rotation Predicates
+
+ro_rot90(+Grid, -Out): rotate 90 degrees clockwise.
+Each new row C of Out equals column C of Grid read from the bottom row upward.
+
+    ro_rot90([[a,b],[c,d]], Out).
+    Out = [[c,a],[d,b]]
+
+For a non-square grid [[1,2],[3,4],[5,6]] (H=3, W=2), ro_rot90 gives a 2x3 grid:
+
+    ro_rot90([[1,2],[3,4],[5,6]], Out).
+    Out = [[5,3,1],[6,4,2]]
+
+ro_rot180(+Grid, -Out): rotate 180 degrees.
+Implemented as reversing each row then reversing the row order.
+
+    ro_rot180([[a,b],[c,d]], Out).
+    Out = [[d,c],[b,a]]
+
+ro_rot270(+Grid, -Out): rotate 270 degrees clockwise (= 90 counter-clockwise).
+Each new row C equals column W-1-C of Grid read top-to-bottom.
+
+    ro_rot270([[a,b],[c,d]], Out).
+    Out = [[b,d],[a,c]]
+
+ro_rot_n(+Grid, +N, -Out): rotate by N*90 degrees clockwise; N in 0..3.
+N=0 returns Grid unchanged. Uses cuts to eliminate choicepoints.
+
+    ro_rot_n([[a,b],[c,d]], 3, Out).
+    Out = [[b,d],[a,c]]
+
+
+All Rotations and Canonical Form
+
+ro_all(+Grid, -Rots): produce [G0, G90, G180, G270].
+
+    ro_all([[1,0],[0,0]], Rots).
+    Rots = [[[1,0],[0,0]], [[0,1],[0,0]], [[0,0],[0,1]], [[0,0],[1,0]]]
+
+ro_canonical(+Grid, -Canon): lexicographically smallest of the four rotations.
+Uses standard SWI-Prolog term ordering (msort).
+
+    ro_canonical([[c,a],[d,b]], Canon).
+    Canon = [[a,b],[c,d]]
+
+
+Testing Rotational Symmetry
+
+ro_is_rot2(+Grid): succeed if Grid equals its 180-degree rotation.
+
+    ro_is_rot2([[1,2],[2,1]]).  % succeeds (1,1)=1 maps to (0,0)=1 etc.
+    ro_is_rot2([[1,2],[3,4]]). % fails
+
+ro_is_rot4(+Grid): succeed if Grid equals its 90-degree rotation. Requires square.
+
+    ro_is_rot4([[a,a],[a,a]]).  % succeeds (all same)
+    ro_is_rot4([[a,b],[a,b]]). % fails
+
+ro_sym_order(+Grid, -N): N in {1, 2, 4}.
+N=4 means 4-fold symmetry (invariant under 90 CW).
+N=2 means 2-fold symmetry (invariant under 180, but not 90).
+N=1 means no rotational symmetry.
+
+    ro_sym_order([[1,1],[1,1]], N).  % N = 4
+    ro_sym_order([[1,2],[2,1]], N).  % N = 2
+    ro_sym_order([[a,b],[c,d]], N).  % N = 1
+
+
+Rotating Cell Coordinates
+
+ro_rotate_cells(+Cells, +H, +W, +N, -Out): rotate a list of R-C pairs by N*90 CW.
+H and W define the bounding box.
+
+    ro_rotate_cells([0-0, 0-1, 1-0], 3, 3, 1, Out).
+    Out = [0-2, 1-2, 0-1]
+
+Formula for N=1 (90 CW): (R,C) -> (C, H-1-R). So (0,0) -> (0,2), (0,1) -> (1,2).
+
+
+Spin Operations
+
+ro_spin2(+Grid, +Bg, -Out): overlay Grid with its 180 rotation.
+Non-background cells of Grid take priority.
+
+    ro_spin2([[1,0],[0,0]], 0, Out).
+    Out = [[1,0],[0,1]]
+
+ro_spin4(+Grid, +Bg, -Out): overlay all four rotations.
+Useful for completing a grid with 4-fold rotational symmetry.
+
+    ro_spin4([[1,0],[0,0]], 0, Out).
+    Out = [[1,1],[1,1]]
+
+    ro_spin4([[1,0,0],[0,0,0],[0,0,0]], 0, Out).
+    Out = [[1,0,1],[0,0,0],[1,0,1]]
+
+
+Finding Matching Rotations
+
+ro_match_rotation(+GridA, +GridB, -N): find N such that ro_rot_n(GridA, N) = GridB.
+Returns the smallest matching N. Fails if no rotation matches.
+
+    ro_match_rotation([[a,b],[c,d]], [[c,a],[d,b]], N).  % N = 1
+    ro_match_rotation([[a,b],[c,d]], [[b,d],[a,c]], N).  % N = 3
+
+ro_equiv_rotation(+GridA, +GridB): succeed if any rotation of GridA equals GridB.
+
+    ro_equiv_rotation([[1,0],[0,0]], [[0,0],[0,1]]).  % succeeds (N=2)
+
+
+Round-Trip Properties
+
+Four applications of ro_rot90 return the original grid.
+Two applications of ro_rot180 return the original grid.
+Three applications of ro_rot90 equal one application of ro_rot270.
+
+
+Library Requirements
+
+library(lists): member/2, nth0/3, reverse/2.
+library(apply): maplist/2, maplist/3.
+Built-ins: between/3, length/2, findall/3, msort/2.
+
+Predicate count: 14 (ro_* prefix). Tests: 46/46. Layer: 144.

@@ -16097,3 +16097,84 @@ Library imports: library(apply): maplist/3, maplist/4.
 Built-ins: between/3, forall/2, findall/3, length/2.
 
 Predicate count: 14 (fd_* prefix). Tests: 42/42. Layer: 143.
+
+
+Chapter 126: Grid Rotation and Rotational Symmetry Detection (Layer 144, ro_* prefix)
+
+The rotation pack provides 14 predicates for rotating 2D grids by multiples of 90
+degrees clockwise, testing rotational symmetry, rotating cell coordinate lists,
+combining grids via rotation-based overlay (spin), and matching rotations.
+
+Predicates:
+
+ro_rot90(+Grid, -Out)
+  Rotate 90 CW. Each new row C = column C of Grid read bottom-to-top.
+  Output: W rows by H cols. (R,C) -> (C, H-1-R).
+
+ro_rot180(+Grid, -Out)
+  Rotate 180. Equivalent to reversing each row then reversing row order.
+  Output: same dimensions as Grid. (R,C) -> (H-1-R, W-1-C).
+
+ro_rot270(+Grid, -Out)
+  Rotate 270 CW (= 90 CCW). Each new row C = column W-1-C top-to-bottom.
+  Output: W rows by H cols. (R,C) -> (W-1-C, R).
+
+ro_rot_n(+Grid, +N, -Out)
+  Rotate by N*90 CW; N in 0..3. Uses cuts to prevent choicepoints.
+
+ro_all(+Grid, -Rots)
+  Rots = [G0, G90, G180, G270].
+
+ro_canonical(+Grid, -Canon)
+  Canon = lexicographically smallest of the four rotations (msort).
+
+ro_is_rot2(+Grid)
+  Succeed if Grid == ro_rot180(Grid). 2-fold rotational symmetry.
+
+ro_is_rot4(+Grid)
+  Succeed if Grid == ro_rot90(Grid). 4-fold rotational symmetry (square only).
+
+ro_sym_order(+Grid, -N)
+  N in {1, 2, 4}: smallest order of rotational symmetry.
+
+ro_rotate_cells(+Cells, +H, +W, +N, -Out)
+  Rotate list of R-C pairs by N*90 CW in H x W bounding box.
+  N=1: (R,C)->(C,H-1-R). N=2: (R,C)->(H-1-R,W-1-C). N=3: (R,C)->(W-1-C,R).
+
+ro_spin2(+Grid, +Bg, -Out)
+  Overlay Grid with its 180-degree rotation; non-Bg cells of Grid win.
+
+ro_spin4(+Grid, +Bg, -Out)
+  Overlay all 4 rotations; non-Bg cells win from Grid, G90, G180, G270 in order.
+
+ro_match_rotation(+GridA, +GridB, -N)
+  First N in 0..3 such that ro_rot_n(GridA, N) = GridB. Fails if none.
+
+ro_equiv_rotation(+GridA, +GridB)
+  Succeed if any rotation of GridA equals GridB.
+
+Usage examples:
+
+ro_rot90([[a,b],[c,d]], Out).      % Out = [[c,a],[d,b]]
+ro_rot180([[a,b],[c,d]], Out).     % Out = [[d,c],[b,a]]
+ro_rot270([[a,b],[c,d]], Out).     % Out = [[b,d],[a,c]]
+
+ro_all([[1,0],[0,0]], Rots).
+%  Rots = [[[1,0],[0,0]], [[0,1],[0,0]], [[0,0],[0,1]], [[0,0],[1,0]]]
+
+ro_is_rot2([[1,2],[2,1]]).         % succeeds
+ro_is_rot4([[a,a],[a,a]]).         % succeeds
+ro_sym_order([[1,2],[2,1]], N).    % N = 2
+
+ro_rotate_cells([0-0, 0-1, 1-0], 3, 3, 1, Out).  % Out = [0-2, 1-2, 0-1]
+
+ro_spin4([[1,0],[0,0]], 0, Out).   % Out = [[1,1],[1,1]]
+
+ro_match_rotation([[a,b],[c,d]], [[c,a],[d,b]], N).  % N = 1
+ro_equiv_rotation([[1,0],[0,0]], [[0,0],[0,1]]).     % succeeds (N=2)
+
+Library imports: library(lists): member/2, nth0/3, reverse/2.
+Library imports: library(apply): maplist/2, maplist/3.
+Built-ins: between/3, length/2, findall/3, msort/2.
+
+Predicate count: 14 (ro_* prefix). Tests: 46/46. Layer: 144.
