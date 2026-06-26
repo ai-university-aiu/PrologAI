@@ -14510,4 +14510,28 @@ the most common value in each FxF block.
 
 Predicate count: 14 (zm_* prefix). Tests: 42/42. Layer: 111.
 
-Next chapter: Chapter 94 covers the next perceptual or structural pack.
+Next chapter: Chapter 94 covers the Offset Pack (grid shifting and circular rolling).
+
+
+Chapter 94: Grid Shifting and Circular Rolling - The Offset Pack (od_* prefix)
+
+The offset pack (Work Package 133, Layer 112) provides 14 predicates for
+grid shifting and circular rolling.
+
+od_shift_row([1,2,3,4], 1, 0, S).    % S = [0,1,2,3]
+od_shift_right([[1,2,3],[4,5,6]], 1, 0, S).  % S = [[0,1,2],[0,4,5]]
+od_shift_down([[1,2],[3,4],[5,6]], 1, 0, S). % S = [[0,0],[1,2],[3,4]]
+od_shift_dir([[1,2,3]], right, 1, 0, S).     % S = [[0,1,2]]
+od_roll_row([1,2,3,4], 1, R).  % R = [4,1,2,3]  (4 wraps to front)
+od_roll_down([[1],[2],[3],[4]], 1, R). % R = [[4],[1],[2],[3]]
+od_shift_color([[0,1,0]], 1, 0, 1, 0, R). % R = [[0,0,1]]  (1 moves right)
+od_infer_shift([[0,1,0],[0,0,0]], [[0,0,1],[0,0,0]], 0, DR, DC).  % DR=0, DC=1
+
+Shifting: content moves; vacated cells become Bg; overflow is dropped.
+Rolling: content wraps; N is normalized by mod (full cycle = identity).
+od_shift_dir uses if-then-else for determinism; od_infer_shift brute-forces
+all displacements and cuts on the first match.
+
+Predicate count: 14 (od_* prefix). Tests: 42/42. Layer: 112.
+
+Next chapter: Chapter 95 covers the next perceptual or structural pack.
