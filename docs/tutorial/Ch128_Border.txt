@@ -1,0 +1,170 @@
+Chapter 128: Border Pack
+
+The border pack (br_*, Layer 146) provides 14 predicates for concentric ring analysis
+of 2D grids. A ring is the set of all cells at the same distance from the nearest edge.
+Ring 0 is the outermost border of the grid. Ring 1 is the next layer inward. Ring N is
+N steps from the outer edge. The maximum ring index for an H x W grid is
+(min(H,W)-1)//2.
+
+The ring depth of a cell (R,C) in an H x W grid is:
+  min(R, H-1-R, C, W-1-C)
+
+
+Ring Depth Formula
+
+A 3x3 grid has two rings. Ring 0 is the 8-cell outer border. Ring 1 is the single
+center cell. A 5x5 grid has three rings: ring 0 (outer border, 16 cells), ring 1
+(inner ring, 8 cells), ring 2 (center cell, 1 cell).
+
+    br_max_ring([[0,0,0],[0,0,0],[0,0,0]], N).
+    % N = 1
+
+    br_max_ring([[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]], N).
+    % N = 2
+
+    br_max_ring([[5]], N).
+    % N = 0
+
+
+Enumerating Ring Cells and Values
+
+br_ring_cells(+Grid, +N, -Cells): list of R-C pairs in ring N, row-major order.
+
+    br_ring_cells([[0,0,0],[0,0,0],[0,0,0]], 0, Cells).
+    % Cells = [0-0, 0-1, 0-2, 1-0, 1-2, 2-0, 2-1, 2-2]  (8 cells)
+
+    br_ring_cells([[5]], 0, Cells).
+    % Cells = [0-0]
+
+br_ring_vals(+Grid, +N, -Vals): values at ring N in row-major order.
+
+    G = [[1,1,1],[1,2,1],[1,1,1]].
+    br_ring_vals(G, 0, Vals).
+    % Vals = [1,1,1,1,1,1,1,1]  (8 border values)
+
+    br_ring_vals(G, 1, Vals).
+    % Vals = [2]  (center cell only)
+
+
+Testing Ring Uniformity
+
+br_ring_color(+Grid, +N, -Color): uniform color of ring N. Fails if non-uniform.
+
+    br_ring_color([[1,1],[1,1]], 0, Color).
+    % Color = 1
+
+    br_ring_color([[1,2,1],[1,1,1],[1,1,1]], 0, _).
+    % fails (ring 0 has both 1 and 2)
+
+br_is_uniform_ring(+Grid, +N): succeeds if ring N is uniform.
+
+    br_is_uniform_ring([[2,2],[2,2]], 0).   % succeeds
+    br_is_uniform_ring([[1,2],[2,1]], 0).   % fails
+
+
+Outer Ring Queries
+
+br_outer_color(+Grid, -V): uniform color of the outermost ring (ring 0).
+
+    br_outer_color([[1,1,1],[1,2,1],[1,1,1]], V).
+    % V = 1
+
+br_is_uniform_outer(+Grid): succeeds if ring 0 is uniform.
+
+    br_is_uniform_outer([[3,3],[3,3]]).   % succeeds
+    br_is_uniform_outer([[3,4],[3,3]]).   % fails
+
+
+Multi-Ring Color Collection
+
+br_ring_colors(+Grid, -Colors): list of uniform ring colors from outside in.
+Collects until a non-uniform ring is found or max ring is reached.
+
+    G3 = [[1,1,1],[1,2,1],[1,1,1]].
+    br_ring_colors(G3, Colors).
+    % Colors = [1, 2]
+
+    G5 = [[1,1,1,1,1],[1,2,2,2,1],[1,2,3,2,1],[1,2,2,2,1],[1,1,1,1,1]].
+    br_ring_colors(G5, Colors).
+    % Colors = [1, 2, 3]
+
+    br_ring_colors([[1,2,1],[1,1,1],[1,1,1]], Colors).
+    % Colors = []  (outermost ring is non-uniform)
+
+
+Nested (Bullseye) Detection
+
+br_is_nested(+Grid): succeeds if every ring of Grid is uniform.
+
+    br_is_nested([[1,1,1],[1,2,1],[1,1,1]]).           % succeeds (concentric rings)
+    br_is_nested([[1,1,1],[1,2,1],[1,2,1]]).           % fails (ring 0 non-uniform)
+    br_is_nested(G5).                                   % succeeds (three uniform rings)
+
+
+Adding and Removing Border Layers
+
+br_add_border(+Grid, +V, -Out): add one layer of V cells around Grid.
+Result is (H+2) x (W+2).
+
+    br_add_border([[1,2],[3,4]], 0, Out).
+    % Out = [[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]]
+
+    br_add_border([[1]], 5, Out).
+    % Out = [[5,5,5],[5,1,5],[5,5,5]]
+
+br_strip_border(+Grid, -Inner): remove the outermost ring.
+Result is (H-2) x (W-2). Returns [] if grid is too small.
+
+    br_strip_border([[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]], Inner).
+    % Inner = [[1,2],[3,4]]
+
+    br_strip_border([[1,2,3],[4,5,6],[7,8,9]], Inner).
+    % Inner = [[5]]
+
+    br_strip_border([[1,2],[3,4]], Inner).
+    % Inner = []  (2x2 has no interior)
+
+br_inner_n(+Grid, +N, -Inner): strip N rings. N=0 is identity.
+
+    br_inner_n(G5, 1, Inner).
+    % Inner = [[2,2,2],[2,3,2],[2,2,2]]
+
+    br_inner_n(G5, 2, Inner).
+    % Inner = [[3]]
+
+
+Ring Depth Map
+
+br_depth_map(+Grid, -DepthGrid): grid where each cell holds its ring index.
+
+    br_depth_map([[0,0,0],[0,0,0],[0,0,0]], DM).
+    % DM = [[0,0,0],[0,1,0],[0,0,0]]
+
+    br_depth_map([[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]], DM).
+    % DM = [[0,0,0,0],[0,1,1,0],[0,1,1,0],[0,0,0,0]]
+
+    br_depth_map([[a,b,c,d,e]], DM).
+    % DM = [[0,0,0,0,0]]  (single row: all ring 0)
+
+
+Filling a Specific Ring
+
+br_fill_ring(+Grid, +N, +V, -Out): replace all cells in ring N with value V.
+
+    br_fill_ring([[1,2,1],[3,4,3],[1,2,1]], 0, 9, Out).
+    % Out = [[9,9,9],[9,4,9],[9,9,9]]  (outer ring filled with 9)
+
+    br_fill_ring([[1,1,1],[1,2,1],[1,1,1]], 1, 0, Out).
+    % Out = [[1,1,1],[1,0,1],[1,1,1]]  (center filled with 0)
+
+    br_fill_ring([[1,1],[1,1]], 0, 1, Out).
+    % Out = [[1,1],[1,1]]  (filling with same value is identity)
+
+
+Library Requirements
+
+library(lists): member/2, nth0/3, numlist/3, append/2, append/3.
+library(apply): maplist/2, maplist/3.
+Built-ins: between/3, length/2, findall/3, forall/2, sort/2.
+
+Predicate count: 14 (br_* prefix). Tests: 42/42. Layer: 146.

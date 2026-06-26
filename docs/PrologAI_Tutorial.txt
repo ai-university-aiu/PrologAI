@@ -16212,3 +16212,40 @@ Library imports: library(apply): maplist/2, maplist/3.
 Built-ins: between/3, length/2, findall/3.
 
 42/42 PLUnit tests pass.
+
+Chapter 128: Border Pack (Layer 146, br_* prefix)
+
+The border pack provides 14 predicates for concentric ring analysis of 2D grids.
+The ring depth of cell (R,C) in an H x W grid is min(R, H-1-R, C, W-1-C).
+Ring 0 is the outermost border. Ring N is N steps inward. The max ring index is
+(min(H,W)-1)//2.
+
+br_ring_cells(+Grid, +N, -Cells): list of R-C pairs in ring N, row-major order.
+br_ring_vals(+Grid, +N, -Vals): values at ring N in row-major order.
+br_ring_color(+Grid, +N, -Color): uniform color of ring N; fails if non-uniform.
+br_is_uniform_ring(+Grid, +N): succeed if ring N is uniform.
+br_add_border(+Grid, +V, -Out): add one V-layer around Grid; Out is (H+2)x(W+2).
+br_strip_border(+Grid, -Inner): remove outermost ring; Inner is (H-2)x(W-2) or [].
+br_inner_n(+Grid, +N, -Inner): strip N rings (N=0 is identity).
+br_outer_color(+Grid, -V): uniform color of ring 0.
+br_is_uniform_outer(+Grid): succeed if ring 0 is uniform.
+br_ring_colors(+Grid, -Colors): list of uniform ring colors from outside in.
+br_max_ring(+Grid, -N): index of innermost ring = (min(H,W)-1)//2.
+br_is_nested(+Grid): succeed if every ring is uniform (bullseye pattern).
+br_depth_map(+Grid, -DepthGrid): grid where each cell holds its ring index.
+br_fill_ring(+Grid, +N, +V, -Out): replace all cells in ring N with V.
+
+Example: br_add_border([[1,2],[3,4]], 0, Out).
+         Out = [[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]].
+
+Example: br_depth_map([[0,0,0],[0,0,0],[0,0,0]], DM).
+         DM = [[0,0,0],[0,1,0],[0,0,0]].
+
+Example: br_ring_colors([[1,1,1,1,1],[1,2,2,2,1],[1,2,3,2,1],[1,2,2,2,1],[1,1,1,1,1]], C).
+         C = [1, 2, 3].
+
+Library imports: library(lists): member/2, nth0/3, numlist/3, append/2, append/3.
+Library imports: library(apply): maplist/2, maplist/3.
+Built-ins: between/3, length/2, findall/3, forall/2, sort/2.
+
+42/42 PLUnit tests pass.
