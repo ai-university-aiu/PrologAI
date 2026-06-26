@@ -17394,3 +17394,36 @@ lk_apply_cells(+Links, -Result): replace O1's cells with O2's cells; keep O1's c
 lk_filter_same_color(+Links, -Same): keep links where both share a color.
 lk_filter_diff_color(+Links, -Diff): keep links where colors differ.
 lk_unlinked(+Objs, +Links, -Unlinked): objects not appearing as O1 in any link.
+
+Chapter 141: Layout Pack (lt_*)
+
+The layout pack analyzes the collective spatial arrangement of a list of
+obj(Color, Cells) terms.
+
+1. Global Bounding Box
+lt_global_bbox(+Objs, -R1, -C1, -R2, -C2): bounding box over ALL cells of all objs.
+lt_bbox_area(+Objs, -Area): (R2-R1+1) * (C2-C1+1).
+
+2. Row and Column Range
+lt_row_range(+Objs, -MinR, -MaxR): range of topmost rows.
+lt_col_range(+Objs, -MinC, -MaxC): range of leftmost columns.
+lt_row_count(+Objs, -N): distinct topmost row count.
+lt_col_count(+Objs, -N): distinct leftmost col count.
+
+3. Line Detection
+lt_all_same_row(+Objs): succeed iff all share the same topmost row.
+lt_all_same_col(+Objs): succeed iff all share the same leftmost column.
+
+4. Centroid of All
+lt_centroid_of_all(+Objs, -R, -C): integer-truncated centroid of all centroids.
+
+5. Grid Detection
+lt_is_grid(+Objs, -Rows, -Cols): objects' centroids form an R x C grid.
+
+6. Diagonal Detection
+lt_is_diagonal_dr(+Objs): R-C constant (downward-right diagonal).
+lt_is_diagonal_dl(+Objs): R+C constant (downward-left diagonal).
+
+7. Uniform Spacing
+lt_gap_h(+Objs, -Gap): uniform horizontal centroid gap (fails if non-uniform).
+lt_gap_v(+Objs, -Gap): uniform vertical centroid gap.

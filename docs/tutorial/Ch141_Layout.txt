@@ -1,0 +1,57 @@
+Chapter 141: Layout Pack (lt_*)
+
+The layout pack analyzes the collective spatial arrangement of a list of
+obj(Color, Cells) terms. All centroid computations use integer truncation.
+
+1. Global Bounding Box
+
+lt_global_bbox(+Objs, -R1, -C1, -R2, -C2): bounding box over ALL cells.
+
+  ?- lt_global_bbox([obj(a,[r(0,0)]),obj(b,[r(3,5)])], R1, C1, R2, C2).
+  R1=0, C1=0, R2=3, C2=5.
+
+lt_bbox_area(+Objs, -Area): (R2-R1+1) * (C2-C1+1).
+
+2. Row and Column Range
+
+lt_row_range(+Objs, -MinR, -MaxR): range of topmost rows.
+lt_col_range(+Objs, -MinC, -MaxC): range of leftmost columns.
+lt_row_count(+Objs, -N): number of distinct topmost rows.
+lt_col_count(+Objs, -N): number of distinct leftmost columns.
+
+3. Line Detection
+
+lt_all_same_row(+Objs): succeed iff all objects share the same topmost row.
+lt_all_same_col(+Objs): succeed iff all objects share the same leftmost column.
+
+  ?- lt_all_same_row([obj(a,[r(0,0)]),obj(b,[r(0,3)]),obj(c,[r(0,7)])]).
+  true.
+
+4. Centroid Aggregation
+
+lt_centroid_of_all(+Objs, -R, -C): integer-truncated centroid of all centroids.
+
+5. Grid Arrangement
+
+lt_is_grid(+Objs, -Rows, -Cols): objects' centroids form an R x C grid.
+Every (row, col) combination must be occupied; |Objs| = Rows * Cols.
+
+  ?- lt_is_grid([obj(a,[r(0,0)]),obj(b,[r(0,2)]),
+                 obj(c,[r(2,0)]),obj(d,[r(2,2)])], R, C).
+  R=2, C=2.
+
+6. Diagonal Detection
+
+lt_is_diagonal_dr(+Objs): all centroids on same downward-right diagonal (R-C constant).
+lt_is_diagonal_dl(+Objs): all centroids on same downward-left diagonal (R+C constant).
+
+  ?- lt_is_diagonal_dr([obj(a,[r(0,0)]),obj(b,[r(1,1)]),obj(c,[r(2,2)])]).
+  true.
+
+7. Uniform Spacing
+
+lt_gap_h(+Objs, -Gap): uniform horizontal gap between centroid-sorted objects.
+lt_gap_v(+Objs, -Gap): uniform vertical gap. Fails if gaps are non-uniform.
+
+  ?- lt_gap_h([obj(a,[r(0,0)]),obj(b,[r(0,3)]),obj(c,[r(0,6)])], Gap).
+  Gap = 3.
