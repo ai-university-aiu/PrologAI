@@ -17284,3 +17284,74 @@ Library imports: library(lists): member/2, memberchk/2, min_list/2, max_list/2.
 Built-ins: findall/3, sort/2, length/2.
 
 42/42 PLUnit tests pass.
+
+Chapter 139: Proximity Pack (px_*)
+
+The proximity pack computes distances and spatial relationships between
+obj(Color, Cells) terms.
+
+All distance measures use Manhattan distance (sum of absolute row and column
+differences). Centroid distance is the Manhattan distance between the integer-
+truncated average positions of two objects' cells.
+
+1. Centroid and Distance
+
+px_centroid(+Obj, -R, -C): integer-truncated centroid of an obj term.
+
+Example:
+  ?- px_centroid(obj(red,[r(0,0),r(0,1),r(1,0),r(1,1)]), R, C).
+  R = 0, C = 0.
+
+px_centroid_dist(+O1, +O2, -D): Manhattan distance between centroids.
+
+  ?- px_centroid_dist(obj(a,[r(0,0)]), obj(b,[r(3,4)]), D).
+  D = 7.
+
+px_min_cell_dist(+O1, +O2, -D): minimum distance between any cell pair.
+
+  ?- px_min_cell_dist(obj(a,[r(0,0),r(1,0)]), obj(b,[r(1,2)]), D).
+  D = 2.
+
+2. Touching
+
+px_touching(+O1, +O2): succeed if any cell of O1 is 4-adjacent to O2.
+4-adjacent means cells share an edge (Manhattan distance = 1).
+
+  ?- px_touching(obj(a,[r(1,1)]), obj(b,[r(1,2)])).
+  true.
+
+  ?- px_touching(obj(a,[r(1,1)]), obj(b,[r(2,2)])).
+  false.
+
+3. Finding Nearest and Farthest
+
+px_nearest(+Objs, +Ref, -Nearest): object with smallest centroid distance.
+px_farthest(+Objs, +Ref, -Farthest): object with largest centroid distance.
+Ties go to the earliest object in Objs.
+
+  ?- px_nearest(
+       [obj(blue,[r(5,5)]), obj(green,[r(1,1)])],
+       obj(red,[r(0,0)]),
+       N).
+  N = obj(green,[r(1,1)]).
+
+4. Sorting and Filtering
+
+px_sort_by_dist(+Objs, +Ref, -Sorted): Objs sorted ascending by centroid distance.
+
+px_within_dist(+Objs, +Ref, +D, -Near): objects at centroid distance at most D.
+px_beyond_dist(+Objs, +Ref, +D, -Far): objects at centroid distance strictly > D.
+
+5. Pair Detection
+
+px_closest_pair(+Objs, -O1-O2): unordered pair with minimum centroid distance.
+px_farthest_pair(+Objs, -O1-O2): unordered pair with maximum centroid distance.
+
+6. Contact Filters
+
+px_touching_objs(+Objs, +Ref, -Touching): sub-list that touches Ref.
+px_non_touching_objs(+Objs, +Ref, -NonTouching): sub-list not touching Ref.
+
+7. Distance Rank
+
+px_dist_rank(+Objs, +Ref, -Ranked): D-Obj pairs sorted ascending by distance.
