@@ -15394,3 +15394,42 @@ Library imports: library(lists): member/2, nth0/3, max_list/2, sum_list/2.
   Built-ins: length/2, between/3, sort/2.
 
 Predicate count: 14 (pj_* prefix). Tests: 42/42. Layer: 131.
+
+
+CHAPTER 114: ROW AND COLUMN GRADIENT AND PROGRESSION ANALYSIS (gr_*)
+
+The gradient pack (Layer 132, module gradient, prefix gr_*) provides 14
+predicates for measuring value gradients, monotonicity, range, cumulative
+sums, and second-order differences in 2D grids.
+
+Load: :- use_module('packs/gradient/prolog/gradient.pl').
+
+Example queries:
+gr_h_diffs([[1,2,3],[4,5,6],[7,8,9]],D). % D=[[1,1],[1,1],[1,1]]
+gr_v_diffs([[1,2,3],[4,5,6],[7,8,9]],D). % D=[[3,3,3],[3,3,3]]
+gr_h_mono([[1,2,3],[3,2,1],[1,1,1]],F). % F=[1,-1,1]
+gr_v_mono([[7,8,9],[4,5,6],[1,2,3]],F). % F=[-1,-1,-1]
+gr_h_range([[1,2,3],[4,5,6],[7,8,9]],R). % R=[2,2,2]
+gr_v_range([[1,2,3],[4,5,6],[7,8,9]],R). % R=[6,6,6]
+gr_h_slope([[1,2,3],[4,5,6],[7,8,9]],S). % S=[2,2,2]
+gr_v_slope([[7,8,9],[4,5,6],[1,2,3]],S). % S=[-6,-6,-6]
+gr_h_const([[1,1,1],[2,2,2],[3,3,3]],B). % B=[1,1,1]
+gr_v_const([[1,2],[1,2],[1,2]],B). % B=[1,1]
+gr_h_cum([[1,2,3],[4,5,6],[7,8,9]],C). % C=[[1,3,6],[4,9,15],[7,15,24]]
+gr_v_cum([[1,2,3],[4,5,6],[7,8,9]],C). % C=[[1,2,3],[5,7,9],[12,15,18]]
+gr_h_second([[1,2,4],[1,2,4],[1,2,4]],D). % D=[[1],[1],[1]]
+gr_v_second([[1,1,1],[2,2,2],[4,4,4],[7,7,7]],D). % D=[[1,1,1],[1,1,1]]
+
+Key implementation patterns:
+gr_adj_diffs_: three clauses for [], [_], and [A,B|T]; recurses with [B|T].
+gr_v_diffs_: pairs adjacent rows R1,R2; computes gr_pair_diffs_(R1,R2,D).
+gr_mono_: if-then-else over gr_is_nondec_/gr_is_noninc_; constant → 1.
+gr_v_cum_acc_: first row passthrough, subsequent rows use gr_row_add_.
+gr_second_diffs_: calls gr_adj_diffs_ twice.
+gr_v_second: calls gr_v_diffs twice (D1 then D2Grid).
+
+Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2,
+  last/2. library(apply): maplist/3.
+  Built-ins: length/2, between/3.
+
+Predicate count: 14 (gr_* prefix). Tests: 42/42. Layer: 132.
