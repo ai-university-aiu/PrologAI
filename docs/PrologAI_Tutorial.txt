@@ -15719,3 +15719,104 @@ Library imports: library(lists): member/2, nth0/3, last/2, append/3.
 Built-ins: sort/2, msort/2, length/2, between/3, findall/3.
 
 Predicate count: 14 (co_* prefix). Tests: 42/42. Layer: 139.
+
+Chapter 122: Row and Column Signature Analysis Pack (Layer 140, rs_* prefix)
+
+The rowsig pack provides 14 predicates for analyzing rows and columns of 2D
+integer grids as collections: extracting columns, computing frequency tables,
+finding the modal row or column, identifying unique and duplicate rows/columns
+by index, and testing palindrome and anagram structure.
+
+Predicates:
+
+rs_col_at(+Grid, +C, -Col)
+  Col is the ordered list of values in column C, top-to-bottom (row 0 first).
+
+rs_all_cols(+Grid, -Cols)
+  Cols is the list of all column lists in column order (column 0 first).
+
+rs_row_freq(+Grid, -Freqs)
+  Freqs is Row-N pairs where N is how often Row appears. Sorted by N desc;
+  equal-count rows ordered by reverse standard order (largest last in msort,
+  first after reverse).
+
+rs_col_freq(+Grid, -Freqs)
+  Freqs is Col-N pairs where N is how often column list Col appears. Sorted
+  by N descending.
+
+rs_modal_row(+Grid, -Row)
+  Row is the most frequently appearing row. On tie, the largest row in
+  standard order wins (msort + last). Fails if Grid is empty.
+
+rs_modal_col(+Grid, -Col)
+  Col is the most frequently appearing column list. Ties resolved by largest
+  column (msort + last). Fails if Grid has no columns.
+
+rs_uniq_rows(+Grid, -Pairs)
+  Pairs is the list of R-Row terms for rows appearing exactly once, ordered
+  by row index ascending.
+
+rs_uniq_cols(+Grid, -Pairs)
+  Pairs is the list of C-Col terms for columns appearing exactly once,
+  ordered by column index ascending.
+
+rs_dup_row_pairs(+Grid, -Pairs)
+  Pairs is the list of R1-R2 index pairs where row R1 equals row R2 and
+  R1 < R2. Ordered by R1 then R2.
+
+rs_dup_col_pairs(+Grid, -Pairs)
+  Pairs is the list of C1-C2 index pairs where column C1 equals column C2
+  and C1 < C2. Ordered by C1 then C2.
+
+rs_row_palindrome(+Grid, +R)
+  Succeeds if row R reads the same left-to-right and right-to-left.
+
+rs_col_palindrome(+Grid, +C)
+  Succeeds if column C reads the same top-to-bottom and bottom-to-top.
+
+rs_rows_anagram(+Grid, +R1, +R2)
+  Succeeds if rows R1 and R2 have the same multiset of values
+  (msort of both rows produces the same list).
+
+rs_cols_anagram(+Grid, +C1, +C2)
+  Succeeds if columns C1 and C2 have the same multiset of values
+  (msort of both columns produces the same list).
+
+Usage examples:
+
+G = [[1,2,3],[4,5,6],[7,8,9]].
+rs_col_at(G, 0, Col).     % Col=[1,4,7]
+rs_all_cols(G, Cols).     % Cols=[[1,4,7],[2,5,8],[3,6,9]]
+rs_modal_row(G, Row).     % Row=[7,8,9]
+rs_uniq_rows(G, Pairs).   % Pairs=[0-[1,2,3],1-[4,5,6],2-[7,8,9]]
+rs_dup_row_pairs(G, P).   % P=[]
+
+G2 = [[1,2],[3,4],[1,2]].
+rs_row_freq(G2, Freqs).   % Freqs=[[1,2]-2,[3,4]-1]
+rs_modal_row(G2, Row).    % Row=[1,2]
+rs_uniq_rows(G2, Pairs).  % Pairs=[1-[3,4]]
+rs_dup_row_pairs(G2, P).  % P=[0-2]
+
+rs_row_palindrome([[1,2,1],[3,4,5]], 0). % succeeds
+rs_col_palindrome([[1,2],[3,3],[1,5]], 0). % succeeds (col0=[1,3,1])
+rs_rows_anagram([[1,2,3],[3,1,2],[4,5,6]], 0, 1). % succeeds
+rs_cols_anagram([[1,2],[3,1],[2,3]], 0, 1). % succeeds
+
+Key implementation notes:
+
+rs_modal_row and rs_modal_col use msort + last on Count-Element pairs.
+  When all counts are equal, the largest element wins as a deterministic
+  tie-breaking rule.
+
+rs_rows_anagram and rs_cols_anagram use msort (not sort) to preserve
+  duplicate values. Two rows [1,1,2] and [2,1,1] are anagrams; sort would
+  collapse duplicates and mask differences.
+
+rs_row_palindrome and rs_col_palindrome use the Prolog idiom reverse(X) = X,
+  which unifies the list with its own reverse, succeeding iff they are equal.
+
+Library imports: library(lists): member/2, nth0/3, reverse/2, last/2.
+                 library(apply): include/3.
+Built-ins: sort/2, msort/2, length/2, between/3, findall/3.
+
+Predicate count: 14 (rs_* prefix). Tests: 47/47. Layer: 140.
