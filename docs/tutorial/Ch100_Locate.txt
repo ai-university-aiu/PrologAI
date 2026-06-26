@@ -1,0 +1,131 @@
+Chapter 100: Pattern Location and Subgrid Matching - The Locate Pack (lc_* prefix)
+
+The locate pack (Work Package 139, Layer 118) provides 14 predicates for
+finding patterns within grids: testing whether a sub-grid appears at a specific
+position, finding all or the first position where a template matches, searching
+for rows or columns matching a given sequence, testing row prefixes and suffixes,
+locating a unique marker cell, counting value occurrences per row, and finding
+rows and columns that contain a given value.
+
+
+1. Loading the Pack
+
+:- use_module(packs/locate/prolog/locate).
+
+
+2. Subgrid Template Matching
+
+lc_subgrid_at(+Grid, +Sub, +R0, +C0) tests whether the sub-grid Sub appears
+with its top-left corner at position (R0, C0) in Grid. Uses forall over all
+Sub positions to verify each cell.
+
+?- lc_subgrid_at([[1,2,3],[4,5,6],[7,8,9]], [[5,6],[8,9]], 1, 1). true.
+?- lc_subgrid_at([[1,2],[3,4]], [[1]], 0, 0). true.
+?- lc_subgrid_at([[1,2],[3,4]], [[9]], 0, 0). false.
+
+lc_find_sub(+Grid, +Sub, -R0, -C0) finds the first top-left position (row-major)
+where Sub appears. Deterministic via cut. Fails if Sub is not present.
+
+?- lc_find_sub([[0,0,0],[0,1,0],[0,0,0]], [[1]], R, C).
+R = 1, C = 1.
+
+?- lc_find_sub([[0,1,0],[0,0,0]], [[1]], R, C).
+R = 0, C = 1.
+
+lc_all_sub(+Grid, +Sub, -Positions) returns the list of all R0-C0 pairs where
+Sub appears.
+
+?- lc_all_sub([[1,0,1],[0,0,0],[1,0,1]], [[1]], P).
+P = [0-0, 0-2, 2-0, 2-2].
+
+?- lc_all_sub([[0,0],[0,0]], [[1]], P).
+P = [].
+
+lc_subgrid_count(+Grid, +Sub, -N) counts how many times Sub appears.
+
+?- lc_subgrid_count([[1,0,1],[0,0,0],[1,0,1]], [[1]], N). N = 4.
+?- lc_subgrid_count([[1,1],[1,0]], [[1,1]], N). N = 1.
+
+
+3. Row and Column Pattern Search
+
+lc_row_pattern(+Grid, +Pattern, -R) finds the first row index where the row
+equals Pattern.
+
+?- lc_row_pattern([[0,0],[1,2],[0,0]], [1,2], R). R = 1.
+?- lc_row_pattern([[1,1],[0,0],[1,1]], [1,1], R). R = 0.
+?- lc_row_pattern([[0,0],[1,0]], [9,9], _). false.
+
+lc_all_row_pattern(+Grid, +Pattern, -Rows) returns all matching row indices.
+
+?- lc_all_row_pattern([[1,1],[0,0],[1,1]], [1,1], Rs). Rs = [0, 2].
+?- lc_all_row_pattern([[0,0],[0,0]], [1,1], Rs). Rs = [].
+
+lc_col_pattern(+Grid, +Pattern, -C) finds the first column index whose value
+list equals Pattern (column values from top to bottom).
+
+?- lc_col_pattern([[1,0],[2,0],[3,0]], [1,2,3], C). C = 0.
+?- lc_col_pattern([[0,1],[0,2],[0,3]], [1,2,3], C). C = 1.
+?- lc_col_pattern([[0,0],[0,0]], [9,9], _). false.
+
+lc_all_col_pattern(+Grid, +Pattern, -Cols) returns all matching column indices.
+
+?- lc_all_col_pattern([[1,1],[2,2],[3,3]], [1,2,3], Cols). Cols = [0, 1].
+?- lc_all_col_pattern([[1,0],[2,0],[3,0]], [1,2,3], Cols). Cols = [0].
+
+
+4. Row Prefix and Suffix
+
+lc_row_prefix(+Grid, +R, +Prefix, -Rest) decomposes row R as Prefix ++ Rest.
+
+?- lc_row_prefix([[1,2,3],[4,5,6]], 0, [1,2], Rest). Rest = [3].
+?- lc_row_prefix([[1,2,3]], 0, [], Rest). Rest = [1,2,3].
+?- lc_row_prefix([[1,2,3],[4,5,6]], 1, [4,5,6], Rest). Rest = [].
+
+lc_row_suffix(+Grid, +R, +Suffix) succeeds if row R ends with Suffix. Deterministic.
+
+?- lc_row_suffix([[1,2,3],[4,5,6]], 0, [2,3]). true.
+?- lc_row_suffix([[1,2,3]], 0, []). true.
+?- lc_row_suffix([[1,2,3]], 0, [1,3]). false.
+
+
+5. Anchor and Value Counting
+
+lc_anchor(+Grid, +V, -R, -C) succeeds if exactly one cell in Grid equals V and
+returns its position. Fails if V appears zero or more than once.
+
+?- lc_anchor([[0,0,0],[0,9,0],[0,0,0]], 9, R, C). R = 1, C = 1.
+?- lc_anchor([[9,0],[0,0]], 9, R, C). R = 0, C = 0.
+?- lc_anchor([[9,0],[9,0]], 9, _, _). false.  % two occurrences
+
+lc_row_count(+Grid, +V, -Counts) returns one integer per row counting V occurrences.
+
+?- lc_row_count([[1,0,1],[0,0,0],[1,1,0]], 1, Counts).
+Counts = [2, 0, 2].
+
+?- lc_row_count([[0,0],[0,0]], 1, Counts). Counts = [0, 0].
+
+
+6. Row and Column Containment
+
+lc_row_contains(+Grid, +V, -Rows) returns sorted rows that contain V.
+
+?- lc_row_contains([[0,1,0],[1,0,0],[0,0,1]], 1, Rows). Rows = [0, 1, 2].
+?- lc_row_contains([[0,0],[0,0]], 1, Rows). Rows = [].
+?- lc_row_contains([[0,0],[1,0]], 1, Rows). Rows = [1].
+
+lc_col_contains(+Grid, +V, -Cols) returns sorted columns that contain V.
+
+?- lc_col_contains([[0,1,0],[0,1,0]], 1, Cols). Cols = [1].
+?- lc_col_contains([[1,0,1],[0,1,0]], 1, Cols). Cols = [0, 1, 2].
+
+
+7. Summary
+
+The 14 lc_* predicates support subgrid template matching (lc_subgrid_at,
+lc_find_sub, lc_all_sub, lc_subgrid_count), row and column sequence search
+(lc_row_pattern, lc_all_row_pattern, lc_col_pattern, lc_all_col_pattern),
+structural row testing (lc_row_prefix, lc_row_suffix), unique-marker location
+(lc_anchor), per-row value counting (lc_row_count), and value containment
+queries (lc_row_contains, lc_col_contains). lc_anchor is the key predicate for
+tasks with a single "special" marker cell.
