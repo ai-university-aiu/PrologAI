@@ -16450,3 +16450,79 @@ Library imports: library(lists): member/2, memberchk/2, nth0/3, min_list/2, max_
 Built-ins: length/2, findall/3, between/3, sort/2.
 
 42/42 PLUnit tests pass.
+
+
+Chapter 131: Pair Pack
+
+The pair pack (pr_*, Layer 149) provides 14 predicates for object pairing and
+scene correspondence. It operates on obj(Color, Cells) terms where Cells is a
+sorted list of r(R,C) terms, as produced by the scene pack. The central
+innovation is a D4-canonical shape representation that identifies all rotations
+and reflections of a shape as the same shape.
+
+A D4-canonical shape is computed by: normalizing the cell list to origin,
+generating all 8 D4 transforms (id, r90, r180, r270, fh, fv, fd1, fd2),
+normalizing each result, and taking the lexicographically smallest.
+
+
+Object Properties
+
+pr_obj_shape(+Obj, -Shape): D4-canonical shape of an obj term.
+
+    pr_obj_shape(obj(1, [r(0,0), r(0,1)]), Shape).  % Shape = [r(0,0), r(0,1)]
+    pr_obj_shape(obj(2, [r(0,0), r(1,0)]), Shape).  % Shape = [r(0,0), r(0,1)]
+    % Horizontal and vertical pairs have the same canonical shape.
+
+pr_obj_color(+Obj, -Color): extract color.
+pr_obj_size(+Obj, -N): number of cells.
+
+    pr_obj_color(obj(5, [r(0,0)]), 5).   % succeeds
+    pr_obj_size(obj(2, [r(0,0), r(0,1), r(0,2)]), 3).  % succeeds
+
+
+Equality Tests
+
+pr_shape_eq(+Obj1, +Obj2): same D4-canonical shape.
+pr_color_eq(+Obj1, +Obj2): same color.
+pr_size_eq(+Obj1, +Obj2): same cell count.
+
+    pr_shape_eq(obj(1, [r(0,0),r(0,1)]), obj(2, [r(0,0),r(1,0)])).  % succeeds
+    pr_color_eq(obj(3, [r(0,0)]), obj(3, [r(1,2)])).   % succeeds
+    pr_size_eq(obj(1, [r(0,0)]), obj(2, [r(5,5)])).    % succeeds
+
+
+Grouping
+
+pr_group_color(+Objs, -Groups): Color-[Obj] pairs sorted by color.
+pr_group_size(+Objs, -Groups): N-[Obj] pairs sorted by cell count.
+pr_group_shape(+Objs, -Groups): Shape-[Obj] pairs sorted by canonical shape.
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])].
+    pr_group_color(Objs, Groups).
+    % Groups = [1-[obj(1,[r(0,0)]),obj(1,[r(1,0)])], 2-[obj(2,[r(0,1)])]]
+
+
+Finding the Unique Object
+
+pr_unique_color(+Objs, -Obj): the obj whose color appears exactly once.
+pr_unique_size(+Objs, -Obj): the obj whose size appears exactly once.
+Both fail if there is not exactly one such object.
+
+    Objs = [obj(1,[r(0,0)]), obj(1,[r(1,0)]), obj(2,[r(0,1)])].
+    pr_unique_color(Objs, obj(2,[r(0,1)])).  % color 2 appears once
+
+
+Cross-Scene Matching
+
+pr_match_color(+Objs1, +Objs2, -Pairs): Color-O1-O2 triples.
+pr_match_size(+Objs1, +Objs2, -Pairs): N-O1-O2 triples.
+pr_match_shape(+Objs1, +Objs2, -Pairs): Shape-O1-O2 triples.
+
+    pr_match_shape([obj(1,[r(0,0),r(0,1)])], [obj(2,[r(0,0),r(1,0)])], Pairs).
+    % Pairs = [[r(0,0),r(0,1)]-obj(1,...)-obj(2,...)]
+    % Horizontal and vertical pairs match under D4 equivalence.
+
+Library imports: library(lists): member/2, min_list/2, max_list/2.
+Built-ins: findall/3, sort/2, length/2.
+
+42/42 PLUnit tests pass.
