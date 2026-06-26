@@ -1,0 +1,90 @@
+Chapter 150: Wavefront BFS Pack (wf_*)
+
+The wavefront pack (Layer 168) provides BFS-based wave propagation through a 2D
+grid. Starting from a set of seed cells, the wave spreads through adjacent cells
+that match a caller-supplied passable color. All distances are exact BFS path
+lengths, so obstacles are respected automatically.
+
+This is different from the voronoi pack, which uses open-space Manhattan distance.
+The wavefront pack handles mazes, corridors, and irregular shapes correctly.
+
+14 predicates, prefix wf_*. 41 tests pass.
+
+Basic Usage
+
+Collect passable cells:
+
+    % wf_passable(+Grid, +PassColor, -Cells)
+    wf_passable([[0,1,0],[0,0,0],[0,1,0]], 0, Cells).
+    % Cells = [r(0,0),r(0,2),r(1,0),r(1,1),r(1,2),r(2,0),r(2,2)]
+
+Run BFS from a seed:
+
+    % wf_bfs(+Grid, +Seeds, +PassColor, -DistPairs)
+    wf_bfs([[0,1,0],[0,0,0],[0,1,0]], [r(0,0)], 0, DP).
+    % DP = [0-r(0,0), 1-r(1,0), 2-r(1,1), 2-r(2,0),
+    %        3-r(1,2), 4-r(0,2), 4-r(2,2)]
+
+Seeds are always at distance 0. The wave avoids the wall cells (value 1).
+
+Distance Queries
+
+    % wf_at_dist(+DistPairs, +D, -Cells)
+    wf_at_dist(DP, 2, Cells).
+    % Cells = [r(1,1), r(2,0)]
+
+    % wf_within_dist(+DistPairs, +MaxD, -Cells)
+    wf_within_dist(DP, 2, Cells).
+    % Cells = [r(0,0), r(1,0), r(1,1), r(2,0)]
+
+    % wf_dist_of(+DistPairs, +Cell, -D)
+    wf_dist_of(DP, r(1,2), D).  % D = 3
+
+    % wf_max_dist(+DistPairs, -MaxD)
+    wf_max_dist(DP, MaxD).  % MaxD = 4
+
+    % wf_all_dists(+DistPairs, -Dists)
+    wf_all_dists(DP, Dists).  % Dists = [0,1,2,3,4]
+
+Reachability
+
+    % wf_reachable(+Grid, +Seeds, +PassColor, -Cells)
+    wf_reachable(Grid, [r(0,0)], 0, Cells).
+
+    % wf_unreachable(+Grid, +Seeds, +PassColor, -Cells)
+    wf_unreachable(Grid, [r(0,0)], 0, U).
+    % U = [] if all passable cells are reachable
+
+    % wf_path_exists(+Grid, +CellA, +CellB, +PassColor)
+    wf_path_exists(Grid, r(0,0), r(0,2), 0).
+
+Painting Distance Maps
+
+    % wf_paint_bg(+Grid, +Seeds, +PassColor, +MaxD, -NewGrid)
+    wf_paint_bg([[0,0],[0,0]], [r(0,0)], 0, 9, Painted).
+    % Painted = [[0,1],[1,2]]
+
+Each passable cell becomes its BFS distance, capped at MaxD.
+
+Multi-Source Waves
+
+    % wf_multi_wave(+Grid, +ColoredSeeds, +PassColor, -Painted)
+    % ColoredSeeds: list of Color-[Seeds] pairs
+    wf_multi_wave(Grid, [a-[r(0,0)], b-[r(0,2)]], 0, Painted).
+    % Each passable cell gets the color of its nearest seed.
+    % Ties broken by standard term order.
+
+Collision Detection
+
+    % wf_collision(+Grid, +ColoredSeeds, +PassColor, -Cells)
+    wf_collision(Grid, [a-[r(0,0)], b-[r(0,2)]], 0, Cells).
+    % Cells = cells equidistant from 2+ color sources (the boundary)
+
+Enclosed Region Detection
+
+    % wf_enclosed(+Grid, +PassColor, -Cells)
+    wf_enclosed([[0,1,1,0],[1,0,0,1],[1,0,0,1],[0,1,1,0]], 0, Cells).
+    % Cells = [r(1,1),r(1,2),r(2,1),r(2,2)]  (inner pocket)
+
+wf_enclosed seeds BFS from all PassColor cells on the grid border and returns
+PassColor cells not reached. These are "enclosed" by walls.
