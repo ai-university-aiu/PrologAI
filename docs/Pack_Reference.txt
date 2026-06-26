@@ -1,0 +1,741 @@
+PrologAI Data Layer Pack Reference
+===================================
+
+This file contains the full predicate-level descriptions for each pack in the
+Data Layer section of PrologAI. The README.md contains short titles only.
+
+vector_backend
+The Vector Backend
+
+    a backend-agnostic six-predicate interface. Ships with two backends: the built-in pure-Prolog fallback and the RuVector HNSW (Hierarchical Navigable Small World) + SIMD HTTP REST backend (port 6333). Any vector store plugs in without changing the reasoning layer. Run `vb_set_backend(ruvector)` to switch; use `run_bakeoff([prolog, ruvector], [100, 1000])` to compare. Includes in-process shadow store (`vbr_shadow/5`) and rebuild predicate (`vb_rebuild/1`) — if the RuVector server restarts, call `vb_rebuild(Ref)` to re-insert all shadow vectors and restore the HNSW index. Bakeoff result: ruvector scores 0.2655 vs. prolog 0.0650 at 100,000 vectors (4x advantage, HNSW sub-linear scaling confirmed).
+
+vsa
+Compositional Vector Binding (VSA — Vector Symbolic Architecture)
+
+    MAP and HRR algebras. Concepts are built by binding, not by lookup.
+
+lattice_crypto
+Lattice Cryptographic Privacy Layer
+
+    RSA, ECDH, and post-quantum (PQC) hybrid encryption for sensitive Lattice data.
+
+ephemera
+Ephemeral Code Synthesis, Execution, and Skill Persistence (PR 53)
+
+    compose short-lived programs in Prolog, Python, or Bash, run them with a wall-clock timeout, capture stdout and stderr, and log execution traces. Useful ephemera can be named, saved, indexed, retrieved by name, and re-run as skills without re-synthesis. Key predicates: `ep_eval/3` (Prolog goal with timeout), `ep_shell/3` (shell command), `ep_ephemeral/4` (language-specific script), `ep_iterate/5` (synthesize-execute-check loop), `ep_skill_save/4`, `ep_skill_run/3`, `ep_skill_list/1`.
+
+agency
+Agentic Execution Loop (PR 54)
+
+    formal, observable, bounded goal-pursuit loop. Allocate a loop with a step budget, supply a reasoning goal, and let the loop execute Observe-Reason-Act-Observe steps until done, budget-exhausted, or escalated to human oversight. Full trace recording, goal stack management, loop detection, and safe escalation. Key predicates: `ag_loop_create/3`, `ag_loop_run/3`, `ag_detect_loop/2`, `ag_escalate/2`, `ag_loop_trace/2`.
+
+refinery
+Evaluator-Optimizer and Metacognitive Quality Layer (PR 55)
+
+    critique outputs against named criteria, score them as a fraction in [0.0, 1.0], drive iterative improvement cycles with an improver goal, run full evaluator-optimizer loops, explore multiple reasoning paths and rank by score, and maintain a lesson database that records what went wrong and recalls it before future attempts. Key predicates: `rn_critique/4`, `rn_score/3`, `rn_optimize/5`, `rn_explore_paths/4`, `rn_learn/3`.
+
+grid
+ARC-AGI Grid Perception and Manipulation (PR 56)
+
+    native grid operations for the ARC-AGI benchmark: dimensions (`gd_size/3`), zero-based cell access (`gd_cell/4`, `gd_row/3`, `gd_col/3`), color analysis (`gd_colors/2`, `gd_color_count/3`, `gd_color_map/3`), 4-connected object extraction (`gd_objects/3`, `gd_connected/3`), bounding box (`gd_bounding_box/3`), seven spatial transformations (rotate 90/180/270, reflect h/v/d1/d2), translation, cropping, overlay compositing, diff, symmetry detection (`gd_symmetry/2`), flood fill (`gd_fill/5`), uniform grid construction (`gd_make/4`), and single-cell mutation (`gd_set_cell/5`). The perceptual foundation for ARC-AGI solving.
+
+analogy
+ARC-AGI Structural Analogy and Transformation Inference (PR 57)
+
+    infers the transformation rule from (input, output) training pairs and applies it to test inputs. Covers the full D4 dihedral group (8 spatial isometries: identity, rot90, rot180, rot270, ref_h, ref_v, ref_d1, ref_d2) combined with color substitution maps. Key predicates: `ay_solve_from_examples/3`, `ay_examples_isometry/3`, `ay_apply_isometry/3`, `ay_isometry_candidates/3`, `ay_normalize_shape/2`, `ay_shape_equal/2`. The inferential foundation for ARC-AGI solving.
+
+scene
+ARC-AGI Scene Model and Object-Centric Reasoning (PR 58)
+
+    builds a structured object inventory from a grid. Identifies the background color, extracts all foreground objects as `obj(Color, Cells)` terms, and provides 24 predicates for object properties (size, shape, bounding box, centroid), filtering, sorting, counting, and spatial relations. Key predicates: `sc_grid_to_scene/3`, `sc_objects/2`, `sc_largest/2`, `sc_same_shape/2`, `sc_cells_touching/2`, `sc_contained_in/2`. The object-centric reasoning layer for ARC-AGI-2.
+
+quant
+Quantitative Reasoning over Object Sets (PR 59)
+
+    counts, groups, and compares collections of `obj(Color, Cells)` terms. Provides histogram (`qn_histogram/2`), grouping by color/size/shape (`qn_group_by_color/2`, `qn_group_by_size/2`, `qn_group_by_shape/2`), frequency extremes (`qn_most_frequent_color/2`, `qn_least_frequent_color/2`), unique shape enumeration (`qn_unique_shapes/2`), conditional counting (`qn_count_where/3`), uniformity tests (`qn_all_same_color/1`, `qn_all_same_size/1`, `qn_all_same_shape/1`), multiset matching (`qn_colors_match/2`, `qn_shapes_match/2`, `qn_sizes_match/2`), and threshold predicates (`qn_exactly_n/3`, `qn_at_least_n/3`). 18 qn_* predicates, Layer 38.
+
+pattern
+Periodic Pattern Detection, Tiling, and Repetition (PR 60)
+
+    detects repeating periods in lists, rows, and columns (`pt_list_period/2`, `pt_row_period/3`, `pt_col_period/3`); constructs tiled grids from a base tile (`pt_tile_grid/4`, `pt_extract_tile/4`, `pt_is_tiling/3`); scales grids by integer factors (`pt_scale_up/3`, `pt_scale_down/3`); repeats grids horizontally and vertically (`pt_repeat_h/3`, `pt_repeat_v/3`); mirrors grids (`pt_mirror_h/2`, `pt_mirror_v/2`); and generates checkerboard and stripe patterns (`pt_checkerboard/5`, `pt_stripe_h/4`, `pt_stripe_v/4`). 15 pt_* predicates, Layer 39.
+
+compose
+Sequential Rule Pipelines and Transformation Composition (PR 61)
+
+    higher-order combinators for building transformation pipelines: single dispatch (`cp_apply/3`), identity (`cp_identity/2`), constant (`cp_const/3`), sequential pipeline (`cp_pipe/3`, `cp_pipe_n/4`), conditional branching (`cp_branch/5`), repetition (`cp_repeat/4`, `cp_until/4`, `cp_fixed_point/3`), row and column mapping (`cp_map_rows/3`, `cp_map_cols/3`), pairwise cell combination (`cp_zip/4`), and left-fold over a list of grids (`cp_fold/4`). 13 cp_* predicates, Layer 40.
+
+motion
+Spatial Movement, Gravity, and Distance for Grid-Based Reasoning (PR 62)
+
+    gravity predicates that pull foreground cells toward any edge (`mv_gravity_down/3`, `mv_gravity_up/3`, `mv_gravity_left/3`, `mv_gravity_right/3`), directional sliding (`mv_slide_col/4`, `mv_slide_row/4`), whole-grid translation (`mv_shift_grid/5`), scene-level object translation (`mv_obj_translate/4`, `mv_scene_translate/4`), scene-to-grid rendering (`mv_scene_to_grid/2`), scene gravity via grid round-trip (`mv_scene_gravity/2`), and proximity computation (`mv_distance/3`, `mv_closest_cell/3`). 13 mv_* predicates, Layer 41.
+
+frame
+Rectangular Border Detection, Interior Extraction, and Frame Generation (PR 63)
+
+    detect uniform outer rings (`fr_border_color/2`, `fr_has_border/2`, `fr_border_cells/2`), extract interiors (`fr_inner/2`, `fr_interior_uniform/1`, `fr_interior_color/2`), generate framed grids (`fr_make_framed/5`, `fr_add_border/4`), test sub-region borders (`fr_region_has_border/6`, `fr_region_border_color/6`), find bounding boxes (`fr_bounding_box/6`), and analyze concentric nesting (`fr_is_nested/3`, `fr_ring_count/2`). 14 fr_* predicates, Layer 42.
+
+path
+Path-Finding, Flood Fill, Connectivity, and Reachability (PR 64)
+
+    4-connected neighbor enumeration (`pf_neighbors/3`), same-color flood fill (`pf_flood_fill/4`), connectivity testing (`pf_connected/4`, `pf_is_connected/2`), connected component analysis (`pf_components/3`, `pf_component_count/3`, `pf_component_size/4`, `pf_largest_component/3`), BFS shortest path (`pf_shortest_path/5`, `pf_path_length/5`, `pf_path_exists/4`), reachability without walls (`pf_reachable/4`), and flood-fill bounding box (`pf_fill_bbox/7`). 13 pf_* predicates, Layer 43.
+
+symmetry
+Grid Symmetry Testing, Canonical Orientation, and Orbit Generation (PR 65)
+
+    individual D4 symmetry tests (`sy_is_hsymmetric/1`, `sy_is_vsymmetric/1`, `sy_is_rot180/1`, `sy_is_rot90/1`, `sy_is_diagonal/1`, `sy_is_antidiagonal/1`), symmetry group computation (`sy_group/2`), rotation and orbit enumeration (`sy_rotations/2`, `sy_orbit/2`), canonical form (`sy_canonical/2`), orbit equivalence (`sy_equivalent/2`), and symmetry order (`sy_order/2`). 12 sy_* predicates, Layer 44.
+
+color
+Color Palette Extraction, Histogram Analysis, and Color Manipulation (PR 66)
+
+    palette extraction (`cl_palette/2`, `cl_color_count/2`, `cl_is_mono/1`, `cl_has_color/2`), color counting and histograms (`cl_count/3`, `cl_histogram/2`), palette comparison (`cl_same_palette/2`), dominant and rarest color detection (`cl_dominant/2`, `cl_rarest/2`), color replacement and remapping (`cl_replace/4`, `cl_remap/3`, `cl_swap/4`), and color filtering (`cl_isolate/4`, `cl_remove/4`). 14 cl_* predicates, Layer 45.
+
+shape
+Normalized Shape Extraction, Comparison, Transformation, and D4 Orbit Reasoning (PR 67)
+
+    shape creation from cell lists (`sh_from_cells/2`) and grids (`sh_from_grid/3`), shape properties (`sh_area/2`, `sh_bounding_size/3`, `sh_contains_cell/2`, `sh_equal/2`), spatial transformations (`sh_translate/4`, `sh_rotate90/2`, `sh_reflect_h/2`, `sh_reflect_v/2`), D4 orbit and canonical form (`sh_orbit/2`, `sh_canonical/2`, `sh_equivalent/2`), and grid placement (`sh_to_grid/6`). A shape is a sorted list of r(R,C) cells normalized to the origin. 14 sh_* predicates, Layer 46.
+
+relation
+Spatial Relations Between Cell Regions (PR 68)
+
+    positional ordering (`rl_above/2`, `rl_below/2`, `rl_left_of/2`, `rl_right_of/2`), 4-connected adjacency (`rl_adjacent/2`), minimum Manhattan distance (`rl_distance/3`), bounding box containment (`rl_contained_bbox/2`), set relations (`rl_overlap/2`, `rl_disjoint/2`), row and column alignment (`rl_same_row/2`, `rl_same_col/2`), integer centroid (`rl_centroid/3`), centroid offset (`rl_offset/4`), and cardinal direction (`rl_direction/3`). A region is any list of r(R,C) cells. 14 rl_* predicates, Layer 47.
+
+sequence
+Arithmetic Sequence Analysis, List Structure, and Period Detection (PR 69)
+
+    integer range generation (`sq_range/3`), first differences (`sq_delta/2`), arithmetic detection and extension (`sq_is_arithmetic/1`, `sq_common_diff/2`, `sq_extend_arith/3`), chunking (`sq_chunk/3`), zip/unzip (`sq_zip/3`, `sq_unzip/3`), cumulative sums (`sq_cumsum/2`), 0-indexed slicing (`sq_slice/4`), one-level flatten (`sq_flatten1/2`), matrix transposition (`sq_transpose/2`), and period detection (`sq_period/2`, `sq_is_periodic/1`). 14 sq_* predicates, Layer 48.
+
+crop
+Subgrid Extraction, Padding, Splitting, Joining, and Embedding (PR 70)
+
+    bounding box detection (`cr_bbox/3`), rectangular extraction (`cr_crop_bbox/6`), content-aware cropping (`cr_crop_content/3`), uniform padding (`cr_pad/4`), border removal (`cr_strip_border/3`), horizontal/vertical splitting (`cr_split_h/4`, `cr_split_v/4`), row/column bands (`cr_rows/4`, `cr_cols/4`), stitching (`cr_stitch_h/3`, `cr_stitch_v/3`), subgrid embedding (`cr_embed/5`), center extraction (`cr_center/4`), and quadrant split (`cr_quadrants/5`). 14 cr_* predicates, Layer 49.
+
+overlay
+Grid Combination by Layering, Logic, Masking, and Priority Merge (PR 71)
+
+    transparent overlay (`ov_over/4`, `ov_blend/4`), bitwise operations (`ov_or/3`, `ov_and/3`, `ov_xor/4`), difference and intersection (`ov_diff/4`, `ov_intersect/4`), masking (`ov_mask/4`, `ov_mask_inv/4`), priority merge across multiple grids (`ov_priority/3`), color replacement (`ov_replace/4`, `ov_fill_bg/4`), and pointwise extrema (`ov_max/3`, `ov_min/3`). 14 ov_* predicates, Layer 50.
+
+measure
+Geometric Measurement of Cell Regions and Grids (PR 72)
+
+    area (`ms_area/2`), bounding box (`ms_bbox/2`, `ms_bbox_size/3`), perimeter (`ms_perimeter/2`), diameter (`ms_diameter/2`), extent fraction (`ms_extent/3`), aspect ratio (`ms_aspect/3`), row/column spans (`ms_row_span/2`, `ms_col_span/2`), integer centroid (`ms_centroid/3`), Chebyshev radius (`ms_radius/2`), interior and border counts (`ms_interior_count/2`, `ms_border_count/2`), and distinct color count (`ms_color_count/2`). 14 ms_* predicates, Layer 51.
+
+transform
+Grid-Level Spatial and Color Transformations (PR 73)
+
+    spatial scaling (`tr_scale_up/3`, `tr_scale_down/3`), horizontal/vertical tiling (`tr_tile_h/3`, `tr_tile_v/3`, `tr_tile/3`), transposition (`tr_transpose/2`), reflections (`tr_flip_h/2`, `tr_flip_v/2`), rotations (`tr_rot90/2`, `tr_rot180/2`), content shifting with fill (`tr_shift/5`), color-map application (`tr_apply_map/3`), single-color replacement (`tr_replace_color/4`), and mask-based selection (`tr_mask_grid/4`). 14 tr_* predicates, Layer 52.
+
+select
+Selection and Filtering of Cell Regions by Spatial and Size Properties (PR 74)
+
+    largest and smallest region (`sl_largest/2`, `sl_smallest/2`), area-sorted list (`sl_sort_by_area/2`), area filters (`sl_filter_area/3`, `sl_filter_area_min/3`, `sl_filter_area_max/3`), border test (`sl_touches_border/3`), border/interior filters (`sl_filter_border/4`, `sl_filter_interior/4`), directional filters (`sl_above_row/3`, `sl_below_row/3`, `sl_left_of_col/3`, `sl_right_of_col/3`), and unique-area selection (`sl_unique_area/2`). 14 sl_* predicates, Layer 53.
+
+count
+Counting Cells, Colors, and Regions in Grids (PR 75)
+
+    color cell count (`cn_color_count/3`), color histogram (`cn_histogram/3`), most/least frequent colors (`cn_max_color/2`, `cn_min_color/2`), rows/columns containing a color (`cn_color_rows/3`, `cn_color_cols/3`), row/column value diversity (`cn_row_distinct/3`, `cn_col_distinct/3`), total cells (`cn_grid_total/2`), grid comparison counts (`cn_equal_cells/3`, `cn_diff_cells/3`), region color lookup (`cn_region_color/3`), per-color region tally (`cn_regions_per_color/3`), and flat-list value count (`cn_by_value/3`). 14 cn_* predicates, Layer 54.
+
+fill
+Pattern-Based Region and Grid Filling (PR 76)
+
+    fill a region list (`fl_fill_region/4`), fill a bounding box (`fl_fill_bbox/4`), fill entire rows or columns (`fl_fill_row/4`, `fl_fill_col/4`), fill explicit cell lists (`fl_fill_cells/4`), fill the outermost grid ring (`fl_fill_border/3`), fill only boundary cells of a region (`fl_outline_region/4`), fill only interior cells (`fl_fill_interior/4`), create uniform-color grids (`fl_solid_rect/4`), create checkerboard grids (`fl_checkerboard/5`), draw horizontal and vertical line segments (`fl_draw_hline/6`, `fl_draw_vline/6`), fill the main diagonal (`fl_fill_main_diag/3`), and overlay a subgrid with transparency (`fl_stamp/6`). 14 fl_* predicates, Layer 55.
+
+pattern
+Pattern Detection, Tiling Period, and Motif Extraction (PR 77)
+
+    tiling period of a row (`pt_row_period/2`), tiling period of a column (`pt_col_period/3`), horizontal grid tiling period (`pt_grid_period_h/2`), vertical grid tiling period (`pt_grid_period_v/2`), minimal horizontal tile (`pt_tile_unit_h/2`), minimal vertical tile (`pt_tile_unit_v/2`), minimal 2D tile (`pt_tile_unit/2`), exact tiling test (`pt_is_tiling/2`), tile match counting (`pt_count_tile/3`), tile match position list (`pt_find_tile/3`), subgrid extraction at position (`pt_extract_tile/5`), distinct row count (`pt_unique_rows/2`), distinct column count (`pt_unique_cols/2`), and uniform-row test (`pt_has_uniform_rows/1`). 14 pt_* predicates, Layer 56.
+
+compare
+Grid and Region Comparison, Difference Detection, and Similarity Scoring (PR 78)
+
+    cells where two grids differ (`cp_diff_cells/3`), cells where they agree (`cp_same_cells/3`), cells where a color was gained (`cp_added_color/4`) or lost (`cp_removed_color/4`), cells that changed to (`cp_changed_to/4`) or from (`cp_changed_from/4`) a color, 0/1 difference map (`cp_diff_map/3`), integer-exact similarity score (`cp_similarity/3`), region set difference (`cp_region_diff/3`), intersection (`cp_region_intersect/3`), union (`cp_region_union/3`), order-independent region equality (`cp_region_equal/2`), structural grid equality (`cp_grids_equal/2`), and Old-New color pairs for changed cells (`cp_color_shift/3`). 14 cp_* predicates, Layer 57.
+
+spatial
+Spatial Reasoning: Directions, Containment, Adjacency, and Grid Topology (PR 79)
+
+    cardinal direction between cells (`sp_direction/3`), Manhattan distance (`sp_distance_manhattan/3`), Chebyshev distance (`sp_distance_chebyshev/3`), 4-connected in-bounds neighbors (`sp_neighbors4/3`), 8-connected in-bounds neighbors (`sp_neighbors8/3`), 4-connected adjacency (`sp_adjacent4/2`), 8-connected adjacency (`sp_adjacent8/2`), bounding box containment (`sp_bbox_contains/2`), region membership (`sp_in_region/2`), row-band filtering (`sp_row_between/4`), column-band filtering (`sp_col_between/4`), nearest region cell (`sp_closest/3`), farthest region cell (`sp_farthest/3`), and integer centroid (`sp_centroid/3`). 14 sp_* predicates, Layer 58.
+
+induction
+Grid-Pair Inductive Analysis: Color Maps, Recolor Detection, and Scale Inference (PR 80)
+
+    grid dimensions (`id_grid_dims/3`), sorted distinct colors in input and output (`id_input_colors/2`, `id_output_colors/2`), color set differences (`id_new_colors/3`, `id_lost_colors/3`), changed and unchanged cell lists (`id_changed_cells/3`, `id_unchanged_cells/3`), inferred Old-New color substitution map (`id_color_map/3`), consistent color-substitution test (`id_is_recolor/2`), uniform single-color output detection (`id_uniform_output/2`, `id_output_color/2`), dimension ratio (`id_size_ratio/3`), integer uniform-scale test (`id_is_scale/2`), and integer scale factor extraction (`id_scale_factor/3`). 14 id_* predicates, Layer 59.
+
+gravity
+Directional Gravity and Settling Operations (PR 81)
+
+    column value extraction (`gv_col_values/3`), column replacement (`gv_set_col/4`), compacting all non-background cells to column bottoms (`gv_compact_col/3`, `gv_fall_down/3`), column tops (`gv_fall_up/3`), row lefts (`gv_compact_row/3`, `gv_fall_left/3`), row rights (`gv_fall_right/3`), settling a specific color to the column bottom past background with other cells as obstacles (`gv_settle_color/4`, `gv_stack_down/4`), floating a color to the column top (`gv_float_color/4`, `gv_stack_up/4`), and custom column or row transforms (`gv_apply_col/4`, `gv_apply_row/4`). 14 gv_* predicates, Layer 60.
+
+noise
+Binary Mask Operations and Grid Noise Analysis (PR 82)
+
+    mask application with fill color (`ns_mask_apply/4`), mask inversion (`ns_mask_invert/3`), pointwise AND and OR (`ns_mask_and/3`, `ns_mask_or/3`), building masks from color criteria (`ns_mask_from_color/3`), converting masks to region lists (`ns_mask_to_region/2`) and back (`ns_region_to_mask/4`), identifying cells deviating from the majority color (`ns_noise_cells/3`), replacing noise with the majority color (`ns_denoise/3`), finding the most frequent color (`ns_majority_color/2`), counting a specific color (`ns_color_count/3`), finding cells of rare colors (`ns_sparse_cells/3`), finding cells of common colors (`ns_dense_cells/3`), and isolating one color by zeroing all others (`ns_isolate_color/3`). 14 ns_* predicates, Layer 61.
+
+generate
+Grid Construction from Visual Patterns (PR 83)
+
+    uniform fill (`ge_uniform/4`), horizontal and vertical gradients (`ge_gradient_h/4`, `ge_gradient_v/4`), checkerboard (`ge_checkerboard/5`), horizontal and vertical stripes (`ge_stripes_h/4`, `ge_stripes_v/4`), bordered rectangle and frame (`ge_border_rect/5`, `ge_frame/5`), main and anti-diagonal patterns (`ge_diagonal/4`, `ge_antidiagonal/4`), identity matrix pattern (`ge_identity_grid/3`), cross through center (`ge_cross/5`), build from cell-color map (`ge_from_map/3`), and tile a pattern to fill a larger grid (`ge_repeat_pattern/4`). 14 ge_* predicates, Layer 62.
+
+lookup
+Association List Operations and Grid Index Maps (PR 84)
+
+    key lookup (`lk_get/3`), add or replace pair (`lk_put/4`), extract keys and values (`lk_keys/2`, `lk_values/2`), membership test (`lk_has_key/2`), removal (`lk_delete/3`), value transformation (`lk_map_values/3`), pair building (`lk_from_pairs/2`), grid row/column/cell access (`lk_grid_row/3`, `lk_grid_col/3`, `lk_grid_cell/4`), Color-to-positions index map (`lk_color_positions/3`), position-to-Color index map (`lk_position_color/3`), and association list inversion (`lk_invert/2`). 14 lk_* predicates, Layer 63.
+
+connect
+Flood Fill and Connected Component Analysis (PR 85)
+
+    4-connected flood fill (`cc_flood4/4`), 8-connected flood fill (`cc_flood8/4`), all 4-connected components (`cc_components4/3`), all 8-connected components (`cc_components8/3`), component counts (`cc_count4/3`, `cc_count8/3`), sorted size lists (`cc_sizes4/3`, `cc_sizes8/3`), largest component (`cc_largest4/3`, `cc_largest8/3`), smallest component (`cc_smallest4/3`), border cells of a region (`cc_border_cells/3`), interior cells of a region (`cc_interior_cells/3`), and background cells enclosed inside a closed shape (`cc_enclosed/3`). 14 cc_* predicates, Layer 64.
+
+morph
+Morphological Grid Operations (PR 105)
+
+    4-connected dilation copying neighbor color (`mo_dilate/3`), erosion of cells adjacent to background (`mo_erode/3`), N-step dilation (`mo_dilate_n/4`), N-step erosion (`mo_erode_n/4`), morphological open/close/smooth (`mo_open/3`, `mo_close/3`, `mo_smooth/3`), perimeter extraction (`mo_boundary/3`), interior extraction (`mo_interior/3`), dilation with fixed fill value (`mo_dilate_val/4`), BFS region growing from seeds (`mo_grow_from/5`), L1 distance to background (`mo_dist_to_bg/3`), N-step dilation ring (`mo_ring/4`), and filling enclosed background holes (`mo_fill_holes/4`). 14 mo_* predicates, Layer 84.
+
+walk
+Grid Traversal Patterns (PR 106)
+
+    all R-C positions in row-major order (`wk_row_scan/2`), column-major order (`wk_col_scan/2`), zigzag boustrophedon order (`wk_zigzag_scan/2`), diagonal-grouped order by D=C-R (`wk_diag_scan/2`), anti-diagonal-grouped order by D=R+C (`wk_antidiag_scan/2`), clockwise inward spiral (`wk_spiral_in/2`), and clockwise outer border walk (`wk_border_walk/2`); extracting values on main diagonal D (`wk_diag_extract/3`) or anti-diagonal D (`wk_antidiag_extract/3`); computing diagonal index D=C-R (`wk_diag_of/2`) or anti-diagonal index D=R+C (`wk_antidiag_of/2`); extracting values at R-C positions (`wk_cells_to_vals/3`); painting values at R-C positions (`wk_vals_to_cells/4`); and listing non-border R-C positions (`wk_inner_cells/2`). 14 wk_* predicates, Layer 85.
+
+run
+Run-Length Encoding of Grid Sequences (PR 88)
+
+    encoding a flat list to Value-Count pairs (`rn_encode/2`), decoding back to a flat list (`rn_decode/2`), encoding a single grid row (`rn_row_encode/3`) or column (`rn_col_encode/3`), encoding all rows (`rn_grid_rows/2`) or all columns (`rn_grid_cols/2`), total element count of a run list (`rn_length/2`), positional lookup in a run list (`rn_at/3`), longest run of a given value (`rn_max_run/3`), distinct run count (`rn_count_runs/3`), uniformity test (`rn_uniform/1`), leading/trailing value trimming (`rn_trim/3`), sequence repetition with boundary merging (`rn_repeat/3`), and 0-indexed position enumeration (`rn_positions/3`). 14 rn_* predicates, Layer 67.
+
+rewrite
+Rule-Based Grid Cell Rewriting (PR 87)
+
+    color substitution map (`rw_map_color/3`), single-color replacement (`rw_replace_color/4`), two-color swap (`rw_swap_colors/4`), region painting (`rw_set_region/4`), binary mask application (`rw_mask_apply/5`), grid overlay with background key (`rw_overlay/4`), patch stamping at an offset (`rw_stamp/5`), diff-list cell edits (`rw_diff_apply/3`), color normalization to 1,2,... (`rw_normalize/3`), color inversion (`rw_invert_colors/3`), background remapping (`rw_remap_bg/4`), border ring painting (`rw_set_border/3`), rectangle fill (`rw_fill_rect/7`), and conditional per-cell recoloring via a goal (`rw_conditional/5`). 14 rw_* predicates, Layer 66.
+
+arith
+Cell-Wise Arithmetic on Grids (PR 89)
+
+    cell-wise addition (`ar_cell_add/3`), subtraction (`ar_cell_sub/3`), multiplication (`ar_cell_mul/3`), modulo by scalar (`ar_cell_mod/3`), scalar addition (`ar_scalar_add/3`), scalar multiplication (`ar_scalar_mul/3`), row sum (`ar_row_sum/3`), column sum (`ar_col_sum/3`), all row sums (`ar_row_sums/2`), all column sums (`ar_col_sums/2`), grid-wide maximum (`ar_cell_max/2`), grid-wide minimum (`ar_cell_min/2`), value clamping to a range (`ar_cell_clamp/4`), and cell-wise absolute difference (`ar_cell_abs_diff/3`). 14 ar_* predicates, Layer 68.
+
+context
+Context Map Operations (PR 92)
+
+    storing key-value bindings (`ctx_put/4`), retrieving values (`ctx_get/3`), testing presence (`ctx_has/2`), removing entries (`ctx_delete/3`), extracting keys (`ctx_keys/2`) and values (`ctx_values/2`), building from pairs (`ctx_from_pairs/2`), converting to pairs (`ctx_to_pairs/2`), merging two maps with override semantics (`ctx_merge/3`), dispatching a goal by key with a default (`ctx_dispatch/4`), selecting the value for the first present key in a priority list (`ctx_select/4`), transforming all values (`ctx_map_values/3`), filtering entries by key predicate (`ctx_filter_keys/3`), and counting entries (`ctx_size/2`). 14 ctx_* predicates, Layer 71.
+
+score
+Candidate Grid Scoring and Hypothesis Selection (PR 93)
+
+    structural grid equality (`sc_exact/2`), counting matching cells (`sc_cell_match/3`), total cell count (`sc_cell_total/2`), pixel accuracy as a float in [0.0, 1.0] (`sc_accuracy/3`), per-color recall (`sc_color_recall/4`), per-color precision (`sc_color_precision/4`), per-color F1 score (`sc_color_f1/4`), applying a rule to one training pair and measuring accuracy (`sc_pair_score/3`), mean accuracy over a list of pairs (`sc_pairs_score/3`), exact-match test for one pair (`sc_perfect/3`), all-pairs exact-match test (`sc_pairs_perfect/2`), ranking candidates by accuracy descending (`sc_rank/3`), picking the best candidate (`sc_best/3`), and filtering by a minimum accuracy threshold (`sc_threshold/4`). 14 sc_* predicates, Layer 72.
+
+induct
+Rule Induction Observation Layer (PR 94)
+
+    computing the color-delta between two grids as changed-cell triples (`in_delta/3`), identity rule test (`in_constant/2`), inferring a consistent color substitution map for one pair (`in_color_map/3`), intersecting color maps across all pairs (`in_color_map_pairs/2`), computing row and column size change for one pair (`in_size_change/4`), verifying consistent size change across all pairs (`in_size_change_pairs/3`), building the union color palette for one pair (`in_color_palette/3`), separating input and output color sets across all pairs (`in_palette_pairs/3`), listing invariant cells (`in_invariant_cells/3`), listing changed cells (`in_changed_cells/3`), verifying a consistent delta across all pairs (`in_consistent_delta/2`), finding the background color by frequency (`in_bg_color/2`), verifying a consistent background across all pairs (`in_bg_color_pairs/2`), and intersecting two color maps (`in_common_keys/3`). 14 in_* predicates, Layer 73.
+
+sym
+Spatial Symmetry Transforms and Symmetry Testing (PR 96)
+
+    reflecting a grid left-right (`sy_reflect_h/2`), top-bottom (`sy_reflect_v/2`), and across the main diagonal (`sy_transpose/2`), rotating 90 degrees clockwise (`sy_rotate90/2`), 180 degrees (`sy_rotate180/2`), and 270 degrees clockwise (`sy_rotate270/2`), testing for horizontal symmetry (`sy_has_h_symm/1`), vertical symmetry (`sy_has_v_symm/1`), 2-fold rotational symmetry (`sy_has_rot2_symm/1`), and 4-fold rotational symmetry (`sy_has_rot4_symm/1`), listing all symmetry names present (`sy_symmetries/2`), making a grid horizontally symmetric by mirroring the left half (`sy_make_h_symm/2`), making it vertically symmetric by mirroring the top half (`sy_make_v_symm/2`), and computing the full D4 orbit of all distinct spatial transforms (`sy_d4_orbit/2`). 14 sy_* predicates, Layer 75.
+
+hyp
+Hypothesis Application, Testing, and Selection (PR 95)
+
+    applying a color substitution map to every grid cell with identity fallback for unmapped colors (`hy_color_sub/3`), identity no-op hypothesis (`hy_identity/2`), partial-application alias for color substitution (`hy_from_map/3`), testing a hypothesis on one training pair and returning pixel accuracy (`hy_test/4`), testing on all pairs and returning mean accuracy (`hy_test_all/4`), exact-match test for one pair (`hy_verify/3`), exact-match test for all pairs (`hy_verify_all/2`), selecting the best hypothesis from a list (`hy_select/3`), ranking hypotheses by mean accuracy descending (`hy_rank/3`), alias for color substitution (`hy_apply_map/3`), sequential two-map color substitution (`hy_compose/4`), inverting a color substitution map (`hy_invert_map/2`), color lookup with identity fallback (`hy_map_lookup/3`), and describing a hypothesis as a human-readable atom (`hy_describe/2`). 14 hy_* predicates, Layer 74.
+
+seek
+Spatial Pattern Search and Transform Discovery (PR 97)
+
+    finding all (row,col) positions of a value (`sk_positions/3`), finding row indices containing a value (`sk_rows_with/3`), finding column indices containing a value (`sk_cols_with/3`), listing border cell positions (`sk_border_cells/2`), listing interior cell positions (`sk_interior_cells/2`), exact sub-grid match test (`sk_fits/4`), enumerating sub-grid positions nondeterministically (`sk_find_sub/4`), collecting all fitting positions (`sk_all_subs/3`), counting occurrences (`sk_count_sub/3`), counting matching cells at a position (`sk_match_count/5`), finding the position with maximum match count (`sk_best_fit/4`), discovering the D4 transform mapping one grid to another (`sk_find_d4/3`), upscaling each cell to a Factor x Factor block (`sk_upscale/3`), and finding the integer scale factor between two grids (`sk_find_scale/3`). 14 sk_* predicates, Layer 76.
+
+remap
+Color Remapping and Palette Manipulation (PR 98)
+
+    replacing one value with another (`rm_replace/4`), swapping two values (`rm_swap/4`), applying a color substitution map with identity fallback (`rm_apply_map/3`), applying a map only to cells matching a specific value (`rm_apply_map_to/4`), inverting a map by swapping keys and values (`rm_invert_map/2`), composing two maps by chaining lookups (`rm_compose_maps/3`), normalizing distinct values to consecutive 1-based integers (`rm_normalize/2`), shifting all cell values by an offset (`rm_shift/3`), clamping all cell values to a range (`rm_clamp/4`), recoloring cells satisfying a predicate goal (`rm_conditional/4`), binarizing a grid to foreground/background (`rm_binarize/4`), remapping the background color (`rm_remap_bg/4`), extracting the sorted palette of distinct values (`rm_palette/2`), and reindexing a grid using a supplied palette (`rm_reindex/3`). 14 rm_* predicates, Layer 77.
+
+logic
+Boolean and Mask Grid Operations (PR 99)
+
+    intersection keeping cells present in both grids (`lg_and/4`), union keeping cells present in either grid (`lg_or/4`), exclusive-or keeping cells present in exactly one grid (`lg_xor/4`), inverting foreground and background (`lg_not/4`), set-difference keeping cells in Grid1 absent in Grid2 (`lg_diff/4`), overlaying one grid onto another with background as transparent (`lg_overlay/4`), applying a mask to keep grid values where the mask is non-background (`lg_mask_apply/4`), creating a binary presence mask from a grid (`lg_mask_from/4`), per-row presence flags (`lg_any_row/3`), per-column presence flags (`lg_any_col/3`), per-row fullness flags (`lg_all_row/3`), per-column fullness flags (`lg_all_col/3`), cell-wise equality to 0/1 grid (`lg_eq/3`), and cell-wise inequality (`lg_neq/3`). 14 lg_* predicates, Layer 78.
+
+window
+Sliding Window and Neighborhood Operations (PR 100)
+
+    4-connected neighbor triples (`wn_neighbors4/4`), 8-connected neighbor triples (`wn_neighbors8/4`), count of 4-connected neighbors equal to a value (`wn_count4/5`), count of 8-connected neighbors equal to a value (`wn_count8/5`), sub-grid extraction (`wn_extract/6`), sliding window enumeration as R0-C0-Sub triples (`wn_slide/4`), padding all sides with N layers (`wn_pad/4`), local 4-connected maximum test (`wn_local_max4/3`), local 4-connected minimum test (`wn_local_min4/3`), cells adjacent to a target value but not equal to it (`wn_halo4/3`), integer convolution (`wn_convolve/3`), floor-center coordinates (`wn_center/3`), Manhattan distance (`wn_manhattan/5`), and in-bounds cells at exactly Manhattan distance D (`wn_cells_at_dist/5`). 14 wn_* predicates, Layer 79.
+
+sort
+Sorting, Ranking, and Ordering (PR 101)
+
+    per-row integer sums (`so_row_sums/2`), per-column integer sums (`so_col_sums/2`), count of a value per row (`so_row_count/3`), count of a value per column (`so_col_count/3`), sorting rows ascending by value count (`so_sort_rows_asc/3`), sorting rows descending (`so_sort_rows_desc/3`), sorting columns ascending (`so_sort_cols_asc/3`), sorting columns descending (`so_sort_cols_desc/3`), row index with highest count (`so_max_row/3`), row index with lowest count (`so_min_row/3`), column index with highest count (`so_max_col/3`), column index with lowest count (`so_min_col/3`), all values sorted ascending with duplicates (`so_sorted_vals/2`), and 1-based rank of a cell value among distinct grid values (`so_cell_rank/4`). 14 so_* predicates, Layer 80.
+
+tile
+Tiling, Stamping, and Period Detection (PR 102)
+
+    repeating a tile N times horizontally (`ti_tile_h/3`), repeating a tile N times vertically (`ti_tile_v/3`), tiling a motif into NR rows of NC copies (`ti_tile/4`), splitting a grid into horizontal TH-row bands (`ti_split_rows/3`), splitting into vertical TW-col stripes (`ti_split_cols/3`), splitting into a list-of-tile-rows (`ti_split/4`), reassembling tiles into one grid (`ti_flatten_tiles/2`), overlaying a motif at position (R, C) (`ti_stamp/5`), stamping a motif at multiple positions (`ti_stamp_all/4`), extracting the tile at tile-position (TR, TC) (`ti_extract_tile/6`), checking if a grid is an exact tiling of one motif (`ti_is_tiling/3`), finding the smallest horizontal period in columns (`ti_find_period_h/2`), finding the smallest vertical period in rows (`ti_find_period_v/2`), and generating an H x W checkerboard (`ti_checkerboard/5`). 14 ti_* predicates, Layer 81.
+
+trace
+Path Tracing, Rays, and Grid Boundaries (PR 103)
+
+    finding maximal contiguous non-Bg runs in a row (`tr_runs_row/3`), per-row run lists (`tr_spans_h/3`), per-column run lists (`tr_spans_v/3`), casting a horizontal ray to the first non-Bg cell (`tr_ray_h/6`), casting a vertical ray (`tr_ray_v/6`), listing cells in a horizontal line (`tr_line_h/4`), listing cells in a vertical line (`tr_line_v/4`), extracting values along a path (`tr_path_vals/3`), painting a value along a path (`tr_draw_path/4`), listing the border cells of a bounding rectangle (`tr_bbox_border/5`), non-Bg cells touching Bg or on the grid edge (`tr_perimeter/3`), Bg cells adjacent to non-Bg cells (`tr_outline/3`), all cells on the grid boundary (`tr_edge_cells/2`), and floor midpoint of two positions (`tr_midpoint/3`). 14 tr_* predicates, Layer 82.
+
+label
+Connected Component Labeling and Region Queries (PR 104)
+
+    assigning unique integer labels to 4-connected components (`lb_label/3`), returning component cell lists (`lb_components/3`), counting components (`lb_count/3`), returning the cell count of a label (`lb_size_of/3`), sorted Label-Size pairs for all labels (`lb_sizes_all/3`), cells of a specific label (`lb_cells_of/3`), bounding box corners of a label region (`lb_bbox_of/4`), foreground labels 4-adjacent to a label (`lb_neighbors_of/4`), replacing all cells of a label with a value (`lb_fill_label/4`), keeping only the largest component (`lb_keep_largest/3`), removing components below a size threshold (`lb_remove_small/4`), coloring each label from a cycling palette (`lb_color_labels/4`), merging two labels into one (`lb_merge_two/4`), and extracting one component from the original grid (`lb_select_label/4`). 14 lb_* predicates, Layer 83.
+
+morph
+Morphological Grid Operations (PR 105)
+
+    4-connected dilation copying neighbor color (`mo_dilate/3`), erosion of cells adjacent to background (`mo_erode/3`), N-step dilation (`mo_dilate_n/4`), N-step erosion (`mo_erode_n/4`), morphological open/close/smooth (`mo_open/3`, `mo_close/3`, `mo_smooth/3`), perimeter extraction (`mo_boundary/3`), interior extraction (`mo_interior/3`), dilation with fixed fill value (`mo_dilate_val/4`), BFS region growing from seeds (`mo_grow_from/5`), L1 distance to background (`mo_dist_to_bg/3`), N-step dilation ring (`mo_ring/4`), and filling enclosed background holes (`mo_fill_holes/4`). 14 mo_* predicates, Layer 84.
+
+walk
+Grid Traversal Patterns (PR 106)
+
+    all R-C positions in row-major order (`wk_row_scan/2`), column-major order (`wk_col_scan/2`), zigzag boustrophedon order (`wk_zigzag_scan/2`), diagonal-grouped order by D=C-R (`wk_diag_scan/2`), anti-diagonal-grouped order by D=R+C (`wk_antidiag_scan/2`), clockwise inward spiral (`wk_spiral_in/2`), and clockwise outer border walk (`wk_border_walk/2`); extracting values on main diagonal D (`wk_diag_extract/3`) or anti-diagonal D (`wk_antidiag_extract/3`); computing diagonal index D=C-R (`wk_diag_of/2`) or anti-diagonal index D=R+C (`wk_antidiag_of/2`); extracting values at R-C positions (`wk_cells_to_vals/3`); painting values at R-C positions (`wk_vals_to_cells/4`); and listing non-border R-C positions (`wk_inner_cells/2`). 14 wk_* predicates, Layer 85.
+
+step
+Directional Grid Movement (PR 107)
+
+    one unbounded step in a direction (`st_step/3`), one bounded step that fails if out of grid (`st_step_in/4`), all in-bounds cells in a direction excluding start (`st_ray/4`), ray stopping before a given cell value (`st_ray_to/5`), all in-bounds cells including start (`st_walk/4`), the four cardinal directions (`st_dirs4/1`), all eight principal directions (`st_dirs8/1`), 90-degree clockwise rotation (`st_rotate_cw/2`), 90-degree counter-clockwise rotation (`st_rotate_ccw/2`), direction reversal (`st_opposite/2`), unit step direction between two cells (`st_normalize/3`), following a list of direction steps (`st_path/3`), first cell in a direction with a given value (`st_first/5`), and steps until the grid boundary (`st_to_edge/4`). 14 st_* predicates, Layer 86.
+
+pivot
+Pivot-Relative Cell Transformations (PR 108)
+
+    integer floor centroid of a cell list (`pv_centroid/2`), converting absolute cell to pivot-relative offset (`pv_to_rel/3`), converting pivot-relative offset to absolute cell (`pv_from_rel/3`), rotating one cell 90 degrees CW around a pivot (`pv_rotate_cell_cw/3`), rotating a cell list 90 CW (`pv_rotate_cells_cw/3`), rotating 180 degrees (`pv_rotate_cells_180/3`), rotating 90 CCW (`pv_rotate_cells_ccw/3`), reflecting a cell list horizontally around pivot column (`pv_reflect_cells_h/3`), reflecting vertically around pivot row (`pv_reflect_cells_v/3`), reflecting across main diagonal through pivot (`pv_reflect_cells_diag/3`), reflecting across anti-diagonal through pivot (`pv_reflect_cells_antidiag/3`), the sorted D4 orbit of one cell (`pv_orbit/3`), the sorted D4 symmetry closure of a cell list (`pv_sym_closure/3`), and stamping DR-DC offset cells at a pivot in a grid (`pv_stamp_at/5`). 14 pv_* predicates, Layer 87.
+
+project
+Axis Projection and Shadow Casting (PR 109)
+
+    propagating non-BG values downward through BG cells per column (`pj_shadow_down/3`), upward (`pj_shadow_up/3`), leftward (`pj_shadow_left/3`), rightward (`pj_shadow_right/3`), dispatching by direction atom (`pj_shadow_dir/4`), sorted row indices containing non-BG cells (`pj_nonbg_rows/3`), sorted column indices containing non-BG cells (`pj_nonbg_cols/3`), non-BG cell count per row (`pj_row_counts/3`), non-BG cell count per column (`pj_col_counts/3`), collapsing all rows to one row by first-non-BG per column (`pj_collapse_rows/3`), collapsing all columns to one column by first-non-BG per row (`pj_collapse_cols/3`), row index of topmost non-BG in a column (`pj_col_first/4`), row index of bottommost non-BG in a column (`pj_col_last/4`), and column index of leftmost non-BG in a row (`pj_row_first/4`). 14 pj_* predicates, Layer 88.
+
+neighbor
+Cell Neighborhood Analysis (PR 114)
+
+    returning a list of nb(Row,Col,Val) terms for each valid 4-connected neighbor of a cell with out-of-bounds directions omitted (`nb_4neighbors/4`), the same for 8-connected neighbors including diagonals (`nb_8neighbors/4`), testing whether a non-Bg cell is a boundary cell (has at least one Bg or out-of-bounds 4-neighbor) (`nb_is_boundary/4`), testing whether a non-Bg cell is interior (all 4-neighbors in-bounds and non-Bg) (`nb_is_interior/4`), sorted R-C pairs of all boundary cells (`nb_boundary_cells/3`), sorted R-C pairs of all interior cells (`nb_interior_cells/3`), count of 4-neighbors with the same color as the cell (`nb_count_same/4`), count of 4-neighbors with a different color (`nb_count_diff/4`), sorted set of distinct colors among 4-neighbors (`nb_adjacent_colors/4`), sorted R-C pairs of all Color cells adjacent to non-Color or grid boundary (`nb_contour/3`), succeed if any ColorA cell is 4-adjacent to any ColorB cell (`nb_color_touches/3`), sorted (R1-C1)-(R2-C2) pairs of all ColorA-ColorB 4-adjacencies (`nb_touching_pairs/4`), 4-connected flood fill from a seed cell returning the modified grid (`nb_flood_fill/5`), and expanding a Color region by one 4-connected layer into adjacent Bg cells (`nb_dilate/4`). 14 nb_* predicates, Layer 93.
+
+gravity
+Directional Cell-Sliding and Gravity Operations (PR 116)
+
+    compacting all non-Bg values to the left end of a row (`gv_pack_row_left/3`), right end (`gv_pack_row_right/3`), top of a column list (`gv_pack_col_up/3`), bottom of a column list (`gv_pack_col_down/3`), sliding all non-Bg cells left within their row (`gv_fall_left/3`), right (`gv_fall_right/3`), downward within their column (`gv_fall_down/3`), upward (`gv_fall_up/3`), dispatching gravity by direction atom (`gv_fall_dir/4`), sliding only a specific Color left while other non-Bg cells act as immovable walls (`gv_fall_color_left/4`), right (`gv_fall_color_right/4`), downward (`gv_fall_color_down/4`), upward (`gv_fall_color_up/4`), and dispatching color-specific gravity by direction atom (`gv_fall_color_dir/5`). 14 gv_* predicates, Layer 95.
+
+count
+Value Counting and Frequency Analysis (PR 117)
+
+    counting occurrences of a value in a flat list (`cn_by_value/3`), counting a value across all cells of a 2D grid (`cn_color_count/3`), building a frequency histogram as parallel sorted Colors and Counts lists (`cn_histogram/3`), returning the most frequently occurring value (`cn_max_color/2`), the least frequently occurring value (`cn_min_color/2`), counting rows containing a given value (`cn_color_rows/3`), counting columns containing a given value (`cn_color_cols/3`), counting distinct values in a single row (`cn_row_distinct/3`), counting distinct values in a single column (`cn_col_distinct/3`), returning the total number of cells as rows times columns (`cn_grid_total/2`), counting cells where two grids agree (`cn_equal_cells/3`), counting cells where two grids differ (`cn_diff_cells/3`), looking up the grid value at the first cell of a region expressed as r(R,C) terms (`cn_region_color/3`), and building a Color-Count tally for a list of regions (`cn_regions_per_color/3`). 14 cn_* predicates, Layer 96.
+
+diagonal
+Diagonal Line Extraction and Filling (PR 119)
+
+    extracting values on the main diagonal where C equals R (`dg_main_diag/2`), main anti-diagonal where R+C equals NC-1 (`dg_anti_diag/2`), the N-th diagonal where C-R equals N (`dg_nth_diag/3`), the N-th anti-diagonal where R+C equals N (`dg_nth_anti_diag/3`), all diagonals sorted by offset (`dg_all_diags/2`), all anti-diagonals sorted by sum (`dg_all_anti_diags/2`), filling the main diagonal with Color (`dg_fill_main/3`), filling the main anti-diagonal (`dg_fill_anti/3`), filling the N-th diagonal (`dg_fill_nth_diag/4`), filling the N-th anti-diagonal (`dg_fill_nth_anti_diag/4`), computing the diagonal index N=C-R for any cell (`dg_cell_diag/3`), computing the anti-diagonal index N=R+C (`dg_cell_anti_diag/3`), testing whether the N-th diagonal is all Color (`dg_uniform_diag/3`), and testing whether the N-th anti-diagonal is all Color (`dg_uniform_anti_diag/3`). 14 dg_* predicates, Layer 98.
+
+cluster
+Spatial Proximity and Grouping (PR 123)
+
+    Chebyshev L-infinity distance (`cl_chebyshev/5`), Manhattan L-1 distance (`cl_manhattan/5`), squared Euclidean distance (`cl_euclidean_sq/5`), filtering cells within a Chebyshev radius (`cl_within/5`), nearest cell by Chebyshev distance (`cl_nearest/4`), farthest cell (`cl_farthest/4`), integer centroid of a cell set (`cl_center/3`), maximum pairwise Chebyshev distance (`cl_diameter/2`), bounding box row and column spans (`cl_spread/3`), grouping cells by grid color into parallel Colors and Groups lists (`cl_group_by_color/4`), sorting cells by ascending Chebyshev distance to a point (`cl_sort_by_dist/4`), closest pair of cells by Chebyshev distance (`cl_nearest_pair/3`), farthest pair (`cl_farthest_pair/3`), and filtering cells whose row and column both fall in a given inclusive band (`cl_cells_in_band/6`). 14 cl_* predicates, Layer 102.
+
+patch
+Sub-Grid Extraction and Template Matching (PR 129)
+
+    extracting an H x W rectangular sub-patch from a grid at a given top-left position (`pa_extract/6`), getting patch height and width dimensions (`pa_dims/3`), non-deterministically enumerating all positions where a small pattern occurs exactly in a larger grid (`pa_match/4`), collecting all matching positions as a list (`pa_match_all/3`), counting matching positions (`pa_match_count/3`), matching with a background wildcard where background-valued cells in the pattern match any grid cell (`pa_match_bg/4`), enumerating all overlapping H x W sub-patches in row-major order with their coordinates (`pa_slides/4`), finding the sorted list of all distinct patches of a given size (`pa_unique_patches/4`), finding the most frequently occurring patch and its count (`pa_most_common_patch/5`), returning cells where two same-size patches differ (`pa_diff/3`), testing if all cells have the same value (`pa_is_uniform/2`), horizontal left-right flip by reversing each row (`pa_flip_h/2`), vertical top-bottom flip by reversing the row sequence (`pa_flip_v/2`), and 90-degree clockwise rotation using the formula Rotated(r',c') = Patch(H-1-c',r') for W x H output (`pa_rot90/2`). 14 pa_* predicates, Layer 108.
+
+panel
+Grid Panel Detection and Splitting (PR 135)
+
+    testing whether a row is entirely background (`pn_is_divider_row/3`), testing whether a column is entirely background (`pn_is_divider_col/3`), listing all all-background row indices (`pn_divider_rows/3`), listing all all-background column indices (`pn_divider_cols/3`), splitting at given row divider indices where the divider rows are excluded and bands between dividers become parts (`pn_split_rows/3`), splitting at given column dividers (`pn_split_cols/3`), detecting and splitting at all all-background rows automatically (`pn_auto_split_rows/3`), detecting and splitting at all all-background columns (`pn_auto_split_cols/3`), removing all all-background rows using findall + not-memberchk (`pn_strip_rows/3`), removing all all-background columns from each row (`pn_strip_cols/3`), splitting at floor midpoints into four quadrant sub-grids (`pn_quadrants/5`), partitioning into N equal-width column strips (`pn_n_col_parts/3`), partitioning into custom-width column slices given a width list with cumulative sum boundaries (`pn_col_slices/3`), and testing for any all-background row or column (`pn_has_dividers/2`). 14 pn_* predicates, Layer 114.
+
+cellset
+Sparse Cell Set Operations (PR 138)
+
+    converting a grid to a sorted list of R-C positions for a given color using findall + sort (`cs_from_grid/3`), painting a sorted cell set onto an HxW canvas with nested findall and memberchk (`cs_to_grid/6`), computing the sorted set union of two cell sets by appending and sorting (`cs_union/3`), computing the sorted set intersection by collecting members of A that appear in B (`cs_intersect/3`), computing the set difference by delegating to subtract/3 (`cs_subtract/3`), shifting all cells by a row-column offset using maplist with cs_add_ (`cs_translate/4`), computing the bounding box of a non-empty cell set using findall + min_list/max_list (`cs_bbox/5`), translating so the minimum row and column become zero and returning the offsets (`cs_normalize/4`), counting cells using length/2 (`cs_size/2`), testing deterministic membership with memberchk (`cs_contains/3`), finding all 4-connected background neighbors using fixed-offset findall with sort to remove duplicates (`cs_adjacent_bg/2`), testing shape equality after normalizing both sets to the origin (`cs_same_shape/2`), rotating cell positions 90 degrees clockwise within H rows using formula new_R=C new_C=H-1-R (`cs_rotate_90/3`), and mirroring horizontally within W columns using formula new_C=W-1-C (`cs_mirror_h/3`). 14 cs_* predicates, Layer 117.
+
+locate
+Pattern Location and Subgrid Matching (PR 139)
+
+    testing whether a sub-grid appears at a specific position in a larger grid using forall over Sub positions (`lc_subgrid_at/4`), finding the first row-major position where a template matches using between enumeration with a cut (`lc_find_sub/4`), collecting all matching positions (`lc_all_sub/3`), counting occurrences via list length (`lc_subgrid_count/3`), finding the first row index whose row equals a pattern via nth0 unification with cut (`lc_row_pattern/3`), collecting all such row indices (`lc_all_row_pattern/3`), finding the first column index whose value list equals a pattern via inner findall with cut (`lc_col_pattern/3`), collecting all such column indices using nested findall (`lc_all_col_pattern/3`), decomposing a grid row as prefix ++ rest using append/3 (`lc_row_prefix/4`), testing whether a row ends with a given suffix deterministically (`lc_row_suffix/3`), finding the unique position of a value by matching a single-element findall result (`lc_anchor/4`), counting occurrences per row using maplist and findall (`lc_row_count/3`), listing sorted rows that contain a value (`lc_row_contains/3`), and listing sorted columns that contain a value (`lc_col_contains/3`). 14 lc_* predicates, Layer 118.
+
+xsel
+Extended Cell Selection by Value Comparison (PR 140)
+
+    selecting cells with value strictly less than a threshold (`xs_cells_lt/3`), selecting cells with value strictly greater than a threshold (`xs_cells_gt/3`), selecting cells with value less than or equal to a threshold (`xs_cells_le/3`), selecting cells with value greater than or equal to a threshold (`xs_cells_ge/3`), selecting cells in a closed numerical interval (`xs_cells_between/4`), selecting cells not equal to a given value (`xs_cells_ne/3`), locating all cells that contain the maximum value using a two-pass approach (`xs_max_cells/2`), locating all cells that contain the minimum value (`xs_min_cells/2`), applying a binary threshold to map each cell to one of two output values depending on whether it meets the threshold (`xs_threshold/5`), replacing cells below a threshold with a new value (`xs_replace_lt/4`), replacing cells above a threshold with a new value (`xs_replace_gt/4`), computing the sorted unique value list as an ordinal rank ladder (`xs_rank_vals/2`), finding the 0-based ordinal rank of a specific value using nth0 with cut (`xs_val_rank/3`), and replacing every cell with its ordinal rank to produce a rank grid (`xs_rank_grid/2`). 14 xs_* predicates, Layer 119.
+
+autom
+Cellular Automaton Neighborhood Aggregation (PR 141)
+
+    producing a count grid where each cell holds the number of in-bounds 4-connected neighbors equal to a target value using triple-nested findall (`at_count_nbrs_4/3`), doing the same for 8-connected neighbors (`at_count_nbrs_8/3`), counting 4-connected neighbors that share the same value as the cell itself (`at_count_same_4/2`), counting same-valued 8-connected neighbors (`at_count_same_8/2`), producing a 1/0 boolean grid indicating whether any in-bounds 4-neighbor equals a target value using a cut-on-first-match private helper (`at_any_nbr_4/3`), producing a boolean grid indicating whether every in-bounds 4-neighbor equals a target value using forall/2 (`at_all_nbrs_4/3`), doing the any-test for 8-neighbors (`at_any_nbr_8/3`), doing the all-test for 8-neighbors (`at_all_nbrs_8/3`), finding isolated target-valued cells that have no same-valued 4-neighbor via negation-as-failure (`at_isolated_4/3`), finding 8-connected isolated cells (`at_isolated_8/3`), applying a birth rule where dead cells with exactly N live 4-neighbors become live (`at_birth_4/5`), doing the same for 8-neighbors (`at_birth_8/5`), computing the majority value among a cell and its in-bounds 4-neighbors with tie-breaking to a background value (`at_majority_4/3`), and applying one step of Conway's Game of Life with the B3/S23 rule (`at_step_gol/2`). 14 at_* predicates, Layer 120.
+
+cross
+1D Cross-Section Extraction from 2D Grids (PR 142)
+
+    extracting a single row by 0-based index using nth0/3 (`cx_row/3`), extracting a single column as a list by collecting the C-th element from each row using member+nth0 inside findall (`cx_col/3`), extracting the main diagonal where each element is Grid[R][R] (`cx_diag/2`), extracting the anti-diagonal where each element is Grid[R][W-1-R] with a guard C>=0 for non-square grids (`cx_antidiag/2`), computing the arithmetic sum of a row using sum_list/2 from library(lists) (`cx_row_sum/3`), computing the sum of a column (`cx_col_sum/3`), counting occurrences of a value in a row using findall+member+length (`cx_row_count/4`), counting occurrences of a value in a column (`cx_col_count/4`), returning sorted row indices that contain at least one occurrence of a value using between+nth0+member then sort/2 to deduplicate (`cx_rows_with/3`), returning sorted column indices that contain a value (`cx_cols_with/3`), returning the sorted unique value set of a row using sort/2 (`cx_row_uniq/3`), returning the sorted unique value set of a column (`cx_col_uniq/3`), returning the most frequently occurring value in a row with tie-breaking to a background value via the findall+max_list+unique-winner-or-Bg pattern (`cx_row_mode/4`), and doing the same for a column (`cx_col_mode/4`). 14 cx_* predicates, Layer 121.
+
+mask
+Boolean Mask Operations on 2D Grids (PR 143)
+
+    creating a 1/0 mask from a grid by marking positions that equal a target value using nested maplist/3 with a two-clause cut-on-match helper (`mk_from_val/3`), creating the complementary mask that marks non-background positions (`mk_from_bg/3`), inverting every bit in a mask (`mk_invert/2`), computing element-wise AND of two masks using maplist/4 with a two-clause cut-based helper (`mk_and/3`), computing element-wise OR (`mk_or/3`), computing element-wise XOR via (A+B) mod 2 arithmetic (`mk_xor/3`), producing a grid that keeps original values at mask=1 positions and replaces mask=0 positions with a background value (`mk_apply/4`), producing a grid that fills mask=1 positions with a constant and keeps mask=0 positions unchanged (`mk_fill/4`), blending two grids by taking values from the second grid at mask=1 positions and from the first grid at mask=0 positions using maplist/5 (`mk_overlay/4`), returning sorted R-C pairs of mask=1 positions via findall+nth0+sort (`mk_where/2`), counting 1-valued cells using findall+member+length (`mk_count/2`), testing whether any cell equals 1 using member/2 with cut-on-first-match (`mk_any/1`), testing whether all cells equal 1 using forall/2 built-in (`mk_all/1`), and extracting the sorted set of unique Grid values at mask=1 positions (`mk_extract/3`). 14 mk_* predicates, Layer 122.
+
+table
+Grid-as-Table Operations (PR 144)
+
+    transposing a grid so rows become columns by iterating column indices and collecting each column using member+nth0 inside findall (`tb_transpose/2`); sorting rows ascending by a specified column value using keysort/2 (`tb_sort_rows/3`); filtering rows where a column equals a target value using structural equality (`tb_filter_rows/4`); grouping rows into V-Rows pairs by unique column value (`tb_group_by/3`); counting rows per unique column value as V-N pairs (`tb_count_by/3`); deduplicating rows in document order preserving first occurrence (`tb_unique_rows/2`); extracting a subset of columns in the specified order allowing reordering (`tb_select_cols/3`); removing a column from every row (`tb_drop_col/3`); appending a list as a new rightmost column (`tb_add_col/3`); inserting a row at a 0-indexed position via two-clause recursion (`tb_insert_row/4`); deleting a row at a position via findall with index inequality (`tb_delete_row/3`); swapping two rows by pre-fetching both and rebuilding with if-then-else (`tb_swap_rows/4`); finding the first row where a column has its maximum value using max_list/2 then nth0+cut (`tb_col_max_row/3`); and finding the first row where a column has its minimum value (`tb_col_min_row/3`). 14 tb_* predicates, Layer 123.
+
+numseq
+Numerical Sequence Operations on 1D Lists (PR 145)
+
+    computing consecutive pairwise differences where each element is the difference of the next minus the current (`nr_diff/2`); computing prefix cumulative sums via a recursive accumulator helper (`nr_cumsum/2`); computing the running maximum where each output element is the maximum of all inputs seen so far (`nr_running_max/2`); computing the running minimum symmetrically (`nr_running_min/2`); element-wise addition of two equal-length lists using maplist/3 with named helper nr_add_ (`nr_zip_add/3`); element-wise subtraction (`nr_zip_sub/3`); element-wise multiplication (`nr_zip_mul/3`); element-wise maximum (`nr_zip_max/3`); element-wise minimum (`nr_zip_min/3`); multiplying every element by a scalar K using maplist/3 with a helper capturing K (`nr_scale/3`); adding a constant D to every element using a helper capturing D (`nr_offset/3`); testing that a list is non-decreasing via A =< B recursive guards (`nr_is_sorted/1`); testing that a list is an arithmetic sequence by computing the common difference from the first pair and verifying it throughout (`nr_is_arith/1`); and finding the shortest repeating period P within 1..MaxP using between/3 + Len mod P check + forall+nth0 element comparison (`nr_period/3`). 14 nr_* predicates, Layer 124.
+
+gridmath
+Cell-Wise Arithmetic on 2D Grids (PR 146)
+
+    computing cell-wise sum of two grids using nested maplist/4 with named row helper gm_add_row_ and cell helper gm_add_ (`gm_add/3`); cell-wise difference (`gm_sub/3`); cell-wise product (`gm_mul/3`); cell-wise maximum using max/2 (`gm_max/3`); cell-wise minimum (`gm_min/3`); multiplying every cell by a scalar K using nested maplist/3 with row helper gm_scale_row_(K) capturing K and cell helper gm_scale_(K) (`gm_scale/3`); adding a constant D to every cell (`gm_offset/3`); replacing every cell with its absolute value using abs/1 (`gm_abs/2`); producing a 1/0 mask where 1 marks positions where two grids agree using a two-clause cut helper gm_eq_(X,X,1):-!. gm_eq_(_,_,0) (`gm_eq_mask/3`); producing the complement mask where 1 marks positions where grids differ (`gm_diff_mask/3`); clamping each cell to an inclusive range [Lo,Hi] using max(Lo,min(Hi,V)) (`gm_clamp/4`); applying modulo M to every cell using V mod M (`gm_modulo/3`); summing all cell values by flattening with findall+member and a recursive accumulator (`gm_sum/2`); and computing the product of all cell values similarly (`gm_product/2`). 14 gm_* predicates, Layer 125.
+
+block
+Rectangular Sub-Grid Block Decomposition (PR 148)
+
+    extracting a rectangular sub-grid by inclusive row and column ranges using nested findall with between/3 and nth0/3 (`bk_extract/6`); computing block row and column counts via integer division of grid dimensions (`bk_dims/5`); splitting into horizontal strips of height BH using findall over strip indices (`bk_split_h/3`); splitting into vertical strips of width BW with inner row-slicing (`bk_split_v/3`); stacking N copies of a grid vertically using findall over between + member (`bk_tile_h/3`); extending each row N times horizontally using maplist with a capturing helper (`bk_tile_v/3`); counting complete horizontal strips (`bk_count_h/3`); counting complete vertical strips (`bk_count_v/3`); applying a 2-argument predicate to each block in a list using maplist (`bk_map/3`); returning the value at a single cell position using nth0 twice (`bk_uniform/4`); finding the most frequent value in a 2x2 block using include/3 + max_list/2 + sort/2 with tie-breaking to the lowest value (`bk_mode_color/4`); finding the most frequent in-bounds border value in a 3x3 neighborhood excluding the center via findall + negation-as-failure (`bk_border_color/4`); testing whether every cell equals a target color using forall + member twice (`bk_is_solid/3`); and testing whether a cell lies on the outer grid border using a disjunctive if-then-else guard (`bk_is_border/4`). 14 bk_* predicates, Layer 127.
+
+topology
+Grid Topology and Connected Component Analysis (PR 151)
+
+    finding all cells of a value 4-connected to a seed using BFS with memberchk-based visited set (`tp_component/4`); partitioning all cells of a value into connected components using iterative seed extraction with subtract/3 (`tp_all_components/3`); counting connected components (`tp_component_count/3`); measuring component size at a seed (`tp_component_size/4`); finding the largest component by size (`tp_largest_component/3`); testing whether Dst is reachable from Src through a value's cells via flood fill (`tp_reachable/5`); finding Bg cells that cannot reach the grid border via Bg neighbors by seeding BFS from all border Bg cells (`tp_enclosed/4`); testing hole existence (`tp_has_hole/4`); counting distinct enclosed Bg components (`tp_hole_count/4`); replacing enclosed Bg cells with Val (`tp_fill_holes/4`); collecting components touching the outer border using once/1 to avoid duplicates (`tp_border_components/3`); collecting interior-only components using negation-as-failure (`tp_interior_components/3`); building a same-size label grid where each Val cell shows its 1-based component index (`tp_label_components/3`); and testing same-component membership (`tp_same_component/5`). 14 tp_* predicates, Layer 130.
+
+distance
+Cell Distance and Proximity Computation (PR 150)
+
+    computing Manhattan (L1) distance as the sum of absolute row and column differences (`dt_manhattan/5`); computing Chebyshev (L-infinity, king-move) distance as the maximum of absolute row and column differences (`dt_chebyshev/5`); computing squared Euclidean distance as an integer to avoid square roots (`dt_euclidean_sq/5`); finding the nearest cell of a given value to a query position by collecting all D-R-C triples and selecting the minimum (`dt_nearest/4`); finding the farthest cell of a given value (`dt_farthest/4`); finding all cells of a given value at exactly a specified Manhattan distance (`dt_all_at/5`); collecting all in-bounds positions within a Manhattan radius (`dt_within_manhattan/5`); collecting all in-bounds positions within a Chebyshev radius (`dt_within_chebyshev/5`); building a same-size Manhattan distance transform grid where each cell holds its distance to the nearest target-value cell (`dt_map_manhattan/3`); building the Chebyshev distance transform grid (`dt_map_chebyshev/3`); collecting positions at exactly a specified Manhattan distance forming a ring (`dt_ring_manhattan/5`); computing the integer floor centroid of all cells with a given value (`dt_centroid/3`); computing the maximum pairwise Manhattan distance (diameter) of a set of R-C pairs and returning the two farthest cells (`dt_diameter_manhattan/3`); and computing the diameter under Chebyshev distance (`dt_diameter_chebyshev/3`). 14 dt_* predicates, Layer 129.
+
+edge
+Grid Edge Detection and Boundary Analysis (PR 149)
+
+    collecting all horizontal edge R-C positions where adjacent rows differ using findall with between and nth0 (`ed_h_edges/2`); collecting all vertical edge R-C positions where adjacent columns differ (`ed_v_edges/2`); testing whether a single horizontal edge exists at a specific row-column position returning Bool=1 or 0 (`ed_h_edge/4`); testing for a single vertical edge (`ed_v_edge/4`); combining horizontal and vertical edges into a sorted list of h-R-C and v-R-C direction-tagged terms (`ed_all_edges/2`); finding all cells of a given value that have at least one 4-connected neighbor with a different value using disjunctive findall (`ed_boundary_cells/3`); finding all cells on the outer grid perimeter using row and column index comparison (`ed_outer_boundary/2`); finding cells of a given value that are NOT boundary cells using negation-as-failure (`ed_inner_cells/3`); counting total edges as sum of horizontal and vertical edge list lengths (`ed_edge_count/2`); testing whether a grid has zero edges (`ed_is_smooth/1`); producing a same-size mask grid where each cell is 1 if it is a boundary cell and Bg otherwise using nested findall and a private four-direction helper (`ed_label_edges/3`); testing whether a single cell is a boundary cell returning Bool=1 or 0 (`ed_has_edge/4`); finding all 2x2 top-left corner positions where the four cells are not all equal using findall with negation-as-failure (`ed_corners/2`); and counting corner positions (`ed_corner_count/2`). 14 ed_* predicates, Layer 128.
+
+colormap
+Color Lookup Table and Palette Substitution (PR 147)
+
+    substituting each cell via a list of Old-New pairs with unmatched cells left unchanged using memberchk in if-then-else via nested maplist (`cm_apply/3`); same but replacing unmatched cells with a background value (`cm_apply_default/4`); applying the inverse map by swapping all Old-New pairs (`cm_invert/3`); composing two maps so MapAB[k]=MapB[MapA[k]] with pass-through on miss using findall+memberchk (`cm_compose/3`); deriving a map from cell-by-cell correspondences of two same-sized grids using nth0-aligned collection and sort/2 deduplication (`cm_from_grids/3`); building the identity map V-V for every palette value (`cm_identity/2`); building a map from two parallel equal-length lists using nth0 pairing (`cm_remap/3`); applying a map to a one-dimensional list with pass-through on miss (`cm_remap_list/3`); returning the sorted list of all source (key) values in a map (`cm_palette/2`); returning the sorted list of all distinct values used in a grid (`cm_used/2`); testing whether a key appears in a map using memberchk for determinism (`cm_has_key/2`); looking up the value for a key failing if absent (`cm_lookup/3`); keeping only map entries whose key appears in a given set (`cm_restrict/3`); and extending a map with K-Bg entries for every palette value that has no entry in the map using negation-as-failure + append/3 (`cm_expand/4`). 14 cm_* predicates, Layer 126.
+
+bound
+Bounding Box Extraction and Placement (PR 137)
+
+    computing the tight inclusive bounding box of all cells of a given color using findall + min_list + max_list (`bd_bbox/6`), computing bounding box height as R1-R0+1 (`bd_bbox_h/3`), width as C1-C0+1 (`bd_bbox_w/3`), cropping a grid to an inclusive rectangle using findall over the row range with inclusive column slice extraction (`bd_crop_bbox/6`), cropping to the tight bounding box of a color as a two-step pipeline (`bd_crop_color/3`), removing all all-background border rows and columns by finding the bounding box of non-background cells (`bd_trim/3`), adding N background cells on all four sides using findall for background rows and maplist for row-level extension (`bd_pad/4`), placing a sub-grid into a canvas at a given top-left position with nested findall and if-then-else on patch bounds (`bd_place/6`), computing the integer floor center of a color's bounding box (`bd_center/4`), testing whether a cell lies within an inclusive bounding box (`bd_bbox_contains/6`), testing whether two bounding boxes overlap by the four-condition formula (`bd_bbox_overlap/8`), computing the smallest bounding box enclosing two boxes (`bd_bbox_union/12`), expanding a bounding box outward by N cells (`bd_expand/9`), and filling every cell within an inclusive rectangle with a color (`bd_fill_bbox/7`). 14 bd_* predicates, Layer 116.
+
+scan
+Grid Cell Enumeration and Manipulation (PR 136)
+
+    enumerating all R-C-V triples in row-major order with row as outer loop (`sn_row_major/2`), column-major order with column as outer loop (`sn_col_major/2`), listing all R-C positions of a specific value (`sn_cells_of/3`), returning a new grid with a single cell replaced using nested findall with if-then-else on row and column indices (`sn_set_cell/5`), applying a 4-argument goal Goal(R,C,OldV,NewV) to every cell via nested findall with call/5 (`sn_map_cells/3`), collecting R-C-V triples satisfying a 3-argument predicate (`sn_filter_cells/3`), applying a list of R-C-V batch updates using memberchk lookup (`sn_update_cells/3`), traversing in boustrophedon order where even rows go left-to-right and odd rows go right-to-left (`sn_zigzag/2`), traversing in clockwise spiral order from the outermost ring inward using a recursive sn_spiral_/6 helper with nested if-then-else termination (`sn_spiral_in/2`), visiting the outer border cells clockwise (`sn_border_traversal/2`), visiting NE-going diagonals where D = R+C is enumerated from 0 to H+W-2 (`sn_diag_traversal_ne/2`), visiting SE-going diagonals where D = C-R is enumerated from -(H-1) to W-1 (`sn_diag_traversal_se/2`), building an H-by-W grid from a sparse R-C-V cell list with a background default (`sn_grid_from_cells/5`), and finding the first occurrence of a value in row-major order with a cut (`sn_index_of/4`). 14 sn_* predicates, Layer 115.
+
+interleave
+Row and Column Interleaving, Weaving, and Stride Selection (PR 134)
+
+    merging two same-height grids by alternating rows (`il_rows/3`), merging by alternating columns within each row (`il_cols/3`), splitting a grid into even-indexed and odd-indexed rows (`il_derows/3`), splitting into even and odd columns (`il_decols/3`), inserting a background row between every pair of adjacent rows to create a woven grid (`il_weave_rows/3`), inserting a background value between adjacent column values in each row (`il_weave_cols/3`), removing odd-indexed rows to recover the core (`il_unweave_rows/2`), removing odd-indexed columns (`il_unweave_cols/2`), extracting every Step-th row starting at a 0-based index (`il_stride_rows/4`), extracting every Step-th column (`il_stride_cols/4`), extracting rows at a given 0-based index list (`il_select_rows/3`), extracting columns at a given index list (`il_select_cols/3`), round-robin interleaving rows from a list of equal-height grids (`il_rows_n/2`), and partitioning rows into consecutive groups of N rows (`il_block_rows/3`). 14 il_* predicates, Layer 113.
+
+offset
+Grid Shifting and Circular Rolling (PR 133)
+
+    shifting a row rightward by N with Bg fill and overflow dropped (`od_shift_row/4`), shifting leftward (`od_shift_row_left/4`), circular right shift of a row with mod normalization (`od_roll_row/3`), shifting all grid rows rightward (`od_shift_right/4`), leftward (`od_shift_left/4`), content downward with Bg rows inserted at top (`od_shift_down/4`), content upward (`od_shift_up/4`), dispatching shift by direction atom using if-then-else (`od_shift_dir/5`), circular right shift of all grid rows (`od_roll_right/3`), circular left shift of all rows (`od_roll_left/3`), circular downward row roll (`od_roll_down/3`), circular upward row roll (`od_roll_up/3`), translating all cells of a specific color by (DR,DC) with per-cell if-then-else logic (`od_shift_color/6`), and inferring the (DR,DC) displacement between two grids by brute-force search with cut (`od_infer_shift/5`). 14 od_* predicates, Layer 112.
+
+zoom
+Integer-Factor Grid Scaling (PR 132)
+
+    upscaling a grid by integer factor F where each cell becomes an FxF block of the same color (`zm_scale_up/3`), downsampling by sampling every Fth row and column (`zm_scale_down/3`), scaling a single row by repeating each element F times (`zm_scale_up_row/3`), sampling every Fth element from a row (`zm_scale_down_row/3`), inferring the scale factor from the ratio of grid widths (`zm_scale_factor/3`), testing scaled equivalence (`zm_is_scaled_up/3`), computing upscaled dimensions (`zm_dims_up/5`), computing downsampled dimensions (`zm_dims_down/5`), extracting the FxF block at a tile position (`zm_extract_block/5`), splitting a grid into all FxF blocks as a flat row-major list (`zm_split_blocks/3`), counting tile blocks per dimension (`zm_blocks_dims/4`), returning the single color of a uniform block and failing for non-uniform blocks (`zm_block_color/5`), downsampling using the mode of each FxF block (`zm_scale_down_mode/3`), and tiling a small grid NR x NC times (`zm_tile_grid/4`). 14 zm_* predicates, Layer 111.
+
+histogram
+Value Frequency Analysis (PR 131)
+
+    counting occurrences of a specific value (`hi_count/3`), computing sorted V-Count pairs for every distinct value (`hi_freq/2`), finding the most frequent value with ties broken by smallest value (`hi_mode/3`), finding the least frequent value with ties broken by largest value (`hi_rare/3`), returning the sorted list of distinct values (`hi_unique_vals/2`), counting distinct values (`hi_unique_count/2`), sorting all V-Count pairs by count descending with value-ascending tiebreak using negated-count keysort (`hi_sorted_by_freq/2`), extracting the N most frequent V-Count pairs (`hi_top_n/3`), testing value presence with memberchk (`hi_has_value/2`), testing that all elements equal the first element using forall and =:= (`hi_all_equal/2`), computing the frequency table of all cell values in a 2D grid (`hi_grid_freq/2`), finding the most frequent grid cell color (`hi_grid_mode/3`), finding the least frequent grid cell color (`hi_grid_rare/3`), and giving the 1-based rank of a value by frequency where rank 1 is most common (`hi_rank/3`). 14 hi_* predicates, Layer 110.
+
+signal
+1D Signal Analysis of Grid Rows and Columns (PR 130)
+
+    finding strict interior local maxima (`sg_peaks/2`), strict interior local minima (`sg_valleys/2`), the 0-based index of the maximum value with first-occurrence tie-breaking (`sg_argmax/2`), the index of the minimum value (`sg_argmin/2`), consecutive element-wise differences (`sg_diffs/2`), sign of each consecutive difference as 1/-1/0 (`sg_slope_signs/2`), strictly increasing order test (`sg_is_increasing/1`), strictly decreasing order test (`sg_is_decreasing/1`), non-decreasing order test (`sg_is_nondecreasing/1`), non-increasing order test (`sg_is_nonincreasing/1`), partitioning indices into above-threshold and at-or-below-threshold groups (`sg_threshold/4`), extracting a complete grid row by index (`sg_row_profile/3`), extracting a complete grid column by index using a YALL lambda (`sg_col_profile/3`), and extracting both row and column profiles for a given cell position (`sg_cross_profile/5`). 14 sg_* predicates, Layer 109.
+
+hull
+Convex Hull and Polygon Geometry (PR 128)
+
+    computing the convex hull of a cell set as a list of vertices in clockwise screen order using Andrew's monotone chain algorithm with collinear points excluded (`hu_convex_hull/2`), testing whether a discrete cell set is convex meaning it equals the complete set of grid cells inside its hull within the bounding box (`hu_is_convex/1`), counting hull vertices excluding collinear intermediate points (`hu_hull_size/2`), computing twice the hull polygon area as an integer using the shoelace formula with zero returned for degenerate hulls (`hu_hull_area2/2`), testing whether a row-column point lies inside or on the hull with degenerate case handling (`hu_in_hull/3`), collecting all grid cells inside or on the hull as a sorted list (`hu_cells_in_hull/3`), painting all cells inside the hull with a given color (`hu_fill_hull/4`), finding background cells inside the hull but absent from the input shape representing concavities (`hu_concavities/4`), finding the farthest pair of cells and their squared Euclidean distance (`hu_diameter/4`), computing the row-span and column-span of the hull bounding box (`hu_aspect/3`), testing whether the hull has exactly four vertices all at right angles for both axis-aligned and tilted rectangles (`hu_is_rect/1`), computing the sum of squared hull edge lengths as an integer proxy for perimeter (`hu_hull_perim2/2`), computing the integer floor of the average hull vertex position as centroid (`hu_centroid/3`), and testing whether every cell in a given set lies inside or on the hull of another set (`hu_hull_contains/2`). 14 hu_* predicates, Layer 107.
+
+enclosure
+Interior and Exterior Classification (PR 127)
+
+    collecting all cells on the four grid edges in sorted order (`en_border_cells/2`), finding all background cells reachable from the grid border by 4-connected background steps returning the exterior region (`en_outer_cells/3`), finding all background cells not reachable from the border returning the enclosed interior region (`en_inner_cells/3`), testing if a specific cell is enclosed (`en_is_inner/4`), testing if a specific cell is exterior (`en_is_outer/4`), painting all enclosed background cells with a given color (`en_fill_inner/4`), counting enclosed background cells (`en_inner_count/3`), testing for any enclosed background cell (`en_has_inner/2`), partitioning enclosed background cells into 4-connected components (`en_inner_components/3`), partitioning exterior background cells into 4-connected components (`en_outer_components/3`), filling the enclosed component at a given cell with a color (`en_fill_hole/6`), finding all Color cells on the boundary of a color region (`en_boundary_cells/3`), finding all Color cells strictly interior to a color region (`en_interior_cells/3`), and testing whether all orthogonal neighbors of a cell are a given wall color (`en_is_surrounded/4`). 14 en_* predicates, Layer 106.
+
+spread
+BFS Spreading, Distance Maps, and Reachability (PR 126)
+
+    computing a single-source BFS distance map returning Cell-D pairs for every reachable background cell (`sd_dist_map/5`), computing a multi-source BFS distance map with minimum distances from any seed (`sd_dist_multi/4`), listing all background cells reachable from a source in sorted order (`sd_reachable/5`), finding BFS shortest path distance between two cells failing when no path exists (`sd_path_dist/7`), testing reachability deterministically (`sd_path_exists/6`), collecting cells at exactly BFS distance D (`sd_ring/6`), collecting cells within BFS distance MaxD (`sd_zone/6`), finding minimum distance from source to any cell in a target set (`sd_dist_to_set/6`), identifying the farthest reachable cell (`sd_farthest/5`), performing one BFS level expansion (`sd_expand_once/5`), spreading a color outward through background cells up to MaxD steps (`sd_spread_color/5`), computing maximum BFS distance to any reachable cell (`sd_max_dist/5`), overlaying BFS distances as cell values leaving other cells unchanged (`sd_fill_dist/5`), and assigning Bg cells to their nearest seed by Voronoi BFS with ties broken by lower seed index (`sd_voronoi/4`). 14 sd_* predicates, Layer 105.
+
+vec2
+2D Integer Vector Arithmetic and Geometry (PR 125)
+
+    computing the displacement vector between two cells as (DR=R2-R1, DC=C2-C1) (`vv_offset/6`), applying a displacement to a point (`vv_add/6`), scaling a vector by an integer factor (`vv_scale/5`), negating a vector to reverse its direction (`vv_neg/4`), squared Euclidean length without floating-point arithmetic (`vv_len_sq/3`), L1 Manhattan magnitude as the sum of absolute components (`vv_manhattan/3`), L-infinity Chebyshev magnitude as the maximum absolute component (`vv_chebyshev/3`), rotating a vector 90 degrees clockwise in row-column coordinates (`vv_rot90_cw/4`), rotating 90 degrees counter-clockwise (`vv_rot90_ccw/4`), rotating 180 degrees (`vv_rot180/4`), dot product of two vectors (`vv_dot/5`), z-component of the 2D cross product (`vv_cross/5`), parallelism test by asserting zero cross product (`vv_parallel/4`), and translating a list of R-C cell coordinates by a displacement vector preserving order (`vv_translate_region/4`). All predicates are pure arithmetic with no grid access. 14 vv_* predicates, Layer 104.
+
+ray
+Ray Casting and Line-of-Sight Operations (PR 124)
+
+    testing whether a cell is within 0-based grid bounds (`ry_in_bounds/3`), enumerating all in-bounds cells starting one step beyond an origin in direction (DR,DC) until leaving the grid (`ry_cells_in_dir/6`), finding the first cell in a direction whose value differs from the background (`ry_first_hit/7`), collecting the background-colored prefix of a ray before the first obstacle (`ry_cast_clear/7`), counting steps to the first non-background cell (`ry_distance_to_hit/7`), counting steps to the grid boundary in a direction (`ry_distance_to_edge/6`), testing that every cell in a direction is background (`ry_is_clear/6`), computing coordinates N steps from an origin in a direction with in-bounds check (`ry_project/8`), mapping named direction atoms up/down/left/right/ul/ur/dl/dr to unit step pairs (`ry_dir_to_delta/3`), reflecting a direction across a horizontal axis by negating the row component (`ry_reflect_h/4`), reflecting across a vertical axis by negating the column component (`ry_reflect_v/4`), testing clear line of sight between two cells on the same row, column, or diagonal (`ry_los/6`), listing interior cells strictly between two aligned cells (`ry_los_cells/6`), and casting rays in all 4 compass directions returning Dir-Result pairs where each result is the first obstacle cell or none (`ry_cast_all_4/5`). 14 ry_* predicates, Layer 103.
+
+rect
+Rectangle Detection and Drawing (PR 122)
+
+    enumerating all cells of a solid rectangle in row-major order (`rt_cells/5`), listing only the frame cells sorted row-major (`rt_border/5`), listing interior cells or returning empty for thin rectangles (`rt_interior/5`), filling the entire solid rectangle with a color (`rt_draw/7`), drawing only the frame (`rt_draw_border/7`), filling only the interior (`rt_draw_interior/7`), computing total cell count (`rt_area/5`), testing cell containment inclusive on all four sides (`rt_contains/6`), returning four corner cells in tl-tr-bl-br order (`rt_corners/5`), computing bounding box of any non-empty R-C cell list (`rt_bbox/5`), testing uniform fill color of entire rectangle (`rt_is_solid/6`), testing uniform color of border cells (`rt_is_frame/6`), testing whether two rectangles share any cell via interval arithmetic (`rt_overlap/8`), and scaling a rectangle from its top-left corner by an integer factor (`rt_scale/7`). 14 rt_* predicates, Layer 101.
+
+line
+Straight-Line Segment Detection and Drawing (PR 121)
+
+    listing all R-C cells on a horizontal segment (`li_hline/4`), listing cells on a vertical segment (`li_vline/4`), listing cells on a 45-degree diagonal where row span equals column span (`li_diag_seg/5`), drawing a horizontal line onto a grid (`li_draw_h/6`), drawing a vertical line onto a grid (`li_draw_v/6`), drawing a 45-degree diagonal line onto a grid (`li_draw_diag/7`), testing whether two cells share a row (`li_same_row/4`), testing whether two cells share a column (`li_same_col/4`), testing whether two cells lie on the same diagonal where C minus R is constant (`li_same_diag/4`), testing whether two cells lie on the same anti-diagonal where R plus C is constant (`li_same_anti/4`), testing whether three cells are collinear sharing a row, column, diagonal, or anti-diagonal (`li_collinear/6`), extracting the first and last R-C pairs from a cell list (`li_endpoints/3`), returning interior cells strictly between two aligned points excluding endpoints (`li_gap/5`), and classifying a segment as point, horizontal, vertical, diagonal, anti_diagonal, or other (`li_line_type/5`). 14 li_* predicates, Layer 100.
+
+recur
+Arithmetic Progression and Periodic Recurrence Detection (PR 120)
+
+    generating an N-term arithmetic sequence from a start value and step (`rc_arith/4`), extracting the common difference of an arithmetic sequence (`rc_arith_step/2`), testing whether a sequence is arithmetic with detected step (`rc_is_arith/2`), generating a sequence by repeating a unit N times end-to-end (`rc_repeat/3`), finding the minimal repeating unit of a sequence (`rc_period/2`), testing whether a sequence is an exact integer-multiple repetition of some unit (`rc_is_periodic/2`), computing the next N terms of an arithmetic sequence by continuing from its last element (`rc_next_arith/3`), computing the next N terms of a periodic sequence by cycling from the current offset (`rc_next_repeat/3`), extending an arithmetic sequence by N terms and returning the step (`rc_extend_arith/4`), extending a periodic sequence by N terms and returning the minimal period unit (`rc_extend_repeat/4`), returning the N-th element one-based of the infinite cyclic repetition of a unit (`rc_cycle_nth/3`), pair-wise application of a 3-argument goal over two lists (`rc_zip_with/4`), computing consecutive element-wise differences of a numeric list (`rc_diff_list/2`), and testing whether all consecutive differences are equal and returning the common value (`rc_const_diffs/2`). 14 rc_* predicates, Layer 99.
+
+stripe
+Uniform Row and Column Stripe Detection and Filling (PR 118)
+
+    testing whether row R is all one value (`sr_uniform_row/3`), testing whether column C is all one value (`sr_uniform_col/3`), returning sorted row indices uniformly equal to Color (`sr_uniform_rows/3`), returning sorted column indices uniformly equal to Color (`sr_uniform_cols/3`), R-Color pairs for all uniform rows in row-index order (`sr_all_stripe_rows/2`), C-Color pairs for all uniform columns in column-index order (`sr_all_stripe_cols/2`), sorted row indices that are NOT uniform (`sr_mixed_rows/2`), sorted column indices that are NOT uniform (`sr_mixed_cols/2`), filling row R with Color (`sr_fill_row/4`), filling column C with Color (`sr_fill_col/4`), filling multiple row indices with Color (`sr_fill_rows/4`), filling multiple column indices with Color (`sr_fill_cols/4`), returning r(R,C) terms for the Cartesian product of two index lists (`sr_cross_cells/4`), and filling all cells at row-column intersections with Color (`sr_cross_fill/5`). 14 sr_* predicates, Layer 97.
+
+permute
+Row and Column Permutation Operations (PR 115)
+
+    reordering all rows of a grid by an explicit index list so that result row i comes from grid row Perm[i] (`pm_permute_rows/3`), reordering all columns by an index list (`pm_permute_cols/3`), exchanging exactly two rows (`pm_swap_rows/4`), exchanging exactly two columns (`pm_swap_cols/4`), cyclically shifting rows so the last N rows move to the front (`pm_cycle_rows/3`), cyclically shifting columns so the last N columns move to the left (`pm_cycle_cols/3`), discovering the index permutation mapping one grid's rows to another's (`pm_find_row_perm/3`), discovering the index permutation mapping one grid's columns to another's (`pm_find_col_perm/3`), sorting all rows in ascending lexicographic order preserving duplicates (`pm_sort_rows/2`), sorting all columns in ascending lexicographic order preserving duplicates (`pm_sort_cols/2`), inserting a complete row before a given position (`pm_insert_row/4`), removing the row at a given position (`pm_delete_row/3`), inserting a column of values before a given position in every row (`pm_insert_col/4`), and removing the column at a given position from every row (`pm_delete_col/3`). 14 pm_* predicates, Layer 94.
+
+region
+Grid Region Extraction by Separator Lines (PR 113)
+
+    checking whether a row is entirely equal to a separator value (`rg_is_sep_row/3`), checking whether a column is entirely equal to a separator value (`rg_is_sep_col/3`), collecting all separator row indices into a sorted list (`rg_sep_rows/3`), collecting all separator column indices (`rg_sep_cols/3`), computing R0-R1 inclusive row spans of non-separator horizontal sections (`rg_spans_h/3`), computing C0-C1 inclusive column spans of non-separator vertical sections (`rg_spans_v/3`), splitting a grid at its separator rows into a list of sub-grids with separators excluded (`rg_cut_h/3`), splitting at separator columns (`rg_cut_v/3`), assembling a 2D list-of-lists of all sections by cutting in both directions (`rg_sections/3`), retrieving the N-th horizontal section by 1-indexed number (`rg_section_h/4`), retrieving the N-th vertical section (`rg_section_v/4`), counting horizontal sections (`rg_count_h/3`), counting vertical sections (`rg_count_v/3`), and extracting the sub-grid of the section containing a given cell coordinate, failing if the cell is on a separator (`rg_region/5`). 14 rg_* predicates, Layer 92.
+
+assemble
+Grid Assembly, Concatenation, and Composition (PR 112)
+
+    horizontally concatenating a list of same-height grids into one wide grid (`as_hcat/2`), vertically stacking a list of same-width grids (`as_vcat/2`), assembling a 2D matrix of grids into one combined grid (`as_grid_of/2`), reducing each K x K block to one cell by majority vote (`as_downscale/3`), surrounding a grid with a W-cell wide colored frame (`as_border/4`), embedding a grid at the integer floor center of a canvas (`as_center_in/5`), extracting one of four named quadrants tl/tr/bl/br (`as_quarter/3`), concatenating a grid with its left-right mirror (`as_flip_h_cat/2`), stacking a grid with its top-bottom mirror (`as_flip_v_cat/2`), interleaving columns from two same-size grids (`as_zip_h/3`), interleaving rows from two same-size grids (`as_zip_v/3`), unconditionally pasting a sub-grid at a given offset (`as_paste/5`), replacing cells where a mask is non-zero with a fill value (`as_mask_fill/4`), and cropping or padding to an exact target size (`as_crop_to/5`). 14 as_* predicates, Layer 91.
+
+order
+Object Spatial Ordering and Ranking (PR 111)
+
+    computing the integer floor centroid of an obj(Color, Cells) term (`od_centroid/3`), sorting objects by centroid row ascending/topmost-first (`od_sort_row/2`), sorting by centroid column ascending/leftmost-first (`od_sort_col/2`), sorting by row then column in reading order (`od_reading_order/2`), sorting by color value ascending (`od_sort_color/2`), finding the topmost object (`od_topmost/2`), bottommost (`od_bottommost/2`), leftmost (`od_leftmost/2`), rightmost (`od_rightmost/2`), the Nth object in row order (`od_nth_row/3`), the Nth object in column order (`od_nth_col/3`), the object nearest to a reference position (`od_nearest/4`), the object farthest from a reference position (`od_farthest/4`), and the 1-based rank of an object in row order (`od_rank_row/3`). 14 od_* predicates, Layer 90.
+
+diff
+Multi-Pair Grid Difference Analysis (PR 110)
+
+    all changed cells as diff(R,C,OldV,NewV) terms (`df_cell_diff/3`), cells that went from background to non-background (`df_added/4`), cells that went from non-background to background (`df_removed/4`), cells that stayed non-background but changed color (`df_recolored/4`), cells whose value did not change (`df_stable/3`), colors added to or lost from the palette (`df_palette_change/4`), cells that changed in every In-Out pair in a list (`df_common_diffs/2`), cells that were stable in every pair (`df_common_stable/2`), cells added in every pair (`df_always_added/3`), cells removed in every pair (`df_always_removed/3`), total count of changed cells (`df_total_changes/3`), applying a diff list to a grid (`df_apply_diffs/3`), inverting a diff list to reverse direction of each change (`df_invert_diffs/2`), and filtering diffs by a goal predicate (`df_filter_diffs/3`). 14 df_* predicates, Layer 89.
+
+pipeline
+Sequential Step Dispatch and List Utilities (PR 91)
+
+    registering named step handlers (`pl_register/2`), querying handlers (`pl_registered/2`), removing handlers (`pl_unregister/1`), applying one step with optional local registry (`pl_step/4`), threading an input through a sequence of named steps (`pl_run/3`), mapping a 2-argument goal over a list (`pl_map/3`), filtering by a 1-argument goal (`pl_filter/3`), folding with an accumulator (`pl_fold/4`), zipping two lists into pairs (`pl_zip/3`), unzipping pairs into two lists (`pl_unzip/3`), taking the first N elements (`pl_take/3`), dropping the first N elements (`pl_drop/3`), and partitioning into satisfied and rejected elements (`pl_partition/4`). 14 pl_* predicates, Layer 70.
+
+obj
+Object Inventory and Reasoning (PR 90)
+
+    constructing an object term from color and cells (`obj_from_cells/3`), extracting color (`obj_color/2`), cells (`obj_cells/2`), size (`obj_size/2`), bounding box (`obj_bbox/5`), integer centroid (`obj_center/3`), translation-independent normalized shape (`obj_shape/2`), extracting all 4-connected objects of one color (`obj_inventory/3`), all objects of all non-zero colors (`obj_all/2`), counting objects (`obj_count/3`), finding the largest (`obj_largest/3`) and smallest (`obj_smallest/3`) object, looking up which object contains a cell (`obj_at_cell/3`), and sorting objects by size (`obj_sort_size/3`). 14 obj_* predicates, Layer 69.
+
+projection
+Row and Column Projection and Profile Analysis (PR 237)
+
+    per-row sums (`pj_row_sums/2`), per-column sums (`pj_col_sums/2`), value occurrence counts per row and column (`pj_row_counts/3`, `pj_col_counts/3`), per-row and per-column maxima (`pj_row_maxes/2`, `pj_col_maxes/2`), sorted unique value sets per row and column (`pj_row_uniq/2`, `pj_col_uniq/2`), column and row shadow indices (`pj_shadow_h/3`, `pj_shadow_v/3`), longest contiguous value run per row and column via cumulative accumulator (`pj_h_profile/3`, `pj_v_profile/3`), and modal value per row and column (`pj_row_modes/2`, `pj_col_modes/2`). 14 pj_* predicates, Layer 131.
+
+gradient
+Row and Column Gradient and Progression Analysis (PR 238)
+
+    adjacent pairwise differences per row (`gr_h_diffs/2`) and column (`gr_v_diffs/2`), monotonicity classification per row and column as 1/-1/0 (`gr_h_mono/2`, `gr_v_mono/2`), max-minus-min range per row and column (`gr_h_range/2`, `gr_v_range/2`), last-minus-first net slope per row and column (`gr_h_slope/2`, `gr_v_slope/2`), constancy tests (`gr_h_const/2`, `gr_v_const/2`), running cumulative sums per row and column (`gr_h_cum/2`, `gr_v_cum/2`), and second-order differences per row and column (`gr_h_second/2`, `gr_v_second/2`). 14 gr_* predicates, Layer 132.
+
+extrema
+2D Grid Extrema, Local Peaks, and Threshold Filtering (PR 239)
+
+    global maximum and minimum values (`ex_max_val/2`, `ex_min_val/2`), all cell positions holding the maximum or minimum (`ex_max_cells/2`, `ex_min_cells/2`), 0-based row and column argmax and argmin with first-occurrence tie-breaking (`ex_row_argmax/2`, `ex_col_argmax/2`, `ex_row_argmin/2`, `ex_col_argmin/2`), local maxima and minima among in-bounds 4-neighbors (`ex_local_max4/2`, `ex_local_min4/2`), threshold filter cells above and below a value (`ex_above/3`, `ex_below/3`), max-minus-min range (`ex_range/2`), and non-zero cell positions (`ex_nonzero/2`). 14 ex_* predicates, Layer 133.
+
+naggr
+Per-Cell Neighborhood Value Aggregation (PR 240)
+
+    per-cell sum of in-bounds 4-neighbor and 8-neighbor values (`na_sum4/2`, `na_sum8/2`), maximum neighbor value (`na_max4/2`, `na_max8/2`), minimum neighbor value (`na_min4/2`, `na_min8/2`), integer floor mean of neighbor values (`na_mean4/2`, `na_mean8/2`), max-minus-min range of neighbor values (`na_range4/2`, `na_range8/2`), count of distinct values among neighbors (`na_spread4/2`, `na_spread8/2`), and count of neighbors whose value differs from the cell itself (`na_diff4/2`, `na_diff8/2`). All empty neighborhoods return 0. 14 na_* predicates, Layer 134.
+
+median
+Integer Median Computation for Lists and 2D Grids (PR 241)
+
+    lower (floor) median of an integer list (`md_median/2`), per-row and per-column medians (`md_row/3`, `md_col/3`, `md_row_medians/2`, `md_col_medians/2`), grid-wide median (`md_grid/2`), 4-connected and 8-connected median filters where each output cell is the median of the cell and its in-bounds neighbors (`md_filter4/2`, `md_filter8/2`), and above/below median cell selection at grid, row, and column level (`md_above/2`, `md_below/2`, `md_row_above/3`, `md_row_below/3`, `md_col_above/3`, `md_col_below/3`). Uses msort/2 to preserve duplicates for correct computation. 14 md_* predicates, Layer 135.
+
+nmode
+Neighborhood Mode Filter for 2D Grids (PR 242)
+
+    mode (most frequent value, smallest-value tie-breaking) of an integer list (`nm_mode/2`), all tied-for-top values (`nm_mode_all/2`), mode with count (`nm_mode_count/3`), per-row and per-column modes (`nm_row/3`, `nm_col/3`, `nm_row_modes/2`, `nm_col_modes/2`), grid-wide mode (`nm_grid/2`), 4-connected and 8-connected mode filters (`nm_filter4/2`, `nm_filter8/2`), uniform neighborhood detection (`nm_uniform4/2`, `nm_uniform8/2`), and outlier detection where the cell differs from its neighborhood mode (`nm_outlier4/2`, `nm_outlier8/2`). 14 nm_* predicates, Layer 136.
+
+rank
+Dense Ranking of Integer Values in Lists and 2D Grids (PR 243)
+
+    1-based dense rank of a value in a list (`rk_rank_of/3`), replace each element with its dense rank (`rk_dense/2`), 0-based argsort ascending and descending (`rk_argsort_asc/2`, `rk_argsort_desc/2`), per-row dense rank grid (`rk_row_dense/2`), per-column dense rank grid (`rk_col_dense/2`), grid-wide dense rank grid (`rk_grid_dense/2`), cell-level row/column/grid rank queries (`rk_row_rank_of/4`, `rk_col_rank_of/4`, `rk_grid_rank_of/4`), and top-N and bottom-N cell selection by distinct value plus rank-threshold filtering (`rk_top_n/3`, `rk_bottom_n/3`, `rk_above_rank/3`, `rk_below_rank/3`). 14 rk_* predicates, Layer 137.
+
+varstat
+Mean, Sum, and Deviation Statistics for Integer Lists and 2D Grids (PR 244)
+
+    integer sum of a list (`vt_sum/2`), floor mean (`vt_mean_floor/2`), rounded mean (`vt_mean_round/2`), per-element signed deviation from floor mean (`vt_deviation/2`), absolute deviation (`vt_abs_deviation/2`), per-row sums and means (`vt_row_sums/2`, `vt_row_means/2`), per-column sums and means (`vt_col_sums/2`, `vt_col_means/2`), global floor mean (`vt_global_mean/2`), and position lists for cells above or below the global mean, row mean, or column mean (`vt_above_mean/2`, `vt_below_mean/2`, `vt_row_above_mean/2`, `vt_col_above_mean/2`). 14 vt_* predicates, Layer 138.
+
+cooccur
+Value Co-Occurrence and Adjacency Analysis in 2D Grids (PR 245)
+
+    ordered horizontal adjacent pairs (`co_h_pairs/2`), vertical adjacent pairs in column-major order (`co_v_pairs/2`), down-right and down-left diagonal pairs (`co_d_pairs_dr/2`, `co_d_pairs_dl/2`), directed horizontal and vertical pair counts (`co_count_h/4`, `co_count_v/4`), undirected 4-adjacent pair count (`co_count_adj4/4`), universal adjacency testing (`co_always_adj4/3`), empty adjacency testing (`co_never_adj4/3`), isolated cell detection (`co_isolated4/3`), border-value enumeration (`co_border_vals/3`), shared-border testing (`co_shared_border/3`), horizontal transition frequency triples sorted by count (`co_row_transitions/2`), and most-frequently-adjacent value (`co_most_common_adj4/3`). 14 co_* predicates, Layer 139.
+
+rowsig
+Row and Column Signature Analysis for 2D Grids (PR 246)
+
+    single column extraction as top-to-bottom list (`rs_col_at/3`), all columns as list of lists (`rs_all_cols/2`), row frequency table sorted by count descending (`rs_row_freq/2`), column frequency table (`rs_col_freq/2`), most frequently occurring row with tie-breaking by largest row (`rs_modal_row/2`), most frequently occurring column (`rs_modal_col/2`), rows appearing exactly once with their index (`rs_uniq_rows/2`), columns appearing exactly once (`rs_uniq_cols/2`), index pairs of equal rows with R1 < R2 (`rs_dup_row_pairs/2`), index pairs of equal columns (`rs_dup_col_pairs/2`), palindrome test for a row (`rs_row_palindrome/2`), palindrome test for a column (`rs_col_palindrome/2`), anagram test for two rows via msort (`rs_rows_anagram/3`), and anagram test for two columns (`rs_cols_anagram/3`). 14 rs_* predicates, Layer 140.
+
+gridops
+Grid Collection Operations for Multi-Grid Analysis (PR 247)
+
+    positions where every grid has a value (`go_always/3`), no grid has a value (`go_never/3`), some but not all grids have a value (`go_sometimes/3`), per-cell count of grids having a value (`go_count_v/3`), modal value per cell with smallest-value tie-breaking (`go_modal/2`), cells where all grids agree (`go_stable/2`), cells where grids disagree (`go_unstable/2`), cell-for-cell equality test via unification (`go_eq/2`), elementwise addition (`go_add/3`), elementwise subtraction (`go_sub/3`), elementwise maximum (`go_emax/3`), elementwise minimum (`go_emin/3`), overlay taking first non-background value per cell (`go_overlay/3`), and intersection keeping only unanimously non-background values (`go_intersect/3`). 14 go_* predicates, Layer 141.
+
+index
+Coordinate-Valued Grid Generation and Index Masking (PR 248)
+
+    row-index grid where cell(R,C)=R (`ix_row_grid/3`), column-index grid where cell(R,C)=C (`ix_col_grid/3`), diagonal-sum grid where cell(R,C)=R+C (`ix_sum_grid/3`), anti-diagonal grid where cell(R,C)=R-C with signed values (`ix_diff_grid/3`), product grid where cell(R,C)=R*C (`ix_prod_grid/3`), Manhattan distance field from a reference point (`ix_manhattan_grid/5`), Chebyshev distance field producing concentric square shells (`ix_chebyshev_grid/5`), diagonal modular stripe grid via (R+C) mod N (`ix_mod_grid/4`), horizontal stripe grid via R mod N (`ix_row_mod_grid/4`), vertical stripe grid via C mod N (`ix_col_mod_grid/4`), masking rows not in an index list to background (`ix_mask_rows/4`), masking columns not in an index list to background (`ix_mask_cols/4`), elementwise binary Op between index grid and value grid for Op in {add,sub,mul,max_op,min_op} (`ix_apply/4`), and signed linear row-major offsets from a reference point (`ix_from/5`). 14 ix_* predicates, Layer 142.
+
+splice
+Row and Column Structural Editing (PR 253)
+
+    inserting a new row before index R where R=0 prepends and R=H appends (`sp_insert_row/4`), deleting the row at index R (`sp_delete_row/3`), inserting a column of constant value V before column C by applying a private helper to every row via maplist (`sp_insert_col/4`), deleting column C from every row (`sp_delete_col/3`), swapping two rows by index using findall with between enumeration and conditional assignment leaving the grid unchanged when R1=R2 (`sp_swap_rows/4`), swapping two columns via a per-row private helper (`sp_swap_cols/4`), reversing the order of rows with reverse/2 (`sp_reverse_rows/2`), reversing cells within each row with maplist(reverse) (`sp_reverse_cols/2`), cyclically shifting rows by K positions where K is taken modulo H so K=H returns the original grid (`sp_rotate_rows/3`), cyclically shifting columns by K positions via a per-row helper (`sp_rotate_cols/3`), replacing row R with N copies where N=1 is identity and N=0 deletes the row (`sp_replicate_row/4`), replacing column C with N copies via a per-row helper (`sp_replicate_col/4`), keeping only rows at given indices in the specified order allowing repetition and omission (`sp_select_rows/3`), and keeping only columns at given indices via a per-row helper (`sp_select_cols/3`). 14 sp_* predicates, Layer 147.
+
+objop
+Object-Level Grid Manipulation (PR 254)
+
+    collecting sorted R-C positions for a color value (`oo_cells_of/3`), computing the bounding box of a cell list (`oo_bbox/5`), counting cells of a value (`oo_count/3`), computing bounding box height and width (`oo_size/4`), computing bounding box center via integer division (`oo_center/4`), replacing all V cells with background (`oo_erase/4`), recoloring all V cells to a new value (`oo_repaint/4`), exchanging two non-overlapping colors (`oo_swap/4`), translating V cells by (DR,DC) with in-bounds clipping (`oo_move/6`), copying V cells to an offset position leaving originals intact (`oo_copy/5`), rotating V cells 90 degrees CW around the bbox top-left using normalized formula (r,c)-(c,H-1-r) (`oo_rotate90/4`), rotating 180 degrees with (r,c)-(H-1-r,W-1-c) (`oo_rotate180/4`), flipping V cells left-right within the bbox using (r,c)-(r,W-1-c) (`oo_mirror_h/4`), and flipping top-bottom within the bbox using (r,c)-(H-1-r,c) (`oo_mirror_v/4`). All operations accept and return complete grids; the central private helper oo_set_cells_ does a full H-by-W scan via nested findall. 14 oo_* predicates, Layer 148.
+
+pair
+Object Pairing and Scene Correspondence (PR 255)
+
+    extracting the D4-canonical shape of an obj term as the lex-min of 8 D4 transforms normalized to origin (`pr_obj_shape/2`), extracting color (`pr_obj_color/2`), extracting cell count (`pr_obj_size/2`), testing D4-equivalent shapes (`pr_shape_eq/2`), testing same color (`pr_color_eq/2`), testing same size (`pr_size_eq/2`), grouping by color as sorted Color-[Obj] pairs (`pr_group_color/2`), grouping by size (`pr_group_size/2`), grouping by D4-canonical shape (`pr_group_shape/2`), finding the obj whose color appears exactly once (`pr_unique_color/2`), finding the obj whose size appears exactly once (`pr_unique_size/2`), finding Color-O1-O2 triples for same-color pairs across two lists (`pr_match_color/3`), finding N-O1-O2 triples for same-size pairs (`pr_match_size/3`), and finding Shape-O1-O2 triples for D4-equivalent shape pairs where a horizontal pair matches a vertical pair (`pr_match_shape/3`). 14 pr_* predicates, Layer 149.
+
+arrange
+Object Arrangement and Spatial Ordering (PR 256)
+
+    computing the integer floor-average centroid of an obj term (`ag_centroid/2`), computing the displacement vector from one centroid to another (`ag_offset/3`), testing that one object's centroid row is at most another's (`ag_row_order/2`), testing centroid column order (`ag_col_order/2`), testing that two objects share the same centroid row (`ag_row_aligned/2`), testing that two objects share the same centroid column (`ag_col_aligned/2`), stable sort of an obj list by centroid row using keysort so equal-row objects preserve input order (`ag_sort_by_row/2`), stable sort by centroid column (`ag_sort_by_col/2`), consecutive gaps between sorted distinct centroid rows (`ag_row_gaps/2`), consecutive centroid column gaps (`ag_col_gaps/2`), testing that all consecutive centroid row gaps are equal (`ag_equal_row_gaps/1`), testing equal column gaps (`ag_equal_col_gaps/1`), bounding box of all cells across all obj terms in a list (`ag_group_bbox/5`), and finding the obj in a list whose centroid is nearest a reference by Manhattan distance via keysort (`ag_nearest/3`). 14 ag_* predicates, Layer 150.
+
+xform
+Object-Level Transformation and Inference (PR 257)
+
+    creating a new obj with a different color keeping the same cells via head unification (`xf_recolor/3`), shifting all cells by a row-column offset (`xf_translate/3`), translating an obj to the origin so min row=0 and min col=0 (`xf_normalize/2`), applying a named D4 symmetry operation (id/r90/r180/r270/fh/fv/fd1/fd2) with normalization and back-translation to the original top-left corner (`xf_d4/3`), testing same sorted cell set by shared-variable unification (`xf_same_cells/2`), finding the r(DR,DC) translation vector between two same-shape objs from their bbox top-left difference after normalizing both (`xf_cell_offset/3`), testing same cells and different color via shared-variable and \\=/2 (`xf_is_recolor/2`), computing cells in Obj2 absent from Obj1 via subtract/3 (`xf_cells_added/3`), computing cells in Obj1 absent from Obj2 (`xf_cells_removed/3`), computing cells in both via findall+memberchk (`xf_cells_kept/3`), counting shared cells (`xf_overlap_count/3`), finding the first D4 Op such that d4(Op, Obj1.normalized) = Obj2.normalized by trying ops with member and cutting after first match (`xf_any_d4/3`), finding integer N such that Obj2 has N times as many cells as Obj1 via divisibility check (`xf_scale_factor/3`), and merging two same-color objs by append+sort (`xf_merge/3`). 14 xf_* predicates, Layer 151.
+
+query
+Aggregate Queries over Object Lists (PR 258)
+
+    counting the number of obj terms per distinct color as sorted Color-N pairs using two-phase findall+sort (`qu_count_by_color/2`), counting per distinct cell count (`qu_count_by_size/2`), counting per distinct origin-normalized form where "form" is the cell list translated to origin and sorted which is an exact structural match and not D4-invariant (`qu_count_by_form/2`), finding the color with the highest count with ties broken by smallest color (`qu_most_frequent_color/2`), finding the color with the lowest count with same tie-breaking (`qu_least_frequent_color/2`), finding the obj with the most cells with ties broken by first in input order (`qu_largest_obj/2`), finding the obj with the fewest cells with same tie-breaking (`qu_smallest_obj/2`), summing the cell counts of all obj terms (`qu_total_cells/2`), floor-average cell count per obj via integer division (`qu_avg_size/2`), testing that all objs share one color via findall+sort to singleton (`qu_all_same_color/1`), testing that all objs share one cell count (`qu_all_same_size/1`), testing that all objs share one origin-normalized form (`qu_all_same_form/1`), sorted distinct color values (`qu_colors/2`), and sorted distinct cell counts (`qu_sizes/2`). 14 qu_* predicates, Layer 152.
+
+sift
+Object List Filtering by Attribute Predicates (PR 259)
+
+    keeping only objs matching an exact color via head-unification pattern (`si_by_color/3`), excluding by color via C \= Color (`si_not_color/3`), keeping by exact cell count via length/2 (`si_by_size/3`), keeping by origin-normalized cell list which is an exact structural match not D4-invariant (`si_by_form/3`), strict greater-than size filter (`si_larger_than/3`), strict less-than size filter (`si_smaller_than/3`), membership in a color list via memberchk/2 (`si_color_in/3`), non-membership in a color list (`si_color_not_in/3`), all objs tied for the maximum cell count via two-phase collect-max-then-findall returning ALL tied objects unlike qu_largest_obj which returns only the first (`si_max_size/2`), all objs tied for the minimum cell count (`si_min_size/2`), objs whose color appears exactly once using the two-phase count pattern (`si_unique_color/2`), objs whose color appears more than once (`si_shared_color/2`), objs with any cell on the H-by-W grid border (row=0, row=H-1, col=0, col=W-1) via member+si_on_border_ helper (`si_on_border/4`), and objs with no border cell via negation-as-failure (`si_off_border/4`). 14 si_* predicates, Layer 153.
+
+pigment
+Bulk Color Operations on Object Scenes (PR 260)
+
+    setting every obj's color to a fixed value via findall with color in output head (`pg_recolor_all/3`), replacing one color with another using if-then-else inside findall (`pg_recolor_one/4`), exchanging two colors via nested if-then-else (`pg_swap/4`), applying a From-To color table leniently so unmapped objs keep their color using memberchk with if-then-else (`pg_apply_table/3`), applying a table strictly to exclude unmapped objs (`pg_apply_table_strict/3`), inferring a color table from two scenes by matching obj terms with identical cell sets and recording Old-New color pairs then deduplicating with sort (`pg_infer_table/3`), pairing each obj with the corresponding color from a list with truncation at the shorter list (`pg_zip_recolor/3`), recoloring the most frequent color (smallest on ties) via pg_count_by_color_ + max_list + member+cut + if-then-else (`pg_majority_to/3`), recoloring the least frequent color via min_list (`pg_minority_to/3`), recoloring uniquely-colored objs (count=1) via memberchk with if-then-else (`pg_unique_to/3`), recoloring shared-color objs (count>1) (`pg_shared_to/3`), swapping From-To pairs to produce the inverse table (`pg_invert_table/2`), extracting sorted distinct From colors from a table (`pg_table_from/2`), and testing consistency via negation-as-failure to detect contradictory mappings (`pg_consistent/1`). 14 pg_* predicates, Layer 154.
+
+delta
+Scene-Level Delta Analysis (PR 261)
+
+    comparing two object scenes (lists of obj(Color, Cells) terms) using exact cell-set equality for matching where two objects match iff they have identical Cells lists under Prolog unification; collecting objects in S2 whose cell set does not appear in S1 at any color via findall+negation-as-failure (`dl_added/3`); collecting objects in S1 absent from S2 (`dl_removed/3`); collecting O1-O2 pairs sharing identical cell sets across scenes with sort deduplication (`dl_matched/3`); collecting From-To color change pairs for matched objects where C1 \= C2 (`dl_recolored/3`); collecting objects with verbatim identity (same color and same cells) in both scenes via member/2 term unification (`dl_unchanged/3`); computing colors in S2 not in S1 by set difference on sorted palettes (`dl_color_gain/3`); computing colors in S1 not in S2 (`dl_color_loss/3`); computing object count change N = length(S2) - length(S1) (`dl_count_diff/3`); computing total cell count change N = total_cells(S2) - total_cells(S1) via findall+length+sum_list (`dl_size_diff/3`); testing that only additions occurred by checking removed=[] and recolored=[] (`dl_is_added_only/2`); testing that only removals occurred (`dl_is_removed_only/2`); testing that no additions or removals occurred so only color changes are possible (`dl_is_recolor_only/2`); testing that both scenes are identical (`dl_is_stable/2`); and computing all four components as a single delta(Added, Removed, Recolored, Unchanged) compound term (`dl_scene_diff/3`). 14 dl_* predicates, Layer 155.
+
+group
+Object Grouping and Partition (PR 262)
+
+    partitioning a list of obj(Color, Cells) terms into sorted Key-[Objs] groups sharing a common property; gp_by_color/2 (two-phase findall+sort collecting distinct colors then grouping objs by color match using head unification O=obj(C,_)); gp_by_size/2 (two-phase collecting distinct cell counts via length/2 then grouping); gp_by_row/2 (nested findall+min_list to compute minimum row for each obj as key); gp_by_col/2 (minimum column via nested findall+min_list); gp_by_form/2 (private gp_norm_ helper computes origin-normalized sorted cell list as key: min-row subtracted from each row, min-col from each col, then sort); gp_size_of/2 (length of groups list); gp_flatten/2 (findall over member(_-Grp,Groups) and member(O,Grp)); gp_largest_group/2 (N-K pairs from length of each group then max_list then member+cut to find smallest key at max cardinality then memberchk for choicepoint-free final lookup); gp_smallest_group/2 (min_list version with same determinism strategy); gp_singleton_groups/2 (findall with length(Objs,1) test); gp_shared_groups/2 (findall with N>1 test); gp_group_sizes/2 (findall+sort of group cardinalities); gp_all_same_size/1 (base clause [] with cut + general case: collect all lengths then sort/2 to singleton [_]); gp_keys/2 (findall+sort of all group keys). 14 gp_* predicates, Layer 156.
+
+proximity
+Object-Level Proximity and Distance (PR 263)
+
+    Manhattan distance and spatial relationship computation for obj(Color, Cells) terms; px_centroid/3 (integer-truncated centroid via sum_list+integer division); px_centroid_dist/3 (Manhattan distance between centroids); px_min_cell_dist/3 (minimum distance across all cell pairs via findall+min_list); px_touching/2 (4-adjacency via member on both cell lists then =:= 1 check with cut); px_nearest/3 and px_farthest/3 (min/max centroid distance via findall+min_list/max_list+member+cut); px_sort_by_dist/3 (stable sort via msort on D-O pairs); px_within_dist/4 and px_beyond_dist/4 (distance threshold filtering with =< and >); px_closest_pair/2 and px_farthest_pair/2 (all index-ordered pairs I<J via between/3+nth1/3 then min/max); px_touching_objs/3 (findall with px_touching test); px_non_touching_objs/3 (findall with \+ px_touching); px_dist_rank/3 (D-Obj pairs via msort for stable ascending order). 14 px_* predicates, Layer 157.
+
+link
+Object-to-Object Correspondence Linking (PR 264)
+
+    builds and manipulates O1-O2 link pairs between two obj(Color, Cells) lists; lk_by_position/3 (zip element-wise: three-clause recursive predicate with cuts on both empty base cases, then pair heads and recurse on tails); lk_by_nearest/3 (private lk_nearest_ helper: findall D-O pairs from centroid distances, min_list + member+cut for nearest with tie-break by list order); lk_by_color/3 (findall Cartesian product with color atom equality O=obj(C,_) pattern, then sort); lk_by_size/3 (findall with length equality, then sort); lk_by_form/3 (private lk_norm_ normalizes cells to origin and sorts, then findall pairs with equal norm, then sort); lk_source/2 and lk_target/2 (findall member(O1-_, Links) and member(_-O2, Links)); lk_invert/2 (findall O2-O1 from O1-O2); lk_count/2 (length/2); lk_apply_color/2 (findall obj(C2,Cells1) from member(obj(_,Cells1)-obj(C2,_), Links)); lk_apply_cells/2 (findall obj(C1,Cells2) from member(obj(C1,_)-obj(_,Cells2), Links)); lk_filter_same_color/2 (findall with O1=obj(C,_), O2=obj(C,_) pattern); lk_filter_diff_color/2 (C1 \= C2); lk_unlinked/3 (findall with \+ member(O-_, Links)). 14 lk_* predicates, Layer 158.
+
+layout
+Multi-Object Layout Analysis (PR 265)
+
+    collective spatial arrangement analysis for a list of obj(Color, Cells) terms; lt_global_bbox/5 (bounding box over ALL cells of all objs: nested findall collecting r(R,_) and r(_,C) from all objects then min_list/max_list); lt_bbox_area/2 (area = (R2-R1+1)*(C2-C1+1)); lt_row_range/3 and lt_col_range/3 (min/max of per-object topmost rows or leftmost cols via nested findall+min_list); lt_all_same_row/1 and lt_all_same_col/1 (base [] with cut + general: collect topmost rows/leftmost cols, sort to singleton [_]); lt_centroid_of_all/3 (private lt_centroid_ per object, collect centroid rows/cols, sum_list+integer division); lt_row_count/2 and lt_col_count/2 (collect distinct topmost rows/cols then sort+length); lt_is_grid/3 (centroid R-C pairs: distinct rows and cols with member/3, verify all combinations present with \+ (member(R,...),member(C,...),\+member(R-C,...)), check |Objs|=Rows*Cols); lt_is_diagonal_dr/1 (collect R-C values per centroid, sort to singleton); lt_is_diagonal_dl/1 (R+C values); lt_gap_h/2 and lt_gap_v/2 (sort C-O or R-O pairs by col/row with msort, extract col/row values, compute consecutive diffs with private lt_diffs_ recursive predicate, verify all equal and > 0). 14 lt_* predicates, Layer 159.
+
+sizeop
+Size-Based Sorting and Assignment for Object Collections (PR 267)
+
+    size extraction (sz_of: cell count via length/2 on Cells field); ascending/descending stable sort (sz_sort_asc and sz_sort_desc: N-Obj keysort then strip keys; descending via negated-key trick Neg is -N then keysort); smallest/largest selection (sz_smallest and sz_largest: min_list/max_list + member+cut for first input-order tie-break); rank-indexed access (sz_nth_smallest and sz_nth_largest: sz_sort_asc/desc + nth1/3); rank query (sz_rank_of: sz_sort_asc + nth1/3 to find position); color assignment in size order (sz_assign_colors: sz_sort_asc then private sz_zip_recolor_ with dual base clauses for empty lists); exact/above/below size filtering (sz_by_size/sz_above/sz_below: findall with arithmetic test S=N/S>N/S<N); distinct sizes (sz_unique_sizes: findall+sort/2 deduplication); total aggregation (sz_total_cells: findall+sum_list/2; empty=0). 14 sz_* predicates, Layer 161.
+
+posop
+Position-Based Sorting, Filtering, and Assignment for Object Collections (PR 268)
+
+    position extraction (po_row_of: min row via findall+min_list on r(R,_) cells; po_col_of: min col via findall+min_list on r(_,C) cells); rank queries by topmost row, leftmost col, and reading order (po_row_rank, po_col_rank, po_reading_rank: private sort then nth1/3); color assignment in topmost-row, leftmost-col, or reading order (po_assign_by_row, po_assign_by_col, po_assign_reading: private sort then private po_zip_recolor_ with dual base clauses for empty lists); reading-order sort uses compound key (Row-Col) with keysort so that compound terms sort row-first-then-col naturally via standard order of terms; threshold filtering by row or col (po_above_row: row < R; po_from_row: row >= R; po_left_of: col < C; po_from_col: col >= C; all via findall with arithmetic test); band filtering (po_in_row_band: row in [R1,R2] inclusive; po_in_col_band: col in [C1,C2] inclusive). 14 po_* predicates, Layer 162.
+
+objxf
+Spatial and Color Transformations for obj(Color, Cells) Terms (PR 269)
+
+    treats obj terms as first-class geometric objects; bounding box query (ox_bbox: min/max row/col via findall+min_list/max_list; ox_size: H=R1-R0+1, W=C1-C0+1); translation (ox_translate: shift by DR,DC; ox_to_origin: shift by -R0,-C0); color replacement (ox_recolor: replace Color field only); rotations use bounding-box-local coords Lr=R-R0, Lc=C-C0 (ox_rot90: r->r(R0+Lc,C0+(H-1)-Lr) swaps H/W; ox_rot180: r->r(R0+R1-R,C0+C1-C); ox_rot270: r->r(R0+(W-1)-Lc,C0+Lr) swaps W/H); reflections (ox_reflect_h: r->r(R0+R1-R,C) mirrors rows; ox_reflect_v: r->r(R,C0+C1-C) mirrors cols); set algebra (ox_merge: append+sort dedup union; ox_diff: findall with \\+ member; ox_intersect: findall with member; all result in first object's color); scale-up (ox_scale_up: each r(R,C)->Factor x Factor block via between/3; cell count = original * Factor * Factor). 14 ox_* predicates, Layer 163.
+
+shrink
+Grid Downscaling and Block Decomposition (PR 270)
+
+    the inverse of ox_scale_up; partitions a 2D grid into equal-sized NxN blocks and tests or exploits blocky structure where every block is a uniform color; block dimensions (dn_block_dims: H//N rows of blocks, W//N cols); block cell coordinates (dn_block_cells: r(R,C) pairs for block I,J without needing the grid); block color inspection (dn_block_color: unique color via sort+[Color] pattern, fails if mixed; dn_block_majority: most frequent color via msort+last on Count-V pairs); blocky test (dn_is_blocky: forall over all block indices); grid shrinking (dn_shrink: majority vote per block; dn_shrink_strict: unique color per block, fails if any mixed); scale search (dn_find_scale: smallest N>=2 such that all blocks are uniform, cut on first match); object downscaling (dn_obj_shrink: R//N, C//N integer division per cell, sort removes duplicates; dn_scale_factor: try N=2..30, shrink Obj2 and compare normalized cell sets to Obj1); block classification (dn_uniform_blocks: I-J pairs where block is uniform; dn_mixed_blocks: I-J pairs where not uniform); block extraction (dn_block_grid: NxN sub-grid; dn_block_val: flat value list in row-major order). 14 dn_* predicates, Layer 164.
+
+objmorph
+Morphological Operations on obj(Color, Cells) Terms (PR 271)
+
+    binary morphology directly on obj terms without requiring a grid; neighborhood generators (om_neighbors4: 4 orthogonal neighbors of r(R,C); om_neighbors8: 8 neighbors including diagonals; both always return fixed counts, coordinates may be negative); boundary and interior under 4-connectivity (om_boundary4: cells with at least one 4-neighbor outside set via \+ forall(member(N,Nbrs),member(N,S)); om_interior4: cells where all 4 neighbors inside via forall(member(N,Nbrs),member(N,S))); boundary and interior under 8-connectivity (om_boundary8: \+ forall over 8 neighbors; om_interior8: forall over 8 neighbors, stricter than interior4); single-step dilation (om_dilate4: findall neighbor lists then append+sort union; om_dilate8: same with 8-neighbors; single cell expands to plus shape (5 cells) or 3x3 block (9 cells)); single-step erosion delegates to interior (om_erode4 = om_interior4; om_erode8 = om_interior8); iterated operations with N countdown (om_dilate4_n: N=0 is identity, recurses with N-1; om_erode4_n: same pattern); compound operations (om_open4: erode4 then dilate4, removes thin protrusions; om_close4: dilate4 then erode4, fills small gaps). 14 om_* predicates, Layer 165.
+
+voronoi
+Nearest-Color Painting and Voronoi Partitioning (PR 272)
+
+    nearest-color and distance queries on 2D integer-or-atom grids using a caller-supplied background value Bg; source queries: vn_non_bg_cells (findall positions where value != Bg; sorted), vn_non_bg_colors (findall non-Bg values; sort-dedup); nearest distance: vn_nearest_dist (findall Manhattan distances to non-Bg cells; min_list); nearest color: vn_nearest_color (findall D-V pairs; sort; take first color); painting: vn_paint_bg (for each Bg cell apply vn_nearest_color; non-Bg cells unchanged); distance transform: vn_dist_map (0 for non-Bg cells; min Manhattan distance for Bg cells; pre-collects non-Bg cells for efficiency); Voronoi regions: vn_region_cells (findall Bg cells where nearest color = Color), vn_regions (one Color-Cells pair per non-Bg color); distance queries: vn_max_dist (findall Bg distances; max_list), vn_at_dist (findall where dist=D), vn_within_dist (findall where dist=<D); medial axis: vn_medial (findall Bg cells where 2+ distinct non-Bg colors tie for nearest; sort to require [_,_|_]); expansion: vn_expand1 (Bg cells 4-adjacent to any Color cell), vn_expand_n (Bg cells within Manhattan distance N of any Color cell; N=0 returns []). 14 vn_* predicates, Layer 166.
+
+objcomp
+Object Connectivity and Component Analysis (PR 273)
+
+    adjacency and connected-component analysis over obj(Color, Cells) collections; touching relation: oc_touches (any cell of O1 is 4-adjacent to any cell of O2; same-row adjacent-cols or same-col adjacent-rows; cut after first found pair); pair enumeration: oc_touching_pairs (nth0 I < J to enumerate each unordered pair exactly once avoiding == ambiguity); adjacency list: oc_adj_list (Obj-[Neighbors] for every obj); degree: oc_degree (count touching neighbors); isolation: oc_isolated (\+ existential test for any touching neighbor); connectivity: oc_connected (BFS with Queue+Visited accumulator; oc_bfs_ base case returns accumulated list), oc_components (recursive partition: extract one component at a time via subtract/3); aggregates: oc_num_components (length of components), oc_largest_component and oc_smallest_component (msort on N-C pairs; last/first), oc_singleton_components and oc_shared_components (filter components by length=1 or >1), oc_max_degree (max_list on degree list), oc_sort_by_degree (keysort on D-Obj pairs; stable). 14 oc_* predicates, Layer 167.
+
+wavefront
+Wavefront BFS Propagation Through Passable Cells (PR 274)
+
+    BFS wavefront from seed cells through 4-adjacent cells matching a passable color; seeds always enter at distance 0 regardless of their own color; wf_bfs_ maintains an Enqueued set (not Visited) to prevent duplicate queue insertions while still collecting each dequeued cell into the result; wf_passable (collect all PassColor cells); wf_bfs (BFS from seeds; returns sorted D-r(R,C) DistPairs list); wf_reachable (all cells in DistPairs); wf_unreachable (PassColor cells absent from DistPairs); distance queries: wf_at_dist (cells at exact distance D), wf_within_dist (cells at distance <= MaxD), wf_dist_of (distance of specific cell), wf_max_dist (maximum distance), wf_all_dists (sorted list of distinct distance values); wf_path_exists (memberchk on BFS result; no choicepoints); wf_paint_bg (replace each passable cell with min(BFS_distance, MaxD); unreachable cells unchanged); multi-source: wf_multi_wave (pre-compute one BFS per color; each passable cell gets color of nearest seed; ties by term order), wf_collision (passable cells where min distance is achieved by 2+ colors: sort D-Color pairs, check [MinD-_|Rest] contains MinD again); wf_enclosed (seed BFS from all PassColor border cells; return PassColor cells absent from exterior BFS). 14 wf_* predicates, Layer 168.
+
+objfilter
+Object List Filtering and Selection for obj(Color, Cells) Terms (PR 281)
+
+    filtering, selection, and partitioning for lists of obj terms; no cross-pack dependencies; private helpers: of_size_ (length), of_bbox_ (findall+min/max_list), of_is_rect_ (count=H*W), of_is_hline_ (MinR=MaxR), of_is_vline_ (MinC=MaxC), of_is_single_ (count=1), of_is_hollow_ (count<H*W), of_largest_acc_/of_smallest_acc_ (recursive accumulators); color filters: of_by_color (findall match obj(Color,_)), of_not_color (findall with C\=Color); size filters: of_exact_size (count=N), of_min_size (count>=N), of_max_size (count=<N); shape filters: of_is_rect (count=H*W), of_is_hline (MinR=MaxR), of_is_vline (MinC=MaxC), of_is_single (count=1), of_is_hollow (count<H*W); aggregates: of_largest (first max via accumulator), of_smallest (first min via accumulator); meta: of_filter (wraps include/3), of_partition (wraps partition/4; both declared :- meta_predicate). 14 of_* predicates, Layer 173.
+
+objrel
+Object Pair Relation Analysis for obj(Color, Cells) Terms (PR 280)
+
+    pairwise geometric and spatial relation predicates; colors ignored in all 14 predicates; private or_centroid_ (float centroid sum_rows/N, sum_cols/N via findall+sumlist), or_bbox_ (row/col extremes via findall+min/max_list), or_dir_ (delta pair to compass atom via arithmetic comparisons); or_overlap (member+memberchk+cut on first shared cell); or_shared_cells (findall+memberchk filter); or_n_shared (length of intersection); or_touch4 (\+overlap guard then Manhattan=1 pair search+cut); or_touch8 (\+overlap guard then Chebyshev=1 pair search+cut); or_contains (forall+memberchk subset test); or_union_cells (append+sort deduplication); or_dist (Euclidean sqrt of squared centroid deltas); or_manhattan (abs sum of centroid deltas); or_direction (centroid deltas through or_dir_; Dir one of n/s/e/w/ne/nw/se/sw/same); or_aligned_h (centroid rows arithmetically equal); or_aligned_v (centroid cols arithmetically equal); or_gap_rows (max(0,max(MinR1,MinR2)-min(MaxR1,MaxR2)-1) gap formula); or_gap_cols (same for column extremes). 14 or_* predicates, Layer 172.
+
+objbound
+Object Shape Classification and Bounding Box Analysis (PR 277)
+
+    bounding-box dimension queries, shape type tests, hole detection, frame detection, perimeter, and dense hull for obj(Color, Cells) terms; ob_bbox_h (MaxR-MinR+1 height); ob_bbox_w (MaxC-MinC+1 width); ob_bbox_area (H*W); ob_is_rect (cell count = bbox area, no holes); ob_is_hline (H=1); ob_is_vline (W=1); ob_is_single (H=1 AND W=1); ob_is_square_bbox (H=W); ob_holes (findall over bbox with \+ memberchk exclusion; cells in bbox not in object); ob_n_holes (length of holes list); ob_is_hollow (N>0); ob_is_frame (H>=3, W>=3, forall border cells memberchk, \+ interior cell existential test); ob_cell_exposed_ (private: count non-object 4-adjacent neighbors); ob_perimeter (sum_list over ob_cell_exposed_ values; single cell=4, 1x3 bar=8, 2x2 block=8, 3x3 frame=16); ob_dense_hull (findall between/3 over bbox, same color as original). 14 ob_* predicates, Layer 171.
+
+objsym
+Object Symmetry Analysis for obj(Color, Cells) Terms (PR 276)
+
+    bounding-box-relative reflection, rotation, and symmetry testing for individual obj(Color, Cells) terms; os_bbox (min/max row and column of cell set); os_normalize (translate so bbox top-left is r(0,0)); os_translate (shift all cells by DR, DC); os_reflect_h (mirror left-right: new C = MinC+MaxC-C); os_reflect_v (mirror top-bottom: new R = MinR+MaxR-R); os_rotate180 (both flips simultaneously); os_rotate90 (CW 90-degree rotation normalized to origin: new NR=C-MinC, new NC=MaxR-R); os_is_hsymm (sorted cells == sorted cells of reflect_h); os_is_vsymm (sorted cells == sorted cells of reflect_v); os_is_rot180 (sorted cells == sorted cells of rotate180); os_is_rot90 (normalized sorted cells == normalized sorted cells after rotate90; normalizes before and after for position-independent comparison); os_has_symmetry (disjunction with cut on first passing test); os_symmetries (findall over [h,v,rot180,rot90] with case dispatch); os_equivalent (normalize Obj1; iterate D4 orbit of Obj2 via os_d4_orbit_/2 which applies 3 additional rotate90 calls plus 4 reflect_h-then-rotate variants; compare msorted cell sets ignoring color; cut on first match). 14 os_* predicates, Layer 170.
+
+objchain
+Linear Chain Analysis for obj(Color, Cells) Sequences (PR 275)
+
+    detecting and traversing linear chains of objects connected by 4-adjacency touching; a chain is a set of objects whose touching graph is a simple path (exactly two degree-1 endpoints; all interior objects degree 2); ch_touches (4-adjacency test; cut after first found pair); ch_degree (count of touching neighbors within Objs); ch_is_chain (empty/singleton: trivially true; two: ch_touches; three+: degree constraints: no degree>2, no degree=0, exactly two degree-1 objects); ch_has_cycle (N>=3 and all degrees=2; uses =\= for arithmetic inequality); ch_endpoints (findall degree-1 objects -> [E1,E2]); ch_linearize (find endpoint then ch_walk_); ch_walk_ (DFS via unique unvisited touching neighbor; ch_next_ handles empty/singleton neighbor lists; multiple neighbors = branching = fail); ch_from_endpoint (ch_walk_ from caller-specified object); ch_nth (nth0 delegate); ch_color_seq (findall color of each obj in ordered list); ch_sub (length+append to slice I..J inclusive); ch_reverse (reverse/2 delegate); ch_length (length/2 delegate); ch_is_linear_path (recursive: O1 touches O2, recurse on tail); ch_direction (h: all min-rows same via forall; v: all min-cols same; other: fallthrough). 14 ch_* predicates, Layer 169.
+
+weave
+List Interlacing, Slicing, and Cycling (PR 266)
+
+    general-purpose list operations on any Prolog list; wv_alternate/3 (interleave two lists alternately: [L1[0],L2[0],L1[1],L2[1],...] with remainder of longer list appended; base case wv_alternate([],Rest,Rest) then swap-roles recursion); wv_split_even_odd/3 (split into 0-based even/odd indexed elements: base [], then [H|Evens] with swapped Evens/Odds in recursive call); wv_stride/3 (every Step-th element: take head, drop next Step-1 via private wv_drop_, recurse); wv_chunk/3 (non-overlapping chunks of exactly N: length(Chunk,N)+append+cut, trailing remainder discarded); wv_pair_wise/2 (consecutive overlapping pairs [[A,B],[B,C],...] with two base clauses for [] and [_]); wv_triple_wise/2 (consecutive overlapping triples with three base clauses); wv_rotate_left/3 (K mod N effective shift, length(Front,K1)+append(Front,Back)+append(Back,Front) split-and-rejoin); wv_rotate_right/3 (translate to left rotation by K2=N-K1); wv_reflect/2 (delegate to reverse/2); wv_repeat/3 (append(List,Rest) with N-1 recursion, base N=0 returns []); wv_take/3 (take N elements with dual base clauses for N=0 and []); wv_drop/3 (drop N elements with dual base clauses for N=0 and []); wv_cycle/3 (private wv_cycle_ with Current+Source pair, restart from Source when Current exhausted); wv_zip/3 (pair H1-H2 with dual base clauses for empty left and empty right). 14 wv_* predicates, Layer 160.
+
+border
+Concentric Ring Analysis for 2D Grids (PR 252)
+
+    the ring depth formula min(R,H-1-R,C,W-1-C) assigns each cell to a concentric ring where ring 0 is the outermost border and ring N is N steps inward; the maximum ring index is (min(H,W)-1)//2; enumerating all R-C pairs in ring N in row-major order (`br_ring_cells/3`), collecting grid values at those positions (`br_ring_vals/3`), determining the uniform color of ring N failing if non-uniform (`br_ring_color/3`), testing that ring N has a single uniform color (`br_is_uniform_ring/2`), adding one layer of value V around a grid to produce an (H+2)-by-(W+2) output (`br_add_border/3`), removing the outermost ring to give a (H-2)-by-(W-2) inner grid or the empty list for grids too small to have an interior (`br_strip_border/2`), stripping N rings by recursive application with N=0 as identity (`br_inner_n/3`), querying the uniform color of ring 0 (`br_outer_color/2`), testing that ring 0 is uniform (`br_is_uniform_outer/1`), collecting a list of uniform ring colors from outside in stopping at the first non-uniform ring (`br_ring_colors/2`), returning the maximum ring index (`br_max_ring/2`), testing that every ring is uniform forming a concentric bullseye pattern using forall/2 (`br_is_nested/1`), building a depth-map grid where each cell contains its ring index (`br_depth_map/2`), and replacing all cells in ring N with a new value while keeping non-ring cells unchanged (`br_fill_ring/4`). 14 br_* predicates, Layer 146.
+
+warp
+Shear, Cyclic Shift, and Non-Uniform Grid Warping (PR 251)
+
+    shifting a single row right by N cells with Bg fill using formula Out[C]=Row[C-N] (`wr_shift_row/5`), shifting a single column down by N cells (`wr_shift_col/5`), applying a horizontal shear where row I shifts right by I*Step creating a staircase pattern (`wr_shear_h/4`), applying a vertical shear where column J shifts down by J*Step (`wr_shear_v/4`), undoing horizontal shear by negating the step (`wr_unshear_h/4`), undoing vertical shear (`wr_unshear_v/4`), cyclically shifting all rows right by N with toroidal wrap-around using (C-N) mod W (`wr_cyclic_h/3`), cyclically shifting all columns down by N using (R-N) mod H (`wr_cyclic_v/3`), cyclic horizontal shear where row I wraps right by I*Step (`wr_cyclic_shear_h/3`), cyclic vertical shear where column J wraps down by J*Step (`wr_cyclic_shear_v/3`), per-row arbitrary offset warping where row I shifts right by Offsets[I] generalizing the shear (`wr_skew_offsets/4`), anti-diagonal transpose mapping (R,C) to (W-1-C,H-1-R) giving W-by-H output and being an involution on square grids (`wr_transpose_anti/2`), finding the step in [-(W-1),W-1] such that horizontal shear maps GridA to GridB (`wr_find_shear_h/4`), and finding the vertical shear step (`wr_find_shear_v/4`). 14 wr_* predicates, Layer 145.
+
+rotation
+Grid Rotation and Rotational Symmetry Detection (PR 250)
+
+    rotating a grid 90 degrees clockwise so each new row C equals column C read bottom-to-top giving W-by-H output (`ro_rot90/2`), rotating 180 degrees by reversing each row then reversing row order (`ro_rot180/2`), rotating 270 CW by reading column W-1-C top-to-bottom (`ro_rot270/2`), dispatching to any rotation by index N in 0..3 with cuts to avoid choicepoints (`ro_rot_n/3`), producing all four rotations as a list (`ro_all/2`), finding the lexicographically smallest rotation as a canonical form (`ro_canonical/2`), testing 2-fold symmetry (Grid == its own 180 rotation) (`ro_is_rot2/1`), testing 4-fold symmetry for square grids (`ro_is_rot4/1`), determining the smallest symmetry order in {1,2,4} (`ro_sym_order/2`), rotating R-C cell coordinate pairs using (R,C)->(C,H-1-R)/(H-1-R,W-1-C)/(W-1-C,R) for N=1/2/3 (`ro_rotate_cells/5`), overlaying a grid with its 180 rotation to build 2-fold symmetric output (`ro_spin2/3`), overlaying all four rotations to complete 4-fold symmetric patterns (`ro_spin4/3`), finding the smallest N such that rotating GridA by N*90 equals GridB (`ro_match_rotation/3`), and testing whether any rotation of GridA equals GridB (`ro_equiv_rotation/2`). 14 ro_* predicates, Layer 144.
+
+fold
+Grid Folding, Unfolding, and Fold-Symmetry Detection (PR 249)
+
+    splitting a grid into top/bottom halves at a horizontal crease row (`fd_split_h/4`), splitting into left/right halves at a vertical crease column (`fd_split_v/4`), overlaying two same-size grids with background-priority semantics where non-background cells of grid A overwrite grid B (`fd_overlay/4`), folding the bottom half upward with the crease after row R so that output row I overlays Top[I] with Bottom[R-I] (`fd_fold_h/4`), folding the right half leftward with the crease after column C so that output column I overlays Left[col][I] with Right[col][C-I] (`fd_fold_v/4`), creating a symmetric full grid from a top half by stacking with its row-reversed copy (`fd_unfold_h/2`), creating a symmetric full grid from a left half by joining each row with its column-reverse (`fd_unfold_v/2`), testing horizontal fold symmetry using between-rows mirror formula row I maps to row 2R+1-I consistent with fd_fold_h (`fd_sym_h/2`), testing vertical fold symmetry using mirror formula column J maps to column 2C+1-J (`fd_sym_v/2`), finding the first valid horizontal fold crease (`fd_find_fold_h/2`), finding the first valid vertical fold crease (`fd_find_fold_v/2`), finding the first row where every cell equals a marker value (`fd_mark_row/3`), finding the first column where every cell equals a marker value (`fd_mark_col/3`), and composing a horizontal fold then vertical fold to reduce a grid to its top-left quadrant (`fd_fold_both/5`). 14 fd_* predicates, Layer 143.
+
+interop
+Hyperon Interoperability Bridge
+
+    bidirectional Atomese/MeTTa import-export and space mounting. PrologAI can exchange knowledge with other symbolic AI systems.
+
