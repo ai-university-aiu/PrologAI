@@ -941,3 +941,20 @@ Grid Neighbor Analysis: Cell Adjacency, Morphological Ops, and Neighbor Counts (
     gn_shrink_color/3: morphological erosion — remove Color cells touching any non-Color 4-neighbor
     gn_majority_nbr4/4: most frequent color among 4-connected neighbors; fails for no-neighbor cells
     gn_conway_step/4: one cellular automaton step — kill Color cells with exactly N Color 4-neighbors
+
+griddist
+Grid Distance Transform: Cell-to-Color Distances, BFS Flood, Voronoi, and Morphological N-Step Ops (gd_*, Layer 200)
+    gd_manhattan/5: Manhattan (L1) distance between two grid positions (R1,C1) and (R2,C2)
+    gd_chebyshev/5: Chebyshev (L-infinity) distance between two grid positions
+    gd_dist_map/3: grid of minimum Manhattan distances from each cell to the nearest Color cell
+    gd_dist_map8/3: grid of minimum Chebyshev distances from each cell to the nearest Color cell
+    gd_nearest_coord/5: [R2,C2] coordinates of the nearest Color cell from a given position
+    gd_zone/4: mark non-Color cells within Manhattan distance N of any Color cell with atom zone
+    gd_ring/5: list of in-bounds [R,C] positions at exactly Manhattan distance D from a given cell
+    gd_voronoi/2: replace each background cell with the color of its nearest non-background cell
+    gd_bfs_flood/5: BFS distances from a start cell treating Wall-color cells as impassable
+    gd_recolor_by_dist/4: recolor each Color cell based on its Manhattan distance from background
+    gd_expand_n/4: N-step morphological dilation — expand Color region outward by N steps
+    gd_shrink_n/4: N-step morphological erosion — shrink Color region inward by N steps
+    gd_equidistant/4: mark cells equidistant from ColorA and ColorB with atom equidist
+    gd_max_dist/4: row and column of the cell farthest from any Color cell (Manhattan)
