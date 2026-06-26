@@ -1,0 +1,129 @@
+Chapter 93: Integer-Factor Grid Scaling - The Zoom Pack (zm_* prefix)
+
+The zoom pack (Work Package 132, Layer 111) provides 14 predicates for
+integer-factor grid scaling. It upscales each cell to an FxF block, downsamples
+by sampling or mode, infers scale factors, tests scaled equivalence, computes
+scaled dimensions, extracts and splits FxF tiles, finds the dominant color of
+a tile, and tiles a small grid NR x NC times.
+
+
+1. Loading the Pack
+
+:- use_module(packs/zoom/prolog/zoom).
+
+
+2. Upscaling
+
+zm_scale_up(+Grid, +F, -Big) upscales Grid by integer factor F: each cell
+becomes an FxF block of the same color. The result has H*F rows and W*F columns.
+Implemented recursively per row to preserve correct row order.
+
+zm_scale_up_row(+Row, +F, -BigRow) scales a single row: each element is
+repeated F consecutive times.
+
+?- zm_scale_up([[1,2],[3,4]], 2, Big).
+Big = [[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]].
+
+?- zm_scale_up_row([1,2,3], 2, BigRow).
+BigRow = [1,1,2,2,3,3].
+
+?- zm_scale_up([[9]], 3, Big).
+Big = [[9,9,9],[9,9,9],[9,9,9]].
+
+
+3. Downsampling
+
+zm_scale_down(+Grid, +F, -Small) downsamples by sampling every Fth row and
+column (the top-left corner of each FxF block). Results have (H // F) rows
+and (W // F) columns.
+
+zm_scale_down_row(+Row, +F, -SmallRow) samples every Fth element (indices
+0, F, 2F, ...).
+
+?- zm_scale_down([[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, Small).
+Small = [[1,2],[3,4]].
+
+zm_scale_down_mode(+Grid, +F, -Small) downsamples using the mode (most common
+value) of each FxF block. Tie-breaking: on equal counts, the largest value
+wins.
+
+?- zm_scale_down_mode([[1,1,1,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, Small).
+Small = [[1,2],[3,4]].   % block (0,0) has three 1s and one 2: mode=1
+
+
+4. Scale Factor Inference and Testing
+
+zm_scale_factor(+Small, +Big, -F) infers F from the ratio of grid widths.
+
+zm_is_scaled_up(+Small, +Big, +F) tests if Big is exactly the F-upscaling
+of Small. Fails if not.
+
+?- zm_scale_factor([[1]], [[1,1],[1,1]], F).
+F = 2.
+
+?- zm_is_scaled_up([[1,2],[3,4]], [[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2).
+true.
+
+
+5. Dimension Computation
+
+zm_dims_up(+H, +W, +F, -BH, -BW) computes BH = H*F, BW = W*F.
+zm_dims_down(+H, +W, +F, -SH, -SW) computes SH = H//F, SW = W//F.
+
+?- zm_dims_up(2, 3, 2, BH, BW).
+BH = 4, BW = 6.
+
+?- zm_dims_down(9, 9, 3, SH, SW).
+SH = 3, SW = 3.
+
+
+6. Block Extraction and Splitting
+
+zm_extract_block(+Grid, +F, +BR, +BC, -Block) extracts the FxF block at
+tile position (BR, BC) where positions are 0-based from the top-left.
+
+zm_split_blocks(+Grid, +F, -Blocks) returns all FxF blocks as a flat list
+in row-major order.
+
+zm_blocks_dims(+Grid, +F, -NR, -NC) returns the number of complete tile
+blocks along each dimension.
+
+?- zm_extract_block([[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, 0, 0, B).
+B = [[1,1],[1,1]].
+
+?- zm_split_blocks([[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, Blocks).
+length(Blocks, 4).   % four 2x2 blocks
+
+
+7. Block Color
+
+zm_block_color(+Grid, +F, +BR, +BC, -Color) returns the single color of a
+uniform FxF block. Fails if the block contains more than one distinct color.
+
+?- zm_block_color([[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, 1, 1, Color).
+Color = 4.
+
+?- zm_block_color([[1,2],[3,4]], 2, 0, 0, _).
+false.   % non-uniform block
+
+
+8. Tiling
+
+zm_tile_grid(+Tile, +NR, +NC, -Grid) tiles Tile NR times vertically and NC
+times horizontally.
+
+?- zm_tile_grid([[1,2],[3,4]], 2, 2, Grid).
+Grid = [[1,2,1,2],[3,4,3,4],[1,2,1,2],[3,4,3,4]].
+
+?- zm_tile_grid([[5]], 2, 2, Grid).
+Grid = [[5,5],[5,5]].
+
+
+9. Summary
+
+The zoom pack makes integer-factor scaling a first-class operation. In
+combination with the patch pack (template matching on blocks) and the histogram
+pack (color counting), it enables: extract blocks, count their colors, detect
+scaling structure, and reconstruct a scaled output.
+
+Predicate count: 14 (zm_* prefix). Tests: 42/42. Layer: 111.

@@ -14475,4 +14475,39 @@ hi_all_equal uses forall(member(X, T), X =:= H) for uniform integer grids.
 
 Predicate count: 14 (hi_* prefix). Tests: 42/42. Layer: 110.
 
-Next chapter: Chapter 93 covers the next perceptual or structural pack.
+Next chapter: Chapter 93 covers the Zoom Pack (integer-factor grid scaling).
+
+
+Chapter 93: Integer-Factor Grid Scaling - The Zoom Pack (zm_* prefix)
+
+The zoom pack (Work Package 132, Layer 111) provides 14 predicates for
+integer-factor grid scaling: upscaling, downsampling, block extraction and
+splitting, scale factor inference, dimension computation, mode-based
+downsampling, and tiling.
+
+zm_scale_up([[1,2],[3,4]], 2, Big).
+% Big = [[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]]
+
+zm_scale_down([[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, Small).
+% Small = [[1,2],[3,4]]
+
+zm_scale_factor([[1]], [[1,1],[1,1]], F).  % F = 2
+zm_dims_up(2, 3, 2, BH, BW).              % BH=4, BW=6
+zm_dims_down(9, 9, 3, SH, SW).            % SH=3, SW=3
+
+zm_extract_block([[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, 0, 0, B).
+% B = [[1,1],[1,1]]
+
+zm_block_color([[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, 1, 1, C). % C=4
+zm_scale_down_mode([[1,1,1,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, S).   % S=[[1,2],[3,4]]
+zm_tile_grid([[1,2],[3,4]], 2, 2, Grid).
+% Grid = [[1,2,1,2],[3,4,3,4],[1,2,1,2],[3,4,3,4]]
+
+zm_scale_up uses recursive per-row structure (not nested findall) to ensure
+rows appear in the correct order: all F copies of row 1 before all F copies
+of row 2. zm_scale_down_mode uses zm_mode_ (msort N-V pairs + last) to pick
+the most common value in each FxF block.
+
+Predicate count: 14 (zm_* prefix). Tests: 42/42. Layer: 111.
+
+Next chapter: Chapter 94 covers the next perceptual or structural pack.
