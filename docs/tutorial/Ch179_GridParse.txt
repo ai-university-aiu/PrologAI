@@ -1,0 +1,171 @@
+Chapter 179: gridparse Pack - Grid Parse and Object Extraction (gp_*, Layer 197)
+
+
+Overview
+
+The gridparse pack converts between raw grid format (list-of-lists of color atoms)
+and the obj(Color, Cells) scene representation used by all of PrologAI's scene
+reasoning packs. It provides the essential bridge between ARC's native format and
+the higher-level reasoning tools.
+
+Layer 197. Pack prefix: gp_*. Work Package 218.
+
+
+Exported Predicates
+
+
+gp_bg_color(+Grid, -BgColor)
+
+Identify the most frequent color in the grid, which is conventionally the
+background. Ties broken by standard term order.
+
+Example:
+
+gp_bg_color([[r,r,r],[r,b,r],[r,r,r]], BgColor).
+% BgColor = r  (r appears 8 times; b appears 1 time)
+
+
+gp_grid_cells(+Grid, +Color, -Cells)
+
+List of r(R,C) positions where the grid has value Color. Order is row-major.
+
+Example:
+
+gp_grid_cells([[r,b,r],[r,b,r]], b, Cells).
+% Cells = [r(0,1), r(1,1)]
+
+
+gp_color_components(+Grid, +Color, -Components)
+
+Components is a list of cell-lists, one per 4-connected component of Color in
+the grid. Uses BFS flood fill starting from the first unvisited Color cell.
+
+Example:
+
+% Two separate blue cells — two components
+gp_color_components([[b,r,b],[r,r,r]], b, Comps).
+% length(Comps, 2)
+
+% One 2x2 blue block — one component with 4 cells
+gp_color_components([[b,b],[b,b]], b, Comps).
+% Comps = [Cells], length(Cells, 4)
+
+
+gp_grid_to_scene(+Grid, +BgColor, -Scene)
+
+Scene is the list of obj(Color, Cells) terms for all non-background 4-connected
+regions. Objects are listed in sorted color order; within each color by flood-fill
+discovery order.
+
+Example:
+
+gp_grid_to_scene([[r,r,r],[r,b,r],[r,r,r]], r, Scene).
+% Scene = [obj(b, [r(1,1)])]
+
+
+gp_scene_to_grid(+Scene, +H, +W, +BgColor, -Grid)
+
+Render Scene onto an H x W background grid. Creates a blank grid filled with
+BgColor, then paints each object in Scene onto it.
+
+Example:
+
+gp_scene_to_grid([obj(b,[r(1,1)])], 3, 3, r, Grid).
+% Grid = [[r,r,r],[r,b,r],[r,r,r]]
+
+
+gp_n_objects(+Grid, +BgColor, -N)
+
+N is the total count of non-background 4-connected objects.
+
+
+gp_object_colors(+Grid, +BgColor, -Colors)
+
+Sorted list of distinct non-background colors.
+
+
+gp_largest_object(+Grid, +BgColor, -Obj)
+
+The obj term with the most cells. Ties broken by term order.
+
+
+gp_smallest_object(+Grid, +BgColor, -Obj)
+
+The obj term with the fewest cells.
+
+
+gp_objects_by_size(+Grid, +BgColor, -Objs)
+
+All non-background objects sorted by cell count descending (largest first).
+
+
+gp_grid_from_rows(+H, +W, +Color, -Grid)
+
+Create an H x W grid with every cell set to Color. Useful for making backgrounds.
+
+Example:
+
+gp_grid_from_rows(2, 3, r, Grid).
+% Grid = [[r,r,r],[r,r,r]]
+
+
+gp_paint_obj(+Grid, +Obj, -NewGrid)
+
+Paint all cells of Obj onto Grid. Cells already in Grid are overwritten.
+
+
+gp_paint_scene(+Grid, +Scene, -NewGrid)
+
+Paint all objects in Scene onto Grid in list order (later objects overwrite earlier).
+
+
+gp_grid_equal(+Grid1, +Grid2)
+
+Succeed if Grid1 and Grid2 are identical (structural equality ==).
+
+
+Typical Pipeline
+
+1. Load a raw grid from the task input.
+2. Use gp_bg_color to identify the background.
+3. Use gp_grid_to_scene to extract objects.
+4. Apply reasoning packs (multicolor, scene, gridsolve, seqinfer, etc.).
+5. Use gp_scene_to_grid to render the output back to grid format.
+
+Example:
+
+solve_task(InputGrid, OutputGrid) :-
+    gp_bg_color(InputGrid, Bg),
+    gp_grid_to_scene(InputGrid, Bg, Scene),
+    % ... reason about Scene to get OutputScene ...
+    length(InputGrid, H), InputGrid = [Row|_], length(Row, W),
+    gp_scene_to_grid(OutputScene, H, W, Bg, OutputGrid).
+
+
+Round-Trip Guarantee
+
+gp_grid_to_scene followed by gp_scene_to_grid with the same background color
+reproduces the original grid exactly, provided no two objects overlap.
+
+
+Dependencies
+
+None. Uses library(lists) and library(apply).
+
+
+Test Coverage
+
+All 43 acceptance criteria (AC-GP-001 through AC-GP-044, where AC-GP-004 is the
+extra bg_color test) defined in Refinement v231 Part 208 are exercised in
+packs/gridparse/test/test_gridparse.pl. All 43 tests pass including round-trip
+verification.
+
+
+Summary
+
+The gridparse pack is the essential bridge between ARC's raw grid format and
+PrologAI's scene reasoning infrastructure. With gridparse and gridquery together,
+the platform can now ingest any ARC-style task, reason about it in obj-term form,
+and emit a grid answer.
+
+Continue to Chapter 180 for the next pack in the PrologAI Layer sequence.

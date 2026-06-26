@@ -890,3 +890,20 @@ Grid Query and Manipulation: Size, Color, Region, Diff, and Structural Ops (gq_*
     gq_transpose/2: transpose the grid (rows become columns)
     gq_replace/5: replace one cell and return the new grid
     gq_fill_region/7: fill a rectangular region with a given color
+
+gridparse
+Grid Parse: Conversion between Raw Grid Format and obj(Color,Cells) Scenes (gp_*, Layer 197)
+    gp_bg_color/2: most frequent color in the grid (background)
+    gp_grid_cells/3: r(R,C) positions where the grid has a given color
+    gp_color_components/3: partition cells into 4-connected components via BFS flood fill
+    gp_grid_to_scene/3: extract all non-background objects as obj terms
+    gp_scene_to_grid/5: render a scene onto a blank grid with a background color
+    gp_n_objects/3: count of non-background 4-connected objects
+    gp_object_colors/3: sorted distinct non-background colors
+    gp_largest_object/3: largest non-background object by cell count
+    gp_smallest_object/3: smallest non-background object by cell count
+    gp_objects_by_size/3: non-background objects sorted by cell count descending
+    gp_grid_from_rows/4: create an H x W grid filled uniformly with Color
+    gp_paint_obj/3: paint one obj(Color,Cells) term onto a grid
+    gp_paint_scene/3: paint all objects in a scene onto a grid
+    gp_grid_equal/2: succeed if two grids are identical cell-by-cell
