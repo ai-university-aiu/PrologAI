@@ -15909,3 +15909,96 @@ Library imports: library(lists): member/2, nth0/3, last/2.
 Built-ins: sort/2, msort/2, length/2, between/3, forall/2, findall/3.
 
 Predicate count: 14 (go_* prefix). Tests: 42/42. Layer: 141.
+
+Chapter 124: Coordinate-Valued Grid Generation Pack (Layer 142, ix_* prefix)
+
+The index pack provides 14 predicates that generate special 2D grids whose
+cell values are derived from cell coordinates, and apply index-based masking
+and arithmetic. These coordinate grids serve as operands for arithmetic
+operations, masks for row/column selection, and distance fields for spatial
+analysis.
+
+Predicates:
+
+ix_row_grid(+H, +W, -Grid)
+  Grid is H rows by W cols; cell(R,C) = R.
+  Row 0 is all zeros; row H-1 is all H-1.
+
+ix_col_grid(+H, +W, -Grid)
+  Grid is H rows by W cols; cell(R,C) = C.
+  Every row is [0, 1, 2, ..., W-1].
+
+ix_sum_grid(+H, +W, -Grid)
+  Grid is H rows by W cols; cell(R,C) = R+C.
+  Cells on the same top-left/bottom-right diagonal share a value.
+
+ix_diff_grid(+H, +W, -Grid)
+  Grid is H rows by W cols; cell(R,C) = R-C.
+  Values may be negative. Anti-diagonal cells share a value.
+
+ix_prod_grid(+H, +W, -Grid)
+  Grid is H rows by W cols; cell(R,C) = R*C.
+  Row 0 and column 0 are all zeros.
+
+ix_manhattan_grid(+H, +W, +R0, +C0, -Grid)
+  cell(R,C) = |R-R0| + |C-C0| (Manhattan/taxi-cab distance from R0,C0).
+
+ix_chebyshev_grid(+H, +W, +R0, +C0, -Grid)
+  cell(R,C) = max(|R-R0|, |C-C0|) (Chebyshev/king-move distance).
+  Cells at distance K form a hollow square ring (shell) around (R0,C0).
+
+ix_mod_grid(+H, +W, +N, -Grid)
+  cell(R,C) = (R+C) mod N. Diagonal stripe pattern with period N.
+
+ix_row_mod_grid(+H, +W, +N, -Grid)
+  cell(R,C) = R mod N. Horizontal stripe pattern; period N across rows.
+
+ix_col_mod_grid(+H, +W, +N, -Grid)
+  cell(R,C) = C mod N. Vertical stripe pattern; period N across columns.
+
+ix_mask_rows(+Grid, +Is, +Bg, -Grid2)
+  Grid2 is Grid with rows NOT in Is replaced by all-Bg rows.
+
+ix_mask_cols(+Grid, +Js, +Bg, -Grid2)
+  Grid2 is Grid with columns NOT in Js replaced by Bg.
+
+ix_apply(+IxGrid, +Op, +Grid, -Out)
+  Out[R][C] = Grid[R][C] Op IxGrid[R][C].
+  Op is one of: add, sub, mul, max_op, min_op.
+
+ix_from(+H, +W, +R0, +C0, -Grid)
+  cell(R,C) = (R-R0)*W + (C-C0). Signed linear row-major offset from
+  reference point (R0,C0). Values may be negative.
+
+Usage examples:
+
+ix_row_grid(3, 3, G).    % G = [[0,0,0],[1,1,1],[2,2,2]]
+ix_col_grid(3, 3, G).    % G = [[0,1,2],[0,1,2],[0,1,2]]
+ix_sum_grid(3, 3, G).    % G = [[0,1,2],[1,2,3],[2,3,4]]
+ix_diff_grid(3, 3, G).   % G = [[0,-1,-2],[1,0,-1],[2,1,0]]
+ix_prod_grid(3, 3, G).   % G = [[0,0,0],[0,1,2],[0,2,4]]
+
+ix_manhattan_grid(3, 3, 1, 1, G).
+%   G = [[2,1,2],[1,0,1],[2,1,2]]
+
+ix_chebyshev_grid(5, 5, 2, 2, G).
+%   G = [[2,2,2,2,2],[2,1,1,1,2],[2,1,0,1,2],[2,1,1,1,2],[2,2,2,2,2]]
+
+ix_mod_grid(3, 3, 3, G).      % G = [[0,1,2],[1,2,0],[2,0,1]]
+ix_row_mod_grid(4, 3, 2, G).  % G = [[0,0,0],[1,1,1],[0,0,0],[1,1,1]]
+ix_col_mod_grid(3, 4, 2, G).  % G = [[0,1,0,1],[0,1,0,1],[0,1,0,1]]
+
+ix_mask_rows([[a,b],[c,d],[e,f]], [0,2], 9, G).  % G = [[a,b],[9,9],[e,f]]
+ix_mask_cols([[a,b,c],[d,e,f]], [1], 0, G).      % G = [[0,b,0],[0,e,0]]
+
+ix_row_grid(2, 3, IxG),
+ix_apply(IxG, add, [[10,10,10],[10,10,10]], Out).
+%   Out = [[10,10,10],[11,11,11]]
+
+ix_from(3, 3, 0, 0, G).   % G = [[0,1,2],[3,4,5],[6,7,8]]
+ix_from(3, 3, 1, 1, G).   % G = [[-4,-3,-2],[-1,0,1],[2,3,4]]
+
+Library imports: library(lists): member/2, nth0/3.
+Built-ins: length/2, between/3, findall/3.
+
+Predicate count: 14 (ix_* prefix). Tests: 42/42. Layer: 142.
