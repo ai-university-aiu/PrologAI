@@ -958,3 +958,20 @@ Grid Distance Transform: Cell-to-Color Distances, BFS Flood, Voronoi, and Morpho
     gd_shrink_n/4: N-step morphological erosion — shrink Color region inward by N steps
     gd_equidistant/4: mark cells equidistant from ColorA and ColorB with atom equidist
     gd_max_dist/4: row and column of the cell farthest from any Color cell (Manhattan)
+
+gridperiod
+Grid Periodic Pattern Detection and Extension: Row/Column Period, Tiling, Autocorrelation, and Wrap-Shift (gper_*, Layer 201)
+    gper_is_row_periodic/2: succeed if every pair of rows separated by P are identical (vacuously true for P >= H)
+    gper_is_col_periodic/2: succeed if every pair of columns separated by P are identical (vacuously true for P >= W)
+    gper_row_period/2: smallest positive P for which gper_is_row_periodic holds; always succeeds (P=H is upper bound)
+    gper_col_period/2: smallest positive P for which gper_is_col_periodic holds; always succeeds (P=W is upper bound)
+    gper_tile_dims/3: PH and PW — the smallest tile dimensions whose tiling reconstructs the grid
+    gper_extract_tile/4: top-left TH x TW sub-grid of Grid
+    gper_tile_grid/4: H x W grid formed by repeating Tile via wrap-around indexing Grid[r][c] = Tile[r mod TH][c mod TW]
+    gper_extend_rows/3: extend Grid to TargetH rows by wrapping row index (row R = row R mod H)
+    gper_extend_cols/3: extend Grid to TargetW columns per row by wrapping column index
+    gper_extend/4: extend Grid to TargetH x TargetW by tiling in both dimensions
+    gper_autocorr_row/3: fraction of row pairs (r, r+P) that are identical; 1.0 when no pairs exist
+    gper_autocorr_col/3: fraction of column pairs (c, c+P) that are identical; 1.0 when no pairs exist
+    gper_shift_wrap_rows/3: shift rows down by N with wrap-around; row R of result = row (R-N) mod H of input
+    gper_shift_wrap_cols/3: shift each row's columns right by N with wrap-around; cell (R,C) = (R,(C-N) mod W)

@@ -1146,7 +1146,7 @@ Tier 2 is the Data Layer (layers 60 and above).
 
 These are the perception, analysis, and transformation packs: color, shape, symmetry, fill, compare, grid operations, and everything that processes structured data.
 
-As of this writing, the highest Data Layer pack is griddist on layer 200.
+As of this writing, the highest Data Layer pack is gridperiod on layer 201.
 
 New packs always receive a layer number higher than all existing packs they depend on.
 
@@ -18392,3 +18392,38 @@ gd_shrink_n([[r,r,r],[r,b,r],[r,r,r]], b, 1, S).
 
 14 gd_* predicates. 53 tests pass. Layer 200.
 All 53 tests pass. See docs/tutorial/Ch182_GridDist.txt for the full chapter.
+
+
+Chapter 172: gridperiod Pack - Grid Periodic Pattern Detection and Extension (gper_*, Layer 201)
+
+The gridperiod pack detects and exploits periodic structure in raw grid format
+(list-of-lists of color atoms). It finds the smallest repeating period along
+rows and columns, extracts the fundamental tile, tiles small grids to larger
+target sizes, measures autocorrelation, and applies wrap-around shifts.
+
+:- use_module(pack(gridperiod/prolog/gridperiod)).
+
+% Detect tile dimensions of a 4x4 repeating pattern:
+gper_tile_dims([[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]], PH, PW).
+% PH = 2, PW = 2
+
+% Extract the tile and reconstruct:
+gper_extract_tile([[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]], 2, 2, Tile).
+% Tile = [[r,b],[b,r]]
+gper_tile_grid([[r,b],[b,r]], 4, 4, G).
+% G = [[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]]
+
+% Extend a small grid to a larger target size:
+gper_extend([[r,b],[b,r]], 4, 4, E).
+% E = [[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]]
+
+% Measure autocorrelation at lag 2 (score 1.0 = perfect period):
+gper_autocorr_row([[r,b],[b,r],[r,b],[b,r]], 2, S).
+% S = 1.0
+
+% Shift rows down by 1 with wrap-around:
+gper_shift_wrap_rows([[r,r,r],[b,b,b],[g,g,g]], 1, S).
+% S = [[g,g,g],[r,r,r],[b,b,b]]
+
+14 gper_* predicates. 51 tests pass. Layer 201.
+All 51 tests pass. See docs/tutorial/Ch183_GridPeriod.txt for the full chapter.
