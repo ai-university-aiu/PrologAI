@@ -15471,3 +15471,48 @@ Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2,
   sum_list/2. Built-ins: length/2, between/3.
 
 Predicate count: 14 (ex_* prefix). Tests: 42/42. Layer: 133.
+
+PROLOGAI TUTORIAL
+
+Chapter 116: Per-Cell Neighborhood Value Aggregation Pack (Layer 134, na_* prefix)
+
+The naggr pack provides per-cell aggregate statistics over in-bounds 4-connected
+and 8-connected neighborhoods.  Complements the automaton pack (at_*, Layer 120)
+which provides count-based neighbor operations.
+
+Predicates: na_sum4/2, na_sum8/2, na_max4/2, na_max8/2, na_min4/2, na_min8/2,
+  na_mean4/2, na_mean8/2, na_range4/2, na_range8/2, na_spread4/2, na_spread8/2,
+  na_diff4/2, na_diff8/2.
+
+Usage examples:
+
+na_sum4([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[6,9,8],[13,20,17],[12,21,14]]
+na_sum8([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[11,19,13],[23,40,27],[17,31,19]]
+na_max4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[4,5,6],[7,8,9],[8,9,8]]
+na_max8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[5,6,6],[8,9,9],[8,9,8]]
+na_min4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[2,1,2],[1,2,3],[4,5,6]]
+na_min8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[2,1,2],[1,1,2],[4,4,5]]
+na_mean4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[3,3,4],[4,5,5],[6,7,7]]
+na_mean8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[3,3,4],[4,5,5],[5,6,6]]
+na_range4([[1,2,3],[4,5,6],[7,8,9]],R). % R=[[2,4,4],[6,6,6],[4,4,2]]
+na_range8([[1,2,3],[4,5,6],[7,8,9]],R). % R=[[3,5,4],[7,8,7],[4,5,3]]
+na_spread4([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[2,3,2],[3,4,3],[2,3,2]]
+na_spread8([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[3,5,3],[5,8,5],[3,5,3]]
+na_diff4([[1,2,1],[2,1,2],[1,2,1]],D). % D=[[2,3,2],[3,4,3],[2,3,2]]
+na_diff8([[1,2,1],[2,1,2],[1,2,1]],D). % D=[[2,3,2],[3,4,3],[2,3,2]]
+
+Empty neighborhood sentinel:
+na_sum4([[5]],S). % S=[[0]] - 1x1 grid has no 4-neighbors
+na_max4([[5]],M). % M=[[0]]
+
+Key implementation patterns:
+na_nbr4_vals_/na_nbr8_vals_: findall over member(DR-DC, offsets) with
+  bounds guards NR>=0, NR<H, NC>=0, NC<W.
+Nested findall: outer collects rows; inner collects per-cell aggregates.
+na_spread4/8: sort/2 removes duplicates; length measures distinct set.
+na_diff4/8: nested findall counts same-valued neighbors; D = Total - SC.
+
+Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2,
+  sum_list/2. Built-ins: sort/2, length/2, between/3.
+
+Predicate count: 14 (na_* prefix). Tests: 42/42. Layer: 134.
