@@ -17251,3 +17251,36 @@ Library imports: library(lists): member/2, sum_list/2.
 Built-ins: findall/3, sort/2, length/2, \+.
 
 42/42 PLUnit tests pass.
+
+
+Chapter 138: Group Pack (gp_* Prefix, Layer 156)
+
+The group pack partitions a list of obj(Color, Cells) terms into named groups.
+
+Groups are Key-[Objs] pairs sorted by key.
+
+gp_by_color(+Objs, -Groups): partition by color.
+gp_by_size(+Objs, -Groups): partition by cell count.
+gp_by_row(+Objs, -Groups): partition by minimum row of cells.
+gp_by_col(+Objs, -Groups): partition by minimum column of cells.
+gp_by_form(+Objs, -Groups): partition by origin-normalized cell list (shape).
+gp_size_of(+Groups, -N): number of groups.
+gp_flatten(+Groups, -Objs): flatten all groups into a single list.
+gp_largest_group(+Groups, -Key-Grp): group with the most objects.
+gp_smallest_group(+Groups, -Key-Grp): group with the fewest objects.
+gp_singleton_groups(+Groups, -Singles): groups with exactly one object.
+gp_shared_groups(+Groups, -Shared): groups with more than one object.
+gp_group_sizes(+Groups, -Sizes): sorted distinct group cardinalities.
+gp_all_same_size(+Groups): succeed iff all groups have the same cardinality.
+gp_keys(+Groups, -Keys): sorted list of group keys.
+
+Example:
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(1,1)]), obj(1,[r(0,1)])],
+    gp_by_color(Objs, Groups).
+    % Groups = [1-[obj(1,[r(0,0)]),obj(1,[r(0,1)])], 2-[obj(2,[r(1,1)])]]
+
+Library imports: library(lists): member/2, memberchk/2, min_list/2, max_list/2.
+Built-ins: findall/3, sort/2, length/2.
+
+42/42 PLUnit tests pass.
