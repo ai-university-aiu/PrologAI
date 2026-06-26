@@ -14682,3 +14682,50 @@ bd_place uses nested findall with if-then-else on Patch row/col bounds.
 bd_slice_row_ uses length/2 + append/3 for inclusive [C0,C1] column extraction.
 
 Predicate count: 14 (bd_* prefix). Tests: 42/42. Layer: 116.
+
+
+Next chapter: Chapter 99 covers the Cellset Pack (sparse cell set operations).
+
+Chapter 99: Sparse Cell Set Operations - The Cellset Pack (cs_* prefix)
+
+The cellset pack (Work Package 138, Layer 117) provides 14 predicates for
+treating grid objects as sorted lists of R-C position pairs.
+
+Predicates:
+cs_from_grid(+Grid, +Color, -Cells).   % sorted R-C positions of Color
+cs_to_grid(+Cells, +H, +W, +Color, +Bg, -Grid). % paint cell set onto canvas
+cs_union(+A, +B, -Union).              % sorted set union
+cs_intersect(+A, +B, -Inter).          % sorted set intersection
+cs_subtract(+A, +B, -Diff).            % set difference A minus B
+cs_translate(+Cells, +DR, +DC, -Shifted). % shift all cells by (DR,DC)
+cs_bbox(+Cells, -R0, -C0, -R1, -C1).  % bounding box; fails if empty
+cs_normalize(+Cells, -Norm, -DR, -DC). % translate top-left to (0,0)
+cs_size(+Cells, -N).                   % count of cells
+cs_contains(+Cells, +R, +C).           % deterministic membership test
+cs_adjacent_bg(+Cells, -Adjacent).     % sorted 4-connected background neighbors
+cs_same_shape(+A, +B).                 % shape equality after normalization
+cs_rotate_90(+Cells, +H, -Rotated).    % 90-degree CW rotation; H = grid height
+cs_mirror_h(+Cells, +W, -Mirrored).    % horizontal mirror; W = grid width
+
+Examples:
+cs_from_grid([[0,1,0],[1,0,1]], 1, Cells). % Cells=[0-1,1-0,1-2]
+cs_to_grid([0-0,1-1], 2, 2, 1, 0, Grid).  % Grid=[[1,0],[0,1]]
+cs_union([0-0,0-1], [0-0,1-1], U).        % U=[0-0,0-1,1-1]
+cs_intersect([0-0,0-1,1-0], [0-1,1-0,2-2], I). % I=[0-1,1-0]
+cs_subtract([0-0,0-1,1-0], [0-1], D).     % D=[0-0,1-0]
+cs_translate([0-0,0-1,1-0], 2, 3, S).     % S=[2-3,2-4,3-3]
+cs_normalize([2-3,2-4,3-3], N, DR, DC).   % N=[0-0,0-1,1-0],DR=-2,DC=-3
+cs_same_shape([0-0,0-1,1-0], [3-5,3-6,4-5]). % same L-shape, different origin
+cs_rotate_90([0-0,0-1,0-2], 3, Rot).      % Rot=[0-2,1-2,2-2] (top row -> right col)
+cs_mirror_h([0-0,0-1,1-2], 3, M).         % M=[0-1,0-2,1-0]
+
+cs_from_grid: findall + sort/2 for canonical R-C order.
+cs_to_grid: nested findall with memberchk to select Color or Bg.
+cs_union: append + sort removes duplicates.
+cs_subtract: delegates to subtract/3 from library(lists).
+cs_normalize: two clauses; empty returns ([], 0, 0); non-empty uses cs_bbox + cs_translate.
+cs_adjacent_bg: four fixed offsets per cell; \+memberchk filter; sort removes shared-neighbor dups.
+cs_rotate_90: maplist with cs_rot90_ (new_R=C, new_C=H1-R), then sort.
+cs_mirror_h: maplist with cs_mirh_ (new_C=W1-C), then sort.
+
+Predicate count: 14 (cs_* prefix). Tests: 42/42. Layer: 117.
