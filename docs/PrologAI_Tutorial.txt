@@ -17937,3 +17937,51 @@ sa_seq_len/2: length of rule sequence.
 sa_rule_invertible/1: recolor, shift, reflect_h, reflect_v are invertible.
 
 All 46 tests pass. See docs/tutorial/Ch168_SceneApply.txt for the full chapter.
+
+
+Chapter 158: condxf Pack - Conditional and Selective Scene Transformation (xc_*, Layer 187)
+
+The condxf pack applies transformations to a subset of objects in an
+obj(Color, Cells) scene list - those satisfying a condition - while leaving
+the remaining objects unchanged. Complements scenexf (uniform transforms).
+
+:- use_module(pack(condxf/prolog/condxf)).
+
+% Partition by color
+xc_split_color([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, Reds, Others).
+% Reds = [obj(r,[r(0,0)])], Others = [obj(b,[r(0,1)])]
+
+% Recolor only matching objects
+xc_recolor_matching([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, g, Out).
+% Out = [obj(g,[r(0,0)]),obj(b,[r(0,1)])]
+
+% Shift only red objects
+xc_shift_color([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, 1, 0, Out).
+% Out = [obj(r,[r(1,0)]),obj(b,[r(0,1)])]
+
+% Swap two colors throughout
+xc_swap_colors([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, b, Out).
+% Out = [obj(b,[r(0,0)]),obj(r,[r(0,1)])]
+
+% Recolor by size comparison (gt/lt/eq/ge/le)
+xc_recolor_by_size([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], 1, gt, y, Out).
+% Out = [obj(r,[r(0,0)]),obj(y,[r(0,0),r(0,1),r(0,2)])]
+
+% Largest and smallest
+xc_largest([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], Obj).
+% Obj = obj(r,[r(0,0),r(0,1),r(0,2)])
+
+% Recolor the largest
+xc_recolor_largest([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], g, Out).
+% Out = [obj(r,[r(0,0)]),obj(g,[r(0,0),r(0,1),r(0,2)])]
+
+% Unique-size object
+xc_unique_size([obj(r,[r(0,0)]),obj(b,[r(0,1)]),obj(p,[r(0,0),r(1,0),r(1,1)])], Obj).
+% Obj = obj(p,[r(0,0),r(1,0),r(1,1)])
+
+% Partition by size
+xc_split_size([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], 1, gt, Match, NoMatch).
+% Match = [obj(r,[r(0,0),r(0,1),r(0,2)])], NoMatch = [obj(r,[r(0,0)])]
+
+14 xc_* predicates. 41 tests pass. Layer 187.
+All 41 tests pass. See docs/tutorial/Ch169_CondXf.txt for the full chapter.
