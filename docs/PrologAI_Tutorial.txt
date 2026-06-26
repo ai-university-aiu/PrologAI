@@ -14920,3 +14920,49 @@ cx_row_uniq/cx_col_uniq: sort/2 on extracted list.
 cx_row_mode/cx_col_mode: cx_mode_ with findall+max_list+unique-winner-or-Bg.
 
 Predicate count: 14 (cx_* prefix). Tests: 42/42. Layer: 121.
+
+Next chapter: Chapter 104 covers the Boolean Mask Operations Pack.
+
+Chapter 104: Boolean Mask Operations - The mask Pack (mk_* prefix)
+
+The mask pack creates, combines, and applies binary 0/1 masks to grids.
+A mask is a same-size grid where each cell is 0 (disabled) or 1 (enabled).
+Layer 122, Work Package 143.
+
+Public predicates:
+mk_from_val(+Grid, +V, -Mask).       % 1 where Grid=V, else 0
+mk_from_bg(+Grid, +Bg, -Mask).       % 0 where Grid=Bg, else 1
+mk_invert(+Mask, -Mask2).            % flip all bits
+mk_and(+MaskA, +MaskB, -MaskC).      % element-wise AND
+mk_or(+MaskA, +MaskB, -MaskC).       % element-wise OR
+mk_xor(+MaskA, +MaskB, -MaskC).      % element-wise XOR
+mk_apply(+Grid, +Mask, +Bg, -Grid2). % keep Grid at 1-cells, Bg at 0-cells
+mk_fill(+Grid, +Mask, +V, -Grid2).   % set V at 1-cells, keep Grid at 0-cells
+mk_overlay(+GA, +GB, +Mask, -Grid2). % GB at 1-cells, GA at 0-cells
+mk_where(+Mask, -Cells).             % sorted R-C pairs of 1-positions
+mk_count(+Mask, -N).                 % count of 1-cells
+mk_any(+Mask).                       % true iff any cell = 1
+mk_all(+Mask).                       % true iff all cells = 1
+mk_extract(+Grid, +Mask, -Vals).     % sorted unique values at 1-positions
+
+Examples:
+mk_from_val([[0,1,0],[1,0,1]], 1, M).      % M=[[0,1,0],[1,0,1]]
+mk_from_bg([[0,1,2],[0,3,0]], 0, M).       % M=[[0,1,1],[0,1,0]]
+mk_invert([[1,0],[0,1]], M).               % M=[[0,1],[1,0]]
+mk_and([[1,1],[0,1]], [[1,0],[1,1]], M).   % M=[[1,0],[0,1]]
+mk_apply([[1,2],[3,4]], [[1,0],[0,1]], 0, G). % G=[[1,0],[0,4]]
+mk_fill([[1,2],[3,4]], [[1,0],[0,1]], 9, G).  % G=[[9,2],[3,9]]
+mk_overlay([[1,1],[1,1]], [[2,2],[2,2]], [[1,0],[0,1]], G). % G=[[2,1],[1,2]]
+mk_where([[1,0,1],[0,1,0]], Cs).           % Cs=[0-0,0-2,1-1]
+mk_count([[1,0,1],[0,1,0]], N).            % N=3
+mk_extract([[1,2,3]], [[1,0,1]], Vals).    % Vals=[1,3]
+
+mk_from_val/mk_from_bg: nested maplist/3 with two-clause cut-on-match helpers.
+mk_and/mk_or: nested maplist/4 with two-clause helpers.
+mk_xor: (A+B) mod 2 per cell.
+mk_apply/mk_fill: nested maplist/4; strict duals of each other.
+mk_overlay: nested maplist/5 for four-way parallel iteration.
+mk_any: member/2 with cut on first 1 found.
+mk_all: forall/2 (built-in) over all rows and cells.
+
+Predicate count: 14 (mk_* prefix). Tests: 42/42. Layer: 122.
