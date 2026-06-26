@@ -17484,3 +17484,35 @@ ob_is_frame(+Obj): H>=3, W>=3, all border cells present, no interior cells.
 5. Perimeter and Hull
 ob_perimeter(+Obj, -P): total exposed cell edges.
 ob_dense_hull(+Obj, -HullObj): solid bbox rectangle with same color.
+
+Chapter 144: Object Pair Relations (objrel Pack, or_*, Layer 172)
+
+The objrel pack computes pairwise relationships between two
+obj(Color, Cells) terms. Colors are ignored; all reasoning uses
+cell positions only.
+
+1. Overlap
+or_overlap/2: share at least one cell.
+or_shared_cells/3: cells in both objects.
+or_n_shared/3: count of shared cells.
+
+2. Adjacency
+or_touch4/2: 4-adjacent (Manhattan 1), no overlap.
+or_touch8/2: 8-adjacent (Chebyshev 1, includes diagonal), no overlap.
+
+3. Containment and Union
+or_contains/2: every cell of Obj2 is in Obj1.
+or_union_cells/3: sorted union of both cell sets.
+
+4. Distance
+or_dist/3: Euclidean distance between centroids (float).
+or_manhattan/3: Manhattan distance between centroids.
+
+5. Direction and Alignment
+or_direction/3: compass direction (n/s/e/w/ne/nw/se/sw/same).
+or_aligned_h/2: same centroid row.
+or_aligned_v/2: same centroid column.
+
+6. Bounding Box Gaps
+or_gap_rows/3: empty rows between bounding boxes (0 if touching/overlap).
+or_gap_cols/3: empty columns between bounding boxes.
