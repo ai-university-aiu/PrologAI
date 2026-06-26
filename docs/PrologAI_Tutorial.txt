@@ -17798,3 +17798,31 @@ sm_added_forms/3: forms in After not in Before.
 sm_removed_forms/3: forms in Before not in After.
 sm_n_color_change/3: |added colors| + |removed colors|.
 sm_any_change/2: any difference in count, color, or form; fails if none.
+
+
+Chapter 154: Object-List Spatial and Attribute Query Against a Reference (objlocate, lq_*, Layer 183)
+
+The objlocate pack queries a list of obj(Color, Cells) terms for those satisfying a
+spatial or attribute relationship to a given reference object.
+
+1. Directional Queries (by centroid)
+lq_above/3: centroid row strictly less than Ref.
+lq_below/3: centroid row strictly greater than Ref.
+lq_left_of/3: centroid col strictly less than Ref.
+lq_right_of/3: centroid col strictly greater than Ref.
+
+2. Adjacency Queries
+lq_touching4/3: 4-adjacent to Ref (Manhattan distance 1, no overlap).
+lq_touching8/3: 8-adjacent to Ref (Chebyshev distance 1, no overlap).
+lq_overlapping/3: sharing at least one cell with Ref.
+
+3. Attribute Queries
+lq_same_color/3: same color atom as Ref.
+lq_same_form/3: same normalized shape as Ref (translate-to-origin, sort).
+lq_aligned_h/3: same top-left row as Ref.
+lq_aligned_v/3: same top-left column as Ref.
+
+4. Distance Queries
+lq_nearest/3: single object with smallest squared centroid distance to Ref.
+lq_farthest/3: single object with largest squared centroid distance to Ref.
+lq_n_touching4/3: count of 4-touching objects.
