@@ -17717,3 +17717,31 @@ mg_pad/4: add P layers of border cells with new color.
 mg_split_cc4/2: split into 4-connected component objs.
 mg_split_cc8/2: split into 8-connected component objs.
 mg_n_components4/2: count 4-connected components.
+
+
+Chapter 151: Object-List Aggregate Attribute Analysis (objattr, oa_*, Layer 180)
+
+The objattr pack provides aggregate statistics and rankings over a list of obj(Color, Cells)
+terms. It gives a reasoner a bird's-eye view of a scene without manual accumulation.
+
+1. Cell and Color Counts
+oa_total_cells/2: total cells across all objects.
+oa_color_counts/2: Color-Count pairs (number of objects per color).
+oa_cell_counts_by_color/2: Color-Total pairs (total cells per color).
+oa_n_colors/2: number of distinct colors.
+oa_n_objs_of_color/3: object count for a specific color.
+
+2. Color Dominance
+oa_dominant_color/2: color with the most total cells.
+oa_rarest_color/2: color with the fewest total cells.
+oa_unique_color/2: backtrackable; each color appearing in exactly one object.
+
+3. Rankings
+oa_size_rank/2: objects sorted by cell count descending.
+oa_pos_rank/2: objects sorted by top-left corner, row-major order.
+oa_majority_size/2: most frequently occurring cell count.
+
+4. Uniformity Tests
+oa_all_same_color/1: all objects share the same color.
+oa_all_same_size/1: all objects have the same cell count.
+oa_all_same_form/1: all objects have the same normalized shape (position and color ignored).

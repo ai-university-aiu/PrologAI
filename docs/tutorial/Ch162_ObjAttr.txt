@@ -1,0 +1,216 @@
+Chapter 162: Object-List Aggregate Attribute Analysis (objattr Pack, oa_* Prefix, Layer 180)
+
+Author: D. R. Dison, Founder of AIU, Creator of PrologAI and Mentova,
+ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
+
+
+Overview
+
+The objattr pack (Layer 180) provides aggregate statistics and rankings over a list of
+obj(Color, Cells) terms.
+
+Where objfilter selects individual objects by property, objattr answers questions about
+the list as a whole: how many cells are there in total, which color appears most often,
+which object is largest, are all objects the same shape?
+
+The pack exports 14 predicates under the oa_* prefix.
+
+
+The Object Representation
+
+Every object is an obj(Color, Cells) term, where Color is an atom such as r, b, g, y,
+and Cells is a list of r(Row, Col) terms identifying the occupied cells.
+
+Example objects used throughout this chapter:
+
+red dot:    obj(r, [r(0,0)])
+blue dot:   obj(b, [r(0,1)])
+green dot:  obj(g, [r(1,0)])
+red bar:    obj(r, [r(0,0),r(0,1),r(0,2)])       3 cells
+red sq:     obj(r, [r(0,0),r(0,1),r(1,0),r(1,1)]) 4 cells
+L-shape:    obj(p, [r(0,0),r(1,0),r(1,1)])        3 cells
+
+
+Predicate Reference
+
+
+oa_total_cells(+Objs, -N)
+
+Unifies N with the total number of cells across all objects in Objs.
+
+  ?- oa_total_cells([obj(r,[r(0,0)]), obj(b,[r(0,1),r(0,2),r(0,3)])], N).
+  N = 4.
+
+  ?- oa_total_cells([], N).
+  N = 0.
+
+
+oa_color_counts(+Objs, -Pairs)
+
+Unifies Pairs with a sorted list of Color-Count terms giving the number of objects per
+distinct color.
+
+  ?- oa_color_counts([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], P).
+  P = [b-1, r-2].
+
+
+oa_cell_counts_by_color(+Objs, -Pairs)
+
+Unifies Pairs with a sorted list of Color-Total terms giving the total number of cells
+per distinct color (summed across all objects of that color).
+
+  ?- oa_cell_counts_by_color([obj(r,[r(0,0)]), obj(r,[r(0,0),r(0,1),r(0,2)]),
+                               obj(b,[r(0,0)])], P).
+  P = [b-1, r-4].
+
+
+oa_n_colors(+Objs, -N)
+
+Unifies N with the number of distinct colors in the list.
+
+  ?- oa_n_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])], N).
+  N = 3.
+
+
+oa_n_objs_of_color(+Objs, +Color, -N)
+
+Unifies N with the count of objects whose color matches Color.
+
+  ?- oa_n_objs_of_color([obj(r,[r(0,0)]), obj(r,[r(1,0)]), obj(b,[r(0,1)])], r, N).
+  N = 2.
+
+
+oa_dominant_color(+Objs, -Color)
+
+Unifies Color with the color that has the most total cells across the list. If two
+colors tie, the one that appears first in alphabetical order wins.
+
+  ?- oa_dominant_color([obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)]),
+                         obj(b,[r(0,0)]), obj(g,[r(0,1)])], C).
+  C = r.
+
+
+oa_rarest_color(+Objs, -Color)
+
+Unifies Color with the color that has the fewest total cells.
+
+  ?- oa_rarest_color([obj(r,[r(0,0),r(0,1),r(0,2)]), obj(b,[r(0,0)])], C).
+  C = b.
+
+
+oa_unique_color(+Objs, -Color)
+
+Succeeds for each color that appears in exactly one object. Fails if no such color
+exists. Backtrackable.
+
+  ?- oa_unique_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], C).
+  C = b.
+
+
+oa_size_rank(+Objs, -Ranked)
+
+Unifies Ranked with Objs sorted by cell count descending (largest object first).
+
+  ?- oa_size_rank([obj(r,[r(0,0)]),
+                   obj(r,[r(0,0),r(0,1),r(0,2)]),
+                   obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)])], Ranked).
+  Ranked = [obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)]),
+            obj(r,[r(0,0),r(0,1),r(0,2)]),
+            obj(r,[r(0,0)])].
+
+
+oa_pos_rank(+Objs, -Ranked)
+
+Unifies Ranked with Objs sorted by top-left corner position in row-major order
+(topmost row first, leftmost column first within a row).
+
+  ?- oa_pos_rank([obj(g,[r(1,0)]), obj(b,[r(0,1)]), obj(r,[r(0,0)])], Ranked).
+  Ranked = [obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])].
+
+
+oa_majority_size(+Objs, -N)
+
+Unifies N with the most frequently occurring cell count in Objs.
+
+  ?- oa_majority_size([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)]),
+                        obj(r,[r(0,0),r(0,1),r(0,2)])], N).
+  N = 1.
+
+The mode is found using a run-length accumulator over a sorted list of counts.
+
+
+oa_all_same_color(+Objs)
+
+Succeeds iff all objects in Objs share the same color. Succeeds vacuously for empty
+list.
+
+  ?- oa_all_same_color([obj(r,[r(0,0)]), obj(r,[r(0,1)]), obj(r,[r(1,0)])]).
+  true.
+
+  ?- oa_all_same_color([obj(r,[r(0,0)]), obj(b,[r(0,1)])]).
+  false.
+
+
+oa_all_same_size(+Objs)
+
+Succeeds iff all objects have the same cell count.
+
+  ?- oa_all_same_size([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])]).
+  true.   % all have 1 cell
+
+
+oa_all_same_form(+Objs)
+
+Succeeds iff all objects have the same normalized shape (translated to the origin and
+sorted). Color and position are ignored; only the relative arrangement of cells matters.
+
+  ?- oa_all_same_form([obj(p,[r(0,0),r(1,0),r(1,1)]),
+                        obj(b,[r(3,4),r(4,4),r(4,5)])]).
+  true.   % both are the same L-shape, just at different positions
+
+
+Worked Example: Scene Analysis
+
+Suppose a visual scene has three objects:
+
+  Objs = [obj(r, [r(0,0),r(0,1),r(1,0),r(1,1)]),   % red 2x2 square
+          obj(b, [r(3,0)]),                            % blue dot
+          obj(b, [r(3,2)])]                            % blue dot
+
+Find the dominant color, check uniformity, and rank by size:
+
+  ?- Objs = [obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)]),
+             obj(b,[r(3,0)]), obj(b,[r(3,2)])],
+     oa_dominant_color(Objs, Dom),
+     oa_n_colors(Objs, NC),
+     oa_all_same_color(Objs),
+     oa_size_rank(Objs, Ranked).
+
+  Dom = r,
+  NC = 2,
+  false.   % not all same color
+
+  ?- Objs = [obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)]),
+             obj(b,[r(3,0)]), obj(b,[r(3,2)])],
+     oa_dominant_color(Objs, Dom),
+     oa_size_rank(Objs, [Biggest|_]).
+
+  Dom = r,
+  Biggest = obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)]).
+
+
+Test Coverage
+
+All 41 acceptance criteria (AC-OA-001 through AC-OA-041) defined in
+Refinement v214 Part 191 are exercised in packs/objattr/test/test_objattr.pl.
+All 41 tests pass.
+
+
+Summary
+
+The objattr pack gives a reasoner a statistical and comparative view of a scene's object
+list. With oa_dominant_color, oa_size_rank, oa_all_same_form, and related predicates,
+a symbolic agent can quickly characterize what is in a scene and how the objects relate
+to one another in aggregate - without looping or accumulating manually in calling code.
+
+Continue to Chapter 163 for the next pack in the PrologAI Layer sequence.
