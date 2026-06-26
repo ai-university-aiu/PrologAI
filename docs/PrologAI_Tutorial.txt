@@ -16526,3 +16526,147 @@ Library imports: library(lists): member/2, min_list/2, max_list/2.
 Built-ins: findall/3, sort/2, length/2.
 
 42/42 PLUnit tests pass.
+Chapter 132: Arrange Pack
+
+The arrange pack (ag_*, Layer 150) provides 14 predicates for reasoning about the
+spatial arrangement of obj(Color, Cells) terms as produced by the scene pack. Where
+the pair pack (Layer 149) answers "are these two objects the same?", the arrange pack
+answers "where are these objects relative to each other?" and "how are they laid out?"
+
+All predicates operate on obj(Color, Cells) terms where Cells is a sorted list of
+r(R,C) terms. The central concept is the centroid: the integer (floor-average) row
+and column of the cell list.
+
+
+Object Centroid
+
+ag_centroid(+Obj, -r(CR,CC)): compute the floor-average centroid of an obj term.
+The centroid row is the sum of all cell rows divided by the cell count (// operator).
+The centroid column is computed the same way.
+
+    ag_centroid(obj(1, [r(4,6)]), C).
+    % C = r(4,6)   (single cell; centroid is the cell itself)
+
+    ag_centroid(obj(2, [r(0,0), r(0,2)]), C).
+    % C = r(0,1)   (sum of cols = 0+2=2; 2//2=1)
+
+    ag_centroid(obj(3, [r(0,0), r(0,1), r(1,0), r(1,1)]), C).
+    % C = r(0,0)   (sum of rows = 0+0+1+1=2; 2//4=0)
+
+ag_offset(+Obj1, +Obj2, -r(DR,DC)): displacement vector from Obj1 centroid to Obj2.
+
+    ag_offset(obj(1,[r(0,0)]), obj(2,[r(0,3)]), Offset).
+    % Offset = r(0,3)
+
+    ag_offset(obj(1,[r(1,1)]), obj(2,[r(3,4)]), Offset).
+    % Offset = r(2,3)
+
+
+Pairwise Spatial Order
+
+ag_row_order(+Obj1, +Obj2): Obj1 centroid row is at most Obj2 centroid row.
+
+    ag_row_order(obj(1,[r(0,0)]), obj(2,[r(3,0)])).  % succeeds (0 =< 3)
+    ag_row_order(obj(1,[r(2,0)]), obj(2,[r(2,5)])).  % succeeds (equal rows)
+    % ag_row_order(obj(1,[r(5,0)]), obj(2,[r(1,0)])).  % fails (5 > 1)
+
+ag_col_order(+Obj1, +Obj2): Obj1 centroid column is at most Obj2 centroid column.
+
+    ag_col_order(obj(1,[r(0,0)]), obj(2,[r(0,4)])).  % succeeds (0 =< 4)
+    % ag_col_order(obj(1,[r(0,7)]), obj(2,[r(0,2)])).  % fails (7 > 2)
+
+ag_row_aligned(+Obj1, +Obj2): both objects share the same centroid row.
+
+    ag_row_aligned(obj(1,[r(2,0)]), obj(2,[r(2,5)])).  % succeeds
+    % ag_row_aligned(obj(1,[r(0,0)]), obj(2,[r(1,0)])).  % fails
+
+ag_col_aligned(+Obj1, +Obj2): both objects share the same centroid column.
+
+    ag_col_aligned(obj(1,[r(0,3)]), obj(2,[r(4,3)])).  % succeeds
+
+
+Sorting Objects by Position
+
+ag_sort_by_row(+Objs, -Sorted): sort obj list top to bottom by centroid row.
+Uses keysort/2, which is stable: equal-row objects preserve their input order.
+
+    Objs = [obj(1,[r(3,0)]), obj(2,[r(1,0)]), obj(3,[r(2,0)])],
+    ag_sort_by_row(Objs, Sorted).
+    % Sorted = [obj(2,[r(1,0)]), obj(3,[r(2,0)]), obj(1,[r(3,0)])]
+
+ag_sort_by_col(+Objs, -Sorted): sort obj list left to right by centroid column.
+
+    Objs = [obj(1,[r(0,5)]), obj(2,[r(0,1)]), obj(3,[r(0,3)])],
+    ag_sort_by_col(Objs, Sorted).
+    % Sorted = [obj(2,[r(0,1)]), obj(3,[r(0,3)]), obj(1,[r(0,5)])]
+
+
+Gap Analysis
+
+ag_row_gaps(+Objs, -Gaps): consecutive gaps between sorted distinct centroid rows.
+Deduplicates centroid rows first (sort/2), so coincident objects count once.
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(3,0)]), obj(3,[r(7,0)])],
+    ag_row_gaps(Objs, Gaps).
+    % Gaps = [3, 4]
+
+    Objs2 = [obj(1,[r(0,0)]), obj(2,[r(2,0)]), obj(3,[r(4,0)])],
+    ag_row_gaps(Objs2, Gaps2).
+    % Gaps2 = [2, 2]
+
+ag_col_gaps(+Objs, -Gaps): consecutive gaps between sorted distinct centroid columns.
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(0,3)]), obj(3,[r(0,6)])],
+    ag_col_gaps(Objs, Gaps).
+    % Gaps = [3, 3]
+
+ag_equal_row_gaps(+Objs): all consecutive centroid row gaps are equal.
+Requires at least two objects with distinct centroid rows.
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(3,0)]), obj(3,[r(6,0)])],
+    ag_equal_row_gaps(Objs).  % succeeds (both gaps are 3)
+
+    Objs2 = [obj(1,[r(0,0)]), obj(2,[r(2,0)]), obj(3,[r(5,0)])],
+    % ag_equal_row_gaps(Objs2).  % fails (gaps are 2 and 3)
+
+ag_equal_col_gaps(+Objs): all consecutive centroid column gaps are equal.
+
+    Objs = [obj(1,[r(0,0)]), obj(2,[r(0,4)]), obj(3,[r(0,8)])],
+    ag_equal_col_gaps(Objs).  % succeeds (both gaps are 4)
+
+
+Group Bounding Box
+
+ag_group_bbox(+Objs, -R0, -C0, -R1, -C1): bounding box of all cells of all objs.
+This is not the box around centroids but around the actual cells.
+
+    Objs = [obj(1,[r(0,0), r(0,1)]), obj(2,[r(3,2), r(3,3)])],
+    ag_group_bbox(Objs, R0, C0, R1, C1).
+    % R0=0, C0=0, R1=3, C1=3
+
+    Objs2 = [obj(1,[r(0,0)]), obj(2,[r(5,0)]), obj(3,[r(0,8)])],
+    ag_group_bbox(Objs2, R0, C0, R1, C1).
+    % R0=0, C0=0, R1=5, C1=8
+
+
+Nearest Neighbor
+
+ag_nearest(+RefObj, +Objs, -Nearest): find the obj in Objs whose centroid is
+closest (Manhattan distance) to RefObj's centroid.
+
+    Ref = obj(1, [r(0,0)]),
+    Candidates = [obj(2,[r(0,5)]), obj(3,[r(0,2)])],
+    ag_nearest(Ref, Candidates, Nearest).
+    % Nearest = obj(3,[r(0,2)])   (distance 2 vs 5)
+
+    Ref2 = obj(1, [r(5,5)]),
+    Cands2 = [obj(2,[r(0,0)]), obj(3,[r(4,4)]), obj(4,[r(9,9)])],
+    ag_nearest(Ref2, Cands2, N).
+    % N = obj(3,[r(4,4)])   (Manhattan distance 2)
+
+
+Library imports: library(lists): member/2, min_list/2, max_list/2, sum_list/2.
+Built-ins: findall/3, sort/2, keysort/2, length/2.
+
+42/42 PLUnit tests pass.
+
