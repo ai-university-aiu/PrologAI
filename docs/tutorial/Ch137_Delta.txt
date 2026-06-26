@@ -1,0 +1,142 @@
+Chapter 137: Delta Pack (dl_* Prefix, Layer 155)
+
+The delta pack compares two object scenes and computes what changed between
+them. A scene is a list of obj(Color, Cells) terms, where Color is an integer
+and Cells is a list of r(Row,Col) terms.
+
+The delta pack answers: "What transformation was applied to produce Scene2
+from Scene1?" This is the foundational question in multi-step ARC-AGI-2
+reasoning.
+
+
+Core Concept: Matching by Cell Set
+
+Two objects match iff they have exactly the same Cells list under Prolog term
+unification. This means:
+
+    obj(1, [r(0,0), r(0,1)])    %  color 1, two cells
+    obj(5, [r(0,0), r(0,1)])    %  color 5, same two cells
+
+These two match (same cell set). The color changed from 1 to 5, so the object
+was "recolored". This is the same matching approach used by pg_infer_table in
+the pigment pack.
+
+
+Change Decomposition
+
+dl_added(+S1, +S2, -Added): collect objects in S2 whose cell set does not
+appear in S1 at all. These are genuinely new objects.
+
+    S1 = [obj(1,[r(0,0)])],
+    S2 = [obj(1,[r(0,0)]), obj(2,[r(1,1)])],
+    dl_added(S1, S2, Added).
+    % Added = [obj(2,[r(1,1)])]
+
+dl_removed(+S1, +S2, -Removed): collect objects in S1 whose cell set does not
+appear in S2. These objects disappeared.
+
+    S1 = [obj(1,[r(0,0)]), obj(2,[r(1,1)])],
+    S2 = [obj(1,[r(0,0)])],
+    dl_removed(S1, S2, Removed).
+    % Removed = [obj(2,[r(1,1)])]
+
+dl_matched(+S1, +S2, -Pairs): list of O1-O2 pairs sharing identical cell sets.
+
+    S1 = [obj(1,[r(0,0)])],
+    S2 = [obj(3,[r(0,0)])],
+    dl_matched(S1, S2, Pairs).
+    % Pairs = [obj(1,[r(0,0)])-obj(3,[r(0,0)])]
+
+dl_recolored(+S1, +S2, -Changes): From-To color pairs for matched objects
+whose color changed. Sorted; deduplicated.
+
+    S1 = [obj(1,[r(0,0)]), obj(2,[r(1,1)])],
+    S2 = [obj(5,[r(0,0)]), obj(6,[r(1,1)])],
+    dl_recolored(S1, S2, Changes).
+    % Changes = [1-5, 2-6]
+
+dl_unchanged(+S1, +S2, -Objs): objects with identical color AND cells in both.
+
+    S1 = [obj(1,[r(0,0)]), obj(2,[r(1,1)])],
+    S2 = [obj(1,[r(0,0)]), obj(3,[r(1,1)])],
+    dl_unchanged(S1, S2, Objs).
+    % Objs = [obj(1,[r(0,0)])]
+
+
+Color Analysis
+
+dl_color_gain(+S1, +S2, -Colors): colors in S2 not in S1.
+
+    dl_color_gain([obj(1,[r(0,0)])], [obj(2,[r(0,0)])], Colors).
+    % Colors = [2]
+
+dl_color_loss(+S1, +S2, -Colors): colors in S1 not in S2.
+
+    dl_color_loss([obj(1,[r(0,0)])], [obj(2,[r(0,0)])], Colors).
+    % Colors = [1]
+
+
+Numeric Metrics
+
+dl_count_diff(+S1, +S2, -N): N = length(S2) - length(S1).
+Positive = more objects in S2; negative = fewer.
+
+    dl_count_diff([obj(1,[r(0,0)])],
+                  [obj(1,[r(0,0)]), obj(2,[r(1,1)])],
+                  N).
+    % N = 1
+
+dl_size_diff(+S1, +S2, -N): N = total cells in S2 minus total cells in S1.
+
+    dl_size_diff([obj(1,[r(0,0)])],
+                 [obj(1,[r(0,0),r(0,1)])],
+                 N).
+    % N = 1
+
+
+Change Type Tests
+
+These succeed or fail based on which change types occurred.
+
+dl_is_added_only(+S1, +S2): only additions (no removals, no recolorings).
+dl_is_removed_only(+S1, +S2): only removals (no additions, no recolorings).
+dl_is_recolor_only(+S1, +S2): no additions, no removals (only color changes).
+dl_is_stable(+S1, +S2): the two scenes are identical.
+
+    S = [obj(1,[r(0,0)])],
+    dl_is_stable(S, S).    % succeeds
+
+    dl_is_recolor_only([obj(1,[r(0,0)])], [obj(2,[r(0,0)])]).  % succeeds
+    dl_is_recolor_only([obj(1,[r(0,0)])], [obj(1,[r(0,0)]), obj(2,[r(1,1)])]).  % fails (addition)
+
+
+Composite Delta
+
+dl_scene_diff(+S1, +S2, -Delta): compute all four components at once.
+Delta = delta(Added, Removed, Recolored, Unchanged).
+
+    S1 = [obj(1,[r(0,0)]), obj(2,[r(1,1)])],
+    S2 = [obj(3,[r(0,0)]), obj(4,[r(2,2)])],
+    dl_scene_diff(S1, S2, delta(Added, Removed, Recolored, Unchanged)).
+    % Added     = [obj(4,[r(2,2)])]   % new position in S2
+    % Removed   = [obj(2,[r(1,1)])]   % position [r(1,1)] gone in S2
+    % Recolored = [1-3]                % position [r(0,0)]: color 1 -> 3
+    % Unchanged = []                   % nothing identical in both
+
+
+Design Notes
+
+Exact cell-set matching: "added" means the cell set is entirely new (not
+present in S1 at any color). "Removed" means the cell set is entirely gone.
+"Recolored" means the cell set exists in both scenes but with different colors.
+These three are mutually exclusive with dl_unchanged (same cells, same color).
+
+dl_is_recolor_only vs dl_is_stable: recolor_only allows colors to change;
+stable requires everything to match. A scene where every object changed color
+satisfies recolor_only but not stable.
+
+Empty scenes: dl_added([], [], []), dl_is_stable([], []) etc. all behave
+correctly. findall on an empty scene returns []; arithmetic on empty
+sum_list is 0.
+
+42/42 PLUnit tests pass. No warnings.
