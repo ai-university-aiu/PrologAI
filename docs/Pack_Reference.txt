@@ -924,3 +924,20 @@ Grid Task: End-to-End Raw Grid Task Solver (gt_*, Layer 198)
     gt_infer_shift/4: infer constant translation (DR,DC) from a Before-After pair
     gt_pair_score/4: pixel accuracy of a rule applied to one Before-After pair
     gt_solve/4: try identity, color_map, scale, and shift; apply best to test grid
+
+gridnbr
+Grid Neighbor Analysis: Cell Adjacency, Morphological Ops, and Neighbor Counts (gn_*, Layer 199)
+    gn_nbr4/4: list of values at 4-connected neighbors of (R,C), omitting out-of-bounds
+    gn_nbr8/4: list of values at 8-connected neighbors of (R,C), omitting out-of-bounds
+    gn_count4/5: count of Color among 4-connected neighbors of (R,C)
+    gn_count8/5: count of Color among 8-connected neighbors of (R,C)
+    gn_count4_grid/3: grid of 4-neighbor Color counts for every cell
+    gn_count8_grid/3: grid of 8-neighbor Color counts for every cell
+    gn_any4/4: succeed (deterministic) if any 4-neighbor has given Color
+    gn_all4/4: succeed if every 4-neighbor has given Color (fails for no-neighbor cells)
+    gn_mark_border/3: replace non-background cells touching background with atom border
+    gn_mark_isolated/3: replace non-background cells with no same-color 4-neighbor with atom isolated
+    gn_expand_color/3: morphological dilation — add one layer of Color to all neighboring background cells
+    gn_shrink_color/3: morphological erosion — remove Color cells touching any non-Color 4-neighbor
+    gn_majority_nbr4/4: most frequent color among 4-connected neighbors; fails for no-neighbor cells
+    gn_conway_step/4: one cellular automaton step — kill Color cells with exactly N Color 4-neighbors

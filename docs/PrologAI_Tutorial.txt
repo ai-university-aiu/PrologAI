@@ -18256,3 +18256,38 @@ gt_pair_score(identity, [[r,r]], [[r,r]], Score).
 
 14 gt_* predicates. 51 tests pass. Layer 198.
 All 51 tests pass. See docs/tutorial/Ch180_GridTask.txt for the full chapter.
+
+
+Chapter 170: gridnbr Pack - Grid Neighbor Analysis (gn_*, Layer 199)
+
+The gridnbr pack analyzes cell neighborhoods in raw grids: neighbor values,
+color counts, morphological dilation and erosion, and Conway-like steps.
+
+:- use_module(pack(gridnbr/prolog/gridnbr)).
+
+% 4-connected neighbor values at (R,C)
+gn_nbr4([[r,r,r],[r,b,r],[r,r,r]], 1, 1, Vals).
+% Vals = [r,r,r,r]
+
+% Count r-neighbors at center
+gn_count4([[r,r,r],[r,b,r],[r,r,r]], 1, 1, r, N).
+% N = 4
+
+% Morphological dilation: grow b by one layer
+gn_expand_color([[r,r,r],[r,b,r],[r,r,r]], b, E).
+% b spreads to left, right, above, below center
+
+% Morphological erosion: shrink a 3x3 b block
+gn_shrink_color(G5x5, b, S).
+% outer ring of b removed; inner center remains b
+
+% Mark border cells (foreground touching background)
+gn_mark_border([[r,r,r],[r,b,r],[r,r,r]], r, MG).
+% MG[1][1] = border
+
+% Conway step: kill isolated b (0 b-neighbors)
+gn_conway_step([[r,r,r],[r,b,r],[r,r,r]], b, 0, NG).
+% NG = all r
+
+14 gn_* predicates. 51 tests pass. Layer 199.
+All 51 tests pass. See docs/tutorial/Ch181_GridNbr.txt for the full chapter.
