@@ -1,0 +1,205 @@
+PrologAI Tutorial
+Chapter 105: Grid-as-Table Operations - The table Pack
+
+The table pack (Work Package 144, Layer 123) provides 14 predicates for
+treating a 2D grid as a table of rows and applying tabular operations:
+transpose, sorting, filtering, grouping, counting, deduplication, column
+selection and manipulation, row insertion and deletion, row swapping, and
+extremum row queries.
+
+All predicates use the tb_* prefix.
+
+
+1. Transpose
+
+tb_transpose(+Grid, -TGrid) produces the transpose of Grid: TGrid[C][R] =
+Grid[R][C]. The resulting grid has W rows and H columns if the original has
+H rows and W columns.
+
+Examples:
+
+:- tb_transpose([[1,2,3],[4,5,6]], T).
+% T = [[1,4],[2,5],[3,6]]   (2x3 becomes 3x2)
+
+:- tb_transpose([[1,2],[3,4],[5,6]], T).
+% T = [[1,3,5],[2,4,6]]   (3x2 becomes 2x3)
+
+Implemented by iterating column indices 0..W-1; column C of Grid becomes
+row C of TGrid, collected via member(Row,Grid) + nth0(C,Row,V) inside findall.
+
+
+2. Sorting and Filtering Rows
+
+tb_sort_rows(+Grid, +C, -Sorted) sorts rows ascending by the value of
+column C. Ties among rows with the same column C value are broken by keysort
+stability: rows preserve their original relative order within a tie group.
+
+tb_filter_rows(+Grid, +C, +V, -Filtered) returns only rows where column C
+equals V. Uses structural equality (==) so it works with any Prolog term.
+
+Examples:
+
+:- tb_sort_rows([[3,a],[1,b],[2,c]], 0, S).
+% S = [[1,b],[2,c],[3,a]]
+
+:- tb_sort_rows([[x,5],[y,1],[z,3]], 1, S).
+% S = [[y,1],[z,3],[x,5]]
+
+:- tb_filter_rows([[1,a],[2,b],[1,c],[3,d]], 0, 1, F).
+% F = [[1,a],[1,c]]
+
+:- tb_filter_rows([[1,a],[2,b]], 0, 9, F).
+% F = []
+
+
+3. Grouping and Counting
+
+tb_group_by(+Grid, +C, -Groups) groups rows by their column C value.
+Groups is a list of V-Rows pairs, one per unique column C value, ordered
+by the sorted column C values.
+
+tb_count_by(+Grid, +C, -Counts) counts rows per unique column C value.
+Counts is a list of V-N pairs.
+
+Examples:
+
+:- tb_group_by([[1,a],[2,b],[1,c]], 0, G).
+% G = [1-[[1,a],[1,c]], 2-[[2,b]]]
+
+:- tb_count_by([[1,a],[2,b],[1,c],[1,d]], 0, C).
+% C = [1-3, 2-1]
+
+:- tb_count_by([[0,x],[1,y],[0,z],[1,w]], 0, C).
+% C = [0-2, 1-2]
+
+
+4. Row Deduplication
+
+tb_unique_rows(+Grid, -UniqueGrid) removes duplicate rows, preserving the
+first occurrence of each unique row in document order.
+
+Examples:
+
+:- tb_unique_rows([[1,2],[3,4],[1,2],[5,6]], U).
+% U = [[1,2],[3,4],[5,6]]
+
+:- tb_unique_rows([[a,b],[a,b],[a,b]], U).
+% U = [[a,b]]
+
+Uses a recursive helper with an accumulator tracking seen rows. Comparison
+is via structural equality (\+ member/2).
+
+
+5. Column Selection and Manipulation
+
+tb_select_cols(+Grid, +ColIdxs, -SubGrid) extracts only the columns at
+the indices given in ColIdxs, in the order given by ColIdxs. Passing
+ColIdxs in reverse order achieves column reordering.
+
+tb_drop_col(+Grid, +C, -Grid2) removes column C from every row.
+
+tb_add_col(+Grid, +NewCol, -Grid2) appends the list NewCol as a new
+rightmost column. NewCol must have the same length as Grid.
+
+Examples:
+
+:- tb_select_cols([[1,2,3],[4,5,6]], [0,2], Sub).
+% Sub = [[1,3],[4,6]]
+
+:- tb_select_cols([[1,2,3]], [2,0], Sub).
+% Sub = [[3,1]]   (column reordering)
+
+:- tb_drop_col([[1,2,3],[4,5,6]], 1, G).
+% G = [[1,3],[4,6]]
+
+:- tb_add_col([[1,2],[3,4]], [5,6], G).
+% G = [[1,2,5],[3,4,6]]
+
+:- tb_add_col([[],[],[]], [a,b,c], G).
+% G = [[a],[b],[c]]   (start from empty rows)
+
+
+6. Row Insertion and Deletion
+
+tb_insert_row(+Grid, +Row, +R, -Grid2) inserts Row before position R
+(0-indexed). Position 0 inserts at the beginning; position H (the grid
+height) inserts at the end.
+
+tb_delete_row(+Grid, +R, -Grid2) removes the row at position R.
+
+Examples:
+
+:- tb_insert_row([[1,2],[3,4]], [0,0], 0, G).
+% G = [[0,0],[1,2],[3,4]]
+
+:- tb_insert_row([[1,2],[5,6]], [3,4], 1, G).
+% G = [[1,2],[3,4],[5,6]]
+
+:- tb_delete_row([[1,2],[3,4],[5,6]], 1, G).
+% G = [[1,2],[5,6]]
+
+tb_insert_row uses two-clause recursion: the base case (R=0) prepends the
+row; the recursive case decrements R and recurses on the tail.
+tb_delete_row uses findall with an index inequality guard.
+
+
+7. Row Swapping
+
+tb_swap_rows(+Grid, +R1, +R2, -Grid2) exchanges rows R1 and R2.
+
+Examples:
+
+:- tb_swap_rows([[1,2],[3,4],[5,6]], 0, 2, G).
+% G = [[5,6],[3,4],[1,2]]
+
+:- tb_swap_rows([[1,2],[3,4]], 0, 1, G).
+% G = [[3,4],[1,2]]
+
+:- tb_swap_rows([[1,2],[3,4]], 1, 1, G).
+% G = [[1,2],[3,4]]   (swapping a row with itself is a no-op)
+
+Fetches both rows first, then rebuilds via findall with an if-then-else
+that substitutes row values at positions R1 and R2.
+
+
+8. Extremum Row Queries
+
+tb_col_max_row(+Grid, +C, -R) returns the 0-indexed row where column C
+achieves its maximum value. On ties, returns the first (lowest-indexed)
+such row.
+
+tb_col_min_row(+Grid, +C, -R) returns the row with the minimum column C
+value.
+
+Examples:
+
+:- tb_col_max_row([[1,5],[3,2],[2,8]], 1, R).
+% R = 2   (column 1 values are 5, 2, 8; max is 8 at row 2)
+
+:- tb_col_min_row([[9,0],[1,0],[3,0]], 0, R).
+% R = 1   (column 0 values are 9, 1, 3; min is 1 at row 1)
+
+:- tb_col_max_row([[5,0],[5,0],[2,0]], 0, R).
+% R = 0   (tie: first row with column 0 = 5 is returned)
+
+Both use max_list/2 and min_list/2 from library(lists) to find the extremum,
+then nth0+nth0+cut to locate the first row containing that value.
+
+
+9. Design Notes
+
+tb_group_by orders groups by sorted column C values, not by first appearance.
+If insertion order of groups matters, sort the Groups result separately.
+
+tb_select_cols allows column reordering by passing ColIdxs in any order.
+Repeated indices in ColIdxs are permitted and produce repeated columns in SubGrid.
+
+tb_add_col pairs rows by index using nth0/3 with the index unbound. If Grid
+and NewCol have different lengths, tb_add_col produces as many rows as the
+shorter of the two.
+
+Library imports: library(lists): member/2, nth0/3, append/3, max_list/2,
+  min_list/2.
+keysort/2 is a built-in and is not imported.
+
+Test file: packs/table/test/test_table.pl. All 42 tests pass.
