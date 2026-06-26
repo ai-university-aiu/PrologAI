@@ -1146,7 +1146,7 @@ Tier 2 is the Data Layer (layers 60 and above).
 
 These are the perception, analysis, and transformation packs: color, shape, symmetry, fill, compare, grid operations, and everything that processes structured data.
 
-As of this writing, the highest Data Layer pack is gridnbr on layer 199.
+As of this writing, the highest Data Layer pack is griddist on layer 200.
 
 New packs always receive a layer number higher than all existing packs they depend on.
 
@@ -18351,3 +18351,44 @@ gn_conway_step([[r,r,r],[r,b,r],[r,r,r]], b, 0, NG).
 
 14 gn_* predicates. 51 tests pass. Layer 199.
 All 51 tests pass. See docs/tutorial/Ch181_GridNbr.txt for the full chapter.
+
+Chapter 171: griddist Pack - Grid Distance Transform (gd_*, Layer 200)
+
+The griddist pack computes spatial distances between cells in raw grids and
+provides operations built on those distances: distance maps, BFS flood with
+walls, Voronoi assignment, zone marking, morphological N-step expansion and
+erosion, distance-based recoloring, equidistance detection, and farthest-cell
+lookup.
+
+:- use_module(pack(griddist/prolog/griddist)).
+
+% Manhattan distance between (0,0) and (2,3): 2+3 = 5
+gd_manhattan(0, 0, 2, 3, D).
+% D = 5
+
+% Chebyshev distance: max(2,3) = 3
+gd_chebyshev(0, 0, 2, 3, D).
+% D = 3
+
+% Distance map: each cell holds min Manhattan dist to nearest b
+gd_dist_map([[r,r,r],[r,b,r],[r,r,r]], b, DMap).
+% DMap = [[2,1,2],[1,0,1],[2,1,2]]
+
+% Voronoi: background cells assigned color of nearest foreground cell
+gd_voronoi([[r,r,r],[b,r,g],[r,r,r]], VG).
+% VG = [[b,b,g],[b,b,g],[b,b,g]]
+
+% BFS flood: distances from (0,0) with b as wall
+gd_bfs_flood([[r,r,r],[r,b,r],[r,r,r]], 0, 0, b, DG).
+% DG[1][1] = 9999 (blocked); DG[1][2] = 3 (detour via top row)
+
+% N-step expand: grow b outward by 1 step
+gd_expand_n([[r,r,r],[r,b,r],[r,r,r]], b, 1, E).
+% E = [[r,b,r],[b,b,b],[r,b,r]]
+
+% N-step shrink: erode b by 1 step (removes b at center; it touches r)
+gd_shrink_n([[r,r,r],[r,b,r],[r,r,r]], b, 1, S).
+% S = [[r,r,r],[r,r,r],[r,r,r]]
+
+14 gd_* predicates. 53 tests pass. Layer 200.
+All 53 tests pass. See docs/tutorial/Ch182_GridDist.txt for the full chapter.
