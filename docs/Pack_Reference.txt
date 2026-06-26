@@ -839,3 +839,20 @@ multicolor
 Multi-Color Scene Analysis: Frequency, Partition, and Color-Indexed Queries (PR 302)
 
     Queries and partitions obj(Color,Cells) scenes by color frequency and membership. mc_color_counts: findall C-N per distinct color. mc_count_of_color: findall matching objects + length. mc_color_present: member + == + cut. mc_dominant_color: color_counts -> findall -N-C keyed -> msort -> head. mc_rarest_color: findall N-C keyed -> msort -> head. mc_singleton_colors: findall C where count==1. mc_unique_color: member C-1 (backtrackable). mc_color_freq_rank: color_counts -> findall -N-C keyed -> msort -> findall C -> nth1(N). mc_color_partition: sort distinct colors -> findall C-Objs per color. mc_pair_colors: sort distinct colors -> findall C1-C2 where C1 @< C2. mc_equal_count_pairs: color_counts -> findall C1-C2 where count(C1)==count(C2) and C1 @< C2. mc_majority_color: length(Scene,Total); Half is Total/2; member Color-N where N > Half; cut. mc_n_distinct_colors: sort + length. mc_color_index: color_counts -> findall -N-C keyed -> msort -> findall C -> nth1(Index). No cross-pack dependencies; uses library(lists) and library(apply). 14 mc_* predicates, 42 tests, Layer 193.
+
+sceneinv
+Scene Invariant Detection across Training Pairs (si_*, Layer 194)
+    si_n_before/2: object count in the Before scene of one pair
+    si_n_after/2: object count in the After scene of one pair
+    si_all_n_before/2: list of Before object counts for all pairs
+    si_all_n_after/2: list of After object counts for all pairs
+    si_const_n_before/2: Before object count is constant across all pairs
+    si_const_n_after/2: After object count is constant across all pairs
+    si_n_preserved/1: Before and After have the same object count in every pair
+    si_colors_before/2: sorted distinct colors in the Before scene of one pair
+    si_colors_after/2: sorted distinct colors in the After scene of one pair
+    si_const_colors_before/2: Before color set is constant across all pairs
+    si_const_colors_after/2: After color set is constant across all pairs
+    si_colors_preserved/1: Before and After have the same color set in every pair
+    si_total_cells_before/2: total cell count across all Before objects in one pair
+    si_cells_preserved/1: total cell count is the same in Before and After for every pair
