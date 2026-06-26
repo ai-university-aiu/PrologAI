@@ -1,0 +1,178 @@
+PrologAI Tutorial
+Chapter 102: Cellular Automaton Neighborhood Aggregation - The autom Pack
+
+The autom pack (Work Package 141, Layer 120) provides 14 predicates for
+applying neighborhood aggregation rules across an entire 2D grid in one call.
+Where the neighbor pack (nb_*) queries individual cells and the window pack
+(wn_*) counts neighbors for individual positions, the autom pack produces a
+transformed grid in which each cell's value reflects a neighborhood computation.
+
+All predicates use the at_* prefix.
+
+
+1. Neighbor Count Grids
+
+at_count_nbrs_4(+Grid, +V, -CGrid) produces a count grid where each cell
+holds the number of in-bounds 4-connected neighbors equal to V.
+
+at_count_nbrs_8(+Grid, +V, -CGrid) does the same for 8-connected neighbors.
+
+Example:
+
+:- at_count_nbrs_4([[0,0,0],[0,1,0],[0,0,0]], 0, CGrid).
+% CGrid = [[2,2,2],[2,4,2],[2,2,2]]
+% Center (1,1) has 4 in-bounds 4-neighbors, all 0. Corners have 2 each.
+
+:- at_count_nbrs_8([[0,0,0],[0,1,0],[0,0,0]], 1, CGrid).
+% CGrid = [[1,1,1],[1,0,1],[1,1,1]]
+% All 8 cells surrounding the center have it as a neighbor. Center has 0.
+
+at_count_same_4(+Grid, -CGrid) produces a count grid where each cell holds
+the number of 4-neighbors that share the same value as that cell.
+
+at_count_same_8(+Grid, -CGrid) does the same for 8-neighbors.
+
+Example:
+
+:- at_count_same_4([[2,2,2],[2,2,2],[2,2,2]], CGrid).
+% CGrid = [[2,3,2],[3,4,3],[2,3,2]]
+% Corners touch 2 same-valued 4-neighbors, edges touch 3, center touches 4.
+
+All four use triple-nested findall: outer per-row, middle per-cell, innermost
+per direction to count matching in-bounds neighbors.
+
+
+2. Boolean Neighbor Grids
+
+at_any_nbr_4(+Grid, +V, -BGrid) produces a 1/0 boolean grid where each cell
+is 1 if any in-bounds 4-neighbor equals V.
+
+at_all_nbrs_4(+Grid, +V, -BGrid) produces a 1/0 boolean grid where each cell
+is 1 if every in-bounds 4-neighbor equals V.
+
+at_any_nbr_8(+Grid, +V, -BGrid) and at_all_nbrs_8(+Grid, +V, -BGrid) do
+the same for 8-connected neighborhoods.
+
+Example:
+
+:- at_any_nbr_4([[0,0,0],[0,1,0],[0,0,0]], 1, BGrid).
+% BGrid = [[0,1,0],[1,0,1],[0,1,0]]
+% Cells directly adjacent to the center 1 get 1.
+
+:- at_all_nbrs_4([[1,1,1],[1,0,1],[1,1,1]], 1, BGrid).
+% BGrid = [[1,0,1],[0,1,0],[1,0,1]]
+% Corner cells touch only 1-valued 4-neighbors; edges and sides do not.
+
+:- at_all_nbrs_8([[1,1,1],[1,0,1],[1,1,1]], 1, BGrid).
+% BGrid = [[0,0,0],[0,1,0],[0,0,0]]
+% Only center (1,1) has all 8-neighbors equal to 1 (the eight surrounding 1s).
+
+at_any_nbr_4/8 uses a private helper with a cut on the first V-neighbor found.
+at_all_nbrs_4/8 uses forall/2 over in-bounds directions; vacuously true for
+a cell with no in-bounds neighbors.
+
+
+3. Isolated Cell Detection
+
+at_isolated_4(+Grid, +V, -Cells) returns the sorted list of R-C pairs of
+V-valued cells that have no V-valued 4-neighbor (isolated cells).
+
+at_isolated_8(+Grid, +V, -Cells) does the same for 8-connectivity.
+
+Example:
+
+:- at_isolated_4([[0,0,0],[0,1,0],[0,0,0]], 1, Cells).
+% Cells = [1-1]   (the single 1 at center has no 1 among its 4-neighbors)
+
+:- at_isolated_4([[1,1],[0,0]], 1, Cells).
+% Cells = []      (both 1s are adjacent to each other, so neither is isolated)
+
+:- at_isolated_8([[1,0],[0,1]], 1, Cells).
+% Cells = []      (diagonal 1s are 8-connected, so neither is isolated)
+
+Uses findall with \+ at_has_nbr_4_/\+ at_has_nbr_8_ for negation-as-failure.
+
+
+4. Birth Rules
+
+at_birth_4(+Grid, +Dead, +Live, +N, -Grid2) applies a cellular automaton
+birth rule: each cell with value Dead that has exactly N cells with value
+Live among its in-bounds 4-neighbors becomes Live. All other cells keep their
+current value.
+
+at_birth_8(+Grid, +Dead, +Live, +N, -Grid2) does the same for 8-neighbors.
+
+Example:
+
+:- at_birth_4([[0,1,0],[1,0,1],[0,1,0]], 0, 1, 4, Grid2).
+% Grid2 = [[0,1,0],[1,1,1],[0,1,0]]
+% Center (1,1) was dead (0) with 4 live (1) 4-neighbors: it is born.
+
+:- at_birth_4([[0,1,0],[0,0,0]], 0, 1, 1, Grid2).
+% Grid2 = [[1,1,1],[0,1,0]]
+% Cells (0,0), (0,2), (1,1) each have exactly 1 live 4-neighbor.
+
+:- at_birth_8([[0,1,1],[1,0,0],[0,0,0]], 0, 1, 3, Grid2).
+% Grid2 = [[0,1,1],[1,1,0],[0,0,0]]
+% Cell (1,1) has exactly 3 live 8-neighbors.
+
+
+5. Majority Voting
+
+at_majority_4(+Grid, +Bg, -Grid2) produces Grid2 where each cell takes the
+value most common among itself and its in-bounds 4-neighbors. Ties are broken
+by returning Bg.
+
+Example:
+
+:- at_majority_4([[1,1],[1,0]], 0, Grid2).
+% Grid2 = [[1,1],[1,1]]
+% Every cell has at least 2 neighboring 1s; 1 wins the majority everywhere.
+
+:- at_majority_4([[0,0,0],[0,1,0],[0,0,0]], 0, Grid2).
+% Grid2 = [[0,0,0],[0,0,0],[0,0,0]]
+% Center (1,1) collects [1,0,0,0,0]; 0 wins 4-to-1.
+
+Implemented via at_maj4_cell_ (collects self + in-bounds 4-neighbors) and
+at_mode_ (finds maximum-frequency value; ties to Bg via unique-winner test).
+
+
+6. Conway's Game of Life
+
+at_step_gol(+Grid, -Grid2) applies one step of Conway's Game of Life where
+0 = dead and 1 = alive. The rule is B3/S23: a dead cell with exactly 3
+alive 8-neighbors becomes alive; an alive cell with 2 or 3 alive 8-neighbors
+survives; all other cells die or stay dead.
+
+Example:
+
+:- at_step_gol([[0,0,0],[1,1,1],[0,0,0]], Grid2).
+% Grid2 = [[0,1,0],[0,1,0],[0,1,0]]
+% Horizontal blinker becomes vertical blinker after one step.
+
+:- at_step_gol([[0,0,0],[0,1,0],[0,0,0]], Grid2).
+% Grid2 = [[0,0,0],[0,0,0],[0,0,0]]
+% Lone cell dies (underpopulation).
+
+:- at_step_gol([[0,0,0,0],[0,1,1,0],[0,1,1,0],[0,0,0,0]], Grid2).
+% Grid2 = Grid (block is a stable still-life).
+
+Implemented via triple-nested findall that counts alive 8-neighbors per cell
+and then calls at_gol_next_ which uses three Prolog clauses for S2, S3/B3, and death.
+
+
+7. Design Notes
+
+Private predicates at_offs4_ and at_offs8_ provide the direction offset lists
+as facts, avoiding literal repetition across multiple predicates.
+
+at_has_nbr_4_ and at_has_nbr_8_ use member/2 to try each direction and cut
+on the first V-valued in-bounds neighbor. This makes at_any_nbr_4/8 efficient.
+
+at_mode_ uses three steps: findall of N-V frequency pairs, max_list/2 to find
+the maximum frequency, then findall to collect all winners. A single winner
+becomes Mode; multiple winners resolve to Bg.
+
+Library imports: library(lists): member/2, nth0/3, max_list/2.
+
+Test file: packs/autom/test/test_autom.pl. All 42 tests pass.

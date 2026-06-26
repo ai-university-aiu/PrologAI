@@ -14821,3 +14821,53 @@ xs_rank_vals: findall via nested member/2 + sort/2 (deduplication is free).
 xs_val_rank/xs_rank_val_: nth0 + cut to commit to unique match in sorted list.
 
 Predicate count: 14 (xs_* prefix). Tests: 42/42. Layer: 119.
+
+Next chapter: Chapter 102 covers the Cellular Automaton Neighborhood Aggregation Pack.
+
+Chapter 102: Cellular Automaton Neighborhood Aggregation - The autom Pack (at_* prefix)
+
+The autom pack applies neighborhood aggregation rules across an entire grid
+in a single call, producing transformed grids based on cell neighborhoods.
+
+Neighborhood count grids (produce integer grid from same-sized grid):
+at_count_nbrs_4(+Grid, +V, -CGrid).  % each cell = count of V 4-neighbors
+at_count_nbrs_8(+Grid, +V, -CGrid).  % each cell = count of V 8-neighbors
+at_count_same_4(+Grid, -CGrid).       % each cell = count of same-val 4-nbrs
+at_count_same_8(+Grid, -CGrid).       % each cell = count of same-val 8-nbrs
+
+Boolean neighbor grids (produce 1/0 grid):
+at_any_nbr_4(+Grid, +V, -BGrid).     % 1 if any 4-neighbor = V; else 0
+at_all_nbrs_4(+Grid, +V, -BGrid).    % 1 if all in-bounds 4-nbrs = V; else 0
+at_any_nbr_8(+Grid, +V, -BGrid).     % 1 if any 8-neighbor = V; else 0
+at_all_nbrs_8(+Grid, +V, -BGrid).    % 1 if all in-bounds 8-nbrs = V; else 0
+
+Isolated cell detection:
+at_isolated_4(+Grid, +V, -Cells).    % V cells with no V 4-neighbor
+at_isolated_8(+Grid, +V, -Cells).    % V cells with no V 8-neighbor
+
+Birth rules:
+at_birth_4(+Grid, +Dead, +Live, +N, -Grid2). % Dead + N Live 4-nbrs -> Live
+at_birth_8(+Grid, +Dead, +Live, +N, -Grid2). % Dead + N Live 8-nbrs -> Live
+
+Aggregation:
+at_majority_4(+Grid, +Bg, -Grid2).   % each cell takes majority of self+4-nbrs
+at_step_gol(+Grid, -Grid2).          % one step of Conway's Game of Life B3/S23
+
+Examples:
+at_count_nbrs_4([[0,0,0],[0,1,0],[0,0,0]], 0, CG). % CG=[[2,2,2],[2,4,2],[2,2,2]]
+at_count_nbrs_8([[0,0,0],[0,1,0],[0,0,0]], 1, CG). % CG=[[1,1,1],[1,0,1],[1,1,1]]
+at_any_nbr_4([[0,0,0],[0,1,0],[0,0,0]], 1, BG).    % BG=[[0,1,0],[1,0,1],[0,1,0]]
+at_all_nbrs_4([[1,1,1],[1,0,1],[1,1,1]], 1, BG).   % BG=[[1,0,1],[0,1,0],[1,0,1]]
+at_isolated_4([[1,0,1],[0,0,0]], 1, Cs).            % Cs=[0-0, 0-2]
+at_birth_4([[0,1,0],[1,0,1],[0,1,0]], 0, 1, 4, G). % G=[[0,1,0],[1,1,1],[0,1,0]]
+at_majority_4([[1,1],[1,0]], 0, G).                  % G=[[1,1],[1,1]]
+at_step_gol([[0,0,0],[1,1,1],[0,0,0]], G).           % G=[[0,1,0],[0,1,0],[0,1,0]]
+
+at_count_nbrs_4/8: triple-nested findall (rows, cells, directions).
+at_any_nbr_4/8: private helper with cut on first V-neighbor; if-then-else->1/0.
+at_all_nbrs_4/8: forall/2 over in-bounds directions; vacuously true if no nbrs.
+at_birth_4/8: (V==Dead, N==Count -> Live ; V) per cell.
+at_majority_4: at_mode_ uses findall+max_list+unique-winner-or-Bg.
+at_step_gol: count alive 8-nbrs + at_gol_next_ (survive S23, birth B3, die).
+
+Predicate count: 14 (at_* prefix). Tests: 42/42. Layer: 120.
