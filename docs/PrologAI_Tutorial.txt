@@ -15311,3 +15311,43 @@ Library imports: library(lists): member/2, nth0/3, min_list/2, max_list/2.
   library(apply): maplist/3. Built-ins: length/2, between/3, abs/1, max/2.
 
 Predicate count: 14 (dt_* prefix). Tests: 42/42. Layer: 129.
+
+
+CHAPTER 112: GRID TOPOLOGY AND CONNECTED COMPONENT ANALYSIS (tp_*)
+
+The topology pack (Layer 130, module topology, prefix tp_*) provides 14
+predicates for flood-fill-based connected component analysis, enclosed
+region detection, and topological classification of grid regions.
+All connectivity is 4-connected (orthogonal neighbors).
+
+Load: :- use_module('packs/topology/prolog/topology.pl').
+
+Examples:
+tp_component([[1,1,1],[1,1,1],[1,1,1]],1,0-0,C),length(C,N). % N=9
+tp_all_components([[1,0,0],[0,0,0],[0,0,1]],1,Cs),length(Cs,N). % N=2
+tp_component_count([[1,0,0],[0,0,0],[0,0,1]],1,N). % N=2
+tp_component_size([[1,1,2,2],[1,1,2,2],[1,1,2,2],[1,1,2,2]],1,0-0,N). % N=8
+tp_largest_component([[1,0,0],[0,0,0],[0,0,1]],1,C),length(C,N). % N=1
+tp_reachable([[1,0,0],[0,0,0],[0,0,1]],1,0-0,2-2,B). % B=0
+tp_enclosed([[1,1,1],[1,0,1],[1,1,1]],1,0,C). % C=[1-1]
+tp_has_hole([[1,1,1],[1,0,1],[1,1,1]],1,0,B). % B=1
+tp_hole_count([[1,1,1],[1,0,1],[1,1,1]],1,0,N). % N=1
+tp_fill_holes([[1,1,1],[1,0,1],[1,1,1]],1,0,G2). % G2=[[1,1,1],[1,1,1],[1,1,1]]
+tp_border_components([[0,0,0],[0,1,0],[0,0,0]],1,C). % C=[]
+tp_interior_components([[0,0,0],[0,1,0],[0,0,0]],1,C),length(C,N). % N=1
+tp_label_components([[1,0,0],[0,0,0],[0,0,1]],1,L). % L=[[1,0,0],[0,0,0],[0,0,2]]
+tp_same_component([[1,0,0],[0,0,0],[0,0,1]],1,0-0,2-2,B). % B=0
+
+Key implementation patterns:
+tp_grow_: BFS with memberchk for visited-set; tp_val_nbr_ generates four
+  orthogonal neighbors with bounds checks; append/3 to prepend new neighbors to queue.
+tp_split_cells_: head uses AllCells=[Seed|_] in BODY (not head); subtract/3
+  removes found component from remaining; recursive until empty.
+tp_enclosed: seeds BFS from all border Bg cells; unreached Bg cells = enclosed.
+tp_border_components: uses once/1 to find first border-touching cell per
+  component; prevents duplicate component entries in findall.
+
+Library imports: library(lists): member/2, memberchk/2, nth0/3, max_list/2,
+  append/3, subtract/3. Built-ins: length/2, between/3, sort/2.
+
+Predicate count: 14 (tp_* prefix). Tests: 42/42. Layer: 130.
