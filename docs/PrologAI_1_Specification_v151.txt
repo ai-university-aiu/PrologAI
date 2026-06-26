@@ -14329,3 +14329,43 @@ dn_block_val(+Grid, +N, +I, +J, -Vals): Flat list of all values in block (I,J) i
 Section 175.3: Layer Assignment
 
 Layer 164. Depends on no other packs. Uses member/2, nth0/3, min_list/2, last/2 from library(lists); built-ins sort/2, msort/2, findall/3, forall/2, between/3, length/2.
+
+Part 176: Objmorph Pack Specification (om_*, Layer 165)
+
+Section 176.1: Purpose
+
+The objmorph pack provides morphological operations on obj(Color, Cells) terms directly, without requiring a grid. It implements neighborhood generation, boundary and interior extraction under both 4-connectivity and 8-connectivity, single-step and iterated dilation, single-step and iterated erosion, and the compound operations of morphological opening and closing. The pack treats each obj as a cell set and performs standard binary morphology on that set.
+
+Section 176.2: Predicate Specifications
+
+om_neighbors4(+Cell, -Neighbors): Returns the 4 cells directly adjacent (up, down, left, right) to r(R,C). Always returns exactly 4 cells; coordinates may be negative or outside any particular grid boundary.
+
+om_neighbors8(+Cell, -Neighbors): Returns the 8 cells adjacent (including diagonals) to r(R,C). Always returns exactly 8 cells.
+
+om_boundary4(+Obj, -Boundary): Returns an obj with the same Color containing only the boundary cells under 4-connectivity. A cell is a boundary4 cell if at least one of its 4 neighbors is not in the cell set.
+
+om_interior4(+Obj, -Interior): Returns an obj with the same Color containing only the interior cells under 4-connectivity. A cell is interior4 if all 4 of its neighbors are in the cell set.
+
+om_boundary8(+Obj, -Boundary): Returns an obj containing cells that have at least one 8-neighbor outside the cell set.
+
+om_interior8(+Obj, -Interior): Returns an obj containing cells where all 8 neighbors are in the cell set. Stricter than interior4.
+
+om_dilate4(+Obj, -Result): Expands the cell set by one 4-connected step. Each cell contributes its 4 neighbors to the result; original cells are retained. Result = union of original cells and all 4-neighbors of every original cell.
+
+om_erode4(+Obj, -Result): Shrinks the cell set by one 4-connected step. Equivalent to om_interior4: retains only cells fully surrounded on all 4 sides.
+
+om_dilate8(+Obj, -Result): Expands the cell set by one 8-connected step, including diagonal expansion.
+
+om_erode8(+Obj, -Result): Shrinks the cell set by one 8-connected step. Equivalent to om_interior8.
+
+om_dilate4_n(+Obj, +N, -Result): Applies om_dilate4 exactly N times. N=0 is the identity.
+
+om_erode4_n(+Obj, +N, -Result): Applies om_erode4 exactly N times. N=0 is the identity.
+
+om_open4(+Obj, -Result): Morphological opening = erode4 then dilate4. Removes small protrusions and thin connections while preserving bulk shapes.
+
+om_close4(+Obj, -Result): Morphological closing = dilate4 then erode4. Fills small gaps and indentations while preserving bulk shapes.
+
+Section 176.3: Layer Assignment
+
+Layer 165. Depends on no other packs. Uses member/2 from library(lists); built-ins sort/2, findall/3, forall/2.

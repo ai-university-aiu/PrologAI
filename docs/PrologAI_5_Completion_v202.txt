@@ -6359,3 +6359,22 @@ Tests: 52 PLUnit tests, all pass, no warnings.
 SPARC: Spec v150, Pseudo v143, Arch v144, Refinement v198, Completion v201.
 
 Summary: Grid downscaling and NxN block decomposition. The inverse of ox_scale_up in objxf. A grid is N-blocky when every NxN partition tile is a uniform color. dn_block_dims gives the count of complete NxN blocks. dn_block_cells generates the r(R,C) coordinate set for one block. dn_block_color checks uniformity (fails on mixed blocks). dn_block_majority uses msort+last to find the dominant value. dn_is_blocky uses forall over all block indices. dn_shrink builds a smaller grid by majority vote per block; dn_shrink_strict requires all blocks to be uniform. dn_find_scale searches divisors from 2 upward. dn_obj_shrink divides every cell coordinate by N and deduplicates. dn_scale_factor searches N from 2 to 30 comparing normalized cell sets. dn_uniform_blocks and dn_mixed_blocks enumerate block types. dn_block_grid extracts an NxN sub-grid; dn_block_val returns a flat value list.
+
+WP-186 Completion Record
+
+Work Package: 186
+Pack: objmorph
+Module: objmorph
+Prefix: om_
+Layer: 165
+Branch: feature/wp186-objmorph-pack
+PR: 271
+Merged: 2026-06-26
+
+Predicates (14): om_neighbors4/2, om_neighbors8/2, om_boundary4/2, om_interior4/2, om_boundary8/2, om_interior8/2, om_dilate4/2, om_erode4/2, om_dilate8/2, om_erode8/2, om_dilate4_n/3, om_erode4_n/3, om_open4/2, om_close4/2.
+
+Tests: 46 PLUnit tests, all pass, no warnings.
+
+SPARC: Spec v151, Pseudo v144, Arch v145, Refinement v199, Completion v202.
+
+Summary: Morphological operations directly on obj(Color, Cells) terms without requiring a grid. Two neighborhood generators: om_neighbors4 (4 orthogonal neighbors) and om_neighbors8 (8 directional neighbors including diagonals). Boundary extraction: om_boundary4 keeps cells with at least one 4-neighbor outside the set; om_boundary8 uses 8-connectivity. Interior extraction: om_interior4 keeps cells where all 4 neighbors are inside; om_interior8 uses all 8 neighbors (stricter). Dilation: om_dilate4 and om_dilate8 expand by one step; implemented via findall over neighbor lists then append+sort union. Erosion: om_erode4 delegates to om_interior4; om_erode8 delegates to om_interior8. Iterated forms: om_dilate4_n and om_erode4_n recurse with N countdown. Compound operations: om_open4 = erode4 then dilate4 (removes thin protrusions); om_close4 = dilate4 then erode4 (fills small gaps). Key implementation: boundary uses \+ forall(member(N,Nbrs), member(N,S)); interior uses forall(member(N,Nbrs), member(N,S)).

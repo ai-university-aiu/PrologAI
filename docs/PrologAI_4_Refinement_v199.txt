@@ -14723,3 +14723,52 @@ AC-SK-049: dn_block_grid(G, 2, 2, 2) returns [[i,i],[i,i]] for a 6x6 2-blocky gr
 AC-SK-050: dn_block_val on a uniform block returns N*N copies of that single color.
 AC-SK-051: dn_block_val on a mixed block returns all N*N values in row-major order.
 AC-SK-052: dn_block_val returns exactly N*N values (length = N*N).
+
+Part 176: Objmorph Pack Acceptance Criteria (om_*, Layer 165)
+
+AC-OM-001: om_neighbors4(r(0,0), N) returns exactly 4 cells.
+AC-OM-002: om_neighbors4(r(0,0), N) contains r(-1,0), r(1,0), r(0,-1), r(0,1).
+AC-OM-003: om_neighbors4(r(2,3), N) contains r(1,3), r(3,3), r(2,2), r(2,4).
+AC-OM-004: om_neighbors8(r(5,5), N) returns exactly 8 cells.
+AC-OM-005: om_neighbors8(r(0,0), N) contains all 8 diagonal and orthogonal neighbors.
+AC-OM-006: om_boundary4 of a single cell returns that cell (all 4 neighbors outside).
+AC-OM-007: om_boundary4 of a horizontal line of 3 returns all 3 (none has all 4 neighbors inside).
+AC-OM-008: om_boundary4 of a 3x3 square returns 8 cells (all except center r(1,1)).
+AC-OM-009: om_boundary4 of a 3x3 square does not include r(1,1).
+AC-OM-010: om_boundary4 of a 2x2 square returns 4 cells (all boundary, none interior4).
+AC-OM-011: om_interior4 of a single cell returns an empty cell list.
+AC-OM-012: om_interior4 of a horizontal line of 5 returns empty (missing top/bottom neighbors).
+AC-OM-013: om_interior4 of a 3x3 square returns exactly [r(1,1)].
+AC-OM-014: om_interior4 of a 4x4 square returns 4 interior cells.
+AC-OM-015: om_interior4 of a 2x2 square returns empty.
+AC-OM-016: om_boundary8 of a 3x3 square returns 8 cells (center r(1,1) is interior8).
+AC-OM-017: om_boundary8 of a 5x5 square returns 16 cells (inner 3x3 = 9 interior8 cells).
+AC-OM-018: om_interior8 of a 3x3 square returns [r(1,1)] (center has all 8 neighbors).
+AC-OM-019: om_interior8 of a 5x5 square returns 9 cells.
+AC-OM-020: om_interior8 of a 2x2 square returns empty.
+AC-OM-021: om_dilate4 of a single cell returns a plus shape of 5 cells.
+AC-OM-022: om_dilate4 of [r(0,0),r(0,1)] returns 8 cells.
+AC-OM-023: om_dilate4 preserves the Color of the obj.
+AC-OM-024: om_dilate4 result contains all original cells.
+AC-OM-025: om_erode4 of a single cell returns empty.
+AC-OM-026: om_erode4 of a horizontal line returns empty.
+AC-OM-027: om_erode4 of a 3x3 square returns [r(1,1)].
+AC-OM-028: om_erode4 of a 4x4 square returns 4 cells.
+AC-OM-029: om_dilate8 of a single cell returns a 3x3 block of 9 cells.
+AC-OM-030: om_dilate8 of a single cell returns 9 cells.
+AC-OM-031: om_dilate8 produces more cells than om_dilate4 from the same input.
+AC-OM-032: om_erode8 of a 3x3 square returns [r(1,1)].
+AC-OM-033: om_erode8 of a 2x2 square returns empty.
+AC-OM-034: om_erode8 result is always a subset of om_erode4 result (stricter criterion).
+AC-OM-035: om_dilate4_n with N=0 returns the original obj unchanged.
+AC-OM-036: om_dilate4_n with N=1 gives the same result as om_dilate4.
+AC-OM-037: om_dilate4_n with N=2 from a single cell returns a diamond of 13 cells.
+AC-OM-038: om_erode4_n with N=0 returns the original obj unchanged.
+AC-OM-039: om_erode4_n with N=1 gives the same result as om_erode4.
+AC-OM-040: om_erode4_n with N=2 on a 5x5 square returns a single center cell.
+AC-OM-041: om_open4 of a 3x3 square returns 5 cells (erode to center, dilate to plus).
+AC-OM-042: om_open4 of a single cell returns empty.
+AC-OM-043: om_open4 of a thin horizontal line returns empty.
+AC-OM-044: om_close4 of a single cell returns [r(0,0)] (dilate to plus, erode back).
+AC-OM-045: om_close4 of a 3x3 square returns 9 cells.
+AC-OM-046: om_close4 of a horizontal line of 3 returns the same 3 cells.
