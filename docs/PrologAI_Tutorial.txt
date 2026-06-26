@@ -16249,3 +16249,46 @@ Library imports: library(apply): maplist/2, maplist/3.
 Built-ins: between/3, length/2, findall/3, forall/2, sort/2.
 
 42/42 PLUnit tests pass.
+
+Chapter 129: Splice Pack (sp_*, Layer 147)
+
+Row and column structural editing. These predicates reshape the grid itself by
+inserting, deleting, swapping, reversing, rotating, replicating, or selecting
+rows and columns, changing the grid dimensions rather than just cell values.
+
+The split-and-reassemble pattern: length(Prefix, K), append(Prefix, Suffix, List)
+splits a list at position K. Re-assembling with the modified element produces the
+result.
+
+sp_insert_row(+Grid, +R, +NewRow, -Out): insert NewRow before row index R.
+sp_delete_row(+Grid, +R, -Out): delete the row at index R.
+sp_insert_col(+Grid, +C, +V, -Out): insert a constant-value column before column C.
+sp_delete_col(+Grid, +C, -Out): delete the column at index C.
+sp_swap_rows(+Grid, +R1, +R2, -Out): swap rows R1 and R2.
+sp_swap_cols(+Grid, +C1, +C2, -Out): swap columns C1 and C2.
+sp_reverse_rows(+Grid, -Out): reverse the order of rows.
+sp_reverse_cols(+Grid, -Out): reverse cells within each row.
+sp_rotate_rows(+Grid, +K, -Out): cyclic shift of rows; row K becomes row 0.
+sp_rotate_cols(+Grid, +K, -Out): cyclic shift of columns; column K becomes column 0.
+sp_replicate_row(+Grid, +R, +N, -Out): replace row R with N copies (N=0 deletes).
+sp_replicate_col(+Grid, +C, +N, -Out): replace column C with N copies (N=0 deletes).
+sp_select_rows(+Grid, +Indices, -Out): keep only rows at given indices in that order.
+sp_select_cols(+Grid, +Indices, -Out): keep only columns at given indices in that order.
+
+Example: sp_insert_row([[1,2],[3,4]], 1, [5,5], Out).
+         Out = [[1,2],[5,5],[3,4]].
+
+Example: sp_rotate_rows([[1,2],[3,4],[5,6]], 1, Out).
+         Out = [[3,4],[5,6],[1,2]].
+
+Example: sp_replicate_col([[1,2,3],[4,5,6]], 1, 2, Out).
+         Out = [[1,2,2,3],[4,5,5,6]].
+
+Example: sp_select_cols([[1,2,3],[4,5,6]], [2,0], Out).
+         Out = [[3,1],[6,4]].
+
+Library imports: library(lists): member/2, nth0/3, append/2, append/3, reverse/2.
+Library imports: library(apply): maplist/2, maplist/3.
+Built-ins: length/2, findall/3, between/3.
+
+42/42 PLUnit tests pass.
