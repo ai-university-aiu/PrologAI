@@ -1,0 +1,181 @@
+PrologAI Tutorial
+Chapter 103: 1D Cross-Section Extraction - The cross Pack
+
+The cross pack (Work Package 142, Layer 121) provides 14 predicates for
+extracting and analyzing 1D slices of 2D grids. A cross-section is any
+linear subset of a grid: a single row, a single column, or a diagonal.
+The cross pack extracts these slices and computes aggregate statistics
+(sum, count, unique values, mode) over them.
+
+All predicates use the cx_* prefix.
+
+
+1. Row and Column Extraction
+
+cx_row(+Grid, +R, -Row) extracts row R (0-indexed) as a plain list.
+
+cx_col(+Grid, +C, -Col) extracts column C (0-indexed) as a list with
+one element per row.
+
+Examples:
+
+:- cx_row([[1,2,3],[4,5,6],[7,8,9]], 1, Row).
+% Row = [4,5,6]
+
+:- cx_col([[1,2,3],[4,5,6],[7,8,9]], 2, Col).
+% Col = [3,6,9]
+
+:- cx_row([[a,b],[c,d]], 0, Row).
+% Row = [a,b]   (works with any term, not just numbers)
+
+
+2. Diagonal Extraction
+
+cx_diag(+Grid, -Diag) extracts the main diagonal (top-left to
+bottom-right): the sequence Grid[0][0], Grid[1][1], ..., Grid[N][N]
+where N = min(H, W) - 1.
+
+cx_antidiag(+Grid, -Diag) extracts the anti-diagonal (top-right to
+bottom-left): Grid[0][W-1], Grid[1][W-2], ..., Grid[H-1][W-H].
+
+Examples:
+
+:- cx_diag([[1,2,3],[4,5,6],[7,8,9]], Diag).
+% Diag = [1,5,9]
+
+:- cx_antidiag([[1,2,3],[4,5,6],[7,8,9]], Diag).
+% Diag = [3,5,7]
+
+:- cx_diag([[1,2],[3,4]], Diag).
+% Diag = [1,4]
+
+:- cx_antidiag([[1,2],[3,4]], Diag).
+% Diag = [2,3]
+
+For non-square grids where H > W, cx_antidiag guards C >= 0 to stop
+collecting once the column index would go negative.
+
+
+3. Row and Column Sums
+
+cx_row_sum(+Grid, +R, -Sum) computes the arithmetic sum of all values
+in row R.
+
+cx_col_sum(+Grid, +C, -Sum) computes the arithmetic sum of all values
+in column C.
+
+Examples:
+
+:- cx_row_sum([[1,2,3],[4,5,6]], 0, Sum).
+% Sum = 6
+
+:- cx_col_sum([[1,2],[3,4],[5,6]], 1, Sum).
+% Sum = 12
+
+Both delegate to sum_list/2 from library(lists) after extracting the
+relevant row or column.
+
+
+4. Value Counts
+
+cx_row_count(+Grid, +R, +V, -N) counts occurrences of value V in
+row R.
+
+cx_col_count(+Grid, +C, +V, -N) counts occurrences of value V in
+column C.
+
+Examples:
+
+:- cx_row_count([[1,2,1,1,3]], 0, 1, N).
+% N = 3
+
+:- cx_col_count([[1,2],[1,3],[1,4]], 0, 1, N).
+% N = 3
+
+:- cx_row_count([[0,0,0]], 0, 9, N).
+% N = 0   (V not present)
+
+
+5. Row and Column Index Queries
+
+cx_rows_with(+Grid, +V, -Rows) returns the sorted list of row indices
+that contain at least one occurrence of V.
+
+cx_cols_with(+Grid, +V, -Cols) returns the sorted list of column
+indices that contain at least one occurrence of V.
+
+Examples:
+
+:- cx_rows_with([[0,0],[1,0],[0,1]], 1, Rows).
+% Rows = [1,2]
+
+:- cx_cols_with([[1,0,0],[0,1,0],[0,0,0]], 1, Cols).
+% Cols = [0,1]
+
+:- cx_rows_with([[0,0],[0,0]], 1, Rows).
+% Rows = []   (V absent)
+
+sort/2 inside each predicate removes duplicate indices that would arise
+when V appears multiple times in the same row or column.
+
+
+6. Unique Values
+
+cx_row_uniq(+Grid, +R, -Vals) returns the sorted set of distinct
+values in row R.
+
+cx_col_uniq(+Grid, +C, -Vals) returns the sorted set of distinct
+values in column C.
+
+Examples:
+
+:- cx_row_uniq([[3,1,2,1,3]], 0, Vals).
+% Vals = [1,2,3]
+
+:- cx_col_uniq([[1],[2],[1],[3]], 0, Vals).
+% Vals = [1,2,3]
+
+:- cx_row_uniq([[5,5,5]], 0, Vals).
+% Vals = [5]   (single unique value)
+
+sort/2 is applied to the extracted list to both sort and deduplicate.
+
+
+7. Mode (Most Frequent Value)
+
+cx_row_mode(+Grid, +R, +Bg, -Mode) returns the most frequently
+occurring value in row R. If multiple values tie for the highest
+frequency, Mode = Bg.
+
+cx_col_mode(+Grid, +C, +Bg, -Mode) does the same for column C.
+
+Examples:
+
+:- cx_row_mode([[1,2,1,1,3]], 0, 0, Mode).
+% Mode = 1   (appears 3 times; clear winner)
+
+:- cx_row_mode([[1,2]], 0, 0, Mode).
+% Mode = 0   (1 and 2 are tied; Bg=0 wins)
+
+:- cx_col_mode([[5],[5],[5]], 0, 0, Mode).
+% Mode = 5   (only value present)
+
+Both predicates use private helper cx_mode_/3 which builds frequency
+pairs with findall, finds the maximum with max_list/2, collects all
+tied winners, and returns the unique winner or Bg on a tie. This is the
+same pattern used by at_majority_4 in the autom pack.
+
+
+8. Design Notes
+
+cx_col and cx_col_* predicates extract the column on each call by
+iterating all rows. For grids processed once this is efficient; if the
+same column is needed repeatedly, extract it first with cx_col/3.
+
+cx_diag and cx_antidiag produce a list of length min(H, W). For a
+2x3 grid (2 rows, 3 columns), the diagonal is [Grid[0][0], Grid[1][1]]
+and the anti-diagonal is [Grid[0][2], Grid[1][1]].
+
+Library imports: library(lists): member/2, nth0/3, sum_list/2, max_list/2.
+
+Test file: packs/cross/test/test_cross.pl. All 42 tests pass.
