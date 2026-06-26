@@ -18020,3 +18020,44 @@ ps_size_preserved([obj(r,[r(0,0)])], [obj(g,[r(0,0)])]).
 
 14 ps_* predicates. 41 tests pass. Layer 188.
 All 41 tests pass. See docs/tutorial/Ch170_ScenePair.txt for the full chapter.
+
+
+Chapter 160: scenerank Pack - Rule Hypothesis Ranking for Scene Lists (rk_*, Layer 189)
+
+The scenerank pack ranks candidate rule terms by coverage across Before-After
+training pairs. A pair is the term Before-After where both are obj(Color,Cells) lists.
+
+:- use_module(pack(scenerank/prolog/scenerank)).
+
+Pairs = [[obj(r,[r(0,0)])]-[obj(g,[r(0,0)])], [obj(r,[r(1,0)])]-[obj(g,[r(1,0)])]].
+
+% Coverage: how many pairs does this rule correctly transform?
+rk_coverage(recolor(r,g), Pairs, N).    % N = 2
+rk_coverage(recolor(r,b), Pairs, N).    % N = 0
+
+% Consistency check
+rk_consistent(recolor(r,g), Pairs).     % succeeds
+
+% Inconsistent pairs
+rk_inconsistent_pairs(recolor(r,b), Pairs, Bad).  % Bad = Pairs
+
+% Rank candidates by coverage descending
+rk_rank_rules([recolor(r,g), shift(1,0)], Pairs, Ranked).
+% Ranked = [recolor(r,g), shift(1,0)]
+
+% Best rule
+rk_best_rule([recolor(r,b), recolor(r,g)], Pairs, Best).
+% Best = recolor(r,g)
+
+% Perfect rules (coverage == pair count)
+rk_perfect_rules([recolor(r,g), shift(1,0)], Pairs, [recolor(r,g)]).
+
+% Coverage ratio
+rk_coverage_ratio(recolor(r,g), Pairs, Num/Den).  % 2/2
+
+% Top 2 rules as Coverage-Rule pairs
+rk_top_n_rules([recolor(r,g), shift(1,0), recolor(r,b)], Pairs, 2, TopN).
+% TopN = [2-recolor(r,g), 0-shift(1,0)]  (order depends on pair content)
+
+14 rk_* predicates. 41 tests pass. Layer 189.
+All 41 tests pass. See docs/tutorial/Ch171_SceneRank.txt for the full chapter.
