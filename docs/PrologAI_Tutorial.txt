@@ -14772,3 +14772,52 @@ lc_row_suffix: append(_, Suffix, Row) + cut for deterministic existence test.
 lc_anchor: findall of all V cells; single-element [R-C] pattern for uniqueness.
 
 Predicate count: 14 (lc_* prefix). Tests: 42/42. Layer: 118.
+
+Next chapter: Chapter 101 covers the Extended Cell Selection Pack (value comparison and ranking).
+
+Chapter 101: Extended Cell Selection by Value Comparison - The xsel Pack (xs_* prefix)
+
+The xsel pack selects, locates, and transforms grid cells based on numerical
+value comparisons. It complements arith (arithmetic), histogram (frequency),
+and count (equality) by providing order-based queries across the value range.
+
+Threshold selectors (return sorted R-C pair lists):
+xs_cells_lt(+Grid, +V, -Cells).         % cells with value < V
+xs_cells_gt(+Grid, +V, -Cells).         % cells with value > V
+xs_cells_le(+Grid, +V, -Cells).         % cells with value =< V
+xs_cells_ge(+Grid, +V, -Cells).         % cells with value >= V
+xs_cells_between(+Grid, +Lo, +Hi, -Cells). % cells with Lo =< value =< Hi
+xs_cells_ne(+Grid, +V, -Cells).         % cells with value \== V
+
+Extremum locators:
+xs_max_cells(+Grid, -Cells).            % cells containing maximum value
+xs_min_cells(+Grid, -Cells).            % cells containing minimum value
+
+Conditional replacement (produce new grid):
+xs_threshold(+Grid, +T, +OnV, +OffV, -Grid2). % value >= T -> OnV else OffV
+xs_replace_lt(+Grid, +V, +New, -Grid2). % replace cells < V with New
+xs_replace_gt(+Grid, +V, +New, -Grid2). % replace cells > V with New
+
+Value ranking:
+xs_rank_vals(+Grid, -Vals).             % sorted unique values (rank ladder)
+xs_val_rank(+Grid, +V, -Rank).          % 0-based rank of value V
+xs_rank_grid(+Grid, -RankGrid).         % replace each cell with its rank
+
+Examples:
+xs_cells_lt([[1,2],[3,4]], 3, Cs).      % Cs=[0-0, 0-1]
+xs_cells_ge([[1,2],[3,4]], 3, Cs).      % Cs=[1-0, 1-1]
+xs_cells_between([[0,1],[2,3]], 1, 2, Cs). % Cs=[0-1, 1-0]
+xs_max_cells([[5,0],[0,5]], Cs).        % Cs=[0-0, 1-1]
+xs_threshold([[1,3],[5,2]], 3, 1, 0, G). % G=[[0,1],[1,0]]
+xs_replace_lt([[1,3],[2,4]], 3, 0, G).  % G=[[0,3],[0,4]]
+xs_rank_vals([[3,1],[2,1]], Vs).        % Vs=[1,2,3]
+xs_val_rank([[3,1],[2,1]], 3, R).       % R=2
+xs_rank_grid([[5,3],[1,7]], G).         % G=[[2,1],[0,3]]
+
+xs_cells_lt/gt/le/ge/between/ne: findall with arithmetic guard + sort/2.
+xs_max_cells/xs_min_cells: two-pass (max_list/min_list then findall for positions).
+xs_threshold/replace_lt/replace_gt: nested maplist with if-then-else per cell.
+xs_rank_vals: findall via nested member/2 + sort/2 (deduplication is free).
+xs_val_rank/xs_rank_val_: nth0 + cut to commit to unique match in sorted list.
+
+Predicate count: 14 (xs_* prefix). Tests: 42/42. Layer: 119.

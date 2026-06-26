@@ -1,0 +1,151 @@
+PrologAI Tutorial
+Chapter 101: Extended Cell Selection by Value Comparison - The xsel Pack
+
+The xsel pack (Work Package 140, Layer 119) provides 14 predicates for
+selecting, locating, and transforming grid cells based on numerical value
+comparisons. The pack answers questions like "which cells have values above
+a threshold?", "where is the maximum value?", and "what is the ordinal rank
+of this cell's value?".
+
+All predicates use the xs_* prefix.
+
+
+1. Threshold Cell Selectors
+
+xs_cells_lt(+Grid, +V, -Cells) returns the sorted list of R-C pairs for cells
+with value strictly less than V.
+
+xs_cells_gt(+Grid, +V, -Cells) returns the sorted list for cells with value
+strictly greater than V.
+
+xs_cells_le(+Grid, +V, -Cells) returns the sorted list for cells with value
+less than or equal to V.
+
+xs_cells_ge(+Grid, +V, -Cells) returns the sorted list for cells with value
+greater than or equal to V.
+
+Example:
+
+:- xs_cells_lt([[1,2],[3,4]], 3, Cs).
+% Cs = [0-0, 0-1]    (values 1 and 2 are < 3)
+
+:- xs_cells_ge([[1,2],[3,4]], 3, Cs).
+% Cs = [1-0, 1-1]    (values 3 and 4 are >= 3)
+
+All four predicates use findall with an arithmetic guard followed by sort/2
+to produce a canonical list.
+
+
+2. Range and Inequality Selectors
+
+xs_cells_between(+Grid, +Lo, +Hi, -Cells) returns cells with Lo =< value =< Hi.
+
+xs_cells_ne(+Grid, +V, -Cells) returns cells with value not equal to V.
+
+Example:
+
+:- xs_cells_between([[0,1],[2,3]], 1, 2, Cs).
+% Cs = [0-1, 1-0]    (values 1 and 2 are in [1,2])
+
+:- xs_cells_ne([[0,1],[1,0]], 0, Cs).
+% Cs = [0-1, 1-0]    (cells where value != 0)
+
+
+3. Extremum Locators
+
+xs_max_cells(+Grid, -Cells) returns the sorted list of R-C pairs of cells
+containing the maximum value in Grid.
+
+xs_min_cells(+Grid, -Cells) returns the sorted list of R-C pairs of cells
+containing the minimum value.
+
+Example:
+
+:- xs_max_cells([[1,2],[3,4]], Cs).
+% Cs = [1-1]          (4 is the unique maximum)
+
+:- xs_max_cells([[5,0],[0,5]], Cs).
+% Cs = [0-0, 1-1]    (both 5s are the maximum)
+
+:- xs_min_cells([[3,3],[3,3]], Cs).
+% Cs = [0-0, 0-1, 1-0, 1-1]  (all cells share the minimum)
+
+Implementation: two-pass approach. First pass collects all cell values and
+finds the extremum with max_list/2 or min_list/2. Second pass collects
+positions equal to that extremum.
+
+
+4. Conditional Replacement
+
+xs_threshold(+Grid, +T, +OnV, +OffV, -Grid2) replaces each cell with OnV
+if its value is >= T, otherwise with OffV. This is a binary threshold.
+
+xs_replace_lt(+Grid, +V, +New, -Grid2) replaces every cell with value < V
+with New, leaving all other cells unchanged.
+
+xs_replace_gt(+Grid, +V, +New, -Grid2) replaces every cell with value > V
+with New.
+
+Example:
+
+:- xs_threshold([[1,3],[5,2]], 3, 1, 0, G).
+% G = [[0,1],[1,0]]  (3 and 5 >= 3 become 1; 1 and 2 become 0)
+
+:- xs_replace_lt([[1,3],[2,4]], 3, 0, G).
+% G = [[0,3],[0,4]]  (1 and 2 are < 3, replaced with 0)
+
+:- xs_replace_gt([[1,3],[5,2]], 3, 0, G).
+% G = [[1,3],[0,2]]  (5 is > 3, replaced with 0)
+
+All three use nested maplist (one level per row, one level per cell) with
+an if-then-else inside a private helper predicate.
+
+
+5. Value Ranking
+
+xs_rank_vals(+Grid, -Vals) returns the sorted list of unique values appearing
+in Grid. The index of each value in this list is its ordinal rank (0 = smallest).
+
+xs_val_rank(+Grid, +V, -Rank) returns the 0-based ordinal rank of value V.
+Fails if V does not appear in Grid.
+
+xs_rank_grid(+Grid, -RankGrid) produces a new grid where each cell contains
+its original value's ordinal rank.
+
+Example:
+
+:- xs_rank_vals([[3,1],[2,1]], Vs).
+% Vs = [1, 2, 3]       (1 is rank 0, 2 is rank 1, 3 is rank 2)
+
+:- xs_val_rank([[3,1],[2,1]], 3, R).
+% R = 2
+
+:- xs_rank_grid([[3,1],[2,1]], G).
+% G = [[2,0],[1,0]]    (3->2, 1->0, 2->1)
+
+:- xs_rank_grid([[5,3],[1,7]], G).
+% G = [[2,1],[0,3]]    (1->0, 3->1, 5->2, 7->3)
+
+xs_rank_vals uses findall with nested member/2 to collect all values, then
+sort/2 which simultaneously removes duplicates and orders ascending. xs_val_rank
+uses nth0 with a cut to find the unique position. xs_rank_grid calls xs_rank_vals
+once and then applies xs_rank_val_ (nth0 + cut) to every cell via nested maplist.
+
+
+6. Design Notes
+
+The xs_rank_val_ private helper adds a cut after nth0(Rank, Vals, V) because
+the sorted unique list contains each value exactly once; without the cut, nth0
+would leave a choicepoint that produces PLUnit warnings. The cut is safe here
+because uniqueness is guaranteed by the sort/2 that built Vals.
+
+The six threshold selectors (xs_cells_lt, xs_cells_gt, xs_cells_le,
+xs_cells_ge, xs_cells_between, xs_cells_ne) all follow the same findall +
+sort pattern with different arithmetic guards. This uniformity makes them
+easy to combine: for example, calling xs_cells_ge and then xs_cells_le on the
+same grid and intersecting the results is equivalent to xs_cells_between.
+
+Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2.
+library(apply): maplist/3.
+
+Test file: packs/xsel/test/test_xsel.pl. All 42 tests pass.
