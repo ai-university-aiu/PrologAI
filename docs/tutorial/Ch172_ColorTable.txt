@@ -1,0 +1,206 @@
+Chapter 172: colortable Pack - Color Substitution Table Learning and Application (ct_*, Layer 190)
+
+
+Overview
+
+The colortable pack learns a complete color substitution table from a set of
+Before-After scene pair training examples, then applies that table to new
+scenes. It answers the question: "given that red turned into green, blue into
+yellow, and so on across these examples, what is the complete color mapping?"
+
+A Before-After pair is the term Before-After where Before and After are lists
+of obj(Color, Cells) of equal length. Objects are matched positionally: the
+first Before object corresponds to the first After object, the second to the
+second, and so on.
+
+Layer 190. Pack prefix: ct_*. Work Package 211.
+
+
+Core Concept: The Color Map
+
+A color map is a list of From-To atom pairs. For example:
+
+[r-g, b-y, p-w]
+
+This map says: red becomes green, blue becomes yellow, purple becomes white.
+Only changed colors appear in the map. If a color is not in the map, it is
+left unchanged (identity behavior).
+
+
+Exported Predicates
+
+
+ct_infer_from_pair(+Before, +After, -Map)
+
+Derive the color-to-color mapping from one Before-After pair.
+
+Example:
+
+ct_infer_from_pair([obj(r,[r(0,0)]),obj(b,[r(0,1)])],
+                   [obj(g,[r(0,0)]),obj(y,[r(0,1)])],
+                   Map).
+% Map = [r-g, b-y]
+
+
+ct_consistent_map(+Map)
+
+Succeed if no source color appears with two different target colors.
+
+Example:
+
+ct_consistent_map([r-g, b-y]).   % true
+\+ ct_consistent_map([r-g, r-b]). % true (r maps to two targets -- fails)
+
+
+ct_merge_maps(+Map1, +Map2, -Merged)
+
+Combine two maps. Fails if merging would create a conflict.
+
+Example:
+
+ct_merge_maps([r-g], [b-y], Merged).
+% Merged = [r-g, b-y]
+
+
+ct_extend_map(+Base, +Extra, -Extended)
+
+Add new entries from Extra to Base. Alias for ct_merge_maps.
+
+
+ct_learn_map(+Pairs, -Map, -Inconsistent)
+
+Learn a color map from a list of Before-After training pairs. Processes pairs
+one by one, accumulating a consistent map. Pairs that conflict with the
+accumulated map are returned in Inconsistent.
+
+Example:
+
+Pairs = [
+    [obj(r,[r(0,0)])]-[obj(g,[r(0,0)])],
+    [obj(b,[r(0,1)])]-[obj(y,[r(0,1)])]
+],
+ct_learn_map(Pairs, Map, Bad).
+% Map = [r-g, b-y], Bad = []
+
+
+ct_mapped_color(+Map, +Color, -Mapped)
+
+Look up one color. Returns the mapped target, or the color itself if not found.
+
+Example:
+
+ct_mapped_color([r-g, b-y], r, g).  % g
+ct_mapped_color([r-g, b-y], p, p).  % p (not in map, identity)
+
+
+ct_apply_map(+Map, +Obj, -MappedObj)
+
+Apply a color map to one obj(Color, Cells) term.
+
+Example:
+
+ct_apply_map([r-g], obj(r,[r(0,0)]), Result).
+% Result = obj(g,[r(0,0)])
+
+
+ct_apply_to_scene(+Map, +Scene, -MappedScene)
+
+Apply a color map to every object in a scene list.
+
+Example:
+
+ct_apply_to_scene([r-g, b-y],
+                  [obj(r,[r(0,0)]), obj(b,[r(0,1)])],
+                  MappedScene).
+% MappedScene = [obj(g,[r(0,0)]), obj(y,[r(0,1)])]
+
+
+ct_map_covers(+Map, +Scene)
+
+Succeed if Map has an explicit entry for every color in Scene.
+
+Example:
+
+ct_map_covers([r-g, b-y], [obj(r,[r(0,0)]), obj(b,[r(0,1)])]).  % true
+\+ ct_map_covers([r-g], [obj(r,[r(0,0)]), obj(b,[r(0,1)])]).    % true (b not covered)
+
+
+ct_complete_map(+Map, +Scene, -Complete)
+
+Extend Map with identity entries for any colors in Scene not already covered.
+
+Example:
+
+ct_complete_map([r-g], [obj(b,[r(0,1)])], Complete).
+% Complete = [r-g, b-b]  (b mapped to itself)
+
+
+ct_invert_map(+Map, -Inverted)
+
+Swap From and To in each entry. Fails if the result would be inconsistent.
+
+Example:
+
+ct_invert_map([r-g, b-y], Inverted).
+% Inverted = [g-r, y-b]
+
+
+ct_identity_map(+Colors, -Map)
+
+Build a map where every color maps to itself.
+
+Example:
+
+ct_identity_map([r, b, g], Map).
+% Map = [r-r, b-b, g-g]
+
+
+ct_restrict_map(+Map, +Colors, -Restricted)
+
+Keep only map entries whose source color appears in Colors.
+
+Example:
+
+ct_restrict_map([r-g, b-y, p-w], [r, p], Restricted).
+% Restricted = [r-g, p-w]
+
+
+ct_map_colors(+Map, -Colors)
+
+List all source (From) colors in the map.
+
+Example:
+
+ct_map_colors([r-g, b-y, p-w], Colors).
+% Colors = [r, b, p]
+
+
+Typical Workflow
+
+Given a set of training pairs, learn the color table and apply it:
+
+solve_color_puzzle(TrainingPairs, TestScene, Output) :-
+    ct_learn_map(TrainingPairs, Map, []),  % [] = no inconsistencies
+    ct_apply_to_scene(Map, TestScene, Output).
+
+
+Dependencies
+
+None. Uses library(lists) and library(apply).
+
+
+Test Coverage
+
+All 44 acceptance criteria (AC-CT-001 through AC-CT-044) defined in
+Refinement v224 Part 201 are exercised in packs/colortable/test/test_colortable.pl.
+All 44 tests pass.
+
+
+Summary
+
+The colortable pack answers "what color becomes what?" across a set of training
+examples, then applies the learned table to new inputs. Combined with scene
+analysis (scene pack) and transformation ranking (scenerank), it enables
+solving color-permutation class ARC-AGI-2 tasks.
+
+Continue to Chapter 173 for the next pack in the PrologAI Layer sequence.
