@@ -1,0 +1,197 @@
+Chapter 173: gridsolve Pack - End-to-End Scene Puzzle Solver (gs_*, Layer 191)
+
+
+Overview
+
+The gridsolve pack is the high-level integration layer. It combines rule
+inference, candidate ranking, and rule application into a single solve
+predicate that takes training examples and a test input and returns an output.
+
+This is the "bring it all together" pack: if you have a set of Before-After
+training pairs and want to know what happens to a new test input, use gridsolve.
+
+Layer 191. Pack prefix: gs_*. Work Package 212.
+
+
+The Pipeline
+
+1. Infer: gs_infer_candidates derives specific rule terms from the training
+   pairs (e.g., if all pairs show red becoming green, infer recolor(r,g)).
+
+2. Enumerate: gs_default_candidates provides a broad fallback set covering
+   all common rule patterns.
+
+3. Rank: gs_rank_rules sorts candidate rules by how many training pairs each
+   one correctly explains.
+
+4. Apply: gs_apply applies the best rule to a new test input.
+
+gs_solve wraps all four steps into a single predicate call.
+
+
+Exported Predicates
+
+
+gs_apply(+Rule, +Scene, -Result)
+
+Apply a symbolic rule term to an obj(Color,Cells) scene list.
+
+Supported rules: recolor(Old,New), recolor_all(New), color_map(Map),
+shift(DR,DC), to_origin, reflect_h(Width), reflect_v(Height),
+remove_color(Color), keep_color(Color), sort_size_desc, sort_size_asc,
+top_n(N), identity.
+
+Example:
+
+gs_apply(recolor(r,g), [obj(r,[r(0,0)]), obj(b,[r(0,1)])], Result).
+% Result = [obj(g,[r(0,0)]), obj(b,[r(0,1)])]
+
+
+gs_coverage(+Rule, +Pairs, -N)
+
+Count how many Before-After pairs the rule correctly explains.
+
+Example:
+
+Pairs = [[obj(r,[r(0,0)])]-[obj(g,[r(0,0)])]],
+gs_coverage(recolor(r,g), Pairs, N).
+% N = 1
+
+
+gs_consistent(+Rule, +Pairs)
+
+Succeed if the rule correctly transforms every pair.
+
+Example:
+
+gs_consistent(recolor(r,g), Pairs).  % true if all pairs are r->g
+
+
+gs_rank_rules(+Rules, +Pairs, -Ranked)
+
+Sort rules by coverage descending. Ties broken by standard term order.
+
+Example:
+
+gs_rank_rules([recolor(r,b), recolor(r,g)], Pairs, Ranked).
+% Ranked = [recolor(r,g), recolor(r,b)]
+
+
+gs_best_rule(+Rules, +Pairs, -Best)
+
+The rule with the highest coverage. Fails if Rules is empty.
+
+
+gs_consistent_rules(+Rules, +Pairs, -Consistent)
+
+The subset of Rules that are fully consistent with every pair.
+
+
+gs_valid_rules(+Rules, +Pairs, -Valid)
+
+The subset of Rules with coverage > 0.
+
+
+gs_infer_candidates(+Pairs, -Candidates)
+
+Infer specific rule terms from training pairs by pattern matching.
+Tries: recolor, recolor_all, color_map, shift, to_origin, remove_color.
+
+Example:
+
+Pairs = [[obj(r,[r(0,0)])]-[obj(g,[r(0,0)])]],
+gs_infer_candidates(Pairs, Cands).
+% Cands includes recolor(r,g), recolor_all(g), color_map([r-g]), ...
+
+
+gs_default_candidates(-Candidates)
+
+A broad static set of candidate rule terms for exhaustive search.
+Covers recolor (r/b/g/y/p variants), recolor_all, shift (8 directions),
+to_origin, remove_color, sort, top_n, and identity.
+
+
+gs_solve(+Pairs, +TestInput, -Output)
+
+Full end-to-end solve. Infers candidates, unions with defaults, ranks,
+applies the best rule to TestInput.
+
+Example:
+
+TrainingPairs = [
+    [obj(r,[r(0,0)])]-[obj(g,[r(0,0)])],
+    [obj(r,[r(1,0)])]-[obj(g,[r(1,0)])]
+],
+TestInput = [obj(r,[r(2,0)])],
+gs_solve(TrainingPairs, TestInput, Output).
+% Output = [obj(g,[r(2,0)])]
+
+
+gs_solve_n(+Pairs, +N, -TopRules, -BestRule)
+
+Return the top N rules as Coverage-Rule pairs and the best rule.
+
+Example:
+
+gs_solve_n(Pairs, 3, TopRules, Best).
+% TopRules = [2-recolor(r,g), 2-color_map([r-g]), 0-shift(1,0)]
+% Best = recolor(r,g)
+
+
+gs_explain(+Pairs, -BestRule, -Coverage)
+
+Return the best rule and its coverage for the training pairs.
+
+Example:
+
+gs_explain(Pairs, BestRule, Coverage).
+% BestRule = color_map([r-g]), Coverage = 2
+
+
+gs_all_same_output(+Rule, +TestInputs, -Outputs)
+
+Apply Rule to each test input in a list.
+
+Example:
+
+gs_all_same_output(recolor(r,g),
+    [[obj(r,[r(0,0)])], [obj(r,[r(1,0)])]],
+    Outputs).
+% Outputs = [[obj(g,[r(0,0)])], [obj(g,[r(1,0)])]]
+
+
+gs_n_pairs(+Pairs, -N)
+
+Count training pairs.
+
+
+Typical Usage
+
+solve_puzzle(TrainingPairs, TestInput, Output) :-
+    gs_solve(TrainingPairs, TestInput, Output).
+
+explain_puzzle(TrainingPairs, Rule, Coverage) :-
+    gs_explain(TrainingPairs, Rule, Coverage).
+
+
+Dependencies
+
+None. Self-contained rule application engine. Uses library(lists) and
+library(apply).
+
+
+Test Coverage
+
+All 41 acceptance criteria (AC-GS-001 through AC-GS-041) defined in
+Refinement v225 Part 202 are exercised in packs/gridsolve/test/test_gridsolve.pl.
+All 41 tests pass.
+
+
+Summary
+
+The gridsolve pack is the end-to-end entry point for scene-level symbolic
+reasoning. Given training examples and a test input, it answers: what should
+the output look like? Combined with the scene, analogy, ruleinfer, scenerank,
+and colortable packs, it provides a complete ARC-AGI-2 reasoning pipeline.
+
+Continue to Chapter 174 for the next pack in the PrologAI Layer sequence.
