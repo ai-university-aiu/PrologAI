@@ -907,3 +907,20 @@ Grid Parse: Conversion between Raw Grid Format and obj(Color,Cells) Scenes (gp_*
     gp_paint_obj/3: paint one obj(Color,Cells) term onto a grid
     gp_paint_scene/3: paint all objects in a scene onto a grid
     gp_grid_equal/2: succeed if two grids are identical cell-by-cell
+
+gridtask
+Grid Task: End-to-End Raw Grid Task Solver (gt_*, Layer 198)
+    gt_diff_cells/3: r(R,C) positions where two same-size grids differ
+    gt_n_changed/3: count of cells that differ between two grids
+    gt_unchanged_cells/3: r(R,C) positions where two grids agree
+    gt_bg_color/2: most frequent color in a raw grid (background)
+    gt_infer_color_map/3: consistent From-To color map from one Before-After pair
+    gt_test_color_map/3: succeed iff applying a map to Before yields After exactly
+    gt_apply_color_map/3: apply a color substitution map to a raw grid
+    gt_color_map_pairs/2: consistent color map from a list of Before-After pairs
+    gt_is_color_sub/1: succeed if a consistent color map explains all training pairs
+    gt_is_identity/2: succeed if two grids are structurally identical
+    gt_is_scale/3: succeed if After is an integer-N upscaling of Before
+    gt_infer_shift/4: infer constant translation (DR,DC) from a Before-After pair
+    gt_pair_score/4: pixel accuracy of a rule applied to one Before-After pair
+    gt_solve/4: try identity, color_map, scale, and shift; apply best to test grid
