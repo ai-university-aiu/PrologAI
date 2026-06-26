@@ -17545,3 +17545,32 @@ of_smallest/2: object with the fewest cells (first on ties).
 5. Generic Meta-Predicates
 of_filter/3: include(Goal, Objs, Filtered) — custom test per object.
 of_partition/4: partition(Goal, Objs, In, Out) — split by goal.
+
+Chapter 145: Grid Canvas and Object Rendering (canvas Pack, cv_*, Layer 174)
+
+This is WP 195. The canvas pack bridges the obj(Color, Cells) world and the
+2D grid world with 14 predicates.
+
+1. Canvas Creation
+cv_blank/4: create H x W grid filled with Bg.
+cv_size/3: get grid height and width.
+
+2. Painting Objects
+cv_paint/3: paint one obj term onto a grid.
+cv_paint_all/3: paint a list of obj terms in order.
+cv_paint_at/5: translate by (DR,DC) then paint.
+cv_paint_clip/3: paint with out-of-bounds cells silently skipped.
+cv_paint_bg/4: paint only onto background-valued cells.
+
+3. Erasing Objects
+cv_erase/4: fill obj cells with background value.
+
+4. Extracting Objects
+cv_extract/3: extract obj(Color, Cells) for all Color cells.
+cv_extract_all/3: extract all non-bg objects from a grid.
+
+5. Convenience
+cv_render/5: create blank canvas and paint all objects.
+cv_move/6: erase obj at current position, repaint at offset.
+cv_stamp/3: extract obj as minimal bounding-box grid.
+cv_blit/5: paste a subgrid at a given position.
