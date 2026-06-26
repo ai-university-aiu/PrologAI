@@ -17603,3 +17603,30 @@ oq_collinear/1: all centroids on a straight line.
 oq_next_centroid/2: predict next position from constant step.
 oq_zip_colors/3: zip two obj lists into C1-C2 color pairs.
 
+
+Chapter 147: Object-Pair Change Analysis and Rule Application (objdelta Pack, dp_*, Layer 176)
+
+1. Single-Pair Deltas
+dp_color_delta/3: extract C1-C2 color change from one O1-O2 pair.
+dp_pos_delta/3: extract dr(DR,DC) centroid displacement from one pair.
+dp_size_delta/3: extract size change N2-N1 from one pair.
+
+2. Pair Tests
+dp_same_color/2: O1 and O2 share the same color.
+dp_same_form/2: O1 and O2 share the same normalised shape.
+dp_same_pos/2: O1 and O2 share the same centroid.
+
+3. Color Map Operations
+dp_color_map/2: extract sorted distinct C1-C2 map from a list of pairs.
+dp_apply_color/3: apply single C1-C2 rule; fail if color does not match.
+dp_apply_color_map/3: apply first matching Map entry to one object.
+dp_apply_map_all/3: apply Map to a list; unmatched objects unchanged.
+
+4. Constant Displacement
+dp_const_dr/2: all pairs share the same row delta DR.
+dp_const_dc/2: all pairs share the same col delta DC.
+
+5. Cell-Level Analysis
+dp_common_cells/3: positions in both O1 and O2.
+dp_cell_diff/4: Added (in O2 not O1) and Removed (in O1 not O2).
+
