@@ -15516,3 +15516,39 @@ Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2,
   sum_list/2. Built-ins: sort/2, length/2, between/3.
 
 Predicate count: 14 (na_* prefix). Tests: 42/42. Layer: 134.
+
+PROLOGAI TUTORIAL
+
+Chapter 117: Integer Median Computation for Lists and 2D Grids Pack (Layer 135, md_* prefix)
+
+The median pack provides the lower (floor) integer median for lists, rows, columns,
+grid-wide, and per-cell 4/8-connected neighborhoods.  Uses msort/2 (built-in) to
+preserve duplicates.  Lower median index: MI = (N-1)//2 (0-based).
+
+Predicates: md_median/2, md_row/3, md_col/3, md_row_medians/2, md_col_medians/2,
+  md_grid/2, md_filter4/2, md_filter8/2, md_above/2, md_below/2,
+  md_row_above/3, md_row_below/3, md_col_above/3, md_col_below/3.
+
+Usage examples:
+
+md_median([1,2,3,4,5],M). % M=3
+md_median([1,2,3,4],M). % M=2 (lower of 2 and 3)
+md_median([1,1,1,2,3],M). % M=1 (duplicates preserved by msort)
+md_grid([[1,2,3],[4,5,6],[7,8,9]],M). % M=5
+md_row_medians([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[2,5,8]
+md_col_medians([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[4,5,6]
+md_filter4([[1,2,3],[4,5,6],[7,8,9]],F). % F=[[2,2,3],[4,5,5],[7,7,8]]
+md_filter8([[1,2,1],[2,4,2],[1,2,1]],F). % F=[[2,2,2],[2,2,2],[2,2,2]]
+md_above([[1,2,3],[4,5,6],[7,8,9]],C). % C=[1-2,2-0,2-1,2-2]
+md_below([[1,2],[3,4]],C). % C=[0-0]
+md_row_above([[1,2,3],[4,5,6],[7,8,9]],1,C). % C=[1-2]
+md_col_above([[1,2],[3,4]],0,C). % C=[1-0]
+
+Key implementation patterns:
+md_median: msort preserving duplicates; MI=(N-1)//2; nth0(MI,Sorted,M).
+md_filter4/8: triple-nested findall; neighbor collection via offset list+bounds guard.
+md_above/below: compute grid median first; findall+nth0 with V>Median or V<Median.
+
+Library imports: library(lists): member/2, nth0/3. Built-ins: msort/2, length/2.
+
+Predicate count: 14 (md_* prefix). Tests: 42/42. Layer: 135.
