@@ -15351,3 +15351,46 @@ Library imports: library(lists): member/2, memberchk/2, nth0/3, max_list/2,
   append/3, subtract/3. Built-ins: length/2, between/3, sort/2.
 
 Predicate count: 14 (tp_* prefix). Tests: 42/42. Layer: 130.
+
+
+CHAPTER 113: ROW AND COLUMN PROJECTION AND PROFILE ANALYSIS (pj_*)
+
+The projection pack (Layer 131, module projection, prefix pj_*) provides 14
+predicates for computing 1D summaries of 2D grids by projecting along rows
+or columns. Predicates cover sums, counts, maxima, unique values, shadow
+projections, run-length profiles, and modal values.
+
+Load: :- use_module('packs/projection/prolog/projection.pl').
+
+Example queries:
+pj_row_sums([[1,2,3],[4,5,6],[7,8,9]],S). % S=[6,15,24]
+pj_col_sums([[1,2,3],[4,5,6],[7,8,9]],S). % S=[12,15,18]
+pj_row_counts([[0,1,2],[0,1,2],[0,1,2]],0,C). % C=[1,1,1]
+pj_col_counts([[0,1,2],[0,1,2],[0,1,2]],2,C). % C=[0,0,3]
+pj_row_maxes([[1,2,3],[4,5,6],[7,8,9]],M). % M=[3,6,9]
+pj_col_maxes([[1,2,3],[4,5,6],[7,8,9]],M). % M=[7,8,9]
+pj_row_uniq([[1,1,2],[1,2,2]],U). % U=[[1,2],[1,2]]
+pj_col_uniq([[0,1,2],[0,1,2],[0,1,2]],U). % U=[[0],[1],[2]]
+pj_shadow_h([[0,1,2],[0,1,2],[0,1,2]],0,C). % C=[0]
+pj_shadow_v([[1,1,1],[1,1,1],[1,1,1]],1,R). % R=[0,1,2]
+pj_h_profile([[1,1,0],[1,0,0],[1,1,1]],1,P). % P=[2,1,3]
+pj_v_profile([[1,1,0],[1,0,0],[1,1,1]],1,P). % P=[3,1,1]
+pj_row_modes([[1,1,2],[1,2,2]],M). % M=[1,2]
+pj_col_modes([[1,1,2],[1,2,2]],M). % M=[1,1,2]
+
+Key implementation patterns:
+pj_col_: private helper extracts column C via findall(V, (member(Row,Grid),
+  nth0(C,Row,V)), Col); used by all column predicates.
+pj_run_acc_: tail-recursive accumulator with Cur (current run) and Max
+  (maximum seen); on match Cur1=Cur+1, Max1=max(Cur1,Max); on mismatch
+  reset Cur to 0, update Max; final N=Max at empty list.
+pj_mode_/pj_max_pair_: sort for unique vals, findall N-V count pairs,
+  recurse picking higher count; on tie prefer smaller V.
+include(=(Val), List, Occ): partial-application unification acts as integer
+  equality filter for ground values.
+
+Library imports: library(lists): member/2, nth0/3, max_list/2, sum_list/2.
+  library(apply): maplist/2, maplist/3, include/3.
+  Built-ins: length/2, between/3, sort/2.
+
+Predicate count: 14 (pj_* prefix). Tests: 42/42. Layer: 131.
