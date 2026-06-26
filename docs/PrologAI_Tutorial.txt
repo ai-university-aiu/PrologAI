@@ -15017,3 +15017,59 @@ tb_swap_rows: pre-fetch both rows; rebuild with if-then-else.
 tb_col_max_row/min_row: max_list/min_list then nth0+cut for first match.
 
 Predicate count: 14 (tb_* prefix). Tests: 42/42. Layer: 123.
+
+Next chapter: Chapter 106 covers the Numerical Sequence Operations Pack.
+
+Chapter 106: Numerical Sequence Operations - The numseq Pack (nr_* prefix)
+
+The numseq pack provides 14 predicates for analyzing and transforming 1D
+numerical lists. It complements the cross pack (cx_*) which extracts rows,
+columns, and diagonals from grids; the numseq pack then processes those slices.
+
+Predicates:
+nr_diff(+List, -Diffs).                  % consecutive pairwise differences
+nr_cumsum(+List, -Sums).                 % prefix cumulative sums
+nr_running_max(+List, -Maxs).            % running maximum
+nr_running_min(+List, -Mins).            % running minimum
+nr_zip_add(+A, +B, -C).                  % element-wise A[I]+B[I]
+nr_zip_sub(+A, +B, -C).                  % element-wise A[I]-B[I]
+nr_zip_mul(+A, +B, -C).                  % element-wise A[I]*B[I]
+nr_zip_max(+A, +B, -C).                  % element-wise max(A[I],B[I])
+nr_zip_min(+A, +B, -C).                  % element-wise min(A[I],B[I])
+nr_scale(+List, +K, -Scaled).            % multiply every element by K
+nr_offset(+List, +D, -Shifted).          % add constant D to every element
+nr_is_sorted(+List).                     % succeeds iff non-decreasing
+nr_is_arith(+List).                      % succeeds iff constant pairwise diff
+nr_period(+List, +MaxP, -P).             % shortest repeating period in 1..MaxP
+
+Examples:
+nr_diff([1,3,6,10], Diffs).              % Diffs=[2,3,4]
+nr_cumsum([1,2,3,4], Sums).              % Sums=[1,3,6,10]
+nr_running_max([3,1,4,1,5,9,2], Maxs).  % Maxs=[3,3,4,4,5,9,9]
+nr_running_min([5,3,4,1,2], Mins).      % Mins=[5,3,3,1,1]
+nr_zip_add([1,2,3],[4,5,6],C).           % C=[5,7,9]
+nr_zip_sub([5,6,7],[1,2,3],C).           % C=[4,4,4]
+nr_zip_mul([2,3,4],[5,6,7],C).           % C=[10,18,28]
+nr_zip_max([1,5,3],[4,2,6],C).           % C=[4,5,6]
+nr_zip_min([1,5,3],[4,2,6],C).           % C=[1,2,3]
+nr_scale([1,2,3,4], 2, S).              % S=[2,4,6,8]
+nr_offset([5,6,7], -3, S).              % S=[2,3,4]
+nr_is_sorted([1,2,3,4]).                 % true
+nr_is_arith([2,4,6,8]).                  % true (step=2)
+nr_period([1,2,1,2,1,2], 3, P).         % P=2
+
+Key implementation patterns:
+nr_diff: two-clause recursion; D is B-A; recurse on [B|T].
+nr_cumsum: recursive helper accumulates S is Acc+H.
+nr_running_max/min: recursive helper updating Max1 is max(H,Max0).
+nr_zip_*: maplist/3 with named per-element helper (nr_add_, nr_sub_, etc.).
+nr_scale/offset: maplist/3 with helper capturing K or D from outer call.
+nr_is_sorted: A =< B recursive guard.
+nr_is_arith: compute D from first pair; recursive helper verifies D2=:=D.
+nr_period: between/3 + Len mod P =:= 0 + forall+nth0 element comparison.
+
+Library imports: library(apply): maplist/3.
+  library(lists): nth0/3, numlist/3.
+  Built-ins: length/2, between/3, forall/2.
+
+Predicate count: 14 (nr_* prefix). Tests: 42/42. Layer: 124.
