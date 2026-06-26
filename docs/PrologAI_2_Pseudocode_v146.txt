@@ -10758,3 +10758,58 @@ PROCEDURE vn_expand_n(Grid, Bg, Color, N, Cells):
   Cells <- sort([r(BR,BC) : r(BR,BC) Bg,
                  r(CR,CC) IN ColorCells,
                  |BR-CR|+|BC-CC| <= N])
+
+Part 178: Objcomp Pack Pseudocode (oc_*, Layer 167)
+
+Section 178.1: Touching Test
+
+PROCEDURE oc_touches(obj(_, Cells1), obj(_, Cells2)):
+  FOR r(R1,C1) IN Cells1:
+    FOR r(R2,C2) IN Cells2:
+      IF (R1=R2 AND |C1-C2|=1) OR (C1=C2 AND |R1-R2|=1):
+        RETURN true
+  RETURN false
+
+Section 178.2: Pair and Adjacency Queries
+
+PROCEDURE oc_touching_pairs(Objs, Pairs):
+  Pairs <- [(Objs[I], Objs[J]) FOR I < J WHERE oc_touches(Objs[I], Objs[J])]
+
+PROCEDURE oc_adj_list(Objs, AdjList):
+  AdjList <- [Obj-[N FOR N IN Objs WHERE N != Obj AND oc_touches(Obj,N)]
+              FOR Obj IN Objs]
+
+PROCEDURE oc_degree(Obj, Objs, N):
+  N <- |{O IN Objs : O != Obj AND oc_touches(Obj, O)}|
+
+Section 178.3: Isolation and Connectivity
+
+PROCEDURE oc_isolated(Objs, Isolated):
+  Isolated <- [Obj IN Objs WHERE NOT EXISTS Other IN Objs: Other!=Obj AND oc_touches(Obj,Other)]
+
+PROCEDURE oc_connected(Obj, Objs, Component):
+  Queue <- [Obj]; Visited <- []
+  WHILE Queue != []:
+    H <- dequeue(Queue)
+    IF H IN Visited: continue
+    Visited <- Visited + [H]
+    Queue <- Queue + [N IN Objs WHERE N != H AND N NOT IN Visited AND oc_touches(H,N)]
+  Component <- sort(Visited)
+
+PROCEDURE oc_components(Objs, Components):
+  Todo <- Objs; Components <- []
+  WHILE Todo != []:
+    H <- head(Todo)
+    Comp <- oc_connected(H, Todo)
+    Components <- Components + [Comp]
+    Todo <- Todo \ Comp
+
+Section 178.4: Component and Degree Aggregates
+
+PROCEDURE oc_num_components(Objs, N): N <- |oc_components(Objs)|
+PROCEDURE oc_largest_component(Objs, C): C <- argmax_size(oc_components(Objs))
+PROCEDURE oc_smallest_component(Objs, C): C <- argmin_size(oc_components(Objs))
+PROCEDURE oc_singleton_components(Objs, S): S <- [C IN oc_components(Objs) WHERE |C|=1]
+PROCEDURE oc_shared_components(Objs, G): G <- [C IN oc_components(Objs) WHERE |C|>1]
+PROCEDURE oc_max_degree(Objs, D): D <- max([oc_degree(O, Objs) FOR O IN Objs])
+PROCEDURE oc_sort_by_degree(Objs, Sorted): Sorted <- keysort([oc_degree(O,Objs)-O FOR O IN Objs])

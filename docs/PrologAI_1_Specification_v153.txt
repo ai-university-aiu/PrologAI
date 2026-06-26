@@ -14409,3 +14409,43 @@ vn_expand_n(+Grid, +Bg, +Color, +N, -Cells): sorted list of Bg cells within Manh
 Section 177.3: Layer Assignment
 
 Layer 166. Depends on no other packs. Uses member/2, nth0/3, min_list/2, max_list/2, append/3 from library(lists); built-ins sort/2, findall/3.
+
+Part 178: Objcomp Pack Specification (oc_*, Layer 167)
+
+Section 178.1: Purpose
+
+The objcomp pack provides adjacency and connected-component analysis over collections of obj(Color, Cells) terms. Two objects "touch" when any cell of the first is 4-connected (Manhattan distance 1) to any cell of the second. The pack builds on this touching relation to: enumerate touching pairs, compute adjacency lists, measure touch degree, find isolated objects, compute BFS-connected components, and rank objects by connectivity.
+
+Section 178.2: Predicate Specifications
+
+oc_touches(+Obj1, +Obj2): true when any cell of Obj1 is 4-adjacent to any cell of Obj2. Cuts after the first found adjacent pair.
+
+oc_touching_pairs(+Objs, -Pairs): list of O1-O2 pairs where both are in Objs and oc_touches(O1,O2) is true. Each unordered pair appears once (lower index first).
+
+oc_adj_list(+Objs, -AdjList): Obj-[Neighbors] pairs for every Obj in Objs. Neighbors are all other elements of Objs that touch Obj.
+
+oc_degree(+Obj, +Objs, -N): count of objects in Objs (excluding Obj itself) that touch Obj.
+
+oc_isolated(+Objs, -Isolated): objects in Objs that do not touch any other object in Objs.
+
+oc_connected(+Obj, +Objs, -Component): sorted list of objects reachable from Obj through the touching relation within Objs, including Obj itself. Uses BFS.
+
+oc_components(+Objs, -Components): list of all touching-connected components. Each component is a sorted list of obj terms.
+
+oc_num_components(+Objs, -N): number of touching-connected components in Objs.
+
+oc_largest_component(+Objs, -Component): the component with the most objects. Ties resolved by component order from oc_components.
+
+oc_smallest_component(+Objs, -Component): the component with the fewest objects.
+
+oc_singleton_components(+Objs, -Singles): all components of size exactly 1.
+
+oc_shared_components(+Objs, -Groups): all components of size 2 or more.
+
+oc_max_degree(+Objs, -MaxDeg): maximum touch degree of any object in Objs. Fails if Objs is empty.
+
+oc_sort_by_degree(+Objs, -Sorted): Objs sorted in ascending order of touch degree. Equal-degree objects retain their original relative order.
+
+Section 178.3: Layer Assignment
+
+Layer 167. Depends on no other packs. Uses member/2, nth0/3, last/2, append/3, subtract/3, max_list/2 from library(lists); built-ins sort/2, findall/3, keysort/2, length/2.

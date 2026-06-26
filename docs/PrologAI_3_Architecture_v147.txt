@@ -6929,3 +6929,15 @@ Depends on: (none)
 Exports: vn_non_bg_cells/3, vn_non_bg_colors/3, vn_nearest_dist/5, vn_nearest_color/5, vn_paint_bg/3, vn_dist_map/3, vn_region_cells/4, vn_regions/3, vn_max_dist/3, vn_at_dist/4, vn_within_dist/4, vn_medial/3, vn_expand1/4, vn_expand_n/5
 
 Purpose: Nearest-color painting and Voronoi partitioning for 2D grids. Treats grid cells as either background (matching the Bg parameter) or colored (all other values). Source queries: vn_non_bg_cells (findall non-Bg positions) and vn_non_bg_colors (findall non-Bg values then sort). Distance and color: vn_nearest_dist (findall Manhattan distances then min_list); vn_nearest_color (findall D-V pairs then sort to get smallest D first). Painting: vn_paint_bg applies vn_nearest_color to every Bg cell. Distance transform: vn_dist_map precomputes non-Bg cells then fills 0 for non-Bg, min-dist for Bg. Regions: vn_region_cells (findall Bg cells where nearest color = Color); vn_regions (one pair per non-Bg color). Distance queries: vn_max_dist (findall Bg distances then max_list); vn_at_dist and vn_within_dist (findall with exact/range test). Medial axis: vn_medial finds Bg cells where at least two distinct non-Bg colors tie for nearest. Expansion: vn_expand1 finds Bg cells 4-adjacent to any Color cell; vn_expand_n finds Bg cells within Manhattan distance N of any Color cell.
+
+ARCH-154: Objcomp Pack (WP 188, Layer 167)
+
+Module: objcomp
+Prefix: oc_
+File: packs/objcomp/prolog/objcomp.pl
+Test: packs/objcomp/test/test_objcomp.pl
+Layer: 167
+Depends on: (none)
+Exports: oc_touches/2, oc_touching_pairs/2, oc_adj_list/2, oc_degree/3, oc_isolated/2, oc_connected/3, oc_components/2, oc_num_components/2, oc_largest_component/2, oc_smallest_component/2, oc_singleton_components/2, oc_shared_components/2, oc_max_degree/2, oc_sort_by_degree/2
+
+Purpose: Adjacency and connected-component analysis over obj(Color, Cells) collections. Touching relation: any cell of O1 is 4-adjacent to any cell of O2 (same row adjacent cols or same col adjacent rows; cut after first found pair). Pairs: oc_touching_pairs uses nth0 I < J to enumerate each unordered pair exactly once. Adjacency list: oc_adj_list builds Obj-[Neighbors] pairs via findall. Degree: oc_degree counts touching neighbors. Isolation: oc_isolated uses \+ existential test. Connectivity: oc_connected does BFS with Queue+Visited accumulator; oc_bfs_ base case returns visited list. Components: oc_partition_ recursively extracts one component at a time using subtract/3 to remove component members. Aggregates: oc_largest/smallest use msort on N-C pairs then last/first. oc_singleton/shared filter by component length. oc_max_degree uses max_list on degree list. oc_sort_by_degree uses keysort on D-Obj pairs.
