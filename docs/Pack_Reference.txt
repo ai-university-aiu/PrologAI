@@ -975,3 +975,20 @@ Grid Periodic Pattern Detection and Extension: Row/Column Period, Tiling, Autoco
     gper_autocorr_col/3: fraction of column pairs (c, c+P) that are identical; 1.0 when no pairs exist
     gper_shift_wrap_rows/3: shift rows down by N with wrap-around; row R of result = row (R-N) mod H of input
     gper_shift_wrap_cols/3: shift each row's columns right by N with wrap-around; cell (R,C) = (R,(C-N) mod W)
+
+gridscale
+Grid Block-Pixel Scaling: Upsample, Downsample, Scale Factor, Tile Inference, Pad, and Resize (gsc_*, Layer 202)
+    gsc_upsample/3: each cell becomes NxN block of same color; output is (H*N) x (W*N)
+    gsc_downsample/3: each NxN block must be uniform; that color becomes one cell; fails if any block is not uniform
+    gsc_block_majority/3: downsample by N using majority-vote per NxN block; never fails
+    gsc_scale_factor/3: find integer N such that GridB = gsc_upsample(GridA, N); fails if none exists
+    gsc_is_scale_of/3: succeed if GridB equals GridA upsampled by N (negation-as-failure check)
+    gsc_block_at/5: extract NxN sub-grid at block position (BR, BC) = raw cells (BR*N..BR*N+N-1) x (BC*N..BC*N+N-1)
+    gsc_block_uniform/5: succeed if NxN block at (BR, BC) is all one Color; returns that Color
+    gsc_all_uniform/2: succeed if every NxN block in Grid is uniform (necessary condition for exact upsampling)
+    gsc_infer_tile/2: find smallest Tile whose N-upsampling equals Grid (largest valid block size); fails if no N>=2 works
+    gsc_factors/2: ascending list of all positive integers that divide both H and W
+    gsc_resize/4: nearest-neighbor resize to (TargetH, TargetW); Resized[r][c] = Grid[(r*H)//TargetH][(c*W)//TargetW]
+    gsc_subsample/3: stride-N sampling; Sub[BR][BC] = Grid[BR*N][BC*N]; output is (H//N) x (W//N)
+    gsc_pad/4: surround Grid with N-cell wide border of Color; output is (H+2N) x (W+2N); N=0 is no-op
+    gsc_crop_to_factor/3: crop to largest dimensions divisible by N; CH=(H//N)*N, CW=(W//N)*N, top-left region
