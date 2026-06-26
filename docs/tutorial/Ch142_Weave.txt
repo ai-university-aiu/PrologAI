@@ -1,0 +1,104 @@
+Chapter 142: Weave Pack (wv_*)
+
+The weave pack provides general-purpose list interlacing, slicing, and cycling.
+All predicates work on any Prolog list; no dependency on obj() terms.
+
+1. Interleaving Two Lists
+
+wv_alternate(+L1, +L2, -Result): interleave elements alternately.
+When one list runs out, the remainder of the other is appended.
+
+  ?- wv_alternate([a,b,c], [1,2,3], R).
+  R = [a,1,b,2,c,3].
+
+  ?- wv_alternate([a,b,c], [1], R).
+  R = [a,1,b,c].
+
+2. Even/Odd Index Split
+
+wv_split_even_odd(+List, -Evens, -Odds): split into 0-based even (0,2,4,...)
+and odd (1,3,5,...) indexed elements.
+
+  ?- wv_split_even_odd([a,b,c,d,e], Evens, Odds).
+  Evens = [a,c,e], Odds = [b,d].
+
+3. Stride Sampling
+
+wv_stride(+List, +Step, -Result): every Step-th element starting at index 0.
+
+  ?- wv_stride([a,b,c,d,e,f], 2, R).
+  R = [a,c,e].
+
+  ?- wv_stride([a,b,c,d,e,f], 3, R).
+  R = [a,d].
+
+4. Chunking
+
+wv_chunk(+List, +N, -Chunks): split into consecutive non-overlapping chunks
+of exactly N elements; trailing remainder is discarded.
+
+  ?- wv_chunk([a,b,c,d,e], 2, C).
+  C = [[a,b],[c,d]].
+
+5. Sliding Windows
+
+wv_pair_wise(+List, -Pairs): consecutive overlapping pairs.
+wv_triple_wise(+List, -Triples): consecutive overlapping triples.
+
+  ?- wv_pair_wise([a,b,c,d], P).
+  P = [[a,b],[b,c],[c,d]].
+
+  ?- wv_triple_wise([a,b,c,d], T).
+  T = [[a,b,c],[b,c,d]].
+
+6. Rotation
+
+wv_rotate_left(+List, +K, -Result): rotate left by K (mod length).
+wv_rotate_right(+List, +K, -Result): rotate right by K (mod length).
+
+  ?- wv_rotate_left([a,b,c,d], 1, R).
+  R = [b,c,d,a].
+
+  ?- wv_rotate_right([a,b,c,d], 1, R).
+  R = [d,a,b,c].
+
+7. Reflection and Repetition
+
+wv_reflect(+List, -Result): reverse the list (mirror reflection).
+wv_repeat(+List, +N, -Result): concatenate List with itself N times.
+
+  ?- wv_reflect([a,b,c], R).
+  R = [c,b,a].
+
+  ?- wv_repeat([a,b], 3, R).
+  R = [a,b,a,b,a,b].
+
+8. Take and Drop
+
+wv_take(+List, +N, -Result): first N elements; returns whole list if N > length.
+wv_drop(+List, +N, -Result): discard first N elements; returns [] if N > length.
+
+  ?- wv_take([a,b,c,d], 2, R).
+  R = [a,b].
+
+  ?- wv_drop([a,b,c,d], 2, R).
+  R = [c,d].
+
+9. Cyclic Padding
+
+wv_cycle(+List, +N, -Result): produce exactly N elements by cycling List.
+Fails if List is empty and N > 0.
+
+  ?- wv_cycle([a,b,c], 7, R).
+  R = [a,b,c,a,b,c,a].
+
+10. Zipping
+
+wv_zip(+List1, +List2, -Pairs): pair elements as H1-H2 terms.
+Stops at the shorter list.
+
+  ?- wv_zip([a,b,c], [1,2,3], P).
+  P = [a-1,b-2,c-3].
+
+  ?- wv_zip([a,b], [1,2,3], P).
+  P = [a-1,b-2].
