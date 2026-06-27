@@ -1264,3 +1264,20 @@ griddelta
     gdt_overlay/4: G2 overlaid onto G1; Marker color in G2 is transparent (shows G1)
     gdt_invert_delta/3: reverse delta applied to G2 — changed cells revert to G1's values
     gdt_is_identity/2: succeeds if two grids are identical (zero differences)
+
+gridrowcol
+Grid Row and Column Comparative Analysis (grc_*, Layer 219)
+    grc_row/3: extract row R (0-indexed) as a flat list
+    grc_col/3: extract column C (0-indexed) as a top-to-bottom list
+    grc_row_uniform/3: succeeds if all cells in row R share the same color; binds that color
+    grc_col_uniform/3: succeeds if all cells in column C share the same color; binds that color
+    grc_equal_rows/3: succeeds if rows R1 and R2 of Grid have identical content
+    grc_equal_cols/3: succeeds if columns C1 and C2 of Grid have identical content
+    grc_row_positions/3: sorted list of row indices whose content equals Pattern
+    grc_col_positions/3: sorted list of column indices whose content equals Pattern
+    grc_matching_rows/2: all R1-R2 pairs (R1<R2) of row indices with identical content
+    grc_matching_cols/2: all C1-C2 pairs (C1<C2) of column indices with identical content
+    grc_unique_rows/2: row indices whose content appears exactly once in the grid
+    grc_unique_cols/2: column indices whose content appears exactly once in the grid
+    grc_row_sort/2: grid with rows sorted in standard order (duplicates preserved)
+    grc_col_sort/2: grid with columns reordered by lexicographic order of their content

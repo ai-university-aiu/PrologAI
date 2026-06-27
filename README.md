@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       239 work packages — the complete cognitive engine (see below)
+├── packs/       240 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,7 +78,7 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 179 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 218 (griddelta).
+Layer 60 and above is the Data Layer: the 180 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 219 (gridrowcol).
 
 The full layer table is in Architecture Section 0.4.
 
@@ -325,6 +325,7 @@ Everything is inspectable.
 | `gridmask` | Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206) (PR 315) |
 | `gridxform` | Grid Transformations: Rotate, Flip, Transpose, Crop, Pad, Scale, Tile, Canonicalize (gx_*, Layer 207) (PR 317) |
 | `gridsymm` | Grid Symmetry: Detection, Completion, Violations, and Score (gsm_*, Layer 208) (PR 318) |
+| `gridrowcol` | Grid Row and Column Comparative Analysis: Extract, Compare, Sort, and Find Matching Rows and Columns (grc_*, Layer 219) (PR 329) |
 | `griddelta` | Grid Delta Analysis: Difference Detection, Change Maps, Color Transitions, and Grid Comparison (gdt_*, Layer 218) (PR 328) |
 | `gridspiral` | Grid Spiral Traversal: Clockwise Spiral Ordering, Read, Write, Rotate, and Frame Spirals (gsp_*, Layer 217) (PR 327) |
 | `gridframe` | Grid Frame Analysis: Concentric Ring Depth, Frame Extraction, Uniformity, Fill, and Peel (gfr_*, Layer 216) (PR 326) |
