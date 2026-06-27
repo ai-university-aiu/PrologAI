@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       277 work packages — the complete cognitive engine (see below)
+├── packs/       278 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,7 +78,7 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transformation packs that handle structured data, currently reaching Layer 252 (taskcat) with WP-274 through WP-277 enhancing four existing packs for ARC-AGI-2.
+Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transformation packs that handle structured data, currently reaching Layer 253 (periodfix) with WP-274 through WP-277 enhancing four existing packs for ARC-AGI-2 and WP-278 adding the periodfix periodic-pattern-repair pack.
 
 The full layer table is in Architecture Section 0.4.
 
@@ -354,6 +354,7 @@ Everything is inspectable.
 | `legend` | Legend and Key Region Detection: Detect Legend, Is Legend, Legend Entries, Consistent Legend, Region BBox, Separated, Region Area, All Regions, Region Color, Is Small, Same Shape, Entry Boundaries, Color Map, and Position (lg_*, Layer 250) (PR 362) |
 | `multipair` | Multi-Pair Object Tracking: Track Objects, Invariant Objects, Role Objects, Cross-Pair Match, All Input Objects, Color Frequency, Universal Colors, Variable Colors, Disappeared Objects, Appeared Objects, Stable Color Objects, Modal Object Count, Consistent Count, Singleton Color (mp_*, Layer 251) (PR 362) |
 | `taskcat` | Task Type Classification: Categorize, Is Single Rule, Is Multi-Step, Has Context Gate, Has Symbol Table, Suggest Strategies, Preserves Dims, Preserves Colors, Consistent Change Count, Max Change Count, Distinct Change Patterns, Is Fill Task, Is Deletion Task, Confidence (tc_*, Layer 252) (PR 362) |
+| `periodfix` | Periodic Pattern Repair: List and Grid Period Detection, Majority-Vote Tile Construction, Violation Finding, Full and Single-Corruption Repair, and Best-Period Search (ppf_*, Layer 253) (PR 366) |
 | `seqinfer` (enhanced) | Sequential Rule Inference + ARC-AGI-2 Candidates: sq_arc2_candidates/1 adds 66-entry integer-color candidate list for multi-step search (sq_*, Layer 195) (WP-274, PR 363) |
 | `hyp` (enhanced) | Hypothesis Generation + Spatial/Structural/Sequence: hy_spatial_hyp/3, hy_structural_hyp/3, hy_sequence_hyp/4 extend hypothesis search to grid-level shifts, structural patterns, and two-step color maps (hy_*, Layer 74) (WP-275, PR 363) |
 | `condxf` (enhanced) | Conditional Scene Transform + Gate Inference: xc_infer_gate/3 infers the gate_color that separates training pairs by change signature (xc_*, Layer 187) (WP-276, PR 363) |
