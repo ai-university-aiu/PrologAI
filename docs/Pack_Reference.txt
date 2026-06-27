@@ -1315,3 +1315,20 @@ Grid Histogram Analysis: Per-Row and Per-Column Color Frequency (ghst_*, Layer 2
     ghst_min_row/3: row index with lowest non-zero count of Color (tie: lowest index)
     ghst_rows_with/4: row indices where Color appears at least N times
     ghst_cols_with/4: column indices where Color appears at least N times
+
+gridpos
+Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222)
+    gps_top_half/2: sub-grid of the top half of rows [0, H//2)
+    gps_bottom_half/2: sub-grid of the bottom half of rows [H//2, H)
+    gps_left_half/2: sub-grid of the left half of columns [0, W//2)
+    gps_right_half/2: sub-grid of the right half of columns [W//2, W)
+    gps_quadrant/3: rectangular quadrant sub-grid by atom (tl/tr/bl/br)
+    gps_even_rows/2: sub-grid of rows at even 0-indexed positions (0, 2, 4, ...)
+    gps_odd_rows/2: sub-grid of rows at odd 0-indexed positions (1, 3, 5, ...)
+    gps_even_cols/2: sub-grid of columns at even 0-indexed positions
+    gps_odd_cols/2: sub-grid of columns at odd 0-indexed positions
+    gps_checkerboard/3: list of R-C pairs where (R+C) mod 2 = Parity (Parity bound to 0 or 1)
+    gps_center_cell/3: center cell row and column indices (H//2, W//2)
+    gps_corners/2: four corner cells as R-C-Value terms (tl, tr, bl, br order)
+    gps_cross_h/3: center row index and row content
+    gps_cross_v/3: center column index and column content as a list

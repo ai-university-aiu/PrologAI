@@ -18935,3 +18935,22 @@ and ghst_cols_with/4 return indices where a color appears >= N times.
 :- use_module(pack(gridhist/prolog/gridhist)).
 
 14 ghst_* predicates. 44 tests pass. Layer 221.
+
+Chapter 199: gridpos Pack - Grid Positional Analysis (gps_*, Layer 222)
+
+The gridpos pack (Layer 222) provides fourteen predicates for extracting sub-grids
+and cell positions based on geometric position: halves, quadrants, even/odd rows
+and columns, checkerboard patterns, center cell, corner cells, and center cross.
+gps_top_half/2 returns rows [0, H//2); gps_bottom_half/2 returns rows [H//2, H).
+gps_left_half/2 and gps_right_half/2 do the same for columns. gps_quadrant/3
+takes tl/tr/bl/br and returns the corresponding rectangular sub-grid.
+gps_even_rows/2 and gps_odd_rows/2 filter by row parity; gps_even_cols/2 and
+gps_odd_cols/2 filter by column parity. gps_checkerboard/3 returns R-C pairs
+where (R+C) mod 2 = Parity (Parity must be bound). gps_center_cell/3 returns
+the center coordinates (H//2, W//2). gps_corners/2 returns four R-C-Value terms
+for the corner cells. gps_cross_h/3 and gps_cross_v/3 return the center row and
+center column respectively.
+
+:- use_module(pack(gridpos/prolog/gridpos)).
+
+14 gps_* predicates. 44 tests pass. Layer 222.
