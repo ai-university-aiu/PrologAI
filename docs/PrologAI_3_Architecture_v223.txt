@@ -9386,3 +9386,46 @@ Design notes:
   get the best-fitting integer dimension from the float scale factor.
 - grs_crop clamps indices to grid bounds rather than failing on out-of-bounds
   requests; this matches the expected behavior for imprecise crop calls.
+
+
+ARCH-229: gridobj Pack (gob_*, Layer 242)
+
+Pack name: gridobj
+Layer: 242
+Prefix: gob_
+Module file: packs/gridobj/prolog/gridobj.pl
+Test file: packs/gridobj/test/test_gridobj.pl
+Pack file: packs/gridobj/pack.pl
+Dependencies: library(lists) [member/2, min_list/2, max_list/2,
+  list_to_set/2, append/3]. No cross-pack dependencies.
+Work Package: WP-263
+
+Public predicates (14):
+  gob_object_cells/4, gob_object_color/4, gob_object_size/4,
+  gob_object_bbox/4, gob_object_mask/5, gob_extract_object/5,
+  gob_all_objects/3, gob_object_count/3, gob_largest_object/3,
+  gob_smallest_object/3, gob_flood_fill/5, gob_fill_enclosed/4,
+  gob_remove_object/5, gob_move_object/7
+
+Private helpers (5):
+  gob_dims_/3, gob_cell_/4, gob_cells_bbox_/2,
+  gob_bfs_/7, gob_bg_bfs_/7, gob_collect_objects_/7
+
+Design notes:
+- gob_bfs_ checks both the Visited set (\+ member in Visited) and the current
+  frontier tail (\+ member in Rest) before adding a cell to NewCells. This
+  ensures no cell appears twice in the frontier, even when multiple frontier
+  cells have the same neighbor not yet in Visited.
+- gob_collect_objects_ uses an accumulator (Seen) of cells already assigned to
+  a component. It skips any cell in Seen and recursively collects the rest,
+  ensuring each component is found exactly once regardless of which cell within
+  it is encountered as the seed.
+- gob_fill_enclosed uses gob_bg_bfs_ starting from all border Bg cells to find
+  all "reachable" Bg cells. Any Bg cell not in that reachable set is fully
+  enclosed and is replaced by FgColor. If no Bg cells touch the border,
+  all Bg cells are enclosed.
+- gob_move_object clips cells that would fall outside the grid bounds after
+  translation. The original cells are always removed even if the new position
+  is partially or fully out of bounds.
+- gob_largest_object uses neg(Neg, Cs) keys (Neg is -Len) so msort produces
+  the largest first. gob_smallest_object uses pos(Len, Cs) directly.

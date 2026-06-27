@@ -1,0 +1,138 @@
+Chapter 224: gridobj - Grid Object Operations (gob_*, Layer 242)
+
+Work Package 263. Module: gridobj. Prefix: gob_. Layer: 242.
+Dependencies: library(lists) [member/2, min_list/2, max_list/2,
+  list_to_set/2, append/3]. No cross-pack dependencies.
+
+
+Overview
+
+The gridobj pack provides fourteen predicates for 4-connected component
+analysis, extraction, and manipulation in symbolic grids. It covers cell
+enumeration by BFS, color/size/bbox query, binary masking, bounding-box
+extraction, full object inventory, count, largest/smallest selection, flood
+fill, enclosed-region fill, removal, and movement.
+
+All operations use 4-connectivity (up, down, left, right only - no diagonals).
+
+
+Predicates
+
+gob_object_cells(+Grid, +R, +C, -Cells)
+  Cells is the list of r(R,C) positions in the 4-connected component at (R,C).
+  Uses BFS starting from (R,C) expanding to 4-neighbors with the same color.
+
+gob_object_color(+Grid, +R, +C, -Color)
+  Color is Grid[R][C]. This is the color of the entire connected component.
+
+gob_object_size(+Grid, +R, +C, -Size)
+  Size is the count of cells in the 4-connected component at (R,C).
+
+gob_object_bbox(+Grid, +R, +C, -BBox)
+  BBox is r0(R0,C0,R1,C1): the tight bounding box of the component.
+
+gob_object_mask(+Grid, +R, +C, +Bg, -Mask)
+  Mask is a grid with component cells in their Color and all other cells Bg.
+  Same dimensions as Grid.
+
+gob_extract_object(+Grid, +R, +C, +Bg, -Extracted)
+  Extracted is the bounding-box subgrid of the component; non-component cells
+  within the bounding box are filled with Bg.
+
+gob_all_objects(+Grid, +Bg, -Objects)
+  Objects is a list of ob(Color,Cells,BBox) for all non-Bg connected components,
+  returned in scan order (top-to-bottom, left-to-right by seed cell).
+
+gob_object_count(+Grid, +Bg, -Count)
+  Count is the number of distinct non-Bg connected components.
+
+gob_largest_object(+Grid, +Bg, -Cells)
+  Cells is the cell list of the connected component with the most cells.
+  Fails if Grid has no non-Bg cells.
+
+gob_smallest_object(+Grid, +Bg, -Cells)
+  Cells is the cell list of the connected component with the fewest cells.
+  Fails if Grid has no non-Bg cells.
+
+gob_flood_fill(+Grid, +R, +C, +NewColor, -Result)
+  Replace all cells of the connected component at (R,C) with NewColor.
+  Does not change cells of other colors including Bg.
+
+gob_fill_enclosed(+Grid, +Bg, +FgColor, -Result)
+  Fill all Bg regions that are fully enclosed by non-Bg cells with FgColor.
+  A region is enclosed if it has no 4-connected path to the grid border.
+  Bg cells on the border or reachable from the border are unchanged.
+
+gob_remove_object(+Grid, +R, +C, +Bg, -Result)
+  Replace all cells of the connected component at (R,C) with Bg.
+  Other cells are unchanged.
+
+gob_move_object(+Grid, +R, +C, +NewR, +NewC, +Bg, -Result)
+  Move the connected component at (R,C) so its bounding-box top-left is at
+  (NewR,NewC). Removes original cells and places the component at the new
+  position. Cells that fall outside the grid bounds after moving are clipped.
+
+
+BFS algorithm (gob_bfs_)
+
+The BFS uses a frontier list and a visited set:
+  - Start: Frontier = [seed], Visited = [seed]
+  - Each step: expand the first cell in Frontier to its 4-neighbors
+  - A neighbor is added only if: (1) it is in bounds, (2) its color = target
+    color, (3) it is NOT in Visited, (4) it is NOT already in the frontier tail
+  - Repeat until Frontier is empty; return Visited
+
+Checking both Visited and the frontier tail prevents any cell from being
+enqueued twice, even when two frontier cells share a neighbor.
+
+
+Example session
+
+:- use_module(pack(gridobj/prolog/gridobj)).
+
+% Get all cells of the top-left r-component.
+gob_object_cells([[r,r,b],[r,b,b]], 0, 0, Cells).
+% Cells = [r(0,0),r(0,1),r(1,0)].
+
+% Count objects in a 3-cell grid.
+gob_object_count([[r,b,g],[b,b,b]], b, Count).
+% Count = 2.
+
+% Flood fill a connected region.
+gob_flood_fill([[r,r],[r,b]], 0, 0, g, Result).
+% Result = [[g,g],[g,b]].
+
+% Fill enclosed bg region.
+gob_fill_enclosed([[r,r,r],[r,b,r],[r,r,r]], b, x, Result).
+% Result = [[r,r,r],[r,x,r],[r,r,r]].
+
+% Extract object bounding box.
+gob_extract_object([[b,r,r,b],[b,b,b,b]], 0, 1, b, R).
+% R = [[r,r]].
+
+% Move object to new position.
+gob_move_object([[r,b,b],[b,b,b]], 0, 0, 0, 2, b, Result).
+% Result = [[b,b,r],[b,b,b]].
+
+
+Test coverage
+
+44 tests AC-GOB-001 through AC-GOB-044 in
+packs/gridobj/test/test_gridobj.pl. All pass.
+
+Coverage by predicate:
+  gob_object_cells: 3 tests (001-003)
+  gob_object_color: 2 tests (004-005)
+  gob_object_size: 2 tests (006-007)
+  gob_object_bbox: 3 tests (008-010)
+  gob_object_mask: 3 tests (011-013)
+  gob_extract_object: 3 tests (014-016)
+  gob_all_objects: 3 tests (017-019)
+  gob_object_count: 3 tests (020-022)
+  gob_largest_object: 3 tests (023-025)
+  gob_smallest_object: 3 tests (026-028)
+  gob_flood_fill: 3 tests (029-031)
+  gob_fill_enclosed: 3 tests (032-034)
+  gob_remove_object: 3 tests (035-037)
+  gob_move_object: 3 tests (038-040)
+  integration: 4 tests (041-044)

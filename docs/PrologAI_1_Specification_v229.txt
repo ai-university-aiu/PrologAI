@@ -17632,3 +17632,37 @@ whether H = W. Critical design note: all if-then-else blocks that follow a
 grs_dims_ call must be wrapped in explicit outer parentheses, because without them
 SWI-Prolog parses the preceding comma-chain as part of the condition, leaving H
 and W unbound in the else branch.
+
+
+Part 253: Work Package 263 - gridobj Pack (gob_*, Layer 242)
+
+WP-263-SPEC-001: The gridobj pack (Layer 242) provides fourteen predicates for
+4-connected component analysis, extraction, and manipulation in symbolic grids.
+The pack covers component cell enumeration, color and size query, bounding box,
+binary mask, subgrid extraction, full object inventory, count, largest/smallest
+component selection, flood fill, enclosed-region fill, object removal, and object
+movement. All 44 acceptance tests pass.
+
+WP-263-SPEC-002: gob_object_cells/4 enumerates all cells in the 4-connected
+component at (R,C) using BFS. gob_object_color/4 returns the color at (R,C).
+gob_object_size/4 returns the count of cells in the component. gob_object_bbox/4
+returns the tight bounding box r0(R0,C0,R1,C1). gob_object_mask/5 produces a
+full-grid mask with the component's color at component positions and Bg elsewhere.
+
+WP-263-SPEC-003: gob_extract_object/5 returns the bounding-box subgrid of the
+component, with non-component cells filled with Bg. gob_all_objects/3 returns a
+list of ob(Color,Cells,BBox) for all non-Bg connected components in scan order.
+gob_object_count/3 returns the count of such components.
+
+WP-263-SPEC-004: gob_largest_object/3 returns the cells of the component with
+the most cells; gob_smallest_object/3 returns the cells of the component with
+the fewest cells. Both fail if Grid has no non-Bg cells. gob_flood_fill/5
+replaces a component with a new color. gob_fill_enclosed/4 fills all Bg regions
+that have no 4-connected path to the grid border.
+
+WP-263-SPEC-005: gob_remove_object/5 replaces a component with Bg.
+gob_move_object/7 moves a component by computing the offset from the component's
+bounding-box top-left to the target (NewR,NewC), removes the original, and places
+the component at the new position. Cells that would fall outside grid bounds are
+clipped. The BFS in gob_bfs_ checks both the Visited set and the current frontier
+(Rest) to prevent any cell from being added to the frontier twice.

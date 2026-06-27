@@ -14724,3 +14724,76 @@ Private helper: grs_mode_(List, Mode)
   Keyed := [ neg(Neg,V) | V in Vals, N := count(V,List), Neg is -N ]
   Mode := first value from msort(Keyed)
   Note: Neg is -N (arithmetic) ensures numeric sort order.
+
+
+Part 253: Work Package 263 - gridobj Pack (gob_*, Layer 242)
+
+WP-263-PSEUDO-001: gob_object_cells(Grid, R, C, Cells)
+  Color := Grid[R][C]
+  Cells := BFS(start={r(R,C)}, visited={r(R,C)}, match=Color)
+
+WP-263-PSEUDO-002: gob_object_color(Grid, R, C, Color)
+  Color := Grid[R][C]
+
+WP-263-PSEUDO-003: gob_object_size(Grid, R, C, Size)
+  Cells := gob_object_cells(Grid, R, C)
+  Size := length(Cells)
+
+WP-263-PSEUDO-004: gob_object_bbox(Grid, R, C, BBox)
+  Cells := gob_object_cells(Grid, R, C)
+  BBox := r0(min_R, min_C, max_R, max_C) over Cells
+
+WP-263-PSEUDO-005: gob_object_mask(Grid, R, C, Bg, Mask)
+  Cells := gob_object_cells(Grid, R, C); Color := Grid[R][C]
+  Mask[r][c] := if r(r,c) in Cells then Color else Bg
+
+WP-263-PSEUDO-006: gob_extract_object(Grid, R, C, Bg, Extracted)
+  Cells := gob_object_cells; Color := Grid[R][C]
+  r0(R0,C0,R1,C1) := bbox(Cells)
+  Extracted[dr][dc] := if r(R0+dr,C0+dc) in Cells then Color else Bg
+
+WP-263-PSEUDO-007: gob_all_objects(Grid, Bg, Objects)
+  NonBg := scan all non-Bg cells in row-major order
+  Objects := collect_components(NonBg, Grid, already_seen={})
+  Each component: ob(Color, Cells, BBox)
+
+WP-263-PSEUDO-008: gob_object_count(Grid, Bg, Count)
+  Count := length(gob_all_objects(Grid, Bg))
+
+WP-263-PSEUDO-009: gob_largest_object(Grid, Bg, Cells)
+  Cells := cells of ob with max length in gob_all_objects
+  Key for msort: neg(Neg, Cs) where Neg is -(length(Cs))
+
+WP-263-PSEUDO-010: gob_smallest_object(Grid, Bg, Cells)
+  Cells := cells of ob with min length in gob_all_objects
+  Key for msort: pos(Len, Cs) where Len = length(Cs)
+
+WP-263-PSEUDO-011: gob_flood_fill(Grid, R, C, NewColor, Result)
+  Cells := gob_object_cells(Grid, R, C)
+  Result[r][c] := if r(r,c) in Cells then NewColor else Grid[r][c]
+
+WP-263-PSEUDO-012: gob_fill_enclosed(Grid, Bg, FgColor, Result)
+  BorderBg := all Bg cells at row=0, row=H-1, col=0, or col=W-1
+  Reachable := BFS(start=BorderBg, match=Bg)
+  Result[r][c] := if Grid[r][c]=Bg and r(r,c) not in Reachable: FgColor
+                  else Grid[r][c]
+
+WP-263-PSEUDO-013: gob_remove_object(Grid, R, C, Bg, Result)
+  Cells := gob_object_cells(Grid, R, C)
+  Result[r][c] := if r(r,c) in Cells then Bg else Grid[r][c]
+
+WP-263-PSEUDO-014: gob_move_object(Grid, R, C, NewR, NewC, Bg, Result)
+  Cells := gob_object_cells; Color := Grid[R][C]
+  r0(OldR0,OldC0,_,_) := bbox(Cells)
+  DR := NewR - OldR0, DC := NewC - OldC0
+  Base := gob_remove_object(Grid, R, C, Bg)
+  Moved := { r(OR+DR, OC+DC, Color) | r(OR,OC) in Cells, in bounds }
+  Result[r][c] := if r(r,c,Color) in Moved then Color else Base[r][c]
+
+BFS subroutine: gob_bfs_(Frontier, Visited, Color, H, W, Grid, Result)
+  if Frontier = []: Result = Visited
+  else:
+    [r(R,C)|Rest] = Frontier
+    NewCells = { r(NR,NC) | (NR,NC) is 4-neighbor of (R,C), in bounds,
+                 not in Visited, not in Rest, Grid[NR][NC]=Color }
+    recurse with Frontier=Rest+NewCells, Visited=Visited+NewCells

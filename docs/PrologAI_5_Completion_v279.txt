@@ -7505,3 +7505,18 @@ Pack_Reference: gridresize entry added
 Design note: outer parentheses around if-then-else blocks are required when
   the block follows a grs_dims_ call; without them, SWI-Prolog parses
   grs_dims_ as part of the condition, leaving H and W unbound in else branches.
+
+WP-263: gridobj Pack (gob_*, Layer 242)
+Status: COMPLETE
+Branch: feature/wp263-gridobj
+Tests: 44/44 pass (AC-GOB-001 through AC-GOB-044)
+Predicates: gob_object_cells/4, gob_object_color/4, gob_object_size/4,
+  gob_object_bbox/4, gob_object_mask/5, gob_extract_object/5,
+  gob_all_objects/3, gob_object_count/3, gob_largest_object/3,
+  gob_smallest_object/3, gob_flood_fill/5, gob_fill_enclosed/4,
+  gob_remove_object/5, gob_move_object/7
+SPARC: Spec v229, Pseudo v221, Arch v223, Refinement v276, Completion v279
+Tutorial: docs/tutorial/Ch224_GridObj.txt
+Pack_Reference: gridobj entry added
+Bug fixed: gob_remove_object was declared as /4 in module export but
+  implemented as /5; corrected export arity.
