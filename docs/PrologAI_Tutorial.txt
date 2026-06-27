@@ -18792,3 +18792,29 @@ ggr_color_components/3 counts connected components; ggr_component_cells/3
 partitions them.
 
 14 ggr_* predicates. 44 tests pass. Layer 214.
+
+
+Chapter 192: griddiag Pack - Grid Diagonal Analysis (gdi_*, Layer 215)
+
+The griddiag pack (Layer 215) provides symbolic analysis of both main
+diagonals (cells where C - R = K) and anti-diagonals (cells where R + C = K)
+of symbolic grids. Main diagonal K = 0 is the principal diagonal.
+
+:- use_module(pack(griddiag/prolog/griddiag)).
+
+gdi_main_diag/3 extracts values on main diagonal K in ascending R order;
+gdi_anti_diag/3 extracts values on anti-diagonal K in ascending C order;
+gdi_trace/2 returns the principal diagonal (K=0, length = min(H,W)).
+gdi_all_main_diags/2 and gdi_all_anti_diags/2 return all H+W-1 diagonals
+or anti-diagonals as lists of value lists.
+
+gdi_main_count/4 and gdi_anti_count/4 count Color occurrences on a specific
+diagonal. gdi_main_uniform/3 and gdi_anti_uniform/3 return yes/no for whether
+all values on a diagonal are equal. gdi_uniform_main_diags/2 and
+gdi_uniform_anti_diags/2 collect K values of uniform diagonals. 
+gdi_diag_length/3 gives the cell count of main diagonal K.
+
+gdi_set_main_diag/4 and gdi_set_anti_diag/4 return a modified grid with all
+cells on the specified diagonal set to a new Color.
+
+14 gdi_* predicates. 44 tests pass. Layer 215.

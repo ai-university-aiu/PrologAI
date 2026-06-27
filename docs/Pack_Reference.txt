@@ -1196,3 +1196,20 @@ gridgraph
     ggr_merge_colors/4: replace FromColor with ToColor everywhere in Grid
     ggr_color_components/3: count 4-connected components of Color
     ggr_component_cells/3: list of cell-lists; each is one 4-connected component of Color
+
+griddiag
+    Grid Diagonal Analysis: Main and Anti-Diagonal Extraction, Counting, Uniformity, and Modification (gdi_*, Layer 215)
+    gdi_main_diag/3: values on K-th main diagonal (C-R=K), in ascending R order; K=0 is principal diagonal
+    gdi_anti_diag/3: values on K-th anti-diagonal (R+C=K), in ascending C order; K=0 is top-left corner
+    gdi_trace/2: principal diagonal (K=0); length = min(H,W)
+    gdi_all_main_diags/2: all H+W-1 main diagonals ordered from K=-(H-1) to K=W-1
+    gdi_all_anti_diags/2: all H+W-1 anti-diagonals ordered from K=0 to K=H+W-2
+    gdi_main_count/4: count of Color occurrences on K-th main diagonal
+    gdi_anti_count/4: count of Color occurrences on K-th anti-diagonal
+    gdi_main_uniform/3: yes/no - all cells on K-th main diagonal are the same color
+    gdi_anti_uniform/3: yes/no - all cells on K-th anti-diagonal are the same color
+    gdi_set_main_diag/4: grid with all cells on main diagonal K replaced by Color
+    gdi_set_anti_diag/4: grid with all cells on anti-diagonal K replaced by Color
+    gdi_uniform_main_diags/2: list of K values for which the main diagonal is uniform
+    gdi_uniform_anti_diags/2: list of K values for which the anti-diagonal is uniform
+    gdi_diag_length/3: number of cells on the K-th main diagonal
