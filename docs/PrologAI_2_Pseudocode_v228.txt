@@ -14954,3 +14954,238 @@ WP-266-PSEUDO-013: gtr_common_grid(GridA, GridB, Bg, Common):
 
 WP-266-PSEUDO-014: gtr_is_color_permutation(GridA, GridB):
   Call gtr_color_map. Fail if any two sources map to same target.
+
+
+Part 257: Work Package 267 - gridobjmatch Pack (gom_*, Layer 246)
+
+WP-267-PSEUDO-001: gom_match_color(Objs1, Objs2, Pairs):
+  Base case: Objs1=[] -> Pairs=[].
+  Take O1 from Objs1; get its Color.
+  If gom_select_color_(Objs2, Color, O2, Objs2Rem) ->
+    Pairs = [match(O1,O2)|More], recurse with Objs2Rem.
+  Else recurse with Objs2 unchanged.
+
+WP-267-PSEUDO-002: gom_match_nearest(Objs1, Objs2, Pairs):
+  Base cases: Objs1=[] or Objs2=[] -> Pairs=[].
+  Take O1 from Objs1.
+  Call gom_find_nearest_(O1, Objs2, Best): collect D-O2 pairs by
+    doubled-centroid Manhattan distance; msort, take first element.
+  Remove Best from Objs2 once (gom_remove_once_).
+  Pairs = [match(O1,Best)|More], recurse.
+
+WP-267-PSEUDO-003: gom_match_size(Objs1, Objs2, Pairs):
+  Same structure as gom_match_color but uses gom_select_size_.
+  Size = length of Cells list.
+
+WP-267-PSEUDO-004: gom_unmatched_a(Pairs, Objs1, Unmatched):
+  Matched = findall(O1, member(match(O1,_), Pairs)).
+  Unmatched = subtract(Objs1, Matched).
+
+WP-267-PSEUDO-005: gom_unmatched_b(Pairs, Objs2, Unmatched):
+  Matched = findall(O2, member(match(_,O2), Pairs)).
+  Unmatched = subtract(Objs2, Matched).
+
+WP-267-PSEUDO-006: gom_color_diff(Pairs, Same, Diff):
+  Recurse over Pairs.
+  For match(O1,O2): if gom_color_(O1)=gom_color_(O2) -> add to Same else to Diff.
+
+WP-267-PSEUDO-007: gom_move_vector(match(O1,O2), mv(DR,DC)):
+  gom_top_left_(O1, R1, C1); gom_top_left_(O2, R2, C2).
+  DR = R2-R1, DC = C2-C1.
+
+WP-267-PSEUDO-008: gom_move_vectors(Pairs, Vectors):
+  maplist(gom_move_vector, Pairs, Vectors).
+
+WP-267-PSEUDO-009: gom_constant_move([P|Rest], V):
+  V = gom_move_vector(P).
+  maplist(gom_has_vector_(V), Rest).
+  Fails for empty list.
+
+WP-267-PSEUDO-010: gom_infer_color_map(Pairs, Map):
+  findall(cm(C1,C2), (member(match(O1,O2),Pairs), C1=color(O1), C2=color(O2), C1\=C2)).
+  sort to dedup -> Map.
+
+WP-267-PSEUDO-011: gom_appeared(Objs1, Objs2, Appeared):
+  Cs1 = all colors in Objs1.
+  include(not_in(Cs1), Objs2, Appeared).
+
+WP-267-PSEUDO-012: gom_disappeared(Objs1, Objs2, Disappeared):
+  Cs2 = all colors in Objs2.
+  include(not_in(Cs2), Objs1, Disappeared).
+
+WP-267-PSEUDO-013: gom_same_structure(Objs1, Objs2):
+  msort(colors(Objs1), S1); msort(colors(Objs2), S2).
+  Succeed if S1 = S2.
+
+WP-267-PSEUDO-014: gom_count_change(Objs1, Objs2, N):
+  N = length(Objs2) - length(Objs1).
+
+
+Part 258: Work Package 268 - symtab Pack (st_*, Layer 247)
+
+WP-268-PSEUDO-001: st_build_table(Pairs, SymbolTable):
+  Call st_contrastive_learn(Pairs, Candidates).
+  If Candidates=[]: SymbolTable=[].
+  Else: st_best_table(Candidates, Pairs, SymbolTable).
+
+WP-268-PSEUDO-002: st_identify_symbols(Pairs, Symbols):
+  findall(sym(Feature, OutColor),
+    (member(pair(InObjs,OutObjs), Pairs),
+     member(InObj, InObjs), member(OutObj, OutObjs),
+     colors differ,
+     Feature from st_color_feature or st_size_feature or holes(H)).
+  sort -> Symbols.
+
+WP-268-PSEUDO-003: st_contrastive_learn([], []).
+  st_contrastive_learn([Pair|Rest], Findings):
+    Extract PairSet from Pair via findall over all features.
+    Recurse on Rest -> RestFindings.
+    include(st_entry_consistent_(RestFindings), PairSet, Findings).
+
+WP-268-PSEUDO-004: st_apply_table(SymbolTable, InObjs, ColorMap):
+  findall(cm(Color,Value),
+    (member(InObj, InObjs), st_ob_color_(InObj, Color),
+     member(Sym, SymbolTable), st_apply_sym_(Sym, InObj, cm(Color, Value)))).
+  sort -> ColorMap.
+
+WP-268-PSEUDO-005: st_hole_count(ob(_, Cells, r0(R0,C0,R1,C1)), N):
+  BboxArea = (R1-R0+1)*(C1-C0+1). CellCount = length(Cells).
+  HoleArea = BboxArea - CellCount. N = max(0, HoleArea).
+
+WP-268-PSEUDO-006: st_lookup([sym(F,V)|_], F, V) :- cut.
+  st_lookup([_|Rest], F, V) :- st_lookup(Rest, F, V).
+
+WP-268-PSEUDO-007: st_entry_consistent(sym(F,V), Table):
+  \+ (member(sym(F,V2), Table), V2 \= V).
+
+WP-268-PSEUDO-008: st_color_feature(ob(Color,_,_), color(Color)).
+
+WP-268-PSEUDO-009: st_size_feature(ob(_,Cells,_), size(N)) :- length(Cells, N).
+
+WP-268-PSEUDO-010: st_position_feature(ob(_,_,r0(R0,C0,_,_)), dims(Rows,Cols), pos(Q)):
+  Compute quadrant by comparing R0 to Rows/2 and C0 to Cols/2.
+
+WP-268-PSEUDO-011: st_is_symbol(Obj, ContentObjs):
+  size(Obj) < max(sizes(ContentObjs)), OR unique color not in ContentObjs.
+
+WP-268-PSEUDO-012: st_candidate_symbols(InObjs, Candidates):
+  Sort by size ascending. Take first len/4 objects. Return as Candidates.
+
+WP-268-PSEUDO-013: st_score_table(SymbolTable, Pairs, Score):
+  For each pair: apply table -> ColorMap. Verify ColorMap transforms InObjs to OutObjs.
+  Score = count of verified pairs.
+
+WP-268-PSEUDO-014: st_best_table(Tables, Pairs, Best):
+  Score each table. msort -> take last (highest). Return Best.
+
+
+Part 259: Work Package 269 - invariant Pack (iv_*, Layer 248)
+
+WP-269-PSEUDO-001: iv_grid_invariants(Pairs, Invariants):
+  Extract inputs. Find dims(R,C) such that all inputs have those dims.
+  Return [inv(dims(R,C))] or [].
+
+WP-269-PSEUDO-002: iv_output_invariants(Pairs, Invariants):
+  Same as iv_grid_invariants but over outputs.
+
+WP-269-PSEUDO-003: iv_object_invariants(Pairs, Invariants):
+  Extract inputs. Get color set of first input.
+  If all inputs have same color set: [inv(stable_color_set(Cs))].
+  Else: [].
+
+WP-269-PSEUDO-004: iv_variant_features(Pairs, Features):
+  Extract inputs. Check dims: if vary -> [feature(dims)].
+  Check color set: if vary -> [feature(color_set)].
+  Append results.
+
+WP-269-PSEUDO-005: iv_consistent_delta(Pairs, Delta):
+  If all pairs preserve dims -> [inv(dims_preserved)].
+  If all pairs preserve color set -> [inv(color_set_preserved)].
+  Append results.
+
+WP-269-PSEUDO-006: iv_all_grids(Grids, Goal):
+  maplist(Goal, Grids).
+
+WP-269-PSEUDO-007: iv_no_grids([], _).
+  iv_no_grids([G|Rest], Goal) :- \+ call(Goal, G), recurse.
+
+WP-269-PSEUDO-008: iv_color_set(Grid, BgColor, Colors):
+  Collect all non-BgColor values. Sort.
+
+WP-269-PSEUDO-009: iv_same_color_sets(Grids, BgColor):
+  Get color set of first. maplist check all have same.
+
+WP-269-PSEUDO-010: iv_same_dims(Grids):
+  Get dims of first. maplist check all have same dims.
+
+WP-269-PSEUDO-011: iv_preserves_dims(Pairs):
+  maplist(pair_preserves_dims, Pairs).
+
+WP-269-PSEUDO-012: iv_preserves_colors(Pairs):
+  maplist(pair_preserves_color_set, Pairs).
+
+WP-269-PSEUDO-013: iv_preserves_count(Pairs, BgColor):
+  For each pair: count distinct colors in In and Out. Succeed if equal.
+
+WP-269-PSEUDO-014: iv_stable_color_map(Pairs, Map):
+  For each pair: extract per-cell cm(InV,OutV) where InV\=OutV. Sort.
+  Intersect across all pairs. Return common entries.
+
+
+WP-270: contrast Pack (ca_*, Layer 249)
+
+WP-270-PSEUDO-001: ca_pairwise_delta(Pairs, Deltas):
+  numlist(1, N, Idxs). maplist(delta_for_pair, Idxs, Pairs, Deltas).
+  delta_for_pair(I, pair(In,Out), delta(I, Changes)):
+    find all chg(R,C,IV,OV) where cell at R,C differs.
+
+WP-270-PSEUDO-002: ca_feature_profile(Grid, Profile):
+  Get dims (Rows-Cols). Get non-bg colors. Count colors.
+  Find dominant (most frequent non-0) color.
+  sort [feat(dims,Rows-Cols), feat(color_count,N), feat(dominant_color,C)].
+
+WP-270-PSEUDO-003: ca_profile_diff(Profile1, Profile2, Changed):
+  include(not_in_profile2, Profile1, Changed).
+  not_in_profile2(feat(N,V)): \+ member(feat(N,V), Profile2).
+
+WP-270-PSEUDO-004: ca_stable_features(Pairs, Features):
+  maplist(input_profile, Pairs, Profiles). ca_common_features(Profiles, Features).
+  common_features: intersect all profiles.
+
+WP-270-PSEUDO-005: ca_unstable_features(Pairs, Features):
+  Union all input profiles. Subtract stable. Return remainder.
+
+WP-270-PSEUDO-006: ca_covarying_features(Pairs, Features):
+  Partition Pairs into ChangingPairs and StablePairs.
+  Get features common to ALL ChangingPairs.
+  Subtract features present in any StablePair.
+
+WP-270-PSEUDO-007: ca_change_count(Pairs, Feature, N):
+  include(pair_changes, Pairs, Changing).
+  include(has_feature(Feature), Changing, Matching). length(Matching, N).
+
+WP-270-PSEUDO-008: ca_rank_features(Pairs, RankedFeatures):
+  Get all input features (union). For each: compute change_count / total_changing.
+  msort descending by score. Return feature list in order.
+
+WP-270-PSEUDO-009: ca_context_gate(Pairs, Gate):
+  ca_rank_features(Pairs, [feat(N,V)|_]) -> Gate = feat(N,V).
+  Empty rank -> Gate = feat(none, none).
+
+WP-270-PSEUDO-010: ca_separates(Pairs, Feature, PositivePairs, Result):
+  TP = pairs with Feature in PositivePairs.
+  FP = pairs with Feature not in PositivePairs.
+  Result is TPN / (TPN + FPN). 0.0 if none.
+
+WP-270-PSEUDO-011: ca_correlated_features(Pairs, OutputChange, Features):
+  Filter Pairs to those containing OutputChange pattern.
+  Get common input features of matching pairs.
+
+WP-270-PSEUDO-012: ca_common_context(Pairs, OutputChange, Context):
+  Same as ca_correlated_features.
+
+WP-270-PSEUDO-013: ca_discriminating_pair(Pairs, Hyp1, Hyp2, DiscPair):
+  Find first pair where applying Hyp1 explains changes but Hyp2 does not (or vice versa).
+
+WP-270-PSEUDO-014: ca_minimal_features(Pairs, Features):
+  Greedy: rank by correlation. Return ranked list.

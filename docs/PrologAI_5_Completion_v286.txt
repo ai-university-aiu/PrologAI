@@ -7604,3 +7604,38 @@ Design note: symbol tables are sym(Feature, Value) lists. Contrastive learning
   intersects candidate sym entries across all training pairs. st_hole_count uses
   bbox-area minus cell-count approximation. st_is_symbol uses size and unique-color
   heuristics. st_best_table scores all candidates and returns the highest-scoring.
+
+
+WP-269: invariant Pack (iv_*, Layer 248)
+Status: COMPLETE
+Branch: feature/wp269-invariant
+Tests: 44/44 pass (AC-IV-001 through AC-IV-044)
+Predicates: iv_grid_invariants/2, iv_output_invariants/2, iv_object_invariants/2,
+  iv_variant_features/2, iv_consistent_delta/2, iv_all_grids/2, iv_no_grids/2,
+  iv_color_set/3, iv_same_color_sets/2, iv_same_dims/1, iv_preserves_dims/1,
+  iv_preserves_colors/1, iv_preserves_count/2, iv_stable_color_map/2
+SPARC: Spec v235, Pseudo v227, Arch v229, Refinement v282, Completion v285
+Tutorial: docs/tutorial/Ch230_Invariant.txt
+Pack_Reference: invariant entry added
+Design note: invariants are inv(Property) terms; features are feature(Property).
+  iv_stable_color_map intersects per-pair cell change maps. iv_all_grids/iv_no_grids
+  declared as meta_predicate for correct module dispatch. iv_count_objects_ counts
+  distinct non-bg colors as a proxy for object count.
+
+
+WP-270: contrast Pack (ca_*, Layer 249)
+Status: COMPLETE
+Branch: feature/wp270-contrast
+Tests: 44/44 pass (AC-CA-001 through AC-CA-044)
+Predicates: ca_pairwise_delta/2, ca_covarying_features/2, ca_context_gate/2,
+  ca_discriminating_pair/4, ca_correlated_features/3, ca_change_count/3,
+  ca_common_context/3, ca_separates/4, ca_minimal_features/2,
+  ca_feature_profile/2, ca_profile_diff/3, ca_stable_features/2,
+  ca_unstable_features/2, ca_rank_features/2
+SPARC: Spec v236, Pseudo v228, Arch v230, Refinement v283, Completion v286
+Tutorial: docs/tutorial/Ch231_Contrast.txt
+Pack_Reference: contrast entry added
+Design note: deltas are delta(I, Changes) where Changes = [chg(R,C,OldV,NewV)...].
+  Features are feat(Name, Value) terms. co-varying features are those in all
+  changing pairs but absent from stable pairs. rank_features uses change_count /
+  total_changing as the correlation score. dominant_color uses run-length encoding.
