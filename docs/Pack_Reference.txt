@@ -1009,3 +1009,20 @@ Grid Run-Length Encoding and Stripe Analysis: Row/Column Runs, Uniformity, Strip
     grl_stripe_colors_v/2: list of column colors for vertically striped grid; fail if any column non-uniform
     grl_max_run/4: Color and Len of longest run in row R; ties broken by term order on Color
     grl_alternating/2: succeed if row R alternates exactly 2 colors with all run lengths 1 and >= 2 cells
+
+gridflood
+Grid Flood-Fill, Region Analysis, Hole Filling, and Connected Components (gf_*, Layer 204)
+    gf_fill/5: 4-connected flood-fill from seed (R,C); replaces same-color region with NewColor; no-op if already NewColor
+    gf_fill8/5: 8-connected flood-fill from seed (R,C); diagonally adjacent cells of same color are included
+    gf_recolor/4: global palette swap; every OldColor cell becomes NewColor regardless of connectivity
+    gf_isolate/5: keep 4-connected region at (R,C); set all other cells to BgColor
+    gf_region_cells/4: list of R-C coordinates of 4-connected same-color region at (R,C) in BFS order
+    gf_region_size/4: cell count of 4-connected same-color region at (R,C)
+    gf_region_bbox/7: bounding box (MinR, MinC, MaxR, MaxC) of 4-connected region at (R,C)
+    gf_enclosed_cells/3: list of BgColor cells not reachable from grid border via 4-connected BgColor paths (holes)
+    gf_fill_enclosed/4: replace all enclosed BgColor cells with FillColor; border-reachable BgColor cells unchanged
+    gf_components/3: list of cell-lists, one per 4-connected Color region, in top-left seed order
+    gf_n_components/3: count of 4-connected Color regions; 0 if Color absent
+    gf_largest/3: cell-list of largest 4-connected Color region; ties favor first encountered; fails if Color absent
+    gf_is_connected/3: succeed if all Color cells form at most one connected region (Connectivity = 4 or 8); vacuously true if none
+    gf_boundary_fill/6: 4-connected flood-fill from (R,C) stopping at BoundaryColor walls; fills only SeedColor cells
