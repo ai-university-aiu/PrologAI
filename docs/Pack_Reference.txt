@@ -1719,3 +1719,20 @@ Grid Transformation Detection and Application: Color Map, Apply Map, Diff Cells,
     gtr_overlay(+Base,+Delta,+Bg,-Result): paste non-Bg cells of Delta onto Base.
     gtr_common_grid(+GridA,+GridB,+Bg,-Common): keep matching cells; differing = Bg.
     gtr_is_color_permutation(+GridA,+GridB): succeed if B is a bijective color permutation of A.
+
+gridobjmatch
+Object Matching and Change Detection Between Object Lists (gom_*, Layer 246)
+    gom_match_color(+Objs1,+Objs2,-Pairs): match ob/3 terms by shared color; unmatched dropped.
+    gom_match_nearest(+Objs1,+Objs2,-Pairs): match by nearest doubled-centroid Manhattan distance; greedy.
+    gom_match_size(+Objs1,+Objs2,-Pairs): match by shared cell count; unmatched dropped.
+    gom_unmatched_a(+Pairs,+Objs1,-Unmatched): objects in Objs1 absent from any match/2 first element.
+    gom_unmatched_b(+Pairs,+Objs2,-Unmatched): objects in Objs2 absent from any match/2 second element.
+    gom_color_diff(+Pairs,-Same,-Diff): partition into same-color and different-color sub-lists.
+    gom_move_vector(+match(O1,O2),-mv(DR,DC)): displacement from top-left bbox of O1 to O2.
+    gom_move_vectors(+Pairs,-Vectors): list of mv/2 terms for each match pair.
+    gom_constant_move(+Pairs,-mv(DR,DC)): succeed if every pair shares the same move vector; fails for [].
+    gom_infer_color_map(+Pairs,-Map): sorted deduplicated cm(Old,New) list from color-changing pairs.
+    gom_appeared(+Objs1,+Objs2,-Appeared): objects in Objs2 with a color not present in Objs1.
+    gom_disappeared(+Objs1,+Objs2,-Disappeared): objects in Objs1 with a color not present in Objs2.
+    gom_same_structure(+Objs1,+Objs2): succeed if both lists have the same multiset of object colors.
+    gom_count_change(+Objs1,+Objs2,-N): N = length(Objs2) - length(Objs1).
