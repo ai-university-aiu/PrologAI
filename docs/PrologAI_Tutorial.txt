@@ -18742,3 +18742,28 @@ gmo_connected_border/4 BFS-floods from the grid border through TargetColor cells
 gmo_remove_small/5 removes FgColor components below a size threshold.
 
 14 gmo_* predicates. 44 tests pass. Layer 212.
+
+
+Chapter 190: gridconv Pack - Sliding Window, Pattern Matching, and Square Morphology (gcv_*, Layer 213)
+
+The gridconv pack (Layer 213) provides fourteen predicates for grid convolution
+operations: sliding window extraction, window statistics (majority, uniformity,
+density), pattern (subgrid) matching, hot spot detection, and square structuring
+element morphology (dilation, erosion, and first-match replacement).
+
+:- use_module(pack(gridconv/prolog/gridconv)).
+
+Window radius N gives a (2N+1) x (2N+1) neighborhood. gcv_window/6 extracts
+it with out-of-bounds fill; gcv_count_in/6 counts a Color in the window;
+gcv_density_map/4 builds a per-cell count grid; gcv_majority/5 returns the
+most frequent color; gcv_majority_map/3 applies this over the whole grid;
+gcv_uniform_at/5 tests window uniformity; gcv_uniform_cells/3 collects
+uniform positions.
+
+gcv_find_pattern/3 finds all subgrid matches; gcv_count_pattern/3 counts
+them; gcv_has_pattern/2 tests for existence.
+gcv_hot_spots/5 returns cells where Color density meets a threshold.
+gcv_dilate_sq/4 and gcv_erode_sq/4 apply square SE morphology.
+gcv_replace_pattern/4 replaces the first pattern match.
+
+14 gcv_* predicates. 46 tests pass. Layer 213.

@@ -1162,3 +1162,20 @@ gridmorph
     gmo_fill_holes/4: replace enclosed BgColor regions (unreachable from grid border) with FgColor
     gmo_connected_border/4: BFS from border TargetColor cells through TargetColor region; returns all reachable cells
     gmo_remove_small/5: remove FgColor connected components with fewer than MinSize cells
+
+gridconv
+    Grid Convolution: Sliding Window, Pattern Matching, Density Maps, and Square Morphology (gcv_*, Layer 213)
+    gcv_window/6: extract (2N+1)x(2N+1) subgrid centered at (R,C); fill out-of-bounds with Fill color
+    gcv_count_in/6: count cells of Color in in-bounds portion of (2N+1)x(2N+1) window
+    gcv_density_map/4: grid where each cell holds Color count from its (2N+1)x(2N+1) window
+    gcv_majority/5: most frequent color among in-bounds window cells (ties by term order)
+    gcv_majority_map/3: each cell replaced by its local majority color (radius N)
+    gcv_uniform_at/5: yes/no - all in-bounds window cells are the same color
+    gcv_uniform_cells/3: list of (R,C) where in-bounds window is uniform
+    gcv_find_pattern/3: list of (R,C) where Pattern exactly matches as a subgrid; (R,C) is top-left corner
+    gcv_count_pattern/3: count positions where Pattern matches in Grid
+    gcv_has_pattern/2: succeeds if Pattern occurs at least once in Grid
+    gcv_hot_spots/5: cells where Color count in window >= Threshold
+    gcv_dilate_sq/4: square SE dilation radius N - cell becomes FgColor if any window cell is FgColor
+    gcv_erode_sq/4: square SE erosion radius N - FgColor cell loses color if any in-bounds window cell is not FgColor
+    gcv_replace_pattern/4: replace first (row-major) Pattern occurrence with Replacement; unchanged if no match
