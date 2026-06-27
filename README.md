@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       269 work packages — the complete cognitive engine (see below)
+├── packs/       270 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,11 +78,11 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 200 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 248 (invariant).
+Layer 60 and above is the Data Layer: the 200 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 249 (contrast).
 
 The full layer table is in Architecture Section 0.4.
 
-### The 269 Work Packages
+### The 270 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -350,6 +350,7 @@ Everything is inspectable.
 | `gridobjmatch` | Object Matching and Change Detection Between Object Lists: Match by Color, Nearest Centroid, and Size; Unmatched Extraction; Color-Diff Partition; Movement Vectors; Constant Move; Color Map Inference; Appeared, Disappeared, Structure, and Count Change (gom_*, Layer 246) (PR 358) |
 | `symtab` | Symbol Table Learning from Input-Output Pairs: Build Table, Identify Symbols, Contrastive Learn, Apply Table, Hole Count, Lookup, Entry Consistency, Color/Size/Position Features, Is Symbol, Candidate Symbols, Score Table, and Best Table (st_*, Layer 247) (PR 359) |
 | `invariant` | Cross-Pair Invariant Extraction: Grid and Output Invariants, Object Invariants, Variant Features, Consistent Delta, All/No-Grids Meta-Predicates, Color Set, Same Color Sets, Same Dims, Preserves Dims/Colors/Count, and Stable Color Map (iv_*, Layer 248) (PR 360) |
+| `contrast` | Contrastive Pair Analysis: Pairwise Delta, Covarying Features, Context Gate, Discriminating Pair, Correlated Features, Change Count, Common Context, Separates, Minimal Features, Feature Profile, Profile Diff, Stable Features, Unstable Features, and Rank Features (ca_*, Layer 249) (PR 361) |
 | `gridpos` | Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222) (PR 332) |
 | `gridhist` | Grid Histogram Analysis: Per-Row and Per-Column Color Frequency, Modal, and Entropy (ghst_*, Layer 221) (PR 331) |
 | `gridseg` | Grid Segmentation by Separator Rows and Columns: Split, Trim, and Panel Extraction (gsg_*, Layer 220) (PR 330) |
@@ -415,11 +416,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v235` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v227` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v229` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v282` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v285` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v236` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v228` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v230` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v283` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v286` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---

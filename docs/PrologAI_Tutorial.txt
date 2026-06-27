@@ -19539,3 +19539,23 @@ per-pair cell change maps to find consistent color mappings. iv_all_grids/iv_no_
 are meta_predicate declarations for correct module-qualified dispatch.
 
 See docs/tutorial/Ch230_Invariant.txt for full details and examples.
+
+
+Chapter 231: Contrastive Pair Analysis - The contrast Pack (ca_*, Layer 249)
+
+The contrast pack (Work Package 270, Layer 249) provides fourteen predicates for
+contrastive pair analysis. It finds which input features co-vary with output changes
+across all training pairs - the key causal signal for identifying transformation rules.
+
+Predicates: ca_pairwise_delta/2, ca_covarying_features/2, ca_context_gate/2,
+ca_discriminating_pair/4, ca_correlated_features/3, ca_change_count/3,
+ca_common_context/3, ca_separates/4, ca_minimal_features/2, ca_feature_profile/2,
+ca_profile_diff/3, ca_stable_features/2, ca_unstable_features/2, ca_rank_features/2.
+
+Key design: deltas are delta(I, Changes) terms where Changes is a list of
+chg(R,C,OldV,NewV). Features are feat(Name, Value) terms. ca_covarying_features
+returns features present in ALL changing pairs but absent from stable pairs.
+ca_rank_features scores features by change_count / total_changing and returns
+them in descending correlation order. ca_context_gate returns the top-ranked feature.
+
+See docs/tutorial/Ch231_Contrast.txt for full details and examples.

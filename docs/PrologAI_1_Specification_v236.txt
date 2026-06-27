@@ -17752,3 +17752,127 @@ WP-266-SPEC-005: gtr_delta_grid/4 produces a grid showing only changed cells.
 gtr_overlay/4 pastes non-Bg cells of a delta grid onto a base grid. gtr_common_grid/4
 keeps cells that match between two grids; others become Bg. gtr_is_color_permutation/2
 succeeds if GridB is a bijective color permutation of GridA.
+
+
+Part 257: Work Package 267 - gridobjmatch Pack (gom_*, Layer 246)
+
+WP-267-SPEC-001: The gridobjmatch pack (Layer 246) provides fourteen predicates for
+matching ob(Color,Cells,BBox) object terms between two lists and detecting what
+changed from one list to the other. The pack covers color-based matching, nearest-
+centroid matching, size-based matching, unmatched-object extraction, color-difference
+partitioning, movement-vector computation, constant-move detection, color-map
+inference, appeared/disappeared detection, structural equality, and object-count
+change. All 44 acceptance tests pass.
+
+WP-267-SPEC-002: gom_match_color/3 pairs each object in Objs1 with the first object
+in Objs2 sharing the same color; unmatched objects on either side are dropped silently.
+gom_match_nearest/3 pairs each object in Objs1 with the nearest object in Objs2 by
+doubled-centroid Manhattan distance; objects in Objs2 are consumed greedily.
+gom_match_size/3 pairs objects by shared cell count (number of cells).
+
+WP-267-SPEC-003: gom_unmatched_a/3 returns objects in Objs1 that have no partner in
+any match/2 term. gom_unmatched_b/3 does the same for Objs2. gom_color_diff/3
+partitions a match list into a Same sub-list (both objects share color) and a Diff
+sub-list (objects have different colors).
+
+WP-267-SPEC-004: gom_move_vector/2 computes the mv(DR,DC) displacement from the
+top-left bounding-box corner of O1 to that of O2. gom_move_vectors/2 maps this over
+a list of match pairs. gom_constant_move/2 succeeds if every pair in the list has the
+same move vector; fails for an empty list.
+
+WP-267-SPEC-005: gom_infer_color_map/2 collects cm(OldColor,NewColor) terms from
+color-changing matched pairs and returns a deduplicated sorted list.
+gom_appeared/3 returns objects in Objs2 whose color does not appear in Objs1.
+gom_disappeared/3 returns objects in Objs1 whose color does not appear in Objs2.
+gom_same_structure/2 succeeds if the two lists share the same multiset of colors.
+gom_count_change/3 returns length(Objs2) minus length(Objs1).
+
+
+Part 258: Work Package 268 - symtab Pack (st_*, Layer 247)
+
+WP-268-SPEC-001: The symtab pack (Layer 247) provides fourteen predicates for
+learning symbol-to-value mappings from training pairs. A symbol table is a list
+of sym(Feature, Value) terms where Feature identifies an observable property of
+an input object and Value is what that feature encodes in the output. The pack
+addresses the in-context symbol definition problem: some objects in a task stand
+for something other than themselves, and their meaning is defined only by the
+task's own training pairs. All 44 acceptance tests pass.
+
+WP-268-SPEC-002: st_build_table/2 takes a list of pair(InputObjs, OutputObjs)
+training pairs and returns the most specific symbol table consistent with all pairs.
+st_identify_symbols/2 finds objects whose observable features co-vary with output
+changes. st_contrastive_learn/2 performs cross-pair analysis to find features that
+consistently predict output values.
+
+WP-268-SPEC-003: st_apply_table/3 applies a learned symbol table to a list of input
+objects and returns a color map (list of cm(OldColor, NewColor) terms). st_hole_count/2
+estimates the number of enclosed gaps in an object's bounding box.
+st_lookup/3 retrieves the value for a given feature from a symbol table.
+
+WP-268-SPEC-004: st_entry_consistent/2 checks that a proposed sym entry does not
+conflict with existing table entries. st_color_feature/2 and st_size_feature/2 extract
+color and size features from ob/3 terms. st_position_feature/3 extracts the grid
+quadrant (tl/tr/bl/br) from an ob/3 term given grid dimensions.
+
+WP-268-SPEC-005: st_is_symbol/2 checks whether an object is plausibly a symbol by
+heuristic (smaller than content objects or unique color). st_candidate_symbols/2
+extracts the smallest quartile of objects as symbol candidates.
+st_score_table/3 scores a table against training pairs. st_best_table/3 selects the
+highest-scoring table from a list of candidates.
+
+
+Part 259: Work Package 269 - invariant Pack (iv_*, Layer 248)
+
+WP-269-SPEC-001: The invariant pack (Layer 248) provides fourteen predicates for
+extracting what stays constant across all training pairs. Invariants reduce the
+hypothesis search space by eliminating entire rule classes before any search begins.
+Training pairs are pair(InputGrid, OutputGrid) terms. All 44 acceptance tests pass.
+
+WP-269-SPEC-002: iv_grid_invariants/2 finds grid-level properties (dimensions) that
+are identical in every input grid across all training pairs. iv_output_invariants/2
+does the same for output grids. iv_object_invariants/2 finds object-level properties
+(stable color set) constant across inputs.
+
+WP-269-SPEC-003: iv_variant_features/2 returns the complementary list of features
+that DO change across training inputs, identifying candidate rule parameters.
+iv_consistent_delta/2 finds input-to-output changes consistent across all pairs,
+such as dims_preserved or color_set_preserved.
+
+WP-269-SPEC-004: iv_all_grids/2 and iv_no_grids/2 are meta-predicates that test
+a goal against all grids or verify its failure on all grids respectively.
+iv_color_set/3 extracts non-background colors from a grid. iv_same_color_sets/2
+and iv_same_dims/1 check structural equality across a list of grids.
+
+WP-269-SPEC-005: iv_preserves_dims/1, iv_preserves_colors/1, and
+iv_preserves_count/2 check cross-pair structural invariants at the pair level.
+iv_stable_color_map/2 finds cell-level color mappings consistent across all pairs
+by intersecting the per-pair color maps.
+
+
+Part 260: Work Package 270 - contrast Pack (ca_*, Layer 249)
+
+WP-270-SPEC-001: The contrast pack (Layer 249) provides fourteen predicates for
+contrastive pair analysis across training pairs. It identifies which input features
+co-vary with output changes - the key causal signal in grid transformation tasks.
+Training pairs are pair(InputGrid, OutputGrid) terms. All 44 acceptance tests pass.
+
+WP-270-SPEC-002: ca_pairwise_delta/2 computes a delta(I, Changes) term for each
+training pair, where Changes is a list of chg(R,C,OldV,NewV) terms recording every
+cell that changed. ca_feature_profile/2 extracts a feature profile for a single
+grid as a list of feat(Name, Value) terms covering dims, color_count, and
+dominant_color.
+
+WP-270-SPEC-003: ca_stable_features/2 returns input features constant across all
+training examples. ca_unstable_features/2 returns features that vary. These two
+sets are disjoint and complement each other. ca_profile_diff/3 computes the set
+difference between two feature profiles.
+
+WP-270-SPEC-004: ca_covarying_features/2 finds input features present in ALL
+changing pairs but absent from stable pairs - the strongest evidence for a causal
+link between feature and transformation. ca_rank_features/2 sorts all candidate
+features by their correlation with output changes.
+
+WP-270-SPEC-005: ca_context_gate/2 returns the top-ranked co-varying feature as
+the rule-triggering context. ca_change_count/3 counts changing pairs containing a
+given feature. ca_common_context/3, ca_correlated_features/3, ca_separates/4, and
+ca_minimal_features/2 provide additional contrastive analysis tools.

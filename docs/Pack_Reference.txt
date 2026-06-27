@@ -1770,3 +1770,20 @@ Cross-Pair Invariant Extraction from Training Pairs (iv_*, Layer 248)
     iv_preserves_colors(+Pairs): succeed if every pair has same color set in input and output (bg=0).
     iv_preserves_count(+Pairs,+BgColor): succeed if every pair has same distinct-color count in input and output.
     iv_stable_color_map(+Pairs,-Map): sorted cm(InColor,OutColor) list for cell mappings consistent across all pairs.
+
+contrast
+Contrastive Pair Analysis Across Training Pairs (ca_*, Layer 249)
+    ca_pairwise_delta(+Pairs,-Deltas): list of delta(I,Changes) with chg(R,C,OldV,NewV) for each changed cell.
+    ca_covarying_features(+Pairs,-Features): feat/2 terms present in all changing pairs but absent from stable pairs.
+    ca_context_gate(+Pairs,-Gate): top-ranked co-varying feature or feat(none,none).
+    ca_discriminating_pair(+Pairs,+Hyp1,+Hyp2,-Pair): first pair where Hyp1 and Hyp2 give different outcomes.
+    ca_correlated_features(+Pairs,+OutputChange,-Features): input features common to pairs containing OutputChange.
+    ca_change_count(+Pairs,+Feature,-N): count of changing pairs that contain Feature in their input profile.
+    ca_common_context(+Pairs,+OutputChange,-Context): alias for ca_correlated_features.
+    ca_separates(+Pairs,+Feature,+PositivePairs,-Score): precision of Feature as a separator (0.0-1.0).
+    ca_minimal_features(+Pairs,-Features): greedy feature selection ordered by correlation score.
+    ca_feature_profile(+Grid,-Profile): [feat(dims,R-C), feat(color_count,N), feat(dominant_color,C)].
+    ca_profile_diff(+Profile1,+Profile2,-Changed): features in Profile1 not matching same name in Profile2.
+    ca_stable_features(+Pairs,-Features): feat/2 terms whose value is the same in every training input.
+    ca_unstable_features(+Pairs,-Features): feat/2 terms whose value varies across at least two training inputs.
+    ca_rank_features(+Pairs,-RankedFeatures): features sorted by change_count/total_changing descending.

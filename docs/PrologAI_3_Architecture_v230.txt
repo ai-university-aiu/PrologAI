@@ -9577,3 +9577,62 @@ Design notes:
 - st_best_table scores all candidate tables and returns the highest-scoring one;
   ties favor the shorter (simpler) table via msort lexicographic ordering.
 - Private helpers use the trailing-underscore convention.
+
+
+ARCH-235: invariant Pack (iv_*, Layer 248)
+
+Location: packs/invariant/prolog/invariant.pl
+Test: packs/invariant/test/test_invariant.pl
+Module: invariant
+Prefix: iv_
+Layer: 248
+Dependencies: library(lists) [member/2, subtract/3], library(apply) [maplist/2-3, include/3]
+Meta-predicates: iv_all_grids/2 (1-arg goal), iv_no_grids/2 (1-arg goal)
+
+Exports:
+  iv_grid_invariants/2, iv_output_invariants/2, iv_object_invariants/2,
+  iv_variant_features/2, iv_consistent_delta/2, iv_all_grids/2,
+  iv_no_grids/2, iv_color_set/3, iv_same_color_sets/2, iv_same_dims/1,
+  iv_preserves_dims/1, iv_preserves_colors/1, iv_preserves_count/2,
+  iv_stable_color_map/2
+
+Design notes:
+- Training pairs are pair(InputGrid, OutputGrid) terms.
+- Invariants are inv(Property) terms. Variant features are feature(Property) terms.
+- iv_grid_invariants checks dims only; color-set invariance is in iv_object_invariants.
+- iv_stable_color_map extracts per-cell change maps and intersects them across pairs.
+  Only changes consistent in every pair are retained.
+- iv_all_grids and iv_no_grids declared as meta_predicate (1-arg goal) for correct
+  module-qualified dispatch when goals are defined in caller modules.
+- iv_count_objects_ counts distinct non-bg colors as a proxy for object count;
+  exact connected-component counting requires gridobj.
+
+
+WP-270: contrast Pack (ca_*, Layer 249)
+Location: packs/contrast/
+  prolog/contrast.pl   - module contrast, 14 public predicates
+  test/test_contrast.pl - 44 PLUnit tests
+  pack.pl              - manifest
+
+Layer: 249 (Data Layer - contrastive analysis)
+Prefix: ca_
+
+Dependencies: library(lists) [member/2, subtract/3, numlist/3, last/2, reverse/2],
+              library(apply) [maplist/2, maplist/3, include/3]
+
+Exports:
+  ca_pairwise_delta/2, ca_covarying_features/2, ca_context_gate/2,
+  ca_discriminating_pair/4, ca_correlated_features/3, ca_change_count/3,
+  ca_common_context/3, ca_separates/4, ca_minimal_features/2,
+  ca_feature_profile/2, ca_profile_diff/3, ca_stable_features/2,
+  ca_unstable_features/2, ca_rank_features/2
+
+Design notes:
+- Training pairs are pair(InputGrid, OutputGrid) terms.
+- Deltas are delta(PairIdx, Changes) terms; Changes is a list of chg(R,C,OldV,NewV).
+- Features are feat(Name, Value) terms.
+- ca_covarying_features: features in ALL changing pairs minus features in any stable pair.
+- ca_rank_features uses change_count / total_changing as the correlation score.
+- ca_context_gate returns the top-ranked feature or feat(none,none).
+- ca_stable_features and ca_unstable_features are disjoint complements.
+- ca_dominant_color_ uses run-length encoding for color frequency counting.

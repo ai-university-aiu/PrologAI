@@ -18856,3 +18856,96 @@ AC-ST-041: st_build_table: build from single pair.
 AC-ST-042: st_build_table: build from two consistent pairs.
 AC-ST-043: st_build_table: empty pairs gives empty table.
 AC-ST-044: st_best_table: selects highest scoring candidate.
+
+
+WP-269: invariant Pack (iv_*, Layer 248) - Test Registry
+
+AC-IV-001: iv_color_set: extracts non-bg colors from 2x2 grid.
+AC-IV-002: iv_color_set: returns empty for all-bg grid.
+AC-IV-003: iv_color_set: respects non-zero BgColor.
+AC-IV-004: iv_same_dims: succeeds for single grid.
+AC-IV-005: iv_same_dims: succeeds for two same-size grids.
+AC-IV-006: iv_same_dims: fails for different-size grids.
+AC-IV-007: iv_same_dims: succeeds for empty list.
+AC-IV-008: iv_same_color_sets: succeeds when all grids share colors.
+AC-IV-009: iv_same_color_sets: fails when color sets differ.
+AC-IV-010: iv_same_color_sets: succeeds for single grid.
+AC-IV-011: iv_preserves_dims: succeeds when all pairs same dims.
+AC-IV-012: iv_preserves_dims: fails when any pair changes dims.
+AC-IV-013: iv_preserves_dims: succeeds for empty list.
+AC-IV-014: iv_preserves_colors: succeeds when colors preserved.
+AC-IV-015: iv_preserves_colors: fails when colors change.
+AC-IV-016: iv_preserves_count: succeeds when same distinct color count.
+AC-IV-017: iv_preserves_count: fails when color count changes.
+AC-IV-018: iv_preserves_count: succeeds for empty list.
+AC-IV-019: iv_grid_invariants: finds dims invariant for same-size inputs.
+AC-IV-020: iv_grid_invariants: returns empty for empty pairs.
+AC-IV-021: iv_grid_invariants: returns [] when dims vary.
+AC-IV-022: iv_output_invariants: finds dims invariant for same-size outputs.
+AC-IV-023: iv_output_invariants: returns [] for empty pairs.
+AC-IV-024: iv_object_invariants: finds stable color set.
+AC-IV-025: iv_object_invariants: returns [] when color set varies.
+AC-IV-026: iv_variant_features: returns [] when all same dims and colors.
+AC-IV-027: iv_variant_features: flags dims when grids vary in size.
+AC-IV-028: iv_variant_features: flags color_set when colors vary.
+AC-IV-029: iv_consistent_delta: finds dims_preserved when all pairs same dims.
+AC-IV-030: iv_consistent_delta: finds color_set_preserved.
+AC-IV-031: iv_consistent_delta: returns [] for empty pairs.
+AC-IV-032: iv_consistent_delta: excludes dims_preserved when dims change.
+AC-IV-033: iv_all_grids: succeeds when Goal holds for all grids.
+AC-IV-034: iv_all_grids: fails when Goal fails for some grids.
+AC-IV-035: iv_no_grids: succeeds when Goal fails for all grids.
+AC-IV-036: iv_no_grids: fails when Goal holds for some grids.
+AC-IV-037: iv_stable_color_map: finds consistent mapping across two pairs.
+AC-IV-038: iv_stable_color_map: returns [] for empty pairs.
+AC-IV-039: iv_stable_color_map: returns map for single pair.
+AC-IV-040: integration - grid_invariants and preserves_dims agree.
+AC-IV-041: integration - variant_features complement of grid_invariants.
+AC-IV-042: integration - consistent_delta and preserves_dims agree.
+AC-IV-043: integration - color_set and object_invariants stable_color_set agree.
+AC-IV-044: integration - full invariant pipeline on symmetric swap task.
+
+AC-CA-001: ca_feature_profile: extracts feat(dims, 2-2) from all-1 grid.
+AC-CA-002: ca_feature_profile: extracts feat(color_count, 2) from mixed grid.
+AC-CA-003: ca_feature_profile: extracts feat(color_count, 0) from all-bg grid.
+AC-CA-004: ca_feature_profile: extracts feat(dominant_color, 1) from all-1 grid.
+AC-CA-005: ca_profile_diff: returns [] for identical profiles.
+AC-CA-006: ca_profile_diff: finds changed feature between different profiles.
+AC-CA-007: ca_pairwise_delta: single swap pair has non-empty changes.
+AC-CA-008: ca_pairwise_delta: stable pair has empty changes.
+AC-CA-009: ca_pairwise_delta: two pairs return two deltas.
+AC-CA-010: ca_stable_features: finds dims(2-2) for same-size inputs.
+AC-CA-011: ca_stable_features: returns [] for empty pairs.
+AC-CA-012: ca_unstable_features: result is list for varying color_count.
+AC-CA-013: ca_unstable_features: returns [] for single pair.
+AC-CA-014: ca_covarying_features: returns list for changing pairs.
+AC-CA-015: ca_covarying_features: returns [] for empty pairs.
+AC-CA-016: ca_covarying_features: returns [] when no pairs change.
+AC-CA-017: ca_change_count: is 2 for feature in both changing pairs.
+AC-CA-018: ca_change_count: is 0 for stable pair.
+AC-CA-019: ca_common_context: returns list for changing pairs.
+AC-CA-020: ca_common_context: returns [] for no matching pairs.
+AC-CA-021: ca_correlated_features: returns list for pairs with changes.
+AC-CA-022: ca_correlated_features: returns [] when no pairs match.
+AC-CA-023: ca_rank_features: returns list for non-empty pairs.
+AC-CA-024: ca_rank_features: returns [] for empty pairs.
+AC-CA-025: ca_rank_features: does not error for all-stable pairs.
+AC-CA-026: ca_context_gate: returns feat/2 for non-empty changing pairs.
+AC-CA-027: ca_context_gate: acceptable result for stable-only pairs.
+AC-CA-028: ca_separates: returns score in [0,1].
+AC-CA-029: ca_separates: returns 0.0 for absent feature.
+AC-CA-030: ca_minimal_features: returns list.
+AC-CA-031: ca_minimal_features: returns [] for empty pairs.
+AC-CA-032: integration - pairwise_delta records correct changed cell (0,1).
+AC-CA-033: integration - pairwise_delta records all changes in both swap pairs.
+AC-CA-034: integration - stable_features and unstable_features are disjoint.
+AC-CA-035: integration - covarying and stable features are disjoint.
+AC-CA-036: integration - feature profile has exactly 3 features.
+AC-CA-037: integration - pairwise_delta finds no changes in stable pair.
+AC-CA-038: integration - change_count for absent feature is 0.
+AC-CA-039: integration - profile_diff is asymmetric.
+AC-CA-040: integration - pairwise_delta indexes start at 1.
+AC-CA-041: integration - rank_features has no duplicates.
+AC-CA-042: integration - correlated_features result contains feat terms.
+AC-CA-043: integration - context_gate returns feat with atom name.
+AC-CA-044: integration - full contrastive pipeline on two symmetric pairs.

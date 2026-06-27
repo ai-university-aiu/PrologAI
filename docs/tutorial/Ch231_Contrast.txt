@@ -1,0 +1,184 @@
+Chapter 231: Contrastive Pair Analysis - The contrast Pack (ca_*, Layer 249)
+
+Work Package: 270
+Layer: 249
+Module: contrast
+Prefix: ca_
+File: packs/contrast/prolog/contrast.pl
+Tests: packs/contrast/test/test_contrast.pl (44 tests)
+
+
+OVERVIEW
+
+The contrast pack provides the analytical layer that identifies which input
+features cause output changes. Given a set of training pair(InputGrid, OutputGrid)
+terms, it answers: "What is different about the inputs where the output changes
+versus the inputs where the output stays the same?"
+
+This is the contrastive analysis step in the pipeline:
+  1. Extract delta (pairwise_delta): find exactly what changed in each pair.
+  2. Extract features (feature_profile): describe each input symbolically.
+  3. Find stable features (stable_features): features constant across all inputs.
+  4. Find unstable features (unstable_features): features that vary.
+  5. Find co-varying features (covarying_features): features that track changes.
+  6. Rank features (rank_features): sort by correlation with output changes.
+  7. Identify gate (context_gate): the single strongest causal feature.
+
+
+CORE DATA STRUCTURES
+
+pair(InputGrid, OutputGrid)
+  - Training pair. Both grids are lists-of-lists of color integers.
+
+delta(PairIndex, Changes)
+  - PairIndex is 1-based. Changes is a list of chg(R, C, OldValue, NewValue).
+
+chg(R, C, OldValue, NewValue)
+  - A single changed cell at row R, column C (0-based indexing).
+
+feat(Name, Value)
+  - A feature term. Name is an atom. Current names: dims, color_count, dominant_color.
+  - dims value is Rows-Cols (a minus/2 term, e.g., 3-4).
+
+cm(InColor, OutColor)
+  - Color map term used in ca_discriminating_pair and ca_explains_.
+
+
+PREDICATES
+
+ca_feature_profile(+Grid, -Profile)
+  Extract a symbolic description of a single grid.
+  Profile is a sorted list of feat/2 terms:
+    feat(dims, Rows-Cols)       - grid dimensions
+    feat(color_count, N)        - number of distinct non-background (non-0) colors
+    feat(dominant_color, C)     - most frequent non-0 color; 0 if grid is all-background
+
+  Example:
+    ?- ca_feature_profile([[0,1],[1,0]], P).
+    P = [feat(color_count, 1), feat(dims, 2-2), feat(dominant_color, 1)].
+
+ca_pairwise_delta(+Pairs, -Deltas)
+  Compute per-pair deltas. For each pair(In, Out), find all cells that changed.
+  Deltas is a list of delta(I, Changes) terms with 1-based indexing.
+  A stable pair produces delta(I, []) with an empty Changes list.
+
+  Example:
+    ?- ca_pairwise_delta([pair([[0,1],[1,0]], [[0,2],[2,0]])], D).
+    D = [delta(1, [chg(0,1,1,2), chg(1,0,1,2)])].
+
+ca_profile_diff(+Profile1, +Profile2, -Changed)
+  Return feat/2 terms in Profile1 whose value differs from Profile2.
+  If feat(dims, 2-2) is in Profile1 and Profile2, it is not in Changed.
+  If feat(dominant_color, 1) is in Profile1 but Profile2 has feat(dominant_color, 2),
+  then feat(dominant_color, 1) appears in Changed.
+
+ca_stable_features(+Pairs, -Features)
+  Return feat/2 terms whose value is identical in every training input.
+  These features cannot distinguish changing from stable pairs.
+
+ca_unstable_features(+Pairs, -Features)
+  Return feat/2 terms whose value differs between at least two training inputs.
+  These are candidate rule parameters or context variables.
+  Returns [] for a single-pair list (nothing to vary against).
+
+ca_covarying_features(+Pairs, -Features)
+  The key contrastive predicate. Returns features that:
+    (a) are present in ALL pairs where the output changes, AND
+    (b) are absent from pairs where the output does not change.
+  These are the strongest causal candidates.
+
+ca_change_count(+Pairs, +Feature, -N)
+  N is the number of training pairs where Feature appears in the input AND
+  the output differs from the input.
+
+ca_rank_features(+Pairs, -RankedFeatures)
+  Rank all input features by correlation with output changes.
+  Score for each feature = change_count(feature) / total_changing_pairs.
+  Returns features in descending score order. No duplicates.
+
+ca_context_gate(+Pairs, -GateFeature)
+  Return the single highest-ranked co-varying feature as the gate.
+  If no pairs change, returns feat(none, none).
+
+ca_common_context(+Pairs, +OutputChange, -Context)
+  Return input features common to all pairs containing OutputChange.
+  OutputChange is a chg(R,C,OldV,NewV) term; use atom `any` to match all changes.
+
+ca_correlated_features(+Pairs, +OutputChange, -Features)
+  Same as ca_common_context. Alias for consistency with the feature vocabulary.
+
+ca_separates(+Pairs, +Feature, +PositivePairs, -Score)
+  Compute the precision of Feature as a separator.
+  Score = |TP| / (|TP| + |FP|) where TP = pairs with Feature in PositivePairs,
+  FP = pairs with Feature not in PositivePairs. Returns 0.0 if Feature is absent.
+
+ca_discriminating_pair(+Pairs, +Hyp1, +Hyp2, -DiscPair)
+  Find the first pair where Hyp1 (a color map) explains the changes but Hyp2 does not,
+  or vice versa. Used for hypothesis disambiguation.
+
+ca_minimal_features(+Pairs, -Features)
+  Return a short feature list that together explains output variation.
+  Current implementation returns the ranked feature list (greedy selection).
+
+
+COMPLETE USAGE EXAMPLE
+
+% Define two training pairs: both transform 1->2 in a 2x2 grid.
+Pairs = [
+    pair([[0,1],[1,0]], [[0,2],[2,0]]),   % 1-cells become 2-cells
+    pair([[1,0],[0,1]], [[2,0],[0,2]])    % same rule, different arrangement
+].
+
+% Step 1: find what changed in each pair.
+?- ca_pairwise_delta(Pairs, Deltas).
+Deltas = [delta(1, [chg(0,1,1,2),chg(1,0,1,2)]),
+          delta(2, [chg(0,0,1,2),chg(1,1,1,2)])].
+
+% Step 2: find features constant across inputs.
+?- ca_stable_features(Pairs, S).
+S = [feat(color_count, 1), feat(dims, 2-2), feat(dominant_color, 1)].
+
+% Step 3: find co-varying features (same as stable since no stable pairs here).
+?- ca_covarying_features(Pairs, C).
+C = [feat(color_count, 1), feat(dims, 2-2), feat(dominant_color, 1)].
+
+% Step 4: rank features by correlation with output changes.
+?- ca_rank_features(Pairs, R).
+R = [feat(color_count,1), feat(dims,2-2), feat(dominant_color,1)].
+% All have equal score (1.0) since both inputs change.
+
+% Step 5: identify the top gate feature.
+?- ca_context_gate(Pairs, G).
+G = feat(color_count, 1).
+% (or any of the 3 features; all score equally here)
+
+
+INTEGRATION WITH OTHER PACKS
+
+contrast sits at Layer 249 and depends only on standard SWI-Prolog libraries.
+It is designed to work alongside:
+  - invariant (Layer 248): use iv_stable_color_map to find consistent cell mappings;
+    then use ca_covarying_features to find which input features trigger those mappings.
+  - symtab (Layer 247): after contrast identifies the gate feature, symtab can
+    assign symbolic meaning (color, size, holes) to the objects that carry that feature.
+  - gridobjmatch (Layer 246): combine with ca_pairwise_delta to understand which
+    objects moved/changed/appeared in each training pair.
+
+
+DESIGN NOTES
+
+Features are always extracted from INPUT grids only. The contrastive analysis
+looks at "what the input looks like when the output changes" versus "what the input
+looks like when the output does not change."
+
+ca_stable_features and ca_unstable_features are guaranteed disjoint:
+  - A feature in stable (same value in all inputs) cannot also be in unstable
+    (different value in some inputs) because stable requires ALL to agree.
+
+ca_covarying_features is stricter than ca_rank_features:
+  - covarying requires presence in ALL changing pairs AND absence from ALL stable pairs.
+  - rank_features simply scores by how often the feature appears in changing pairs.
+
+The dominant_color computation uses run-length encoding on sorted color lists.
+For grids with a single non-background color, dominant_color equals that color.
+For all-background grids, dominant_color is 0.
