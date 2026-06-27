@@ -19092,3 +19092,32 @@ gwv_contract/3   - remove non-bg cells touching in-bounds bg (interior erosion)
 gwv_contract_n/4 - N contraction steps
 
 14 gwv_* predicates. 44 tests pass. Layer 229.
+
+Chapter 212: gridshift - Grid Shifting and Cyclic Rolling (gsh_*, Layer 230)
+
+The gridshift pack provides fourteen predicates for shifting and rolling grids.
+Four directional shifts (gsh_shift_right, gsh_shift_left, gsh_shift_down,
+gsh_shift_up) move cells with bg fill for vacated positions. Four cyclic rolls
+(gsh_roll_right, gsh_roll_left, gsh_roll_down, gsh_roll_up) wrap cells toroidally.
+Per-row/column operations (gsh_roll_row, gsh_roll_col, gsh_shift_row, gsh_shift_col)
+modify individual rows or columns. gsh_shift_color shifts cells of one color,
+and gsh_offset shifts the entire grid by (DR, DC).
+
+:- use_module(pack(gridshift/prolog/gridshift)).
+
+gsh_shift_right/4  - shift each row right by N (bg fill left)
+gsh_shift_left/4   - shift each row left by N (bg fill right)
+gsh_shift_down/4   - shift grid down by N rows (bg rows at top)
+gsh_shift_up/4     - shift grid up by N rows (bg rows at bottom)
+gsh_roll_right/3   - cyclic roll each row right (toroidal)
+gsh_roll_left/3    - cyclic roll each row left (toroidal)
+gsh_roll_down/3    - cyclic roll grid down N rows (toroidal)
+gsh_roll_up/3      - cyclic roll grid up N rows (toroidal)
+gsh_roll_row/4     - cyclic roll single row right by N
+gsh_roll_col/4     - cyclic roll single column down by N
+gsh_shift_color/6  - shift cells of specific Color by (DR, DC)
+gsh_offset/5       - shift entire grid by (DR, DC) with bg fill
+gsh_shift_row/5    - shift single row by N (pos=right, neg=left)
+gsh_shift_col/5    - shift single column by N (pos=down, neg=up)
+
+14 gsh_* predicates. 44 tests pass. Layer 230.
