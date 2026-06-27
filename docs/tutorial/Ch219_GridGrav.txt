@@ -1,0 +1,185 @@
+Chapter 219: gridgrav - Grid Gravity and Sliding (gra_*, Layer 237)
+
+The gridgrav pack provides fourteen predicates for making non-background cells
+fall or slide toward the edges of their rows and columns. This models the
+"gravity" operation common in grid reasoning tasks: objects sink to the bottom,
+float to the top, slide left, or slide right. Blocked gravity stops cells before
+immovable wall cells.
+
+Pack: gridgrav
+Prefix: gra_
+Layer: 237
+File: packs/gridgrav/prolog/gridgrav.pl
+
+
+1. Loading the Pack
+
+:- use_module(pack(gridgrav/prolog/gridgrav)).
+
+
+2. Core Concept
+
+Gravity operates column-by-column (for down/up) or row-by-row (for left/right).
+Within each column or row, non-bg values are collected in their existing order and
+packed toward the target edge. Background color fills the vacated positions. The
+relative order of non-bg values within a column or row is always preserved.
+
+Example - fall down on a 3x3 grid (bg = b):
+
+Grid:              After gra_fall_down:
+r b b              b b b
+b g b    -->       b b b
+b b y              r g y
+
+Each column sinks its non-bg values to the bottom row.
+
+
+3. Directional Fall Predicates
+
+gra_fall_down(+Grid, +Bg, -Result)
+  Non-bg values in each column sink to the bottom.
+
+gra_fall_up(+Grid, +Bg, -Result)
+  Non-bg values in each column rise to the top.
+
+gra_fall_left(+Grid, +Bg, -Result)
+  Non-bg values in each row slide to the left.
+
+gra_fall_right(+Grid, +Bg, -Result)
+  Non-bg values in each row slide to the right.
+
+gra_fall(+Grid, +Bg, +Dir, -Result)
+  Direction dispatch. Dir is one of: down, up, left, right.
+
+Example:
+
+?- gra_fall([[r,b,b],[b,g,b],[b,b,y]], b, down, R).
+R = [[b,b,b],[b,b,b],[r,g,y]].
+
+?- gra_fall([[r,b,b],[b,g,b],[b,b,y]], b, left, R).
+R = [[r,b,b],[g,b,b],[y,b,b]].
+
+
+4. Column and Row Extraction
+
+gra_col_nonbg(+Grid, +Col, +Bg, -Vals)
+  Collect non-bg values from column Col (0-indexed), top to bottom.
+
+gra_row_nonbg(+Grid, +RowIdx, +Bg, -Vals)
+  Collect non-bg values from row RowIdx (0-indexed), left to right.
+
+Example:
+
+?- gra_col_nonbg([[b,r,b],[b,g,b]], 1, b, Vals).
+Vals = [r,g].
+
+?- gra_row_nonbg([[b,r,b,g]], 0, b, Vals).
+Vals = [r,g].
+
+
+5. Column and Row Setters
+
+gra_set_col_bottom(+Grid, +Col, +Vals, +Bg, -Result)
+  Replace column Col with Vals packed to the bottom; cells above become Bg.
+
+gra_set_col_top(+Grid, +Col, +Vals, +Bg, -Result)
+  Replace column Col with Vals packed to the top; cells below become Bg.
+
+gra_set_row_left(+Grid, +RowIdx, +Vals, +Bg, -Result)
+  Replace row RowIdx with Vals packed to the left; cells to the right become Bg.
+
+gra_set_row_right(+Grid, +RowIdx, +Vals, +Bg, -Result)
+  Replace row RowIdx with Vals packed to the right; cells to the left become Bg.
+
+These predicates combine naturally with gra_col_nonbg and gra_row_nonbg for
+extract-transform-insert workflows.
+
+Example - extract column 0, modify, restore at top:
+
+?- Grid = [[b,b],[b,b],[b,b]],
+   gra_set_col_top(Grid, 0, [r,g], b, Result).
+Result = [[r,b],[g,b],[b,b]].
+
+
+6. Blocked Gravity
+
+gra_blocked_fall(+Grid, +Bg, +BlockColor, +Dir, -Result)
+  Like gra_fall but BlockColor cells are immovable walls. Non-bg non-block cells
+  fall in Dir and stop at the near face of each BlockColor cell. BlockColor cells
+  remain in place.
+
+The column or row is split at each BlockColor position. Each segment between
+walls is settled independently in the given direction.
+
+Example - blocked fall down (blk = wall, b = bg, r g = movable):
+
+Grid:              After gra_blocked_fall(Grid, b, blk, down, R):
+r b                b b
+b b                r b
+blk b    -->       blk b
+g b                g b
+
+The r cell sinks to just above blk. The g cell below blk is already settled.
+
+?- Grid = [[r,b],[b,b],[blk,b],[g,b]],
+   gra_blocked_fall(Grid, b, blk, down, R).
+R = [[b,b],[r,b],[blk,b],[g,b]].
+
+
+7. Settled Test and Gravity Score
+
+gra_is_settled(+Grid, +Bg)
+  Succeeds if applying gra_fall_down would leave the grid unchanged (all non-bg
+  cells are already at the bottom of their columns).
+
+gra_gravity_score(+Grid, +Bg, -Score)
+  Score is the number of cell positions that differ between Grid and its
+  gra_fall_down result. Score=0 means already settled. Score=2*N means N cells
+  would move (each moved cell creates one disappearance and one appearance).
+
+Example:
+
+?- gra_is_settled([[b,b],[r,g]], b).
+true.
+
+?- gra_gravity_score([[r,b],[b,b]], b, Score).
+Score = 2.   % one cell moves: 1 disappearance + 1 appearance
+
+
+8. Composing Multiple Operations
+
+Extract-modify-restore pattern:
+
+transform_column(Grid, Col, Bg, NewGrid) :-
+    gra_col_nonbg(Grid, Col, Bg, Vals),
+    % ... transform Vals to NewVals ...
+    gra_set_col_bottom(Grid, Col, NewVals, Bg, NewGrid).
+
+Two-step gravity (first right, then down):
+
+?- gra_fall([[b,r,b],[b,b,g]], b, right, Step1),
+   gra_fall(Step1, b, down, Step2).
+Step1 = [[b,b,r],[b,b,g]].
+Step2 = [[b,b,b],[b,b,r]].   % only r survives (g was already at bottom-right)
+
+Wait -- let me recalculate: after right: [[b,b,r],[b,b,g]]. After down on that:
+col0: [b,b] -> [b,b]; col1: [b,b] -> [b,b]; col2: [r,g] -> Vals=[r,g], all full.
+So Step2 = [[b,b,r],[b,b,g]]. Same -- both non-bg are already at bottom of their columns.
+
+
+9. Summary of Predicates
+
+gra_fall_down/3    - gravity toward bottom (per column)
+gra_fall_up/3      - gravity toward top (per column)
+gra_fall_left/3    - gravity toward left (per row)
+gra_fall_right/3   - gravity toward right (per row)
+gra_fall/4         - direction dispatch (down/up/left/right)
+gra_col_nonbg/4    - extract non-bg values from a column
+gra_row_nonbg/4    - extract non-bg values from a row
+gra_set_col_bottom/5 - place values at bottom of a column
+gra_set_col_top/5    - place values at top of a column
+gra_set_row_left/5   - place values at left of a row
+gra_set_row_right/5  - place values at right of a row
+gra_blocked_fall/5   - gravity with immovable wall cells
+gra_is_settled/2     - test: grid unchanged by fall_down
+gra_gravity_score/3  - count of cells displaced by fall_down

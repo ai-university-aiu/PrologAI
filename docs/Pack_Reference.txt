@@ -1566,3 +1566,20 @@ Grid Object Extraction: Bounding Box Crops, Non-BG Object Isolation, Color-Regio
     gxt_col_cells/4: non-bg cells in a specific 0-indexed column as r(R,C,V) triples
     gxt_region_count/4: count distinct 4-connected regions of a given color
     gxt_registry/3: obj(Color,Count,BBox) records for each unique non-bg color, sorted by color
+
+gridgrav
+Grid Gravity and Sliding: Fall Down, Up, Left, Right, Blocked Fall, Column and Row Setters, Settled Test, and Gravity Score (gra_*, Layer 237)
+    gra_fall_down/3: each column - non-bg values sink to the bottom; bg fills above
+    gra_fall_up/3: each column - non-bg values rise to the top; bg fills below
+    gra_fall_left/3: each row - non-bg values slide to the left; bg fills to the right
+    gra_fall_right/3: each row - non-bg values slide to the right; bg fills to the left
+    gra_fall/4: dispatch gravity by direction atom: down | up | left | right
+    gra_col_nonbg/4: collect non-bg values from a 0-indexed column, top to bottom
+    gra_row_nonbg/4: collect non-bg values from a 0-indexed row, left to right
+    gra_set_col_bottom/5: replace column with values packed to bottom; remaining cells become bg
+    gra_set_col_top/5: replace column with values packed to top; remaining cells become bg
+    gra_set_row_left/5: replace row with values packed to left; remaining cells become bg
+    gra_set_row_right/5: replace row with values packed to right; remaining cells become bg
+    gra_blocked_fall/5: gravity in a named direction with BlockColor cells as immovable walls
+    gra_is_settled/2: succeeds if gra_fall_down leaves the grid unchanged
+    gra_gravity_score/3: count of cell positions that differ between grid and its fall_down result
