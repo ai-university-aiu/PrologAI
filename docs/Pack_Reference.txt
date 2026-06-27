@@ -1787,3 +1787,54 @@ Contrastive Pair Analysis Across Training Pairs (ca_*, Layer 249)
     ca_stable_features(+Pairs,-Features): feat/2 terms whose value is the same in every training input.
     ca_unstable_features(+Pairs,-Features): feat/2 terms whose value varies across at least two training inputs.
     ca_rank_features(+Pairs,-RankedFeatures): features sorted by change_count/total_changing descending.
+
+legend
+Legend and Key Region Detection from Grid Training Pairs (lg_*, Layer 250)
+    lg_detect_legend(+Grid,+BgColor,-LegendRegion): find most likely legend region (small, isolated, structurally distinct).
+    lg_is_legend(+Region,+ContentRegions): succeed if Region is more likely a legend/key than content.
+    lg_legend_entries(+LegendRegion,-Entries): parse legend region into entry(BandIdx,BandIdx) terms by row band.
+    lg_consistent_legend(+Pairs,-Legend): find legend structure appearing in every training pair input.
+    lg_region_bbox(+Region,+BgColor,-BBox): BBox = r0(MinR,MinC,MaxR,MaxC) bounding box.
+    lg_separated(+RegionA,+RegionB): succeed if regions are not 4-connected adjacent.
+    lg_region_area(+Region,-Area): cell count of region.
+    lg_all_regions(+Grid,+BgColor,-Regions): all BFS-connected non-bg regions.
+    lg_region_color(+Region,+Grid,-Color): most common color in region cells.
+    lg_is_small(+Region,+Grid,-Bool): true if area <= TotalArea/4.
+    lg_same_shape(+Region1,+Region2): succeed if normalized shapes are equal.
+    lg_entry_boundaries(+LegendRegion,-Boundaries): sorted unique row indices.
+    lg_color_map(+LegendRegion,+Grid,-ColorMap): cm(Color,BandIdx) for each row band.
+    lg_position(+Region,+Grid,-Position): spatial position atom: top, bottom, left, right, or center.
+
+multipair
+Multi-Pair Object Tracking and Cross-Pair Correspondence (mp_*, Layer 251)
+    mp_track_objects(+Pairs,-TrackedObjects): tracked(Idx,Color,PairIdxList) identity terms for each non-bg color.
+    mp_invariant_objects(+TrackedObjects,-Objects): tracked entries appearing in ALL training pair inputs.
+    mp_role_objects(+TrackedObjects,-ContentObjs,-MarkerObjs): split into invariant (content) and variable (marker) objects.
+    mp_cross_pair_match(+Pairs,-MatchMatrix): match(I,J,CommonColors) for every pair of pair indices (I<J).
+    mp_all_input_objects(+Pairs,-AllObjects): flat list of po(PairIdx,Color) for every non-bg color in each input.
+    mp_color_frequency(+Pairs,+Color,-N): number of pair inputs containing Color.
+    mp_universal_colors(+Pairs,-Colors): non-bg colors present in EVERY pair input.
+    mp_variable_colors(+Pairs,-Colors): non-bg colors present in SOME but not ALL pair inputs.
+    mp_disappeared_objects(+Pairs,-Colors): universal colors absent from all outputs.
+    mp_appeared_objects(+Pairs,-Colors): colors in outputs but in no input.
+    mp_stable_color_objects(+Pairs,-Colors): universal colors with same cell count in every input.
+    mp_modal_object_count(+Pairs,-Count): most common distinct non-bg color count across inputs.
+    mp_consistent_count(+Pairs): succeed if all inputs have the same distinct non-bg color count.
+    mp_singleton_color(+Pairs,-Color): non-bg color appearing in exactly one pair input.
+
+taskcat
+Task Type Classification and Solving Strategy Selection (tc_*, Layer 252)
+    tc_categorize(+Pairs,-Category): classify task as single_rule, multi_step, context_gated, or symbol_table.
+    tc_is_single_rule(+Pairs): succeed if pairs show consistent change count, uniform pattern, and preserved dims.
+    tc_is_multi_step(+Pairs): succeed if pairs suggest 2+ sequential steps (high max changes or multiple patterns).
+    tc_has_context_gate(+Pairs): succeed if some input color consistently separates pairs by change count.
+    tc_has_symbol_table(+Pairs): succeed if inputs consistently have more distinct colors than outputs.
+    tc_suggest_strategies(+Category,-Strategies): ordered strategy list: [simple_rule_search, seqinfer_2step, ...].
+    tc_preserves_dims(+Pairs): succeed if every pair preserves grid dimensions.
+    tc_preserves_colors(+Pairs): succeed if every pair preserves the non-bg color set.
+    tc_consistent_change_count(+Pairs): succeed if the changed cell count is the same in every pair.
+    tc_max_change_count(+Pairs,-MaxN): maximum changed cell count across all pairs.
+    tc_distinct_change_patterns(+Pairs,-N): number of distinct change patterns across all pairs.
+    tc_is_fill_task(+Pairs): succeed if all pairs change only bg-to-color cells.
+    tc_is_deletion_task(+Pairs): succeed if all pairs change only color-to-bg cells.
+    tc_confidence(+Pairs,-Score): 0.0-1.0 confidence score for the primary category.

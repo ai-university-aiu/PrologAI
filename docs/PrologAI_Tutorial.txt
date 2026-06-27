@@ -19559,3 +19559,59 @@ ca_rank_features scores features by change_count / total_changing and returns
 them in descending correlation order. ca_context_gate returns the top-ranked feature.
 
 See docs/tutorial/Ch231_Contrast.txt for full details and examples.
+
+
+Chapter 232: Legend and Key Region Detection - The legend Pack (lg_*, Layer 250)
+
+The legend pack (Work Package 271, Layer 250) provides fourteen predicates for
+detecting and parsing "legend" or "key" regions in grid tasks. A legend region is
+a small, isolated part of the grid that acts as a code key.
+
+Predicates: lg_detect_legend/3, lg_is_legend/2, lg_legend_entries/2,
+lg_consistent_legend/2, lg_region_bbox/3, lg_separated/2, lg_region_area/2,
+lg_all_regions/3, lg_region_color/3, lg_is_small/3, lg_same_shape/2,
+lg_entry_boundaries/2, lg_color_map/3, lg_position/3.
+
+Key design: regions are lists of r(Row,Col) cells. BFS 4-connected flood-fill.
+Legend detection requires area <= TotalArea/4 and not touching other regions.
+lg_color_map/3 takes the source grid to look up actual cell colors by row band.
+
+See docs/tutorial/Ch232_Legend.txt for full details and examples.
+
+
+Chapter 233: Multi-Pair Object Tracking - The multipair Pack (mp_*, Layer 251)
+
+The multipair pack (Work Package 272, Layer 251) provides fourteen predicates for
+tracking object identity and correspondence across multiple training pairs. Objects
+are identified by color (bg=0). Training pairs are pair(InputGrid, OutputGrid) terms.
+
+Predicates: mp_track_objects/2, mp_invariant_objects/2, mp_role_objects/3,
+mp_cross_pair_match/2, mp_all_input_objects/2, mp_color_frequency/3,
+mp_universal_colors/2, mp_variable_colors/2, mp_disappeared_objects/2,
+mp_appeared_objects/2, mp_stable_color_objects/2, mp_modal_object_count/2,
+mp_consistent_count/1, mp_singleton_color/2.
+
+Key design: tracked(Idx, Color, PairIdxList) identity terms; po(PairIdx, Color)
+input objects; match(I, J, CommonColors) correspondence terms.
+mp_universal_colors and mp_variable_colors are guaranteed disjoint.
+
+See docs/tutorial/Ch233_MultiPair.txt for full details and examples.
+
+
+Chapter 234: Task Type Classification - The taskcat Pack (tc_*, Layer 252)
+
+The taskcat pack (Work Package 273, Layer 252) provides fourteen predicates for
+classifying grid transformation tasks by type and selecting solving strategies.
+The four task categories are: single_rule, multi_step, context_gated, symbol_table.
+
+Predicates: tc_categorize/2, tc_is_single_rule/1, tc_is_multi_step/1,
+tc_has_context_gate/1, tc_has_symbol_table/1, tc_suggest_strategies/2,
+tc_preserves_dims/1, tc_preserves_colors/1, tc_consistent_change_count/1,
+tc_max_change_count/2, tc_distinct_change_patterns/2, tc_is_fill_task/1,
+tc_is_deletion_task/1, tc_confidence/2.
+
+Key design: Chain of Responsibility ordering in tc_categorize (simplest wins).
+tc_suggest_strategies returns ordered fallback strategy lists per category.
+tc_confidence provides a 0.0-1.0 score using dims, count, and pattern uniformity.
+
+See docs/tutorial/Ch234_TaskCat.txt for full details and examples.
