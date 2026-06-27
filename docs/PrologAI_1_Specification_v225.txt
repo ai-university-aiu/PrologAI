@@ -17457,3 +17457,71 @@ unique non-bg color, sorted by color in msort order. gxt_row_cells/4 and
 gxt_col_cells/4 return non-bg cells in a specified 0-indexed row or column as
 r(R,C,V) triples. gxt_all_colors/3 returns a sorted unique list of all non-bg
 colors present.
+
+Part 248 - Work Package 258: gridgrav Pack (gra_*, Layer 237)
+
+WP-258-SPEC-001: The gridgrav pack (Layer 237) provides fourteen predicates for
+making non-bg cells fall or slide toward edges of rows and columns. Predicates:
+gra_fall_down/3, gra_fall_up/3, gra_fall_left/3, gra_fall_right/3, gra_fall/4,
+gra_col_nonbg/4, gra_row_nonbg/4, gra_set_col_bottom/5, gra_set_col_top/5,
+gra_set_row_left/5, gra_set_row_right/5, gra_blocked_fall/5, gra_is_settled/2,
+gra_gravity_score/3. All 44 acceptance tests pass.
+
+WP-258-SPEC-002: gra_fall_down/3, gra_fall_up/3, gra_fall_left/3, and
+gra_fall_right/3 apply gravity in a named direction to the whole grid. Each
+predicate works column-by-column (for down/up) or row-by-row (for left/right),
+collecting non-bg values and packing them to the target edge while filling the
+vacated positions with the background color. Relative order among non-bg values
+within each column or row is preserved.
+
+WP-258-SPEC-003: gra_fall/4 dispatches to the four directional predicates by a
+direction atom (down, up, left, right) using deterministic cuts. gra_col_nonbg/4
+and gra_row_nonbg/4 extract non-bg values from a specified column or row in
+row-major order, returning them as a simple list without position information.
+
+WP-258-SPEC-004: gra_set_col_bottom/5, gra_set_col_top/5, gra_set_row_left/5,
+and gra_set_row_right/5 replace a single column or row in a grid with a supplied
+list of values packed to the specified edge; remaining positions become the
+background color. These predicates are composable with gra_col_nonbg and
+gra_row_nonbg for extract-transform-insert workflows.
+
+WP-258-SPEC-005: gra_blocked_fall/5 applies gravity in a named direction but
+treats a specified BlockColor as an immovable wall: non-bg non-block cells fall
+within each segment delimited by BlockColor positions, stopping at the wall face.
+gra_is_settled/2 tests whether gra_fall_down leaves the grid unchanged.
+gra_gravity_score/3 returns the number of cell positions that would differ between
+the grid and its fall_down result; a score of 0 means already settled.
+
+Part 249 - Work Package 259: gridstamp Pack (gst_*, Layer 238)
+
+WP-259-SPEC-001: The gridstamp pack (Layer 238) provides fourteen predicates for
+placing patterns on grids, finding matches, manipulating grid borders and
+dimensions, and creating blank canvases. Predicates: gst_stamp/6, gst_stamp_all/5,
+gst_scatter/5, gst_find_matches/4, gst_stamp_count/4, gst_pad/5, gst_unpad/3,
+gst_replicate_h/4, gst_replicate_v/4, gst_border/5, gst_center/5, gst_extract/6,
+gst_replace/5, gst_canvas/4. All 44 acceptance tests pass.
+
+WP-259-SPEC-002: gst_stamp/6 pastes a Stamp grid at a given (R,C) position in a
+Grid, using the background color as transparency: non-bg cells in Stamp overwrite;
+bg cells in Stamp leave the original Grid cell unchanged. Stamp cells that fall
+outside the Grid boundary are silently ignored. gst_stamp_all/5 applies the same
+stamp at each position in a list, accumulating results left to right.
+
+WP-259-SPEC-003: gst_scatter/5 places a single Color value at every (R,C)
+position in a list, unconditionally overwriting whatever was there. gst_find_matches/4
+finds all top-left positions where a Pattern grid matches the corresponding Grid
+subgrid exactly (cell by cell). gst_stamp_count/4 wraps gst_find_matches to return
+a count. Both find_matches and stamp_count handle patterns larger than the Grid by
+returning zero matches.
+
+WP-259-SPEC-004: gst_pad/5 pads a Grid to at least H rows and W columns using the
+background color, anchored at the top-left. gst_unpad/3 removes all-bg border rows
+and columns, returning the tight bounding rectangle of non-bg content; an all-bg
+grid yields []. gst_extract/6 extracts an H x W subgrid at (R,C). gst_replace/5
+places a Patch opaquely at (R,C), overwriting all cells including bg.
+
+WP-259-SPEC-005: gst_replicate_h/4 and gst_replicate_v/4 repeat a Grid N times
+side by side or stacked. gst_border/5 surrounds a Grid with a colored border of
+given thickness T, producing a grid of height GH+2T and width GW+2T. gst_center/5
+places a Grid at the center of an H x W bg canvas using integer division for
+alignment. gst_canvas/4 creates a blank all-bg grid of the given dimensions.

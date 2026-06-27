@@ -18377,3 +18377,50 @@ Tests: 44/44 pass
 SPARC volumes updated: Spec v224, Pseudo v216, Arch v218, Refinement v271, Completion v274
 Tutorial chapter: Ch219_GridGrav.txt
 Mentova accomplishment: Acc_278
+
+Part 249 - Work Package 259: gridstamp Acceptance Criteria (AC-GST-*)
+
+AC-GST-001: gst_canvas(2,3,b,Canvas) => [[b,b,b],[b,b,b]].
+AC-GST-002: gst_canvas(1,1,b,Canvas) => [[b]].
+AC-GST-003: gst_canvas(0,3,b,Canvas) => [].
+AC-GST-004: gst_stamp([[b,b,b],[b,b,b]],[[r]],0,1,b,R) => [[b,r,b],[b,b,b]].
+AC-GST-005: gst_stamp([[b,b],[b,b]],[[r,g],[y,p]],0,0,b,R) => [[r,g],[y,p]].
+AC-GST-006: gst_stamp([[r,b],[b,g]],[[b,x]],0,0,b,R) => [[r,x],[b,g]]. (transparent bg)
+AC-GST-007: gst_stamp_all([[b,b,b],[b,b,b]],[[r]],[r(0,0),r(1,2)],b,R) => [[r,b,b],[b,b,r]].
+AC-GST-008: gst_stamp_all([[r,b],[b,g]],[[x]],[],b,R) => [[r,b],[b,g]].
+AC-GST-009: gst_stamp_all([[b,b],[b,b]],[[r,g]],[r(1,0)],b,R) => [[b,b],[r,g]].
+AC-GST-010: gst_scatter([[b,b],[b,b]],r,[r(0,0),r(1,1)],b,R) => [[r,b],[b,r]].
+AC-GST-011: gst_scatter([[b,b],[b,b]],r,[],b,R) => [[b,b],[b,b]].
+AC-GST-012: gst_scatter([[b,b,b]],r,[r(0,1)],b,R) => [[b,r,b]].
+AC-GST-013: gst_find_matches([[r,b,r],[b,b,b]],[[r]],b,M) => [r(0,0),r(0,2)].
+AC-GST-014: gst_find_matches([[b,b],[b,b]],[[r]],b,M) => [].
+AC-GST-015: gst_find_matches([[r,r,b],[r,r,b],[b,b,b]],[[r,r],[r,r]],b,M) => [r(0,0)].
+AC-GST-016: gst_stamp_count([[r,b,r],[b,b,b]],[[r]],b,C) => 2.
+AC-GST-017: gst_stamp_count([[b,b],[b,b]],[[r]],b,C) => 0.
+AC-GST-018: gst_stamp_count([[r,b,r],[b,r,b]],[[r]],b,C) => 3.
+AC-GST-019: gst_pad([[r,b],[g,b]],3,4,b,R) => [[r,b,b,b],[g,b,b,b],[b,b,b,b]].
+AC-GST-020: gst_pad([[r,b],[g,b]],2,2,b,R) => [[r,b],[g,b]].
+AC-GST-021: gst_pad([[r],[g]],2,3,b,R) => [[r,b,b],[g,b,b]].
+AC-GST-022: gst_unpad([[b,b,b],[b,r,b],[b,b,b]],b,R) => [[r]].
+AC-GST-023: gst_unpad([[r,g],[y,p]],b,R) => [[r,g],[y,p]].
+AC-GST-024: gst_unpad([[b,b],[b,b]],b,R) => [].
+AC-GST-025: gst_replicate_h([[r,b],[g,b]],2,b,R) => [[r,b,r,b],[g,b,g,b]].
+AC-GST-026: gst_replicate_h([[r,b],[g,b]],1,b,R) => [[r,b],[g,b]].
+AC-GST-027: gst_replicate_v([[r,g]],3,b,R) => [[r,g],[r,g],[r,g]].
+AC-GST-028: gst_border([[r,g],[y,p]],x,1,b,R) => [[x,x,x,x],[x,r,g,x],[x,y,p,x],[x,x,x,x]].
+AC-GST-029: gst_border([[r]],x,2,b,R) => [[x,x,x,x,x],[x,x,x,x,x],[x,x,r,x,x],[x,x,x,x,x],[x,x,x,x,x]].
+AC-GST-030: gst_border([[r,g],[y,p]],x,0,b,R) => [[r,g],[y,p]].
+AC-GST-031: gst_center([[r]],3,3,b,R) => [[b,b,b],[b,r,b],[b,b,b]].
+AC-GST-032: gst_center([[r,g],[y,p]],2,2,b,R) => [[r,g],[y,p]].
+AC-GST-033: gst_center([[r,g,y]],1,5,b,R) => [[b,r,g,y,b]].
+AC-GST-034: gst_extract([[a,b,c],[d,e,f],[g,h,i]],0,1,2,2,S) => [[b,c],[e,f]].
+AC-GST-035: gst_extract([[r,g],[y,p]],0,0,2,2,S) => [[r,g],[y,p]].
+AC-GST-036: gst_extract([[a,b,c],[d,e,f]],1,2,1,1,S) => [[f]].
+AC-GST-037: gst_replace([[b,b,b],[b,b,b],[b,b,b]],1,1,[[r,g],[y,p]],R) => [[b,b,b],[b,r,g],[b,y,p]].
+AC-GST-038: gst_replace([[r,r],[r,r]],0,0,[[b,b],[b,b]],R) => [[b,b],[b,b]].
+AC-GST-039: gst_replace([[b,b],[b,b]],1,1,[[r,g],[y,p]],R) => [[b,b],[b,r]]. (clips at bounds)
+AC-GST-040: gst_replicate_v([[r,b],[g,b]],2,b,R) => [[r,b],[g,b],[r,b],[g,b]].
+AC-GST-041: gst_replicate_h([[r,g],[y,p]],3,b,R) => [[r,g,r,g,r,g],[y,p,y,p,y,p]].
+AC-GST-042: gst_stamp_all([[b,b,b]],[[r]],[r(0,0),r(0,0)],b,R) => [[r,b,b]].
+AC-GST-043: integration - canvas+stamp_all+find_matches: diagonal of 3 r cells, find 3 matches.
+AC-GST-044: integration - stamp then extract recovers stamp content exactly.

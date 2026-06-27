@@ -19338,3 +19338,20 @@ gra_is_settled/2     - true if fall_down leaves the grid unchanged
 gra_gravity_score/3  - count of cell positions displaced by fall_down
 
 14 gra_* predicates. 44 tests pass. Layer 237.
+
+Chapter 220: gridstamp - Grid Stamping and Canvas Operations (gst_*, Layer 238)
+
+The gridstamp pack adds fourteen predicates for placing patterns on grids,
+finding pattern matches, resizing grids, and creating blank canvases.
+
+Predicates: gst_canvas/4, gst_stamp/6, gst_stamp_all/5, gst_scatter/5,
+gst_find_matches/4, gst_stamp_count/4, gst_pad/5, gst_unpad/3,
+gst_replicate_h/4, gst_replicate_v/4, gst_border/5, gst_center/5,
+gst_extract/6, gst_replace/5.
+
+Key distinction: gst_stamp is transparent (Bg cells in Stamp show through
+to Grid); gst_scatter and gst_replace are opaque (every target cell is
+overwritten regardless of color).
+
+See docs/tutorial/Ch220_GridStamp.txt for full predicate descriptions,
+design notes, example session, and test coverage summary.

@@ -9231,3 +9231,54 @@ Design notes:
   clamps the crop window with max/min arithmetic.
 - gxt_registry produces obj(Color,Count,BBox) records sorted by color via
   gxt_all_colors which uses gxt_sorted_unique_ (msort + consecutive dedup).
+
+ARCH-224: gridgrav Pack (Layer 237)
+File: packs/gridgrav/prolog/gridgrav.pl
+Module: gridgrav
+Exports: gra_fall_down/3, gra_fall_up/3, gra_fall_left/3, gra_fall_right/3,
+         gra_fall/4, gra_col_nonbg/4, gra_row_nonbg/4, gra_set_col_bottom/5,
+         gra_set_col_top/5, gra_set_row_left/5, gra_set_row_right/5,
+         gra_blocked_fall/5, gra_is_settled/2, gra_gravity_score/3
+Dependencies: library(lists) - member/2
+Layer: 237 (above gridextract Layer 236)
+
+Design notes:
+- gra_settle_segment_/4 is the single private helper that powers all eight
+  directional operations (fall_* and blocked_fall segments). Dir=down/right packs
+  values to the end of a segment; Dir=up/left packs to the start.
+- gra_cols_to_grid_/3 transposes a list of settled column lists back to row-major
+  form using a findall+member+nth0 pattern.
+- gra_split_at_first_/4 splits a list at the first occurrence of BlockColor, used
+  by gra_segment_apply_ to break a column or row into independent gravity segments.
+- gra_is_settled/2 is implemented as gra_fall_down(Grid,Bg,Grid): if the result
+  unifies with the original, the grid is already settled.
+- gra_gravity_score/3 counts positions where Grid and its fall_down result differ;
+  a score of 2*N indicates N cells would move.
+
+ARCH-225: gridstamp Pack (Layer 238, gst_*)
+
+Layer: 238
+Module: gridstamp
+File: packs/gridstamp/prolog/gridstamp.pl
+Dependencies: library(lists) [member/2]; SWI-Prolog built-ins only.
+Public predicates (14):
+  gst_canvas/4, gst_stamp/6, gst_stamp_all/5, gst_scatter/5,
+  gst_find_matches/4, gst_stamp_count/4, gst_pad/5, gst_unpad/3,
+  gst_replicate_h/4, gst_replicate_v/4, gst_border/5, gst_center/5,
+  gst_extract/6, gst_replace/5
+Private helpers (3):
+  gst_min_list_/2, gst_max_list_/2 (bounding box for gst_unpad)
+  gst_matches_at_/5 (negation-as-failure cell match for gst_find_matches)
+
+Design notes:
+- gst_stamp uses transparency: only non-bg Stamp cells are collected as Mods;
+  bg cells in Stamp leave the underlying Grid cell unchanged.
+- gst_replace is opaque: all Patch cells overwrite regardless of color.
+- gst_center uses direct cell bounds arithmetic (no nested stamp call) to
+  avoid over-writing bg content already present in Grid.
+- gst_find_matches uses gst_matches_at_ with \+ to short-circuit on first
+  differing cell, making match rejection fast.
+- gst_replicate_v: findall(Row, (between(1,N,_), member(Row,Grid)), Result)
+  -- idiomatic repeat via backtracking over member, no explicit list concat.
+- gst_border: T=0 edge case returns Grid unchanged because findall over
+  between(1,0,_) yields zero rows/cells.
