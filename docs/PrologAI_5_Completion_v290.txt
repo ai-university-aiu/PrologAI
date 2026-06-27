@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v288)
+PROLOGAI COMPLETION  (v290)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -7709,3 +7709,67 @@ Pack: induction (Layer 59)
 New predicates: id_cross_pair_invariants/2, id_cross_pair_variants/2
 Tests: 46 total (37 existing + 9 new), all pass.
 PR: PrologAI #363
+
+
+ARC-AGI-2 Benchmark: Wave 1 — recolor_plus (Acc_299, 2026-06-27)
+Status: COMPLETE
+Score: 1 / 120 = 0.83%
+Task solved: 1818057f
+Rule: recolor_plus(4,8) — all 5-cell plus shapes of color 4 are recolored to color 8.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+PR: Mentova #310
+SPARC: Completion v289
+
+ARC-AGI-2 Benchmark: Wave 2 — chain_strip (Acc_300, 2026-06-27)
+Status: COMPLETE
+Score: 2 / 120 = 1.67%
+Task solved: 7b5033c1
+Rule: chain_strip — BFS flood-fill finds connected same-color blobs; traces
+the linear chain from the topmost endpoint; outputs each blob's color
+repeated for its cell count as an Nx1 strip.
+New predicates: arc2_bg_color_/2, arc2_run_mode_/2, arc2_run_mode_h_/6,
+arc2_bfs_/7, arc2_all_comps_/3, arc2_seeds_to_comps_/4,
+arc2_comp_adjacent_/2, arc2_nbr_map_/2, arc2_chain_endpoints_/3,
+arc2_earliest_comp_/2, arc2_trace_chain_/4.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+PR: Mentova #311
+SPARC: Completion v289
+
+ARC-AGI-2 Benchmark: Wave 3 — arm_endpoint_ray (Acc_301, 2026-06-27)
+Status: COMPLETE
+Score: 3 / 120 = 2.50%
+Task solved: 80a900e0
+Rule: arm_endpoint_ray — checkerboard background of alternating 0s and 1s
+contains diagonal arm segments. Each arm endpoint (a non-bg cell with
+exactly one same-color diagonal neighbor in one direction and zero in the
+other) shoots a perpendicular ray through background-1 cells, recoloring
+them with the arm color. Rays stop at grid boundaries or non-bg cells.
+Junction cells (same-color neighbors in both diagonal directions) and
+midpoints (two neighbors in the same direction) are excluded by the
+structural test.
+New predicates: arc2_replace_idx_/4, arc2_set_cell_/5,
+arc2_diag_nbr_cnt_/6, arc2_arm_endpoints_/2, arc2_shoot_ray_/9,
+arc2_apply_arm_rays_/5.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+PR: Mentova #312
+SPARC: Completion v289
+
+ARC-AGI-2 Benchmark: Wave 4 — segment_equalize (Acc_302, 2026-06-27)
+Status: COMPLETE
+Score: 4 / 120 = 3.33%
+Task solved: e376de54
+Rule: segment_equalize — non-background cells form linear segments in one
+direction (horizontal, vertical, or anti-diagonal). One endpoint of every
+segment is aligned to a common value (the anchor); the other is extended or
+trimmed to match the middle segment by sorted position. For anti-diagonal
+segments the alignment value is r-c of the endpoint cell (2*row - key),
+enabling direction-invariant equalization. The correct non-anchor endpoint
+for key K and target alignment D is row = (K+D)//2 (anti-diagonal) or the
+alignment value directly (horizontal/vertical).
+New predicates: arc2_segeq_kv_/5, arc2_segeq_align_/4,
+arc2_segeq_cvary_/4, arc2_segeq_cellpos_/5, arc2_segeq_consec_/1,
+arc2_segeq_dir_/2, arc2_segeq_build_segs_/3, arc2_segeq_anchor_/4,
+arc2_segeq_setrange_/7, arc2_segeq_adj1_/7, arc2_segeq_adjall_/7.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+PR: Mentova #313
+SPARC: Completion v290
