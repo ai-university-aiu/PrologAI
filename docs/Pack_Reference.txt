@@ -1668,3 +1668,20 @@ Grid Object Operations: Connected Component Cells, Color, Size, Bbox, Mask, Extr
     gob_fill_enclosed(+Grid,+Bg,+FgColor,-Result): fill Bg regions with no path to the border with FgColor.
     gob_remove_object(+Grid,+R,+C,+Bg,-Result): replace connected component at (R,C) with Bg.
     gob_move_object(+Grid,+R,+C,+NewR,+NewC,+Bg,-Result): move component bbox top-left to (NewR,NewC).
+
+gridgroupby
+Grid Group-By Operations: Group, Filter, Sort, Pair, and Count Objects by Attribute (ggb_*, Layer 243)
+    ggb_group_by_color(+Objects,-Groups): grp(Color,ObjList) list for each distinct color, ascending.
+    ggb_group_by_size(+Objects,-Groups): grp(Size,ObjList) list for each distinct cell count, ascending.
+    ggb_group_by_row(+Objects,-Groups): grp(Row0,ObjList) list for each distinct top row, ascending.
+    ggb_group_by_col(+Objects,-Groups): grp(Col0,ObjList) list for each distinct left col, ascending.
+    ggb_filter_by_color(+Objects,+Color,-Filtered): keep only objects whose color equals Color.
+    ggb_filter_by_size(+Objects,+Size,-Filtered): keep only objects whose cell count equals Size.
+    ggb_filter_larger(+Objects,+N,-Filtered): keep only objects whose cell count is > N.
+    ggb_filter_smaller(+Objects,+N,-Filtered): keep only objects whose cell count is < N.
+    ggb_sort_by_size_asc(+Objects,-Sorted): sort objects by cell count, smallest first.
+    ggb_sort_by_size_desc(+Objects,-Sorted): sort objects by cell count, largest first.
+    ggb_sort_by_row(+Objects,-Sorted): sort objects by top row of bbox, smallest first.
+    ggb_sort_by_col(+Objects,-Sorted): sort objects by left col of bbox, smallest first.
+    ggb_pair_by_color(+Objects,-Pairs): pair(Color,Obj1,Obj2) for each color with exactly two objects.
+    ggb_count_per_color(+Objects,-Counts): cnt(Color,N) list, most frequent color first.

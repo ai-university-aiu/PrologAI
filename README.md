@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       263 work packages — the complete cognitive engine (see below)
+├── packs/       264 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,7 +78,7 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 200 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 242 (gridobj).
+Layer 60 and above is the Data Layer: the 200 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 243 (gridgroupby).
 
 The full layer table is in Architecture Section 0.4.
 
@@ -344,6 +344,7 @@ Everything is inspectable.
 | `gridcolorop` | Grid Color Operations: Count, Swap, Replace, Mask, Cycle, Rank, Palette Apply, and Invert (gco_*, Layer 240) (PR 351) |
 | `gridresize` | Grid Resize and Scale Operations: Integer Scale Up/Down, Mode Downsample, Double, Halve, Nearest-Neighbor Resize, Tile, Crop, Border Crop, Fit, Embed, Size, Aspect Ratio, and Square Test (grs_*, Layer 241) (PR 352) |
 | `gridobj` | Grid Object Operations: Connected Component Cells, Color, Size, Bbox, Mask, Extract, All Objects, Count, Largest, Smallest, Flood Fill, Fill Enclosed, Remove, and Move (gob_*, Layer 242) (PR 353) |
+| `gridgroupby` | Grid Group-By Operations: Group, Filter, Sort, Pair, and Count Objects by Attribute (ggb_*, Layer 243) (PR 354) |
 | `gridpos` | Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222) (PR 332) |
 | `gridhist` | Grid Histogram Analysis: Per-Row and Per-Column Color Frequency, Modal, and Entropy (ghst_*, Layer 221) (PR 331) |
 | `gridseg` | Grid Segmentation by Separator Rows and Columns: Split, Trim, and Panel Extraction (gsg_*, Layer 220) (PR 330) |
@@ -409,11 +410,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v229` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v221` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v223` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v276` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v279` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v230` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v222` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v224` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v277` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v280` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---

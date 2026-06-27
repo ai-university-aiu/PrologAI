@@ -1,0 +1,132 @@
+Chapter 225: gridgroupby - Grid Group-By Operations (ggb_*, Layer 243)
+
+Work Package 264. Module: gridgroupby. Prefix: ggb_. Layer: 243.
+Dependencies: library(lists) [member/2, append/3].
+Input format: ob(Color,Cells,BBox) terms as produced by gob_all_objects/3.
+
+
+Overview
+
+The gridgroupby pack provides fourteen predicates for grouping, filtering,
+sorting, pairing, and counting objects in a symbolic grid's object list.
+
+It operates on ob(Color,Cells,BBox) terms - the format returned by
+gob_all_objects/3 from the gridobj pack. It does not access grids directly;
+all operations are list transformations over object lists.
+
+
+Predicates
+
+ggb_group_by_color(+Objects, -Groups)
+  Groups is a list of grp(Color, ObjList) for each distinct color in Objects.
+  Groups are in ascending color (term) order. Objects of the same color appear
+  together in one grp term.
+
+ggb_group_by_size(+Objects, -Groups)
+  Groups is a list of grp(Size, ObjList) for each distinct cell count.
+  Groups are in ascending size order.
+
+ggb_group_by_row(+Objects, -Groups)
+  Groups is a list of grp(Row0, ObjList) for each distinct top row of bbox.
+  Groups are in ascending row order.
+
+ggb_group_by_col(+Objects, -Groups)
+  Groups is a list of grp(Col0, ObjList) for each distinct left column of bbox.
+  Groups are in ascending column order.
+
+ggb_filter_by_color(+Objects, +Color, -Filtered)
+  Filtered is the sub-list of Objects whose color equals Color.
+
+ggb_filter_by_size(+Objects, +Size, -Filtered)
+  Filtered is the sub-list of Objects whose cell count equals Size.
+
+ggb_filter_larger(+Objects, +N, -Filtered)
+  Filtered is the sub-list of Objects whose cell count is strictly greater than N.
+
+ggb_filter_smaller(+Objects, +N, -Filtered)
+  Filtered is the sub-list of Objects whose cell count is strictly less than N.
+
+ggb_sort_by_size_asc(+Objects, -Sorted)
+  Sorted is Objects ordered by cell count, smallest first.
+
+ggb_sort_by_size_desc(+Objects, -Sorted)
+  Sorted is Objects ordered by cell count, largest first.
+
+ggb_sort_by_row(+Objects, -Sorted)
+  Sorted is Objects ordered by the top row of their bounding box, smallest first.
+
+ggb_sort_by_col(+Objects, -Sorted)
+  Sorted is Objects ordered by the left column of their bounding box, smallest first.
+
+ggb_pair_by_color(+Objects, -Pairs)
+  Pairs is a list of pair(Color, Obj1, Obj2) for each color that has exactly
+  two objects. Colors with one object or three or more objects are omitted.
+
+ggb_count_per_color(+Objects, -Counts)
+  Counts is a list of cnt(Color, N) for each distinct color, in descending
+  count order (most frequent color first).
+
+
+Internal design
+
+All group-by predicates share a helper ggb_group_by_key_(Objects, Goal, Groups)
+that:
+  1. Collects k(Key, Obj) pairs by calling Goal(Obj, Key) for each object.
+  2. Sorts the pairs with msort (stable, ascending by key, then by term order).
+  3. Collects consecutive same-key runs into grp(Key, ObjList) terms using
+     ggb_span_key_, which uses == (syntactic identity) for key comparison.
+
+Descending sort predicates use neg(Neg, Obj) keys where Neg is -Size so that
+msort produces ascending Neg order (most negative = largest original value first).
+
+
+Example session
+
+:- use_module(pack(gridobj/prolog/gridobj)).
+:- use_module(pack(gridgroupby/prolog/gridgroupby)).
+
+% Get all objects then group by color.
+Grid = [[r,b,r],[b,r,b]],
+gob_all_objects(Grid, b, Objects),
+ggb_group_by_color(Objects, Groups).
+% Objects has r-colored objects; Groups = [grp(r, [ob(r,[r(0,0)],_), ob(r,[r(0,2)],_), ob(r,[r(1,1)],_)])].
+
+% Find the two objects of the same color.
+Objects2 = [ob(r,[r(0,0)],r0(0,0,0,0)), ob(b,[r(0,1)],r0(0,1,0,1)), ob(r,[r(1,0)],r0(1,0,1,0))],
+ggb_pair_by_color(Objects2, Pairs).
+% Pairs = [pair(r, ob(r,[r(0,0)],_), ob(r,[r(1,0)],_))].
+
+% Sort objects largest first.
+ggb_sort_by_size_desc(Objects2, Sorted).
+% Sorted = [first-by-atom-then-size...].
+
+% Count per color.
+ggb_count_per_color(Objects2, Counts).
+% Counts = [cnt(r,2), cnt(b,1)].
+
+% Filter to only large objects.
+ggb_filter_larger(Objects2, 1, Big).
+% Big = [] (all size 1 in this example).
+
+
+Test coverage
+
+44 tests AC-GGB-001 through AC-GGB-044 in
+packs/gridgroupby/test/test_gridgroupby.pl. All pass.
+
+Coverage by predicate:
+  ggb_group_by_color: 5 tests (001-005)
+  ggb_group_by_size: 3 tests (006-008)
+  ggb_group_by_row: 3 tests (009-011)
+  ggb_group_by_col: 2 tests (012-013)
+  ggb_filter_by_color: 3 tests (014-016)
+  ggb_filter_by_size: 2 tests (017-018)
+  ggb_filter_larger: 2 tests (019-020)
+  ggb_filter_smaller: 2 tests (021-022)
+  ggb_sort_by_size_asc: 3 tests (023-025)
+  ggb_sort_by_size_desc: 3 tests (026-028)
+  ggb_sort_by_row: 3 tests (029-031)
+  ggb_sort_by_col: 2 tests (032-033)
+  ggb_pair_by_color: 4 tests (034-037)
+  ggb_count_per_color: 3 tests (038-040)
+  integration: 4 tests (041-044)

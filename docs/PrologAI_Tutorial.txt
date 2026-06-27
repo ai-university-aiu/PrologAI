@@ -19430,3 +19430,21 @@ double-enqueueing. gob_fill_enclosed BFS-floods from all border Bg cells;
 unreachable Bg cells are enclosed. gob_move_object clips out-of-bounds cells.
 
 See docs/tutorial/Ch224_GridObj.txt for full details and examples.
+
+Chapter 225: gridgroupby - Grid Group-By Operations (ggb_*, Layer 243)
+
+The gridgroupby pack adds fourteen predicates for grouping, filtering, sorting,
+pairing, and counting ob(Color,Cells,BBox) object terms produced by gob_all_objects.
+
+Predicates: ggb_group_by_color/2, ggb_group_by_size/2, ggb_group_by_row/2,
+ggb_group_by_col/2, ggb_filter_by_color/3, ggb_filter_by_size/3,
+ggb_filter_larger/3, ggb_filter_smaller/3, ggb_sort_by_size_asc/2,
+ggb_sort_by_size_desc/2, ggb_sort_by_row/2, ggb_sort_by_col/2,
+ggb_pair_by_color/2, ggb_count_per_color/2.
+
+Key design: all group-by predicates share ggb_group_by_key_/3 which collects
+k(Key,Obj) pairs, msort-s by key, then collects same-key runs into grp terms.
+Descending sort uses neg(Neg,Obj) keys (Neg is -Size) so msort produces largest
+first. ggb_pair_by_color emits pair/3 only for colors with exactly two objects.
+
+See docs/tutorial/Ch225_GridGroupBy.txt for full details and examples.
