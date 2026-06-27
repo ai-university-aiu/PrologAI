@@ -1753,3 +1753,20 @@ Symbol Table Learning from Input-Output Pairs (st_*, Layer 247)
     st_candidate_symbols(+InObjs,-Candidates): return smallest-quartile objects as symbol candidates.
     st_score_table(+SymbolTable,+Pairs,-Score): count pairs correctly explained by SymbolTable.
     st_best_table(+Tables,+Pairs,-Best): return the highest-scoring table from a list of candidates.
+
+invariant
+Cross-Pair Invariant Extraction from Training Pairs (iv_*, Layer 248)
+    iv_grid_invariants(+Pairs,-Invariants): inv(dims(R,C)) atoms constant across all input grids.
+    iv_output_invariants(+Pairs,-Invariants): inv(dims(R,C)) atoms constant across all output grids.
+    iv_object_invariants(+Pairs,-Invariants): inv(stable_color_set(Cs)) when color set invariant across inputs.
+    iv_variant_features(+Pairs,-Features): feature/1 atoms for properties that DO change across inputs.
+    iv_consistent_delta(+Pairs,-Delta): inv atoms for input→output changes consistent across all pairs.
+    iv_all_grids(+Grids,:Goal): succeed if Goal holds for every grid (meta_predicate, 1-arg goal).
+    iv_no_grids(+Grids,:Goal): succeed if Goal fails for every grid (meta_predicate, 1-arg goal).
+    iv_color_set(+Grid,+BgColor,-Colors): sorted set of non-BgColor values in Grid.
+    iv_same_color_sets(+Grids,+BgColor): succeed if all grids share the same non-BgColor set.
+    iv_same_dims(+Grids): succeed if all grids have the same row and column counts.
+    iv_preserves_dims(+Pairs): succeed if every pair has same-dimension input and output.
+    iv_preserves_colors(+Pairs): succeed if every pair has same color set in input and output (bg=0).
+    iv_preserves_count(+Pairs,+BgColor): succeed if every pair has same distinct-color count in input and output.
+    iv_stable_color_map(+Pairs,-Map): sorted cm(InColor,OutColor) list for cell mappings consistent across all pairs.

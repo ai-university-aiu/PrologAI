@@ -19521,3 +19521,21 @@ st_hole_count uses bbox-area minus cell-count approximation. st_best_table
 selects the highest-scoring candidate table.
 
 See docs/tutorial/Ch229_SymTab.txt for full details and examples.
+
+Chapter 230: invariant - Cross-Pair Invariant Extraction (iv_*, Layer 248)
+
+The invariant pack (Work Package 269, Layer 248) provides fourteen predicates for
+finding what stays constant across all training pairs. Invariants reduce the rule
+search space by eliminating entire rule classes before any search begins.
+
+Predicates: iv_grid_invariants/2, iv_output_invariants/2, iv_object_invariants/2,
+iv_variant_features/2, iv_consistent_delta/2, iv_all_grids/2, iv_no_grids/2,
+iv_color_set/3, iv_same_color_sets/2, iv_same_dims/1, iv_preserves_dims/1,
+iv_preserves_colors/1, iv_preserves_count/2, iv_stable_color_map/2.
+
+Key design: invariants are inv(Property) terms; variant features are feature(Property)
+terms. Training pairs are pair(InputGrid, OutputGrid). iv_stable_color_map intersects
+per-pair cell change maps to find consistent color mappings. iv_all_grids/iv_no_grids
+are meta_predicate declarations for correct module-qualified dispatch.
+
+See docs/tutorial/Ch230_Invariant.txt for full details and examples.

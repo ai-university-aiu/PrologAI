@@ -1,0 +1,168 @@
+Chapter 230: invariant - Cross-Pair Invariant Extraction from Training Pairs (iv_*, Layer 248)
+
+Work Package 269. Module: invariant. Prefix: iv_. Layer: 248.
+Dependencies: library(lists) [member/2, subtract/3], library(apply) [maplist/2-3, include/3].
+Meta-predicates: iv_all_grids/2 (1-arg goal), iv_no_grids/2 (1-arg goal).
+
+
+Overview
+
+The invariant pack finds what stays constant across all training pairs before any
+rule search begins. Invariants are powerful constraints: knowing that the grid size
+never changes eliminates all resize rules; knowing that the color set is preserved
+eliminates all rules that introduce new colors.
+
+Training pairs are pair(InputGrid, OutputGrid) terms.
+Invariants are inv(Property) terms.
+Variant features are feature(Property) terms.
+
+
+1. Loading the Pack
+
+:- use_module(packs/invariant/prolog/invariant).
+
+
+2. Grid-Level Invariants
+
+iv_grid_invariants(+Pairs, -Invariants)
+  Returns inv(dims(Rows,Cols)) if all input grids have the same dimensions.
+
+iv_output_invariants(+Pairs, -Invariants)
+  Same as iv_grid_invariants but over output grids.
+
+?- Pairs = [pair([[0,1],[2,0]], [[0,2],[1,0]]),
+            pair([[0,2],[1,0]], [[0,1],[2,0]])],
+   iv_grid_invariants(Pairs, Invs).
+% Invs = [inv(dims(2,2))]
+
+
+3. Object-Level Invariants
+
+iv_object_invariants(+Pairs, -Invariants)
+  Returns inv(stable_color_set(Colors)) if all input grids have the same
+  set of non-background colors (background = 0).
+
+?- Pairs = [pair([[0,1],[2,0]], [[0,2],[1,0]]),
+            pair([[0,1],[1,2]], [[0,2],[2,1]])],
+   iv_object_invariants(Pairs, Invs).
+% Invs = [inv(stable_color_set([1,2]))]
+
+
+4. Variant Features
+
+iv_variant_features(+Pairs, -Features)
+  Returns feature/1 atoms for properties that DO change across inputs.
+  Complements iv_grid_invariants and iv_object_invariants.
+
+?- Pairs = [pair([[0,1],[2,0]], [[0]]),
+            pair([[0,1,0],[1,0,1]], [[0]])],
+   iv_variant_features(Pairs, Feats).
+% Feats includes feature(dims)  (grids have different sizes)
+
+
+5. Consistent Delta
+
+iv_consistent_delta(+Pairs, -Delta)
+  Returns inv atoms for input-to-output changes consistent across all pairs.
+  Two properties are checked: dims_preserved and color_set_preserved.
+
+?- Pairs = [pair([[0,1],[2,0]], [[0,2],[1,0]]),
+            pair([[0,2],[1,0]], [[0,1],[2,0]])],
+   iv_consistent_delta(Pairs, Delta).
+% Delta = [inv(dims_preserved), inv(color_set_preserved)]
+
+
+6. Structural Checks
+
+iv_preserves_dims(+Pairs)
+  Succeed if every pair has equal-dimension input and output.
+
+iv_preserves_colors(+Pairs)
+  Succeed if every pair has the same color set in input and output (bg = 0).
+
+iv_preserves_count(+Pairs, +BgColor)
+  Succeed if every pair has the same number of distinct non-BgColor values
+  in input and output.
+
+iv_same_dims(+Grids)
+  Succeed if all grids in the list share the same row and column counts.
+
+iv_same_color_sets(+Grids, +BgColor)
+  Succeed if all grids share the same set of non-BgColor values.
+
+
+7. Color Set Extraction
+
+iv_color_set(+Grid, +BgColor, -Colors)
+  Colors is a sorted list of all non-BgColor values present in Grid.
+
+?- iv_color_set([[0,1,2],[1,0,2]], 0, Colors).
+% Colors = [1, 2]
+
+
+8. Stable Color Map
+
+iv_stable_color_map(+Pairs, -Map)
+  Map is the list of cm(InColor, OutColor) mappings that are consistent
+  in every training pair. A mapping is consistent if InColor always produces
+  the same OutColor at every cell position across all pairs.
+
+?- Pairs = [pair([[0,1],[2,0]], [[0,2],[1,0]]),
+            pair([[1,0],[0,2]], [[2,0],[0,1]])],
+   iv_stable_color_map(Pairs, Map).
+% Map includes cm(1,2) and cm(2,1)   (consistent color swap across both pairs)
+
+
+9. Meta-Predicates
+
+iv_all_grids(+Grids, :Goal)
+  Succeed if Goal(Grid) succeeds for every grid in Grids.
+  Goal must be a 1-argument callable.
+
+iv_no_grids(+Grids, :Goal)
+  Succeed if Goal(Grid) fails for every grid in Grids.
+
+:- meta_predicate iv_all_grids(+, 1).
+:- meta_predicate iv_no_grids(+, 1).
+
+These predicates accept goals from any module when the goal is module-qualified
+or the meta_predicate declaration allows transparent dispatch.
+
+
+10. Integration Pattern
+
+The recommended workflow before any rule search:
+
+analyze_pairs(Pairs, BgColor, Analysis) :-
+    iv_grid_invariants(Pairs, GInvs),
+    iv_consistent_delta(Pairs, Delta),
+    iv_stable_color_map(Pairs, ColorMap),
+    iv_object_invariants(Pairs, ObjInvs),
+    iv_variant_features(Pairs, Variants),
+    Analysis = analysis(
+        grid_invs(GInvs),
+        delta(Delta),
+        color_map(ColorMap),
+        obj_invs(ObjInvs),
+        variants(Variants)
+    ).
+
+If Delta includes inv(dims_preserved): eliminate resize rules.
+If Delta includes inv(color_set_preserved): eliminate rules that add/remove colors.
+If ColorMap is non-empty: the consistent color map is a strong candidate rule.
+If Variants includes feature(dims): expect a reshape or crop rule.
+
+
+11. Design Notes
+
+iv_stable_color_map extracts per-cell cm(InColor, OutColor) for every position
+where the cell value changed, then intersects the maps from all pairs. Only color
+mappings present in every pair are retained. This finds color substitution rules
+that apply uniformly across the entire training set.
+
+iv_count_objects_ in the implementation uses distinct non-background color count
+as a proxy for object count. For exact connected-component counting, use
+gob_all_objects/3 from the gridobj pack.
+
+iv_grid_invariants and iv_object_invariants use the first grid as the reference
+point and verify all remaining grids match. This is O(N) in the number of grids.
