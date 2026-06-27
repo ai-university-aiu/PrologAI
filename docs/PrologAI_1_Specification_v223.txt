@@ -17424,3 +17424,36 @@ the non-bg count meets or exceeds a threshold. gbld_dominant/3 performs a
 per-cell plurality vote across a list of grids, selecting the most frequent non-bg
 value (all-bg positions remain bg). gbld_composite/4 dispatches to overlay,
 underlay (merge_many), or dominant based on a Mode atom.
+
+Part 247 - Work Package 257: gridextract Pack (gxt_*, Layer 236)
+
+WP-257-SPEC-001: The gridextract pack (Layer 236) provides fourteen predicates for
+collecting cells, computing bounding boxes, extracting crops, and building object
+registries from symbolic grids. Predicates: gxt_nonbg_cells/3, gxt_color_cells/3,
+gxt_bbox/4, gxt_crop_bbox/5, gxt_object_at/5, gxt_all_colors/3,
+gxt_color_count/4, gxt_largest_color/3, gxt_smallest_color/3,
+gxt_centered_crop/5, gxt_row_cells/4, gxt_col_cells/4, gxt_region_count/4,
+gxt_registry/3. All 44 acceptance tests pass.
+
+WP-257-SPEC-002: gxt_nonbg_cells/3 and gxt_color_cells/3 collect non-bg or
+specific-color cells as r(R,C,V) triples in row-major order. gxt_bbox/4 computes
+the tight bounding box over all non-bg cells and returns bb(MinR,MinC,MaxR,MaxC);
+it fails if the grid is all-bg. gxt_crop_bbox/5 extracts the sub-grid for a given
+bounding box and returns an off(R1,C1) origin offset.
+
+WP-257-SPEC-003: gxt_object_at/5 finds the bounding box of the 4-connected region
+of same-color cells reachable from a given starting cell, using BFS flood fill.
+gxt_region_count/4 counts distinct 4-connected same-color regions by repeatedly
+flood-filling and removing visited cells from the worklist.
+
+WP-257-SPEC-004: gxt_largest_color/3 and gxt_smallest_color/3 return the non-bg
+color with the most and fewest cells respectively, using msort on count-color pairs
+for deterministic tie-breaking. gxt_centered_crop/5 computes the centroid of all
+non-bg cells, clamps a crop window of the requested size to the grid boundaries,
+and extracts the sub-grid.
+
+WP-257-SPEC-005: gxt_registry/3 builds an obj(Color,Count,BBox) record for each
+unique non-bg color, sorted by color in msort order. gxt_row_cells/4 and
+gxt_col_cells/4 return non-bg cells in a specified 0-indexed row or column as
+r(R,C,V) triples. gxt_all_colors/3 returns a sorted unique list of all non-bg
+colors present.
