@@ -1,0 +1,97 @@
+Chapter 202: gridseg - Grid Segmentation by Separator Rows and Columns (gsg_*, Layer 220)
+
+The gridseg pack (Layer 220) detects uniform-color separator rows and columns
+in a raw grid, splits the grid into non-separator segments, extracts
+rectangular panels, and trims border separators. A separator row is a row
+whose every cell shares the same color; a separator column is a column whose
+every cell shares the same color.
+
+
+1. Separator Detection
+
+gsg_is_sep_row/3 and gsg_is_sep_col/3 test whether a specific row or column
+is uniform and bind the separator color.
+
+  :- use_module(pack(gridseg/prolog/gridseg)).
+
+  G = [[a,b,c],[s,s,s],[d,e,f]].
+  gsg_is_sep_row(G, 1, Color).  % Color = s (row 1 is all s)
+  gsg_is_sep_row(G, 0, _).      % fails (row 0 has mixed colors)
+
+gsg_sep_rows/3 and gsg_sep_cols/3 return the complete list of separator
+indices for a given color.
+
+  G2 = [[s,s,s],[a,b,c],[s,s,s],[d,e,f]].
+  gsg_sep_rows(G2, s, Rows).  % Rows = [0,2]
+
+
+2. Splitting by Separators
+
+gsg_split_h/3 splits a grid at separator rows into a list of sub-grids.
+Consecutive separator rows count as one boundary - no empty segments appear.
+
+  G = [[a,b,c],[s,s,s],[d,e,f]].
+  gsg_split_h(G, s, Segs).  % Segs = [[[a,b,c]], [[d,e,f]]]
+
+  G2 = [[s,s,s],[s,s,s],[a,b,c]].
+  gsg_split_h(G2, s, Segs).  % Segs = [[[a,b,c]]]  (two seps = one boundary)
+
+  G3 = [[a,b,c],[d,e,f],[g,h,i]].
+  gsg_split_h(G3, s, Segs).  % Segs = [G3]  (no sep = one segment)
+
+gsg_split_v/3 does the same for separator columns.
+
+
+3. Segment Counts
+
+  gsg_segment_count_h(G, s, N).  % N = 2
+  gsg_segment_count_v(G, s, N).  % N = 1 (no vertical seps)
+
+
+4. Panels
+
+gsg_panels/3 splits by both separator rows and columns and returns all
+rectangular panels as a flat row-major list.
+
+  G = [[r,s,r],[s,s,s],[r,s,r]].
+  gsg_panels(G, s, Panels).  % Panels = [[[r]],[[r]],[[r]],[[r]]]  (4 panels)
+
+  gsg_panel_count(G, s, N).  % N = 4
+
+
+5. Trimming Border Separators
+
+gsg_trim_h/3 removes leading and trailing separator rows. gsg_trim_v/3
+removes leading and trailing separator columns. gsg_trim/3 removes both.
+
+  G = [[s,s,s],[a,b,c],[d,e,f],[s,s,s]].
+  gsg_trim_h(G, s, T).  % T = [[a,b,c],[d,e,f]]
+
+  G2 = [[s,a,b,s],[s,c,d,s],[s,e,f,s]].
+  gsg_trim_v(G2, s, T).  % T = [[a,b],[c,d],[e,f]]
+
+
+6. Separator Color Detection
+
+gsg_sep_color/2 finds the unique color used as a separator throughout the
+grid. Fails if there are zero or multiple separator colors.
+
+  gsg_sep_color(G, Color).  % Color = s
+
+
+7. Predicate Reference
+
+  gsg_is_sep_row/3       - is row R entirely one color? binds it
+  gsg_is_sep_col/3       - is col C entirely one color? binds it
+  gsg_sep_rows/3         - all separator row indices for a color
+  gsg_sep_cols/3         - all separator col indices for a color
+  gsg_split_h/3          - split by separator rows
+  gsg_split_v/3          - split by separator columns
+  gsg_segment_count_h/3  - number of horizontal segments
+  gsg_segment_count_v/3  - number of vertical segments
+  gsg_panels/3           - all panels (row-major flat list)
+  gsg_panel_count/3      - total number of panels
+  gsg_trim_h/3           - remove border separator rows
+  gsg_trim_v/3           - remove border separator columns
+  gsg_trim/3             - remove all border separators
+  gsg_sep_color/2        - detect the unique separator color
