@@ -18179,3 +18179,52 @@ AC-GGL-041: ggl_filter with empty Colors list gives all-bg.
 AC-GGL-042: ggl_filter with all present colors is identity.
 AC-GGL-043: ggl_or then ggl_subtract: or(G,H) subtract H = G subtract H.
 AC-GGL-044: ggl_not applied twice restores original non-bg positions.
+
+AC-GCH-001: gch_pairs([G1,G2,G3], [[G1,G2],[G2,G3]]).
+AC-GCH-002: gch_pairs([G1,G2], [[G1,G2]]).
+AC-GCH-003: gch_pairs([G], []).
+AC-GCH-004: gch_window([G1,G2,G3,G4], 2, [[G1,G2],[G2,G3],[G3,G4]]).
+AC-GCH-005: gch_window([G1,G2,G3], 3, [[G1,G2,G3]]).
+AC-GCH-006: gch_window([G1,G2], 5, []).
+AC-GCH-007: gch_zip([G1,G2],[G3,G4],[[G1,G3],[G2,G4]]).
+AC-GCH-008: gch_zip([G1,G2,G3],[G2],[[G1,G2]]).
+AC-GCH-009: gch_zip([],[G],[]]).
+AC-GCH-010: gch_take([G1,G2,G3],2,[G1,G2]).
+AC-GCH-011: gch_take([G1,G2],2,[G1,G2]).
+AC-GCH-012: gch_take([G1,G2],10,[G1,G2]).
+AC-GCH-013: gch_drop([G1,G2,G3],1,[G2,G3]).
+AC-GCH-014: gch_drop([G1,G2],2,[]).
+AC-GCH-015: gch_drop([G1,G2],10,[]).
+AC-GCH-016: gch_nth([G1,G2],0,G1).
+AC-GCH-017: gch_nth([G1,G2,G3],1,G2).
+AC-GCH-018: gch_nth([G1,G2,G3],2,G3).
+AC-GCH-019: gch_all_same([G,G,G]) succeeds.
+AC-GCH-020: gch_all_same([G]) succeeds.
+AC-GCH-021: gch_all_same([G1,G2]) fails when G1\=G2.
+AC-GCH-022: gch_dedup([G1,G1,G2],[G1,G2]).
+AC-GCH-023: gch_dedup([G1,G2,G1,G3],[G1,G2,G3]).
+AC-GCH-024: gch_dedup([G,G,G],[G]).
+AC-GCH-025: gch_cycle(G,3,[G,G,G]).
+AC-GCH-026: gch_cycle(G,1,[G]).
+AC-GCH-027: gch_cycle(G,0,[]).
+AC-GCH-028: gch_interleave([G1,G2],[G3,G4],[G1,G3,G2,G4]).
+AC-GCH-029: gch_interleave([G1,G2,G3],[G2],[G1,G2]).
+AC-GCH-030: gch_interleave([],[G],[]).
+AC-GCH-031: gch_split_at([G1,G2,G3,G4],2,[G1,G2],[G3,G4]).
+AC-GCH-032: gch_split_at([G1,G2],0,[],[G1,G2]).
+AC-GCH-033: gch_split_at([G1,G2],2,[G1,G2],[]).
+AC-GCH-034: gch_reverse([G1,G2,G3],[G3,G2,G1]).
+AC-GCH-035: gch_reverse([G],[G]).
+AC-GCH-036: gch_reverse([],[]).
+AC-GCH-037: gch_diff_counts([G,G],b,[0]).
+AC-GCH-038: gch_diff_counts([G1,G2],b,[4]) when all 4 cells differ.
+AC-GCH-039: gch_diff_counts([G1,G2,G3],b,[1,1]).
+AC-GCH-040: gch_changes_mask marks single changed cell with MarkColor.
+AC-GCH-041: gch_changes_mask all-same sequence returns all-bg mask.
+AC-GCH-042: gch_changes_mask single-grid input returns all-bg mask.
+AC-GCH-043: window + diff_counts integration.
+AC-GCH-044: cycle + dedup returns singleton.
+Tests: 44/44 pass
+SPARC volumes updated: Spec v221, Pseudo v213, Arch v215, Refinement v268, Completion v271
+Tutorial chapter: Ch216_GridChain.txt
+Mentova accomplishment: Acc_275

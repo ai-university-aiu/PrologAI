@@ -19241,3 +19241,30 @@ ggl_if/5        - CondColor → ThenGrid; else ElseGrid
 ggl_filter/4    - keep cells in Colors list; else bg
 
 14 ggl_* predicates. 44 tests pass. Layer 233.
+
+Chapter 216: gridchain - Grid Sequence Utilities (gch_*, Layer 234)
+
+The gridchain pack provides fourteen predicates for structural manipulation of
+sequences (lists) of grids. Covers consecutive pairing, sliding windows, zip,
+take, drop, 0-indexed access, sameness testing, deduplication, repetition,
+interleaving, splitting, reversal, pairwise change counts, and first-vs-last
+change masks.
+
+:- use_module(pack(gridchain/prolog/gridchain)).
+
+gch_pairs/2       - consecutive two-element pairs: [[G1,G2],[G2,G3],...]
+gch_window/3      - sliding windows of W consecutive grids
+gch_zip/3         - element-wise zip of two sequences into pairs
+gch_take/3        - first N grids (clamps to length)
+gch_drop/3        - drop first N grids (clamps to length)
+gch_nth/3         - 0-indexed element access
+gch_all_same/1    - succeed if all grids identical
+gch_dedup/2       - remove duplicate grids, preserve first occurrence
+gch_cycle/3       - N copies of a grid
+gch_interleave/3  - interleave two sequences element by element
+gch_split_at/4    - split at index N into Before and After
+gch_reverse/2     - reverse the sequence
+gch_diff_counts/3 - per-pair count of differing cell positions
+gch_changes_mask/4 - first-vs-last change mask with MarkColor
+
+14 gch_* predicates. 44 tests pass. Layer 234.

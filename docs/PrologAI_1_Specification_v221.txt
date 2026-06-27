@@ -17360,3 +17360,36 @@ WP-254-SPEC-005: ggl_mask/5 keeps Grid's cell values where MaskGrid equals MaskC
 all other cells become BgColor. ggl_if/5 selects ThenGrid's cell value where CondGrid
 equals CondColor; otherwise ElseGrid's value. ggl_filter/4 keeps only cells whose
 color appears in a given list; all others become BgColor.
+
+Part 245 - Work Package 255: gridchain Pack (gch_*, Layer 234)
+
+WP-255-SPEC-001: The gridchain pack (Layer 234) provides fourteen predicates for
+structural manipulation of sequences (lists) of grids. It covers consecutive
+pairing (gch_pairs), sliding windows (gch_window), element-wise zipping (gch_zip),
+prefix/suffix extraction (gch_take, gch_drop), indexed access (gch_nth), sameness
+testing (gch_all_same), deduplication (gch_dedup), repetition (gch_cycle),
+interleaving (gch_interleave), splitting (gch_split_at), reversal (gch_reverse),
+per-pair change counts (gch_diff_counts), and first-vs-last change masks
+(gch_changes_mask). All 44 acceptance tests pass.
+
+WP-255-SPEC-002: gch_pairs/2 produces a list of consecutive two-element sublists
+from a sequence of grids. An empty or single-element sequence yields an empty
+result. gch_window/3 generalises this to overlapping windows of width W;
+W > length(Grids) yields an empty result. Both predicates use findall with
+nth0-based indexing for clean, deterministic output.
+
+WP-255-SPEC-003: gch_zip/3 pairs two sequences element-wise, stopping at the
+shorter. gch_take/3 and gch_drop/3 both clamp to the actual list length rather
+than failing when the requested index exceeds it. gch_split_at/4 uses the
+length/append idiom to split cleanly without arithmetic.
+
+WP-255-SPEC-004: gch_dedup/2 removes duplicate grids while preserving the order of
+first occurrence. It uses an accumulator (Seen list) identical in structure to
+gmp_unique_ordered_ in gridmap. gch_all_same/1 matches [G,G|Rest] recursively and
+fails immediately on any pair that differs.
+
+WP-255-SPEC-005: gch_diff_counts/3 delegates to gch_pairs and then counts differing
+positions using recursive cell-level helpers with a cut on the equal-cell clause.
+gch_changes_mask/4 compares only the first and last grids (using last/2), producing
+a binary mask with MarkColor at changed positions and BgColor elsewhere. A
+single-element sequence returns an all-BgColor mask of the same dimensions.
