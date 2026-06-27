@@ -1,0 +1,137 @@
+Chapter 191: gridcolor Pack - Color Analysis, Recoloring, Histogram, Threshold, and Dominant Color (gc_*, Layer 209)
+
+Overview
+
+The gridcolor pack (Layer 209, gc_* prefix) provides fourteen predicates for
+color analysis and transformation: counting, histograms, frequency ranking,
+unique color listing, cell lookup, recoloring, color mapping, binary
+thresholding, dominant color detection, fraction computation, and frequency-
+sorted color lists.
+
+Load the pack:
+
+:- use_module(pack(gridcolor/prolog/gridcolor)).
+
+
+1. Counting and Analysis
+
+gc_count(+Grid, +Color, -N)
+
+Count cells in Grid equal to Color.
+
+Example:
+G = [[r,r,x],[r,x,b],[x,x,r]].
+gc_count(G, r, N).
+% N = 4
+
+gc_histogram(+Grid, -Pairs)
+
+Pairs is a Color-Count list for every distinct color, sorted alphabetically.
+
+Example:
+gc_histogram([[r,x],[r,r]], Pairs).
+% Pairs = [r-3, x-1]
+
+gc_most_frequent(+Grid, -Color)
+
+Color is the most frequently occurring color.
+
+gc_least_frequent(+Grid, -Color)
+
+Color is the least frequently occurring color.
+
+gc_unique_colors(+Grid, -Colors)
+
+Colors is the sorted list of distinct color atoms present.
+
+gc_count_colors(+Grid, -N)
+
+N is the number of distinct colors.
+
+gc_sorted_by_freq(+Grid, -Colors)
+
+Colors sorted most-frequent-first.
+
+Example:
+G = [[r,r,r],[r,x,x],[x,x,b]].
+gc_sorted_by_freq(G, Colors).
+% Colors = [r, x, b]  (r:4, x:4, b:1 -- ties broken alphabetically... actually by sort order)
+
+
+2. Cell Lookup
+
+gc_color_cells(+Grid, +Color, -Cells)
+
+Cells is the list of R-C positions (row-major order) where Grid[R][C] = Color.
+
+Example:
+gc_color_cells([[r,x],[x,r]], r, Cells).
+% Cells = [0-0, 1-1]
+
+gc_contains(+Grid, +Color)
+
+Succeed if Grid has at least one cell of Color.
+
+
+3. Color Transformation
+
+gc_recolor(+Grid, +OldColor, +NewColor, -Result)
+
+Replace every occurrence of OldColor with NewColor. Other cells unchanged.
+
+Example:
+gc_recolor([[r,b],[b,r]], r, x, R).
+% R = [[x,b],[b,x]]
+
+gc_color_map(+Grid, +Map, -Result)
+
+Apply a color mapping Map (list of Old-New pairs). Unmapped colors pass through.
+
+Example:
+gc_color_map([[r,g],[g,r]], [r-b, g-r], R).
+% R = [[b,r],[r,b]]
+
+gc_threshold(+Grid, +Colors, +FgColor, +BgColor, -Result)
+
+Binary grid: cells in Colors become FgColor; all others become BgColor.
+
+Example:
+gc_threshold([[r,x,b],[r,r,x]], [r,b], sel, bg, R).
+% R = [[sel,bg,sel],[sel,sel,bg]]
+
+
+4. Statistics
+
+gc_dominant(+Grid, +BgColor, -Color)
+
+Most frequent non-BgColor color. Fails if Grid has only BgColor cells.
+
+Example:
+gc_dominant([[x,r,x],[x,r,r]], x, Color).
+% Color = r
+
+gc_fraction(+Grid, +Color, -Frac)
+
+Fraction [0.0..1.0] of cells matching Color.
+
+Example:
+gc_fraction([[r,r,r],[r,r,r],[r,r,r]], r, F).
+% F = 1.0
+
+
+5. Summary of Predicates
+
+gc_count/3          - count cells matching Color
+gc_histogram/2      - Color-Count pairs sorted by Color name
+gc_most_frequent/2  - most common color
+gc_least_frequent/2 - least common color
+gc_unique_colors/2  - sorted list of distinct colors
+gc_color_cells/3    - R-C list of cells matching Color
+gc_contains/2       - succeed if Color present in Grid
+gc_recolor/4        - replace OldColor with NewColor throughout
+gc_color_map/3      - apply list of Old-New mappings
+gc_threshold/5      - binary grid: Colors list -> FgColor; others -> BgColor
+gc_dominant/3       - most frequent non-BgColor
+gc_fraction/3       - float fraction of cells matching Color
+gc_count_colors/2   - number of distinct colors present
+gc_sorted_by_freq/2 - colors sorted most-frequent-first

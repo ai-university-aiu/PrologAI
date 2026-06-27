@@ -18631,3 +18631,34 @@ gsm_score([[r,x,r],[r,x,b],[r,x,r]], v, S).
 
 14 gsm_* predicates. 44 tests pass. Layer 208.
 All 44 tests pass. See docs/tutorial/Ch190_GridSymm.txt for the full chapter.
+
+
+Chapter 186: gridcolor Pack - Color Analysis, Recolor, Histogram, Threshold, and Dominant (gc_*, Layer 209)
+
+The gridcolor pack (Layer 209) provides fourteen predicates for color analysis
+and transformation of symbolic grids: counting, histograms, frequency ranking,
+recoloring, color mapping, binary thresholding, and dominant color detection.
+
+:- use_module(pack(gridcolor/prolog/gridcolor)).
+
+% Count red cells:
+gc_count([[r,r,x],[r,x,b],[x,x,r]], r, N). % N = 4
+
+% Histogram:
+gc_histogram([[r,x],[r,r]], Pairs). % Pairs = [r-3, x-1]
+
+% Recolor x to background:
+gc_recolor([[r,x],[x,r]], x, bg, R). % R = [[r,bg],[bg,r]]
+
+% Color map (swap colors):
+gc_color_map([[r,g],[g,r]], [r-b, g-r], R). % R = [[b,r],[r,b]]
+
+% Threshold: only red cells selected:
+gc_threshold([[r,x,b],[r,r,x]], [r], sel, bg, R).
+% R = [[sel,bg,bg],[sel,sel,bg]]
+
+% Most frequent non-background:
+gc_dominant([[x,r,x],[x,r,r]], x, Color). % Color = r
+
+14 gc_* predicates. 44 tests pass. Layer 209.
+All 44 tests pass. See docs/tutorial/Ch191_GridColor.txt for the full chapter.

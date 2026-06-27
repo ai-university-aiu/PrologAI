@@ -1094,3 +1094,20 @@ Grid Symmetry: Detection, Completion, Violations, and Score (gsm_*, Layer 208)
     gsm_violations_v/2: list R-C positions in left half where Grid[R][C] != Grid[R][W-1-C]; empty = symmetric
     gsm_violations_rot180/2: list first-half R-C positions where Grid[R][C] != Grid[H-1-R][W-1-C]
     gsm_score/3: symmetry score in [0.0..1.0]; Type in {h, v, rot180}; float(matches)/total pairs
+
+gridcolor
+Grid Color Analysis: Count, Histogram, Recolor, Color Map, Threshold, Dominant, Fraction (gc_*, Layer 209)
+    gc_count/3: count cells matching Color; N = total matches in the flat cell list
+    gc_histogram/2: Color-Count pairs for every distinct color, sorted alphabetically by color name
+    gc_most_frequent/2: most frequently occurring color; ties resolved by alphabetical order (last in sort)
+    gc_least_frequent/2: least frequently occurring color; ties resolved alphabetically (first in sort)
+    gc_unique_colors/2: sorted list of distinct color atoms using sort/2
+    gc_color_cells/3: R-C positions (row-major) of all cells matching Color
+    gc_contains/2: succeed if at least one cell equals Color; uses memberchk
+    gc_recolor/4: replace all OldColor cells with NewColor; other cells unchanged
+    gc_color_map/3: apply list of OldColor-NewColor pair mappings; unmapped colors pass through unchanged
+    gc_threshold/5: binary grid where Colors-list cells become FgColor and all other cells become BgColor
+    gc_dominant/3: most frequent non-BgColor; fails if only BgColor present
+    gc_fraction/3: float fraction of cells matching Color in [0.0..1.0]
+    gc_count_colors/2: number of distinct colors present (integer)
+    gc_sorted_by_freq/2: colors sorted most-frequent-first; ties broken by sort order
