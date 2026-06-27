@@ -1485,3 +1485,20 @@ Grid Color Mapping: Remap, Swap, Replace, Merge, Normalize, Palette, Mask, Inver
     gmp_invert_map/2: reverse all From-To pairs to To-From
     gmp_compose_maps/3: chain two maps - From-Mid in Map1, Mid-To in Map2 yields From-To
     gmp_map_count/3: count cells whose color appears as a From key in a mapping
+
+gridrefl
+Grid Reflection and Rotation: Flip, Rotate, Transpose, Anti-Diagonal, Symmetry Detection, and Symmetry Completion (grf_*, Layer 232)
+    grf_flip_h/2: reverse each row (left-right mirror of the grid)
+    grf_flip_v/2: reverse list of rows (top-bottom mirror of the grid)
+    grf_rot90/2: rotate 90 degrees clockwise (transpose then flip_h)
+    grf_rot180/2: rotate 180 degrees (flip_v then flip_h)
+    grf_rot270/2: rotate 270 degrees clockwise / 90 degrees counter-clockwise (flip_h then transpose)
+    grf_transpose/2: swap rows and columns (main-diagonal reflection)
+    grf_antidiag/2: reflect across anti-diagonal (rot180 then transpose; AntiDiag[R][C] = Grid[N-1-C][N-1-R])
+    grf_is_sym_h/1: succeed if grid equals its horizontal flip
+    grf_is_sym_v/1: succeed if grid equals its vertical flip
+    grf_is_sym_d/1: succeed if grid equals its own transpose (diagonal symmetry)
+    grf_is_sym_a/1: succeed if grid equals its own anti-diagonal reflection
+    grf_sym_axes/2: return the subset of [h,v,d,a] for which the grid is symmetric
+    grf_make_sym_h/3: make horizontally symmetric by merging each row with its reverse
+    grf_make_sym_v/3: make vertically symmetric by merging row R with row (H-1-R)
