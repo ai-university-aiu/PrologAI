@@ -18598,3 +18598,36 @@ gx_scale([[r,x],[x,r]], 2, R).
 
 14 gx_* predicates. 44 tests pass. Layer 207.
 All 44 tests pass. See docs/tutorial/Ch189_GridXform.txt for the full chapter.
+
+
+Chapter 184: gridsymm Pack - Symmetry Detection, Completion, Violations, and Score (gsm_*, Layer 208)
+
+The gridsymm pack (Layer 208) provides fourteen predicates for testing,
+completing, and measuring symmetry in symbolic grids across six types:
+top-bottom (h), left-right (v), main diagonal (d1), anti-diagonal (d2),
+90-degree rotation (rot90), and 180-degree rotation (rot180).
+
+:- use_module(pack(gridsymm/prolog/gridsymm)).
+
+% Test top-bottom symmetry:
+gsm_sym_h([[r,x,r],[x,b,x],[r,x,r]]).
+% true
+
+% Enumerate all symmetries:
+gsm_symmetries([[r,x,r],[x,x,x],[r,x,r]], Syms).
+% Syms = [h, v, d1, d2, rot90, rot180]
+
+% Complete grid to be horizontally symmetric:
+gsm_complete_h([[r,b],[x,x]], top, R).
+% R = [[r,b],[r,b]]
+
+% Find symmetry violations:
+gsm_violations_h([[r,x],[b,x]], Cells).
+% Cells = [0-0]  (row 0, col 0: r != b)
+
+% Compute symmetry score (fraction of matching pairs):
+gsm_score([[r,x,r],[r,x,b],[r,x,r]], v, S).
+% S = 0.666...
+
+14 gsm_* predicates. 44 tests pass. Layer 208.
+All 44 tests pass. See docs/tutorial/Ch190_GridSymm.txt for the full chapter.
