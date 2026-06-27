@@ -14577,3 +14577,71 @@ WP-260-PSEUDO-014: gal_match_any_offset(Grid1, Grid2, Bg, Offsets)
   S1 := { (r,c) | Grid1[r][c] != Bg }
   S2 := { (r,c) | Grid2[r][c] != Bg }
   Offsets := deduplicate { o(dr,dc) | (r2,c2) in S2, (r2+dr, c2+dc) in S1 }
+
+
+Part 251: Work Package 261 - gridcolorop Pack (gco_*, Layer 240)
+
+WP-261-PSEUDO-001: gco_color_counts(Grid, Bg, Counts)
+  Colors := { V | Grid[r][c] = V, V != Bg }
+  Distinct := set(Colors)
+  Pairs := [ cc(V, count(V, Colors)) | V in Distinct ]
+  Counts := sort_by_count_desc(Pairs)
+
+WP-261-PSEUDO-002: gco_distinct_colors(Grid, Bg, Colors)
+  Counts := gco_color_counts(Grid, Bg)
+  Colors := [ V | cc(V,_) in Counts ]
+
+WP-261-PSEUDO-003: gco_nth_color(Grid, Bg, N, Color)
+  Colors := gco_distinct_colors(Grid, Bg)
+  Color := Colors[N]
+
+WP-261-PSEUDO-004: gco_count_distinct(Grid, Bg, Count)
+  Colors := gco_distinct_colors(Grid, Bg)
+  Count := length(Colors)
+
+WP-261-PSEUDO-005: gco_swap(Grid, C1, C2, Bg, Result)
+  Result[r][c] := if Grid[r][c]=C1 then C2
+                  else if Grid[r][c]=C2 then C1
+                  else Grid[r][c]
+
+WP-261-PSEUDO-006: gco_replace(Grid, Old, New, Bg, Result)
+  Result[r][c] := if Grid[r][c]=Old then New else Grid[r][c]
+
+WP-261-PSEUDO-007: gco_apply_map(Grid, Map, Bg, Result)
+  Result[r][c] := if (Grid[r][c] -> MV) in Map then MV else Grid[r][c]
+
+WP-261-PSEUDO-008: gco_keep_only(Grid, Color, Bg, Result)
+  Result[r][c] := if Grid[r][c]=Color then Color else Bg
+
+WP-261-PSEUDO-009: gco_remove_color(Grid, Color, Bg, Result)
+  Result[r][c] := if Grid[r][c]=Color then Bg else Grid[r][c]
+
+WP-261-PSEUDO-010: gco_cycle(Grid, Palette, N, Bg, Result)
+  PLen := length(Palette)
+  Result[r][c] := if Palette[Idx]=Grid[r][c] then
+                    Palette[((Idx+N) mod PLen + PLen) mod PLen]
+                  else Grid[r][c]
+
+WP-261-PSEUDO-011: gco_rank_grid(Grid, Bg, Result)
+  ByFreq := gco_distinct_colors(Grid, Bg)
+  Result[r][c] := if Grid[r][c]=Bg then Bg else index_of(ByFreq, Grid[r][c])
+
+WP-261-PSEUDO-012: gco_apply_palette(Grid, Bg, Palette, Result)
+  ByFreq := gco_distinct_colors(Grid, Bg)
+  Map := [ ByFreq[K] -> Palette[K] | K in 0..min(|Palette|,|ByFreq|)-1 ]
+  Result := gco_apply_map(Grid, Map, Bg)
+
+WP-261-PSEUDO-013: gco_most_least(Grid, Bg, Most, Least)
+  Counts := gco_color_counts(Grid, Bg)  (non-empty)
+  Most := first(Counts).color
+  Least := last(Counts).color
+
+WP-261-PSEUDO-014: gco_invert(Grid, Bg, FgColor, Result)
+  Result[r][c] := if Grid[r][c]=Bg then FgColor else Bg
+
+Private helper: gco_sort_by_count_desc_(Pairs, Sorted)
+  Keyed := [ neg(Neg, cc(V,N)) | cc(V,N) in Pairs, Neg is -N ]
+  KeyedSorted := msort(Keyed)
+  Sorted := [ cc(V,N) | neg(_,cc(V,N)) in KeyedSorted ]
+  Note: Neg is -N evaluates arithmetic; -N as a term creates compound -(N)
+  which compares by functor and arity, not numeric value.

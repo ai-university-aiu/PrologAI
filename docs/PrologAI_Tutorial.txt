@@ -19373,3 +19373,22 @@ gal_find_offset searches cell sets, not full translated grids, for efficiency.
 gal_place_at is transparent (same model as gst_stamp).
 
 See docs/tutorial/Ch221_GridAlign.txt for full details and examples.
+
+Chapter 222: gridcolorop - Grid Color Operations (gco_*, Layer 240)
+
+The gridcolorop pack adds fourteen predicates for querying and transforming
+colors in symbolic grids: counting, ranking, swapping, replacing, masking,
+cycling, palette application, and binary inversion.
+
+Predicates: gco_color_counts/3, gco_distinct_colors/3, gco_nth_color/4,
+gco_count_distinct/3, gco_swap/5, gco_replace/5, gco_apply_map/4,
+gco_keep_only/4, gco_remove_color/4, gco_cycle/5, gco_rank_grid/3,
+gco_apply_palette/4, gco_most_least/4, gco_invert/4.
+
+Key design: gco_sort_by_count_desc_ uses Neg is -N (arithmetic integer) not
+the term -N (compound -(N)) to ensure msort produces descending count order.
+gco_cycle uses ((Idx+N) mod PLen + PLen) mod PLen to handle negative N.
+gco_invert is binary: all non-bg becomes Bg, all Bg becomes FgColor.
+
+See docs/tutorial/Ch222_GridColorOp.txt for full predicate descriptions,
+design notes, example session, and test coverage summary.

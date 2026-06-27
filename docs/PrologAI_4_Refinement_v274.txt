@@ -18471,3 +18471,51 @@ AC-GAL-041: gal_overlap_count([[r,b],[b,b]],[[g,b],[b,b]],b,1). (same pos, diff 
 AC-GAL-042: gal_nonbg_bbox([[r,g],[y,p]],b,r0(0,0,1,1)).
 AC-GAL-043: integration - translate then overlap_count = 1.
 AC-GAL-044: integration - place_at then overlap_count = 1.
+
+
+WP-261 Acceptance Criteria: gridcolorop Pack (gco_*, Layer 240)
+
+AC-GCO-001: gco_color_counts([[r,r,g],[b,b,b]],b,Counts) - member(cc(r,2),Counts), member(cc(g,1),Counts).
+AC-GCO-002: gco_color_counts([[r,r,r],[g,g,b]],b,[cc(r,3)|_]).
+AC-GCO-003: gco_color_counts([[b,b],[b,b]],b,[]).
+AC-GCO-004: gco_distinct_colors([[r,r,g],[b,b,b]],b,[r,g]).
+AC-GCO-005: gco_distinct_colors([[r,r],[r,r]],b,[r]).
+AC-GCO-006: gco_distinct_colors([[b,b],[b,b]],b,[]).
+AC-GCO-007: gco_nth_color([[r,r,g],[b,b,b]],b,0,r).
+AC-GCO-008: gco_nth_color([[r,r,g],[b,b,b]],b,1,g).
+AC-GCO-009: gco_count_distinct([[r,g],[b,b]],b,2).
+AC-GCO-010: gco_count_distinct([[b,b],[b,b]],b,0).
+AC-GCO-011: gco_swap([[r,g],[g,r]],r,g,b,[[g,r],[r,g]]).
+AC-GCO-012: gco_swap([[r,b],[r,b]],r,g,b,[[g,b],[g,b]]).
+AC-GCO-013: gco_swap([[r,b],[b,g]],r,g,b,[[g,b],[b,r]]).
+AC-GCO-014: gco_replace([[r,b],[r,g]],r,x,b,[[x,b],[x,g]]).
+AC-GCO-015: gco_replace([[r,b],[b,g]],y,x,b,[[r,b],[b,g]]).
+AC-GCO-016: gco_apply_map([[r,g],[b,b]],[r-x,g-y],b,[[x,y],[b,b]]).
+AC-GCO-017: gco_apply_map([[r,g],[b,b]],[],b,[[r,g],[b,b]]).
+AC-GCO-018: gco_keep_only([[r,g],[b,b]],r,b,[[r,b],[b,b]]).
+AC-GCO-019: gco_keep_only([[b,b],[b,b]],r,b,[[b,b],[b,b]]).
+AC-GCO-020: gco_remove_color([[r,g],[b,b]],r,b,[[b,g],[b,b]]).
+AC-GCO-021: gco_remove_color([[r,g],[b,b]],y,b,[[r,g],[b,b]]).
+AC-GCO-022: gco_cycle([[r,g],[b,b]],[r,g,y],1,b,[[g,y],[b,b]]).
+AC-GCO-023: gco_cycle([[y,b],[b,b]],[r,g,y],1,b,[[r,b],[b,b]]).
+AC-GCO-024: gco_cycle([[r,g],[b,b]],[r,g,y],0,b,[[r,g],[b,b]]).
+AC-GCO-025: gco_cycle([[r,x],[b,b]],[r,g],1,b,[[g,x],[b,b]]). (non-palette unchanged)
+AC-GCO-026: gco_rank_grid([[r,r,r],[g,g,b]],b,[[0,0,0],[1,1,b]]). (r=rank0, g=rank1)
+AC-GCO-027: gco_rank_grid([[r,b],[r,b]],b,[[0,b],[0,b]]).
+AC-GCO-028: gco_rank_grid([[b,b],[b,b]],b,[[b,b],[b,b]]).
+AC-GCO-029: gco_apply_palette([[r,r,r],[g,g,b]],b,[x,y],[[x,x,x],[y,y,b]]). (r->x, g->y)
+AC-GCO-030: gco_apply_palette([[r,r,g],[b,b,b]],b,[x],[[x,x,g],[b,b,b]]). (partial)
+AC-GCO-031: gco_most_least([[r,r,r],[g,g,b]],b,r,g). (r most, g least)
+AC-GCO-032: gco_most_least([[r,r],[r,b]],b,r,r). (single color: most=least)
+AC-GCO-033: gco_invert([[r,b],[b,g]],b,x,[[b,x],[x,b]]).
+AC-GCO-034: gco_invert([[b,b],[b,b]],b,r,[[r,r],[r,r]]).
+AC-GCO-035: gco_invert([[r,g],[y,p]],b,x,[[b,b],[b,b]]).
+AC-GCO-036: gco_replace([[r,b],[b,g]],b,x,b,[[r,x],[x,g]]). (replaces bg cells)
+AC-GCO-037: gco_cycle([[r,b],[b,b]],[r,g,y],-1,b,[[y,b],[b,b]]). (backward)
+AC-GCO-038: gco_apply_map([[r,b],[g,b]],[y-z],b,[[r,b],[g,b]]). (no match = identity)
+AC-GCO-039: gco_keep_only([[r,r],[r,r]],r,b,[[r,r],[r,r]]). (all target)
+AC-GCO-040: gco_color_counts([[r,r,g],[g,y,b]],b,Counts) - length(Counts,3).
+AC-GCO-041: gco_count_distinct([[r,g,y],[b,b,b]],b,3).
+AC-GCO-042: gco_cycle([[r,b],[b,b]],[r,g,y],2,b,[[y,b],[b,b]]). (2 steps)
+AC-GCO-043: gco_apply_palette([[r,r,g],[g,g,b]],b,[a,c],[[c,c,a],[a,a,b]]). (g=rank0->a, r=rank1->c)
+AC-GCO-044: gco_remove_color then gco_count_distinct = 1 for [[r,g],[g,r]] minus r.
