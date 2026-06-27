@@ -19048,3 +19048,20 @@ equality. gpt_inpaint/7 fills a rectangular region with a color.
 :- use_module(pack(gridpatch/prolog/gridpatch)).
 
 14 gpt_* predicates. 44 tests pass. Layer 227.
+
+Chapter 205: gridscan Pack - Grid Ray Scanning (gsn_*, Layer 228)
+
+The gridscan pack (Layer 228) provides fourteen predicates for scanning a grid in
+four directions (right, left, down, up) to find non-background cells. gsn_scan_row/4
+collects all non-background cells in a row as C-V pairs. gsn_scan_col/4 does the
+same for a column as R-V pairs. gsn_first_right/5, gsn_first_left/5,
+gsn_first_down/5, and gsn_first_up/5 each return the nearest non-background cell
+in the named direction, failing if none exists. gsn_dist_right/5, gsn_dist_left/5,
+gsn_dist_down/5, and gsn_dist_up/5 return the step count to the nearest
+non-background cell, also failing if none. gsn_blocked_right/4, gsn_blocked_left/4,
+gsn_blocked_down/4, and gsn_blocked_up/4 succeed if any non-background cell exists
+in the named direction from the given position.
+
+:- use_module(pack(gridscan/prolog/gridscan)).
+
+14 gsn_* predicates. 44 tests pass. Layer 228.
