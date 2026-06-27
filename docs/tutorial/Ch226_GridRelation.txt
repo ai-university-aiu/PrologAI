@@ -1,0 +1,121 @@
+Chapter 226: gridrelation - Grid Object Spatial Relations (grl_*, Layer 244)
+
+Work Package 265. Module: gridrelation. Prefix: grl_. Layer: 244.
+Dependencies: library(lists) [member/2].
+Input format: ob(Color,Cells,BBox) terms as produced by gob_all_objects/3.
+
+
+Overview
+
+The gridrelation pack provides fourteen predicates for computing spatial relations
+between ob(Color,Cells,BBox) object terms. It covers touching and adjacency at
+the cell level, strict positional relations at the bbox level, overlap detection,
+range overlap, primary direction, and a comprehensive all-relations query.
+
+
+Predicates
+
+grl_touching(+ObjA, +ObjB)
+  Succeed if ObjA and ObjB share a 4-adjacent cell edge. Two cells are
+  4-adjacent when they differ by exactly 1 in exactly one coordinate.
+  Cuts after the first matching pair.
+
+grl_adjacent(+ObjA, +ObjB, +N)
+  Succeed if the minimum Manhattan distance between ObjA and ObjB is at most N.
+  Implemented via grl_min_distance. grl_touching is equivalent to N=1 but
+  uses a direct cell-pair check which is slightly faster.
+
+grl_min_distance(+ObjA, +ObjB, -D)
+  D is the minimum Manhattan distance between any cell of ObjA and any cell of ObjB.
+
+grl_above(+ObjA, +ObjB)
+  Succeed if ObjA's entire bbox is strictly above ObjB's entire bbox:
+  ObjA's last row < ObjB's first row.
+
+grl_below(+ObjA, +ObjB)
+  Succeed if ObjA's entire bbox is strictly below ObjB's entire bbox:
+  ObjA's first row > ObjB's last row.
+
+grl_left_of(+ObjA, +ObjB)
+  Succeed if ObjA's entire bbox is strictly to the left:
+  ObjA's last col < ObjB's first col.
+
+grl_right_of(+ObjA, +ObjB)
+  Succeed if ObjA's entire bbox is strictly to the right:
+  ObjA's first col > ObjB's last col.
+
+grl_bbox_contains(+ObjA, +ObjB)
+  Succeed if ObjA's bbox fully contains ObjB's bbox on all four sides.
+
+grl_bbox_overlap(+ObjA, +ObjB)
+  Succeed if the two bboxes share any area: row ranges overlap AND col ranges
+  overlap. Uses the standard interval test: [a0,a1] and [b0,b1] overlap iff
+  a0 =< b1 and b0 =< a1. Note: adjacent single-cell bboxes at consecutive
+  columns do NOT overlap by this test.
+
+grl_cells_overlap(+ObjA, +ObjB)
+  Succeed if ObjA and ObjB share at least one identical cell position.
+
+grl_same_rows(+ObjA, +ObjB)
+  Succeed if ObjA's and ObjB's bbox row ranges overlap.
+
+grl_same_cols(+ObjA, +ObjB)
+  Succeed if ObjA's and ObjB's bbox column ranges overlap.
+
+grl_direction(+ObjA, +ObjB, -Dir)
+  Dir is the primary direction from ObjA to ObjB: above, below, left, right,
+  or overlap. Uses doubled bbox centroids (R0+R1, C0+C1) for exact integer
+  arithmetic. Primary axis is vertical when |DR| >= |DC|.
+
+grl_all_relations(+ObjA, +ObjB, -Relations)
+  Relations is a list of all true relation atoms between ObjA and ObjB.
+  The possible atoms: touching, above, below, left_of, right_of, bbox_contains,
+  bbox_overlap, cells_overlap, same_rows, same_cols.
+
+
+Example session
+
+:- use_module(pack(gridobj/prolog/gridobj)).
+:- use_module(pack(gridrelation/prolog/gridrelation)).
+
+% Are two objects touching?
+ObjA = ob(r, [r(0,0)], r0(0,0,0,0)),
+ObjB = ob(b, [r(0,1)], r0(0,1,0,1)),
+grl_touching(ObjA, ObjB).
+% succeeds (cells share a horizontal edge)
+
+% Direction from A to B?
+grl_direction(ObjA, ObjB, Dir).
+% Dir = right (B centroid is to the right of A centroid)
+
+% All relations?
+grl_all_relations(ObjA, ObjB, Relations).
+% Relations = [touching, same_rows] (same row=0, touching at col edge)
+
+% Minimum distance?
+ObjC = ob(g, [r(2,2)], r0(2,2,2,2)),
+grl_min_distance(ObjA, ObjC, D).
+% D = 4 (Manhattan from (0,0) to (2,2))
+
+
+Test coverage
+
+44 tests AC-GRL-001 through AC-GRL-044 in
+packs/gridrelation/test/test_gridrelation.pl. All pass.
+
+Coverage by predicate:
+  grl_touching: 3 tests (001-003)
+  grl_adjacent: 3 tests (004-006)
+  grl_min_distance: 3 tests (007-009)
+  grl_above: 3 tests (010-012)
+  grl_below: 2 tests (013-014)
+  grl_left_of: 2 tests (015-016)
+  grl_right_of: 2 tests (017-018)
+  grl_bbox_contains: 3 tests (019-021)
+  grl_bbox_overlap: 3 tests (022-024)
+  grl_cells_overlap: 3 tests (025-027)
+  grl_same_rows: 3 tests (028-030)
+  grl_same_cols: 3 tests (031-033)
+  grl_direction: 4 tests (034-037)
+  grl_all_relations: 3 tests (038-040)
+  integration: 4 tests (041-044)
