@@ -1,0 +1,116 @@
+Chapter 208: Grid Cropping and Padding (gridcrop, gcr_*)
+
+Layer 226 - Work Package 247
+
+The gridcrop pack provides fourteen predicates for resizing grids by cropping,
+trimming, padding, centering, and expanding. All operations are non-destructive.
+
+
+1. Bounding Box
+
+gcr_bbox/3 finds the smallest rectangle enclosing all non-background cells:
+
+  G = [[b,b,b,b],[b,x,x,b],[b,x,x,b],[b,b,b,b]].
+  gcr_bbox(G, b, Box).  % Box = 1-1-2-2
+
+The box is R0-C0-R1-C1 (top-left to bottom-right). The predicate fails if every
+cell equals the background color.
+
+gcr_content_h/3 and gcr_content_w/3 derive sizes from the bounding box:
+
+  gcr_content_h(G, b, H).  % H = 2
+  gcr_content_w(G, b, W).  % W = 2
+
+
+2. Trimming
+
+gcr_trim/3 removes all outer uniform-background rows and columns:
+
+  gcr_trim(G, b, T).  % T = [[x,x],[x,x]]
+
+gcr_trim_rows/3 removes only leading and trailing uniform-background rows:
+
+  gcr_trim_rows(G, b, T).  % T = [[b,x,x,b],[b,x,x,b]] (2 rows, 4 cols)
+
+gcr_trim_cols/3 removes only leading and trailing uniform-background columns:
+
+  gcr_trim_cols(G, b, T).  % T = [[b,b],[x,x],[x,x],[b,b]] (4 rows, 2 cols)
+
+
+3. Cropping
+
+gcr_crop/6 extracts an explicit rectangle:
+
+  gcr_crop(G, 1, 1, 2, 2, C).  % C = [[x,x],[x,x]]
+  gcr_crop(G, 0, 0, 1, 1, C).  % C = [[b,b],[b,x]]
+
+gcr_crop_bbox/3 combines gcr_bbox with gcr_crop:
+
+  gcr_crop_bbox(G, b, C).  % same as gcr_trim: C = [[x,x],[x,x]]
+
+
+4. Padding
+
+gcr_pad_to/5 extends a grid to reach at least a target size:
+
+  G2 = [[x,x],[x,x]].
+  gcr_pad_to(G2, b, 4, 4, P).
+  % P = [[x,x,b,b],[x,x,b,b],[b,b,b,b],[b,b,b,b]]
+
+Extra rows appear at the bottom; extra columns appear at the right. Dimensions
+already at or above the target are not changed.
+
+
+5. Centering
+
+gcr_center_in/5 places a grid in the center of a background frame:
+
+  G1 = [[x]].
+  gcr_center_in(G1, b, 3, 3, C).
+  % C = [[b,b,b],[b,x,b],[b,b,b]]
+
+  gcr_center_in(G2, b, 4, 4, C).
+  % C = [[b,b,b,b],[b,x,x,b],[b,x,x,b],[b,b,b,b]]
+
+
+6. Border Operations
+
+gcr_add_border/4 adds N rows and columns of a color on all four sides:
+
+  gcr_add_border([[x]], 2, b, B).
+  % B = [[b,b,b,b,b],[b,b,b,b,b],[b,b,x,b,b],[b,b,b,b,b],[b,b,b,b,b]]
+
+gcr_remove_border/4 removes N rows and columns from all four sides:
+
+  gcr_remove_border(B, 2, b, R).  % R = [[x]] (original recovered)
+
+
+7. Expanding
+
+gcr_expand_down/4 appends N new rows of a color at the bottom:
+
+  gcr_expand_down([[a,b],[c,d]], 1, z, E).
+  % E = [[a,b],[c,d],[z,z]]
+
+gcr_expand_right/4 appends N new columns at the right:
+
+  gcr_expand_right([[a,b],[c,d]], 1, z, E).
+  % E = [[a,b,z],[c,d,z]]
+
+
+8. Predicate Reference
+
+  gcr_bbox/3            - bounding box of non-BgColor cells
+  gcr_crop_bbox/3       - crop to non-BgColor bounding box
+  gcr_trim/3            - remove all outer uniform-bg rows and columns
+  gcr_trim_rows/3       - remove leading/trailing uniform-bg rows only
+  gcr_trim_cols/3       - remove leading/trailing uniform-bg columns only
+  gcr_crop/6            - extract sub-grid at explicit rectangle
+  gcr_pad_to/5          - pad to at least TargetH x TargetW
+  gcr_center_in/5       - center in TargetH x TargetW bg frame
+  gcr_add_border/4      - add N-cell color border on all sides
+  gcr_remove_border/4   - remove N-cell border from all sides
+  gcr_expand_down/4     - append N rows of color at bottom
+  gcr_expand_right/4    - append N columns of color at right
+  gcr_content_h/3       - height of non-BgColor bounding box
+  gcr_content_w/3       - width of non-BgColor bounding box

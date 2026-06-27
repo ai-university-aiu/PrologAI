@@ -19012,3 +19012,21 @@ with a background color.
 :- use_module(pack(gridmark/prolog/gridmark)).
 
 14 gmk_* predicates. 44 tests pass. Layer 225.
+
+Chapter 203: gridcrop Pack - Grid Cropping and Padding (gcr_*, Layer 226)
+
+The gridcrop pack (Layer 226) provides fourteen predicates for resizing grids by
+cropping, trimming, padding, centering, and expanding. All operations are
+non-destructive. gcr_bbox/3 returns the bounding box R0-C0-R1-C1 of all
+non-background cells. gcr_crop_bbox/3 and gcr_trim/3 crop the grid to that box.
+gcr_trim_rows/3 removes leading and trailing uniform-background rows only;
+gcr_trim_cols/3 removes uniform-background columns only. gcr_crop/6 extracts an
+explicit rectangle. gcr_pad_to/5 extends the grid to at least a target size.
+gcr_center_in/5 places the grid inside a background frame. gcr_add_border/4 and
+gcr_remove_border/4 add or remove an N-cell color border. gcr_expand_down/4 and
+gcr_expand_right/4 append rows or columns. gcr_content_h/3 and gcr_content_w/3
+return the height and width of the non-background bounding box.
+
+:- use_module(pack(gridcrop/prolog/gridcrop)).
+
+14 gcr_* predicates. 44 tests pass. Layer 226.

@@ -1383,3 +1383,20 @@ Grid Marking and Annotation: Mark Cells, Rows, Columns, Borders, Diagonals, Rect
     gmk_is_marked/4: check if cell (R,C) has MarkColor
     gmk_mark_checkerboard/3: overwrite all cells where (R+C) mod 2 = 0
     gmk_erase/4: replace all cells of MarkColor with BgColor
+
+gridcrop
+Grid Cropping and Padding: Bounding Box, Trim, Crop, Pad, Center, Border, and Expand (gcr_*, Layer 226)
+    gcr_bbox/3: bounding box R0-C0-R1-C1 of all non-BgColor cells; fails if all cells are BgColor
+    gcr_crop_bbox/3: crop grid to the non-BgColor bounding box
+    gcr_trim/3: remove all outer uniform-BgColor rows and columns (equivalent to gcr_crop_bbox)
+    gcr_trim_rows/3: remove leading and trailing uniform-BgColor rows; columns unchanged
+    gcr_trim_cols/3: remove leading and trailing uniform-BgColor columns; rows unchanged
+    gcr_crop/6: extract sub-grid at rows R0..R1 and columns C0..C1 (0-indexed, inclusive)
+    gcr_pad_to/5: extend grid with BgColor to at least TargetH rows and TargetW columns
+    gcr_center_in/5: place grid in the center of a TargetH x TargetW BgColor frame
+    gcr_add_border/4: add N rows and N columns of Color on all four sides
+    gcr_remove_border/4: remove N rows and columns from all four sides
+    gcr_expand_down/4: append N new rows of Color at the bottom
+    gcr_expand_right/4: append N new columns of Color at the right
+    gcr_content_h/3: height of the non-BgColor bounding box (MaxR - MinR + 1)
+    gcr_content_w/3: width of the non-BgColor bounding box (MaxC - MinC + 1)
