@@ -1230,3 +1230,20 @@ gridframe
     gfr_fill_frames/3: fill each frame D with Colors[D]; extra frames unchanged
     gfr_innermost/2: R-C pairs at the maximum frame depth
     gfr_onion_layers/2: list of D-Color pairs for uniform frames (onion/target pattern)
+
+gridspiral
+    Grid Spiral Traversal: Clockwise Spiral Ordering, Read, Write, Rotate, and Frame Spirals (gsp_*, Layer 217)
+    gsp_spiral/2: R-C pairs in clockwise spiral order, outer frame to inner; starts at (0,0) moving right
+    gsp_read_spiral/2: color values read from cells in spiral order
+    gsp_write_spiral/3: grid with cells overwritten in spiral order from a value list; unchanged cells beyond list
+    gsp_spiral_length/2: H*W (total cells in the spiral)
+    gsp_spiral_index/4: 0-based position of cell (R,C) in the spiral
+    gsp_nth_spiral/4: R-C pair at 0-based position N in the spiral
+    gsp_frame_spiral/3: clockwise spiral cells for frame D only (one concentric ring)
+    gsp_all_frame_spirals/2: list of per-frame spiral cell-lists from depth 0 to max_depth
+    gsp_spiral_uniform/2: yes/no - all cells have the same color
+    gsp_spiral_reversed/2: R-C pairs in reverse spiral order (inner to outer)
+    gsp_spiral_count/3: count of Color occurrences in the grid
+    gsp_fill_spiral/3: alias for gsp_write_spiral
+    gsp_rotate_spiral/3: rotate all values N steps forward along the spiral
+    gsp_spiral_slice/4: sublist of spiral cells from 0-based index Start to End inclusive
