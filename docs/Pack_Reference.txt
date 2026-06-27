@@ -1502,3 +1502,20 @@ Grid Reflection and Rotation: Flip, Rotate, Transpose, Anti-Diagonal, Symmetry D
     grf_sym_axes/2: return the subset of [h,v,d,a] for which the grid is symmetric
     grf_make_sym_h/3: make horizontally symmetric by merging each row with its reverse
     grf_make_sym_v/3: make vertically symmetric by merging row R with row (H-1-R)
+
+gridlogic
+Grid Logical Operations: Cell-Wise AND, OR, XOR, NOT, Subtract, Common, Differ, Any, All, Majority, Unanimous, Mask, If-Then-Else, and Filter (ggl_*, Layer 233)
+    ggl_and/4: cell-wise AND - both non-bg → Grid1's value; else bg
+    ggl_or/4: cell-wise OR - first non-bg wins (Grid1 over Grid2); else bg
+    ggl_xor/4: cell-wise XOR - exactly one non-bg → that value; else bg
+    ggl_not/4: logical NOT - bg → FgColor; non-bg → bg
+    ggl_subtract/4: set difference - Grid1 non-bg AND Grid2 bg → Grid1 value; else bg
+    ggl_common/4: agreement - both grids agree on same non-bg value → that value; else bg
+    ggl_differ/4: disagreement - both non-bg but different → Grid1 value; else bg
+    ggl_any/3: list-wise OR over a list of grids - first non-bg across grids wins
+    ggl_all/3: list-wise AND over a list - unanimous non-bg agreement → value; else bg
+    ggl_majority/3: plurality vote - most frequent non-bg if count > N/2; else bg
+    ggl_unanimous/3: strict all-grids agreement (including bg) → value; else bg
+    ggl_mask/5: masking - keep Grid cell where MaskGrid = MaskColor; else bg
+    ggl_if/5: conditional selection - CondGrid = CondColor → ThenGrid; else → ElseGrid
+    ggl_filter/4: color filtering - keep cells in Colors list; else bg

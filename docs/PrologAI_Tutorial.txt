@@ -19202,3 +19202,42 @@ grf_make_sym_h/3 - make horizontally symmetric by merging row with its reverse
 grf_make_sym_v/3 - make vertically symmetric by merging row R with row H-1-R
 
 14 grf_* predicates. 44 tests pass. Layer 232.
+
+Chapter 215: gridlogic - Grid Logical Operations (ggl_*, Layer 233)
+
+The gridlogic pack provides fourteen predicates for cell-wise logical and set
+operations on symbolic grids. BgColor acts as false; all other colors are true.
+Covers pairwise and/or/xor/not/subtract/common/differ, list-wide any/all/majority/
+unanimous, and conditional mask/if/filter.
+
+:- use_module(pack(gridlogic/prolog/gridlogic)).
+
+A = [[r,b],[b,b]], B = [[r,b],[r,b]].
+ggl_and(A, B, b, R).
+% R = [[r,b],[b,b]]  (only (0,0) non-bg in both)
+
+ggl_or([[r,b],[b,b]], [[b,g],[b,b]], b, R).
+% R = [[r,g],[b,b]]
+
+ggl_not([[r,b],[b,g]], b, x, R).
+% R = [[b,x],[x,b]]
+
+ggl_any([A, B, C], b, R).  % first non-bg across list wins
+ggl_majority([G, G, H], b, R).  % 2/3 majority wins
+
+ggl_and/4       - both non-bg → Grid1; else bg
+ggl_or/4        - first non-bg wins (Grid1 over Grid2)
+ggl_xor/4       - exactly one non-bg → that; else bg
+ggl_not/4       - bg → FgColor; non-bg → bg
+ggl_subtract/4  - Grid1 non-bg AND Grid2 bg → Grid1; else bg
+ggl_common/4    - same non-bg value in both → value; else bg
+ggl_differ/4    - both non-bg but different → Grid1; else bg
+ggl_any/3       - list-wide OR (first non-bg wins)
+ggl_all/3       - list-wide AND (unanimous non-bg agreement)
+ggl_majority/3  - plurality vote per cell (>N/2 threshold)
+ggl_unanimous/3 - strict all-grids agreement including bg
+ggl_mask/5      - keep Grid where Mask = MaskColor; else bg
+ggl_if/5        - CondColor → ThenGrid; else ElseGrid
+ggl_filter/4    - keep cells in Colors list; else bg
+
+14 ggl_* predicates. 44 tests pass. Layer 233.
