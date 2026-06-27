@@ -247,3 +247,38 @@ test(recolor_unique_size_no_unique) :-
     \+ xc_recolor_unique_size([R, B], g, _).
 
 :- end_tests(condxf).
+
+:- begin_tests(xc_infer_gate).
+
+% Dataset where only color 3 is a valid gate:
+% Pairs A/B both have colors 1 and 2 mixed equally, so color 1 and 2 alone don't separate.
+% But color 3 perfectly separates: pairs WITH color 3 all lose it; pairs WITHOUT never lose it.
+test(infer_gate_finds_a_gate) :-
+    PA = pair([obj(3, [r(0,0)]), obj(1, [r(0,1)])], [obj(1, [r(0,1)])]),  % has 3, loses 3
+    PB = pair([obj(3, [r(0,0)]), obj(2, [r(0,1)])], [obj(2, [r(0,1)])]),  % has 3, loses 3
+    PC = pair([obj(1, [r(0,0)])], [obj(1, [r(0,0)])]),                     % no 3, no change
+    PD = pair([obj(2, [r(0,0)])], [obj(2, [r(0,0)])]),                     % no 3, no change
+    xc_infer_gate([PA, PB, PC, PD], [], gate_color(3)).
+
+% Result is always a gate_color term when a valid gate exists.
+test(infer_gate_returns_gate_color_term) :-
+    PA = pair([obj(3, [r(0,0)]), obj(1, [r(0,1)])], [obj(1, [r(0,1)])]),
+    PB = pair([obj(3, [r(0,0)]), obj(2, [r(0,1)])], [obj(2, [r(0,1)])]),
+    PC = pair([obj(1, [r(0,0)])], [obj(1, [r(0,0)])]),
+    PD = pair([obj(2, [r(0,0)])], [obj(2, [r(0,0)])]),
+    xc_infer_gate([PA, PB, PC, PD], [], Gate),
+    Gate = gate_color(_).
+
+% Fails when all pairs have the same change signature regardless of any color.
+test(infer_gate_fails_no_distinction) :-
+    % Both pairs have identical change signatures regardless of color presence.
+    PA = pair([obj(1, [r(0,0)])], [obj(1, [r(0,0)])]),
+    PB = pair([obj(2, [r(0,0)])], [obj(2, [r(0,0)])]),
+    \+ xc_infer_gate([PA, PB], [], _).
+
+% Fails when only one pair exists (cannot split into two non-empty groups).
+test(infer_gate_fails_single_pair) :-
+    PA = pair([obj(1, [r(0,0)])], []),
+    \+ xc_infer_gate([PA], [], _).
+
+:- end_tests(xc_infer_gate).

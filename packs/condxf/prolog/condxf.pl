@@ -31,7 +31,9 @@
     % xc_recolor_unique_size/3: recolor the unique-size object to NewColor.
     xc_recolor_unique_size/3,
     % xc_split_size/5: partition scene into objects satisfying size Cmp N vs others.
-    xc_split_size/5
+    xc_split_size/5,
+    % xc_infer_gate/3: infer the gate color that splits pairs into distinct change groups.
+    xc_infer_gate/3
 ]).
 
 % Load list utilities.
@@ -167,3 +169,38 @@ xc_recolor_unique_size(Scene, NewColor, Scene2) :-
 xc_split_size(Scene, N, Cmp, Match, NoMatch) :-
     findall(O, (member(O, Scene), xc_size_(O, S), xc_size_cmp_(Cmp, S, N)), Match),
     findall(O, (member(O, Scene), xc_size_(O, S), \+ xc_size_cmp_(Cmp, S, N)), NoMatch).
+
+% xc_infer_gate(+Pairs, +_Variants, -Gate)
+% Infer the gate color: the object color in input scenes whose presence vs absence
+% separates the training pairs into groups with distinct change signatures.
+% Pairs is a list of pair(SceneIn, SceneOut) where each scene is a list of obj/2 terms.
+% Gate is gate_color(Color) for the first color that successfully separates the pairs.
+% Fails if no single color acts as a consistent gate across all pairs.
+xc_infer_gate(Pairs, _Variants, Gate) :-
+    findall(C, (member(pair(S, _), Pairs), member(obj(C, _), S)), AllColors),
+    sort(AllColors, UniqColors),
+    member(GateColor, UniqColors),
+    include(xc_scene_has_color_(GateColor), Pairs, WithGate),
+    exclude(xc_scene_has_color_(GateColor), Pairs, WithoutGate),
+    WithGate \= [],
+    WithoutGate \= [],
+    findall(Sig, (member(pair(SI, SO), WithGate), xc_change_sig_(SI, SO, Sig)), SigsW),
+    findall(Sig, (member(pair(SI, SO), WithoutGate), xc_change_sig_(SI, SO, Sig)), SigsWO),
+    sort(SigsW, SW), sort(SigsWO, SWO),
+    SW \= SWO,
+    !,
+    Gate = gate_color(GateColor).
+
+% xc_scene_has_color_(+Color, +Pair): succeed if SceneIn contains Color.
+xc_scene_has_color_(Color, pair(SceneIn, _)) :-
+    member(obj(Color, _), SceneIn).
+
+% xc_change_sig_(+SceneIn, +SceneOut, -Sig): compute a change signature for a pair.
+% Sig = lost(Lost)-gained(Gained) where Lost and Gained are sorted color lists.
+xc_change_sig_(SceneIn, SceneOut, Sig) :-
+    findall(C, member(obj(C, _), SceneIn), CIn),
+    findall(C, member(obj(C, _), SceneOut), COut),
+    sort(CIn, SI), sort(COut, SO),
+    subtract(SI, SO, Lost),
+    subtract(SO, SI, Gained),
+    Sig = lost(Lost)-gained(Gained).

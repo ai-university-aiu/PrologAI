@@ -27,7 +27,13 @@
     % hy_map_lookup/3: look up a color in a map with identity fallback.
     hy_map_lookup/3,
     % hy_describe/2: describe a hypothesis as a human-readable atom.
-    hy_describe/2
+    hy_describe/2,
+    % hy_spatial_hyp/3: find the shift hypothesis that explains all grid pairs.
+    hy_spatial_hyp/3,
+    % hy_structural_hyp/3: find the named structural pattern that fits all pairs.
+    hy_structural_hyp/3,
+    % hy_sequence_hyp/4: find a two-step color-map hypothesis for all pairs.
+    hy_sequence_hyp/4
 ]).
 
 % Import list utilities; msort/length/forall are built-ins, not imported.
@@ -178,3 +184,88 @@ hy_describe(hy_color_sub(Map, _), Desc) :- !,
     term_to_atom(color_sub(Map), Desc).
 hy_describe(Goal, Desc) :-
     term_to_atom(Goal, Desc).
+
+% hy_spatial_hyp(+Pairs, +Moves, -Hyp)
+% Find the first shift in Moves that, when applied to each pair's input grid
+% (moving every non-background cell by DR-DC), exactly reproduces the output.
+% Pairs is a list of pair(InGrid, OutGrid) where grids are 2D integer lists.
+% Moves is a list of DR-DC integer delta pairs to try in order.
+% Hyp is shift(DR, DC) for the first move that verifies all pairs.
+hy_spatial_hyp(Pairs, Moves, Hyp) :-
+    member(DR-DC, Moves),
+    forall(member(pair(In, Out), Pairs),
+           hy_spatial_verify_(In, Out, DR, DC)),
+    !,
+    Hyp = shift(DR, DC).
+
+% hy_spatial_verify_(+In, +Out, +DR, +DC)
+% Succeed if shifting all non-zero cells of In by (DR, DC) matches Out.
+hy_spatial_verify_(In, Out, DR, DC) :-
+    length(In, NR),
+    ( In = [FR|_] -> length(FR, NC) ; NC = 0 ),
+    findall(R2-C2-V,
+        (nth0(R, In, Row), nth0(C, Row, V), V \= 0,
+         R2 is R + DR, C2 is C + DC,
+         R2 >= 0, R2 < NR, C2 >= 0, C2 < NC),
+        ShiftedIn),
+    findall(R-C-V2,
+        (nth0(R, Out, Row2), nth0(C, Row2, V2), V2 \= 0),
+        OutCells),
+    msort(ShiftedIn, S1), msort(OutCells, S2),
+    S1 = S2.
+
+% hy_structural_hyp(+Pairs, +Patterns, -Hyp)
+% Find the first pattern name in Patterns that is consistent with all training pairs.
+% Patterns is a list of atoms drawn from:
+%   dims_preserved, colors_preserved, total_nonzero_preserved,
+%   monotone_output, output_subset_of_input, input_subset_of_output.
+% Hyp is structural(Pattern) for the first matching pattern.
+hy_structural_hyp(Pairs, Patterns, Hyp) :-
+    member(Pattern, Patterns),
+    forall(member(pair(In, Out), Pairs),
+           hy_struct_check_(Pattern, In, Out)),
+    !,
+    Hyp = structural(Pattern).
+
+% hy_struct_check_(+Pattern, +In, +Out): test one structural property for a pair.
+hy_struct_check_(dims_preserved, In, Out) :-
+    length(In, R), ( In=[FR|_] -> length(FR,C) ; C=0 ),
+    length(Out, R), ( Out=[OR|_] -> length(OR,C) ; C=0 ).
+hy_struct_check_(colors_preserved, In, Out) :-
+    findall(V, (member(Row, In), member(V, Row)), FI), sort(FI, SI),
+    findall(V, (member(Row, Out), member(V, Row)), FO), sort(FO, SO),
+    SI = SO.
+hy_struct_check_(total_nonzero_preserved, In, Out) :-
+    findall(V, (member(Row, In), member(V, Row), V \= 0), NZI),
+    findall(V, (member(Row, Out), member(V, Row), V \= 0), NZO),
+    length(NZI, N), length(NZO, N).
+hy_struct_check_(monotone_output, _, Out) :-
+    findall(V, (member(Row, Out), member(V, Row), V \= 0), NZO),
+    sort(NZO, Uniq),
+    length(Uniq, 1).
+hy_struct_check_(output_subset_of_input, In, Out) :-
+    findall(V, (member(Row, Out), member(V, Row), V \= 0), NZO),
+    findall(V, (member(Row, In), member(V, Row), V \= 0), NZI),
+    sort(NZO, SO), sort(NZI, SI),
+    subtract(SO, SI, Extra),
+    Extra = [].
+hy_struct_check_(input_subset_of_output, In, Out) :-
+    findall(V, (member(Row, In), member(V, Row), V \= 0), NZI),
+    findall(V, (member(Row, Out), member(V, Row), V \= 0), NZO),
+    sort(NZI, SI), sort(NZO, SO),
+    subtract(SI, SO, Missing),
+    Missing = [].
+
+% hy_sequence_hyp(+Pairs, +Maps1, +Maps2, -Hyp)
+% Find a two-step color-substitution hypothesis seq(Map1, Map2) such that
+% applying Map1 then Map2 to each input grid produces the output.
+% Maps1 and Maps2 are lists of color substitution maps (lists of Old-New pairs).
+% Hyp is seq(Map1, Map2) for the first combination that verifies all pairs.
+hy_sequence_hyp(Pairs, Maps1, Maps2, Hyp) :-
+    member(Map1, Maps1),
+    member(Map2, Maps2),
+    forall(member(pair(In, Out), Pairs),
+           (hy_color_sub(Map1, In, Mid),
+            hy_color_sub(Map2, Mid, Out))),
+    !,
+    Hyp = seq(Map1, Map2).

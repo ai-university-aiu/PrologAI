@@ -254,3 +254,53 @@ test(apply_sort_size_asc) :-
     length(R, 2).
 
 :- end_tests(seqinfer).
+
+:- begin_tests(sq_arc2_candidates).
+
+% sq_arc2_candidates returns a non-empty list.
+test(arc2_candidates_nonempty) :-
+    sq_arc2_candidates(Rules),
+    Rules \= [].
+
+% sq_arc2_candidates includes identity.
+test(arc2_candidates_has_identity) :-
+    sq_arc2_candidates(Rules),
+    member(identity, Rules).
+
+% sq_arc2_candidates includes integer recolor entries.
+test(arc2_candidates_has_int_recolor) :-
+    sq_arc2_candidates(Rules),
+    member(recolor(1, 2), Rules).
+
+% sq_arc2_candidates includes to_origin.
+test(arc2_candidates_has_to_origin) :-
+    sq_arc2_candidates(Rules),
+    member(to_origin, Rules).
+
+% sq_arc2_candidates includes reflect_h and reflect_v.
+test(arc2_candidates_has_reflects) :-
+    sq_arc2_candidates(Rules),
+    member(reflect_h, Rules),
+    member(reflect_v, Rules).
+
+% sq_arc2_candidates includes top_n variants.
+test(arc2_candidates_has_top_n) :-
+    sq_arc2_candidates(Rules),
+    member(top_n(1), Rules),
+    member(top_n(2), Rules).
+
+% sq_arc2_candidates list length is at least 50.
+test(arc2_candidates_length) :-
+    sq_arc2_candidates(Rules),
+    length(Rules, N),
+    N >= 50.
+
+% sq_arc2_candidates can be used directly with sq_infer_2step.
+test(arc2_candidates_compatible_with_infer) :-
+    % scene: color 1 -> color 2 (recolor); then shift (0,1).
+    P1 = pair([obj(1, [r(0,0)])], [obj(2, [r(0,1)])]),
+    sq_arc2_candidates(Cands),
+    % Just check that infer does not crash; result is unimportant.
+    (sq_infer_2step(Cands, [P1], _) -> true ; true).
+
+:- end_tests(sq_arc2_candidates).

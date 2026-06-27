@@ -225,3 +225,73 @@ test(factor_1) :-
     in_2x2(G), id_scale_factor(G, G, K), K =:= 1.
 
 :- end_tests(induction_id_scale_factor).
+
+:- begin_tests(id_cross_pair_invariants).
+
+% Swap colors 1 and 2: dims preserved, colors preserved, total nonzero preserved.
+test(swap_pairs_invariants) :-
+    A = pair([[1,2],[2,1]], [[2,1],[1,2]]),
+    B = pair([[1,2],[0,0]], [[2,1],[0,0]]),
+    id_cross_pair_invariants([A, B], Inv),
+    member(dims_preserved, Inv),
+    member(colors_preserved, Inv),
+    member(total_nonzero_preserved, Inv).
+
+% All background to color 5: monotone_output holds.
+test(fill_task_invariants) :-
+    A = pair([[0,0],[0,0]], [[5,5],[5,5]]),
+    B = pair([[0,0,0]], [[5,5,5]]),
+    id_cross_pair_invariants([A, B], Inv),
+    member(monotone_output, Inv).
+
+% Returns a list.
+test(invariants_returns_list) :-
+    P = pair([[1,0],[0,1]], [[1,0],[0,1]]),
+    id_cross_pair_invariants([P], Inv),
+    is_list(Inv).
+
+% Empty pairs list gives all properties as invariants (vacuously true).
+test(invariants_empty_pairs) :-
+    id_cross_pair_invariants([], Inv),
+    is_list(Inv),
+    length(Inv, N), N > 0.
+
+% dims_preserved absent when sizes differ.
+test(invariants_dims_absent_when_changed) :-
+    A = pair([[1,2]], [[1,2],[3,4]]),
+    id_cross_pair_invariants([A], Inv),
+    \+ member(dims_preserved, Inv).
+
+:- end_tests(id_cross_pair_invariants).
+
+:- begin_tests(id_cross_pair_variants).
+
+% bg_preserved holds for some swap pairs but not all when one pair changes bg.
+test(variants_bg_sometimes) :-
+    A = pair([[1,2],[2,1]], [[2,1],[1,2]]),
+    B = pair([[0,1],[0,0]], [[1,0],[0,0]]),
+    % bg_preserved holds for A (bg 0 unchanged) but not B (cell (0,0) changed).
+    id_cross_pair_variants([A, B], Var),
+    is_list(Var).
+
+% Variants and invariants are disjoint.
+test(variants_disjoint_from_invariants) :-
+    A = pair([[1,2]], [[2,1]]),
+    id_cross_pair_invariants([A], Inv),
+    id_cross_pair_variants([A], Var),
+    subtract(Var, Inv, Diff),
+    Diff = Var.
+
+% Returns a list.
+test(variants_returns_list) :-
+    P = pair([[1,0],[0,1]], [[2,0],[0,2]]),
+    id_cross_pair_variants([P], Var),
+    is_list(Var).
+
+% Uniform pairs (no change) have all properties as invariants; variants is empty.
+test(variants_empty_for_stable_pair) :-
+    P = pair([[1,2],[0,0]], [[1,2],[0,0]]),
+    id_cross_pair_variants([P], Var),
+    Var = [].
+
+:- end_tests(id_cross_pair_variants).

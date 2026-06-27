@@ -19615,3 +19615,58 @@ tc_suggest_strategies returns ordered fallback strategy lists per category.
 tc_confidence provides a 0.0-1.0 score using dims, count, and pattern uniformity.
 
 See docs/tutorial/Ch234_TaskCat.txt for full details and examples.
+
+
+Chapter 235: seqinfer Enhancement - ARC-AGI-2 Candidates (WP-274)
+
+sq_arc2_candidates/1 returns a 66-entry list of integer-color scene-level rule
+candidates for use with sq_infer_2step and sq_infer_3step on harder tasks.
+
+    sq_arc2_candidates(Rules),
+    sq_infer_2step(Rules, TrainingPairs, BestSeq).
+
+Uses integer colors 0-9 (standard ARC encoding). Extends sq_default_rules with
+more recolor pairs (colors 1-6), larger shift deltas, and top_n operators.
+
+
+Chapter 236: hyp Enhancement - Spatial, Structural, Sequence Hypotheses (WP-275)
+
+Three new hypothesis types extend the hyp pack beyond color substitutions:
+
+hy_spatial_hyp(+Pairs, +Moves, -Hyp): find the first DR-DC shift that explains all pairs.
+    hy_spatial_hyp(Pairs, [0-1, 1-0, 0-(-1), (-1)-0], shift(DR, DC)).
+
+hy_structural_hyp(+Pairs, +Patterns, -Hyp): find the first structural pattern consistent
+with all pairs.
+    hy_structural_hyp(Pairs, [dims_preserved, colors_preserved], structural(Pat)).
+
+hy_sequence_hyp(+Pairs, +Maps1, +Maps2, -Hyp): find a two-step color-map hypothesis.
+    hy_sequence_hyp(Pairs, [[1-2]], [[2-3]], seq([1-2], [2-3])).
+
+
+Chapter 237: condxf Enhancement - Context Gate Inference (WP-276)
+
+xc_infer_gate/3 infers which scene-object color acts as a context gate:
+
+    xc_infer_gate(Pairs, [], gate_color(GateColor)).
+
+For each sorted candidate color, the predicate partitions pairs into those that
+contain the color in their input scene vs those that do not, then checks whether
+the two groups produce different change signatures (lost/gained color sets).
+Returns gate_color(C) for the first color that successfully separates the groups.
+
+
+Chapter 238: induction Enhancement - Cross-Pair Property Aggregation (WP-277)
+
+Two new predicates aggregate grid-pair properties across a list of training pairs:
+
+id_cross_pair_invariants(+Pairs, -Invariants):
+    Returns properties that hold for every training pair (e.g. dims_preserved).
+    id_cross_pair_invariants(Pairs, Inv), member(dims_preserved, Inv).
+
+id_cross_pair_variants(+Pairs, -Variants):
+    Returns properties that hold for SOME but not ALL pairs.
+    id_cross_pair_variants(Pairs, Var), member(colors_preserved, Var).
+
+Properties tested: dims_preserved, colors_preserved, total_nonzero_preserved,
+monotone_input, monotone_output, bg_preserved, scale_preserved.
