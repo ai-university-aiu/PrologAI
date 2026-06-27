@@ -1400,3 +1400,20 @@ Grid Cropping and Padding: Bounding Box, Trim, Crop, Pad, Center, Border, and Ex
     gcr_expand_right/4: append N new columns of Color at the right
     gcr_content_h/3: height of the non-BgColor bounding box (MaxR - MinR + 1)
     gcr_content_w/3: width of the non-BgColor bounding box (MaxC - MinC + 1)
+
+gridpatch
+Grid Patch Operations: Extract, Place, Overlay, Find, Tile, Scatter, and Inpaint (gpt_*, Layer 227)
+    gpt_extract/6: extract sub-grid at rows R0..R1 and columns C0..C1
+    gpt_place/5: paste Patch at (R0,C0) overwriting cells in Grid
+    gpt_overlay/6: paste Patch with transparency (TranspColor cells kept from Grid)
+    gpt_match_at/4: check if Patch exactly matches Grid at position (R0,C0)
+    gpt_find_all/3: all R0-C0 positions where Patch matches in Grid (row-major)
+    gpt_count/3: count positions where Patch matches in Grid
+    gpt_scatter/4: place Patch at every position in a list, left-to-right
+    gpt_tile_fill/4: build H x W grid by tiling Patch (cell (R,C) = Patch[R mod PH][C mod PW])
+    gpt_h/2: number of rows in Patch
+    gpt_w/2: number of columns in Patch
+    gpt_size/3: row and column count of Patch
+    gpt_eq/2: check if two patches are identical
+    gpt_inpaint/7: fill rectangle [R0..R1] x [C0..C1] in Grid with Color
+    gpt_replace_first/4: replace first (top-left) matching OldPatch occurrence with NewPatch
