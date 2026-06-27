@@ -18861,3 +18861,21 @@ gsp_spiral_count/3 counts a color. gsp_rotate_spiral/3 rotates values N steps
 along the spiral; gsp_spiral_slice/4 returns spiral cells from Start to End.
 
 14 gsp_* predicates. 44 tests pass. Layer 217.
+
+
+Chapter 195: griddelta Pack - Grid Delta Analysis (gdt_*, Layer 218)
+
+The griddelta pack (Layer 218) compares two same-size grids, detecting changes
+and mapping transitions. gdt_compatible/2 tests dimension compatibility;
+gdt_diff_cells/3 finds changed cells; gdt_diff_count/3 counts them; gdt_same_cells/3
+finds unchanged cells. gdt_changed_pairs/3 maps R-C-(Old->New) for each change;
+gdt_color_changes/4 counts changes from a specific color; gdt_changed_colors/3
+returns new colors. gdt_apply_delta/4 applies G1→G2 changes to a third grid;
+gdt_invert_delta/3 reverses them. gdt_diff_rows/3 and gdt_diff_cols/3 find
+changed rows and columns. gdt_agree_region/6 tests a rectangular sub-region.
+gdt_overlay/4 overlays G2 on G1 with Marker as transparent. gdt_is_identity/2
+tests if two grids are identical.
+
+:- use_module(pack(griddelta/prolog/griddelta)).
+
+14 gdt_* predicates. 44 tests pass. Layer 218.
