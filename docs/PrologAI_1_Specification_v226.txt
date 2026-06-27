@@ -17525,3 +17525,35 @@ side by side or stacked. gst_border/5 surrounds a Grid with a colored border of
 given thickness T, producing a grid of height GH+2T and width GW+2T. gst_center/5
 places a Grid at the center of an H x W bg canvas using integer division for
 alignment. gst_canvas/4 creates a blank all-bg grid of the given dimensions.
+
+Part 250 - Work Package 260: gridalign Pack (gal_*, Layer 239)
+
+WP-260-SPEC-001: The gridalign pack (Layer 239) provides fourteen predicates for
+computing alignment properties of symbolic grids: center of mass, bounding box,
+bounding box center, translation, overlap counting and scoring, intersection-over-
+union, offset search, center alignment, bbox-center alignment, centroid offset
+vector, placement at a position, anchor-based placement, and any-overlap offset
+search. All 44 acceptance tests pass.
+
+WP-260-SPEC-002: gal_center_of_mass/3 returns the integer-floor average (R,C) of
+all non-bg cell indices. gal_nonbg_bbox/3 returns the tight bounding box r0(R0,C0,R1,C1)
+or the atom none for all-bg grids. gal_bbox_center/3 returns the floor center of the
+bounding box. All three predicates fail gracefully on all-bg inputs.
+
+WP-260-SPEC-003: gal_translate/5 shifts every non-bg cell by (DR,DC) within the
+same grid dimensions; cells that move out of bounds become Bg. gal_overlap_count/4
+counts positions where both grids have non-bg cells. gal_overlap_score/4 normalises
+by Grid1's non-bg count. gal_iou/4 computes intersection-over-union of non-bg regions
+using negation to avoid double-counting the disjunction.
+
+WP-260-SPEC-004: gal_find_offset/5 searches all (DR,DC) in [-SearchR,SearchR]^2,
+shifts Grid2's non-bg cells by each candidate, and selects the offset maximising
+overlap with Grid1's non-bg cells (ties broken by minimum Manhattan distance).
+gal_align_centers/4 and gal_align_bbox_centers/4 apply gal_translate after computing
+the required shift; both return Grid2 unchanged if either grid has no non-bg cells.
+
+WP-260-SPEC-005: gal_place_at/6 pastes Grid2 transparently onto a canvas at (R0,C0)
+using the same transparency model as gridstamp. gal_anchor_to/8 computes (R0,C0)
+from a given cell-to-cell alignment (PR,PC) in Grid2 to (QR,QC) in Canvas and
+delegates to gal_place_at. gal_match_any_offset/4 finds all (DR,DC) offsets where
+at least one non-bg cell of Grid2, after translation, lands on a non-bg cell of Grid1.

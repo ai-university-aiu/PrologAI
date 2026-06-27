@@ -19355,3 +19355,21 @@ overwritten regardless of color).
 
 See docs/tutorial/Ch220_GridStamp.txt for full predicate descriptions,
 design notes, example session, and test coverage summary.
+
+Chapter 221: gridalign - Grid Alignment and Shift Matching (gal_*, Layer 239)
+
+The gridalign pack adds fourteen predicates for computing alignment properties
+of symbolic grids: center of mass, bounding box, translation, overlap scoring,
+IoU, offset search, center alignment, placement, anchor-based placement, and
+any-overlap offset enumeration.
+
+Predicates: gal_center_of_mass/3, gal_nonbg_bbox/3, gal_bbox_center/3,
+gal_translate/5, gal_overlap_count/4, gal_overlap_score/4, gal_iou/4,
+gal_find_offset/5, gal_align_centers/4, gal_align_bbox_centers/4,
+gal_nonbg_offset/4, gal_place_at/6, gal_anchor_to/8, gal_match_any_offset/4.
+
+Key design: gal_iou uses \+(V1=Bg, V2=Bg) for the union to avoid double-counting.
+gal_find_offset searches cell sets, not full translated grids, for efficiency.
+gal_place_at is transparent (same model as gst_stamp).
+
+See docs/tutorial/Ch221_GridAlign.txt for full details and examples.

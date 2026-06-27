@@ -1600,3 +1600,20 @@ Grid Stamping and Canvas Operations: Stamp, Scatter, Match Finding, Pad, Unpad, 
     gst_center(+Grid,+H,+W,+Bg,-Result): center on H x W canvas.
     gst_extract(+Grid,+R0,+C0,+H,+W,-Subgrid): extract H x W subgrid at (R0,C0).
     gst_replace(+Grid,+R0,+C0,+Patch,-Result): overwrite rectangle with Patch (opaque).
+
+gridalign
+Grid Alignment and Shift Matching: Center of Mass, Translation, Offset Search, Overlap Scoring, Bounding Box Alignment, and Anchor Placement (gal_*, Layer 239)
+    gal_center_of_mass(+Grid,+Bg,-r(R,C)): floor-average centroid of non-bg cells.
+    gal_nonbg_bbox(+Grid,+Bg,-BBox): tight bounding box r0(R0,C0,R1,C1) or none.
+    gal_bbox_center(+Grid,+Bg,-Center): floor center of bbox, or none.
+    gal_translate(+Grid,+DR,+DC,+Bg,-Result): shift content by (DR,DC), same size.
+    gal_overlap_count(+Grid1,+Grid2,+Bg,-Count): positions where both are non-bg.
+    gal_overlap_score(+Grid1,+Grid2,+Bg,-Score): overlap / Grid1 non-bg count.
+    gal_iou(+Grid1,+Grid2,+Bg,-IoU): intersection over union of non-bg regions.
+    gal_find_offset(+Grid1,+Grid2,+Bg,+SearchR,-o(DR,DC)): best alignment offset.
+    gal_align_centers(+Grid1,+Grid2,+Bg,-Aligned): translate Grid2 to match Grid1 centroid.
+    gal_align_bbox_centers(+Grid1,+Grid2,+Bg,-Aligned): translate Grid2 to match Grid1 bbox center.
+    gal_nonbg_offset(+Grid1,+Grid2,+Bg,-o(DR,DC)): centroid-to-centroid vector.
+    gal_place_at(+Canvas,+Grid2,+R0,+C0,+Bg,-Result): transparent paste at (R0,C0).
+    gal_anchor_to(+Canvas,+Grid2,+PR,+PC,+QR,+QC,+Bg,-Result): cell-to-cell alignment paste.
+    gal_match_any_offset(+Grid1,+Grid2,+Bg,-Offsets): all offsets with at least one overlap.
