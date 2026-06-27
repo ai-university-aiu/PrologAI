@@ -1839,3 +1839,20 @@ Task Type Classification and Solving Strategy Selection (tc_*, Layer 252)
     tc_is_fill_task(+Pairs): succeed if all pairs change only bg-to-color cells.
     tc_is_deletion_task(+Pairs): succeed if all pairs change only color-to-bg cells.
     tc_confidence(+Pairs,-Score): 0.0-1.0 confidence score for the primary category.
+
+periodfix
+Periodic Pattern Repair: Majority-Vote Tile Detection, Violation Finding, and Single-Corruption Repair (ppf_*, Layer 253)
+    ppf_list_period(+List,-P): smallest exact period P of List with no violations.
+    ppf_majority(+List,-Mode): most common element in a non-empty list (run-scan algorithm).
+    ppf_tile_from_list(+List,+P,-Tile): majority-vote tile of length P built by taking the modal value at each phase (i mod P).
+    ppf_violations_list(+List,+P,+Tile,-Violations): list of viol(Index,Actual,Expected) where List[i] differs from Tile[i mod P].
+    ppf_repair_list(+List,+P,+Tile,-Repaired): replace every violation in List with the corresponding Tile value.
+    ppf_best_period_list(+List,-P,-NViol): period in 1..max(1,N//2) minimising violation count; ties broken by smallest P.
+    ppf_tile_2d(+Grid,+PH,+PW,-Tile): PH-by-PW majority-vote tile; Tile[r][c] is the mode of all cells where R mod PH=r, C mod PW=c.
+    ppf_violations_2d(+Grid,+Tile,+PH,+PW,-Violations): list of viol(R,C,Actual,Expected) for each cell differing from Tile.
+    ppf_repair_grid(+Grid,+Tile,+PH,+PW,-Repaired): replace every 2D violation with the Tile value at that phase.
+    ppf_best_periods(+Grid,-PH,-PW): (PH,PW) in 1..max(1,H//2) x 1..max(1,W//2) minimising total 2D violations.
+    ppf_single_violation_list(+List,+P,+Tile,-Violation): true (and binds Violation) iff List has exactly one violation.
+    ppf_repair_single_list(+List,+P,+Tile,-Repaired): repair the unique violation; fails if 0 or 2+ violations.
+    ppf_single_violation_2d(+Grid,+Tile,+PH,+PW,-Violation): true iff Grid has exactly one 2D violation.
+    ppf_repair_single_grid(+Grid,+Tile,+PH,+PW,-Repaired): repair the unique 2D violation; fails if 0 or 2+ violations.
