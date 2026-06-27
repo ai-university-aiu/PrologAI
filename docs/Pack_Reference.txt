@@ -1434,3 +1434,20 @@ Grid Ray Scanning: First Hit, Distance, Row/Column Content, and Blocking Detecti
     gsn_blocked_left/4: succeeds if any non-BgColor cell exists to the left of C0
     gsn_blocked_down/4: succeeds if any non-BgColor cell exists below R0
     gsn_blocked_up/4: succeeds if any non-BgColor cell exists above R0
+
+gridwave
+Grid Wave Propagation: Color Expansion, Contraction, Frontier Detection, and Directional Shadows (gwv_*, Layer 229)
+    gwv_step/3: one wave-expansion step; each bg cell adjacent to exactly one non-bg color takes it; conflict cells stay bg
+    gwv_fill/3: apply gwv_step to fixed point (full multi-color Voronoi with conflict preservation)
+    gwv_fill_n/4: apply exactly N wave-expansion steps
+    gwv_frontier/3: R-C list of bg cells adjacent to any non-bg cell (4-connected)
+    gwv_color_frontier/4: R-C list of bg cells adjacent to a specific color
+    gwv_equidistant_front/3: R-C list of bg cells adjacent to two or more different non-bg colors
+    gwv_color_expand/4: expand a single named color one step into adjacent bg cells
+    gwv_color_expand_n/5: expand a single named color exactly N steps
+    gwv_shadow_right/4: mark bg cells to the right of each non-bg cell as ShadowColor (row-wise state machine)
+    gwv_shadow_down/4: cast shadow downward (implemented via grid transpose)
+    gwv_shadow_left/4: cast shadow leftward (implemented via row reverse)
+    gwv_shadow_up/4: cast shadow upward (implemented via transpose + reverse)
+    gwv_contract/3: remove non-bg cells that have at least one in-bounds 4-connected bg neighbor
+    gwv_contract_n/4: apply gwv_contract exactly N times

@@ -19065,3 +19065,30 @@ in the named direction from the given position.
 :- use_module(pack(gridscan/prolog/gridscan)).
 
 14 gsn_* predicates. 44 tests pass. Layer 228.
+
+Chapter 211: gridwave - Grid Wave Propagation (gwv_*, Layer 229)
+
+The gridwave pack provides fourteen predicates for color wave propagation,
+frontier detection, single-color expansion, directional shadow casting,
+and interior contraction. Wave expansion models BFS-style multi-color flooding:
+each background cell adjacent to exactly one non-background color takes that
+color; cells adjacent to two or more different colors remain background (conflict).
+
+:- use_module(pack(gridwave/prolog/gridwave)).
+
+gwv_step/3       - one wave-expansion step (all colors, conflict = stays bg)
+gwv_fill/3       - expand to fixed point (multi-color Voronoi with conflict)
+gwv_fill_n/4     - exactly N wave-expansion steps
+gwv_frontier/3   - bg cells adjacent to any non-bg (R-C list)
+gwv_color_frontier/4   - bg cells adjacent to a specific color
+gwv_equidistant_front/3 - bg cells adjacent to two or more different colors
+gwv_color_expand/4     - expand one color one step
+gwv_color_expand_n/5   - expand one color N steps
+gwv_shadow_right/4     - cast shadow rightward from non-bg cells
+gwv_shadow_left/4      - cast shadow leftward
+gwv_shadow_down/4      - cast shadow downward
+gwv_shadow_up/4        - cast shadow upward
+gwv_contract/3   - remove non-bg cells touching in-bounds bg (interior erosion)
+gwv_contract_n/4 - N contraction steps
+
+14 gwv_* predicates. 44 tests pass. Layer 229.
