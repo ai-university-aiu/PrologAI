@@ -1451,3 +1451,20 @@ Grid Wave Propagation: Color Expansion, Contraction, Frontier Detection, and Dir
     gwv_shadow_up/4: cast shadow upward (implemented via transpose + reverse)
     gwv_contract/3: remove non-bg cells that have at least one in-bounds 4-connected bg neighbor
     gwv_contract_n/4: apply gwv_contract exactly N times
+
+gridshift
+Grid Shifting and Cyclic Rolling: Linear Shifts, Toroidal Rolls, Per-Row/Column Rolls, Color Shift, and Offset (gsh_*, Layer 230)
+    gsh_shift_right/4: shift each row right by N; left cells become BgColor
+    gsh_shift_left/4: shift each row left by N; right cells become BgColor
+    gsh_shift_down/4: shift all rows down by N; N new BgColor rows at top
+    gsh_shift_up/4: shift all rows up by N; N new BgColor rows at bottom
+    gsh_roll_right/3: cyclically roll each row right by N (toroidal)
+    gsh_roll_left/3: cyclically roll each row left by N (toroidal)
+    gsh_roll_down/3: cyclically roll entire grid down by N rows (toroidal)
+    gsh_roll_up/3: cyclically roll entire grid up by N rows (toroidal)
+    gsh_roll_row/4: cyclically roll a single named row right by N positions
+    gsh_roll_col/4: cyclically roll a single named column down by N positions (via transpose)
+    gsh_shift_color/6: shift all cells of Color by (DR, DC); OOB cells disappear; vacated become BgColor
+    gsh_offset/5: shift entire grid by (DR, DC); Result[R][C] = Grid[R-DR][C-DC] or BgColor
+    gsh_shift_row/5: shift single row by N (positive=right, negative=left) with bg fill
+    gsh_shift_col/5: shift single column by N (positive=down, negative=up; via transpose)

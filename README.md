@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       250 work packages — the complete cognitive engine (see below)
+├── packs/       251 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,11 +78,11 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 190 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 229 (gridwave).
+Layer 60 and above is the Data Layer: the 191 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 230 (gridshift).
 
 The full layer table is in Architecture Section 0.4.
 
-### The 250 Work Packages
+### The 251 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -330,6 +330,7 @@ Everything is inspectable.
 | `gridpatch` | Grid Patch Operations: Extract, Place, Overlay, Find, Tile, Scatter, and Inpaint (gpt_*, Layer 227) (PR 337) |
 | `gridscan` | Grid Ray Scanning: First Hit, Distance, Row/Column Content, and Blocking Detection in Four Directions (gsn_*, Layer 228) (PR 338) |
 | `gridwave` | Grid Wave Propagation: Color Expansion, Contraction, Frontier Detection, and Directional Shadows (gwv_*, Layer 229) (PR 339) |
+| `gridshift` | Grid Shifting and Cyclic Rolling: Linear Shifts, Toroidal Rolls, Per-Row/Column Rolls, Color Shift, and Offset (gsh_*, Layer 230) (PR 340) |
 | `gridtile` | Grid Tiling Pattern Analysis: Period Detection, Tile Extraction, Tiling Verification, and Grid Construction from Tiles (gti_*, Layer 224) (PR 334) |
 | `gridgrav` | Grid Gravity Simulation: Settlement in Four Directions, Pile Analysis, and Floating Cell Detection (gv_*, Layer 223) (PR 333) |
 | `gridpos` | Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222) (PR 332) |
@@ -397,11 +398,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v216` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v208` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v210` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v263` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v266` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v217` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v209` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v211` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v264` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v267` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---
