@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       247 work packages — the complete cognitive engine (see below)
+├── packs/       248 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,11 +78,11 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 187 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 226 (gridcrop).
+Layer 60 and above is the Data Layer: the 188 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 227 (gridpatch).
 
 The full layer table is in Architecture Section 0.4.
 
-### The 247 Work Packages
+### The 248 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -327,6 +327,7 @@ Everything is inspectable.
 | `gridsymm` | Grid Symmetry: Detection, Completion, Violations, and Score (gsm_*, Layer 208) (PR 318) |
 | `gridmark` | Grid Marking and Annotation: Mark Cells, Rows, Columns, Borders, Diagonals, Rectangles, and Checkerboards (gmk_*, Layer 225) (PR 335) |
 | `gridcrop` | Grid Cropping and Padding: Bounding Box, Trim, Crop, Pad, Center, Border, and Expand (gcr_*, Layer 226) (PR 336) |
+| `gridpatch` | Grid Patch Operations: Extract, Place, Overlay, Find, Tile, Scatter, and Inpaint (gpt_*, Layer 227) (PR 337) |
 | `gridtile` | Grid Tiling Pattern Analysis: Period Detection, Tile Extraction, Tiling Verification, and Grid Construction from Tiles (gti_*, Layer 224) (PR 334) |
 | `gridgrav` | Grid Gravity Simulation: Settlement in Four Directions, Pile Analysis, and Floating Cell Detection (gv_*, Layer 223) (PR 333) |
 | `gridpos` | Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222) (PR 332) |

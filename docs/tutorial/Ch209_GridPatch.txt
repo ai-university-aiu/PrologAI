@@ -1,0 +1,102 @@
+Chapter 209: Grid Patch Operations (gridpatch, gpt_*)
+
+Layer 227 - Work Package 248
+
+The gridpatch pack provides fourteen predicates for working with sub-grid regions
+(patches): extracting, placing, overlaying, searching, tiling, scattering, and
+clearing. A patch is itself a grid (list of rows of color atoms).
+
+
+1. Extracting and Placing
+
+gpt_extract/6 copies a rectangular region from a grid:
+
+  G = [[x,b,x,b],[b,x,b,x],[x,b,x,b],[b,x,b,x]].
+  gpt_extract(G, 0, 0, 1, 1, P).  % P = [[x,b],[b,x]]
+
+gpt_place/5 pastes a patch at a position, overwriting cells:
+
+  gpt_place(G, [[m,m],[m,m]], 1, 1, R).
+  % R row 1 = [b,m,m,x], row 2 = [x,m,m,b]
+
+
+2. Overlay with Transparency
+
+gpt_overlay/6 pastes a patch but skips cells with a transparency color:
+
+  Patch = [[b,m],[m,b]].
+  gpt_overlay(G, Patch, 0, 0, b, R).
+  % b cells in Patch are transparent: Grid cells shine through
+  % m cells in Patch overwrite the Grid
+
+
+3. Searching for Patches
+
+gpt_match_at/4 checks if a patch matches at a specific position:
+
+  gpt_match_at(G, [[x,b],[b,x]], 0, 0).  % succeeds
+  gpt_match_at(G, [[x,x],[x,x]], 0, 0).  % fails
+
+gpt_find_all/3 returns all matching positions:
+
+  gpt_find_all(G, [[x,b],[b,x]], Pos).
+  % Pos = [0-0, 0-2, 1-1, 2-0, 2-2]  (5 positions in 4x4 checker)
+
+gpt_count/3 counts them:
+
+  gpt_count(G, [[x,b],[b,x]], N).  % N = 5
+
+gpt_replace_first/4 replaces the first (top-left) match:
+
+  gpt_replace_first(G, [[x,b],[b,x]], [[z,z],[z,z]], R).
+  % replaces the match at (0,0)
+
+
+4. Tiling and Scattering
+
+gpt_tile_fill/4 builds an H x W grid by repeating a tile:
+
+  gpt_tile_fill([[x,b],[b,x]], 4, 4, G).  % G = checker grid
+
+gpt_scatter/4 places a patch at each of a list of positions:
+
+  gpt_scatter(G, [[m]], [0-0, 2-2, 3-3], R).
+  % places [[m]] at three positions, left-to-right
+
+
+5. Dimensions and Equality
+
+gpt_h/2, gpt_w/2, and gpt_size/3 return patch dimensions:
+
+  gpt_h([[x,b],[b,x]], H).  % H = 2
+  gpt_w([[x,b],[b,x]], W).  % W = 2
+  gpt_size([[x,b],[b,x]], H, W).  % H = 2, W = 2
+
+gpt_eq/2 checks if two patches are identical:
+
+  gpt_eq([[x,b],[b,x]], [[x,b],[b,x]]).  % succeeds
+
+
+6. Inpainting
+
+gpt_inpaint/7 clears a rectangular region to a fill color:
+
+  gpt_inpaint(G, 1, 1, 2, 2, b, R).  % sets rows 1-2, cols 1-2 to b
+
+
+7. Predicate Reference
+
+  gpt_extract/6       - extract sub-grid region
+  gpt_place/5         - paste patch at position (overwrite)
+  gpt_overlay/6       - paste patch with transparency
+  gpt_match_at/4      - check match at position
+  gpt_find_all/3      - all positions where patch matches
+  gpt_count/3         - count matching positions
+  gpt_replace_first/4 - replace first matching occurrence
+  gpt_scatter/4       - place patch at each listed position
+  gpt_tile_fill/4     - build H x W grid by tiling patch
+  gpt_h/2             - height (row count) of patch
+  gpt_w/2             - width (column count) of patch
+  gpt_size/3          - height and width of patch
+  gpt_eq/2            - patch equality check
+  gpt_inpaint/7       - fill rectangular region with color

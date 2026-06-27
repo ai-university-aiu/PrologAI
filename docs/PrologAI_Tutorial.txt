@@ -19030,3 +19030,21 @@ return the height and width of the non-background bounding box.
 :- use_module(pack(gridcrop/prolog/gridcrop)).
 
 14 gcr_* predicates. 44 tests pass. Layer 226.
+
+Chapter 204: gridpatch Pack - Grid Patch Operations (gpt_*, Layer 227)
+
+The gridpatch pack (Layer 227) provides fourteen predicates for working with
+sub-grid regions called patches. A patch is itself a grid: a list of rows of
+color atoms. gpt_extract/6 copies a rectangular region from a grid. gpt_place/5
+pastes a patch at a position, overwriting cells. gpt_overlay/6 pastes with
+transparency: patch cells matching a transparency color are skipped. gpt_match_at/4
+checks if a patch matches at a specific position. gpt_find_all/3 returns all
+positions where a patch matches. gpt_count/3 counts them. gpt_replace_first/4
+replaces the first (top-left) match with a new patch. gpt_scatter/4 places a patch
+at each of a list of positions. gpt_tile_fill/4 builds an H x W grid by repeating
+a tile. gpt_h/2, gpt_w/2, and gpt_size/3 return dimensions. gpt_eq/2 checks
+equality. gpt_inpaint/7 fills a rectangular region with a color.
+
+:- use_module(pack(gridpatch/prolog/gridpatch)).
+
+14 gpt_* predicates. 44 tests pass. Layer 227.
