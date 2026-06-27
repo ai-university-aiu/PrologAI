@@ -1685,3 +1685,20 @@ Grid Group-By Operations: Group, Filter, Sort, Pair, and Count Objects by Attrib
     ggb_sort_by_col(+Objects,-Sorted): sort objects by left col of bbox, smallest first.
     ggb_pair_by_color(+Objects,-Pairs): pair(Color,Obj1,Obj2) for each color with exactly two objects.
     ggb_count_per_color(+Objects,-Counts): cnt(Color,N) list, most frequent color first.
+
+gridrelation
+Grid Object Spatial Relations: Touching, Adjacent, Distance, Above, Below, Left-Of, Right-Of, Bbox Contains, Bbox Overlap, Cells Overlap, Same Rows, Same Cols, Direction, and All Relations (grl_*, Layer 244)
+    grl_touching(+ObjA,+ObjB): succeed if ObjA and ObjB share a 4-adjacent cell edge.
+    grl_adjacent(+ObjA,+ObjB,+N): succeed if min Manhattan distance between objects is =< N.
+    grl_min_distance(+ObjA,+ObjB,-D): minimum Manhattan distance between any cell pair.
+    grl_above(+ObjA,+ObjB): succeed if ObjA's last row < ObjB's first row.
+    grl_below(+ObjA,+ObjB): succeed if ObjA's first row > ObjB's last row.
+    grl_left_of(+ObjA,+ObjB): succeed if ObjA's last col < ObjB's first col.
+    grl_right_of(+ObjA,+ObjB): succeed if ObjA's first col > ObjB's last col.
+    grl_bbox_contains(+ObjA,+ObjB): succeed if ObjA's bbox fully contains ObjB's bbox.
+    grl_bbox_overlap(+ObjA,+ObjB): succeed if bboxes share any area (interval test on both axes).
+    grl_cells_overlap(+ObjA,+ObjB): succeed if any cell position appears in both objects.
+    grl_same_rows(+ObjA,+ObjB): succeed if row ranges of the two bboxes overlap.
+    grl_same_cols(+ObjA,+ObjB): succeed if col ranges of the two bboxes overlap.
+    grl_direction(+ObjA,+ObjB,-Dir): primary direction (above/below/left/right/overlap) from A to B.
+    grl_all_relations(+ObjA,+ObjB,-Relations): list of all true relation atoms between the two objects.

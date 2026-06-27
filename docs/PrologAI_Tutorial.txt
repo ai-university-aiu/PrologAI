@@ -19448,3 +19448,20 @@ Descending sort uses neg(Neg,Obj) keys (Neg is -Size) so msort produces largest
 first. ggb_pair_by_color emits pair/3 only for colors with exactly two objects.
 
 See docs/tutorial/Ch225_GridGroupBy.txt for full details and examples.
+
+Chapter 226: gridrelation - Grid Object Spatial Relations (grl_*, Layer 244)
+
+The gridrelation pack adds fourteen predicates for computing spatial relations
+between ob(Color,Cells,BBox) object terms from gob_all_objects.
+
+Predicates: grl_touching/2, grl_adjacent/3, grl_min_distance/3, grl_above/2,
+grl_below/2, grl_left_of/2, grl_right_of/2, grl_bbox_contains/2,
+grl_bbox_overlap/2, grl_cells_overlap/2, grl_same_rows/2, grl_same_cols/2,
+grl_direction/3, grl_all_relations/3.
+
+Key design: grl_touching cuts after first match. grl_direction uses doubled
+centroid (R0+R1, C0+C1) for exact integer arithmetic; tie favors vertical axis.
+grl_bbox_overlap uses standard interval test; adjacent single-cell bboxes do not
+overlap. grl_all_relations uses a findall over a 10-element Rel-Goal association.
+
+See docs/tutorial/Ch226_GridRelation.txt for full details and examples.
