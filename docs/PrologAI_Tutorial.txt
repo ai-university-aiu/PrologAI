@@ -18994,3 +18994,21 @@ extracts the minimal tile.
 :- use_module(pack(gridtile/prolog/gridtile)).
 
 14 gti_* predicates. 44 tests pass. Layer 224.
+
+Chapter 202: gridmark Pack - Grid Marking and Annotation (gmk_*, Layer 225)
+
+The gridmark pack (Layer 225) provides fourteen predicates for creating annotated
+copies of a grid with specific cells overwritten by a mark color. All operations
+are non-destructive. gmk_mark_cell/5 marks a single cell. gmk_mark_cells/4 marks
+a list of R-C pairs. gmk_mark_row/4 and gmk_mark_col/4 mark entire rows or
+columns. gmk_mark_rect/7 marks a rectangular region. gmk_mark_border/3 marks the
+outer ring. gmk_mark_diagonal/3 marks cells where R=C. gmk_mark_anti_diagonal/3
+marks cells where R+C=W-1. gmk_mark_corners/3 marks the four corners.
+gmk_mark_cross/3 marks the center row and column. gmk_mark_checkerboard/3 marks
+cells where (R+C) mod 2 = 0. gmk_marked_cells/3 returns R-C pairs of marked
+cells. gmk_is_marked/4 checks a single cell. gmk_erase/4 replaces mark color
+with a background color.
+
+:- use_module(pack(gridmark/prolog/gridmark)).
+
+14 gmk_* predicates. 44 tests pass. Layer 225.

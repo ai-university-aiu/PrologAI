@@ -1,0 +1,97 @@
+Chapter 207: Grid Marking and Annotation (gridmark, gmk_*)
+
+Layer 225 - Work Package 246
+
+The gridmark pack provides fourteen predicates for creating annotated copies of a
+grid where specific cells are overwritten by a mark color. All operations are
+non-destructive: the input Grid is unchanged and Marked is a new grid.
+
+
+1. Marking Individual Cells
+
+gmk_mark_cell/5 marks a single cell at (R, C):
+
+  G = [[b,b,b],[b,b,b],[b,b,b]].
+  gmk_mark_cell(G, 1, 1, m, M).  % M[1][1] = m; all other cells = b
+
+gmk_mark_cells/4 marks a list of R-C pairs in one pass:
+
+  gmk_mark_cells(G, [0-0, 1-1, 2-2], m, M).  % diagonal marked
+
+
+2. Marking Lines and Rectangles
+
+gmk_mark_row/4 and gmk_mark_col/4 mark all cells in a row or column:
+
+  gmk_mark_row(G, 0, m, M).  % M row 0 = [m, m, m]
+  gmk_mark_col(G, 2, m, M).  % all rows have m at col 2
+
+gmk_mark_rect/7 marks all cells within a rectangle:
+
+  gmk_mark_rect(G, 1, 1, 2, 2, m, M).  % 2x2 inner square
+
+
+3. Marking Structural Patterns
+
+gmk_mark_border/3 marks all outer-ring cells (first and last row, first and last
+column):
+
+  G4 = [[b,b,b,b],[b,b,b,b],[b,b,b,b],[b,b,b,b]].
+  gmk_mark_border(G4, m, M).
+  % M row 0 = [m,m,m,m], M row 3 = [m,m,m,m], cols 0 and 3 all m
+
+gmk_mark_diagonal/3 marks cells where R = C (main diagonal):
+
+  gmk_mark_diagonal(G4, m, M).
+  % marks (0,0),(1,1),(2,2),(3,3)
+
+gmk_mark_anti_diagonal/3 marks cells where R + C = W - 1:
+
+  gmk_mark_anti_diagonal(G4, m, M).
+  % marks (0,3),(1,2),(2,1),(3,0)
+
+gmk_mark_corners/3 marks the four corner cells:
+
+  gmk_mark_corners(G4, m, M).  % marks (0,0),(0,3),(3,0),(3,3)
+
+gmk_mark_cross/3 marks the center row (H//2) and center column (W//2):
+
+  gmk_mark_cross(G4, m, M).
+  % marks all of row 2 and all of col 2 (7 cells total for 4x4)
+
+gmk_mark_checkerboard/3 marks cells where (R+C) mod 2 = 0:
+
+  gmk_mark_checkerboard(G4, m, M).  % 8 cells marked in 4x4
+
+
+4. Querying and Erasing
+
+gmk_marked_cells/3 returns the list of R-C pairs for all cells with MarkColor:
+
+  gmk_marked_cells(M, m, Cs).  % Cs = [0-0, 1-1, 2-2, 3-3] after mark_diagonal
+
+gmk_is_marked/4 checks if a specific cell has MarkColor:
+
+  gmk_is_marked(M, 1, 1, m).  % succeeds
+
+gmk_erase/4 replaces all MarkColor cells with BgColor, effectively undoing marking:
+
+  gmk_erase(M, m, b, E).  % E = original G (if G was all b before marking)
+
+
+5. Predicate Reference
+
+  gmk_mark_cell/5          - mark one cell
+  gmk_mark_cells/4         - mark a list of cells
+  gmk_mark_row/4           - mark all cells in a row
+  gmk_mark_col/4           - mark all cells in a column
+  gmk_mark_rect/7          - mark a rectangular region
+  gmk_mark_border/3        - mark the outer ring
+  gmk_mark_diagonal/3      - mark main diagonal (R=C)
+  gmk_mark_anti_diagonal/3 - mark anti-diagonal (R+C=W-1)
+  gmk_mark_corners/3       - mark four corner cells
+  gmk_mark_cross/3         - mark center row and column
+  gmk_marked_cells/3       - list cells with MarkColor
+  gmk_is_marked/4          - check if cell has MarkColor
+  gmk_mark_checkerboard/3  - mark even-parity cells
+  gmk_erase/4              - replace MarkColor with BgColor
