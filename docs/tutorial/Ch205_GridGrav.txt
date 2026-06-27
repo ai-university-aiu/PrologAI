@@ -1,0 +1,102 @@
+Chapter 205: Grid Gravity Simulation (gridgrav, gv_*)
+
+Layer 223 - Work Package 244
+
+The gridgrav pack provides fourteen predicates for simulating gravity within a
+raw grid. Non-background cells (any cell whose color differs from a specified
+BgColor) settle toward an edge of their row or column under gravity. The pack
+supports analysis of how many cells move, where they end up, and whether a grid
+is already settled.
+
+
+1. Gravity Directions
+
+gv_fall_down/3 settles non-bg cells to the bottom of each column, packing them
+as low as possible while preserving their relative order. BgColor fills the
+vacated top positions.
+
+  G = [[b,x,b],[x,b,b],[b,b,x],[b,b,b]].
+  gv_fall_down(G, b, F).
+  % F = [[b,b,b],[b,b,b],[b,b,b],[x,x,x]]
+
+gv_fall_up/3, gv_fall_left/3, and gv_fall_right/3 work the same way in the
+named direction:
+
+  gv_fall_up(G, b, F).    % x cells rise to the top of each column
+  gv_fall_left(G, b, F).  % x cells pack left in each row
+  gv_fall_right(G, b, F). % x cells pack right in each row
+
+All four operations preserve the count and relative order of non-bg cells within
+each row or column.
+
+
+2. Pile Analysis
+
+gv_col_pile_h/4 returns the count of non-bg cells in a single column. Under
+fall_down semantics, this is the pile height that would stack at the bottom.
+
+  gv_col_pile_h(G, 0, b, H).  % H = 1
+
+gv_row_pile_w/4 does the same for rows (useful for left/right gravity).
+
+gv_all_col_piles/3 and gv_all_row_piles/3 return lists of counts for all
+columns and rows respectively:
+
+  gv_all_col_piles(G, b, Piles).  % Piles = [1, 1, 1]
+  gv_all_row_piles(G, b, Piles).  % Piles = [1, 1, 1, 0]
+
+
+3. Floating Cells and Settlement
+
+gv_floating_cells/3 returns R-C pairs for non-bg cells that have a BgColor cell
+directly below them. These are the cells that would move in the next step of
+downward gravity.
+
+  gv_floating_cells(G, b, Cs).  % Cs = [0-1, 1-0, 2-2]
+
+gv_settled/2 succeeds if the grid is already settled (no floating cells):
+
+  gv_settled(G, b).  % fails for G above
+  gv_fall_down(G, b, F), gv_settled(F, b).  % succeeds after falling
+
+
+4. Column Gap and Pile Extremes
+
+gv_col_gap_above/4 returns the number of BgColor cells at the top of a column
+above the first non-bg cell. For an all-bg column it returns the full height.
+
+  G3 = [[a,b],[b,b],[b,b]].
+  gv_col_gap_above(G3, 0, b, Gap).  % Gap = 0 (a is at the top)
+  gv_col_gap_above(G3, 1, b, Gap).  % Gap = 3 (column 1 is all bg)
+
+gv_max_col_pile/3 returns the index of the column with the most non-bg cells;
+gv_min_col_pile/3 returns the index of the column with the fewest. Ties
+resolve to the lowest column index.
+
+  gv_max_col_pile(G, b, C).  % C = 0 (all columns tied; lowest wins)
+
+
+5. Total Non-BG Count
+
+gv_non_bg_count/3 returns the total count of non-bg cells in the entire grid.
+This count is invariant under any gravity operation.
+
+  gv_non_bg_count(G, b, N).  % N = 3
+
+
+6. Predicate Reference
+
+  gv_fall_down/3      - settle non-bg cells to bottom
+  gv_fall_up/3        - settle non-bg cells to top
+  gv_fall_left/3      - settle non-bg cells to left of each row
+  gv_fall_right/3     - settle non-bg cells to right of each row
+  gv_col_pile_h/4     - non-bg count in column C
+  gv_row_pile_w/4     - non-bg count in row R
+  gv_all_col_piles/3  - pile heights for all columns
+  gv_all_row_piles/3  - pile widths for all rows
+  gv_floating_cells/3 - R-C pairs of cells with bg directly below
+  gv_settled/2        - succeeds if grid is fully settled (down)
+  gv_col_gap_above/4  - bg cells at top of column before first non-bg
+  gv_max_col_pile/3   - column index with max non-bg count
+  gv_min_col_pile/3   - column index with min non-bg count
+  gv_non_bg_count/3   - total non-bg cell count

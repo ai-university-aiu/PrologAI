@@ -1332,3 +1332,20 @@ Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerb
     gps_corners/2: four corner cells as R-C-Value terms (tl, tr, bl, br order)
     gps_cross_h/3: center row index and row content
     gps_cross_v/3: center column index and column content as a list
+
+gridgrav
+Grid Gravity Simulation: Settlement in Four Directions, Pile Analysis, and Floating Cell Detection (gv_*, Layer 223)
+    gv_fall_down/3: settle non-bg cells to the bottom of each column; bg fills top vacancies
+    gv_fall_up/3: settle non-bg cells to the top of each column; bg fills bottom vacancies
+    gv_fall_left/3: settle non-bg cells to the left of each row; bg fills right vacancies
+    gv_fall_right/3: settle non-bg cells to the right of each row; bg fills left vacancies
+    gv_col_pile_h/4: count of non-bg cells in column C (pile height under down gravity)
+    gv_row_pile_w/4: count of non-bg cells in row R (pile width under left gravity)
+    gv_all_col_piles/3: list of pile heights for all columns in column-index order
+    gv_all_row_piles/3: list of pile widths for all rows in row-index order
+    gv_floating_cells/3: R-C pairs of non-bg cells that have a bg cell directly below them
+    gv_settled/2: succeeds if no cell would move under down gravity (no floating cells)
+    gv_col_gap_above/4: count of bg cells at the top of column C above the first non-bg cell
+    gv_max_col_pile/3: column index with the most non-bg cells (ties: lowest index)
+    gv_min_col_pile/3: column index with the fewest non-bg cells (ties: lowest index)
+    gv_non_bg_count/3: total count of non-bg cells across the entire grid
