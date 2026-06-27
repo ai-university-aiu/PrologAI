@@ -9350,3 +9350,39 @@ Design notes:
   preserve distinct non-bg colors.
 - gco_apply_palette delegates to gco_apply_map after building a replace map
   from (ByFreq[K] -> Palette[K]) pairs for K < min(|Palette|, |ByFreq|).
+
+
+ARCH-228: gridresize Pack (grs_*, Layer 241)
+
+Pack name: gridresize
+Layer: 241
+Prefix: grs_
+Module file: packs/gridresize/prolog/gridresize.pl
+Test file: packs/gridresize/test/test_gridresize.pl
+Pack file: packs/gridresize/pack.pl
+Dependencies: built-ins only (no library imports). No cross-pack dependencies.
+Work Package: WP-262
+
+Public predicates (14):
+  grs_scale_up/3, grs_scale_down/4, grs_scale_down_mode/4,
+  grs_double/2, grs_halve/3, grs_resize/5, grs_tile_to/4,
+  grs_crop/6, grs_border_crop/4, grs_fit_in/5, grs_embed_in/5,
+  grs_grid_size/3, grs_aspect_ratio/4, grs_is_square/1
+
+Private helpers (4):
+  grs_dims_/3, grs_cell_/4, grs_count_/3, grs_mode_/2
+
+Design notes:
+- All if-then-else blocks following a grs_dims_ call are wrapped in explicit
+  outer parentheses. Without them, SWI-Prolog parses the preceding comma-chain
+  as part of the if-then condition, leaving H and W from grs_dims_ unbound in
+  the else branch. The outer parens make the entire if-then-else a single goal
+  with precedence 0, cleanly separating it from the preceding grs_dims_ call.
+- grs_mode_ uses Neg is -N (arithmetic evaluation) for the sort key, not the
+  compound term -N, following the same pattern established in gridcolorop.
+- grs_resize uses floor integer arithmetic (R*H)//NewH rather than floating-
+  point to avoid rounding issues with large grids.
+- grs_fit_in uses round/1 for the scaled dimensions rather than floor/1, to
+  get the best-fitting integer dimension from the float scale factor.
+- grs_crop clamps indices to grid bounds rather than failing on out-of-bounds
+  requests; this matches the expected behavior for imprecise crop calls.

@@ -19392,3 +19392,23 @@ gco_invert is binary: all non-bg becomes Bg, all Bg becomes FgColor.
 
 See docs/tutorial/Ch222_GridColorOp.txt for full predicate descriptions,
 design notes, example session, and test coverage summary.
+
+Chapter 223: gridresize - Grid Resize and Scale Operations (grs_*, Layer 241)
+
+The gridresize pack adds fourteen predicates for scaling, resizing, tiling,
+cropping, and fitting symbolic grids: integer scale-up/down, mode downsample,
+double and halve shortcuts, nearest-neighbor resize, modular tiling, rectangular
+crop, border crop, letterbox fit, canvas centering, dimension query, aspect ratio,
+and square test.
+
+Predicates: grs_scale_up/3, grs_scale_down/4, grs_scale_down_mode/4,
+grs_double/2, grs_halve/3, grs_resize/5, grs_tile_to/4, grs_crop/6,
+grs_border_crop/4, grs_fit_in/5, grs_embed_in/5, grs_grid_size/3,
+grs_aspect_ratio/4, grs_is_square/1.
+
+Key design: all if-then-else blocks following grs_dims_ must be wrapped in
+outer parentheses; without them SWI-Prolog parses grs_dims_ as part of the
+condition and H, W are unbound in the else branch. grs_mode_ uses arithmetic
+negation (Neg is -N) for sort keys. grs_fit_in uses round/1 for pixel rounding.
+
+See docs/tutorial/Ch223_GridResize.txt for full details and examples.

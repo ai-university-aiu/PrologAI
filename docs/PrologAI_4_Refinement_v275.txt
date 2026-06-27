@@ -18519,3 +18519,51 @@ AC-GCO-041: gco_count_distinct([[r,g,y],[b,b,b]],b,3).
 AC-GCO-042: gco_cycle([[r,b],[b,b]],[r,g,y],2,b,[[y,b],[b,b]]). (2 steps)
 AC-GCO-043: gco_apply_palette([[r,r,g],[g,g,b]],b,[a,c],[[c,c,a],[a,a,b]]). (g=rank0->a, r=rank1->c)
 AC-GCO-044: gco_remove_color then gco_count_distinct = 1 for [[r,g],[g,r]] minus r.
+
+
+WP-262 Acceptance Criteria: gridresize Pack (grs_*, Layer 241)
+
+AC-GRS-001: grs_scale_up([[r]],2,[[r,r],[r,r]]).
+AC-GRS-002: grs_scale_up([[a,b],[c,d]],2,[[a,a,b,b],[a,a,b,b],[c,c,d,d],[c,c,d,d]]).
+AC-GRS-003: grs_scale_up([[r,g],[b,b]],1,[[r,g],[b,b]]). (factor 1 = identity)
+AC-GRS-004: grs_scale_down([[a,b],[c,d]],2,b,[[a]]). (top-left sample)
+AC-GRS-005: grs_scale_down([[a,a,b,b],[a,a,b,b],[c,c,d,d],[c,c,d,d]],2,b,[[a,b],[c,d]]).
+AC-GRS-006: grs_scale_down([[r]],2,b,[]). (1x1 by 2 = 0x0 = [])
+AC-GRS-007: grs_scale_down_mode([[r,r],[g,r]],2,b,[[r]]). (r appears 3x, mode=r)
+AC-GRS-008: grs_scale_down_mode([[a,b],[b,a]],2,b,[[X]]) - (X=a;X=b). (tie)
+AC-GRS-009: grs_scale_down_mode([[g,g],[g,g]],2,b,[[g]]). (uniform block)
+AC-GRS-010: grs_double([[r]],[[r,r],[r,r]]).
+AC-GRS-011: grs_double([[a,b]],[[a,a,b,b],[a,a,b,b]]).
+AC-GRS-012: grs_halve([[r,g],[b,y]],b,[[r]]). (top-left of 2x2 block)
+AC-GRS-013: grs_resize([[r]],3,3,b,[[r,r,r],[r,r,r],[r,r,r]]).
+AC-GRS-014: grs_resize([[a,b],[c,d]],1,1,b,[[a]]). (sample floor(0*2/1)=0)
+AC-GRS-015: grs_resize([[a,b,c]],1,2,b,[[a,b]]). (nearest-neighbor downsample)
+AC-GRS-016: grs_tile_to([[a,b],[c,d]],4,4,[[a,b,a,b],[c,d,c,d],[a,b,a,b],[c,d,c,d]]).
+AC-GRS-017: grs_tile_to([[a,b],[c,d]],3,3,[[a,b,a],[c,d,c],[a,b,a]]).
+AC-GRS-018: grs_tile_to([[r,g],[b,b]],2,2,[[r,g],[b,b]]). (same dims = identity)
+AC-GRS-019: grs_crop([[a,b,c],[d,e,f],[g,h,i]],0,0,1,1,[[a,b],[d,e]]).
+AC-GRS-020: grs_crop([[a,b,c],[d,e,f]],1,0,1,2,[[d,e,f]]). (single row)
+AC-GRS-021: grs_crop([[a,b],[c,d]],0,0,5,5,[[a,b],[c,d]]). (clamped)
+AC-GRS-022: grs_border_crop([[a,b,c],[d,e,f],[g,h,i]],1,b,[[e]]).
+AC-GRS-023: grs_border_crop([[a,b],[c,d]],0,b,[[a,b],[c,d]]). (N=0 identity)
+AC-GRS-024: grs_border_crop([[a,b],[c,d]],2,b,[]). (too large)
+AC-GRS-025: grs_fit_in([[a,b],[c,d]],4,4,b,[[a,a,b,b],[a,a,b,b],[c,c,d,d],[c,c,d,d]]).
+AC-GRS-026: grs_fit_in([[r,g]],4,6,b,Result) - length(Result,4).
+AC-GRS-027: grs_fit_in([[r]],3,3,b,[[r,r,r],[r,r,r],[r,r,r]]).
+AC-GRS-028: grs_embed_in([[r]],3,3,b,[[b,b,b],[b,r,b],[b,b,b]]).
+AC-GRS-029: grs_embed_in([[a,b],[c,d]],2,2,b,[[a,b],[c,d]]). (same size)
+AC-GRS-030: grs_embed_in([[a,b],[c,d]],4,4,b,[[b,b,b,b],[b,a,b,b],[b,c,d,b],[b,b,b,b]]).
+AC-GRS-031: grs_grid_size([[a,b,c],[d,e,f]],2,3).
+AC-GRS-032: grs_grid_size([[r]],1,1).
+AC-GRS-033: grs_aspect_ratio([[a,b,c,d],[e,f,g,h]],2,4,R) - abs(R-2.0)<0.001.
+AC-GRS-034: grs_aspect_ratio([[a,b],[c,d]],2,2,R) - abs(R-1.0)<0.001.
+AC-GRS-035: grs_is_square([[a,b],[c,d]]).
+AC-GRS-036: \+ grs_is_square([[a,b,c],[d,e,f]]).
+AC-GRS-037: integration - scale_up(Grid,3,Big), scale_down(Big,3,b,Grid).
+AC-GRS-038: integration - double(Grid,Big), halve(Big,b,Grid).
+AC-GRS-039: integration - resize to 4x6, check size is 4x6.
+AC-GRS-040: integration - tile_to 1x2 to 2x4, crop row 0 cols 0-1 = [[r,b]].
+AC-GRS-041: grs_scale_up([[r,g]],3,[[r,r,r,g,g,g],[r,r,r,g,g,g],[r,r,r,g,g,g]]).
+AC-GRS-042: grs_resize(Grid,2,2,b,Grid). (same dims = identity)
+AC-GRS-043: grs_embed_in([[r,g,b]],3,3,x,[[x,x,x],[r,g,b],[x,x,x]]).
+AC-GRS-044: integration - border_crop 4x4 by N=1, check size is 2x2.
