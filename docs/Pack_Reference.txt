@@ -1702,3 +1702,20 @@ Grid Object Spatial Relations: Touching, Adjacent, Distance, Above, Below, Left-
     grl_same_cols(+ObjA,+ObjB): succeed if col ranges of the two bboxes overlap.
     grl_direction(+ObjA,+ObjB,-Dir): primary direction (above/below/left/right/overlap) from A to B.
     grl_all_relations(+ObjA,+ObjB,-Relations): list of all true relation atoms between the two objects.
+
+gridtransform
+Grid Transformation Detection and Application: Color Map, Apply Map, Diff Cells, Diff Count, Same Cells, Changed Colors, Invert Map, Compose Maps, Identity Test, Apply Changes, Delta Grid, Overlay, Common Grid, and Color Permutation Test (gtr_*, Layer 245)
+    gtr_color_map(+GridA,+GridB,-Map): sorted cm(Old,New) list for consistent color mapping A→B; fails if inconsistent.
+    gtr_apply_color_map(+Grid,+Map,-Result): apply cm/2 color map; unmapped colors pass through.
+    gtr_diff_cells(+GridA,+GridB,-Cells): r(R,C) positions where grids differ.
+    gtr_diff_count(+GridA,+GridB,-N): count of positions where grids differ.
+    gtr_same_cells(+GridA,+GridB,-Cells): r(R,C) positions where grids agree.
+    gtr_changed_colors(+GridA,+GridB,-Changes): chg(R,C,OldColor,NewColor) for each changed position.
+    gtr_invert_map(+Map,-InvMap): invert color map; fails if not injective.
+    gtr_compose_maps(+MapAtoB,+MapBtoC,-MapAtoC): compose two color maps.
+    gtr_is_identity_map(+Map): succeed if every cm/2 has same source and target.
+    gtr_apply_changes(+Grid,+Changes,-Result): apply list of chg/4 to a grid.
+    gtr_delta_grid(+GridA,+GridB,+Bg,-Delta): changed cells show B value; unchanged = Bg.
+    gtr_overlay(+Base,+Delta,+Bg,-Result): paste non-Bg cells of Delta onto Base.
+    gtr_common_grid(+GridA,+GridB,+Bg,-Common): keep matching cells; differing = Bg.
+    gtr_is_color_permutation(+GridA,+GridB): succeed if B is a bijective color permutation of A.
