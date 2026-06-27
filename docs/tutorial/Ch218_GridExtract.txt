@@ -1,0 +1,118 @@
+Chapter 218: gridextract - Grid Object Extraction (gxt_*, Layer 236)
+
+Overview
+
+The gridextract pack provides fourteen gxt_* predicates for collecting cells,
+computing bounding boxes, extracting sub-grid crops, and building object
+registries from symbolic grids. All cell references use the r(R,C,V) triple
+format; all bounding boxes use bb(MinR,MinC,MaxR,MaxC).
+
+Pack: gridextract
+Module: gridextract
+Prefix: gxt_
+Layer: 236
+Dependencies: library(lists), msort/2, nth0/3, sumlist/2 (built-ins)
+
+
+Cell Collection
+
+gxt_nonbg_cells(+Grid, +BgColor, -Cells)
+All non-bg cells as r(R,C,V) triples in row-major order.
+
+    gxt_nonbg_cells([[r,b,g],[b,b,b],[b,b,r]], b, Cells).
+    % Cells = [r(0,0,r), r(0,2,g), r(2,2,r)]
+
+gxt_color_cells(+Grid, +Color, -Cells)
+All cells of a specific color as r(R,C,Color) triples.
+
+    gxt_color_cells([[r,b],[b,r]], r, [r(0,0,r), r(1,1,r)]).
+
+gxt_row_cells(+Grid, +Row, +BgColor, -Cells)
+Non-bg cells in a specific 0-indexed row.
+
+    gxt_row_cells([[r,b,g],[b,b,b]], 0, b, [r(0,0,r), r(0,2,g)]).
+
+gxt_col_cells(+Grid, +Col, +BgColor, -Cells)
+Non-bg cells in a specific 0-indexed column.
+
+    gxt_col_cells([[r,b],[b,b],[g,b]], 0, b, [r(0,0,r), r(2,0,g)]).
+
+
+Bounding Boxes and Crops
+
+gxt_bbox(+Grid, +BgColor, -BBox, -Cells)
+Tight bounding box over all non-bg cells. BBox = bb(MinR,MinC,MaxR,MaxC).
+Cells is the list of non-bg r(R,C,V) triples. Fails if the grid is all-bg.
+
+    gxt_bbox([[b,b,b],[b,r,b],[b,b,b]], b, bb(1,1,1,1), [r(1,1,r)]).
+
+gxt_crop_bbox(+Grid, +BgColor, +BBox, -Crop, -Offset)
+Extract the sub-grid defined by BBox. Offset = off(R1,C1) is the origin.
+
+    gxt_crop_bbox(Grid, b, bb(1,1,2,2), SubGrid, off(1,1)).
+
+gxt_centered_crop(+Grid, +BgColor, +CropH, +CropW, -Crop)
+Crop of size CropH × CropW centered on the centroid of all non-bg cells.
+The window is clamped to the grid boundaries.
+
+    Grid = [[b,b,b],[b,r,b],[b,b,b]].
+    gxt_centered_crop(Grid, b, 1, 1, [[r]]).
+
+
+Object Identification
+
+gxt_object_at(+Grid, +R, +C, +BgColor, -BBox)
+BFS flood fill from (R,C) using the color at that cell. Returns the bounding box
+of the connected 4-neighbor region of that color.
+
+    Grid = [[b,b,b],[r,r,b],[b,b,b]].
+    gxt_object_at(Grid, 1, 0, b, bb(1,0,1,1)).
+
+gxt_region_count(+Grid, +Color, +BgColor, -Count)
+Count distinct 4-connected regions of the given color. Returns 0 if absent.
+
+    gxt_region_count([[r,b,r],[b,b,b]], r, b, 2).
+
+
+Color Statistics
+
+gxt_all_colors(+Grid, +BgColor, -Colors)
+Sorted list of unique non-bg colors present in the grid.
+
+    gxt_all_colors([[r,g],[b,r]], b, [g,r]).
+
+gxt_color_count(+Grid, +Color, +BgColor, -Count)
+Count of all cells with the given color.
+
+    gxt_color_count([[r,g],[r,r]], r, b, 3).
+
+gxt_largest_color(+Grid, +BgColor, -Color)
+Non-bg color with the most cells (ties broken by msort order).
+
+gxt_smallest_color(+Grid, +BgColor, -Color)
+Non-bg color with the fewest cells (ties broken by msort order).
+
+
+Object Registry
+
+gxt_registry(+Grid, +BgColor, -Registry)
+Build an obj(Color,Count,BBox) record for each unique non-bg color.
+Sorted by color in msort order.
+
+    Grid = [[r,b],[b,g]].
+    gxt_registry(Grid, b, [obj(g,1,bb(1,1,1,1)), obj(r,1,bb(0,0,0,0))]).
+
+
+Typical Workflows
+
+% Extract and crop the non-bg content:
+gxt_bbox(Grid, Bg, BBox, _),
+gxt_crop_bbox(Grid, Bg, BBox, Content, Offset).
+
+% Find all objects and their sizes:
+gxt_registry(Grid, Bg, Registry),
+member(obj(Color, Count, _), Registry).
+
+% Count objects of each color:
+gxt_all_colors(Grid, Bg, Colors),
+maplist([C]>>(gxt_region_count(Grid, C, Bg, N), write(C-N)), Colors).

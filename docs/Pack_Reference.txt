@@ -1549,3 +1549,20 @@ Grid Blending and Layered Composition: Overlay, Underlay, Stencil, Priority Stac
     gbld_merge_many/3: reduce a list of grids with last grid as topmost layer
     gbld_dominant/3: per-cell plurality vote - most frequent non-bg value across a grid list
     gbld_composite/4: mode-dispatched composite reduction: overlay | underlay | dominant
+
+gridextract
+Grid Object Extraction: Bounding Box Crops, Non-BG Object Isolation, Color-Region Extraction, Cell Collection, Largest/Smallest Object, Centered Crop, Region Count, and Object Registry (gxt_*, Layer 236)
+    gxt_nonbg_cells/3: collect all non-bg cells as r(R,C,V) triples in row-major order
+    gxt_color_cells/3: collect all cells of a specific color as r(R,C,Color) triples
+    gxt_bbox/4: compute tight bounding box bb(MinR,MinC,MaxR,MaxC) of all non-bg cells; fails if all-bg
+    gxt_crop_bbox/5: extract sub-grid for bounding box; returns crop and off(R1,C1) offset
+    gxt_object_at/5: BFS flood fill bounding box of 4-connected same-color region from (R,C)
+    gxt_all_colors/3: sorted unique list of all non-bg colors present in the grid
+    gxt_color_count/4: count all occurrences of a specific color
+    gxt_largest_color/3: non-bg color with the most cells (msort tie-breaking)
+    gxt_smallest_color/3: non-bg color with the fewest cells (msort tie-breaking)
+    gxt_centered_crop/5: crop of given height/width centered on centroid of non-bg cells (clamped)
+    gxt_row_cells/4: non-bg cells in a specific 0-indexed row as r(R,C,V) triples
+    gxt_col_cells/4: non-bg cells in a specific 0-indexed column as r(R,C,V) triples
+    gxt_region_count/4: count distinct 4-connected regions of a given color
+    gxt_registry/3: obj(Color,Count,BBox) records for each unique non-bg color, sorted by color

@@ -9204,3 +9204,30 @@ Design notes:
   selection; cell values are taken directly from one of the two input grids.
 - gbld_dominant uses msort + run-length scan (gbld_best_run_/6) to find the mode.
 - gbld_composite dispatches via a three-clause definition with cuts on each Mode.
+
+ARCH-223: gridextract Pack (gxt_*, Layer 236)
+
+Location: packs/gridextract/
+Files: pack.pl, prolog/gridextract.pl, test/test_gridextract.pl
+Module: gridextract
+Exports: gxt_nonbg_cells/3, gxt_color_cells/3, gxt_bbox/4, gxt_crop_bbox/5,
+         gxt_object_at/5, gxt_all_colors/3, gxt_color_count/4,
+         gxt_largest_color/3, gxt_smallest_color/3, gxt_centered_crop/5,
+         gxt_row_cells/4, gxt_col_cells/4, gxt_region_count/4, gxt_registry/3
+Dependencies: library(lists) - member/2, last/2; msort/2, nth0/3, sumlist/2 as built-ins
+Layer: 236 (above gridblend Layer 235)
+
+Design notes:
+- All cell-collection predicates use findall with between/3 and nth0/3 for clean,
+  deterministic row-major iteration.
+- gxt_bbox/4 fails on all-bg grids rather than returning a degenerate bbox.
+- gxt_object_at uses iterative BFS (worklist) with member-based visited tracking.
+  Suitable for the small grids (≤30×30) found in benchmark tasks.
+- gxt_region_count uses the same BFS, then subtracts visited cells from the
+  remaining cell list using gxt_subtract_. The if-then-else in gxt_region_count
+  uses the form (Cells=[] -> ... ; ...) with Cells bound BEFORE the if-then-else
+  to ensure Cells is available in the else branch.
+- gxt_centered_crop uses sumlist/2 (SWI-Prolog built-in) for sum computation and
+  clamps the crop window with max/min arithmetic.
+- gxt_registry produces obj(Color,Count,BBox) records sorted by color via
+  gxt_all_colors which uses gxt_sorted_unique_ (msort + consecutive dedup).

@@ -19289,3 +19289,27 @@ gbld_dominant/3          - per-cell plurality vote across grid list
 gbld_composite/4         - mode-dispatched composite: overlay | underlay | dominant
 
 10 gbld_* predicates. 44 tests pass. Layer 235.
+
+Chapter 218: gridextract - Grid Object Extraction (gxt_*, Layer 236)
+
+The gridextract pack provides fourteen predicates for collecting cells, computing
+bounding boxes, extracting crops, counting regions, and building object registries.
+
+:- use_module(pack(gridextract/prolog/gridextract)).
+
+gxt_nonbg_cells/3    - all non-bg cells as r(R,C,V) triples in row-major order
+gxt_color_cells/3    - all cells of a specific color as r(R,C,Color) triples
+gxt_bbox/4           - tight bounding box of all non-bg cells + cell list
+gxt_crop_bbox/5      - extract sub-grid for a bounding box + offset
+gxt_object_at/5      - BFS flood bbox of 4-connected same-color region from (R,C)
+gxt_all_colors/3     - sorted unique list of non-bg colors in the grid
+gxt_color_count/4    - count occurrences of a specific color
+gxt_largest_color/3  - non-bg color with the highest cell count
+gxt_smallest_color/3 - non-bg color with the lowest cell count
+gxt_centered_crop/5  - crop of given size centered on centroid of non-bg cells
+gxt_row_cells/4      - non-bg cells in a specific 0-indexed row
+gxt_col_cells/4      - non-bg cells in a specific 0-indexed column
+gxt_region_count/4   - count distinct 4-connected regions of a given color
+gxt_registry/3       - obj(Color,Count,BBox) for each unique non-bg color
+
+14 gxt_* predicates. 44 tests pass. Layer 236.

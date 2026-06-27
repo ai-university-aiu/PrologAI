@@ -14393,3 +14393,20 @@ gbld_dominant(Grids,Bg,R): R[r][c] = mode of non-bg values across grids at (r,c)
 gbld_composite(Grids,Bg,overlay,R) :- gbld_priority(Grids,Bg,R).
 gbld_composite(Grids,Bg,underlay,R) :- gbld_merge_many(Grids,Bg,R).
 gbld_composite(Grids,Bg,dominant,R) :- gbld_dominant(Grids,Bg,R).
+
+Part 247 - WP-257: gridextract (gxt_*, Layer 236)
+
+gxt_nonbg_cells(Grid,Bg,Cells): Cells=[r(R,C,V) | R in 0..H-1, C in 0..W-1, Grid[R][C]/=Bg].
+gxt_color_cells(Grid,Color,Cells): Cells=[r(R,C,Color) | Grid[R][C]=Color].
+gxt_bbox(Grid,Bg,bb(MinR,MinC,MaxR,MaxC),Cells): Cells=gxt_nonbg_cells; Cells/=[]; bbox from min/max of R,C.
+gxt_crop_bbox(Grid,_Bg,bb(R1,C1,R2,C2),Crop,off(R1,C1)): extract rows R1..R2, cols C1..C2.
+gxt_object_at(Grid,R,C,_Bg,BBox): BFS flood fill from (R,C) with color Grid[R][C]; bbox of reachable cells.
+gxt_all_colors(Grid,Bg,Colors): sorted unique non-bg values in Grid.
+gxt_color_count(Grid,Color,_Bg,Count): count of Color occurrences in Grid.
+gxt_largest_color(Grid,Bg,Color): non-bg color with highest count; last of msort(count-color pairs).
+gxt_smallest_color(Grid,Bg,Color): non-bg color with lowest count; first of msort(count-color pairs).
+gxt_centered_crop(Grid,Bg,CropH,CropW,Crop): centroid of non-bg cells → clamped crop window.
+gxt_row_cells(Grid,R,Bg,Cells): non-bg cells in row R as r(R,C,V) triples.
+gxt_col_cells(Grid,C,Bg,Cells): non-bg cells in column C as r(R,C,V) triples.
+gxt_region_count(Grid,Color,_Bg,Count): count 4-connected regions; BFS subtract loop.
+gxt_registry(Grid,Bg,Registry): [obj(Color,Count,BBox)] for each unique non-bg color; sorted by color.
