@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       237 work packages — the complete cognitive engine (see below)
+├── packs/       238 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,11 +78,11 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 177 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 216 (gridframe).
+Layer 60 and above is the Data Layer: the 178 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 217 (gridspiral).
 
 The full layer table is in Architecture Section 0.4.
 
-### The 237 Work Packages
+### The 238 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -325,6 +325,7 @@ Everything is inspectable.
 | `gridmask` | Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206) (PR 315) |
 | `gridxform` | Grid Transformations: Rotate, Flip, Transpose, Crop, Pad, Scale, Tile, Canonicalize (gx_*, Layer 207) (PR 317) |
 | `gridsymm` | Grid Symmetry: Detection, Completion, Violations, and Score (gsm_*, Layer 208) (PR 318) |
+| `gridspiral` | Grid Spiral Traversal: Clockwise Spiral Ordering, Read, Write, Rotate, and Frame Spirals (gsp_*, Layer 217) (PR 327) |
 | `gridframe` | Grid Frame Analysis: Concentric Ring Depth, Frame Extraction, Uniformity, Fill, and Peel (gfr_*, Layer 216) (PR 326) |
 | `griddiag` | Grid Diagonal Analysis: Main and Anti-Diagonal Extraction, Counting, Uniformity, and Modification (gdi_*, Layer 215) (PR 325) |
 | `gridgraph` | Grid Region Adjacency Graph: Color Adjacency, Borders, Enclosure, Spanning, and Component Analysis (ggr_*, Layer 214) (PR 324) |
@@ -384,11 +385,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v203` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v195` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v197` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v250` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v253` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v204` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v196` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v198` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v251` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v254` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---
