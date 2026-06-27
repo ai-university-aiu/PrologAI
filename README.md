@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       234 work packages — the complete cognitive engine (see below)
+├── packs/       235 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,11 +78,11 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 174 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 213 (gridconv).
+Layer 60 and above is the Data Layer: the 175 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 214 (gridgraph).
 
 The full layer table is in Architecture Section 0.4.
 
-### The 234 Work Packages
+### The 235 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -325,6 +325,7 @@ Everything is inspectable.
 | `gridmask` | Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206) (PR 315) |
 | `gridxform` | Grid Transformations: Rotate, Flip, Transpose, Crop, Pad, Scale, Tile, Canonicalize (gx_*, Layer 207) (PR 317) |
 | `gridsymm` | Grid Symmetry: Detection, Completion, Violations, and Score (gsm_*, Layer 208) (PR 318) |
+| `gridgraph` | Grid Region Adjacency Graph: Color Adjacency, Borders, Enclosure, Spanning, and Component Analysis (ggr_*, Layer 214) (PR 324) |
 | `gridconv` | Grid Convolution: Sliding Window, Pattern Matching, Density Maps, and Square Morphology (gcv_*, Layer 213) (PR 323) |
 | `gridmorph` | Grid Morphological Operations: Dilation, Erosion, Opening, Closing, Fill, and Gradient (gmo_*, Layer 212) (PR 322) |
 | `gridedge` | Grid Edge and Boundary Detection: Edge Cells, Boundaries, Corners, Endpoints, and Transition Maps (ge_*, Layer 211) (PR 321) |
@@ -381,11 +382,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v200` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v192` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v194` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v247` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v250` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v201` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v193` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v195` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v248` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v251` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---

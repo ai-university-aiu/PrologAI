@@ -18767,3 +18767,28 @@ gcv_dilate_sq/4 and gcv_erode_sq/4 apply square SE morphology.
 gcv_replace_pattern/4 replaces the first pattern match.
 
 14 gcv_* predicates. 46 tests pass. Layer 213.
+
+
+Chapter 191: gridgraph Pack - Region Adjacency Graph Analysis (ggr_*, Layer 214)
+
+The gridgraph pack (Layer 214) provides fourteen predicates for region adjacency
+graph (RAG) analysis. A "region" is all cells of a given color. The pack covers
+color pair adjacency, per-color neighbor enumeration, full adjacency graph
+construction, degree computation, directional shared border analysis, isolated
+and enclosed color detection, horizontal/vertical spanning detection, color
+merging, and 4-connected component counting and partitioning.
+
+:- use_module(pack(gridgraph/prolog/gridgraph)).
+
+ggr_adj_colors/2 collects sorted (C1-C2, C1@<C2) pairs of 4-adjacent colors;
+ggr_adj_of/3 returns colors adjacent to a given color; ggr_adj_graph/2 builds
+the full adjacency list; ggr_are_adj/3 tests adjacency. ggr_color_degree/3
+counts adjacent colors; ggr_shared_border/4 collects the boundary cells;
+ggr_border_length/4 counts them. ggr_isolated_colors/2 finds degree-0 colors;
+ggr_enclosed_colors/3 finds colors fully surrounded by OuterColor with no
+border cells. ggr_spanning_h/2 and ggr_spanning_v/2 find colors crossing
+the grid. ggr_merge_colors/4 replaces one color with another. 
+ggr_color_components/3 counts connected components; ggr_component_cells/3
+partitions them.
+
+14 ggr_* predicates. 44 tests pass. Layer 214.

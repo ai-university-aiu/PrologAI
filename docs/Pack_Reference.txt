@@ -1179,3 +1179,20 @@ gridconv
     gcv_dilate_sq/4: square SE dilation radius N - cell becomes FgColor if any window cell is FgColor
     gcv_erode_sq/4: square SE erosion radius N - FgColor cell loses color if any in-bounds window cell is not FgColor
     gcv_replace_pattern/4: replace first (row-major) Pattern occurrence with Replacement; unchanged if no match
+
+gridgraph
+    Grid Region Adjacency Graph: Color Adjacency, Borders, Enclosure, Spanning, and Component Analysis (ggr_*, Layer 214)
+    ggr_adj_colors/2: sorted list of color pairs (C1-C2, C1 @< C2) where the two color regions share a 4-connected boundary
+    ggr_adj_of/3: sorted list of distinct colors 4-adjacent to Color
+    ggr_adj_graph/2: full adjacency list as list of (Color, Neighbors) for every distinct color
+    ggr_are_adj/3: test if two distinct colors share at least one 4-connected boundary
+    ggr_color_degree/3: count distinct colors adjacent to Color
+    ggr_shared_border/4: C1 cells that have at least one C2 4-neighbor (directional border)
+    ggr_border_length/4: count of C1 cells touching C2 (directional; may differ from C2->C1 count)
+    ggr_isolated_colors/2: colors with no differently-colored in-bounds 4-neighbor (degree 0)
+    ggr_enclosed_colors/3: colors with no border cells AND every non-self 4-neighbor is OuterColor
+    ggr_spanning_h/2: colors with at least one cell in column 0 AND at least one cell in last column
+    ggr_spanning_v/2: colors with at least one cell in row 0 AND at least one cell in last row
+    ggr_merge_colors/4: replace FromColor with ToColor everywhere in Grid
+    ggr_color_components/3: count 4-connected components of Color
+    ggr_component_cells/3: list of cell-lists; each is one 4-connected component of Color
