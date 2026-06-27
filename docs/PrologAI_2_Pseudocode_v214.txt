@@ -14378,3 +14378,18 @@ gch_reverse(Grids, Rev): reverse(Grids, Rev).
 gch_diff_counts(Grids, _Bg, Counts): gch_pairs(Grids,Pairs); Counts=findall N per pair using cell-diff recursion.
 gch_changes_mask([G],Bg,_,Mask): all-Bg mask same size as G.
 gch_changes_mask([First|Rest],Bg,MC,Mask): last([First|Rest],Last); diff_mask_rows_(First,Last,Bg,MC,Mask).
+
+Part 246 - WP-256: gridblend (gbld_*, Layer 235)
+
+gbld_overlay(Top, Bottom, Bg, R): R[r][c] = Top[r][c] if /=Bg; else Bottom[r][c].
+gbld_underlay(Top, Bottom, Bg, R): R[r][c] = Bottom[r][c] if /=Bg; else Top[r][c].
+gbld_stencil(Source, Stencil, SC, R): R[r][c] = Source[r][c] if Stencil[r][c]=SC; else SC.
+gbld_priority([G], _, G). gbld_priority([G1|Rest], Bg, R) :- priority(Rest,Bg,RR), overlay(G1,RR,Bg,R).
+gbld_checker_blend(G1,G2,_Bg,Par,R): R[r][c] = G1[r][c] if (r+c) mod 2 = Par; else G2[r][c].
+gbld_stripe_blend(G1,G2,Bg,SW,R): row r uses G1 on G2 if (r//SW) mod 2 = 0; else G2 on G1.
+gbld_threshold_replace(Grid,T,RC,Bg,R): for each row: if count(non-bg)>=T replace non-bg with RC; else identity.
+gbld_merge_many([G],_,G). gbld_merge_many([G1|Rest],Bg,R) :- merge_many(Rest,Bg,RR), overlay(Last,RR,Bg,R) where Last=last(Rest).
+gbld_dominant(Grids,Bg,R): R[r][c] = mode of non-bg values across grids at (r,c); else Bg.
+gbld_composite(Grids,Bg,overlay,R) :- gbld_priority(Grids,Bg,R).
+gbld_composite(Grids,Bg,underlay,R) :- gbld_merge_many(Grids,Bg,R).
+gbld_composite(Grids,Bg,dominant,R) :- gbld_dominant(Grids,Bg,R).

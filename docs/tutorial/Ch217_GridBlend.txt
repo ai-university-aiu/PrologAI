@@ -1,0 +1,116 @@
+Chapter 217: gridblend - Grid Blending and Layered Composition (gbld_*, Layer 235)
+
+Overview
+
+The gridblend pack provides ten gbld_* predicates for compositing grids in layers,
+applying spatial blend patterns, and reducing lists of grids to a single composite.
+All operations treat one designated BgColor as transparent: a bg cell is "absent"
+and the corresponding cell from another layer shows through.
+
+Pack: gridblend
+Module: gridblend
+Prefix: gbld_
+Layer: 235
+Dependencies: library(lists), msort/2 (built-in)
+
+
+Overlay and Underlay
+
+gbld_overlay(+Top, +Bottom, +BgColor, -Result)
+Non-bg cells in Top always show; bg cells in Top reveal Bottom.
+
+    Top    = [[r,b],[b,b]], Bottom = [[g,g],[g,g]].
+    gbld_overlay(Top, Bottom, b, [[r,g],[g,g]]).
+
+gbld_underlay(+Top, +Bottom, +BgColor, -Result)
+Non-bg cells in Bottom always show; bg cells in Bottom reveal Top.
+
+    Top = [[r,r],[r,r]], Bottom = [[g,b],[b,b]].
+    gbld_underlay(Top, Bottom, b, [[g,r],[r,r]]).
+
+
+Stencil Masking
+
+gbld_stencil(+Source, +Stencil, +StencilColor, -Result)
+Keep Source's cell only where Stencil = StencilColor. Other positions output
+StencilColor (acts as the "erased" background).
+
+    Source  = [[r,g],[g,r]], Stencil = [[m,b],[b,m]].
+    gbld_stencil(Source, Stencil, m, [[r,m],[m,r]]).
+
+
+Priority Reduction and Merge
+
+gbld_priority(+Grids, +BgColor, -Result)
+Reduce a list of grids with the first as topmost: first non-bg value at each
+position wins across the list.
+
+    G1 = [[r,b],[b,b]], G2 = [[g,g],[b,b]], G3 = [[y,y],[y,y]].
+    gbld_priority([G1,G2,G3], b, [[r,g],[y,y]]).
+
+gbld_merge_many(+Grids, +BgColor, -Result)
+Reduce a list of grids with the last as topmost (first grid is the base layer).
+Later grids paint over earlier ones.
+
+    G1 = [[r,b],[b,b]], G2 = [[b,g],[b,b]], G3 = [[b,b],[y,b]].
+    gbld_merge_many([G1,G2,G3], b, [[r,g],[y,b]]).
+
+
+Spatial Blend Patterns
+
+gbld_checker_blend(+Grid1, +Grid2, +BgColor, +Parity, -Result)
+Blend using checkerboard parity. Positions where (R+C) mod 2 = Parity take from
+Grid1; all others from Grid2. Parity is 0 or 1.
+
+    gbld_checker_blend([[r,r],[r,r]], [[g,g],[g,g]], b, 0, [[r,g],[g,r]]).
+
+gbld_stripe_blend(+Grid1, +Grid2, +BgColor, +StripeWidth, -Result)
+Blend using horizontal row stripes of StripeWidth rows each. Even stripe bands
+use Grid1; odd bands use Grid2. Within each band, one grid overlays the other.
+
+    gbld_stripe_blend([[r,r],[r,r],[r,r],[r,r]], [[g,g],[g,g],[g,g],[g,g]], b, 2,
+        [[r,r],[r,r],[g,g],[g,g]]).
+
+
+Threshold and Voting
+
+gbld_threshold_replace(+Grid, +Threshold, +ReplaceColor, +BgColor, -Result)
+In each row: if the count of non-bg cells is >= Threshold, replace every non-bg
+cell with ReplaceColor. Rows below the threshold are unchanged.
+
+    gbld_threshold_replace([[r,g,r],[b,b,b]], 3, x, b, [[x,x,x],[b,b,b]]).
+
+gbld_dominant(+Grids, +BgColor, -Result)
+At each cell position, take the most frequent non-bg value across the grid list.
+All-bg positions remain bg.
+
+    G1 = [[r,b]], G2 = [[r,g]], G3 = [[b,g]].
+    gbld_dominant([G1,G2,G3], b, [[r,g]]).
+
+
+Mode-Dispatched Composite
+
+gbld_composite(+Grids, +BgColor, +Mode, -Result)
+Reduce a list of grids to one according to Mode:
+  overlay   - first grid on top (gbld_priority)
+  underlay  - last grid on top  (gbld_merge_many)
+  dominant  - most frequent non-bg per cell (gbld_dominant)
+
+    gbld_composite([G1,G2,G3], b, overlay,  Result).
+    gbld_composite([G1,G2,G3], b, underlay, Result).
+    gbld_composite([G1,G2,G3], b, dominant, Result).
+
+
+Typical Workflows
+
+% Layer two grids with transparency:
+gbld_overlay(ForegroundGrid, BackgroundGrid, Bg, Composite).
+
+% Protect a region using a stencil mask:
+gbld_stencil(Source, MaskGrid, MaskColor, Protected).
+
+% Build a composite from multiple candidates, first answer wins:
+gbld_priority(Candidates, Bg, BestGuess).
+
+% Find consensus across multiple transformation outputs:
+gbld_dominant(Outputs, Bg, Consensus).

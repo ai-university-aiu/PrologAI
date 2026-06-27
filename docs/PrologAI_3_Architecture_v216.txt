@@ -9179,3 +9179,28 @@ Design notes:
   on the matching-value clause.
 - gch_changes_mask compares only first vs. last (using last/2), not all consecutive
   pairs, for a clean single-pass result.
+
+ARCH-222: gridblend Pack (gbld_*, Layer 235)
+
+Location: packs/gridblend/
+Files: pack.pl, prolog/gridblend.pl, test/test_gridblend.pl
+Module: gridblend
+Exports: gbld_overlay/4, gbld_underlay/4, gbld_stencil/4, gbld_priority/3,
+         gbld_checker_blend/5, gbld_stripe_blend/5, gbld_threshold_replace/5,
+         gbld_merge_many/3, gbld_dominant/3, gbld_composite/4
+Dependencies: library(lists) - member/2, nth0/3; msort/2 as built-in
+Layer: 235 (above gridchain Layer 234)
+
+Design notes:
+- gbld_overlay and gbld_underlay use symmetric recursive helpers (overlay_rows_,
+  underlay_rows_) that differ only in which grid's cell wins over the other.
+- gbld_stencil uses SC (StencilColor) as both the trigger (mask=SC → pass source)
+  and the fill value (mask/=SC → output SC), keeping the API minimal.
+- gbld_priority folds the grid list right-to-left: last grid becomes the base,
+  then each preceding grid is overlaid on top. First grid is topmost.
+- gbld_merge_many folds left-to-right: first grid is the base; each subsequent
+  grid overlays the accumulated result. Last grid is topmost.
+- gbld_checker_blend passes Bg for API consistency but does not use it in cell
+  selection; cell values are taken directly from one of the two input grids.
+- gbld_dominant uses msort + run-length scan (gbld_best_run_/6) to find the mode.
+- gbld_composite dispatches via a three-clause definition with cuts on each Mode.

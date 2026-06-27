@@ -17393,3 +17393,34 @@ positions using recursive cell-level helpers with a cut on the equal-cell clause
 gch_changes_mask/4 compares only the first and last grids (using last/2), producing
 a binary mask with MarkColor at changed positions and BgColor elsewhere. A
 single-element sequence returns an all-BgColor mask of the same dimensions.
+
+Part 246 - Work Package 256: gridblend Pack (gbld_*, Layer 235)
+
+WP-256-SPEC-001: The gridblend pack (Layer 235) provides ten predicates for
+blending and compositing grids using layered priority, transparency, spatial
+patterns, and voting. All operations treat one designated BgColor as transparent.
+The pack covers gbld_overlay/4, gbld_underlay/4, gbld_stencil/4, gbld_priority/3,
+gbld_checker_blend/5, gbld_stripe_blend/5, gbld_threshold_replace/5,
+gbld_merge_many/3, gbld_dominant/3, and gbld_composite/4. All 44 tests pass.
+
+WP-256-SPEC-002: gbld_overlay/4 places a Top grid over a Bottom grid: non-bg
+cells in Top show; bg cells in Top are transparent and reveal Bottom. gbld_underlay
+is the inverse: Bottom wins over Top. gbld_stencil/4 keeps Source cells only at
+positions where a Stencil grid equals StencilColor; other positions output
+StencilColor as the "erased" value.
+
+WP-256-SPEC-003: gbld_priority/3 folds a list of grids with the first as topmost
+layer, reducing by repeated gbld_overlay. gbld_merge_many/3 folds with the last
+as topmost, reducing by accumulating from the bottom up. Both produce a single
+composite grid where the first or last non-bg value at each position wins.
+
+WP-256-SPEC-004: gbld_checker_blend/5 blends two grids by checkerboard parity:
+positions where (R+C) mod 2 = Parity take from Grid1; all others from Grid2.
+gbld_stripe_blend/5 blends by horizontal row stripes of StripeWidth rows each,
+alternating between Grid1 and Grid2 within even/odd stripe bands.
+
+WP-256-SPEC-005: gbld_threshold_replace/5 replaces all non-bg cells in rows where
+the non-bg count meets or exceeds a threshold. gbld_dominant/3 performs a
+per-cell plurality vote across a list of grids, selecting the most frequent non-bg
+value (all-bg positions remain bg). gbld_composite/4 dispatches to overlay,
+underlay (merge_many), or dominant based on a Mode atom.
