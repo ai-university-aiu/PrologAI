@@ -8300,3 +8300,23 @@ Private helpers:
 Design note: gx_build_ takes explicit NewH and NewW (unlike gm_build_ which
 reads them from the input grid). This allows rotation predicates to produce
 grids whose dimensions differ from the input (e.g., W x H for rotate90).
+
+ARCH-195 - gridsymm Pack (Layer 208)
+
+Location: packs/gridsymm/
+  pack.pl                    - pack descriptor
+  prolog/gridsymm.pl         - module gridsymm, exports 14 gsm_* predicates
+  test/test_gridsymm.pl      - 44 PLUnit acceptance tests
+
+Layer: 208 (Data Layer)
+Dependencies: library(lists) [nth0/3, member/2]
+No cross-pack dependencies.
+
+Private helpers:
+  gsm_dims_/3   - grid height and width
+  gsm_cell_/4   - cell value at (R,C)
+  gsm_build_/4  - build H x W grid using lambda Goal(R,C,V)
+
+Design note: gsm_score/3 uses a single-clause if-then-else dispatch on Type
+to avoid choice points from multiple-clause head matching. All score
+computations use float(N)/D to return floating-point values.

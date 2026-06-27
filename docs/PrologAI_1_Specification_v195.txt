@@ -16492,3 +16492,41 @@ reported only from the first half of each pair to avoid duplicates.
 WP-229-SPEC-007: gsm_score/3 computes a symmetry score in [0.0..1.0] for
 types h, v, or rot180. Score = 1.0 means fully symmetric; score = 0.0 means
 no pairs match. Uses float division to ensure a floating-point result.
+
+Part 220 - Work Package 230: gridcolor Pack (gc_*, Layer 209)
+
+WP-230-SPEC-001: The gridcolor pack (Layer 209) provides fourteen predicates
+for color analysis and transformation of raw grids: cell counting by color,
+histogram generation, most and least frequent color detection, unique color
+enumeration, cell position lookup, color presence testing, recoloring,
+color mapping, binary thresholding, dominant non-background color, fraction
+computation, color count, and frequency-sorted color list.
+
+WP-230-SPEC-002: gc_count/3 counts cells matching a given color atom.
+gc_histogram/2 produces a sorted list of Color-Count pairs for every distinct
+color in Grid. gc_most_frequent/2 and gc_least_frequent/2 use the histogram
+and msort to find the color with the highest or lowest count respectively.
+
+WP-230-SPEC-003: gc_unique_colors/2 returns the sorted list of distinct color
+atoms using sort/2. gc_color_cells/3 returns R-C positions of all cells
+matching a given color. gc_contains/2 uses memberchk for efficient O(n) presence
+testing. gc_count_colors/2 returns the integer count of distinct colors.
+
+WP-230-SPEC-004: gc_recolor/4 replaces all occurrences of OldColor with
+NewColor. gc_color_map/3 applies a list of Old-New pair mappings; unmapped
+colors pass through unchanged. gc_threshold/5 produces a binary grid where
+cells in the Colors list become FgColor and all others become BgColor.
+
+WP-230-SPEC-005: gc_dominant/3 finds the most frequent non-BgColor by
+filtering the histogram and selecting the maximum. gc_fraction/3 computes
+the fraction of cells matching Color as a float in [0.0..1.0] using float/1
+division to avoid integer arithmetic. gc_sorted_by_freq/2 returns colors in
+descending frequency order by negating counts before msort.
+
+WP-230-SPEC-006: All predicates use a private gc_all_cells_/2 helper that
+collects all cell values via findall in row-major order. This enables histogram
+and count operations without re-reading the grid multiple times per predicate.
+
+WP-230-SPEC-007: gc_build_/4 is the standard H x W grid builder using a
+lambda Goal(R,C,V). Transformation predicates (gc_recolor, gc_color_map,
+gc_threshold) all use gc_build_ for consistent output construction.

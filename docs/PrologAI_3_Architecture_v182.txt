@@ -8091,3 +8091,39 @@ Exported predicates (14):
 No cross-pack dependencies. Self-contained.
 
 Layer table addition: Layer 201 -> gridperiod (gper_*)
+
+
+ARCH-189: gridscale Pack (Layer 202, gsc_*, Work Package 223)
+
+Purpose: Integer block-pixel scaling of raw grids — upsample, downsample,
+majority-vote downscale, scale-factor detection, tile inference, nearest-neighbor
+resize, stride subsampling, border padding, and factor-aligned cropping.
+
+Module: packs/gridscale/prolog/gridscale.pl
+Prefix: gsc_
+Layer: 202
+Dependencies: library(lists), library(apply) — no cross-pack dependencies.
+
+Exported predicates:
+  gsc_upsample/3, gsc_downsample/3, gsc_block_majority/3,
+  gsc_scale_factor/3, gsc_is_scale_of/3,
+  gsc_block_at/5, gsc_block_uniform/5, gsc_all_uniform/2,
+  gsc_infer_tile/2, gsc_factors/2,
+  gsc_resize/4, gsc_subsample/3,
+  gsc_pad/4, gsc_crop_to_factor/3
+
+Private helpers:
+  gsc_dims_/3: height and width from a grid
+  gsc_cell_/4: value at (R,C)
+  gsc_subgrid_/6: extract SH x SW sub-grid starting at (SR,SC)
+  gsc_majority_/2: most frequent element of a flat list
+
+Key design decisions:
+- gsc_downsample calls gsc_all_uniform before findall to ensure failures
+  from non-uniform blocks propagate correctly (findall silences failures).
+- gsc_infer_tile searches from largest valid divisor down using reverse/2
+  to find the coarsest valid block size.
+- gsc_resize uses nearest-neighbor (floor-division mapping) for both
+  upsampling and downsampling to arbitrary target sizes.
+
+Layer table addition: Layer 202 -> gridscale (gsc_*)

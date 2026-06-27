@@ -16947,3 +16947,48 @@ AC-GSM-041: gsm_complete_h then gsm_sym_h on result succeeds.
 AC-GSM-042: gsm_complete_v then gsm_sym_v on result succeeds.
 AC-GSM-043: gsm_sym_rot180 implies gsm_score rot180 = 1.0.
 AC-GSM-044: gsm_violations_h count is correct for a 2x2 diagonal grid.
+
+AC-GC-001: gc_count correctly counts 4 occurrences of r in g3x3_mixed.
+AC-GC-002: gc_count returns 0 for a color not present.
+AC-GC-003: gc_count counts background color correctly.
+AC-GC-004: gc_histogram includes correct Color-Count pairs.
+AC-GC-005: gc_histogram on uniform-color grid returns single pair.
+AC-GC-006: gc_histogram pairs are sorted alphabetically by Color.
+AC-GC-007: gc_most_frequent returns the unique maximum-count color.
+AC-GC-008: gc_most_frequent on uniform grid returns that single color.
+AC-GC-009: gc_least_frequent returns the unique minimum-count color.
+AC-GC-010: gc_least_frequent on single-color grid returns that color.
+AC-GC-011: gc_unique_colors returns sorted list of all distinct colors.
+AC-GC-012: gc_unique_colors on uniform grid returns single-element list.
+AC-GC-013: gc_unique_colors on 2-color grid returns both colors sorted.
+AC-GC-014: gc_color_cells returns correct R-C positions.
+AC-GC-015: gc_color_cells returns empty list when color is absent.
+AC-GC-016: gc_color_cells returns all 4 cells for uniform 2x2 grid.
+AC-GC-017: gc_contains succeeds when color is present.
+AC-GC-018: gc_contains fails when color is absent.
+AC-GC-019: gc_recolor replaces all occurrences of a color.
+AC-GC-020: gc_recolor on absent color leaves grid unchanged.
+AC-GC-021: gc_recolor on full grid produces all-new-color result.
+AC-GC-022: gc_color_map applies two-swap mapping correctly.
+AC-GC-023: gc_color_map with partial mapping replaces only mapped colors.
+AC-GC-024: gc_color_map with empty map leaves grid unchanged.
+AC-GC-025: gc_threshold with single-color select produces correct counts.
+AC-GC-026: gc_threshold with multiple-color select combines counts correctly.
+AC-GC-027: gc_threshold with empty select produces all-BgColor result.
+AC-GC-028: gc_dominant returns most frequent non-BgColor.
+AC-GC-029: gc_dominant with single-fg-color grid returns that color.
+AC-GC-030: gc_fraction computes correct float ratio for mixed grid.
+AC-GC-031: gc_fraction returns 1.0 for uniform grid where all cells match.
+AC-GC-032: gc_fraction returns 0.0 for absent color.
+AC-GC-033: gc_count_colors returns correct count of distinct colors.
+AC-GC-034: gc_count_colors returns 1 for uniform-color grid.
+AC-GC-035: gc_sorted_by_freq returns colors most-frequent-first.
+AC-GC-036: gc_sorted_by_freq on uniform grid returns single-element list.
+AC-GC-037: gc_count and gc_fraction are consistent (count = frac * total).
+AC-GC-038: gc_recolor then gc_count: old color count = 0; total preserved.
+AC-GC-039: gc_threshold then gc_unique_colors: only FgColor and BgColor present.
+AC-GC-040: gc_color_map then gc_histogram: only mapped colors in result.
+AC-GC-041: gc_dominant after gc_recolor (b->r) returns r.
+AC-GC-042: gc_color_cells length matches gc_count.
+AC-GC-043: gc_unique_colors count matches gc_count_colors.
+AC-GC-044: gc_count_colors on 2-color grid returns 2.

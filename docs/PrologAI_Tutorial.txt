@@ -18718,3 +18718,27 @@ count (0..4) of differently-colored 4-neighbors.
 
 14 ge_* predicates. 44 tests pass. Layer 211.
 All 44 tests pass. See docs/tutorial/Ch193_GridEdge.txt for the full chapter.
+
+
+Chapter 189: gridmorph Pack - Morphological Operations on Symbolic Grids (gmo_*, Layer 212)
+
+The gridmorph pack (Layer 212) provides fourteen predicates for morphological
+operations on symbolic grids: dilation, erosion, opening, closing, single-step
+variants, inner and outer boundary extraction, morphological gradient, top-hat
+and bottom-hat transforms, hole filling, border-reachable flood fill, and
+connected-component size filtering.
+
+:- use_module(pack(gridmorph/prolog/gridmorph)).
+
+gmo_dilate/4 expands FgColor by N layers; gmo_erode/4 shrinks by N layers.
+gmo_open/4 removes small FgColor protrusions; gmo_close/4 fills small holes.
+gmo_boundary_inner/3 returns FgColor cells on the inner border;
+gmo_boundary_outer/3 returns non-FgColor cells on the outer border;
+gmo_gradient_cells/3 returns their union.
+gmo_top_hat/4 highlights cells removed by opening;
+gmo_bottom_hat/4 highlights cells added by closing.
+gmo_fill_holes/4 fills enclosed background regions with FgColor.
+gmo_connected_border/4 BFS-floods from the grid border through TargetColor cells.
+gmo_remove_small/5 removes FgColor components below a size threshold.
+
+14 gmo_* predicates. 44 tests pass. Layer 212.

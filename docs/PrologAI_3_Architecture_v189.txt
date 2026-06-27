@@ -8320,3 +8320,20 @@ Private helpers:
 Design note: gsm_score/3 uses a single-clause if-then-else dispatch on Type
 to avoid choice points from multiple-clause head matching. All score
 computations use float(N)/D to return floating-point values.
+
+ARCH-196 - gridcolor Pack (Layer 209)
+
+Location: packs/gridcolor/
+  pack.pl                    - pack descriptor
+  prolog/gridcolor.pl        - module gridcolor, exports 14 gc_* predicates
+  test/test_gridcolor.pl     - 44 PLUnit acceptance tests
+
+Layer: 209 (Data Layer)
+Dependencies: library(lists) [nth0/3, member/2, last/2]
+No cross-pack dependencies.
+
+Private helpers:
+  gc_dims_/3       - grid height and width
+  gc_cell_/4       - cell value at (R,C)
+  gc_all_cells_/2  - flat list of all cell values in row-major order
+  gc_build_/4      - build H x W grid using lambda Goal(R,C,V)

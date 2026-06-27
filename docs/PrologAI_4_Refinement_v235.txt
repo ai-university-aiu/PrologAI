@@ -16560,3 +16560,69 @@ AC-GPER-048: gper_row_period([[r,b],[r,b]], 1) (two identical rows).
 AC-GPER-049: gper_autocorr_row(g3x3_rows, 1, 0.0).
 AC-GPER-050: gper_autocorr_col(g3x3_cols, 1, 0.0).
 AC-GPER-051: gper_extend_rows([[r,b,g]], 4, [[r,b,g],[r,b,g],[r,b,g],[r,b,g]]).
+
+
+PART 213 - WORK PACKAGE 223: gridscale ACCEPTANCE CRITERIA (AC-GSC-*)
+
+Layer 202, gsc_* prefix. 60 acceptance tests in packs/gridscale/test/test_gridscale.pl.
+
+AC-GSC-001: gsc_upsample([[r]], 2, [[r,r],[r,r]]).
+AC-GSC-002: gsc_upsample([[r,b],[b,r]], 2, [[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]]).
+AC-GSC-003: gsc_upsample([[r,b],[b,r]], 3, [[r,r,r,b,b,b],[r,r,r,b,b,b],[r,r,r,b,b,b],[b,b,b,r,r,r],[b,b,b,r,r,r],[b,b,b,r,r,r]]).
+AC-GSC-004: gsc_upsample(Grid, 1, Grid) for any Grid (no-op).
+AC-GSC-005: gsc_upsample([[r,b,g],[b,r,g]], 2, 4x6 grid by factor 2).
+AC-GSC-006: gsc_downsample(g4x4_up2, 2, [[r,b],[b,r]]).
+AC-GSC-007: gsc_downsample(g4x4_r, 4, [[r]]).
+AC-GSC-008: gsc_downsample(g4x4_nonunif, 2, _) fails (non-uniform blocks).
+AC-GSC-009: gsc_downsample(g6x6_up3, 3, [[r,b],[b,r]]).
+AC-GSC-010: gsc_downsample(Grid, 1, Grid) for any uniform-block grid.
+AC-GSC-011: gsc_block_majority(g4x4_up2, 2, [[r,b],[b,r]]) (uniform blocks).
+AC-GSC-012: gsc_block_majority(g4x4_nonunif, 2, [[b,r],[r,b]]) (majority with tie-break).
+AC-GSC-013: gsc_block_majority(Grid, 1, Grid) (block size 1 = identity).
+AC-GSC-014: gsc_scale_factor([[r,b],[b,r]], g4x4_up2, 2).
+AC-GSC-015: gsc_scale_factor([[r,b],[b,r]], g6x6_up3, 3).
+AC-GSC-016: gsc_scale_factor(Grid, Grid, 1) for same grid.
+AC-GSC-017: gsc_scale_factor(g3x3_rows, g4x4_r, _) fails (dimension mismatch).
+AC-GSC-018: gsc_is_scale_of([[r,b],[b,r]], g4x4_up2, 2) succeeds.
+AC-GSC-019: gsc_is_scale_of([[r,b],[b,r]], g6x6_up3, 3) succeeds.
+AC-GSC-020: gsc_is_scale_of([[r,b],[b,r]], g4x4_nonunif, 2) fails.
+AC-GSC-021: gsc_block_at(g4x4_up2, 2, 0, 0, [[r,r],[r,r]]).
+AC-GSC-022: gsc_block_at(g4x4_up2, 2, 0, 1, [[b,b],[b,b]]).
+AC-GSC-023: gsc_block_at(g4x4_up2, 2, 1, 0, [[b,b],[b,b]]).
+AC-GSC-024: gsc_block_at(g3x3_rows, 1, 1, 2, [[b]]).
+AC-GSC-025: gsc_block_uniform(g4x4_up2, 2, 0, 0, r).
+AC-GSC-026: gsc_block_uniform(g4x4_up2, 2, 0, 1, b).
+AC-GSC-027: gsc_block_uniform(g4x4_nonunif, 2, 0, 0, _) fails.
+AC-GSC-028: gsc_block_uniform(g3x3_rows, 1, 0, 0, r).
+AC-GSC-029: gsc_all_uniform(g4x4_up2, 2) succeeds.
+AC-GSC-030: gsc_all_uniform(g4x4_nonunif, 1) succeeds (block size 1 always uniform).
+AC-GSC-031: gsc_all_uniform(g4x4_nonunif, 2) fails.
+AC-GSC-032: gsc_all_uniform(g4x4_r, 4) succeeds.
+AC-GSC-033: gsc_infer_tile(g4x4_up2, [[r,b],[b,r]]).
+AC-GSC-034: gsc_infer_tile(g6x6_up3, [[r,b],[b,r]]).
+AC-GSC-035: gsc_infer_tile(g4x4_r, [[r]]).
+AC-GSC-036: gsc_infer_tile(g3x3_rows, _) fails (no N>=2 with all_uniform).
+AC-GSC-037: gsc_factors(g4x4_r, [1,2,4]).
+AC-GSC-038: gsc_factors(g3x3_r, [1,3]).
+AC-GSC-039: gsc_factors(g2x3, [1]).
+AC-GSC-040: gsc_factors(g6x6_up3, [1,2,3,6]).
+AC-GSC-041: gsc_resize([[r,b],[b,r]], 4, 4, g4x4_up2) (upsample 2x to 4x4).
+AC-GSC-042: gsc_resize(g4x4_up2, 2, 2, [[r,b],[b,r]]) (downsample 4x4 to 2x2).
+AC-GSC-043: gsc_resize(Grid, 3, 3, Grid) for a 3x3 grid (identity).
+AC-GSC-044: gsc_resize([[r]], 3, 3, [[r,r,r],[r,r,r],[r,r,r]]).
+AC-GSC-045: gsc_subsample(g4x4_up2, 2, [[r,b],[b,r]]).
+AC-GSC-046: gsc_subsample(Grid, 1, Grid) for 3x3 grid.
+AC-GSC-047: gsc_subsample(g4x4_up2, 4, [[r]]).
+AC-GSC-048: gsc_pad([[r,b],[b,r]], 1, gr, [[gr,gr,gr,gr],[gr,r,b,gr],[gr,b,r,gr],[gr,gr,gr,gr]]).
+AC-GSC-049: gsc_pad([[r]], 2, b, 5x5 grid with r at center (2,2)).
+AC-GSC-050: gsc_pad(Grid, 0, x, Grid) for any Grid (no-op).
+AC-GSC-051: gsc_pad(g3x3_r, 1, b, 5x5 grid).
+AC-GSC-052: gsc_crop_to_factor(g4x4_up2, 2, g4x4_up2) (already divisible).
+AC-GSC-053: gsc_crop_to_factor(g3x3_rows, 2, 2x2 top-left sub-grid).
+AC-GSC-054: gsc_crop_to_factor(g4x6_up2, 3, 3x6 top-left sub-grid).
+AC-GSC-055: gsc_crop_to_factor(Grid, 1, Grid) for any Grid.
+AC-GSC-056: upsample then downsample round-trip recovers original.
+AC-GSC-057: infer_tile then scale_factor recovers factor 2 for g4x4_up2.
+AC-GSC-058: scale_factor implies is_scale_of for g2x2_check and g6x6_up3.
+AC-GSC-059: resize(g4x4_up2, 1, 1, [[r]]) (any grid resized to 1x1 = top-left).
+AC-GSC-060: pad(g4x4_r, 2, b, 8x8 grid).

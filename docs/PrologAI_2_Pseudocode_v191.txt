@@ -13383,3 +13383,202 @@ gsm_violations_rot180(Grid, Cells): findall R-C where Idx < H*W/2 and Grid[R][C]
 gsm_score(Grid, Type, Score):
   Type in {h, v, rot180}
   Score = float(matching pairs) / float(total pairs checked).
+
+Part 220 - Work Package 230: gridcolor Pack (gc_*, Layer 209)
+
+gc_all_cells_(Grid, Cells): flatten all cell values in row-major order.
+
+gc_count(Grid, Color, N): findall matching Color from gc_all_cells_; N = length.
+gc_histogram(Grid, Pairs): sort(gc_all_cells_) -> Colors; for each C count occurrences -> C-N pairs.
+gc_most_frequent(Grid, Color): histogram -> NCPairs; msort -> last = _-Color.
+gc_least_frequent(Grid, Color): histogram -> NCPairs; msort -> first = _-Color.
+gc_unique_colors(Grid, Colors): sort(gc_all_cells_) = Colors.
+gc_color_cells(Grid, Color, Cells): findall R-C where cell = Color.
+gc_contains(Grid, Color): gc_all_cells_ then memberchk(Color, All).
+gc_recolor(Grid, Old, New, Result): build H x W: cell = Old -> New, else cell.
+gc_color_map(Grid, Map, Result): build H x W: member(cell-NV, Map) -> NV, else cell.
+gc_threshold(Grid, Colors, Fg, Bg, Result): build H x W: memberchk(cell, Colors) -> Fg, else Bg.
+gc_dominant(Grid, BgColor, Color): histogram filtered for != BgColor; max count color.
+gc_fraction(Grid, Color, Frac): gc_count / H*W as float.
+gc_count_colors(Grid, N): length(gc_unique_colors).
+gc_sorted_by_freq(Grid, Colors): histogram; negate counts; msort ascending; extract colors.
+
+
+Part 221 - Work Package 231: gridstitch Pack (gst_*, Layer 210)
+
+gst_concat_h(GridA, GridB, Result):
+  gst_dims_(GridA, H, _), gst_dims_(GridB, H, _).
+  maplist([RA,RB,RC]>>(append(RA,RB,RC)), GridA, GridB, Result).
+
+gst_concat_v(GridA, GridB, Result):
+  gst_dims_(GridA, _, W), gst_dims_(GridB, _, W).
+  append(GridA, GridB, Result).
+
+gst_hstack([], []).
+gst_hstack([G], G) :- !.
+gst_hstack([G1,G2|Rest], Result): gst_concat_h(G1,G2,G12), gst_hstack([G12|Rest], Result).
+
+gst_vstack([], []).
+gst_vstack([G], G) :- !.
+gst_vstack([G1,G2|Rest], Result): gst_concat_v(G1,G2,G12), gst_vstack([G12|Rest], Result).
+
+gst_split_h(Grid, R, Top, Bottom): length(Top, R), append(Top, Bottom, Grid).
+
+gst_split_v(Grid, C, Left, Right):
+  maplist([Row,LRow,RRow]>>(length(LRow,C), append(LRow,RRow,Row)), Grid, Left, Right).
+
+gst_halves_h(Grid, Top, Bottom): gst_dims_(Grid,H,_), Half is H//2, gst_split_h(Grid,Half,Top,Bottom).
+gst_halves_v(Grid, Left, Right): gst_dims_(Grid,_,W), Half is W//2, gst_split_v(Grid,Half,Left,Right).
+
+gst_quadrants(Grid, TL, TR, BL, BR):
+  gst_halves_h(Grid, Top, Bottom).
+  gst_halves_v(Top, TL, TR).
+  gst_halves_v(Bottom, BL, BR).
+
+gst_tile_grid(SubGrids, NR, NC, Result):
+  NTotal is NR*NC, length(SubGrids, NTotal).
+  findall(Band, (between(1,NR,RowIdx), Start is (RowIdx-1)*NC,
+    findall(SG, (between(0,NC,Col), Col<NC, Pos is Start+Col, nth0(Pos,SubGrids,SG)), RowSubs),
+    gst_hstack(RowSubs, Band)), Bands).
+  gst_vstack(Bands, Result).
+
+gst_add_border(Grid, N, Color, Result):
+  gst_dims_(Grid,H,W), NewH is H+2*N, NewW is W+2*N.
+  gst_build_(NewH, NewW, [R,C,V]>>(OR is R-N, OC is C-N,
+    (OR>=0,OR<H,OC>=0,OC<W -> gst_cell_(Grid,OR,OC,V) ; V=Color)), Result).
+
+gst_strip_border(Grid, N, Result):
+  gst_dims_(Grid,H,W), NewH is H-2*N, NewW is W-2*N.
+  gst_build_(NewH, NewW, [R,C,V]>>(OR is R+N, OC is C+N, gst_cell_(Grid,OR,OC,V)), Result).
+
+gst_repeat_h(Grid, N, Result): findall(Grid, between(1,N,_), Copies), gst_hstack(Copies, Result).
+gst_repeat_v(Grid, N, Result): findall(Grid, between(1,N,_), Copies), gst_vstack(Copies, Result).
+
+
+Part 222 - Work Package 232: gridedge Pack (ge_*, Layer 211)
+
+ge_edge_cells(Grid, FgColor, Cells):
+  ge_dims_(Grid,H,W); H1 is H-1; W1 is W-1.
+  findall(R-C, (between(0,H1,R), between(0,W1,C),
+    ge_cell_(Grid,R,C,FgColor),
+    once((ge_nbr4_(R,C,NR,NC), ge_cell_(Grid,NR,NC,NV), NV\=FgColor))), Cells).
+
+ge_edge_cells8(Grid, FgColor, Cells): same but ge_nbr8_.
+
+ge_is_edge(Grid, R-C, Bool):
+  ge_cell_(Grid,R,C,V).
+  (once((ge_nbr4_(R,C,NR,NC), ge_cell_(Grid,NR,NC,NV), NV\=V)) -> Bool=yes ; Bool=no).
+
+ge_boundary(Grid, Color1, Color2, Cells):
+  findall(R-C, (between(0,H1,R), between(0,W1,C),
+    ge_cell_(Grid,R,C,Color1),
+    once((ge_nbr4_(R,C,NR,NC), ge_cell_(Grid,NR,NC,Color2)))), Cells).
+
+ge_inner_border(Grid, BgColor, Cells): ge_boundary_to_nonbg_(Grid,BgColor,Cells).
+  Private: BgColor cells with once((ge_nbr4_, ge_cell_!=BgColor)).
+
+ge_outer_border(Grid, FgColor, Cells):
+  findall(R-C, (cell!=FgColor,
+    once((ge_nbr4_, ge_cell_==FgColor))), Cells).
+
+ge_edge_grid(Grid, FgColor, EdgeColor, Result):
+  ge_edge_cells(Grid,FgColor,Edges).
+  ge_build_(H,W, [R,C,V]>>(ge_cell_(Grid,R,C,GV),
+    (memberchk(R-C,Edges)->V=EdgeColor;V=GV)), Result).
+
+ge_edge_count(Grid, FgColor, N): ge_edge_cells(Grid,FgColor,Cells); length(Cells,N).
+
+ge_neighbors_diff(Grid, R, C, Neighbors):
+  ge_cell_(Grid,R,C,V).
+  findall(NR-NC, (ge_nbr4_(R,C,NR,NC), ge_cell_(Grid,NR,NC,NV), NV\=V), Neighbors).
+
+ge_corners(Grid, FgColor, Cells):
+  findall(R-C, (cell=FgColor,
+    findall(1,(ge_nbr4_,cell!=FgColor),Diff), length(Diff,D), D>=2), Cells).
+
+ge_endpoints(Grid, FgColor, Cells):
+  findall(R-C, (cell=FgColor,
+    findall(1,(ge_nbr4_,cell=FgColor),Same), length(Same,1)), Cells).
+
+ge_smooth_cells(Grid, FgColor, Cells):
+  findall(R-C, (cell=FgColor,
+    \+(ge_nbr4_,cell!=FgColor)), Cells).
+
+ge_transition_map(Grid, Result):
+  ge_build_(H,W, [R,C,V]>>(ge_cell_(Grid,R,C,GV),
+    findall(1,(ge_nbr4_,cell!=GV),Diffs), length(Diffs,V)), Result).
+
+ge_edge_color_count(Grid, FgColor, BgColor, N):
+  ge_boundary(Grid,FgColor,BgColor,Cells); length(Cells,N).
+
+
+Part 223 - Work Package 233: gridmorph Pack (gmo_*, Layer 212)
+
+gmo_dilate1(Grid, FgColor, Result):
+  gmo_dims_(Grid, H, W)
+  gmo_build_(H, W, [R,C,V]>>(
+    gmo_cell_(Grid,R,C,GV),
+    if GV=FgColor then V=FgColor
+    else if once(nbr4 exists with FgColor) then V=FgColor
+    else V=GV), Result).
+
+gmo_erode1(Grid, FgColor, Result):
+  gmo_bg_color_(Grid, FgColor, BgColor)
+  gmo_dims_(Grid, H, W)
+  gmo_build_(H, W, [R,C,V]>>(
+    gmo_cell_(Grid,R,C,GV),
+    if GV=FgColor then
+      (if once(nbr4 exists with color!=FgColor) then V=BgColor else V=FgColor)
+    else V=GV), Result).
+
+gmo_dilate(Grid, FgColor, N, Result):
+  iterate gmo_dilate1 N times starting from Grid.
+
+gmo_erode(Grid, FgColor, N, Result):
+  gmo_bg_color_(Grid, FgColor, BgColor) or BgColor=bg
+  iterate gmo_erode1_step_(Grid, FgColor, BgColor) N times.
+
+gmo_open(Grid, FgColor, N, Result):
+  gmo_erode(Grid, FgColor, N, Eroded)
+  gmo_dilate(Eroded, FgColor, N, Result).
+
+gmo_close(Grid, FgColor, N, Result):
+  gmo_dilate(Grid, FgColor, N, Dilated)
+  gmo_erode(Dilated, FgColor, N, Result).
+
+gmo_boundary_inner(Grid, FgColor, Cells):
+  findall(R-C, (cell=FgColor,
+    once(nbr4 exists with color!=FgColor)), Cells).
+
+gmo_boundary_outer(Grid, FgColor, Cells):
+  findall(R-C, (cell!=FgColor,
+    once(nbr4 exists with color=FgColor)), Cells).
+
+gmo_gradient_cells(Grid, FgColor, Cells):
+  gmo_boundary_inner(Grid, FgColor, Inner)
+  gmo_boundary_outer(Grid, FgColor, Outer)
+  append(Inner, Outer, Cells).
+
+gmo_top_hat(Grid, FgColor, N, Cells):
+  gmo_open(Grid, FgColor, N, Opened)
+  findall(R-C, (cell(Grid)=FgColor, cell(Opened)!=FgColor), Cells).
+
+gmo_bottom_hat(Grid, FgColor, N, Cells):
+  gmo_close(Grid, FgColor, N, Closed)
+  findall(R-C, (cell(Closed)=FgColor, cell(Grid)!=FgColor), Cells).
+
+gmo_fill_holes(Grid, FgColor, BgColor, Result):
+  gmo_connected_border(Grid, BgColor, FgColor, OpenBg)
+  gmo_build_(H, W, [R,C,V]>>(
+    if cell=BgColor then
+      (if R-C in OpenBg then V=BgColor else V=FgColor)
+    else V=cell), Result).
+
+gmo_connected_border(Grid, TargetColor, BlockColor, Cells):
+  Seeds = border cells with TargetColor
+  BFS from Seeds through TargetColor cells (BlockColor stops expansion).
+
+gmo_remove_small(Grid, FgColor, BgColor, MinSize, Result):
+  AllFg = all FgColor cells
+  SmallCells = cells in FgColor components where length < MinSize
+  build result replacing SmallCells with BgColor.

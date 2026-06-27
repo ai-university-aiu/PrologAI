@@ -1145,3 +1145,20 @@ gridedge
     ge_smooth_cells/3: FgColor cells with no differently-colored in-bounds 4-connected neighbors
     ge_transition_map/2: grid of per-cell counts of differently-colored 4-neighbors (integer 0..4)
     ge_edge_color_count/4: count FgColor cells adjacent to at least one BgColor cell
+
+gridmorph
+    Grid Morphological Operations: Dilation, Erosion, Opening, Closing, Fill, and Gradient (gmo_*, Layer 212)
+    gmo_dilate/4: expand FgColor region by N layers (each non-FgColor cell adjacent to FgColor becomes FgColor)
+    gmo_erode/4: shrink FgColor region by N layers (each FgColor cell adjacent to non-FgColor becomes background)
+    gmo_open/4: morphological opening - N erosions then N dilations; removes small FgColor protrusions
+    gmo_close/4: morphological closing - N dilations then N erosions; fills small gaps and holes in FgColor
+    gmo_dilate1/3: single dilation step
+    gmo_erode1/3: single erosion step (background color discovered automatically)
+    gmo_boundary_inner/3: FgColor cells with at least one non-FgColor 4-connected in-bounds neighbor (inner border)
+    gmo_boundary_outer/3: non-FgColor cells with at least one FgColor 4-connected in-bounds neighbor (outer border)
+    gmo_gradient_cells/3: union of inner and outer boundaries (all cells in the border region)
+    gmo_top_hat/4: FgColor cells present in input but absent after opening (highlights small bright structures)
+    gmo_bottom_hat/4: cells added by closing that were not FgColor in input (highlights small dark holes)
+    gmo_fill_holes/4: replace enclosed BgColor regions (unreachable from grid border) with FgColor
+    gmo_connected_border/4: BFS from border TargetColor cells through TargetColor region; returns all reachable cells
+    gmo_remove_small/5: remove FgColor connected components with fewer than MinSize cells

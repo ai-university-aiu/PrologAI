@@ -13017,3 +13017,58 @@ gsc_pad(Grid, N, Color, Padded):
 gsc_crop_to_factor(Grid, N, Cropped):
   CH = (H//N)*N, CW = (W//N)*N
   Cropped = subgrid(Grid, 0, 0, CH, CW)
+
+
+PART 214 - WORK PACKAGE 224: gridrun PACK (LAYER 203, grl_*) PSEUDOCODE
+
+grl_list_runs_(List, Runs):
+  if List empty: Runs = []
+  else: accumulate starting with head color, count consecutive equal values
+
+grl_row_runs(Grid, R, Runs):
+  Row = Grid[R]; Runs = grl_list_runs_(Row)
+
+grl_col_runs(Grid, C, Runs):
+  Col = [Grid[r][C] for r in 0..H-1]; Runs = grl_list_runs_(Col)
+
+grl_all_row_runs(Grid, AllRuns):
+  AllRuns = [grl_row_runs(Grid, R) for R in 0..H-1]
+
+grl_all_col_runs(Grid, AllRuns):
+  AllRuns = [grl_col_runs(Grid, C) for C in 0..W-1]
+
+grl_decode(Runs, List):
+  List = [Color repeated N times for each Color-N in Runs]
+
+grl_run_count(Grid, R, N):
+  N = length(grl_row_runs(Grid, R))
+
+grl_uniform_row(Grid, R, Color):
+  grl_row_runs(Grid, R, [Color-_])
+
+grl_uniform_col(Grid, C, Color):
+  grl_col_runs(Grid, C, [Color-_])
+
+grl_is_striped_h(Grid):
+  for all R in 0..H-1: fail if not grl_uniform_row(Grid, R)
+
+grl_is_striped_v(Grid):
+  for all C in 0..W-1: fail if not grl_uniform_col(Grid, C)
+
+grl_stripe_colors_h(Grid, Colors):
+  Colors = [Color | R in 0..H-1, grl_uniform_row(Grid, R, Color)]
+  fail if length(Colors) != H
+
+grl_stripe_colors_v(Grid, Colors):
+  Colors = [Color | C in 0..W-1, grl_uniform_col(Grid, C, Color)]
+  fail if length(Colors) != W
+
+grl_max_run(Grid, R, Color, Len):
+  Runs = grl_row_runs(Grid, R)
+  (Color, Len) = run with maximum length; ties broken by term order on Color
+
+grl_alternating(Grid, R):
+  Runs = grl_row_runs(Grid, R)
+  all runs have length 1
+  exactly 2 distinct colors appear in Runs
+  length(Runs) >= 2

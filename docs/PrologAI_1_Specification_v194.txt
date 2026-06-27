@@ -16454,3 +16454,41 @@ grid by calling a lambda Goal(R,C,V) for each cell position in row-major order.
 Unlike gm_build_/4, gx_build_ accepts explicit NewH and NewW parameters that
 may differ from the input grid dimensions, enabling non-square output grids for
 rotations and transpositions.
+
+Part 219 - Work Package 229: gridsymm Pack (gsm_*, Layer 208)
+
+WP-229-SPEC-001: The gridsymm pack (Layer 208) provides fourteen predicates
+for detecting, completing, and measuring symmetry in raw grids. It covers the
+six fundamental symmetry types relevant to D4 rectangular grid analysis: top-
+bottom (h), left-right (v), main diagonal (d1), anti-diagonal (d2), 90-degree
+rotation (rot90), and 180-degree rotation (rot180).
+
+WP-229-SPEC-002: gsm_sym_h/1 tests top-bottom symmetry: Grid[R][C] =
+Grid[H-1-R][C] for all R, C. gsm_sym_v/1 tests left-right symmetry:
+Grid[R][C] = Grid[R][W-1-C]. Both use a \+ existential check over only the
+first half of row or column pairs.
+
+WP-229-SPEC-003: gsm_sym_d1/1 and gsm_sym_d2/1 test main-diagonal and anti-
+diagonal symmetry respectively. Both predicates fail for non-square grids.
+gsm_sym_rot90/1 tests 90-degree rotational symmetry and also fails for non-
+square grids. gsm_sym_rot180/1 tests 180-degree rotational symmetry and works
+for any rectangular grid.
+
+WP-229-SPEC-004: gsm_symmetries/2 returns the list of all symmetry types
+possessed by Grid in order [h, v, d1, d2, rot90, rot180], omitting types that
+are inapplicable (d1, d2, rot90 for non-square grids) or not present.
+
+WP-229-SPEC-005: gsm_complete_h/3 and gsm_complete_v/3 produce grids that are
+top-bottom or left-right symmetric by copying one half onto the other. Dir=top
+maps result[R][C] = Grid[min(R,H-1-R)][C]; Dir=bottom maps to Grid[max(R,H-1-R)][C].
+Similarly for v with left/right directions. gsm_complete_rot180/3 fills
+BgColor cells from their 180-rotational mirrors, keeping non-BgColor cells.
+
+WP-229-SPEC-006: gsm_violations_h/2, gsm_violations_v/2, and
+gsm_violations_rot180/2 return lists of R-C positions where the grid fails a
+given symmetry. An empty result list confirms the symmetry holds. Violations are
+reported only from the first half of each pair to avoid duplicates.
+
+WP-229-SPEC-007: gsm_score/3 computes a symmetry score in [0.0..1.0] for
+types h, v, or rot180. Score = 1.0 means fully symmetric; score = 0.0 means
+no pairs match. Uses float division to ensure a floating-point result.
