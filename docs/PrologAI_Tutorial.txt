@@ -18897,3 +18897,22 @@ reorders columns by their lexicographic content.
 :- use_module(pack(gridrowcol/prolog/gridrowcol)).
 
 14 grc_* predicates. 44 tests pass. Layer 219.
+
+
+Chapter 197: gridseg Pack - Grid Segmentation by Separator Rows and Columns (gsg_*, Layer 220)
+
+The gridseg pack (Layer 220) detects uniform-color separator rows and columns
+and uses them to split, trim, and extract panels from a raw grid. gsg_is_sep_row/3
+and gsg_is_sep_col/3 test uniformity and bind the separator color. gsg_sep_rows/3
+and gsg_sep_cols/3 collect all separator indices. gsg_split_h/3 splits by
+separator rows into sub-grids (consecutive separators = one boundary, no empty
+segments). gsg_split_v/3 splits by separator columns. gsg_segment_count_h/3 and
+gsg_segment_count_v/3 count segments. gsg_panels/3 splits by both separator kinds
+and returns all rectangular panels as a flat row-major list. gsg_panel_count/3
+counts panels. gsg_trim_h/3 removes border separator rows; gsg_trim_v/3 removes
+border separator columns; gsg_trim/3 removes both. gsg_sep_color/2 finds the
+unique separator color used in the grid.
+
+:- use_module(pack(gridseg/prolog/gridseg)).
+
+14 gsg_* predicates. 44 tests pass. Layer 220.

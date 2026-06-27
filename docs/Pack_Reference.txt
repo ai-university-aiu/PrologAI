@@ -1281,3 +1281,20 @@ Grid Row and Column Comparative Analysis (grc_*, Layer 219)
     grc_unique_cols/2: column indices whose content appears exactly once in the grid
     grc_row_sort/2: grid with rows sorted in standard order (duplicates preserved)
     grc_col_sort/2: grid with columns reordered by lexicographic order of their content
+
+gridseg
+Grid Segmentation by Separator Rows and Columns (gsg_*, Layer 220)
+    gsg_is_sep_row/3: succeeds if row R is entirely one color; binds that color
+    gsg_is_sep_col/3: succeeds if column C is entirely one color; binds that color
+    gsg_sep_rows/3: sorted list of row indices that are entirely Color
+    gsg_sep_cols/3: sorted list of column indices that are entirely Color
+    gsg_split_h/3: split Grid at separator rows of Color into non-empty sub-grids
+    gsg_split_v/3: split Grid at separator columns of Color into non-empty sub-grids
+    gsg_segment_count_h/3: number of horizontal segments after splitting
+    gsg_segment_count_v/3: number of vertical segments after splitting
+    gsg_panels/3: flat row-major list of all panels after splitting by separator rows and cols
+    gsg_panel_count/3: total number of panels
+    gsg_trim_h/3: remove leading and trailing separator rows (top and bottom)
+    gsg_trim_v/3: remove leading and trailing separator columns (left and right)
+    gsg_trim/3: remove all border separator rows and columns
+    gsg_sep_color/2: succeeds if exactly one color is used as separator; binds it
