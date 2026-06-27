@@ -14645,3 +14645,82 @@ Private helper: gco_sort_by_count_desc_(Pairs, Sorted)
   Sorted := [ cc(V,N) | neg(_,cc(V,N)) in KeyedSorted ]
   Note: Neg is -N evaluates arithmetic; -N as a term creates compound -(N)
   which compares by functor and arity, not numeric value.
+
+
+Part 252: Work Package 262 - gridresize Pack (grs_*, Layer 241)
+
+WP-262-PSEUDO-001: grs_scale_up(Grid, F, Result)
+  H, W := dims(Grid)
+  NewH := H*F, NewW := W*F
+  Result[r][c] := Grid[r // F][c // F]  for r in [0,NewH), c in [0,NewW)
+
+WP-262-PSEUDO-002: grs_scale_down(Grid, F, Bg, Result)
+  NewH := H // F, NewW := W // F
+  if NewH=0 or NewW=0: Result := []
+  else: Result[r][c] := Grid[r*F][c*F]  for r in [0,NewH), c in [0,NewW)
+
+WP-262-PSEUDO-003: grs_scale_down_mode(Grid, F, Bg, Result)
+  NewH := H // F, NewW := W // F
+  if NewH=0 or NewW=0: Result := []
+  else: Block(r,c) := { Grid[sr][sc] | sr in [r*F, r*F+F-1], sc in [c*F, c*F+F-1], in bounds }
+        Result[r][c] := mode(Block(r,c))
+
+WP-262-PSEUDO-004: grs_double(Grid, Result)
+  Result := grs_scale_up(Grid, 2)
+
+WP-262-PSEUDO-005: grs_halve(Grid, Bg, Result)
+  Result := grs_scale_down(Grid, 2, Bg)
+
+WP-262-PSEUDO-006: grs_resize(Grid, NewH, NewW, Bg, Result)
+  if NewH=0 or NewW=0: Result := []
+  elif H=0 or W=0: Result := NewH x NewW canvas of Bg
+  else: Result[r][c] := Grid[floor(r*H/NewH)][floor(c*W/NewW)]
+
+WP-262-PSEUDO-007: grs_tile_to(Grid, H, W, Result)
+  H0, W0 := dims(Grid)
+  if H=0 or W=0 or H0=0 or W0=0: Result := []
+  else: Result[r][c] := Grid[r mod H0][c mod W0]
+
+WP-262-PSEUDO-008: grs_crop(Grid, R0, C0, R1, C1, Result)
+  ClR0 := max(R0,0), ClC0 := max(C0,0)
+  ClR1 := min(R1, H-1), ClC1 := min(C1, W-1)
+  if ClR0 > ClR1 or ClC0 > ClC1: Result := []
+  else: Result[r][c] := Grid[ClR0+r][ClC0+c]
+
+WP-262-PSEUDO-009: grs_border_crop(Grid, N, Bg, Result)
+  R0:=N, C0:=N, R1:=H-N-1, C1:=W-N-1
+  if R1 >= R0 and C1 >= C0: Result := grs_crop(Grid, R0, C0, R1, C1)
+  else: Result := []
+
+WP-262-PSEUDO-010: grs_fit_in(Grid, H, W, Bg, Result)
+  H0, W0 := dims(Grid)
+  if H0=0 or W0=0: Result := grs_embed_in(Grid, H, W, Bg)
+  else:
+    Scale := min(H/H0, W/W0)
+    NewH := max(1, round(H0*Scale)), NewW := max(1, round(W0*Scale))
+    Scaled := grs_resize(Grid, NewH, NewW, Bg)
+    Result := grs_embed_in(Scaled, H, W, Bg)
+
+WP-262-PSEUDO-011: grs_embed_in(Grid, H, W, Bg, Result)
+  H0, W0 := dims(Grid)
+  OffR := (H-H0) // 2, OffC := (W-W0) // 2
+  Result[r][c] := if (r-OffR) in [0,H0) and (c-OffC) in [0,W0):
+                    Grid[r-OffR][c-OffC]
+                  else: Bg
+
+WP-262-PSEUDO-012: grs_grid_size(Grid, H, W)
+  H, W := dims(Grid)
+
+WP-262-PSEUDO-013: grs_aspect_ratio(Grid, H, W, Ratio)
+  H, W := dims(Grid)
+  Ratio := if H=0: 0.0 else W/H
+
+WP-262-PSEUDO-014: grs_is_square(Grid)
+  H, W := dims(Grid)
+  succeed iff H = W
+
+Private helper: grs_mode_(List, Mode)
+  Vals := sort(List)
+  Keyed := [ neg(Neg,V) | V in Vals, N := count(V,List), Neg is -N ]
+  Mode := first value from msort(Keyed)
+  Note: Neg is -N (arithmetic) ensures numeric sort order.

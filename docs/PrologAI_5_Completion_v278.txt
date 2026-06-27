@@ -7490,3 +7490,18 @@ Tutorial: docs/tutorial/Ch222_GridColorOp.txt
 Pack_Reference: gridcolorop entry added
 Bug fixed: gco_sort_by_count_desc_ used -N (compound term -(N)) instead of
   Neg is -N (arithmetic integer); fixed to produce correct descending sort.
+
+WP-262: gridresize Pack (grs_*, Layer 241)
+Status: COMPLETE
+Branch: feature/wp262-gridresize
+Tests: 44/44 pass (AC-GRS-001 through AC-GRS-044)
+Predicates: grs_scale_up/3, grs_scale_down/4, grs_scale_down_mode/4,
+  grs_double/2, grs_halve/3, grs_resize/5, grs_tile_to/4, grs_crop/6,
+  grs_border_crop/4, grs_fit_in/5, grs_embed_in/5, grs_grid_size/3,
+  grs_aspect_ratio/4, grs_is_square/1
+SPARC: Spec v228, Pseudo v220, Arch v222, Refinement v275, Completion v278
+Tutorial: docs/tutorial/Ch223_GridResize.txt
+Pack_Reference: gridresize entry added
+Design note: outer parentheses around if-then-else blocks are required when
+  the block follows a grs_dims_ call; without them, SWI-Prolog parses
+  grs_dims_ as part of the condition, leaving H and W unbound in else branches.

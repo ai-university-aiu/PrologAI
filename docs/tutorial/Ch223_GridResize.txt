@@ -1,0 +1,150 @@
+Chapter 223: gridresize - Grid Resize and Scale Operations (grs_*, Layer 241)
+
+Work Package 262. Module: gridresize. Prefix: grs_. Layer: 241.
+No cross-pack dependencies.
+
+
+Overview
+
+The gridresize pack provides fourteen predicates for scaling, resizing, tiling,
+cropping, and fitting symbolic grids. It covers integer scale-up and scale-down,
+mode-based downsampling, nearest-neighbor resize to arbitrary dimensions, modular
+tiling, rectangular cropping, border removal, aspect-ratio-preserving fit, canvas
+centering, dimension querying, aspect ratio, and square testing.
+
+
+Predicates
+
+grs_scale_up(+Grid, +F, -Result)
+  Expands each cell into an F x F block. The output is (H*F) x (W*F).
+  output[r][c] = input[r // F][c // F].
+
+grs_scale_down(+Grid, +F, +Bg, -Result)
+  Samples the top-left cell of each F x F block. Output is floor(H/F) x
+  floor(W/F). Returns [] if either dimension would be zero.
+
+grs_scale_down_mode(+Grid, +F, +Bg, -Result)
+  Takes the most common value (mode) of each F x F block. Ties are broken by
+  msort order (lexicographically first atom). Same output dimensions as
+  grs_scale_down.
+
+grs_double(+Grid, -Result)
+  Shorthand for grs_scale_up with F=2. Each cell becomes a 2 x 2 block.
+
+grs_halve(+Grid, +Bg, -Result)
+  Shorthand for grs_scale_down with F=2. Samples top-left of each 2 x 2 block.
+
+grs_resize(+Grid, +NewH, +NewW, +Bg, -Result)
+  Nearest-neighbor resize: output[r][c] = input[floor(r*H/NewH)][floor(c*W/NewW)].
+  Returns [] for NewH=0 or NewW=0. Fills with Bg if source is empty.
+
+grs_tile_to(+Grid, +H, +W, -Result)
+  Fills H x W by modular repetition: output[r][c] = input[r mod H0][c mod W0].
+  Returns [] if any dimension is zero.
+
+grs_crop(+Grid, +R0, +C0, +R1, +C1, -Result)
+  Extracts rows R0..R1 and cols C0..C1 (0-indexed, inclusive). Indices are
+  clamped to grid bounds. Returns [] for empty range.
+
+grs_border_crop(+Grid, +N, +Bg, -Result)
+  Removes N rows and columns from all four borders. Returns [] if the grid
+  would become empty (H <= 2N or W <= 2N). Delegates to grs_crop.
+
+grs_fit_in(+Grid, +H, +W, +Bg, -Result)
+  Scales Grid to fit within H x W preserving aspect ratio (letterbox), then
+  centers it on a H x W Bg canvas. Uses float arithmetic for the scale factor
+  and round/1 for the target dimensions.
+
+grs_embed_in(+Grid, +H, +W, +Bg, -Result)
+  Centers Grid in a H x W Bg canvas without scaling. The offset is
+  ((H-H0)//2, (W-W0)//2). Grid content that falls outside the canvas is clipped.
+
+grs_grid_size(+Grid, -H, -W)
+  Returns H (rows) and W (columns).
+
+grs_aspect_ratio(+Grid, -H, -W, -Ratio)
+  Returns H, W, and Ratio = W/H as a float. Ratio = 0.0 if H = 0.
+
+grs_is_square(+Grid)
+  Succeeds if H = W.
+
+
+Key design note: outer parentheses for if-then-else
+
+In SWI-Prolog, the clause body is parsed left to right using operator
+precedences. The comma operator (1000xfy) binds tighter than the if-then arrow
+(1050xfy) and the semicolon (1100xfy). This means:
+
+  grs_dims_(Grid, H, W), (Cond) -> Then ; Else
+
+is parsed as:
+
+  ( grs_dims_(Grid, H, W), (Cond) ) -> Then ; Else
+
+where grs_dims_ is INSIDE the if-then condition. If the condition fails
+(because Cond fails), the bindings from grs_dims_ are LOST, leaving H and W
+unbound in the Else branch.
+
+The fix: wrap the entire if-then-else in outer parentheses:
+
+  grs_dims_(Grid, H, W),
+  (   (Cond)
+  ->  Then
+  ;   Else
+  ).
+
+Now the outer `( ... )` is a single goal with precedence 0, which is a valid
+right argument for `,`. grs_dims_ runs as a separate goal before the if-then-else
+and its bindings are available in all branches.
+
+
+Example session
+
+:- use_module(pack(gridresize/prolog/gridresize)).
+
+% Scale up a 2x2 pattern to 4x4.
+grs_scale_up([[a,b],[c,d]], 2, R).
+% R = [[a,a,b,b],[a,a,b,b],[c,c,d,d],[c,c,d,d]].
+
+% Nearest-neighbor resize 1x1 to 3x3.
+grs_resize([[r]], 3, 3, b, R).
+% R = [[r,r,r],[r,r,r],[r,r,r]].
+
+% Tile 2x2 to 3x3.
+grs_tile_to([[a,b],[c,d]], 3, 3, R).
+% R = [[a,b,a],[c,d,c],[a,b,a]].
+
+% Crop a 3x3 grid to its center cell.
+grs_border_crop([[a,b,c],[d,e,f],[g,h,i]], 1, b, R).
+% R = [[e]].
+
+% Fit 1x1 into 3x3 canvas.
+grs_fit_in([[r]], 3, 3, b, R).
+% R = [[r,r,r],[r,r,r],[r,r,r]].
+
+% Center 1x1 in 3x3 canvas.
+grs_embed_in([[r]], 3, 3, b, R).
+% R = [[b,b,b],[b,r,b],[b,b,b]].
+
+
+Test coverage
+
+44 tests AC-GRS-001 through AC-GRS-044 in
+packs/gridresize/test/test_gridresize.pl. All pass.
+
+Coverage by predicate:
+  grs_scale_up: 3 tests (001-003)
+  grs_scale_down: 3 tests (004-006)
+  grs_scale_down_mode: 3 tests (007-009)
+  grs_double: 2 tests (010-011)
+  grs_halve: 1 test (012)
+  grs_resize: 3 tests (013-015)
+  grs_tile_to: 3 tests (016-018)
+  grs_crop: 3 tests (019-021)
+  grs_border_crop: 3 tests (022-024)
+  grs_fit_in: 3 tests (025-027)
+  grs_embed_in: 3 tests (028-030)
+  grs_grid_size: 2 tests (031-032)
+  grs_aspect_ratio: 2 tests (033-034)
+  grs_is_square: 2 tests (035-036)
+  integration: 8 tests (037-044)

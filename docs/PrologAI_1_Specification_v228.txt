@@ -17596,3 +17596,39 @@ gco_invert/4 is a binary invert: non-bg cells become Bg and Bg cells become
 FgColor. Critically, gco_sort_by_count_desc_ uses Neg is -N (arithmetic
 evaluation) to compute integer negation, not the term -N which would create
 the compound -(N) and sort in the wrong direction.
+
+
+Part 252: Work Package 262 - gridresize Pack (grs_*, Layer 241)
+
+WP-262-SPEC-001: The gridresize pack (Layer 241) provides fourteen predicates
+for scaling, resizing, tiling, cropping, and fitting symbolic grids. The pack
+covers integer scale up and down, mode-based downsampling, double and halve
+shortcuts, nearest-neighbor resize to arbitrary dimensions, modular tiling,
+rectangular cropping, border cropping, aspect-ratio-preserving fit into a canvas,
+centering a grid in a larger canvas, dimension querying, aspect ratio, and
+square test. All 44 acceptance tests pass.
+
+WP-262-SPEC-002: grs_scale_up/3 expands each cell into an F x F block; the
+output is (H*F) x (W*F). grs_scale_down/4 samples the top-left cell of each
+F x F block, producing a floor(H/F) x floor(W/F) result. grs_scale_down_mode/4
+takes the mode (most common value) of each block; ties are broken by msort order
+(lexicographically first atom). Returns [] when the scaled result would be 0x0.
+
+WP-262-SPEC-003: grs_double/2 and grs_halve/3 are shorthands for F=2.
+grs_resize/5 performs nearest-neighbor resizing: output[r][c] =
+input[floor(r*H/NewH)][floor(c*W/NewW)]. Returns [] for NewH=0 or NewW=0.
+grs_tile_to/4 fills a target H x W grid by modular repetition of the source.
+
+WP-262-SPEC-004: grs_crop/6 extracts rows [R0,R1] x cols [C0,C1] with clamping
+to grid bounds; returns [] for an empty range. grs_border_crop/4 removes N rows
+and columns from all four borders; returns [] when the result would be empty.
+grs_embed_in/5 centers a grid on a Bg canvas of specified dimensions.
+
+WP-262-SPEC-005: grs_fit_in/5 scales a grid to fit within H x W while preserving
+aspect ratio (letterbox), then centers it on a Bg canvas. It uses float arithmetic
+to compute the scale factor and rounds to the nearest integer pixel.
+grs_grid_size/3 and grs_aspect_ratio/4 report dimensions. grs_is_square/1 tests
+whether H = W. Critical design note: all if-then-else blocks that follow a
+grs_dims_ call must be wrapped in explicit outer parentheses, because without them
+SWI-Prolog parses the preceding comma-chain as part of the condition, leaving H
+and W unbound in the else branch.
