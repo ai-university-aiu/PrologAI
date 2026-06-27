@@ -17557,3 +17557,42 @@ using the same transparency model as gridstamp. gal_anchor_to/8 computes (R0,C0)
 from a given cell-to-cell alignment (PR,PC) in Grid2 to (QR,QC) in Canvas and
 delegates to gal_place_at. gal_match_any_offset/4 finds all (DR,DC) offsets where
 at least one non-bg cell of Grid2, after translation, lands on a non-bg cell of Grid1.
+
+
+Part 251: Work Package 261 - gridcolorop Pack (gco_*, Layer 240)
+
+WP-261-SPEC-001: The gridcolorop pack (Layer 240) provides fourteen predicates
+for querying, transforming, and analyzing colors in symbolic grids. The pack
+covers color counting, distinct-color listing, Nth-color selection, color
+swapping, color replacement, map-based substitution, keep-only masking, color
+removal, palette cycling, frequency-rank replacement, palette application,
+most/least frequent color query, and binary inversion. All 44 acceptance
+tests pass.
+
+WP-261-SPEC-002: gco_color_counts/3 returns cc(Color,Count) pairs for all
+non-bg colors sorted by count descending. gco_distinct_colors/3 extracts the
+color list from those pairs. gco_nth_color/4 returns the Nth most frequent
+non-bg color (0-indexed). gco_count_distinct/3 returns the count of distinct
+non-bg colors.
+
+WP-261-SPEC-003: gco_swap/5 exchanges Color1 and Color2 throughout a grid;
+all other cells including Bg are unchanged. gco_replace/5 replaces every
+occurrence of OldColor with NewColor (including Bg cells if OldColor=Bg).
+gco_apply_map/4 applies a list of OldColor-NewColor pairs; cells not matching
+any key are unchanged.
+
+WP-261-SPEC-004: gco_keep_only/4 keeps cells matching Color and replaces all
+others with Bg. gco_remove_color/4 replaces Color cells with Bg while keeping
+all others unchanged. gco_cycle/5 advances each palette-member cell N steps
+through the Palette list (modular, supports negative N for backward cycling);
+cells not in Palette are unchanged.
+
+WP-261-SPEC-005: gco_rank_grid/3 replaces each non-bg cell with the 0-indexed
+frequency rank of its color (0 = most frequent); Bg cells remain Bg.
+gco_apply_palette/4 replaces the Kth most frequent non-bg color with the Kth
+entry in a Palette list; colors beyond Palette length are unchanged.
+gco_most_least/4 returns the most and least frequent non-bg colors.
+gco_invert/4 is a binary invert: non-bg cells become Bg and Bg cells become
+FgColor. Critically, gco_sort_by_count_desc_ uses Neg is -N (arithmetic
+evaluation) to compute integer negation, not the term -N which would create
+the compound -(N) and sort in the wrong direction.

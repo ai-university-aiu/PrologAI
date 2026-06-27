@@ -1,0 +1,161 @@
+Chapter 222: gridcolorop - Grid Color Operations (gco_*, Layer 240)
+
+Work Package 261. Module: gridcolorop. Prefix: gco_. Layer: 240.
+No cross-pack dependencies.
+
+
+Overview
+
+The gridcolorop pack provides fourteen predicates for querying and transforming
+the color distribution of symbolic grids. It handles counting, ranking, swapping,
+replacing, masking, cycling, palette application, and binary inversion.
+
+The foundational design is that colors are treated as arbitrary atoms (r, g, b,
+any atom). The Bg parameter identifies the background; non-Bg cells are "active."
+All sorting by frequency uses arithmetic negation (Neg is -N) so that msort
+produces descending numeric order correctly.
+
+
+Predicates
+
+gco_color_counts(+Grid, +Bg, -Counts)
+  Counts is a list of cc(Color,Count) pairs for all non-bg colors, sorted by
+  count descending. Returns [] if Grid has no non-bg cells.
+
+gco_distinct_colors(+Grid, +Bg, -Colors)
+  Colors is the list of distinct non-bg colors sorted by count descending.
+  Equivalent to extracting the first element of each cc/2 pair from
+  gco_color_counts.
+
+gco_nth_color(+Grid, +Bg, +N, -Color)
+  Color is the Nth most frequent non-bg color, 0-indexed. Fails if N is
+  out of range (no such color exists).
+
+gco_count_distinct(+Grid, +Bg, -Count)
+  Count is the number of distinct non-bg colors in Grid.
+
+gco_swap(+Grid, +Color1, +Color2, +Bg, -Result)
+  Exchanges every occurrence of Color1 and Color2 in Grid. Bg and all other
+  colors are unchanged. The Bg parameter is accepted for interface uniformity
+  but Color1/Color2 may equal Bg (the swap is unconditional).
+
+gco_replace(+Grid, +OldColor, +NewColor, +Bg, -Result)
+  Replaces every cell equal to OldColor with NewColor. All other cells are
+  unchanged. Works on any color including Bg.
+
+gco_apply_map(+Grid, +Map, +Bg, -Result)
+  Applies a list of OldColor-NewColor substitution pairs (Map = [c1-d1, c2-d2,
+  ...]). Each cell is replaced by the first matching NewColor found in Map; if
+  no pair matches, the cell is unchanged. Bg is accepted for interface uniformity.
+
+gco_keep_only(+Grid, +Color, +Bg, -Result)
+  Keeps cells matching Color and replaces all others (including Bg cells) with Bg.
+
+gco_remove_color(+Grid, +Color, +Bg, -Result)
+  Replaces cells matching Color with Bg; all other cells are unchanged.
+
+gco_cycle(+Grid, +Palette, +N, +Bg, -Result)
+  For each cell whose value appears in Palette, advances it N steps forward
+  through Palette (modular arithmetic with wrap). Negative N cycles backward.
+  Cells not in Palette are unchanged.
+
+  Implementation detail: ((Idx + N) mod PLen + PLen) mod PLen handles SWI-Prolog
+  mod returning negative values for negative N.
+
+gco_rank_grid(+Grid, +Bg, -Result)
+  Replaces each non-bg cell with the 0-indexed frequency rank of its color:
+  0 = most frequent, 1 = second most frequent, etc. Bg cells remain Bg.
+  The result values are integers.
+
+gco_apply_palette(+Grid, +Bg, +Palette, -Result)
+  Replaces the Kth most frequent non-bg color with the Kth element of Palette.
+  Colors beyond the length of Palette are unchanged. Bg is unchanged.
+  Delegates to gco_apply_map after building the replacement map.
+
+gco_most_least(+Grid, +Bg, -Most, -Least)
+  Most is the most frequent non-bg color; Least is the least frequent.
+  Fails if Grid has no non-bg cells.
+
+gco_invert(+Grid, +Bg, +FgColor, -Result)
+  Binary inversion: all non-bg cells become Bg; all Bg cells become FgColor.
+  Does not distinguish among different non-bg colors.
+
+
+Private helpers
+
+gco_cell_colors_/3: collect all non-bg values in scan order.
+gco_count_val_/3: count occurrences of a value in a flat list.
+gco_sort_by_count_desc_/2: sort cc(V,N) pairs by N descending using
+  Neg is -N to compute integer negation (not the term -N).
+gco_nth_in_/3: 0-indexed list element (delegates to nth0).
+gco_grid_dims_/3: extract (H,W) from a non-empty grid.
+
+
+Key design note: integer negation in sort keys
+
+gco_sort_by_count_desc_ uses `Neg is -N` rather than `-N` as a term. In
+SWI-Prolog, `-N` in a findall template creates the compound term `-(N)`, not
+the integer -N. When msort compares compound terms, it compares by functor name
+and then by arguments: -(3) < -(2) < -(1), so lower-count items sort first.
+Arithmetic evaluation `Neg is -N` produces integers, which compare numerically:
+-3 < -2 < -1, so msort produces ascending negatives = descending originals.
+
+
+Example session
+
+:- use_module(pack(gridcolorop/prolog/gridcolorop)).
+
+% Count colors.
+gco_color_counts([[r,r,g],[b,b,b]], b, Counts).
+% Counts = [cc(r,2), cc(g,1)].
+
+% Get most frequent color.
+gco_nth_color([[r,r,g],[b,b,b]], b, 0, C).
+% C = r.
+
+% Swap r and g.
+gco_swap([[r,g],[g,r]], r, g, b, R).
+% R = [[g,r],[r,g]].
+
+% Rank by frequency (r=3 -> 0, g=2 -> 1).
+gco_rank_grid([[r,r,r],[g,g,b]], b, R).
+% R = [[0,0,0],[1,1,b]].
+
+% Apply palette: most frequent gets first palette color.
+gco_apply_palette([[r,r,r],[g,g,b]], b, [x,y], R).
+% R = [[x,x,x],[y,y,b]].
+
+% Invert: fg becomes bg, bg becomes x.
+gco_invert([[r,b],[b,g]], b, x, R).
+% R = [[b,x],[x,b]].
+
+% Cycle palette forward by 1.
+gco_cycle([[r,g],[b,b]], [r,g,y], 1, b, R).
+% R = [[g,y],[b,b]].
+
+% Cycle wraps around.
+gco_cycle([[y,b],[b,b]], [r,g,y], 1, b, R).
+% R = [[r,b],[b,b]].
+
+
+Test coverage
+
+44 tests AC-GCO-001 through AC-GCO-044 in
+packs/gridcolorop/test/test_gridcolorop.pl. All pass.
+
+Coverage by predicate:
+  gco_color_counts: 3 tests (001-003, 040)
+  gco_distinct_colors: 3 tests (004-006)
+  gco_nth_color: 2 tests (007-008)
+  gco_count_distinct: 2 tests (009-010, 041)
+  gco_swap: 3 tests (011-013)
+  gco_replace: 3 tests (014-015, 036)
+  gco_apply_map: 3 tests (016-017, 038)
+  gco_keep_only: 3 tests (018-019, 039)
+  gco_remove_color: 2 tests (020-021)
+  gco_cycle: 5 tests (022-025, 037, 042)
+  gco_rank_grid: 3 tests (026-028)
+  gco_apply_palette: 2 tests (029-030)
+  gco_most_least: 2 tests (031-032)
+  gco_invert: 3 tests (033-035)
+  integration: 2 tests (043-044)

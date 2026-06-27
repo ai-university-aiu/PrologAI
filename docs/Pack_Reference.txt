@@ -1617,3 +1617,20 @@ Grid Alignment and Shift Matching: Center of Mass, Translation, Offset Search, O
     gal_place_at(+Canvas,+Grid2,+R0,+C0,+Bg,-Result): transparent paste at (R0,C0).
     gal_anchor_to(+Canvas,+Grid2,+PR,+PC,+QR,+QC,+Bg,-Result): cell-to-cell alignment paste.
     gal_match_any_offset(+Grid1,+Grid2,+Bg,-Offsets): all offsets with at least one overlap.
+
+gridcolorop
+Grid Color Operations: Count, Swap, Replace, Mask, Cycle, Rank, Palette Apply, and Invert (gco_*, Layer 240)
+    gco_color_counts(+Grid,+Bg,-Counts): cc(Color,Count) pairs for all non-bg colors, sorted by count descending.
+    gco_distinct_colors(+Grid,+Bg,-Colors): distinct non-bg colors sorted by count descending.
+    gco_nth_color(+Grid,+Bg,+N,-Color): Nth most frequent non-bg color (0-indexed).
+    gco_count_distinct(+Grid,+Bg,-Count): count of distinct non-bg colors.
+    gco_swap(+Grid,+Color1,+Color2,+Bg,-Result): exchange Color1 and Color2 throughout grid.
+    gco_replace(+Grid,+Old,+New,+Bg,-Result): replace every Old cell with New.
+    gco_apply_map(+Grid,+Map,+Bg,-Result): apply list of Old-New substitution pairs.
+    gco_keep_only(+Grid,+Color,+Bg,-Result): keep Color cells; bg-ify all others.
+    gco_remove_color(+Grid,+Color,+Bg,-Result): replace Color cells with Bg.
+    gco_cycle(+Grid,+Palette,+N,+Bg,-Result): advance each palette-member cell N steps (wrapping).
+    gco_rank_grid(+Grid,+Bg,-Result): replace non-bg cells with 0-indexed frequency rank integer.
+    gco_apply_palette(+Grid,+Bg,+Palette,-Result): replace Kth most frequent color with Kth palette entry.
+    gco_most_least(+Grid,+Bg,-Most,-Least): most and least frequent non-bg colors.
+    gco_invert(+Grid,+Bg,+FgColor,-Result): binary invert: non-bg->Bg, Bg->FgColor.
