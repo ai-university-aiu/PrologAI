@@ -18818,3 +18818,27 @@ gdi_set_main_diag/4 and gdi_set_anti_diag/4 return a modified grid with all
 cells on the specified diagonal set to a new Color.
 
 14 gdi_* predicates. 44 tests pass. Layer 215.
+
+
+Chapter 193: gridframe Pack - Grid Frame Analysis (gfr_*, Layer 216)
+
+The gridframe pack (Layer 216) treats a grid as a set of concentric rings
+(frames). Frame depth D is the set of cells (R,C) where the expression
+min(R, H-1-R, C, W-1-C) equals D. Frame 0 is the outermost border.
+
+:- use_module(pack(gridframe/prolog/gridframe)).
+
+gfr_cell_depth/4 computes the depth of a specific cell; gfr_frame/3 returns
+all cells at depth D as R-C pairs; gfr_max_depth/2 returns floor((min(H,W)-1)/2);
+gfr_frame_count/2 returns max_depth+1. gfr_peel/2 returns the inner (H-2)x(W-2)
+grid after stripping the outermost frame (fails for grids smaller than 3x3).
+gfr_all_frames/2 lists all frame cell-lists in depth order.
+
+gfr_frame_uniform/3 returns yes/no for frame uniformity; gfr_frame_colors/3
+gives distinct colors in a frame; gfr_count_in_frame/4 counts a specific color.
+gfr_set_frame/4 sets frame D to Color; gfr_fill_frames/3 assigns Colors[D] to
+each frame. gfr_uniform_frames/2 collects depths of uniform frames.
+gfr_innermost/2 returns cells at max depth; gfr_onion_layers/2 returns D-Color
+pairs for all uniform frames, enabling onion/target pattern detection.
+
+14 gfr_* predicates. 44 tests pass. Layer 216.
