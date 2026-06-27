@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       244 work packages — the complete cognitive engine (see below)
+├── packs/       245 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,7 +78,7 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 184 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 223 (gridgrav).
+Layer 60 and above is the Data Layer: the 185 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 224 (gridtile).
 
 The full layer table is in Architecture Section 0.4.
 
@@ -325,6 +325,7 @@ Everything is inspectable.
 | `gridmask` | Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206) (PR 315) |
 | `gridxform` | Grid Transformations: Rotate, Flip, Transpose, Crop, Pad, Scale, Tile, Canonicalize (gx_*, Layer 207) (PR 317) |
 | `gridsymm` | Grid Symmetry: Detection, Completion, Violations, and Score (gsm_*, Layer 208) (PR 318) |
+| `gridtile` | Grid Tiling Pattern Analysis: Period Detection, Tile Extraction, Tiling Verification, and Grid Construction from Tiles (gti_*, Layer 224) (PR 334) |
 | `gridgrav` | Grid Gravity Simulation: Settlement in Four Directions, Pile Analysis, and Floating Cell Detection (gv_*, Layer 223) (PR 333) |
 | `gridpos` | Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222) (PR 332) |
 | `gridhist` | Grid Histogram Analysis: Per-Row and Per-Column Color Frequency, Modal, and Entropy (ghst_*, Layer 221) (PR 331) |

@@ -18974,3 +18974,23 @@ gv_non_bg_count/3 returns the total non-bg cell count.
 :- use_module(pack(gridgrav/prolog/gridgrav)).
 
 14 gv_* predicates. 44 tests pass. Layer 223.
+
+Chapter 201: gridtile Pack - Grid Tiling Pattern Analysis (gti_*, Layer 224)
+
+The gridtile pack (Layer 224) provides fourteen predicates for detecting, extracting,
+verifying, and constructing tiling patterns in raw grids. A grid has vertical period
+P if H mod P = 0 and every row R equals row R mod P; horizontal period is defined
+similarly for columns. gti_h_period/2 and gti_w_period/2 find the smallest periods.
+gti_tile_size/3 returns both. gti_is_tiling/3 verifies a given (TH, TW) pair.
+gti_extract_tile/4 extracts the top-left TH x TW sub-grid as the canonical tile.
+gti_tile_to_grid/4 builds any H x W grid by repeating a tile (cell R,C = Tile[R mod
+TH][C mod TW]). gti_row_is_periodic/3 and gti_col_is_periodic/3 check periodicity
+of individual rows and columns. gti_tile_count_h/3 and gti_tile_count_w/3 count
+complete tile rows and columns. gti_matches_tile/4 checks if a specific sub-grid
+equals a tile. gti_tile_offset/5 finds the tile-relative position of a cell.
+gti_all_tiles/4 lists all tile sub-grids in row-major order. gti_crop_to_tile/2
+extracts the minimal tile.
+
+:- use_module(pack(gridtile/prolog/gridtile)).
+
+14 gti_* predicates. 44 tests pass. Layer 224.

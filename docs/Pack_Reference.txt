@@ -1349,3 +1349,20 @@ Grid Gravity Simulation: Settlement in Four Directions, Pile Analysis, and Float
     gv_max_col_pile/3: column index with the most non-bg cells (ties: lowest index)
     gv_min_col_pile/3: column index with the fewest non-bg cells (ties: lowest index)
     gv_non_bg_count/3: total count of non-bg cells across the entire grid
+
+gridtile
+Grid Tiling Pattern Analysis: Period Detection, Tile Extraction, Tiling Verification, and Grid Construction from Tiles (gti_*, Layer 224)
+    gti_h_period/2: smallest vertical period P where H mod P = 0 and row R = row(R mod P)
+    gti_w_period/2: smallest horizontal period P where W mod P = 0 and col C = col(C mod P)
+    gti_tile_size/3: minimal tile dimensions (h_period, w_period)
+    gti_is_tiling/3: check if grid is a valid tiling with tile of given height and width
+    gti_extract_tile/4: extract the top-left TH x TW sub-grid as the canonical tile
+    gti_tile_to_grid/4: build an H x W grid by repeating a tile (cell R,C = Tile[R mod TH][C mod TW])
+    gti_row_is_periodic/3: check if a row of given length has period P
+    gti_col_is_periodic/3: check if column C in the grid has vertical period P
+    gti_tile_count_h/3: number of complete tile rows (H div TH)
+    gti_tile_count_w/3: number of complete tile columns (W div TW)
+    gti_matches_tile/4: check if the TH x TW sub-grid at (R0,C0) equals a given tile
+    gti_tile_offset/5: tile-relative position TileR-TileC for cell (R,C) given periods (TH,TW)
+    gti_all_tiles/4: list all TH x TW tile sub-grids in row-major order
+    gti_crop_to_tile/2: extract the minimal tile (top-left h_period x w_period sub-grid)
