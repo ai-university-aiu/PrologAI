@@ -1468,3 +1468,20 @@ Grid Shifting and Cyclic Rolling: Linear Shifts, Toroidal Rolls, Per-Row/Column 
     gsh_offset/5: shift entire grid by (DR, DC); Result[R][C] = Grid[R-DR][C-DC] or BgColor
     gsh_shift_row/5: shift single row by N (positive=right, negative=left) with bg fill
     gsh_shift_col/5: shift single column by N (positive=down, negative=up; via transpose)
+
+gridmap
+Grid Color Mapping: Remap, Swap, Replace, Merge, Normalize, Palette, Mask, Invert, Cycle, and Map Composition (gmp_*, Layer 231)
+    gmp_remap/3: apply a list of From-To color pairs to all cells; unmapped cells keep their color
+    gmp_swap/4: swap two specific colors throughout the grid (bidirectional remap)
+    gmp_replace/4: replace one specific color with another throughout the grid
+    gmp_merge/4: replace a list of colors with a single target color
+    gmp_normalize/3: assign integer rank labels (1, 2, 3, ...) to non-bg colors in first-occurrence row-major order
+    gmp_palette/3: return ordered list of distinct non-bg colors in first-occurrence row-major order
+    gmp_recolor_fg/4: replace all non-bg cells with a single foreground color
+    gmp_mask_color/4: keep cells of one color; replace all others with bg
+    gmp_invert/3: reverse palette assignments given explicit Palette list (c_i -> c_(n+1-i))
+    gmp_cycle/4: cyclically advance each cell's palette index by N positions mod palette length
+    gmp_build_map/4: derive From-To mapping from two aligned grids (non-bg positions that differ)
+    gmp_invert_map/2: reverse all From-To pairs to To-From
+    gmp_compose_maps/3: chain two maps - From-Mid in Map1, Mid-To in Map2 yields From-To
+    gmp_map_count/3: count cells whose color appears as a From key in a mapping

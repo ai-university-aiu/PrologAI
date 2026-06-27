@@ -19121,3 +19121,42 @@ gsh_shift_row/5    - shift single row by N (pos=right, neg=left)
 gsh_shift_col/5    - shift single column by N (pos=down, neg=up)
 
 14 gsh_* predicates. 44 tests pass. Layer 230.
+
+Chapter 213: gridmap - Grid Color Mapping (gmp_*, Layer 231)
+
+The gridmap pack provides fourteen predicates for color mapping and substitution
+on symbolic grids: applying From-To substitution lists, swapping/replacing/merging
+colors, normalizing to integer labels, extracting palettes, masking, palette
+inversion and cycling, deriving mappings from aligned grids, and composing maps.
+
+:- use_module(pack(gridmap/prolog/gridmap)).
+
+G = [[r,g,r],[g,b,g],[r,g,r]].
+gmp_remap(G, [r-x, g-y], R).
+% R = [[x,y,x],[y,b,y],[x,y,x]]
+
+gmp_normalize(G, b, N).
+% N = [[1,2,1],[2,b,2],[1,2,1]]
+
+gmp_palette(G, b, P).
+% P = [r, g]
+
+gmp_build_map([[r,g],[b,r]], [[x,y],[z,x]], q, M).
+% M = [r-x, g-y, b-z]
+
+gmp_remap/3   - apply From-To mapping list; unmapped cells unchanged
+gmp_swap/4    - swap two colors (bidirectional remap)
+gmp_replace/4 - replace one color with another
+gmp_merge/4   - replace list of colors with single target
+gmp_normalize/3 - assign integer rank labels in row-major order
+gmp_palette/3   - ordered distinct non-bg colors in first-occurrence order
+gmp_recolor_fg/4  - replace all non-bg cells with FgColor
+gmp_mask_color/4  - keep one color; replace all others with bg
+gmp_invert/3    - reverse palette assignments (c_i -> c_(n+1-i))
+gmp_cycle/4     - cyclic palette index shift by N
+gmp_build_map/4 - derive mapping from two aligned grids
+gmp_invert_map/2 - reverse all From-To pairs
+gmp_compose_maps/3 - chain two maps (From-Mid, Mid-To -> From-To)
+gmp_map_count/3  - count cells with a From key in the mapping
+
+14 gmp_* predicates. 44 tests pass. Layer 231.
