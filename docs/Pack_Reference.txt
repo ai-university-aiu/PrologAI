@@ -1026,3 +1026,20 @@ Grid Flood-Fill, Region Analysis, Hole Filling, and Connected Components (gf_*, 
     gf_largest/3: cell-list of largest 4-connected Color region; ties favor first encountered; fails if Color absent
     gf_is_connected/3: succeed if all Color cells form at most one connected region (Connectivity = 4 or 8); vacuously true if none
     gf_boundary_fill/6: 4-connected flood-fill from (R,C) stopping at BoundaryColor walls; fills only SeedColor cells
+
+gridpath
+Grid Pathfinding: BFS Shortest Path, Distance Maps, Flood-N, Wavefront, Line-of-Sight, and Region Path (gpa_*, Layer 205)
+    gpa_shortest_path/7: shortest 4-connected path from (R1,C1) to (R2,C2) avoiding ObsColor; returns R-C list including both endpoints; fails if either endpoint is obstacle or no path exists
+    gpa_path_length/7: step count of shortest 4-path (length of path list minus 1); fails if no path
+    gpa_reachable/6: succeed if (R2,C2) is 4-connected reachable from (R1,C1) avoiding ObsColor
+    gpa_all_reachable/5: list of all cells reachable from seed via 4-connected non-ObsColor paths; includes seed itself
+    gpa_distance_map/5: list of NR-NC-Dist triples for all cells reachable from seed; seed has Dist=0; unreachable cells omitted
+    gpa_nearest/6: nearest reachable cell of TargetColor to seed; tie-break by BFS order; returns NR-NC; fails if none reachable
+    gpa_flood_n/6: all cells reachable within N 4-connected steps from seed avoiding ObsColor; N=0 returns just seed
+    gpa_wavefront/6: cells at exactly BFS distance N from seed; returns [] if no cells at that distance
+    gpa_straight_h/4: cells on horizontal segment row R, columns C1..C2 inclusive; order follows C1-to-C2 direction
+    gpa_straight_v/4: cells on vertical segment column C, rows R1..R2 inclusive; order follows R1-to-R2 direction
+    gpa_line_of_sight/6: succeed if (R1,C1) and (R2,C2) share row or column with no ObsColor strictly between; fail for diagonals
+    gpa_between_h/4: cells strictly interior to horizontal segment (endpoints excluded) in ascending column order
+    gpa_between_v/4: cells strictly interior to vertical segment (endpoints excluded) in ascending row order
+    gpa_region_path/5: shortest 4-path from any Color1 cell to any Color2 cell avoiding ObsColor; fails if no cells or no path
