@@ -14501,3 +14501,79 @@ WP-259-PSEUDO-014: gst_replace(Grid, R0, C0, Patch, Result)
     let PR := R - R0, PC := C - C0 in
     if PR in [0,PH-1] and PC in [0,PW-1] then Patch[PR][PC] else Grid[R][C]
   -- Opaque: all Patch cells written regardless of color.
+
+Part 250 - Work Package 260: gridalign Pack Pseudocode (gal_*, Layer 239)
+
+WP-260-PSEUDO-001: gal_center_of_mass(Grid, Bg, r(R,C))
+  S := { (r,c) | Grid[r][c] != Bg }
+  R := floor(mean({ r | (r,c) in S }))
+  C := floor(mean({ c | (r,c) in S }))
+
+WP-260-PSEUDO-002: gal_nonbg_bbox(Grid, Bg, BBox)
+  S := { (r,c) | Grid[r][c] != Bg }
+  if S = {} then BBox := none
+  else BBox := r0(min_r(S), min_c(S), max_r(S), max_c(S))
+
+WP-260-PSEUDO-003: gal_bbox_center(Grid, Bg, Center)
+  BBox := gal_nonbg_bbox(Grid, Bg)
+  if BBox = none then Center := none
+  else Center := r((R0+R1)//2, (C0+C1)//2)
+
+WP-260-PSEUDO-004: gal_translate(Grid, DR, DC, Bg, Result)
+  Result[r][c] :=
+    let sr := r - DR, sc := c - DC in
+    if sr in [0, H-1] and sc in [0, W-1] and Grid[sr][sc] != Bg
+    then Grid[sr][sc] else Bg
+
+WP-260-PSEUDO-005: gal_overlap_count(Grid1, Grid2, Bg, Count)
+  Count := |{ (r,c) | Grid1[r][c] != Bg and Grid2[r][c] != Bg }|
+
+WP-260-PSEUDO-006: gal_overlap_score(Grid1, Grid2, Bg, Score)
+  N1 := |{ (r,c) | Grid1[r][c] != Bg }|
+  if N1 = 0 then Score := 0.0
+  else Score := gal_overlap_count(Grid1, Grid2) / N1
+
+WP-260-PSEUDO-007: gal_iou(Grid1, Grid2, Bg, IoU)
+  Inter := |{ (r,c) | Grid1[r][c] != Bg and Grid2[r][c] != Bg }|
+  Union := |{ (r,c) | Grid1[r][c] != Bg or Grid2[r][c] != Bg }|
+  -- Use negation \+(V1=Bg, V2=Bg) to avoid double-counting disjunction.
+  if Union = 0 then IoU := 0.0 else IoU := Inter / Union
+
+WP-260-PSEUDO-008: gal_find_offset(Grid1, Grid2, Bg, SearchR, o(DR,DC))
+  S1 := { (r,c) | Grid1[r][c] != Bg }
+  S2 := { (r,c) | Grid2[r][c] != Bg }
+  BestOv := 0, BestDR := 0, BestDC := 0
+  for each (dr,dc) in [-SearchR,SearchR]^2:
+    Ov := |{ (r,c) in S2 | (r+dr, c+dc) in S1 }|
+    if Ov > BestOv or (Ov = BestOv and |dr|+|dc| < |BestDR|+|BestDC|):
+      BestOv := Ov, BestDR := dr, BestDC := dc
+  (DR, DC) := (BestDR, BestDC)
+
+WP-260-PSEUDO-009: gal_align_centers(Grid1, Grid2, Bg, Aligned)
+  r(R1,C1) := gal_center_of_mass(Grid1, Bg)
+  r(R2,C2) := gal_center_of_mass(Grid2, Bg)
+  Aligned := gal_translate(Grid2, R1-R2, C1-C2, Bg)
+  -- If either grid has no non-bg cells, Aligned := Grid2.
+
+WP-260-PSEUDO-010: gal_align_bbox_centers(Grid1, Grid2, Bg, Aligned)
+  r(R1,C1) := gal_bbox_center(Grid1, Bg)
+  r(R2,C2) := gal_bbox_center(Grid2, Bg)
+  Aligned := gal_translate(Grid2, R1-R2, C1-C2, Bg)
+
+WP-260-PSEUDO-011: gal_nonbg_offset(Grid1, Grid2, Bg, o(DR,DC))
+  r(R1,C1) := gal_center_of_mass(Grid1, Bg)
+  r(R2,C2) := gal_center_of_mass(Grid2, Bg)
+  (DR, DC) := (R2-R1, C2-C1)
+
+WP-260-PSEUDO-012: gal_place_at(Canvas, Grid2, R0, C0, Bg, Result)
+  Mods := { (R0+sr, C0+sc, v) | Grid2[sr][sc] = v != Bg, in bounds }
+  Result[r][c] := if (r,c,mv) in Mods then mv else Canvas[r][c]
+
+WP-260-PSEUDO-013: gal_anchor_to(Canvas, Grid2, PR, PC, QR, QC, Bg, Result)
+  R0 := QR - PR, C0 := QC - PC
+  Result := gal_place_at(Canvas, Grid2, R0, C0, Bg)
+
+WP-260-PSEUDO-014: gal_match_any_offset(Grid1, Grid2, Bg, Offsets)
+  S1 := { (r,c) | Grid1[r][c] != Bg }
+  S2 := { (r,c) | Grid2[r][c] != Bg }
+  Offsets := deduplicate { o(dr,dc) | (r2,c2) in S2, (r2+dr, c2+dc) in S1 }

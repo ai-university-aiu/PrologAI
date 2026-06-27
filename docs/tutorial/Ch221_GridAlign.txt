@@ -1,0 +1,115 @@
+Chapter 221: gridalign - Grid Alignment and Shift Matching (gal_*, Layer 239)
+
+The gridalign pack adds fourteen predicates for computing alignment properties
+of symbolic grids, finding optimal translation offsets, and placing one grid
+relative to another.
+
+
+Predicates
+
+gal_center_of_mass(+Grid, +Bg, -r(R,C))
+  Integer-floor average of row and column indices of all non-bg cells.
+  Fails if Grid has no non-bg cells.
+
+gal_nonbg_bbox(+Grid, +Bg, -BBox)
+  BBox = r0(R0,C0,R1,C1): tight bounding box of all non-bg cells.
+  BBox = none if Grid is all-bg.
+
+gal_bbox_center(+Grid, +Bg, -Center)
+  Center = r(R,C): floor center of the bounding box of non-bg cells.
+  Center = none if Grid is all-bg.
+
+gal_translate(+Grid, +DR, +DC, +Bg, -Result)
+  Shift every non-bg cell by (DR,DC). Cells that move out of bounds become Bg.
+  Result has the same dimensions as Grid.
+
+gal_overlap_count(+Grid1, +Grid2, +Bg, -Count)
+  Count positions where both grids have a non-bg cell.
+
+gal_overlap_score(+Grid1, +Grid2, +Bg, -Score)
+  Score = OverlapCount / Grid1_NonbgCount, as a float. 0.0 if Grid1 is all-bg.
+
+gal_iou(+Grid1, +Grid2, +Bg, -IoU)
+  Intersection-over-union of non-bg regions. 0.0 if both grids are all-bg.
+
+gal_find_offset(+Grid1, +Grid2, +Bg, +SearchR, -o(DR,DC))
+  Find the (DR,DC) in [-SearchR,SearchR]^2 that maximises the count of
+  Grid2's non-bg cells that land on Grid1's non-bg cells after translation.
+  Ties broken by minimum Manhattan distance.
+
+gal_align_centers(+Grid1, +Grid2, +Bg, -Aligned)
+  Translate Grid2 so its center of mass coincides with Grid1's. Returns Grid2
+  unchanged if either grid has no non-bg cells.
+
+gal_align_bbox_centers(+Grid1, +Grid2, +Bg, -Aligned)
+  Translate Grid2 so its bbox center coincides with Grid1's bbox center.
+
+gal_nonbg_offset(+Grid1, +Grid2, +Bg, -o(DR,DC))
+  (DR,DC) vector from Grid1's non-bg centroid to Grid2's. Fails if either
+  grid has no non-bg cells.
+
+gal_place_at(+Canvas, +Grid2, +R0, +C0, +Bg, -Result)
+  Paste Grid2 onto Canvas with its top-left at (R0,C0). Non-Bg cells in Grid2
+  overwrite Canvas; Bg cells leave Canvas unchanged (transparent placement).
+
+gal_anchor_to(+Canvas, +Grid2, +PR, +PC, +QR, +QC, +Bg, -Result)
+  Translate Grid2 so that its cell at (PR,PC) aligns with Canvas cell at
+  (QR,QC), then paste transparently onto Canvas.
+
+gal_match_any_offset(+Grid1, +Grid2, +Bg, -Offsets)
+  List of all o(DR,DC) offsets where at least one non-bg cell of Grid2,
+  shifted by (DR,DC), coincides with a non-bg cell of Grid1.
+
+
+Key design notes:
+
+gal_iou uses \+(V1=Bg, V2=Bg) for the union set — not the disjunction
+(V1\=Bg ; V2\=Bg). The disjunction form causes findall to produce duplicate
+entries for cells where both V1 and V2 are non-bg.
+
+gal_find_offset works on non-bg cell sets rather than full translated grids,
+making the search efficient even for large SearchR values.
+
+gal_place_at is transparent like gst_stamp: Bg cells in Grid2 show through
+to Canvas. Use gal_translate (which fills with Bg) for opaque overlay.
+
+
+Example Session
+
+:- use_module(pack(gridalign/prolog/gridalign)).
+
+% Center of mass.
+gal_center_of_mass([[r,b,b],[b,b,b],[b,b,r]], b, COM).
+% COM = r(1,1).
+
+% Translate right by 1.
+gal_translate([[r,b,b],[b,b,b]], 0, 1, b, T).
+% T = [[b,r,b],[b,b,b]].
+
+% Find offset to align two patterns.
+gal_find_offset([[b,r,b],[b,b,b]], [[r,b,b],[b,b,b]], b, 2, Offset).
+% Offset = o(0,1).  (shift Grid2 right 1 to align r at col 1)
+
+% Overlap count and score.
+gal_overlap_count([[r,b],[b,g]], [[r,b],[b,b]], b, Count).
+% Count = 1.
+gal_overlap_score([[r,b],[b,g]], [[r,b],[b,b]], b, Score).
+% Score = 0.5.
+
+% Place a 1x1 stamp at (1,1).
+gal_place_at([[b,b,b],[b,b,b],[b,b,b]], [[x]], 1, 1, b, P).
+% P = [[b,b,b],[b,x,b],[b,b,b]].
+
+% Anchor cell (0,0) of Grid2 to position (2,1) on Canvas.
+gal_anchor_to([[b,b,b],[b,b,b],[b,b,b]], [[r,g]], 0, 0, 2, 1, b, R).
+% R = [[b,b,b],[b,b,b],[b,r,g]].
+
+% Intersection over union.
+gal_iou([[r,b],[b,g]], [[r,b],[b,b]], b, IoU).
+% IoU = 0.5.  (1 common, 2 total)
+
+
+Test Coverage
+
+44 acceptance criteria (AC-GAL-001 through AC-GAL-044) in
+packs/gridalign/test/test_gridalign.pl.

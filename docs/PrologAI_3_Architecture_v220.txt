@@ -9282,3 +9282,35 @@ Design notes:
   -- idiomatic repeat via backtracking over member, no explicit list concat.
 - gst_border: T=0 edge case returns Grid unchanged because findall over
   between(1,0,_) yields zero rows/cells.
+
+ARCH-226: gridalign Pack (Layer 239, gal_*)
+
+Layer: 239
+Module: gridalign
+File: packs/gridalign/prolog/gridalign.pl
+Dependencies: library(lists) [member/2]; SWI-Prolog built-ins only
+  (uses min_list/2, max_list/2, sumlist/2, list_to_set/2 from lists).
+Public predicates (14):
+  gal_center_of_mass/3, gal_nonbg_bbox/3, gal_bbox_center/3,
+  gal_translate/5, gal_overlap_count/4, gal_overlap_score/4, gal_iou/4,
+  gal_find_offset/5, gal_align_centers/4, gal_align_bbox_centers/4,
+  gal_nonbg_offset/4, gal_place_at/6, gal_anchor_to/8, gal_match_any_offset/4
+Private helpers (3):
+  gal_nonbg_cells_/3, gal_floor_avg_/2, gal_grid_size_/3,
+  gal_pick_best_offset_/6
+
+Design notes:
+- gal_iou uses \+(V1=Bg, V2=Bg) for the union condition rather than
+  (V1\=Bg ; V2\=Bg). The disjunction form causes findall to backtrack over
+  both branches for cells where both V1 and V2 are non-bg, double-counting
+  them. The negation form is deterministic.
+- gal_find_offset works on non-bg cell sets (not full grids) for efficiency:
+  shift S2 by (DR,DC), count intersections with S1. No gal_translate call needed.
+- gal_match_any_offset uses list_to_set to deduplicate: multiple Grid2 non-bg
+  cells may produce the same offset independently.
+- gal_pick_best_offset_ is a tail-recursive fold that maintains the current best
+  overlap and offset; ties resolved by Manhattan distance.
+- gal_place_at is transparent (same model as gridstamp's gst_stamp).
+- gal_anchor_to/8 computes R0 = QR - PR, C0 = QC - PC and delegates to
+  gal_place_at/6. This is the correct formula for "place Grid2 at a position
+  where its cell (PR,PC) aligns with Canvas cell (QR,QC)".

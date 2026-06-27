@@ -18424,3 +18424,50 @@ AC-GST-041: gst_replicate_h([[r,g],[y,p]],3,b,R) => [[r,g,r,g,r,g],[y,p,y,p,y,p]
 AC-GST-042: gst_stamp_all([[b,b,b]],[[r]],[r(0,0),r(0,0)],b,R) => [[r,b,b]].
 AC-GST-043: integration - canvas+stamp_all+find_matches: diagonal of 3 r cells, find 3 matches.
 AC-GST-044: integration - stamp then extract recovers stamp content exactly.
+
+Part 250 - Work Package 260: gridalign Acceptance Criteria (AC-GAL-*)
+
+AC-GAL-001: gal_center_of_mass([[b,b],[b,r]],b,r(1,1)).
+AC-GAL-002: gal_center_of_mass([[r,b,r],[b,b,b],[r,b,r]],b,r(1,1)). (4 corners avg)
+AC-GAL-003: gal_center_of_mass([[r,r,r]],b,r(0,1)). (floor avg of 0,1,2)
+AC-GAL-004: gal_nonbg_bbox([[b,b,b],[b,r,b],[b,b,g]],b,r0(1,1,2,2)).
+AC-GAL-005: gal_nonbg_bbox([[b,b],[b,b]],b,none).
+AC-GAL-006: gal_nonbg_bbox([[b,b],[r,b]],b,r0(1,0,1,0)).
+AC-GAL-007: gal_bbox_center([[b,b,b],[b,r,b],[b,b,b]],b,r(1,1)).
+AC-GAL-008: gal_bbox_center([[b,b],[b,b]],b,none).
+AC-GAL-009: gal_translate([[r,b,b]],0,1,b,[[b,r,b]]).
+AC-GAL-010: gal_translate([[b,b,r]],0,1,b,[[b,b,b]]). (off right edge)
+AC-GAL-011: gal_translate([[r,b],[b,b]],1,0,b,[[b,b],[r,b]]).
+AC-GAL-012: gal_translate([[r,g],[y,p]],0,0,b,[[r,g],[y,p]]).
+AC-GAL-013: gal_overlap_count([[r,b],[b,g]],same,b,2).
+AC-GAL-014: gal_overlap_count([[r,b],[b,b]],[[b,b],[b,g]],b,0).
+AC-GAL-015: gal_overlap_count([[r,g],[b,b]],[[r,b],[b,b]],b,1).
+AC-GAL-016: gal_overlap_score([[r,b],[b,g]],same,b,1.0).
+AC-GAL-017: gal_overlap_score([[r,b],[b,b]],[[b,b],[b,g]],b,0.0).
+AC-GAL-018: gal_overlap_score([[b,b],[b,b]],[[r,g],[y,p]],b,0.0).
+AC-GAL-019: gal_iou([[r,b],[b,g]],same,b,1.0).
+AC-GAL-020: gal_iou([[r,b],[b,b]],[[b,b],[b,g]],b,0.0).
+AC-GAL-021: gal_iou([[r,b],[b,b]],[[r,g],[b,b]],b,0.5). (1 common / 2 total)
+AC-GAL-022: gal_find_offset(Grid,Grid,b,2,o(0,0)). (identical grids)
+AC-GAL-023: gal_find_offset([[b,r,b],[b,b,b]],[[r,b,b],[b,b,b]],b,2,o(0,1)).
+AC-GAL-024: gal_find_offset([[b,b,b],[b,r,b]],[[b,r,b],[b,b,b]],b,2,o(1,0)).
+AC-GAL-025: gal_align_centers(Grid1,Grid2,b,Aligned) - Aligned centroid matches Grid1's.
+AC-GAL-026: gal_align_centers([[b,b],[b,b]],[[r,b],[b,b]],b,[[r,b],[b,b]]). (no-op)
+AC-GAL-027: gal_align_bbox_centers(Grid1,Grid2,b,Aligned) - bbox center matches.
+AC-GAL-028: gal_nonbg_offset([[r,b],[b,b]],[[b,b],[b,r]],b,o(1,1)).
+AC-GAL-029: gal_nonbg_offset(Grid,Grid,b,o(0,0)).
+AC-GAL-030: gal_place_at(Canvas,[[r,g]],0,0,b,[[r,g,b],[b,b,b],[b,b,b]]).
+AC-GAL-031: gal_place_at(Canvas,[[r]],1,1,b,[[b,b,b],[b,r,b],[b,b,b]]).
+AC-GAL-032: gal_place_at([[b,b],[b,b]],[[r,g],[y,p]],1,1,b,[[b,b],[b,r]]). (clips)
+AC-GAL-033: gal_anchor_to(Canvas,[[r]],0,0,1,1,b,R) => center cell is r.
+AC-GAL-034: gal_anchor_to(Canvas,[[g,g],[r,r]],1,0,0,0,b,R) => top row is [r,r].
+AC-GAL-035: gal_match_any_offset([[r,b,b],[b,b,b]],[[b,b,r],[b,b,b]],b,Os) - member(o(0,-2),Os).
+AC-GAL-036: gal_match_any_offset([[r,b],[b,b]],[[b,b],[b,b]],b,[]).
+AC-GAL-037: gal_translate([[b,r,b]],0,-1,b,[[r,b,b]]). (shift left)
+AC-GAL-038: gal_translate([[r,b,b],[b,b,b],[b,b,b]],1,1,b,R) => r at (1,1).
+AC-GAL-039: gal_center_of_mass([[r,g],[y,p]],b,r(0,0)). (all 4 cells, floor avg)
+AC-GAL-040: gal_iou([[b,b],[b,b]],[[b,b],[b,b]],b,0.0).
+AC-GAL-041: gal_overlap_count([[r,b],[b,b]],[[g,b],[b,b]],b,1). (same pos, diff colors)
+AC-GAL-042: gal_nonbg_bbox([[r,g],[y,p]],b,r0(0,0,1,1)).
+AC-GAL-043: integration - translate then overlap_count = 1.
+AC-GAL-044: integration - place_at then overlap_count = 1.
