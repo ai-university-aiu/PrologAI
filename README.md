@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       238 work packages — the complete cognitive engine (see below)
+├── packs/       239 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,11 +78,11 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 178 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 217 (gridspiral).
+Layer 60 and above is the Data Layer: the 179 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 218 (griddelta).
 
 The full layer table is in Architecture Section 0.4.
 
-### The 238 Work Packages
+### The 239 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -325,6 +325,7 @@ Everything is inspectable.
 | `gridmask` | Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206) (PR 315) |
 | `gridxform` | Grid Transformations: Rotate, Flip, Transpose, Crop, Pad, Scale, Tile, Canonicalize (gx_*, Layer 207) (PR 317) |
 | `gridsymm` | Grid Symmetry: Detection, Completion, Violations, and Score (gsm_*, Layer 208) (PR 318) |
+| `griddelta` | Grid Delta Analysis: Difference Detection, Change Maps, Color Transitions, and Grid Comparison (gdt_*, Layer 218) (PR 328) |
 | `gridspiral` | Grid Spiral Traversal: Clockwise Spiral Ordering, Read, Write, Rotate, and Frame Spirals (gsp_*, Layer 217) (PR 327) |
 | `gridframe` | Grid Frame Analysis: Concentric Ring Depth, Frame Extraction, Uniformity, Fill, and Peel (gfr_*, Layer 216) (PR 326) |
 | `griddiag` | Grid Diagonal Analysis: Main and Anti-Diagonal Extraction, Counting, Uniformity, and Modification (gdi_*, Layer 215) (PR 325) |
@@ -385,11 +386,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v204` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v196` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v198` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v251` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v254` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v205` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v197` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v199` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v252` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v255` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---

@@ -1,0 +1,159 @@
+Chapter 200: griddelta - Grid Delta Analysis (gdt_*, Layer 218)
+
+D. R. Dison, Founder of AIU, Creator of PrologAI and Mentova,
+ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
+
+
+1. Overview
+
+The griddelta pack (Layer 218) compares two same-size grids, finding cells
+that differ or agree, mapping color transitions, applying deltas to new grids,
+and testing identity.
+
+Load the pack:
+
+    :- use_module(pack(griddelta/prolog/griddelta)).
+
+
+2. Compatibility
+
+gdt_compatible/2 succeeds if two grids have the same dimensions:
+
+    G1 = [[r,r],[r,r]].
+    G2 = [[r,x],[r,r]].
+    gdt_compatible(G1, G2).
+    % Succeeds (both 2x2)
+
+
+3. Finding Differences
+
+gdt_diff_cells/3 returns R-C pairs where the grids differ:
+
+    G1 = [[r,r,r],[r,x,r],[r,r,r]].
+    G2 = [[r,r,r],[r,b,r],[r,r,r]].
+    gdt_diff_cells(G1, G2, Cells).
+    % Cells = [1-1]   (only center changed)
+
+gdt_diff_count/3 counts them:
+
+    gdt_diff_count(G1, G2, Count).
+    % Count = 1
+
+gdt_same_cells/3 returns agreeing cells:
+
+    gdt_same_cells(G1, G2, Same).
+    % Same has 8 entries
+
+
+4. Color Transitions
+
+gdt_changed_pairs/3 returns (position, old, new) for each change:
+
+    gdt_changed_pairs(G1, G2, Pairs).
+    % Pairs = [1-1-(x->b)]
+
+gdt_color_changes/4 counts cells where a specific color was replaced:
+
+    gdt_color_changes(G1, G2, x, Count).
+    % Count = 1   (the one x that changed to b)
+
+gdt_changed_colors/3 returns distinct new colors:
+
+    gdt_changed_colors(G1, G2, Colors).
+    % Colors = [b]
+
+
+5. Applying Deltas
+
+gdt_apply_delta/4 applies the changes from G1→G2 to a third grid G3:
+
+    G1 = [[r,r,r],[r,x,r],[r,r,r]].
+    G2 = [[r,r,r],[r,b,r],[r,r,r]].
+    G3 = [[r,r,r],[r,x,r],[r,r,r]].
+    gdt_apply_delta(G1, G2, G3, Result).
+    % Result = [[r,r,r],[r,b,r],[r,r,r]]  (G3's center x → b)
+
+The rule: for each cell where G1 ≠ G2, if G3 has G1's value at that cell,
+replace it with G2's value. Other cells are copied unchanged from G3.
+
+gdt_invert_delta/3 reverses a delta (restores changed cells to G1's values):
+
+    gdt_invert_delta(G1, G2, Inv).
+    % Inv = G1   (G2's changed cells restored to G1's values)
+
+
+6. Row and Column Analysis
+
+gdt_diff_rows/3 returns row indices with at least one change:
+
+    gdt_diff_rows(G1, G2, Rows).
+    % Rows = [1]   (only row 1 has the changed cell)
+
+gdt_diff_cols/3 returns column indices with changes:
+
+    gdt_diff_cols(G1, G2, Cols).
+    % Cols = [1]   (only column 1)
+
+
+7. Region Agreement
+
+gdt_agree_region/6 tests agreement in a rectangular sub-region:
+
+    G1 = [[r,r,r],[r,x,r],[r,r,r]].
+    G2 = [[r,r,r],[r,b,r],[r,r,r]].
+    gdt_agree_region(G1, G2, 0, 0, 0, 2).
+    % Succeeds (row 0 is identical)
+
+    \+ gdt_agree_region(G1, G2, 1, 1, 1, 1).
+    % Fails (center cell differs)
+
+
+8. Overlay
+
+gdt_overlay/4 overlays G2 onto G1, treating Marker as transparent:
+
+    Base = [[r,r,r],[r,r,r],[r,r,r]].
+    Overlay = [[r,n,r],[n,r,n],[r,n,r]].
+    gdt_overlay(Base, Overlay, r, Result).
+    % Result = [[r,n,r],[n,r,n],[r,n,r]]  (n cells win; r is transparent)
+
+Where Overlay has Marker (r), the Base value is used.
+Where Overlay has a non-Marker value, that value wins.
+
+
+9. Identity Test
+
+gdt_is_identity/2 succeeds if two grids are identical:
+
+    gdt_is_identity(G, G).
+    % Succeeds
+
+    \+ gdt_is_identity(G1, G2).
+    % Fails if they differ
+
+
+10. Test Coverage
+
+44 acceptance criteria (AC-GDT-001 through AC-GDT-044). Tests cover
+compatibility (2), diff_cells (4), diff_count (3), same_cells (3),
+changed_pairs (2), color_changes (3), changed_colors (3), apply_delta (3),
+diff_rows (3), diff_cols (2), agree_region (3), overlay (2), invert_delta (2),
+is_identity (3), and combined tests (5).
+
+
+11. Summary
+
+gdt_compatible/2      - test same dimensions
+gdt_diff_cells/3      - cells where grids differ
+gdt_diff_count/3      - count of differing cells
+gdt_same_cells/3      - cells where grids agree
+gdt_changed_pairs/3   - R-C-(Old->New) for each change
+gdt_color_changes/4   - count cells where From color was replaced
+gdt_changed_colors/3  - distinct new colors from the delta
+gdt_apply_delta/4     - apply G1→G2 changes to G3
+gdt_diff_rows/3       - rows containing changes
+gdt_diff_cols/3       - columns containing changes
+gdt_agree_region/6    - test agreement in a rectangular region
+gdt_overlay/4         - overlay with transparent Marker
+gdt_invert_delta/3    - reverse delta (restore G1's values)
+gdt_is_identity/2     - test if two grids are identical

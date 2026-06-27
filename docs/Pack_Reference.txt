@@ -1247,3 +1247,20 @@ gridspiral
     gsp_fill_spiral/3: alias for gsp_write_spiral
     gsp_rotate_spiral/3: rotate all values N steps forward along the spiral
     gsp_spiral_slice/4: sublist of spiral cells from 0-based index Start to End inclusive
+
+griddelta
+    Grid Delta Analysis: Difference Detection, Change Maps, Color Transitions, and Grid Comparison (gdt_*, Layer 218)
+    gdt_compatible/2: succeeds if two grids have the same number of rows and columns
+    gdt_diff_cells/3: R-C pairs where G1 and G2 have different values, in row-major order
+    gdt_diff_count/3: count of cells where G1 and G2 differ
+    gdt_same_cells/3: R-C pairs where G1 and G2 have equal values
+    gdt_changed_pairs/3: R-C-(Old->New) terms for each cell that changed from G1 to G2
+    gdt_color_changes/4: count cells where G1 has From color and G2 has a different color
+    gdt_changed_colors/3: distinct new colors introduced by the G1→G2 delta
+    gdt_apply_delta/4: apply G1→G2 changes to G3; cell gets G2 value if G3 matches G1 at that cell
+    gdt_diff_rows/3: sorted row indices containing at least one changed cell
+    gdt_diff_cols/3: sorted column indices containing at least one changed cell
+    gdt_agree_region/6: succeeds if G1 and G2 agree on every cell in [RowMin..RowMax] x [ColMin..ColMax]
+    gdt_overlay/4: G2 overlaid onto G1; Marker color in G2 is transparent (shows G1)
+    gdt_invert_delta/3: reverse delta applied to G2 — changed cells revert to G1's values
+    gdt_is_identity/2: succeeds if two grids are identical (zero differences)
