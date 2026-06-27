@@ -1146,7 +1146,7 @@ Tier 2 is the Data Layer (layers 60 and above).
 
 These are the perception, analysis, and transformation packs: color, shape, symmetry, fill, compare, grid operations, and everything that processes structured data.
 
-As of this writing, the highest Data Layer pack is gridflood on layer 204.
+As of this writing, the highest Data Layer pack is gridpath on layer 205.
 
 New packs always receive a layer number higher than all existing packs they depend on.
 
@@ -18516,3 +18516,26 @@ gf_n_components([[r,b,r],[b,b,b],[r,b,r]], r, N).
 
 14 gf_* predicates. 54 tests pass. Layer 204.
 All 54 tests pass. See docs/tutorial/Ch186_GridFlood.txt for the full chapter.
+
+
+Chapter 178: gridpath Pack - BFS Pathfinding, Distance Maps, Flood-N, and Line-of-Sight (gpa_*, Layer 205)
+
+The gridpath pack provides BFS shortest-path finding, distance maps, flood
+expansion, wavefront extraction, line-of-sight, and multi-region path discovery.
+
+:- use_module(pack(gridpath/prolog/gridpath)).
+
+% Shortest path avoiding walls:
+gpa_shortest_path([[p,p,p],[p,w,p],[p,p,p]], 0, 0, 2, 2, w, Path).
+% Path is 5 cells long (length 5, 4 steps)
+
+% Distance map from corner:
+gpa_distance_map([[p,p,p],[p,p,p],[p,p,p]], 0, 0, w, Map).
+% Map includes 0-0-0 ... 2-2-4
+
+% Wavefront at distance 2:
+gpa_wavefront([[p,p,p],[p,p,p],[p,p,p]], 1, 1, 2, w, Cells).
+% Cells = [0-0, 0-2, 2-0, 2-2]  (4 corners)
+
+14 gpa_* predicates. 57 tests pass. Layer 205.
+All 57 tests pass. See docs/tutorial/Ch187_GridPath.txt for the full chapter.
