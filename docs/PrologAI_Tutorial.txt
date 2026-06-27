@@ -18564,3 +18564,37 @@ gm_border_mask([[p,p,p],[p,p,p],[p,p,p]], 1, M).
 
 14 gm_* predicates. 44 tests pass. Layer 206.
 All 44 tests pass. See docs/tutorial/Ch188_GridMask.txt for the full chapter.
+
+
+Chapter 182: gridxform Pack - Rotations, Flips, Transpose, Crop, Pad, Scale, Tile, and Canonical Form (gx_*, Layer 207)
+
+The gridxform pack (Layer 207) provides fourteen predicates for geometric
+transformation of raw grids: three rotations (90/180/270 CW), horizontal and
+vertical flips, main-diagonal transpose, anti-diagonal flip, crop to explicit
+or auto-detected bounding box, pad with background color, integer upscale,
+tile to target dimensions, D4 group enumeration, and canonical D4 form.
+
+:- use_module(pack(gridxform/prolog/gridxform)).
+
+% Rotate 90 CW:
+gx_rotate90([[a,b,c],[d,e,f],[g,h,i]], R).
+% R = [[g,d,a],[h,e,b],[i,f,c]]
+
+% Transpose a 2x3 grid to get 3x2:
+gx_transpose([[a,b,c],[d,e,f]], R).
+% R = [[a,d],[b,e],[c,f]]
+
+% Auto-crop to content bounding box:
+gx_crop_content([[x,x,x],[x,r,r],[x,r,r]], x, R).
+% R = [[r,r],[r,r]]
+
+% Tile a 2x2 checkerboard to 4x4:
+gx_tile([[r,x],[x,r]], 4, 4, R).
+% R = [[r,x,r,x],[x,r,x,r],[r,x,r,x],[x,r,x,r]]
+
+% Scale up by 2:
+gx_scale([[r,x],[x,r]], 2, R).
+% R = [[r,r,x,x],[r,r,x,x],[x,x,r,r],[x,x,r,r]]
+
+14 gx_* predicates. 44 tests pass. Layer 207.
+All 44 tests pass. See docs/tutorial/Ch189_GridXform.txt for the full chapter.
