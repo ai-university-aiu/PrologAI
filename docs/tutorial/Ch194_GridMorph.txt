@@ -1,0 +1,223 @@
+Chapter 194: gridmorph Pack - Morphological Operations on Symbolic Grids (gmo_*, Layer 212)
+
+1. Overview
+
+The gridmorph pack adds fourteen predicates for morphological operations on
+symbolic grids. Morphological operations treat one designated color as the
+foreground (FgColor) and all other colors as background. The pack covers the
+complete morphological toolkit: dilation, erosion, opening, closing, boundary
+extraction, gradient, top-hat and bottom-hat transforms, hole filling, and
+connected-component size filtering.
+
+Layer 212 sits immediately above gridedge (Layer 211).
+
+Pack file: packs/gridmorph/prolog/gridmorph.pl
+Tests:     packs/gridmorph/test/test_gridmorph.pl
+
+To load the pack:
+:- use_module(pack(gridmorph/prolog/gridmorph)).
+
+
+2. Key Concepts
+
+Foreground and background: all gmo_* predicates accept a FgColor argument.
+Every cell with that color is foreground; every other color is background.
+This binary model allows morphological operations that expand or shrink the
+foreground region.
+
+Grid boundary behavior: there are no phantom background cells outside the
+grid. Out-of-bounds positions simply do not exist. A corner foreground cell
+whose only in-bounds 4-neighbors are also foreground will NOT be eroded even
+though it sits at the grid boundary. This is the correct behavior for finite
+grids.
+
+The once/1 invariant: predicates that ask "does this cell have at least one
+neighbor satisfying P?" wrap the neighbor check in once/1 inside findall. This
+ensures each qualifying cell appears exactly once in the output even when
+multiple neighbors qualify.
+
+
+3. Dilation and Erosion
+
+gmo_dilate(+Grid, +FgColor, +N, -Result)
+  Expands FgColor region by N layers. In each step, every non-FgColor cell
+  with at least one FgColor 4-neighbor becomes FgColor.
+
+gmo_erode(+Grid, +FgColor, +N, -Result)
+  Shrinks FgColor region by N layers. In each step, every FgColor cell with
+  at least one non-FgColor neighbor becomes background (the background color
+  is discovered automatically as the first non-FgColor cell).
+
+gmo_dilate1(+Grid, +FgColor, -Result)
+gmo_erode1(+Grid, +FgColor, -Result)
+  Single-step variants.
+
+Example:
+G = [[x,x,x,x,x],
+     [x,x,x,x,x],
+     [x,x,r,x,x],
+     [x,x,x,x,x],
+     [x,x,x,x,x]].
+
+gmo_dilate(G, r, 1, D).
+% D has 5 r cells: (2,2) plus 4 cardinal neighbors
+
+gmo_dilate(G, r, 2, D2).
+% D2 has 13 r cells: all cells within Manhattan distance 2 of (2,2)
+
+gmo_erode(G, r, 1, E).
+% E has 0 r cells: single cell eroded away
+
+Block example:
+B = [[x,x,x,x,x],
+     [x,r,r,r,x],
+     [x,r,r,r,x],
+     [x,r,r,r,x],
+     [x,x,x,x,x]].
+
+gmo_erode(B, r, 1, E).
+% E has only center (2,2) as r
+
+gmo_dilate(E, r, 1, D).
+% D has 5 r cells: (2,2) plus 4 cardinal neighbors
+
+
+4. Opening and Closing
+
+gmo_open(+Grid, +FgColor, +N, -Result)
+  Morphological opening: N erosions then N dilations.
+  Removes small protrusions and isolated FgColor regions smaller than N.
+  Preserves the approximate shape of large regions.
+
+gmo_close(+Grid, +FgColor, +N, -Result)
+  Morphological closing: N dilations then N erosions.
+  Fills small gaps and holes within FgColor regions.
+
+Example (opening removes isolated spot):
+Dot = [[x,x,x,x,x],[x,x,x,x,x],[x,x,r,x,x],[x,x,x,x,x],[x,x,x,x,x]].
+gmo_open(Dot, r, 1, O).
+% O is all-x: the single r cell is eroded away; nothing to dilate back
+
+Example (closing fills ring hole):
+Ring = [[r,r,r,r,r],[r,x,x,x,r],[r,x,x,x,r],[r,x,x,x,r],[r,r,r,r,r]].
+gmo_close(Ring, r, 2, C).
+% C has more r cells than Ring: the interior x hole is partially or fully filled
+
+
+5. Boundary Extraction
+
+gmo_boundary_inner(+Grid, +FgColor, -Cells)
+  Inner border: FgColor cells that have at least one non-FgColor in-bounds
+  4-neighbor. Corner FgColor cells at the grid edge whose ALL in-bounds
+  neighbors are FgColor are NOT inner border cells.
+
+gmo_boundary_outer(+Grid, +FgColor, -Cells)
+  Outer border: non-FgColor cells that have at least one FgColor in-bounds
+  4-neighbor.
+
+gmo_gradient_cells(+Grid, +FgColor, -Cells)
+  Morphological gradient: append(Inner, Outer, Cells). All cells in the border
+  region between FgColor and background.
+
+Example:
+G = [[r,r,x],[r,r,x],[x,x,x]].
+
+gmo_boundary_inner(G, r, Inner).
+% Inner = [0-1, 1-0, 1-1]
+% (0,0) has in-bounds neighbors (0,1)=r and (1,0)=r only; NOT inner border
+
+gmo_boundary_outer(G, r, Outer).
+% Outer = [0-2, 1-2, 2-0, 2-1]
+
+gmo_gradient_cells(G, r, Grad).
+% Grad = [0-1, 1-0, 1-1, 0-2, 1-2, 2-0, 2-1]  (7 cells)
+
+
+6. Top-Hat and Bottom-Hat Transforms
+
+gmo_top_hat(+Grid, +FgColor, +N, -Cells)
+  Top-hat: FgColor cells present in Grid that disappear after opening.
+  Highlights small bright structures (protrusions, isolated spots).
+
+gmo_bottom_hat(+Grid, +FgColor, +N, -Cells)
+  Bottom-hat (black-hat): cells that become FgColor after closing but were
+  not FgColor in the input. Highlights small dark holes filled by closing.
+
+Example:
+Dot = [[x,x,x,x,x],[x,x,x,x,x],[x,x,r,x,x],[x,x,x,x,x],[x,x,x,x,x]].
+gmo_top_hat(Dot, r, 1, TopHat).
+% TopHat = [2-2]   the isolated r cell is highlighted
+
+Ring = [[r,r,r,r,r],[r,x,x,x,r],[r,x,x,x,r],[r,x,x,x,r],[r,r,r,r,r]].
+gmo_bottom_hat(Ring, r, 2, BotHat).
+% BotHat is non-empty: interior x cells filled by closing are highlighted
+
+
+7. Hole Filling and Border Flood Fill
+
+gmo_fill_holes(+Grid, +FgColor, +BgColor, -Result)
+  Fills all enclosed BgColor regions (not reachable from the grid border)
+  with FgColor. Uses BFS from the border to find open background.
+
+gmo_connected_border(+Grid, +TargetColor, +BlockColor, -Cells)
+  BFS from all TargetColor cells on the grid border (row 0, last row,
+  column 0, last column) through TargetColor cells. BlockColor cells stop
+  expansion. Returns all reachable TargetColor cells.
+
+Example:
+Ring = [[r,r,r,r,r],[r,x,x,x,r],[r,x,x,x,r],[r,x,x,x,r],[r,r,r,r,r]].
+
+gmo_fill_holes(Ring, r, x, Filled).
+% Filled: all 25 cells are r (9 enclosed x cells became r)
+
+gmo_connected_border(Ring, x, r, Reachable).
+% Reachable = [] (no x is on the border; all x is enclosed)
+
+Block = [[x,x,x,x,x],[x,r,r,r,x],[x,r,r,r,x],[x,r,r,r,x],[x,x,x,x,x]].
+gmo_connected_border(Block, x, r, Reachable).
+% Reachable has 16 cells (all x cells around the block reach the border)
+
+
+8. Connected Component Size Filtering
+
+gmo_remove_small(+Grid, +FgColor, +BgColor, +MinSize, -Result)
+  Removes all FgColor connected components with fewer than MinSize cells.
+  Uses BFS per unprocessed FgColor cell to discover each component.
+  Small components (size < MinSize) are replaced by BgColor.
+  Components with size >= MinSize are kept.
+
+Example:
+Two = [[r,x,x,x,r],[x,x,x,x,x],[x,x,x,x,x],[x,x,x,x,x],[r,x,x,x,r]].
+gmo_remove_small(Two, r, x, 2, R).
+% R: all r removed (4 corners, each a 1-cell component; 1 < 2)
+
+Block = [[x,x,x,x,x],[x,r,r,r,x],[x,r,r,r,x],[x,r,r,r,x],[x,x,x,x,x]].
+gmo_remove_small(Block, r, x, 9, R).
+% R: all r kept (one 9-cell component; 9 >= 9)
+
+gmo_remove_small(Block, r, x, 10, R).
+% R: all r removed (9 < 10)
+
+
+9. Predicate Index
+
+gmo_dilate/4           - expand FgColor region N layers (4-connected)
+gmo_erode/4            - shrink FgColor region N layers (4-connected)
+gmo_open/4             - N erosions then N dilations (removes small regions)
+gmo_close/4            - N dilations then N erosions (fills small holes)
+gmo_dilate1/3          - single dilation step
+gmo_erode1/3           - single erosion step
+gmo_boundary_inner/3   - FgColor cells with non-FgColor neighbor (inner border)
+gmo_boundary_outer/3   - non-FgColor cells with FgColor neighbor (outer border)
+gmo_gradient_cells/3   - union of inner and outer boundaries
+gmo_top_hat/4          - FgColor cells removed by opening (small protrusions)
+gmo_bottom_hat/4       - cells added by closing (small holes)
+gmo_fill_holes/4       - fill enclosed BgColor regions with FgColor
+gmo_connected_border/4 - BFS from border through TargetColor cells
+gmo_remove_small/5     - remove FgColor components below MinSize
+
+
+10. Test Coverage
+
+44 acceptance tests in packs/gridmorph/test/test_gridmorph.pl covering all
+fourteen predicates. All 44 tests pass.

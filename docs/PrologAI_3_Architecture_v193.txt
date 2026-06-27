@@ -8161,3 +8161,306 @@ Key design:
   exactly 2; all run lengths must be 1.
 
 Layer table addition: Layer 203 -> gridrun (grl_*)
+
+
+ARCH-191: gridflood Pack (gf_*, Layer 204)
+
+Location: packs/gridflood/prolog/gridflood.pl
+Test: packs/gridflood/test/test_gridflood.pl
+Pack descriptor: packs/gridflood/pack.pl
+
+Layer 204 sits immediately above gridrun (Layer 203) in the PrologAI dependency chain.
+No cross-pack imports; uses library(lists) [nth0/3, member/2, memberchk/2, append/2,
+append/3, list_to_set/2, subtract/3, min_list/2, max_list/2] and library(apply) [foldl/4].
+
+Exported predicates (14):
+  gf_fill/5          - 4-connected flood-fill from seed cell
+  gf_fill8/5         - 8-connected flood-fill from seed cell
+  gf_recolor/4       - global palette swap OldColor to NewColor
+  gf_isolate/5       - extract one 4-connected region onto blank background
+  gf_region_cells/4  - list all cells in 4-connected region at seed
+  gf_region_size/4   - count cells in 4-connected region
+  gf_region_bbox/7   - bounding box (MinR,MinC,MaxR,MaxC) of 4-connected region
+  gf_enclosed_cells/3 - BgColor cells not reachable from grid border
+  gf_fill_enclosed/4 - fill enclosed BgColor cells with FillColor
+  gf_components/3    - list of cell-lists, one per 4-connected Color region
+  gf_n_components/3  - count 4-connected Color regions
+  gf_largest/3       - cell-list of largest 4-connected Color region
+  gf_is_connected/3  - succeed if all Color cells form one connected region (4 or 8)
+  gf_boundary_fill/6 - flood-fill stopping at BoundaryColor cells
+
+Private helpers: gf_dims_/3, gf_cell_/3, gf_bfs4_/7, gf_bfs8_/7,
+gf_set_cells_/4, gf_keep_larger_/3, gf_extract_components_/6.
+
+Design decision: BFS uses an explicit queue (list) accumulated via append/3 to avoid
+the stack-depth limitations of recursive DFS on large grids. The visited list is
+maintained as a flat list; memberchk/2 provides O(n) lookup which is acceptable for
+grid sizes typical of ARC-AGI tasks.
+
+gf_enclosed_cells seeds BFS from the union of all border cells of BgColor, which
+correctly handles multi-cell border seeds and empty borders alike.
+gf_is_connected/3 for connectivity=4 delegates to gf_n_components which returns 0
+for absent colors (vacuously connected).
+
+
+ARCH-192: gridpath Pack (gpa_*, Layer 205)
+
+Location: packs/gridpath/prolog/gridpath.pl
+Test: packs/gridpath/test/test_gridpath.pl
+Pack descriptor: packs/gridpath/pack.pl
+
+Layer 205 sits immediately above gridflood (Layer 204). No cross-pack imports;
+uses library(lists) [nth0/3, member/2, memberchk/2, append/2, append/3] only.
+
+Exported predicates (14):
+  gpa_shortest_path/7  - BFS shortest 4-path from (R1,C1) to (R2,C2) avoiding ObsColor
+  gpa_path_length/7    - step count of shortest 4-path (cells - 1)
+  gpa_reachable/6      - succeed if (R2,C2) reachable from (R1,C1) via 4-path
+  gpa_all_reachable/5  - all cells reachable from seed via 4-connected non-Obs walk
+  gpa_distance_map/5   - BFS distance triples R-C-Dist for all reachable cells
+  gpa_nearest/6        - nearest reachable cell of TargetColor (tie-break by BFS order)
+  gpa_flood_n/6        - cells reachable in at most N steps from seed
+  gpa_wavefront/6      - cells at exactly N BFS steps from seed
+  gpa_straight_h/4     - cells on horizontal segment R,C1..C2 inclusive
+  gpa_straight_v/4     - cells on vertical segment C,R1..R2 inclusive
+  gpa_line_of_sight/6  - same row or col with no ObsColor strictly between
+  gpa_between_h/4      - cells strictly between C1 and C2 on row R
+  gpa_between_v/4      - cells strictly between R1 and R2 on column C
+  gpa_region_path/5    - shortest path between any Color1 and any Color2 cell
+
+Private helpers: gpa_dims_/3, gpa_cell_/4, gpa_path_bfs_/9,
+gpa_reach_bfs_/7, gpa_dist_bfs_/7.
+
+Design decision: gpa_path_bfs_ stores the full reverse path in each BFS queue
+entry (node(R, C, RevPath)). For typical ARC-AGI grids (< 30x30 cells) this
+is memory-efficient enough; the BFS is guaranteed to find a shortest path
+because we process nodes in FIFO order.
+
+gpa_nearest uses gpa_distance_map + msort on D-NR-NC to find the closest
+TargetColor cell; this avoids running a separate BFS per candidate.
+
+gpa_region_path iterates over all (Color1, Color2) cell pairs and picks the
+shortest successful path, which is correct but quadratic in the number of
+region cells. For ARC-AGI grid sizes this is acceptable.
+
+
+ARCH-193: gridmask Pack (gm_*, Layer 206)
+
+Location: packs/gridmask/prolog/gridmask.pl
+Test: packs/gridmask/test/test_gridmask.pl
+Pack descriptor: packs/gridmask/pack.pl
+
+Layer 206 sits immediately above gridpath (Layer 205). No cross-pack imports;
+uses library(lists) [nth0/3, member/2, memberchk/2, append/2, append/3] only.
+
+Exported predicates (14):
+  gm_overlay/5     - overlay GridB (non-BgColor) onto GridA (BgColor cells transparent)
+  gm_union/4       - union of non-background regions (GridA color wins ties)
+  gm_intersect/5   - intersection: FgColor where both non-BgColor, else BgColor
+  gm_difference/5  - A minus B: keep GridA where GridB is BgColor, else BgOut
+  gm_invert/4      - swap foreground and background colors
+  gm_mask_apply/5  - gate Grid through Mask: non-Bg passes, Bg cells -> FillColor
+  gm_extract/4     - keep only named R-C cells; all others become BgColor
+  gm_stamp/5       - paste Stamp at (OR,OC); all Stamp cells overwrite; out-of-bounds skipped
+  gm_compare/4     - list of R-C positions where two grids differ
+  gm_equal/2       - succeed if two grids are identical (unification)
+  gm_sub/6         - extract Height x Width sub-grid at (R0,C0); fails if out of bounds
+  gm_paste/6       - transparent paste: non-BgColor Patch cells overwrite Grid
+  gm_border_mask/3 - binary mask: N-layer border cells = 'border', interior = 'interior'
+  gm_color_mask/4  - binary mask: target Color cells = FgColor, others = 'bg'
+
+Private helpers: gm_dims_/3, gm_cell_/4, gm_build_/4.
+
+Design decision: gm_build_/4 is a single generic grid constructor that takes a
+closure (R, C, V)>>(body) and calls it for each cell. This avoids duplicating
+the double findall pattern across all 14 predicates.
+
+gm_stamp uses subtraction (SR=R-OR) to map grid coordinates to stamp coordinates,
+skipping cells outside stamp bounds with a guard. gm_paste is similar but uses
+catch/3 to handle Patch cell access that falls outside Patch bounds, making it
+robust to arbitrary (R0, C0) placements. gm_equal uses unification (=) which is
+cheaper than cell-by-cell comparison when the grids are already ground.
+
+ARCH-194 - gridxform Pack (Layer 207)
+
+Location: packs/gridxform/
+  pack.pl                    - pack descriptor
+  prolog/gridxform.pl        - module gridxform, exports 14 gx_* predicates
+  test/test_gridxform.pl     - 44 PLUnit acceptance tests
+
+Layer: 207 (Data Layer)
+Dependencies: library(lists) [nth0/3, member/2, min_list/2, max_list/2]
+No cross-pack dependencies.
+
+Private helpers:
+  gx_dims_/3   - grid height and width
+  gx_cell_/4   - cell value at (R,C)
+  gx_build_/4  - build NewH x NewW grid using lambda Goal(R,C,V)
+
+Design note: gx_build_ takes explicit NewH and NewW (unlike gm_build_ which
+reads them from the input grid). This allows rotation predicates to produce
+grids whose dimensions differ from the input (e.g., W x H for rotate90).
+
+ARCH-195 - gridsymm Pack (Layer 208)
+
+Location: packs/gridsymm/
+  pack.pl                    - pack descriptor
+  prolog/gridsymm.pl         - module gridsymm, exports 14 gsm_* predicates
+  test/test_gridsymm.pl      - 44 PLUnit acceptance tests
+
+Layer: 208 (Data Layer)
+Dependencies: library(lists) [nth0/3, member/2]
+No cross-pack dependencies.
+
+Private helpers:
+  gsm_dims_/3   - grid height and width
+  gsm_cell_/4   - cell value at (R,C)
+  gsm_build_/4  - build H x W grid using lambda Goal(R,C,V)
+
+Design note: gsm_score/3 uses a single-clause if-then-else dispatch on Type
+to avoid choice points from multiple-clause head matching. All score
+computations use float(N)/D to return floating-point values.
+
+ARCH-196 - gridcolor Pack (Layer 209)
+
+Location: packs/gridcolor/
+  pack.pl                    - pack descriptor
+  prolog/gridcolor.pl        - module gridcolor, exports 14 gc_* predicates
+  test/test_gridcolor.pl     - 44 PLUnit acceptance tests
+
+Layer: 209 (Data Layer)
+Dependencies: library(lists) [nth0/3, member/2, last/2]
+No cross-pack dependencies.
+
+Private helpers:
+  gc_dims_/3       - grid height and width
+  gc_cell_/4       - cell value at (R,C)
+  gc_all_cells_/2  - flat list of all cell values in row-major order
+  gc_build_/4      - build H x W grid using lambda Goal(R,C,V)
+
+
+ARCH-197 - gridstitch Pack (Layer 210)
+
+Location: packs/gridstitch/
+  pack.pl                     - pack descriptor
+  prolog/gridstitch.pl        - module gridstitch, exports 14 gst_* predicates
+  test/test_gridstitch.pl     - 44 PLUnit acceptance tests
+
+Layer: 210 (Data Layer)
+Dependencies: library(lists) [nth0/3, append/2, append/3]
+No cross-pack dependencies.
+
+Private helpers:
+  gst_dims_/3   - grid height and width
+  gst_cell_/4   - cell value at (R,C)
+  gst_build_/4  - build H x W grid using lambda Goal(R,C,V)
+  gst_fill_/4   - build H x W constant-fill grid (used internally)
+
+Design notes:
+
+gst_concat_h uses maplist/4 with an append lambda to zip row lists horizontally.
+This is more concise than a manual recursive loop and handles arbitrary-length rows.
+
+gst_hstack and gst_vstack are left-associative recursive reducers. The singleton
+clause uses a cut (!) to prevent a choice point when the list has exactly one
+element, ensuring deterministic behavior.
+
+gst_split_h uses Prolog's append/3 with a length-constrained first argument
+as the split mechanism (length(Top, R), append(Top, Bottom, Grid)). This avoids
+explicit nth0 indexing.
+
+gst_split_v uses maplist/4 over rows, splitting each row independently with the
+same (length(LRow, C), append(LRow, RRow, Row)) pattern.
+
+gst_tile_grid uses a two-level findall: the outer findall collects one band per
+row position, and the inner findall collects sub-grids for that band using
+arithmetic index computation (Start = (RowIdx-1)*NC + ColOffset).
+
+gst_add_border uses gst_build_ with a conditional: if the mapped source cell
+(OR, OC) falls within the original grid bounds, copy the cell value; otherwise
+emit the border color. This handles the general case without separate border
+and interior passes.
+
+
+ARCH-198 - gridedge Pack (Layer 211)
+
+Location: packs/gridedge/
+  pack.pl                    - pack descriptor
+  prolog/gridedge.pl         - module gridedge, exports 14 ge_* predicates
+  test/test_gridedge.pl      - 44 PLUnit acceptance tests
+
+Layer: 211 (Data Layer)
+Dependencies: library(lists) [nth0/3, member/2]
+No cross-pack dependencies.
+
+Private helpers:
+  ge_dims_/3   - grid height and width
+  ge_cell_/4   - cell value at (R,C)
+  ge_build_/4  - build H x W grid using lambda Goal(R,C,V)
+  ge_nbr4_/4   - generate 4-connected neighbor (R,C) -> (NR,NC); backtracks through all 4
+  ge_nbr8_/4   - generate 8-connected neighbor (R,C) -> (NR,NC); backtracks through all 8
+  ge_boundary_to_nonbg_/3 - BgColor cells adjacent to any non-BgColor cell
+
+Design notes:
+
+ge_nbr4_ and ge_nbr8_ use member/2 over a list of offset pairs to generate
+all four (or eight) neighbor directions on backtracking. They succeed for all
+offsets including those that would produce out-of-bounds coordinates; callers
+must follow up with ge_cell_ which will fail for out-of-bounds via nth0 failure.
+
+The critical correctness invariant: any predicate that uses "does this cell have
+at least one neighbor satisfying property P?" must wrap the neighbor check in
+once/1 to ensure each qualifying cell appears exactly once in findall output.
+Without once, a cell adjacent to k qualifying neighbors would appear k times.
+This invariant applies to: ge_edge_cells, ge_edge_cells8, ge_boundary,
+ge_boundary_to_nonbg_, ge_outer_border.
+
+Predicates that COUNT neighbors (ge_corners, ge_endpoints, ge_smooth_cells)
+use their own inner findall for the counting step and are not affected by the
+once invariant.
+
+ge_transition_map uses gst_build_ with a per-cell inner findall that counts
+differently-colored 4-neighbors. Cell values are integers in [0..4].
+
+
+ARCH-199: gridmorph Pack (gmo_*, Layer 212)
+
+File: packs/gridmorph/prolog/gridmorph.pl
+Test: packs/gridmorph/test/test_gridmorph.pl
+Pack: packs/gridmorph/pack.pl
+
+Layer 212 sits immediately above gridedge (Layer 211).
+Uses library(lists): nth0/3, member/2, append/3. No cross-pack dependencies.
+
+Private helpers:
+- gmo_dims_/3: grid height and width
+- gmo_cell_/4: cell value at row R, column C (0-indexed); fails out of bounds
+- gmo_build_/4: build H x W grid using lambda Goal(R, C, V)
+- gmo_nbr4_/4: generate one 4-connected neighbor on backtracking (4 choices)
+- gmo_bg_color_/3: find first non-FgColor cell in row-major order
+- gmo_dilate1_step_/3: one dilation iteration
+- gmo_erode1_step_/4: one erosion iteration (requires BgColor)
+- gmo_dilate_n_/4: iterate N dilation steps (base case N=0 cuts choicepoint)
+- gmo_erode_n_/5: iterate N erosion steps (base case N=0 cuts choicepoint)
+- gmo_small_cells_/6: BFS to classify components as small or large
+- gmo_bfs_/6: generic BFS from seeds through TargetColor cells
+
+Design notes:
+
+Erosion boundary behavior: grid boundary cells have no out-of-bounds neighbors.
+Corner cells of a FgColor region may survive erosion when all their in-bounds
+neighbors are FgColor (e.g., a 2x2 block corner in a 3x3 grid).
+
+The once/1 invariant applies to gmo_boundary_inner and gmo_boundary_outer:
+any predicate asking "does this cell have at least one qualifying neighbor?"
+must wrap the neighbor check in once/1 inside findall to prevent a cell with
+k qualifying neighbors from appearing k times.
+
+gmo_connected_border BFS: Seeds may include grid border cells reachable via
+both row-sweep and column-sweep (corners counted twice). The memberchk(RC,Visited)
+check handles duplicates. BlockColor is passed for interface consistency but is
+not used in BFS expansion; only TargetColor cells are traversed.
+
+gmo_fill_holes uses memberchk on the OpenBg list for O(|OpenBg|) membership
+tests, acceptable for ARC-AGI grid sizes. gmo_remove_small uses BFS per
+unprocessed FgColor cell; large components are re-processed but correct.

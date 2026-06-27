@@ -16687,3 +16687,475 @@ AC-GRL-052: grl_run_count(g2x2_check, 0, 2).
 AC-GRL-053: grl_all_row_runs(g3x5_runs, All), length(All, 3).
 AC-GRL-054: grl_col_runs(g4x3_vstripe, 1, [b-4]).
 AC-GRL-055: grl_col_runs(g4x4_mixed, 2, [b-2,r-2]).
+
+
+Refinement Criteria: gridflood Pack (gf_*, Layer 204)
+Work Package 225 - Acceptance Tests AC-GF-001 through AC-GF-054
+
+AC-GF-001: gf_fill on all-same-color grid returns same grid (no-op).
+AC-GF-002: gf_fill replaces 2x2 connected block in 3x3 grid.
+AC-GF-003: gf_fill on single-cell b region in g3x3_rb replaces that L-shape.
+AC-GF-004: gf_fill on 1x1 grid replaces single cell.
+AC-GF-005: gf_fill on checkerboard island fills only the seed cell.
+AC-GF-006: gf_fill8 on diagonal 3-cell pattern fills all three (8-connected).
+AC-GF-007: gf_fill8 on 2x2 all-same fills all four cells.
+AC-GF-008: gf_fill8 same-color seed returns grid unchanged.
+AC-GF-009: gf_recolor replaces all cells of target color in mixed grid.
+AC-GF-010: gf_recolor on absent color returns grid unchanged.
+AC-GF-011: gf_recolor OldColor=NewColor returns grid unchanged.
+AC-GF-012: gf_recolor changes disconnected patches simultaneously.
+AC-GF-013: gf_isolate keeps 2x2 r block, sets other cells to x.
+AC-GF-014: gf_isolate on b region in g3x3_rb keeps b cells.
+AC-GF-015: gf_isolate on 1x1 grid preserves the single cell.
+AC-GF-016: gf_region_cells returns correct 4 cells for 2x2 block.
+AC-GF-017: gf_region_cells returns [0-0] for isolated island in checkerboard.
+AC-GF-018: gf_region_cells returns 9 cells for 3x3 all-same grid.
+AC-GF-019: gf_region_size = 4 for 2x2 block in 3x3 grid.
+AC-GF-020: gf_region_size = 1 for checkerboard island.
+AC-GF-021: gf_region_size = 9 for 3x3 all-same grid.
+AC-GF-022: gf_region_bbox rows 0-1, cols 0-1 for 2x2 r block.
+AC-GF-023: gf_region_bbox rows 0-2, cols 0-2 for full 3x3 region.
+AC-GF-024: gf_region_bbox for L-shape b region: rows 0-2, cols 0-2.
+AC-GF-025: gf_enclosed_cells finds 4 enclosed b cells in 4x4 ring grid.
+AC-GF-026: gf_enclosed_cells returns [] for b open to border.
+AC-GF-027: gf_enclosed_cells returns [] for grid with no target color.
+AC-GF-028: gf_enclosed_cells finds center r cell enclosed in 5x5 hole grid.
+AC-GF-029: gf_fill_enclosed fills 2x2 b hole in ring with r, resulting all-r.
+AC-GF-030: gf_fill_enclosed returns same grid when nothing is enclosed.
+AC-GF-031: gf_components on 4-corner-isolated grid returns 4 regions.
+AC-GF-032: gf_components on 3x3 all-same returns 1 region of size 9.
+AC-GF-033: gf_components on grid with no Color cells returns [].
+AC-GF-034: gf_components on g3x3_rb for r returns 1 region.
+AC-GF-035: gf_n_components = 4 for corner-isolated grid.
+AC-GF-036: gf_n_components = 1 for single-region grid.
+AC-GF-037: gf_n_components = 0 for absent color.
+AC-GF-038: gf_n_components = 5 for checkerboard (5 isolated r cells).
+AC-GF-039: gf_largest returns 4-cell region in g3x3_rb.
+AC-GF-040: gf_largest returns 9-cell region for 3x3 all-same.
+AC-GF-041: gf_largest fails when Color absent.
+AC-GF-042: gf_largest returns 1-cell region when all regions are equal.
+AC-GF-043: gf_is_connected(Grid, r, 4) succeeds for 3x3 all-r.
+AC-GF-044: gf_is_connected(Grid, r, 4) fails for 4-corner-isolated grid.
+AC-GF-045: gf_is_connected(Grid, b, 4) fails for diagonal b pattern.
+AC-GF-046: gf_is_connected(Grid, b, 8) succeeds for diagonal b pattern.
+AC-GF-047: gf_is_connected vacuously succeeds for absent Color (4-connected).
+AC-GF-048: gf_is_connected succeeds for 2x2 block (4-connected).
+AC-GF-049: gf_boundary_fill fills r region in g3x3_rb using b as boundary.
+AC-GF-050: gf_boundary_fill seed=BoundaryColor is a no-op.
+AC-GF-051: gf_boundary_fill fills all-same grid with no boundary walls.
+AC-GF-052: fill then n_components for old color = 0.
+AC-GF-053: fill_enclosed + is_connected: ring after fill is connected.
+AC-GF-054: region_cells then fill changes the n_components correctly.
+
+
+Refinement Criteria: gridpath Pack (gpa_*, Layer 205)
+Work Package 226 - Acceptance Tests AC-GPA-001 through AC-GPA-057
+
+AC-GPA-001: gpa_shortest_path same start and end returns [R-C].
+AC-GPA-002: gpa_shortest_path adjacent cells returns 2-cell path.
+AC-GPA-003: gpa_shortest_path corner to corner in 3x3 open returns 5-cell path.
+AC-GPA-004: gpa_shortest_path with wall separating fails.
+AC-GPA-005: gpa_shortest_path in 4x4 maze navigates around inner walls.
+AC-GPA-006: gpa_shortest_path fails when start is obstacle.
+AC-GPA-007: gpa_shortest_path fails when end is obstacle.
+AC-GPA-008: gpa_shortest_path on 1x1 grid returns [0-0].
+AC-GPA-009: gpa_path_length adjacent = 1.
+AC-GPA-010: gpa_path_length same cell = 0.
+AC-GPA-011: gpa_path_length corner-to-corner 3x3 = 4.
+AC-GPA-012: gpa_path_length fails for blocked route.
+AC-GPA-013: gpa_reachable succeeds for open grid corner to corner.
+AC-GPA-014: gpa_reachable fails for wall-separated cells.
+AC-GPA-015: gpa_reachable succeeds for same cell.
+AC-GPA-016: gpa_all_reachable from center of 3x3 open returns 9 cells.
+AC-GPA-017: gpa_all_reachable from left column with wall returns 3 cells.
+AC-GPA-018: gpa_all_reachable from 1x1 returns [0-0].
+AC-GPA-019: gpa_all_reachable fails when seed is obstacle.
+AC-GPA-020: gpa_distance_map on 1x1 returns [0-0-0].
+AC-GPA-021: gpa_distance_map corner-to-corner 4x4 has distance 6 at (3,3).
+AC-GPA-022: gpa_distance_map on 4x4 open returns 16 entries.
+AC-GPA-023: gpa_distance_map with wall returns 3 entries from left column.
+AC-GPA-024: gpa_nearest finds r from (3,3) in two-color grid.
+AC-GPA-025: gpa_nearest finds b from (0,0) in two-color grid.
+AC-GPA-026: gpa_nearest fails when no TargetColor is reachable.
+AC-GPA-027: gpa_flood_n N=0 returns just the seed cell.
+AC-GPA-028: gpa_flood_n N=1 from center returns 5 cells.
+AC-GPA-029: gpa_flood_n N=2 from center of 3x3 returns all 9 cells.
+AC-GPA-030: gpa_flood_n across wall returns only left-side cells.
+AC-GPA-031: gpa_wavefront N=0 returns [seed].
+AC-GPA-032: gpa_wavefront N=1 from center returns 4 cells.
+AC-GPA-033: gpa_wavefront N=2 from center of 3x3 returns 4 corner cells.
+AC-GPA-034: gpa_wavefront N=10 in small grid returns [].
+AC-GPA-035: gpa_straight_h single column returns [R-C].
+AC-GPA-036: gpa_straight_h left-to-right returns 5 cells in order.
+AC-GPA-037: gpa_straight_h right-to-left returns 3 cells in reverse column order.
+AC-GPA-038: gpa_straight_v single row returns [R-C].
+AC-GPA-039: gpa_straight_v top-to-bottom returns 4 cells in order.
+AC-GPA-040: gpa_straight_v bottom-to-top returns 3 cells in reverse row order.
+AC-GPA-041: gpa_line_of_sight same row no obstacle succeeds.
+AC-GPA-042: gpa_line_of_sight same row with wall between fails.
+AC-GPA-043: gpa_line_of_sight same column no obstacle succeeds.
+AC-GPA-044: gpa_line_of_sight same column with wall between fails.
+AC-GPA-045: gpa_line_of_sight diagonal position fails.
+AC-GPA-046: gpa_line_of_sight adjacent same-row cells succeeds (no cells between).
+AC-GPA-047: gpa_between_h adjacent cells returns [].
+AC-GPA-048: gpa_between_h span 3 returns 1 interior cell.
+AC-GPA-049: gpa_between_h span 5 returns 3 interior cells.
+AC-GPA-050: gpa_between_h C2 < C1 returns same interior cells in ascending order.
+AC-GPA-051: gpa_between_v adjacent cells returns [].
+AC-GPA-052: gpa_between_v span 3 returns 1 interior cell.
+AC-GPA-053: gpa_between_v span 5 returns 3 interior cells.
+AC-GPA-054: gpa_region_path finds path from r to b in two-color 4x4 grid.
+AC-GPA-055: gpa_region_path path from r to b has length 7 (6 steps).
+AC-GPA-056: gpa_region_path same Color1 and Color2 returns length-1 path.
+AC-GPA-057: gpa_region_path fails when no Color1 cells exist.
+
+
+Refinement Criteria: gridmask Pack (gm_*, Layer 206)
+Work Package 227 - Acceptance Tests AC-GM-001 through AC-GM-044
+
+AC-GM-001: gm_overlay with all-BgColor GridB returns GridA unchanged.
+AC-GM-002: gm_overlay pastes non-BgColor cells of GridB onto GridA correctly.
+AC-GM-003: gm_overlay with identical non-BgColor grids preserves top-layer.
+AC-GM-004: gm_union of two non-overlapping regions: GridA color where GA non-bg, else GB color.
+AC-GM-005: gm_union with all-BgColor GridB returns GridA.
+AC-GM-006: gm_union of two all-BgColor grids returns all-BgColor.
+AC-GM-007: gm_intersect with one-cell overlap returns FgColor at that cell.
+AC-GM-008: gm_intersect with no overlap returns all-BgColor.
+AC-GM-009: gm_intersect with full overlap returns all-FgColor.
+AC-GM-010: gm_difference A minus B: keeps A where B is BgColor, BgOut elsewhere.
+AC-GM-011: gm_difference A minus empty B: returns A unchanged.
+AC-GM-012: gm_difference empty A minus any B: returns all-BgColor.
+AC-GM-013: gm_invert replaces non-BgColor with BgColor and BgColor with FgColor.
+AC-GM-014: gm_invert of all-FgColor returns all-BgColor.
+AC-GM-015: gm_invert of all-BgColor returns all-FgColor.
+AC-GM-016: gm_mask_apply passes Grid cells where Mask non-BgColor.
+AC-GM-017: gm_mask_apply with full mask passes entire Grid.
+AC-GM-018: gm_mask_apply with empty mask fills all with FillColor.
+AC-GM-019: gm_extract keeps only listed cells; others become BgColor.
+AC-GM-020: gm_extract with empty cell list returns all-BgColor.
+AC-GM-021: gm_extract with all cells listed returns Grid unchanged.
+AC-GM-022: gm_stamp at (0,0) overlays stamp in top-left corner.
+AC-GM-023: gm_stamp at (1,1) places stamp in center.
+AC-GM-024: gm_stamp partially outside only shows visible cells.
+AC-GM-025: gm_compare identical grids returns empty diff list.
+AC-GM-026: gm_compare tl vs br returns all cells that differ.
+AC-GM-027: gm_compare all-r vs all-x returns 9 cells.
+AC-GM-028: gm_equal succeeds for same grid.
+AC-GM-029: gm_equal fails for different grids.
+AC-GM-030: gm_sub extracts 2x2 sub-grid from (0,0).
+AC-GM-031: gm_sub extracts 1x1 from (2,2).
+AC-GM-032: gm_sub fails when sub-grid extends beyond bounds.
+AC-GM-033: gm_sub of full grid returns Grid unchanged.
+AC-GM-034: gm_paste at (0,0) places non-BgColor Patch cells.
+AC-GM-035: gm_paste at (1,1) places Patch in center area.
+AC-GM-036: gm_paste with all-BgColor Patch leaves Grid unchanged.
+AC-GM-037: gm_border_mask N=1 on 3x3: center cell interior, others border.
+AC-GM-038: gm_border_mask N=2 on 4x4: all cells border (no interior).
+AC-GM-039: gm_border_mask N=0: all cells interior.
+AC-GM-040: gm_color_mask selects cells of target color as FgColor.
+AC-GM-041: gm_color_mask with absent color returns all-bg.
+AC-GM-042: gm_color_mask with universal color returns all-FgColor.
+AC-GM-043: invert then union with original = all-FgColor grid.
+AC-GM-044: sub then stamp round-trip returns original grid.
+
+AC-GX-001: gx_rotate90 on 3x3 grid [[a,b,c],[d,e,f],[g,h,i]] yields [[g,d,a],[h,e,b],[i,f,c]].
+AC-GX-002: gx_rotate90 on 2x3 grid yields 3x2 result [[d,a],[e,b],[f,c]].
+AC-GX-003: gx_rotate90 on 1x1 grid yields the same 1x1 grid.
+AC-GX-004: gx_rotate180 on 3x3 grid yields [[i,h,g],[f,e,d],[c,b,a]].
+AC-GX-005: gx_rotate180 on 2x3 grid yields 2x3 result [[f,e,d],[c,b,a]].
+AC-GX-006: gx_rotate180 applied twice to any grid returns the original.
+AC-GX-007: gx_rotate270 on 3x3 grid yields [[c,f,i],[b,e,h],[a,d,g]].
+AC-GX-008: gx_rotate270 on 2x3 grid yields 3x2 result [[c,f],[b,e],[a,d]].
+AC-GX-009: gx_rotate90 then gx_rotate270 returns original grid.
+AC-GX-010: gx_flip_h on 3x3 grid reverses each row.
+AC-GX-011: gx_flip_h on 2x3 grid reverses each row.
+AC-GX-012: gx_flip_h applied twice returns the original grid.
+AC-GX-013: gx_flip_v on 3x3 grid reverses row order.
+AC-GX-014: gx_flip_v on 2x3 grid reverses row order.
+AC-GX-015: gx_flip_v applied twice returns the original grid.
+AC-GX-016: gx_transpose on 3x3 grid yields [[a,d,g],[b,e,h],[c,f,i]].
+AC-GX-017: gx_transpose on 2x3 grid yields 3x2 result [[a,d],[b,e],[c,f]].
+AC-GX-018: gx_transpose applied twice returns the original grid.
+AC-GX-019: gx_flip_d2 on 3x3 grid yields [[i,f,c],[h,e,b],[g,d,a]].
+AC-GX-020: gx_flip_d2 on 2x3 grid yields 3x2 result [[f,c],[e,b],[d,a]].
+AC-GX-021: gx_flip_d2 applied twice returns the original grid.
+AC-GX-022: gx_crop on 3x3 grid with (1,1,1,1) yields 1x1 [[e]].
+AC-GX-023: gx_crop on 3x3 grid with (0,0,0,2) yields single top row.
+AC-GX-024: gx_crop on 3x3 grid with (1,1,2,2) yields 2x2 bottom-right.
+AC-GX-025: gx_crop_content on grid with single center cell crops to 1x1.
+AC-GX-026: gx_crop_content on all-background grid returns original unchanged.
+AC-GX-027: gx_crop_content on grid with single corner cell crops to 1x1.
+AC-GX-028: gx_pad with uniform N=1 surrounding single cell yields 3x3.
+AC-GX-029: gx_pad with left=1 right=1 top=0 bot=0 adds two columns.
+AC-GX-030: gx_pad with asymmetric (2,0,0,1) pads correctly on all sides.
+AC-GX-031: gx_scale with N=1 returns the original grid.
+AC-GX-032: gx_scale 2x2 grid by N=2 yields 4x4 with each cell doubled.
+AC-GX-033: gx_scale 1x1 grid by N=3 yields 3x3 uniform grid.
+AC-GX-034: gx_tile with matching target size returns identical grid.
+AC-GX-035: gx_tile 2x2 checkerboard to 4x4 tiles correctly.
+AC-GX-036: gx_tile 1x1 grid to 3x3 yields uniform 3x3.
+AC-GX-037: gx_d4_group returns list of exactly 8 elements.
+AC-GX-038: gx_d4_group first element is the original grid (identity).
+AC-GX-039: gx_d4_group on symmetric grid still returns 8 elements.
+AC-GX-040: gx_normalize returns the msort minimum of gx_d4_group.
+AC-GX-041: gx_normalize on uniform-color grid returns that grid.
+AC-GX-042: gx_rotate90 applied four times returns the original grid.
+AC-GX-043: gx_scale of 3x3 center grid by 2 yields 6x6 with 2x2 center block.
+AC-GX-044: gx_crop_content on non-square content region crops correctly.
+
+AC-GSM-001: gsm_sym_h succeeds on a 3x3 grid with matching rows 0 and 2.
+AC-GSM-002: gsm_sym_h succeeds on a fully D4-symmetric grid.
+AC-GSM-003: gsm_sym_h fails on an asymmetric grid.
+AC-GSM-004: gsm_sym_v succeeds on a 3x3 grid with matching columns 0 and 2.
+AC-GSM-005: gsm_sym_v succeeds on a fully D4-symmetric grid.
+AC-GSM-006: gsm_sym_v fails on an asymmetric grid.
+AC-GSM-007: gsm_sym_d1 succeeds on a main-diagonal symmetric grid.
+AC-GSM-008: gsm_sym_d1 fails for non-square grids.
+AC-GSM-009: gsm_sym_d1 fails on an asymmetric grid.
+AC-GSM-010: gsm_sym_d2 succeeds on an anti-diagonal symmetric grid.
+AC-GSM-011: gsm_sym_d2 fails on an asymmetric grid.
+AC-GSM-012: gsm_sym_rot90 succeeds on a uniform-color (fully rotation-symmetric) grid.
+AC-GSM-013: gsm_sym_rot90 fails on an asymmetric grid.
+AC-GSM-014: gsm_sym_rot90 fails for non-square grids.
+AC-GSM-015: gsm_sym_rot180 succeeds on a 180-rotation symmetric grid.
+AC-GSM-016: gsm_sym_rot180 succeeds on a 2x2 symmetric grid.
+AC-GSM-017: gsm_sym_rot180 fails on an asymmetric grid.
+AC-GSM-018: gsm_symmetries returns a list containing h, v, rot180 for a D4 grid.
+AC-GSM-019: gsm_symmetries returns [] for a fully asymmetric grid.
+AC-GSM-020: gsm_symmetries for h-only grid contains h but not v.
+AC-GSM-021: gsm_complete_h with Dir=top copies top row to bottom.
+AC-GSM-022: gsm_complete_h with Dir=bottom copies bottom row to top.
+AC-GSM-023: gsm_complete_h on an already-symmetric grid returns the grid unchanged.
+AC-GSM-024: gsm_complete_v with Dir=left copies left column to right.
+AC-GSM-025: gsm_complete_v with Dir=right copies right column to left.
+AC-GSM-026: gsm_complete_v on an already-symmetric grid returns the grid unchanged.
+AC-GSM-027: gsm_complete_rot180 fills BgColor cell from rotational mirror.
+AC-GSM-028: gsm_complete_rot180 preserves non-BgColor cells unchanged.
+AC-GSM-029: gsm_complete_rot180 on a rot180-symmetric grid returns the grid unchanged.
+AC-GSM-030: gsm_violations_h returns empty list for a horizontally symmetric grid.
+AC-GSM-031: gsm_violations_h returns non-empty list for a partially h-symmetric grid.
+AC-GSM-032: gsm_violations_h returns empty list for a 1x1 grid.
+AC-GSM-033: gsm_violations_v returns empty list for a vertically symmetric grid.
+AC-GSM-034: gsm_violations_v returns non-empty list for an asymmetric grid.
+AC-GSM-035: gsm_violations_rot180 returns empty list for a rot180-symmetric grid.
+AC-GSM-036: gsm_violations_rot180 returns non-empty list for an asymmetric grid.
+AC-GSM-037: gsm_score with Type=h returns 1.0 for a fully symmetric grid.
+AC-GSM-038: gsm_score with Type=v returns a value in (0,1) for a partially v-symmetric grid.
+AC-GSM-039: gsm_score with Type=rot180 returns 1.0 for a rot180-symmetric grid.
+AC-GSM-040: gsm_score with Type=h returns 1.0 for a 1x1 grid.
+AC-GSM-041: gsm_complete_h then gsm_sym_h on result succeeds.
+AC-GSM-042: gsm_complete_v then gsm_sym_v on result succeeds.
+AC-GSM-043: gsm_sym_rot180 implies gsm_score rot180 = 1.0.
+AC-GSM-044: gsm_violations_h count is correct for a 2x2 diagonal grid.
+
+AC-GC-001: gc_count correctly counts 4 occurrences of r in g3x3_mixed.
+AC-GC-002: gc_count returns 0 for a color not present.
+AC-GC-003: gc_count counts background color correctly.
+AC-GC-004: gc_histogram includes correct Color-Count pairs.
+AC-GC-005: gc_histogram on uniform-color grid returns single pair.
+AC-GC-006: gc_histogram pairs are sorted alphabetically by Color.
+AC-GC-007: gc_most_frequent returns the unique maximum-count color.
+AC-GC-008: gc_most_frequent on uniform grid returns that single color.
+AC-GC-009: gc_least_frequent returns the unique minimum-count color.
+AC-GC-010: gc_least_frequent on single-color grid returns that color.
+AC-GC-011: gc_unique_colors returns sorted list of all distinct colors.
+AC-GC-012: gc_unique_colors on uniform grid returns single-element list.
+AC-GC-013: gc_unique_colors on 2-color grid returns both colors sorted.
+AC-GC-014: gc_color_cells returns correct R-C positions.
+AC-GC-015: gc_color_cells returns empty list when color is absent.
+AC-GC-016: gc_color_cells returns all 4 cells for uniform 2x2 grid.
+AC-GC-017: gc_contains succeeds when color is present.
+AC-GC-018: gc_contains fails when color is absent.
+AC-GC-019: gc_recolor replaces all occurrences of a color.
+AC-GC-020: gc_recolor on absent color leaves grid unchanged.
+AC-GC-021: gc_recolor on full grid produces all-new-color result.
+AC-GC-022: gc_color_map applies two-swap mapping correctly.
+AC-GC-023: gc_color_map with partial mapping replaces only mapped colors.
+AC-GC-024: gc_color_map with empty map leaves grid unchanged.
+AC-GC-025: gc_threshold with single-color select produces correct counts.
+AC-GC-026: gc_threshold with multiple-color select combines counts correctly.
+AC-GC-027: gc_threshold with empty select produces all-BgColor result.
+AC-GC-028: gc_dominant returns most frequent non-BgColor.
+AC-GC-029: gc_dominant with single-fg-color grid returns that color.
+AC-GC-030: gc_fraction computes correct float ratio for mixed grid.
+AC-GC-031: gc_fraction returns 1.0 for uniform grid where all cells match.
+AC-GC-032: gc_fraction returns 0.0 for absent color.
+AC-GC-033: gc_count_colors returns correct count of distinct colors.
+AC-GC-034: gc_count_colors returns 1 for uniform-color grid.
+AC-GC-035: gc_sorted_by_freq returns colors most-frequent-first.
+AC-GC-036: gc_sorted_by_freq on uniform grid returns single-element list.
+AC-GC-037: gc_count and gc_fraction are consistent (count = frac * total).
+AC-GC-038: gc_recolor then gc_count: old color count = 0; total preserved.
+AC-GC-039: gc_threshold then gc_unique_colors: only FgColor and BgColor present.
+AC-GC-040: gc_color_map then gc_histogram: only mapped colors in result.
+AC-GC-041: gc_dominant after gc_recolor (b->r) returns r.
+AC-GC-042: gc_color_cells length matches gc_count.
+AC-GC-043: gc_unique_colors count matches gc_count_colors.
+AC-GC-044: gc_count_colors on 2-color grid returns 2.
+
+
+Work Package 231: gridstitch Acceptance Criteria (AC-GST-001 through AC-GST-044)
+
+AC-GST-001: gst_concat_h on two 2x2 grids produces a 2x4 grid.
+AC-GST-002: gst_concat_h on 2x3 and 2x2 grids produces a 2x5 grid.
+AC-GST-003: gst_concat_h on two 1x3 grids produces a 1x6 grid.
+AC-GST-004: gst_concat_v on two 2x2 grids produces a 4x2 grid.
+AC-GST-005: gst_concat_v on two 2x3 grids produces a 4x3 grid.
+AC-GST-006: gst_concat_v on two 3x1 grids produces a 6x1 grid.
+AC-GST-007: gst_hstack on three 2x2 grids produces a 2x6 grid.
+AC-GST-008: gst_hstack on a singleton list returns the original grid.
+AC-GST-009: gst_hstack on an empty list returns an empty grid.
+AC-GST-010: gst_vstack on three 2x2 grids produces a 6x2 grid.
+AC-GST-011: gst_vstack on a singleton list returns the original grid.
+AC-GST-012: gst_vstack on an empty list returns an empty grid.
+AC-GST-013: gst_split_h at row 1 of a 3x2 grid gives Top=1 row, Bottom=2 rows.
+AC-GST-014: gst_split_h at row 2 of a 4x4 grid gives equal halves.
+AC-GST-015: gst_split_v at col 1 of a 2x3 grid gives Left=1 col, Right=2 cols.
+AC-GST-016: gst_split_v at col 2 of a 4x4 grid gives equal halves.
+AC-GST-017: gst_halves_h on a 4x4 grid gives two 2x4 halves.
+AC-GST-018: gst_halves_h followed by gst_concat_v reconstructs the original 4x4 grid.
+AC-GST-019: gst_halves_v on a 4x4 grid gives two 4x2 halves.
+AC-GST-020: gst_halves_v followed by gst_concat_h reconstructs the original 4x4 grid.
+AC-GST-021: gst_quadrants on a 4x4 grid produces four 2x2 quadrants.
+AC-GST-022: gst_quadrants then concat_h/concat_v reconstructs the original grid.
+AC-GST-023: gst_tile_grid with 4 sub-grids in 2x2 layout produces correct 4x4 grid.
+AC-GST-024: gst_tile_grid with 3 sub-grids in 1x3 layout produces correct 2x6 grid.
+AC-GST-025: gst_repeat_h with N=2 doubles grid width.
+AC-GST-026: gst_repeat_h with N=3 on a 1x3 grid produces 1x9 grid.
+AC-GST-027: gst_repeat_h with N=1 returns the original grid.
+AC-GST-028: gst_repeat_v with N=2 doubles grid height.
+AC-GST-029: gst_repeat_v with N=1 returns the original grid.
+AC-GST-030: gst_add_border with N=1, Color=r on a 2x2 grid produces a 4x4 grid.
+AC-GST-031: gst_add_border with N=2 on a 1x1 grid produces a 5x5 grid.
+AC-GST-032: gst_add_border preserves interior cells; border cells are Color.
+AC-GST-033: gst_strip_border with N=1 on a 4x4 grid produces a 2x2 grid.
+AC-GST-034: gst_strip_border is the inverse of gst_add_border.
+AC-GST-035: gst_strip_border with N=2 on a 5x5 grid leaves a 1x1 cell.
+AC-GST-036: gst_concat_h followed by gst_split_v at mid recovers original left and right.
+AC-GST-037: gst_concat_v followed by gst_split_h at mid recovers original top and bottom.
+AC-GST-038: gst_repeat_h width equals N times original width.
+AC-GST-039: gst_tile_grid followed by gst_quadrants recovers original sub-grids.
+AC-GST-040: gst_concat_h(A,B,Full), gst_split_v(Full,2,A,B) for 3x2 grids.
+AC-GST-041: gst_add_border then gst_strip_border with N=2 is identity on 2x3 grid.
+AC-GST-042: gst_repeat_v with N=4 produces grid with 4*H rows.
+AC-GST-043: gst_split_h at 1 then gst_vstack reconstructs original 4x4 grid.
+AC-GST-044: gst_split_v at 1 then gst_hstack reconstructs original 4x4 grid.
+
+
+Work Package 232: gridedge Acceptance Criteria (AC-GE-001 through AC-GE-044)
+
+AC-GE-001: ge_edge_cells on g3x3_rb with FgColor=r returns 3 cells.
+AC-GE-002: ge_edge_cells on uniform grid returns empty list.
+AC-GE-003: ge_edge_cells on cross pattern returns 4 cells (arms only; center is smooth).
+AC-GE-004: ge_edge_cells on 5x5 ring returns 8 cells (center cell has all-r neighbors).
+AC-GE-005: ge_edge_cells8 on g3x3_rb with r returns 3 cells.
+AC-GE-006: ge_edge_cells8 on diagonal pattern returns 3 cells.
+AC-GE-007: ge_is_edge on g3x3_rb at (0,1) returns yes.
+AC-GE-008: ge_is_edge on uniform grid at (1,1) returns no.
+AC-GE-009: ge_is_edge on 5x5 ring at center (2,2) returns no.
+AC-GE-010: ge_is_edge on 5x5 ring at (1,1) returns yes.
+AC-GE-011: ge_boundary(G, r, x) on g3x3_rb returns 3 cells.
+AC-GE-012: ge_boundary(G, r, x) on uniform r grid returns empty list.
+AC-GE-013: ge_boundary(G, x, r) on g3x3_rb returns 4 cells.
+AC-GE-014: ge_inner_border on 5x5 ring with BgColor=x returns 12 cells.
+AC-GE-015: ge_inner_border on uniform r grid with BgColor=x returns empty list.
+AC-GE-016: ge_outer_border on g3x3_rb with FgColor=r returns 4 cells.
+AC-GE-017: ge_outer_border on uniform r grid returns empty list.
+AC-GE-018: ge_edge_grid marks 3 cells as EdgeColor on g3x3_rb.
+AC-GE-019: ge_edge_grid on uniform grid returns unchanged grid.
+AC-GE-020: ge_edge_count on g3x3_rb with r returns 3.
+AC-GE-021: ge_edge_count on uniform grid with r returns 0.
+AC-GE-022: ge_edge_count on cross pattern with r returns 4.
+AC-GE-023: ge_neighbors_diff at (0,0) in g3x3_rb returns empty list (all r neighbors).
+AC-GE-024: ge_neighbors_diff at (0,1) in g3x3_rb returns 1 neighbor.
+AC-GE-025: ge_neighbors_diff at center (1,1) in cross returns empty list.
+AC-GE-026: ge_corners on g3x3_rb with r returns [1-1] only.
+AC-GE-027: ge_corners on uniform r grid returns empty list.
+AC-GE-028: ge_endpoints on cross with r returns 4 cells (the 4 arms).
+AC-GE-029: ge_endpoints on line with r returns 2 endpoint cells.
+AC-GE-030: ge_smooth_cells on 5x5 ring returns [2-2] (interior center).
+AC-GE-031: ge_smooth_cells on uniform r grid returns all 9 cells.
+AC-GE-032: ge_smooth_cells on g3x3_rb returns [0-0] only.
+AC-GE-033: ge_transition_map on uniform x grid returns all-zero grid.
+AC-GE-034: ge_transition_map on g3x3_rb returns [[0,1,1],[1,2,1],[1,1,0]].
+AC-GE-035: ge_transition_map on 2x2 checkerboard returns [[2,2],[2,2]].
+AC-GE-036: ge_edge_color_count(G, r, x) on g3x3_rb returns 3.
+AC-GE-037: ge_edge_color_count on uniform r grid returns 0.
+AC-GE-038: ge_edge_cells on 1x1 grid returns empty list.
+AC-GE-039: ge_is_edge on 1x1 grid returns no.
+AC-GE-040: ge_smooth_cells on cross center is (1,1).
+AC-GE-041: ge_endpoints on uniform r grid returns empty list (no r has exactly 1 r neighbor).
+AC-GE-042: edge_cells + smooth_cells partition all r cells in 5x5 ring (8+1=9).
+AC-GE-043: outer_border cells are all non-FgColor in g3x3_rb.
+AC-GE-044: transition_map values are in [0..4] for all cells.
+
+
+Work Package 233: gridmorph Pack (gmo_*, Layer 212)
+Acceptance Criteria
+
+AC-GMO-001: gmo_dilate1 on g3x3_rb with FgColor=r produces 8 r cells (corner
+  (2,2) stays x because its only in-bounds neighbors are x cells).
+AC-GMO-002: gmo_dilate1 on uniform r grid returns the same grid.
+AC-GMO-003: gmo_dilate1 on g5x5_dot (single r at center) produces 5 r cells
+  (center plus 4 cardinal neighbors).
+AC-GMO-004: gmo_erode1 on g5x5_block (3x3 r block) leaves only center cell (2,2).
+AC-GMO-005: gmo_erode1 on g3x3_rb leaves only (0,0) (corner has all-r in-bounds
+  neighbors; all other r cells have at least one x neighbor).
+AC-GMO-006: gmo_erode1 on uniform r grid returns the same grid.
+AC-GMO-007: gmo_dilate(G, r, 1, R) equals gmo_dilate1(G, r, R) for g3x3_rb.
+AC-GMO-008: gmo_dilate with N=0 returns the grid unchanged.
+AC-GMO-009: gmo_dilate(g5x5_dot, r, 2) produces 13 r cells (Manhattan
+  distance 2 diamond: 1+4+8=13).
+AC-GMO-010: gmo_erode with N=0 returns the grid unchanged.
+AC-GMO-011: gmo_erode(g5x5_block, r, 1, R) equals gmo_erode1(g5x5_block, r, R).
+AC-GMO-012: gmo_erode(g5x5_block, r, 2) leaves no r cells.
+AC-GMO-013: gmo_open(g5x5_dot, r, 1) removes the single r cell (erode removes
+  it; dilate on empty adds nothing).
+AC-GMO-014: gmo_open(g5x5_block, r, 1) leaves 5 r cells (erode to center;
+  dilate center by 1 = cross of 5).
+AC-GMO-015: gmo_close(g5x5_ring, r, 1) has at least as many r cells as original
+  (closing cannot reduce FgColor count).
+AC-GMO-016: gmo_close with N=0 returns the grid unchanged.
+AC-GMO-017: gmo_boundary_inner(g3x3_rb, r) returns 3 cells (not 4; corner (0,0)
+  has only r in-bounds neighbors).
+AC-GMO-018: gmo_boundary_inner on uniform r grid returns empty list.
+AC-GMO-019: gmo_boundary_outer(g3x3_rb, r) returns 4 cells: (0,2),(1,2),(2,0),(2,1).
+AC-GMO-020: gmo_boundary_outer on uniform r grid returns empty list.
+AC-GMO-021: gmo_gradient_cells(g3x3_rb, r) returns 7 cells (inner 3 + outer 4).
+AC-GMO-022: gmo_top_hat(g5x5_dot, r, 1) returns [2-2] (single cell removed by open).
+AC-GMO-023: gmo_top_hat(g5x5_block, r, 2) returns all 9 r cells (erode 2 removes
+  everything; open result is empty; all r cells are in top-hat).
+AC-GMO-024: gmo_bottom_hat(g5x5_ring, r, 2) returns a non-empty list (the hole
+  cells filled by closing are highlighted).
+AC-GMO-025: gmo_bottom_hat(g5x5_block, r, 0) returns empty list (no-op closing).
+AC-GMO-026: gmo_fill_holes(g5x5_ring, r, x) makes all 25 cells r (the 9 enclosed
+  x cells become r; outer r cells remain r).
+AC-GMO-027: gmo_fill_holes(g5x5_block, r, x) returns the input unchanged
+  (no enclosed holes exist).
+AC-GMO-028: gmo_connected_border(g5x5_ring, x, r) returns empty list (all x is
+  enclosed; no border cell is x in the ring).
+AC-GMO-029: gmo_connected_border(g5x5_block, x, r) returns 16 cells (all x cells
+  surrounding the block are reachable from the border).
+AC-GMO-030: gmo_remove_small(g5x5_two, r, x, 2) removes all 4 corner r cells
+  (each is a 1-cell component; 1 < 2).
+AC-GMO-031: gmo_remove_small(g5x5_block, r, x, 9) leaves all 9 r cells intact
+  (component size 9 >= threshold 9).
+AC-GMO-032: gmo_remove_small(g5x5_block, r, x, 10) removes all 9 r cells
+  (component size 9 < threshold 10).
+AC-GMO-033: gmo_erode then gmo_dilate equals gmo_open (combined test).
+AC-GMO-034: gmo_fill_holes on g5x5_ring then counting filled cells yields 25.
+AC-GMO-035: gmo_dilate1 strictly increases r cell count on g3x3_rb.
+AC-GMO-036: gmo_erode1 strictly decreases r cell count on g5x5_block.
+AC-GMO-037: gmo_dilate(g5x5_dot, r, 2) produces 13 r cells (duplicate of AC-GMO-009
+  as combined test).
+AC-GMO-038: gmo_boundary_inner(g5x5_ring, r) returns 12 cells (16 r cells minus
+  4 corners that have only r in-bounds neighbors).
+AC-GMO-039: gmo_boundary_outer(g5x5_block, r) returns 12 cells.
+AC-GMO-040: gmo_gradient_cells(g5x5_block, r) returns 20 cells
+  (inner 8 + outer 12; center (2,2) is smooth, not inner border).
+AC-GMO-041: gmo_fill_holes(g5x5_block, r, x) returns input unchanged (no holes).
+AC-GMO-042: gmo_erode1 on uniform r 3x3 grid returns grid unchanged.
+AC-GMO-043: gmo_remove_small on 2x2 r grid with threshold 4 leaves grid unchanged
+  (component size 4 >= 4).
+AC-GMO-044: gmo_connected_border on uniform x 3x3 grid returns 9 cells (all x
+  cells reachable from the border).

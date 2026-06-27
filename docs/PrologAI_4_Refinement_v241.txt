@@ -16902,3 +16902,48 @@ AC-GX-041: gx_normalize on uniform-color grid returns that grid.
 AC-GX-042: gx_rotate90 applied four times returns the original grid.
 AC-GX-043: gx_scale of 3x3 center grid by 2 yields 6x6 with 2x2 center block.
 AC-GX-044: gx_crop_content on non-square content region crops correctly.
+
+AC-GSM-001: gsm_sym_h succeeds on a 3x3 grid with matching rows 0 and 2.
+AC-GSM-002: gsm_sym_h succeeds on a fully D4-symmetric grid.
+AC-GSM-003: gsm_sym_h fails on an asymmetric grid.
+AC-GSM-004: gsm_sym_v succeeds on a 3x3 grid with matching columns 0 and 2.
+AC-GSM-005: gsm_sym_v succeeds on a fully D4-symmetric grid.
+AC-GSM-006: gsm_sym_v fails on an asymmetric grid.
+AC-GSM-007: gsm_sym_d1 succeeds on a main-diagonal symmetric grid.
+AC-GSM-008: gsm_sym_d1 fails for non-square grids.
+AC-GSM-009: gsm_sym_d1 fails on an asymmetric grid.
+AC-GSM-010: gsm_sym_d2 succeeds on an anti-diagonal symmetric grid.
+AC-GSM-011: gsm_sym_d2 fails on an asymmetric grid.
+AC-GSM-012: gsm_sym_rot90 succeeds on a uniform-color (fully rotation-symmetric) grid.
+AC-GSM-013: gsm_sym_rot90 fails on an asymmetric grid.
+AC-GSM-014: gsm_sym_rot90 fails for non-square grids.
+AC-GSM-015: gsm_sym_rot180 succeeds on a 180-rotation symmetric grid.
+AC-GSM-016: gsm_sym_rot180 succeeds on a 2x2 symmetric grid.
+AC-GSM-017: gsm_sym_rot180 fails on an asymmetric grid.
+AC-GSM-018: gsm_symmetries returns a list containing h, v, rot180 for a D4 grid.
+AC-GSM-019: gsm_symmetries returns [] for a fully asymmetric grid.
+AC-GSM-020: gsm_symmetries for h-only grid contains h but not v.
+AC-GSM-021: gsm_complete_h with Dir=top copies top row to bottom.
+AC-GSM-022: gsm_complete_h with Dir=bottom copies bottom row to top.
+AC-GSM-023: gsm_complete_h on an already-symmetric grid returns the grid unchanged.
+AC-GSM-024: gsm_complete_v with Dir=left copies left column to right.
+AC-GSM-025: gsm_complete_v with Dir=right copies right column to left.
+AC-GSM-026: gsm_complete_v on an already-symmetric grid returns the grid unchanged.
+AC-GSM-027: gsm_complete_rot180 fills BgColor cell from rotational mirror.
+AC-GSM-028: gsm_complete_rot180 preserves non-BgColor cells unchanged.
+AC-GSM-029: gsm_complete_rot180 on a rot180-symmetric grid returns the grid unchanged.
+AC-GSM-030: gsm_violations_h returns empty list for a horizontally symmetric grid.
+AC-GSM-031: gsm_violations_h returns non-empty list for a partially h-symmetric grid.
+AC-GSM-032: gsm_violations_h returns empty list for a 1x1 grid.
+AC-GSM-033: gsm_violations_v returns empty list for a vertically symmetric grid.
+AC-GSM-034: gsm_violations_v returns non-empty list for an asymmetric grid.
+AC-GSM-035: gsm_violations_rot180 returns empty list for a rot180-symmetric grid.
+AC-GSM-036: gsm_violations_rot180 returns non-empty list for an asymmetric grid.
+AC-GSM-037: gsm_score with Type=h returns 1.0 for a fully symmetric grid.
+AC-GSM-038: gsm_score with Type=v returns a value in (0,1) for a partially v-symmetric grid.
+AC-GSM-039: gsm_score with Type=rot180 returns 1.0 for a rot180-symmetric grid.
+AC-GSM-040: gsm_score with Type=h returns 1.0 for a 1x1 grid.
+AC-GSM-041: gsm_complete_h then gsm_sym_h on result succeeds.
+AC-GSM-042: gsm_complete_v then gsm_sym_v on result succeeds.
+AC-GSM-043: gsm_sym_rot180 implies gsm_score rot180 = 1.0.
+AC-GSM-044: gsm_violations_h count is correct for a 2x2 diagonal grid.

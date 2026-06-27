@@ -12938,3 +12938,82 @@ gper_shift_wrap_rows(Grid, N, Shifted):
 gper_shift_wrap_cols(Grid, N, Shifted):
   for each (r,c) in 0..H-1 x 0..W-1:
     Shifted[r][c] = Grid[r][(c-N) mod W]
+
+
+PART 213 - WORK PACKAGE 223: gridscale PACK (LAYER 202, gsc_*) PSEUDOCODE
+
+gsc_upsample(Grid, N, Scaled):
+  H, W = dims(Grid)
+  for r in 0..H*N-1:
+    for c in 0..W*N-1:
+      Scaled[r][c] = Grid[r//N][c//N]
+
+gsc_downsample(Grid, N, Small):
+  fail unless gsc_all_uniform(Grid, N)
+  BH = H//N, BW = W//N
+  for BR in 0..BH-1:
+    for BC in 0..BW-1:
+      Small[BR][BC] = color of block (BR, BC)
+
+gsc_block_majority(Grid, N, Small):
+  BH = H//N, BW = W//N
+  for BR in 0..BH-1:
+    for BC in 0..BW-1:
+      cells = flatten(block_at(Grid, N, BR, BC))
+      Small[BR][BC] = most_frequent(cells)
+
+gsc_scale_factor(GridA, GridB, N):
+  N = H_B // H_A  (must equal W_B // W_A)
+  fail unless gsc_is_scale_of(GridA, GridB, N)
+
+gsc_is_scale_of(GridA, GridB, N):
+  for all (r,c) in GridB:
+    fail if GridB[r][c] != GridA[r//N][c//N]
+  succeed
+
+gsc_block_at(Grid, N, BR, BC, Block):
+  SR = BR*N, SC = BC*N
+  Block = subgrid(Grid, SR, SC, N, N)
+
+gsc_block_uniform(Grid, N, BR, BC, Color):
+  Block = block_at(Grid, N, BR, BC)
+  cells = flatten(Block)
+  Color = first(cells)
+  fail if any cell != Color
+
+gsc_all_uniform(Grid, N):
+  BH = H//N, BW = W//N
+  for all (BR, BC): fail if not block_uniform(BR, BC)
+  succeed
+
+gsc_infer_tile(Grid, Tile):
+  Divs = [N | N divides H and W, N >= 2] sorted descending
+  for N in Divs:
+    if gsc_all_uniform(Grid, N): return gsc_downsample(Grid, N)
+  fail
+
+gsc_factors(Grid, Factors):
+  Factors = [N | N divides H and W, N in 1..min(H,W)] sorted ascending
+
+gsc_resize(Grid, TargetH, TargetW, Resized):
+  for r in 0..TargetH-1:
+    for c in 0..TargetW-1:
+      Resized[r][c] = Grid[(r*H)//TargetH][(c*W)//TargetW]
+
+gsc_subsample(Grid, N, Sub):
+  BH = H//N, BW = W//N
+  for BR in 0..BH-1:
+    for BC in 0..BW-1:
+      Sub[BR][BC] = Grid[BR*N][BC*N]
+
+gsc_pad(Grid, N, Color, Padded):
+  NewH = H+2N, NewW = W+2N
+  for r in 0..NewH-1:
+    for c in 0..NewW-1:
+      GR = r-N, GC = c-N
+      if 0 <= GR < H and 0 <= GC < W: Padded[r][c] = Grid[GR][GC]
+      else: Padded[r][c] = Color
+
+gsc_crop_to_factor(Grid, N, Cropped):
+  CH = (H//N)*N, CW = (W//N)*N
+  Cropped = subgrid(Grid, 0, 0, CH, CW)

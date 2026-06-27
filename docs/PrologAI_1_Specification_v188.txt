@@ -16184,3 +16184,52 @@ WP-222-SPEC-007: gper_shift_wrap_rows/3 returns a grid with rows shifted down
 by N positions (wrapping): row R of result = row (R-N) mod H of Grid.
 gper_shift_wrap_cols/3 shifts each row's columns right by N positions
 (wrapping): column C of result = column (C-N) mod W of Grid.
+
+
+PART 213 - WORK PACKAGE 223: gridscale PACK (LAYER 202, gsc_*)
+
+WP-223-SPEC-001: The gridscale pack (Layer 202) provides 14 predicates
+(gsc_* prefix) for integer block-pixel scaling of raw grids. It operates
+on raw grid format (list of rows, each row a list of color atoms, 0-indexed).
+"Block size N" partitions the grid into NxN pixel blocks; block (BR, BC)
+covers raw rows BR*N..BR*N+N-1 and columns BC*N..BC*N+N-1.
+No cross-pack dependencies. Uses library(lists) and library(apply) only.
+
+WP-223-SPEC-002: gsc_upsample/3 scales Grid up by integer factor N: each
+source cell becomes an NxN block of the same color in the output, which has
+dimensions (H*N) x (W*N). N=1 is a no-op. Fails for N < 1.
+gsc_downsample/3 scales Grid down by N: each NxN block must be uniform
+(all cells the same color); that color becomes one cell in the output, which
+has dimensions (H//N) x (W//N). Fails if any block is not uniform.
+
+WP-223-SPEC-003: gsc_block_majority/3 downsample by N using majority vote per
+NxN block (most frequent color, ties broken by term order). Never fails.
+gsc_scale_factor/3 finds the integer N such that GridB = gsc_upsample(GridA, N);
+requires H_B = H_A * N and W_B = W_A * N. Fails if no exact N exists.
+gsc_is_scale_of/3 tests whether GridB = gsc_upsample(GridA, N) using
+negation-as-failure across all (R,C) pairs.
+
+WP-223-SPEC-004: gsc_block_at/5 extracts the NxN sub-grid at block position
+(BR, BC) (raw rows BR*N..BR*N+N-1, columns BC*N..BC*N+N-1).
+gsc_block_uniform/5 succeeds if the NxN block at (BR, BC) is all one Color.
+gsc_all_uniform/2 succeeds if every NxN block in Grid is uniform; this is
+the necessary and sufficient condition for Grid being an exact N-upsampling.
+
+WP-223-SPEC-005: gsc_infer_tile/2 finds the smallest grid Tile whose
+upsampling reproduces Grid, by searching for the largest valid block size N
+(largest divisor of both H and W, >= 2, for which gsc_all_uniform holds)
+and then downsampling. Fails if no N >= 2 satisfies gsc_all_uniform.
+gsc_factors/2 returns the ascending list of all positive integers that divide
+both the height and the width of Grid.
+
+WP-223-SPEC-006: gsc_resize/4 resizes Grid to (TargetH, TargetW) using
+nearest-neighbor interpolation: Resized[r][c] = Grid[(r*H)//TargetH][(c*W)//TargetW].
+gsc_subsample/3 extracts every N-th row and every N-th column (stride-N
+sampling): Sub[BR][BC] = Grid[BR*N][BC*N]. Output has (H//N) x (W//N) cells.
+
+WP-223-SPEC-007: gsc_pad/4 surrounds Grid with an N-cell wide border of Color,
+producing a (H+2N) x (W+2N) grid. The original occupies rows N..N+H-1 and
+columns N..N+W-1. N=0 is a no-op.
+gsc_crop_to_factor/3 crops Grid to the largest dimensions divisible by N:
+CH = (H//N)*N, CW = (W//N)*N, taking the top-left region. If H and W are
+already divisible by N, the full grid is returned.

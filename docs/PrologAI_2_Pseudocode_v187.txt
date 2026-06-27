@@ -13383,3 +13383,22 @@ gsm_violations_rot180(Grid, Cells): findall R-C where Idx < H*W/2 and Grid[R][C]
 gsm_score(Grid, Type, Score):
   Type in {h, v, rot180}
   Score = float(matching pairs) / float(total pairs checked).
+
+Part 220 - Work Package 230: gridcolor Pack (gc_*, Layer 209)
+
+gc_all_cells_(Grid, Cells): flatten all cell values in row-major order.
+
+gc_count(Grid, Color, N): findall matching Color from gc_all_cells_; N = length.
+gc_histogram(Grid, Pairs): sort(gc_all_cells_) -> Colors; for each C count occurrences -> C-N pairs.
+gc_most_frequent(Grid, Color): histogram -> NCPairs; msort -> last = _-Color.
+gc_least_frequent(Grid, Color): histogram -> NCPairs; msort -> first = _-Color.
+gc_unique_colors(Grid, Colors): sort(gc_all_cells_) = Colors.
+gc_color_cells(Grid, Color, Cells): findall R-C where cell = Color.
+gc_contains(Grid, Color): gc_all_cells_ then memberchk(Color, All).
+gc_recolor(Grid, Old, New, Result): build H x W: cell = Old -> New, else cell.
+gc_color_map(Grid, Map, Result): build H x W: member(cell-NV, Map) -> NV, else cell.
+gc_threshold(Grid, Colors, Fg, Bg, Result): build H x W: memberchk(cell, Colors) -> Fg, else Bg.
+gc_dominant(Grid, BgColor, Color): histogram filtered for != BgColor; max count color.
+gc_fraction(Grid, Color, Frac): gc_count / H*W as float.
+gc_count_colors(Grid, N): length(gc_unique_colors).
+gc_sorted_by_freq(Grid, Colors): histogram; negate counts; msort ascending; extract colors.
