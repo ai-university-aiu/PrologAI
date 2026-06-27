@@ -1,0 +1,793 @@
+ARC-AGI-2 READINESS ANALYSIS
+PrologAI and Mentova Platform Review
+Pre-Challenge Preparation Report
+
+D. R. Dison, Founder of AIU (Artificial Intelligence University), Creator of PrologAI and Mentova, ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
+
+2026-06-27
+
+
+PURPOSE OF THIS DOCUMENT
+
+
+This document presents the findings of a thorough, line-by-line review of five planning files and an entire inspiration directory before PrologAI and Mentova accept the challenge of ARC-AGI-2 (Abstraction and Reasoning Corpus for Artificial General Intelligence, version 2).
+
+The review covered:
+
+• /home/ccaitwo/inspiration/ARC-AGI-2_Preparation.txt
+
+• /home/ccaitwo/Mentova/data/arc_agi_2/ARC-AGI-2_Next_Steps.txt
+
+• /home/ccaitwo/PrologAI/docs/ARC-AGI_Human_Steps.txt
+
+• /home/ccaitwo/inspiration/ARC-AGI-2_Human_Steps.txt
+
+• /home/ccaitwo/inspiration/Artificial_Mind_Patterns_Parts_1_2_3.txt
+
+• /home/ccaitwo/inspiration/Agentic_Patterns_Outline.txt
+
+• /home/ccaitwo/inspiration/Coding_Patterns_Outline.txt
+
+• /home/ccaitwo/inspiration/Harness_Outline.txt
+
+• /home/ccaitwo/inspiration/RSI_Outline.txt
+
+• /home/ccaitwo/inspiration/PrologAI_Vision_Product_Requirements_Transcripts.txt
+
+Web searches were also run covering ARC-AGI-2 task types, top-scoring 2025 approaches, and symbolic Artificial Intelligence (AI) strategies for compositional reasoning.
+
+The full current pack inventory (265 packs) was scanned to identify what already exists and what is missing.
+
+
+SECTION 1 - WHAT ARC-AGI-2 ACTUALLY DEMANDS
+
+
+ARC-AGI-2 is harder than ARC-AGI-1 along four dimensions called compositional difficulty flavors.
+
+Each flavor is described below along with its implication for PrologAI.
+
+
+Flavor 1 - Multi-Rule Compositional Reasoning.
+
+Several transformation rules act at the same time and interact with one another.
+
+For example, a task might require cropping the grid, then resizing colored objects, then dropping each object into a matching hole.
+
+Missing any single step produces a completely wrong answer.
+
+Implication: PrologAI must be able to run sequences of named rules in order, which the existing pipeline pack (pl_run/3, Layer 70) and seqinfer pack (sq_infer_2step/3, sq_infer_3step/3, Layer 195) already provide.
+
+
+Flavor 2 - Multi-Step Sequential Reasoning.
+
+Each step depends on the output of the previous step.
+
+The final output cannot be predicted by looking at only the input.
+
+Only by simulating each intermediate state in order can the solver reach the correct answer.
+
+Implication: Symbolic induction can simulate intermediate states explicitly, which is PrologAI's structural advantage over neural approaches that predict output from input directly.
+
+The seqinfer pack and pipeline pack together cover this capability.
+
+
+Flavor 3 - Contextual Rule Application.
+
+The same operation is applied differently depending on a "context gate" element in the grid, such as the color of an outline or the presence of a marker cell.
+
+A rule that works "in general" fails on the specifics if the context gate is missed.
+
+Implication: The condxf pack (Layer 187, xc_* predicates) handles conditional transforms based on color and size.
+
+However, condxf applies conditions that are pre-specified by the rule builder.
+
+What is still missing is a predicate that can DETECT which element in a grid is acting as the context gate, inferred from training pairs alone.
+
+
+Flavor 4 - In-Context Symbol Definition.
+
+Some objects in the grid are symbols: they stand for something other than themselves, and their meaning is defined only within that one task's training pairs.
+
+For example, a colored rectangle with three holes might encode "use color blue for everything that also has three holes."
+
+The solver must read the training pairs to learn the private symbol code and then apply it to the test input.
+
+Implication: This is the single largest gap in the current platform.
+
+No existing pack builds a symbol-to-operation mapping from training pairs.
+
+This is confirmed as the most algorithmically novel component needed for ARC-AGI-2 by the ARC-AGI-2_Next_Steps.txt roadmap.
+
+
+SECTION 2 - WHAT THE PLATFORM ALREADY HAS
+
+
+The following survey shows where PrologAI is already strong for ARC-AGI-2.
+
+All pack names listed are confirmed to exist in /home/ccaitwo/PrologAI/packs/.
+
+
+Grid Perception - Strong.
+
+• Grid primitive operations: ~60 grid* packs covering color, shape, connectivity, scaling, rotation, reflection, flood fill, boundary detection, and stamping.
+
+• Object detection: gridobj, gridobjmatch (WP-267, just completed), gridseg, gridflood, gridgraph.
+
+• Scene comparison: scene, scenecmp, sceneapply, scenepair, scenerank, scenexf, sceneinv.
+
+
+Object-Level Operations - Strong.
+
+• Full suite of obj* packs: objattr, objbound, objchain, objcomp, objcopy, objdelta, objfilter, objgroup, objlocate, objmatch, objmerge, objmorph, objop, objrel, objseq, objsym, objxf.
+
+• The new gridobjmatch pack (WP-267) adds 14 gom_* predicates specifically for matching and comparing two object lists, which is the foundation for detecting what changed between training pairs.
+
+
+Multi-Step Execution - Strong.
+
+• pipeline pack (Layer 70): pl_run/3 applies a list of named step terms in order using a dispatcher registry.
+
+• seqinfer pack (Layer 195): sq_infer_2step/3 and sq_infer_3step/3 find 2-step and 3-step rule sequences from candidate lists.
+
+• sq_consistent/2 and sq_verify_all/2 verify that a sequence correctly transforms all training pairs.
+
+These two packs together implement the "arc2_pipeline" capability called for in the Next Steps roadmap.
+
+
+Hypothesis Testing - Partial.
+
+• hyp pack (Layer 74): hy_verify_all/2, hy_select/3, hy_rank/3 test and rank color-substitution hypotheses against training pairs.
+
+• induction pack (Layer 59): id_color_map/3, id_changed_cells/3, id_new_colors/3, id_lost_colors/3 analyze a single input-output pair for color-level changes.
+
+• ruleinfer pack: exists, handles rule inference.
+
+Gap: These packs work on single pairs.
+
+None performs cross-pair analysis to find what is INVARIANT across all training pairs simultaneously.
+
+
+Conditional and Contextual Transforms - Partial.
+
+• condxf pack (Layer 187): xc_split_color/4, xc_recolor_by_size/5, xc_shift_color/5, xc_recolor_unique_size/3 apply conditions pre-specified by the caller.
+
+Gap: condxf requires the caller to already know which condition governs the transformation.
+
+There is no pack that infers the context gate from the training pairs themselves.
+
+
+Analogy and Isometry - Present.
+
+• analogy pack (WP-57, 15 ay_* predicates): D4 isometry (rotations and reflections) plus color map matching.
+
+This handles structural similarity between two grids.
+
+Gap: The analogy pack handles geometric isometry and color maps, but not general symbol-to-operation mappings where a symbol can encode non-geometric operations.
+
+
+Cognitive Processes - Present.
+
+• daydream, dreaming, imagination, curiosity, attention, awareness, beliefs, motivation, prediction, reflection, workspace packs: these implement the high-level cognitive substrate.
+
+These are correctly in place and do not need to be added for ARC-AGI-2.
+
+
+SECTION 3 - CONFIRMED GAPS
+
+
+The following packs do NOT exist in the current platform.
+
+Each gap is described with its impact on ARC-AGI-2 performance.
+
+
+GAP 1 - Symbol Table Learning (symtab).
+
+This is the single most critical missing pack.
+
+ARC-AGI-2 tasks with in-context symbol definition CANNOT be solved without it.
+
+A symbol table learner takes a list of training pairs and produces a mapping such as [symbol(3_holes, blue), symbol(1_hole, red)] where the left side is an observable feature of an object in the input and the right side is an operation or color it encodes.
+
+The Next Steps roadmap (Section 5.5) specifies arc2_learn_symbol_table(Pairs, SymbolTable) as the predicate to build.
+
+The primary search strategy is contrastive analysis: looking across training pairs to find which feature of a symbol object co-varies with the output operation.
+
+
+GAP 2 - Cross-Pair Invariant Extraction (invariant).
+
+No pack currently identifies what stays CONSTANT across all training pairs simultaneously.
+
+Invariants are powerful constraints: a solver that knows "the grid size never changes" or "the background color is always zero" can eliminate entire classes of hypotheses instantly.
+
+The human steps documents (ARC-AGI-2_Human_Steps.txt, Sub-step 4.1) explicitly list invariance detection as one of the first and most important steps.
+
+The induction pack analyzes single pairs; it does not compare multiple pairs to extract their common properties.
+
+
+GAP 3 - Contrastive Pair Analysis (contrast).
+
+No pack performs contrastive analysis across multiple training pairs.
+
+Contrastive analysis means: given N training pairs, find which features co-vary with the output (these are the "triggers" or "context gates") and which features are irrelevant (they vary freely without affecting the rule).
+
+This is how context gates and symbol meanings are decoded.
+
+For example, if in pair 1 the marker is red and objects rotate clockwise, but in pair 2 the marker is blue and objects rotate counterclockwise, contrastive analysis identifies the marker color as the context gate.
+
+
+GAP 4 - Task Type Classifier (taskcat).
+
+No pack classifies an ARC task by its compositional type before attempting to solve it.
+
+The Next Steps roadmap (Section 6.1) identifies "hypothesis-first search" as the mitigation for combinatorial explosion.
+
+Without task classification, the solver must search all possible rule compositions blind.
+
+With task classification, it narrows to the correct class: single-rule search for simple tasks, 2-step pipeline search for multi-step tasks, context gate detection for contextual tasks, and symbol table learning for symbol-definition tasks.
+
+
+GAP 5 - Legend Region Detector (legend).
+
+No pack detects "legend" or "key" regions in a grid.
+
+Many ARC-AGI-2 tasks include a small, separated region of the grid that acts as a code key, mapping symbols to meanings.
+
+The human steps (ARC-AGI-2_Human_Steps.txt, Sub-step 3.5) describe this explicitly:
+
+"The human looks for a legend - a small separate region that seems to define a code."
+
+A legend detector would identify a region that (a) appears in every training pair input, (b) is small relative to the total grid, and (c) has a structural correspondence to the changes observed in the output.
+
+This is a prerequisite for the symbol table learning pack.
+
+
+GAP 6 - Multi-Pair Object Tracking (multipair).
+
+No pack tracks object identity ACROSS multiple training pairs simultaneously.
+
+The gridobjmatch pack matches objects between one pair of object lists.
+
+For ARC-AGI-2, a solver needs to track which object in pair 1 corresponds to which object in pair 2 and in pair 3, building a consistent object identity model across all training pairs.
+
+This cross-pair correspondence is required for invariant extraction and contrastive analysis.
+
+
+GAP 7 - ARC-AGI-2 Data Infrastructure.
+
+The platform lacks:
+
+• arc_tasks_2.pl in Mentova, which would load ARC-AGI-2 JSON files into Prolog facts following the same structure as arc_tasks.pl.
+
+• arc_benchmark_2.pl in Mentova, which would be the wave solver for ARC-AGI-2 (equivalent to arc_benchmark.pl for ARC-AGI-1).
+
+• Climbing_ARC-AGI-2.txt, the wave log file, has not been started.
+
+These are infrastructure items, not Data Layer packs, but they must be in place before Wave 1 can begin.
+
+
+SECTION 4 - INSIGHTS FROM THE INSPIRATION FILES
+
+
+The following findings come specifically from files that were not already covered in the other planning documents.
+
+
+From Artificial_Mind_Patterns_Parts_1_2_3.txt.
+
+The Reminding Pattern (case-based memory) maps directly to how PrologAI should reuse ARC-AGI-1 rules in ARC-AGI-2.
+
+The named rule library in arc_benchmark.pl IS the case memory.
+
+When a new ARC-AGI-2 task arrives, the solver should first check whether any ARC-AGI-1 rule, or any ARC-AGI-2 rule from a previous wave, matches the new task's training pairs.
+
+This is already implicit in the wave structure but could be made more systematic.
+
+The Coordination Pattern describes "chunking" as one of its inference families.
+
+Chunking means inducing categories and hierarchies from observations.
+
+This maps to task type classification: the solver needs to "chunk" a task into a category before it can apply the right strategy.
+
+The Deliberation Pattern describes selecting actions by relevance to goals, not just applicability.
+
+For ARC-AGI-2, this means the rule search should be goal-directed: given that we observe "objects are moving," prefer movement-related rules over color-change rules, even if both are syntactically applicable.
+
+
+From the RSI (Recursive Self-Improvement) Outline.
+
+The RSI concept of a "feedback loop that compounds over waves" perfectly describes PrologAI's approach.
+
+Each ARC-AGI-2 wave adds new named rules to the library.
+
+Those new rules become candidates in the seqinfer pack's sq_default_rules/1 for subsequent waves.
+
+The RSI insight about "seed AI" applies here: the ARC-AGI-1 primitive library IS the seed for ARC-AGI-2.
+
+The seed is rich: BFS connected components, all 8 rigid isometries, ring completion, template stamping, color frequency analysis, bounding box extraction, chain reflection, and piece assembly.
+
+These do not need to be re-invented.
+
+The RSI concept of "validation bottleneck" means: even if a rule is invented quickly, verifying it against all training pairs is the check that must succeed before the rule is accepted.
+
+This is already guaranteed by hy_verify_all/2 and sq_consistent/2.
+
+
+From the Harness Engineering Outline (ETCLOVG).
+
+The seven-layer ETCLOVG (Execution, Tooling, Context, Lifecycle, Observability, Verification, Governance) taxonomy maps clearly to the PrologAI ARC-AGI solving infrastructure:
+
+• Execution = the wave solver loop
+
+• Tooling = the named rule library and primitive packs
+
+• Context = the training pairs for the current task
+
+• Lifecycle = the wave structure (Wave 1, Wave 2, etc.)
+
+• Observability = the glass-box property: every rule is an inspectable named Prolog predicate
+
+• Verification = arc_induce_rule_400/2 and its ARC-AGI-2 successor
+
+• Governance = the Refinement SPARC volume's safety rules
+
+The harness is already correctly in place.
+
+No new harness infrastructure is needed for ARC-AGI-2 beyond the data loader and wave solver noted in Gap 7.
+
+
+From the Agentic Patterns Outline.
+
+The "Evaluator-Optimizer Pattern" (produce work, grade it, loop) is already embodied in the ARC-AGI-1 approach: propose a rule, verify it against all training pairs, accept or reject.
+
+The "Tree of Thoughts" pattern is relevant for multi-rule search: when searching for a 2-step composition, maintain a beam of the most promising partial pipelines rather than evaluating every combination exhaustively.
+
+This could be incorporated into the seqinfer pack's search strategy without building a new pack.
+
+The "Reflection Pattern" (self-review) maps to the human Step 6.2 (Diagnosing the Failure): when a rule fails a training pair, the solver should inspect exactly which step failed and why, rather than discarding the whole sequence.
+
+The pipeline pack's dispatcher architecture supports this: each step is named and its output can be inspected.
+
+
+From the Coding Patterns Outline.
+
+The Strategy Pattern (select an interchangeable algorithm at runtime) maps directly to the task type classifier: once the task is classified, dispatch to the appropriate solving strategy.
+
+The Interpreter Pattern (representing and evaluating a simple grammar) maps to the symbol table learning pack: the symbol table IS a mini-grammar that the task defines on the fly, and the solver must interpret it.
+
+The Chain of Responsibility Pattern (pass a request along a line of handlers until one handles it) maps to the rule candidate search: try single-rule, if it fails try 2-step, if that fails try context-gated, if that fails try symbol table.
+
+
+SECTION 5 - WHAT TOP COMPETITORS USE AND WHAT THAT TELLS US
+
+
+In the ARC Prize 2025 Kaggle competition (entirely on ARC-AGI-2), the results were:
+
+• NVARC: 24% on the private set (winner)
+
+• MindsAI: 15%
+
+• The ARChitects: 16.5%
+
+• All three approaches showed 2-3x performance drops from ARC-AGI-1 to ARC-AGI-2.
+
+The top approaches used test-time training (adapting neural network weights per task) and program synthesis with refinement loops.
+
+The state-of-the-art single paper result on ARC-AGI-2 as of mid-2026 uses Efficient Evolutionary Program Synthesis with a refinement loop.
+
+A lightweight Prolog meta-interpreter implemented in SWI-Prolog (the same engine as PrologAI) appears in neuro-symbolic approaches as a reasoning layer, confirming that symbolic induction approaches remain relevant.
+
+The key lesson: the compositional tasks (Flavors 1 and 2) are partially solved by existing approaches.
+
+The symbol definition tasks (Flavor 4) remain the hardest for all systems.
+
+PrologAI's structural advantage - explicit intermediate state simulation, named glass-box rules, pure induction from the task's own training pairs - is most pronounced precisely on the types of tasks all neural approaches struggle most with.
+
+
+SECTION 6 - RECOMMENDED NEW PACKS
+
+
+The following new packs are recommended to be built before or during Wave 1 of the ARC-AGI-2 climb.
+
+They are ordered from highest to lowest priority.
+
+
+PRIORITY 1 - symtab (Symbol Table Learning, approximately Layer 247).
+
+Build a new pack with the st_* prefix.
+
+Predicates to include:
+
+• st_build_table(+Pairs, -SymbolTable): from N training pairs, produce a list of sym(Feature, Operation) terms mapping symbol features to what they encode.
+
+• st_identify_symbols(+Pairs, -Symbols): find objects that appear to function as symbols rather than as content, by observing that their visual features co-vary with the output transformation.
+
+• st_contrastive_learn(+Pairs, -Findings): perform contrastive analysis across all pairs to extract which features of which objects predict which output operations.
+
+• st_apply_table(+SymbolTable, +Scene, -TransformedScene): apply a learned symbol table to a test input scene.
+
+• st_hole_count(+Obj, -N): count enclosed holes in an object (commonly used as symbol values in ARC-AGI-2).
+
+• st_color_code(+SymbolTable, +Feature, -Color): look up what color a given feature encodes in a symbol table.
+
+• st_is_symbol(+Obj, +ContentObjs): succeed if Obj is plausibly a symbol object (small, isolated, structurally distinct from content objects).
+
+
+PRIORITY 2 - invariant (Cross-Pair Invariant Extraction, approximately Layer 248).
+
+Build a new pack with the iv_* prefix.
+
+Predicates to include:
+
+• iv_grid_invariants(+Pairs, -Invariants): find grid-level properties (size, background color, number of objects) that are identical across all training pairs.
+
+• iv_object_invariants(+Pairs, -Invariants): find object-level properties (colors present, size distribution, shape classes) that stay constant.
+
+• iv_structure_invariants(+Pairs, -Invariants): find structural relationships (topology, connectivity type, spatial arrangement of objects) that are preserved.
+
+• iv_variant_features(+Pairs, -Features): the complement - list properties that DO change across pairs, which are the candidate rule parameters.
+
+• iv_consistent_delta(+Pairs, -Delta): find the transformation property that is the same in every pair (e.g., "objects always move by the same vector").
+
+
+PRIORITY 3 - contrast (Contrastive Pair Analysis, approximately Layer 249).
+
+Build a new pack with the ca_* prefix.
+
+Predicates to include:
+
+• ca_pairwise_delta(+Pairs, -Deltas): for each pair, compute what changed from input to output.
+
+• ca_covarying_features(+Pairs, -Features): find input features that co-vary with specific output changes.
+
+• ca_context_gate(+Pairs, -GateFeature): identify which input feature acts as the conditional gating signal (e.g., the color of the frame object determines which rule variant fires).
+
+• ca_discriminating_pair(+Pairs, +Hyp1, +Hyp2, -Pair): find the training pair that would distinguish between two competing hypotheses.
+
+• ca_cross_pair_corr(+Pairs, +InputFeature, +OutputFeature, -Correlation): compute whether an input feature and output feature are correlated across the training pairs.
+
+
+PRIORITY 4 - legend (Legend and Key Region Detection, approximately Layer 250).
+
+Build a new pack with the lg_* prefix.
+
+Predicates to include:
+
+• lg_detect_legend(+Grid, +BgColor, -LegendRegion): find small, isolated regions in the grid that appear structurally distinct from the main content.
+
+• lg_is_legend(+Region, +ContentRegions): succeed if a region is more likely a key or legend than a content object.
+
+• lg_legend_entries(+LegendRegion, -Entries): parse a legend region into entry(Feature, Value) terms.
+
+• lg_consistent_legend(+Pairs, -Legend): find a legend region structure that appears in every training pair input in the same structural position.
+
+
+PRIORITY 5 - multipair (Multi-Pair Object Tracking, approximately Layer 251).
+
+Build a new pack with the mp_* prefix.
+
+Predicates to include:
+
+• mp_track_objects(+Pairs, -TrackedObjects): assign consistent identity labels to objects across all training pair inputs.
+
+• mp_invariant_objects(+TrackedObjects, -Objects): objects that appear in every training pair input with the same properties.
+
+• mp_role_objects(+TrackedObjects, -ContentObjs, -MarkerObjs): classify objects as content (transform targets) or markers (rule parameters).
+
+• mp_cross_pair_match(+Pairs, -MatchMatrix): for every pair of training inputs, find the object-level correspondence.
+
+
+PRIORITY 6 - taskcat (Task Type Classifier, approximately Layer 252).
+
+Build a new pack with the tc_* prefix.
+
+Predicates to include:
+
+• tc_categorize(+Pairs, -Category): classify a task as single_rule, multi_step, context_gated, or symbol_table.
+
+• tc_is_single_rule(+Pairs): succeed if training pairs are consistent with a single-rule explanation.
+
+• tc_is_multi_step(+Pairs): succeed if training pairs require 2 or more sequential steps.
+
+• tc_has_context_gate(+Pairs): succeed if some input feature modulates which rule variant applies.
+
+• tc_has_symbol_table(+Pairs): succeed if some objects appear to function as symbols with task-defined meanings.
+
+• tc_suggest_strategy(+Category, -Strategy): given a category, recommend the solving strategy (e.g., try seqinfer for multi_step, try symtab for symbol_table).
+
+
+SECTION 7 - EXISTING PACKS THAT NEED ENHANCEMENT
+
+
+The following existing packs do not need to be replaced but would benefit from targeted enhancement before or during the ARC-AGI-2 climb.
+
+
+seqinfer (Layer 195) - Extend the default rule candidates.
+
+Currently, sq_default_rules/1 lists a fixed set of candidate rules.
+
+For ARC-AGI-2, the candidate rule set must include the full library of primitives from the ARC-AGI-1 climb (the 400 named rules in arc_benchmark.pl).
+
+Enhancement: add sq_arc2_candidates/1 that exports the ARC-AGI-2-relevant primitive list, which seqinfer can use for its 2-step and 3-step searches.
+
+
+hyp (Layer 74) - Add non-color-substitution hypothesis types.
+
+Currently, hyp handles color substitution maps only.
+
+Enhancement: add hy_spatial_hyp/3 for movement hypotheses, hy_structural_hyp/3 for connectivity hypotheses, and hy_sequence_hyp/4 for multi-step hypotheses.
+
+
+condxf (Layer 187) - Add context gate inference.
+
+Currently, the caller must pre-specify the condition.
+
+Enhancement: add xc_infer_gate/3 that, given a list of training pairs plus a set of candidate rule variants, tries all candidate gate features and returns the one that makes the rule consistent across all pairs.
+
+
+induction (Layer 59) - Add cross-pair analysis.
+
+Currently, each predicate analyzes a single (Input, Output) pair.
+
+Enhancement: add id_cross_pair_invariants/2 and id_cross_pair_variants/2 that accept a list of pairs and aggregate the analysis.
+
+These would avoid duplicating this logic in the new invariant pack.
+
+
+SECTION 8 - INFRASTRUCTURE NEEDED BEFORE WAVE 1
+
+
+The following three items are not Data Layer packs but are required before the ARC-AGI-2 climb can start.
+
+
+Item 1 - arc_tasks_2.pl in Mentova.
+
+Following the same structure as arc_tasks.pl.
+
+Defines arc2_task(TaskId, TrainingPairs, TestIn, TestOut).
+
+Loads from JSON files in /home/ccaitwo/Mentova/data/arc_agi_2/.
+
+The ARC-AGI-2 public training set (400 tasks) should be downloaded first.
+
+
+Item 2 - arc_benchmark_2.pl in Mentova.
+
+Following the same structure as arc_benchmark.pl.
+
+The wave solver for ARC-AGI-2.
+
+Includes an arc2_induce_rule/2 predicate that:
+
+• Calls tc_categorize to classify the task type.
+
+• Dispatches to the appropriate solving strategy based on category.
+
+• Verifies the resulting rule against all training pairs.
+
+• Stores the verified rule as a named Prolog clause.
+
+
+Item 3 - Climbing_ARC-AGI-2.txt.
+
+The wave log file.
+
+Should follow the same structure as Climbing_ARC-AGI-1.txt.
+
+Should be created at /home/ccaitwo/Mentova/papers/Climbing_ARC-AGI-2.txt before Wave 1.
+
+
+SECTION 9 - WHAT WAS FOUND IN THE PREPARATION FILES THAT SHOULD NOT BE OVERLOOKED
+
+
+The following specific points from the reviewed files deserve special attention and are at risk of being skimmed over.
+
+
+From ARC-AGI-2_Preparation.txt, Section 7 - the "ordering cues."
+
+The document lists "ordering cues" as a category of within-task clues that hint at the transformation being a sequence.
+
+These cues tell the solver not just WHAT the steps are but what ORDER they must happen in.
+
+The seqinfer pack handles sequence EXECUTION but does not yet have a predicate for detecting ordering cues from training pair analysis.
+
+The new invariant pack should include detection of ordering cues as a feature category.
+
+
+From ARC-AGI-2_Preparation.txt, Section 7 - the "self-check signal."
+
+The document emphasizes that the demonstration outputs are the answer key.
+
+A correct rule must reproduce every demonstration output exactly.
+
+This exact-match requirement is already implemented by sq_consistent/2 and hy_verify_all/2.
+
+However, this document reminds us that near-matches that score zero deserve special handling: when a proposed rule is close but not exact, the diagnostic output of WHERE it fails (which cells are wrong) should be captured.
+
+The new pipeline pack enhancement should record per-cell failure diagnostics, not just pass/fail.
+
+
+From ARC-AGI-2_Human_Steps.txt, Stage 3.5 - Symbol Decoding.
+
+This sub-step says: "The human tentatively assigns meaning to the suspected symbol and holds that assignment loosely, ready to revise it."
+
+The word "loosely" is important.
+
+The symbol table learner should not commit to a symbol meaning after seeing only one training pair.
+
+It should maintain multiple candidate interpretations and narrow them across all training pairs.
+
+The st_contrastive_learn predicate should return a ranked list of candidate symbol meanings, not a single committed meaning.
+
+
+From ARC-AGI-2_Human_Steps.txt, Stage 7 (Hypothesis Refinement).
+
+"The human guards against fixation - getting trapped by an early wrong idea - by intentionally questioning the assumption that felt most obvious."
+
+For PrologAI, this translates to: the task type classifier should not commit to a single category prematurely.
+
+If a task is classified as single_rule but the single-rule search fails, the solver should escalate to multi_step, then to context_gated, then to symbol_table, rather than giving up.
+
+The tc_suggest_strategy predicate should return an ordered list of strategies to try, not just a single recommendation.
+
+
+From ARC-AGI-2_Next_Steps.txt, Section 6.3 - Mitigations for Unknown Symbol Meanings.
+
+"If object X appears in every training input but its grid location changes in each output in a way that tracks another feature, then X is likely a contextual modifier."
+
+This is the core heuristic for the symbol table learner.
+
+The st_identify_symbols predicate should implement exactly this check: an object that appears in every training input, whose behavior in the output co-varies with another observable feature, is likely a symbol.
+
+
+From ARC-AGI_Human_Steps.txt, Part Six - Background Process 3 (Unconscious Pattern Recognition).
+
+"System 1 continuously scans for patterns that resemble things the human has seen before."
+
+For PrologAI, this System 1 scan is the named rule library.
+
+At the start of each ARC-AGI-2 task, the solver should quickly check whether the training pair deltas resemble any pattern from the ARC-AGI-1 primitive library.
+
+If a close match is found, that match should be the first hypothesis to test, before any systematic search.
+
+This is the "reminding" step from the cognitive architecture patterns, and it is not explicitly implemented in the current ARC-AGI-2 solving infrastructure.
+
+
+From Artificial_Mind_Patterns, Pattern 6 - Deliberation.
+
+The Deliberation Pattern describes selecting actions by relevance to objectives.
+
+For ARC-AGI-2, relevance means: given the observed training pair delta, which rule classes are LIKELY to be relevant?
+
+If the delta shows objects changing color but not position, then color-manipulation rules are relevant and movement rules are irrelevant.
+
+This selective focus would dramatically reduce the search space before any compositional search begins.
+
+An explicit "relevance filter" predicate in the taskcat pack or the invariant pack would formalize this.
+
+
+SECTION 10 - WHAT THE EXISTING PACKS HANDLE WELL
+
+
+To avoid building what already exists, the following is a clear statement of what the existing packs cover adequately for ARC-AGI-2 with no enhancement needed.
+
+
+Grid primitives for large grids (up to 30 by 30): fully handled by the grid* pack suite.
+
+The concern in the Next Steps roadmap about large grid performance is mitigated by the existing gridobj pack's precomputed object inventory.
+
+
+Object inventory construction: fully handled by gridobj, gridseg, gridflood, and the new gridobjmatch pack.
+
+
+Single-pair delta analysis (what changed from one input to one output): fully handled by griddelta, induction, and diff packs.
+
+
+Multi-step rule execution given a known sequence: fully handled by seqinfer (sq_apply/3) and pipeline (pl_run/3).
+
+
+Rigid isometry (all 8 rotations and reflections): fully handled by gridrefl and analogy packs.
+
+
+Spatial relationship computation (above, below, left-of, right-of, touching, contained-in): fully handled by gridrelation, objrel, and scene packs.
+
+
+Color frequency analysis and background detection: fully handled by gridhist, gridscan, and gridcolor packs.
+
+
+Bounding box extraction: fully handled by gridobj and objbound packs.
+
+
+Chain reflection across markers, template stamping, and piece assembly: carried over from the ARC-AGI-1 primitive library in arc_benchmark.pl.
+
+
+SECTION 11 - PRIORITY ORDER FOR PACK DEVELOPMENT
+
+
+The following sequence is recommended for building the missing packs before and during Wave 1 of ARC-AGI-2.
+
+
+Before Wave 1 starts (preparation phase):
+
+1. Build symtab pack (st_*) - highest impact, unblocks symbol-definition tasks.
+
+2. Build invariant pack (iv_*) - essential for narrowing hypothesis space on any task.
+
+3. Build contrast pack (ca_*) - essential for context gate detection and symbol learning.
+
+4. Create Climbing_ARC-AGI-2.txt and arc_tasks_2.pl.
+
+5. Create arc_benchmark_2.pl with tc_categorize dispatch.
+
+
+During Wave 1 and early waves:
+
+6. Build legend pack (lg_*) - based on early task observation.
+
+7. Build multipair pack (mp_*) - as cross-pair tracking needs become clear.
+
+8. Build taskcat pack (tc_*) - refining category rules as more task types are encountered.
+
+
+During Wave 3 and beyond:
+
+9. Enhance seqinfer with ARC-AGI-2 candidate rules.
+
+10. Enhance condxf with context gate inference.
+
+11. Enhance hyp with non-color hypothesis types.
+
+
+SECTION 12 - FINAL SUMMARY
+
+
+PrologAI is well-prepared for ARC-AGI-2 in all areas that overlap with ARC-AGI-1.
+
+The grid primitive library, object detection suite, scene comparison packs, and multi-step execution infrastructure are all in place.
+
+The structural advantages (explicit intermediate state simulation, named glass-box rules, pure induction from task data, no pretraining) remain as relevant for ARC-AGI-2 as they were for ARC-AGI-1.
+
+The primary gaps are concentrated in exactly the areas where ARC-AGI-2 is designed to be hardest: in-context symbol definition, cross-pair invariant extraction, contrastive pair analysis, and context gate detection.
+
+Building the six packs identified in Section 6 (symtab, invariant, contrast, legend, multipair, taskcat) and the infrastructure in Section 8 (arc_tasks_2.pl, arc_benchmark_2.pl, Climbing_ARC-AGI-2.txt) before or during early waves will put PrologAI in the strongest possible position to climb ARC-AGI-2 using the same systematic methodology that achieved 400/400 on ARC-AGI-1.
+
+The second mountain is taller.
+
+But the tools to climb it are, with these additions, now within reach.
+
+
+REFERENCES
+
+
+ARC-AGI-2: A New Challenge for Frontier AI Reasoning Systems (Chollet et al., 2025). arxiv.org/abs/2505.11831
+
+ARC Prize 2025: Technical Report (ARC Prize Team, 2025). arxiv.org/abs/2601.10904
+
+ARC Prize 2025 Results and Analysis. arcprize.org/blog/arc-prize-2025-results-analysis
+
+Efficient Evolutionary Program Synthesis for ARC-AGI-2. ctpang.substack.com/p/arc-agi-2-sota-efficient-evolutionary
+
+ARC-AGI-2: Next Steps. /home/ccaitwo/Mentova/data/arc_agi_2/ARC-AGI-2_Next_Steps.txt
+
+ARC-AGI-2: Preparation. /home/ccaitwo/inspiration/ARC-AGI-2_Preparation.txt
+
+ARC-AGI Human Steps. /home/ccaitwo/PrologAI/docs/ARC-AGI_Human_Steps.txt
+
+ARC-AGI-2 Human Steps (Merged). /home/ccaitwo/inspiration/ARC-AGI-2_Human_Steps.txt
+
+Patterns of Mind (Artificial_Mind_Patterns_Parts_1_2_3.txt). /home/ccaitwo/inspiration/
+
+Building Minds with Patterns. /home/ccaitwo/inspiration/Building_Minds.txt
+
+Certified AI Harness Engineer Outline. /home/ccaitwo/inspiration/Harness_Outline.txt
+
+Certified AI Recursive Self Improvement Engineer Outline. /home/ccaitwo/inspiration/RSI_Outline.txt
+
+Agentic AI Design Patterns Outline. /home/ccaitwo/inspiration/Agentic_Patterns_Outline.txt
+
+Compositional Neuro-Symbolic Reasoning. arxiv.org/pdf/2604.02434
+
+Procedural Refinement by LLM-driven Algorithmic Debugging for ARC-AGI-2. arxiv.org/html/2603.20334v2
+
+The ARC of Progress towards AGI: A Living Survey. arxiv.org/pdf/2603.13372
+
+
+END OF DOCUMENT

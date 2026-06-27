@@ -9516,3 +9516,33 @@ Design notes:
   collects one value per cell, the last chg match). For deterministic use, provide
   at most one change per cell.
 - gtr_delta_grid and gtr_overlay compose: apply delta = overlay(A, delta(A,B,Bg), Bg) = B.
+
+
+ARCH-233: gridobjmatch Pack (gom_*, Layer 246)
+
+Location: packs/gridobjmatch/prolog/gridobjmatch.pl
+Test: packs/gridobjmatch/test/test_gridobjmatch.pl
+Module: gridobjmatch
+Prefix: gom_
+Layer: 246
+Dependencies: library(lists) [member/2, subtract/3], library(apply) [maplist/2-3, include/3]
+
+Exports:
+  gom_match_color/3, gom_match_nearest/3, gom_match_size/3,
+  gom_unmatched_a/3, gom_unmatched_b/3, gom_color_diff/3,
+  gom_move_vector/2, gom_move_vectors/2, gom_constant_move/2,
+  gom_infer_color_map/2, gom_appeared/3, gom_disappeared/3,
+  gom_same_structure/2, gom_count_change/3
+
+Design notes:
+- Operates on ob(Color, Cells, BBox) terms from gob_all_objects/3; BBox = r0(R0,C0,R1,C1).
+- Match pairs use the match(O1, O2) term; movement vectors use mv(DR, DC);
+  color change maps use cm(OldColor, NewColor).
+- gom_match_nearest uses doubled centroid (R0+R1, C0+C1) to avoid integer division.
+  Greedy assignment: each object in Objs2 is consumed once.
+- gom_constant_move uses maplist with a partial-apply helper gom_has_vector_/2;
+  fails for an empty list (no evidence of any move).
+- gom_appeared and gom_disappeared use include/3 with a partial-apply color test;
+  these detect brand-new or lost color classes, not individual objects.
+- gom_same_structure uses msort on color lists; ignores object count for same color.
+- Private helpers are prefixed gom_*_ (trailing underscore); not exported.

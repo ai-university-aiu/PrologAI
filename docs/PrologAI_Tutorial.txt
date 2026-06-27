@@ -1318,7 +1318,7 @@ PR 10 - kernel continuations: Advanced kernel features.
 
 PR 11 - sona: The episodic memory (Sparse Online Nexus Archive).
 
-PR 12 - assessment: The developmental assessment framework (Piagetian, Bayley, CHC, consciousness indicators).
+PR 12 - assessment: The developmental assessment framework (Piagetian, Bayley, Cattell-Horn-Carroll (CHC), consciousness indicators).
 
 PR 13 - refinement: The testing and improvement harness.
 
@@ -19482,3 +19482,22 @@ gtr_is_color_permutation requires both consistency (no ambiguous mapping) and
 injectivity (no two sources map to same target).
 
 See docs/tutorial/Ch227_GridTransform.txt for full details and examples.
+
+Chapter 228: gridobjmatch - Object Matching and Change Detection (gom_*, Layer 246)
+
+The gridobjmatch pack (Work Package 267, Layer 246) provides fourteen predicates for
+matching ob(Color,Cells,BBox) object terms between two lists and detecting what
+changed from one list to the other. Objects are produced by gob_all_objects/3 from
+the gridobj pack.
+
+Predicates: gom_match_color/3, gom_match_nearest/3, gom_match_size/3,
+gom_unmatched_a/3, gom_unmatched_b/3, gom_color_diff/3, gom_move_vector/2,
+gom_move_vectors/2, gom_constant_move/2, gom_infer_color_map/2, gom_appeared/3,
+gom_disappeared/3, gom_same_structure/2, gom_count_change/3.
+
+Key design: match(O1,O2) pairing terms; mv(DR,DC) movement vectors; cm(Old,New)
+color maps. gom_match_nearest uses doubled centroid (R0+R1, C0+C1) for exact
+integer arithmetic. gom_constant_move fails for empty list. gom_appeared and
+gom_disappeared operate on color classes across the two lists.
+
+See docs/tutorial/Ch228_GridObjMatch.txt for full details and examples.

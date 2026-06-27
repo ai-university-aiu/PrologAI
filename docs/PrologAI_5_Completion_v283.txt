@@ -7569,3 +7569,21 @@ Pack_Reference: gridtransform entry added
 Design note: color maps are cm(Old,New) lists; change lists are chg(R,C,Old,New).
   gtr_color_map uses sort/2 dedup + consistency check. delta/overlay compose:
   overlay(A, delta(A,B,Bg), Bg) = B.
+
+
+WP-267: gridobjmatch Pack (gom_*, Layer 246)
+Status: COMPLETE
+Branch: feature/wp267-gridobjmatch
+Tests: 44/44 pass (AC-GOM-001 through AC-GOM-044)
+Predicates: gom_match_color/3, gom_match_nearest/3, gom_match_size/3,
+  gom_unmatched_a/3, gom_unmatched_b/3, gom_color_diff/3,
+  gom_move_vector/2, gom_move_vectors/2, gom_constant_move/2,
+  gom_infer_color_map/2, gom_appeared/3, gom_disappeared/3,
+  gom_same_structure/2, gom_count_change/3
+SPARC: Spec v233, Pseudo v225, Arch v227, Refinement v280, Completion v283
+Tutorial: docs/tutorial/Ch228_GridObjMatch.txt
+Pack_Reference: gridobjmatch entry added
+Design note: match(O1,O2) pairing terms; mv(DR,DC) movement vectors; cm(Old,New)
+  color maps. gom_match_nearest uses doubled centroid for exact integer arithmetic.
+  gom_constant_move fails for empty list (no evidence). gom_appeared/disappeared
+  operate on color classes, not individual object identity.

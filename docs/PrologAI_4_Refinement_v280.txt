@@ -18760,3 +18760,51 @@ AC-GTR-041: integration - apply_color_map then invert returns original grid.
 AC-GTR-042: integration - compose_maps is associative.
 AC-GTR-043: integration - delta_grid then overlay on a different base.
 AC-GTR-044: integration - is_color_permutation and invert/apply round-trip.
+
+
+WP-267: gridobjmatch Pack (gom_*, Layer 246) - Test Registry
+
+AC-GOM-001: gom_match_color: match single red object by color.
+AC-GOM-002: gom_match_color: match two objects, each a different color.
+AC-GOM-003: gom_match_color: no match when colors differ.
+AC-GOM-004: gom_match_nearest: match single pair by nearest centroid.
+AC-GOM-005: gom_match_nearest: nearest match selects closest, not first.
+AC-GOM-006: gom_match_nearest: empty Objs2 yields no pairs.
+AC-GOM-007: gom_match_size: match two size-1 objects.
+AC-GOM-008: gom_match_size: no match when sizes differ.
+AC-GOM-009: gom_match_size: match multiple objects by size.
+AC-GOM-010: gom_unmatched_a: all objects matched, result is empty.
+AC-GOM-011: gom_unmatched_a: one object in Objs1 not in any pair.
+AC-GOM-012: gom_unmatched_b: all objects matched, result is empty.
+AC-GOM-013: gom_unmatched_b: one object in Objs2 not in any pair.
+AC-GOM-014: gom_color_diff: all same-color pairs go into Same.
+AC-GOM-015: gom_color_diff: all different-color pairs go into Diff.
+AC-GOM-016: gom_color_diff: mixed pairs split correctly.
+AC-GOM-017: gom_move_vector: no movement gives mv(0,0).
+AC-GOM-018: gom_move_vector: move right by 1 gives mv(0,1).
+AC-GOM-019: gom_move_vector: move down by 1 gives mv(1,0).
+AC-GOM-020: gom_move_vectors: list of pairs produces list of vectors.
+AC-GOM-021: gom_move_vectors: empty pairs list gives empty vectors list.
+AC-GOM-022: gom_constant_move: all pairs same vector - succeeds.
+AC-GOM-023: gom_constant_move: different vectors - fails.
+AC-GOM-024: gom_constant_move: single pair always constant.
+AC-GOM-025: gom_infer_color_map: no color changes - empty map.
+AC-GOM-026: gom_infer_color_map: one color change inferred correctly.
+AC-GOM-027: gom_infer_color_map: multiple changes deduplicated and sorted.
+AC-GOM-028: gom_appeared: no new colors - appeared is empty.
+AC-GOM-029: gom_appeared: one new color in Objs2.
+AC-GOM-030: gom_disappeared: no lost colors - disappeared is empty.
+AC-GOM-031: gom_disappeared: one color lost from Objs1.
+AC-GOM-032: gom_same_structure: same color multiset - succeeds.
+AC-GOM-033: gom_same_structure: different color multiset - fails.
+AC-GOM-034: gom_same_structure: same colors in different list order - succeeds.
+AC-GOM-035: gom_count_change: same count gives N=0.
+AC-GOM-036: gom_count_change: more objects in Objs2 gives positive N.
+AC-GOM-037: integration - match by color then color_diff all same.
+AC-GOM-038: integration - match nearest, color_diff finds all pairs changed.
+AC-GOM-039: integration - match nearest then constant move.
+AC-GOM-040: integration - infer color map from matched pairs.
+AC-GOM-041: integration - appeared and disappeared correct after color swap.
+AC-GOM-042: integration - unmatched_a and unmatched_b after partial color match.
+AC-GOM-043: integration - same structure check via match and structure.
+AC-GOM-044: integration - full pipeline, pairs then color_diff then infer_color_map.

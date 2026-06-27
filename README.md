@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       266 work packages — the complete cognitive engine (see below)
+├── packs/       267 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,11 +78,11 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 200 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 245 (gridtransform).
+Layer 60 and above is the Data Layer: the 200 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 246 (gridobjmatch).
 
 The full layer table is in Architecture Section 0.4.
 
-### The 262 Work Packages
+### The 267 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -347,6 +347,7 @@ Everything is inspectable.
 | `gridgroupby` | Grid Group-By Operations: Group, Filter, Sort, Pair, and Count Objects by Attribute (ggb_*, Layer 243) (PR 354) |
 | `gridrelation` | Grid Object Spatial Relations: Touching, Adjacent, Distance, Above, Below, Left-Of, Right-Of, Bbox Contains, Bbox Overlap, Cells Overlap, Same Rows, Same Cols, Direction, and All Relations (grl_*, Layer 244) (PR 355) |
 | `gridtransform` | Grid Transformation Detection and Application: Color Map, Apply Map, Diff Cells, Diff Count, Same Cells, Changed Colors, Invert Map, Compose Maps, Identity Test, Apply Changes, Delta Grid, Overlay, Common Grid, and Color Permutation Test (gtr_*, Layer 245) (PR 356) |
+| `gridobjmatch` | Object Matching and Change Detection Between Object Lists: Match by Color, Nearest Centroid, and Size; Unmatched Extraction; Color-Diff Partition; Movement Vectors; Constant Move; Color Map Inference; Appeared, Disappeared, Structure, and Count Change (gom_*, Layer 246) (PR 358) |
 | `gridpos` | Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222) (PR 332) |
 | `gridhist` | Grid Histogram Analysis: Per-Row and Per-Column Color Frequency, Modal, and Entropy (ghst_*, Layer 221) (PR 331) |
 | `gridseg` | Grid Segmentation by Separator Rows and Columns: Split, Trim, and Panel Extraction (gsg_*, Layer 220) (PR 330) |
@@ -412,11 +413,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v232` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v224` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v226` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v279` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v282` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v233` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v225` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v227` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v280` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v283` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---
