@@ -1060,3 +1060,20 @@ Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, 
     gm_paste/6: transparent paste; only non-BgColor Patch cells overwrite Grid; BgColor Patch cells are invisible
     gm_border_mask/3: binary mask marking N-layer border cells as border and all other cells as interior
     gm_color_mask/4: binary mask where target Color cells become FgColor and all other cells become bg
+
+gridxform
+Grid Transformations: Rotate, Flip, Transpose, Crop, Pad, Scale, Tile, Canonicalize (gx_*, Layer 207)
+    gx_rotate90/2: rotate Grid 90 degrees clockwise; H x W input becomes W x H; result[R][C] = original[H-1-C][R]
+    gx_rotate180/2: rotate Grid 180 degrees; same dimensions; result[R][C] = original[H-1-R][W-1-C]
+    gx_rotate270/2: rotate Grid 270 degrees clockwise (90 CCW); H x W becomes W x H; result[R][C] = original[C][W-1-R]
+    gx_flip_h/2: flip horizontally (left-right mirror); same dims; result[R][C] = original[R][W-1-C]
+    gx_flip_v/2: flip vertically (top-bottom mirror); same dims; result[R][C] = original[H-1-R][C]
+    gx_transpose/2: main-diagonal transpose; H x W becomes W x H; result[R][C] = original[C][R]
+    gx_flip_d2/2: anti-diagonal flip; H x W becomes W x H; result[R][C] = original[H-1-C][W-1-R]
+    gx_crop/6: extract rows [R0..R1] x cols [C0..C1] (inclusive); result is (R1-R0+1) x (C1-C0+1)
+    gx_crop_content/3: auto-crop to tightest bounding box of non-BgColor cells; unchanged if all-background
+    gx_pad/7: surround Grid with BgColor padding: Top rows above, Bot below, Left cols left, Right cols right
+    gx_scale/3: integer upscale by N; each cell becomes N x N block; H x W becomes (H*N) x (W*N)
+    gx_tile/4: tile Grid to fill H x W target; result[R][C] = original[R mod TH][C mod TW]
+    gx_d4_group/2: enumerate all 8 D4 isometries [identity, r90, r180, r270, flip_h, flip_v, transpose, flip_d2]
+    gx_normalize/2: canonical D4 form; lexicographically smallest of the 8 D4 isometries under Prolog term order
