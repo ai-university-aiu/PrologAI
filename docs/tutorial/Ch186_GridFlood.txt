@@ -1,0 +1,202 @@
+Chapter 186: gridflood Pack - Flood-Fill, Region Analysis, and Connected Components (gf_*, Layer 204)
+
+Overview
+
+The gridflood pack (Layer 204, gf_* prefix) provides fourteen predicates for
+flood-fill operations, connected-region extraction, hole detection, and
+connected-component enumeration on raw grids. A "region" is a maximal set of
+cells that share the same color and are connected by 4-adjacency (sharing an edge).
+
+Load the pack:
+
+:- use_module(pack(gridflood/prolog/gridflood)).
+
+
+1. Flood-Fill Operations
+
+gf_fill(+Grid, +R, +C, +NewColor, -Result)
+
+Replaces the 4-connected same-color region at seed cell (R, C) with NewColor
+using breadth-first search. If the seed cell already has NewColor, Result = Grid
+(no-op).
+
+Example:
+
+G = [[r,r,b],[r,r,b],[b,b,b]].
+gf_fill(G, 0, 0, g, R).
+% R = [[g,g,b],[g,g,b],[b,b,b]]
+
+gf_fill8(+Grid, +R, +C, +NewColor, -Result)
+
+Same as gf_fill but uses 8-connectivity (diagonal neighbors included). This
+allows diagonally touching cells of the same color to be filled together.
+
+Example:
+
+G = [[b,r,r],[r,b,r],[r,r,b]].
+gf_fill8(G, 0, 0, g, R).
+% R = [[g,r,r],[r,g,r],[r,r,g]]  (all diagonal b cells filled as one 8-region)
+
+gf_recolor(+Grid, +OldColor, +NewColor, -Result)
+
+Replaces every cell of OldColor with NewColor regardless of connectivity. This
+is a global palette swap: all OldColor cells change, even disconnected ones.
+
+Example:
+
+G = [[r,b,r],[b,b,b],[r,b,r]].
+gf_recolor(G, b, g, R).
+% R = [[r,g,r],[g,g,g],[r,g,r]]
+
+gf_boundary_fill(+Grid, +R, +C, +BoundaryColor, +FillColor, -Result)
+
+Flood-fills the 4-connected same-color region at (R,C) with FillColor, treating
+BoundaryColor cells as impassable walls. Cells of other colors also stop the fill.
+If the seed is BoundaryColor, Result = Grid.
+
+Example:
+
+G = [[r,r,b],[r,r,b],[b,b,b]].
+gf_boundary_fill(G, 0, 0, b, g, R).
+% R = [[g,g,b],[g,g,b],[b,b,b]]
+
+
+2. Region Analysis
+
+gf_isolate(+Grid, +R, +C, +BgColor, -Result)
+
+Keeps the 4-connected region at (R,C) intact and replaces all other cells with
+BgColor. Useful for extracting a single object onto a blank background.
+
+Example:
+
+G = [[r,r,b],[r,r,b],[b,b,b]].
+gf_isolate(G, 0, 0, x, R).
+% R = [[r,r,x],[r,r,x],[x,x,x]]
+
+gf_region_cells(+Grid, +R, +C, -Cells)
+
+Returns the list of R-C coordinates for the 4-connected same-color region at
+(R,C), in BFS discovery order.
+
+Example:
+
+G = [[r,r,b],[r,r,b],[b,b,b]].
+gf_region_cells(G, 0, 0, Cells).
+% Cells = [0-0, 0-1, 1-0, 1-1]  (order may vary)
+
+gf_region_size(+Grid, +R, +C, -N)
+
+Returns the cell count of the 4-connected region at (R,C).
+
+Example:
+
+G = [[r,r,b],[r,r,b],[b,b,b]].
+gf_region_size(G, 0, 0, N).
+% N = 4
+
+gf_region_bbox(+Grid, +R, +C, -MinR, -MinC, -MaxR, -MaxC)
+
+Returns the bounding box of the 4-connected region at (R,C). MinR and MaxR are
+the smallest and largest row indices in the region; MinC and MaxC are the column
+bounds.
+
+Example:
+
+G = [[r,r,b],[r,r,b],[b,b,b]].
+gf_region_bbox(G, 0, 0, MinR, MinC, MaxR, MaxC).
+% MinR=0, MinC=0, MaxR=1, MaxC=1
+
+
+3. Hole Detection and Filling
+
+gf_enclosed_cells(+Grid, +BgColor, -Enclosed)
+
+Returns the list of BgColor cells that are completely enclosed: they cannot
+reach any border cell via 4-connected BgColor paths. These are "holes" inside
+surrounding non-BgColor regions.
+
+Example (4x4 red ring with blue interior):
+
+G = [[r,r,r,r],[r,b,b,r],[r,b,b,r],[r,r,r,r]].
+gf_enclosed_cells(G, b, Enclosed).
+% Enclosed = [1-1, 1-2, 2-1, 2-2]
+
+gf_fill_enclosed(+Grid, +BgColor, +FillColor, -Result)
+
+Replaces all enclosed BgColor cells with FillColor. Border-reachable BgColor
+cells are left unchanged.
+
+Example:
+
+G = [[r,r,r,r],[r,b,b,r],[r,b,b,r],[r,r,r,r]].
+gf_fill_enclosed(G, b, r, R).
+% R = [[r,r,r,r],[r,r,r,r],[r,r,r,r],[r,r,r,r]]
+
+
+4. Connected Components
+
+gf_components(+Grid, +Color, -Components)
+
+Returns a list of cell-lists, one per 4-connected region of Color. Each inner
+list holds the R-C coordinates of that region in BFS order. Regions appear in
+top-left seed order.
+
+Example:
+
+G = [[r,b,r],[b,b,b],[r,b,r]].
+gf_components(G, r, Comps).
+% Comps = [[0-0], [0-2], [2-0], [2-2]]  (four isolated corners)
+
+gf_n_components(+Grid, +Color, -N)
+
+Returns the number of 4-connected regions of Color.
+
+Example:
+
+G = [[r,b,r],[b,b,b],[r,b,r]].
+gf_n_components(G, r, N).
+% N = 4
+
+gf_largest(+Grid, +Color, -Cells)
+
+Returns the cell-list for the largest 4-connected Color region. Ties are broken
+by order of appearance (first encountered wins). Fails if no Color cells exist.
+
+Example:
+
+G = [[r,r,b],[r,r,b],[b,b,b]].
+gf_largest(G, r, Cells).
+% Cells = [0-0, 0-1, 1-0, 1-1]
+
+gf_is_connected(+Grid, +Color, +Connectivity)
+
+Succeeds if all Color cells form at most one connected region. Connectivity
+must be 4 or 8. Vacuously succeeds when no Color cells exist.
+
+Examples:
+
+G = [[r,r,r],[r,r,r],[r,r,r]].
+gf_is_connected(G, r, 4).     % true: all one region
+
+D = [[b,r,r],[r,b,r],[r,r,b]].
+\+ gf_is_connected(D, b, 4).  % true: 3 separate 4-regions
+gf_is_connected(D, b, 8).     % true: one 8-connected diagonal chain
+
+
+5. Summary of Predicates
+
+gf_fill/5          - 4-connected flood-fill from seed cell
+gf_fill8/5         - 8-connected flood-fill from seed cell
+gf_recolor/4       - global palette swap OldColor -> NewColor
+gf_isolate/5       - extract one 4-connected region onto blank background
+gf_region_cells/4  - list of R-C coordinates in 4-connected region
+gf_region_size/4   - count of cells in 4-connected region
+gf_region_bbox/7   - bounding box (MinR, MinC, MaxR, MaxC) of region
+gf_enclosed_cells/3 - BgColor cells not reachable from grid border
+gf_fill_enclosed/4 - fill enclosed BgColor cells with FillColor
+gf_components/3    - list of cell-lists, one per 4-connected Color region
+gf_n_components/3  - count of 4-connected Color regions
+gf_largest/3       - cell-list of largest 4-connected Color region
+gf_is_connected/3  - succeed if all Color cells form one region (4 or 8)
+gf_boundary_fill/6 - flood-fill stopping at BoundaryColor cells

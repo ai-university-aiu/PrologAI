@@ -1146,7 +1146,7 @@ Tier 2 is the Data Layer (layers 60 and above).
 
 These are the perception, analysis, and transformation packs: color, shape, symmetry, fill, compare, grid operations, and everything that processes structured data.
 
-As of this writing, the highest Data Layer pack is gridrun on layer 203.
+As of this writing, the highest Data Layer pack is gridflood on layer 204.
 
 New packs always receive a layer number higher than all existing packs they depend on.
 
@@ -18493,3 +18493,26 @@ grl_alternating([[r,b,r,b,r,b]], 0).  % succeeds
 
 14 grl_* predicates. 55 tests pass. Layer 203.
 All 55 tests pass. See docs/tutorial/Ch185_GridRun.txt for the full chapter.
+
+
+Chapter 176: gridflood Pack - Flood-Fill, Region Analysis, and Connected Components (gf_*, Layer 204)
+
+The gridflood pack provides BFS flood-fill, region extraction, hole detection,
+and connected-component enumeration for raw grids.
+
+:- use_module(pack(gridflood/prolog/gridflood)).
+
+% 4-connected flood-fill:
+gf_fill([[r,r,b],[r,r,b],[b,b,b]], 0, 0, g, R).
+% R = [[g,g,b],[g,g,b],[b,b,b]]
+
+% Enclosed hole detection:
+gf_enclosed_cells([[r,r,r,r],[r,b,b,r],[r,b,b,r],[r,r,r,r]], b, Enc).
+% Enc = [1-1,1-2,2-1,2-2]
+
+% Connected components:
+gf_n_components([[r,b,r],[b,b,b],[r,b,r]], r, N).
+% N = 4
+
+14 gf_* predicates. 54 tests pass. Layer 204.
+All 54 tests pass. See docs/tutorial/Ch186_GridFlood.txt for the full chapter.
