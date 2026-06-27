@@ -1111,3 +1111,20 @@ Grid Color Analysis: Count, Histogram, Recolor, Color Map, Threshold, Dominant, 
     gc_fraction/3: float fraction of cells matching Color in [0.0..1.0]
     gc_count_colors/2: number of distinct colors present (integer)
     gc_sorted_by_freq/2: colors sorted most-frequent-first; ties broken by sort order
+
+gridstitch
+    Grid Assembly: Concatenation, Splitting, Tiling, Border, and Repetition (gst_*, Layer 210)
+    gst_concat_h/3: concatenate two grids side by side; both must have the same number of rows
+    gst_concat_v/3: stack two grids top to bottom; both must have the same number of columns
+    gst_hstack/2: concatenate a list of grids horizontally left to right
+    gst_vstack/2: stack a list of grids vertically top to bottom
+    gst_split_h/4: split grid at row R into Top (rows 0..R-1) and Bottom (rows R..H-1)
+    gst_split_v/4: split grid at col C into Left (cols 0..C-1) and Right (cols C..W-1)
+    gst_halves_h/3: split at midpoint into equal Top and Bottom halves (even row count required)
+    gst_halves_v/3: split at midpoint into equal Left and Right halves (even col count required)
+    gst_quadrants/5: extract four quadrants TL, TR, BL, BR from even-sized grid
+    gst_tile_grid/4: arrange NR*NC sub-grids in row-major order into an NR x NC tiled layout
+    gst_repeat_h/3: repeat Grid N times horizontally side by side
+    gst_repeat_v/3: repeat Grid N times vertically stacked
+    gst_add_border/4: add N-cell-wide Color border on all four sides of Grid
+    gst_strip_border/3: remove N cells from all four sides; inverse of gst_add_border

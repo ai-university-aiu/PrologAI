@@ -18662,3 +18662,29 @@ gc_dominant([[x,r,x],[x,r,r]], x, Color). % Color = r
 
 14 gc_* predicates. 44 tests pass. Layer 209.
 All 44 tests pass. See docs/tutorial/Ch191_GridColor.txt for the full chapter.
+
+
+Chapter 187: gridstitch Pack - Concatenation, Splitting, Tiling, Border, and Repetition (gst_*, Layer 210)
+
+The gridstitch pack (Layer 210) provides fourteen predicates for assembling
+and disassembling symbolic grids.
+
+:- use_module(pack(gridstitch/prolog/gridstitch)).
+
+Concatenation: gst_concat_h/3 places two grids side by side (matching row
+counts); gst_concat_v/3 stacks two grids top to bottom (matching column
+counts); gst_hstack/2 and gst_vstack/2 reduce a list of grids using the
+two-grid concat predicates.
+
+Splitting: gst_split_h/4 and gst_split_v/4 split at a given index;
+gst_halves_h/3 and gst_halves_v/3 split at the midpoint; gst_quadrants/5
+extracts all four even-size quadrants.
+
+Tiling: gst_tile_grid/4 arranges NR*NC sub-grids in a tiled layout;
+gst_repeat_h/3 and gst_repeat_v/3 repeat a grid N times in one direction.
+
+Border: gst_add_border/4 wraps in an N-cell Color border; gst_strip_border/3
+removes N cells from all sides (inverse of add_border).
+
+14 gst_* predicates. 44 tests pass. Layer 210.
+All 44 tests pass. See docs/tutorial/Ch192_GridStitch.txt for the full chapter.

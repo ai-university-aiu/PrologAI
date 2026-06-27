@@ -1,0 +1,145 @@
+Chapter 192: gridstitch Pack - Concatenation, Splitting, Tiling, Border, and Repetition (gst_*, Layer 210)
+
+Overview
+
+The gridstitch pack (Layer 210, gst_* prefix) provides fourteen predicates for
+assembling and disassembling symbolic grids: concatenating two grids side by
+side or top to bottom, stacking lists of grids, splitting a grid at any row or
+column index, extracting halves and quadrants, arranging sub-grids in tiled
+layouts, repeating a grid N times, and adding or removing uniform borders.
+
+Load the pack:
+
+:- use_module(pack(gridstitch/prolog/gridstitch)).
+
+
+1. Concatenation
+
+gst_concat_h(+GridA, +GridB, -Result)
+
+Place GridA and GridB side by side (GridA on left). Both must have the same
+number of rows.
+
+Example:
+gst_concat_h([[a,b],[c,d]], [[x,y],[z,w]], R).
+% R = [[a,b,x,y],[c,d,z,w]]
+
+gst_concat_v(+GridA, +GridB, -Result)
+
+Stack GridA on top of GridB. Both must have the same number of columns.
+
+Example:
+gst_concat_v([[a,b],[c,d]], [[x,y],[z,w]], R).
+% R = [[a,b],[c,d],[x,y],[z,w]]
+
+gst_hstack(+Grids, -Result)
+
+Concatenate a list of grids horizontally, left to right. Empty list gives
+empty grid; singleton list returns the grid unchanged.
+
+gst_vstack(+Grids, -Result)
+
+Stack a list of grids vertically, top to bottom.
+
+Example:
+gst_hstack([[[a,b],[c,d]], [[x],[y]], [[p,q],[r,s]]], R).
+% R = [[a,b,x,p,q],[c,d,y,r,s]]
+
+
+2. Splitting
+
+gst_split_h(+Grid, +R, -Top, -Bottom)
+
+Split Grid at row R: Top has rows 0..R-1, Bottom has rows R..H-1.
+
+Example:
+gst_split_h([[a,b],[c,d],[e,f]], 2, Top, Bottom).
+% Top = [[a,b],[c,d]], Bottom = [[e,f]]
+
+gst_split_v(+Grid, +C, -Left, -Right)
+
+Split Grid at column C: Left has columns 0..C-1, Right has columns C..W-1.
+
+Example:
+gst_split_v([[a,b,c],[d,e,f]], 2, Left, Right).
+% Left = [[a,b],[d,e]], Right = [[c],[f]]
+
+gst_halves_h(+Grid, -Top, -Bottom)
+
+Split Grid into equal top and bottom halves. Row count must be even.
+
+gst_halves_v(+Grid, -Left, -Right)
+
+Split Grid into equal left and right halves. Column count must be even.
+
+gst_quadrants(+Grid, -TL, -TR, -BL, -BR)
+
+Extract all four quadrants (top-left, top-right, bottom-left, bottom-right).
+Grid must have even row and column counts.
+
+Example:
+gst_quadrants([[a,b,c,d],[e,f,g,h],[i,j,k,l],[m,n,o,p]], TL, TR, BL, BR).
+% TL = [[a,b],[e,f]], TR = [[c,d],[g,h]]
+% BL = [[i,j],[m,n]], BR = [[k,l],[o,p]]
+
+
+3. Tiling and Repetition
+
+gst_tile_grid(+SubGrids, +NR, +NC, -Result)
+
+Arrange SubGrids (a flat list of NR*NC sub-grids in row-major order) into an
+NR rows by NC columns tiled layout.
+
+Example:
+gst_tile_grid([[[a,a],[a,a]], [[b,b],[b,b]],
+               [[b,b],[b,b]], [[a,a],[a,a]]], 2, 2, R).
+% R = [[a,a,b,b],[a,a,b,b],[b,b,a,a],[b,b,a,a]]
+
+gst_repeat_h(+Grid, +N, -Result)
+
+Result is Grid repeated N times horizontally.
+
+Example:
+gst_repeat_h([[r,x],[x,r]], 3, R).
+% R = [[r,x,r,x,r,x],[x,r,x,r,x,r]]
+
+gst_repeat_v(+Grid, +N, -Result)
+
+Result is Grid repeated N times vertically.
+
+
+4. Border Operations
+
+gst_add_border(+Grid, +N, +Color, -Result)
+
+Add an N-cell-wide border of Color on all four sides of Grid.
+
+Example:
+gst_add_border([[x,x],[x,x]], 1, r, R).
+% R = [[r,r,r,r],[r,x,x,r],[r,x,x,r],[r,r,r,r]]
+
+gst_strip_border(+Grid, +N, -Result)
+
+Remove N cells from all four sides. Inverse of gst_add_border.
+
+Example:
+gst_strip_border([[r,r,r],[r,x,r],[r,r,r]], 1, R).
+% R = [[x]]
+
+
+5. Summary of Predicates
+
+gst_concat_h/3     - two grids side by side (same row count)
+gst_concat_v/3     - two grids stacked (same column count)
+gst_hstack/2       - list of grids concatenated horizontally
+gst_vstack/2       - list of grids stacked vertically
+gst_split_h/4      - split at row R into Top and Bottom
+gst_split_v/4      - split at col C into Left and Right
+gst_halves_h/3     - even horizontal split (top, bottom)
+gst_halves_v/3     - even vertical split (left, right)
+gst_quadrants/5    - four quadrants of even-sized grid
+gst_tile_grid/4    - arrange NR*NC sub-grids in tiled layout
+gst_repeat_h/3     - repeat grid N times horizontally
+gst_repeat_v/3     - repeat grid N times vertically
+gst_add_border/4   - add N-cell Color border on all sides
+gst_strip_border/3 - remove N-cell border from all sides
