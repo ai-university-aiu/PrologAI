@@ -18688,3 +18688,33 @@ removes N cells from all sides (inverse of add_border).
 
 14 gst_* predicates. 44 tests pass. Layer 210.
 All 44 tests pass. See docs/tutorial/Ch192_GridStitch.txt for the full chapter.
+
+
+Chapter 188: gridedge Pack - Edge Detection, Boundary Analysis, Corners, and Transition Maps (ge_*, Layer 211)
+
+The gridedge pack (Layer 211) provides fourteen predicates for detecting edges
+and structural features of symbolic grids.
+
+:- use_module(pack(gridedge/prolog/gridedge)).
+
+Edge detection: ge_edge_cells/3 and ge_edge_cells8/3 collect FgColor cells
+with at least one differently-colored 4/8-connected neighbor (using once/1 to
+prevent duplicate entries when multiple neighbors qualify); ge_is_edge/3 tests
+a single cell; ge_edge_count/3 counts edge cells.
+
+Boundary analysis: ge_boundary/4 finds Color1 cells adjacent to Color2;
+ge_inner_border/3 finds BgColor cells adjacent to non-BgColor; ge_outer_border/3
+finds non-FgColor cells adjacent to FgColor.
+
+Grid construction: ge_edge_grid/4 replaces edge cells with EdgeColor.
+
+Structural features: ge_corners/3 finds cells with 2+ differing neighbors;
+ge_endpoints/3 finds cells with exactly 1 same-color neighbor; ge_smooth_cells/3
+finds cells with no differing neighbors; ge_neighbors_diff/4 lists positions
+of 4-neighbors with different color.
+
+Transition map: ge_transition_map/2 builds a grid where each cell value is the
+count (0..4) of differently-colored 4-neighbors.
+
+14 ge_* predicates. 44 tests pass. Layer 211.
+All 44 tests pass. See docs/tutorial/Ch193_GridEdge.txt for the full chapter.

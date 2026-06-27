@@ -1128,3 +1128,20 @@ gridstitch
     gst_repeat_v/3: repeat Grid N times vertically stacked
     gst_add_border/4: add N-cell-wide Color border on all four sides of Grid
     gst_strip_border/3: remove N cells from all four sides; inverse of gst_add_border
+
+gridedge
+    Grid Edge and Boundary Detection: Edge Cells, Boundaries, Corners, Endpoints, and Transition Maps (ge_*, Layer 211)
+    ge_edge_cells/3: FgColor cells with at least one differently-colored 4-connected in-bounds neighbor
+    ge_edge_cells8/3: FgColor cells with at least one differently-colored 8-connected in-bounds neighbor
+    ge_is_edge/3: test whether a single cell (R,C) is an edge cell; returns yes or no
+    ge_boundary/4: Color1 cells adjacent to at least one Color2 cell (4-connected)
+    ge_inner_border/3: BgColor cells adjacent to at least one non-BgColor cell
+    ge_outer_border/3: non-FgColor cells adjacent to at least one FgColor cell
+    ge_edge_grid/4: grid with FgColor edge cells replaced by EdgeColor; other cells unchanged
+    ge_edge_count/3: count of FgColor cells that are edge cells (4-connected)
+    ge_neighbors_diff/4: list of 4-connected neighbor positions with different color than (R,C)
+    ge_corners/3: FgColor cells with 2 or more differently-colored 4-connected neighbors
+    ge_endpoints/3: FgColor cells with exactly 1 same-color 4-connected neighbor
+    ge_smooth_cells/3: FgColor cells with no differently-colored in-bounds 4-connected neighbors
+    ge_transition_map/2: grid of per-cell counts of differently-colored 4-neighbors (integer 0..4)
+    ge_edge_color_count/4: count FgColor cells adjacent to at least one BgColor cell
