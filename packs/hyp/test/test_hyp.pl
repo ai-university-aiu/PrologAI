@@ -210,3 +210,92 @@ test(describe_generic) :-
     atom(Desc).
 
 :- end_tests(hy_describe).
+
+:- begin_tests(hy_spatial_hyp).
+
+% Shift right by 1: non-zero cell moves from col 0 to col 1.
+test(spatial_shift_right) :-
+    In  = [[0,0,0],[1,0,0],[0,0,0]],
+    Out = [[0,0,0],[0,1,0],[0,0,0]],
+    hy_spatial_hyp([pair(In, Out)], [0-1, 1-0, 0-(-1)], shift(0, 1)).
+
+% Shift down by 1.
+test(spatial_shift_down) :-
+    In  = [[1,0],[0,0]],
+    Out = [[0,0],[1,0]],
+    hy_spatial_hyp([pair(In, Out)], [1-0, 0-1, (-1)-0], shift(1, 0)).
+
+% Consistent shift across two pairs.
+test(spatial_consistent_two_pairs) :-
+    A = pair([[1,0],[0,0]], [[0,0],[1,0]]),
+    B = pair([[2,0],[0,0]], [[0,0],[2,0]]),
+    hy_spatial_hyp([A, B], [1-0, 0-1], shift(1, 0)).
+
+% Fails when no candidate move explains all pairs.
+test(spatial_no_match_fails) :-
+    A = pair([[1,0],[0,0]], [[0,0],[0,1]]),
+    \+ hy_spatial_hyp([A], [0-1, 1-0], _).
+
+:- end_tests(hy_spatial_hyp).
+
+:- begin_tests(hy_structural_hyp).
+
+% dims_preserved: same size in and out.
+test(structural_dims) :-
+    A = pair([[1,0],[0,2]], [[2,0],[0,1]]),
+    hy_structural_hyp([A], [dims_preserved], structural(dims_preserved)).
+
+% colors_preserved: exact same color set.
+test(structural_colors) :-
+    A = pair([[1,2],[2,1]], [[2,1],[1,2]]),
+    hy_structural_hyp([A], [colors_preserved], structural(colors_preserved)).
+
+% monotone_output: output has only one non-zero color.
+test(structural_monotone_output) :-
+    A = pair([[1,2],[0,3]], [[5,5],[0,5]]),
+    hy_structural_hyp([A], [monotone_output], structural(monotone_output)).
+
+% output_subset_of_input: output colors are a subset of input colors.
+test(structural_output_subset) :-
+    A = pair([[1,2],[3,0]], [[1,2],[0,0]]),
+    hy_structural_hyp([A], [output_subset_of_input], structural(output_subset_of_input)).
+
+% Fails when no pattern in the candidate list matches (only colors_preserved checked,
+% but input colors {1,2,0} differ from output colors {3,4,5}).
+test(structural_no_match_fails) :-
+    A = pair([[1,2],[0,0]], [[3,4],[5,0]]),
+    \+ hy_structural_hyp([A], [colors_preserved], _).
+
+:- end_tests(hy_structural_hyp).
+
+:- begin_tests(hy_sequence_hyp).
+
+% Two-step: apply 1->2, then 2->3. Net: 1->3.
+test(sequence_two_step) :-
+    In  = [[1,0],[0,1]],
+    Out = [[3,0],[0,3]],
+    Maps1 = [[1-2]],
+    Maps2 = [[2-3]],
+    hy_sequence_hyp([pair(In, Out)], Maps1, Maps2, seq([1-2], [2-3])).
+
+% Consistent across two pairs.
+test(sequence_two_pairs) :-
+    A = pair([[1,0],[0,0]], [[3,0],[0,0]]),
+    B = pair([[0,1],[0,0]], [[0,3],[0,0]]),
+    Maps1 = [[1-2]],
+    Maps2 = [[2-3]],
+    hy_sequence_hyp([A, B], Maps1, Maps2, seq([1-2], [2-3])).
+
+% Identity maps leave grid unchanged.
+test(sequence_identity_maps) :-
+    P = pair([[1,2],[0,0]], [[1,2],[0,0]]),
+    hy_sequence_hyp([P], [[]], [[]], seq([], [])).
+
+% Fails when no combination explains all pairs.
+test(sequence_no_match_fails) :-
+    A = pair([[1,0],[0,0]], [[9,0],[0,0]]),
+    Maps1 = [[1-2]],
+    Maps2 = [[2-3]],
+    \+ hy_sequence_hyp([A], Maps1, Maps2, _).
+
+:- end_tests(hy_sequence_hyp).

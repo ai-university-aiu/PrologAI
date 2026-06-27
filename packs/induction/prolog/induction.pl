@@ -27,7 +27,11 @@
     % id_lost_colors/3: colors in input that are not in output.
     id_lost_colors/3,
     % id_grid_dims/3: rows and columns of a grid.
-    id_grid_dims/3
+    id_grid_dims/3,
+    % id_cross_pair_invariants/2: properties that hold for every pair in a list.
+    id_cross_pair_invariants/2,
+    % id_cross_pair_variants/2: properties that hold for SOME but not ALL pairs.
+    id_cross_pair_variants/2
 ]).
 
 % Import list and apply utilities.
@@ -180,3 +184,54 @@ id_scale_factor(Input, Output, K) :-
     id_grid_dims(Input, InR, _),
     id_grid_dims(Output, OutR, _),
     K is OutR // InR.
+
+% id_cross_pair_invariants(+Pairs, -Invariants)
+% Invariants is the sorted list of property atoms that hold for every pair in Pairs.
+% Pairs is a list of pair(InGrid, OutGrid) terms.
+% Property atoms tested: dims_preserved, colors_preserved, total_nonzero_preserved,
+%   monotone_input, monotone_output, bg_preserved, scale_preserved.
+id_cross_pair_invariants(Pairs, Invariants) :-
+    AllProps = [dims_preserved, colors_preserved, total_nonzero_preserved,
+                monotone_input, monotone_output, bg_preserved, scale_preserved],
+    include(id_prop_holds_all_(Pairs), AllProps, Invariants).
+
+% id_prop_holds_all_(+Pairs, +Prop): succeed if Prop holds for every pair.
+id_prop_holds_all_(Pairs, Prop) :-
+    forall(member(pair(In, Out), Pairs),
+           id_pair_prop_(Prop, In, Out)).
+
+% id_pair_prop_(+Prop, +In, +Out): test one property for a single pair.
+id_pair_prop_(dims_preserved, In, Out) :-
+    id_grid_dims(In, R, C), id_grid_dims(Out, R, C).
+id_pair_prop_(colors_preserved, In, Out) :-
+    id_input_colors(In, CI), id_output_colors(Out, CO), CI = CO.
+id_pair_prop_(total_nonzero_preserved, In, Out) :-
+    id_flat_(In, FI), include([V]>>(V \= 0), FI, NZI),
+    id_flat_(Out, FO), include([V]>>(V \= 0), FO, NZO),
+    length(NZI, N), length(NZO, N).
+id_pair_prop_(monotone_input, In, _) :-
+    id_input_colors(In, CI0), subtract(CI0, [0], CI), length(CI, 1).
+id_pair_prop_(monotone_output, _, Out) :-
+    id_output_colors(Out, CO0), subtract(CO0, [0], CO), length(CO, 1).
+id_pair_prop_(bg_preserved, In, Out) :-
+    findall(R-C, (nth0(R, In,  InRow),  nth0(C, InRow,  0)), BgIn),
+    findall(R-C, (nth0(R, Out, OutRow), nth0(C, OutRow, 0)), BgOut),
+    msort(BgIn, S1), msort(BgOut, S2), S1 = S2.
+id_pair_prop_(scale_preserved, In, Out) :-
+    id_grid_dims(In, R, C), id_grid_dims(Out, R, C).
+
+% id_cross_pair_variants(+Pairs, -Variants)
+% Variants is the sorted list of property atoms that hold for SOME but not ALL pairs.
+% Properties that hold for zero pairs are excluded (they are simply absent from both lists).
+id_cross_pair_variants(Pairs, Variants) :-
+    AllProps = [dims_preserved, colors_preserved, total_nonzero_preserved,
+                monotone_input, monotone_output, bg_preserved, scale_preserved],
+    id_cross_pair_invariants(Pairs, Invariants),
+    include(id_prop_holds_some_(Pairs), AllProps, HoldsSome),
+    subtract(HoldsSome, Invariants, Variants).
+
+% id_prop_holds_some_(+Pairs, +Prop): succeed if Prop holds for at least one pair.
+id_prop_holds_some_(Pairs, Prop) :-
+    member(pair(In, Out), Pairs),
+    id_pair_prop_(Prop, In, Out),
+    !.

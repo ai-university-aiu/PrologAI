@@ -33,7 +33,9 @@
     % sq_explain/3: return BestSeq and its coverage count for a pair list.
     sq_explain/3,
     % sq_verify_all/2: succeed if Rules correctly transform every pair.
-    sq_verify_all/2
+    sq_verify_all/2,
+    % sq_arc2_candidates/1: ARC-AGI-2-relevant extended primitive rule candidates.
+    sq_arc2_candidates/1
 ]).
 
 % Import list utilities.
@@ -256,3 +258,33 @@ sq_explain(Rules, Pairs, Coverage) :-
 % sq_verify_all(+Rules, +Pairs): succeed if Rules transforms every pair correctly.
 sq_verify_all(Rules, Pairs) :-
     sq_consistent(Rules, Pairs).
+
+% sq_arc2_candidates(-Rules)
+% Extended rule candidate list for multi-step search on harder compositional tasks.
+% Uses integer colors 0-9 (standard ARC encoding) instead of atom colors.
+% Superset of sq_default_rules tuned for the four ARC-AGI-2 difficulty flavours:
+% multi-rule compositional, multi-step sequential, context-gated, symbol-defined.
+sq_arc2_candidates([
+    identity,
+    recolor(1, 2), recolor(2, 1), recolor(1, 3), recolor(3, 1),
+    recolor(1, 4), recolor(4, 1), recolor(1, 5), recolor(5, 1),
+    recolor(1, 6), recolor(6, 1), recolor(2, 3), recolor(3, 2),
+    recolor(2, 4), recolor(4, 2), recolor(2, 5), recolor(5, 2),
+    recolor(3, 4), recolor(4, 3), recolor(3, 5), recolor(5, 3),
+    recolor(4, 5), recolor(5, 4), recolor(4, 6), recolor(6, 4),
+    recolor(5, 6), recolor(6, 5),
+    recolor_all(1), recolor_all(2), recolor_all(3),
+    recolor_all(4), recolor_all(5), recolor_all(6),
+    shift(0, 1), shift(0, -1), shift(1, 0), shift(-1, 0),
+    shift(1, 1), shift(1, -1), shift(-1, 1), shift(-1, -1),
+    shift(2, 0), shift(-2, 0), shift(0, 2), shift(0, -2),
+    shift(3, 0), shift(-3, 0), shift(0, 3), shift(0, -3),
+    to_origin,
+    reflect_h, reflect_v,
+    remove_color(1), remove_color(2), remove_color(3),
+    remove_color(4), remove_color(5), remove_color(6),
+    keep_color(1), keep_color(2), keep_color(3),
+    keep_color(4), keep_color(5), keep_color(6),
+    sort_size_desc, sort_size_asc,
+    top_n(1), top_n(2), top_n(3)
+]).
