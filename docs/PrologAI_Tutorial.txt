@@ -18954,3 +18954,23 @@ center column respectively.
 :- use_module(pack(gridpos/prolog/gridpos)).
 
 14 gps_* predicates. 44 tests pass. Layer 222.
+
+Chapter 200: gridgrav Pack - Grid Gravity Simulation (gv_*, Layer 223)
+
+The gridgrav pack (Layer 223) provides fourteen predicates for simulating gravity
+within a raw grid. Non-background (non-bg) cells are those whose color differs
+from a user-specified BgColor. gv_fall_down/3 settles non-bg cells to the bottom
+of each column; gv_fall_up/3 to the top; gv_fall_left/3 to the left of each row;
+gv_fall_right/3 to the right. All four preserve relative order within each row or
+column. gv_col_pile_h/4 and gv_row_pile_w/4 count non-bg cells in a column or row.
+gv_all_col_piles/3 and gv_all_row_piles/3 return these counts for all columns or
+rows. gv_floating_cells/3 returns R-C pairs of non-bg cells with a bg cell directly
+below (cells that would move under down gravity). gv_settled/2 succeeds if no
+floating cells exist. gv_col_gap_above/4 counts bg cells at the top of a column
+above the first non-bg cell. gv_max_col_pile/3 and gv_min_col_pile/3 find the
+column with the most or fewest non-bg cells (ties: lowest index).
+gv_non_bg_count/3 returns the total non-bg cell count.
+
+:- use_module(pack(gridgrav/prolog/gridgrav)).
+
+14 gv_* predicates. 44 tests pass. Layer 223.
