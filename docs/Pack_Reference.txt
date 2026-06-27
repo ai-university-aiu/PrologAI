@@ -1417,3 +1417,20 @@ Grid Patch Operations: Extract, Place, Overlay, Find, Tile, Scatter, and Inpaint
     gpt_eq/2: check if two patches are identical
     gpt_inpaint/7: fill rectangle [R0..R1] x [C0..C1] in Grid with Color
     gpt_replace_first/4: replace first (top-left) matching OldPatch occurrence with NewPatch
+
+gridscan
+Grid Ray Scanning: First Hit, Distance, Row/Column Content, and Blocking Detection in Four Directions (gsn_*, Layer 228)
+    gsn_scan_row/4: non-BgColor cells in row R as C-V pairs ordered by column
+    gsn_scan_col/4: non-BgColor cells in column C as R-V pairs ordered by row
+    gsn_first_right/5: first non-BgColor cell to the right of column C0 in row R as C-V
+    gsn_first_left/5: nearest non-BgColor cell to the left of column C0 in row R as C-V
+    gsn_first_down/5: first non-BgColor cell below row R0 in column C as R-V
+    gsn_first_up/5: nearest non-BgColor cell above row R0 in column C as R-V
+    gsn_dist_right/5: D = C_hit - C0 to first non-BgColor going right; fails if none
+    gsn_dist_left/5: D = C0 - C_hit to nearest non-BgColor going left; fails if none
+    gsn_dist_down/5: D = R_hit - R0 to first non-BgColor going down; fails if none
+    gsn_dist_up/5: D = R0 - R_hit to nearest non-BgColor going up; fails if none
+    gsn_blocked_right/4: succeeds if any non-BgColor cell exists to the right of C0
+    gsn_blocked_left/4: succeeds if any non-BgColor cell exists to the left of C0
+    gsn_blocked_down/4: succeeds if any non-BgColor cell exists below R0
+    gsn_blocked_up/4: succeeds if any non-BgColor cell exists above R0
