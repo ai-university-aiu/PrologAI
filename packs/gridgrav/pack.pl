@@ -1,5 +1,10 @@
+% Pack metadata for gridgrav.
 name(gridgrav).
+% Version 1.0.0: initial release.
 version('1.0.0').
-title('Grid Gravity Simulation: Settlement in Four Directions, Pile Analysis, and Floating Cell Detection (gv_*, Layer 223)').
+% Full title describing all fourteen predicates and layer assignment.
+title('Grid Gravity and Sliding: Fall Down, Up, Left, Right, Blocked Fall, Column and Row Setters, Settled Test, and Gravity Score (gra_*, Layer 237)').
+% Author byline.
 author('D. R. Dison').
+% No inter-pack dependencies.
 requires([]).

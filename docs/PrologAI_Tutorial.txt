@@ -19313,3 +19313,28 @@ gxt_region_count/4   - count distinct 4-connected regions of a given color
 gxt_registry/3       - obj(Color,Count,BBox) for each unique non-bg color
 
 14 gxt_* predicates. 44 tests pass. Layer 236.
+
+Chapter 219: gridgrav - Grid Gravity and Sliding (gra_*, Layer 237)
+
+The gridgrav pack provides fourteen predicates for making non-bg cells fall or
+slide toward the edges of their rows and columns, with support for all four
+directions, blocked gravity, individual setters, and a settled-state test.
+
+:- use_module(pack(gridgrav/prolog/gridgrav)).
+
+gra_fall_down/3      - non-bg values sink to bottom of each column
+gra_fall_up/3        - non-bg values rise to top of each column
+gra_fall_left/3      - non-bg values slide to left of each row
+gra_fall_right/3     - non-bg values slide to right of each row
+gra_fall/4           - direction dispatch: down | up | left | right
+gra_col_nonbg/4      - collect non-bg values from a column, top to bottom
+gra_row_nonbg/4      - collect non-bg values from a row, left to right
+gra_set_col_bottom/5 - place values at bottom of column; bg fills above
+gra_set_col_top/5    - place values at top of column; bg fills below
+gra_set_row_left/5   - place values at left of row; bg fills to right
+gra_set_row_right/5  - place values at right of row; bg fills to left
+gra_blocked_fall/5   - gravity with BlockColor as immovable walls
+gra_is_settled/2     - true if fall_down leaves the grid unchanged
+gra_gravity_score/3  - count of cell positions displaced by fall_down
+
+14 gra_* predicates. 44 tests pass. Layer 237.

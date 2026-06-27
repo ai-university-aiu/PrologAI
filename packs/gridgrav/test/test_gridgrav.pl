@@ -1,308 +1,273 @@
+% Test suite for gridgrav (gra_*, Layer 237).
 :- use_module('../prolog/gridgrav.pl').
-
-% Test grids used throughout.
-% G1: 3x3 with bg=b and some non-bg cells.
-%   Row0: [a, b, b]
-%   Row1: [b, a, b]
-%   Row2: [b, b, a]
-g1([[a,b,b],[b,a,b],[b,b,a]]).
-
-% G2: 4x3 used for settlement tests.
-%   Row0: [b, x, b]
-%   Row1: [x, b, b]
-%   Row2: [b, b, x]
-%   Row3: [b, b, b]
-g2([[b,x,b],[x,b,b],[b,b,x],[b,b,b]]).
-
-% G3: 3x4 for row-based tests.
-%   Row0: [a, b, a, b]
-%   Row1: [b, b, b, b]
-%   Row2: [a, b, b, a]
-g3([[a,b,a,b],[b,b,b,b],[a,b,b,a]]).
-
-% G4: 3x3 already settled downward (non-bg at bottom).
-%   Row0: [b, b, b]
-%   Row1: [a, b, b]
-%   Row2: [a, a, a]
-g4([[b,b,b],[a,b,b],[a,a,a]]).
-
-% G5: 1x1 bg grid.
-g5([[b]]).
 
 :- begin_tests(gridgrav).
 
-% --- gv_fall_down ---
+% AC-GRA-001: gra_col_nonbg collects non-bg values from a column top to bottom.
+test('AC-GRA-001: col_nonbg basic') :-
+    Grid = [[b,r,b],[b,g,b]],
+    gra_col_nonbg(Grid, 1, b, Vals),
+    Vals = [r,g].
 
-% AC-GV-001: falling down settles all non-bg to the bottom of each column
-test(fall_down_g2) :-
-    g2(G), gv_fall_down(G, b, F),
-    F = [[b,b,b],[b,b,b],[b,b,b],[x,x,x]].
+% AC-GRA-002: gra_col_nonbg on all-bg column yields empty list.
+test('AC-GRA-002: col_nonbg empty column') :-
+    Grid = [[b,b],[b,b]],
+    gra_col_nonbg(Grid, 0, b, Vals),
+    Vals = [].
 
-% AC-GV-002: fall_down on diagonal grid
-test(fall_down_g1) :-
-    g1(G), gv_fall_down(G, b, F),
-    F = [[b,b,b],[b,b,b],[a,a,a]].
+% AC-GRA-003: gra_col_nonbg on all non-bg column yields all values.
+test('AC-GRA-003: col_nonbg full column') :-
+    Grid = [[r,b],[g,b]],
+    gra_col_nonbg(Grid, 0, b, Vals),
+    Vals = [r,g].
 
-% AC-GV-003: fall_down on already settled grid is idempotent
-test(fall_down_idempotent) :-
-    g4(G), gv_fall_down(G, b, F),
-    F = [[b,b,b],[a,b,b],[a,a,a]].
+% AC-GRA-004: gra_row_nonbg collects non-bg values from a row left to right.
+test('AC-GRA-004: row_nonbg basic') :-
+    Grid = [[b,r,b,g]],
+    gra_row_nonbg(Grid, 0, b, Vals),
+    Vals = [r,g].
 
-% --- gv_fall_up ---
+% AC-GRA-005: gra_row_nonbg on all-bg row yields empty list.
+test('AC-GRA-005: row_nonbg empty row') :-
+    Grid = [[b,b,b],[r,b,r]],
+    gra_row_nonbg(Grid, 0, b, Vals),
+    Vals = [].
 
-% AC-GV-004: falling up settles all non-bg to the top of each column
-test(fall_up_g2) :-
-    g2(G), gv_fall_up(G, b, F),
-    F = [[x,x,x],[b,b,b],[b,b,b],[b,b,b]].
+% AC-GRA-006: gra_row_nonbg on a second row with gaps.
+test('AC-GRA-006: row_nonbg partial') :-
+    Grid = [[b,b,b],[r,b,g]],
+    gra_row_nonbg(Grid, 1, b, Vals),
+    Vals = [r,g].
 
-% AC-GV-005: fall_up on diagonal grid
-test(fall_up_g1) :-
-    g1(G), gv_fall_up(G, b, F),
-    F = [[a,a,a],[b,b,b],[b,b,b]].
+% AC-GRA-007: gra_fall_down moves non-bg cells to the bottom of each column.
+test('AC-GRA-007: fall_down basic') :-
+    Grid = [[r,b],[b,b]],
+    gra_fall_down(Grid, b, Result),
+    Result = [[b,b],[r,b]].
 
-% AC-GV-006: fall_up followed by fall_down gives same as fall_down alone
-test(fall_up_then_down) :-
-    g2(G),
-    gv_fall_up(G, b, Up),
-    gv_fall_down(Up, b, UpDown),
-    gv_fall_down(G, b, Down),
-    UpDown = Down.
+% AC-GRA-008: gra_fall_down handles two non-bg cells in different columns.
+test('AC-GRA-008: fall_down two columns') :-
+    Grid = [[r,g],[b,b]],
+    gra_fall_down(Grid, b, Result),
+    Result = [[b,b],[r,g]].
 
-% --- gv_fall_left ---
+% AC-GRA-009: gra_fall_down is idempotent on an already-settled grid.
+test('AC-GRA-009: fall_down idempotent') :-
+    Grid = [[b,b],[r,g]],
+    gra_fall_down(Grid, b, Result),
+    Result = [[b,b],[r,g]].
 
-% AC-GV-007: falling left packs non-bg to the left of each row
-test(fall_left_g3) :-
-    g3(G), gv_fall_left(G, b, F),
-    F = [[a,a,b,b],[b,b,b,b],[a,a,b,b]].
+% AC-GRA-010: gra_fall_down on an all-bg grid makes no change.
+test('AC-GRA-010: fall_down all bg') :-
+    Grid = [[b,b],[b,b]],
+    gra_fall_down(Grid, b, Result),
+    Result = [[b,b],[b,b]].
 
-% AC-GV-008: fall_left on uniform bg row leaves it unchanged
-test(fall_left_uniform_row) :-
-    G = [[b,b,b],[a,b,a]],
-    gv_fall_left(G, b, F),
-    F = [[b,b,b],[a,a,b]].
+% AC-GRA-011: gra_fall_up moves non-bg cells to the top of each column.
+test('AC-GRA-011: fall_up basic') :-
+    Grid = [[b,b],[r,b]],
+    gra_fall_up(Grid, b, Result),
+    Result = [[r,b],[b,b]].
 
-% AC-GV-009: fall_left on fully non-bg row leaves it unchanged
-test(fall_left_full_row) :-
-    G = [[a,a,a]],
-    gv_fall_left(G, b, F),
-    F = [[a,a,a]].
+% AC-GRA-012: gra_fall_up on three-row grid with bottom-heavy non-bg.
+test('AC-GRA-012: fall_up three rows') :-
+    Grid = [[b,b,b],[r,g,y]],
+    gra_fall_up(Grid, b, Result),
+    Result = [[r,g,y],[b,b,b]].
 
-% --- gv_fall_right ---
+% AC-GRA-013: gra_fall_up is idempotent on a top-settled grid.
+test('AC-GRA-013: fall_up idempotent') :-
+    Grid = [[r,g,y],[b,b,b]],
+    gra_fall_up(Grid, b, Result),
+    Result = [[r,g,y],[b,b,b]].
 
-% AC-GV-010: falling right packs non-bg to the right of each row
-test(fall_right_g3) :-
-    g3(G), gv_fall_right(G, b, F),
-    F = [[b,b,a,a],[b,b,b,b],[b,b,a,a]].
+% AC-GRA-014: gra_fall_left slides non-bg values to the left of each row.
+test('AC-GRA-014: fall_left basic') :-
+    Grid = [[b,r,b]],
+    gra_fall_left(Grid, b, Result),
+    Result = [[r,b,b]].
 
-% AC-GV-011: fall_right on single-non-bg row
-test(fall_right_single) :-
-    G = [[b,b,x,b]],
-    gv_fall_right(G, b, F),
-    F = [[b,b,b,x]].
+% AC-GRA-015: gra_fall_left on a two-row grid, each with one non-bg cell.
+test('AC-GRA-015: fall_left two rows') :-
+    Grid = [[b,r,b],[g,b,b]],
+    gra_fall_left(Grid, b, Result),
+    Result = [[r,b,b],[g,b,b]].
 
-% AC-GV-012: fall_right then fall_left gives same non-bg count
-test(fall_right_then_left_count) :-
-    g3(G),
-    gv_fall_right(G, b, Right),
-    gv_fall_left(Right, b, BackLeft),
-    gv_non_bg_count(G, b, N1),
-    gv_non_bg_count(BackLeft, b, N2),
-    N1 = N2.
+% AC-GRA-016: gra_fall_left is idempotent on a left-settled grid.
+test('AC-GRA-016: fall_left idempotent') :-
+    Grid = [[r,g,b],[b,b,b]],
+    gra_fall_left(Grid, b, Result),
+    Result = [[r,g,b],[b,b,b]].
 
-% --- gv_col_pile_h ---
+% AC-GRA-017: gra_fall_right slides non-bg values to the right of each row.
+test('AC-GRA-017: fall_right basic') :-
+    Grid = [[b,r,b]],
+    gra_fall_right(Grid, b, Result),
+    Result = [[b,b,r]].
 
-% AC-GV-013: column pile height counts non-bg cells in that column
-test(col_pile_h_g1) :-
-    g1(G), gv_col_pile_h(G, 0, b, H),
-    H = 1.
+% AC-GRA-018: gra_fall_right on a row with two non-bg values preserves order.
+test('AC-GRA-018: fall_right two values') :-
+    Grid = [[r,b,g]],
+    gra_fall_right(Grid, b, Result),
+    Result = [[b,r,g]].
 
-% AC-GV-014: column with no non-bg has pile height 0
-test(col_pile_h_zero) :-
-    G = [[b,b],[b,b]],
-    gv_col_pile_h(G, 0, b, H),
-    H = 0.
+% AC-GRA-019: gra_fall_right is idempotent on a right-settled grid.
+test('AC-GRA-019: fall_right idempotent') :-
+    Grid = [[b,b,r]],
+    gra_fall_right(Grid, b, Result),
+    Result = [[b,b,r]].
 
-% AC-GV-015: column with all non-bg has pile height = grid height
-test(col_pile_h_full) :-
-    G = [[a],[a],[a]],
-    gv_col_pile_h(G, 0, b, H),
-    H = 3.
+% AC-GRA-020: gra_fall/4 dispatches correctly for direction down.
+test('AC-GRA-020: fall dispatch down') :-
+    Grid = [[r,b],[b,b]],
+    gra_fall(Grid, b, down, Result),
+    Result = [[b,b],[r,b]].
 
-% --- gv_row_pile_w ---
+% AC-GRA-021: gra_fall/4 dispatches correctly for direction up.
+test('AC-GRA-021: fall dispatch up') :-
+    Grid = [[b,b],[r,b]],
+    gra_fall(Grid, b, up, Result),
+    Result = [[r,b],[b,b]].
 
-% AC-GV-016: row pile width counts non-bg cells in that row
-test(row_pile_w_g3) :-
-    g3(G), gv_row_pile_w(G, 0, b, W),
-    W = 2.
+% AC-GRA-022: gra_fall/4 dispatches correctly for direction left.
+test('AC-GRA-022: fall dispatch left') :-
+    Grid = [[b,r,b]],
+    gra_fall(Grid, b, left, Result),
+    Result = [[r,b,b]].
 
-% AC-GV-017: all-bg row has pile width 0
-test(row_pile_w_zero) :-
-    g3(G), gv_row_pile_w(G, 1, b, W),
-    W = 0.
+% AC-GRA-023: gra_fall/4 dispatches correctly for direction right.
+test('AC-GRA-023: fall dispatch right') :-
+    Grid = [[b,r,b]],
+    gra_fall(Grid, b, right, Result),
+    Result = [[b,b,r]].
 
-% AC-GV-018: row with all non-bg has pile width = grid width
-test(row_pile_w_full) :-
-    G = [[a,a,a]],
-    gv_row_pile_w(G, 0, b, W),
-    W = 3.
+% AC-GRA-024: gra_set_col_bottom places values at the bottom of a column.
+test('AC-GRA-024: set_col_bottom basic') :-
+    Grid = [[b,b],[b,b],[b,b]],
+    gra_set_col_bottom(Grid, 1, [r,g], b, Result),
+    Result = [[b,b],[b,r],[b,g]].
 
-% --- gv_all_col_piles ---
+% AC-GRA-025: gra_set_col_bottom with empty vals fills column with bg.
+test('AC-GRA-025: set_col_bottom empty vals') :-
+    Grid = [[b,b],[b,b]],
+    gra_set_col_bottom(Grid, 0, [], b, Result),
+    Result = [[b,b],[b,b]].
 
-% AC-GV-019: all column piles for diagonal grid
-test(all_col_piles_g1) :-
-    g1(G), gv_all_col_piles(G, b, Piles),
-    Piles = [1,1,1].
+% AC-GRA-026: gra_set_col_bottom with vals equal to column height fills all rows.
+test('AC-GRA-026: set_col_bottom full column') :-
+    Grid = [[b,b],[b,b]],
+    gra_set_col_bottom(Grid, 0, [r,g], b, Result),
+    Result = [[r,b],[g,b]].
 
-% AC-GV-020: all column piles for g2 (cols 0=1, 1=1, 2=1)
-test(all_col_piles_g2) :-
-    g2(G), gv_all_col_piles(G, b, Piles),
-    Piles = [1,1,1].
+% AC-GRA-027: gra_set_col_top places values at the top of a column.
+test('AC-GRA-027: set_col_top basic') :-
+    Grid = [[b,b],[b,b],[b,b]],
+    gra_set_col_top(Grid, 0, [r,g], b, Result),
+    Result = [[r,b],[g,b],[b,b]].
 
-% AC-GV-021: all column piles for uniform bg grid
-test(all_col_piles_zeros) :-
-    G = [[b,b,b],[b,b,b]],
-    gv_all_col_piles(G, b, Piles),
-    Piles = [0,0,0].
+% AC-GRA-028: gra_set_col_top with empty vals fills column with bg.
+test('AC-GRA-028: set_col_top empty vals') :-
+    Grid = [[b,b],[b,b]],
+    gra_set_col_top(Grid, 0, [], b, Result),
+    Result = [[b,b],[b,b]].
 
-% --- gv_all_row_piles ---
+% AC-GRA-029: gra_set_col_top with vals equal to column height fills all rows.
+test('AC-GRA-029: set_col_top full column') :-
+    Grid = [[b,b],[b,b]],
+    gra_set_col_top(Grid, 1, [r,g], b, Result),
+    Result = [[b,r],[b,g]].
 
-% AC-GV-022: all row piles for diagonal grid
-test(all_row_piles_g1) :-
-    g1(G), gv_all_row_piles(G, b, Piles),
-    Piles = [1,1,1].
+% AC-GRA-030: gra_set_row_left places values at the left of a row.
+test('AC-GRA-030: set_row_left basic') :-
+    Grid = [[b,b,b],[b,b,b]],
+    gra_set_row_left(Grid, 0, [r,g], b, Result),
+    Result = [[r,g,b],[b,b,b]].
 
-% AC-GV-023: all row piles for g3 (rows 0=2, 1=0, 2=2)
-test(all_row_piles_g3) :-
-    g3(G), gv_all_row_piles(G, b, Piles),
-    Piles = [2,0,2].
+% AC-GRA-031: gra_set_row_left with empty vals fills row with bg.
+test('AC-GRA-031: set_row_left empty vals') :-
+    Grid = [[b,b],[b,b]],
+    gra_set_row_left(Grid, 0, [], b, Result),
+    Result = [[b,b],[b,b]].
 
-% AC-GV-024: sum of all col piles equals total non-bg count
-test(all_col_piles_sum) :-
-    g2(G),
-    gv_all_col_piles(G, b, Piles),
-    sumlist(Piles, Sum),
-    gv_non_bg_count(G, b, N),
-    Sum = N.
+% AC-GRA-032: gra_set_row_left with vals equal to row width fills whole row.
+test('AC-GRA-032: set_row_left full row') :-
+    Grid = [[b,b],[b,b]],
+    gra_set_row_left(Grid, 0, [r,g], b, Result),
+    Result = [[r,g],[b,b]].
 
-% --- gv_floating_cells ---
+% AC-GRA-033: gra_set_row_right places values at the right of a row.
+test('AC-GRA-033: set_row_right basic') :-
+    Grid = [[b,b,b],[b,b,b]],
+    gra_set_row_right(Grid, 0, [r], b, Result),
+    Result = [[b,b,r],[b,b,b]].
 
-% AC-GV-025: g2 has floating cells: (0,1), (1,0), and (2,2) each have bg directly below
-test(floating_cells_g2) :-
-    g2(G), gv_floating_cells(G, b, Cells),
-    Cells = [0-1, 1-0, 2-2].
+% AC-GRA-034: gra_set_row_right with empty vals fills row with bg.
+test('AC-GRA-034: set_row_right empty vals') :-
+    Grid = [[b,b],[b,b]],
+    gra_set_row_right(Grid, 1, [], b, Result),
+    Result = [[b,b],[b,b]].
 
-% AC-GV-026: already settled grid has no floating cells
-test(floating_cells_settled) :-
-    g4(G), gv_floating_cells(G, b, Cells),
-    Cells = [].
+% AC-GRA-035: gra_set_row_right with vals equal to row width fills whole row.
+test('AC-GRA-035: set_row_right full row') :-
+    Grid = [[b,b],[b,b]],
+    gra_set_row_right(Grid, 1, [r,g], b, Result),
+    Result = [[b,b],[r,g]].
 
-% AC-GV-027: diagonal grid has 2 floating cells (row 0 col 0, row 1 col 1)
-test(floating_cells_g1) :-
-    g1(G), gv_floating_cells(G, b, Cells),
-    Cells = [0-0, 1-1].
+% AC-GRA-036: gra_blocked_fall down: non-bg stops above BlockColor wall.
+test('AC-GRA-036: blocked_fall down basic') :-
+    Grid = [[r,b],[b,b],[blk,b],[g,b]],
+    gra_blocked_fall(Grid, b, blk, down, Result),
+    Result = [[b,b],[r,b],[blk,b],[g,b]].
 
-% --- gv_settled ---
+% AC-GRA-037: gra_blocked_fall up: non-bg stops below BlockColor wall.
+test('AC-GRA-037: blocked_fall up basic') :-
+    Grid = [[b,b],[r,b],[blk,b],[g,b]],
+    gra_blocked_fall(Grid, b, blk, up, Result),
+    Result = [[r,b],[b,b],[blk,b],[g,b]].
 
-% AC-GV-028: already settled grid satisfies gv_settled
-test(settled_true) :-
-    g4(G), gv_settled(G, b).
+% AC-GRA-038: gra_blocked_fall left: non-bg stops to right of BlockColor wall.
+test('AC-GRA-038: blocked_fall left basic') :-
+    Grid = [[b,r,blk,g]],
+    gra_blocked_fall(Grid, b, blk, left, Result),
+    Result = [[r,b,blk,g]].
 
-% AC-GV-029: g2 is not settled
-test(settled_false) :-
-    g2(G), \+ gv_settled(G, b).
+% AC-GRA-039: gra_blocked_fall right: non-bg stops to left of BlockColor wall.
+test('AC-GRA-039: blocked_fall right basic') :-
+    Grid = [[g,blk,r,b]],
+    gra_blocked_fall(Grid, b, blk, right, Result),
+    Result = [[g,blk,b,r]].
 
-% AC-GV-030: after fall_down a grid is settled
-test(settled_after_fall) :-
-    g2(G), gv_fall_down(G, b, F),
-    gv_settled(F, b).
+% AC-GRA-040: gra_is_settled succeeds when grid is already settled downward.
+test('AC-GRA-040: is_settled true') :-
+    Grid = [[b,b],[r,g]],
+    gra_is_settled(Grid, b).
 
-% --- gv_col_gap_above ---
+% AC-GRA-041: gra_is_settled fails when grid has unsettled cells.
+test('AC-GRA-041: is_settled false') :-
+    Grid = [[r,b],[b,b]],
+    \+ gra_is_settled(Grid, b).
 
-% AC-GV-031: column with non-bg at top has gap 0
-test(col_gap_above_zero) :-
-    g1(G), gv_col_gap_above(G, 0, b, Gap),
-    Gap = 0.
+% AC-GRA-042: gra_gravity_score is 0 for an already-settled grid.
+test('AC-GRA-042: gravity_score zero') :-
+    Grid = [[b,b],[r,g]],
+    gra_gravity_score(Grid, b, Score),
+    Score = 0.
 
-% AC-GV-032: column 1 of g2 has one bg cell at top before x
-test(col_gap_above_g2) :-
-    g2(G), gv_col_gap_above(G, 1, b, Gap),
-    Gap = 0.
+% AC-GRA-043: gra_gravity_score is 2 when one cell would move (one leave + one arrive).
+test('AC-GRA-043: gravity_score nonzero') :-
+    Grid = [[r,b],[b,b]],
+    gra_gravity_score(Grid, b, Score),
+    Score = 2.
 
-% AC-GV-033: all-bg column returns full column height as gap
-test(col_gap_above_all_bg) :-
-    G = [[b,b],[b,b],[b,b]],
-    gv_col_gap_above(G, 0, b, Gap),
-    Gap = 3.
-
-% --- gv_max_col_pile ---
-
-% AC-GV-034: max column pile for g1 is column 0 (all tied; lowest index wins)
-test(max_col_pile_g1) :-
-    g1(G), gv_max_col_pile(G, b, MaxC),
-    MaxC = 0.
-
-% AC-GV-035: max column pile in grid with clear winner
-test(max_col_pile_clear) :-
-    G = [[a,b,b],[a,b,b],[a,a,b]],
-    gv_max_col_pile(G, b, MaxC),
-    MaxC = 0.
-
-% AC-GV-036: max column pile tie goes to lowest index
-test(max_col_pile_tie) :-
-    G = [[a,a,b],[b,b,b],[b,b,b]],
-    gv_max_col_pile(G, b, MaxC),
-    MaxC = 0.
-
-% --- gv_min_col_pile ---
-
-% AC-GV-037: min column pile for g1 is column 0 (all tied; lowest index wins)
-test(min_col_pile_g1) :-
-    g1(G), gv_min_col_pile(G, b, MinC),
-    MinC = 0.
-
-% AC-GV-038: min column pile in grid with clear minimum
-test(min_col_pile_clear) :-
-    G = [[a,b,b],[a,b,b],[a,a,b]],
-    gv_min_col_pile(G, b, MinC),
-    MinC = 2.
-
-% AC-GV-039: min column pile includes zero-pile columns
-test(min_col_pile_zero) :-
-    G = [[b,b,a],[b,b,a],[b,b,a]],
-    gv_min_col_pile(G, b, MinC),
-    MinC = 0.
-
-% --- gv_non_bg_count ---
-
-% AC-GV-040: total non-bg count for g1 (3 cells)
-test(non_bg_count_g1) :-
-    g1(G), gv_non_bg_count(G, b, N),
-    N = 3.
-
-% AC-GV-041: total non-bg count for g2 (3 cells: x at 0-1, 1-0, 2-2)
-test(non_bg_count_g2) :-
-    g2(G), gv_non_bg_count(G, b, N),
-    N = 3.
-
-% AC-GV-042: total non-bg count for uniform bg grid is 0
-test(non_bg_count_zero) :-
-    g5(G), gv_non_bg_count(G, b, N),
-    N = 0.
-
-% AC-GV-043: non_bg_count is preserved after fall_down
-test(non_bg_count_preserved_fall) :-
-    g2(G),
-    gv_non_bg_count(G, b, N),
-    gv_fall_down(G, b, F),
-    gv_non_bg_count(F, b, NF),
-    N = NF.
-
-% AC-GV-044: non_bg_count is preserved after fall_left
-test(non_bg_count_preserved_left) :-
-    g3(G),
-    gv_non_bg_count(G, b, N),
-    gv_fall_left(G, b, F),
-    gv_non_bg_count(F, b, NF),
-    N = NF.
+% AC-GRA-044: integration: fall_down then col_nonbg then set_col_top restores original.
+test('AC-GRA-044: integration fall and restore') :-
+    Grid = [[r,b,b],[b,b,b]],
+    gra_fall_down(Grid, b, Fallen),
+    Fallen = [[b,b,b],[r,b,b]],
+    gra_col_nonbg(Fallen, 0, b, Vals),
+    Vals = [r],
+    gra_set_col_top(Fallen, 0, [r], b, Restored),
+    Restored = [[r,b,b],[b,b,b]],
+    gra_is_settled(Fallen, b).
 
 :- end_tests(gridgrav).
