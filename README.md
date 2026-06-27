@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       252 work packages — the complete cognitive engine (see below)
+├── packs/       253 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,7 +78,7 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 192 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 231 (gridmap).
+Layer 60 and above is the Data Layer: the 193 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 232 (gridrefl).
 
 The full layer table is in Architecture Section 0.4.
 
@@ -332,6 +332,7 @@ Everything is inspectable.
 | `gridwave` | Grid Wave Propagation: Color Expansion, Contraction, Frontier Detection, and Directional Shadows (gwv_*, Layer 229) (PR 339) |
 | `gridshift` | Grid Shifting and Cyclic Rolling: Linear Shifts, Toroidal Rolls, Per-Row/Column Rolls, Color Shift, and Offset (gsh_*, Layer 230) (PR 340) |
 | `gridmap` | Grid Color Mapping: Remap, Swap, Replace, Merge, Normalize, Palette, Mask, Invert, Cycle, and Map Composition (gmp_*, Layer 231) (PR 341) |
+| `gridrefl` | Grid Reflection and Rotation: Flip, Rotate, Transpose, Anti-Diagonal, Symmetry Detection, and Symmetry Completion (grf_*, Layer 232) (PR 342) |
 | `gridtile` | Grid Tiling Pattern Analysis: Period Detection, Tile Extraction, Tiling Verification, and Grid Construction from Tiles (gti_*, Layer 224) (PR 334) |
 | `gridgrav` | Grid Gravity Simulation: Settlement in Four Directions, Pile Analysis, and Floating Cell Detection (gv_*, Layer 223) (PR 333) |
 | `gridpos` | Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222) (PR 332) |
