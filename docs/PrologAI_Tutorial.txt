@@ -19412,3 +19412,21 @@ condition and H, W are unbound in the else branch. grs_mode_ uses arithmetic
 negation (Neg is -N) for sort keys. grs_fit_in uses round/1 for pixel rounding.
 
 See docs/tutorial/Ch223_GridResize.txt for full details and examples.
+
+Chapter 224: gridobj - Grid Object Operations (gob_*, Layer 242)
+
+The gridobj pack adds fourteen predicates for 4-connected component analysis
+and manipulation: BFS cell enumeration, color/size/bbox query, binary mask,
+bounding-box extraction, full object inventory, count, largest/smallest
+selection, flood fill, enclosed-region fill, object removal, and movement.
+
+Predicates: gob_object_cells/4, gob_object_color/4, gob_object_size/4,
+gob_object_bbox/4, gob_object_mask/5, gob_extract_object/5, gob_all_objects/3,
+gob_object_count/3, gob_largest_object/3, gob_smallest_object/3,
+gob_flood_fill/5, gob_fill_enclosed/4, gob_remove_object/5, gob_move_object/7.
+
+Key design: gob_bfs_ checks both Visited and the frontier tail (Rest) to prevent
+double-enqueueing. gob_fill_enclosed BFS-floods from all border Bg cells;
+unreachable Bg cells are enclosed. gob_move_object clips out-of-bounds cells.
+
+See docs/tutorial/Ch224_GridObj.txt for full details and examples.

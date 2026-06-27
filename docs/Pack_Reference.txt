@@ -1651,3 +1651,20 @@ Grid Resize and Scale Operations: Integer Scale Up/Down, Mode Downsample, Double
     grs_grid_size(+Grid,-H,-W): return row and column counts.
     grs_aspect_ratio(+Grid,-H,-W,-Ratio): H, W, and float W/H ratio.
     grs_is_square(+Grid): succeed if H = W.
+
+gridobj
+Grid Object Operations: Connected Component Cells, Color, Size, Bbox, Mask, Extract, All Objects, Count, Largest, Smallest, Flood Fill, Fill Enclosed, Remove, and Move (gob_*, Layer 242)
+    gob_object_cells(+Grid,+R,+C,-Cells): r(R,C) list for 4-connected component at (R,C) by BFS.
+    gob_object_color(+Grid,+R,+C,-Color): color of the connected component at (R,C).
+    gob_object_size(+Grid,+R,+C,-Size): cell count of the connected component at (R,C).
+    gob_object_bbox(+Grid,+R,+C,-BBox): tight bounding box r0(R0,C0,R1,C1) of the component.
+    gob_object_mask(+Grid,+R,+C,+Bg,-Mask): full-grid mask: component color where object, Bg elsewhere.
+    gob_extract_object(+Grid,+R,+C,+Bg,-Extracted): bbox subgrid of the component; non-component cells = Bg.
+    gob_all_objects(+Grid,+Bg,-Objects): ob(Color,Cells,BBox) list for all non-Bg connected components.
+    gob_object_count(+Grid,+Bg,-Count): count of distinct non-Bg connected components.
+    gob_largest_object(+Grid,+Bg,-Cells): cells of the component with the most cells.
+    gob_smallest_object(+Grid,+Bg,-Cells): cells of the component with the fewest cells.
+    gob_flood_fill(+Grid,+R,+C,+NewColor,-Result): replace connected component at (R,C) with NewColor.
+    gob_fill_enclosed(+Grid,+Bg,+FgColor,-Result): fill Bg regions with no path to the border with FgColor.
+    gob_remove_object(+Grid,+R,+C,+Bg,-Result): replace connected component at (R,C) with Bg.
+    gob_move_object(+Grid,+R,+C,+NewR,+NewC,+Bg,-Result): move component bbox top-left to (NewR,NewC).

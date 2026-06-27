@@ -18567,3 +18567,52 @@ AC-GRS-041: grs_scale_up([[r,g]],3,[[r,r,r,g,g,g],[r,r,r,g,g,g],[r,r,r,g,g,g]]).
 AC-GRS-042: grs_resize(Grid,2,2,b,Grid). (same dims = identity)
 AC-GRS-043: grs_embed_in([[r,g,b]],3,3,x,[[x,x,x],[r,g,b],[x,x,x]]).
 AC-GRS-044: integration - border_crop 4x4 by N=1, check size is 2x2.
+
+
+WP-263 Acceptance Criteria: gridobj Pack (gob_*, Layer 242)
+
+AC-GOB-001: gob_object_cells([[r,b],[b,b]],0,0,[r(0,0)]).
+AC-GOB-002: gob_object_cells([[r,r,b],[b,b,b]],0,0,Cells) - msort(Cells,[r(0,0),r(0,1)]).
+AC-GOB-003: gob_object_cells([[r,r,b],[r,b,b]],0,0,Cells) - msort(Cells,[r(0,0),r(0,1),r(1,0)]).
+AC-GOB-004: gob_object_color([[r,b],[b,b]],0,0,r).
+AC-GOB-005: gob_object_color([[r,g],[b,b]],0,1,g).
+AC-GOB-006: gob_object_size([[r,b],[b,b]],0,0,1).
+AC-GOB-007: gob_object_size([[r,r,r],[b,b,b]],0,0,3).
+AC-GOB-008: gob_object_bbox([[r,b],[b,b]],0,0,r0(0,0,0,0)).
+AC-GOB-009: gob_object_bbox([[r,r],[r,r]],0,0,r0(0,0,1,1)).
+AC-GOB-010: gob_object_bbox([[r,r,b],[r,b,b]],0,0,r0(0,0,1,1)).
+AC-GOB-011: gob_object_mask([[r,b],[b,b]],0,0,b,[[r,b],[b,b]]).
+AC-GOB-012: gob_object_mask([[r,b,g],[b,b,b]],0,0,b,[[r,b,b],[b,b,b]]).
+AC-GOB-013: gob_object_mask([[r,r,r],[b,b,b]],0,0,b,[[r,r,r],[b,b,b]]).
+AC-GOB-014: gob_extract_object([[r,b],[b,b]],0,0,b,[[r]]).
+AC-GOB-015: gob_extract_object([[b,r,r,b],[b,b,b,b]],0,1,b,[[r,r]]).
+AC-GOB-016: gob_extract_object([[r,r,b],[r,b,b],[b,b,b]],0,0,b,[[r,r],[r,b]]).
+AC-GOB-017: gob_all_objects([[r,b,g],[b,b,b]],b,Objects) - length(Objects,2),
+   member(ob(r,[r(0,0)],r0(0,0,0,0)),Objects), member(ob(g,[r(0,2)],r0(0,2,0,2)),Objects).
+AC-GOB-018: gob_all_objects([[b,b],[b,b]],b,[]).
+AC-GOB-019: gob_all_objects([[r,r],[r,r]],b,[ob(r,_,r0(0,0,1,1))]).
+AC-GOB-020: gob_object_count([[r,b,g],[b,b,b]],b,2).
+AC-GOB-021: gob_object_count([[b,b],[b,b]],b,0).
+AC-GOB-022: gob_object_count([[r,r],[r,r]],b,1).
+AC-GOB-023: gob_largest_object([[r,r,b],[b,b,g]],b,Cells) - length(Cells,2), msort(Cells,[r(0,0),r(0,1)]).
+AC-GOB-024: gob_largest_object([[r,r],[r,r]],b,Cells) - length(Cells,4).
+AC-GOB-025: gob_largest_object([[r,r,r],[g,b,y]],b,Cells) - length(Cells,3).
+AC-GOB-026: gob_smallest_object([[r,r,b],[b,b,g]],b,[r(1,2)]).
+AC-GOB-027: gob_smallest_object([[r,r],[r,r]],b,Cells) - length(Cells,4).
+AC-GOB-028: gob_smallest_object([[r,r,r],[g,b,y]],b,Cells) - length(Cells,1).
+AC-GOB-029: gob_flood_fill([[r,b],[b,b]],0,0,x,[[x,b],[b,b]]).
+AC-GOB-030: gob_flood_fill([[r,r],[r,b]],0,0,g,[[g,g],[g,b]]).
+AC-GOB-031: gob_flood_fill([[r,b,r],[r,b,r]],0,0,x,[[x,b,r],[x,b,r]]). (no Bg cross)
+AC-GOB-032: gob_fill_enclosed([[r,r,r],[r,b,r],[r,r,r]],b,x,[[r,r,r],[r,x,r],[r,r,r]]).
+AC-GOB-033: gob_fill_enclosed([[b,b,b],[b,r,b],[b,b,b]],b,x,Grid). (border Bg = no fill)
+AC-GOB-034: gob_fill_enclosed([[r,r,r,r,r],[r,b,r,b,r],[r,r,r,r,r]],b,x,[[r,r,r,r,r],[r,x,r,x,r],[r,r,r,r,r]]).
+AC-GOB-035: gob_remove_object([[r,b],[b,b]],0,0,b,[[b,b],[b,b]]).
+AC-GOB-036: gob_remove_object([[r,r,b],[b,b,g]],0,0,b,[[b,b,b],[b,b,g]]).
+AC-GOB-037: gob_remove_object([[r,r],[r,r]],0,0,b,[[b,b],[b,b]]).
+AC-GOB-038: gob_move_object([[r,b,b],[b,b,b]],0,0,0,2,b,[[b,b,r],[b,b,b]]).
+AC-GOB-039: gob_move_object([[r,r,b],[b,b,b],[b,b,b]],0,0,1,0,b,[[b,b,b],[r,r,b],[b,b,b]]).
+AC-GOB-040: gob_move_object([[r,b,g],[b,b,b]],0,0,1,0,b,Result) - gob_object_cells(Result,0,2,[r(0,2)]).
+AC-GOB-041: integration - extract L-shape from Grid, flood fill with g, result has g cells.
+AC-GOB-042: integration - remove r from [[r,b,g],[b,b,b]], count distinct objects = 1.
+AC-GOB-043: integration - all_objects count equals object_count for same grid.
+AC-GOB-044: integration - largest object from [[r,r,r],[g,b,b]] has size 3; extract gives [[r,r,r]].
