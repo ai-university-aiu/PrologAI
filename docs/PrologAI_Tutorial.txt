@@ -19501,3 +19501,23 @@ integer arithmetic. gom_constant_move fails for empty list. gom_appeared and
 gom_disappeared operate on color classes across the two lists.
 
 See docs/tutorial/Ch228_GridObjMatch.txt for full details and examples.
+
+Chapter 229: symtab - Symbol Table Learning from Input-Output Pairs (st_*, Layer 247)
+
+The symtab pack (Work Package 268, Layer 247) provides fourteen predicates for
+learning symbol-to-value mappings from training pairs. A symbol table is a list
+of sym(Feature, Value) terms that encode what each observable feature of an input
+object means in the output.
+
+Predicates: st_build_table/2, st_identify_symbols/2, st_contrastive_learn/2,
+st_apply_table/3, st_hole_count/2, st_lookup/3, st_entry_consistent/2,
+st_color_feature/2, st_size_feature/2, st_position_feature/3, st_is_symbol/2,
+st_candidate_symbols/2, st_score_table/3, st_best_table/3.
+
+Key design: symbol tables are sym(Feature,Value) lists. Features are color(C),
+size(N), holes(N), or pos(Q). st_contrastive_learn intersects candidate sym
+entries across all training pairs, keeping only entries consistent with every pair.
+st_hole_count uses bbox-area minus cell-count approximation. st_best_table
+selects the highest-scoring candidate table.
+
+See docs/tutorial/Ch229_SymTab.txt for full details and examples.

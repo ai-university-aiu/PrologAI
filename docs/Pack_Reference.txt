@@ -1736,3 +1736,20 @@ Object Matching and Change Detection Between Object Lists (gom_*, Layer 246)
     gom_disappeared(+Objs1,+Objs2,-Disappeared): objects in Objs1 with a color not present in Objs2.
     gom_same_structure(+Objs1,+Objs2): succeed if both lists have the same multiset of object colors.
     gom_count_change(+Objs1,+Objs2,-N): N = length(Objs2) - length(Objs1).
+
+symtab
+Symbol Table Learning from Input-Output Pairs (st_*, Layer 247)
+    st_build_table(+Pairs,-SymbolTable): learn sym(Feature,Value) table from pair(InputObjs,OutputObjs) list.
+    st_identify_symbols(+Pairs,-Symbols): find objects whose features co-vary with output changes.
+    st_contrastive_learn(+Pairs,-Findings): cross-pair analysis; keep only features consistent across all pairs.
+    st_apply_table(+SymbolTable,+InObjs,-ColorMap): apply table to produce cm(OldColor,NewColor) list.
+    st_hole_count(+Obj,-N): estimate enclosed gaps (bbox area minus cell count).
+    st_lookup(+SymbolTable,+Feature,-Value): retrieve value for feature; fails if absent.
+    st_entry_consistent(+sym(F,V),+Table): succeed if no entry in Table maps F to a different value.
+    st_color_feature(+Obj,-color(C)): extract color feature from ob/3.
+    st_size_feature(+Obj,-size(N)): extract size (cell count) feature from ob/3.
+    st_position_feature(+Obj,+dims(Rows,Cols),-pos(Q)): extract grid quadrant (tl/tr/bl/br).
+    st_is_symbol(+Obj,+ContentObjs): succeed if Obj is plausibly a symbol (small or unique color).
+    st_candidate_symbols(+InObjs,-Candidates): return smallest-quartile objects as symbol candidates.
+    st_score_table(+SymbolTable,+Pairs,-Score): count pairs correctly explained by SymbolTable.
+    st_best_table(+Tables,+Pairs,-Best): return the highest-scoring table from a list of candidates.
