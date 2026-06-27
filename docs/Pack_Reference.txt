@@ -1213,3 +1213,20 @@ griddiag
     gdi_uniform_main_diags/2: list of K values for which the main diagonal is uniform
     gdi_uniform_anti_diags/2: list of K values for which the anti-diagonal is uniform
     gdi_diag_length/3: number of cells on the K-th main diagonal
+
+gridframe
+    Grid Frame Analysis: Concentric Ring Depth, Frame Extraction, Uniformity, Fill, and Peel (gfr_*, Layer 216)
+    gfr_cell_depth/4: frame depth of cell (R,C): min(R,H-1-R,C,W-1-C); 0 = outermost border
+    gfr_frame/3: list of R-C pairs at frame depth D, in row-major order
+    gfr_max_depth/2: maximum frame depth = floor((min(H,W)-1)/2)
+    gfr_frame_count/2: number of distinct depths (max_depth + 1)
+    gfr_peel/2: inner (H-2)x(W-2) subgrid after removing the outermost frame; fails if H<3 or W<3
+    gfr_all_frames/2: list of frame cell-lists ordered from depth 0 to max_depth
+    gfr_frame_uniform/3: yes/no - all cells at depth D are the same color
+    gfr_frame_colors/3: deduplicated list of colors present at frame depth D
+    gfr_set_frame/4: grid with all cells at depth D replaced by Color
+    gfr_count_in_frame/4: count of Color occurrences at frame depth D
+    gfr_uniform_frames/2: list of depths for which the frame is uniform, ascending order
+    gfr_fill_frames/3: fill each frame D with Colors[D]; extra frames unchanged
+    gfr_innermost/2: R-C pairs at the maximum frame depth
+    gfr_onion_layers/2: list of D-Color pairs for uniform frames (onion/target pattern)
