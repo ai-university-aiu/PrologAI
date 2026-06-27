@@ -1536,3 +1536,16 @@ Grid Sequence Utilities: Consecutive Pairs, Sliding Windows, Zip, Take, Drop, Cy
     gch_reverse/2: reverse the sequence of grids
     gch_diff_counts/3: per-consecutive-pair count of differing cell positions
     gch_changes_mask/4: mark cells that differ between the first and last grid
+
+gridblend
+Grid Blending and Layered Composition: Overlay, Underlay, Stencil, Priority Stack, Checkerboard Blend, Stripe Blend, Threshold Replace, Merge Many, Dominant Color, and Composite (gbld_*, Layer 235)
+    gbld_overlay/4: overlay Top on Bottom - non-bg cells in Top win; bg cells reveal Bottom
+    gbld_underlay/4: underlay Top beneath Bottom - non-bg cells in Bottom win; bg cells reveal Top
+    gbld_stencil/4: keep Source only at positions where Stencil = StencilColor; else output SC
+    gbld_priority/3: reduce a list of grids with first grid as topmost layer
+    gbld_checker_blend/5: blend two grids by checkerboard position parity (R+C) mod 2
+    gbld_stripe_blend/5: blend two grids by horizontal row stripes of given width
+    gbld_threshold_replace/5: replace non-bg cells in rows where non-bg count >= threshold
+    gbld_merge_many/3: reduce a list of grids with last grid as topmost layer
+    gbld_dominant/3: per-cell plurality vote - most frequent non-bg value across a grid list
+    gbld_composite/4: mode-dispatched composite reduction: overlay | underlay | dominant

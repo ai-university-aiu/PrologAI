@@ -18228,3 +18228,52 @@ Tests: 44/44 pass
 SPARC volumes updated: Spec v221, Pseudo v213, Arch v215, Refinement v268, Completion v271
 Tutorial chapter: Ch216_GridChain.txt
 Mentova accomplishment: Acc_275
+
+AC-GBLD-001: gbld_overlay: top non-bg cell wins over bottom.
+AC-GBLD-002: gbld_overlay: bg in top reveals bottom cell.
+AC-GBLD-003: gbld_overlay: both non-bg → top wins.
+AC-GBLD-004: gbld_underlay: bottom non-bg cell wins over top.
+AC-GBLD-005: gbld_underlay: bg in bottom reveals top cell.
+AC-GBLD-006: gbld_underlay: both non-bg → bottom wins.
+AC-GBLD-007: gbld_stencil: keeps source only at mask-match positions.
+AC-GBLD-008: gbld_stencil: all mask positions match → identity of source.
+AC-GBLD-009: gbld_stencil: no mask positions match → all-SC output.
+AC-GBLD-010: gbld_priority: first grid on top of all others.
+AC-GBLD-011: gbld_priority: single grid → identity.
+AC-GBLD-012: gbld_priority: all grids contribute at non-overlapping positions.
+AC-GBLD-013: gbld_checker_blend: parity 0 on 2×2 → [[G1,G2],[G2,G1]].
+AC-GBLD-014: gbld_checker_blend: parity 1 on 2×2 → [[G2,G1],[G1,G2]].
+AC-GBLD-015: gbld_checker_blend: same grid → identity.
+AC-GBLD-016: gbld_stripe_blend: stripe width 1 alternates rows.
+AC-GBLD-017: gbld_stripe_blend: stripe width 2 on 4 rows.
+AC-GBLD-018: gbld_stripe_blend: same grid → identity.
+AC-GBLD-019: gbld_threshold_replace: row at threshold → replaced.
+AC-GBLD-020: gbld_threshold_replace: row below threshold → kept.
+AC-GBLD-021: gbld_threshold_replace: threshold 1 replaces all non-empty rows.
+AC-GBLD-022: gbld_merge_many: last grid on top.
+AC-GBLD-023: gbld_merge_many: single grid → identity.
+AC-GBLD-024: gbld_merge_many: later grids override earlier.
+AC-GBLD-025: gbld_dominant: majority wins at each cell.
+AC-GBLD-026: gbld_dominant: all-bg input → all-bg output.
+AC-GBLD-027: gbld_dominant: single grid → identity.
+AC-GBLD-028: gbld_composite overlay mode → priority reduction.
+AC-GBLD-029: gbld_composite underlay mode → merge_many reduction.
+AC-GBLD-030: gbld_composite dominant mode → dominant reduction.
+AC-GBLD-031: gbld_overlay: all-bg top → bottom.
+AC-GBLD-032: gbld_underlay: all-bg bottom → top.
+AC-GBLD-033: gbld_priority: empty list → [].
+AC-GBLD-034: gbld_merge_many: empty list → [].
+AC-GBLD-035: gbld_dominant: two identical grids → that grid.
+AC-GBLD-036: gbld_checker_blend: 3×3 parity 0 checkerboard.
+AC-GBLD-037: gbld_stencil: partial mask.
+AC-GBLD-038: gbld_threshold_replace: threshold 0 replaces all rows.
+AC-GBLD-039: gbld_overlay: single-cell grids.
+AC-GBLD-040: gbld_underlay: single-cell grids.
+AC-GBLD-041: gbld_stripe_blend: stripe width ≥ grid height → single stripe.
+AC-GBLD-042: gbld_composite overlay: single grid → identity.
+AC-GBLD-043: gbld_composite underlay: single grid → identity.
+AC-GBLD-044: gbld_overlay then gbld_underlay composition.
+Tests: 44/44 pass
+SPARC volumes updated: Spec v222, Pseudo v214, Arch v216, Refinement v269, Completion v272
+Tutorial chapter: Ch217_GridBlend.txt
+Mentova accomplishment: Acc_276

@@ -19268,3 +19268,24 @@ gch_diff_counts/3 - per-pair count of differing cell positions
 gch_changes_mask/4 - first-vs-last change mask with MarkColor
 
 14 gch_* predicates. 44 tests pass. Layer 234.
+
+Chapter 217: gridblend - Grid Blending and Layered Composition (gbld_*, Layer 235)
+
+The gridblend pack provides ten predicates for compositing grids in layers,
+applying spatial blend patterns, and reducing lists of grids to a single composite.
+All operations treat one designated BgColor as transparent.
+
+:- use_module(pack(gridblend/prolog/gridblend)).
+
+gbld_overlay/4           - Top over Bottom: non-bg in Top wins; bg reveals Bottom
+gbld_underlay/4          - Bottom over Top: non-bg in Bottom wins; bg reveals Top
+gbld_stencil/4           - keep Source only at StencilColor positions; else SC
+gbld_priority/3          - reduce list: first grid topmost (first non-bg wins)
+gbld_checker_blend/5     - blend by checkerboard parity (R+C) mod 2
+gbld_stripe_blend/5      - blend by horizontal row stripes of width StripeW
+gbld_threshold_replace/5 - replace non-bg cells in rows meeting a count threshold
+gbld_merge_many/3        - reduce list: last grid topmost (accumulate from bottom)
+gbld_dominant/3          - per-cell plurality vote across grid list
+gbld_composite/4         - mode-dispatched composite: overlay | underlay | dominant
+
+10 gbld_* predicates. 44 tests pass. Layer 235.
