@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       241 work packages — the complete cognitive engine (see below)
+├── packs/       242 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,7 +78,7 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 181 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 220 (gridseg).
+Layer 60 and above is the Data Layer: the 182 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 221 (gridhist).
 
 The full layer table is in Architecture Section 0.4.
 
@@ -325,6 +325,7 @@ Everything is inspectable.
 | `gridmask` | Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206) (PR 315) |
 | `gridxform` | Grid Transformations: Rotate, Flip, Transpose, Crop, Pad, Scale, Tile, Canonicalize (gx_*, Layer 207) (PR 317) |
 | `gridsymm` | Grid Symmetry: Detection, Completion, Violations, and Score (gsm_*, Layer 208) (PR 318) |
+| `gridhist` | Grid Histogram Analysis: Per-Row and Per-Column Color Frequency, Modal, and Entropy (ghst_*, Layer 221) (PR 331) |
 | `gridseg` | Grid Segmentation by Separator Rows and Columns: Split, Trim, and Panel Extraction (gsg_*, Layer 220) (PR 330) |
 | `gridrowcol` | Grid Row and Column Comparative Analysis: Extract, Compare, Sort, and Find Matching Rows and Columns (grc_*, Layer 219) (PR 329) |
 | `griddelta` | Grid Delta Analysis: Difference Detection, Change Maps, Color Transitions, and Grid Comparison (gdt_*, Layer 218) (PR 328) |
