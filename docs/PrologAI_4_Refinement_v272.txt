@@ -18326,3 +18326,101 @@ Tests: 44/44 pass
 SPARC volumes updated: Spec v223, Pseudo v215, Arch v217, Refinement v270, Completion v273
 Tutorial chapter: Ch218_GridExtract.txt
 Mentova accomplishment: Acc_277
+
+WP-258: gridgrav Pack (gra_*, Layer 237) - Acceptance Criteria
+
+AC-GRA-001: gra_col_nonbg basic: collects non-bg from mid column.
+AC-GRA-002: gra_col_nonbg empty column: all-bg yields empty list.
+AC-GRA-003: gra_col_nonbg full column: all non-bg yields all values.
+AC-GRA-004: gra_row_nonbg basic: collects non-bg from row.
+AC-GRA-005: gra_row_nonbg empty row: all-bg yields empty list.
+AC-GRA-006: gra_row_nonbg partial: second row with gaps.
+AC-GRA-007: gra_fall_down basic: single non-bg cell sinks to bottom.
+AC-GRA-008: gra_fall_down two columns: two non-bg cells in different columns.
+AC-GRA-009: gra_fall_down idempotent: already-settled grid unchanged.
+AC-GRA-010: gra_fall_down all bg: no change.
+AC-GRA-011: gra_fall_up basic: single non-bg cell rises to top.
+AC-GRA-012: gra_fall_up three rows: bottom row rises to top row.
+AC-GRA-013: gra_fall_up idempotent: top-settled grid unchanged.
+AC-GRA-014: gra_fall_left basic: single non-bg cell slides left.
+AC-GRA-015: gra_fall_left two rows: each row settles independently.
+AC-GRA-016: gra_fall_left idempotent: left-settled grid unchanged.
+AC-GRA-017: gra_fall_right basic: single non-bg cell slides right.
+AC-GRA-018: gra_fall_right two values: order preserved when packing right.
+AC-GRA-019: gra_fall_right idempotent: right-settled grid unchanged.
+AC-GRA-020: gra_fall/4 dispatch down.
+AC-GRA-021: gra_fall/4 dispatch up.
+AC-GRA-022: gra_fall/4 dispatch left.
+AC-GRA-023: gra_fall/4 dispatch right.
+AC-GRA-024: gra_set_col_bottom basic: values placed at bottom of column.
+AC-GRA-025: gra_set_col_bottom empty vals: column becomes all bg.
+AC-GRA-026: gra_set_col_bottom full column: vals fill entire column.
+AC-GRA-027: gra_set_col_top basic: values placed at top of column.
+AC-GRA-028: gra_set_col_top empty vals: column becomes all bg.
+AC-GRA-029: gra_set_col_top full column: vals fill entire column.
+AC-GRA-030: gra_set_row_left basic: values placed at left of row.
+AC-GRA-031: gra_set_row_left empty vals: row becomes all bg.
+AC-GRA-032: gra_set_row_left full row: vals fill entire row.
+AC-GRA-033: gra_set_row_right basic: values placed at right of row.
+AC-GRA-034: gra_set_row_right empty vals: row becomes all bg.
+AC-GRA-035: gra_set_row_right full row: vals fill entire row.
+AC-GRA-036: gra_blocked_fall down basic: non-bg stops above BlockColor.
+AC-GRA-037: gra_blocked_fall up basic: non-bg stops below BlockColor.
+AC-GRA-038: gra_blocked_fall left basic: non-bg stops right of BlockColor.
+AC-GRA-039: gra_blocked_fall right basic: non-bg stops left of BlockColor.
+AC-GRA-040: gra_is_settled true: settled grid passes test.
+AC-GRA-041: gra_is_settled false: unsettled grid fails test.
+AC-GRA-042: gra_gravity_score zero: settled grid scores 0.
+AC-GRA-043: gra_gravity_score nonzero: one moving cell scores 2.
+AC-GRA-044: integration: fall_down + col_nonbg + set_col_top round-trip.
+Tests: 44/44 pass
+SPARC volumes updated: Spec v224, Pseudo v216, Arch v218, Refinement v271, Completion v274
+Tutorial chapter: Ch219_GridGrav.txt
+Mentova accomplishment: Acc_278
+
+Part 249 - Work Package 259: gridstamp Acceptance Criteria (AC-GST-*)
+
+AC-GST-001: gst_canvas(2,3,b,Canvas) => [[b,b,b],[b,b,b]].
+AC-GST-002: gst_canvas(1,1,b,Canvas) => [[b]].
+AC-GST-003: gst_canvas(0,3,b,Canvas) => [].
+AC-GST-004: gst_stamp([[b,b,b],[b,b,b]],[[r]],0,1,b,R) => [[b,r,b],[b,b,b]].
+AC-GST-005: gst_stamp([[b,b],[b,b]],[[r,g],[y,p]],0,0,b,R) => [[r,g],[y,p]].
+AC-GST-006: gst_stamp([[r,b],[b,g]],[[b,x]],0,0,b,R) => [[r,x],[b,g]]. (transparent bg)
+AC-GST-007: gst_stamp_all([[b,b,b],[b,b,b]],[[r]],[r(0,0),r(1,2)],b,R) => [[r,b,b],[b,b,r]].
+AC-GST-008: gst_stamp_all([[r,b],[b,g]],[[x]],[],b,R) => [[r,b],[b,g]].
+AC-GST-009: gst_stamp_all([[b,b],[b,b]],[[r,g]],[r(1,0)],b,R) => [[b,b],[r,g]].
+AC-GST-010: gst_scatter([[b,b],[b,b]],r,[r(0,0),r(1,1)],b,R) => [[r,b],[b,r]].
+AC-GST-011: gst_scatter([[b,b],[b,b]],r,[],b,R) => [[b,b],[b,b]].
+AC-GST-012: gst_scatter([[b,b,b]],r,[r(0,1)],b,R) => [[b,r,b]].
+AC-GST-013: gst_find_matches([[r,b,r],[b,b,b]],[[r]],b,M) => [r(0,0),r(0,2)].
+AC-GST-014: gst_find_matches([[b,b],[b,b]],[[r]],b,M) => [].
+AC-GST-015: gst_find_matches([[r,r,b],[r,r,b],[b,b,b]],[[r,r],[r,r]],b,M) => [r(0,0)].
+AC-GST-016: gst_stamp_count([[r,b,r],[b,b,b]],[[r]],b,C) => 2.
+AC-GST-017: gst_stamp_count([[b,b],[b,b]],[[r]],b,C) => 0.
+AC-GST-018: gst_stamp_count([[r,b,r],[b,r,b]],[[r]],b,C) => 3.
+AC-GST-019: gst_pad([[r,b],[g,b]],3,4,b,R) => [[r,b,b,b],[g,b,b,b],[b,b,b,b]].
+AC-GST-020: gst_pad([[r,b],[g,b]],2,2,b,R) => [[r,b],[g,b]].
+AC-GST-021: gst_pad([[r],[g]],2,3,b,R) => [[r,b,b],[g,b,b]].
+AC-GST-022: gst_unpad([[b,b,b],[b,r,b],[b,b,b]],b,R) => [[r]].
+AC-GST-023: gst_unpad([[r,g],[y,p]],b,R) => [[r,g],[y,p]].
+AC-GST-024: gst_unpad([[b,b],[b,b]],b,R) => [].
+AC-GST-025: gst_replicate_h([[r,b],[g,b]],2,b,R) => [[r,b,r,b],[g,b,g,b]].
+AC-GST-026: gst_replicate_h([[r,b],[g,b]],1,b,R) => [[r,b],[g,b]].
+AC-GST-027: gst_replicate_v([[r,g]],3,b,R) => [[r,g],[r,g],[r,g]].
+AC-GST-028: gst_border([[r,g],[y,p]],x,1,b,R) => [[x,x,x,x],[x,r,g,x],[x,y,p,x],[x,x,x,x]].
+AC-GST-029: gst_border([[r]],x,2,b,R) => [[x,x,x,x,x],[x,x,x,x,x],[x,x,r,x,x],[x,x,x,x,x],[x,x,x,x,x]].
+AC-GST-030: gst_border([[r,g],[y,p]],x,0,b,R) => [[r,g],[y,p]].
+AC-GST-031: gst_center([[r]],3,3,b,R) => [[b,b,b],[b,r,b],[b,b,b]].
+AC-GST-032: gst_center([[r,g],[y,p]],2,2,b,R) => [[r,g],[y,p]].
+AC-GST-033: gst_center([[r,g,y]],1,5,b,R) => [[b,r,g,y,b]].
+AC-GST-034: gst_extract([[a,b,c],[d,e,f],[g,h,i]],0,1,2,2,S) => [[b,c],[e,f]].
+AC-GST-035: gst_extract([[r,g],[y,p]],0,0,2,2,S) => [[r,g],[y,p]].
+AC-GST-036: gst_extract([[a,b,c],[d,e,f]],1,2,1,1,S) => [[f]].
+AC-GST-037: gst_replace([[b,b,b],[b,b,b],[b,b,b]],1,1,[[r,g],[y,p]],R) => [[b,b,b],[b,r,g],[b,y,p]].
+AC-GST-038: gst_replace([[r,r],[r,r]],0,0,[[b,b],[b,b]],R) => [[b,b],[b,b]].
+AC-GST-039: gst_replace([[b,b],[b,b]],1,1,[[r,g],[y,p]],R) => [[b,b],[b,r]]. (clips at bounds)
+AC-GST-040: gst_replicate_v([[r,b],[g,b]],2,b,R) => [[r,b],[g,b],[r,b],[g,b]].
+AC-GST-041: gst_replicate_h([[r,g],[y,p]],3,b,R) => [[r,g,r,g,r,g],[y,p,y,p,y,p]].
+AC-GST-042: gst_stamp_all([[b,b,b]],[[r]],[r(0,0),r(0,0)],b,R) => [[r,b,b]].
+AC-GST-043: integration - canvas+stamp_all+find_matches: diagonal of 3 r cells, find 3 matches.
+AC-GST-044: integration - stamp then extract recovers stamp content exactly.

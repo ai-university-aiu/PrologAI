@@ -1583,3 +1583,20 @@ Grid Gravity and Sliding: Fall Down, Up, Left, Right, Blocked Fall, Column and R
     gra_blocked_fall/5: gravity in a named direction with BlockColor cells as immovable walls
     gra_is_settled/2: succeeds if gra_fall_down leaves the grid unchanged
     gra_gravity_score/3: count of cell positions that differ between grid and its fall_down result
+
+gridstamp
+Grid Stamping and Canvas Operations: Stamp, Scatter, Match Finding, Pad, Unpad, Replicate, Border, Center, Extract, Replace, and Canvas (gst_*, Layer 238)
+    gst_canvas(+H,+W,+Bg,-Canvas): blank H x W canvas filled with Bg.
+    gst_stamp(+Grid,+Stamp,+R0,+C0,+Bg,-Result): paste Stamp at (R0,C0), transparent Bg.
+    gst_stamp_all(+Grid,+Stamp,+Positions,+Bg,-Result): stamp at each r(R,C) in list.
+    gst_scatter(+Grid,+Color,+Positions,+Bg,-Result): place Color at each position (opaque).
+    gst_find_matches(+Grid,+Pattern,+Bg,-Matches): all top-left positions where Pattern fits exactly.
+    gst_stamp_count(+Grid,+Pattern,+Bg,-Count): count of pattern occurrences.
+    gst_pad(+Grid,+H,+W,+Bg,-Result): pad to at least H x W, anchored top-left.
+    gst_unpad(+Grid,+Bg,-Result): crop to tight bounding box of non-Bg content.
+    gst_replicate_h(+Grid,+N,+Bg,-Result): repeat N times side by side.
+    gst_replicate_v(+Grid,+N,+Bg,-Result): stack N times vertically.
+    gst_border(+Grid,+BorderColor,+T,+Bg,-Result): surround with border of thickness T.
+    gst_center(+Grid,+H,+W,+Bg,-Result): center on H x W canvas.
+    gst_extract(+Grid,+R0,+C0,+H,+W,-Subgrid): extract H x W subgrid at (R0,C0).
+    gst_replace(+Grid,+R0,+C0,+Patch,-Result): overwrite rectangle with Patch (opaque).

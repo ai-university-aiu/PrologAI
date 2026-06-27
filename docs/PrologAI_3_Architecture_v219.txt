@@ -9254,3 +9254,31 @@ Design notes:
   unifies with the original, the grid is already settled.
 - gra_gravity_score/3 counts positions where Grid and its fall_down result differ;
   a score of 2*N indicates N cells would move.
+
+ARCH-225: gridstamp Pack (Layer 238, gst_*)
+
+Layer: 238
+Module: gridstamp
+File: packs/gridstamp/prolog/gridstamp.pl
+Dependencies: library(lists) [member/2]; SWI-Prolog built-ins only.
+Public predicates (14):
+  gst_canvas/4, gst_stamp/6, gst_stamp_all/5, gst_scatter/5,
+  gst_find_matches/4, gst_stamp_count/4, gst_pad/5, gst_unpad/3,
+  gst_replicate_h/4, gst_replicate_v/4, gst_border/5, gst_center/5,
+  gst_extract/6, gst_replace/5
+Private helpers (3):
+  gst_min_list_/2, gst_max_list_/2 (bounding box for gst_unpad)
+  gst_matches_at_/5 (negation-as-failure cell match for gst_find_matches)
+
+Design notes:
+- gst_stamp uses transparency: only non-bg Stamp cells are collected as Mods;
+  bg cells in Stamp leave the underlying Grid cell unchanged.
+- gst_replace is opaque: all Patch cells overwrite regardless of color.
+- gst_center uses direct cell bounds arithmetic (no nested stamp call) to
+  avoid over-writing bg content already present in Grid.
+- gst_find_matches uses gst_matches_at_ with \+ to short-circuit on first
+  differing cell, making match rejection fast.
+- gst_replicate_v: findall(Row, (between(1,N,_), member(Row,Grid)), Result)
+  -- idiomatic repeat via backtracking over member, no explicit list concat.
+- gst_border: T=0 edge case returns Grid unchanged because findall over
+  between(1,0,_) yields zero rows/cells.

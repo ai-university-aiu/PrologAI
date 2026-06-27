@@ -14429,3 +14429,75 @@ gra_set_row_right(Grid,Row,Vals,Bg,R): NewRow=BgLeft++Vals; replace row in grid.
 gra_blocked_fall(Grid,Bg,Block,Dir,R): split at Block; settle each segment; reassemble.
 gra_is_settled(Grid,Bg): gra_fall_down(Grid,Bg,Grid) -- result unifies with original.
 gra_gravity_score(Grid,Bg,Score): Score=count(positions where Grid/=fall_down(Grid,Bg)).
+
+Part 249 - Work Package 259: gridstamp Pack Pseudocode (gst_*, Layer 238)
+
+WP-259-PSEUDO-001: gst_canvas(H, W, Bg, Canvas)
+  Canvas := [ [Bg * W] * H ]
+  -- Build H rows; each row is W copies of Bg.
+
+WP-259-PSEUDO-002: gst_stamp(Grid, Stamp, R0, C0, Bg, Result)
+  Mods := { gr(R0+SR, C0+SC, V) |
+              (SR,SC,V) in cells(Stamp), V != Bg,
+              R0+SR in [0,GH-1], C0+SC in [0,GW-1] }
+  Result[R][C] := if gr(R,C,MV) in Mods then MV else Grid[R][C]
+  -- Only non-bg stamp cells overwrite; bg stamp cells are transparent.
+
+WP-259-PSEUDO-003: gst_stamp_all(Grid, Stamp, Positions, Bg, Result)
+  Acc := Grid
+  for each r(R,C) in Positions:
+    Acc := gst_stamp(Acc, Stamp, R, C, Bg)
+  Result := Acc
+
+WP-259-PSEUDO-004: gst_scatter(Grid, Color, Positions, Bg, Result)
+  Result[R][C] := if r(R,C) in Positions then Color else Grid[R][C]
+  -- Unconditionally overwrites (including Bg cells).
+
+WP-259-PSEUDO-005: gst_find_matches(Grid, Pattern, Bg, Matches)
+  Matches := { r(R,C) | R in [0, GH-PH], C in [0, GW-PW],
+                 forall (PR,PC): Pattern[PR][PC] = Grid[R+PR][C+PC] }
+  -- If Pattern does not fit in Grid, Matches := [].
+
+WP-259-PSEUDO-006: gst_stamp_count(Grid, Pattern, Bg, Count)
+  Count := |gst_find_matches(Grid, Pattern, Bg)|
+
+WP-259-PSEUDO-007: gst_pad(Grid, H, W, Bg, Result)
+  ExtraCols := max(0, W - GW)
+  ExtraRows := max(0, H - GH)
+  PaddedRows := [ Row ++ [Bg * ExtraCols] | Row in Grid ]
+  Result := PaddedRows ++ [ [Bg * max(W,GW)] * ExtraRows ]
+
+WP-259-PSEUDO-008: gst_unpad(Grid, Bg, Result)
+  Rs := { R | exists C: Grid[R][C] != Bg }
+  Cs := { C | exists R: Grid[R][C] != Bg }
+  if Rs = {} then Result := []
+  else Result := Grid[minRs..maxRs][minCs..maxCs]
+
+WP-259-PSEUDO-009: gst_replicate_h(Grid, N, Bg, Result)
+  Result[R] := Row * N  -- row R of Grid repeated N times end-to-end.
+
+WP-259-PSEUDO-010: gst_replicate_v(Grid, N, Bg, Result)
+  Result := Grid * N  -- all Grid rows stacked N times.
+
+WP-259-PSEUDO-011: gst_border(Grid, BorderColor, T, Bg, Result)
+  NewW := GW + 2*T
+  TopRows := [ [BorderColor * NewW] * T ]
+  MiddleRows := [ [BorderColor*T] ++ GRow ++ [BorderColor*T] | GRow in Grid ]
+  BottomRows := [ [BorderColor * NewW] * T ]
+  Result := TopRows ++ MiddleRows ++ BottomRows
+
+WP-259-PSEUDO-012: gst_center(Grid, H, W, Bg, Result)
+  R0 := (H - GH) // 2
+  C0 := (W - GW) // 2
+  Result[R][C] :=
+    let SR := R - R0, SC := C - C0 in
+    if SR in [0,GH-1] and SC in [0,GW-1] then Grid[SR][SC] else Bg
+
+WP-259-PSEUDO-013: gst_extract(Grid, R0, C0, H, W, Subgrid)
+  Subgrid := Grid[R0..R0+H-1][C0..C0+W-1]
+
+WP-259-PSEUDO-014: gst_replace(Grid, R0, C0, Patch, Result)
+  Result[R][C] :=
+    let PR := R - R0, PC := C - C0 in
+    if PR in [0,PH-1] and PC in [0,PW-1] then Patch[PR][PC] else Grid[R][C]
+  -- Opaque: all Patch cells written regardless of color.
