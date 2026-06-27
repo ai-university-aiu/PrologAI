@@ -1146,7 +1146,7 @@ Tier 2 is the Data Layer (layers 60 and above).
 
 These are the perception, analysis, and transformation packs: color, shape, symmetry, fill, compare, grid operations, and everything that processes structured data.
 
-As of this writing, the highest Data Layer pack is gridpath on layer 205.
+As of this writing, the highest Data Layer pack is gridmask on layer 206.
 
 New packs always receive a layer number higher than all existing packs they depend on.
 
@@ -18539,3 +18539,28 @@ gpa_wavefront([[p,p,p],[p,p,p],[p,p,p]], 1, 1, 2, w, Cells).
 
 14 gpa_* predicates. 57 tests pass. Layer 205.
 All 57 tests pass. See docs/tutorial/Ch187_GridPath.txt for the full chapter.
+
+
+Chapter 180: gridmask Pack - Boolean Overlay, Union, Intersection, Difference, and Mask Operations (gm_*, Layer 206)
+
+The gridmask pack provides boolean mask operations: overlay, union, intersection,
+difference, inversion, mask gating, cell extraction, stamp paste, sub-grid
+extraction, comparison, and border/color mask generation.
+
+:- use_module(pack(gridmask/prolog/gridmask)).
+
+% Overlay br region on tl region:
+GA = [[r,r,x],[r,r,x],[x,x,x]], GB = [[x,x,x],[x,b,b],[x,b,b]].
+gm_overlay(GA, GB, x, r, R).
+% R = [[r,r,x],[r,b,b],[x,b,b]]
+
+% Color mask for red cells:
+gm_color_mask([[r,r,b],[b,r,r],[r,b,b]], r, sel, Mask).
+% Mask = [[sel,sel,bg],[bg,sel,sel],[sel,bg,bg]]
+
+% Border mask N=1 on 3x3:
+gm_border_mask([[p,p,p],[p,p,p],[p,p,p]], 1, M).
+% M = [[border,border,border],[border,interior,border],[border,border,border]]
+
+14 gm_* predicates. 44 tests pass. Layer 206.
+All 44 tests pass. See docs/tutorial/Ch188_GridMask.txt for the full chapter.

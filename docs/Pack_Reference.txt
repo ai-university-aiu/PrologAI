@@ -1043,3 +1043,20 @@ Grid Pathfinding: BFS Shortest Path, Distance Maps, Flood-N, Wavefront, Line-of-
     gpa_between_h/4: cells strictly interior to horizontal segment (endpoints excluded) in ascending column order
     gpa_between_v/4: cells strictly interior to vertical segment (endpoints excluded) in ascending row order
     gpa_region_path/5: shortest 4-path from any Color1 cell to any Color2 cell avoiding ObsColor; fails if no cells or no path
+
+gridmask
+Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206)
+    gm_overlay/5: overlay GridB (transparent where BgColor) onto GridA; non-BgColor cells of GridB replace GridA
+    gm_union/4: union of non-background regions; GridA color wins where both non-BgColor; else GridB color; else BgColor
+    gm_intersect/5: intersection: Result = FgColor where both grids non-BgColor; else BgColor (boolean AND)
+    gm_difference/5: A minus B: keep GridA cell where GridB is BgColor; else replace with BgOut (set subtraction)
+    gm_invert/4: swap foreground and background; non-BgColor -> BgColor; BgColor -> FgColor
+    gm_mask_apply/5: gate Grid through Mask; where Mask non-BgColor Grid value shows; where BgColor result is FillColor
+    gm_extract/4: keep only named R-C cells from Grid; all other cells become BgColor
+    gm_stamp/5: paste Stamp at (OriginR, OriginC); all Stamp cells overwrite Grid; out-of-bounds cells silently skipped
+    gm_compare/4: list of R-C positions where two same-dimension grids differ; empty list if identical
+    gm_equal/2: succeed if two grids are structurally identical (unification)
+    gm_sub/6: extract Height x Width sub-grid at (R0,C0); fails if sub-grid extends outside bounds
+    gm_paste/6: transparent paste; only non-BgColor Patch cells overwrite Grid; BgColor Patch cells are invisible
+    gm_border_mask/3: binary mask marking N-layer border cells as border and all other cells as interior
+    gm_color_mask/4: binary mask where target Color cells become FgColor and all other cells become bg

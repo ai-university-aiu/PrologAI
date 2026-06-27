@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       226 work packages — the complete cognitive engine (see below)
+├── packs/       227 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,7 +78,7 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 166 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 205 (gridpath).
+Layer 60 and above is the Data Layer: the 167 perception, analysis, and transformation packs that handle structured data, currently reaching Layer 206 (gridmask).
 
 The full layer table is in Architecture Section 0.4.
 
@@ -322,6 +322,7 @@ Everything is inspectable.
 | `objcopy` | Object Tiling and Multi-Copy Layout (PR 286) |
 | `objmatch` | Object-List Correspondence and Matching (PR 287) |
 | `gridnbr` | Grid Neighbor Analysis: Cell Adjacency, Morphological Ops, and Neighbor Counts (gn_*, Layer 199) (PR 308) |
+| `gridmask` | Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206) (PR 315) |
 | `gridpath` | Grid Pathfinding: BFS Shortest Path, Distance Maps, Flood-N, Wavefront, Line-of-Sight, and Region Path (gpa_*, Layer 205) (PR 314) |
 | `gridflood` | Grid Flood-Fill, Region Analysis, Hole Filling, and Connected Components (gf_*, Layer 204) (PR 313) |
 | `gridrun` | Grid Run-Length Encoding and Stripe Analysis: Row/Column Runs, Uniformity, Striped Grids, and Alternating Patterns (grl_*, Layer 203) (PR 312) |
@@ -373,11 +374,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v192` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v184` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v186` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v239` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v242` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v193` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v185` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v187` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v240` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v243` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---
