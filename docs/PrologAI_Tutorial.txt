@@ -19465,3 +19465,20 @@ grl_bbox_overlap uses standard interval test; adjacent single-cell bboxes do not
 overlap. grl_all_relations uses a findall over a 10-element Rel-Goal association.
 
 See docs/tutorial/Ch226_GridRelation.txt for full details and examples.
+
+Chapter 227: gridtransform - Grid Transformation Detection and Application (gtr_*, Layer 245)
+
+The gridtransform pack adds fourteen predicates for detecting color mappings between
+two grids, computing differences, and applying transformations.
+
+Predicates: gtr_color_map/3, gtr_apply_color_map/3, gtr_diff_cells/3,
+gtr_diff_count/3, gtr_same_cells/3, gtr_changed_colors/3, gtr_invert_map/2,
+gtr_compose_maps/3, gtr_is_identity_map/1, gtr_apply_changes/3, gtr_delta_grid/4,
+gtr_overlay/4, gtr_common_grid/4, gtr_is_color_permutation/2.
+
+Key design: color maps are cm(Old,New) sorted lists. gtr_color_map uses sort+
+consistency check. gtr_delta_grid and gtr_overlay compose: overlay(A,delta(A,B,Bg),Bg)=B.
+gtr_is_color_permutation requires both consistency (no ambiguous mapping) and
+injectivity (no two sources map to same target).
+
+See docs/tutorial/Ch227_GridTransform.txt for full details and examples.
