@@ -1366,3 +1366,20 @@ Grid Tiling Pattern Analysis: Period Detection, Tile Extraction, Tiling Verifica
     gti_tile_offset/5: tile-relative position TileR-TileC for cell (R,C) given periods (TH,TW)
     gti_all_tiles/4: list all TH x TW tile sub-grids in row-major order
     gti_crop_to_tile/2: extract the minimal tile (top-left h_period x w_period sub-grid)
+
+gridmark
+Grid Marking and Annotation: Mark Cells, Rows, Columns, Borders, Diagonals, Rectangles, and Checkerboards (gmk_*, Layer 225)
+    gmk_mark_cell/5: overwrite one cell (R,C) with MarkColor
+    gmk_mark_cells/4: overwrite a list of R-C pairs with MarkColor
+    gmk_mark_row/4: overwrite all cells in row R with MarkColor
+    gmk_mark_col/4: overwrite all cells in column C with MarkColor
+    gmk_mark_rect/7: overwrite cells in rectangle rows [R0..R1], cols [C0..C1]
+    gmk_mark_border/3: overwrite all outer-ring cells with MarkColor
+    gmk_mark_diagonal/3: overwrite main diagonal cells (R=C, both in range)
+    gmk_mark_anti_diagonal/3: overwrite anti-diagonal cells where R+C = W-1
+    gmk_mark_corners/3: overwrite the four corner cells with MarkColor
+    gmk_mark_cross/3: overwrite the center row (H//2) and center column (W//2)
+    gmk_marked_cells/3: list of R-C pairs for all cells with MarkColor in row-major order
+    gmk_is_marked/4: check if cell (R,C) has MarkColor
+    gmk_mark_checkerboard/3: overwrite all cells where (R+C) mod 2 = 0
+    gmk_erase/4: replace all cells of MarkColor with BgColor
