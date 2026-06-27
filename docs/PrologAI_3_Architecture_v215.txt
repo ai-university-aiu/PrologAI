@@ -9155,3 +9155,27 @@ Private helpers:
   ggl_mask_cells_/5 - apply mask cell by cell
   ggl_if_rows_/5 - apply conditional row by row
   ggl_if_cells_/5 - apply conditional cell by cell
+
+ARCH-221: gridchain Pack (gch_*, Layer 234)
+
+Location: packs/gridchain/
+Files: pack.pl, prolog/gridchain.pl, test/test_gridchain.pl
+Module: gridchain
+Exports: gch_pairs/2, gch_window/3, gch_zip/3, gch_take/3, gch_drop/3,
+         gch_nth/3, gch_all_same/1, gch_dedup/2, gch_cycle/3,
+         gch_interleave/3, gch_split_at/4, gch_reverse/2,
+         gch_diff_counts/3, gch_changes_mask/4
+Dependencies: library(lists) - member/2, nth0/3, reverse/2, last/2, append/3
+Layer: 234 (above gridlogic Layer 233)
+
+Design notes:
+- gch_pairs and gch_window use findall + nth0 indexing; deterministic by construction.
+- gch_zip and gch_interleave use cuts on the two empty-list base clauses to prevent
+  choicepoint warnings.
+- gch_all_same uses cuts on the [] and [_] base clauses.
+- gch_dedup uses an accumulator (Seen list) in the same pattern as gmp_unique_ordered_.
+- gch_take and gch_drop clamp to actual length with min/2 rather than failing.
+- gch_diff_counts delegates to gch_pairs and a recursive cell-diff helper with a cut
+  on the matching-value clause.
+- gch_changes_mask compares only first vs. last (using last/2), not all consecutive
+  pairs, for a clean single-pass result.

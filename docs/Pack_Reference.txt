@@ -1519,3 +1519,20 @@ Grid Logical Operations: Cell-Wise AND, OR, XOR, NOT, Subtract, Common, Differ, 
     ggl_mask/5: masking - keep Grid cell where MaskGrid = MaskColor; else bg
     ggl_if/5: conditional selection - CondGrid = CondColor → ThenGrid; else → ElseGrid
     ggl_filter/4: color filtering - keep cells in Colors list; else bg
+
+gridchain
+Grid Sequence Utilities: Consecutive Pairs, Sliding Windows, Zip, Take, Drop, Cycle, Interleave, Split, Dedup, Diff Counts, and Change Mask (gch_*, Layer 234)
+    gch_pairs/2: consecutive two-element sublists from a sequence: [[G1,G2],[G2,G3],...]
+    gch_window/3: all consecutive overlapping windows of width W
+    gch_zip/3: element-wise zip of two sequences into two-element sublists
+    gch_take/3: first N grids from a sequence (clamps to actual length)
+    gch_drop/3: drop the first N grids (clamps to actual length, returns [])
+    gch_nth/3: 0-indexed element access into a sequence
+    gch_all_same/1: succeed if all grids in the sequence are identical
+    gch_dedup/2: remove duplicate grids preserving first-occurrence order
+    gch_cycle/3: build a sequence of N copies of a single grid
+    gch_interleave/3: interleave two sequences element by element
+    gch_split_at/4: split a sequence at index N into Before and After sublists
+    gch_reverse/2: reverse the sequence of grids
+    gch_diff_counts/3: per-consecutive-pair count of differing cell positions
+    gch_changes_mask/4: mark cells that differ between the first and last grid

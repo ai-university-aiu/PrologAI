@@ -14360,3 +14360,21 @@ ggl_unanimous(Grids, Bg, R): R[r][c] = V if all grids agree G[r][c]=V (any value
 ggl_mask(Grid, Mask, MC, Bg, R): R[r][c] = Grid[r][c] if Mask[r][c]=MC; else Bg.
 ggl_if(Cond, CC, Then, Else, R): R[r][c] = Then[r][c] if Cond[r][c]=CC; else Else[r][c].
 ggl_filter(Grid, Colors, Bg, R): R[r][c] = Grid[r][c] if Grid[r][c] in Colors; else Bg.
+
+Part 245 - WP-255: gridchain (gch_*, Layer 234)
+
+gch_pairs(Grids, Pairs): if |Grids|>=2 then Pairs=[findall [G_i,G_{i+1}] for i in 0..N-2]; else Pairs=[].
+gch_window(Grids, W, Windows): if W<=N then Windows=findall sublist(Grids,i,W) for i in 0..N-W; else [].
+gch_zip([], _, []).  gch_zip(_, [], []).  gch_zip([G1|T1],[G2|T2],[[G1,G2]|R]) :- gch_zip(T1,T2,R).
+gch_take(Grids, N, Taken): N2=min(N,|Grids|); length(Taken,N2); append(Taken,_,Grids).
+gch_drop(Grids, N, Rest): N2=min(N,|Grids|); length(Prefix,N2); append(Prefix,Rest,Grids).
+gch_nth(Grids, N, G): nth0(N, Grids, G).
+gch_all_same([]). gch_all_same([_]). gch_all_same([G,G|R]) :- gch_all_same([G|R]).
+gch_dedup(Grids, Unique): accumulator Seen; skip if member(H,Seen); else prepend H and recurse.
+gch_cycle(Grid, N, Seq): Seq = findall(Grid, between(1,N,_), Seq).
+gch_interleave([],_,[]). gch_interleave(_,[],[]). gch_interleave([G1|T1],[G2|T2],[G1,G2|R]).
+gch_split_at(Grids, N, Before, After): length(Before,N); append(Before,After,Grids).
+gch_reverse(Grids, Rev): reverse(Grids, Rev).
+gch_diff_counts(Grids, _Bg, Counts): gch_pairs(Grids,Pairs); Counts=findall N per pair using cell-diff recursion.
+gch_changes_mask([G],Bg,_,Mask): all-Bg mask same size as G.
+gch_changes_mask([First|Rest],Bg,MC,Mask): last([First|Rest],Last); diff_mask_rows_(First,Last,Bg,MC,Mask).
