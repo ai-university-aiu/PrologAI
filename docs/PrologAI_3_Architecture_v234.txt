@@ -1,4 +1,4 @@
-PROLOGAI ARCHITECTURE  (v232)
+PROLOGAI ARCHITECTURE  (v234)
 
 HOW THE COMPONENTS FIT TOGETHER AND COMMUNICATE
 
@@ -9739,3 +9739,41 @@ Location: packs/induction/prolog/induction.pl
 Tests: packs/induction/test/test_induction.pl (9 new tests in 2 new test blocks).
 Private helper id_pair_prop_/3 and id_prop_holds_all_/2, id_prop_holds_some_/2 added.
 No new imports. Uses include/3, forall/2, subtract/3 already available.
+
+
+WP-278: periodfix Pack (ppf_*, Layer 253)
+Location: packs/periodfix/
+  prolog/periodfix.pl  - module periodfix, 14 public predicates
+  test/test_periodfix.pl - 30 PLUnit tests
+  pack.pl              - manifest
+Layer: 253, Prefix: ppf_
+Dependencies: library(lists), library(apply)
+Exports: ppf_list_period/2, ppf_majority/2, ppf_tile_from_list/3,
+  ppf_violations_list/4, ppf_repair_list/4, ppf_best_period_list/3,
+  ppf_tile_2d/4, ppf_violations_2d/5, ppf_repair_grid/5,
+  ppf_best_periods/3, ppf_single_violation_list/4, ppf_repair_single_list/4,
+  ppf_single_violation_2d/5, ppf_repair_single_grid/5
+Design notes:
+- A list has period P if List[i] = List[i mod P] for all i.
+- Majority-vote tile: modal value at each phase index (i mod P for lists, (r mod PH, c mod PW) for grids).
+- ppf_best_period_list and ppf_best_periods cap search at N//2 (or H//2, W//2) to
+  avoid the trivial full-length period that always reports zero violations.
+- ppf_run_mode_ uses a cut after head-match clause to remain deterministic.
+- ppf_single_violation_* predicates guarantee exactly one corruption; they fail on 0 or 2+.
+- No cross-pack dependencies.
+
+
+ARC-AGI-2 Wave 5: stub_rank_fill architectural note
+
+Location: Mentova/src/mentova/games/arc_benchmark_2.pl
+Layer: ARC-AGI-2 wave solver (not a Data Layer pack; lives in the Mentova game layer).
+Dependencies: uses arc2_bg_color_/2 (already in arc_benchmark_2.pl), standard
+  SWI-Prolog library predicates (findall/3, member/2, msort/2, between/3, nth0/3,
+  nth1/3, length/2, reverse/2, forall/2).
+Exports: arc2_named_rule(stub_rank_fill) registers the rule name; arc2_transform/3
+  and arc2_induce_rule/2 extend the existing benchmark dispatch protocol.
+Helper predicates (private to arc_benchmark_2 module):
+  arc2_srf_top_run_/5, arc2_srf_find_vbar_/8,
+  arc2_srf_apply_fills_/3, arc2_srf_in_fill_zone_/4.
+No new Data Layer pack is required; the rule is self-contained within the benchmark.
+Score impact: 4/120 = 3.33% -> 5/120 = 4.17% (+1 task, +0.83%).
