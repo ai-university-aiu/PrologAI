@@ -8,9 +8,9 @@ the Pseudocode (docs/PrologAI_2_Pseudocode_v233.txt) for how each work package r
 
 the Architecture (docs/PrologAI_3_Architecture_v236.txt) for where each piece lives,
 
-the Refinement (docs/PrologAI_4_Refinement_v289.txt) for testing and safety,
+the Refinement (docs/PrologAI_4_Refinement_v290.txt) for testing and safety,
 
-the Completion (docs/PrologAI_5_Completion_v295.txt) for release,
+the Completion (docs/PrologAI_5_Completion_v296.txt) for release,
 
 and the Demonstration Plan (docs/PrologAI_6_Demonstration_Mentova_v4.txt) for how Mentova is born, proven, and grown on the finished platform.
 

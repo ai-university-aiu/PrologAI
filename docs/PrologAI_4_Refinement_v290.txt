@@ -19185,3 +19185,51 @@ AC-SL-008: arc2_transform(staircase_lift, TestIn, TestOut) succeeds and
   produces the correct output for the test case of task 4c3d4a41.
 AC-SL-009: full benchmark run confirms 7/120 = 5.83% with no regressions.
   Passing tasks: 1818057f, 45a5af55, 4c3d4a41, 7b5033c1, 80a900e0, 97d7923e, e376de54.
+
+
+ARC-AGI-2 WAVE 8 ACCEPTANCE CRITERIA - BAR SORT
+
+AC-BS-001: arc2_bs_mode_/2 returns the most frequent element from a sorted list.
+  Example: arc2_bs_mode_([1,1,2,2,2,3], Mode) -> Mode = 2.
+AC-BS-002: arc2_bs_divider_(Grid, 8, DivIdx, DIV) returns DivIdx=6, DIV=6 for
+  train 0 of task 31f7f899 (divider at row 6, all 6s except bar positions).
+AC-BS-003: arc2_bs_bars_(DivRow, 0, 8, 6, Bars) returns Bars containing
+  bar(1,1,5), bar(6,6,2), bar(7,7,7), bar(8,8,1) for train 0 divider row.
+AC-BS-004: arc2_bs_count_up_(Grid, 6, 1, 5, 0, HA) returns HA=4 for train 0
+  (color 5 in column 1 at rows 2,3,4,5 above divider row 6).
+AC-BS-005: arc2_bs_count_dn_(Grid, 6, 13, 1, 5, 0, HB) returns HB=4 for train 0.
+AC-BS-006: msort([4-4, 3-3, 2-2, 1-1], Sorted) = [1-1, 2-2, 3-3, 4-4] confirms
+  the height pairs sort correctly by ascending above-height.
+AC-BS-007: arc2_transform(bar_sort, TrainIn0, Out0) succeeds and produces the
+  correct output for training pair 0 of task 31f7f899.
+AC-BS-008: arc2_transform(bar_sort, TrainIn1, Out1) succeeds and produces the
+  correct output for training pair 1 of task 31f7f899.
+AC-BS-009: arc2_transform(bar_sort, TrainIn2, Out2) succeeds and produces the
+  correct output for training pair 2 of task 31f7f899.
+AC-BS-010: arc2_transform(bar_sort, TestIn, TestOut) succeeds and produces the
+  correct output for the test case of task 31f7f899.
+AC-BS-011: full benchmark run confirms 8/120 = 6.67% with no regressions.
+  Passing tasks: 1818057f, 31f7f899, 45a5af55, 4c3d4a41, 7b5033c1, 80a900e0,
+  97d7923e, e376de54.
+
+ARC-AGI-2 WAVE 9 ACCEPTANCE CRITERIA - PANEL OVERLAY
+
+AC-PO-001: arc2_po_seed_(Positions, Seed) succeeds when exactly one member of
+  Positions has no 8-connected neighbor also in Positions.
+  Example: arc2_po_seed_([r(0,2),r(0,4),r(1,2),r(2,2),r(2,3),r(2,4)], r(0,4)).
+AC-PO-002: arc2_po_flood4_(r(0,4), [r(0,2),r(1,2),r(2,2),r(2,3),r(2,4)], R)
+  returns R = {r(0,3),r(0,4),r(1,3),r(1,4)} for the test panel wall of task
+  7491f3cf (L-shaped wall blocks all other directions).
+AC-PO-003: arc2_transform(panel_overlay, TrainIn0, Out0) succeeds and produces
+  the correct output for training pair 0 of task 7491f3cf.
+AC-PO-004: arc2_transform(panel_overlay, TrainIn1, Out1) succeeds and produces
+  the correct output for training pair 1 of task 7491f3cf.
+AC-PO-005: arc2_transform(panel_overlay, TrainIn2, Out2) succeeds and produces
+  the correct output for training pair 2 of task 7491f3cf.
+AC-PO-006: arc2_transform(panel_overlay, TrainIn3, Out3) succeeds and produces
+  the correct output for training pair 3 of task 7491f3cf.
+AC-PO-007: arc2_transform(panel_overlay, TestIn, TestOut) succeeds and produces
+  the correct output for the test case of task 7491f3cf.
+AC-PO-008: full benchmark run confirms 9/120 = 7.50% with no regressions.
+  Passing tasks: 1818057f, 31f7f899, 45a5af55, 4c3d4a41, 7491f3cf, 7b5033c1,
+  80a900e0, 97d7923e, e376de54.
