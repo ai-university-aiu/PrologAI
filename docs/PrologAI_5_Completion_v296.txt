@@ -7841,3 +7841,31 @@ New predicates: arc2_sl_col_h_/3, arc2_sl_count_up_/5, arc2_sl_bar_/4,
 arc2_sl_first_color_/5, arc2_sl_run_len_/5, arc2_sl_out_/4, arc2_sl_val_/4.
 File: Mentova/src/mentova/games/arc_benchmark_2.pl
 SPARC: Specification v241, Pseudocode v233, Architecture v236, Refinement v288, Completion v294
+
+
+ARC-AGI-2 WAVE 8 COMPLETION RECORD
+
+Date: 2026-06-28
+Score: 8 / 120 = 6.67%
+Task solved: 31f7f899
+Rule: bar_sort - the grid contains a horizontal divider row (first row with no
+background cells) and N vertical color bars crossing it. Each bar extends HA rows
+above and HB rows below the divider. The rule sorts bars left-to-right by their
+above-height HA in ascending order, reassigning each bar slot's color to the sorted
+position while preserving bar widths and the divider row exactly.
+New predicates: arc2_bs_mode_/2, arc2_bs_divider_/4, arc2_bs_bars_/5,
+arc2_bs_run_/5, arc2_bs_heights_/4, arc2_bs_count_up_/6, arc2_bs_count_dn_/7,
+arc2_bs_cell_/8, arc2_bs_bar_covers_/6.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+SPARC: Specification v241, Pseudocode v233, Architecture v236, Refinement v289, Completion v295
+
+ARC-AGI-2 Wave 9: panel_overlay - Four-panel flood-fill boundary rule (task 7491f3cf).
+The input grid has four 5x5 panels. Panel 1 defines a wall (main 8-connected
+component) plus a seed (isolated extra cell). A 4-connected flood fill from the
+seed labels cells as L-region (s2 side) or R-region (s3 side). Panel 4 is filled:
+L-region = s2, R-region = s3, wall = s2 if non-bg else s3.
+New predicates: arc2_po_panels_/2, arc2_po_slice_/4, arc2_po_flat3_/4,
+arc2_po_nonbg_pos_/3, arc2_po_seed_/2, arc2_po_flood4_/3, arc2_po_bfs4_/4,
+arc2_po_build_result_/8, arc2_po_cell_val_/8.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+SPARC: Specification v241, Pseudocode v233, Architecture v236, Refinement v290, Completion v296
