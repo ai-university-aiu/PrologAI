@@ -19373,3 +19373,29 @@ AC-WF-010: arc2_induce_rule([pair(T0In,T0Out),...,pair(T5In,T5Out)],
 AC-WF-011: full benchmark run confirms 12/120 = 10.00% with no regressions.
   Passing tasks: 1818057f, 31f7f899, 36a08778, 409aa875, 45a5af55, 4c3d4a41,
   7491f3cf, 7b5033c1, 80a900e0, 8e5c0c38, 97d7923e, e376de54.
+
+
+% ARC-AGI-2 Wave 13 acceptance criteria - odd_col rule (task 38007db0)
+
+AC-OC-001: oc_all_same_([6,6,6,6,6], 6) succeeds; oc_all_same_([6,4,6], _) fails.
+
+AC-OC-002: oc_strip_([1,2,3,4,5], 1, 3, [2,3,4]) succeeds.
+
+AC-OC-003: arc2_transform(odd_col, Train0In, Train0Out) succeeds and produces
+  the correct 19x7 output for training pair 0 of task 38007db0 (2 changes
+  from the majority pattern; 19x19 input with 3x3 cell tile layout).
+
+AC-OC-004: arc2_transform(odd_col, Train1In, Train1Out) succeeds and produces
+  the correct 19x7 output for training pair 1 of task 38007db0 (3 changes
+  from the majority pattern; 19x25 input with 3x4 cell tile layout).
+
+AC-OC-005: arc2_transform(odd_col, TestIn, TestOut) succeeds and produces
+  the correct 29x8 output for the test case of task 38007db0 (29x29 input
+  with 4x4 cell tile layout).
+
+AC-OC-006: arc2_induce_rule([pair(T0In,T0Out), pair(T1In,T1Out)], odd_col)
+  succeeds for both training pairs of task 38007db0.
+
+AC-OC-007: full benchmark run confirms 13/120 = 10.83% with no regressions.
+  Passing tasks: 1818057f, 31f7f899, 36a08778, 38007db0, 409aa875, 45a5af55,
+  4c3d4a41, 7491f3cf, 7b5033c1, 80a900e0, 8e5c0c38, 97d7923e, e376de54.

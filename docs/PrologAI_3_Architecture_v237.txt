@@ -1,4 +1,4 @@
-PROLOGAI ARCHITECTURE  (v235)
+PROLOGAI ARCHITECTURE  (v237)
 
 HOW THE COMPONENTS FIT TOGETHER AND COMMUNICATE
 
@@ -9814,3 +9814,29 @@ Helper predicates (private to arc_benchmark_2 module):
   arc2_sl_first_color_/5, arc2_sl_run_len_/5, arc2_sl_out_/4, arc2_sl_val_/4.
 No new Data Layer pack is required; the rule is self-contained within the benchmark.
 Score impact: 6/120 = 5.00% -> 7/120 = 5.83% (+1 task, +0.83%).
+
+
+ARC-AGI-2 WAVE 13 ARCHITECTURE NOTE - ODD COL
+
+Location: src/mentova/games/arc_benchmark_2.pl, Wave 13 block (after Wave 12 waterfall block).
+Implements: arc2_named_rule(odd_col), arc2_transform(odd_col, +Grid, -Result),
+            arc2_induce_rule(+TrainingPairs, odd_col).
+Solves: task 38007db0 (tiled grid with one unique cell per row section).
+
+Architecture: the rule detects uniform separator rows and cols, builds a
+row-section by col-section partition, then votes per row section to find
+the col section whose interior strip is the odd one out. The output grid
+has the same row count as the input but the column width of one col section.
+
+Key predicates (private to arc_benchmark_2 module):
+  oc_all_same_/2           - all elements of a list equal one value
+  oc_adjacent_pairs_/2     - turn a list into adjacent pairs
+  oc_strip_/4              - slice a list from index C0 to C1 inclusive
+  oc_strips_for_row_/4     - extract one strip per col section for a row
+  oc_majority_strip_/2     - compute majority value at each position across strips
+  oc_find_unique_idx_/3    - find the one strip index that differs from majority
+  oc_vote_unique_col_/5    - vote for the unique col section in one row section
+  oc_build_secs_/5         - emit rows for each section using the voted col section
+
+No new Data Layer pack is required; all logic is self-contained in the benchmark file.
+Score impact: 12/120 = 10.00% -> 13/120 = 10.83% (+1 task, +0.83%).
