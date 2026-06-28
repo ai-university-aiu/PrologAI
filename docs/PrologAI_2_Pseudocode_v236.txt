@@ -1,4 +1,4 @@
-PROLOGAI PSEUDOCODE  (v234)
+PROLOGAI PSEUDOCODE  (v235)
 
 ENGLISH READABLE CODE (ERC) - THE LOGIC OF EVERY WORK PACKAGE
 
@@ -15561,3 +15561,101 @@ arc2_induce_rule(TrainingPairs, odd_col) ->
   Guard: TrainingPairs is non-empty
   Guard: forall pair(In, Out) in TrainingPairs:
            arc2_transform(odd_col, In, Out) succeeds and matches Out.
+
+-- WAVE 14: reflect_axis (task 7ed72f31) --
+
+arc2_transform reflect_axis(Grid) ->
+  NR := number of rows in Grid
+  NC := number of cols in first row of Grid
+  Bg := mode of all values in flatten(Grid)
+  Twos := all (R,C) where Grid[R][C] = 2
+  TwoClusters := 4-connected components of Twos
+  ShapeComps := 4-connected components of {(R,C,V) | Grid[R][C] != Bg and Grid[R][C] != 2}
+  Output := Grid
+  for each comp(V, Pts) in ShapeComps:
+    NearCluster := cluster in TwoClusters minimising min-manhattan-distance(Pts, cluster)
+    Axis := axis_type(NearCluster)
+    for each (R,C) in Pts:
+      (R2,C2) := reflect(R, C, Axis)
+      if (R2,C2) is within bounds: Output[R2][C2] := V
+  return Output
+
+axis_type(Cluster) ->
+  if |Cluster| = 1: return point(R0, C0) where Cluster = [(R0,C0)]
+  Rows := {R | (R,C) in Cluster}
+  if |Rows| = 1: return h(R0) where R0 is the unique row
+  Cols := {C | (R,C) in Cluster}
+  if |Cols| = 1: return v(C0) where C0 is the unique col
+  return point(R0,C0) where (R0,C0) is the first cell of Cluster
+
+reflect(R, C, h(R0)) -> (2*R0 - R, C)
+reflect(R, C, v(C0)) -> (R, 2*C0 - C)
+reflect(R, C, point(R0,C0)) -> (2*R0 - R, 2*C0 - C)
+
+arc2_induce_rule(TrainingPairs, reflect_axis) ->
+  Guard: TrainingPairs is non-empty
+  Guard: forall pair(In, Out) in TrainingPairs:
+           arc2_transform(reflect_axis, In, Out) succeeds and matches Out.
+
+% ARC-AGI-2 Wave 15 pseudocode - period_repair rule
+
+arc2_transform(period_repair, Grid, Out):
+  Bg := mode of all cells in Grid
+  Grid1 := maplist(pr2_repair_row_(Bg), Grid)  % row repair
+  GridT := transpose(Grid1)
+  GridT2 := maplist(pr2_repair_row_(Bg), GridT)  % column repair via transpose
+  Out := transpose(GridT2)
+
+pr2_repair_row_(Bg, Row, Fixed):
+  Wall := first V in Row where V != Bg  (or none)
+  if Wall = none: Fixed = Row
+  else:
+    WallPositions := [i | Row[i] = Wall]
+    if |WallPositions| < 2: Fixed = Row
+    else: Fixed := pr2_fix_segs_(Row, WallPositions)
+
+pr2_fix_segs_(Row, [W1, W2 | Rest], Fixed):
+  InLen := W2 - W1 - 1
+  if InLen >= 5:
+    Inner := Row[W1+1 .. W2-1]
+    (P, Errs) := pr2_best_period_(Inner)
+    if Errs != []: Row1 := apply_fixes(Row, W1+1, Errs)
+    else: Row1 := Row
+  else: Row1 := Row
+  Fixed := pr2_fix_segs_(Row1, [W2 | Rest])
+
+pr2_best_period_(Seq):
+  N := |Seq|; MaxP := N // 2
+  Candidates := [(|Errs|, P, Errs) |
+    P in 2..MaxP,
+    Base := pr2_majority_base_(Seq, P),
+    MinSupp := pr2_min_support_(Seq, P, Base),
+    MinSupp >= 0.75,
+    Errs := pr2_errors_(Seq, P, Base),
+    1 <= |Errs| <= 3]
+  if Candidates = []: return (none, [])
+  sort Candidates by (|Errs| ASC, P ASC)
+  return first candidate
+
+pr2_majority_base_(Seq, P):
+  for r in 0..P-1:
+    Vals := [Seq[i] | i in 0..|Seq|-1, i mod P = r]
+    Base[r] := mode(Vals)
+  return Base
+
+pr2_min_support_(Seq, P, Base):
+  for r in 0..P-1:
+    Vals := [Seq[i] | i in 0..|Seq|-1, i mod P = r]
+    Supp[r] := count(v in Vals where v = Base[r]) / |Vals|
+  return min(Supp)
+
+pr2_errors_(Seq, P, Base):
+  return [err(i, Seq[i], Base[i mod P]) |
+    i in 0..|Seq|-1, Seq[i] != Base[i mod P]]
+
+arc2_induce_rule(Pairs, period_repair):
+  Guard: Pairs non-empty; all pairs preserve grid dimensions.
+  Guard: first training input has a non-background element in row 1 (wall marker).
+  Verify: forall pair(In, Out) in Pairs: arc2_transform(period_repair, In, Out).
+
+Score impact: 14/120 = 11.67% -> 15/120 = 12.50% (+1 task, +0.83%).

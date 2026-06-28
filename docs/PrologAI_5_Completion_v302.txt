@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v300)
+PROLOGAI COMPLETION  (v301)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -7924,3 +7924,32 @@ oc_strips_for_row_/4, oc_majority_strip_/2, oc_find_unique_idx_/3,
 oc_vote_unique_col_/5, oc_build_secs_/5.
 File: Mentova/src/mentova/games/arc_benchmark_2.pl
 SPARC: Specification v242, Pseudocode v234, Architecture v237, Refinement v294, Completion v300
+
+ARC-AGI-2 Wave 14: reflect_axis - Shape reflection across 2-marker axis (task 7ed72f31).
+Each non-background non-2 shape is paired with its nearest cluster of 2-cells. The axis
+type is determined by the cluster geometry: a single 2-cell gives a 180-degree point
+reflection; a collinear column of 2-cells gives a vertical axis; a collinear row of
+2-cells gives a horizontal axis. The original shapes and 2-markers are preserved;
+reflected copies are added. Both training pairs (bg=1 with 4 shapes; bg=8 with 3 shapes)
+and the test case of task 7ed72f31 pass.
+Score advance: 13/120 = 10.83% to 14/120 = 11.67%.
+New predicates: ra_bg_/2, ra_nrc_/3, ra_inb_/4, ra_nbrs4_/5, ra_absorb_/4,
+ra_bfs4_/6, ra_cc4_/4, ra_split_col_/4, ra_add_col_/3, ra_shape_comps_/5,
+ra_min_manhattan_/3, ra_nearest_cluster_/3, ra_extract_rows_/2, ra_extract_cols_/2,
+ra_all_equal_/1, ra_axis_/2, ra_reflect_/5, ra_set_cell_/5, ra_reflect_pts_/7,
+ra_apply_refls_/6.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+SPARC: Specification v243, Pseudocode v235, Architecture v238, Refinement v295, Completion v301
+
+ARC-AGI-2 Wave 15: period_repair - Periodic-pattern deviation repair (task 135a2760).
+Finds inner sequences between wall markers. For each sequence, selects period P with
+minimum residue-class support >= 0.75 and fewest errors (1..3); repairs deviating cells.
+Row repair first, then column repair via transpose-repair-transpose. A cut-free induction
+guard uses once/1 to commit to the first wall marker without cutting fallback clauses.
+The periodic_repair induction yields to period_repair when period_repair also solves
+all training pairs, preventing priority conflicts between similar rules.
+New predicates: pr2_repair_row_/3, pr2_fix_segs_/3, pr2_extract_/4, pr2_apply_fixes_/4,
+pr2_replace_nth0_/4, pr2_best_period_/4, pr2_majority_base_/3, pr2_min_support_/4,
+pr2_errors_/4, pr2_mode_/2, pr2_mode_acc_/6.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+SPARC: Specification v244, Pseudocode v236, Architecture v239, Refinement v296, Completion v302

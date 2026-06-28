@@ -1,4 +1,4 @@
-PROLOGAI PLATFORM SPECIFICATION  (v242)
+PROLOGAI PLATFORM SPECIFICATION  (v243)
 
 THE AUTHORITATIVE REFERENCE
 
@@ -18170,3 +18170,61 @@ each cell 5x5 interior enclosed by a uniform-value border. The test input is
 a 29x29 grid of 4x4 cell tiles. Exactly one cell per row section has a
 unique interior pattern; the output isolates that cell's column section for
 each row section. Score advances from 12/120 = 10.00% to 13/120 = 10.83%.
+
+ARC2-W14-SPEC-001: The reflect_axis rule operates on a grid with a solid
+background color (the mode of the grid), non-background non-2 colored shapes,
+and clusters of 2-cells. Each non-background non-2 shape is reflected across
+the axis defined by its nearest 2-cluster.
+
+ARC2-W14-SPEC-002: Shapes are identified as 4-connected components of
+non-background non-2 cells. The background color is the most frequent value
+in the grid.
+
+ARC2-W14-SPEC-003: 2-clusters are identified as 4-connected components of
+cells with value 2. The axis type is determined by the cluster's geometry:
+a single 2-cell defines a point reflection; a collinear column of 2-cells
+defines a vertical axis; a collinear row of 2-cells defines a horizontal axis.
+
+ARC2-W14-SPEC-004: Each shape is paired with the 2-cluster having the minimum
+Manhattan distance from any shape cell to any cluster cell. This is the
+nearest-cluster pairing.
+
+ARC2-W14-SPEC-005: For point reflection through (R0, C0): each shape cell
+(R, C) maps to (2*R0 - R, 2*C0 - C). For vertical axis at col C0: each
+cell (R, C) maps to (R, 2*C0 - C). For horizontal axis at row R0: each cell
+(R, C) maps to (2*R0 - R, C). Reflected cells outside grid bounds are skipped.
+
+ARC2-W14-SPEC-006: The original shape cells and 2-markers are preserved in
+the output. Only the reflected copies are added to the grid.
+
+ARC2-W14-SPEC-007: reflect_axis solves ARC-AGI-2 task 7ed72f31. Train 0 is
+an 18x18 grid with bg=1, four shapes, and four 2-clusters (including one
+single-cell, one 4-cell vertical, one single-cell, one 5-cell horizontal).
+Train 1 is 18x18 with bg=8, three shapes, and three 2-clusters (two 2-cell
+vertical, one 4-cell horizontal). Score advances from 13/120 = 10.83% to
+14/120 = 11.67%.
+
+ARC2-W15-SPEC-001: period_repair solves ARC-AGI-2 tasks where inner sequences
+(cells between wall markers in a row or column) follow a repeating period-P
+pattern with a small number of deviating cells. The rule repairs those cells.
+
+ARC2-W15-SPEC-002: The wall marker in a row or column is the first non-background
+element. An inner segment is the cells strictly between the first and last
+occurrence of the wall marker. Segments shorter than 5 cells are skipped.
+
+ARC2-W15-SPEC-003: Period selection uses a support-threshold criterion. For each
+candidate P in 2..N//2, the majority-vote base is computed for each residue
+class mod P. The minimum support is the lowest fraction of cells in any residue
+class that match the majority value. Only periods with minimum support >= 0.75
+are accepted. Among accepted periods, the one with the fewest errors (1..3) is
+chosen; ties are broken by smallest P.
+
+ARC2-W15-SPEC-004: period_repair applies row repair first (repair every row),
+then column repair via a transpose-repair-transpose pass (treat each column as
+a row by transposing the grid).
+
+ARC2-W15-SPEC-005: period_repair solves ARC-AGI-2 task 135a2760. Train 0 is
+5x13 with bg=3 and wall=2; one row repair (period-2, 1 error). Train 1 is
+21x22 with bg=4 and wall=2; nine row repairs (periods 2-4, 1-2 errors each).
+Test is 29x29 with bg=8 and wall=3; nine column repairs (periods 2-6, 1-3
+errors each). Score advances from 14/120 = 11.67% to 15/120 = 12.50%.
