@@ -424,11 +424,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v240` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v232` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v235` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v287` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v293` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v241` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v233` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v236` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v288` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v294` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---
