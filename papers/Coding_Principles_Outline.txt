@@ -1,0 +1,985 @@
+CODING (COMPUTER PROGRAMMING) ENGINEERING DESIGN PRINCIPLES
+
+A COMPLETE AND COMPREHENSIVE TOPIC OUTLINE
+
+Prepared for the textbook: Certified Coding (Computer Programming) Design Principles Engineer (CCDPE)
+
+
+HOW TO READ THIS OUTLINE
+
+This document is a structured map of the design principles that guide how computer programs are written so they stay correct, readable, and easy to change.
+
+Coding, also called computer programming, is the act of writing instructions that a computer follows to do useful work.
+
+A design principle is a reusable rule of thumb that steers many smaller decisions in a consistent direction, helping a programmer choose between options.
+
+This outline is written for a newcomer, so each part begins with a plain-language note explaining why the part matters before listing its subtopics.
+
+Acronyms are spelled out the first time they appear, and technical terms are defined the first time they are used.
+
+A key idea runs through the whole outline: principles are not rigid laws but tensions to manage, because each one points at a trade-off such as simplicity versus flexibility.
+
+The outline is organized into parts, and each part is broken into numbered chapters and bulleted subtopics.
+
+
+PART 1 - FOUNDATIONS OF CODING DESIGN PRINCIPLES
+
+This part builds the shared vocabulary and mindset a programmer needs before studying specific principles.
+
+It answers the basic question: what is a design principle and why does it matter.
+
+1.1 What a Design Principle Is
+
+• The idea of a principle as a guiding rule rather than an exact instruction
+
+• How principles differ from rules, which must always be followed
+
+• How principles differ from patterns, which are concrete reusable solutions
+
+• Why principles exist: to keep code readable, changeable, and reliable over time
+
+1.2 Why Design Quality Matters
+
+• Software is read far more often than it is written
+
+• The cost of change grows when code is tangled and unclear
+
+• Technical debt, meaning the future cost created by quick or messy choices
+
+• Maintainability, meaning how easily code can be understood and changed
+
+1.3 Principles as Trade-offs
+
+• Every principle points at a tension, such as reuse versus independence
+
+• Simplicity versus flexibility as a recurring trade-off
+
+• Abstraction versus clarity as a recurring trade-off
+
+• The skill of judgment, meaning knowing which principle wins in a given situation
+
+1.4 The Goals Principles Serve
+
+• Correctness, meaning the program does what it should
+
+• Readability, meaning a human can easily understand the code
+
+• Changeability, meaning the code is easy to extend and fix
+
+• Robustness, meaning the program handles errors and surprises well
+
+• Efficiency, meaning the program uses time and resources wisely
+
+
+PART 2 - FUNDAMENTAL DESIGN PRINCIPLES
+
+This part covers the deepest, most general principles that nearly all others build upon.
+
+These ideas appear in every programming language and paradigm.
+
+2.1 Abstraction
+
+• Abstraction, meaning focusing on essential details and hiding the rest
+
+• Modeling real things as simpler representations in code
+
+• Choosing the right level of abstraction for a problem
+
+• The danger of leaky abstractions, where hidden details still show through
+
+2.2 Encapsulation and Information Hiding
+
+• Encapsulation, meaning bundling data with the code that works on it
+
+• Information hiding, meaning keeping internal details private behind a clear interface
+
+• An interface, meaning the agreed way other code interacts with a component
+
+• Why hiding details makes change safer
+
+2.3 Modularity and Decomposition
+
+• Decomposition, meaning splitting a large problem into smaller parts
+
+• Modularity, meaning building software from independent, replaceable pieces
+
+• Defining clear boundaries between modules
+
+• Composability, meaning combining small pieces into larger ones
+
+2.4 Cohesion and Coupling
+
+• Cohesion, meaning how focused and single-purpose a module is
+
+• High cohesion as a goal, where a module does one thing well
+
+• Coupling, meaning how dependent one module is on another
+
+• Loose coupling as a goal, where modules depend on each other as little as possible
+
+2.5 Separation of Concerns
+
+• Separation of concerns, meaning each part handles one distinct aspect
+
+• Dividing responsibilities such as data, logic, and presentation
+
+• Why mixing concerns makes code hard to change
+
+• Boundaries that keep concerns apart
+
+
+PART 3 - THE CLASSIC NAMED PRINCIPLES
+
+This part covers the short, memorable principles every programmer is expected to know.
+
+They compress hard-won lessons into easy-to-remember acronyms.
+
+3.1 Do Not Repeat Yourself (DRY)
+
+• Do Not Repeat Yourself (DRY), meaning every piece of knowledge has one authoritative place
+
+• Removing duplicated logic and data
+
+• The risk of repetition: fixing a bug in one copy but not the others
+
+• When some duplication is acceptable to avoid the wrong abstraction
+
+3.2 Keep It Simple (KISS)
+
+• Keep It Simple (KISS), meaning prefer the simplest design that works
+
+• Avoiding unnecessary complexity
+
+• Simplicity as a deliberate goal, not an accident
+
+• How simple code is easier to read, test, and change
+
+3.3 You Are Not Going to Need It (YAGNI)
+
+• You Are Not Going to Need It (YAGNI), meaning do not build features until they are actually required
+
+• Avoiding speculative work for imagined future needs
+
+• Focusing effort on what is needed now
+
+• Balancing YAGNI against reasonable, low-cost foresight
+
+3.4 Principle of Least Astonishment (POLA)
+
+• Principle of Least Astonishment (POLA), meaning code should behave the way people expect
+
+• Consistent naming and behavior that avoid surprises
+
+• Following established conventions
+
+• Reducing the mental effort needed to understand code
+
+3.5 Other Guiding Maxims
+
+• The Boy Scout Rule, meaning leave the code a little cleaner than you found it
+
+• Composition over inheritance, meaning prefer assembling behavior over deep class trees
+
+• Fail fast, meaning detect and report errors as early as possible
+
+• Convention over configuration, meaning sensible defaults reduce decisions
+
+
+PART 4 - THE SOLID PRINCIPLES
+
+This part covers five widely taught principles for designing flexible, maintainable code.
+
+SOLID is a memory aid for five principles of object-oriented programming, where objects bundle data and behavior.
+
+4.1 Single Responsibility Principle (SRP)
+
+• Single Responsibility Principle (SRP), meaning a unit should have one reason to change
+
+• Identifying the single responsibility of a class or function
+
+• Splitting units that do too many things
+
+• How clear responsibility improves readability and testing
+
+4.2 Open-Closed Principle (OCP)
+
+• Open-Closed Principle (OCP), meaning code should be open to extension but closed to modification
+
+• Adding new behavior without changing existing, tested code
+
+• Using interfaces and abstraction to allow extension
+
+• Reducing the risk of breaking what already works
+
+4.3 Liskov Substitution Principle (LSP)
+
+• Liskov Substitution Principle (LSP), meaning a subtype must be usable wherever its base type is expected
+
+• Honoring the expected behavior of a base type
+
+• Avoiding subtypes that violate the promises of their parent
+
+• How violations cause subtle, hard-to-find bugs
+
+4.4 Interface Segregation Principle (ISP)
+
+• Interface Segregation Principle (ISP), meaning prefer many small, specific interfaces over one large one
+
+• Not forcing code to depend on methods it does not use
+
+• Designing focused, role-based interfaces
+
+• Reducing unnecessary coupling
+
+4.5 Dependency Inversion Principle (DIP)
+
+• Dependency Inversion Principle (DIP), meaning depend on abstractions rather than concrete details
+
+• High-level policy not depending on low-level implementation
+
+• Dependency injection, meaning supplying a component's dependencies from outside
+
+• How inversion makes code testable and swappable
+
+
+PART 5 - GRASP AND RESPONSIBILITY ASSIGNMENT
+
+This part covers principles for deciding which part of a program should own which job.
+
+GRASP stands for General Responsibility Assignment Software Patterns, a set of guidelines for assigning responsibilities to objects.
+
+5.1 Core Responsibility Principles
+
+• Information Expert, meaning give a responsibility to the unit that has the needed data
+
+• Creator, meaning decide which unit should create another
+
+• Controller, meaning assign the handling of system events to a coordinating unit
+
+• Low Coupling and High Cohesion as goals restated within GRASP
+
+5.2 Flexibility Principles
+
+• Polymorphism, meaning let related types handle their own version of a behavior
+
+• Indirection, meaning introduce a middle unit to reduce direct coupling
+
+• Pure Fabrication, meaning create a helper unit when no real-world object fits
+
+• Protected Variations, meaning shield code from the effects of likely changes
+
+5.3 Applying GRASP
+
+• Using GRASP to guide everyday design decisions
+
+• Combining GRASP with SOLID
+
+• How responsibility assignment shapes the whole structure
+
+
+PART 6 - OBJECT-ORIENTED DESIGN PRINCIPLES
+
+This part covers principles specific to object-oriented programming.
+
+Object-oriented programming is a style that organizes software around objects, which combine data and the operations on that data.
+
+6.1 The Four Pillars
+
+• Encapsulation, meaning bundling data and behavior and hiding internals
+
+• Abstraction, meaning exposing only what matters about an object
+
+• Inheritance, meaning deriving a new type from an existing one
+
+• Polymorphism, meaning many types responding to the same call in their own way
+
+6.2 Relationship Principles
+
+• Composition over inheritance, meaning build behavior by combining objects rather than extending them
+
+• The Law of Demeter, meaning a unit should talk only to its close collaborators
+
+• Favoring interfaces over concrete classes
+
+• Avoiding deep and fragile inheritance hierarchies
+
+6.3 Designing Good Objects
+
+• Clear, single-purpose classes
+
+• Well-defined public interfaces and hidden internals
+
+• Immutability where helpful, meaning objects that do not change after creation
+
+• Value objects versus entities, meaning data-defined versus identity-defined objects
+
+
+PART 7 - PRINCIPLES ACROSS PROGRAMMING PARADIGMS
+
+This part shows that good design ideas extend beyond object-oriented code.
+
+A paradigm is a style or way of organizing programs.
+
+7.1 Functional Programming Principles
+
+• Pure functions, meaning functions whose output depends only on their inputs with no side effects
+
+• A side effect, meaning a change to state outside the function
+
+• Immutability, meaning data that is not modified after creation
+
+• Composition of small functions into larger behavior
+
+7.2 Declarative and Procedural Principles
+
+• Declarative style, meaning describing what to do rather than step-by-step how
+
+• Procedural style, meaning organizing code as sequences of steps and procedures
+
+• Choosing a style that fits the problem
+
+7.3 Cross-Paradigm Ideas
+
+• Referential transparency, meaning an expression can be replaced by its value safely
+
+• Statelessness, meaning avoiding hidden, carried-over state
+
+• Idempotency, meaning repeating an operation gives the same result
+
+• Determinism, meaning the same inputs always produce the same outputs
+
+
+PART 8 - CLEAN CODE PRINCIPLES
+
+This part covers writing code that humans can read and trust at a glance.
+
+Clean code is code that is easy to read, change, and review.
+
+8.1 Naming
+
+• Descriptive names that reveal purpose and intent
+
+• Consistent naming conventions across the codebase
+
+• Avoiding misleading or overly abbreviated names
+
+• Names that remove the need for explanatory comments
+
+8.2 Functions and Methods
+
+• Small functions that each do one thing well
+
+• Few parameters, grouping related ones into an object when needed
+
+• Avoiding hidden side effects
+
+• Clear, single levels of detail within a function
+
+8.3 Comments and Documentation in Code
+
+• Comments that explain why, not what
+
+• Letting clear code speak for itself
+
+• Removing outdated or misleading comments
+
+• Documenting intent, trade-offs, and surprises
+
+8.4 Formatting and Style
+
+• Consistent indentation and layout
+
+• Logical grouping and ordering of code
+
+• Style guides and automated formatters
+
+• Linting, meaning automated checking for style and likely errors
+
+8.5 Readable Control Flow
+
+• Avoiding deep nesting through early returns and guard clauses
+
+• Keeping conditions simple and clear
+
+• Making the normal path easy to follow
+
+• Expressing intent over clever tricks
+
+
+PART 9 - SOFTWARE ARCHITECTURE PRINCIPLES
+
+This part covers principles for structuring a whole program, not just small pieces.
+
+Architecture is the high-level organization of a system into major parts and their relationships.
+
+9.1 Structural Principles
+
+• Layering, meaning organizing code into stacked levels with clear roles
+
+• Separation between core logic and external details
+
+• Dependency direction, meaning controlling which parts depend on which
+
+• Stable dependencies, meaning depending on things less likely to change
+
+9.2 Architectural Patterns
+
+• Layered architecture, with presentation, logic, and data layers
+
+• Hexagonal architecture, also called ports and adapters, which isolates core logic behind adapters
+
+• A port, meaning a defined entry or exit point of the core logic
+
+• An adapter, meaning code that connects an external system to a port
+
+• Microservices, meaning building a system as small independent services
+
+9.3 Boundaries and Interfaces
+
+• Defining clear contracts between parts
+
+• A contract, meaning the promised behavior of an interface
+
+• Anti-corruption layers, meaning code that protects the core from messy outside models
+
+• Designing for replaceability of external pieces
+
+9.4 Architectural Qualities
+
+• Scalability, meaning the system keeps working as load grows
+
+• Resilience, meaning the system recovers from failures
+
+• Evolvability, meaning the system can change over time
+
+• Observability, meaning the ability to see how the system behaves
+
+
+PART 10 - DESIGN PATTERNS
+
+This part covers proven, named solutions to common design problems.
+
+A design pattern is a reusable solution structure that engineers apply instead of inventing one each time.
+
+10.1 What Design Patterns Are
+
+• Patterns as tested answers to recurring problems
+
+• How patterns relate to and apply principles
+
+• The risk of overusing patterns where simple code would do
+
+• Naming patterns to improve team communication
+
+10.2 Creational Patterns
+
+• Patterns that control how objects are created
+
+• Factory, meaning a method or object that creates other objects
+
+• Builder, meaning step-by-step construction of complex objects
+
+• Singleton, meaning ensuring only one instance exists, and its trade-offs
+
+10.3 Structural Patterns
+
+• Patterns that organize how objects are composed
+
+• Adapter, meaning making incompatible interfaces work together
+
+• Decorator, meaning adding behavior to an object without changing its type
+
+• Facade, meaning a simple front for a complex subsystem
+
+10.4 Behavioral Patterns
+
+• Patterns that manage how objects communicate
+
+• Strategy, meaning selecting an algorithm at runtime
+
+• Observer, meaning notifying interested parties when something changes
+
+• Command, meaning packaging a request as an object
+
+10.5 Choosing and Avoiding Patterns
+
+• Matching patterns to real problems, not forcing them
+
+• Combining patterns where helpful
+
+• Recognizing when a pattern adds needless complexity
+
+
+PART 11 - ERROR HANDLING AND ROBUSTNESS PRINCIPLES
+
+This part covers treating failure as a normal, planned part of software.
+
+Robustness means the program behaves sensibly even when inputs or conditions are bad.
+
+11.1 Failure Philosophy
+
+• Treating failures as first-class behavior to be designed for
+
+• Fail fast, meaning surface problems early with clear messages
+
+• Failing safely, meaning leaving the system in a stable state
+
+• Distinguishing expected failures from true bugs
+
+11.2 Defensive Techniques
+
+• Input validation, meaning checking data is correct before using it
+
+• Guard clauses that reject bad input early
+
+• Avoiding silent failures that hide problems
+
+• Clear, actionable error messages with useful identifiers
+
+11.3 Recovery and Resilience
+
+• Retries with backoff, meaning trying again after waiting longer each time
+
+• Fallbacks, meaning a backup plan when the first approach fails
+
+• Timeouts, meaning giving up after a set time
+
+• Circuit breakers, meaning stopping calls to a failing dependency
+
+11.4 Logging and Diagnostics
+
+• Logging with context such as request identifiers and key data
+
+• Correlation identifiers, meaning labels that tie related events together
+
+• Avoiding logging of sensitive information
+
+• Making failures easy to diagnose later
+
+
+PART 12 - TESTING PRINCIPLES
+
+This part covers principles for proving that code works and keeps working.
+
+A test is code that automatically checks whether other code behaves correctly.
+
+12.1 Why and What to Test
+
+• Tests as a safety net that enables confident change
+
+• Unit tests, meaning tests of small individual pieces
+
+• Integration tests, meaning tests of pieces working together
+
+• End-to-end tests, meaning tests of the whole system from the user's view
+
+12.2 Testing Strategy Principles
+
+• The test pyramid, meaning many fast unit tests and fewer slow broad tests
+
+• Test-driven development (TDD), meaning writing tests before the code they check
+
+• Coverage, meaning how much of the code the tests exercise, and its limits
+
+• Testing behavior rather than internal implementation details
+
+12.3 Qualities of Good Tests
+
+• Fast, reliable, and repeatable tests
+
+• Independent tests that do not depend on each other
+
+• Clear tests that document intended behavior
+
+• Avoiding flaky tests, meaning tests that pass or fail unpredictably
+
+12.4 Beyond Functional Testing
+
+• Regression testing, meaning checking that changes do not break past behavior
+
+• Performance and load testing
+
+• Security testing
+
+• Property-based testing, meaning checking rules across many generated inputs
+
+
+PART 13 - SECURE CODING PRINCIPLES
+
+This part covers writing code that resists misuse and attack.
+
+Secure coding means designing and writing software so it stays safe from malicious or accidental harm.
+
+13.1 Core Security Principles
+
+• Least privilege, meaning granting only the minimum access needed
+
+• Defense in depth, meaning multiple independent layers of protection
+
+• Secure by default, meaning the safe option is the standard one
+
+• Minimizing the attack surface, meaning reducing the ways a system can be attacked
+
+13.2 Handling Untrusted Input
+
+• Validating and sanitizing all input
+
+• Preventing injection, meaning untrusted data being run as a command or query
+
+• Output encoding, meaning safely formatting data before display
+
+• Never trusting data from outside the system
+
+13.3 Protecting Data and Secrets
+
+• Encrypting sensitive data at rest and in transit
+
+• Never hardcoding credentials in source code
+
+• Managing secrets such as keys and passwords safely
+
+• Protecting personal and confidential information
+
+13.4 Secure Development Practices
+
+• Authentication, meaning confirming who a user or system is
+
+• Authorization, meaning controlling what they may do
+
+• Keeping dependencies updated to avoid known vulnerabilities
+
+• Security testing and review throughout development
+
+
+PART 14 - PERFORMANCE AND EFFICIENCY PRINCIPLES
+
+This part covers making software fast and resource-aware without sacrificing clarity.
+
+Performance is how quickly and efficiently a program does its work.
+
+14.1 Measure Before Optimizing
+
+• Avoiding premature optimization, meaning not tuning code before it is shown to be slow
+
+• Profiling, meaning measuring where a program actually spends time
+
+• Optimizing the parts that matter most
+
+• Balancing speed against readability and maintainability
+
+14.2 Algorithmic Efficiency
+
+• Algorithmic complexity, meaning how cost grows as input grows
+
+• Choosing suitable data structures for the task
+
+• Reducing unnecessary work and repeated computation
+
+14.3 Practical Optimization
+
+• Caching, meaning reusing results instead of recomputing them
+
+• Lazy evaluation, meaning computing only when needed
+
+• Batching, meaning grouping work to reduce overhead
+
+• Managing memory and resource use
+
+14.4 Efficiency Trade-offs
+
+• Speed versus memory use
+
+• Performance versus simplicity
+
+• Local optimization versus overall system design
+
+
+PART 15 - CONCURRENCY AND STATE PRINCIPLES
+
+This part covers writing code that does several things at once without chaos.
+
+Concurrency means multiple tasks making progress at the same time.
+
+15.1 Managing State
+
+• Shared mutable state as a common source of bugs
+
+• Preferring immutability to avoid concurrency problems
+
+• Isolating state, meaning keeping changeable data contained
+
+• Statelessness as a simplifying goal
+
+15.2 Coordination
+
+• Race conditions, meaning bugs from unpredictable timing between tasks
+
+• Synchronization, meaning controlling access to shared resources
+
+• Deadlocks, meaning tasks stuck waiting on each other forever
+
+• Message passing, meaning tasks communicating by sending data rather than sharing it
+
+15.3 Concurrency Models
+
+• Threads and processes as units of concurrent work
+
+• Asynchronous programming, meaning not waiting idly for slow operations
+
+• Event-driven designs that react to occurrences
+
+• Keeping concurrent code understandable and testable
+
+
+PART 16 - DATA AND INTERFACE DESIGN PRINCIPLES
+
+This part covers designing the shapes of data and the contracts between components.
+
+An interface is the agreed boundary through which parts of a system interact.
+
+16.1 Data Modeling Principles
+
+• Representing data clearly and consistently
+
+• Normalization, meaning organizing data to reduce duplication
+
+• Choosing meaningful types and structures
+
+• Validating data at boundaries
+
+16.2 Application Programming Interface (API) Design
+
+• An Application Programming Interface (API), meaning a defined way for programs to interact
+
+• Designing clear, consistent, and predictable interfaces
+
+• Backward compatibility, meaning not breaking existing users when changing an interface
+
+• Versioning, meaning managing changes over time
+
+16.3 Contracts and Boundaries
+
+• Designing by contract, meaning stating clear expectations and guarantees
+
+• Keeping interfaces small and focused
+
+• Hiding implementation details behind the interface
+
+• Designing for change at the boundaries
+
+
+PART 17 - MAINTAINABILITY AND REFACTORING PRINCIPLES
+
+This part covers keeping code healthy as it grows and ages.
+
+Refactoring means improving the internal structure of code without changing what it does.
+
+17.1 Maintainability Principles
+
+• Writing code for the next reader, including your future self
+
+• Keeping changes small and localized
+
+• Reducing accidental complexity, meaning complexity not required by the problem
+
+• Consistency across the codebase
+
+17.2 Refactoring Practice
+
+• Recognizing code smells, meaning signs that code needs improvement
+
+• Refactoring in small, safe steps backed by tests
+
+• The Boy Scout Rule applied during everyday work
+
+• Renaming, extracting, and simplifying as common moves
+
+17.3 Managing Technical Debt
+
+• Technical debt, meaning the future cost of quick or messy choices
+
+• Making debt visible and deliberate
+
+• Prioritizing which debt to repay
+
+• Preventing debt through review and discipline
+
+
+PART 18 - COLLABORATION AND PROCESS PRINCIPLES
+
+This part covers principles for working well with other programmers.
+
+Most real software is built by teams, so collaboration is part of design.
+
+18.1 Version Control
+
+• Version control, meaning tracking changes to code over time
+
+• Small, focused commits with clear messages
+
+• A commit, meaning a recorded set of changes
+
+• Branching and merging strategies for teamwork
+
+18.2 Code Review
+
+• Reviewing each other's changes before they merge
+
+• Giving and receiving constructive feedback
+
+• Checking for correctness, clarity, and security
+
+• Sharing knowledge across the team through review
+
+18.3 Documentation
+
+• Documenting architecture, decisions, and intent
+
+• A readme, meaning a starting document that explains a project
+
+• Keeping documentation accurate and up to date
+
+• Recording why decisions were made, not only what was done
+
+18.4 Shared Standards
+
+• Coding standards and style guides
+
+• Consistent conventions across a team
+
+• Automated checks that enforce standards
+
+• A shared vocabulary for design discussions
+
+
+PART 19 - DELIVERY AND LIFECYCLE PRINCIPLES
+
+This part covers principles for building, shipping, and running software reliably.
+
+The lifecycle is the full path of software from idea to retirement.
+
+19.1 Build and Integration
+
+• Continuous integration, meaning merging and testing changes frequently
+
+• Automated builds that produce consistent results
+
+• Catching problems early through automation
+
+19.2 Delivery and Deployment
+
+• Continuous delivery, meaning keeping software always ready to release
+
+• Automated, repeatable deployments
+
+• Staged rollouts and safe release practices
+
+• Rollback, meaning quickly returning to a previous working version
+
+19.3 Operability
+
+• Designing software that is easy to run and monitor
+
+• Logging, metrics, and health checks
+
+• Configuration management, meaning handling settings cleanly across environments
+
+• Designing for diagnosis and recovery in production
+
+
+PART 20 - APPLYING AND BALANCING PRINCIPLES
+
+This final part brings everything together into practical judgment.
+
+20.1 Resolving Tensions Between Principles
+
+• Recognizing when two principles conflict
+
+• Weighing simplicity, flexibility, and reuse
+
+• Choosing the principle that best serves the current goal
+
+• Documenting and revisiting design decisions
+
+20.2 Recognizing Anti-Patterns
+
+• An anti-pattern, meaning a tempting but flawed solution
+
+• Over-engineering, meaning adding complexity that is not needed
+
+• Premature optimization and premature abstraction
+
+• Copy-paste programming and tangled dependencies
+
+20.3 A Design Review Checklist
+
+• Is each unit cohesive and loosely coupled
+
+• Is duplicated knowledge removed without forcing the wrong abstraction
+
+• Is the design as simple as the problem allows
+
+• Are failures handled clearly and safely
+
+• Is the code tested, secure, and readable
+
+• Are decisions documented and conventions followed
+
+20.4 Continuous Growth
+
+• Building skill through practice and feedback
+
+• Learning from code review and real failures
+
+• Reading and studying high-quality codebases
+
+• Treating principles as lifelong tools to refine
+
+
+APPENDIX A - GLOSSARY OF KEY TERMS
+
+• Design principle - a guiding rule of thumb that steers many smaller coding decisions
+
+• Design pattern - a named, reusable solution to a recurring design problem
+
+• Abstraction - focusing on essential details while hiding the rest
+
+• Encapsulation - bundling data with the code that works on it and hiding internals
+
+• Cohesion - how focused and single-purpose a module is
+
+• Coupling - how dependent one module is on another
+
+• Do Not Repeat Yourself (DRY) - every piece of knowledge has one authoritative place
+
+• Keep It Simple (KISS) - prefer the simplest design that works
+
+• You Are Not Going to Need It (YAGNI) - do not build features until they are needed
+
+• SOLID - five object-oriented design principles for flexible, maintainable code
+
+• General Responsibility Assignment Software Patterns (GRASP) - guidelines for assigning responsibilities to units
+
+• Refactoring - improving code structure without changing its behavior
+
+• Technical debt - the future cost created by quick or messy choices
+
+• Application Programming Interface (API) - a defined way for programs to interact
+
+• Secure coding - writing software so it stays safe from harm and attack
+
+
+APPENDIX B - SUGGESTED LEARNING PATH
+
+• Begin with Parts 1 and 2 to learn what principles are and the deepest fundamental ideas
+
+• Study Parts 3 through 7 for the named principles, SOLID, GRASP, and paradigm principles
+
+• Continue with Parts 8 through 10 for clean code, architecture, and design patterns
+
+• Cover Parts 11 through 16 for error handling, testing, security, performance, concurrency, and interfaces
+
+• Finish with Parts 17 through 20 for maintainability, collaboration, delivery, and balanced judgment
+
+
+END OF OUTLINE

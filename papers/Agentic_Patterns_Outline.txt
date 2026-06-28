@@ -1,0 +1,961 @@
+AGENTIC ARTIFICIAL INTELLIGENCE (AI) AGENT ENGINEERING DESIGN PATTERNS
+
+A COMPLETE AND COMPREHENSIVE TOPIC OUTLINE
+
+Prepared for the textbook: Certified Agentic Artificial Intelligence (AI) Engineering Designer (CAAIED)
+
+
+HOW TO READ THIS OUTLINE
+
+This document is a structured catalog of the design patterns used to build agentic Artificial Intelligence (AI) systems.
+
+A design pattern is a reusable, named solution to a problem that comes up again and again, written down so engineers can apply a tested answer instead of inventing one each time.
+
+The word "agentic" describes software that pursues a goal on its own, making decisions and taking actions step by step rather than answering a single question once.
+
+An "agent" here means a program built around an Artificial Intelligence (AI) model that can reason about a task, decide what to do, use tools, and act in a loop until the task is finished.
+
+This outline is written for a newcomer, so each part begins with a plain-language note before listing its subtopics.
+
+Acronyms are spelled out the first time they appear, and technical terms are defined the first time they are used.
+
+This is the companion to the separate principles outline: principles tell you what good looks like, while patterns give you concrete, named structures to build with.
+
+
+PART 1 - FOUNDATIONS OF AGENTIC DESIGN PATTERNS
+
+This part explains what a pattern is, how patterns are described, and how they fit together.
+
+It gives the learner the shared language used throughout the rest of the catalog.
+
+1.1 What a Design Pattern Is
+
+• The idea of a pattern as a named, reusable solution to a recurring design problem
+
+• How patterns differ from principles, which are guiding values rather than concrete structures
+
+• How patterns differ from frameworks, which are code libraries that may implement patterns
+
+• Why patterns improve communication, reliability, and speed of design
+
+1.2 The Anatomy of a Pattern
+
+• The name, which gives the pattern a shared label
+
+• The problem or context the pattern is meant to solve
+
+• The structure, meaning the parts and how they connect
+
+• The forces and trade-offs the pattern balances
+
+• The consequences, meaning what you gain and what you give up
+
+• Known uses and examples in real systems
+
+1.3 A Taxonomy of Agentic Patterns
+
+• The single-agent quadrant, where one agent does the work
+
+• The collaborative multi-agent quadrant, where agents cooperate
+
+• The competitive multi-agent quadrant, where agents challenge or check each other
+
+• The orchestration-topology quadrant, which describes how agents are arranged and controlled
+
+• Pattern families such as Core, Advanced, System, Optimization, and Strategic
+
+1.4 Composition Over Purity
+
+• Why most real systems combine two or three patterns rather than using one
+
+• Layering patterns, such as a supervisor on the outside and a pipeline inside a worker
+
+• Nesting patterns, meaning a pattern used inside another pattern
+
+• The rule of starting simple and adding patterns only when needed
+
+
+PART 2 - THE AUGMENTED LARGE LANGUAGE MODEL (LLM) BUILDING BLOCK
+
+This part covers the smallest unit from which all agentic patterns are built.
+
+A Large Language Model (LLM) is an Artificial Intelligence (AI) system trained on text to understand and generate language.
+
+The augmented Large Language Model (LLM) is a model extended with extra abilities so it can do more than generate text.
+
+2.1 Components of the Augmented Model
+
+• Retrieval, meaning the ability to fetch relevant information on demand
+
+• Tools, meaning external functions the model can call to act
+
+• Memory, meaning stored information the model can recall later
+
+• The model call itself as the reasoning engine
+
+2.2 The Basic Agent Loop
+
+• Observe, meaning take in the current situation and inputs
+
+• Think, meaning reason about what to do next
+
+• Act, meaning call a tool or produce an output
+
+• Repeat, meaning continue the loop until the goal is met or a limit is reached
+
+2.3 From Building Block to Pattern
+
+• How chaining several augmented model calls creates workflows
+
+• How adding control logic creates agents
+
+• How adding more agents creates multi-agent systems
+
+• The principle of building complexity only when simpler designs fall short
+
+
+PART 3 - SINGLE-AGENT REASONING PATTERNS
+
+This part covers patterns that improve how one agent thinks through a task.
+
+Reasoning is the internal process of working out what to do before doing it.
+
+3.1 Chain-of-Thought (CoT) Pattern
+
+• The Chain-of-Thought (CoT) pattern, where the model is prompted to reason step by step before answering
+
+• Why showing the steps improves accuracy on hard problems
+
+• When step-by-step reasoning helps and when it wastes effort
+
+3.2 ReAct (Reason and Act) Pattern
+
+• The ReAct pattern, which alternates a reasoning step with a tool action in a repeating loop
+
+• The thought, action, observation cycle that defines ReAct
+
+• Strengths in grounding answers and reducing hallucination, which is stating something false as if true
+
+• Weaknesses such as repeating the same thought and failing to exit the loop
+
+3.3 Tree of Thoughts (ToT) Pattern
+
+• The Tree of Thoughts (ToT) pattern, which explores several reasoning paths arranged as a branching tree
+
+• Generating, evaluating, and pruning candidate paths
+
+• Choosing the most promising branch to continue
+
+• The cost of exploring many paths versus the gain in quality
+
+3.4 Reflection and Reflexion Patterns
+
+• The Reflection pattern, where the agent reviews and critiques its own output before finalizing it
+
+• The Reflexion pattern, where the agent learns from past failures to improve later attempts
+
+• Self-critique loops that repeat until the output is good enough
+
+• The benefit of separating a maker step from a checker step
+
+3.5 Self-Consistency and Voting Patterns
+
+• Self-consistency, where the model produces several answers and keeps the most common one
+
+• Parallel voting, where multiple independent attempts vote on a result
+
+• When sampling several answers beats trusting the first one
+
+
+PART 4 - CORE AGENTIC PATTERNS
+
+This part covers the four widely cited patterns that most agent designs build upon.
+
+These are the patterns popularized as the foundation of modern agent engineering.
+
+4.1 The Reflection Pattern
+
+• Self-review and self-correction of the agent's own work
+
+• Critic and evaluator roles that judge an output
+
+• Iterative improvement until a quality bar is met
+
+• Applications such as improving code, writing, and analysis
+
+4.2 The Tool Use Pattern
+
+• Grounding the agent in the real world by calling external functions
+
+• Function calling, where the model chooses a tool and fills in its inputs
+
+• Selecting the right tool and interpreting its result
+
+• Designing tools that are clear, narrow, and safe
+
+4.3 The Planning Pattern
+
+• Decomposing a complex goal into an ordered list of smaller subgoals
+
+• Plan-and-execute, where the agent first writes a plan and then carries it out
+
+• Plan-act-reflect, which adds a review step after acting
+
+• Replanning when reality differs from the original plan
+
+4.4 The Multi-Agent Collaboration Pattern
+
+• Dividing work across several specialized agents
+
+• Role-based cooperation, where each agent has a clear job and persona
+
+• Sequential, parallel, and loop arrangements of agents
+
+• When collaboration helps and when a single agent is simpler
+
+
+PART 5 - WORKFLOW PATTERNS
+
+This part covers patterns where the steps are mostly fixed and predictable.
+
+A workflow is an arrangement of model calls and tools connected in a defined structure, offering more control than a fully autonomous agent.
+
+5.1 Prompt Chaining Pattern
+
+• Breaking a task into a fixed sequence of steps
+
+• Passing the output of one step as the input to the next
+
+• Adding checks between steps to catch errors early
+
+• Trading more latency for higher accuracy
+
+5.2 Routing Pattern
+
+• Classifying an incoming request and sending it down the right path
+
+• Directing work to a specialist agent or tool
+
+• Handling unknown or ambiguous requests safely
+
+• Separating the router from the specialists it serves
+
+5.3 Parallelization Patterns
+
+• Sectioning, meaning splitting a task into independent parts run at the same time
+
+• Voting, meaning running the same task several times and combining the results
+
+• Combining parallel outputs into one final answer
+
+• Managing the cost of running many calls at once
+
+5.4 Orchestrator-Worker Pattern
+
+• A central orchestrator that breaks a task into subtasks at runtime
+
+• Worker agents that each handle one assigned subtask
+
+• Dynamic task decomposition, meaning deciding the subtasks as the work unfolds
+
+• Gathering and combining worker results
+
+5.5 Evaluator-Optimizer Pattern
+
+• One component that produces work and another that grades it
+
+• A loop where feedback drives repeated improvement
+
+• Test-driven agent development, meaning improving against explicit checks
+
+• Knowing when the output is good enough to stop
+
+
+PART 6 - PLANNING AND DECOMPOSITION PATTERNS
+
+This part covers patterns specifically for breaking big goals into doable steps.
+
+Decomposition means splitting a hard problem into smaller, easier parts.
+
+6.1 Plan-Then-Execute Patterns
+
+• Writing a full plan before taking any action
+
+• Executing each planned step in order
+
+• Tracking which steps are done and which remain
+
+6.2 Interleaved Planning Patterns
+
+• Planning a little, acting, then planning again
+
+• Adapting the plan as new information arrives
+
+• Replanning after a failed or surprising step
+
+6.3 Goal Management Patterns
+
+• Subgoal stacks, meaning tracking goals and the smaller goals beneath them
+
+• Dependency handling, meaning doing steps in the right order
+
+• Least-to-most decomposition, where simpler sub-problems are solved first
+
+6.4 Stopping and Recovery Patterns
+
+• Defining clear success and failure conditions
+
+• Loop and progress detection to avoid getting stuck
+
+• Backtracking, meaning undoing a step and trying another path
+
+• Knowing when to stop, escalate, or give up
+
+
+PART 7 - MEMORY AND CONTEXT PATTERNS
+
+This part covers patterns for remembering information and managing the limited space the model can read at once.
+
+The context window is the limited amount of text a model can consider at one time.
+
+7.1 Memory Manager Pattern
+
+• A dedicated component that stores and retrieves persistent information
+
+• Holding user preferences, long-term facts, and past interactions
+
+• Preventing repetition and supporting continuity across sessions
+
+7.2 Memory Type Patterns
+
+• Short-term or working memory for the current task
+
+• Episodic memory for specific past events
+
+• Semantic memory for general facts and concepts
+
+• Procedural memory for how-to knowledge such as workflows
+
+7.3 Context Management Patterns
+
+• Summarization, meaning compressing old information so it still fits
+
+• Context pruning, meaning removing low-value information
+
+• Relevance ranking, meaning ordering information so the most useful comes first
+
+• Context budgeting, meaning dividing the space among instructions, memory, and tools
+
+7.4 Memory Hygiene Patterns
+
+• Consolidation, meaning merging and cleaning related memories
+
+• Intelligent forgetting, meaning discarding what is no longer useful
+
+• Conflict resolution, meaning choosing between memories that disagree
+
+• Guarding against memory poisoning, meaning false information planted for the agent to trust later
+
+
+PART 8 - RETRIEVAL AND KNOWLEDGE PATTERNS
+
+This part covers patterns for grounding agents in real and current information.
+
+Retrieval-Augmented Generation (RAG) is a method that fetches relevant documents and adds them to the model's context so answers rest on evidence.
+
+8.1 Classic Retrieval-Augmented Generation (RAG) Pattern
+
+• The retrieve, then read, then generate sequence
+
+• Chunking, meaning splitting documents into retrievable pieces
+
+• Indexing, meaning organizing chunks for fast lookup
+
+• Citing sources so claims can be checked
+
+8.2 Agentic Retrieval Patterns
+
+• Letting the agent decide what to retrieve next
+
+• Iterative retrieval, meaning fetching in several rounds as understanding grows
+
+• Query rewriting, meaning improving a search request before sending it
+
+• Routing a question to the right knowledge source
+
+8.3 Multi-Source Knowledge Patterns
+
+• Combining documents, databases, and live data
+
+• Knowledge graphs, which store facts as connected entities and relationships
+
+• Reconciling conflicting or low-quality sources
+
+• Keeping retrieved knowledge fresh and current
+
+8.4 Grounding and Verification Patterns
+
+• Checking that an answer is supported by the retrieved evidence
+
+• Flagging unsupported or uncertain claims
+
+• Re-retrieving when evidence is missing or weak
+
+
+PART 9 - TOOL USE AND ACTION PATTERNS
+
+This part covers patterns for letting an agent act on the world through external functions.
+
+A tool is an external function, service, or Application Programming Interface (API) the agent can call, where an Application Programming Interface (API) is a defined way for one program to request services from another.
+
+9.1 Tool Invocation Patterns
+
+• Function calling, where the model selects a tool and builds its inputs
+
+• Tool selection among many available tools
+
+• Result interpretation, meaning reading and using a tool's output
+
+• Chaining tool calls to complete a multi-step action
+
+9.2 Tool Design Patterns
+
+• Narrow, single-purpose tools rather than broad, ambiguous ones
+
+• Clear descriptions so the model knows when to use each tool
+
+• Input validation, meaning checking inputs are safe and well formed
+
+• Predictable outputs and understandable error messages
+
+9.3 Safe Action Patterns
+
+• Sandboxing, meaning running risky actions in an isolated environment
+
+• Confirmation gates that require approval before high-impact actions
+
+• Idempotent actions, meaning actions that can be repeated safely without duplicate effects
+
+• Dry-run and simulation before real execution
+
+9.4 Code and Computer Use Patterns
+
+• Code-writing and code-execution tools
+
+• Browser and computer-control tools
+
+• Data and database read and write tools
+
+• Action tools that change real systems such as sending messages or creating records
+
+
+PART 10 - MULTI-AGENT COLLABORATION PATTERNS
+
+This part covers patterns for arranging several agents that work together.
+
+A multi-agent system is a design where multiple specialized agents cooperate on a problem too large or varied for one.
+
+10.1 Supervisor and Hierarchical Patterns
+
+• The supervisor pattern, where a lead agent assigns tasks to worker agents
+
+• Hierarchical command structures with layers of supervisors and workers
+
+• Centralized coordination and its bottleneck risk
+
+• When a stable, predictable hierarchy fits the problem
+
+10.2 Pipeline Patterns
+
+• A line of agents that hand work from one to the next
+
+• Each agent performing one stage of a larger process
+
+• Adding checks between stages
+
+• Strengths for routine, sequential work
+
+10.3 Blackboard Patterns
+
+• A shared workspace that agents read from and write to
+
+• A control component that decides which agent acts next
+
+• Specialist agents contributing to a common evolving solution
+
+• Careful state management to keep the shared space consistent
+
+10.4 Swarm and Mesh Patterns
+
+• The swarm pattern, simulating a collaborative team of experts
+
+• The mesh pattern, where agents negotiate and iterate on a shared artifact
+
+• Peer-to-peer collaboration without a central boss
+
+• Tight feedback loops such as planner, coder, and tester working together
+
+10.5 Group Chat and Handoff Patterns
+
+• Group chat, where agents collaborate through a shared conversation
+
+• Handoff, where one agent transfers control to another based on context
+
+• Turn-taking and conversation management among agents
+
+• Knowing when to bring in or release an agent
+
+10.6 Competitive and Checking Patterns
+
+• Debate, where agents argue opposing positions to surface the best answer
+
+• Adversarial review, where one agent tries to find flaws in another's work
+
+• Redundancy, where multiple agents independently solve and compare
+
+• Using disagreement to improve reliability
+
+
+PART 11 - ORCHESTRATION TOPOLOGY PATTERNS
+
+This part covers patterns for the overall control and flow among agents.
+
+Orchestration means the coordination that decides which agent or step runs, in what order, and with what information.
+
+11.1 Managerial Orchestration
+
+• A master agent that decomposes a task and delegates to sub-agents
+
+• Centralized planning and result aggregation
+
+• Clear accountability through a single coordinator
+
+11.2 Adaptive Orchestration
+
+• Agents transferring control based on the evolving context
+
+• Dynamic delegation rather than a fixed plan
+
+• Flexibility for unpredictable, changing tasks
+
+11.3 Sequential and Concurrent Orchestration
+
+• Sequential orchestration, where steps run one after another
+
+• Concurrent orchestration, where steps run at the same time
+
+• Combining the two for mixed workloads
+
+11.4 Event-Driven Orchestration
+
+• Agents reacting to streams of events
+
+• Publishing and subscribing to messages, meaning systems announce events and others respond
+
+• Loose coupling, meaning components depend on each other as little as possible
+
+• Scaling and resilience benefits of event-driven design
+
+
+PART 12 - COMMUNICATION AND PROTOCOL PATTERNS
+
+This part covers patterns for how agents talk to tools and to one another in standard ways.
+
+A protocol is an agreed set of rules that lets separate systems exchange information reliably.
+
+12.1 Tool and Context Protocol Patterns
+
+• The Model Context Protocol (MCP), an open standard for connecting agents to tools and data
+
+• Standardized tool discovery and use through a shared protocol
+
+• Replacing many custom integrations with one common interface
+
+12.2 Agent-to-Agent Communication Patterns
+
+• The Agent-to-Agent (A2A) protocol for secure communication between agents from different vendors
+
+• Shared message formats and schemas, meaning agreed structures for exchanged data
+
+• Interoperability, meaning agents built with different frameworks working together
+
+12.3 Identity and Trust Patterns
+
+• Agent identity, meaning a verifiable name and credentials per agent
+
+• Authentication, meaning proving who an agent is
+
+• Authorization, meaning controlling what an agent may do
+
+• Service discovery, meaning finding available agents and tools at runtime
+
+
+PART 13 - SAFETY, GUARDRAIL, AND GOVERNANCE PATTERNS
+
+This part covers patterns that keep agents inside safe and intended behavior.
+
+A guardrail is a control that keeps the agent within acceptable limits.
+
+13.1 Input and Output Guardrail Patterns
+
+• Input filtering for unsafe or malicious requests
+
+• Output filtering for harmful, private, or non-compliant content
+
+• Detecting Personally Identifiable Information (PII), which is data that can identify a specific person
+
+• Separating trusted instructions from untrusted content to resist prompt injection, which is malicious text that tries to override the agent's instructions
+
+13.2 Safety Guardrail Agent Pattern
+
+• A dedicated agent that enforces safety and compliance rules
+
+• Blocking or modifying risky actions
+
+• Restricting tool usage to what is allowed
+
+• Layered, explicit guardrails rather than ones hidden inside prompts
+
+13.3 Access Control Patterns
+
+• Least privilege, meaning granting only the minimum access needed
+
+• Task-based and time-bound permissions that expire after use
+
+• A centralized policy engine that approves privileged steps
+
+• Escalating critical or irreversible actions for human approval
+
+13.4 Containment Patterns
+
+• Kill switches and circuit breakers that halt a misbehaving agent
+
+• Rate limiting and spending caps
+
+• Isolation and sandboxing of risky operations
+
+• Defense in depth, meaning multiple independent safeguards
+
+
+PART 14 - HUMAN-IN-THE-LOOP AND INTERACTION PATTERNS
+
+This part covers patterns for blending human judgment into an agent's work.
+
+Human-in-the-loop means a design where a person reviews, approves, or corrects the agent at key points.
+
+14.1 Approval and Checkpoint Patterns
+
+• Pausing at a checkpoint to wait for human review
+
+• Requiring approval before high-impact actions
+
+• Presenting the agent's plan for sign-off before execution
+
+14.2 Oversight Patterns
+
+• Human-on-the-loop, meaning a person supervises during operation
+
+• Escalation, meaning routing hard or risky cases to a human
+
+• Override and correction controls
+
+14.3 Interaction Design Patterns
+
+• Asking clarifying questions when the goal is unclear
+
+• Showing progress, uncertainty, and confidence to the user
+
+• Clean handoff between agent and human
+
+• Capturing human decisions to improve the agent later
+
+
+PART 15 - RELIABILITY AND OPTIMIZATION PATTERNS
+
+This part covers patterns that make agents dependable, fast, and affordable.
+
+Reliability means the agent behaves correctly and predictably even when things go wrong.
+
+15.1 Error-Handling Patterns
+
+• Retries with backoff, meaning trying again after waiting a growing amount of time
+
+• Fallbacks, meaning a backup plan when the first approach fails
+
+• Timeouts and step limits to prevent runaway behavior
+
+• Graceful degradation, meaning failing safely and predictably
+
+15.2 Performance Patterns
+
+• Caching, meaning reusing previous results instead of recomputing them
+
+• Parallel execution of independent steps
+
+• Streaming partial results to the user sooner
+
+• Reducing the number of model and tool calls
+
+15.3 Cost-Optimization Patterns
+
+• Model routing, meaning sending easy tasks to cheap models and hard tasks to strong ones
+
+• Token budgeting and context-size control
+
+• Avoiding unnecessary agent spawning and steps
+
+• Measuring and forecasting spending
+
+15.4 Scalability Patterns
+
+• Statelessness and horizontal scaling, meaning adding more machines to share load
+
+• Queueing and load management
+
+• Just-in-time routing of work to available resources
+
+
+PART 16 - EVALUATION AND OBSERVABILITY PATTERNS
+
+This part covers patterns for knowing whether an agent actually works.
+
+Observability is the ability to see what an agent is doing through traces, logs, and metrics.
+
+16.1 Tracing and Logging Patterns
+
+• Tracing, meaning recording the full sequence of thoughts, tool calls, and outputs
+
+• Structured logging of inputs, outputs, and decisions
+
+• Correlating events across multiple agents
+
+16.2 Offline Evaluation Patterns
+
+• Benchmarks and golden test sets with known correct outcomes
+
+• Scenario and edge-case testing
+
+• Regression testing, meaning checking that updates do not break past behavior
+
+16.3 Online Evaluation Patterns
+
+• Monitoring real production behavior
+
+• A/B testing, meaning comparing two versions with real traffic
+
+• Guardrail metrics and alerts in live use
+
+16.4 Judgment Patterns
+
+• Model-based evaluation, where one model grades another's work
+
+• Human review by expert evaluators
+
+• Rule-based checks for objective correctness
+
+• Combining offline and online evaluation into one strategy
+
+
+PART 17 - ANTI-PATTERNS AND PITFALLS
+
+This part covers common designs that look helpful but cause trouble.
+
+An anti-pattern is a tempting but flawed solution that tends to create more problems than it solves.
+
+17.1 Complexity Anti-Patterns
+
+• Over-engineering, meaning using a complex multi-agent design where a simple one would do
+
+• Premature multi-agent splitting before it is needed
+
+• Hidden state that makes behavior hard to test and reproduce
+
+17.2 Coordination Anti-Patterns
+
+• Coordinator bottlenecks, where one supervisor becomes overloaded
+
+• Context inconsistency, where parallel agents form conflicting views of the same state
+
+• Spawn amplification, where a small prompt change causes runaway agent creation and cost
+
+• Deadlocks and infinite loops between agents
+
+17.3 Reasoning Anti-Patterns
+
+• Endless reflection loops that never finish
+
+• Repeated identical thoughts and actions that fail to exit
+
+• Over-trusting the model's first answer without verification
+
+17.4 Safety Anti-Patterns
+
+• Implicit guardrails buried in prompts rather than enforced explicitly
+
+• Over-broad tool permissions
+
+• Acting on untrusted content as if it were trusted instruction
+
+• No human checkpoint on irreversible actions
+
+
+PART 18 - PATTERN SELECTION AND COMPOSITION
+
+This part covers how to choose patterns and combine them into a working system.
+
+Composition means assembling several patterns into one coherent design.
+
+18.1 Selecting Patterns
+
+• Matching patterns to task complexity, risk, and predictability
+
+• Choosing workflows for predictable tasks and agents for open-ended ones
+
+• Weighing flexibility against control, cost, and latency
+
+• Starting simple and adding patterns only when justified
+
+18.2 Composing Patterns
+
+• Common combinations such as supervisor plus pipeline plus a small blackboard
+
+• Nesting a workflow inside an agent or an agent inside a workflow
+
+• Keeping interfaces clean so patterns can be swapped
+
+• Avoiding conflicts between combined patterns
+
+18.3 Mapping Patterns to Frameworks
+
+• How graph-based frameworks express patterns as nodes and connections
+
+• How role-based frameworks express patterns as teams of agents
+
+• How conversation-based frameworks express patterns as dialogue
+
+• Keeping designs portable across frameworks
+
+
+PART 19 - DOMAIN PATTERN APPLICATIONS
+
+This part shows how patterns combine in real fields so the learner connects theory to practice.
+
+A domain is a particular area of work with its own needs and constraints.
+
+19.1 Software Engineering Agents
+
+• Planner, coder, and tester agents in a tight feedback loop
+
+• Reflection and evaluator-optimizer patterns for code quality
+
+• Tool use for running and testing code
+
+19.2 Customer Service Agents
+
+• Routing patterns for directing requests
+
+• Retrieval patterns for grounding answers in policy and history
+
+• Human-in-the-loop patterns for sensitive cases
+
+19.3 Research and Analysis Agents
+
+• Orchestrator-worker patterns for parallel investigation
+
+• Iterative retrieval and verification patterns
+
+• Reflection patterns for synthesizing findings
+
+19.4 Business-Process Automation Agents
+
+• Pipeline and sequential orchestration for routine steps
+
+• Guardrail and approval patterns for compliance
+
+• Event-driven patterns for reacting to business events
+
+
+PART 20 - PATTERN CATALOG REFERENCE
+
+This final part organizes the patterns into a quick reference a designer can return to.
+
+20.1 Quick Pattern Index
+
+• Single-agent reasoning patterns and when to use each
+
+• Workflow patterns and when to use each
+
+• Multi-agent and orchestration patterns and when to use each
+
+• Safety, reliability, and evaluation patterns and when to use each
+
+20.2 A Pattern Template for New Patterns
+
+• Name and short description
+
+• Problem and context
+
+• Structure and participants
+
+• Trade-offs and consequences
+
+• Known uses and related patterns
+
+20.3 Putting It All Together
+
+• Mapping a real project onto patterns from this catalog
+
+• Prioritizing patterns when goals conflict
+
+• Building incrementally from a simple, safe baseline
+
+• Continuously measuring, learning, and refining the design
+
+
+APPENDIX A - GLOSSARY OF KEY TERMS
+
+• Design pattern - a named, reusable solution to a recurring design problem
+
+• Anti-pattern - a tempting but flawed solution that causes more problems than it solves
+
+• Agent - software built around a model that reasons, decides, uses tools, and acts toward a goal
+
+• Augmented Large Language Model (LLM) - a language model extended with retrieval, tools, and memory
+
+• Workflow - an arrangement of model calls and tools connected in a defined, mostly fixed structure
+
+• Orchestration - the coordination that decides which agent or step runs, in what order, with what information
+
+• ReAct (Reason and Act) - a pattern that alternates reasoning steps with tool actions in a loop
+
+• Reflection - a pattern where the agent reviews and improves its own output
+
+• Retrieval-Augmented Generation (RAG) - fetching relevant documents and adding them to the model's context to ground answers
+
+• Blackboard - a shared workspace that multiple agents read from and write to
+
+• Guardrail - a control that keeps an agent within safe and intended behavior
+
+• Human-in-the-loop - a design where a person reviews, approves, or corrects the agent at key points
+
+• Model Context Protocol (MCP) - an open standard for connecting agents to tools and data
+
+• Agent-to-Agent (A2A) protocol - an open standard for secure communication between agents
+
+
+APPENDIX B - SUGGESTED LEARNING PATH
+
+• Begin with Parts 1 and 2 to learn what patterns are and the building block they share
+
+• Study Parts 3 through 5 for single-agent reasoning, the core patterns, and workflow patterns
+
+• Continue with Parts 6 through 9 for planning, memory, retrieval, and tool patterns
+
+• Move to Parts 10 through 12 for multi-agent, orchestration, and communication patterns
+
+• Cover Parts 13 through 16 for safety, human oversight, reliability, and evaluation patterns
+
+• Finish with Parts 17 through 20 for anti-patterns, composition, domain applications, and the catalog reference
+
+
+END OF OUTLINE
