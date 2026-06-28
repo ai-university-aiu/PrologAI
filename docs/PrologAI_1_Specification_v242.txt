@@ -1,4 +1,4 @@
-PROLOGAI PLATFORM SPECIFICATION  (v240)
+PROLOGAI PLATFORM SPECIFICATION  (v242)
 
 THE AUTHORITATIVE REFERENCE
 
@@ -18125,3 +18125,48 @@ ARC2-W7-SPEC-006: arc2_induce_rule(TrainingPairs, staircase_lift) succeeds when:
 (b) row 0 of the first training input has 0 at column 0 and 5 at column 9;
 (c) row 7 of the first training input has 5 at column 9;
 (d) arc2_transform(staircase_lift, In, Out) holds for every pair(In, Out).
+
+
+PART 271: ARC-AGI-2 WAVE 13 - ODD COL RULE
+
+ARC2-W13-SPEC-001: The odd_col rule operates on a grid that is an N-row by
+M-col tiling of identical-sized rectangular cells separated by uniform
+separator rows and separator cols. A separator row is a row in which all
+cells share the same value. A separator col is a column in which all cells
+in that column share the same value. The separator value need not equal the
+background (most-common) value of the interior cells.
+
+ARC2-W13-SPEC-002: Each row section is the region between two adjacent
+separator rows (inclusive of both separator rows). Each col section is the
+region between two adjacent separator cols (inclusive of both separator
+cols). A cell is the intersection of one row section and one col section.
+
+ARC2-W13-SPEC-003: Within each row section, all col sections contain
+nearly-identical interior patterns. Exactly one col section per row section
+(the odd col) has an interior pattern that differs from all others. When no
+col section differs (all identical), the first col section is treated as the
+canonical representative.
+
+ARC2-W13-SPEC-004: The output grid has the same number of rows as the input
+and a column width equal to one col section (c1 - c0 + 1 where c0 and c1
+are the first separator col and the second separator col). For each row r
+in the input, the output row is the row slice from the odd col section of
+the row section containing r.
+
+ARC2-W13-SPEC-005: The odd col section is identified by majority vote across
+content rows (non-separator rows) within each row section. For each content
+row, the strips (row slices) of all col sections are compared. The col
+section whose strip is unique (differs from the majority strip) casts one
+vote. The col section with the most votes across all content rows in the
+section is the odd col. Ties or no votes default to col section index 0.
+
+ARC2-W13-SPEC-006: arc2_induce_rule(TrainingPairs, odd_col) succeeds when
+arc2_transform(odd_col, In, Out) holds for every pair(In, Out) in
+TrainingPairs.
+
+ARC2-W13-SPEC-007: odd_col solves ARC-AGI-2 task 38007db0. The input is a
+19x19 grid (train 0) or 19x25 grid (train 1) of 3x3 or 3x4 cell tiles,
+each cell 5x5 interior enclosed by a uniform-value border. The test input is
+a 29x29 grid of 4x4 cell tiles. Exactly one cell per row section has a
+unique interior pattern; the output isolates that cell's column section for
+each row section. Score advances from 12/120 = 10.00% to 13/120 = 10.83%.

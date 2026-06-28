@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v298)
+PROLOGAI COMPLETION  (v300)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -7909,3 +7909,18 @@ New predicates: wf_bfs_/7, wf_eff_/6, wf_spread_/9, wf_edge_/10, wf_enq_/5,
 wf_pq_ins_/3, wf_enq_all_/6, wf_build_/4, wf_build_row_/5.
 File: Mentova/src/mentova/games/arc_benchmark_2.pl
 SPARC: Specification v241, Pseudocode v233, Architecture v236, Refinement v293, Completion v299
+
+ARC-AGI-2 Wave 13: odd_col - Unique col section extraction per row section (task 38007db0).
+The grid is a tiling of identical-sized rectangular cells separated by uniform separator
+rows and cols.  One col section per row section has a unique interior pattern differing
+from all the other col sections in that row.  The output collapses the grid to one col
+section wide by extracting the unique col section for each row section.  Identification
+uses majority voting across content rows: for each content row, the strip that differs
+from the majority strip casts a vote; the col section with the most votes is the unique
+one.  Both training pairs and the test case of task 38007db0 pass.
+Score advance: 12/120 = 10.00% to 13/120 = 10.83%.
+New predicates: oc_all_same_/2, oc_adjacent_pairs_/2, oc_strip_/4,
+oc_strips_for_row_/4, oc_majority_strip_/2, oc_find_unique_idx_/3,
+oc_vote_unique_col_/5, oc_build_secs_/5.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+SPARC: Specification v242, Pseudocode v234, Architecture v237, Refinement v294, Completion v300

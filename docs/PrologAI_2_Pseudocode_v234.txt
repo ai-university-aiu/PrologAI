@@ -1,4 +1,4 @@
-PROLOGAI PSEUDOCODE  (v232)
+PROLOGAI PSEUDOCODE  (v234)
 
 ENGLISH READABLE CODE (ERC) - THE LOGIC OF EVERY WORK PACKAGE
 
@@ -15497,3 +15497,67 @@ arc2_induce_rule(TrainingPairs, staircase_lift) ->
   Guard: In0[7][9] == 5
   Guard: forall pair(In,Out) in TrainingPairs:
            arc2_transform(staircase_lift, In, Out) succeeds and matches Out.
+
+
+PART 271: ARC-AGI-2 WAVE 13 PSEUDOCODE - ODD COL RULE
+
+% Solve task 38007db0.  The grid is a tiling of N row sections by M col
+% sections separated by uniform-value rows and cols.  One col section per
+% row section has a unique interior pattern.  Output that one col section
+% per row section, giving a single-column-section output with the same
+% row structure as the input.
+
+% Helper: all_same(List) - true when every element of List is equal.
+all_same([]) -> true
+all_same([_]) -> true
+all_same([H, H | T]) -> all_same([H | T])
+
+% Helper: strip(Row, C0, C1) - return Row[C0..C1] inclusive.
+strip(Row, C0, C1) -> Row[C0 .. C1]
+
+% Helper: majority(Values) - return the most frequent value.
+majority(Values) -> mode(sort(Values))
+
+% Step 1 - find separator rows and cols.
+sep_rows(Grid) -> [R | all cells in Grid[R] are equal]
+sep_cols(Grid) -> [C | all cells in column C of Grid are equal]
+
+% Step 2 - build row sections and col sections (adjacent-pair intervals).
+row_sections(SepRows) -> [(SepRows[i], SepRows[i+1]) | i in 0..len-2]
+col_sections(SepCols) -> [(SepCols[j], SepCols[j+1]) | j in 0..len-2]
+
+% Step 3 - for each row section, vote for the unique col section.
+vote_unique_col(R0, R1, Grid, ColSecs) ->
+  votes = empty_counter
+  for R in R0+1 .. R1-1:                  % content rows only
+    Strips = [strip(Grid[R], C0, C1) | (C0,C1) in ColSecs]
+    MajStrip = [majority(Strips[*][i]) | i in 0..len(Strips[0])-1]
+    DiffIdxs = [j | Strips[j] != MajStrip]
+    if len(DiffIdxs) == 1:
+      votes[DiffIdxs[0]] += 1
+  if votes is non-empty:
+    return argmax(votes)
+  else:
+    return 0                              % all identical; use first
+
+% Step 4 - build output.
+arc2_transform odd_col(Grid) ->
+  SepRows = sep_rows(Grid)
+  SepCols = sep_cols(Grid)
+  ColSecs = col_sections(SepCols)
+  RowSecs = row_sections(SepRows)
+  UniqueJs = [vote_unique_col(R0, R1, Grid, ColSecs) | (R0,R1) in RowSecs]
+  (C0First, C1First) = ColSecs[0]
+  Result = []
+  for (i, (R0, R1)) in enumerate(RowSecs):
+    J = UniqueJs[i]
+    (C0, C1) = ColSecs[J]
+    for R in R0 .. R1-1:
+      Result.append(strip(Grid[R], C0, C1))
+  Result.append(strip(Grid[SepRows[-1]], C0First, C1First))
+  return Result
+
+arc2_induce_rule(TrainingPairs, odd_col) ->
+  Guard: TrainingPairs is non-empty
+  Guard: forall pair(In, Out) in TrainingPairs:
+           arc2_transform(odd_col, In, Out) succeeds and matches Out.
