@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v290)
+PROLOGAI COMPLETION  (v292)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -7773,3 +7773,32 @@ arc2_segeq_setrange_/7, arc2_segeq_adj1_/7, arc2_segeq_adjall_/7.
 File: Mentova/src/mentova/games/arc_benchmark_2.pl
 PR: Mentova #313
 SPARC: Completion v290
+
+
+Data Layer Pack: periodfix (ppf_*, Layer 253) - WP-278
+  14 public predicates for periodic pattern detection and single-corruption repair.
+  List operations: ppf_list_period, ppf_majority, ppf_tile_from_list, ppf_violations_list,
+    ppf_repair_list, ppf_best_period_list, ppf_single_violation_list, ppf_repair_single_list.
+  Grid operations: ppf_tile_2d, ppf_violations_2d, ppf_repair_grid, ppf_best_periods,
+    ppf_single_violation_2d, ppf_repair_single_grid.
+  30 PLUnit tests, all pass.
+  Motivation: ARC-AGI-2 tasks involving periodic patterns with one corrupted cell.
+  SPARC: Architecture v233, Completion v291.
+
+
+ARC-AGI-2 Benchmark: Wave 5 - stub_rank_fill (Acc_303, 2026-06-27)
+Status: COMPLETE
+Score: 5 / 120 = 4.17%
+Task solved: 97d7923e
+Rule: stub_rank_fill - column stubs at the top of the grid rank which vertical
+bar to fill. A stub of length N at column C with color V means "select the
+Nth-largest vertical bar with endpoint color V (by body length, descending) and
+fill its body with V." A vertical bar has pattern [V, B, ..., B, V] in a single
+column where V is the endpoint color and B is the body color. Body cells (between
+the two endpoints) are replaced with V for the selected bar. Multiple stubs are
+processed independently in a single pass.
+New predicates: arc2_srf_top_run_/5, arc2_srf_find_vbar_/8,
+arc2_srf_apply_fills_/3, arc2_srf_in_fill_zone_/4.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+PR: Mentova #314
+SPARC: Completion v292
