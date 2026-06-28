@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v294)
+PROLOGAI REFINEMENT  (v295)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -19399,3 +19399,68 @@ AC-OC-006: arc2_induce_rule([pair(T0In,T0Out), pair(T1In,T1Out)], odd_col)
 AC-OC-007: full benchmark run confirms 13/120 = 10.83% with no regressions.
   Passing tasks: 1818057f, 31f7f899, 36a08778, 38007db0, 409aa875, 45a5af55,
   4c3d4a41, 7491f3cf, 7b5033c1, 80a900e0, 8e5c0c38, 97d7923e, e376de54.
+
+% ARC-AGI-2 Wave 14 acceptance criteria - reflect_axis rule (task 7ed72f31)
+
+AC-RA-001: ra_axis_([3-5], p(3,5)) succeeds.
+  ra_axis_([2-14, 3-14, 4-14, 5-14], v(14)) succeeds.
+  ra_axis_([15-11, 15-12, 15-13, 15-14, 15-15], h(15)) succeeds.
+
+AC-RA-002: ra_reflect_(2, 4, p(4,5), 6, 6) succeeds.
+  ra_reflect_(5, 11, v(14), 5, 17) succeeds.
+  ra_reflect_(14, 11, h(15), 16, 11) succeeds.
+
+AC-RA-003: arc2_transform(reflect_axis, Train0In, Train0Out) succeeds and
+  produces the correct 18x18 output for task 7ed72f31 training pair 0 (bg=1,
+  4 shapes reflected through their 2-clusters). All 18 changes confirmed.
+
+AC-RA-004: arc2_transform(reflect_axis, Train1In, Train1Out) succeeds and
+  produces the correct 18x18 output for task 7ed72f31 training pair 1 (bg=8,
+  3 shapes reflected through their 2-clusters). All 18 changes confirmed.
+
+AC-RA-005: arc2_transform(reflect_axis, TestIn, TestOut) succeeds and
+  produces the correct output for task 7ed72f31 test case (bg=8, 3 shapes:
+  4-shape point-reflected, 1-shape point-reflected, 3-shape hrow-reflected).
+
+AC-RA-006: arc2_induce_rule([pair(T0In,T0Out), pair(T1In,T1Out)], reflect_axis)
+  succeeds for both training pairs of task 7ed72f31.
+
+AC-RA-007: full benchmark run confirms 14/120 = 11.67% with no regressions.
+  Passing tasks: 1818057f, 31f7f899, 36a08778, 38007db0, 409aa875, 45a5af55,
+  4c3d4a41, 7491f3cf, 7b5033c1, 7ed72f31, 80a900e0, 8e5c0c38, 97d7923e, e376de54.
+
+% ARC-AGI-2 Wave 15 acceptance criteria - period_repair rule (task 135a2760)
+
+AC-PR-001: pr2_majority_base_([4,4,8,4,8,4,8,4,8,4,8,8,8,4,8,4,8,4,8,4,8,8,8,4,8], 2, [8,4])
+  succeeds. Even positions: majority 8 (12/13). Odd positions: majority 4 (10/12).
+
+AC-PR-002: pr2_min_support_([4,4,8,4,8,4,8,4,8,4,8,8,8,4,8,4,8,4,8,4,8,8,8,4,8], 2, [8,4], MS)
+  succeeds with MS = 0.8333... (10/12, minimum support at odd residue class).
+
+AC-PR-003: pr2_best_period_([4,4,8,4,8,4,8,4,8,4,8,8,8,4,8,4,8,4,8,4,8,8,8,4,8], 2, [8,4], Errors)
+  succeeds with 3 errors: err(0,4,8), err(11,8,4), err(21,8,4).
+
+AC-PR-004: pr2_best_period_([8,8,8,1,8,8,8,8,8,1,8,8,8,8,8,1,8,8,8,8,8,8,8,8,8], 6, [8,8,8,1,8,8], Errors)
+  succeeds with 1 error: err(21,8,1). Period-6 selected over period-2 (3 errors)
+  because fewer errors.
+
+AC-PR-005: arc2_transform(period_repair, Train0In, Train0Out) succeeds and
+  produces the correct 5x13 output for task 135a2760 training pair 0 (bg=3,
+  wall=2, row-2 inner sequence period-2 repair, 1 change).
+
+AC-PR-006: arc2_transform(period_repair, Train1In, Train1Out) succeeds and
+  produces the correct 21x22 output for task 135a2760 training pair 1 (bg=4,
+  wall=2, 9 row repairs, periods 2-4). All 9 changes confirmed.
+
+AC-PR-007: arc2_transform(period_repair, TestIn, TestOut) succeeds and
+  produces the correct 29x29 output for task 135a2760 test case (bg=8, wall=3,
+  9 column repairs, periods 2-6, including 3 changes in column 17). All 9
+  changes confirmed.
+
+AC-PR-008: arc2_induce_rule([pair(T0In,T0Out), pair(T1In,T1Out)], period_repair)
+  succeeds for both training pairs of task 135a2760.
+
+AC-PR-009: full benchmark run confirms 15/120 = 12.50% with no regressions.
+  Passing tasks: 135a2760, 1818057f, 31f7f899, 36a08778, 38007db0, 409aa875,
+  45a5af55, 4c3d4a41, 7491f3cf, 7b5033c1, 7ed72f31, 80a900e0, 8e5c0c38,
+  97d7923e, e376de54.

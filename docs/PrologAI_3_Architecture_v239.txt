@@ -1,4 +1,4 @@
-PROLOGAI ARCHITECTURE  (v237)
+PROLOGAI ARCHITECTURE  (v238)
 
 HOW THE COMPONENTS FIT TOGETHER AND COMMUNICATE
 
@@ -9840,3 +9840,62 @@ Key predicates (private to arc_benchmark_2 module):
 
 No new Data Layer pack is required; all logic is self-contained in the benchmark file.
 Score impact: 12/120 = 10.00% -> 13/120 = 10.83% (+1 task, +0.83%).
+
+-- ARC-AGI-2 Wave 14: reflect_axis --
+
+Location: src/mentova/games/arc_benchmark_2.pl, Wave 14 block (after Wave 13 odd_col block).
+Implements: arc2_named_rule(reflect_axis), arc2_transform(reflect_axis, +Grid, -Result),
+            arc2_induce_rule(+TrainingPairs, reflect_axis).
+Solves: task 7ed72f31 (shapes reflected across nearest 2-marker axis).
+
+Architecture: the rule finds the background color by mode of the grid, groups
+2-cells into 4-connected clusters, groups non-background non-2 cells into
+4-connected shape components, pairs each shape with its nearest 2-cluster by
+minimum Manhattan distance, determines the axis type (point/vertical/horizontal)
+from the cluster's geometry, then reflects each shape cell and adds the result
+to the output grid.
+
+Key predicates (private to arc_benchmark_2 module):
+  ra_bg_/2                 - background color by mode
+  ra_nrc_/3                - grid dimensions
+  ra_inb_/4                - bounds check
+  ra_nbrs4_/5              - 4-connected neighbors
+  ra_absorb_/4             - BFS frontier absorption
+  ra_bfs4_/6               - 4-connected BFS over point sets
+  ra_cc4_/4                - connected components of R-C pairs
+  ra_split_col_/4          - split cells by color
+  ra_add_col_/3            - add color to R-C pairs
+  ra_shape_comps_/5        - shape connected components
+  ra_min_manhattan_/3      - minimum Manhattan distance
+  ra_nearest_cluster_/3    - nearest 2-cluster for a shape
+  ra_extract_rows_/2       - extract row indices from R-C pairs
+  ra_extract_cols_/2       - extract col indices from R-C pairs
+  ra_all_equal_/1          - check all list elements equal
+  ra_axis_/2               - axis type from 2-cluster geometry
+  ra_reflect_/5            - reflect point through axis
+  ra_set_cell_/5           - set one cell in a grid
+  ra_reflect_pts_/7        - add reflected cells to grid
+  ra_apply_refls_/6        - reflect all shape components
+
+No new Data Layer pack is required; all logic is self-contained in the benchmark file.
+Score impact: 13/120 = 10.83% -> 14/120 = 11.67% (+1 task, +0.83%).
+
+ARC-AGI-2 Wave 15: period_repair - Periodic-pattern deviation repair (task 135a2760).
+Finds inner sequences between wall markers in rows and columns. For each sequence,
+selects the period P (in 2..N//2) with minimum-support >= 0.75 and fewest errors (1..3),
+then repairs deviating cells to the majority-vote base. Row repair first, then column
+repair via transpose-repair-transpose. New predicates:
+  pr2_repair_row_/3        - repair one row by segment
+  pr2_fix_segs_/3          - iterate over wall-pair segments
+  pr2_extract_/4           - extract sub-list
+  pr2_apply_fixes_/4       - apply error corrections to row
+  pr2_replace_nth0_/4      - replace element at index
+  pr2_best_period_/4       - select best period with support threshold
+  pr2_majority_base_/3     - majority-vote base for all residues
+  pr2_min_support_/4       - minimum support fraction across residues
+  pr2_errors_/4            - collect deviating positions
+  pr2_mode_/2              - mode of a list
+  pr2_mode_acc_/6          - mode accumulator helper
+
+No new Data Layer pack is required; all logic is self-contained in the benchmark file.
+Score impact: 14/120 = 11.67% -> 15/120 = 12.50% (+1 task, +0.83%).
