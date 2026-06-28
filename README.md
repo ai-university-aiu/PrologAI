@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/SWI--Prolog-9.0.4%2B-8A2BE2?style=for-the-badge" alt="SWI-Prolog 9.0.4+">
   <img src="https://img.shields.io/badge/reasoning-48%20types-5865F2?style=for-the-badge" alt="48 Reasoning Types">
   <img src="https://img.shields.io/badge/protocols-MCP%20%7C%20A2A%20%7C%20ACP%20%7C%20ANP-0075CA?style=for-the-badge" alt="MCP | A2A | ACP | ANP">
-  <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="MIT License">
+  <img src="https://img.shields.io/badge/license-Attribution%20No%20Profit%20No%20Problem-orange?style=for-the-badge" alt="The Attribution. No Profit, No Problem License">
 </p>
 
 <p align="center">
@@ -566,9 +566,17 @@ Every answer Mentova produces comes with a readable justification tree — the c
 ## Author
 
 **D. R. Dison**  
-Founder of AIU (Artificial Intelligence University) · Creator of PrologAI and Mentova  
+Founder of AIU (Artificial Intelligence University) · Creator and Owner of PrologAI and Mentova  
 ORCID: 0009-0001-9246-5758 · [LinkedIn](https://www.linkedin.com/in/d-r-dison/)
 
 ---
 
-*MIT License — see [LICENSE](LICENSE)*
+## License
+
+**The Attribution. No Profit, No Problem License** — see [LICENSE.txt](LICENSE.txt)
+
+Free for non-commercial use (individuals, students, educators, non-profits, academic researchers) with required attribution to PrologAI, Mentova, and D. R. Dison.
+
+Commercial and profit-making use requires a negotiated license including a percentage-of-profits royalty. Contact [ai.university.aiu@gmail.com](mailto:ai.university.aiu@gmail.com) before any commercial use begins.
+
+See [COMMERCIAL.txt](COMMERCIAL.txt) for the full commercial licensing process.
