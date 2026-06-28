@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v297)
+PROLOGAI COMPLETION  (v298)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -7881,3 +7881,31 @@ New predicates: as_comp_proj_/7, as_arm_proj_/10, as_8nbr_wings_/5,
 as_bg_nonbg_split_/5, as_count_hits_/2.
 File: Mentova/src/mentova/games/arc_benchmark_2.pl
 SPARC: Specification v241, Pseudocode v233, Architecture v236, Refinement v291, Completion v297
+
+ARC-AGI-2 Wave 11: sym_restore - Per-colour vertical symmetry restoration (task 8e5c0c38).
+Each non-background colour group has a vertical mirror axis (integer or half-integer
+column).  For each group the rule finds the axis that minimises the number of orphan
+cells (cells whose column-mirror is absent from the group), then removes those orphans
+by setting them to background.  Train 0 (bg=8): colour 1 axis=8.0 removes 3 orphans,
+colour 2 axis=13.0 removes 3 orphans, colour 6 axis=17.0 removes 1 orphan.  Train 1
+(bg=0): colour 2 axis=16.5 removes 2 orphans, colour 4 axis=12.0 removes 2 orphans,
+colour 8 axis=7.0 removes 2 orphans.  Test (bg=1): colour 3 axis=18.0 removes 2,
+colour 4 axis=6.0 removes 3, colour 6 axis=9.5 removes 12; total 17 changes.
+New predicates: sr_color_groups_/3, sr_all_orphans_/2, sr_best_v_orphans_/2,
+sr_min_orphans_/3, sr_orphans_for_axis_/3, sr_remove_rows_/5, sr_remove_row_/6.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+SPARC: Specification v241, Pseudocode v233, Architecture v236, Refinement v292, Completion v298
+
+ARC-AGI-2 Wave 12: waterfall - Gravity-based 6-flow around obstacles (task 36a08778).
+Existing 6-seed cells flow downward by gravity through background cells.  When a 6-cell
+is blocked below by an in-grid obstacle (non-bg, non-6), it spreads horizontally in its
+current row in both directions.  Spreading stops at the first cell that CAN drain down
+(included in the fill range, drain point) or at a barrier (existing 6, obstacle, or grid
+boundary).  OOB below does NOT trigger spreading; the 6 simply halts at the bottom.  The
+result is a connected network of 6-filled paths outlining each obstacle cluster and linking
+back to the original seeds, exactly matching the training examples.  All 6 training pairs
+and the test case of task 36a08778 pass.  Score advance: 11/120 = 9.17% to 12/120 = 10.00%.
+New predicates: wf_bfs_/7, wf_eff_/6, wf_spread_/9, wf_edge_/10, wf_enq_/5,
+wf_pq_ins_/3, wf_enq_all_/6, wf_build_/4, wf_build_row_/5.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+SPARC: Specification v241, Pseudocode v233, Architecture v236, Refinement v293, Completion v299

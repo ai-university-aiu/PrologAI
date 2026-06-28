@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v291)
+PROLOGAI REFINEMENT  (v292)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -19264,3 +19264,112 @@ AC-AS-010: arc2_transform(apex_shadow, TestIn, TestOut) succeeds and produces
 AC-AS-011: full benchmark run confirms 10/120 = 8.33% with no regressions.
   Passing tasks: 1818057f, 31f7f899, 409aa875, 45a5af55, 4c3d4a41, 7491f3cf,
   7b5033c1, 80a900e0, 97d7923e, e376de54.
+
+% ---------------------------------------------------------------------------
+% ACCEPTANCE CRITERIA - ARC-AGI-2 Wave 11 (sym_restore) - AC-SR prefix
+% ---------------------------------------------------------------------------
+
+AC-SR-001: sr_color_groups_(Grid, Bg, Groups) succeeds and returns one group
+  per distinct non-background colour in Grid.  Groups is a list of V-Cells
+  pairs where V is the colour value and Cells = [rc(R,C),...].
+
+AC-SR-002: sr_orphans_for_axis_(Cells, Ax2, Orphans) succeeds and returns
+  Orphans = [rc(5,15)] when Cells = [rc(5,15),rc(5,16),rc(5,17),rc(5,18),
+  rc(6,16),rc(6,18),rc(7,16),rc(7,17),rc(7,18)] and Ax2 = 34 (axis = col 17):
+  rc(5,15) maps to rc(5,19) which is absent.
+
+AC-SR-003: sr_best_v_orphans_ on the colour-6 cells of train-0 in task
+  8e5c0c38 returns exactly [rc(5,15)] (1 orphan, axis col 17.0).
+
+AC-SR-004: sr_best_v_orphans_ on the colour-1 cells of train-0 in task
+  8e5c0c38 returns exactly [rc(3,9),rc(7,4),rc(8,4)] (3 orphans, axis col 8.0).
+
+AC-SR-005: sr_best_v_orphans_ on the colour-2 cells of train-0 in task
+  8e5c0c38 returns exactly [rc(14,16),rc(14,17),rc(16,10)] (3 orphans, axis
+  col 13.0).
+
+AC-SR-006: arc2_transform(sym_restore, TrainIn0, Out0) succeeds and produces
+  the correct output for training pair 0 of task 8e5c0c38: 7 orphan cells
+  across colours 1, 2, and 6 are set to background (8).
+
+AC-SR-007: arc2_transform(sym_restore, TrainIn1, Out1) succeeds and produces
+  the correct output for training pair 1 of task 8e5c0c38: 6 orphan cells
+  across colours 2, 4, and 8 are set to background (0).
+
+AC-SR-008: arc2_transform(sym_restore, TestIn, TestOut) succeeds and produces
+  the correct output for the test case of task 8e5c0c38: 17 orphan cells
+  across colours 3, 4, and 6 are set to background (1).  Colour 6 (58 cells)
+  has axis col 9.5 with 12 orphans; colour 3 (8 cells) has axis col 18.0 with
+  2 orphans; colour 4 (22 cells) has axis col 6.0 with 3 orphans.
+
+AC-SR-009: full benchmark run confirms 11/120 = 9.17% with no regressions.
+  Passing tasks: 1818057f, 31f7f899, 409aa875, 45a5af55, 4c3d4a41, 7491f3cf,
+  7b5033c1, 80a900e0, 8e5c0c38, 97d7923e, e376de54.
+
+Part SR-WF: Waterfall Rule Acceptance Criteria (Wave 12)
+Task: 36a08778
+Rule: waterfall
+Change type: all bg → 6 (background cells become seed colour)
+Training pairs: 6
+Test case: 1
+Score before: 11/120 = 9.17%
+Score after:  12/120 = 10.00%
+
+Algorithm: gravity-based BFS from existing 6-seeds. Each 6-cell either
+(a) flows DOWN into a bg cell, or (b) if blocked by an in-grid obstacle
+(non-bg, non-6), spreads LEFT and RIGHT in the current row. Spreading stops
+at the first cell that CAN fall down (drain point, included in fill range)
+or at a barrier (existing 6, obstacle, or grid boundary). OOB below does
+NOT trigger spreading; water simply halts at the bottom row.
+
+Key predicates:
+  wf_bfs_/7      — priority-queue BFS (row-major order)
+  wf_eff_/6      — effective cell value (Vis overrides original grid)
+  wf_spread_/9   — compute horizontal spread from a blocked cell
+  wf_edge_/10    — find left or right edge of a spread range
+  wf_enq_/5      — enqueue a cell if not already visited
+  wf_pq_ins_/3   — insert into sorted priority queue
+  wf_enq_all_/6  — enqueue a list of cells, collecting newly added ones
+  wf_build_/4    — apply new-mark set to original grid
+  wf_build_row_/5 — apply marks to a single row
+
+AC-WF-001: arc2_named_rule(waterfall) succeeds.
+
+AC-WF-002: wf_edge_(0, 4, -1, Grid, Vis, 7, 1, 14, 14, Lc) for train-0 of
+  task 36a08778 with row-0 seed Vis = [r(0,4),r(0,12),r(1,4),r(1,12)] and
+  Grid obstacle at (1,x)... verifies Lc = 2 (drain at (1,2)=bg, obstacle
+  at (1,3-5) blocks further left).
+
+AC-WF-003: arc2_transform(waterfall, TrainIn0, Out0) succeeds and produces
+  the correct output for training pair 0 of task 36a08778 (61 bg→6 changes,
+  14x14 grid).
+
+AC-WF-004: arc2_transform(waterfall, TrainIn1, Out1) succeeds and produces
+  the correct output for training pair 1 of task 36a08778 (48 bg→6 changes,
+  16x13 grid).
+
+AC-WF-005: arc2_transform(waterfall, TrainIn2, Out2) succeeds and produces
+  the correct output for training pair 2 of task 36a08778 (28 bg→6 changes,
+  8x9 grid).
+
+AC-WF-006: arc2_transform(waterfall, TrainIn3, Out3) succeeds and produces
+  the correct output for training pair 3 of task 36a08778 (21 bg→6 changes,
+  14x5 grid).
+
+AC-WF-007: arc2_transform(waterfall, TrainIn4, Out4) succeeds and produces
+  the correct output for training pair 4 of task 36a08778 (36 bg→6 changes,
+  8x20 grid).
+
+AC-WF-008: arc2_transform(waterfall, TrainIn5, Out5) succeeds and produces
+  the correct output for training pair 5 of task 36a08778 (65 bg→6 changes,
+  15x16 grid).
+
+AC-WF-009: arc2_transform(waterfall, TestIn, TestOut) succeeds and produces
+  the correct output for the test case of task 36a08778.
+
+AC-WF-010: arc2_induce_rule([pair(T0In,T0Out),...,pair(T5In,T5Out)],
+  waterfall) succeeds for all 6 training pairs of task 36a08778.
+
+AC-WF-011: full benchmark run confirms 12/120 = 10.00% with no regressions.
+  Passing tasks: 1818057f, 31f7f899, 36a08778, 409aa875, 45a5af55, 4c3d4a41,
+  7491f3cf, 7b5033c1, 80a900e0, 8e5c0c38, 97d7923e, e376de54.
