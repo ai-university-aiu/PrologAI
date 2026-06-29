@@ -15981,3 +15981,61 @@ find_4connected_any_color_comps(Grid, bg) ->
 erase_comp(Comp, Grid, fill) ->
   for each (R,C) in Comp: Grid[R][C] <- fill
   return Grid
+
+ARC-AGI-2 Wave 23: period_extend pseudocode (2026-06-29)
+period_extend(Grid) ->
+  NR = num_rows(Grid), NC = num_cols(Grid)
+  RowCount = count_active_rows(Grid)   // rows with 2+ same-color non-BG cells
+  ColCount = count_active_cols(Grid)   // cols with 2+ same-color non-BG cells
+  Out = blank_grid(NR, NC)
+  if RowCount >= ColCount:
+    for R in 0..NR-1: Out = apply_line(Grid, R, ROW, NC-1, Out)
+  else:
+    for C in 0..NC-1: Out = apply_line(Grid, C, COL, NR-1, Out)
+  return Out
+
+apply_line(Grid, LineIdx, Dir, MaxPos, Out) ->
+  Pairs = [(P, V) | non_BG cell at line position P with value V]
+  if no anchor pair in Pairs: copy Pairs as singletons into Out; return Out
+  (AnchorColor, AnchorPositions, Step) = find_anchor(Pairs)
+  PatPos = {P | P mod Step = AnchorPositions[0] mod Step, 0 <= P <= MaxPos}
+  Stops = [(P, V) | (P, V) in Pairs, V != AnchorColor, P in PatPos]
+  Singletons = [(P, V) | (P, V) in Pairs, V != AnchorColor, P not in PatPos]
+  if Stops non-empty:
+    (StopP, StopC) = Stops[0]
+    if StopP < min(AnchorPositions): MinFill = StopP; MaxFill = max(AnchorPositions)
+    else: MinFill = min(AnchorPositions); MaxFill = StopP
+    FillCells = [(P, StopC) | P in PatPos, MinFill <= P <= MaxFill]
+  else:
+    FillCells = [(P, AnchorColor) | P in PatPos]
+  write FillCells + Singletons into Out at LineIdx
+  return Out
+
+find_anchor(Pairs) ->
+  StepVals = sorted [(|P2-P1|, V) | (P1,V) and (P2,V) in Pairs, P2>P1]
+  (Step, AnchorColor) = StepVals[0]   // smallest step wins
+  AnchorPositions = [P | (P, AnchorColor) in Pairs]
+  return (AnchorColor, AnchorPositions, Step)
+
+WP-282 shape_sort (Layer 257) - ARC-AGI-2 Wave 24 Pseudocode
+Task: 2ba387bc.
+
+shape_sort(Grid) ->
+  Colors = sort(distinct non-zero values in Grid)
+  Shapes = [one_shape(Grid, C) for C in Colors] sorted by R0-C0 reading order
+  Hollows = [S for S in Shapes if has_zero(S.sub)]
+  Solids  = [S for S in Shapes if not has_zero(S.sub)]
+  Pairs = zip_pad(Hollows, Solids, zero_block)
+  Output = concat([left4 ++ right4 for row in each pair block])
+
+one_shape(Grid, Color) ->
+  Rs = [R | Grid[R][C] = Color for some C]
+  Cs = [C | Grid[R][C] = Color for some R]
+  R0 = min(Rs), C0 = min(Cs)
+  Sub = Grid[R0..R0+3][C0..C0+3]
+  return (R0, C0, Sub)
+
+zip_pad([], [], []) -> []
+zip_pad([H|Hs], [], rest) -> [[H, zero_block] | zip_pad(Hs, [], rest)]
+zip_pad([], [S|Ss], rest) -> [[zero_block, S] | zip_pad([], Ss, rest)]
+zip_pad([H|Hs], [S|Ss], rest) -> [[H, S] | zip_pad(Hs, Ss, rest)]

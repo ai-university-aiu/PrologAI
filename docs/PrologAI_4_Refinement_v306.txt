@@ -19635,3 +19635,27 @@ correctly handles mixed-color components.
 
 Regression: all 21 previously solved tasks continue to pass (verified 22/22).
 Full benchmark: 22/120 = 18.33%.
+
+ARC-AGI-2 Wave 23: period_extend testing note (2026-06-29)
+Rule period_extend verified against all 3 training pairs and the held-out
+test case of task 16de56c4 before commit. Key test cases verified:
+- Pair 1 (row mode): 1s at period-3 positions with singleton stop (6);
+  extension fills to stop with stop color; 8s with singleton-recolor (3).
+- Pair 2 (col mode): 3s define column periods with 4 as stop/recolor;
+  5 singleton at non-pattern position preserved unchanged.
+- Pair 3 (col mode): 2s and 6s fill full column with step-1 and step-2.
+- Test case (row mode): 6 distinct active rows each with anchor+stop or
+  anchor-only; 7 singleton at non-pattern position preserved.
+Regression: all 22 previously solved tasks continue to pass (verified 23/23).
+Full benchmark: 23/120 = 19.17%.
+
+WP-282 shape_sort (Layer 257) - ARC-AGI-2 Wave 24 Testing
+Verified against task 2ba387bc:
+- Pair 1 (23x24 -> 16x8): 3 hollows, 4 solids; bottom-left zero-padded. PASS.
+- Pair 2 (20x21 -> 12x8): 2 hollows, 3 solids; bottom-left zero-padded. PASS.
+- Pair 3 (19x23 -> 8x8):  2 hollows, 2 solids; no padding needed. PASS.
+- Pair 4 (21x22 -> 12x8): 3 hollows, 2 solids; bottom-right zero-padded. PASS.
+- Test case (24x19 -> 16x8): 2 hollows, 4 solids; top two pairs use hollows,
+  bottom two pairs use zero blocks on hollow side. PASS.
+Regression: all 23 previously solved tasks continue to pass (verified 24/24).
+Full benchmark: 24/120 = 20.00%.

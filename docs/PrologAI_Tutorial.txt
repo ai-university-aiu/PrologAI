@@ -19865,3 +19865,64 @@ The period_extend rule is registered via arc2_named_rule(period_extend) and
 dispatched by the standard arc2_transform/3 interface used by all waves.
 
 Task solved: 16de56c4. Benchmark score: 23/120 = 19.17%.
+
+
+Chapter 242: Wave 24 - shape_sort (WP-282, Layer 257)
+
+Wave 24 adds the shape_sort named rule, solving ARC-AGI-2 task 2ba387bc.
+
+WHAT THE RULE DOES
+
+The input grid contains several 4x4 colored blocks on a zero background.
+Every block is one of two types:
+
+- HOLLOW: a one-cell-wide outer ring of a single color surrounds a 2x2
+  interior of zeros. The 4x4 bounding box contains at least one 0.
+
+- SOLID: all 16 cells are the same color. The 4x4 bounding box has no 0.
+
+The rule reads every block, notes its top-left corner, and sorts all blocks
+by reading order (row first, column second). It then splits the sorted list
+into a HOLLOW list and a SOLID list while preserving reading order within
+each. It pairs position-i hollow with position-i solid, placing the hollow
+on the left half and the solid on the right half of 4 output rows. If one
+list is shorter, a 4x4 block of zeros fills the missing side. All pairs are
+stacked vertically to form the output grid.
+
+EXAMPLE
+
+Input pair 1 (23 x 24): 7 blocks scattered on a zero canvas.
+
+Sorted by reading order and classified:
+  pos 1: color=1 (1,2)   SOLID
+  pos 2: color=2 (4,9)   SOLID
+  pos 3: color=8 (6,17)  HOLLOW
+  pos 4: color=7 (12,1)  SOLID
+  pos 5: color=3 (13,8)  HOLLOW
+  pos 6: color=6 (15,17) SOLID
+  pos 7: color=4 (18,3)  HOLLOW
+
+Hollow list: [8, 3, 4]   Solid list: [1, 2, 7, 6]
+
+Output (16 x 8), four pairs stacked:
+  pair 1: hollow=8 | solid=1
+  pair 2: hollow=3 | solid=2
+  pair 3: hollow=4 | solid=7
+  pair 4: hollow=zero  | solid=6
+
+KEY PREDICATES
+
+  arc2_ss_shapes_/2
+      Collect all non-BG colors; for each find min row and min col; extract
+      4x4 sub; sort all by R0-C0 reading order via msort.
+
+  arc2_ss_hollow_/1
+      Succeed if the 4x4 subgrid contains any 0 (used with include/exclude).
+
+  arc2_ss_zip_/3
+      Zip hollow and solid lists into pairs; pad the shorter with zero blocks.
+
+  arc2_ss_pair_rows_/2
+      Concatenate left 4-wide rows with right 4-wide rows to make 8-wide rows.
+
+Task solved: 2ba387bc. Benchmark score: 24/120 = 20.00%.

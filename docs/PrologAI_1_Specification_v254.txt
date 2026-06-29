@@ -18423,3 +18423,37 @@ arc2_lv_any_comps_/3, arc2_lv_comps_/5, arc2_lv_bfs_/7,
 arc2_lv_comp_vals_/4, arc2_lv_all_in_/2, arc2_lv_erase_comp_/4.
 File: Mentova/src/mentova/games/arc_benchmark_2.pl
 Task solved: d59b0160. Score: 21/120 = 17.50% -> 22/120 = 18.33%.
+
+ARC-AGI-2 Wave 23: period_extend rule specification (2026-06-29)
+Rule name: period_extend. Each active line (row or column) in the grid
+contains two or more cells of the same non-BG (0) color, called the anchor
+pair. The distance between the two closest anchor positions defines step D.
+All positions within the grid that share the same residue mod D as the
+anchor form the pattern set. If a cell at a pattern position holds a
+DIFFERENT non-BG color, it is the stop/recolor cell: fill all pattern
+positions between the anchor end and the stop (inclusive) with the stop
+color, leaving positions beyond the stop as BG. If no stop exists, fill
+every in-bounds pattern position with the anchor color. Non-BG cells at
+non-pattern positions (singletons) are preserved in the output unchanged.
+The dominant direction (row vs column) is determined by counting active
+lines in each dimension; the direction with more active lines wins.
+New predicates: arc2_pe_count_active_/5, arc2_pe_blank_grid_/3,
+arc2_pe_apply_rows_/5, arc2_pe_apply_cols_/5, arc2_pe_one_row_/5,
+arc2_pe_one_col_/5, arc2_pe_find_anchor_/4, arc2_pe_pat_pos_/4,
+arc2_pe_out_pairs_/5.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+Task solved: 16de56c4. Score: 22/120 = 18.33% -> 23/120 = 19.17%.
+
+WP-282 shape_sort (Layer 257) - ARC-AGI-2 Wave 24
+Task: 2ba387bc.
+Rule: The input grid (BG=0) contains 4x4 colored blocks. Each block is HOLLOW
+(outer ring of one color, 2x2 interior of zeros) or SOLID (all 16 cells same
+color). Separate by type, sort each list by reading order (top-left row then
+column), pair hollow[i] with solid[i] side-by-side in 4x8 rows, pad shorter
+list with 4x4 zero blocks, stack pairs vertically to form the output.
+New predicates: arc2_named_rule(shape_sort), arc2_ss_shapes_/2,
+arc2_ss_one_shape_/3, arc2_ss_extract4x4_/4, arc2_ss_hollow_/1,
+arc2_ss_zip_/3, arc2_ss_zero_/1, arc2_ss_pair_rows_/2.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+Task solved: 2ba387bc. Score: 23/120 = 19.17% -> 24/120 = 20.00%.
+SPARC: Specification v254, Pseudocode v246, Architecture v247, Refinement v306, Completion v312.
