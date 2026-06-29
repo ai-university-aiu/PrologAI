@@ -1362,6 +1362,10 @@ PR 54 - agency: The Agentic Execution Loop pack. Formal, observable, bounded goa
 
 PR 55 - refinery: The Evaluator-Optimizer and Metacognitive Quality Layer. Critique outputs against criteria, score them, drive iterative improvement cycles, explore multiple reasoning paths, and maintain a lesson database. Chapter 16 covers this pack in full.
 
+WP 278 - periodfix: Periodic Pattern Repair (ppf_*, Layer 253). Detect majority-vote periodic tiles, find violations, and repair corrupted cells in 1D lists and 2D grids. Chapter 239 covers this pack.
+
+WP 279 - iochan: I/O Channel Integration (ic_*, Layer 254). Speaker output (espeak-ng / festival TTS), microphone input (arecord + whisper-cli STT), text channels (console, email, screen, app), image channels (console, email, screen, app, webcam, URL), and printer output (CUPS lp). Chapter 240 covers this pack.
+
 Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 16).
 
 
@@ -19670,3 +19674,158 @@ id_cross_pair_variants(+Pairs, -Variants):
 
 Properties tested: dims_preserved, colors_preserved, total_nonzero_preserved,
 monotone_input, monotone_output, bg_preserved, scale_preserved.
+
+
+Chapter 239: Periodic Pattern Repair - The periodfix Pack (ppf_*, Layer 253)
+
+Author: D. R. Dison, Founder of AIU, Creator and Owner of PrologAI and Mentova, ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
+
+The periodfix pack (Work Package 278, Layer 253) provides fourteen predicates for detecting
+majority-vote periodic tiles, finding violations in periodic patterns, and repairing
+corrupted cells in both 1D lists and 2D grids.
+
+A list has period P if List[i] = List[i mod P] for all i. A majority-vote tile is built
+by taking the modal value at each phase index. A violation is a position where the value
+differs from the tile at that phase.
+
+Core predicates:
+
+    ppf_list_period(+List, -P)           % smallest exact period with no violations
+    ppf_majority(+List, -Mode)           % most common element (mode)
+    ppf_tile_from_list(+List, +P, -Tile) % majority-vote tile of length P
+    ppf_violations_list(+L, +P, +Tile, -Violations) % viol(Idx,Actual,Expected) list
+    ppf_repair_list(+L, +P, +Tile, -Repaired)        % replace all violations
+    ppf_best_period_list(+L, -P, -NViol) % period 1..N//2 minimizing violations
+    ppf_tile_2d(+Grid, +PH, +PW, -Tile)  % PH-by-PW majority-vote tile for a grid
+    ppf_violations_2d(+Grid, +Tile, +PH, +PW, -Violations) % 2D violations
+    ppf_repair_grid(+Grid, +Tile, +PH, +PW, -Repaired)     % replace 2D violations
+    ppf_best_periods(+Grid, -PH, -PW)    % (PH,PW) minimizing total 2D violations
+
+Single-violation repair (for exactly one corrupted cell):
+
+    ppf_single_violation_list(+L, +P, +Tile, -Violation) % true iff exactly 1 mismatch
+    ppf_repair_single_list(+L, +P, +Tile, -Repaired)     % repair the unique mismatch
+    ppf_single_violation_2d(+Grid, +Tile, +PH, +PW, -V)  % true iff exactly 1 2D mismatch
+    ppf_repair_single_grid(+Grid, +Tile, +PH, +PW, -Rep) % repair the unique 2D mismatch
+
+Example:
+
+    :- use_module(library(periodfix)).
+
+    ?- ppf_best_period_list([1,2,1,2,1,3], P, NViol).
+    P = 2, NViol = 1.
+
+    ?- ppf_tile_from_list([1,2,1,2,1,3], 2, Tile).
+    Tile = [1,2].
+
+    ?- ppf_repair_list([1,2,1,2,1,3], 2, [1,2], Repaired).
+    Repaired = [1,2,1,2,1,2].
+
+See docs/tutorial/Ch239_Periodfix.txt for full details and examples.
+
+
+Chapter 240: I/O Channel Integration - The iochan Pack (ic_*, Layer 254)
+
+Author: D. R. Dison, Founder of AIU, Creator and Owner of PrologAI and Mentova, ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
+
+The iochan pack (Work Package 279, Layer 254) provides fourteen predicates for dispatching
+information to and from concrete I/O channels. PrologAI can speak aloud, listen to a
+microphone, send and receive text and images through multiple channels, and print output
+to a physical printer.
+
+CHANNEL TYPES AND CONFIGURATIONS
+
+A channel is a named configuration registered in the runtime registry. Channel types:
+  text_out, text_in, image_out, image_in, audio_out, audio_in, printer
+
+Configuration terms for each type:
+  console_config                  - system stdout (text) or stdin (text)
+  email_config(Addr, Subject)     - SMTP email via sendmail or mutt
+  screen_config(WinId)            - X11 window via xdotool
+  app_config(AppId, Endpoint)     - HTTP POST/GET to an application endpoint
+  speaker_config(DevId)           - espeak-ng TTS; '' = default device
+  mic_config(DevId)               - arecord + whisper-cli; '' = default device
+  file_config(Path)               - local file path (image input)
+  webcam_config(DevId)            - fswebcam camera capture
+  url_config(URL)                 - wget URL download (image input)
+  printer_config(Name, Opts)      - CUPS lp; '' = default printer
+
+REGISTERING CHANNELS
+
+    :- use_module(library(iochan)).
+
+    % Register a custom email channel.
+    ?- ic_register_channel(text_out, email_config('user@example.com', 'Alert'), ChanId).
+    ChanId = chan_6.
+
+    % Check its status.
+    ?- ic_channel_status(chan_6, Status).
+    Status = ready.
+
+    % List all text-output channels.
+    ?- ic_list_channels(text_out, Channels).
+    Channels = [chan(chan_1, console_config), chan(chan_6, email_config(...))].
+
+TEXT OUTPUT
+
+    % Write to the console (pre-registered as chan_1).
+    ?- ic_text_out(console_config, 'Hello from PrologAI!', Status).
+    Hello from PrologAI!
+    Status = ok.
+
+    % Write to an email channel.
+    ?- ic_text_out(chan_6, 'Alert: reasoning complete.', Status).
+    Status = ok.    % (if sendmail is installed)
+
+TEXT INPUT
+
+    % Read a line from the console.
+    ?- ic_text_in(console_config, Text).
+    |: Hello
+    Text = "Hello".
+
+SPEAKER OUTPUT
+
+    % Speak text aloud using espeak-ng (festival as fallback).
+    ?- ic_speak('PrologAI is now speaking.', Status).
+    Status = ok.    % (if espeak-ng or festival is installed)
+
+    % Speak to a named speaker channel.
+    ?- ic_register_channel(audio_out, speaker_config('hw:0,0'), SpkId),
+       ic_speak_to(SpkId, 'Channel test.', Status).
+
+MICROPHONE INPUT
+
+    % Record 5 seconds from the default mic and transcribe.
+    ?- ic_listen(5, Transcript).
+    Transcript = "what I just said".    % (if arecord + whisper-cli installed)
+
+IMAGE OUTPUT
+
+    % Display an image in the terminal (requires img2txt).
+    ?- ic_image_out(console_config, '/path/to/image.png', Status).
+
+    % Email an image attachment.
+    ?- ic_image_out(email_config('user@example.com', 'Photo'), '/path/to/photo.jpg', S).
+
+IMAGE INPUT
+
+    % Capture from a webcam.
+    ?- ic_register_channel(image_in, webcam_config('/dev/video0'), CamId),
+       ic_image_in(CamId, ImagePath).
+
+PRINTER OUTPUT
+
+    % Print text to the default CUPS printer.
+    ?- ic_register_channel(printer, printer_config('', []), PrintId),
+       ic_print_text(PrintId, 'PrologAI report.', Status).
+
+    % Print an image.
+    ?- ic_print_image(PrintId, '/path/to/diagram.png', Status).
+
+All hardware-dependent predicates degrade gracefully: if the required external program
+(espeak-ng, festival, arecord, whisper-cli, sendmail, mutt, xdotool, img2txt,
+display, fswebcam, wget, lp) is absent, Status = error(program_unavailable) is
+returned rather than an exception being thrown.
+
+See docs/tutorial/Ch240_Iochan.txt for full details and exercises.

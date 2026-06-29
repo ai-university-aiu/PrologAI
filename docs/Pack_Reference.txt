@@ -1856,3 +1856,20 @@ Periodic Pattern Repair: Majority-Vote Tile Detection, Violation Finding, and Si
     ppf_repair_single_list(+List,+P,+Tile,-Repaired): repair the unique violation; fails if 0 or 2+ violations.
     ppf_single_violation_2d(+Grid,+Tile,+PH,+PW,-Violation): true iff Grid has exactly one 2D violation.
     ppf_repair_single_grid(+Grid,+Tile,+PH,+PW,-Repaired): repair the unique 2D violation; fails if 0 or 2+ violations.
+
+iochan
+I/O Channel Integration: Speaker, Microphone, Text, Image, and Printer Channels (ic_*, Layer 254)
+    ic_text_out(+Channel,+Text,-Status): dispatch Text to a registered text-output channel (console_config, email_config(Addr,Subject), screen_config(WinId), app_config(AppId,Endpoint)).
+    ic_text_in(+Channel,-Text): read Text from a registered text-input channel (console_config, email_config, screen_config, app_config).
+    ic_image_out(+Channel,+ImagePath,-Status): send the image at ImagePath to a registered image-output channel (console_config for terminal ASCII, email_config for attachment, screen_config for X11 display, app_config for HTTP POST).
+    ic_image_in(+Channel,-ImagePath): capture an image from a registered image-input channel (file_config(Path), webcam_config(DevId) via fswebcam, url_config(URL) via wget).
+    ic_speak(+Text,-Status): synthesize speech from Text and play through the default speaker using espeak-ng with festival as fallback.
+    ic_speak_to(+Channel,+Text,-Status): synthesize speech and send to a named audio-output channel (speaker_config(DevId)).
+    ic_listen(+DurationSecs,-Transcript): record audio for DurationSecs from the default microphone and transcribe via whisper-cli; returns empty string if hardware unavailable.
+    ic_listen_from(+Channel,+DurationSecs,-Transcript): record from a named mic channel (mic_config(DevId)) and transcribe.
+    ic_print_text(+Channel,+Text,-Status): send text to a registered printer channel (printer_config(Name,Opts)) using the CUPS lp command.
+    ic_print_image(+Channel,+ImagePath,-Status): send an image file to a registered printer channel using the CUPS lp command.
+    ic_register_channel(+ChannelType,+Config,-ChannelId): register a channel configuration under a type (text_out, text_in, image_out, image_in, audio_out, audio_in, printer) and return a unique ID atom.
+    ic_channel_info(+ChannelId,-Info): retrieve info(ChannelId,ChannelType,Config) for a registered channel.
+    ic_list_channels(+ChannelType,-Channels): list all registered channels of a type as [chan(Id,Config),...].
+    ic_channel_status(+ChannelId,-Status): return ready if the channel exists in the registry, unavailable otherwise.
