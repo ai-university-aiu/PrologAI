@@ -1,4 +1,4 @@
-PROLOGAI PLATFORM SPECIFICATION  (v246)
+PROLOGAI PLATFORM SPECIFICATION  (v252)
 
 THE AUTHORITATIVE REFERENCE
 
@@ -18406,3 +18406,20 @@ cl_gap_clear_/6, cl_cr_/9, cl_inner_dn_/5, cl_inner_up_/5, cl_inner_rt_/5,
 cl_inner_lt_/5, cl_apply_changes_/3, cl_new_row_/4, cl_new_cell_/5.
 File: Mentova/src/mentova/games/arc_benchmark_2.pl
 Task solved: 3e6067c3. Score: 20/120 = 16.67% -> 21/120 = 17.50%.
+
+ARC-AGI-2 Wave 22: legend_veto rule specification (2026-06-29)
+Rule name: legend_veto. The top-left 4x4 area of the grid is a legend frame
+bordered by 3s on its right column (col 3, rows 0-3) and bottom row (row 3,
+cols 0-3). The non-3, non-7, non-0 values inside this 4x4 area form the legend
+set S. All 4-connected components of non-7 cells are found, ignoring color
+differences (any non-7 cell is part of a component). Components that overlap the
+legend area (any cell with row <= 3 AND col <= 3) are excluded from processing.
+Each remaining data component is checked: if its value set (all non-7, non-0
+colors present in the component) is a superset of S, the entire component is
+erased by replacing all its cells with 7; otherwise the component is kept
+unchanged.
+New predicates: arc2_lv_legend_set_/2, arc2_lv_is_leg_comp_/1,
+arc2_lv_any_comps_/3, arc2_lv_comps_/5, arc2_lv_bfs_/7,
+arc2_lv_comp_vals_/4, arc2_lv_all_in_/2, arc2_lv_erase_comp_/4.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+Task solved: d59b0160. Score: 21/120 = 17.50% -> 22/120 = 18.33%.

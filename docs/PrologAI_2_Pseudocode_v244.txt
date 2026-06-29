@@ -1,4 +1,4 @@
-PROLOGAI PSEUDOCODE  (v238)
+PROLOGAI PSEUDOCODE  (v244)
 
 ENGLISH READABLE CODE (ERC) - THE LOGIC OF EVERY WORK PACKAGE
 
@@ -15953,3 +15953,31 @@ fill_gap(A, B, Grid, BG) ->
     FLB <- last_nonBG_going_toward_A_horizontally(B, Grid, BG)
     return {(R,C,A.color) : R in row_range(A), C in FRA+1..FLB-1}
 
+
+ARC-AGI-2 Wave 22: legend_veto pseudocode (2026-06-29)
+legend_veto(Grid) ->
+  S <- sort({V : V in Grid[0..3][0..3], V != 7, V != 3, V != 0})
+  if S = {}: fail
+  AllComps <- find_4connected_any_color_comps(Grid, bg=7)
+  DataComps <- [C : C in AllComps, not overlaps_legend(C)]
+  for each Comp in DataComps:
+    Vals <- sort({V : (R,C) in Comp, V=Grid[R][C], V != 7, V != 0})
+    if S subset Vals:
+      Grid <- erase_comp(Comp, Grid, fill=7)
+  return Grid
+
+overlaps_legend(Comp) -> exists (R,C) in Comp s.t. R <= 3 AND C <= 3
+
+find_4connected_any_color_comps(Grid, bg) ->
+  Seeds <- all (R,C) s.t. Grid[R][C] != bg   // reading order
+  Visited <- {}
+  Comps <- []
+  for each (R,C) in Seeds not in Visited:
+    Comp <- BFS from (R,C) through non-bg cells of any color
+    Visited <- Visited union Comp
+    Comps <- Comps ++ [Comp]
+  return Comps
+
+erase_comp(Comp, Grid, fill) ->
+  for each (R,C) in Comp: Grid[R][C] <- fill
+  return Grid

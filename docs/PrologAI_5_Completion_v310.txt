@@ -1,4 +1,4 @@
-PROLOGAI COMPLETION  (v304)
+PROLOGAI COMPLETION  (v310)
 
 FINALIZING, PACKAGING, DOCUMENTING, AND SHIPPING THE PLATFORM
 
@@ -8081,3 +8081,17 @@ gap-clear check), then fills gap cells with Va using inner-extent formula. New p
 File: Mentova/src/mentova/games/arc_benchmark_2.pl
 Task solved: 3e6067c3. Score: 20/120 = 16.67% -> 21/120 = 17.50%.
 SPARC: Specification v251, Pseudocode v243, Architecture v244, Refinement v303, Completion v309
+
+ARC-AGI-2 Wave 22: legend_veto release note (2026-06-29)
+New named rule: legend_veto. Reads a 4x4 legend frame (top-left corner;
+bordered by 3s on right column and bottom row) to extract legend set S of
+non-3, non-7, non-0 values. Performs color-agnostic 4-connected component
+finding on non-7 cells; excludes components overlapping the legend area;
+erases any data component whose value set is a superset of S; keeps all others.
+New predicates:
+  arc2_lv_legend_set_/2, arc2_lv_is_leg_comp_/1, arc2_lv_any_comps_/3,
+  arc2_lv_comps_/5, arc2_lv_bfs_/7, arc2_lv_comp_vals_/4,
+  arc2_lv_all_in_/2, arc2_lv_erase_comp_/4.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+Task solved: d59b0160. Score: 21/120 = 17.50% -> 22/120 = 18.33%.
+SPARC: Specification v252, Pseudocode v244, Architecture v245, Refinement v304, Completion v310.
