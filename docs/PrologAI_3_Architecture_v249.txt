@@ -10030,3 +10030,16 @@ WP-283 bar_extend (Layer 258):
   Exports: arc2_transform(bar_extend, +Grid, -Out).
   The rule is self-contained: divider detection, bar analysis, period
   construction, and right-side fill are all local to the bar_extend block.
+
+WP-284 straighten_diag (Layer 259) - ARC-AGI-2 Wave 26
+  Layer 259 in the ARC-AGI-2 solver stack.
+  Depends on: arc2_named_rule/1, arc2_transform/3 dispatch framework,
+              arc2_bg_color_/2, arc2_cell_/4, arc2_set_cell_/5.
+  Exports: arc2_transform(straighten_diag, +Grid, -Out).
+  The rule is self-contained: diagonal detection, 8-connected component
+  finding, anchor analysis, gap scanning, grid rebuild, and perpendicular
+  stub pruning are all local to the straighten_diag block.
+  Key design choice: stub pruning is restricted to DiagNbr (cells originally
+  8-adjacent to diagonal cells) so that genuine line endpoints are never
+  removed. This prevents over-pruning in grids with T-junctions and
+  endpoints in the orthogonal tree.

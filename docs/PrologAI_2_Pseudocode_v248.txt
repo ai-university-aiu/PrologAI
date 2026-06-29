@@ -16059,3 +16059,54 @@ WP-283 bar_extend (Layer 258) pseudocode:
       RFill = [PeriodCells[i mod Period] for i in 0..RightWidth-1]
       OutRow = Bar ++ [Div] ++ RFill
     Out = all OutRows
+
+WP-284 straighten_diag (Layer 259) - ARC-AGI-2 Wave 26
+Task: 7b80bb43.
+Pseudocode:
+  BG = most_common_value(Grid)
+  LV = first_nonbg_value(Grid)
+  Diag = {(r,c) : Grid[r][c]!=BG
+                   and no 4-conn neighbor is non-BG
+                   and some diagonal neighbor is non-BG}
+  if Diag is empty: fail
+  DiagNbr = {(nr,nc) : (r,c) in Diag,
+                        (nr,nc) is 8-neighbor of (r,c),
+                        (nr,nc) not in Diag,
+                        Grid[nr][nc] != BG}
+  Comps = 8-connected components of Diag
+  Fills = []
+  for each Comp in Comps:
+    Anchors = {(ar,ac) : (r,c) in Comp,
+                          (ar,ac) is 8-neighbor of (r,c),
+                          (ar,ac) not in Diag,
+                          Grid[ar][ac] != BG}
+    for each Anchor (ar,ac) in Anchors:
+      Tip = argmax_{(r,c) in Comp} |r-ar| + |c-ac|
+      DDR = sign(Tip.r - ar),  DDC = sign(Tip.c - ac)
+      IsH = Anchor has 4-conn non-diag non-BG in same row
+      IsV = Anchor has 4-conn non-diag non-BG in same col
+      if IsH and DDC != 0:
+        Fill1 = scan(ar, ac, 0, DDC)
+        Fills += Fill1 (if scan succeeds)
+      if IsV and DDR != 0:
+        Fill2 = scan(ar, ac, DDR, 0)
+        Fills += Fill2 (if scan succeeds)
+  scan(ar, ac, fdr, fdc) -> Gap or fail:
+    r,c = ar+fdr, ac+fdc; Gap = []
+    loop:
+      if (r,c) out of bounds: fail
+      if Grid[r][c] == BG: Gap += (r,c); r+=fdr; c+=fdc
+      elif (r,c) in Diag: r+=fdr; c+=fdc  % skip diagonal
+      else: return Gap  % found closing cell
+  G = copy of Grid with Diag cells set to BG, Fills cells set to LV
+  repeat until no change:
+    for each (r,c) in DiagNbr where G[r][c] != BG:
+      n4 = 4-conn non-BG neighbors of (r,c) in G
+      if len(n4) == 1:
+        (ar,ac) = n4[0]
+        a_others = 4-conn non-BG neighbors of (ar,ac) in G, excluding (r,c)
+        if a_others is non-empty:
+          if (ar-r)==0: prune if anchor has no same-row neighbor in a_others
+          else:         prune if anchor has no same-col neighbor in a_others
+          if prune: G[r][c] = BG; changed = True
+  Out = G
