@@ -8051,3 +8051,18 @@ Rationale: Speaker, microphone, text channels (console/email/screen/app), image 
   the concrete channel implementations; tooling can wrap them as named tools if needed.
 Architecture: Layer 254 in the Data Layer; no cross-pack dependencies.
 SPARC: Specification v249, Pseudocode v241, Architecture v243, Refinement v301, Completion v307
+
+ARC-AGI-2 Wave 20: section_tile release note (2026-06-29)
+New named rule: section_tile. Divides the input grid by all-1 row/col dividers
+into rectangular sections; classifies sections as shape1 (sparse multi-color)
+or solid-color (uniform); derives tile count N = total_nz_in_shape2 // 2;
+tiles the inner bounding box of shape1 N times along the dominant axis with
+color-2 separators and solid-color cell mapping. New predicates:
+  st_find_dividers_/3, st_extract_sections_/4, st_ranges_/4,
+  st_slice_rows_/4, st_slice_cols_/4, st_sublist_/4,
+  st_is_shape_sec_/1, st_is_solid_sec_/1, st_solid_color_/2,
+  st_inner_bbox_/2, st_build_tiled_/5, st_tile_vert_/4, st_tile_horiz_/4,
+  st_tile_count_/3.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+Task solved: b0039139. Score: 19/120 = 15.83% -> 20/120 = 16.67%.
+SPARC: Specification v250, Pseudocode v242, Architecture v243, Refinement v302, Completion v308

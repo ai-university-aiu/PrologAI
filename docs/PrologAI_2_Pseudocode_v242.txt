@@ -15891,3 +15891,34 @@ CHANNEL RESOLUTION  ic_resolve_(Type, Channel, Config):
 TEMPORARY FILE  tmp_file_name_(Base, Path):
   T <- get_time in milliseconds mod 1000000
   Path <- concat('/tmp/iochan_', Base, '_', T)
+
+ARC-AGI-2 Wave 20: section_tile pseudocode (2026-06-29)
+section_tile(Grid) ->
+  // Step 1: find all-1 rows and all-1 cols
+  DivRows <- {R | all cells in Grid[R] == 1}
+  DivCols <- {C | all cells in Grid[*][C] == 1}
+  // Step 2: extract non-trivial sections
+  RowRanges <- ranges(0..NRows, DivRows)   // intervals between dividers
+  ColRanges <- ranges(0..NCols, DivCols)
+  Sections  <- {slice(Grid, Rows, Cols) | Rows in RowRanges, Cols in ColRanges,
+                section is non-trivial}
+  // Step 3: classify sections
+  Shape1 <- section with (any 0 cell) and (>= 2 distinct non-zero values)
+  Solids <- Sections - {Shape1}
+  // Step 4: derive tile count from shape2
+  Shape2 <- first solid section
+  TotalNZ <- count of non-zero cells in Shape2
+  N <- TotalNZ // 2
+  // Step 5: derive color mapping
+  ColorSolids <- Solids - {Shape2}   // remaining solid sections in order
+  Colors <- [uniform_value(S) | S in ColorSolids]
+  // Step 6: find inner bbox of shape1
+  BboxRows, BboxCols <- min/max rows and cols of non-zero cells in Shape1
+  InnerPattern <- slice(Shape1, BboxRows, BboxCols)
+  // Step 7: build tiled output
+  Copies <- []
+  for I in 1..N do
+    Copy <- apply_color_map(InnerPattern, Colors)
+    Copies <- Copies ++ [Copy]
+    if I < N: Copies <- Copies ++ [separator_cols_of_2(BboxCols)]   // 2-cell separator
+  return stack_vertically(Copies)   // or horizontally depending on layout axis

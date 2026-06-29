@@ -18368,3 +18368,22 @@ IOC-SPEC-010: Architectural placement: iochan sits in the Data Layer at Layer 25
 above the periodfix pack (Layer 253). It is independent of the tooling pack (Layer
 defined by WP 44); the tooling registry and invocation framework may wrap iochan channels
 as tools using pai_tool_register/2, but iochan does not depend on tooling internally.
+
+ARC-AGI-2 Wave 20: section_tile rule specification (2026-06-29)
+Rule name: section_tile. The input grid is divided into rectangular sections by
+all-1 rows (every cell in the row equals 1) and all-1 columns (every cell in
+the column equals 1). Sections with only 0/1 cells are discarded. Non-trivial
+sections are classified: the shape section (shape1) has at least one 0 cell and
+at least two distinct non-zero values; all other non-trivial sections are solid
+sections (uniform non-zero value). One solid section is shape2, which encodes
+the tile count N as total non-zero cells // 2 (shape2 always contains a two-row
+repeated base sub-pattern so the total is always 2*N). Remaining solid sections
+are color indicators, one per output color, in section-position order. The inner
+bounding box of shape1 (tightest bounds containing all non-zero cells) is tiled
+N times along the dominant axis with color-2 separators between copies; each
+non-zero inner cell is replaced by the corresponding color from the indicator
+order. Early induction clause placement: arc2_induce_rule(section_tile) is
+placed before arc2_induce_rule(frame_target) in the source file so that the
+O(rows*cols) st_find_dividers_ guard fires before frame_target's O(k^2)
+rectangle scan can exhaust the call_with_time_limit/2 budget.
+Task solved: b0039139. Score: 19/120 = 15.83% -> 20/120 = 16.67%.
