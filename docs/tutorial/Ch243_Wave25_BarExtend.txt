@@ -1,0 +1,79 @@
+Chapter 243: Wave 25 - bar_extend (WP-283, Layer 258)
+
+Wave 25 adds the bar_extend named rule to arc_benchmark_2.pl, solving
+ARC-AGI-2 task 1ae2feb7. This rule recognizes that a left-side colored bar
+encodes the period and color layout for a right-side periodic fill.
+
+WHAT THE RULE DOES
+
+The input grid has a vertical divider column: one column where every
+non-blank row carries the same non-background color. The divider separates
+a left bar region (a short colored segment) from a right empty region.
+
+For each row with bar content:
+1. Find the primary color P: the rightmost non-BG cell in the bar. Count
+   how many times P appears in the bar; call that CP.
+2. Find the secondary color S: any other non-BG color. Count it; call
+   that CS. If there is no secondary, use CS = 1.
+3. Compute Period = CP times CS.
+4. Build one period of positions 0 through Period-1:
+   - P appears at every position that is a multiple of CP.
+   - S appears at every position that is a multiple of CS AND is not
+     already occupied by P.
+   - Background (0) fills all remaining positions.
+5. Fill the right side by repeating the period cyclically.
+
+EXAMPLES
+
+Single-color, long bar:
+Bar [1,1,1,1,0]: P=1, CP=4. No secondary, CS=1. Period=4.
+One period: [1,0,0,0]. Right side (10 wide): [1,0,0,0,1,0,0,0,1,0].
+
+Single-color, bar touching divider with different tip:
+Bar [6,6,6,6,8]: P=8 (rightmost), CP=1. Secondary=6, CS=4. Period=4.
+But since CP=1, P occupies every position (0,1,2,3 all mod 1 = 0).
+One period: [8]. Right side: all 8s.
+
+Two-color bar, balanced:
+Bar [0,2,1,1,0]: P=1, CP=2. S=2, CS=1. Period=2.
+P at 0 (mod 2). S at 1 (mod 1, not P). Period: [1,2].
+Right side: [1,2,1,2,1,2,...].
+
+Two-color bar, 3-and-2:
+Bar [3,3,3,4,4]: P=4, CP=2. S=3, CS=3. Period=6.
+P at 0,2,4. S at 3 (only multiple of 3 not in {0,2,4}).
+Period: [4,0,4,3,4,0]. Right side: [4,0,4,3,4,0,4,0,4,3].
+
+Two-color bar, 2-and-3:
+Bar [6,6,8,8,8]: P=8, CP=3. S=6, CS=2. Period=6.
+P at 0,3. S at 2,4 (multiples of 2 not in {0,3}).
+Period: [8,0,6,8,6,0]. Right side: [8,0,6,8,6,0,8,0,6,8,6,0,...].
+
+KEY PREDICATES
+
+  arc2_be_divider_(Grid, D)
+      Scans columns left-to-right. Returns the first column D where all
+      non-BG values across rows are identical and at least 3 rows carry
+      a non-BG value there.
+
+  arc2_be_row_(D, InRow, OutRow)
+      Slices bar and divider from InRow. If bar is blank (PC=0), copies
+      InRow unchanged. Otherwise computes period, builds right fill, and
+      appends bar + divider + fill.
+
+  arc2_be_primary_(Bar, PC, CP)
+      Reverses Bar and finds the first non-BG element (rightmost original).
+      Counts occurrences of PC in Bar to get CP.
+
+  arc2_be_secondary_(Bar, PC, SC, CS)
+      Finds the first element of Bar that is non-BG and different from PC.
+      Counts its occurrences for CS. If none found, SC=0, CS=1.
+
+  arc2_be_cell_(PC, CP, SC, CS, Idx, Val)
+      Returns PC if Idx mod CP = 0; else SC if SC != 0 and Idx mod CS = 0;
+      else 0. This is the core cell-assignment predicate.
+
+BENCHMARK RESULT
+
+Task solved: 1ae2feb7.
+Score: 24/120 = 20.00% to 25/120 = 20.83%.

@@ -19926,3 +19926,46 @@ KEY PREDICATES
       Concatenate left 4-wide rows with right 4-wide rows to make 8-wide rows.
 
 Task solved: 2ba387bc. Benchmark score: 24/120 = 20.00%.
+
+Chapter 243: Wave 25 - bar_extend (WP-283, Layer 258)
+
+Wave 25 adds the bar_extend named rule, solving ARC-AGI-2 task 1ae2feb7.
+
+WHAT THE RULE DOES
+
+A vertical divider column separates the grid into a left bar region and a
+right empty region. Each row with a bar carries 1 or 2 non-background
+colors. The rightmost non-background cell is the primary color P with count
+CP. Any other non-background color is secondary S with count CS (default 1).
+
+Period = CP times CS.
+
+Within one period:
+- P at every multiple of CP.
+- S at every multiple of CS not already P.
+- Background (0) everywhere else.
+
+The right side is filled by repeating this period cyclically.
+
+EXAMPLE
+
+Bar [3,3,3,4,4]: P=4 (count 2), S=3 (count 3). Period=6.
+One period [4,0,4,3,4,0]: 4 at 0,2,4 (multiples of 2); 3 at 3 (multiple
+of 3, not already 4); BG at 1,5.
+Right side: [4,0,4,3,4,0,4,0,4,3,...].
+
+KEY PREDICATES
+
+  arc2_be_divider_(Grid, D)
+      Finds the unique column D where all non-BG values are the same.
+
+  arc2_be_primary_(Bar, PC, CP)
+      Finds the rightmost non-BG cell (primary color) and counts it.
+
+  arc2_be_secondary_(Bar, PC, SC, CS)
+      Finds any other non-BG color (secondary); defaults CS=1 if absent.
+
+  arc2_be_cell_(PC, CP, SC, CS, Idx, Val)
+      Computes the cell value at period position Idx.
+
+Task solved: 1ae2feb7. Benchmark score: 24/120 = 20.00% -> 25/120 = 20.83%.
