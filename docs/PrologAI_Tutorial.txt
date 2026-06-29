@@ -19969,3 +19969,60 @@ KEY PREDICATES
       Computes the cell value at period position Idx.
 
 Task solved: 1ae2feb7. Benchmark score: 24/120 = 20.00% -> 25/120 = 20.83%.
+
+Chapter 244: Wave 26 - straighten_diag (WP-284, Layer 259)
+
+Wave 26 adds the straighten_diag named rule, solving ARC-AGI-2 task 7b80bb43.
+
+WHAT THE RULE DOES
+
+A two-color grid (background BG and one line color LV) contains an orthogonal
+tree of line segments with diagonal shortcuts: non-BG cells that have no
+4-connected non-BG neighbor but do have a diagonal non-BG neighbor. These
+diagonal-only cells corrupt the orthogonal structure. The rule removes them
+and bridges the gaps they span.
+
+Phase 1 - Gap fill:
+Find 8-connected components of diagonal cells. For each component, identify
+anchor cells: non-diagonal non-BG cells 8-adjacent to the component. For each
+anchor, find the farthest diagonal tip (max Manhattan distance). Determine the
+anchor's axis (horizontal if it has a 4-connected non-diagonal non-BG neighbor
+in the same row; vertical if in the same column). Scan from the anchor toward
+the tip along the anchor's axis: collect BG cells (gap) until a non-BG
+non-diagonal terminus is found. If found, the gap cells are filled with LV.
+
+Phase 2 - Diagonal removal:
+Remove all diagonal cells (set to BG). Apply all gap fills.
+
+Phase 3 - Stub pruning:
+Track DiagNbr: non-diagonal non-BG cells that were 8-adjacent to any diagonal.
+Iteratively: find a DiagNbr cell with exactly one 4-connected non-BG neighbor
+(its anchor) whose direction to the anchor is perpendicular to the anchor's
+line axis. Remove it. Repeat until no such stub exists.
+
+KEY PREDICATES
+
+  arc2_sd_find_diag_(Grid, BG, Diag)
+      Finds all diagonal-only cells: non-BG, no 4-conn non-BG, has 8-conn
+      (diagonal) non-BG neighbor.
+
+  arc2_sd_diag_nbr_(Grid, BG, Diag, DiagNbr)
+      Finds non-diagonal non-BG cells 8-adjacent to any diagonal cell.
+
+  arc2_sd_comps8_(Cells, Comps)
+      Partitions Cells into 8-connected components using DFS flood-fill.
+
+  arc2_sd_anchor_fill_(Grid, BG, Diag, Comp, NRows, NCols, AR-AC, Acc, Acc1)
+      For one anchor, computes fill cells in H/V direction toward farthest tip.
+
+  arc2_sd_scan_(Grid, BG, Diag, AR, AC, FDR, FDC, NRows, NCols, Gap)
+      Scans from anchor in direction (FDR,FDC), skipping diagonal cells,
+      collecting BG cells until a non-BG non-diagonal terminus is found.
+
+  arc2_sd_prune_loop_(Grid, BG, DiagNbr, Out)
+      Iteratively removes perpendicular degree-1 stubs from DiagNbr.
+
+  arc2_sd_perp_check_(ANeighbors, AR, AC, DDR, _DDC)
+      True when stub direction is perpendicular to anchor's line axis.
+
+Task solved: 7b80bb43. Benchmark score: 25/120 = 20.83% -> 26/120 = 21.67%.

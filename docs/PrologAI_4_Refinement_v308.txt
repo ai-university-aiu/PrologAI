@@ -19670,3 +19670,19 @@ WP-283 bar_extend (Layer 258) testing:
   CP=2, CS=3 gives period-6 pattern [P,0,P,S,P,0]; two-color interleaving
   with CP=3, CS=2 gives [P,0,S,P,S,0]; no secondary defaults to CS=1
   giving sparse primary-only fill at period CP.
+
+WP-284 straighten_diag (Layer 259) testing:
+  Task: 7b80bb43 (2 training pairs + 1 test case).
+  Verification method: Python simulation (straighten_v4) verified all 2
+  training pairs and the test case before Prolog implementation.
+  swipl benchmark run confirmed PASS 7b80bb43 with score 26/120 = 21.67%.
+  Key correctness challenge: initial stub pruning (v3) was too aggressive -
+  it removed legitimate horizontal branches off vertical junctions. Fix:
+  restrict pruning to DiagNbr cells only (those 8-adjacent to an original
+  diagonal cell). Cells not in DiagNbr cannot be diagonal artifacts.
+  Algorithm invariants verified:
+  - P0: 7 diagonal cells removed, 3 gap fills at (7,15-17), 0 stubs pruned.
+  - P1: multiple diagonal chains removed, multiple gap fills, 0 stubs pruned.
+  - TEST: diagonal chain removed, gap fills applied, stub at 1 cell pruned.
+  Singleton variable DDC correctly suppressed in arc2_sd_perp_check_/5
+  (DC component of stub direction is irrelevant to perpendicularity check).

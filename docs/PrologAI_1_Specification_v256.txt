@@ -18474,3 +18474,33 @@ arc2_be_secondary_/4, arc2_be_cell_/5.
 File: Mentova/src/mentova/games/arc_benchmark_2.pl
 Task solved: 1ae2feb7. Score: 24/120 = 20.00% -> 25/120 = 20.83%.
 SPARC: Specification v255, Pseudocode v247, Architecture v248, Refinement v307, Completion v313.
+
+WP-284 straighten_diag (Layer 259) - ARC-AGI-2 Wave 26
+Task: 7b80bb43.
+Rule: A two-color grid (BG = most common color; LV = line color) contains
+diagonal-only cells: non-BG cells with no 4-connected non-BG neighbor but at
+least one 8-connected (diagonal) non-BG neighbor. These cells form diagonal
+shortcuts in an otherwise orthogonal line network. The rule straightens them:
+Phase 1 - Find 8-connected components of diagonal cells. For each component,
+find anchor cells (non-diagonal non-BG cells 8-adjacent to the component). For
+each anchor, determine its axis (H if it has a same-row 4-conn non-diag non-BG
+neighbor; V if it has a same-col one). Find the farthest diagonal tip (max
+Manhattan distance from anchor). Scan from anchor in the tip's H/V direction
+past diagonal cells; if a non-BG terminus is found, the scanned BG cells form
+a fill gap.
+Phase 2 - Remove all diagonal cells (set to BG). Apply all fill gaps (set to LV).
+Phase 3 - Iteratively prune perpendicular degree-1 stubs: a cell in DiagNbr
+(the set of non-diagonal cells 8-adjacent to any original diagonal) that has
+exactly one 4-conn non-BG neighbor (its anchor) and whose direction to that
+anchor is perpendicular to the anchor's line axis is removed. Repeat until no
+more stubs qualify.
+New predicates: arc2_named_rule(straighten_diag), arc2_transform(straighten_diag/3),
+arc2_sd_line_val_/3, arc2_sd_find_diag_/3, arc2_sd_has4nonbg_/4,
+arc2_sd_has_diag_nonbg_/4, arc2_sd_diag_nbr_/4, arc2_sd_comps8_/2,
+arc2_sd_comps8_iter_/4, arc2_sd_flood8_/6, arc2_sd_comp_fills_/8,
+arc2_sd_anchor_fill_/9, arc2_sd_anchor_axis_/6, arc2_sd_scan_/10,
+arc2_sd_scan_step_/10, arc2_sd_build_/8, arc2_sd_4nbrs_nonbg_/5,
+arc2_sd_prune_loop_/4, arc2_sd_find_stub_/4, arc2_sd_perp_check_/5.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+Task solved: 7b80bb43. Score: 25/120 = 20.83% -> 26/120 = 21.67%.
+SPARC: Specification v256, Pseudocode v248, Architecture v249, Refinement v308, Completion v314.
