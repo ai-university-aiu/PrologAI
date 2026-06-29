@@ -1,4 +1,4 @@
-PROLOGAI ARCHITECTURE  (v241)
+PROLOGAI ARCHITECTURE  (v245)
 
 HOW THE COMPONENTS FIT TOGETHER AND COMMUNICATE
 
@@ -9993,3 +9993,15 @@ cl_inner_lt_/5, cl_apply_changes_/3, cl_new_row_/4, cl_new_cell_/5.
 Also: arc2_named_rule(chain_link), arc2_transform(chain_link,...),
 arc2_induce_rule([...], chain_link).
 SPARC: Specification v251, Pseudocode v243, Architecture v244, Refinement v303, Completion v309.
+
+ARC-AGI-2 Wave 22: legend_veto architectural note (2026-06-29)
+New predicates added to arc_benchmark_2.pl (Mentova game layer):
+arc2_lv_legend_set_/2, arc2_lv_is_leg_comp_/1, arc2_lv_any_comps_/3,
+arc2_lv_comps_/5, arc2_lv_bfs_/7, arc2_lv_comp_vals_/4,
+arc2_lv_all_in_/2, arc2_lv_erase_comp_/4.
+Also: arc2_named_rule(legend_veto), arc2_transform(legend_veto,...).
+Key design choice: arc2_lv_any_comps_ uses color-agnostic BFS (non-BG cells of
+any color are treated as connected), unlike arc2_all_comps_ which requires
+same-color adjacency. This is needed because the task's components mix multiple
+colors within a single connected region.
+SPARC: Specification v252, Pseudocode v244, Architecture v245, Refinement v304, Completion v310.

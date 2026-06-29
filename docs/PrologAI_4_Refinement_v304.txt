@@ -1,4 +1,4 @@
-PROLOGAI REFINEMENT  (v298)
+PROLOGAI REFINEMENT  (v304)
 
 REVIEWING, TESTING, AND IMPROVING THE BUILD
 
@@ -19609,3 +19609,29 @@ matched top-left 4-box (same row block), connector spanned the 8-box interior (n
 Fixed: cl_gap_clear_ verifies all proposed connector cells are BG in original grid.
 Regression: all 20 previously solved tasks continue to pass (verified 21/21).
 Full benchmark: 21/120 = 17.50%.
+
+ARC-AGI-2 Wave 22: legend_veto testing note (2026-06-29)
+Verified: arc2_transform(legend_veto, In, Out) for all 3 training pairs of
+task d59b0160 and the test case. Task uses 16x16 grids.
+
+Training pair 1: Legend S = {1, 2, 4} (3 distinct values). Data components:
+one region contains all three values (erased to 7); remaining components are
+missing at least one S value and are kept unchanged.
+
+Training pair 2: Legend S = {5, 6, 9}. Analogous veto applied; one large
+multi-color component erased; single-color components kept.
+
+Training pair 3: Legend S = {1, 6, 8}. Veto identifies and erases exactly
+the multi-color component containing 1, 6, and 8.
+
+Test case: Legend S = {2, 4, 5}. Six distinct data regions present; those
+containing all of {2,4,5} are erased; those missing at least one value are
+kept. Output verified against expected answer.
+
+Key insight: the BFS must be color-agnostic (any non-7 cell is in the same
+component regardless of color). The existing arc2_all_comps_ predicate
+groups cells by same color and cannot be used here. New arc2_lv_any_comps_
+correctly handles mixed-color components.
+
+Regression: all 21 previously solved tasks continue to pass (verified 22/22).
+Full benchmark: 22/120 = 18.33%.
