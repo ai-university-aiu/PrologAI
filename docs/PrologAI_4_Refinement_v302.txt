@@ -19576,3 +19576,18 @@ Safety design notes:
   - The HTTP client import uses catch at module load time so iochan loads cleanly on
     installations without the http package.
   - No constitutional layer interaction; no Lattice writes; purely an I/O dispatch layer.
+
+ARC-AGI-2 Wave 20: section_tile testing note (2026-06-29)
+Verified: arc2_transform(section_tile, In, Out) for all 4 training pairs of task b0039139
+and the test case. Two correctness bugs discovered and fixed:
+Bug 1: N was computed as max non-zero cells per column of shape2 (vertical layout).
+For test 0, shape2 has total 10 non-zero cells; per-column max was 3, giving N=3 instead
+of correct N=5. Fixed by computing N = total_nz // 2. Correct output is 19 rows x 5 cols.
+Bug 2: arc2_induce_rule(section_tile) was placed after arc2_induce_rule(frame_target) in
+source order. frame_target's O(k^2) rectangle guard consumed the 10-second
+call_with_time_limit budget on b0039139 before the section_tile clause was reached.
+Fixed by adding an early copy of arc2_induce_rule(section_tile) with the fast
+st_find_dividers_ guard immediately before arc2_induce_rule(frame_target). The guard is
+O(rows*cols) and rejects non-section-tile tasks without triggering rectangle search.
+Regression: all 19 previously solved tasks continue to pass (verified 20/20).
+Full benchmark: 20/120 = 16.67%.
