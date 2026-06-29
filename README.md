@@ -425,11 +425,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v250` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v242` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v243` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v302` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v308` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v251` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v243` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v244` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v303` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v309` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---
@@ -537,7 +537,7 @@ Achievement report: [ARC-AGI-1_Perfect_Score_Report.txt](https://github.com/ai-u
 
 [Mentova](https://github.com/ai-university-aiu/Mentova) is the world's first glass-box synthetic mind, built on PrologAI.
 
-It runs 48 reasoning types, achieved a confirmed perfect score of 400/400 = 100% on ARC-AGI-1 (Abstract Reasoning Corpus - Artificial General Intelligence - Year 1), and is actively climbing ARC-AGI-2 (current score: 20/120 = 16.67%, Wave 20 complete).
+It runs 48 reasoning types, achieved a confirmed perfect score of 400/400 = 100% on ARC-AGI-1 (Abstract Reasoning Corpus - Artificial General Intelligence - Year 1), and is actively climbing ARC-AGI-2 (current score: 21/120 = 17.50%, Wave 21 complete).
 
 No large language model (LLM).
 
