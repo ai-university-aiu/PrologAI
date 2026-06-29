@@ -10005,3 +10005,20 @@ any color are treated as connected), unlike arc2_all_comps_ which requires
 same-color adjacency. This is needed because the task's components mix multiple
 colors within a single connected region.
 SPARC: Specification v252, Pseudocode v244, Architecture v245, Refinement v304, Completion v310.
+
+ARC-AGI-2 Wave 23: period_extend architecture note (2026-06-29)
+Wave 23 adds the period_extend named rule (WP-281, Layer 256) inside
+Mentova/src/mentova/games/arc_benchmark_2.pl. The rule uses the
+arc2_pe_* predicate family (9 predicates). It operates on the same
+arc2_cell_/arc2_set_cell_ interface as all other wave rules. No new
+files or modules are added. The blank-grid approach (arc2_pe_blank_grid_)
+initialises an all-zero output and fills it selectively, avoiding any
+mutation of the input grid.
+SPARC: Specification v253, Pseudocode v245, Architecture v246, Refinement v305, Completion v311.
+
+WP-282 shape_sort (Layer 257) - ARC-AGI-2 Wave 24 Architecture
+All arc2_ss_* predicates live in arc_benchmark_2.pl alongside all other
+wave rules. Uses the same arc2_named_rule/arc2_transform interface. The
+8-wide output grid is built by maplist + append without any additional
+helper modules. Reading-order sort uses msort on R0-C0-Sub compound terms.
+SPARC: Specification v254, Pseudocode v246, Architecture v247, Refinement v306, Completion v312.

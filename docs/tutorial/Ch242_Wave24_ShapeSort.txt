@@ -1,0 +1,69 @@
+Chapter 242: Wave 24 - shape_sort (WP-282, Layer 257)
+
+Wave 24 adds the shape_sort named rule to arc_benchmark_2.pl, solving
+ARC-AGI-2 task 2ba387bc. This rule classifies 4x4 colored blocks by type
+and rearranges them into a paired output grid.
+
+WHAT THE RULE DOES
+
+The input grid (background = 0) contains several 4x4 colored blocks at
+arbitrary positions. Each block is classified as:
+
+  HOLLOW: outer ring of one color, 2x2 interior of zeros.
+  SOLID:  all 16 cells the same color, no interior zeros.
+
+The rule sorts all blocks by reading order (top-left row then column),
+splits them into a HOLLOW list and a SOLID list, and pairs them up.
+Each pair becomes 4 rows of 8 columns: hollow on the left, solid on the
+right. If one list is shorter, a 4x4 zero block fills the missing side.
+Pairs are stacked vertically to form the output.
+
+EXAMPLE
+
+Training pair 1 (23 x 24 input, 16 x 8 output):
+
+Seven blocks found and sorted:
+  1. color 1 at (1,2)  - SOLID
+  2. color 2 at (4,9)  - SOLID
+  3. color 8 at (6,17) - HOLLOW
+  4. color 7 at (12,1) - SOLID
+  5. color 3 at (13,8) - HOLLOW
+  6. color 6 at (15,17)- SOLID
+  7. color 4 at (18,3) - HOLLOW
+
+Hollow list: [8, 3, 4]
+Solid  list: [1, 2, 7, 6]
+
+Output rows 0-3  (pair 1): hollow=8  | solid=1
+Output rows 4-7  (pair 2): hollow=3  | solid=2
+Output rows 8-11 (pair 3): hollow=4  | solid=7
+Output rows 12-15(pair 4): hollow=zeros | solid=6
+
+KEY PREDICATES
+
+  arc2_ss_shapes_(Grid, Shapes)
+      Find all distinct non-zero colors; for each color compute min row and
+      min col to get the top-left corner; extract the 4x4 subgrid; sort all
+      shapes in reading order using msort on R0-C0-Sub compound terms.
+
+  arc2_ss_one_shape_(Grid, Color, R0-C0-Sub)
+      For one color: findall row indices with that color, findall column
+      indices, take minimums, call arc2_ss_extract4x4_.
+
+  arc2_ss_extract4x4_(Grid, R0, C0, Sub)
+      Compute R1..R3 and C1..C3; maplist + nth0 to build the 4x4 list.
+
+  arc2_ss_hollow_(R0-C0-Sub)
+      Succeed if member(SRow, Sub), member(0, SRow); used with include/exclude.
+
+  arc2_ss_zip_(Hollows, Solids, Pairs)
+      Recursive zip: pair lists element by element; pad shorter list with
+      zero shapes (arc2_ss_zero_/1) when one list is exhausted.
+
+  arc2_ss_pair_rows_([L, R], Rows)
+      maplist append to combine each 4-wide left row with 4-wide right row.
+
+BENCHMARK RESULT
+
+Task solved: 2ba387bc.
+Score: 23/120 = 19.17% -> 24/120 = 20.00%.
