@@ -15737,3 +15737,50 @@ tip_escape(Grid) ->
     Grid    <- clear(Grid, Marker.cells)
     Grid    <- set(Grid, EscZone[0 .. min(N,|EscZone|)-1], Marker.color)
   return Grid
+
+ARC-AGI-2 Wave 19: segment_ext pseudocode (2026-06-28)
+segment_ext(Grid) ->
+  // Phase 1: process each 4-corner junction cell (value 4)
+  Prio <- compute_fill_priority(Grid)   // none | h | v
+  for each (R,C) with Grid[R][C]=4 do
+    StubDir <- stub_direction(Grid, R, C)   // dir of longest same-color run or adjacent 2-corner
+    ArmColor <- arm_color(Grid, R, C, StubDir)  // first non-bg/non-junction color in StubDir
+    KeptJunction <- (R,C) + StubDir
+    FirstStub <- KeptJunction + StubDir
+    IStub <- contiguous_nonbg(Grid, FirstStub, StubDir)
+    CasStub <- bfs_from_2corner_neighbors(Grid, IStub, blocked={4-corner,KeptJunction}+IStub)
+    FarRem <- far_segments_no_perp(Grid, FirstStub, StubDir, ArmColor, blocked=...)
+    ToRemove <- IStub + CasStub + FarRem
+    Grid <- set(Grid, ToRemove, 0)
+    Grid <- set(Grid, (R,C), ArmColor)
+    ExtDir <- -StubDir
+    Grid <- extend_to_boundary(Grid, (R,C)+ExtDir, ExtDir, ArmColor)
+  // Phase 2: convert remaining 2-corner cells
+  for each (R,C) with Grid[R][C]=2 do
+    Grid[R][C] <- first non-bg non-junction neighbor color
+  // Phase 3: gap fill
+  for each (R,C) do
+    Vpp <- Grid[R][C]; Vin <- OrigGrid[R][C]
+    H <- hfill(Grid, R, C)     // left=right=Color and Color != 0
+    V <- vfill(Grid, R, C)     // above=below=Color and Color != 0
+                                // AND at least one neighbor is pure-vertical
+                                //   (pure-vertical: no same-color horizontal neighbor)
+    Out[R][C] <- fill_rule(Prio, Vpp, Vin, H, V)
+  return Out
+
+fill_rule(Prio, Vpp, Vin, H=none, V=none) = Vpp
+fill_rule(Prio, Vpp, Vin, H=none, V)      = V if V!=Vin else Vpp
+fill_rule(Prio, Vpp, Vin, H, V=none)      = H if H!=Vin else Vpp
+fill_rule(Prio, Vpp, Vin, H, V) where H=V = H if H!=Vin else Vpp
+fill_rule(Prio, Vpp, Vin, H, V) where H!=Vin and V=Vin =
+  H if (Vin=0 or Prio=none) else Vpp  // protect existing arm cells in 4-corner grids
+fill_rule(Prio, Vpp, Vin, H, V) where V!=Vin and H=Vin = V
+fill_rule(Prio, Vpp, Vin, H, V) // true conflict: H!=Vin, V!=Vin, H!=V
+  = H if Prio=h else V           // extension direction decides
+
+compute_fill_priority(Grid):
+  C4s <- all (R,C) with Grid[R][C]=4
+  if C4s = []: return none
+  ExtDirs <- [(-DR,-DC) : (R,C) in C4s, (DR,DC) = stub_direction(Grid,R,C)]
+  if any (DR,DC) in ExtDirs with DR!=0: return v
+  return h

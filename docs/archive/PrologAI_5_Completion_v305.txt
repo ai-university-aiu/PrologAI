@@ -8011,3 +8011,20 @@ New predicates: te_transform_/2, te_all_comps_/3, te_group_comps_/5,
   te_grid_dims_/3, te_set_cell_/5, te_set_cells_/4.
 File: Mentova/src/mentova/games/arc_benchmark_2.pl
 SPARC: Specification v247, Pseudocode v239, Architecture v242, Refinement v299, Completion v305
+
+ARC-AGI-2 Wave 19: segment_ext release note (2026-06-28)
+Fixed three correctness bugs in the existing segment_ext rule to solve task faa9f03d.
+Bug 1 fix: se_vfill_ now requires at least one vertical neighbor to be a pure-vertical
+  arm cell (se_pure_vert_/5: no same-color horizontal neighbor), preventing V fill from
+  bridging between separate horizontal arm segments sharing a column position.
+Bug 2 fix: added se_ext_dir_/5 to compute grid-level fill priority (Prio=none/h/v)
+  from 4-corner extension directions; se_fill_rule_/6 uses Prio as H-vs-V tiebreaker
+  for true conflicts (both H and V fills differ from original cell color).
+Bug 3 fix: se_fill_rule_/6 "only H differs" branch now protects existing non-background
+  cells in 4-corner grids (Prio != none): H fill can overwrite non-bg cells only in
+  no-4-corner grids (Prio=none) or when Vin=0.
+New predicate: se_pure_vert_/5, se_ext_dir_/5.
+Modified predicates: se_vfill_/6, se_fill_cell_/8, se_fill_rule_/6, se_tr_/2.
+Task solved: faa9f03d. Score: 19/120 = 15.83%.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+SPARC: Specification v248, Pseudocode v240, Architecture v243, Refinement v300, Completion v306
