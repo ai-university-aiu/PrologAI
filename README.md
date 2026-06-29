@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       278 work packages — the complete cognitive engine (see below)
+├── packs/       279 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,11 +78,11 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transformation packs that handle structured data, currently reaching Layer 253 (periodfix) with WP-274 through WP-277 enhancing four existing packs for ARC-AGI-2 and WP-278 adding the periodfix periodic-pattern-repair pack.
+Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transformation packs that handle structured data, currently reaching Layer 254 (iochan) with WP-274 through WP-277 enhancing four existing packs for ARC-AGI-2, WP-278 adding the periodfix periodic-pattern-repair pack, and WP-279 adding the iochan I/O channel integration pack (speaker, microphone, text/image/printer channels).
 
 The full layer table is in Architecture Section 0.4.
 
-### The 277 Work Packages
+### The 279 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -355,6 +355,7 @@ Everything is inspectable.
 | `multipair` | Multi-Pair Object Tracking: Track Objects, Invariant Objects, Role Objects, Cross-Pair Match, All Input Objects, Color Frequency, Universal Colors, Variable Colors, Disappeared Objects, Appeared Objects, Stable Color Objects, Modal Object Count, Consistent Count, Singleton Color (mp_*, Layer 251) (PR 362) |
 | `taskcat` | Task Type Classification: Categorize, Is Single Rule, Is Multi-Step, Has Context Gate, Has Symbol Table, Suggest Strategies, Preserves Dims, Preserves Colors, Consistent Change Count, Max Change Count, Distinct Change Patterns, Is Fill Task, Is Deletion Task, Confidence (tc_*, Layer 252) (PR 362) |
 | `periodfix` | Periodic Pattern Repair: List and Grid Period Detection, Majority-Vote Tile Construction, Violation Finding, Full and Single-Corruption Repair, and Best-Period Search (ppf_*, Layer 253) (PR 366) |
+| `iochan` | I/O Channel Integration: Speaker output (espeak-ng / festival TTS), microphone input (arecord + whisper-cli STT), text channels (console / email / screen / app), image channels (console / email / screen / app / webcam / URL), and printer output (CUPS lp) (ic_*, Layer 254) (WP-279) |
 | `seqinfer` (enhanced) | Sequential Rule Inference + ARC-AGI-2 Candidates: sq_arc2_candidates/1 adds 66-entry integer-color candidate list for multi-step search (sq_*, Layer 195) (WP-274, PR 363) |
 | `hyp` (enhanced) | Hypothesis Generation + Spatial/Structural/Sequence: hy_spatial_hyp/3, hy_structural_hyp/3, hy_sequence_hyp/4 extend hypothesis search to grid-level shifts, structural patterns, and two-step color maps (hy_*, Layer 74) (WP-275, PR 363) |
 | `condxf` (enhanced) | Conditional Scene Transform + Gate Inference: xc_infer_gate/3 infers the gate_color that separates training pairs by change signature (xc_*, Layer 187) (WP-276, PR 363) |
@@ -424,11 +425,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v248` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v240` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v242` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v300` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v306` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v249` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v241` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v243` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v301` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v307` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---

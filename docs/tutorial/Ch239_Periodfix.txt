@@ -1,0 +1,143 @@
+Chapter 239: Periodic Pattern Repair - The periodfix Pack (ppf_*, Layer 253)
+
+Author: D. R. Dison, Founder of AIU, Creator and Owner of PrologAI and Mentova,
+ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
+
+Work Package: 278
+Layer: 253
+Predicate prefix: ppf_
+File: packs/periodfix/prolog/periodfix.pl
+
+
+WHAT IS THE PERIODFIX PACK?
+
+The periodfix pack detects periodic structure in lists and grids, locates violations
+(cells that break the periodic pattern), and repairs them by substituting the expected
+tile value.
+
+A list has period P if:
+    List[i] = List[i mod P]   for every i in 0..length-1
+
+A majority-vote tile of length P is built by taking the most common (modal) value at
+each phase index (0, 1, ..., P-1). A violation is a position where the list value
+differs from the corresponding tile value.
+
+The same ideas extend to 2D grids with a pair of periods (PH, PW):
+    Grid[r][c] = Tile[r mod PH][c mod PW]   for every (r, c)
+
+
+FOURTEEN PUBLIC PREDICATES
+
+1D List Operations:
+
+    ppf_list_period(+List, -P)
+        P is the smallest exact period of List: List[i] = List[i mod P] for all i with
+        zero violations. Fails if no period in 1..length-1 exists with zero violations.
+
+    ppf_majority(+List, -Mode)
+        Mode is the most common element in the non-empty list List. On ties the element
+        that appears first in sorted order wins.
+
+    ppf_tile_from_list(+List, +P, -Tile)
+        Tile is the majority-vote tile: Tile[p] = mode of all List[i] where i mod P = p.
+        Length of Tile is P.
+
+    ppf_violations_list(+List, +P, +Tile, -Violations)
+        Violations is the list of viol(Index, Actual, Expected) terms for each position
+        where List[i] differs from Tile[i mod P].
+
+    ppf_repair_list(+List, +P, +Tile, -Repaired)
+        Repaired is List with every violation replaced by the Tile value at that phase.
+
+    ppf_best_period_list(+List, -P, -NViol)
+        P in 1..max(1,N//2) that minimizes the violation count. NViol is that count.
+        Ties broken by smallest P. Caps at N//2 to exclude the trivial full-length period.
+
+    ppf_single_violation_list(+List, +P, +Tile, -Violation)
+        Succeeds (and binds Violation to viol(Idx,Actual,Expected)) iff List has exactly
+        one violation against the tile. Fails for 0 or 2+ violations.
+
+    ppf_repair_single_list(+List, +P, +Tile, -Repaired)
+        Repairs the unique violation. Fails if 0 or 2+ violations.
+
+2D Grid Operations:
+
+    ppf_tile_2d(+Grid, +PH, +PW, -Tile)
+        Tile is a PH-by-PW majority-vote 2D tile: Tile[r][c] is the mode of all
+        Grid cells at (R,C) where R mod PH = r and C mod PW = c.
+
+    ppf_violations_2d(+Grid, +Tile, +PH, +PW, -Violations)
+        Violations is the list of viol(R, C, Actual, Expected) for each cell where
+        Grid[R][C] differs from Tile[R mod PH][C mod PW].
+
+    ppf_repair_grid(+Grid, +Tile, +PH, +PW, -Repaired)
+        Repaired is Grid with every 2D violation replaced by the Tile value at that phase.
+
+    ppf_best_periods(+Grid, -PH, -PW)
+        (PH, PW) in 1..H//2 x 1..W//2 that minimizes total 2D violations. Caps at half
+        dimensions to exclude trivial periods.
+
+    ppf_single_violation_2d(+Grid, +Tile, +PH, +PW, -Violation)
+        Succeeds iff Grid has exactly one 2D violation (binds Violation to viol/4).
+
+    ppf_repair_single_grid(+Grid, +Tile, +PH, +PW, -Repaired)
+        Repairs the unique 2D violation. Fails if 0 or 2+ violations.
+
+
+EXAMPLES
+
+    :- use_module(library(periodfix)).
+
+    % 1D: find period and repair.
+    ?- ppf_best_period_list([1,2,1,2,1,3], P, NViol).
+    P = 2, NViol = 1.
+
+    ?- ppf_tile_from_list([1,2,1,2,1,3], 2, Tile).
+    Tile = [1,2].
+
+    ?- ppf_repair_list([1,2,1,2,1,3], 2, [1,2], Repaired).
+    Repaired = [1,2,1,2,1,2].
+
+    % Single-violation repair:
+    ?- ppf_repair_single_list([1,2,1,2,1,3], 2, [1,2], R).
+    R = [1,2,1,2,1,2].
+
+    % 2D: a 2-by-3 grid with period (2,2) and one corrupted cell.
+    Grid = [[1,2,1,2],[2,1,2,1],[1,2,9,2],[2,1,2,1]].
+    ?- ppf_best_periods(Grid, PH, PW).
+    PH = 2, PW = 2.
+
+    ?- ppf_tile_2d([[1,2,1,2],[2,1,2,1],[1,2,9,2],[2,1,2,1]], 2, 2, Tile).
+    Tile = [[1,2],[2,1]].
+
+    ?- ppf_violations_2d([[1,2,1,2],[2,1,2,1],[1,2,9,2],[2,1,2,1]],
+                         [[1,2],[2,1]], 2, 2, Vs).
+    Vs = [viol(2,2,9,1)].
+
+    ?- ppf_repair_single_grid([[1,2,1,2],[2,1,2,1],[1,2,9,2],[2,1,2,1]],
+                              [[1,2],[2,1]], 2, 2, Repaired).
+    % Repaired grid has 1 at (2,2) instead of 9.
+
+
+ARC-AGI-2 USE CASE
+
+The periodfix pack solves ARC-AGI-2 task 135a2760 (Wave 15). Grids with inner
+periodic row/column sequences containing a single corrupted cell are repaired by:
+  1. Finding the best period for each row (or column).
+  2. Computing the majority-vote tile.
+  3. Repairing the unique violation.
+The same logic handles column sequences via a transpose-repair-transpose pass.
+
+
+EXERCISES
+
+1. Find the period of the list [a,b,c,a,b,c,a,b,c]:
+   ?- ppf_list_period([a,b,c,a,b,c,a,b,c], P).
+
+2. Repair [r,g,b,r,g,b,r,x,b] (one error at index 7, expected g):
+   ?- ppf_best_period_list([r,g,b,r,g,b,r,x,b], P, NViol),
+      ppf_tile_from_list([r,g,b,r,g,b,r,x,b], P, Tile),
+      ppf_repair_list([r,g,b,r,g,b,r,x,b], P, Tile, Repaired).
+
+3. Create a 4x4 grid where Grid[r][c] = (r+c) mod 3, corrupt one cell,
+   then use ppf_best_periods and ppf_repair_single_grid to restore it.
