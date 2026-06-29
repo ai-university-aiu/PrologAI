@@ -19519,3 +19519,18 @@ expected output.
 Test case verified: 9-shape (projection UP, 4 markers), 2-shape (right apex, min(3,2)=2
 markers -> RIGHT), 8-shape (right apex at (9,11), min(2,1)=1 marker -> RIGHT), stray 2
 at (9,7) unchanged. Full benchmark: 18/120 = 15.00%. Run time: ~2 min (10s per-task limit).
+
+ARC-AGI-2 Wave 19: segment_ext testing note (2026-06-28)
+Verified: arc2_transform(segment_ext, In, Out) for all 4 training pairs of task faa9f03d
+and the test case. Three correctness bugs discovered and fixed:
+Bug 1: se_vfill_ bridged separate horizontal arm segments sharing a column. Fixed by
+requiring at least one V-neighbor to be a "pure vertical arm cell" (se_pure_vert_/5:
+no same-color horizontal neighbor). Verified: pair 1 row 6 columns 3-5 no longer
+filled spuriously.
+Bug 2: H-vs-V conflict at (9,2) in pair 1 gave wrong winner (V=7 instead of H=3).
+Fixed by computing Prio (none/h/v) from 4-corner extension directions (se_ext_dir_/5)
+and using it in se_fill_rule_/6. Horizontal extension (pair 1) -> H wins true conflict.
+Bug 3: H fill overwrote existing non-bg arm cell (2,1)=1 with frame color H=6 in pair 3.
+Fixed by protecting existing non-bg cells in 4-corner grids (Prio != none).
+Regression: all 18 previously solved tasks continue to pass (verified 19/19).
+Full benchmark: 19/120 = 15.83%.

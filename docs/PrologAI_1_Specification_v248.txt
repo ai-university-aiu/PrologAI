@@ -18280,3 +18280,23 @@ detection first (tip with perpendicular diverging shape-cell arms), then project
 projection onto this vector). 8-connectivity is required so diagonal-chain shapes and
 concave shapes are identified correctly. Task solved: 3dc255db.
 Score: 17/120 = 14.17% -> 18/120 = 15.00%.
+
+ARC-AGI-2 Wave 19: segment_ext rule specification (2026-06-28)
+Rule name: segment_ext. Each grid encodes a 2-color arm structure with special junction
+cells: value 4 marks a "4-corner" where the stub arm ends and the opposite extension
+emerges; value 2 marks an intermediate "2-corner" junction. Three phases: (1) for each
+4-corner, remove the stub arm (contiguous + cascade + far segments beyond first gap with
+no perpendicular connections), convert the 4-corner to the arm color, extend the arm
+in the opposite direction to the grid boundary; (2) convert remaining 2-corners to the
+adjacent arm color; (3) apply gap fill using H fill (both left and right same non-bg
+color) and V fill (both above and below same non-bg color, with at least one being a
+"pure vertical arm cell": no same-color horizontal neighbors). Fill priority (Prio) is
+determined by 4-corner extension directions: Prio=none (no 4-corners, H wins H-vs-V
+true conflicts and can overwrite non-bg frame cells), Prio=h (horizontal extension, H
+wins true conflicts), Prio=v (vertical extension, V wins true conflicts). Existing
+non-background arm cells are protected from H-fill overwrite in 4-corner grids (Prio
+not none). Three correctness guards: (a) pure-vertical arm cell check prevents V fill
+from bridging between separate horizontal arm segments sharing a column; (b) extension
+direction tiebreaker resolves H-vs-V conflicts at background cells; (c) non-bg cell
+protection prevents frame color from overwriting existing arm cells in 4-corner grids.
+Task solved: faa9f03d. Score: 18/120 = 15.00% -> 19/120 = 15.83%.
