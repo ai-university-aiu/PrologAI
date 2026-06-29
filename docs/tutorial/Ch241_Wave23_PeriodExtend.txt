@@ -1,0 +1,58 @@
+Chapter 241: Wave 23 - period_extend (WP-281, Layer 256)
+
+Wave 23 adds the period_extend named rule to arc_benchmark_2.pl, solving
+ARC-AGI-2 task 16de56c4. This rule detects periodic patterns in rows or
+columns of a grid and extends them to fill the line.
+
+WHAT THE RULE DOES
+
+If a row (or column) contains two or more cells of the same non-background
+color, those cells form an "anchor pair." The distance between them is the
+step D. Every position within the grid that falls at a multiple of D from
+the anchor is a "pattern position."
+
+If another non-background color sits at a pattern position, it is the
+"stop/recolor" cell: fill all pattern positions from the anchor side to the
+stop (inclusive) with the stop color. Do not fill beyond the stop.
+
+If no stop cell exists, fill every in-bounds pattern position with the
+anchor color.
+
+Cells at non-pattern positions that have a non-background value ("singletons")
+are copied unchanged to the output.
+
+DIRECTION SELECTION
+
+The rule operates either row-wise or column-wise. It counts "active lines"
+in each dimension (lines with 2+ same-color non-BG cells) and applies the
+rule in the dimension with more active lines.
+
+EXAMPLE
+
+Row 8 of training pair 1 (task 16de56c4):
+
+    Input:  [9, 0, 9, 0, 0, 0, 6, 0, 0]
+    Anchor: 9s at cols 0 and 2, step = 2
+    Pattern positions: 0, 2, 4, 6, 8
+    Stop: 6 at col 6 (pattern position, different color)
+    Fill range: col 0 to col 6 (anchor at left, stop at right)
+    Output: [6, 0, 6, 0, 6, 0, 6, 0, 0]
+
+KEY PREDICATES
+
+    arc2_pe_count_active_(Grid, MaxR, MaxC, RowCount, ColCount)
+        Count active lines in each dimension to determine direction.
+
+    arc2_pe_find_anchor_(Pairs, AnchorColor, AnchorPositions, Step)
+        Find the same-color pair with the smallest step.
+
+    arc2_pe_pat_pos_(AnchorPositions, Step, MaxPos, PatPos)
+        Generate all in-bounds positions with the anchor residue mod Step.
+
+    arc2_pe_out_pairs_(Pairs, AnchorColor, AnchorPositions, PatPos, OutPairs)
+        Determine output cells: fill range + preserved singletons.
+
+BENCHMARK RESULT
+
+Task solved: 16de56c4.
+Score: 22/120 = 18.33% -> 23/120 = 19.17%.

@@ -19829,3 +19829,39 @@ display, fswebcam, wget, lp) is absent, Status = error(program_unavailable) is
 returned rather than an exception being thrown.
 
 See docs/tutorial/Ch240_Iochan.txt for full details and exercises.
+
+
+Chapter 241: Wave 23 - period_extend (WP-281, Layer 256)
+
+Wave 23 adds the period_extend named rule to arc_benchmark_2.pl, solving
+ARC-AGI-2 task 16de56c4. This rule detects periodic patterns in rows or
+columns of a grid and extends them to fill the line.
+
+The core idea is simple: if a row contains two 1s separated by 3 columns,
+the rule fills every third column of that row with 1s. If a different color
+appears at one of those pattern positions, it acts as a stop-and-recolor
+marker: the pattern fills from the anchor end to the stop marker using the
+marker's color, and does not extend past the stop.
+
+Direction (row-wise vs column-wise) is chosen automatically: whichever
+dimension has more "active lines" (lines with two or more cells of the same
+non-background color) wins.
+
+Example (row mode):
+
+    Input row:  [9, 0, 9, 0, 0, 0, 6, 0, 0]
+                    ^ 9s at cols 0,2  step=2  stop: 6 at col 6
+    Output row: [6, 0, 6, 0, 6, 0, 6, 0, 0]
+                    ^ fills cols 0,2,4,6 with 6 (the stop/recolor color)
+
+Key predicates (all arc2_pe_* namespace):
+
+    arc2_pe_count_active_/5  count active rows and cols
+    arc2_pe_find_anchor_/4   find the anchor pair and step
+    arc2_pe_pat_pos_/4       generate all in-bounds pattern positions
+    arc2_pe_out_pairs_/5     compute output cells with stop/recolor logic
+
+The period_extend rule is registered via arc2_named_rule(period_extend) and
+dispatched by the standard arc2_transform/3 interface used by all waves.
+
+Task solved: 16de56c4. Benchmark score: 23/120 = 19.17%.
