@@ -20552,3 +20552,60 @@ BENCHMARK RESULT
 
 Task solved: 9385bd28 (4 training pairs).
 Score: 34/120 = 28.33% to 35/120 = 29.17%.
+
+Chapter 254: Wave 36 - slide_void (ARC-AGI-2 task 332f06d7)
+
+WHAT IT DOES
+
+slide_void solves maze-navigation tasks where an H x W void (0-cell block)
+must slide through a river of 1-cells to reach the farthest corner of the
+maze. The grid contains an H x W block of 0-cells (the void), an H x W block
+of 2-cells (the marker), and river cells (1) on a non-0/1 background. The
+void slides to the FARTHEST reachable dead-end in the block-movement graph.
+If that dead-end is adjacent to the 2-marker, the void enters the marker
+pocket instead.
+
+BLOCK-MOVEMENT BFS
+
+The void moves as a rigid H x W block. A slide in one direction is valid if
+the new cells entering the block's leading face are all passable (value 0 or 1
+in the original grid). BFS explores block positions (top-left coordinates),
+not individual cells. This is critical: cell-level BFS gives wrong distances
+because the block moves as a whole.
+
+DEAD-END DETECTION
+
+A dead-end is a block position with exactly 1 slide neighbour in the full
+block-movement graph (not just the BFS tree). arc2_svo_is_deadend_ counts
+slide neighbours via findall and checks length == 1.
+
+FARTHEST DEAD-END
+
+Among all reachable non-start dead-ends, the rule picks the one with MAXIMUM
+BFS distance from the void's starting position. This is the far end of the
+river maze. If that dead-end is adjacent to the 2-marker (any face cell == 2),
+the target becomes the marker's top-left position.
+
+OUTPUT
+
+Old void cells (original 0-cells) become river (1). Target cells become
+void (0). All other cells remain unchanged.
+
+PREDICATES
+
+  arc2_transform(slide_void, +Grid, -Out)
+  arc2_svo_void_(+Grid, +NR1, +NC1, -VR, -VC, -H, -W)
+  arc2_svo_marker_(+Grid, +NR1, +NC1, -MR, -MC, -H, -W)
+  arc2_svo_one_nbr_(+Grid, +NR1, +NC1, +R, +C, +H, +W, -NR2, -NC2)
+  arc2_svo_row_passable_(+Grid, +FR, +C, +W)
+  arc2_svo_col_passable_(+Grid, +R, +FC, +H)
+  arc2_svo_block_bfs_(+Grid, +NR1, +NC1, +VR, +VC, +H, +W, -Reached)
+  arc2_svo_is_deadend_(+Grid, +NR1, +NC1, +R, +C, +H, +W)
+  arc2_svo_farthest_end_(+Grid, +NR1, +NC1, +H, +W, +VR, +VC, +Reached, -FR, -FC)
+  arc2_svo_adj_marker_(+Grid, +NR1, +NC1, +R, +C, +H, +W)
+  arc2_svo_cell_out_(+OldCells, +NewCells, +R, +C, +Orig, -Out)
+
+BENCHMARK RESULT
+
+Task solved: 332f06d7 (4 training pairs).
+Score: 35/120 = 29.17% to 36/120 = 30.00%.
