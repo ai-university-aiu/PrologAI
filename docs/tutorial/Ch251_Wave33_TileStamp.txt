@@ -1,0 +1,73 @@
+Chapter 251: Wave 33 - tile_stamp (WP-291, Layer 266)
+
+WHAT IT DOES
+
+tile_stamp solves ARC-AGI-2 task bf45cf4b. Every input grid contains exactly
+two non-background objects:
+
+(1) KERNEL: a compact rectangular tile that uses more than one distinct
+non-background color. This tile is the "stamp" that will be reproduced
+multiple times in the output.
+
+(2) INDICATOR PATTERN: scattered cells that all share a single non-background
+color. Their bounding box defines an NR x NC binary grid where each position
+is either T (non-background = stamp here) or F (background = leave empty).
+
+The rule tiles the output: the output has NR*KR rows and NC*KC cols where KR
+and KC are the kernel height and width. Each tile position (r, c) in the NR x
+NC grid receives a copy of the kernel if the corresponding indicator cell is
+non-background, or a block of background cells otherwise.
+
+PREDICATES
+
+  arc2_transform(tile_stamp, +Grid, -Out)
+      Entry point. Finds BG, collects non-BG cells, partitions into 4-connected
+      components, identifies the kernel component (>1 distinct value), extracts
+      the kernel sub-grid, computes indicator pattern bounding box, and builds
+      the tiled output.
+
+  arc2_stamp_nonbg_(+Grid, +BG, -Cells)
+      Collects all R-C positions where the grid cell value differs from BG.
+
+  arc2_stamp_kern_(+Comps, +Grid, -KR1, -KC1, -KR, -KC, -PatCells)
+      Uses partition/4 to separate the one kernel component (>1 distinct value)
+      from all pattern components. Computes the kernel bounding box and merges
+      all pattern components into a flat position list.
+
+  arc2_stamp_multi_val_(+Comp, +Grid)
+      Succeeds if the cells in Comp, looked up in Grid, yield more than one
+      distinct value. This is the kernel identifier.
+
+  arc2_stamp_bbox_(+Cells, -R1, -C1, -R2, -C2)
+      Computes the bounding box of a list of R-C pairs via min/max of row and
+      column index lists.
+
+  arc2_stamp_subgrid_(+Grid, +R1, +C1, +KR, +KC, -SubGrid)
+      Extracts a KR x KC rectangular sub-grid starting at (R1, C1). Interior
+      background-valued cells are copied verbatim (no filtering).
+
+  arc2_stamp_out_(+PatCells, +PR1, +PC1, +PNR, +PNC, +BG, +Kern, +KR, +KC, -Out)
+      Builds the full output grid row by row. For each output row index, computes
+      the tile row (TR = index // KR) and kernel row offset (DR = index mod KR),
+      then calls arc2_stamp_row_ to produce that row.
+
+  arc2_stamp_row_(+TR, +DR, +PatCells, +PR1, +PC1, +PNC, +KC, +BG, +Kern, -Row)
+      Builds one output row. For each tile column TC in 0..PNC-1, checks whether
+      the absolute indicator position (PR1+TR, PC1+TC) is in PatCells. If yes,
+      the segment is the KC values from the kernel row at offset DR. If no, the
+      segment is KC background values. Segments are concatenated into Row.
+
+KEY DESIGN NOTES
+
+The kernel identifier (>1 distinct value in one 4-connected component) correctly
+handles the case where the kernel's interior cells have the same value as the
+background (pair 1: kernel center = 4 = BG). Since those interior cells are BG,
+they are excluded from the non-BG cell set; the remaining kernel cells form one
+connected ring with two distinct values (3 and 8), which passes the multi-value
+test. The bounding box then captures the full rectangle including the interior
+BG cells, which arc2_stamp_subgrid_ extracts verbatim.
+
+BENCHMARK RESULT
+
+Task solved: bf45cf4b (3 training pairs).
+Score: 32/120 = 26.67% to 33/120 = 27.50%.
