@@ -1,0 +1,97 @@
+Chapter 254: Wave 36 - slide_void (WP-294, Layer 269)
+
+WHAT IT DOES
+
+slide_void solves ARC-AGI-2 task 332f06d7. Every input grid contains an H x W
+block of 0-cells (the void), an H x W block of 2-cells (the marker), and a
+river of 1-cells connecting them on a background of other values. The void
+must slide along the river to the FARTHEST dead-end in the block-movement
+graph. If that dead-end is adjacent to the 2-marker, the void enters the
+marker pocket instead.
+
+BLOCK-MOVEMENT BFS
+
+The void is an H x W rigid block. A slide in one direction is valid only if
+every new cell entering the block's leading face has value 0 or 1 in the
+original grid (passable). The BFS explores block positions (top-left
+coordinates), not individual cells. Starting from the void's initial top-left
+(VR, VC), BFS visits every reachable block position and records its distance
+from the start.
+
+DEAD-END DETECTION
+
+A block position is a dead-end when it has exactly 1 slide neighbour in the
+full block-movement graph (not just in the BFS spanning tree).
+arc2_svo_is_deadend_ calls arc2_svo_one_nbr_ via findall and checks that
+exactly 1 neighbour is found. The starting void position is excluded.
+
+FARTHEST DEAD-END SELECTION
+
+All reachable dead-ends (excluding start) are collected. The one with maximum
+BFS distance from the void start is selected. This is the far end of the river
+maze. If any face cell of that dead-end is a 2-cell (adjacent to the marker),
+the target position is set to (MR, MC) - the marker's top-left - instead.
+
+OUTPUT CONSTRUCTION
+
+Old void cells (original 0-cells) become 1 (river restored). Target cells
+become 0 (new void position). All other cells stay as in the input.
+
+PREDICATES
+
+  arc2_transform(slide_void, +Grid, -Out)
+      Entry point. Locates void and marker, runs block BFS, finds farthest
+      dead-end, checks marker adjacency, and builds the output grid.
+
+  arc2_svo_void_(+Grid, +NR1, +NC1, -VR, -VC, -H, -W)
+      Collects all 0-cells, computes their bounding box to get void top-left
+      (VR,VC), height H, and width W.
+
+  arc2_svo_marker_(+Grid, +NR1, +NC1, -MR, -MC, -H, -W)
+      Collects all 2-cells, computes bounding box. H and W must match void.
+
+  arc2_svo_one_nbr_(+Grid, +NR1, +NC1, +R, +C, +H, +W, -NR2, -NC2)
+      Single slide neighbour of block at (R,C). Four clauses: slide up (new
+      row R-1, check row R-1), down (new row R+1, check row R+H), left (new
+      col C-1, check col C-1), right (new col C+1, check col C+W).
+
+  arc2_svo_row_passable_(+Grid, +FR, +C, +W)
+      All cells in row FR, columns C..C+W-1 have value 0 or 1.
+
+  arc2_svo_col_passable_(+Grid, +R, +FC, +H)
+      All cells in column FC, rows R..R+H-1 have value 0 or 1.
+
+  arc2_svo_block_bfs_(+Grid, +NR1, +NC1, +VR, +VC, +H, +W, -Reached)
+      BFS from (VR,VC) over block positions. Returns list of R-C-Dist triples.
+
+  arc2_svo_is_deadend_(+Grid, +NR1, +NC1, +R, +C, +H, +W)
+      True when exactly 1 slide neighbour exists for block at (R,C,H,W).
+
+  arc2_svo_farthest_end_(+Grid, +NR1, +NC1, +H, +W, +VR, +VC, +Reached, -FR, -FC)
+      Finds all reachable non-start dead-ends, sorts by distance ascending,
+      returns top-left (FR,FC) of the last (farthest) entry.
+
+  arc2_svo_adj_marker_(+Grid, +NR1, +NC1, +R, +C, +H, +W)
+      True when any face cell of block at (R,C,H,W) has value 2.
+
+  arc2_svo_cell_out_(+OldCells, +NewCells, +R, +C, +Orig, -Out)
+      Returns 1 for old void cells, 0 for new target cells, Orig otherwise.
+
+KEY DESIGN NOTES
+
+Block-movement BFS is essential. A cell-level BFS would give distances in
+grid hops, not block-movement hops, leading to the wrong dead-end selection.
+
+Passability includes 0 (the original void cells), so the block can traverse
+its own starting footprint during BFS. This is necessary when a maze path
+loops back through the void's original position.
+
+The farthest dead-end is the correct target because the rule models the void
+sliding to the far end of the maze. The adjacency check to the 2-marker
+handles the case where the maze's far end IS the marker pocket: the void
+enters the marker exactly rather than stopping one step short.
+
+BENCHMARK RESULT
+
+Task solved: 332f06d7 (4 training pairs).
+Score: 35/120 = 29.17% to 36/120 = 30.00%.
