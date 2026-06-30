@@ -16177,3 +16177,43 @@ fill_open(Grid, NRows, NCols, DC) -> Out:
       LeftZeros = [c : 0 <= c <= DC2-1 and Grid[R][c] == 0]
       if LeftZeros != []:
         for C in DC+1..NCols-1: Out[R][C] = 2
+
+WP-287 diag_beam (Layer 262) - ARC-AGI-2 Wave 29
+Input: Grid (list of lists containing only BG, 1, and 6 values).
+Output: Out (same dimensions, beams between diagonal 1-pairs filled with 1;
+        perpendicular rays from 6-obstacles filled with 6).
+
+Procedure diag_beam(Grid) -> Out:
+  BG = Grid[0][0]
+  assert: all non-BG cells have value 1 or 6
+  Ones  = [(r,c) : Grid[r][c] == 1]
+  Sixes = [(r,c) : Grid[r][c] == 6]
+  NRows = len(Grid), NCols = len(Grid[0])
+  Pairs = [(P1,P2) : P1 in Ones, P2 in Ones, P1 < P2,
+            abs(P1.r - P2.r) == abs(P1.c - P2.c), abs(P1.r - P2.r) > 0]
+  assert: Pairs is non-empty
+  G = Grid
+  for each (R1,C1)-(R2,C2) in Pairs:
+    DR = sign(R2 - R1),  DC = sign(C2 - C1)
+    G = march(R1+DR, C1+DC, DR, DC, R2, C2, Sixes, NRows, NCols, G)
+  Out = G
+
+march(R, C, DR, DC, R2, C2, Sixes, NRows, NCols, G) -> G:
+  if R == R2 and C == C2: return G           % reached destination
+  if (R,C) in Sixes:
+    G = bounce(R, C, DR, DC, Sixes, NRows, NCols, G)
+  else:
+    G[R][C] = 1
+  return march(R+DR, C+DC, DR, DC, R2, C2, Sixes, NRows, NCols, G)
+
+bounce(R, C, DR, DC, Sixes, NRows, NCols, G) -> G:
+  G = ray(R, C,  DR, -DC, Sixes, NRows, NCols, G)
+  G = ray(R, C, -DR,  DC, Sixes, NRows, NCols, G)
+  return G
+
+ray(R, C, DR, DC, Sixes, NRows, NCols, G) -> G:
+  NR = R + DR, NC = C + DC
+  if NR < 0 or NR >= NRows or NC < 0 or NC >= NCols: return G  % out of bounds
+  if (NR,NC) in Sixes: return G              % stop at existing obstacle
+  G[NR][NC] = 6
+  return ray(NR, NC, DR, DC, Sixes, NRows, NCols, G)

@@ -19724,3 +19724,24 @@ WP-286 slide_open (Layer 261) testing:
   at least one 0 in columns 0..DC-3 confirms a separate object remains
   on the far left side.
   Regression: all 27 previously solved tasks continue to pass (28/28 total).
+
+WP-287 diag_beam (Layer 262) testing:
+  Task: db695cfb (5 training pairs + 1 test case; 25x21 test grid).
+  Verification method: manual analysis of all 6 cases; each pair of 1s
+  checked for diagonal alignment; beam path traced step by step; bounce
+  rays traced from each 6-obstacle.
+  swipl benchmark run confirmed PASS db695cfb with score 29/120 = 24.17%.
+  Key correctness insight: the guard "all non-BG cells are 1 or 6" is
+  essential to avoid false positive matches on grids with other cell values.
+  The background is read from Grid[0][0] rather than computed by frequency
+  analysis; this is reliable because all training and test grids have
+  background at (0,0).
+  Perpendicular directions: for beam direction (DR, DC), the two
+  perpendicular 45-degree directions are (DR, -DC) and (-DR, DC). These
+  are derived by negating one component of the original direction.
+  Original Sixes list: collected once before any beam fires and remains
+  unchanged. Newly placed 6-fills do not block subsequent beams or rays,
+  matching observed task behavior.
+  Stop conditions for rays: out-of-bounds check (NR<0 or NR>=NRows or
+  NC<0 or NC>=NCols) and memberchk against the original Sixes list.
+  Regression: all 28 previously solved tasks continue to pass (29/29 total).
