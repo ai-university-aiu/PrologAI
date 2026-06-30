@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/SWI--Prolog-9.0.4%2B-8A2BE2?style=for-the-badge" alt="SWI-Prolog 9.0.4+">
   <img src="https://img.shields.io/badge/reasoning-48%20types-5865F2?style=for-the-badge" alt="48 Reasoning Types">
   <img src="https://img.shields.io/badge/protocols-MCP%20%7C%20A2A%20%7C%20ACP%20%7C%20ANP-0075CA?style=for-the-badge" alt="MCP | A2A | ACP | ANP">
-  <img src="https://img.shields.io/badge/license-Attribution%20No%20Profit%20No%20Problem-orange?style=for-the-badge" alt="The Attribution. No Profit, No Problem License">
+  <img src="https://img.shields.io/badge/license-Attribution%20No%20Profit%20No%20Problem-orange?style=for-the-badge" alt="The Attribution Always; No Profit, No Problem License.">
 </p>
 
 <p align="center">
@@ -425,11 +425,11 @@ PrologAI is defined by six companion volumes:
 
 | Volume | Document | Purpose |
 |---|---|---|
-| 1 | `PrologAI_1_Specification_v257` | Authoritative statement of what to build |
-| 2 | `PrologAI_2_Pseudocode_v249` | How each work package reasons |
-| 3 | `PrologAI_3_Architecture_v250` | Where each piece lives |
-| 4 | `PrologAI_4_Refinement_v309` | Testing protocols and safety criteria |
-| 5 | `PrologAI_5_Completion_v315` | Release criteria and completion evidence |
+| 1 | `PrologAI_1_Specification_v258` | Authoritative statement of what to build |
+| 2 | `PrologAI_2_Pseudocode_v250` | How each work package reasons |
+| 3 | `PrologAI_3_Architecture_v251` | Where each piece lives |
+| 4 | `PrologAI_4_Refinement_v310` | Testing protocols and safety criteria |
+| 5 | `PrologAI_5_Completion_v316` | Release criteria and completion evidence |
 | 6 | `PrologAI_6_Demonstration_Mentova` | How Mentova is born, proven, and grown |
 
 ---
@@ -537,7 +537,7 @@ Achievement report: [ARC-AGI-1_Perfect_Score_Report.txt](https://github.com/ai-u
 
 [Mentova](https://github.com/ai-university-aiu/Mentova) is the world's first glass-box synthetic mind, built on PrologAI.
 
-It runs 48 reasoning types, achieved a confirmed perfect score of 400/400 = 100% on ARC-AGI-1 (Abstract Reasoning Corpus - Artificial General Intelligence - Year 1), and is actively climbing ARC-AGI-2 (current score: 27/120 = 22.50%, Wave 27 complete).
+It runs 48 reasoning types, achieved a confirmed perfect score of 400/400 = 100% on ARC-AGI-1 (Abstract Reasoning Corpus - Artificial General Intelligence - Year 1), and is actively climbing ARC-AGI-2 (current score: 28/120 = 23.33%, Wave 28 complete).
 
 No large language model (LLM).
 
@@ -574,9 +574,9 @@ ORCID: 0009-0001-9246-5758 · [LinkedIn](https://www.linkedin.com/in/d-r-dison/)
 
 ## License
 
-**The Attribution. No Profit, No Problem License** — see [LICENSE.txt](LICENSE.txt)
+**The Attribution Always; No Profit, No Problem License.** — see [LICENSE.txt](LICENSE.txt)
 
-Free for non-commercial use (individuals, students, educators, non-profits, academic researchers) with required attribution to PrologAI, Mentova, and D. R. Dison.
+Free for non-commercial use (individuals, students, educators, non-profits, academic researchers) with required attribution to PrologAI, AIU (Artificial Intelligence University), and D. R. Dison.
 
 Commercial and profit-making use requires a negotiated license including a percentage-of-profits royalty. Contact [ai.university.aiu@gmail.com](mailto:ai.university.aiu@gmail.com) before any commercial use begins.
 

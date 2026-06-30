@@ -1,0 +1,65 @@
+Chapter 246: Wave 28 - slide_open (WP-286, Layer 261)
+
+Wave 28 adds the slide_open named rule to arc_benchmark_2.pl, solving
+ARC-AGI-2 task 6e453dd6. This rule recognizes that 0-cell objects left of a
+vertical 5-divider should be slid rightward to touch the divider, and that
+rows left open by the slide should be filled right of the divider with 2.
+
+WHAT THE RULE DOES
+
+The grid contains a vertical column where every cell holds value 5 (the
+divider at column DC). All 0-cells strictly left of DC form one or more
+4-connected components (the objects). Each object is shifted rightward so
+its rightmost cell occupies column DC-1, placing it immediately against the
+divider. After all objects have been slid, the rule scans each row. If a row
+satisfies all three open-row conditions:
+  (1) cell(R, DC-1) = 0  (a gap exists at the divider edge in this row),
+  (2) cell(R, DC-2) != 0 (the gap is isolated; the slid object is not here),
+  (3) at least one 0 exists in columns 0..DC-3 (another object is present),
+then all cells right of the divider (columns DC+1 to NCols-1) are filled
+with value 2 in that row.
+
+KEY PREDICATES
+
+  arc2_so_divider_(Grid, NRows, DC)
+      Finds the column DC where all NRows cells hold value 5.
+      Uses between/3 to generate candidate columns and forall to verify.
+      Critical ordering: NRowsM is computed before numlist/3 is called,
+      because numlist/3 requires an instantiated upper bound.
+
+  arc2_so_comps4_(Cells, Comps)
+      Partitions a flat list of R-C pairs into 4-connected components
+      using iterative DFS flood-fill (arc2_so_flood4_/6).
+
+  arc2_so_slide_(DC, _NRows, _NCols, Comp, G0, G1)
+      Slides one component rightward. Two foldl passes:
+      Pass 1 - erase all component cells (set to placeholder 6).
+      Pass 2 - place each cell at C + Shift, where Shift = (DC-1) - MaxCol.
+      The two-pass design prevents a shifted component from overwriting
+      its own source cells in a single pass.
+
+  arc2_so_fill_open_(Grid, NRows, NCols, DC, Out)
+      Fills open rows with 2 right of the divider. Iterates over all rows
+      via foldl, checking all three open-row conditions per row.
+      Open rows receive value 2 in columns DC+1 through NCols-1.
+
+ALGORITHM TRACE (task 6e453dd6)
+
+The input grid has a vertical column of 5s at column DC. Several 0-cell
+objects appear left of the divider, scattered across rows. Each object is a
+4-connected component.
+
+Slide phase: each component is identified. Its rightmost column MaxCol is
+found. Shift = DC-1 - MaxCol. The component is first erased (set to 6), then
+re-placed at the shifted positions (0s). After all slides, every component
+touches the divider from the left.
+
+Fill phase: the rule scans each row. Rows where the slid object placed its
+rightmost cell at DC-1 show a 0 at DC-1 and a non-zero at DC-2 (the object
+body). If another object (0) exists further left (cols 0..DC-3), the row is
+open, and all cells right of the divider are set to 2.
+
+BENCHMARK RESULT
+
+Task solved: 6e453dd6.
+Score: 27/120 = 22.50% to 28/120 = 23.33%.
