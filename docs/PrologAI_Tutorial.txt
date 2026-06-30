@@ -20411,3 +20411,56 @@ BENCHMARK RESULT
 
 Task solved: aa4ec2a5.
 Score: 31/120 = 25.83% to 32/120 = 26.67%.
+
+Chapter 251: Wave 33 - tile_stamp (WP-291, Layer 266)
+
+WHAT IT DOES
+
+tile_stamp solves ARC-AGI-2 task bf45cf4b. Every input grid contains exactly
+two non-background objects:
+
+(1) KERNEL: a compact rectangular tile that uses more than one distinct
+non-background color. This tile is the stamp reproduced in the output.
+
+(2) INDICATOR PATTERN: scattered cells sharing a single non-background color.
+Their bounding box defines an NR x NC binary grid where each position is T
+(non-background = stamp here) or F (background = leave empty).
+
+The output has NR*KR rows and NC*KC cols (KR and KC are the kernel dimensions).
+Each tile position (r, c) in the NR x NC grid receives a copy of the kernel if
+the corresponding indicator cell is non-background, or background cells otherwise.
+
+PREDICATES
+
+  arc2_transform(tile_stamp, +Grid, -Out)
+      Entry point. Finds BG, collects non-BG cells, partitions into 4-connected
+      components, identifies the kernel component (>1 distinct value), extracts
+      the kernel sub-grid, computes indicator pattern bounding box, builds output.
+
+  arc2_stamp_nonbg_(+Grid, +BG, -Cells)
+      Collects all R-C positions where the grid cell value differs from BG.
+
+  arc2_stamp_kern_(+Comps, +Grid, -KR1, -KC1, -KR, -KC, -PatCells)
+      Separates the kernel component (>1 distinct value) from pattern components.
+      Returns kernel bounding box parameters and merged pattern cell list.
+
+  arc2_stamp_multi_val_(+Comp, +Grid)
+      Succeeds if the component cells yield more than one distinct value in Grid.
+
+  arc2_stamp_bbox_(+Cells, -R1, -C1, -R2, -C2)
+      Computes bounding box of a list of R-C pairs via min/max operations.
+
+  arc2_stamp_subgrid_(+Grid, +R1, +C1, +KR, +KC, -SubGrid)
+      Extracts a KR x KC sub-grid starting at (R1, C1), keeping interior BG cells.
+
+  arc2_stamp_out_(+PatCells, +PR1, +PC1, +PNR, +PNC, +BG, +Kern, +KR, +KC, -Out)
+      Builds the full output grid row by row using arc2_stamp_row_.
+
+  arc2_stamp_row_(+TR, +DR, +PatCells, +PR1, +PC1, +PNC, +KC, +BG, +Kern, -Row)
+      Builds one output row by checking each tile column against PatCells and
+      emitting either the kernel row or a background segment.
+
+BENCHMARK RESULT
+
+Task solved: bf45cf4b.
+Score: 32/120 = 26.67% to 33/120 = 27.50%.
