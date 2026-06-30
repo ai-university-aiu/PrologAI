@@ -1,0 +1,90 @@
+Chapter 248: Wave 30 - frame_absorb (WP-288, Layer 263)
+
+Wave 30 adds the frame_absorb named rule to arc_benchmark_2.pl, solving
+ARC-AGI-2 task d35bdbdc. This rule recognizes frame blocks (rectangular
+3x3 squares or cross-shaped clusters) and builds an absorption graph from
+their center-color and arm-color relationships.
+
+WHAT THE RULE DOES
+
+Each grid in task d35bdbdc contains:
+- A snake path of 5-valued cells that is always preserved unchanged.
+- Frame blocks: either 3x3 squares (8 border cells + 1 center cell) or
+  cross shapes (4 arm cells + 1 center cell).
+- Each frame block has a center color CV and an arm color AV.
+  For monochrome blocks, all cells share one color, so CV = AV.
+
+The transformation: build a directed absorption graph where an edge X -> Y
+means X.CV = Y.AV. Process the graph using this priority order:
+1. Find any monochrome block Y (CV = AV). If a predecessor X exists
+   (X.CV = Y.AV), X absorbs Y: X's center cell is repainted Y.CV, and
+   Y's cells are all erased. If no predecessor, Y is erased.
+2. After all monochrome blocks are handled: find a chain-start block X
+   (no block Z has Z.CV = X.AV). X absorbs its successor Y if one exists;
+   otherwise X is erased.
+3. Any remaining blocks (forming a cycle) are all erased.
+
+KEY PREDICATES
+
+  arc2_transform(frame_absorb, Grid, Out)
+      Collects non-0, non-5 positions; partitions into 4-connected
+      components; classifies each as a frame block; solves the absorption
+      graph; applies actions via foldl.
+
+  arc2_fa_comps_(Positions, Components)
+      BFS partition of cell positions into 4-connected components.
+
+  arc2_fa_block_(Grid, Cells, block(CR,CC,CV,AV,Cells))
+      Classifies one component as a frame block. Two-color: the singleton
+      color is CV, the majority color is AV, and the center cell is the
+      unique cell whose grid value equals CV. Monochrome: CV = AV, and the
+      center is the most 4-connected cell in the component.
+
+  arc2_fa_solve_(Blocks, Actions)
+      Recursive priority-ordered solver. Returns a list of absorb(X,Y) and
+      erase(B) actions.
+
+  arc2_fa_exec_(Action, G0, G1)
+      Applies one action to the grid: absorb erases Y and repaints X's
+      center; erase zeroes all cells of B.
+
+ALGORITHM TRACE (task d35bdbdc, training pair P0)
+
+Input blocks (10x10 grid):
+- A: top-right 3x3, arm=3, center=4. At rows 0-2, cols 7-9.
+- B: middle-right 3x3, arm=6, center=1. At rows 4-6, cols 7-9.
+- C: middle-left 3x3, arm=4, center=2. At rows 3-5, cols 2-4.
+- D: bottom 3x3, arm=1, center=3. At rows 7-9, cols 2-4.
+
+Absorption graph: A.CV=4 = C.AV=4 (A absorbs C); B.CV=1 = D.AV=1 (B absorbs D).
+
+No monochrome blocks. Find chain starts:
+- A: no predecessor (no block Z with Z.CV = A.AV = 3 among {A,B,C,D}).
+  Wait: D.CV=3 = A.AV=3, so D IS a predecessor of A. A is NOT a start.
+  Rechecking: starts are blocks with no predecessor.
+  A.AV=3: D.CV=3 -> D is predecessor of A. A is not a start.
+  B.AV=6: no block has CV=6. B is a start.
+  C.AV=4: A.CV=4 -> A is predecessor of C. C is not a start.
+  D.AV=1: B.CV=1 -> B is predecessor of D. D is not a start.
+
+So B is the only start. B absorbs D (B.CV=1 = D.AV=1). B.center 1->3. D erased.
+
+After step: remaining {A, C}. A.AV=3: no block among {A,C} has CV=3. A is now start.
+A absorbs C (A.CV=4 = C.AV=4). A.center 4->2. C erased.
+
+After step: remaining {}. Done.
+
+Output: A has center=2 (was 4); B has center=3 (was 1); C and D erased.
+Matches the expected output grid.
+
+KEY BUG AND FIX
+
+The snake path (5-valued cells) forms a large 4-connected component.
+If 5-cells are included in the position collection, they form a monochrome
+block with no predecessor and are incorrectly erased, corrupting the grid.
+Fix: exclude 5-valued cells from the findall goal with V \= 5.
+
+BENCHMARK RESULT
+
+Task solved: d35bdbdc.
+Score: 29/120 = 24.17% to 30/120 = 25.00%.
