@@ -20185,3 +20185,66 @@ BENCHMARK RESULT
 
 Task solved: db695cfb.
 Score: 28/120 = 23.33% to 29/120 = 24.17%.
+
+
+Chapter 248: Wave 30 - frame_absorb (WP-288, Layer 263)
+
+Wave 30 adds the frame_absorb named rule to arc_benchmark_2.pl, solving
+ARC-AGI-2 task d35bdbdc. This rule recognizes frame blocks (rectangular
+3x3 squares or cross-shaped clusters) and builds an absorption graph from
+their center-color and arm-color relationships.
+
+WHAT THE RULE DOES
+
+Each grid in task d35bdbdc contains:
+- A snake path of 5-valued cells that is always preserved unchanged.
+- Frame blocks: either 3x3 squares (8 border cells + 1 center cell) or
+  cross shapes (4 arm cells + 1 center cell).
+- Each frame block has a center color CV and an arm color AV.
+  For monochrome blocks, all cells share one color, so CV = AV.
+
+The transformation: build a directed absorption graph where an edge X -> Y
+means X.CV = Y.AV. Process the graph using this priority order:
+1. Find any monochrome block Y (CV = AV). If a predecessor X exists
+   (X.CV = Y.AV), X absorbs Y: X's center cell is repainted Y.CV, and
+   Y's cells are all erased. If no predecessor, Y is erased.
+2. After all monochrome blocks are handled: find a chain-start block X
+   (no block Z has Z.CV = X.AV). X absorbs its successor Y if one exists;
+   otherwise X is erased.
+3. Any remaining blocks (forming a cycle) are all erased.
+
+KEY PREDICATES
+
+  arc2_transform(frame_absorb, Grid, Out)
+      Collects non-0, non-5 positions; partitions into 4-connected
+      components; classifies each as a frame block; solves the absorption
+      graph; applies actions via foldl.
+
+  arc2_fa_comps_(Positions, Components)
+      BFS partition of cell positions into 4-connected components.
+
+  arc2_fa_block_(Grid, Cells, block(CR,CC,CV,AV,Cells))
+      Classifies one component as a frame block. Two-color: the singleton
+      color is CV, the majority color is AV, and the center cell is the
+      unique cell whose grid value equals CV. Monochrome: CV = AV, and the
+      center is the most 4-connected cell in the component.
+
+  arc2_fa_solve_(Blocks, Actions)
+      Recursive priority-ordered solver. Returns a list of absorb(X,Y) and
+      erase(B) actions.
+
+  arc2_fa_exec_(Action, G0, G1)
+      Applies one action to the grid: absorb erases Y and repaints X's
+      center; erase zeroes all cells of B.
+
+KEY BUG AND FIX
+
+The snake path (5-valued cells) forms a large 4-connected component.
+If 5-cells are included in the position collection, they form a monochrome
+block with no predecessor and are incorrectly erased, corrupting the grid.
+Fix: exclude 5-values cells from the findall goal with V \= 5.
+
+BENCHMARK RESULT
+
+Task solved: d35bdbdc.
+Score: 29/120 = 24.17% to 30/120 = 25.00%.
