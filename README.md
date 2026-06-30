@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/prologai_banner.svg" alt="PrologAI — Cognitive Architecture for Synthetic Minds" width="100%">
+  <img src="assets/PrologAI_754x176_New.png" alt="PrologAI — Cognitive Architecture for Synthetic Minds" width="100%">
 </p>
 
 <p align="center">
@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <strong>A cognitive architecture programming language and platform for building synthetic minds.</strong><br>
+  <strong>A Cognitive Substrate for Building Synthetic Minds</strong><br>
   Pure symbolic induction &nbsp;&bull;&nbsp; Named glass-box rules &nbsp;&bull;&nbsp; No Large Language Model (LLM) &nbsp;&bull;&nbsp; No black box
 </p>
 
