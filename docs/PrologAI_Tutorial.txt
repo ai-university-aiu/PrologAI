@@ -20329,3 +20329,85 @@ BENCHMARK RESULT
 
 Task solved: 5961cc34.
 Score: 30/120 = 25.00% to 31/120 = 25.83%.
+
+Chapter 250: Wave 32 - shape_classify (WP-290, Layer 265)
+
+WHAT IT DOES
+
+shape_classify solves ARC-AGI-2 task aa4ec2a5. The grid contains exactly two
+unique cell values: a background color (the most frequent) and a shape color.
+The rule performs three operations on every shape (4-connected component of
+non-background cells):
+(1) HOLES: background cells that cannot reach the grid boundary via a
+4-connected path through background cells are enclosed holes. Holes are
+painted 6.
+(2) BORDER: outside-reachable background cells that are 8-connected (Chebyshev
+distance 1) adjacent to any shape cell are border cells. Border cells are
+painted 2.
+(3) SHAPE CLASSIFICATION: each shape component is checked against the holes.
+If any cell of the component is 4-adjacent to a hole, all cells of that
+component are painted 8. Otherwise the component cells remain at their
+original color (1).
+
+PREDICATES
+
+  arc2_transform(shape_classify, +Grid, -Out)
+      Entry point. Guard: exactly 2 unique values. Finds BG, runs the
+      outside flood-fill, identifies holes and border cells, partitions
+      non-BG cells into components, classifies each component, then
+      paints holes 6, border 2, and hole-adjacent components 8.
+
+  arc2_scc_bg_(+Flat, -BG)
+      Identifies the background as the most-frequent value in the flat
+      cell list using run-length encoding and max_member/2.
+
+  arc2_scc_runs_(+SortedList, -Pairs)
+      Run-length encodes a sorted list into Count-Value pairs.
+
+  arc2_scc_run_count_(+List, +Val, +Acc, -Count, -Remainder)
+      Counts the leading run of Val in List.
+
+  arc2_scc_outside_(+Grid, +NR, +NC, +BG, -Outside)
+      BFS flood-fill from all boundary BG cells through BG cells
+      (4-connected), returning the set of all outside-reachable BG cells.
+
+  arc2_scc_bfs_(+Queue, +Visited, +Grid, +NR, +NC, +BG, -All)
+      BFS worker: expands the queue through unvisited in-bounds BG cells
+      using 4-connectivity, accumulating all visited cells.
+
+  arc2_scc_nonbg_nbr_(+Grid, +BG, +R, +C)
+      Succeeds if cell (R,C) has at least one non-BG cell among its 8
+      Chebyshev neighbors (4 cardinal + 4 diagonal).
+
+  arc2_scc_comps_(+Positions, -Components)
+      Partitions a list of R-C positions into 4-connected components.
+      Calls arc2_scc_grow_/5 with BFS seed expansion.
+
+  arc2_scc_grow_(+Queue, +Pool, +Acc, -Comp, -Remaining)
+      BFS component expansion. For the head cell, finds all Pool members
+      that are 4-adjacent, removes them from Pool immediately to prevent
+      re-discovery, adds them to the queue and accumulator, then recurses.
+
+  arc2_scc_touches_hole_(+Holes, +Comp)
+      Succeeds if any cell in Comp has a 4-adjacent cell in Holes.
+      Used with include/3 to collect hole-touching components.
+
+KEY BUGS AND FIXES
+
+Bug 1: Border used 4-connected adjacency to detect non-BG neighbors.
+Fix: The expected border includes cells diagonally adjacent to shape cells.
+Changed arc2_scc_nonbg_nbr_ to check all 8 Chebyshev neighbors instead of
+only the 4 cardinal neighbors.
+
+Bug 2: foldl lambda variable name clash. The three painting foldls originally
+all used the same variable G1 as both the lambda output parameter and the
+chained accumulator. After the first foldl bound G1, the second foldl's
+lambda received G1 as an already-bound value from copy_term, causing it to
+try to unify the expected output with the existing grid and fail.
+Fix: Use distinct accumulator names (GA, GB, Out) for each foldl and
+decompose elements explicitly (RC6 = R6-C6 etc.).
+
+BENCHMARK RESULT
+
+Task solved: aa4ec2a5.
+Score: 31/120 = 25.83% to 32/120 = 26.67%.
