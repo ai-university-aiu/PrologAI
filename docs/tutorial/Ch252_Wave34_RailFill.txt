@@ -1,0 +1,88 @@
+Chapter 252: Wave 34 - rail_fill (WP-292, Layer 267)
+
+WHAT IT DOES
+
+rail_fill solves ARC-AGI-2 task 271d71e2. Every input grid contains one or
+more sub-objects. Each sub-object is a 0-bordered rectangular box with cells
+valued 5 or 7 inside, plus two parallel 9-rails on one side (the arm). The
+two rails are called the inner rail (closer to the box) and the outer rail.
+
+The arm_gap is the distance between the inner and outer rail. The rule
+computes:
+
+  N7gained = min(arm_gap, free_interior_cells)
+
+where free_interior_cells = total interior cells - current 7-count. The box
+gains N7gained new 7-cells, filling from the arm side. The box then shifts
+N7gained steps toward the outer rail. The inner rail merges into the new box
+position. The new arm_gap = arm_gap - N7gained. If the new gap is 0 only the
+outer rail remains; if positive a new inner rail is drawn at
+outer + new_gap * (sign from outer toward original inner).
+
+FILL ORDER
+
+Cells are filled in a specific traversal order that produces a diagonal
+staircase pattern (the existing 7-cells in the input already occupy the
+first N7in positions in this order):
+
+  arm_left:   column by column left to right; within each column bottom to top.
+  arm_right:  column by column right to left; within each column top to bottom.
+  arm_top:    row by row top to bottom; within each row left to right.
+  arm_bottom: row by row bottom to top; within each row right to left.
+
+PREDICATES
+
+  arc2_transform(rail_fill, +Grid, -Out)
+      Entry point. Finds BG as Grid[0][0]. Detects all 0-bordered boxes with
+      5/7 interiors. For each box calls arc2_rf_box_transform_ to get a plan.
+      Builds the output by querying arc2_rf_cell_val_ for every (R,C).
+
+  arc2_rf_zero_border_(+Grid, +R1, +C1, +R2, +C2)
+      Checks that row R1, row R2, column C1, and column C2 are all 0-valued
+      within the rectangle bounds.
+
+  arc2_rf_valid_interior_(+Grid, +R1, +C1, +R2, +C2)
+      Checks that every interior cell (rows R1+1..R2-1, cols C1+1..C2-1)
+      holds value 5 or 7.
+
+  arc2_rf_arm_(+Grid, +NR, +NC, +R1, +C1, +R2, +C2, -Dir, -Inner, -Outer)
+      Scans outward in each of the four cardinal directions from the box
+      boundary. The first 9-column (or 9-row) found is the inner rail; the
+      second is the outer rail. Sets Dir to arm_left, arm_right, arm_top, or
+      arm_bottom.
+
+  arc2_rf_fill_order_(+Dir, +H, +W, -Order)
+      Produces the ordered list of (Row-Col) interior positions for the given
+      arm direction and interior dimensions H x W.
+
+  arc2_rf_make_interior_(+H, +W, +N7, +Order, -Interior)
+      Builds a H x W grid of 5s and 7s: the first N7 positions in Order
+      get 7, all others get 5.
+
+  arc2_rf_box_transform_(+Grid, +NR, +NC, +Box, -Plan)
+      Orchestrates arm detection, gap computation, fill order, interior
+      generation, new box position, and new rail positions into a single plan
+      term consumed by arc2_rf_cell_in_plan_.
+
+  arc2_rf_cell_in_plan_(+R, +C, +Plan, -V)
+      Given a plan, determines the output value at (R,C): 9 for a rail cell,
+      0 for a box border cell, or the interior value (5 or 7) for an
+      interior cell. Fails if (R,C) is not covered by this plan.
+
+KEY DESIGN NOTES
+
+Box detection indexes 0-cells first and only tests pairs drawn from that
+set, keeping the search manageable even for 26x26 grids. Interior validity
+(all cells are 5 or 7) eliminates false positives from overlapping box
+boundaries.
+
+The fill order was derived by observing that in all training pairs the
+existing 7-cells occupy exactly the first N7in positions of the respective
+traversal sequence. This invariant means the output is fully determined by
+N7new = N7in + N7gained and the traversal order alone, with no need to
+track individual 7-cell positions.
+
+BENCHMARK RESULT
+
+Task solved: 271d71e2 (3 training pairs).
+Score: 33/120 = 27.50% to 34/120 = 28.33%.

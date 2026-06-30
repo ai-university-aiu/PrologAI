@@ -20464,3 +20464,45 @@ BENCHMARK RESULT
 
 Task solved: bf45cf4b.
 Score: 32/120 = 26.67% to 33/120 = 27.50%.
+
+Chapter 252: Wave 34 - rail_fill (WP-292, Layer 267)
+
+WHAT IT DOES
+
+rail_fill solves ARC-AGI-2 task 271d71e2. Every input grid contains one or
+more sub-objects. Each sub-object is a 0-bordered rectangular box with cells
+valued 5 or 7 inside, plus two parallel 9-rails on one side (the arm). The
+two rails are the inner rail (closer to the box) and the outer rail.
+
+arm_gap = distance between inner and outer rail. The box gains
+min(arm_gap, free_interior_cells) new 7-cells, filling from the arm side in
+a direction-specific traversal order. The box shifts by the same step count
+toward the outer rail. The inner rail merges into the new box. New arm_gap =
+arm_gap - step count; if 0 only the outer rail remains.
+
+PREDICATES
+
+  arc2_transform(rail_fill, +Grid, -Out)
+      Entry point. Background = Grid[0][0]. Finds 0-bordered boxes with 5/7
+      interiors, computes transformation plans, and builds output grid.
+
+  arc2_rf_arm_(+Grid,+NR,+NC,+R1,+C1,+R2,+C2,-Dir,-Inner,-Outer)
+      Scans each cardinal direction from box boundary; first 9-rail = inner,
+      second 9-rail = outer. Sets Dir to arm_left/right/top/bottom.
+
+  arc2_rf_fill_order_(+Dir,+H,+W,-Order)
+      Produces (R-C) pairs in arm-side-outward traversal order.
+
+  arc2_rf_make_interior_(+H,+W,+N7,+Order,-Interior)
+      First N7 positions in Order get 7; rest get 5.
+
+  arc2_rf_box_transform_(+Grid,+NR,+NC,+Box,-Plan)
+      Computes arm, gap, fill, new box position, and new rail positions.
+
+  arc2_rf_cell_in_plan_(+R,+C,+Plan,-V)
+      Returns 9 (rail), 0 (border), or interior value for (R,C) in plan.
+
+BENCHMARK RESULT
+
+Task solved: 271d71e2.
+Score: 33/120 = 27.50% to 34/120 = 28.33%.
