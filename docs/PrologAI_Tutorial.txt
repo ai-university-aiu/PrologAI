@@ -20026,3 +20026,37 @@ KEY PREDICATES
       True when stub direction is perpendicular to anchor's line axis.
 
 Task solved: 7b80bb43. Benchmark score: 25/120 = 20.83% -> 26/120 = 21.67%.
+
+Chapter 245: Wave 27 - stream_extend (WP-285, Layer 260)
+
+Wave 27 adds the stream_extend named rule, solving ARC-AGI-2 task 53fb4810.
+
+WHAT THE RULE DOES
+
+The grid has BG = 0 and A-marker cells of value 1 forming 4-connected blobs.
+Adjacent to each blob, in each cardinal direction, a seed chain of colored
+non-BG non-marker cells may appear. If the chain is followed by a BG gap
+before the grid edge, the chain's period-P pattern is tiled outward to the
+boundary. Extension formula: fill value at distance D from chain anchor =
+Chain[D mod P]. Parallel chains in the same direction extend independently.
+
+KEY PREDICATES
+
+  arc2_sx_comps4_(ACells, Comps)
+      Partitions A-marker cells into 4-connected components via flood-fill.
+
+  arc2_sx_try_dir_(Dir, BG, AVal, NRows, NCols, Comp, G0, G1)
+      Finds seed chains in direction Dir; applies extension fills via foldl.
+
+  arc2_sx_collect_(Grid, BG, AVal, NRows, NCols, R, C, Dir, Acc, Chain)
+      Walks from (R,C) in Dir. Returns chain when BG is found (gap exists).
+      Fails when grid boundary is reached or another marker is hit.
+
+  arc2_sx_ext_fill_(Chain, Dir, NRows, NCols, R-C-Val)
+      Generates each fill cell in the extension region. Computes
+      Offset = distance from anchor; Val = Chain[Offset mod P].
+
+  arc2_sx_step_(Dir, DR, DC)
+      Maps direction to row/column delta.
+
+Task solved: 53fb4810. Benchmark score: 26/120 = 21.67% -> 27/120 = 22.50%.

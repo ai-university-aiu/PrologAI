@@ -1,0 +1,76 @@
+Chapter 245: Wave 27 - stream_extend (WP-285, Layer 260)
+
+Wave 27 adds the stream_extend named rule to arc_benchmark_2.pl, solving
+ARC-AGI-2 task 53fb4810. This rule recognizes that A-marker blobs (cells of
+value 1) serve as anchors and that periodic color sequences adjacent to them
+should be extended to the grid boundary.
+
+WHAT THE RULE DOES
+
+The input grid has BG = 0 and A-marker cells of value 1 forming one or more
+4-connected components. Adjacent to each component, in each cardinal direction,
+there may be a sequence of colored (non-BG, non-marker) cells forming a "seed
+chain." If such a chain is followed by a BG gap before the grid boundary, the
+chain's periodic pattern is tiled outward to fill the remaining space to the
+boundary. If the chain already reaches the grid boundary, no extension is
+needed.
+
+Extension formula: for a position at distance D from the chain anchor (the
+first cell beyond the component), the fill value = Chain[D mod P], where P is
+the chain length.
+
+Multiple parallel chains in the same direction (different rows or columns of
+the same component) are extended independently.
+
+KEY PREDICATES
+
+  arc2_sx_comps4_(ACells, Comps)
+      Partitions all A-marker cells into 4-connected components using
+      iterative DFS flood-fill (arc2_sx_flood4_/6).
+
+  arc2_sx_comp_(BG, AVal, NRows, NCols, Comp, G0, G1)
+      Processes one component: tries all four cardinal directions via
+      arc2_sx_try_dir_/8 and threads the grid through each direction.
+
+  arc2_sx_try_dir_(Dir, BG, AVal, NRows, NCols, Comp, G0, G1)
+      Finds all valid seed chains for the component in direction Dir.
+      Computes fill cells via arc2_sx_ext_fill_/5. Applies them using
+      foldl + arc2_set_cell_. Fails cleanly (returning G0 = G1) if no
+      chains qualify.
+
+  arc2_sx_seed_chain_(Grid, BG, AVal, NRows, NCols, Comp, Dir, Chain)
+      For a border cell of Comp in direction Dir, collects a seed chain
+      by calling arc2_sx_collect_/10. Succeeds when the chain is non-empty.
+
+  arc2_sx_collect_(Grid, BG, AVal, NRows, NCols, R, C, Dir, Acc, Chain)
+      Walks from (R,C) in direction Dir. If a BG cell is found, returns
+      the accumulated chain (the pattern to tile). If the grid boundary
+      is reached or an AVal cell is hit, fails (no extension needed).
+
+  arc2_sx_ext_fill_(Chain, Dir, NRows, NCols, R-C-Val)
+      Generates one fill cell (R-C-Val) in the extension region beyond the
+      chain. Uses between/3 to enumerate all positions in the region.
+      Computes Offset = distance from chain anchor; Val = chain[Offset mod P].
+
+  arc2_sx_step_(Dir, DR, DC)
+      Maps each direction to its row/column delta: up=(-1,0), down=(1,0),
+      left=(0,-1), right=(0,1).
+
+ALGORITHM TRACE (task 53fb4810)
+
+Training pair 0 shows a vertical A-marker column. To the right, a 3-cell seed
+chain [Red, Blue, Green] is adjacent. Below the chain, BG cells fill the rest
+of the column. The rule detects the chain (P=3) and tiles [R,B,G,R,B,G,...]
+downward until the grid bottom.
+
+Training pair 1 shows a horizontal A-marker row. Above it, a 2-cell seed chain
+[Yellow, Purple] appears adjacent. The rule tiles [Y,P,Y,P,...] upward to the
+top edge.
+
+The test case combines both patterns: the rule extends in both directions from
+the same A-marker region, filling the full output grid with the tiled patterns.
+
+BENCHMARK RESULT
+
+Task solved: 53fb4810.
+Score: 26/120 = 21.67% to 27/120 = 22.50%.
