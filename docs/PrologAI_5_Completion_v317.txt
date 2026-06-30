@@ -8152,5 +8152,17 @@ Wave 28 - slide_open (WP-286, Layer 261):
   cell(DC-1)=0 AND cell(DC-2)!=0 AND a 0-cell exists in columns 0..DC-3,
   fill columns DC+1..NCols-1 with value 2.
   Mentova PR merged. PrologAI PR linked.
+
+Wave 29 - diag_beam (WP-287, Layer 262):
+  Task: db695cfb.
+  Score: 28/120 = 23.33% -> 29/120 = 24.17%.
+  Rule name: diag_beam.
+  Rule: Guard verifies all non-BG cells are 1 or 6. Find all unordered
+  pairs of 1-cells where |row_diff| = |col_diff| > 0 (diagonal alignment).
+  For each pair, march a beam from one 1 toward the other along the 45-degree
+  diagonal: fill background cells with 1; when a 6-obstacle is hit, leave
+  it unchanged and fire two perpendicular rays from it, each filling
+  background cells with 6 until the grid boundary or another existing 6.
+  Mentova PR merged. PrologAI PR linked.
   SPARC updated: Specification v258, Pseudocode v250, Architecture v251,
   Refinement v310, Completion v316.

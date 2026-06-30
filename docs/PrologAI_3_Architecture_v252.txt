@@ -10079,3 +10079,21 @@ WP-286 slide_open (Layer 261) - ARC-AGI-2 Wave 28
     (3) a 0-cell exists in columns 0..DC-3 - another object is present.
   Only rows satisfying all three conditions are filled right of the
   divider with value 2.
+
+WP-287 diag_beam (Layer 262) - ARC-AGI-2 Wave 29
+  Layer 262 in the ARC-AGI-2 solver stack.
+  Depends on: arc2_named_rule/1, arc2_transform/3 dispatch framework,
+              arc2_set_cell_/5, memberchk/2.
+  Exports: arc2_transform(diag_beam, +Grid, -Out).
+  The rule is self-contained: pair detection, beam marching, obstacle
+  bounce, and perpendicular ray extension are all local to the diag_beam
+  block (arc2_db_* predicates).
+  Key design choice: the original Sixes list is collected once before any
+  beam fires and is used unchanged throughout. Newly placed 6-fills from
+  bounce rays are not added to Sixes, so later beams see only pre-existing
+  obstacles. This matches observed task behavior: each beam pair operates
+  independently with respect to obstacle detection.
+  The march predicate uses a base clause matching the destination (R2,C2)
+  to stop cleanly without off-by-one risk.
+  Bounce rays stop at the first existing 6 they encounter (no secondary
+  bounce), keeping the transform single-pass and terminating.

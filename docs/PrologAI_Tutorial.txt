@@ -20126,3 +20126,62 @@ BENCHMARK RESULT
 
 Task solved: 6e453dd6.
 Score: 27/120 = 22.50% to 28/120 = 23.33%.
+
+Chapter 247: Wave 29 - diag_beam (WP-287, Layer 262)
+
+Wave 29 adds the diag_beam named rule to arc_benchmark_2.pl, solving
+ARC-AGI-2 task db695cfb. This rule recognizes that 1-cells placed exactly
+45 degrees apart from each other define diagonal beams, and that 6-cells
+on a beam path act as reflectors that send perpendicular 6-trails outward.
+
+WHAT THE RULE DOES
+
+The grid contains only three types of cells: background, 1-cells, and
+6-cells. Two 1-cells are diagonally aligned when |row_diff| = |col_diff| > 0.
+Each aligned pair defines a 45-degree beam. The beam fills intermediate
+background cells with 1. When the beam hits a 6-cell, it leaves the 6
+unchanged and fires two perpendicular 45-degree rays from that point. Each
+ray fills background cells with 6 until it hits the grid boundary or
+another existing 6-cell.
+
+KEY PREDICATES
+
+  arc2_transform(diag_beam, Grid, Out)
+      Top-level guard: reads background from Grid[0][0], verifies all
+      non-background cells are 1 or 6, collects Ones and Sixes, finds
+      all diagonal 1-pairs, and applies each beam via foldl.
+
+  arc2_db_march_(R, C, DR, DC, R2, C2, Sixes, NRows, NCols, G0, G1)
+      Base clause stops at the destination (R2, C2). Recursive clause
+      checks memberchk(R-C, Sixes): if true, bounces; otherwise fills
+      the cell with 1 and steps to (R+DR, C+DC).
+
+  arc2_db_bounce_(R, C, DR, DC, Sixes, NRows, NCols, G0, G1)
+      Fires two perpendicular rays: directions (DR, -DC) and (-DR, DC).
+
+  arc2_db_ray_(R, C, DR, DC, Sixes, NRows, NCols, G0, G1)
+      Extends the ray one step at a time. Stops at boundary or existing 6.
+      Fills background cells with 6 and recurses.
+
+ALGORITHM TRACE (task db695cfb, training pair P0)
+
+Background 5. 1s at (3,1) and (9,7). Direction (+1,+1). 6s at (5,3) and
+(8,6) lie on the beam path.
+
+March: (4,2)=bg -> 1; (5,3)=6 -> bounce; (6,4)=bg -> 1; (7,5)=bg -> 1;
+(8,6)=6 -> bounce; destination (9,7) reached.
+
+Bounce at (5,3) with direction (+1,+1):
+  Ray (-1,+1): (4,4),(3,5),(2,6),(1,7),(0,8) -> all become 6.
+  Ray (+1,-1): (6,2),(7,1),(8,0) -> all become 6.
+
+Bounce at (8,6) with direction (+1,+1):
+  Ray (-1,+1): (7,7),(6,8),(5,9),(4,10),(3,11) -> all become 6.
+  Ray (+1,-1): (9,5),(10,4),(11,3),(12,2),(13,1),(14,0) -> all become 6.
+
+Result: 3 new 1s, 19 new 6s, 22 total changes. Output matches.
+
+BENCHMARK RESULT
+
+Task solved: db695cfb.
+Score: 28/120 = 23.33% to 29/120 = 24.17%.

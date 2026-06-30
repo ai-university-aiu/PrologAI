@@ -18542,3 +18542,19 @@ arc2_so_flood4_/6, arc2_so_slide_/5, arc2_so_fill_open_/5.
 File: Mentova/src/mentova/games/arc_benchmark_2.pl
 Task solved: 6e453dd6. Score: 27/120 = 22.50% -> 28/120 = 23.33%.
 SPARC: Specification v258, Pseudocode v250, Architecture v251, Refinement v310, Completion v316.
+
+WP-287 diag_beam (Layer 262) - ARC-AGI-2 Wave 29
+Task: db695cfb.
+Rule: The grid contains only background cells, 1-cells, and 6-cells. Pairs of
+1-cells that are diagonally aligned (|row_diff| = |col_diff| > 0) define 45-degree
+beam axes. For each diagonal pair, a beam marches from one 1 toward the other,
+filling each background cell on the path with 1. When the beam hits an existing
+6-cell, it skips the 6 (leaving it unchanged) and fires two perpendicular 45-degree
+rays from that obstacle. Each perpendicular ray fills background cells with 6 until
+the grid boundary or another existing 6 is reached. The guard verifies all
+non-background cells are exactly 1 or 6 and that at least one diagonal pair exists.
+New predicates: arc2_named_rule(diag_beam), arc2_transform(diag_beam/3),
+arc2_db_pair_/6, arc2_db_march_/11, arc2_db_bounce_/8, arc2_db_ray_/8.
+File: Mentova/src/mentova/games/arc_benchmark_2.pl
+Task solved: db695cfb. Score: 28/120 = 23.33% -> 29/120 = 24.17%.
+SPARC: Specification v259, Pseudocode v251, Architecture v252, Refinement v311, Completion v317.
