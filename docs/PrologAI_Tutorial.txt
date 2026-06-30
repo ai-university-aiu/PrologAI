@@ -20506,3 +20506,49 @@ BENCHMARK RESULT
 
 Task solved: 271d71e2.
 Score: 33/120 = 27.50% to 34/120 = 28.33%.
+
+
+Chapter 253: Wave 35 - bbox_fill (ARC-AGI-2 task 9385bd28)
+
+WHAT IT DOES
+
+bbox_fill reads a 2-column legend in the bottom-left of the grid. Each row
+of the legend maps object color K to fill color V. For each mapping the rule
+finds all K-cells outside the legend, computes their bounding box, and fills
+that box with V. Smaller bounding boxes override larger ones where they
+overlap. The K-cells themselves are preserved unless the bbox is dense (all
+cells are K-cells), in which case they become V.
+
+LEGEND DETECTION
+
+Legend = leftmost column pair (LC, LC+1) in the bottom half where a
+contiguous block of rows has Grid[R][LC] != BG. The right column may be BG,
+encoding "fill bbox with BG" (a punch-through that blocks larger fills).
+
+FILL MODES
+
+V != 0 or V == BG : fill bbox with V; re-paint K-cells (sparse) or convert
+them to V (dense).
+V == 0 and BG != 0 : erase mode - no fill drawn; K-cells treated like BG.
+
+OVERRIDE ORDER
+
+Bboxes sorted ascending by area. arc2_bxf_fill_for_ returns the first
+(smallest) matching bbox's fill color for a given cell.
+
+PREDICATES
+
+  arc2_transform(bbox_fill, +Grid, -Out)
+  arc2_bxf_legend_(+Grid, +BG, -LC, -LegRows, -LegMap)
+  arc2_bxf_scan_up_(+Grid, +BG, +R, +C, -Block)
+  arc2_bxf_bbox_(+Cells, -R1, -C1, -R2, -C2)
+  arc2_bxf_is_erase_(+V, +BG)
+  arc2_bxf_fill_for_(+R, +C, +InfosAsc, -V)
+  arc2_bxf_cell_val_(+R, +C, +OrigV, +BG, +LegCells, +LegMap, +InfosAsc, -V)
+  arc2_bxf_build_row_(+Grid, +R, +NC, +BG, +LegCells, +LegMap, +InfosAsc, -Row)
+  arc2_bxf_update_bbox_(+RC, +Acc, -NewAcc)
+
+BENCHMARK RESULT
+
+Task solved: 9385bd28 (4 training pairs).
+Score: 34/120 = 28.33% to 35/120 = 29.17%.

@@ -1,0 +1,85 @@
+Chapter 253: Wave 35 - bbox_fill (WP-293, Layer 268)
+
+WHAT IT DOES
+
+bbox_fill solves ARC-AGI-2 task 9385bd28. Every input grid contains a
+2-column legend block at the bottom-left. Each legend row maps an object
+color K (left column) to a fill color V (right column). For each mapping,
+the rule finds all cells of color K outside the legend, computes their
+bounding box, and fills that box with V. Smaller bounding boxes override
+larger ones when they overlap. Original K-cells are preserved in their
+positions unless the bounding box is fully covered by K-cells (dense case).
+
+LEGEND DETECTION
+
+The legend occupies the leftmost column pair (LC, LC+1) in the bottom half
+of the grid where a contiguous block of rows has Grid[R][LC] != BG. The
+right column (LC+1) may hold BG (background value), which encodes "fill the
+bounding box with BG" - an operation that blocks any fill from a larger
+enclosing box.
+
+FILL MODES
+
+Non-erase fill (V != 0, or V = BG): fill the entire bounding box with V.
+  Sparse bbox (not all cells are K-cells): re-paint original K-cells as K.
+  Dense bbox (all bbox cells are K-cells): K-cells become V (no re-paint).
+
+Erase fill (V = 0 and BG != 0): erase K-cells; no fill drawn. K-cells
+become whatever fill from a larger enclosing box covers them, or BG.
+
+OVERRIDE ORDER
+
+Bounding boxes are sorted by area ascending. The arc2_bxf_fill_for_ predicate
+iterates this sorted list and returns the fill color from the first (smallest)
+bbox that contains a given cell. This implements "smaller boxes override larger"
+without a separate draw-order pass.
+
+PREDICATES
+
+  arc2_transform(bbox_fill, +Grid, -Out)
+      Entry point. Detects legend, collects K-cells, computes bboxes and
+      densities, sorts by area, then builds output via arc2_bxf_cell_val_.
+
+  arc2_bxf_legend_(+Grid, +BG, -LC, -LegRows, -LegMap)
+      Scans column pairs left-to-right in the bottom half. Accepts rows
+      where Grid[R][LC] != BG (Grid[R][LC+1] may be BG = encode V=BG).
+
+  arc2_bxf_scan_up_(+Grid, +BG, +R, +C, -Block)
+      Collects consecutive rows upward from R where Grid[R][C] != BG.
+
+  arc2_bxf_bbox_(+Cells, -R1, -C1, -R2, -C2)
+      Computes the bounding box of a list of R-C cell positions via foldl.
+
+  arc2_bxf_is_erase_(+V, +BG)
+      True when V=0 and BG!=0 (erase sentinel).
+
+  arc2_bxf_fill_for_(+R, +C, +InfosAsc, -V)
+      Returns the fill color of the smallest bbox (InfosAsc sorted ascending)
+      that contains (R,C). Fails if no bbox covers (R,C).
+
+  arc2_bxf_cell_val_(+R, +C, +OrigV, +BG, +LegCells, +LegMap, +InfosAsc, -V)
+      Dispatches to the correct output value:
+        - Legend cell: original value.
+        - BG cell: fill_for or BG.
+        - Erase K-cell: same as BG cell.
+        - Mapped K-cell (Dense=true): fill color V.
+        - Mapped K-cell (Dense=false): original K (preserved).
+        - Unmapped non-BG cell: original value.
+
+KEY DESIGN NOTES
+
+Sorting ascending and taking the first match in fill_for naturally implements
+"smallest bbox wins" with O(1) per cell in the common case.
+
+The V=BG fill (pair 1 color-1 mapping) works because BG cells inside the
+smaller bbox return BG from fill_for, overriding any larger-box fill. K-cells
+are then re-painted on top (since Dense=false and NOT erase).
+
+The dense-bbox case (pair 4 color-7) collapses a compact solid block of K
+into its fill color V, because there are no BG cells to fill - the K-cells
+themselves are the only content, and they become V.
+
+BENCHMARK RESULT
+
+Task solved: 9385bd28 (4 training pairs).
+Score: 34/120 = 28.33% to 35/120 = 29.17%.
