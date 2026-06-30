@@ -1,0 +1,117 @@
+Chapter 255: Wave 37 - concentric_rings (WP-295, Layer 270)
+
+WHAT IT DOES
+
+concentric_rings solves ARC-AGI-2 task 13e47133. Every input grid contains a
+background color BG (most frequent value), a divider color Div (most frequent
+non-BG value), and a sparse set of single-cell marker cells (non-BG, non-Div).
+The Div cells form walls that partition the remaining cells into one or more
+4-connected components. Each component is filled with concentric rectangular
+rings, where ring 0 is the outermost layer and ring numbers increase inward.
+Marker cells encode a color cycle: the marker color at ring R becomes the fill
+color for all cells at ring R in that component, repeating cyclically.
+
+BG AND DIV DETECTION
+
+arc2_cri_bg_ flattens the 2-D grid, counts occurrences of each value, and
+returns the most frequent value as BG. arc2_cri_div_ does the same after
+excluding BG cells, returning the most frequent remaining value as Div.
+
+COMPONENT DETECTION
+
+arc2_cri_comps_ collects all non-Div cells (NDCs) and partitions them into
+4-connected components using arc2_cri_flood_. The flood-fill expands through
+NBRS4 neighbours (up/down/left/right) and is blocked by any Div cell. This
+produces a list of components, each a list of R-C pairs.
+
+RING-0 BOUNDARY DETECTION
+
+arc2_cri_is_bnd_ classifies a cell as ring-0 if either:
+1. It lies on the grid boundary (R=0, R=NR, C=0, or C=NC), or
+2. At least one of its 8-connected neighbours has the Div value.
+
+8-connectivity is critical for case 2. When the Div wall forms an L-shape
+with a corner cell, cells diagonally adjacent to that corner are concavity-
+boundary cells that must be ring-0 for correct distance computation. Using
+only 4-connectivity for Div-adjacency would make these cells ring-1, producing
+wrong colors in the concavity region.
+
+RING-DISTANCE BFS
+
+arc2_cri_bfs_ runs a multi-source 4-connected BFS starting simultaneously from
+all ring-0 cells of a component. The result is a list of R-C-D triples where
+D is the minimum 4-connected distance from any ring-0 cell. BFS is blocked by
+Div cells; it does not cross component boundaries.
+
+COLOR CYCLE CONSTRUCTION
+
+arc2_cri_build_cycle_ collects all marker cells in the component (non-BG,
+non-Div), records each marker's ring distance D and color, sorts by D
+ascending, and builds a Cycle list of length max_D + 1. Position I in Cycle
+holds the marker color if a marker sits at ring I, or BG if no marker is at
+ring I. The cycle repeats with period = length(Cycle).
+
+OUTPUT CONSTRUCTION
+
+For each cell: if its value is Div, pass it through unchanged. Otherwise,
+find its component index CI, retrieve the ring map RM and Cycle for CI, look
+up the cell's ring distance D from RM, compute D mod len(Cycle), and take
+that index from Cycle as the output color.
+
+PREDICATES
+
+  arc2_transform(concentric_rings, +Grid, -Out)
+      Entry point. Detects BG and Div, partitions into components, computes
+      per-component ring maps and cycles, constructs output grid.
+
+  arc2_cri_bg_(+Grid, -BG)
+      Flatten Grid; msort count-value pairs; last entry = most frequent = BG.
+
+  arc2_cri_div_(+Grid, +BG, -Div)
+      Exclude BG cells; msort count-value pairs on remainder; last = Div.
+
+  arc2_cri_nbrs_(+NR1, +NC1, +R, +C, -Nbrs)
+      4-connected neighbours of (R,C) within grid bounds [0..NR1] x [0..NC1].
+
+  arc2_cri_nbrs8_(+NR1, +NC1, +R, +C, -Nbrs)
+      8-connected neighbours (ortho + diagonal) within bounds. Used only for
+      Div-adjacency check in arc2_cri_is_bnd_.
+
+  arc2_cri_is_bnd_(+Grid, +NR1, +NC1, +Div, +R, +C)
+      True when (R,C) is ring-0: on grid boundary or 8-adjacent to Div.
+
+  arc2_cri_flood_(+Grid, +NR1, +NC1, +Div, +Queue, +Vis, -Comp)
+      BFS flood-fill: expands 4-connected from Queue, blocked by Div,
+      accumulates all reached cells into Comp.
+
+  arc2_cri_comps_(+Grid, +NR1, +NC1, +Div, +NDCs, +Seen, -Comps)
+      Iterates over NDCs; for each unseen cell, runs arc2_cri_flood_ to
+      collect the full component and recurse on the remainder.
+
+  arc2_cri_bfs_(+Grid, +NR1, +NC1, +Div, +Frontier, +Acc, -Res)
+      Multi-source 4-connected BFS. Each step expands unvisited neighbours
+      with ring distance = parent distance + 1. Returns flat R-C-D list.
+
+  arc2_cri_build_cycle_(+RCPairs, +BG, -Cycle)
+      Sort Ring-Color pairs by ring ascending; build list of length MaxRing+1;
+      fill BG for ring positions with no marker.
+
+KEY DESIGN NOTES
+
+8-connectivity for ring-0 Div-adjacency (not BFS propagation) is the key
+design decision. It is the minimal change needed to handle L-shaped components
+correctly: only cells diagonally adjacent to a Div corner gain ring-0 status.
+The BFS itself remains 4-connected, preserving rectilinear ring contours.
+
+Component-local cycles mean each component can have completely different marker
+positions and color sequences. Two components in the same grid can produce
+entirely different concentric ring patterns.
+
+Multi-source BFS (all ring-0 cells seeded simultaneously) means ring K is the
+minimum distance to any ring-0 cell, producing rectangular distance contours
+that follow the component's shape rather than radiating from a single point.
+
+BENCHMARK RESULT
+
+Task solved: 13e47133 (3 training pairs).
+Score: 36/120 = 30.00% to 37/120 = 30.83%.
