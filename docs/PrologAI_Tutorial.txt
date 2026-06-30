@@ -20248,3 +20248,84 @@ BENCHMARK RESULT
 
 Task solved: d35bdbdc.
 Score: 29/120 = 24.17% to 30/120 = 25.00%.
+
+Chapter 249: Wave 31 - shape_beam (WP-289, Layer 264)
+
+WHAT IT DOES
+
+shape_beam solves ARC-AGI-2 task 5961cc34. A rod (a single value-4 cell
+adjacent to a trail of value-2 cells) fires a beam in the direction opposite
+its trail. The beam travels through connected shapes made of value-1 body
+cells and value-3 exit-marker cells. Each shape the beam enters is converted
+entirely to value 2, and the beam is redirected toward the open (background)
+side of the exit markers. This relay continues until the beam exits the grid.
+Shapes not reached by any beam are erased; the output contains only value 2
+on a background.
+
+PREDICATES
+
+  arc2_transform(shape_beam, +Grid, -Out)
+      Entry point. Guards: exactly one value-4 cell; at least one value-1
+      cell. Identifies background BG, rod cell (RR, RC) and beam direction
+      (BeamDir), collects shape components, classifies each shape, and runs
+      the beam relay before painting the result.
+
+  arc2_sb_bg_(+Grid, -BG)
+      Identifies the background as the most-frequent cell value.
+
+  arc2_sb_rod_(+Grid, -RR, -RC, -BeamDir)
+      Finds the value-4 cell and its adjacent value-2 trail. BeamDir is
+      opposite the trail direction.
+
+  arc2_sb_rod_cells_(+Grid, +RR, +RC, +BeamDir, -RodCells)
+      Collects the value-4 cell and all value-2 trail cells as R-C pairs.
+
+  arc2_sb_comps_(+Positions, -Components)
+      Partitions a list of R-C positions into 4-connected components using
+      BFS seed expansion.
+
+  arc2_sb_classify_(+Grid, +BG, +Comp, -shape(AllCells,ExitDir,Cross,ExAP))
+      Classifies one component. Separates value-1 and value-3 cells, calls
+      arc2_sb_exit_dir_ to determine the exit direction, and computes the
+      cross positions (cols for vertical beams, rows for horizontal beams)
+      and exit axis position (row or col of the 3-markers).
+
+  arc2_sb_exit_dir_(+Grid, +BG, +Cells3, -ExitDir)
+      Determines the exit direction by the open-face method. The value-3
+      cells are always collinear. If they share a row R3, check row R3-1
+      (up) and row R3+1 (down) at the marker columns: the side that is all
+      BG is the exit direction. If they share a column C3, check columns
+      C3-1 (left) and C3+1 (right) at the marker rows similarly.
+
+  arc2_sb_beam_(+Dir, +Cross, +AxisStart, +Shapes, +NR, +NC, +Acc, -Out)
+      Recursive beam relay. Finds the closest shape in direction Dir that
+      overlaps Cross positions. Fills the gap between AxisStart and the hit,
+      adds the shape's cells, redirects the beam with the shape's exit
+      parameters, and recurses. Base case fills the remaining gap to the
+      grid boundary.
+
+  arc2_sb_hit_(+Dir, +Cross, +AxisStart, +Shapes, -HitShape, -HitPos)
+      Finds the shape closest to AxisStart in direction Dir whose cells
+      include positions in Cross. Returns HitShape and HitPos (the row or
+      column of the closest cell).
+
+  arc2_sb_rect_(+Cross, +From, +To, +Mode, -Cells)
+      Generates a rectangle of R-C positions. Mode v: rows vary from From
+      to To, columns fixed to Cross list. Mode h: columns vary, rows fixed.
+
+  arc2_sb_blank_(+NR, +NC, +BG, -Blank)
+      Creates an NR x NC grid filled with BG.
+
+KEY BUG AND FIX
+
+Naive exit direction detection checks which value-1 cell is adjacent to a
+value-3 cell. This fails at corner positions where a value-3 cell is adjacent
+to value-1 cells in two directions simultaneously. The correct method: the
+value-3 cells in every shape are always collinear (same row OR same column).
+Check which adjacent row or column is all-background at the marker positions.
+That is the open face, and it is the exit direction.
+
+BENCHMARK RESULT
+
+Task solved: 5961cc34.
+Score: 30/120 = 25.00% to 31/120 = 25.83%.
