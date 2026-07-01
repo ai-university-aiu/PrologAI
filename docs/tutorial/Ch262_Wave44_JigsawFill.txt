@@ -1,0 +1,90 @@
+Chapter 262: Wave 44 - jigsaw_fill (WP-302, Layer 277)
+
+jigsaw_fill solves ARC-AGI-2 task 5dbc8537. The input grid splits at a row or
+column boundary into two non-empty regions. One region is a 2-color template
+(solid color S, hole color H). The other region is a multi-color objects area
+(background B plus shaped pieces). Every non-B 4-connected component in the
+objects region is a "piece" that exactly tiles one contiguous sub-region of
+H-cells in the template.
+
+PATTERN
+
+The corner cell (top-left of the template) always holds the solid color S.
+This corner-color heuristic identifies S unambiguously even when the count of
+S-cells equals the count of H-cells.
+
+Each piece is normalized to a (0,0) bounding-box origin by subtracting the
+minimum row and column offsets from all cell positions. Multi-color pieces
+(where different cells in the same BFS component carry different colors)
+preserve per-cell colors through the normalization and placement steps.
+
+Pieces are sorted by ascending number of valid placements (fewest-first) to
+guide backtracking. Backtracking exact cover then assigns each piece to a
+non-overlapping sub-region of H-cells. The filled template is the output.
+
+SPLIT DETECTION
+
+The algorithm tries four candidate split strategies:
+  1. Row-split-top: template = first N rows; objects = remaining rows.
+  2. Row-split-bottom: template = last N rows; objects = first rows.
+  3. Col-split-left: template = first N columns; objects = remaining columns.
+  4. Col-split-right: template = last N columns; objects = first columns.
+
+Each candidate is validated by checking (1) the template side has exactly 2
+distinct colors and (2) the total non-background cells in the objects side
+equals the total hole cells in the template side.
+
+KEY PREDICATES
+
+  arc2_jf_find_split_(+Grid, -Tmpl, -Hole, -ObjGrid, -ObjBg)
+    Tries row and column splits; returns the unique valid split.
+
+  arc2_jf_check_tmpl_obj_(+Tmpl, +Obj, -Hole, -ObjBg)
+    Validates the 2-color template and matching piece-cell count.
+
+  arc2_jf_mode_(+List, -Mode)
+    Returns the most frequent element (used to identify background).
+
+  arc2_jf_holes_(+Grid, +Hole, -Pairs)
+    Returns list of R-C pairs where Grid[R][C] = Hole.
+
+  arc2_jf_pieces_(+Grid, +Bg, -Pieces)
+    BFS-based 4-connected component extraction of non-Bg cells.
+
+  arc2_jf_normalize_(+Piece, -Norm)
+    Translates piece coords so bounding box starts at (0,0).
+
+  arc2_jf_valid_placements_(+Norm, +Holes, +TR, +TC, -Placements)
+    Finds all (R0,C0) offsets where piece lands entirely on hole cells.
+
+  arc2_jf_augment_(+Pieces, +Holes, +TR, +TC, -PiecesWP)
+    Builds N-Norm-Placements triples for each piece (N for msort).
+
+  arc2_jf_cover_(+Sorted, +RemHoles, +Map0, -Map)
+    Backtracking exact cover: assigns pieces to non-overlapping placements.
+
+  arc2_jf_apply_(+Tmpl, +ColorMap, -Out)
+    Fills each hole cell with its assigned color from ColorMap.
+
+  arc2_transform(jigsaw_fill, +Grid, -Out)
+    Orchestrator: split -> holes -> pieces -> augment -> sort -> cover -> apply.
+
+TASK DETAILS
+
+Task: 5dbc8537. 2 training pairs + 1 test case.
+
+Training Pair 1 (15x15 -> 15x7): template = left 7 columns (solid 9, hole 4);
+  objects = right 8 columns (background 4). 7 pieces totaling 41 cells tile the
+  41 hole cells in the template.
+
+Training Pair 2 (20x20 -> 9x20): template = bottom 9 rows (solid 2, hole 8);
+  objects = top 11 rows (background 8). 9 pieces including multi-color shapes
+  (e.g., a checkerboard piece where different cells have different colors)
+  totaling 74 cells tile the 74 hole cells.
+
+Test Case (25x25 -> 10x25): template = top 10 rows (solid 3, hole 1); objects
+  = bottom 15 rows (background 1). 14 pieces totaling 125 cells tile the 125
+  hole cells. Corner-color heuristic required: counts of 1 and 3 in the
+  template are both 125, so majority-vote would be ambiguous.
+
+Score: 41/120 = 34.17% to 42/120 = 35.00%.

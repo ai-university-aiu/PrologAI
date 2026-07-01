@@ -20837,3 +20837,41 @@ Key predicates:
 
 Task solved: 247ef758 (3 training pairs + 1 test case).
 Score: 40/120 = 33.33% to 41/120 = 34.17%.
+
+Chapter 262: Wave 44 - jigsaw_fill (WP-302, Layer 277)
+
+jigsaw_fill solves ARC-AGI-2 task 5dbc8537. The input grid splits at a row or
+column boundary into two non-empty regions. One region is a 2-color template
+(solid color S, hole color H). The other region is a multi-color objects area
+(background B plus shaped pieces). Every non-B 4-connected component in the
+objects region is a "piece" that exactly tiles one contiguous sub-region of
+H-cells in the template.
+
+The corner cell (top-left of the template) always holds the solid color S.
+This corner-color heuristic identifies S unambiguously even when the count of
+S-cells equals the count of H-cells. Each piece is normalized to a (0,0)
+bounding-box origin by subtracting the minimum row and column offsets from all
+cell positions. Multi-color pieces (where different cells in the same BFS
+component carry different colors) preserve per-cell colors through the
+normalization and placement steps.
+
+Pieces are sorted by ascending number of valid placements (fewest-first) to
+guide backtracking. Backtracking exact cover then assigns each piece to a
+non-overlapping sub-region of H-cells. The filled template is the output.
+
+Key predicates:
+  arc2_jf_find_split_(+Grid, -Tmpl, -Hole, -ObjGrid, -ObjBg)
+  arc2_jf_check_tmpl_obj_(+Tmpl, +Obj, -Hole, -ObjBg)
+  arc2_jf_mode_(+List, -Mode)
+  arc2_jf_holes_(+Grid, +Hole, -Pairs)
+  arc2_jf_pieces_(+Grid, +Bg, -Pieces)
+  arc2_jf_bfs_(+Queue, +Grid, +Bg, +Rows, +Cols, +Vis0, +Acc0, -Comp, -Vis)
+  arc2_jf_normalize_(+Piece, -Norm)
+  arc2_jf_valid_placements_(+Norm, +Holes, +TR, +TC, -Placements)
+  arc2_jf_augment_(+Pieces, +Holes, +TR, +TC, -PiecesWP)
+  arc2_jf_cover_(+Sorted, +RemHoles, +Map0, -Map)
+  arc2_jf_apply_(+Tmpl, +ColorMap, -Out)
+  arc2_transform(jigsaw_fill, +Grid, -Out)
+
+Task solved: 5dbc8537 (2 training pairs + 1 test case).
+Score: 41/120 = 34.17% to 42/120 = 35.00%.
