@@ -20724,3 +20724,42 @@ BENCHMARK RESULT
 
 Task solved: 8f3a5a89 (3 training pairs).
 Score: 36/120 = 30.00% to 37/120 = 30.83%.
+
+Chapter 258: Wave 40 - grid_tile (WP-298, Layer 273)
+
+WHAT IT DOES
+
+grid_tile solves ARC-AGI-2 task eee78d87. Every input is a 6x6 grid with
+background value 7 and a small colored shape whose non-background cells fit
+within a 3x3 bounding box. The rule reads the nine cells of that bounding box,
+decodes four tiling constants from their positions, tiles a 16x16 output grid
+with a period-3 repeating pattern, and highlights the central 6x6 region of
+the output by replacing all background-zero cells with 9.
+
+BOUNDING BOX AND TILE DECODING
+
+arc2_gt_bbox_ finds the minimum row and column of all non-7 cells. The bounding
+box top-left (Rmin, Cmin) anchors the 3x3 sub-grid. arc2_gt_tile_ reads all
+nine values and derives four tiling constants by position:
+
+  corners (0,0)(0,2)(2,0)(2,2)    -> block  = 7 if all four are 7, else 0
+  top+bottom midpoints (0,1)(2,1)  -> v_edge = 7 if both are 7, else 0
+  left+right midpoints (1,0)(1,2)  -> h_edge = 7 if both are 7, else 0
+  center (1,1)                     -> corner = 7 if it is 7, else 0
+
+PERIOD-3 TILING AND ACTIVE REGION
+
+arc2_gt_cell_ maps each (R,C) to a position type by (R mod 3, C mod 3):
+corner(0,0), h_edge(0,!=0), v_edge(!=0,0), or block(!=0,!=0). The cell emits
+the corresponding constant. Within rows 5-10, cols 5-10 (the central 6x6), any
+0-value cell emits 9 instead.
+
+  arc2_transform(grid_tile, +Grid, -Out)
+  arc2_gt_bbox_(+Grid, -Rmin, -Cmin)
+  arc2_gt_tile_(+Grid, +R0, +C0, -Block, -HEdge, -VEdge, -Corner)
+  arc2_gt_gv_(+Grid, +R, +C, -V)
+  arc2_gt_build_(+Block, +HEdge, +VEdge, +Corner, -Out)
+  arc2_gt_cell_(+R, +C, +Block, +HEdge, +VEdge, +Corner, -V)
+
+Task solved: eee78d87 (3 training pairs + 1 test case).
+Score: 37/120 = 30.83% to 38/120 = 31.67%.

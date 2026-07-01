@@ -1,0 +1,94 @@
+Chapter 258: Wave 40 - grid_tile (WP-298, Layer 273)
+
+WHAT IT DOES
+
+grid_tile solves ARC-AGI-2 task eee78d87. Every input is a 6x6 grid with
+background value 7 and a small colored shape whose non-background cells fit
+within a 3x3 bounding box. The rule reads the nine cells of that bounding box,
+decodes four tiling constants from their positions, tiles a 16x16 output grid
+with a period-3 repeating pattern governed by those constants, and then
+highlights the central 6x6 region of the output by replacing all
+background-zero cells with 9.
+
+BOUNDING BOX DETECTION
+
+arc2_gt_bbox_ finds the minimum row and minimum column of all non-7 cells in
+the 6x6 input. The non-7 cells always fit within a 3x3 area, so (Rmin, Cmin)
+is the top-left corner of the bounding box.
+
+TILING CONSTANT DECODING
+
+arc2_gt_tile_ reads all nine values in the 3x3 sub-grid at (Rmin, Cmin) and
+maps them to four scalar constants: block, h_edge, v_edge, and corner. Each
+constant is either 7 (if the corresponding sub-grid position is background) or
+0 (if it is colored). The mapping by position:
+
+  - Corners (0,0), (0,2), (2,0), (2,2): block = 7 if all four are background.
+  - Top+bottom midpoints (0,1) and (2,1): v_edge = 7 if both are background.
+  - Left+right midpoints (1,0) and (1,2): h_edge = 7 if both are background.
+  - Center (1,1): corner = 7 if it is background.
+
+The naming reflects connectivity: top-bottom midpoints lie on the vertical axis
+of the 3x3 box and set the vertical-divider stripe (v_edge); left-right
+midpoints set the horizontal-divider stripe (h_edge).
+
+PERIOD-3 TILING
+
+arc2_gt_build_ generates all 256 cells of the 16x16 output by calling
+arc2_gt_cell_ for each (R, C) pair.
+
+arc2_gt_cell_ classifies each position by (R mod 3, C mod 3):
+
+  - R mod 3 = 0 and C mod 3 = 0: corner value.
+  - R mod 3 = 0 and C mod 3 != 0: h_edge value.
+  - R mod 3 != 0 and C mod 3 = 0: v_edge value.
+  - R mod 3 != 0 and C mod 3 != 0: block value.
+
+The 16x16 grid has divider rows and columns at every index divisible by 3
+(positions 0, 3, 6, 9, 12, 15), creating a 5x5 grid of 2x2 content blocks
+separated by 1-thick dividers.
+
+ACTIVE REGION HIGHLIGHT
+
+Within the central 6x6 region rows 5 through 10, cols 5 through 10, any cell
+whose background tiling value is 0 is emitted as 9 instead of 0. Cells with
+background value 7 remain 7. Outside the active region every cell takes the
+tiling value directly.
+
+PREDICATES
+
+  arc2_transform(grid_tile, +Grid, -Out)
+      Entry point. Calls bbox_, tile_, build_ in sequence.
+
+  arc2_gt_bbox_(+Grid, -Rmin, -Cmin)
+      findall all non-7 positions; min_list for Rmin and Cmin.
+
+  arc2_gt_tile_(+Grid, +R0, +C0, -Block, -HEdge, -VEdge, -Corner)
+      Precomputes R1, R2, C1, C2; fetches nine values via arc2_gt_gv_;
+      applies four if-then-else conditions to derive the constants.
+
+  arc2_gt_gv_(+Grid, +R, +C, -V)
+      nth0(R, Grid, Row), nth0(C, Row, V).
+
+  arc2_gt_build_(+Block, +HEdge, +VEdge, +Corner, -Out)
+      numlist(0,15) double maplist with lambda for row and cell.
+
+  arc2_gt_cell_(+R, +C, +Block, +HEdge, +VEdge, +Corner, -V)
+      Period-3 classification then active-region substitution.
+
+KEY DESIGN NOTES
+
+The decoding step is the structural insight: each of the nine positions in the
+3x3 input bounding box maps to one of four output position types, and the
+background (7) vs colored (non-7) classification at that position directly
+determines the corresponding tiling constant. No heuristics are needed.
+
+The active region is a fixed central 6x6. It does not depend on where in the
+6x6 input the colored cells appear: across training pairs the colored cells are
+at rows 3-5 and rows 1-3 in different examples, yet the active region is always
+rows 5-10, cols 5-10 in the output.
+
+BENCHMARK RESULT
+
+Task solved: eee78d87 (3 training pairs + 1 test case).
+Score: 37/120 = 30.83% to 38/120 = 31.67%.
