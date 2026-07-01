@@ -1,0 +1,113 @@
+Chapter 257: Wave 39 - room_outline (WP-297, Layer 272)
+
+WHAT IT DOES
+
+room_outline solves ARC-AGI-2 task 8f3a5a89. Every input grid contains
+background cells (value 8), wall cells (value 1), and a unique seed cell
+(value 6). The seed sits inside an accessible room: a 4-connected region of
+background cells reachable from the seed without crossing any wall. The rule
+traces the room perimeter with value 7, preserves wall cells belonging to
+boundary-connected components, and erases isolated floating wall clusters.
+
+SEED DETECTION
+
+arc2_ro_seed_ scans rows and columns with nth0 backtracking in row-major order
+and returns the first cell with value 6. Because the seed is unique (exactly
+one 6-cell per grid), the first match is cut immediately.
+
+ACCESSIBLE ROOM: BFS FLOOD-FILL
+
+arc2_ro_flood_ runs a 4-connected BFS from the seed through value-8 cells.
+The BFS queue starts with the seed position; at each step, in-bounds unvisited
+value-8 neighbors are added to the queue and visited set. The result Vis is the
+sorted list of all accessible background positions.
+
+WALL COMPONENT PRESERVATION
+
+Wall cells are preserved or erased as whole 4-connected components. A component
+is preserved if any of its member cells is 4-adjacent to an accessible cell
+(i.e., the component touches the accessible region Vis). Components with no
+accessible 4-neighbor are floating islands in the inaccessible region; these
+are erased to background (8).
+
+arc2_ro_keep_walls_ collects all non-8 non-6 positions via findall.
+arc2_ro_wall_comps_ and arc2_ro_wbfs_ partition them into components using
+BFS with an Avail list (subtract/3 removes consumed cells at each step).
+include/3 with once/1 retains components touching Vis.
+
+BOUNDARY-CONNECTED PERIMETER
+
+The room perimeter is traced along accessible background cells that are:
+(a) on the grid boundary (row 0, last row, col 0, or last col), or
+(b) 8-connected adjacent to any BdryWall cell.
+
+BdryWalls = wall cells in WallKeep components that include at least one
+grid-boundary cell. Floating island walls (WallKeep components with no
+grid-edge cell) do not generate perimeter rings.
+
+arc2_ro_bdry_walls_ re-partitions WallKeep into components and retains only
+those with a boundary cell. arc2_ro_is_perim_ first checks the grid-edge
+condition (with cut), then searches the 8-connected neighborhood for a
+BdryWall cell via member/2 and memberchk/2.
+
+OUTPUT CLASSIFICATION
+
+arc2_ro_cell_out_/11 applies a five-way classification per cell:
+- Seed position: emit 6.
+- Accessible BG (in Vis): emit 7 if perimeter, else 8.
+- Inaccessible BG: emit 8.
+- WallKeep cell: emit original value.
+- Non-WallKeep wall: emit 8.
+
+PREDICATES
+
+  arc2_transform(room_outline, +Grid, -Out)
+      Entry point. Computes seed, Vis, WallKeep, BdryWalls, builds output.
+
+  arc2_ro_seed_(+Grid, -SR, -SC)
+      nth0 row-major scan; cut after first 6-cell found.
+
+  arc2_ro_flood_(+Grid, +NR1, +NC1, +SR, +SC, -Vis)
+      4-connected BFS from seed; result msorted.
+
+  arc2_ro_bfs_(+Queue, +Vis, +Grid, +NR1, +NC1, -Final)
+      BFS loop; expands unvisited in-bounds 8-cells.
+
+  arc2_ro_keep_walls_(+Grid, +NR1, +NC1, +Vis, -WallKeep)
+      findall wall positions; component partition; retain touching-Vis components.
+
+  arc2_ro_wall_comps_(+WallCells, +NR1, +NC1, -Comps)
+      Iterative BFS component partition over WallCells.
+
+  arc2_ro_wbfs_(+Queue, +Comp, +Avail, +NR1, +NC1, -FComp, -FRem)
+      Single-component BFS; subtract newly found cells from Avail each step.
+
+  arc2_ro_bdry_walls_(+WallKeep, +NR1, +NC1, -BdryWalls)
+      Re-partition WallKeep; retain components with a grid-boundary cell.
+
+  arc2_ro_cell_out_(+Grid, +NR1, +NC1, +SR, +SC, +Vis, +WallKeep, +BdryWalls,
+                    +R, +C, -V)
+      Five-way classification per cell.
+
+  arc2_ro_is_perim_(+BdryWalls, +NR1, +NC1, +R, +C)
+      True if cell is on grid edge or 8-adjacent to any BdryWall cell.
+
+  arc2_ro_adj4_vis_(+R, +C, +NR1, +NC1, +Vis)
+      True if any of the 4-connected in-bounds neighbors of (R,C) is in Vis.
+
+KEY DESIGN NOTES
+
+The two-phase component algorithm is the central insight: first filter to
+WallKeep (components touching the accessible room), then filter to BdryWalls
+(WallKeep components attached to the grid edge). Only BdryWalls generate
+perimeter cells. This correctly handles tasks where some wall clusters are
+floating islands inside the room.
+
+Component-based preservation (vs per-cell adjacency) is required for staircase
+structures where deep cells have no direct accessible neighbor but are 4-
+connected to cells that do.
+
+BENCHMARK RESULT
+
+Task solved: 8f3a5a89 (3 training pairs).
+Score: 36/120 = 30.00% to 37/120 = 30.83%.

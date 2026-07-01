@@ -20609,3 +20609,118 @@ BENCHMARK RESULT
 
 Task solved: 332f06d7 (4 training pairs).
 Score: 35/120 = 29.17% to 36/120 = 30.00%.
+
+
+Chapter 255: Wave 37 - concentric_rings (WP-295, Layer 270)
+
+WHAT IT DOES
+
+concentric_rings solves ARC-AGI-2 task 13e47133. Every input grid contains a
+background color BG (most frequent value), a divider color Div (most frequent
+non-BG value), and a sparse set of single-cell marker cells (non-BG, non-Div).
+The Div cells form walls that partition the remaining cells into one or more
+4-connected components. Each component is filled with concentric rectangular
+rings, where ring 0 is the outermost layer and ring numbers increase inward.
+Marker cells encode a color cycle: the marker color at ring R becomes the fill
+color for all cells at ring R in that component, repeating cyclically.
+
+COMPONENT AND RING DETECTION
+
+arc2_cri_bg_ finds BG by counting occurrences (most frequent). arc2_cri_div_
+finds Div by the same method excluding BG. arc2_cri_comps_ collects all non-Div
+cells and partitions them into 4-connected components via arc2_cri_flood_. For
+each component, arc2_cri_is_bnd_ marks ring-0 cells (grid boundary or
+8-connected adjacent to any Div cell). arc2_cri_bfs_ runs multi-source
+4-connected BFS from all ring-0 cells to compute ring distances.
+
+PREDICATES
+
+  arc2_transform(concentric_rings, +Grid, -Out)
+  arc2_cri_bg_(+Grid, -BG)
+  arc2_cri_div_(+Grid, +BG, -Div)
+  arc2_cri_nbrs_(+NR1, +NC1, +R, +C, -Nbrs)
+  arc2_cri_nbrs8_(+NR1, +NC1, +R, +C, -Nbrs)
+  arc2_cri_is_bnd_(+Grid, +NR1, +NC1, +Div, +R, +C)
+  arc2_cri_flood_(+Grid, +NR1, +NC1, +Div, +Queue, +Vis, -Comp)
+  arc2_cri_comps_(+Grid, +NR1, +NC1, +Div, +NDCs, +Seen, -Comps)
+  arc2_cri_bfs_(+Grid, +NR1, +NC1, +Div, +Frontier, +Acc, -Res)
+  arc2_cri_build_cycle_(+RCPairs, +BG, -Cycle)
+
+BENCHMARK RESULT
+
+Task solved: 13e47133 (3 training pairs).
+Score: 36/120 = 30.00% to 37/120 = 30.83%.
+
+Chapter 256: Wave 38 - fill_enclosed (WP-296, Layer 271)
+
+WHAT IT DOES
+
+fill_enclosed solves ARC-AGI-2 task 8b7bacbf. Every input grid contains a
+background color BG (most frequent), a singleton marker M (exactly once),
+rectangular frame structures of one or more frame colors, and small background
+clusters (pockets) enclosed by those frames. Indicator cells (VAdj) mark which
+pockets are targets. The rule fills target pockets with M.
+
+POCKET DETECTION
+
+arc2_fec_all_comps_ finds every 4-connected BG component. A component is an
+enclosed pocket if FrameSet is non-empty and every in-grid non-cluster
+4-connected neighbor belongs to FrameSet. FrameSet derives from values adjacent
+to VAdj cells; a pure-frame structural test distinguishes real frame colors
+(FOthers) from contamination tokens (VDecContam).
+
+PREDICATES
+
+  arc2_transform(fill_enclosed, +Grid, -Out)
+  arc2_fec_all_comps_(+Grid, +BG, +AllBG, +Vis, -Comps)
+  arc2_fec_bfs_comp_(+Grid, +BG, +Q, +Vis, +Comp, -FVis, -FComp)
+  arc2_fec_frame_info_(...)
+  arc2_fec_pure_frame_(+Grid, +BG, +Ms, +VAdjs, +V, +AllComps)
+  arc2_fec_is_pocket_(+Cluster, +Grid, +FrameSet)
+  arc2_fec_clean_ind_(+Cluster, +Grid, +Ms, +VAdjs, +VDec, -M)
+  arc2_fec_classify_all_(...)
+
+BENCHMARK RESULT
+
+Task solved: 8b7bacbf (4 training pairs).
+Score: 36/120 = 30.00% to 37/120 = 30.83%.
+
+Chapter 257: Wave 39 - room_outline (WP-297, Layer 272)
+
+WHAT IT DOES
+
+room_outline solves ARC-AGI-2 task 8f3a5a89. Every input grid contains
+background cells (value 8), wall cells (value 1), and a unique seed cell
+(value 6). The seed sits inside an accessible room: a 4-connected region of
+background cells reachable from the seed without crossing any wall. The rule
+traces the room perimeter with value 7, preserves boundary-connected wall
+cells, and erases isolated floating wall clusters.
+
+ACCESSIBLE ROOM AND PERIMETER
+
+arc2_ro_flood_ runs 4-connected BFS from the seed through value-8 cells to
+build the accessible set Vis. Wall components touching Vis are preserved
+(WallKeep). Among WallKeep, only components that include a grid-edge cell
+(BdryWalls) generate perimeter cells. Accessible BG cells on the grid boundary
+or 8-adjacent to BdryWalls become perimeter (7). Accessible BG cells not
+adjacent to any BdryWall remain interior (8).
+
+PREDICATES
+
+  arc2_transform(room_outline, +Grid, -Out)
+  arc2_ro_seed_(+Grid, -SR, -SC)
+  arc2_ro_flood_(+Grid, +NR1, +NC1, +SR, +SC, -Vis)
+  arc2_ro_bfs_(+Queue, +Vis, +Grid, +NR1, +NC1, -Final)
+  arc2_ro_keep_walls_(+Grid, +NR1, +NC1, +Vis, -WallKeep)
+  arc2_ro_wall_comps_(+WallCells, +NR1, +NC1, -Comps)
+  arc2_ro_wbfs_(+Queue, +Comp, +Avail, +NR1, +NC1, -FComp, -FRem)
+  arc2_ro_bdry_walls_(+WallKeep, +NR1, +NC1, -BdryWalls)
+  arc2_ro_cell_out_(+Grid, +NR1, +NC1, +SR, +SC, +Vis, +WallKeep,
+                    +BdryWalls, +R, +C, -V)
+  arc2_ro_is_perim_(+BdryWalls, +NR1, +NC1, +R, +C)
+  arc2_ro_adj4_vis_(+R, +C, +NR1, +NC1, +Vis)
+
+BENCHMARK RESULT
+
+Task solved: 8f3a5a89 (3 training pairs).
+Score: 36/120 = 30.00% to 37/120 = 30.83%.

@@ -1,0 +1,90 @@
+Chapter 256: Wave 38 - fill_enclosed (WP-296, Layer 271)
+
+WHAT IT DOES
+
+fill_enclosed solves ARC-AGI-2 task 8b7bacbf. Every input grid contains a
+background color BG (most frequent value), a singleton marker M (appearing
+exactly once), rectangular frame structures, small background clusters
+(pockets) enclosed by frames, and indicator cells (VAdj) that mark which
+pockets are targets. The rule fills target pockets with M and leaves decoy
+pockets unchanged.
+
+BG, MARKER, AND INDICATOR DETECTION
+
+BG = most frequent value. Ms = list of values appearing exactly once in the
+grid (excludes BG). VAdj(M) = most common non-BG non-M 4-connected neighbor
+of each M cell.
+
+POCKET DETECTION
+
+arc2_fec_all_comps_ finds every 4-connected BG component by iterating over all
+BG cells and running BFS on each unseen cell, sharing a visited set. A BG
+component is an enclosed pocket if its FrameSet is non-empty and every in-grid
+4-connected non-cluster neighbor belongs to FrameSet.
+
+FRAMESET DERIVATION
+
+FSAdj = non-BG/M/VAdj values that are 4-connected neighbors of any VAdj cell.
+If FSAdj is empty, fall back to all non-BG/M/VAdj values in the grid.
+FDom = most common value in FSAdj (or fallback). FOthers = non-FDom values in
+FSAdj that alone form a complete frame around at least one BG component (the
+pure-frame structural test). Values in FSAdj that fail the pure-frame test
+become VDecContam (contamination tokens). FrameSet = FDom union FOthers.
+
+POCKET CLASSIFICATION
+
+Multi-frame (FOthers non-empty): pockets not exclusively FDom-framed or not
+rectangular are targets. Rectangular FDom-only pockets are decoys.
+
+Single-frame (FOthers empty): a pocket is a target for Ms[i] if any frame
+neighbor of the pocket has a 4-connected VAdj[i] cell not connected (via VAdj-
+chain BFS) to any VDec cell. If no clean indicator exists for any pocket, all
+pockets are targets (exception case).
+
+OUTPUT
+
+Each target pocket's cells are replaced by their assigned M value.
+
+PREDICATES
+
+  arc2_transform(fill_enclosed, +Grid, -Out)
+      Entry point. Derives BG, Ms, VAdjs, FrameSet, pockets, and fills targets.
+
+  arc2_fec_all_comps_(+Grid, +BG, +AllBG, +Vis, -Comps)
+      Iterates over AllBG; for each unseen cell runs BFS via arc2_fec_find_comps_.
+
+  arc2_fec_bfs_comp_(+Grid, +BG, +Q, +Vis, +Comp, -FVis, -FComp)
+      BFS flood-fill on BG cells; accumulates component and global visited set.
+
+  arc2_fec_frame_info_(...)
+      Derives FSAdj, FDom, FOthers (via arc2_fec_pure_frame_), VDecContam, FrameSet.
+
+  arc2_fec_pure_frame_(+Grid, +BG, +Ms, +VAdjs, +V, +AllComps)
+      True if value V alone forms a complete enclosure around some BG component.
+
+  arc2_fec_is_pocket_(+Cluster, +Grid, +FrameSet)
+      True if every in-grid non-cluster 4-neighbor of every cluster cell is in FrameSet.
+
+  arc2_fec_clean_ind_(+Cluster, +Grid, +Ms, +VAdjs, +VDec, -M)
+      Finds a non-contaminated VAdj indicator adjacent to the cluster's frame.
+
+  arc2_fec_classify_all_(...)
+      Dispatches to multi-frame or single-frame logic; returns (Cluster, M) assignments.
+
+KEY DESIGN NOTES
+
+Component-based pocket detection handles boundary-flush pockets correctly:
+seeding BFS from grid border cells would incorrectly mark boundary-touching
+pockets as reachable. The component approach tests each cluster independently.
+
+FrameSet derived from VAdj-adjacent values excludes outer-wall values that
+surround the entire grid interior but are not part of pocket frames.
+
+The pure-frame structural test (arc2_fec_pure_frame_) distinguishes real
+alternative frame colors (FOthers) from contamination tokens (VDecContam).
+A value must alone enclose at least one BG component to qualify.
+
+BENCHMARK RESULT
+
+Task solved: 8b7bacbf (4 training pairs).
+Score: 36/120 = 30.00% to 37/120 = 30.83%.
