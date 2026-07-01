@@ -1,0 +1,23 @@
+Chapter 260: Wave 42 - section_sort (WP-300, Layer 275)
+
+section_sort solves ARC-AGI-2 task 78332cb0. All-6 divider rows and/or columns
+partition the input grid into rectangular sections. The sections are sorted in
+ascending order of their non-background, non-6 cell count. The output direction
+is the transpose of the input direction (a vertical stack becomes a horizontal
+row; a horizontal row becomes a vertical stack). For 2-dimensional inputs (both
+row-dividers and column-dividers present), output direction is determined by
+comparing the sum of section bounding-box heights against the sum of widths.
+Single-cell 6-dividers are re-inserted between sections in the output.
+
+Key predicates:
+  arc2_ss_divs_(+Grid, -HDivs, -VDivs)
+  arc2_ss_segs_(+N, +Divs, -Segs)
+  arc2_ss_kind_(+HDivs, +VDivs, -Kind)
+  arc2_ss_extract_(+Grid, +RSegs, +CSegs, -Secs)
+  arc2_ss_order_(+Kind, +Secs, -Ordered)
+  arc2_ss_outdir_(+Kind, +Secs, -Dir)
+  arc2_ss_build_(+Ordered, +Dir, -Out)
+  arc2_transform(section_sort, +Grid, -Out)
+
+Task solved: 78332cb0 (3 training pairs + 1 test case).
+Score: 39/120 = 32.50% to 40/120 = 33.33%.
