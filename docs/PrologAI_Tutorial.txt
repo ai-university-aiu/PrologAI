@@ -20806,3 +20806,34 @@ Key predicates:
 
 Task solved: 78332cb0 (3 training pairs + 1 test case).
 Score: 39/120 = 32.50% to 40/120 = 33.33%.
+
+Chapter 261: Wave 43 - frame_stamp (WP-301, Layer 276)
+
+frame_stamp solves ARC-AGI-2 task 247ef758. A bordered room occupies the
+right portion of the grid (columns 4 and beyond). The room's outer frame has
+a dominant color (BdrBG). Anomalous values in the top row of the frame encode
+a stamp column per color (col K encodes color C). Anomalous values in the
+rightmost column of the frame encode a stamp row per color (row R encodes
+color C). Colored shapes occupy the left side (columns 0-3) of the grid.
+
+For each color C that has both a top-row column anomaly and a right-column
+row anomaly, and also has a left-side shape: the shape is stamped inside the
+room centered at the (R, K) intersection. Multiple placements per color are
+supported when multiple anomalies exist. Stamps are applied in descending
+cell-count order so smaller shapes overwrite larger ones where they overlap.
+Left-side shapes that were stamped are erased to BG. Left-side shapes without
+any frame anomalies are preserved unchanged.
+
+Key predicates:
+  arc2_fst_bdr_bg_(+Row0, +From, +To, +BG, -BdrBG)
+  arc2_fst_mode_(+SortedList, -Mode)
+  arc2_fst_col_anoms_(+Row, +From, +To, +BdrBG, +BG, -Anoms)
+  arc2_fst_row_anoms_(+Grid, +NR, +LastCol, +BdrBG, +BG, -Anoms)
+  arc2_fst_assoc_add_(+Key, +Pos, +In, -Out)
+  arc2_fst_lshapes_(+Grid, +NR, +BG, -LShapes)
+  arc2_fst_stamps_(+LShapes, +ColAnoms, +RowAnoms, -Stamps)
+  arc2_fst_apply_(+Grid, +NR, +NC, +SortedS, +LShapes, +BG, -Out)
+  arc2_transform(frame_stamp, +Grid, -Out)
+
+Task solved: 247ef758 (3 training pairs + 1 test case).
+Score: 40/120 = 33.33% to 41/120 = 34.17%.
