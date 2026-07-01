@@ -20763,3 +20763,22 @@ the corresponding constant. Within rows 5-10, cols 5-10 (the central 6x6), any
 
 Task solved: eee78d87 (3 training pairs + 1 test case).
 Score: 37/120 = 30.83% to 38/120 = 31.67%.
+
+Chapter 259: Wave 41 - box_absorb (WP-299, Layer 274)
+
+box_absorb solves ARC-AGI-2 task dd6b8c4b. A 3x3 box of 3s (centre=2) sits
+inside a 6-frame. Scattered 9s appear throughout the grid. The rule uses FIFO
+BFS from the box outward through non-6 cells, absorbing reachable 9s in
+distance order up to a cap of 9. Absorbed 9s are removed; the first N box cells
+(reading order) become 9.
+
+Key predicates:
+  arc2_bxa_find2_(+Grid, -R, -C)
+  arc2_bxa_bfs_(+Grid, +Queue, +Visited, +Cap, +Acc, -Absorbed)
+  arc2_bxa_expand_(+RC, +Grid, +Visited, -New, -Nine)
+  arc2_bxa_is9_(+Grid, +RC)
+  arc2_bxa_build_(+Grid, +Absorbed, +Slots, -Out)
+  arc2_transform(box_absorb, +Grid, -Out)
+
+Task solved: dd6b8c4b (3 training pairs + 1 test case).
+Score: 38/120 = 31.67% to 39/120 = 32.50%.
