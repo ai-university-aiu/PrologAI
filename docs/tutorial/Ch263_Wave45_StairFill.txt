@@ -1,0 +1,111 @@
+Chapter 263: Wave 45 - stair_fill (WP-303, Layer 278)
+
+stair_fill solves ARC-AGI-2 task 28a6681f. The input grid contains staircase
+wall cells (any non-0, non-1 color forming L-shaped or step-shaped outlines) and
+exactly N misplaced 1-cells. The output places exactly N 1-cells into the
+interior recesses (step pockets) of the staircase and clears all others. The
+total count of 1-cells is conserved.
+
+
+PATTERN
+
+Staircase wall cells form step-shaped boundaries whose concave interior recesses
+are the step pockets. A horizontal run of open cells (non-wall cells) in a row
+qualifies as a pocket candidate if:
+  (1) the cell immediately to its left is a staircase wall, and
+  (2) the cell immediately to its right is also a staircase wall (Phase 1,
+      doubly-bounded) or the run reaches the right edge of the grid (Phase 2,
+      single-bounded), and
+  (3) every cell directly below the run is either another staircase wall, an
+      already-confirmed pocket cell, or the run is on the last row (grid bottom).
+
+The algorithm fills these pockets in two phases, processing rows from bottom to
+top and sorting candidate runs within each row from smallest gap to largest
+(innermost pocket first).
+
+
+TWO-PHASE FILL
+
+Phase 1 handles doubly-bounded pockets: open runs where both the left and right
+neighbors are staircase walls and neither neighbor is the grid boundary.
+
+Phase 2 handles single-bounded pockets with any remaining budget N: open runs
+where the left neighbor is a staircase wall and the right end of the run is the
+last column of the grid.
+
+This ordering is critical. Training Pair 3 demonstrates why: N=3 cells must go
+to three doubly-bounded cells (true enclosed step treads). A large single-bounded
+open region also exists at cols 6-9. If Phase 2 ran first, it would consume all 3
+cells of the budget in the wrong region. Phase 1 correctly fills only the three
+enclosed pocket cells.
+
+
+KEY PREDICATES
+
+  arc2_sf_count1_(+Grid, -N)
+    Counts all cells equal to 1 across the flattened grid.
+
+  arc2_sf_is_wall_(+Cell)
+    Succeeds if Cell is non-0 and non-1 (a staircase wall value).
+
+  arc2_sf_open_(+Cell)
+    Succeeds if Cell is 0 or 1 (not a staircase wall).
+
+  arc2_sf_find_ranges_(+Row, +NC, -Ranges)
+    Finds all maximal horizontal runs of open cells in Row.
+    Returns Gap-C_L-C_R terms (gap = C_R - C_L + 1).
+
+  arc2_sf_below_ok_(+Grid, +R, +C_L, +C_R, +NR, +Pockets)
+    Checks the floor condition: every cell (R+1, C) for C in [C_L, C_R]
+    must be a staircase wall, an already-confirmed pocket cell, or R
+    must equal the last row.
+
+  arc2_sf_db_ranges_(+Row, +Grid, +R, +NR, +NC, +LC, +Pockets, -DB)
+    Finds Phase 1 candidate runs: doubly-bounded open runs in Row where
+    both neighbors are staircase walls and below_ok holds.
+
+  arc2_sf_sb_ranges_(+Row, +Grid, +R, +NR, +NC, +LC, +Pockets, -SB)
+    Finds Phase 2 candidate runs: single-bounded open runs in Row where
+    left neighbor is a staircase wall and C_R equals last column.
+
+  arc2_sf_phase1_(+Grid, +NR, +NC, +LR, +LC, +N, +P0, -P, -N1)
+    Drives Phase 1: iterates rows bottom-to-top; collects DB ranges;
+    msort by gap size; fills up to N cells; returns remaining budget N1.
+
+  arc2_sf_phase2_(+Grid, +NR, +NC, +LR, +LC, +N, +P0, -P)
+    Drives Phase 2: same structure as Phase 1 using SB ranges.
+
+  arc2_sf_fill_range_(+C_L, +C_R, +R, +N, +P0, -P, -N1)
+    Fills cells from C_L to C_R at row R into the pocket set, stopping
+    when N reaches 0.
+
+  arc2_sf_build_out_(+Grid, +Pockets, -Out)
+    Reconstructs the output: pocket cells become 1, wall cells keep their
+    value, all others become 0.
+
+  arc2_transform(stair_fill, +Grid, -Out)
+    Orchestrator: count1 -> phase1 -> phase2 (if needed) -> build_out.
+
+
+TASK DETAILS
+
+Task: 28a6681f. 3 training pairs + 1 test case. All grids are 10x10.
+
+Training Pair 1 (N=20): staircase walls of color 3 form a step on the right.
+  Phase 1: 4-cell doubly-bounded pocket at col 6, rows 5-8.
+  Phase 2: 16-cell single-bounded region at cols 8-9, rows 2-9.
+  Total: 4 + 16 = 20.
+
+Training Pair 2 (N=25): multiple nested step levels of colors 3 and 5.
+  Phase 1 only: 25 doubly-bounded pocket cells across rows 4-8, filled
+  bottom-to-top with smallest gap first. No Phase 2 needed.
+
+Training Pair 3 (N=3): staircase walls of colors 2, 4, 9 form multiple steps.
+  Phase 1 only: row 8 col 1 (gap=1) and rows 7-8 col 4 (gap=1), total 3 cells.
+  A large col 6-9 run at rows 7-9 is single-bounded and deliberately skipped.
+
+Test Case (N=5): two doubly-bounded pockets in Phase 1.
+  Col 8 rows 7-9 (gap=1, 3 cells) and cols 3-4 rows 8-9 (gap=2, 2 cells).
+  Total: 5. No Phase 2 needed.
+
+Score: 42/120 = 35.00% to 43/120 = 35.83%.
