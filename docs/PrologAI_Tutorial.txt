@@ -21184,4 +21184,34 @@ Key predicates:
   arc2_transform(noise_erase, +Grid, -Out)
 
 Task solved: 71e489b6 (3 training pairs + 1 test case).
+Score: 50/120 = 41.67% to 51/120 = 42.50%.
+
+Chapter 273: Wave 55 - pocket_shot (WP-313, Layer 288)
+
+pocket_shot solves ARC-AGI-2 task 8b9c3697. The input contains frame-shaped
+structures (arm color = non-BG non-2) and rectangular blocks of 2-cells. Each
+2-block either fires into a frame interior channel or disappears to BG. The
+firing direction is identified by a three-condition interior-peg check.
+
+Phase 1 - find BG (most common value). Phase 2 - find 2-blocks via BFS and
+compute bounding boxes. Phase 3 - for each block try all four directions: scan
+from the leading edge to find arm-cells (skipping BG and 2); require block
+integrity (all arm-cells at same row/col); validate each arm-cell as interior
+peg (open face, parent arm, perp bar N>=2). Phase 4 - firing: original and
+trail -> 0, landing -> 2; non-firing: all cells -> BG. Phase 5 - build output
+with priority 2 > 0 > BG > copy.
+
+Key predicates:
+  arc2_ps_dr_/2, arc2_ps_dc_/2: direction-to-delta lookup tables.
+  arc2_ps_perpdirs_/2: maps each direction to its perpendicular pair.
+  arc2_ps_opp_/2: maps each direction to its opposite.
+  arc2_ps_scan_(+Grid, +BG, +R, +C, +D, -XR-XC)
+  arc2_ps_valid_peg_(+Grid, +BG, +XR-XC, +D)
+  arc2_ps_fire_(+Grid, +BG, +Box, -D, -Land)
+  arc2_ps_find_blocks_(+Grid, -Boxes)
+  arc2_ps_trail_(+Box, +D, +Land, -Zeros, -Twos)
+  arc2_ps_solve_(+Grid, +BG, +Blocks, -ZeroSet, -TwoSet, -EraseSet)
+  arc2_transform(pocket_shot, +Grid, -Out)
+
+Task solved: 8b9c3697 (3 training pairs + 1 test case).
 Score: 51/120 = 42.50% to 52/120 = 43.33%.
