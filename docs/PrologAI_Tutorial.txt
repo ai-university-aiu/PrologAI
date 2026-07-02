@@ -21215,3 +21215,36 @@ Key predicates:
 
 Task solved: 8b9c3697 (3 training pairs + 1 test case).
 Score: 51/120 = 42.50% to 52/120 = 43.33%.
+
+
+Chapter 274: Wave 56 - shape_walk (WP-314, Layer 289)
+
+shape_walk solves ARC-AGI-2 task 136b0064. The input has a column of 4s (the
+divider) separating left-side 3x3 block patterns from a right-side 5 marker.
+Each 3x3 block is one of four normalized shapes that map to a chain segment
+direction and length. The output is a colored chain walk in the left region.
+
+Phase 1 - find divider column (first col all-4). Phase 2 - find 5 marker;
+output start col = FC - DC - 1. Phase 3 - extract section starts (groups of 3
+consecutive non-blank rows). Phase 4 - classify each 3x3 block by normalized
+shape: S1 -> LEFT 2; S2 -> RIGHT 3; S3 -> DOWN 2; S4 -> LEFT 4. Phase 5 -
+walk chain: left blocks top-to-bottom, then middle blocks top-to-bottom;
+each segment starts at (prev_tip_row+1, prev_tip_col). Phase 6 - output H x DC
+grid: 5 at row 0, chain cells with their colors, zeros elsewhere.
+
+Key predicates:
+  arc2_sw_divider_col_(+Grid, -DC)
+  arc2_sw_five_rc_(+Grid, -R, -C)
+  arc2_sw_nonblank_rows_(+Grid, +DC, -Rows)
+  arc2_sw_section_starts_(+NbRows, -SectStarts)
+  arc2_sw_block_color_(+Grid, +R, +C, -Color)
+  arc2_sw_block_shape_(+Grid, +R, +C, -Shape)
+  arc2_sw_shape_to_move_(+Shape, -Dir, -Len)
+  arc2_sw_seg_cells_(+R, +C, +Dir, +Len, -Cells)
+  arc2_sw_seg_tip_(+R, +C, +Dir, +Len, -TipR-TipC)
+  arc2_sw_walk_(+Blocks, +R, +C, -ChainCells)
+  arc2_sw_blocks_at_(+Grid, +SectStarts, +ColStart, -Blocks)
+  arc2_transform(shape_walk, +Grid, -Out)
+
+Task solved: 136b0064 (3 training pairs + 1 test case).
+Score: 52/120 = 43.33% to 53/120 = 44.17%.
