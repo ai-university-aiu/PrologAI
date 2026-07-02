@@ -1,0 +1,65 @@
+Chapter 270: Wave 52 - plus_mark (WP-310, Layer 285)
+
+Task solved: 1818057f
+Score: 49/120 = 40.83% to 50/120 = 41.67%
+
+plus_mark solves ARC-AGI-2 task 1818057f. The input grid contains cells of
+value 4 on a background of value 2. Some subsets of 4-cells form a plus-shape:
+a center cell with its four orthogonal neighbors (north, south, east, west)
+each exactly one step away, all five cells holding value 4. The rule recolours
+every cell that belongs to any such plus-shape to value 8. All other cells
+remain unchanged.
+
+
+Algorithm:
+
+  1. H = grid height, W = grid width.
+  2. PlusCells = {}: the set of cells to recolour.
+  3. For each interior (R, C) with R in 1..H-2 and C in 1..W-2:
+     If Grid[R][C] = 4 AND Grid[R-1][C] = 4 AND Grid[R+1][C] = 4
+        AND Grid[R][C-1] = 4 AND Grid[R][C+1] = 4:
+       Add (R,C), (R-1,C), (R+1,C), (R,C-1), (R,C+1) to PlusCells.
+  4. Output = copy of Grid with PlusCells[i][j] set to 8.
+
+
+Training pair verification:
+
+P1 (10x12 -> 10x12):
+  One plus center at (5,9). Plus cells: (4,9),(5,8),(5,9),(5,10),(6,9).
+  Those five 4-cells become 8. All other cells unchanged. PASS.
+
+P2 (15x17 -> 15x17):
+  Nine plus centers at (3,3),(3,8),(3,13),(7,3),(7,8),(7,13),(12,3),(12,8),(12,13).
+  45 cells recoloured to 8. Non-plus 4-cells (corner 2x2 blocks) stay as 4. PASS.
+
+P3 (12x12 -> 12x12):
+  Two plus centers at (5,6) and (8,1). Ten cells recoloured to 8. PASS.
+
+Test (22x22 -> 22x22):
+  Multiple plus centers; all plus-shape cells set to 8; no spurious changes. PASS.
+
+
+Key predicates:
+
+arc2_pm_is_plus_center_(+Grid, +H, +W, +R, +C):
+  Bounds-check R and C as interior (not on boundary); nth0 lookups for center
+  row and neighbor rows; all five cells must hold value 4.
+
+arc2_pm_plus_cells_(+Grid, +H, +W, -PlusCells):
+  between/3 enumeration over all candidate center positions inside findall;
+  for each valid center, generate all 5 member cells; sort deduplicates.
+
+arc2_transform(plus_mark, +Grid, -Out):
+  Measures H and W; calls arc2_pm_plus_cells_; numlist for index lists;
+  maplist builds each output row using memberchk to select 8 vs original value.
+
+arc2_named_rule(plus_mark):
+  Registers the rule for arc2_induce_rule/2 generic induction dispatch.
+
+
+Key insight:
+
+A plus center is uniquely identified by checking its four orthogonal
+neighbors. Using between/3 inside findall ensures the candidate coordinates
+are ground before the > comparison in arc2_pm_is_plus_center_ is called,
+avoiding uninstantiated-variable errors.

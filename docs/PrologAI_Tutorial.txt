@@ -21114,3 +21114,21 @@ Key predicates:
 
 Task solved: f931b4a8 (5 training pairs + 1 test case).
 Score: 48/120 = 40.00% to 49/120 = 40.83%.
+
+Chapter 270: Wave 52 - plus_mark (WP-310, Layer 285)
+
+plus_mark solves ARC-AGI-2 task 1818057f. Cells of value 4 that form a
+5-cell plus-shape (center + N/S/E/W orthogonal neighbors, all value 4) are
+recoloured to 8. All other cells unchanged.
+
+Algorithm: for each interior (R,C) where Grid[R][C]=4 and all four orthogonal
+neighbors also equal 4, collect all 5 cells of the plus-shape. Set collected
+cells to 8 in the output.
+
+Key predicates:
+  arc2_pm_is_plus_center_(+Grid, +H, +W, +R, +C)
+  arc2_pm_plus_cells_(+Grid, +H, +W, -PlusCells)
+  arc2_transform(plus_mark, +Grid, -Out)
+
+Task solved: 1818057f (3 training pairs + 1 test case).
+Score: 49/120 = 40.83% to 50/120 = 41.67%.
