@@ -1,0 +1,68 @@
+Chapter 275: Wave 57 - frame_reflect (WP-315, Layer 290)
+
+Task solved: db0c5428
+Score: 53/120 = 44.17% to 54/120 = 45.00%
+
+frame_reflect solves ARC-AGI-2 task db0c5428. The input grid has a 9x9 bordered
+frame floating in a background of 8s. The frame has a 3x3 interior hole (also 8s)
+at its center. The frame is divided into nine 3x3 sub-regions by its structure.
+The output stamps the 180-degree rotation of each non-center sub-region at the
+adjacent outward position, and fills the interior hole using a 2D arm-product rule.
+
+
+Algorithm:
+
+  Phase 1 - Locate frame:
+  1. Scan the grid in row-major order for the first non-8 cell (arc2_fr_frame_).
+     That cell is the frame top-left (FR, FC). The hole starts at (FR+3, FC+3).
+
+  Phase 2 - Stamp outer sub-regions:
+  2. Enumerate 8 of the 9 sub-regions (RSub in {0,1,2}, CSub in {0,1,2},
+     excluding center 1-1). For each sub-region at (FR+RSub*3, FC+CSub*3):
+     a. Extract the 3x3 block (arc2_fr_sub3_).
+     b. Compute 180-degree rotation (arc2_fr_rot180_).
+     c. Place the rotated block at stamp position:
+        StampR = FR + (2*RSub - 1)*3
+        StampC = FC + (2*CSub - 1)*3
+
+  Phase 3 - Fill center hole:
+  3. Read frame filler (Filler) from (FR, FC+4) - the top-edge center.
+  4. Read arm-inner marker (AI) from (HoleR-1, HoleC+1) - center of top arm.
+  5. Read top arm: T0 at (HoleR-1, HoleC), T2 at (HoleR-1, HoleC+2).
+  6. Read left arm: L0 at (HoleR, HoleC-1), L2 at (HoleR+2, HoleC-1).
+  7. Read outer corners: TL, TR, BL, BR from diagonal cells outside the hole.
+  8. Fill each of 9 hole cells (i,j) using arc2_fr_mix_:
+     - If LA=AI and TA=AI: fill with Filler.
+     - If LA=AI or TA=AI (but not both): fill with AI.
+     - If neither: fill with the outer corner value for that corner position.
+
+  Phase 4 - Build output:
+  9. Start with input grid. Apply all 81 modifications (72 stamp cells + 9 hole
+     cells) over the background (8) cells. Original frame is unchanged.
+
+
+Key predicates:
+  arc2_fr_frame_/3         - find top-left of non-8 frame
+  arc2_fr_sub3_/4          - extract 3x3 block at absolute (SR,SC)
+  arc2_fr_rot180_/2        - 180-degree rotation of 3x3 matrix
+  arc2_fr_mix_/6           - arm-product hole fill value selector
+  arc2_fr_hole_fill_/6     - compute all 9 hole R-C-V triples
+  arc2_transform(frame_reflect)/3 - top-level transform
+
+
+Key insight - stamp placement formula:
+  For sub-region (RSub, CSub), the stamp position is:
+    StampR = FR + (2*RSub - 1)*3
+    StampC = FC + (2*CSub - 1)*3
+  This shifts each sub-region outward by exactly one block-width (3 cells) in
+  both the row and column directions. For RSub=0: StampR = FR-3 (above frame);
+  for RSub=1: StampR = FR+3 (same row band as hole); for RSub=2: StampR = FR+9
+  (below frame).
+
+Key insight - arm-product hole fill:
+  The left and top arm vectors adjacent to the hole are always of the form
+  [Filler, AI, Filler]. The 2D tensor-product rule then produces:
+  - Corner cells (i,j in {0,2}x{0,2}): both arms = Filler -> outer corner value.
+  - Center-edge cells (one index = 1): one arm = AI -> AI.
+  - Center cell (1,1): both arms = AI -> Filler.
+  This creates a miniature frame-like pattern inside the hole.

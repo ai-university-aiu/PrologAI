@@ -21248,3 +21248,30 @@ Key predicates:
 
 Task solved: 136b0064 (3 training pairs + 1 test case).
 Score: 52/120 = 43.33% to 53/120 = 44.17%.
+
+
+Chapter 275: Wave 57 - frame_reflect (WP-315, Layer 290)
+
+frame_reflect solves ARC-AGI-2 task db0c5428. The input grid has a 9x9 bordered
+frame floating in a background of 8s. The frame contains a 3x3 interior hole of
+8s at its center. The output stamps the 180-degree rotation of each of the 8
+non-center 3x3 sub-regions at the adjacent outward position, and fills the
+center hole using a 2D arm-product rule.
+
+Algorithm: (1) Locate frame top-left (FR,FC) by scanning for first non-8 cell.
+(2) For each of 8 non-center sub-regions (RSub,CSub): extract 3x3 block, rotate
+180 degrees, place at (FR+(2*RSub-1)*3, FC+(2*CSub-1)*3). (3) Fill center hole:
+read filler from (FR,FC+4), arm-inner marker AI from (HoleR-1,HoleC+1); apply
+arc2_fr_mix_ for each of 9 hole cells: both arms=AI->Filler; one arm=AI->AI;
+neither arm=AI->outer corner value. (4) Build output by applying mods over input.
+
+Key predicates:
+  arc2_fr_frame_(+Grid, -FR, -FC)
+  arc2_fr_sub3_(+Grid, +SR, +SC, -Matrix3x3)
+  arc2_fr_rot180_(+Matrix3x3, -Rotated3x3)
+  arc2_fr_mix_(+LA, +TA, +AI, +Filler, +Corner, -V)
+  arc2_fr_hole_fill_(+Grid, +FR, +FC, +HoleR, +HoleC, -Cells)
+  arc2_transform(frame_reflect, +Grid, -Out)
+
+Task solved: db0c5428 (3 training pairs + 1 test case).
+Score: 53/120 = 44.17% to 54/120 = 45.00%.
