@@ -1,0 +1,63 @@
+Chapter 274: Wave 56 - shape_walk (WP-314, Layer 289)
+
+Task solved: 136b0064
+Score: 52/120 = 43.33% to 53/120 = 44.17%
+
+shape_walk solves ARC-AGI-2 task 136b0064. The input grid has a full column
+of 4s (the divider) that separates a left region of 3x3 block patterns from
+a right region containing a single 5 marker. The output is a chain walk drawn
+by reading the block shapes as directional instructions.
+
+
+Algorithm:
+
+  Phase 1 - Locate divider and marker:
+  1. Find the divider column DC: the first column where every row holds value 4
+     (arc2_sw_divider_col_).
+  2. Find the 5 marker position (arc2_sw_five_rc_). Output start column is
+     FC - DC - 1.
+
+  Phase 2 - Extract block sections:
+  3. Collect all rows in cols 0..DC-1 that have at least one non-zero cell
+     (arc2_sw_nonblank_rows_).
+  4. Group these into 3-row section starts by consuming consecutive triples
+     (R, R+1, R+2) from the sorted non-blank list (arc2_sw_section_starts_).
+
+  Phase 3 - Classify blocks:
+  5. For each section start, extract the left block (cols 0-2) and middle block
+     (cols DC-3 through DC-1). Read the block color (arc2_sw_block_color_) and
+     normalize the 3x3 pattern to a {0,1} matrix (arc2_sw_block_shape_).
+  6. Match the normalized shape against four fixed patterns
+     (arc2_sw_shape_to_move_):
+     S1 [[1,0,1],[1,0,1],[1,1,1]] -> LEFT 2 cells
+     S2 [[1,1,0],[1,0,1],[0,1,0]] -> RIGHT 3 cells
+     S3 [[1,0,1],[0,1,0],[0,1,0]] -> DOWN 2 cells
+     S4 [[1,1,1],[0,1,0],[1,0,1]] -> LEFT 4 cells
+
+  Phase 4 - Walk chain:
+  7. Traverse blocks in order: all left blocks top-to-bottom, then all middle
+     blocks top-to-bottom (arc2_sw_blocks_at_ called twice with append).
+  8. Starting at (row=1, col=OutC5), draw each block's segment in its direction
+     for its length (arc2_sw_seg_cells_, arc2_sw_seg_tip_, arc2_sw_walk_).
+  9. After each segment, the next starts at (TipRow+1, TipCol).
+
+  Phase 5 - Build output:
+  10. Output is H rows x DC columns, all zeros.
+  11. Place 5 at (0, OutC5). Place each chain cell at its computed position
+      with its block's color.
+
+
+Key predicates:
+  arc2_sw_divider_col_/2    - detect full-column-of-4s
+  arc2_sw_five_rc_/3        - find 5 marker position
+  arc2_sw_nonblank_rows_/3  - rows with non-zero left-side cells
+  arc2_sw_section_starts_/2 - first row of each 3-row section
+  arc2_sw_block_color_/4    - dominant non-zero color in 3x3 block
+  arc2_sw_norm_/2            - binary normalization (0 or 1)
+  arc2_sw_block_shape_/4    - normalized 3x3 matrix
+  arc2_sw_shape_to_move_/3  - shape -> (direction, length)
+  arc2_sw_seg_cells_/5      - cell positions for one segment
+  arc2_sw_seg_tip_/5        - last cell of a segment
+  arc2_sw_walk_/5            - full chain accumulation
+  arc2_sw_blocks_at_/4      - collect blk/3 terms for one block column
+  arc2_transform(shape_walk)/3 - top-level transformation
