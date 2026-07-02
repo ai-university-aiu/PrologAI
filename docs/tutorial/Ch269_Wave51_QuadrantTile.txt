@@ -1,0 +1,80 @@
+Chapter 269: Wave 51 - quadrant_tile (WP-309, Layer 284)
+
+Task solved: f931b4a8
+Score: 48/120 = 40.00% to 49/120 = 40.83%
+
+quadrant_tile solves ARC-AGI-2 task f931b4a8. The input grid is divided into
+four quadrants at its midpoint. The top two quadrants encode output dimensions
+by non-zero cell count. The bottom-left quadrant is the fill template. The
+bottom-right quadrant is the tile template with zeros marking fill positions.
+
+The output is produced by periodically tiling the bottom-right template over
+the computed output dimensions, filling each zero from the bottom-left template
+using the tile-block row index (not the row within the tile) for the BL row
+lookup.
+
+
+Algorithm:
+
+  1. R = grid height, C = grid width. SplitR = R // 2, SplitC = C // 2.
+  2. BL = Grid[SplitR..R-1][0..SplitC-1] (fill template).
+  3. BR = Grid[SplitR..R-1][SplitC..C-1] (tile template).
+  4. Out_H = count of non-zero cells in Grid[0..SplitR-1][0..SplitC-1].
+  5. Out_W = count of non-zero cells in Grid[0..SplitR-1][SplitC..C-1].
+  6. For output (R,C): tile_r = R mod BRh, tile_c = C mod BRw, ti = R // BRh.
+     If BR[tile_r][tile_c] != 0: use that value.
+     Else: use BL[ti mod BLh][tile_c mod BLw].
+
+
+Training pair verification:
+
+P1 (8x8 input, 16x4 output):
+  TL = 4x4 solid 1s (16 cells). TR = 1x4 of 3s (4 cells).
+  BL = 4x4 solid 5s. BR = 4x4 checkerboard of 6 and 0.
+  Tile = 6/5 checkerboard. Output = 16x4 checkerboard. PASS.
+
+P2 (8x8 input, 16x16 output):
+  TL = 4x4 of 8s (16). TR = 4x4 of 6s (16). BL = [1,1,1,1; 5,5,5,5; ...].
+  BR = 4x4 frame with 2x2 hole. Fill for ti=0: BL[0][c]=1; ti=1: BL[1][c]=5.
+  Output = 16x16 tiled with alternating 1-filled and 5-filled frames. PASS.
+
+P3 (16x16 input, 10x10 output):
+  TL = 5x2 block of 6s (10). TR = 2x5 block of 4s (10).
+  BL = 8x8 solid 1s. BR = 8x8 complex tile with 8, 6, and 0.
+  Tile = BR with 0 -> 1. Output = tile wrapped to 10x10. PASS.
+
+P4 (8x8 input, 4x4 output):
+  TL = 1x4 of 4s in row 0 (4 cells). TR = 1x4 of 4s (4 cells).
+  BL = 4x4 [2,5,2,5] pattern. BR = 4x4 all zeros.
+  All positions are holes; output = BL itself. PASS.
+
+P5 (8x8 input, 3x4 output):
+  TL = 3 non-zero cells. TR = 4 non-zero cells.
+  BL = 4x4 solid 6s. BR = [1,1,1,1; 0,0,0,0; 1,1,1,1; 0,0,0,0].
+  Tile (with 0->6) = [1,1,1,1; 6,6,6,6; 1,1,1,1; 6,6,6,6].
+  Output = first 3 rows = [1,1,1,1; 6,6,6,6; 1,1,1,1]. PASS.
+
+Test (8x8 input, 10x8 output):
+  TL = 10 cells. TR = 8 cells. BL = 4x4 solid 2s.
+  BR = [0,3,3,3; 3,2,3,0; 3,0,0,5; 3,3,1,0].
+  Tile = [2,3,3,3; 3,2,3,2; 3,2,2,5; 3,3,1,2].
+  Output = tile wrapped to 10x8. PASS.
+
+
+Key predicates:
+
+arc2_qt_subgrid_(+Grid, +R0, +R1, +C0, +C1, -Sub):
+  Extract rows R0..R1, cols C0..C1 as a list-of-lists subgrid.
+  Uses numlist + nth0 lookups.
+
+arc2_qt_count_nz_(+Grid, +R0, +R1, +C0, +C1, -Count):
+  Count non-zero cells in the specified rectangle using findall.
+
+arc2_qt_cell_(+BR, +BL, +BRh, +BRw, +BLh, +BLw, +R, +C, -V):
+  Compute tile_r, tile_c (mod), ti (div); use BR if non-zero, else BL.
+
+arc2_transform(quadrant_tile, +Grid, -Out):
+  Orchestrates split, counting, and maplist-based row construction.
+
+arc2_named_rule(quadrant_tile):
+  Registers the rule for arc2_induce_rule/2 generic induction dispatch.

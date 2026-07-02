@@ -21091,3 +21091,26 @@ Key predicates:
 
 Task solved: e8686506 (2 training pairs + 1 test case).
 Score: 47/120 = 39.17% to 48/120 = 40.00%.
+
+Chapter 269: Wave 51 - quadrant_tile (WP-309, Layer 284)
+
+quadrant_tile solves ARC-AGI-2 task f931b4a8. The input grid is a 2N x 2N
+square divided into four quadrants at the midpoint. The top-left quadrant
+encodes the output row count (number of non-zero cells). The top-right
+quadrant encodes the output column count. The bottom-left quadrant is the
+fill template. The bottom-right quadrant is the tile template with zeros
+marking positions to fill from the fill template.
+
+Output is built by tiling the bottom-right template periodically over the
+computed output dimensions, replacing each zero with BL[ti mod BLh][tile_c
+mod BLw], where ti is the tile-block row index and tile_c is the column
+position within the tile.
+
+Key predicates:
+  arc2_qt_subgrid_(+Grid, +R0, +R1, +C0, +C1, -Sub)
+  arc2_qt_count_nz_(+Grid, +R0, +R1, +C0, +C1, -Count)
+  arc2_qt_cell_(+BR, +BL, +BRh, +BRw, +BLh, +BLw, +R, +C, -V)
+  arc2_transform(quadrant_tile, +Grid, -Out)
+
+Task solved: f931b4a8 (5 training pairs + 1 test case).
+Score: 48/120 = 40.00% to 49/120 = 40.83%.
