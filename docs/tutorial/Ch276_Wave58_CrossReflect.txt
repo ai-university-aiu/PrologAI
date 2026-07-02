@@ -1,0 +1,82 @@
+Chapter 276: Wave 58 - cross_reflect (WP-316, Layer 291)
+
+Task solved: b10624e5
+Score: 54/120 = 45.00% to 55/120 = 45.83%
+
+cross_reflect solves ARC-AGI-2 task b10624e5. The input is a 27x27 grid where a
+cross of 1s (one complete row + one complete column of value 1) divides the grid
+into four quadrants: top-left (TL), top-right (TR), bottom-right (BR), and
+bottom-left (BL). The TL quadrant contains a composite shape: an anchor block of
+color 2 surrounded by satellite blocks of other colors. Each other quadrant
+contains only a matching anchor block of color 2 (of varying sizes). The output
+copies the TL satellite pattern into each non-TL quadrant, reflected and scaled
+to match the anchor block size in that quadrant.
+
+
+Algorithm:
+
+  Phase 1 - Locate cross and anchor:
+  1. Read BG from cell (0,0).
+  2. Find cross row R (only row where all cells = same non-BG value V).
+  3. Find cross col C (only col where all cells = V).
+  4. Find anchor value A = first non-BG cell found in TR quadrant (scan row-major).
+
+  Phase 2 - Extract TL satellite information:
+  5. Find TL anchor bounding box -> (TL_MinR, TL_MinC, N_tl=height).
+  6. Find all satellite colors (non-BG, non-anchor) in TL quadrant.
+  7. For each satellite SV: bounding box -> (DR, DC, SH, SW) relative to TL
+     anchor top-left (DR=row offset, DC=col offset, SH=height, SW=width).
+
+  Phase 3 - Compute target quadrant anchor sizes:
+  8. Find TR anchor bounding box -> TR_MinR, TR_MinC, N_tr.
+  9. Find BR anchor bounding box -> BR_MinR, BR_MinC, N_br.
+  10. Find BL anchor bounding box -> BL_MinR, BL_MinC, N_bl.
+
+  Phase 4 - Place reflected satellites:
+  For each satellite (SV, DR, DC, SH, SW):
+
+    TR (LR-reflection, scale N_tr/N_tl):
+      NewDC = N_tl - DC - SW
+      DR_q = DR * N_tr // N_tl
+      DC_q = NewDC * N_tr // N_tl
+      H_q = SH * N_tr // N_tl;  W_q = SW * N_tr // N_tl
+      Place SV block at (TR_MinR + DR_q, TR_MinC + DC_q), size H_q x W_q.
+
+    BR (180-degree rotation, scale N_br/N_tl):
+      NewDR = N_tl - DR - SH;  NewDC = N_tl - DC - SW
+      Scale similarly; place at BR anchor.
+
+    BL (TB-reflection, scale N_bl/N_tl):
+      NewDR = N_tl - DR - SH;  DC unchanged
+      Scale similarly; place at BL anchor.
+
+  Phase 5 - Build output:
+  11. Start with input grid unchanged.
+  12. Apply all placement triples (R-C-SV) to the output.
+
+
+Key predicates:
+  arc2_cr_cross_/4         - find cross row R and col C
+  arc2_cr_bbox_q_/10       - tight bounding box in a quadrant region
+  arc2_cr_anchor_/5        - find anchor value from TR quadrant
+  arc2_cr_sats_/6          - list satellite colours in TL
+  arc2_cr_sat_info_/7      - (DR, DC, SH, SW) of one satellite
+  arc2_cr_mods_(tr)/11     - LR-reflected R-C-SV triples
+  arc2_cr_mods_(br)/11     - 180-rotated R-C-SV triples
+  arc2_cr_mods_(bl)/11     - TB-reflected R-C-SV triples
+  arc2_transform(cross_reflect)/3 - top-level transform
+
+
+Key insight - scale-factor arithmetic:
+  All satellite offsets and sizes are expressed in anchor-unit space (1 unit =
+  N_tl cells). When placing in a quadrant with anchor size N_q, every dimension
+  is multiplied by N_q and integer-divided by N_tl. This preserves the relative
+  spatial arrangement regardless of how large each quadrant's anchor block is.
+
+Key insight - reflection transformations:
+  LR-reflection (for TR): a block at col offset DC with width SW maps to
+  DC' = N_tl - DC - SW (measured from anchor top-left). Row offset is unchanged.
+  TB-reflection (for BL): same rule applied to row offset.
+  180-degree rotation (for BR): both LR and TB flips applied together.
+  These three transformations exactly match the spatial symmetry of the four
+  quadrant positions relative to the cross.
