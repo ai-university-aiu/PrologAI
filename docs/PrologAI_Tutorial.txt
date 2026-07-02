@@ -21038,3 +21038,56 @@ Key predicates:
 
 Task solved: 291dc1e1 (4 training pairs + 1 test case).
 Score: 46/120 = 38.33% to 47/120 = 39.17%.
+
+Chapter 268: Wave 50 - frame_assemble (WP-308, Layer 283)
+
+frame_assemble solves ARC-AGI-2 task e8686506. The input contains a frame
+template (one or more colors that dominate by cell count) surrounded by
+scattered piece objects. The frame colors are those whose total cell count
+multiplied by two is at least the maximum non-background color cell count.
+The bounding box of all frame-colored cells is the output region. Background
+cells inside that box are holes. The non-frame non-background 4-connected
+components are pieces. Backtracking exact cover (fewest-placements-first)
+assigns each piece to the unique position where its normalized shape fits the
+hole geometry exactly. The rule reuses arc2_jf_mode_, arc2_jf_pieces_,
+arc2_jf_normalize_, and arc2_jf_place_ from jigsaw_fill (Wave 44).
+
+Frame color detection: count cells per non-BG color; C is a frame color if
+  count(C) * 2 >= max_non_BG_count. Handles fragmented frames (four separate
+  same-color quadrants in P1) and tied-maximum cases (P2 has two frame colors).
+
+Algorithm:
+  1. Bg = most frequent value (arc2_jf_mode_).
+  2. FrameColors = [C | count(C)*2 >= max_count] (arc2_fa_frame_colors_).
+  3. Frame bbox (R1,R2,C1,C2) = bbox of all frame-colored cells.
+  4. Holes = BG cells in bbox (arc2_fa_holes_).
+  5. Pieces = 4-connected non-BG, non-frame components (arc2_fa_piece_comps_).
+  6. Normalize each piece to (0,0) (arc2_jf_normalize_).
+  7. Placements = valid (R0,C0) offsets where all piece cells land on holes
+     (arc2_fa_placements_).
+  8. msort by fewest placements; arc2_fa_cover_ backtracking cover.
+  9. arc2_fa_build_ extracts bbox subgrid with holes replaced from cover map.
+
+Training pair verification:
+  P1 (13x13, BG=8): frame color = 3 (14 cells, 4 disconnected quadrants).
+    Bbox 5x5; 11 holes; 1-block (6 cells, 1 placement), 6-pair (2 cells),
+    3 single-cell 4-markers. All 3 pair outputs match. PASS.
+  P2 (13x13, BG=3): frame colors = 1 and 2 (tied at 11 cells each).
+    Bbox 8x5; 18 holes; 8-T and 4-inverted-T shapes, 2 six-pairs, 4 five-
+    markers. All pair outputs match. PASS.
+  Test (15x15, BG=4): frame color = 8 (18 cells, double ring).
+    Bbox 8x5; 22 holes; two 6-T shapes, two 3-strips, 9-pair, 4 one-markers.
+    Test output matches. PASS.
+
+Key predicates:
+  arc2_fa_frame_colors_(+Grid, +Bg, -FrameColors)
+  arc2_fa_frame_bbox_(+Grid, +FrameColors, -R1, -R2, -C1, -C2)
+  arc2_fa_holes_(+Grid, +Bg, +R1, +R2, +C1, +C2, -Holes)
+  arc2_fa_piece_comps_(+Grid, +Bg, +FrameColors, -PieceComps)
+  arc2_fa_placements_(+Norm, +Holes, +R1, +C1, +TR, +TC, -Placements)
+  arc2_fa_cover_(+PiecesWP, +RemHoles, +Map0, -Map)
+  arc2_fa_build_(+Grid, +R1, +R2, +C1, +C2, +ColorMap, -Out)
+  arc2_transform(frame_assemble, +Grid, -Out)
+
+Task solved: e8686506 (2 training pairs + 1 test case).
+Score: 47/120 = 39.17% to 48/120 = 40.00%.
