@@ -20974,3 +20974,33 @@ Key predicates:
 
 Task solved: 58490d8a (3 training pairs + 1 test case).
 Score: 44/120 = 36.67% to 45/120 = 37.50%.
+
+Chapter 266: Wave 48 - stamp_grid (WP-306, Layer 281)
+
+stamp_grid solves ARC-AGI-2 task dfadab01. Single-cell markers (values 2, 3,
+5, or 8) each trigger placement of a hardcoded 4x4 stamp pattern in the output.
+If the input contains a multi-cell cluster with a 4x4 tight bounding box, its
+visual structure identifies which marker value maps to which pattern. The cell
+at (cluster_maxrow+1, cluster_maxcol+1) is the definition marker and is skipped.
+Shape cells are erased. Without a shape, all non-background cells are markers.
+
+Four hardcoded stamp patterns:
+  Marker 2 -> color 4, full-border rectangle (12 border cells)
+  Marker 3 -> color 1, edge-no-corners diamond (8 cells, corners absent)
+  Marker 5 -> color 6, diagonal 2x2 blocks (top-left and bottom-right 2x2)
+  Marker 8 -> color 7, corners+inner-edge (4 corners + central 2x2)
+
+Key design: non-offset cells in the shape bbox may contain other marker values;
+  the pattern check requires offset cells = SC and non-offset cells != SC.
+
+Key predicates:
+  arc2_sg_stmp_(+MarkerVal, -StampColor, -Offsets)
+  arc2_sg_bg_(+Grid, -BG)
+  arc2_sg_shape_(+Grid, +BG, -SC, -SR0, -SC0)
+  arc2_sg_mval_(+Grid, +BG, +SC, +SR0, +SC0, -MVal)
+  arc2_sg_mkrs_(+Grid, +BG, +SC, +SR0, +SC0, +DefR, +DefC, -Mkrs)
+  arc2_sg_cell_(+R, +C, +BG, +Mkrs, -Cell)
+  arc2_transform(stamp_grid, +Grid, -Out)
+
+Task solved: dfadab01 (4 training pairs + 1 test case).
+Score: 45/120 = 37.50% to 46/120 = 38.33%.

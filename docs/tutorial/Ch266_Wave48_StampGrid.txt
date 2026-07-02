@@ -1,0 +1,48 @@
+Chapter 266: Wave 48 - stamp_grid (WP-306, Layer 281)
+
+Task solved: dfadab01
+Score: 45/120 = 37.50% to 46/120 = 38.33%
+
+stamp_grid solves ARC-AGI-2 task dfadab01. Single-cell markers (values 2, 3,
+5, or 8) each trigger placement of a hardcoded 4x4 stamp pattern in the output.
+If the input contains a multi-cell cluster with a 4x4 tight bounding box, its
+visual structure identifies which marker value maps to which pattern. The cell
+at (cluster_maxrow+1, cluster_maxcol+1) is the definition marker and is skipped.
+Shape cells are erased. Without a shape, all non-background cells are markers.
+
+Four hardcoded stamp patterns (DR,DC offsets in 0..3, 0-indexed):
+  Marker 2 -> color 4, full-border rectangle:
+    4 4 4 4 / 4 0 0 4 / 4 0 0 4 / 4 4 4 4
+    Offsets: (0,0)(0,1)(0,2)(0,3)(1,0)(1,3)(2,0)(2,3)(3,0)(3,1)(3,2)(3,3)
+  Marker 3 -> color 1, edge-no-corners diamond:
+    0 1 1 0 / 1 0 0 1 / 1 0 0 1 / 0 1 1 0
+    Offsets: (0,1)(0,2)(1,0)(1,3)(2,0)(2,3)(3,1)(3,2)
+  Marker 5 -> color 6, diagonal 2x2 blocks:
+    6 6 0 0 / 6 6 0 0 / 0 0 6 6 / 0 0 6 6
+    Offsets: (0,0)(0,1)(1,0)(1,1)(2,2)(2,3)(3,2)(3,3)
+  Marker 8 -> color 7, corners+inner-edge:
+    7 0 0 7 / 0 7 7 0 / 0 7 7 0 / 7 0 0 7
+    Offsets: (0,0)(0,3)(1,1)(1,2)(2,1)(2,2)(3,0)(3,3)
+
+Algorithm:
+  1. Find background (most common color via msort + run-length scan).
+  2. Find shape: first non-BG color whose cells form a 4x4 tight bounding box.
+  3. Identify stamp type: check offset cells = SC, non-offset cells != SC.
+  4. Definition marker = (SR0+4, SC0+4). Skip it.
+  5. Placement markers = all other non-BG, non-shape cells.
+  6. Output = BG grid + stamps placed at each placement marker.
+
+Key design insight: non-offset cells inside the shape bbox may hold other
+marker values. The shape test checks V0 \= SC at non-offset positions (not
+V0 =:= BG), so these markers are correctly excluded from the shape definition
+while being included as placement markers.
+
+Key predicates:
+  arc2_sg_stmp_(+MarkerVal, -StampColor, -Offsets): stamp pattern database
+  arc2_sg_bg_(+Grid, -BG): find most common value
+  arc2_sg_run_(+SortedTail, +Cur, +Cnt, +Max, +Best, -BG): mode accumulator
+  arc2_sg_shape_(+Grid, +BG, -SC, -SR0, -SC0): detect 4x4 bbox cluster
+  arc2_sg_mval_(+Grid, +_BG, +SC, +SR0, +SC0, -MVal): identify pattern type
+  arc2_sg_mkrs_(+Grid, +BG, +SC, +SR0, +SC0, +DefR, +DefC, -Mkrs): collect
+  arc2_sg_cell_(+R, +C, +BG, +Mkrs, -Cell): per-cell output computation
+  arc2_transform(stamp_grid, +Grid, -Out): top-level orchestration
