@@ -1,0 +1,97 @@
+Chapter 268: Wave 50 - frame_assemble (WP-308, Layer 283)
+
+Task solved: e8686506
+Score: 47/120 = 39.17% to 48/120 = 40.00%
+
+frame_assemble solves ARC-AGI-2 task e8686506. The input grid contains a
+frame template made of one or more dominant colors, plus scattered piece
+objects. The output is the frame's bounding box with all background holes
+filled by the piece whose 4-connected shape exactly fits at that location.
+Backtracking exact cover with fewest-placements-first ordering assigns pieces.
+
+The key innovation is frame detection by COLOR FREQUENCY rather than
+connected-component size: a color qualifies as a frame color when its total
+cell count (across all components) times two is at least the maximum non-
+background color cell count. This correctly handles frames that are
+fragmented into multiple disconnected same-color regions (P1 has four
+separate quadrants of color 3) and tied-maximum cases (P2 has two frame
+colors of equal count). A size-threshold approach fails for fragmented frames
+because each fragment may be similar in size to the piece objects.
+
+The rule reuses four utilities from jigsaw_fill (Wave 44, WP-288) without
+modification: arc2_jf_mode_ (mode detection), arc2_jf_pieces_ + arc2_jf_bfs_
+(4-connected component finding), arc2_jf_normalize_ (shape normalization to
+0,0 origin), and arc2_jf_place_ (offset-to-absolute coordinate translation).
+
+Algorithm:
+
+  1. Bg = most frequent cell value (arc2_jf_mode_).
+  2. Count cells per non-BG color; MaxCount = maximum count.
+  3. FrameColors = all colors C with count(C) * 2 >= MaxCount.
+  4. FrameCells = all grid cells with color in FrameColors.
+  5. Frame bbox (R1,R2,C1,C2) = bounding box of FrameCells.
+  6. Holes = BG cells within the frame bbox (absolute R-C pairs).
+  7. AllComps = all 4-connected non-BG components (arc2_jf_pieces_).
+  8. PieceComps = AllComps filtered to exclude frame-colored components.
+  9. For each piece: normalize to (0,0); find valid placements in Holes.
+  10. Sort pieces by fewest placements (most-constrained-first heuristic).
+  11. arc2_fa_cover_: backtracking; for each piece try each placement;
+      check all cells in remaining holes; subtract; recurse.
+  12. arc2_fa_build_: extract subgrid Grid[R1..R2][C1..C2]; replace holes
+      using color map from cover.
+
+
+Training pair verification:
+
+P1 (13x13 input, BG=8, output 5x5):
+  Frame color = 3 (14 cells total, four disconnected quadrants at corners
+  of a 5x5 pattern). Frame bbox rows 3-7, cols 2-6.
+  11 BG holes. Pieces: 1-block (6 cells, 1 placement = bbox offset row 1
+  col 1); 6-pair (2 cells vertical, 1 remaining placement after 1-block);
+  three isolated 4-markers (1 cell each, 3 remaining holes). PASS.
+
+P2 (13x13 input, BG=3, output 8x5):
+  Frame colors = 1 and 2 (both 11 cells; two diamond shapes). Combined
+  bbox rows 3-10, cols 2-6. 18 BG holes. Pieces: 8-T shape (5 cells, 1
+  placement inside 1-diamond interior); 4-inverted-T (5 cells, 1 placement
+  inside 2-diamond interior); two 6-pairs (2 cells each, 2 junction holes);
+  four 5-single-cells (4 corner holes). PASS.
+
+Test (15x15 input, BG=4, output 8x5):
+  Frame color = 8 (18 cells, double concentric ring). Frame bbox rows 2-9,
+  cols 4-8. 22 BG holes. Pieces: two 6-T shapes (4 cells each, 1 placement
+  each at top and bottom bands); two 3-strips (4 cells each, left/right
+  columns); 9-pair (2 cells, center inner holes); four 1-markers (4 corner
+  holes). PASS.
+
+
+Key predicates:
+
+arc2_fa_frame_colors_(+Grid, +Bg, -FrameColors):
+  Flatten grid, exclude BG, count per color, collect colors with count*2>=max.
+
+arc2_fa_frame_bbox_(+Grid, +FrameColors, -R1, -R2, -C1, -C2):
+  findall R-C where cell color is in FrameColors; min_list/max_list.
+
+arc2_fa_holes_(+Grid, +Bg, +R1, +R2, +C1, +C2, -Holes):
+  between/3 scan of bbox; keep cells equal to Bg.
+
+arc2_fa_piece_comps_(+Grid, +Bg, +FrameColors, -PieceComps):
+  arc2_jf_pieces_ then include/3 to filter out frame-colored components.
+
+arc2_fa_placements_(+Norm, +Holes, +R1, +C1, +TR, +TC, -Placements):
+  Double between/3 loop over (DR0,DC0); translate to absolute (R0,C0);
+  forall piece-cell check against Holes; return valid R0-C0 list.
+
+arc2_fa_cover_(+PiecesWP, +RemHoles, +Map0, -Map):
+  member/2 over Placements; arc2_jf_place_ gets absolute cells; maplist+
+  memberchk validates; subtract; recurse; base case [] [] Map Map.
+
+arc2_fa_build_(+Grid, +R1, +R2, +C1, +C2, +ColorMap, -Out):
+  numlist row/col; nth0 reads grid; memberchk ColorMap replaces holes.
+
+arc2_transform(frame_assemble, +Grid, -Out):
+  Orchestrates all steps above in sequence.
+
+arc2_named_rule(frame_assemble):
+  Registers the rule for arc2_induce_rule/2 generic induction dispatch.
