@@ -21275,3 +21275,33 @@ Key predicates:
 
 Task solved: db0c5428 (3 training pairs + 1 test case).
 Score: 53/120 = 44.17% to 54/120 = 45.00%.
+
+
+Chapter 276: Wave 58 - cross_reflect (WP-316, Layer 291)
+
+cross_reflect solves ARC-AGI-2 task b10624e5. The input grid has a cross of 1s
+(one complete row + one complete column of value 1) dividing it into four
+quadrants. The TL quadrant contains a composite shape: an anchor block of color
+2 surrounded by satellite blocks of other colors. Each other quadrant has only a
+matching anchor block. The output adds scaled and reflected satellite copies to
+TR (LR-reflected), BR (180-rotated), and BL (TB-reflected).
+
+Algorithm: (1) Read BG from (0,0). (2) Find cross row R (all cells = same non-BG
+value V) and cross col C. (3) Find anchor A = first non-BG cell in TR quadrant.
+(4) Find TL anchor bounding box -> (TL_MinR, TL_MinC, N_tl). (5) Find satellite
+colors in TL; for each compute offset (DR,DC) and size (SH,SW) relative to TL
+anchor. (6) For each other quadrant: find anchor bbox (AR, AC, N_q). (7) For TR:
+NewDC=N_tl-DC-SW; scale dims by N_q//N_tl; place satellite. For BR: also flip
+DR. For BL: flip DR only. (8) Apply all mods to input grid.
+
+Key predicates:
+  arc2_cr_cross_(+Grid, +BG, -R, -C)
+  arc2_cr_bbox_q_(+Grid, +V, +RLo, +RHi, +CLo, +CHi, -MinR, -MaxR, -MinC, -MaxC)
+  arc2_cr_anchor_(+Grid, +BG, +R, +C, -Anchor)
+  arc2_cr_sats_(+Grid, +BG, +Anchor, +R, +C, -Sats)
+  arc2_cr_sat_info_(+Grid, +CR, +CC, +AR, +AC, +SV, -Info)
+  arc2_cr_mods_(+Xform, +SV, +DR, +DC, +SH, +SW, +N_tl, +N_q, +AR, +AC, -Mods)
+  arc2_transform(cross_reflect, +Grid, -Out)
+
+Task solved: b10624e5 (2 training pairs + 1 test case).
+Score: 54/120 = 45.00% to 55/120 = 45.83%.
