@@ -20950,3 +20950,27 @@ KEY PREDICATES
 
 Task solved: 20270e3b (4 training pairs + 1 test case).
 Score: 43/120 = 35.83% to 44/120 = 36.67%.
+
+Chapter 265: Wave 47 - shape_count (WP-305, Layer 280)
+
+shape_count solves ARC-AGI-2 task 58490d8a. The input has a rectangular
+0-cell template (odd rows have color markers at col TC0+1) and a game board
+with identical small shape instances. Count instances per color using iterative
+bounding-box expansion; output repeats each color marker Count times at odd
+output columns.
+
+Instance detection: iterative bbox expansion groups all same-color cells within
+a 1-cell-padded bounding box regardless of internal connectivity. This correctly
+handles diamond-cross shapes (C _ C / _ C _ / C _ C) that are NOT 4-connected.
+
+Key predicates:
+  arc2_sc_tmpl_bbox_(+Grid, -TR0, -TR1, -TC0, -TC1)
+  arc2_sc_tmpl_colors_(+Grid, +TR0, +TR1, +TC0, +TC1, -Colors)
+  arc2_sc_count_(+Grid, +Color, +TR0, +TR1, +TC0, +TC1, -Count)
+  arc2_sc_instances_(+SortedCells, +N0, -N)
+  arc2_sc_expand_(+CurInst, +AllCells, -Inst)
+  arc2_sc_place_(+OutIn, +TR, +Color, +Count, +TC, +NTC, -Out)
+  arc2_transform(shape_count, +Grid, -Out)
+
+Task solved: 58490d8a (3 training pairs + 1 test case).
+Score: 44/120 = 36.67% to 45/120 = 37.50%.
