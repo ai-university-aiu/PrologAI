@@ -1,0 +1,119 @@
+Chapter 264: Wave 46 - two_join (WP-304, Layer 279)
+
+two_join solves ARC-AGI-2 task 20270e3b. The input grid contains two
+connected objects made of 4-cells, each with one cluster of 7-cells marking
+its connection point. The output merges the two objects by shifting one
+so its 7-cluster aligns just above (or adjacent to) the other object's
+7-cluster, then replaces all 7s with 4s.
+
+
+PATTERN
+
+Every input grid has exactly two clusters of 7-cells (each cluster is a
+group of 7-cells connected by 4-adjacency). Each 7-cluster is embedded in
+or adjacent to one of the two 4-cell objects.
+
+The join rule:
+  (1) Identify two 7-clusters G1 and G2.
+  (2) For each ordering (base=G1, shift=G2) and (base=G2, shift=G1):
+      Object A = all non-1 cells reachable from the base cluster via
+                 4-adjacent non-1 cells (BFS through the non-1 pool).
+      Object B = all remaining non-1 cells (the complement in the non-1 pool).
+      dr = min_row(base_7s) - min_row(shift_7s) - 1
+      dc = min_col(base_7s) - min_col(shift_7s)
+      Shifted B = shift every cell in Object B by (dr, dc).
+  (3) Accept the ordering where all shifted positions have row >= 0 and
+      col >= 0. If both orderings produce valid positions, pick the one
+      with the smaller merged bounding box.
+  (4) Output = a grid of 1s (background) with 4 at every position in
+      Object A union Shifted B. The bounding box of all placed cells
+      determines the output dimensions.
+
+Critical implementation detail: Object B is defined as ALL non-1 cells
+not in Object A. This includes cells that are not 4-connected to any 7-cell
+but visually belong to the same object (e.g., isolated pieces separated by
+1-cells within the same sub-pattern). Simple connected-component labeling
+would incorrectly leave such cells unassigned.
+
+
+FOUR TRAINING PAIRS
+
+Training Pair 1 (7x13 to 7x8):
+  Left frame (7x8 rectangle). 7-strip at row 1 cols 3-5 inside the frame.
+  Right pattern (7x4, cols 9-12). 7-strip at row 0 cols 9-11 (top edge).
+  G1 = left 7s {(1,3),(1,4),(1,5)}. G2 = right 7s {(0,9),(0,10),(0,11)}.
+  Ordering A: dr=0, dc=-6. Right pattern slides left into the frame interior.
+  The right pattern's inner shape (hollow rectangle with open top) fills
+  the interior of the left frame starting at row 1.
+
+Training Pair 2 (7x13 to 7x6):
+  L-shaped left structure, 7 at bottom tip (6,1).
+  Mini right pattern (cols 10-12), 7 at (0,10).
+  Ordering A: dr=5, dc=-9. Mini pattern shifts down 5 rows and left 9 cols.
+  The mini pattern's 4-cells land at (5,3), (6,1), (6,2), (6,3).
+  The L-arm gains a right-angle extension at its tip.
+
+Training Pair 3 (9x3 to 6x3):
+  Two identical 3x3 frames connected by a 7/1/7 bridge at rows 3-5.
+  G1 = top 7-strip {(3,0),(3,1),(3,2)}. G2 = bottom 7-strip {(5,0),(5,1),(5,2)}.
+  Ordering A: dr=-3, dc=0. Bottom frame shifts up 3 rows. The frames
+  stack directly, the bridge disappears, producing a 6x3 output.
+
+Training Pair 4 (7x9 to 5x12):
+  Upper L-structure (arm ending at 7 at (4,5)). Lower shape (arm starting
+  at 7 at (5,2) then extending right). Ordering A: dr=-2, dc=3.
+  Lower shape slides up 2 rows and right 3 cols. The upper and lower L-shapes
+  connect to form a wider U-shaped structure 5 rows x 12 cols.
+
+
+KEY PREDICATES
+
+  arc2_tj_nonbg_pos_(+Grid, +R, +NR, +NC, -Pos)
+    Gathers all non-1 cell positions as R-C pairs.
+
+  arc2_tj_all_sevens_(+Grid, +R, +NR, +NC, -Pos)
+    Gathers all 7-cell positions.
+
+  arc2_tj_seven_clusters_(+Sevens, -G1, -G2)
+    BFS within the 7-cell set to form two 4-connected clusters.
+
+  arc2_tj_bfs_obj_(+Seeds, +NR, +NC, +AllPos, -ObjA)
+    BFS from Seeds through AllPos, returning all reachable non-1 positions.
+
+  arc2_tj_subtract_pos_(+All, +Remove, -Result)
+    Set subtraction: Result = All minus positions appearing in Remove.
+
+  arc2_tj_shift_(+GA, +GB, -Dr, -Dc)
+    Dr = min_row(GA) - min_row(GB) - 1.
+    Dc = min_col(GA) - min_col(GB).
+
+  arc2_tj_shift_pos_(+Positions, +Dr, +Dc, -Shifted)
+    Applies (Dr, Dc) offset to every position.
+
+  arc2_tj_valid_pos_(+Positions)
+    Checks that every position has row >= 0 and col >= 0.
+
+  arc2_tj_combined_size_(+ObjA, +ObjBs, -Size)
+    Computes (max_row+1) * (max_col+1) for the merged position set.
+
+  arc2_tj_build_out_(+ObjA, +ObjBs, -Out)
+    Constructs a grid of 1s; sets each merged position to 4.
+
+  arc2_transform(two_join, +Grid, -Out)
+    Orchestrator: nonbg_pos -> all_sevens -> seven_clusters ->
+    two orderings (bfs_obj, subtract, shift, valid, size) ->
+    pick smaller -> build_out.
+
+
+TASK DETAILS
+
+Task: 20270e3b. 4 training pairs + 1 test case.
+
+Test Case (11x10 to 5x10):
+  Upper comb pattern (rows 0-3, 7 at (1,7)).
+  Lower L-shape (rows 6-10, 7 at (6,3)).
+  Ordering A: dr=-6, dc=4. Lower L shifts up 6 rows and right 4 cols.
+  Lower L positions land at rows 0-4, cols 5-7 (filling comb slots and
+  adding a bottom row of 4s). All 4 training pairs and test case PASS.
+
+Score: 43/120 = 35.83% to 44/120 = 36.67%.
