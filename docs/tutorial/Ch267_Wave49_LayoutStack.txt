@@ -1,0 +1,92 @@
+Chapter 267: Wave 49 - layout_stack (WP-307, Layer 282)
+
+Task solved: 291dc1e1
+Score: 46/120 = 38.33% to 47/120 = 39.17%
+
+layout_stack solves ARC-AGI-2 task 291dc1e1. The input grid has a corner
+cell of value 0 flanked by a row of 1s in one direction and 2s in the
+perpendicular direction. These markers encode the reading order and
+orientation of colored blocks embedded in the interior of the grid (after
+stripping the header row and column). All blocks are extracted in reading
+order, optionally rotated 90 degrees CCW (in column-major mode), and
+stacked vertically in the output, centered within the width of the widest
+block. The background color is 8.
+
+The two reading modes:
+
+Row-major (1s horizontal): The header row contains 1s. Row bands (groups
+of consecutive rows with non-8 content) are scanned in the direction of the
+2s (T->B or B->T). Within each row band, column stretches (consecutive
+groups of cols with non-8 content) are scanned in the direction of the 1s
+(L->R or R->L). Blocks are extracted as-is (no rotation).
+
+Col-major (1s vertical): The header col contains 1s. Column bands (groups
+of consecutive cols with non-8 content) are scanned in the direction of the
+2s (L->R or R->L). Within each column band, row stretches (consecutive
+groups of rows with non-8 content) are scanned T->B or B->T. Each block is
+rotated 90 degrees CCW before stacking. This normalizes tall blocks (H x W)
+into wide blocks (W x H).
+
+The 90-degree CCW rotation formula: Output[i][j] = Input[j][C-1-i], where
+C is the number of columns in the input block. This maps each input column
+to an output row, reversing the column order.
+
+After all blocks are collected, the output width is the maximum block width.
+Each block row is centered by adding equal 8-padding on both sides, with any
+odd remainder going to the right.
+
+Algorithm:
+  1. Find corner (row CR, col CC) where Grid[CR][CC] = 0.
+  2. Read cell adjacent to corner along header row to get mode (1 = row,
+     2 = col).
+  3. PrimReverse = (CR == last row). SecReverse = (CC == last col).
+  4. Strip header row and col to get Interior.
+  5. Find bands (col bands for col-major, row bands for row-major).
+  6. Apply SecReverse to band order if needed.
+  7. For each band: find stretches; apply PrimReverse; extract sub-grids.
+  8. For col-major: rotate each sub-grid 90 CCW.
+  9. Compute MaxW = max block width.
+  10. Center each block row in MaxW with 8-padding.
+  11. Concatenate all centered rows into the output grid.
+
+Training pair verification:
+
+P1 (20x8 -> 12x6): col-major (1s vertical), L->R bands, T->B stretches.
+  Left band (cols 2-3): stretch1 = rows2-3 (4,4 block, 2x2).
+    stretch2 = rows6-11 (6x2 block with 1,2,6 anomalies).
+    stretch3 = rows14-17 (4x2 block with 3,6 anomalies).
+  Right band (cols 5-6): stretch1 = rows2-3 (9,9).
+    stretch2 = rows6-7 (4,4). stretch3 = rows10-15 (6x2 of 7,4 mix).
+  Each block rotated CCW; MaxW = 6. PASS.
+
+P2 (8x11 -> 8x4): row-major (1s horizontal), T->B bands, L->R stretches.
+  Row band rows2-3: stretch1 = cols2-3 (3, 2-wide). stretch2 = cols6-9 (4, 4-wide).
+  Row band rows5-6: stretch1 = cols2-3 (6). stretch2 = cols6-7 (9).
+  No rotation; MaxW = 4. PASS.
+
+P3 (8x28 -> 14x8): row-major, same structure; 7 blocks; MaxW = 8. PASS.
+
+P4 (8x23 -> 14x6): row-major, R->L (corner at top-right); 7 blocks;
+  MaxW = 6; blocks listed right-to-left within each row band. PASS.
+
+Test (28x8 -> 18x8): col-major, R->L bands (corner at top-right). PASS.
+
+Key predicates:
+  arc2_ls_corner_(+Grid, -CR, -CC): locate the 0-corner
+  arc2_ls_mode_(+Grid, +CR, +CC, -Mode, -PrimRev, -SecRev): decode mode
+  arc2_ls_del_row_(+Grid, +N, -Rest): remove row N
+  arc2_ls_del_col_(+C, +List, -Rest): remove element C from a list
+  arc2_ls_interior_(+Grid, +CR, +CC, -Interior): strip header row/col
+  arc2_ls_consec_groups_(+Ints, -Groups): partition into consecutive runs
+  arc2_ls_consec_ext_(+List, +Prev, -Group, -Rem): extend a group
+  arc2_ls_col_active_(+Interior, +C): true if col C has any non-8 cell
+  arc2_ls_col_bands_(+Interior, -Bands): find column bands
+  arc2_ls_row_active_in_band_(+Interior, +BandCols, +R): row active check
+  arc2_ls_band_stretches_(+Interior, +BandCols, -Stretches): row stretches
+  arc2_ls_rotate_ccw_(+Grid, -Rotated): 90 CCW rotation
+  arc2_ls_row_active_(+Interior, +R): true if row R has any non-8 cell
+  arc2_ls_row_bands_(+Interior, -RowBands): find row bands
+  arc2_ls_col_active_in_rows_(+Interior, +RowBand, +C): col active check
+  arc2_ls_band_col_stretches_(+Interior, +RowBand, -Stretches): col stretches
+  arc2_ls_center_block_(+MaxW, +Block, -Centered): pad rows with 8s
+  arc2_transform(layout_stack, +Grid, -Out): top-level orchestration
