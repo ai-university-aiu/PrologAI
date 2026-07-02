@@ -21004,3 +21004,37 @@ Key predicates:
 
 Task solved: dfadab01 (4 training pairs + 1 test case).
 Score: 45/120 = 37.50% to 46/120 = 38.33%.
+
+Chapter 267: Wave 49 - layout_stack (WP-307, Layer 282)
+
+layout_stack solves ARC-AGI-2 task 291dc1e1. The input has a corner cell of
+value 0 flanked by a header row of 1s (or 2s) and a header col of the other
+value. These markers encode reading order. The interior (minus header row/col)
+contains colored blocks on an 8-background. Blocks are extracted in reading
+order, optionally rotated 90 degrees CCW (col-major mode), then stacked
+vertically and centered within the maximum block width using 8-padding.
+
+Row-major mode (1s horizontal): row bands scanned T->B or B->T; within each
+band, column stretches read L->R or R->L; no rotation applied.
+
+Col-major mode (1s vertical): column bands scanned L->R or R->L; within each
+band, row stretches read T->B or B->T; each block rotated 90 CCW (H x W ->
+W x H). The rotation formula: Output[i][j] = Input[j][C-1-i].
+
+Centering: Pad = (MaxW-W)//2 left, Pad2 = MaxW-W-Pad right (extra on right).
+
+Key predicates:
+  arc2_ls_corner_(+Grid, -CR, -CC)
+  arc2_ls_mode_(+Grid, +CR, +CC, -Mode, -PrimRev, -SecRev)
+  arc2_ls_interior_(+Grid, +CR, +CC, -Interior)
+  arc2_ls_consec_groups_(+Ints, -Groups)
+  arc2_ls_col_bands_(+Interior, -Bands)
+  arc2_ls_band_stretches_(+Interior, +BandCols, -Stretches)
+  arc2_ls_rotate_ccw_(+Grid, -Rotated)
+  arc2_ls_row_bands_(+Interior, -RowBands)
+  arc2_ls_band_col_stretches_(+Interior, +RowBand, -Stretches)
+  arc2_ls_center_block_(+MaxW, +Block, -Centered)
+  arc2_transform(layout_stack, +Grid, -Out)
+
+Task solved: 291dc1e1 (4 training pairs + 1 test case).
+Score: 46/120 = 38.33% to 47/120 = 39.17%.
