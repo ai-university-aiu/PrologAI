@@ -1,0 +1,93 @@
+Chapter 271: Wave 53 - template_expand (WP-311, Layer 286)
+
+Task solved: c4d067a0
+Score: 50/120 = 41.67% to 51/120 = 42.50%
+
+template_expand solves ARC-AGI-2 task c4d067a0. The input contains two
+distinct regions: a sparse template (single isolated non-background cells
+arranged in a regular row-column matrix defining a color table) and a seed
+(one or more rectangular blocks of uniform color anchoring the table at a
+specific position). The rule fills in the complete block array by expanding
+from the seed in both directions using the template as a color guide.
+
+
+Algorithm:
+
+  1. BG = most-common cell value (mode of all cells).
+  2. template_cells = all non-BG cells with no non-BG 4-neighbor.
+  3. seed_cells = all non-BG cells NOT in template_cells.
+  4. TRows = sorted distinct row indices of template_cells.
+  5. TCols = sorted distinct col indices of template_cells.
+  6. SeedRowMin = min row of seed_cells; SeedRowMax = max row.
+  7. BH = SeedRowMax - SeedRowMin + 1 (block height).
+  8. col_runs = contiguous column groups among seed cells at row SeedRowMin.
+  9. BW = col_runs[0].end - col_runs[0].start + 1 (block width).
+  10. Stride = col_runs[1].start - col_runs[0].start.
+  11. SeedColors[i] = Grid[SeedRowMin][col_runs[i].start].
+  12. Find (L, C0) such that TRows[L][TCols[C0+i]] == SeedColors[i] for all i.
+  13. AnchorRow = SeedRowMin - L * Stride.
+  14. AnchorCol = col_runs[0].start - C0 * Stride.
+  15. For each cell (R, C):
+      LI = (R - AnchorRow) // Stride; CGI = (C - AnchorCol) // Stride.
+      If LI in bounds, CGI in bounds, row-offset < BH, col-offset < BW:
+        TV = Grid[TRows[LI]][TCols[CGI]]
+        If TV != BG: Out[R][C] = TV; else Out[R][C] = Grid[R][C].
+      Else: Out[R][C] = Grid[R][C].
+
+
+Training pair verification:
+
+P1 (18x25): BG=1. Template 3x2 color table at rows 1,3,5 x cols 1,3.
+  Seed: two 3x3 blocks (color 4) at rows 1-3 cols 8-10 and 13-15. Stride=5.
+  Seed = level 0. Anchor=(1,8). Output adds color-1 blocks at rows 6-8
+  and 11-13 at matching col positions. PASS.
+
+P2 (22x21): BG=8. Template 4x3 color table. Seed: three 2x2 sub-blocks at
+  rows 4-5. Seed = level 0. Levels 1-3 filled below seed. PASS.
+
+P3 (23x23): BG=1. Template 3x2 table [[2,3],[3,3],[3,4]]. Seed: two 2x2
+  blocks (colors 3 and 4) at rows 20-21. Seed = level 2. AnchorRow=10.
+  Output adds level-0 and level-1 blocks ABOVE the seed. PASS.
+
+Test (27x27): BG=3. Template 4x3 table. Seed: two 4x4 sub-blocks (colors 4
+  and 2) at rows 10-13 representing level 1 col-groups 1 and 2. AnchorRow=5,
+  AnchorCol=8. All four levels and three col-groups filled. PASS.
+
+
+Key predicates:
+
+arc2_te_bg_(+Grid, -BG):
+  Flatten + msort + linear mode scan. Identifies background without
+  hardcoding any specific value.
+
+arc2_te_isolated_(+Grid, +BG, +H, +W, +R, +C):
+  Checks that (R,C) is non-BG and all 4 neighbours within bounds are BG.
+  Distinguishes template markers from seed blocks.
+
+arc2_te_col_runs_(+SortedCols, -Runs):
+  Converts a sorted integer list to contiguous S-E run pairs. Used to
+  identify seed sub-block positions and compute block width and stride.
+
+arc2_te_find_level_(+Grid, +TRows, +TCols, +SeedColors, -Level, -CGOff):
+  Double between/3 loop over (level, col-group offset) pairs. Commits on
+  first (Level, CGOff) where template colors match seed colors exactly.
+
+arc2_te_in_block_(+X, +Anchor, +Stride, +BlockSize, +NumBlocks, -BIdx):
+  Computes block index from coordinate. Guards: DX >= 0, BIdx < NumBlocks,
+  offset within block < BlockSize.
+
+arc2_transform(template_expand, +Grid, -Out):
+  Top-level: bg_ -> templ_cells_ -> seed_info_ -> template_structure_ ->
+  find_level_ -> anchor computation -> maplist row/col fill.
+
+arc2_named_rule(template_expand):
+  Registry entry for arc2_induce_rule/2 dispatch.
+
+
+Key insight:
+
+The seed's level is found by matching per-sub-block colors against the
+template. The same algorithm works whether the seed is at level 0 (expanding
+downward), level N-1 (expanding upward), or any intermediate level
+(expanding both ways). The anchor formula AnchorRow = SeedRowMin - L * Stride
+handles all cases uniformly.

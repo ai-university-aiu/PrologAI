@@ -21132,3 +21132,30 @@ Key predicates:
 
 Task solved: 1818057f (3 training pairs + 1 test case).
 Score: 49/120 = 40.83% to 50/120 = 41.67%.
+
+Chapter 271: Wave 53 - template_expand (WP-311, Layer 286)
+
+template_expand solves ARC-AGI-2 task c4d067a0. The input contains a sparse
+template (isolated single-cell color markers defining a level x col-group color
+table) and rectangular seed blocks (anchoring the table at a specific level and
+col-group). The rule identifies the seed's position in the table via color
+matching and fills all missing block positions at stride-spaced intervals.
+
+Algorithm: (1) detect BG = most-common cell value; (2) isolate template cells
+(non-BG with no non-BG neighbor) and seed cells (the rest); (3) parse TRows,
+TCols from template positions; (4) find seed stride and colors per sub-block;
+(5) find (level L, col-group offset C0) where template[L][C0+i]==SeedColors[i];
+(6) AnchorRow=SeedRowMin-L*Stride, AnchorCol=SeedColStart-C0*Stride; (7)
+fill output: each cell (R,C) in block (LI,CGI) gets template color.
+
+Key predicates:
+  arc2_te_bg_(+Grid, -BG)
+  arc2_te_isolated_(+Grid, +BG, +H, +W, +R, +C)
+  arc2_te_col_runs_(+SortedCols, -Runs)
+  arc2_te_seed_info_(+Grid, +BG, +H, +W, +TemplCells, -SeedRowMin, -ColRuns, -BH, -BW, -Stride, -SeedColors)
+  arc2_te_find_level_(+Grid, +TRows, +TCols, +SeedColors, -Level, -CGOff)
+  arc2_te_in_block_(+X, +Anchor, +Stride, +BlockSize, +NumBlocks, -BIdx)
+  arc2_transform(template_expand, +Grid, -Out)
+
+Task solved: c4d067a0 (3 training pairs + 1 test case).
+Score: 50/120 = 41.67% to 51/120 = 42.50%.
