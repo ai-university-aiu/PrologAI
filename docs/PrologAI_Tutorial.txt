@@ -21159,3 +21159,29 @@ Key predicates:
 
 Task solved: c4d067a0 (3 training pairs + 1 test case).
 Score: 50/120 = 41.67% to 51/120 = 42.50%.
+
+Chapter 272: Wave 54 - noise_erase (WP-312, Layer 287)
+
+noise_erase solves ARC-AGI-2 task 71e489b6. The input is a binary grid
+(only 0s and 1s) with two large regions and noise cells embedded in each.
+Stray-0 cells (0s embedded in the 1-region) receive a 3x3 frame of 7s while
+their centers stay 0. Stray-1 cells (isolated 1s in the 0-region) are
+erased to 0.
+
+Two-phase stray-0 detection: (1) seed 0-cells with 1-neighbor count >=
+min(3, available neighbors), handling corner/edge cells; (2) BFS-expand
+to adjacent 0-cells with >= 2 1-neighbors to catch multi-cell clusters.
+
+Key predicates:
+  arc2_ne_1nbr_count_(+Grid, +R, +C, -Count)
+  arc2_ne_avail_count_(+Grid, +R, +C, -Avail)
+  arc2_ne_stray0_seed_(+Grid, +R, +C)
+  arc2_ne_stray1_(+Grid, +R, +C)
+  arc2_ne_expand_bfs_(+Grid, +Queue, +Visited, -Stray0)
+  arc2_ne_stray0_all_(+Grid, +H, +W, -Stray0)
+  arc2_ne_frame_(+Stray0, +Grid, -Frame)
+  arc2_ne_out_val_(+R, +C, +Grid, +Stray0, +Frame, +Stray1, -Val)
+  arc2_transform(noise_erase, +Grid, -Out)
+
+Task solved: 71e489b6 (3 training pairs + 1 test case).
+Score: 51/120 = 42.50% to 52/120 = 43.33%.

@@ -1,0 +1,118 @@
+Chapter 272: Wave 54 - noise_erase (WP-312, Layer 287)
+
+Task solved: 71e489b6
+Score: 51/120 = 42.50% to 52/120 = 43.33%
+
+noise_erase solves ARC-AGI-2 task 71e489b6. The input is a binary grid
+containing only 0s and 1s. Two large regions exist: a 0-region and a
+1-region. Scattered through both regions are noise cells that must be
+identified and treated differently depending on which region they invade.
+
+
+Algorithm:
+
+  Phase 1 - Detect stray-0 seeds:
+  1. For each 0-cell (R,C), count how many of its in-bounds 4-neighbors
+     hold value 1 (call this OneCount) and how many 4-neighbors exist in
+     bounds at all (call this Avail).
+  2. If OneCount >= min(3, Avail), mark (R,C) as a stray-0 seed.
+     The min(3, Avail) threshold adapts to corner cells (Avail=2) and
+     edge cells (Avail=3), classifying them as stray when all or nearly
+     all available neighbors are 1.
+
+  Phase 2 - Expand the stray-0 set by BFS:
+  3. Start a BFS queue with all seeds.
+  4. For each position in the queue, examine its 4-connected 0-cell
+     neighbors that are not yet in the stray-0 set.
+  5. If such a neighbor itself has >= 2 1-valued 4-neighbors, add it to
+     the stray-0 set and to the BFS queue.
+  6. Repeat until the queue is empty.
+
+  Phase 3 - Build the frame:
+  7. For every stray-0 cell, collect all in-bounds 8-neighbors.
+  8. Remove positions that are themselves stray-0 cells.
+  9. The remaining positions form the frame; they will become 7.
+
+  Phase 4 - Detect stray-1 cells:
+  10. For each 1-cell (R,C), count 1-valued 4-neighbors.
+  11. If that count is <= 1, mark (R,C) as stray-1.
+
+  Phase 5 - Build output:
+  12. If (R,C) is a stray-0 center: output 0 (cell is preserved).
+  13. Else if (R,C) is a frame cell: output 7.
+  14. Else if (R,C) is a stray-1: output 0 (cell is erased).
+  15. Else: copy the input value.
+
+
+Training pair verification:
+
+P1 (19x17): upper 1-region (rows 0-4), 0-region (rows 5-8), middle 1-region
+  (rows 9-13), 0-region (rows 14-16), lower 1-region (rows 17-18).
+  Stray-0 seeds at (0,3), (2,16), (4,8), (10,6), (17,14).
+  BFS expansion: (10,6) -> (11,6) -> (11,5); cluster of 3 cells formed.
+  Frame of (4,8) extends into 0-region at (5,7-9).
+  Stray-1s at (7,13), (14,8), (15,3) erased. 41 diffs. PASS.
+
+P2 (16x16): mostly 1-region with a 0-region embedded as an irregular hole.
+  Corner stray-0 seed at (0,15): only 2 available neighbors, both 1.
+  min(3,2)=2 and ones=2 >= 2 -> seed. Frame: (0,14),(1,14),(1,15) -> 7.
+  Stray-1s at (5,2) and (8,4) erased. 34 diffs. PASS.
+
+P3 (16x16): 0-region (rows 0-3), 1-region (rows 4-12), 0-region (rows 13-15).
+  Stray-0 seeds at (6,10), (7,11), (12,7). (12,7) has (13,7) in 0-region
+  as a neighbor; frame of (12,7) extends into 0-region at (13,6-8).
+  Stray-1s at (3,6), (4,15), (14,1) erased. 9 diffs. PASS.
+
+Test (16x16): left-column 1-block plus middle 1-block; top-right and
+  bottom-right are 0-regions.
+  Stray-0 seeds: (3,11),(5,5),(6,4),(7,3),(8,11),(11,6).
+  BFS: (8,11) -> (9,11); cluster of 2.
+  Stray-1s: (4,15),(6,15),(9,14),(14,12),(15,15). 20 diffs. PASS.
+
+
+Key predicates:
+
+arc2_ne_1nbr_count_(+Grid, +R, +C, -Count):
+  Builds list of four cardinal neighbor coords; uses include/3 with
+  arc2_cell_/4 to keep only those with value 1; length gives Count.
+
+arc2_ne_avail_count_(+Grid, +R, +C, -Avail):
+  Same structure but keeps all in-bounds neighbors regardless of value.
+
+arc2_ne_stray0_seed_(+Grid, +R, +C):
+  Succeeds when cell (R,C) is 0 and OneCount >= min(3, Avail).
+
+arc2_ne_stray1_(+Grid, +R, +C):
+  Succeeds when cell (R,C) is 1 and 1-neighbor count <= 1.
+
+arc2_ne_expand_bfs_(+Grid, +Queue, +Visited, -Stray0):
+  BFS implementation; each step filters 4-neighbors for unvisited 0-cells
+  with >= 2 1-neighbors; deduplicates with sort/2; appends to visited and
+  queue tail; base case: empty queue unifies Visited with Stray0.
+
+arc2_ne_stray0_all_(+Grid, +H, +W, -Stray0):
+  findall to collect seeds, sort, then expand_bfs_ from sorted seeds.
+
+arc2_ne_frame_(+Stray0, +Grid, -Frame):
+  findall over 8-offsets for each stray-0 cell; arc2_cell_/4 bounds check;
+  excludes stray-0 positions; sort deduplicates.
+
+arc2_ne_out_val_(+R, +C, +Grid, +Stray0, +Frame, +Stray1, -Val):
+  Priority if-then-else: memberchk in each set; fallback arc2_cell_ copy.
+
+arc2_transform(noise_erase, +Grid, -Out):
+  Calls stray0_all_, frame_, stray1 findall, then maplist over row/col lists.
+
+arc2_named_rule(noise_erase):
+  Registry entry for arc2_induce_rule/2 dispatch.
+
+
+Key insight:
+
+A single per-cell threshold fails for stray-0 clusters: interior cluster
+cells have only 2 1-neighbors (the other neighbors are fellow cluster cells).
+The two-phase approach solves this by first seeding with cells that clearly
+qualify (>=3 or all-of-fewer 1-neighbors) and then BFS-propagating to
+reachable cluster cells. BFS does not contaminate the main 0-region because
+its boundary cells have at most 1 1-neighbor.
+
