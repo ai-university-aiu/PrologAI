@@ -21606,3 +21606,40 @@ Key predicates:
 
 Task solved: 981571dc (4 training pairs + 1 test case).
 Score: 62/120 = 51.67% to 63/120 = 52.50%.
+
+Chapter 285: Wave 67 - mirror_patch (WP-325, Layer 300)
+
+mirror_patch solves ARC-AGI-2 task 0934a4d8. The input grid is a 30x30
+mirror-symmetric wallpaper in which one rectangular patch has been
+covered by a solid block of color 8. The output is the recovered
+hidden patch alone, exactly the size of the covered rectangle,
+containing no 8s.
+
+The rule:
+1. Cover location: the bounding box of all color 8 cells must be
+   solid (cell count equals bounding-box area).
+2. Axis detection: the horizontal mirror axis is a column reflection
+   sum SC with G[r][c] = G[r][SC-c], the vertical axis a row sum SR;
+   a candidate is accepted only with zero disagreeing visible pairs
+   and more than 50 supporting pairs. The detected sum is 31, not the
+   grid-center 29: the crop is asymmetric, so the axis must come from
+   the data.
+3. Mirror fixpoint: each covered cell takes the value of its
+   horizontal, vertical, or point mirror, whichever is visible first;
+   healed cells become donors and the pass repeats until stable.
+4. Transpose fallback: cells whose mirrors fall outside the grid or
+   inside the cover borrow from the transpose donor (r, c) <- (c, r);
+   the mirror fixpoint then runs again.
+5. The patch inside the cover bounding box is the output, and the
+   transform succeeds only if it is free of 8s.
+
+Key predicates:
+  mp_bbox8_/5          - solid color 8 cover rectangle location
+  mp_axis_/5           - conflict-free mirror axis detection
+  mp_heal_/6           - mirror fixpoint plus transpose fallback
+  mp_mirror_pass_/6    - fill covered cells from mirror images
+  mp_transpose_pass_/5 - fill covered cells from transpose donors
+  arc2_transform(mirror_patch, +Grid, -Out)
+
+Task solved: 0934a4d8 (4 training pairs + 1 test case).
+Score: 63/120 = 52.50% to 64/120 = 53.33%.
