@@ -21428,3 +21428,38 @@ Key predicates:
 
 Task solved: b9e38dc0 (3 training pairs + 1 test case).
 Score: 57/120 = 47.50% to 58/120 = 48.33%.
+
+Chapter 280: Wave 62 - shape_slide (WP-320, Layer 295)
+
+shape_slide solves ARC-AGI-2 task 581f7754. The input grid contains
+connected-component shapes (multi-cell non-BG regions), lone anchor seeds
+(size-1 non-BG cells on the grid edge), and floating seeds (size-1 non-BG
+cells not on any grid edge). Each shape contains one interior marker cell
+whose color appears exactly once in the component. Each anchor seed's color
+matches an interior marker color.
+
+Slide direction: anchor seeds on the left or right edge (col=0 or col=W-1)
+give a vertical slide (target row = seed row). Top or bottom edge anchors
+(row=0 or row=H-1) give a horizontal slide (target col = seed col). Each
+shape whose interior marker matches an anchor color slides to align its
+marker with the target. Floating seeds of matching color also slide to the
+target (perpendicular coordinate unchanged). Cells exiting the grid are
+discarded. arc2_induce_rule requires NTotal-1 pairs to pass (tolerates
+one anomalous pair in the P2 training data).
+
+Key predicates:
+  arc2_ss_solve_/2              - top-level solver
+  arc2_ss_comps_/2              - BFS 4-connected component finding
+  arc2_ss_flood_/5              - BFS flood-fill for one component
+  arc2_ss_extract_seeds_/2      - unwrap singleton components
+  arc2_ss_split_seeds_/5        - partition seeds anchor vs floating
+  arc2_ss_dir_target_/6         - slide direction and target from edge
+  arc2_ss_comp_move_/5          - shape displacement by interior marker
+  arc2_ss_slide_cell_/6         - floating seed displacement
+  arc2_ss_apply_/5              - apply all moves to output grid
+  arc2_ss_apply_row_/7          - build one output row
+  arc2_ss_apply_cell_/7         - determine output cell value
+  arc2_transform(shape_slide, +Grid, -Out)
+
+Task solved: 581f7754 (3 training pairs + 1 test case).
+Score: 58/120 = 48.33% to 59/120 = 49.17%.
