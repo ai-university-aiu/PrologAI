@@ -1,0 +1,67 @@
+Chapter 285: Wave 67 - mirror_patch (WP-325, Layer 300)
+
+mirror_patch solves ARC-AGI-2 task 0934a4d8. The input grid is a 30x30
+mirror-symmetric wallpaper in which one rectangular patch has been
+covered by a solid block of color 8. The output is not the healed
+grid: it is the recovered hidden patch alone, exactly the height and
+width of the covered rectangle, containing no 8s. The four training
+covers sit in different parts of the grid; the test cover is a 9x3
+block flush against the left edge, the hardest placement for
+mirror-based recovery.
+
+Rule: the wallpaper carries redundant copies of the hidden patch on
+the other side of its mirror axes, so recovery is deterministic
+symmetry detection plus redundancy readout with no learned parameters.
+
+Algorithm:
+(1) Cover location: collect every color 8 cell and compute its
+    bounding box; the block must be solid (the cell count exactly
+    fills the bounding box), so stray 8s elsewhere reject the rule.
+(2) Axis detection: the horizontal mirror axis is a column reflection
+    sum SC with G[r][c] = G[r][SC-c]; the vertical axis is a row
+    reflection sum SR with G[r][c] = G[SR-r][c]. Each candidate sum is
+    tested against every pair of visible (non-8) cells it relates: one
+    disagreement rejects the candidate, and more than 50 supporting
+    pairs are required. In all five grids of this task the detected
+    sum is 31 (axis between rows/columns 15 and 16), NOT the
+    grid-center sum 29: the 30x30 grid is an asymmetric crop of the
+    wallpaper, so rows and columns 0-1 have no in-grid partners and
+    hard-coding the grid-center mirror fails every pair.
+(3) Mirror fixpoint: every covered cell takes the value of its
+    horizontal mirror (r, SC-c), vertical mirror (SR-r, c), or point
+    mirror (SR-r, SC-c), whichever is visible first. Healed cells
+    become donors for later iterations, so the pass repeats until no
+    covered cell can be filled.
+(4) Transpose fallback: in the test grid, columns 0-1 mirror outside
+    the grid and rows 14-17 mirror into the cover itself, leaving
+    eight cells unreachable by any mirror. These fall back to the
+    transpose donor (r, c) <- (c, r), which holds exactly in the
+    central band of the wallpaper; the mirror fixpoint then runs again
+    and completes the patch.
+(5) The healed cells inside the cover bounding box are extracted as
+    the output; the transform succeeds only if the patch is free of
+    8s.
+(6) Induction pre-filter: the first training input has a solid
+    8-block whose bounding-box dimensions equal the first output's
+    dimensions, and the output contains no 8; then all training pairs
+    are verified with forall.
+
+The design insight is that a wallpaper crop need not be centered on a
+symmetry axis: detecting the reflection sum from visible cells with a
+zero-conflict test plus a support threshold finds the true axis
+uniquely and generalizes to any crop offset, whereas any fixed axis
+assumption is brittle. The same zero-conflict discipline that made
+mosaic_heal (Chapter 284) converge is reused here at the level of
+whole symmetry axes rather than donor rows.
+
+Key predicates:
+  mp_bbox8_/5          - solid color 8 cover rectangle location
+  mp_axis_/5           - conflict-free mirror axis detection
+  mp_heal_/6           - mirror fixpoint, transpose fallback, iterate
+  mp_mirror_pass_/6    - fill covered cells from H, V, or point mirrors
+  mp_transpose_pass_/5 - fill covered cells from transpose donors
+  arc2_transform(mirror_patch, +Grid, -Out)
+  arc2_induce_rule(+Pairs, mirror_patch)
+
+Task solved: 0934a4d8 (4 training pairs + 1 test case).
+Score: 63/120 = 52.50% to 64/120 = 53.33%.
