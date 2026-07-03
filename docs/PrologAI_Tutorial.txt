@@ -21463,3 +21463,37 @@ Key predicates:
 
 Task solved: 581f7754 (3 training pairs + 1 test case).
 Score: 58/120 = 48.33% to 59/120 = 49.17%.
+
+Chapter 281: Wave 63 - col_rank_fill (WP-321, Layer 296)
+
+col_rank_fill solves ARC-AGI-2 task 97d7923e. The input grid contains
+vertical column segments of the form [M, F, F, ..., F, M] (marker color
+M at top and bottom, filler color F in the middle). Some columns also
+contain indicator bars: a column C has an indicator bar if Grid[0][C]
+is non-BG; the bar length is the count of consecutive cells of that
+color from row 0 downward.
+
+The rule: for each indicator (marker_color M, bar_length = rank R),
+collect all column segments whose marker color equals M. Sort these
+segments by filler-cell count descending. Replace all filler cells in
+the rank-R segment (1-indexed) with the marker color M.
+
+Indicator bars and column segments can coexist in the same column at
+different row ranges. Segment detection skips the bar rows for that
+column. If the rank exceeds the number of segments with that marker
+color, no change is applied for that indicator.
+
+Key predicates:
+  arc2_crf_indicators_/3        - find indicator bars (col, color, length)
+  arc2_crf_bar_len_/6           - count consecutive color run from row 0
+  arc2_crf_segments_/5          - find column segments [M, F+, M]
+  arc2_crf_seg_/8               - detect segment below bar in one column
+  arc2_crf_last_nonbg_/5        - find last non-BG row in a column range
+  arc2_crf_targets_/3           - select rank-R segment per indicator
+  arc2_crf_apply_/3             - build replacement list and apply to grid
+  arc2_crf_apply_rows_/4        - process each row for replacements
+  arc2_crf_apply_cols_/4        - apply column replacements within a row
+  arc2_transform(col_rank_fill, +Grid, -Out)
+
+Task solved: 97d7923e (3 training pairs + 1 test case).
+Score: 59/120 = 49.17% to 60/120 = 50.00%.
