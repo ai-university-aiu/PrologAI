@@ -21535,3 +21535,40 @@ Key predicates:
 
 Task solved: cb2d8a2c (4 training pairs + 1 test case).
 Score: 60/120 = 50.00% to 61/120 = 50.83%.
+
+Chapter 283: Wave 65 - hole_color (WP-323, Layer 298)
+
+hole_color solves ARC-AGI-2 task e3721c99. The input grid contains a
+legend region of compact colored template shapes and a body region of
+grey (value 5) shapes. Each legend template encloses N background holes
+(4-connected pockets of value-0 cells not reachable from the grid
+border). Each grey body shape is classified by its own enclosed-hole
+count and recolored to the legend color whose template has the same
+hole count; grey shapes with an unmatched hole count are erased to
+background.
+
+The rule:
+1. Find all non-background 4-connected components.
+2. Legend templates: non-grey components with bounding-box height >= 2,
+   width >= 2, and fill rate >= 75% (cell count * 4 >= bbox area * 3).
+   The full-width divider line is rejected by the height filter.
+3. Count each template's enclosed holes with wall color = template
+   color: exterior BFS from non-wall border cells; hole seeds are
+   value-0 cells 4-adjacent to the component and not exterior; hole
+   count = number of 4-connected components among hole seeds. The
+   legend map entry is hole_count -> color.
+4. Classify every grey shape on the original grid (wall color 5) with
+   the same procedure; look up its target color in the legend map;
+   unmatched hole counts erase the shape to value 0.
+5. Apply all recolorings with foldl over arc2_set_cell_.
+
+Key predicates:
+  hc_bbox4_/5, hc_bbox4_acc_/9 - accumulator bounding box
+  hc_holes_/6                  - enclosed-hole count for one component
+  hc_nwall_bfs_/5              - exterior BFS through non-wall cells
+  hc_nwall_comps_/5            - hole-seed component counting
+  hc_bg_bfs_/5                 - BFS through enclosed background cells
+  arc2_transform(hole_color, +Grid, -Out)
+
+Task solved: e3721c99 (2 training pairs + 1 test case).
+Score: 61/120 = 50.83% to 62/120 = 51.67%.
