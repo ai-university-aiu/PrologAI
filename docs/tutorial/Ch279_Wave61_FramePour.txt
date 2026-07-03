@@ -1,0 +1,60 @@
+Chapter 279: Wave 61 - frame_pour (WP-319, Layer 294)
+
+frame_pour solves ARC-AGI-2 task b9e38dc0. The input grid contains a
+rectangular frame of color F with a fill-seed of color FC on one interior
+side. The side OPPOSITE FC is the opening. The rule fills the interior with
+FC (excluding F-cells and B-cells), then pours through the opening into the
+exterior as a widening triangular cone whose width grows by one unit every S
+depth steps. B-cells cast directional shadows that propagate from the interior
+through the opening into the exterior via a unified blocked-set.
+
+Key insight: the interior and exterior fills use the SAME directional scan
+(not BFS). Scanning from the far frame wall toward the boundary Bnd, each
+B-cell adds its row or col index to the blocked set. That blocked set is
+passed directly to the exterior phase so shadows continue past the opening.
+
+Degenerate boundary: at the boundary col (=Bnd), the frame may have only
+ONE F-cell (a corner), giving an empty range [min_F+1, max_F-1]. Fix: detect
+the single-F-cell case (FTW=:=FBW), determine if it is the top or bottom wall
+by comparing to the midpoint (FbTW+FbBW)/2, and extend to the precomputed
+fallback wall FbBW or FbTW (inclusive, since that wall is in the adjacent col,
+not the current col).
+
+Float slope: S = 2.0/DC where DC is the change in minimum F-col over 2 interior
+rows. Using integer 2//DC gives 0 when DC > 2, which halts the exterior cone.
+Using float 2.0/DC and E = truncate((D-1)/S) gives the correct gradual widening.
+
+Algorithm:
+(1) Detect BG (most frequent), F (frame color), FC (fill-seed color).
+(2) Compute FC centroid; opening direction = opposite the FC side.
+(3) Compute boundary Bnd, wall extents LW/RW, slope S.
+(4) Interior shadow-cone: scan from far frame wall toward Bnd, row by row (or
+    col by col for WEST/EAST); determine fill range from F-cells at that row/col
+    (with degenerate fallback); track blocked set from B-cells.
+(5) Exterior cone: depth loop 1..MaxD; at depth D, E = truncate((D-1)/S);
+    range [LW-E, RW+E]; blocked set inherited from interior.
+(6) Apply: replace BG cells in accumulated fill set with FC.
+
+Key predicates:
+  arc2_fp_bg_/2              - background color detection
+  arc2_fp_fcolor_/3          - frame color (F) detection
+  arc2_fp_ccolor_/4          - fill-seed color (FC) detection
+  arc2_fp_dir_/4             - opening direction from FC centroid
+  arc2_fp_bnd_/7             - boundary Bnd, wall extents LW/RW, slope S
+  arc2_fp_wcols_/5           - min/max F-col at two adjacent boundary rows
+  arc2_fp_wrows_/5           - min/max F-row at two adjacent boundary cols
+  arc2_fp_slopev_/4          - slope for N/S openings
+  arc2_fp_slopeh_/4          - slope for E/W openings
+  arc2_fp_int_cone_/11       - interior shadow-cone fill orchestrator
+  arc2_fp_int_rloop_/15      - interior row loop (NORTH/SOUTH)
+  arc2_fp_int_cloop_/15      - interior col loop (WEST/EAST)
+  arc2_fp_scan_int_/11       - scan one interior row with shadow tracking
+  arc2_fp_scan_intc_/11      - scan one interior col with shadow tracking
+  arc2_fp_exterior_/13       - exterior cone orchestrator
+  arc2_fp_ext_loop_/16       - exterior depth loop
+  arc2_fp_scan_/11           - scan one exterior row/col with shadow tracking
+  arc2_fp_apply_/4           - apply fill set to grid
+  arc2_transform(frame_pour, +Grid, -Out)
+
+Task solved: b9e38dc0 (3 training pairs + 1 test case).
+Score: 57/120 = 47.50% to 58/120 = 48.33%.
