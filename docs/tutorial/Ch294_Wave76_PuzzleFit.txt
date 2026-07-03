@@ -1,0 +1,61 @@
+Chapter 294: Wave 76 - puzzle_fit (WP-334, Layer 309)
+
+puzzle_fit solves ARC-AGI-2 task 7b3084d4. Each 20x20 input grid
+scatters four puzzle pieces over the background - mostly single-color
+connected shapes with bumps and notches - and exactly one piece
+carries a single anchor stud of color 5 in place of one of its own
+cells. The total number of piece cells is always a perfect square:
+36, 100, and 16 across the three training grids and 196 in the test
+grid. The task is to assemble the pieces into the N-by-N square,
+rotating each piece by quarter turns so the pieces interlock with no
+gaps and no overlaps, with the color-5 anchor stud landing exactly on
+the square's top-left corner.
+
+Rule: the pieces are chiral. Each piece may be turned but never
+mirrored, and under that restriction the square has exactly one
+assembly.
+
+Algorithm:
+
+The background is the most common cell value. All non-background
+cells are grouped into 8-connected components over mixed colors -
+8-connected because some piece cells touch only diagonally, and
+mixed-color because the anchor stud's color 5 differs from its
+piece's body color. Each piece is normalized to its bounding-box
+origin, and the summed cell counts must equal N * N, fixing the
+output side N. Each piece then generates exactly four variants:
+identity and the three quarter-turn rotations, deduplicated by
+sorting. Backtracking exact cover fills the board: at each step the
+scanline-first empty cell must be covered by the scanline-first cell
+of some rotated variant of a still-unplaced piece, fitting inside the
+board and overlapping only empty cells. The accepted solution is the
+tiling whose top-left corner carries the color-5 anchor stud, and the
+placed cells are painted row by row into the output square, every
+cell keeping its input color. The induction pre-filter requires the
+first output to be strictly smaller than the first input in both
+dimensions, exactly square, with color 5 in its top-left cell and not
+in its bottom-left cell, then verifies all pairs with forall.
+
+The lesson: reflections do not belong to this puzzle. Under the full
+dihedral group of eight variants per piece the grids admit two or
+three perfect tilings each and the first-found tiling fails the
+hidden test; under rotations only, every grid - training and test
+alike - admits exactly one perfect tiling, confirmed by exhaustive
+enumeration. A second lesson came from the prototype: the
+counterclockwise rotation map reused the input column variable as the
+output column, and the resulting zero-solution search on a grid that
+had been solved by hand exposed the bug - which the singleton-variable
+warning had flagged all along.
+
+Key predicates:
+  pf_cells_/3          - non-background cells as row-column-color
+  pf_comps_/2          - 8-connected multi-color components
+  pf_norm_/2           - piece shifted to bounding-box origin
+  pf_variants_/2       - the four quarter-turn rotations, deduped
+  pf_solve_/3          - N-by-N exact-cover tiling search
+  pf_fill_/5           - scanline-anchored backtracking placement
+  pf_render_/3         - placed cells painted as the output square
+  arc2_transform(puzzle_fit, +Grid, -Out)
+
+Task solved: 7b3084d4 (3 training pairs + 1 test case).
+Score: 72/120 = 60.00% to 73/120 = 60.83%.
