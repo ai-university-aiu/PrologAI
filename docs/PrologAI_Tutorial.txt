@@ -21782,3 +21782,51 @@ Key predicates:
 
 Task solved: 67e490f4 (2 training pairs + 1 test case).
 Score: 66/120 = 55.00% to 67/120 = 55.83%.
+
+
+Chapter 289: Wave 71 - wallpaper_motif (WP-329, Layer 304)
+
+wallpaper_motif solves ARC-AGI-2 task b99e7126. Each 29x29 input is a
+wallpaper: uniform separator rows and columns carve the grid into a
+7x7 tile grid of 3x3 inner tiles carrying exactly two designs - a
+majority standard tile and a minority motif tile, the same design
+with one extra color painted into some of its cells. The separator
+color and the palette change from grid to grid. The output is the
+same wallpaper with the motif tile stamped at additional positions.
+
+Rule: the motif is its own placement map. The picture painted in the
+motif color inside one 3x3 tile is exactly the picture that the
+motif tiles must paint across the 7x7 tile grid - a fractal in
+miniature.
+
+Algorithm: the separator color is the color of the uniform first
+row; separator rows are all rows uniform in that color, and the same
+scan on the transposed grid yields the separator columns. The index
+spans between separators define the tile bands, and every tile is
+cut out with its tile-grid coordinates. Exactly two distinct designs
+must exist with different frequencies: majority standard, minority
+motif. The motif color is the color unique to the motif tile, and
+its cell positions inside the motif tile form the placement mask.
+The mask is slid over the tile grid until every observed motif tile
+lands on a mask position, and the wallpaper is repainted: separator
+lines unchanged, motif tile at every anchored mask position,
+standard tile elsewhere. The induction pre-filter requires equal
+input and output dimensions plus a uniform first row and first
+column in one separator color, then verifies all pairs with forall.
+
+The lesson: the mask must be the motif color's own cells, not the
+cell-by-cell difference between the two designs - the difference
+mask also marks where the motif tile paints its complement color,
+and it passes only one of the three training pairs. Only the motif
+color's cells form the self-similar placement picture.
+
+Key predicates:
+  wm_sep_idx_/3    - separator row indices and their shared color
+  wm_segments_/3   - index spans between consecutive separators
+  wm_tile_/4       - cut one tile out of the wallpaper
+  wm_render_/9     - repaint the wallpaper from the anchored mask
+  wm_cell_/11      - per-cell paint decision
+  arc2_transform(wallpaper_motif, +Grid, -Out)
+
+Task solved: b99e7126 (3 training pairs + 1 test case).
+Score: 67/120 = 55.83% to 68/120 = 56.67%.
