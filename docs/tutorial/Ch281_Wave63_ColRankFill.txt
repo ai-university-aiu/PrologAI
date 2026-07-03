@@ -1,0 +1,52 @@
+Chapter 281: Wave 63 - col_rank_fill (WP-321, Layer 296)
+
+col_rank_fill solves ARC-AGI-2 task 97d7923e. The input grid contains
+vertical column segments of the form [M, F, F, ..., F, M]: a marker color M
+at the top and bottom of the segment, with a filler color F occupying all
+cells between them. Some columns also contain indicator bars at the very top
+of the grid: if a column C has a non-BG value at row 0, the length of the
+consecutive run of that color from row 0 downward is the indicator bar length,
+which doubles as the rank R for that marker color.
+
+Rule: for each indicator bar (color = marker M, bar_length = rank R), collect
+all column segments whose top and bottom markers have color M. Sort these
+segments by filler-cell count in descending order. If rank R is within the
+list, replace all filler cells in the rank-R segment (1-indexed, largest
+first) with the marker color M. Segments for other marker colors are unchanged.
+If rank R exceeds the number of segments with marker M, no change is applied.
+
+Indicator bars and column segments can coexist in the same column at
+different row ranges. The segment detection for that column starts below the
+indicator bar rows, so the bar cells are not confused with segment markers.
+
+Algorithm:
+(1) Get grid dimensions (H x W).
+(2) For each column C where Grid[0][C] != BG, count the consecutive run of
+    Grid[0][C] from row 0 downward; record (C, color, run_length).
+(3) For each column C, skipping the indicator bar rows (if any), find the
+    first and last non-BG cells; verify they have the same color (marker M);
+    verify all cells between them are the same non-BG non-M color (filler F);
+    record (C, M, filler_count, top_row, bot_row).
+(4) For each indicator (marker M, rank R): filter segments by marker M, sort
+    by filler_count descending, pick the R-th entry (1-indexed).
+(5) For each selected segment: replace all cells from top_row to bot_row
+    (inclusive) in that column with M.
+
+Filler validation: arc2_crf_seg_ verifies that all intermediate cells have
+exactly one distinct non-BG non-marker color. This prevents spurious segments
+(e.g., columns that have two different non-BG colors in their interior).
+
+Key predicates:
+  arc2_crf_indicators_/3        - find indicator bars (col, color, length)
+  arc2_crf_bar_len_/6           - count consecutive color run from row 0
+  arc2_crf_segments_/5          - find column segments [M, F+, M] per column
+  arc2_crf_seg_/8               - detect one segment in a column below bar
+  arc2_crf_last_nonbg_/5        - find last non-BG row in a column range
+  arc2_crf_targets_/3           - select rank-R segment for each indicator
+  arc2_crf_apply_/3             - build replacements and apply to grid
+  arc2_crf_apply_rows_/4        - process each grid row for replacements
+  arc2_crf_apply_cols_/4        - apply column replacements within one row
+  arc2_transform(col_rank_fill, +Grid, -Out)
+
+Task solved: 97d7923e (3 training pairs + 1 test case).
+Score: 59/120 = 49.17% to 60/120 = 50.00%.
