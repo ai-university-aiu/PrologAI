@@ -21572,3 +21572,37 @@ Key predicates:
 
 Task solved: e3721c99 (2 training pairs + 1 test case).
 Score: 61/120 = 50.83% to 62/120 = 51.67%.
+
+Chapter 284: Wave 66 - mosaic_heal (WP-324, Layer 299)
+
+mosaic_heal solves ARC-AGI-2 task 981571dc. The input grid is a 30x30
+symmetric wallpaper mosaic damaged by rectangular patches of zeros.
+The mosaic has mirror structure in its rows, its columns, and across
+its main diagonal. The output is the fully healed grid with every zero
+replaced by the color the undamaged mosaic carries at that position.
+
+The rule:
+1. Row donor healing: every row containing a zero searches the grid
+   for a donor row that agrees at every position where both rows are
+   non-zero (any shared non-zero disagreement fails the candidate),
+   with at least 5 agreeing non-zero positions; the donor's values
+   fill the row's zero cells.
+2. Column donor healing: transpose, heal rows, transpose back.
+3. Fixpoint: repeat row-plus-column passes until nothing changes;
+   partially damaged rows heal each other across passes.
+4. Diagonal fallback: leftover zeros at (r, c) borrow the value at
+   (c, r) via a row-wise merge with the grid's own transpose.
+5. The fixpoint runs once more, and the transform succeeds only if
+   the final grid is zero-free.
+
+Key predicates:
+  mh_fixpoint_/2  - iterate healing passes until stable
+  mh_pass_/2      - row pass plus column pass via transpose
+  mh_heal_row_/3  - find a compatible donor and merge it in
+  mh_compat_/4    - hard-failing agreement test with count
+  mh_merge_/3     - fill zeros from a donor row
+  mh_diag_/2      - diagonal mirror repair
+  arc2_transform(mosaic_heal, +Grid, -Out)
+
+Task solved: 981571dc (4 training pairs + 1 test case).
+Score: 62/120 = 51.67% to 63/120 = 52.50%.

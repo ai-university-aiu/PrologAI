@@ -1,0 +1,60 @@
+Chapter 284: Wave 66 - mosaic_heal (WP-324, Layer 299)
+
+mosaic_heal solves ARC-AGI-2 task 981571dc. The input grid is a 30x30
+symmetric wallpaper mosaic damaged by rectangular patches of zeros -
+between 82 and 114 destroyed cells per training input. The mosaic has
+mirror structure in its rows, its columns, and across its main
+diagonal. The output is the fully healed grid: every zero replaced by
+the color the undamaged mosaic carries at that position. No training
+or test output contains a single zero.
+
+Rule: a symmetric mosaic carries its own backup copies, so the repair
+is pure redundancy recovery with no learned parameters.
+
+Algorithm:
+(1) Row donor healing: every row containing a zero searches the grid
+    for a compatible donor row. Compatibility requires agreement at
+    every position where both rows are non-zero; a disagreement at any
+    shared non-zero position fails the candidate outright. Zeros on
+    either side are neutral. At least 5 agreeing non-zero positions
+    are required for confidence. The damaged row copies the donor's
+    values into its zero cells. Rows without a suitable donor pass
+    through unchanged.
+(2) Column donor healing: transpose the grid, run the row healing
+    pass, and transpose back.
+(3) Fixpoint: repeat row-plus-column passes until a full pass changes
+    nothing. Two rows damaged in different columns heal each other
+    across successive passes, which is what lets the fixpoint converge
+    from multiple damage patches.
+(4) Diagonal fallback: if zeros survive the fixpoint (a row and all of
+    its potential donors damaged in the same columns), each leftover
+    zero at (r, c) borrows the value at its diagonal mirror (c, r),
+    implemented as a row-wise merge of the grid with its own
+    transpose.
+(5) The fixpoint runs once more after the diagonal repair, because a
+    diagonal borrow can unlock further row and column donors.
+(6) The transform succeeds only if the final grid is zero-free.
+(7) Induction pre-filter: the first training input contains a zero,
+    the first training output contains no zero, and the row counts
+    match; then all training pairs are verified with forall.
+
+The design insight is that the compatibility test must fail hard
+rather than merely score low: an early sketch that scored similarity
+and picked the best donor let near-miss rows donate wrong colors.
+Failing outright on any shared non-zero disagreement means only
+genuinely repeated or mirrored rows qualify as donors.
+
+Key predicates:
+  mh_fixpoint_/2  - iterate row+column healing passes until stable
+  mh_pass_/2      - one row pass plus one column pass via transpose
+  mh_heal_rows_/2 - map the single-row healer over all rows
+  mh_heal_row_/3  - find a compatible donor and merge it into the row
+  mh_compat_/4    - hard-failing agreement test with agreement count
+  mh_merge_/3     - fill zeros of a damaged row from a donor row
+  mh_diag_/2      - diagonal mirror repair via transpose merge
+  mh_transpose_/2 - grid transposition
+  arc2_transform(mosaic_heal, +Grid, -Out)
+  arc2_induce_rule(+Pairs, mosaic_heal)
+
+Task solved: 981571dc (4 training pairs + 1 test case).
+Score: 62/120 = 51.67% to 63/120 = 52.50%.
