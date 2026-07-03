@@ -1,0 +1,66 @@
+Chapter 295: Wave 77 - palette_jigsaw (WP-335, Layer 310)
+
+palette_jigsaw solves ARC-AGI-2 task f560132c. Each input grid (20x20
+in training, 26x26 in the test) scatters four pieces over the
+background: three single-color connected shapes and one key piece
+whose body embeds a 2-by-2 block of four foreign palette colors in
+place of four of its own cells. The total number of piece cells is
+always a perfect square: 64 and 100 across the two training grids and
+144 in the test grid. The task is to assemble the pieces into the
+N-by-N square, rotating each piece by quarter turns so the pieces
+interlock with no gaps and no overlaps, with the key piece covering
+the top-left corner, and then to repaint every piece with the palette
+color of the output corner it covers.
+
+Rule: the palette carrier anchors the corner. The key piece pins the
+top-left corner - the same corner where its own palette reading
+begins - and under that pin the square has exactly one assembly.
+
+Algorithm:
+
+The background is the most common cell value. All non-background
+cells are grouped into 8-connected components over mixed colors, and
+exactly four components must emerge; exactly one - the key - carries
+more than one distinct color. The key's body color is its most
+frequent cell color, and the four cells differing from the body form
+a 2-by-2 palette block read as top-left, top-right, bottom-left, and
+bottom-right. Each piece is normalized to its bounding-box origin and
+converted to a shape mask tagged with a piece index, the key being
+index 1 with its palette cells counted as part of its shape; the
+summed cell counts must equal N * N, fixing the output side N. The
+Wave 76 exact-cover engine then tiles the board with the four
+quarter-turn rotation variants of each mask, and the accepted tiling
+has the key covering the top-left corner and the four corners covered
+by four distinct pieces. Finally each piece is repainted with the
+palette color of the corner it covers - the key takes the palette's
+top-left color - and the recolored cells are painted row by row into
+the output square. The induction pre-filter requires the first output
+to be strictly smaller than the first input in both dimensions,
+exactly square, with four distinct colors in its four corners, then
+verifies all pairs with forall.
+
+The lesson: the corner anchor generalizes from a colored stud to a
+role-bearing piece. Without the key-corner pin each grid admits
+exactly four distinct-corner tilings - the four global rotations of
+one and the same assembly - and only one of them recolors correctly;
+with the pin, every grid admits exactly one tiling, confirmed by
+exhaustive enumeration. A second lesson: the published human-solver
+walkthrough (quadrant roles from centroid offsets with fixed per-role
+rotations) does not survive contact with the data - the
+piece-to-corner assignment ignores the input quadrants and the
+rotations vary freely - so the anchored jigsaw search is the real
+rule, and the entire Wave 76 pf_* engine is reused unmodified.
+
+Key predicates:
+  pj_multi_/1          - component carries more than one distinct color
+  pj_majority_/2       - most frequent color in a color list
+  pj_mask_/4           - normalized piece mask tagged with piece index
+  pj_color_/9          - piece index mapped to its corner palette color
+  pf_comps_/2          - 8-connected mixed-color components (reused)
+  pf_variants_/2       - the four quarter-turn rotations (reused)
+  pf_solve_/3          - N-by-N exact-cover tiling search (reused)
+  pf_render_/3         - placed cells painted as the output square (reused)
+  arc2_transform(palette_jigsaw, +Grid, -Out)
+
+Task solved: f560132c (2 training pairs + 1 test case).
+Score: 73/120 = 60.83% to 74/120 = 61.67%.
