@@ -1,0 +1,48 @@
+Chapter 278: Wave 60 - layout_tile (WP-318, Layer 293)
+
+layout_tile solves ARC-AGI-2 task 65b59efc. The input grid is divided by two
+identical "major divider rows" and N "divider cols" into three horizontal
+row-groups and N vertical col-groups of equal width S. Row-group 0 (top)
+contains N template subgrids (S x S each). Row-group 2 (bottom) contains N
+marker colors (one per col-group). Row-group 1 (middle) contains N layout
+subgrids (S x S each); each non-zero non-5 cell at position (r,c) in a layout
+identifies which template T to place at output block (r,c), recolored with T's
+marker color. The output is an S x S arrangement of S x S blocks (S^2 x S^2
+total).
+
+Key insight: a major divider row has all values in {0,5} AND at least half its
+cells are 5 (the full-width pattern spanning all col-groups). Sparse-5 rows in
+the marker region must be excluded; the detection uses include(==(5), Row, Fives)
+then NF*2 >= W to avoid false positives and avoid duplicate findall results from
+member/2 backtracking.
+
+Algorithm: (1) Find divider rows (majority-5 rows). (2) Find divider cols
+(all-{0,5} cols with at least one 5). (3) Split into 3 row-groups and N
+col-groups. (4) Extract templates, markers, layouts. (5) Build assignments list:
+for each layout non-zero non-5 cell (r,c,V), find template TI containing V.
+(6) Build S^2 x S^2 output: cell (OR,OC) has block_row=OR//S, block_col=OC//S,
+inner_row=OR mod S, inner_col=OC mod S; find TI in assignments; output =
+marker[TI] if template[TI][inner_row][inner_col] != 0 else 0.
+
+Performance note: the arc2_induce_rule(layout_tile) clause is placed before
+the generic clause so its O(H) pre-filter (two identical majority-5 rows) is
+applied before the slow frame_assemble rule in the generic dispatch.
+
+Key predicates:
+  arc2_lt_divider_rows_/2     - findall majority-5 all-{0,5} rows
+  arc2_lt_divider_cols_/2     - findall all-{0,5} cols with any 5
+  arc2_lt_row_groups_/5       - split non-divider rows into 3 groups
+  arc2_lt_col_groups_/3       - split non-divider cols into N groups
+  arc2_lt_contiguous_groups_/2 - split sorted indices into runs
+  arc2_lt_cont_run_/4         - extend one contiguous run
+  arc2_lt_subgrid_/4          - extract subgrid by row/col lists
+  arc2_lt_subgrids_/4         - maplist subgrid extraction
+  arc2_lt_markers_/4          - extract marker colors from RG2
+  arc2_lt_layouts_/4          - extract layout subgrids from RG1
+  arc2_lt_has_color_/2        - check template contains given color
+  arc2_lt_assignments_/3      - build (br,bc,template_index) list
+  arc2_lt_build_output_/5     - build S^2 x S^2 output grid
+  arc2_transform(layout_tile, +Grid, -Out)
+
+Task solved: 65b59efc (3 training pairs + 1 test case).
+Score: 54/120 = 45.00% to 57/120 = 47.50%.
