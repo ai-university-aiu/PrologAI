@@ -1,0 +1,87 @@
+Chapter 287: Wave 69 - frame_compass (WP-327, Layer 302)
+
+frame_compass solves ARC-AGI-2 task fc7cae8d. Each input grid (22x22
+to 29x29) carries noisy border lines on all four sides, each side
+owning a majority non-zero color - for example a top row of solid 4s
+and a left column of mostly 6s. The interior holds one large
+multi-color patterned component hugged by exactly two straight frame
+lines, one horizontal and one vertical, each one cell away from the
+component's bounding box. The task is to crop the component out along
+its bounding box and output it rotated and/or mirrored - a different
+orientation in each training pair, and yet another in the test case.
+
+Rule: the frame lines are a color-coded compass. Each frame line is
+painted in the majority color of one grid border side, and it
+commands: the crop edge I touch must face the border side that shares
+my color in the output. Two adjacent-edge constraints pin down
+exactly one of the eight dihedral-four transforms (identity, three
+rotations, four reflections), so the orientation is read off the
+grid, never guessed.
+
+Algorithm:
+(1) Border colors: each of the four grid border lines (first row,
+    last row, first column, last column) is assigned its majority
+    non-zero color (fc_border_colors_/2, fc_majority_/2); at least
+    one border line must be one solid non-zero color
+    (fc_has_solid_side_/1, a fast gate).
+(2) Interior component: the largest 4-connected component of
+    non-zero cells that touches no grid border line is located
+    (fc_largest_inner_blob_/4, fc_blobs_/2, fc_flood_/5); flood fill
+    consumes cells from a shared shrinking pool, so each cell is
+    claimed exactly once.
+(3) Split: component cells whose color is not a border color are
+    crop cells; cells whose color matches a border color are frame
+    cells (fc_split_blob_/5). Exactly two frame colors must exist.
+(4) Compass reading: each frame color's cells must hug exactly one
+    edge of the crop bounding box - the line one cell above, below,
+    left of, or right of it (fc_frame_side_/6) - giving the input
+    edge; the unique border side owning that color gives the output
+    edge (fc_compass_/9).
+(5) Unique transform: the two edge constraints select one element of
+    the dihedral-four group via the 32-fact edge-permutation table
+    fc_emap_/3; the crop is sliced out (fc_crop_/6) and the element
+    is applied (fc_apply_/3) by delegating to the registered
+    primitives rotate_90_cw, rotate_90_ccw, rotate_180, reverse_rows,
+    vertical_flip, and transpose.
+(6) Induction pre-filter: the first output must be strictly smaller
+    than its input in both dimensions and the input must have a solid
+    non-zero border line; then all training pairs are verified with
+    forall.
+
+Two subtleties make the rule honest. First, the largest non-zero
+component in the grid can be the border noise itself: in training
+pair 3 the left border column and the bottom border row share a
+corner cell and fuse into one 60-cell component, larger than the
+33-cell interior component, so components touching any border line
+are excluded before taking the largest. Second, two border sides may
+share a majority color (left and bottom are both 5 in the test
+case), so each frame color must resolve to the unique border side
+owning it - and both frame colors always do.
+
+The design insight is semantics over heuristics: the published
+human-steps description of this task ("rotate a quarter turn, then
+mirror left-right if the dominant color leans on the right edge")
+cannot solve the hidden test case, which needs a main-diagonal
+reflection no training pair uses. Reading the frame lines as pointers
+makes the rule deterministic: training pair 1 is the anti-diagonal
+reflection, pairs 2 and 3 the counterclockwise quarter turn, and the
+test case the main-diagonal reflection.
+
+Key predicates:
+  fc_border_colors_/2      - majority non-zero color per border side
+  fc_majority_/2           - most frequent non-zero value of a line
+  fc_has_solid_side_/1     - at least one solid non-zero border line
+  fc_largest_inner_blob_/4 - largest component touching no border
+  fc_blobs_/2, fc_flood_/5 - 4-connected component partitioning
+  fc_split_blob_/5         - split into crop cells and frame cells
+  fc_bbox_/5               - bounding box of the crop cells
+  fc_compass_/9            - frame color to input and output edges
+  fc_frame_side_/6         - which bounding-box edge a frame hugs
+  fc_emap_/3               - 32-fact dihedral-four edge table
+  fc_crop_/6               - cut the bounding-box subgrid
+  fc_apply_/3              - apply the selected transform
+  arc2_transform(frame_compass, +Grid, -Out)
+  arc2_induce_rule(+Pairs, frame_compass)
+
+Task solved: fc7cae8d (3 training pairs + 1 test case).
+Score: 65/120 = 54.17% to 66/120 = 55.00%.
