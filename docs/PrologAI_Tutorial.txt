@@ -21497,3 +21497,41 @@ Key predicates:
 
 Task solved: 97d7923e (3 training pairs + 1 test case).
 Score: 59/120 = 49.17% to 60/120 = 50.00%.
+
+Chapter 282: Wave 64 - snake_frame (WP-322, Layer 297)
+
+snake_frame solves ARC-AGI-2 task cb2d8a2c. The input grid contains a
+background (value 8), snake objects (4-connected bodies of cells with
+value 1 or 2), and a single pointer cell (value 3) located on one grid
+edge. The output traces the pointer's rectangular wrap-path around each
+snake nearest-to-farthest from the pointer edge; all value-1 snake cells
+become value 2.
+
+The rule:
+1. Locate the pointer cell (value 3) and determine which grid edge it
+   sits on (top/bottom/left/right).
+2. Find all snake cells (values 1 or 2) and partition them into 4-connected
+   components. Analyse each component: bounding rows TR/BR, cols LC/RC,
+   count of 1-cells N1, and half-counts TopH/BotH (for vertical snakes)
+   or LH/RH (for horizontal snakes).
+3. Order components nearest-to-farthest from the pointer edge.
+4. Traverse components in order: advance to near boundary (snake_edge +/-
+   (N1+1)), turn perpendicular toward the half with more 1s (clamped to
+   grid bounds), reach far boundary, return to primary direction.
+5. After all snakes, continue to the opposite grid edge.
+6. Output: path cells become 3; snake cells with value 1 become 2.
+
+Key predicates:
+  cbsf_ptr/4              - locate value-3 pointer by row scan
+  cbsf_cells/5, cbsf_row/5 - collect all 1/2 cells as R-C pairs
+  cbsf_partition/2, cbsf_bfs/4 - BFS connected-component partitioning
+  cbsf_analyse/3          - bounding box, N1, TopH/BotH/LH/RH half-counts
+  cbsf_edge/5             - determine pointer edge from position
+  cbsf_order/3            - keysort by nearest-first coordinate
+  cbsf_trace/7            - recursive path generation (4 edge-type clauses)
+  cbsf_hline/4, cbsf_vline/4 - generate horizontal/vertical cell lists
+  cbsf_out/5, cbsf_outrow/7  - build output grid
+  arc2_transform(snake_frame, +Grid, -Out)
+
+Task solved: cb2d8a2c (4 training pairs + 1 test case).
+Score: 60/120 = 50.00% to 61/120 = 50.83%.

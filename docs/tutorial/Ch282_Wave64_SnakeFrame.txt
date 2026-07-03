@@ -1,0 +1,58 @@
+Chapter 282: Wave 64 - snake_frame (WP-322, Layer 297)
+
+snake_frame solves ARC-AGI-2 task cb2d8a2c. The input grid contains a
+background (value 8), snake objects (4-connected bodies of cells with value
+1 or 2), and a single pointer cell (value 3) located on exactly one grid
+edge. The output traces a rectangular wrap-path from the pointer through each
+snake (nearest-to-farthest), placing value 3 at every path cell; all
+value-1 cells in snake bodies become value 2.
+
+Rule: the pointer starts on one edge and travels in the primary direction
+(away from that edge). For each snake in nearest-to-farthest order:
+  (a) Advance to the near boundary: snake_edge +/- (N1 + 1), where N1 is
+      the count of value-1 cells in the snake, and snake_edge is the
+      relevant edge column (for right/left pointer) or row (for top/bottom).
+  (b) Turn perpendicular: for vertical snakes (right/left primary direction),
+      count value-1 cells in the top half vs bottom half of the bounding box.
+      If TopH >= BotH, turn toward row BR + N1 + 1 (clamped to H-1); else
+      turn toward TR - N1 - 1 (clamped to 0). For horizontal snakes
+      (top/bottom primary direction), use LH vs RH to choose left or right.
+      Grid boundary overrides: if one direction places the far coordinate
+      outside the grid, take the other direction.
+  (c) Reach the far boundary.
+  (d) Return to primary direction for the next snake.
+After all snakes, continue in primary direction to the opposite grid edge.
+
+Algorithm:
+(1) Scan rows to find the value-3 pointer cell (PR, PC).
+(2) Collect all cells with value 1 or 2 as R-C pairs.
+(3) BFS partition the collected cells into 4-connected components.
+(4) Analyse each component: min/max row (TR, BR), min/max col (LC, RC),
+    count of value-1 cells (N1), half-counts (TopH/BotH, LH/RH).
+(5) Determine the pointer edge from PR/PC vs H/W.
+(6) Sort components by nearest-first coordinate for that edge.
+(7) Recursively trace the path through all components, generating cell
+    lists from cbsf_hline and cbsf_vline.
+(8) Build output: path cells -> 3; snake cells with value 1 -> 2; others
+    unchanged.
+
+Early dispatch in arc2_induce_rule filters: exactly four distinct values
+{1, 2, 3, 8} in the first training input, and exactly one cell with value 3.
+
+Key predicates:
+  cbsf_ptr/4                - locate value-3 pointer by row scan
+  cbsf_cells/5, cbsf_row/5  - collect all 1/2 cells as R-C pairs
+  cbsf_partition/2          - greedy component extraction driver
+  cbsf_bfs/4                - BFS with subtract/3 available-pool
+  cbsf_adj4/3               - 4-adjacency check
+  cbsf_analyse/3            - bounding box, N1, TopH/BotH/LH/RH
+  cbsf_edge/5               - determine pointer edge from position
+  cbsf_order/3              - keysort by nearest-first coordinate
+  cbsf_trace/7              - recursive path generation (4 edge clauses)
+  cbsf_hline/4              - horizontal cell list (R, C1 to C2)
+  cbsf_vline/4              - vertical cell list (R1 to R2, C)
+  cbsf_out/5, cbsf_outrow/7 - build output grid
+  arc2_transform(snake_frame, +Grid, -Out)
+
+Task solved: cb2d8a2c (4 training pairs + 1 test case).
+Score: 60/120 = 50.00% to 61/120 = 50.83%.
