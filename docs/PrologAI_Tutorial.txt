@@ -21686,3 +21686,50 @@ Key predicates:
 
 Task solved: 7666fa5d (2 training pairs + 1 test case).
 Score: 64/120 = 53.33% to 65/120 = 54.17%.
+
+
+Chapter 287: Wave 69 - frame_compass (WP-327, Layer 302)
+
+frame_compass solves ARC-AGI-2 task fc7cae8d. Each input grid carries
+noisy border lines on all four sides, each side owning a majority
+non-zero color, plus one large multi-color interior component hugged
+by exactly two straight frame lines painted in border-side colors.
+The output is the component cropped along its bounding box and
+reoriented by a rotation and/or mirror that differs across pairs.
+
+The rule:
+1. Border colors: each of the four border lines (first row, last
+   row, first column, last column) gets its majority non-zero color;
+   at least one border line must be one solid non-zero color.
+2. Interior component: the largest 4-connected non-zero component
+   touching no grid border line; its cells split into crop cells
+   (non-border colors) and frame cells (border colors).
+3. Compass reading: exactly two frame colors; each frame color's
+   cells hug exactly one edge of the crop bounding box (input edge),
+   and the unique border side owning that color is its output edge.
+4. Unique transform: the two constraints "input edge faces output
+   edge" select one of the eight dihedral-four transforms via a
+   32-fact edge-permutation table; the crop is cut out and the
+   transform applied by delegating to the registered primitives
+   (rotations, flips, transpose).
+5. Induction pre-filter: first output strictly smaller than its
+   input in both dimensions plus a solid border line; then all
+   training pairs are verified.
+
+The key insight is that the frame lines are a color-coded compass:
+each one points its crop edge at the border side sharing its color,
+which makes the orientation deterministic - including the hidden
+test case's main-diagonal reflection, a transform no training pair
+uses and no quarter-turn-plus-mirror heuristic can produce.
+
+Key predicates:
+  fc_border_colors_/2      - majority non-zero color per border side
+  fc_largest_inner_blob_/4 - largest component touching no border
+  fc_split_blob_/5         - split into crop cells and frame cells
+  fc_compass_/9            - frame color to input and output edges
+  fc_emap_/3               - 32-fact dihedral-four edge table
+  fc_apply_/3              - apply the selected transform
+  arc2_transform(frame_compass, +Grid, -Out)
+
+Task solved: fc7cae8d (3 training pairs + 1 test case).
+Score: 65/120 = 54.17% to 66/120 = 55.00%.
