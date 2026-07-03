@@ -1,0 +1,71 @@
+Chapter 292: Wave 74 - hole_census (WP-332, Layer 307)
+
+hole_census solves ARC-AGI-2 task 8698868d. Each input grid (20x15 to
+30x30) holds two families of rectangular objects over a background.
+The first family is a set of equally sized large tiles of distinct
+colors packed side by side into a row-and-column layout. The second
+family is an equal number of smaller rectangular shapes of their own
+colors scattered elsewhere over the background. Both families are
+pierced by background-colored holes: the tiles carry a few scattered
+single-cell holes, while the shapes carry hole patterns that clump
+into blocks, bars, and diagonals. The task is to redraw the packed
+tile layout alone, each tile solid in its own color with one small
+shape stamped dead center inside it, the shape's holes filled by the
+tile color.
+
+Rule: the holes are a census. A tile with N scattered holes belongs
+to the shape whose background-hole region forms exactly N
+4-connected components - the hole count is the invariant carried
+from shape interior to tile face.
+
+Algorithm:
+(1) Background and components: the background is the most common cell
+    value (arc2_bg_color_/2); every non-background cell is collected
+    and partitioned into same-color 4-connected components
+    (bst_components_/2, reused from band_stamp).
+(2) Census annotation: each component is annotated with its bounding
+    box (hc_bbox4_/5, reused from hole_color) and its hole census -
+    the number of 4-connected components formed by the background
+    cells inside its bounding box (hcs_items_/4, hcs_census_/7).
+(3) Tile and shape split: the components whose bounding-box area
+    equals the maximum are the tiles; all remaining components are
+    the shapes; tile and shape counts must be equal, every tile must
+    share one bounding-box size, and every shape must share one
+    strictly smaller size in both dimensions.
+(4) Census pairing: each tile is paired with the unique shape whose
+    hole census equals the tile's own hole census (hcs_pairing_/3,
+    hcs_match_/3); exactly one shape may match each tile, and the
+    pairing must use every shape exactly once - a verified bijection.
+(5) Render: the output spans exactly the packed tile layout, anchored
+    at the smallest tile top row and left column; each tile is redrawn
+    solid in its own color, its paired shape is stamped centered
+    inside it, shape cells keep the shape color, and shape holes take
+    the tile color (hcs_render_/14).
+(6) Induction pre-filter: the first training pair's output must have
+    strictly fewer rows and strictly fewer columns than its input;
+    then all training pairs are verified with forall.
+
+The decisive observation is that two simpler readings both fail.
+Counting raw hole cells fails because a shape's holes clump: a 3x3
+block of nine hole cells is one component, and its partner tile
+carries one hole, not nine. Matching hole positions fails because the
+tile holes sit at arbitrary spots that do not align with the shape's
+hole pattern when the shape is centered. Only the component count of
+the holes survives. The bijection check turns any ambiguous grid into
+a clean rule failure instead of a wrong stamp. Both training pairs
+and the test case pass on the first run.
+
+Key predicates:
+  hcs_items_/4         - annotate components with bounding box and census
+  hcs_census_/7        - count hole components inside a bounding box
+  hcs_pairing_/3       - bijective tile-shape pairing by equal census
+  hcs_match_/3         - the unique shape carrying a given census
+  hcs_render_/14       - paint the packed layout with centered shapes
+  bst_components_/2    - same-color 4-connected components (reused)
+  hc_bbox4_/5          - component bounding box (reused)
+  arc2_bg_color_/2     - most common cell value as background (reused)
+  arc2_transform(hole_census, +Grid, -Out)
+  arc2_induce_rule(+Pairs, hole_census)
+
+Task solved: 8698868d (2 training pairs + 1 test case).
+Score: 70/120 = 58.33% to 71/120 = 59.17%.

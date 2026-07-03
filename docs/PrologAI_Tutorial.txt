@@ -21924,3 +21924,55 @@ Key predicates:
 
 Task solved: a395ee82 (3 training pairs + 1 test case).
 Score: 69/120 = 57.50% to 70/120 = 58.33%.
+
+
+Chapter 292: Wave 74 - hole_census (WP-332, Layer 307)
+
+hole_census solves ARC-AGI-2 task 8698868d. Each input grid holds
+equally sized large tiles of distinct colors packed side by side,
+plus an equal number of smaller rectangular shapes scattered over
+the background. Both are pierced by background-colored holes: the
+tiles carry a few scattered single cells, the shapes carry hole
+patterns that clump into blocks, bars, and diagonals. The output
+redraws the packed tile layout alone, each tile solid in its own
+color with one small shape stamped dead center inside it, the
+shape's holes filled by the tile color.
+
+Rule: the holes are a census. A tile with N scattered holes belongs
+to the shape whose background-hole region forms exactly N
+4-connected components - the hole count is the invariant carried
+from shape interior to tile face.
+
+Algorithm: the background is the most common cell value, and the
+non-background cells are partitioned into same-color 4-connected
+components. Each component is annotated with its bounding box and
+its hole census - the number of 4-connected components formed by
+the background cells inside its bounding box. The components at the
+maximum bounding-box area are the tiles and the rest are the
+shapes; counts must match, tiles share one size, shapes share one
+strictly smaller size. Each tile pairs with the unique shape whose
+census equals its own, and the pairing must use every shape exactly
+once. The output spans the packed tile layout anchored at the
+smallest tile top row and left column; each tile is redrawn solid
+with its paired shape centered inside, shape cells keeping the
+shape color and shape holes taking the tile color. The induction
+pre-filter requires the first output to be strictly smaller than
+the first input in both dimensions, then verifies all pairs with
+forall.
+
+The lesson: counting raw hole cells fails (shape holes clump into
+blocks and bars) and matching hole positions fails (tile holes sit
+at arbitrary spots); only the component count of the holes survives
+the trip from shape to tile, and the bijection check turns any
+ambiguous grid into a clean rule failure instead of a wrong stamp.
+
+Key predicates:
+  hcs_items_/4         - components with bounding box and census
+  hcs_census_/7        - hole-component count inside a bounding box
+  hcs_pairing_/3       - bijective tile-shape pairing by equal census
+  hcs_render_/14       - packed layout with centered shapes
+  bst_components_/2    - same-color 4-connected components (reused)
+  arc2_transform(hole_census, +Grid, -Out)
+
+Task solved: 8698868d (2 training pairs + 1 test case).
+Score: 70/120 = 58.33% to 71/120 = 59.17%.
