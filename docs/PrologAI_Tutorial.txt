@@ -21733,3 +21733,52 @@ Key predicates:
 
 Task solved: fc7cae8d (3 training pairs + 1 test case).
 Score: 65/120 = 54.17% to 66/120 = 55.00%.
+
+
+Chapter 288: Wave 70 - shape_catalog (WP-328, Layer 303)
+
+shape_catalog solves ARC-AGI-2 task 67e490f4. Each 30x30 input is
+dominated by one large lattice block built from exactly two colors: a
+frame color drawn over the background. The lattice encloses small
+background pockets shaped like squares, dominoes, pluses, and
+L-triominoes, while the field outside the block holds a catalogue of
+small monochrome shapes, each in its own color. The output is the
+block alone, cropped along its bounding box, with every pocket
+recolored to the color of the same-shaped catalogue entry.
+
+Rule: the outside shapes are a color dictionary keyed by shape. Every
+pocket inside the block looks itself up in that dictionary - up to
+rotation and reflection - and paints itself with the dominant color
+it finds there.
+
+Algorithm: the largest 4-connected non-background component is the
+frame lattice; every cell in its bounding box must be frame color or
+background; the block is cropped along the box. Every non-frame
+component is canonicalized by shifting its cells to the origin and
+taking the lexicographically smallest of its eight dihedral-four
+variants. The background pockets inside the crop are extracted by
+rerunning the standard component sweep with the frame color playing
+the background role. Each motif collects the colors of all
+same-shaped catalogue entries and takes the most frequent one,
+smallest color value on ties; frame cells stay, motif cells repaint.
+The induction pre-filter requires the first output to be strictly
+smaller than its input and at least five distinct input colors, then
+verifies all training pairs with forall.
+
+Two lessons: matching must be rotation- and reflection-invariant
+(the test block holds a horizontal domino whose only catalogue mates
+are vertical), and the assignment is a vote, not a first match (one
+training motif matches catalogue squares in three colors; the color
+with the most entries is correct).
+
+Key predicates:
+  scg_largest_/2   - component with the most cells (frame lattice)
+  scg_crop_/6      - cut the bounding-box subgrid out of the input
+  scg_canon_/2     - canonical shape under the eight D4 maps
+  scg_assign_/3    - motif-to-color assignment by canonical shape
+  scg_dominant_/2  - most frequent vote, smallest color on ties
+  scg_paint_/4     - rebuild the recolored block
+  arc2_transform(shape_catalog, +Grid, -Out)
+
+Task solved: 67e490f4 (2 training pairs + 1 test case).
+Score: 66/120 = 55.00% to 67/120 = 55.83%.
