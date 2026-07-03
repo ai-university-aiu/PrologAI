@@ -1,0 +1,73 @@
+Chapter 293: Wave 75 - glyph_swap (WP-333, Layer 308)
+
+glyph_swap solves ARC-AGI-2 task edb79dae. Each input grid (22x24 to
+30x30) shows a rectangular frame of color 5 enclosing a display area
+that holds solid square blocks of one shared size B - 3, 4, and 5
+across the three grids - each block painted in a single color and
+separated from its neighbors by the display background. Outside the
+frame sit two kinds of hints. Legend interlocks are 3-row-by-4-column
+figures built from two colors A and B in the exact pattern
+AABB / AAAB / AABB, meaning that color A maps to color B. Reference
+glyphs are B-by-B pictures, one per block color, drawn in that color
+over the background. The task is to output only the framed region,
+with every solid block replaced by its color's reference glyph shape,
+repainted in the legend-mapped color.
+
+Rule: the blocks are coded pictures. Each block names a color, the
+color's glyph outside the frame gives the picture, and the legend
+gives the paint.
+
+Algorithm:
+(1) Frame detection: the background is the most common cell value
+    (arc2_bg_color_/2); the frame region is the bounding box of all
+    color-5 cells (hc_bbox4_/5, reused from hole_color), and all four
+    edges of that box must be solid color 5.
+(2) Legend detection: a fixed 12-cell window scans for the interlock
+    pattern AABB / AAAB / AABB of two non-background, non-frame
+    colors anchored fully outside the frame box (gsw_legends_/8,
+    gsw_legend_at_/10); each match contributes the mapping A to B,
+    the collected map must be a function, and every covered legend
+    cell is recorded for later subtraction.
+(3) Block detection: the frame interior is partitioned into
+    same-color 4-connected components (bst_components_/2, reused from
+    band_stamp), and every component must be a solid B-by-B square,
+    fixing the shared block size B (gsw_blocks_/8).
+(4) Glyph extraction: for each distinct block color, the reference
+    glyph is the set of that color's cells outside the frame and
+    outside every legend interlock; its bounding box must be exactly
+    B-by-B, and its cell offsets form the glyph mask (gsw_glyph_/9).
+(5) Render: the output is the framed subgrid copied cell for cell,
+    except that every solid block is replaced by its color's glyph
+    mask repainted in the legend-mapped color, with off-mask block
+    cells restored to the display background.
+(6) Induction pre-filter: the first training pair's output must have
+    strictly fewer rows and strictly fewer columns than its input and
+    carry frame color 5 in its top-left and bottom-left cells; then
+    all training pairs are verified with forall.
+
+The decisive observation is that the two hint systems share colors
+and must be separated before either can be read. In the test grid
+color 9 plays three roles at once: legend target (3 maps to 9),
+legend source (9 maps to 2), and reference glyph. Reading a color's
+glyph only works after every legend cell is subtracted from that
+color's cell set; what remains is exactly the B-by-B picture. A
+second trap: color 8 is the background of one training grid but a
+genuine block color in the test grid (arriving via 3 maps to 8 in
+training and departing via 8 maps to 7 in the test), so no color may
+be treated as special except the frame color 5 and the per-grid
+background. Both training pairs and the test case pass on the first
+run.
+
+Key predicates:
+  gsw_legends_/8       - collect legend interlocks into a color map
+  gsw_legend_at_/10    - match one AABB / AAAB / AABB interlock window
+  gsw_blocks_/8        - solid B-by-B blocks inside the frame interior
+  gsw_glyph_/9         - reference glyph mask after legend subtraction
+  bst_components_/2    - same-color 4-connected components (reused)
+  hc_bbox4_/5          - cell-set bounding box (reused)
+  arc2_bg_color_/2     - most common cell value as background (reused)
+  arc2_transform(glyph_swap, +Grid, -Out)
+  arc2_induce_rule(+Pairs, glyph_swap)
+
+Task solved: edb79dae (2 training pairs + 1 test case).
+Score: 71/120 = 59.17% to 72/120 = 60.00%.
