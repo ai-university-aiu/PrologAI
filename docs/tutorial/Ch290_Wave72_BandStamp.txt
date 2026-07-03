@@ -1,0 +1,71 @@
+Chapter 290: Wave 72 - band_stamp (WP-330, Layer 305)
+
+band_stamp solves ARC-AGI-2 task 7c66cb00. Each input grid (29x24 to
+30x24) is split into two regions. The upper region is a legend:
+small shapes drawn on the background color, including hollow boxes
+whose interior holes are themselves colored shapes. The lower region
+is a stack of full-width bands: each band shows an edge color in its
+first and last columns and a uniform interior color between them,
+and both colors change from band to band and from grid to grid. The
+task is to erase the legend and stamp each legend shape into the
+band whose interior color matches the shape's color, redrawn in the
+band's edge color, at the same columns, resting on the band's bottom
+row.
+
+Rule: the hole is its own messenger. A color-3 legend box with a
+color-2 hole feeds two different bands - the box travels to the band
+with interior color 3 and the hole travels to the band with interior
+color 2, each repainted in the receiving band's edge color.
+
+Algorithm:
+(1) Background and band detection: the background is the most common
+    cell value (arc2_bg_color_/2); a band row has the form edge,
+    uniform interior, edge with the edge color different from the
+    interior color (bst_band_rows_/3), and consecutive band rows
+    sharing the same color pair are grouped into bands with a top
+    row and a bottom row (bst_group_bands_/2, bst_extend_band_/6).
+(2) Legend extraction: every non-background cell outside the band
+    rows is a legend cell (bst_legend_cells_/4).
+(3) Component analysis: the legend cells are partitioned into
+    same-color 4-connected components by breadth-first flooding
+    (bst_components_/2, bst_flood_/6, bst_adjacent_/4); a hollow box
+    of one color and the hole shape inside it of another color are
+    separate components.
+(4) Color-paired bottom-anchored stamping: each legend component is
+    paired with the band whose interior color equals the component
+    color; the component is stamped in the band's edge color,
+    keeping its columns unchanged and shifting down so its lowest
+    row (bst_max_row_/2) lands on the band's bottom row.
+(5) Render: the output keeps every band row's input appearance
+    outside the stamps and erases every non-band row to the
+    background color (bst_render_/5).
+(6) Induction pre-filter: the first training pair must have equal
+    input and output dimensions and the first input must contain at
+    least one full-width band row; then all training pairs are
+    verified with forall.
+
+The decisive observation is that the hole inside a legend box is not
+decoration - it is a first-class component routed to its own band by
+its own color. Same-color 4-connected components make this fall out
+naturally: no special hole-extraction step is needed, because
+splitting the legend by color before connectivity already separates
+box from hole. Bottom anchoring is per component, not per color
+group - two same-color components land on the same bottom row but
+keep their own shapes and columns, so a box and a distant hole bar
+of the same color arrive in the same band without colliding. All
+three training pairs and the test case pass on the first run.
+
+Key predicates:
+  bst_band_rows_/3     - band row indices with edge and interior colors
+  bst_group_bands_/2   - group consecutive band rows into bands
+  bst_extend_band_/6   - absorb adjacent same-color band rows
+  bst_legend_cells_/4  - non-background cells outside all band rows
+  bst_components_/2    - same-color 4-connected legend components
+  bst_flood_/6         - breadth-first component flooding
+  bst_max_row_/2       - lowest row of a component for anchoring
+  bst_render_/5        - stamp application and legend erasure
+  arc2_transform(band_stamp, +Grid, -Out)
+  arc2_induce_rule(+Pairs, band_stamp)
+
+Task solved: 7c66cb00 (3 training pairs + 1 test case).
+Score: 68/120 = 56.67% to 69/120 = 57.50%.

@@ -21830,3 +21830,49 @@ Key predicates:
 
 Task solved: b99e7126 (3 training pairs + 1 test case).
 Score: 67/120 = 55.83% to 68/120 = 56.67%.
+
+
+Chapter 290: Wave 72 - band_stamp (WP-330, Layer 305)
+
+band_stamp solves ARC-AGI-2 task 7c66cb00. Each input grid holds a
+legend of small shapes above a stack of full-width bands. Each band
+shows an edge color in its first and last columns and a uniform
+interior color between them. The output erases the legend and gives
+each band a stamp: the legend shape whose color matches the band's
+interior color, redrawn in the band's edge color, at the same
+columns, resting on the band's bottom row.
+
+Rule: the hole is its own messenger. A color-3 legend box with a
+color-2 hole feeds two different bands - the box travels to the band
+with interior color 3 and the hole travels to the band with interior
+color 2, each repainted in the receiving band's edge color.
+
+Algorithm: the background is the most common cell value; a band row
+has the form edge, uniform interior, edge with differing colors, and
+consecutive band rows sharing the same color pair group into bands.
+Every non-background cell outside the band rows is a legend cell,
+and the legend cells are partitioned into same-color 4-connected
+components by breadth-first flooding. Each component is paired with
+the band whose interior color equals the component color, stamped in
+the band's edge color at the same columns, and shifted down so its
+lowest row lands on the band's bottom row. The output keeps band
+rows unchanged outside the stamps and erases every non-band row to
+the background. The induction pre-filter requires equal input and
+output dimensions and at least one band row in the first input, then
+verifies all pairs with forall.
+
+The lesson: no special hole-extraction step is needed - splitting
+the legend by color before connectivity already separates box from
+hole, and bottom anchoring is per component, so same-color shapes
+arrive in their band without colliding.
+
+Key predicates:
+  bst_band_rows_/3     - band rows with edge and interior colors
+  bst_group_bands_/2   - group consecutive band rows into bands
+  bst_components_/2    - same-color 4-connected legend components
+  bst_flood_/6         - breadth-first component flooding
+  bst_render_/5        - stamp application and legend erasure
+  arc2_transform(band_stamp, +Grid, -Out)
+
+Task solved: 7c66cb00 (3 training pairs + 1 test case).
+Score: 68/120 = 56.67% to 69/120 = 57.50%.
