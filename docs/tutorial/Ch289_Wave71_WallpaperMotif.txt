@@ -1,0 +1,71 @@
+Chapter 289: Wave 71 - wallpaper_motif (WP-329, Layer 304)
+
+wallpaper_motif solves ARC-AGI-2 task b99e7126. Each 29x29 input grid
+is a wallpaper: uniform separator rows and columns every 4 cells
+carve the grid into a 7x7 tile grid of 3x3 inner tiles. Exactly two
+tile designs appear - a majority standard tile repeated everywhere,
+and a minority motif tile, the same design with one extra color
+painted into some of its cells, occupying a handful of tile
+positions. The separator color and the palette change from grid to
+grid: the training grids use separators 2, 2, and 1 with palettes
+1/2/3/4, 1/2/3/8, and 1/2/4/8, and the hidden test grid uses
+separator 8 with palette 2/4/8/9. The task is to output the same
+wallpaper with the motif tile stamped at additional tile positions.
+
+Rule: the motif is its own placement map. The picture painted in the
+motif color inside one 3x3 tile is exactly the picture that the
+motif tiles must paint across the 7x7 tile grid - a fractal in
+miniature.
+
+Algorithm:
+(1) Separator detection: the separator color is the color of row 0,
+    which must be uniform (arc2_bw_uniform_/2); all rows uniform in
+    that color are separator rows, and the same scan on the
+    transposed grid (arc2_transform(transpose, ...)) yields the
+    separator columns, requiring the same color and at least two
+    separators in each direction (wm_sep_idx_/3).
+(2) Tile extraction: the index spans between consecutive separators
+    - plus any span before the first or after the last separator -
+    define the tile bands (wm_segments_/3); every tile is cut out
+    with its tile-grid coordinates (wm_slice_/3, wm_tile_/4).
+(3) Majority and minority: exactly two distinct tile designs must
+    exist with different frequencies; the more frequent design is
+    the standard tile, the less frequent one is the motif tile.
+(4) The self-placement mask: the motif color is the color present in
+    the motif tile but absent from the standard tile; the set of
+    positions where the motif color appears inside the motif tile is
+    the placement mask. The anchor offset is found by sliding the
+    mask over the tile grid and accepting the first offset at which
+    every observed motif tile position lands on a mask position.
+(5) Repaint: the wallpaper is rebuilt cell by cell - separator rows
+    and columns unchanged, motif tile at every anchored mask
+    position, standard tile everywhere else (wm_render_/9,
+    wm_cell_/11).
+(6) Induction pre-filter: the first training pair must have equal
+    input and output dimensions, a uniform first row, and a first
+    column entirely in the same separator color; then all training
+    pairs are verified with forall.
+
+The decisive lesson came from a failed first prototype. Building the
+mask from the cell-by-cell difference between the two tile designs -
+every position where motif and standard tiles disagree - passes
+training pair 2 but fails pairs 1 and 3, because the difference mask
+is a full 3x3 box minus the shared center: it also marks the
+positions where the motif tile paints its complement color rather
+than the motif color. Only the motif color's own cells form the
+self-similar placement picture. A partially passing mask definition
+is still the wrong abstraction. With the motif-color mask, all three
+training pairs and the test case pass on the first run.
+
+Key predicates:
+  wm_sep_idx_/3    - separator row indices and their shared color
+  wm_segments_/3   - index spans between consecutive separators
+  wm_slice_/3      - elements of a list across an index span
+  wm_tile_/4       - cut one tile out of the wallpaper
+  wm_render_/9     - repaint the wallpaper from the anchored mask
+  wm_cell_/11      - per-cell paint decision
+  arc2_transform(wallpaper_motif, +Grid, -Out)
+  arc2_induce_rule(+Pairs, wallpaper_motif)
+
+Task solved: b99e7126 (3 training pairs + 1 test case).
+Score: 67/120 = 55.83% to 68/120 = 56.67%.
