@@ -1,0 +1,101 @@
+Chapter 277: Wave 59 - scaled_frame (WP-317, Layer 292)
+
+Task solved: 898e7135
+Score: 55/120 = 45.83% to 56/120 = 46.67%
+
+scaled_frame solves ARC-AGI-2 task 898e7135. The input grid contains one
+rectangular frame (a solid-colored rectangular border with 0-holes scattered
+inside its interior) and several colored object-blobs placed in the background
+outside the frame. Scattered single-cell "noise" markers (a different color
+from all objects) act as distractors and are ignored. The output is the frame
+scaled by a factor N, where each 0-hole in the frame becomes a solid block of
+the matched object color.
+
+
+Algorithm:
+
+  Phase 1 - Locate the frame:
+  1. For each distinct non-background color FC in the grid:
+     a. Collect all cells of that color; compute their bounding box (R0,C0,R1,C1).
+     b. Check the bounding box is at least 3x3.
+     c. Verify all four border edges (top row, bottom row, left col, right col)
+        are completely solid FC.
+     d. Verify at least one 0-cell exists strictly inside the bounding box.
+     e. If all checks pass, FC is the frame color.
+
+  Phase 2 - Find hole components:
+  2. Collect all 0-cells inside the frame interior (rows R0+1..R1-1,
+     cols C0+1..C1-1).
+  3. Find the 4-connected components of those 0-cells (hole-groups).
+
+  Phase 3 - Identify background objects:
+  4. Collect all non-BG non-FC cells that lie OUTSIDE the frame bounding box.
+  5. Find their 4-connected components.
+  6. Discard any component with fewer than 4 cells (noise filter).
+  7. Record each component as (color, cell-list).
+
+  Phase 4 - Determine scale factor:
+  8. Compute GCD of all object cell-counts.
+  9. Scale = round(sqrt(GCD)).
+
+  Phase 5 - Match hole-groups to object colors:
+  10. For each hole-group of size H: its matching object has cell-count = H * N^2.
+  11. Annotate hole-groups as (H, centroid_col, HComp).
+  12. Annotate objects as (H * N^2 / N^2 = H_norm, centroid_col, Color).
+  13. Sort both lists jointly by (normalized_size, centroid_col).
+  14. Pair hole-groups to object colors in corresponding sorted order.
+      This breaks ties (same size, multiple candidates) by column position:
+      leftmost hole-group gets the leftmost same-size object, etc.
+
+  Phase 6 - Build output:
+  15. Output is (R1-R0+1)*N rows x (C1-C0+1)*N cols.
+  16. Output cell (R,C) comes from frame cell (R0 + R//N, C0 + C//N).
+  17. If that frame cell is FC (non-hole): output = FC.
+  18. If that frame cell is 0 (hole): output = the matched fill color.
+
+
+Key predicates:
+  arc2_sf_frame_/6          - find frame color and bounding box
+  arc2_sf_solid_border_/6   - verify all 4 border edges are solid FC
+  arc2_sf_holes_/6          - collect 0-cells in frame interior
+  arc2_sf_conn_comps_/2     - 4-connected component finding (BFS)
+  arc2_sf_comps_/2          - recursive component extraction
+  arc2_sf_bfs_/5            - BFS flood-fill for one component
+  arc2_sf_objects_/7        - find background objects outside frame bbox
+  arc2_sf_scale_/2          - compute scale = round(sqrt(GCD of sizes))
+  arc2_sf_gcd_list_/2       - GCD fold over a list of integers
+  arc2_sf_match_/4          - sort-pair hole-groups with objects
+  arc2_sf_pair_match_/3     - extract HC-V pair from annotation triples
+  arc2_sf_centcol_/2        - centroid column of a R-C cell list
+  arc2_sf_cell_val_/8       - resolve color for one output cell
+  arc2_sf_hole_color_/4     - look up fill color from Matches
+  arc2_sf_solve_/2          - top-level orchestrator
+  arc2_transform(scaled_frame)/3 - main entry point
+
+
+Key insight - Frame identification:
+  The solid-border test uniquely identifies the frame. All four edges of the
+  bounding box must be completely filled with the frame color. Interior cells
+  can be either frame-colored (interior walls) or 0 (holes); both are valid.
+  Other colored blobs (objects and noise) fail this test because their bounding
+  box border contains cells of different colors or values.
+
+Key insight - Scale factor from GCD:
+  Each background object corresponds to exactly one hole-group: if the hole-group
+  has H holes and the scale is N, the object has exactly H * N^2 cells. The GCD
+  of all object cell-counts therefore equals N^2, so N = sqrt(GCD). This is
+  computed as round(sqrt(float(GCD))) to avoid floating-point issues.
+
+Key insight - Tie-breaking by column:
+  When multiple hole-groups have the same size and multiple objects have the
+  same cell-count (thus the same normalized size), the matching is resolved by
+  sorting both groups by centroid column in ascending order and pairing them
+  in that order. This places left-side hole-groups with left-side objects and
+  right-side hole-groups with right-side objects, matching the spatial layout
+  of the puzzle.
+
+Key insight - Output construction by integer division:
+  The output at (R,C) corresponds to frame position (R0 + R//N, C0 + C//N).
+  This correctly tiles the frame N-times in each dimension: all N consecutive
+  output rows/cols that map to the same frame row/col get the same value,
+  producing a uniform N*N block for each frame cell.

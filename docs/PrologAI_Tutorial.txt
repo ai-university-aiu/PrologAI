@@ -21305,3 +21305,36 @@ Key predicates:
 
 Task solved: b10624e5 (2 training pairs + 1 test case).
 Score: 54/120 = 45.00% to 55/120 = 45.83%.
+
+Chapter 277: Wave 59 - scaled_frame (WP-317, Layer 292)
+
+scaled_frame solves ARC-AGI-2 task 898e7135. The input grid contains one
+rectangular frame (solid FC-colored border with 0-holes inside) and colored
+background object-blobs. The output scales the frame by N = sqrt(GCD of object
+cell-counts) and fills each 0-hole in the frame with the color of the matched
+background object, matched by (normalized_size, centroid_col) sort-pair order.
+
+Algorithm: (1) Find frame: for each color FC collect cells, check bounding box
+has all 4 border edges solid FC and at least one 0-hole inside. (2) Collect
+hole-groups: 4-connected components of 0-cells in frame interior. (3) Find
+objects: non-BG non-FC blobs outside frame bbox with size >= 4. (4) Scale =
+round(sqrt(GCD of all object sizes)). (5) Match: annotate hole-groups and objects
+with (norm_size, centroid_col); msort both; pair in order. (6) Build output of
+frame_H*Scale rows x frame_W*Scale cols: cell (R,C) maps to frame cell
+(R0+R//Scale, C0+C//Scale); if that cell is 0 use fill color, else use FC.
+
+Key predicates:
+  arc2_sf_frame_/6         - bounding box + solid border + hole test
+  arc2_sf_solid_border_/6  - forall 4 border edges = FC
+  arc2_sf_holes_/6         - collect 0-cells in frame interior
+  arc2_sf_conn_comps_/2    - 4-connected component finder
+  arc2_sf_bfs_/5           - BFS flood fill for one component
+  arc2_sf_objects_/7       - background objects outside frame bbox
+  arc2_sf_scale_/2         - round(sqrt(GCD of sizes))
+  arc2_sf_gcd_list_/2      - fold GCD over a list
+  arc2_sf_match_/4         - sort-pair hole-groups with objects
+  arc2_sf_cell_val_/8      - resolve color for one output cell
+  arc2_transform(scaled_frame, +Grid, -Out)
+
+Task solved: 898e7135 (2 training pairs + 1 test case).
+Score: 55/120 = 45.83% to 56/120 = 46.67%.
