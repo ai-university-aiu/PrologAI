@@ -1,0 +1,66 @@
+Chapter 291: Wave 73 - lattice_stamp (WP-331, Layer 306)
+
+lattice_stamp solves ARC-AGI-2 task a395ee82. Each input grid (22x22)
+holds exactly two non-background colors. One color T draws a single
+small template shape. The other color M draws a marker map: scattered
+single cells arranged around one additional single cell of color T
+that acts as the map center. Every marker sits at an even offset from
+the center, such as two cells up, two cells left, or four cells down.
+The task is to stamp one copy of the template, in color T, for every
+marker, placed at the template's own position shifted by half the
+marker's offset measured in whole template heights and widths, while
+repainting the original template in the marker color M and erasing
+the marker map.
+
+Rule: the center wears the template's color. The map center is not a
+marker - it is a single cell of the TEMPLATE's color sitting among
+the markers, and that one color choice separates the two roles
+without any positional heuristic.
+
+Algorithm:
+(1) Background and cell extraction: the background is the most common
+    cell value (arc2_bg_color_/2); every non-background cell is
+    collected, and exactly two distinct non-background colors must be
+    present.
+(2) Role separation: the cells are partitioned into same-color
+    4-connected components (bst_components_/2, reused from
+    band_stamp); the template color T is the color forming exactly
+    two components, one with two or more cells (the template) and one
+    single cell (the map center), found by lst_roles_/4; the other
+    color M supplies the marker cells.
+(3) Offset halving: each marker's offset (DR, DC) from the map center
+    must be even in both coordinates; halving converts it into whole
+    template-size units (UR, UC) - the map is a half-scale blueprint
+    of the copy field.
+(4) Template stamping: for each marker, a copy of the template,
+    painted in color T, is stamped at the template's own bounding-box
+    position shifted by UR template heights and UC template widths;
+    every stamp cell must land inside the grid, and every marker must
+    contribute one full copy.
+(5) Render: the original template is repainted in the marker color M,
+    the marker map is erased, and every other cell becomes background
+    (lst_render_/5).
+(6) Induction pre-filter: the first training pair must have equal
+    input and output dimensions and the first input must contain
+    exactly two distinct non-background colors; then all training
+    pairs are verified with forall.
+
+The decisive observation is the asymmetric color exchange: all copies
+keep the template color, and only the original template flips to the
+marker color, marking the map's own position inside the copy field.
+The second observation is the half-scale reading: marker offsets
+count in steps of two cells while stamp offsets count in whole
+template heights and widths, so the map is read by halving each
+offset, never by measuring raw distances. All three training pairs
+and the test case pass on the first run.
+
+Key predicates:
+  lst_roles_/4         - split the template color into template and center
+  lst_render_/5        - paint the stamps on a fresh background grid
+  bst_components_/2    - same-color 4-connected components (reused)
+  arc2_bg_color_/2     - most common cell value as background (reused)
+  arc2_transform(lattice_stamp, +Grid, -Out)
+  arc2_induce_rule(+Pairs, lattice_stamp)
+
+Task solved: a395ee82 (3 training pairs + 1 test case).
+Score: 69/120 = 57.50% to 70/120 = 58.33%.

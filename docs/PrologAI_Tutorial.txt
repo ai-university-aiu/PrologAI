@@ -21876,3 +21876,51 @@ Key predicates:
 
 Task solved: 7c66cb00 (3 training pairs + 1 test case).
 Score: 68/120 = 56.67% to 69/120 = 57.50%.
+
+
+Chapter 291: Wave 73 - lattice_stamp (WP-331, Layer 306)
+
+lattice_stamp solves ARC-AGI-2 task a395ee82. Each input grid holds
+exactly two non-background colors: a small template shape of one
+color T, and a marker map of scattered single cells of a marker
+color M arranged around one single cell of color T that acts as the
+map center. Every marker sits at an even offset from the center. The
+output stamps one T-colored copy of the template per marker at the
+template's own position shifted by half the marker's offset measured
+in whole template heights and widths, repaints the original template
+in M, and erases the marker map.
+
+Rule: the center wears the template's color. The map center is a
+single cell of the TEMPLATE's color sitting among the markers, so
+the template color is simply the color with one multi-cell and one
+single-cell component - no positional heuristic is needed.
+
+Algorithm: the background is the most common cell value, and the
+non-background cells must use exactly two distinct colors. The cells
+are partitioned into same-color 4-connected components; the template
+color forms exactly two components, one multi-cell (the template)
+and one single cell (the map center), and the other color supplies
+the markers. Each marker's offset from the center must be even in
+both coordinates; halving converts it into whole template-size
+units, and a copy of the template painted in the template color is
+stamped at the template's bounding-box position shifted by that many
+template heights and widths. The original template is repainted in
+the marker color, the map is erased, and everything else becomes
+background. The induction pre-filter requires equal input and output
+dimensions and exactly two non-background colors in the first input,
+then verifies all pairs with forall.
+
+The lesson: the map is a half-scale blueprint - marker offsets count
+in steps of two cells while stamp offsets count in whole template
+units - and the color exchange is asymmetric: copies keep the
+template color, only the original flips to the marker color.
+
+Key predicates:
+  lst_roles_/4         - split template color into template and center
+  lst_render_/5        - paint stamps on a fresh background grid
+  bst_components_/2    - same-color 4-connected components (reused)
+  arc2_bg_color_/2     - background as most common value (reused)
+  arc2_transform(lattice_stamp, +Grid, -Out)
+
+Task solved: a395ee82 (3 training pairs + 1 test case).
+Score: 69/120 = 57.50% to 70/120 = 58.33%.
