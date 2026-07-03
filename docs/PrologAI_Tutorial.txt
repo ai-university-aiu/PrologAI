@@ -21643,3 +21643,46 @@ Key predicates:
 
 Task solved: 0934a4d8 (4 training pairs + 1 test case).
 Score: 63/120 = 52.50% to 64/120 = 53.33%.
+
+
+Chapter 286: Wave 68 - diag_corridor (WP-326, Layer 301)
+
+diag_corridor solves ARC-AGI-2 task 7666fa5d. Each 16x16 grid has
+background color 8 and one bank color (4, 3, or 9); the bank cells
+form slanted anti-diagonal chains, the two banks of a winding
+corridor. Every background cell lying between a pair of opposing
+banks is flooded with color 2; banks and unbracketed background stay
+untouched.
+
+The rule:
+1. Background and banks: the most frequent cell value is the
+   background; every other cell is a bank cell.
+2. Chain extraction: bank cells are grouped into chains, the
+   connected components under the anti-diagonal step (r+1, c-1);
+   every cell of a chain shares the line sum s = r + c, and the
+   chain spans an interval [dmin, dmax] in the cross coordinate
+   d = r - c.
+3. Corridor bracketing: for every pair of chains with distinct line
+   sums s1 < s2, a background cell is bracketed when s1 < r + c < s2
+   and r - c lies inside [max(dmin1, dmin2), min(dmax1, dmax2)].
+   All chain pairs contribute, not merely adjacent pairs, and chains
+   sharing a line sum are kept apart by connectivity.
+4. Flood: the union of all corridor regions is painted with color 2.
+5. Induction pre-filter: equal grid sizes, exactly two input colors,
+   output palette equal to input palette plus color 2; then all
+   training pairs are verified.
+
+The key insight is the change of coordinates: corridors that wind in
+row-column space become plain rectangles in (s, d) space, so the
+whole fill reduces to two interval tests.
+
+Key predicates:
+  dc_bg_/2          - most frequent cell value as background
+  dc_chains_/2      - anti-diagonal connected components
+  dc_chain_info_/4  - line sum and cross range of a chain
+  dc_fill_cell_/5   - background cell bracketed by a chain pair
+  dc_paint_/4       - repaint bracketed cells with color 2
+  arc2_transform(diag_corridor, +Grid, -Out)
+
+Task solved: 7666fa5d (2 training pairs + 1 test case).
+Score: 64/120 = 53.33% to 65/120 = 54.17%.

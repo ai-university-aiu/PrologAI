@@ -1,0 +1,72 @@
+Chapter 286: Wave 68 - diag_corridor (WP-326, Layer 301)
+
+diag_corridor solves ARC-AGI-2 task 7666fa5d. Each 16x16 input grid
+has background color 8 and one bank color per grid (4, 3, or 9). The
+bank cells form slanted anti-diagonal chains - runs of cells stepping
+(row+1, column-1) - that act as the two banks of a winding corridor.
+The task is to flood every background cell lying between a pair of
+opposing banks with color 2 (red), filling the corridor while leaving
+the banks and all unbracketed background untouched.
+
+Rule: the corridors look irregular in row-column space - a background
+cell directly adjacent to a bank may stay empty while a farther cell
+is filled - but they become plain rectangles after a change of
+coordinates. With line sum s = r + c and cross coordinate d = r - c,
+every anti-diagonal chain is an axis-aligned segment (constant s, an
+interval in d), and the corridor between two banks is exactly the set
+of cells strictly between the two chains in s whose d falls inside
+the intersection of the two chains' d-intervals.
+
+Algorithm:
+(1) Background and banks: the background color is the most frequent
+    cell value (dc_bg_/2); every other cell is a bank cell
+    (dc_banks_/3).
+(2) Chain extraction: bank cells are grouped into chains, the
+    connected components under the anti-diagonal step (r+1, c-1)
+    (dc_chains_/2, dc_grow_/5). Because the bank pool is sorted by
+    row, the head of the pool is always the topmost cell of its own
+    chain, so a single downward sweep with select/3 finds each chain
+    without a visited set.
+(3) Chain info: each chain is summarized by its shared line sum
+    s = r + c and its cross interval [dmin, dmax] in d = r - c
+    (dc_chain_info_/4).
+(4) Corridor bracketing: for every unordered pair of chains with
+    distinct line sums s1 < s2, a background cell belongs to their
+    corridor when s1 < r + c < s2 and its cross coordinate lies inside
+    [max(dmin1, dmin2), min(dmax1, dmax2)] (dc_fill_cell_/5).
+(5) Flood: the union of all corridor regions over all chain pairs is
+    deduplicated with sort/2 and painted with color 2 (dc_paint_/4);
+    bank cells and unbracketed background cells are preserved.
+(6) Induction pre-filter: equal input and output row counts, exactly
+    two distinct input colors, and an output palette equal to the
+    input palette plus color 2; then all training pairs are verified
+    with forall.
+
+Two subtleties make the rule honest. First, ALL pairs of chains
+contribute corridors, not merely adjacent pairs: in training pair 2,
+cells such as (8,13) are bracketed only by the outermost chain pair,
+whose corridor covers regions no adjacent pair reaches. Second, two
+distinct chains can share the same line sum - in training pair 1 two
+separate chains both sit on s = 12 at opposite ends of the grid - so
+chains must be separated by anti-diagonal connectivity, never merely
+grouped by line sum, or phantom corridors appear.
+
+The design insight is the coordinate transform: geometry that winds
+in one frame is straight in another, and choosing the frame in which
+the pattern is axis-aligned turns an irregular-looking fill into two
+interval tests. No grid rotation is ever materialized; the transform
+lives entirely in the arithmetic of the bracketing test.
+
+Key predicates:
+  dc_bg_/2          - most frequent cell value as background color
+  dc_banks_/3       - sorted coordinates of all non-background cells
+  dc_chains_/2      - anti-diagonal connected components of bank cells
+  dc_grow_/5        - extend a chain by the next (r+1, c-1) neighbor
+  dc_chain_info_/4  - line sum and cross range of a chain
+  dc_fill_cell_/5   - background cell bracketed by a pair of chains
+  dc_paint_/4       - repaint bracketed cells with color 2
+  arc2_transform(diag_corridor, +Grid, -Out)
+  arc2_induce_rule(+Pairs, diag_corridor)
+
+Task solved: 7666fa5d (2 training pairs + 1 test case).
+Score: 64/120 = 53.33% to 65/120 = 54.17%.
