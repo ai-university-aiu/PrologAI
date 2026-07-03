@@ -21976,3 +21976,53 @@ Key predicates:
 
 Task solved: 8698868d (2 training pairs + 1 test case).
 Score: 70/120 = 58.33% to 71/120 = 59.17%.
+
+
+Chapter 293: Wave 75 - glyph_swap (WP-333, Layer 308)
+
+glyph_swap solves ARC-AGI-2 task edb79dae. Each input grid shows a
+rectangular frame of color 5 enclosing a display of solid square
+blocks of one shared size B, each painted in a single color over the
+display background. Outside the frame sit two kinds of hints: legend
+interlocks - 3-row-by-4-column figures of two colors A and B in the
+exact pattern AABB / AAAB / AABB, meaning color A maps to color B -
+and reference glyphs - one B-by-B picture per block color, drawn in
+that color over the background. The output keeps only the framed
+region, with every solid block replaced by its color's glyph shape,
+repainted in the legend-mapped color.
+
+The frame region is the bounding box of all color-5 cells, verified
+to have solid color-5 edges on all four sides. Legend detection
+scans a fixed 12-cell window for the interlock pattern anchored
+fully outside the frame box; the collected map must be a function,
+and every covered legend cell is recorded. The frame interior is
+partitioned into same-color 4-connected components, each of which
+must be a solid B-by-B square. For each distinct block color, the
+reference glyph is the set of that color's cells outside the frame
+and outside every legend interlock, with a bounding box of exactly
+B-by-B. The output copies the framed subgrid cell for cell, except
+that every solid block is replaced by its color's glyph mask
+repainted in the legend-mapped color, off-mask cells restored to
+the background. The induction pre-filter requires the first output
+to be strictly smaller than the first input in both dimensions and
+to carry frame color 5 in its top-left and bottom-left cells, then
+verifies all pairs with forall.
+
+The lesson: the two hint systems share colors - one color can be a
+legend source, a legend target, and a glyph in the same grid - so
+the glyph is read only after subtracting every legend cell from the
+color's cell set; and no color may be treated as special except the
+frame color and the per-grid background, because color 8 is the
+background of one training grid and a genuine block color in the
+test grid.
+
+Key predicates:
+  gsw_legends_/8       - legend interlocks collected into a color map
+  gsw_legend_at_/10    - one AABB / AAAB / AABB interlock window
+  gsw_blocks_/8        - solid B-by-B blocks inside the frame interior
+  gsw_glyph_/9         - glyph mask after legend subtraction
+  bst_components_/2    - same-color 4-connected components (reused)
+  arc2_transform(glyph_swap, +Grid, -Out)
+
+Task solved: edb79dae (2 training pairs + 1 test case).
+Score: 71/120 = 59.17% to 72/120 = 60.00%.
