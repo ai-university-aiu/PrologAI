@@ -1,0 +1,63 @@
+Chapter 283: Wave 65 - hole_color (WP-323, Layer 298)
+
+hole_color solves ARC-AGI-2 task e3721c99. The input grid contains a
+legend region of compact colored template shapes and a body region of
+grey (value 5) shapes. Each legend template encloses some number N of
+background holes: 4-connected pockets of value-0 cells that cannot be
+reached from the grid border without crossing the template's color.
+Each grey body shape is classified by counting its own enclosed holes
+and is recolored to the legend color whose template has the same hole
+count. Grey shapes whose hole count matches no legend entry are erased
+to background (value 0).
+
+Rule: the legend acts as an in-context symbol table mapping hole counts
+to colors. In training pair 1 the legend defines: a solid 3x3 square of
+color 4 with 0 holes, a 3x3 ring of color 3 with 1 hole, a 3x5 shape of
+color 1 with 2 holes, and a 3x7 shape of color 2 with 3 holes. A grey
+body shape with 4 enclosed holes matches no legend entry and is erased.
+
+Algorithm:
+(1) Find all non-background 4-connected components (arc2_all_comps_
+    with background 0).
+(2) Partition: grey components have color 5; legend templates are
+    non-grey components with bounding-box height >= 2, width >= 2, and
+    fill rate >= 75% (cell count * 4 >= bbox area * 3). The full-width
+    divider line between legend and body is rejected by the height
+    filter.
+(3) Count enclosed holes per template with wall color = template color:
+    (a) Exterior BFS: seeds are all grid-border cells whose value
+        differs from the wall color; expansion passes through any cell
+        whose value differs from the wall color.
+    (b) Hole seeds: value-0 cells 4-adjacent to component cells, in
+        bounds, and not in the exterior set.
+    (c) Hole count N = number of 4-connected components among the hole
+        seeds (BFS through value-0 non-exterior cells).
+    The legend map entry is N -> template color.
+(4) Classify every grey shape on the ORIGINAL grid (wall color 5) using
+    the same hole-counting procedure; look up the target color in the
+    legend map; if the hole count is absent, the target is 0 (erase).
+(5) Apply all recolorings with foldl over arc2_set_cell_.
+(6) Induction pre-filter: the first training input contains a 5 and the
+    first training output contains no 5; then all training pairs are
+    verified with forall.
+
+Two refinements were needed during verification. First, the BFS
+predicates initially received the seed set as the initial visited set;
+because the BFS guard skips already-visited cells, no seed was ever
+expanded, the exterior collapsed to the border ring, and a solid 3x3
+square reported 6 holes instead of 0. The fix passes an empty initial
+visited set. Second, the fallback for unmatched grey hole counts was
+changed from keep-grey to erase-to-background after training pair 1
+showed a 4-hole grey shape erased in the expected output.
+
+Key predicates:
+  hc_bbox4_/5, hc_bbox4_acc_/9 - accumulator bounding box over R-C pairs
+  hc_holes_/6                  - enclosed-hole count for one component
+  hc_nwall_bfs_/5              - exterior BFS through non-wall cells
+  hc_nwall_comps_/5            - hole-seed connected-component counting
+  hc_bg_bfs_/5                 - BFS through enclosed background cells
+  arc2_transform(hole_color, +Grid, -Out)
+  arc2_induce_rule(+Pairs, hole_color)
+
+Task solved: e3721c99 (2 training pairs + 1 test case).
+Score: 61/120 = 50.83% to 62/120 = 51.67%.
