@@ -21387,3 +21387,44 @@ Key predicates:
 
 Task solved: 65b59efc (3 training pairs + 1 test case).
 Score: 54/120 = 45.00% to 57/120 = 47.50%.
+
+Chapter 279: Wave 61 - frame_pour (WP-319, Layer 294)
+
+frame_pour solves ARC-AGI-2 task b9e38dc0. A rectangular frame of color F
+contains a fill-seed FC on one interior side; the opposite side is the
+opening. The interior fills with FC via a directional shadow-cone scan (from
+far wall toward the boundary Bnd). B-cells cast shadows tracked in a blocked
+set. The blocked set passes through the opening into the exterior cone phase.
+The exterior widens by 1 unit every S depth steps; S = 2.0/DC (float) where
+DC is the wall drift rate over 2 interior rows/cols.
+
+Key insight: using float slope S = 2.0/DC instead of integer 2//DC correctly
+handles frames where the wall moves more than 2 cells between reference rows.
+Integer division 2//DC gives 0 when DC > 2, which stops cone widening entirely.
+
+Degenerate boundary: at the opening col/row, the frame may have only ONE
+F-cell (a single corner). The range [min+1, max-1] is empty. Fix: compare
+the single F-cell to the midpoint of the precomputed wall extents (FbTW,FbBW);
+if it is the top wall, extend range to FbBW (inclusive); if bottom wall, extend
+to FbTW (inclusive).
+
+Key predicates:
+  arc2_fp_solve_/2           - top-level orchestrator
+  arc2_fp_bg_/2              - background detection
+  arc2_fp_fcolor_/3          - frame color
+  arc2_fp_ccolor_/4          - fill-seed color
+  arc2_fp_dir_/4             - opening direction
+  arc2_fp_bnd_/7             - boundary, wall extents, slope
+  arc2_fp_int_cone_/11       - interior shadow-cone fill
+  arc2_fp_int_rloop_/15      - interior row loop (N/S)
+  arc2_fp_int_cloop_/15      - interior col loop (E/W)
+  arc2_fp_scan_int_/11       - interior row scan with shadow
+  arc2_fp_scan_intc_/11      - interior col scan with shadow
+  arc2_fp_exterior_/13       - exterior cone
+  arc2_fp_ext_loop_/16       - exterior depth loop
+  arc2_fp_scan_/11           - exterior row/col scan with shadow
+  arc2_fp_apply_/4           - apply fill set
+  arc2_transform(frame_pour, +Grid, -Out)
+
+Task solved: b9e38dc0 (3 training pairs + 1 test case).
+Score: 57/120 = 47.50% to 58/120 = 48.33%.
