@@ -1,0 +1,82 @@
+Chapter 311: Wave 93 - demo_transfer (WP-351, Layer 326)
+
+demo_transfer solves ARC-AGI-2 task 4c7dc4dd. The task gives two
+training pairs and one test case. All three inputs are 30x30
+scenes filled with a noisy diagonal color pattern, and the outputs
+are 5x5, 4x4, and 5x5 - the output size follows the ring boxes
+found in the scene. Every input holds four square ring boxes:
+complete one-color rectangle outlines sharing one frame color and
+one side length, each interior resting on a zero background with
+sparse colored marks. One interior is entirely empty and marks the
+answer slot. Two interiors share the same set of nonzero colors
+and form a worked demonstration - the before and the after of a
+transformation. The fourth interior, carrying its own distinct
+colors, is the question. The output is the demonstrated
+transformation applied to the question interior.
+
+Rule: the grid itself teaches the transformation. The first
+training scene demonstrates connect (markers joined by straight
+filled segments), the second demonstrates complement (zero and
+the mark color swap places), and the test scene demonstrates
+ripple (a radial pattern around the center moves outward and
+repeats) - an operation that appears in no training output, so
+the transformation must be read off the scene at answer time.
+
+Algorithm:
+
+The transform first scans the scene with dt_ring_ for complete
+square rings of one nonzero color with side five to nine whose
+interiors hold at most two distinct nonzero colors and at least
+four zero cells. dt_boxes_ groups the candidate rings by frame
+color and side length and keeps the group holding exactly four
+rings, slicing out their interiors with dt_interior_.
+dt_classify_ then sets aside the all-zero interior as the answer
+slot, pairs the two interiors sharing one nonzero color set as
+the demonstration, and takes the remaining interior as the
+question - color grouping alone separates demo from question, so
+the noisy region frames of the scene never need to be parsed.
+dt_learn_ checks a library of three operations against the
+demonstration pair in both directions through dt_op_ and
+dt_apply_: complement swaps zero with the single mark color;
+connect fills every straight run of zeros between two collinear
+marks with the non-corner mark color, trying each mark color as
+the corner and scanning columns by transposing the grid;
+ripple reads a Manhattan-distance color profile around the center
+of the odd-sided square with dt_ring_val_, requires leading mark
+rings followed by zero rings, and pushes the pattern outward by
+its own extent, repeating it periodically with dt_ripple_val_.
+When both directions match - complement is its own inverse -
+dt_learn_ prefers the direction whose source box has a
+nonzero-cell count closest to the question box. Finally
+dt_apply_ runs the learned operation on the question interior
+with the question's own colors: the corner color learned from
+the demonstration persists, and the fill color is the question's
+other mark. The induce clause dispatches early, directly after
+stencil_carve, requiring a first input of height at least twenty,
+a first output no larger than eight by eight, and four ring boxes
+in the first input, then verifying every training pair.
+
+The lesson of the wave is the in-grid worked example. Any solver
+that memorizes what the training pairs did fails the test by
+construction, because the test demands an operation no training
+output contains; the rule must understand the demonstration
+inside each scene and transfer it to new colors. A second lesson
+is that direction must be earned: position-based pairing of demo
+and question boxes gives the wrong direction on the test grid,
+while matching the question's nonzero-cell count against each
+demonstration box picks the correct source in all three scenes.
+
+Key predicates:
+  dt_boxes_/2          - group rings and slice the four interiors
+  dt_ring_/7           - find one complete square ring candidate
+  dt_interior_/5       - cut a ring interior out of the scene
+  dt_classify_/4       - split answer slot, demo pair, question
+  dt_learn_/4          - pick the operation and its direction
+  dt_op_/3             - check one library operation on the demo
+  dt_apply_/3          - run complement, connect, or ripple
+  dt_ring_val_/4       - read one radial profile color
+  arc2_transform(demo_transfer, +Grid, -Out)
+  arc2_induce_rule(+Pairs, demo_transfer)
+
+Task solved: 4c7dc4dd (2 training pairs + 1 test case).
+Score: 89/120 = 74.17% to 90/120 = 75.00%.
