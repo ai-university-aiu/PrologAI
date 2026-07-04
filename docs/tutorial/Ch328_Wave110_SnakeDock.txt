@@ -1,0 +1,73 @@
+Chapter 328: Wave 110 - snake_dock (WP-368, Layer 343)
+
+snake_dock solves ARC-AGI-2 task a25697e4. The task gives three
+training pairs on 18x25 grids and one test case on a 30x30 grid.
+Every scene holds two kinds of objects on a majority-color
+background (1 in training, 4 in the test, so every role is read
+off each grid rather than memorized). A SNAKE is a single
+4-connected piece made of exactly two single-color segments
+touching orthogonally. A CONTAINER is one or two nearby wall
+components of a single color whose bounding box holds a pocket of
+background cells - the SOCKET - open to the outside through a
+mouth. Each training grid holds one snake and one container; the
+test grid holds two of each at once.
+
+Rule: read the background as the majority color and gather the
+per-color 4-connected components; pair two orthogonally touching
+components of different colors into a snake and treat every
+untouched component as a container wall; cluster same-color walls
+within Chebyshev distance two into containers and read each
+socket as the background cells inside the cluster's bounding box;
+erase every snake; then for each socket in discovery order take
+the first snake, segment, and grid isometry - identity, three
+rotations, four reflections, in fixed order - whose transformed
+segment matches the socket shape exactly and whose partner
+segment, carried by the same rigid map, lands entirely on in-grid
+background cells without overlapping the socket; fill the socket
+and lay the partner segment as the trail through the mouth.
+
+The delicate part is the coloring. Two training grids share the
+same snake pixel for pixel and differ only in a mirrored
+container, yet the two outputs paint the socket in different
+colors. The only property that predicts the paint, across all
+five docking events of the task, is the PARITY of the docking
+isometry: after a proper rotation each segment keeps its own
+color; after a reflection the two segment colors are exchanged -
+a snake that must be flipped over to fit shows its underside,
+like a physical tile turned face-down. The five events split as
+transpose (swap), quarter turn counter-clockwise (keep), pure
+translation (keep), quarter turn clockwise (keep), and vertical
+flip (swap) - five of five.
+
+Two generalizations matter. A container may be drawn as two
+separate wall components with the mouth between them, so
+same-color components are clustered by proximity before bounding
+boxes are read. And segment size must equal socket size, which
+pairs the two snakes to the two containers of the test grid
+uniquely before any shape matching runs. The induce clause
+dispatches early, directly after pipe_router, requiring equal
+input and output dimensions, an identical background, and an
+unchanged foreground cell count on the first pair, then verifying
+every training pair exactly. The complete rule was written in
+plain English covering every grid before any code, all five
+docking events were verified cell by cell by hand, a Python
+prototype confirmed the algorithm on its first run, and the
+integrated rule passed the single-task test and the full
+regression on the first compile.
+
+Key predicates (arc_benchmark_2.pl):
+  snd_components_/3    - per-color 4-connected components
+  snd_split_snakes_/3  - touching component pairs to snakes
+  snd_clusters_/2      - same-color walls to containers
+  snd_socket_/4        - background pocket in the cluster box
+  snd_erase_snakes_/4  - blank every snake cell
+  snd_apply_iso_/3     - one of the eight grid isometries
+  snd_norm_/3          - shape normalization to the origin
+  snd_match_one_/6     - one docking event in fixed order
+  snd_iso_parity_/2    - proper rotation or reflection
+  snd_paint_/4         - fill socket and trail
+  arc2_transform(snake_dock, +Grid, -Out)
+  arc2_induce_rule(+Pairs, snake_dock)
+
+Task solved: a25697e4 (3 training pairs + 1 test case).
+Score: 106/120 = 88.33% to 107/120 = 89.17%.
