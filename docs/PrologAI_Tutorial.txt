@@ -24567,3 +24567,77 @@ Key predicates:
 
 Task solved: e12f9a14 (4 training pairs + 1 test case).
 Score: 103/120 = 85.83% to 104/120 = 86.67%.
+
+Chapter 326: Wave 108 - cavity_paint (WP-366, Layer 341)
+
+cavity_paint solves ARC-AGI-2 task 3a25b0d8. The task gives two
+training pairs and one test case, on inputs of 22x22 and 30x30
+with outputs of 11x11, 13x7, and 18x13. Every input holds exactly
+two foreground shapes on a uniform majority-color background, and
+the two shapes are the same figure drawn twice. One drawing is a
+hollow silhouette: a closed skeleton drawn entirely in a single
+color whose enclosed background pockets are the figure's
+cavities. The other is a multi-color template: the same figure
+redrawn at a different size and visibly warped, with its cavities
+already filled with paint. The background is 8, 1, and 0 and the
+silhouette color is 1, 2, and 4 across the three grids, so every
+role is read off each grid rather than memorized.
+
+Rule: read the majority color as the background; flood the
+foreground into 8-connected components and require exactly two -
+the component drawn in a single color is the mask and the
+component drawn in two or more colors is the template; crop the
+output to the mask's bounding box and keep every mask cell in the
+mask color; flood the in-box background 4-connectedly from the
+border cells, so the unreached background cells are the enclosed
+cavities, grouped into 4-connected regions; collect the
+template's paint regions - template cells whose color is neither
+the background nor the mask color, grouped per color into
+4-connected regions; then paint each cavity with the color of the
+paint region whose centroid, normalized to its own shape's
+bounding box, lies nearest to the cavity's normalized centroid in
+squared euclidean distance, and leave the open background as
+background.
+
+The delicate part is the pairing. The template warp shifts
+regions off their rows, their columns, and even their
+top-to-bottom ranks: in the first training pair the silhouette's
+middle cavity starts one row below its flanking cavities while
+its template twin starts level with its own flankers, so ordinal
+matching, absolute position, and region size all assign the wrong
+color. The invariant that survives the warp is position
+proportional to the bounding box - each region's normalized
+centroid lands nearly on top of its counterpart's, and the
+nearest-centroid match lands every color on every cavity across
+both training pairs and all nine cavities of the test.
+
+Connectivity arity matters twice. The shapes are split
+8-connectedly so diagonal joints hold a figure together, while
+cavities and paint regions are split 4-connectedly so a diagonal
+gap neither leaks a cavity into the open background nor welds two
+paint regions into one. Normalization divides by each bounding
+box extent with a floor of one, so a one-row or one-column shape
+cannot divide by zero. The induce clause dispatches early,
+directly after ray_merge, requiring the first output strictly
+smaller than the first input in both dimensions and a successful
+mono-plus-multi split, then verifying every training pair
+exactly. The complete rule was written in plain English and
+verified cell by cell against every grid before any Prolog, and
+the integrated rule passed the single-task test and the full
+regression on the first compile.
+
+Key predicates:
+  cvp_split_/5         - mono mask versus multi-color template
+  cvp_comps_/3         - connectivity-parameterized components
+  cvp_flood_/5         - breadth-first flood fill
+  cvp_bbox_/5          - bounding box of a cell set
+  cvp_hole_comps_/4    - enclosed cavities via border flood
+  cvp_templ_regions_/4 - per-color paint regions
+  cvp_norm_centroid_/7 - bounding-box-normalized centroid
+  cvp_dye_/9           - nearest-centroid color assignment
+  cvp_render_/7        - mask, paint, background rendering
+  arc2_transform(cavity_paint, +Grid, -Out)
+  arc2_induce_rule(+Pairs, cavity_paint)
+
+Task solved: 3a25b0d8 (2 training pairs + 1 test case).
+Score: 104/120 = 86.67% to 105/120 = 87.50%.
