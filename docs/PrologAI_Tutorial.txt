@@ -24862,3 +24862,72 @@ Key predicates (arc_benchmark_2.pl):
 
 Task solved: a32d8b75 (3 training pairs + 1 test case).
 Score: 107/120 = 89.17% to 108/120 = 90.00%.
+
+Chapter 330: Wave 112 - anchor_jigsaw (WP-370, Layer 345)
+
+anchor_jigsaw solves ARC-AGI-2 task 446ef5d2. The task gives two
+training pairs (grids 12x20 and 10x10 on background 8) and one
+test case (a 26x26 grid on background 4). Every input scatters
+ragged colored FRAGMENTS across the grid - four in each training
+input, ten in the test input, two of them non-rectangular - plus
+one three-cell L-TROMINO MARKER drawn in a color that appears
+nowhere else (4 in training, 2 in the test).
+
+The marker is a corner bracket packing three commands into three
+cells. Its cells fill a two-by-two bounding box except for one
+missing cell, the CUPPED CELL P. The diagonal step from the
+marker's corner cell to P names which corner of the finished
+picture sits exactly on P - bottom-right in train 1, top-left in
+train 2, bottom-left in the test. The fragments are jigsaw
+pieces: they tile, by translation alone, a single rectangle whose
+area equals their total cell count, the piece containing P is
+pinned at that corner and keeps its absolute grid position, and
+the rectangle's outer ring is uniformly the border color - the
+fragment color found at P.
+
+Rule: find the background as the most common color and the marker
+as the color occupying exactly three cells in a two-by-two box
+minus one; take every 4-connected non-background, non-marker
+component as a piece normalized to its bounding-box origin; for
+every height-width factorization of the total cell count that
+fits the tallest and widest piece, pin the anchor piece at the
+P-corner and tile the rest by backtracking - the piece whose
+row-major first cell covers the first empty cell goes next, with
+no overlaps, no out-of-bounds cells, and the border color forced
+on the outer ring; keep only coherent assemblies and paint the
+first onto a blank background grid with its named corner on P.
+
+The delicate part is the COHERENCE LAW. An exact-cover tiler
+armed only with the uniform-border constraint finds TWO complete
+tilings of the 22x10 test rectangle - and the false one first,
+with its color-3 and color-7 frames each torn into two separated
+clusters. The fix is the human jigsaw instinct made formal: every
+non-border color of the finished picture must form exactly one
+4-connected component. That single demand rejects the incoherent
+assembly, accepts the true stacked nested-ring picture, and holds
+silently on both training pairs.
+
+One verification detail matters. Eyeballing the 26-column test
+dump misplaced the assembled rectangle by one row and falsely
+broke the anchor law; the programmatic diff of the fresh dumps
+restored it before any code was written. The induce clause
+dispatches early, directly after fractal_stamp, requiring equal
+input and output dimensions and the unique-color L-tromino
+marker on the first pair, then verifying every training pair
+exactly. The integrated rule passed the single-task test and the
+full regression on the first compile.
+
+Key predicates (arc_benchmark_2.pl):
+  aj_marker_/4      - the L-tromino marker and its cupped cell
+  aj_piece_/3       - one fragment normalized to its origin
+  aj_assemble_/11   - factorizations, pinning, and tiling
+  aj_tile_/6        - backtracking exact-cover placement
+  aj_first_empty_/5 - the next row-major hole to cover
+  aj_place_/8       - bounds, overlap, and border-ring checks
+  aj_coherent_/2    - one component per non-border color
+  aj_render_/7      - paint the assembly anchored on P
+  arc2_transform(anchor_jigsaw, +Grid, -Out)
+  arc2_induce_rule(+Pairs, anchor_jigsaw)
+
+Task solved: 446ef5d2 (2 training pairs + 1 test case).
+Score: 108/120 = 90.00% to 109/120 = 90.83%.
