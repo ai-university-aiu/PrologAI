@@ -23163,3 +23163,86 @@ Key predicates:
 
 Task solved: d8e07eb2 (5 training pairs + 1 test case).
 Score: 87/120 = 72.50% to 88/120 = 73.33%.
+
+
+Chapter 310: Wave 92 - stencil_carve (WP-350, Layer 325)
+
+stencil_carve solves ARC-AGI-2 task 58f5dbd5. The task gives three
+training pairs and one test case. The inputs are 19x19, 19x19,
+23x18, and 23x18, and the outputs are 19x7, 7x19, 13x13, and
+19x13 - the output shape is not fixed but follows the scene. Every
+input holds several solid five-by-five monochrome square blocks
+standing in a regular grid arrangement with one-cell background
+gaps - one column of three blocks, one row of three blocks, a
+two-by-two arrangement, and a three-by-two arrangement across the
+four grids - and each block carries a distinct non-background
+color. Elsewhere in the scene lie small three-by-three sketch
+motifs of various colors, including decoy sketches whose colors
+have no matching block. The output keeps the block arrangement on
+a fresh background canvas and carves each block's central
+three-by-three region with the negative of its same-colored
+sketch: wherever the sketch shows the block color the output cell
+turns background, and wherever the sketch shows background the
+cell keeps the block color.
+
+Rule: each solid block pairs with the detached sketch of its own
+color, and the sketch acts as a stencil whose colored cells are
+the holes - the block interior is the sketch's punched-out
+negative, not its copy.
+
+Algorithm:
+
+The transform first takes the background as the most common color
+with tw_background_. stc_block_ then scans for solid five-by-five
+squares of one non-background color, anchoring each block at a
+top-left corner whose upper and left neighbors differ from the
+block color, so a larger same-colored region can never yield
+duplicate placements and no overlap bookkeeping is needed. The
+distinct block starting rows and starting columns are sorted into
+the arrangement axes, and the block count must equal the product
+of the row count and the column count, so the blocks fill a
+complete row-by-column arrangement. For each block color,
+stc_sketch_ collects every cell of that color outside all blocks -
+stc_in_block_ supplies the membership test - and requires the
+bounding box of the collection to be exactly three by three,
+recording the offsets of the colored cells inside the box. The
+sketches may be disconnected within their bounding boxes, so
+collecting all same-colored cells beats connected-component
+analysis, and decoy colors without a block are simply never
+visited. stc_tile_ carves each block's five-by-five tile with
+stc_tcell_: central cells at sketch offsets turn background, and
+every other tile cell keeps the block color. Finally the output
+canvas - height six times the block rows plus one, width six times
+the block columns plus one - is assembled cell by cell with
+stc_cell_, which uses six-cell band arithmetic (row and column
+modulo six) to decide whether a cell falls inside a block tile and
+reads the tile or paints background accordingly. The induce clause
+dispatches early, directly after catalog_query, requiring the
+first output's height and width to both be one more than a
+multiple of six with a background top-left corner, then verifying
+every training pair.
+
+The lesson of the wave is the carving inversion. The naive reading
+copies the sketch into the block interior and fails every pair;
+the correct reading punches the sketch out of the solid block, so
+a sketch cell of the block color becomes a background hole. A
+second lesson is that the output dimensions are derived, not
+assumed: the four grids exercise four different block
+arrangements, and the canvas resizes to six cells per block row or
+column plus one border cell. The test grid presents the largest
+arrangement - three block rows by two block columns of colors 4,
+8, 2, 1, 6, and 9 - carved from six sketches scattered in the left
+third of the scene.
+
+Key predicates:
+  stc_block_/5         - find one anchored solid five-by-five block
+  stc_in_block_/3      - test a cell for membership in any block
+  stc_sketch_/4        - collect a color's sketch offsets
+  stc_tile_/4          - carve one block's five-by-five tile
+  stc_tcell_/6         - paint one tile cell from the sketch
+  stc_cell_/5          - paint one canvas cell from the tiles
+  arc2_transform(stencil_carve, +Grid, -Out)
+  arc2_induce_rule(+Pairs, stencil_carve)
+
+Task solved: 58f5dbd5 (3 training pairs + 1 test case).
+Score: 88/120 = 73.33% to 89/120 = 74.17%.
