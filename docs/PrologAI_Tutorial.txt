@@ -23499,3 +23499,92 @@ Key predicates:
 
 Task solved: 7b0280bc (3 training pairs + 1 test case).
 Score: 91/120 = 75.83% to 92/120 = 76.67%.
+
+Chapter 314: Wave 96 - junction_hub (WP-354, Layer 329)
+
+junction_hub solves ARC-AGI-2 task 800d221b. The task gives
+three training pairs and one test case. The grids are 16x16,
+10x10, and 20x20 in training and 30x30 in the test, and the
+output always keeps the input size. Every scene draws a wire
+network on a uniform background using exactly three foreground
+colors: one wire color forming the network and two content
+colors mixed together inside the small blocks that the wires
+join. In the first training pair the wires are 8s joining
+blocks of mixed 3s and 4s on a 9 background; in the second the
+wires are 5s joining blocks of 2s and 1s on a 0 background; in
+the third the wires are 7s joining blocks of 6s and 5s on an 8
+background; and in the test the wires are 4s joining blocks of
+3s and 2s on a 6 background. The output repaints every wire
+cell with the majority content color of the block its branch of
+the network reaches, except at the crossing point: there a
+three-by-three ring keeps the wire color and the single cell at
+its center takes the color of the winning side.
+
+Rule: find the hub as the only cell whose full three-by-three
+neighborhood holds the wire color, keep its eight ring cells
+wire colored, split the remaining wire into four-connected
+branches, repaint each branch with the majority content color
+of the blocks it touches, and paint the hub with the majority
+color of the branch cells touching the ring.
+
+Algorithm:
+
+The transform first takes the most common color as the
+background with arc2_bg_color_ and requires exactly four
+distinct colors in the grid. jh_centers_ and jh_solid_ then
+census, for each foreground color, the cells whose full
+three-by-three window holds that color: the wire color is the
+only one owning exactly one such cell - the content colors own
+none, because their blocks are small and mixed, or many,
+because their solid regions are large - and that cell is the
+hub. The eight cells around the hub form the ring; the hub and
+ring leave the wire set and the ring keeps the wire color in
+the output. jh_cells_ lists the content cells and the wire
+cells keyed by position, and jh_parts_ with jh_flood_ splits
+each set into four-connected components over a position assoc -
+the content cells into mixed-color blocks and the ring-free
+wire cells into branches. jh_branch_color_ repaints every
+branch: it collects the blocks holding a cell four-adjacent to
+the branch with jh_meets_ and takes the majority color over all
+cells of those blocks with jh_majority_, which run-length
+encodes the sorted colors through the Wave 95 helper scc_runs_.
+Every branch cell four-adjacent to a ring cell then votes its
+branch color once, and the hub takes the majority vote. Finally
+jh_paint_branch_ writes every branch through scc_paint_ and
+arc2_set_cell_ paints the hub. The induce clause dispatches
+early, directly after short_circuit, requiring equal first-pair
+dimensions and exactly four distinct colors in the first input,
+then verifying every training pair.
+
+The lesson of the wave is that the hub verdict is a cell-level
+election, not a branch-level one. In the third training pair
+the losing color owns three branches against two, yet the
+winning color takes the hub because its two branches each wrap
+onto the ring at two separate places and outvote the others
+four cells to three - a branch touching the ring twice carries
+double weight. A second lesson extends Wave 95: the four colors
+permute freely across pairs, and this time no cell-count
+ranking can name the wire, so the rule recognizes it by a
+purely structural signature - the unique solid three-by-three
+window - derived fresh from every grid. A third lesson is that
+adjacency arity matters: the arms of the network run side by
+side one background cell apart, so the branches separate only
+under four-way adjacency, and the eight-way component helpers
+of the earlier waves would fuse them diagonally.
+
+Key predicates:
+  jh_centers_/5        - solid three-by-three centers of a color
+  jh_solid_/4          - test one full three-by-three window
+  jh_cells_/3          - list cells of given colors by position
+  jh_step_/4           - one four-connected neighbour of a cell
+  jh_parts_/4          - four-connected components of a cell set
+  jh_flood_/4          - four-connected flood fill over an assoc
+  jh_branch_color_/6   - majority block color touching a branch
+  jh_meets_/2          - does an adjacency set enter a block
+  jh_majority_/2       - most frequent value of a list
+  jh_paint_branch_/3   - paint one branch onto the grid
+  arc2_transform(junction_hub, +Grid, -Out)
+  arc2_induce_rule(+Pairs, junction_hub)
+
+Task solved: 800d221b (3 training pairs + 1 test case).
+Score: 92/120 = 76.67% to 93/120 = 77.50%.
