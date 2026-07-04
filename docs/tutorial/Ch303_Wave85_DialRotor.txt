@@ -1,0 +1,67 @@
+Chapter 303: Wave 85 - dial_rotor (WP-343, Layer 318)
+
+dial_rotor solves ARC-AGI-2 task 6ffbe589. The task gives three
+training pairs and one test case, all on 20x20 inputs over
+background 0, with square outputs of 13x13, 10x10, 10x10, and
+13x13. Each input holds one main figure - a framed square wrapped
+in a dotted ring - plus two or three small straight pieces lying
+far away from the figure. The palettes vary per grid: ring 3 with
+core colors 8 and 6 in the first training input, ring 5 with core
+colors 3 and 4 in the second, ring 4 with core colors 1 and 2 in
+the third, and ring 5 with core colors 3 and 4 again in the test.
+
+Rule: the main figure is cropped together with every component
+within Chebyshev distance 3 of its bounding box; each far-away
+piece is a dial - a straight single-color run of color C with
+length L commanding "rotate color C's layer by L quarter turns
+clockwise" (L mod 4); the ring color is the unique color on the
+crop's outermost layer and the ring thickness is the minimum inset
+of any non-ring-colored cell; the ring zone spins by the ring
+color's dial (staying put without one) and the core block spins by
+the largest dial among its own colors.
+
+Algorithm:
+
+The non-zero cells are grouped into 8-connected components with the
+reused helper tw_components_ from the twin_lift pack, and the
+component with the largest bounding box is the main figure. Every
+component with a cell within Chebyshev distance 3 of that bounding
+box merges into the crop box - this pulls in the detached dotted-
+ring pieces of the test grid - and every farther component is a
+dial piece parsed by dr_run_ as a straight single-color run. The
+crop must be square. The ring color is read from the crop's
+outermost layer, the thickness K is the minimum inset of any
+non-ring-colored cell, and the core block is the central region
+inset by K. The ring zone rotates by the ring color's dial and the
+core block by the largest dial among the core's colors; dr_rotn_
+delegates the quarter turns to the existing rotate_90_cw,
+rotate_180, and rotate_90_ccw named rules, and dr_row_ pastes the
+rotated core back into the center of the spun crop. The induce
+clause dispatches early, directly after motif_shadow, requiring a
+strictly smaller square output, 10 to 300 foreground cells, and at
+least two components before verifying every training pair.
+
+The lesson: the palette does not pick the rotation. The second
+training grid and the test grid share the exact same colors - ring
+5 with core 3 and 4 - yet one needs a core quarter turn and the
+other a core half turn, so any variant-by-palette reading is a red
+herring. The debris pieces that look like noise are the actual
+instruction stream: their lengths are dials, and the test's
+five-cell ring dial proves the modulo-4 reading, one full
+revolution plus a quarter. The decisive method was to brute-force
+the ring and core transform pairs per training pair first and hunt
+for the selecting input feature second: length-of-piece matched all
+four grids with zero contradictions, and the rule passed the
+single-task test and the full regression on the first compile.
+
+Key predicates:
+  dr_maxbbox_/2        - component with the largest bounding box
+  dr_near_box_/5       - component within distance 3 of the box
+  dr_run_/3            - parse one dial piece as a straight run
+  dr_rotn_/3           - rotate a grid N quarter turns clockwise
+  dr_row_/8            - rebuild one output row from ring and core
+  arc2_transform(dial_rotor, +Grid, -Out)
+  arc2_induce_rule(+Pairs, dial_rotor)
+
+Task solved: 6ffbe589 (3 training pairs + 1 test case).
+Score: 81/120 = 67.50% to 82/120 = 68.33%.
