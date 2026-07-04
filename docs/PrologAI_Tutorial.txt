@@ -25225,3 +25225,86 @@ glyph_stamp), the arc2_gst_* helpers, and arc2_named_rule(glyph_stamp).
 
 Task solved: a251c730 (2 training pairs + 1 test case).
 Score: 113/120 = 94.17% to 114/120 = 95.00%.
+
+Chapter 336: Wave 118 - sequence_extrapolate (WP-376, Layer 351)
+
+Wave 118 adds a new glass-box rule, sequence_extrapolate, that solves
+ARC-AGI-2 task 20a9e565. The score rises from 114/120 = 95.00% to
+115/120 = 95.83%.
+
+This chapter teaches a rule that reads a grid as a SEQUENCE: a short
+line of shapes grows in size, and the answer is the next one in the
+series.
+
+THE TASK
+
+Each grid is thirty by thirty and carries two features.
+
+The first is a CALIPER: two little L-trominoes drawn in color 5, one
+bracketing a top-left corner and one bracketing a bottom-right corner.
+The combined bounding box of the two trominoes - the smallest
+rectangle that holds both - gives the height and width of the answer.
+
+The second is a SEQUENCE: a run of same-family shapes that grow in size
+from one member to the next, each drawn in a color that cycles through
+a short list. The five grids of the task use five different families -
+a comb (a spine plus two bottom teeth), a ladder (rows alternating full
+rungs and side rails), a band of peaks (a period-five triangular
+motif), and a zigzag (a two-cell-wide braid of nested colored rings).
+
+The output is the next member of whichever family the grid shows,
+generated at full size, then windowed to the caliper rectangle from its
+bottom-left corner and painted in the next color of the cycle.
+
+THE RULE
+
+Find the caliper by collecting every color-5 cell; their combined
+bounding box gives the output height H and width W.
+
+Find the members as the eight-connected components of the colored cells
+that are neither background nor caliper, render each as a small matrix,
+and sort them smallest to largest by bounding-box area. The size
+differences between neighbors give a growth vector.
+
+Read the growth vector to choose the family generator:
+
+  Grow by one row and one column: comb. The target index is the caliper
+  width minus the first member's width; build a comb of that height with
+  a filled left spine and full teeth on the bottom and third-from-bottom
+  rows.
+
+  Grow in width only: peaks. Build the three-row period-five upright
+  motif across the caliper width.
+
+  Grow in height only, every member one color: ladder. Build H rows, a
+  full rung when the distance from the bottom is even, side rails
+  otherwise.
+
+  Grow in height only, some member many colors: zigzag. Read the
+  period-six left-and-right ring-color table from the largest member,
+  outward from its center; the next member is one ring taller, columns
+  swapping every six rings, only the notch tip kept on the outer ring.
+
+The answer color is the next entry of the fundamental cycle - the
+shortest repeating prefix of the member colors. Finally window the
+generated member to the caliper size from its bottom-left corner.
+
+THE DISCRIMINATING OBSERVATION
+
+The clean idea is the split between SIZE and CONTENT. The caliper only
+names how big the answer is; the sequence only names what the pattern
+looks like. Because the two jobs are kept apart, one rule and one
+windowing step serve four families that share nothing else. Choosing
+the family from the growth vector, rather than from a fixed template,
+is what lets the rule recognize a family on a grid it has never seen -
+here the held-out test is the peaks family, extrapolated to the caliper
+width and cropped to two rows.
+
+Predicates added: arc2_transform(sequence_extrapolate)/3,
+arc2_induce_rule(_, sequence_extrapolate), and the se_* helpers. The
+induce clause is gated by a cheap pre-filter that fires only when every
+training input holds exactly two size-three color-5 components, so the
+component extraction runs solely for this task.
+
+Task solved: 20a9e565 (3 training pairs + 1 test case).
+Score: 114/120 = 95.00% to 115/120 = 95.83%.
