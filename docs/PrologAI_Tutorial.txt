@@ -25148,3 +25148,80 @@ Predicate touched: arc2_cri_bfs_ now calls arc2_cri_nbrs8_.
 
 Task solved: 13e47133 (2 training pairs + 1 test case).
 Score: 112/120 = 93.33% to 113/120 = 94.17%.
+
+Chapter 335: Wave 117 - glyph_stamp (WP-375, Layer 350)
+
+Wave 117 adds a new glass-box rule, glyph_stamp, that solves
+ARC-AGI-2 task a251c730. The score rises from 113/120 = 94.17% to
+114/120 = 95.00%.
+
+This chapter teaches a WHERE-meets-WHAT rule, and it carries a second
+lesson that has nothing to do with the rule and everything to do with
+the clock: a correct transform can still fail the benchmark if its
+search is too slow.
+
+THE TASK
+
+Each grid is thirty by thirty and rests on a tiled repeating
+background. Sitting on that background are two hollow rectangular
+frame-boxes - a border of a single color enclosing a differently
+colored interior.
+
+The two boxes play different roles. The SMALLER box, measured by
+interior area, is a canvas: its interior is a plain background dotted
+with a few isolated single-cell markers, each a distinctive accent
+color. The LARGER box is a legend: its interior holds full glyph
+motifs, each a small eight-connected shape built around exactly one
+accent-color cell at its heart.
+
+The output is the small box - frame and interior - with the legend's
+glyphs merged in. For every marker on the canvas, the legend glyph
+whose accent color matches that marker is stamped onto the canvas,
+positioned so the glyph's own accent cell lands exactly on the marker.
+
+THE RULE
+
+Find every hollow rectangular frame-box. Order the two boxes by
+interior area: the smaller is the canvas, the larger is the legend.
+
+Read the canvas interior for markers - any cell that is neither the
+canvas frame color nor its background. Their colors are the accent
+colors. For each accent color, flood the legend's eight-connected
+motif that contains an accent cell and record it as a list of offsets
+from that anchor cell.
+
+Copy the small box as the base output. For each marker, take the
+template for the marker's color and paint every offset cell onto the
+canvas, anchored on the marker.
+
+On the two training pairs a single accent color is in play, so every
+marker gets the same glyph. On the held-out test two distinct accent
+colors appear, and accent-color matching - not position - decides
+which of the two legend glyphs each marker receives. That is the
+discriminating case.
+
+THE PERFORMANCE LESSON
+
+The first working version was correct on every pair, yet a full
+benchmark run showed net minus one: a251c730 passed, but two
+previously solved tasks, tower_donate and template_expand, timed out.
+The reason was frame detection by brute force - testing every possible
+rectangle - which is quadratic in area and explodes on grids full of
+one solid color. Those two grids ran past the ten-second per-task
+limit. The transform was right; the search was too slow.
+
+The cure is to detect each frame with a single bounded candidate. Only
+a genuine top-left corner is considered - a frame-color cell whose
+neighbors above and to the left are not that color. From such a corner
+the box is the maximal frame-color run rightward and downward, giving
+exactly one candidate per corner. Detection becomes O(H*W) and runs in
+a fraction of a second. The induce clause is also gated by a cheap
+pre-filter that fires only when the first training output is itself a
+hollow single-color frame-box, so the frame search runs solely for
+this task.
+
+Predicates added: arc2_transform(glyph_stamp)/3, arc2_induce_rule(_,
+glyph_stamp), the arc2_gst_* helpers, and arc2_named_rule(glyph_stamp).
+
+Task solved: a251c730 (2 training pairs + 1 test case).
+Score: 113/120 = 94.17% to 114/120 = 95.00%.
