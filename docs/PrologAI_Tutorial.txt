@@ -23588,3 +23588,94 @@ Key predicates:
 
 Task solved: 800d221b (3 training pairs + 1 test case).
 Score: 92/120 = 76.67% to 93/120 = 77.50%.
+
+Chapter 315: Wave 97 - hub_dock (WP-355, Layer 330)
+
+hub_dock solves ARC-AGI-2 task 2c181942. The task gives three
+training pairs and one test case. The grids are 23x20, 18x21,
+and 20x25 in training and 24x26 in the test, and the output
+always keeps the input size. Every scene shows one hub piece -
+an eight-cell ring in a four-by-four bounding box whose four
+sides carry two centered cells each, every side in its own
+color - plus loose single-color shapes scattered on the
+background. In the first training pair the hub sides are 6 on
+top, 3 on the left, 2 on the right, and 1 on the bottom, and
+the loose shapes are 2s, 3s, and 4s; in the third the sides are
+1, 2, 7, and 3, and the shapes are 1s, 2s, 3s, and 7s; in the
+test the sides are 1, 4, 2, and 6, and the shapes are 1s, 2s,
+3s, 4s, and 6s. The output rebuilds the scene from a fresh
+background canvas: the hub stays exactly where it was, every
+shape whose color matches a hub side is rotated and parked
+flush against that side, and every shape whose color matches no
+side vanishes - the 4 shape in the first pair and the 3 shape
+in the test.
+
+Rule: find the hub as the only eight-connected component mixing
+four colors, read its four sides as two adjacent same-colored
+cells each, and dock every matching shape by the unique quarter
+turn that puts a bounding-box side holding exactly two adjacent
+centered cells toward its hub side, parked flush so the two
+contact cells sit directly next to the two hub edge cells.
+
+Algorithm:
+
+The transform first takes the most common color as the
+background with arc2_bg_color_ and groups the foreground cells
+into eight-connected components with the Wave 82 helper
+tw_components_. hd_hub_ keeps the components mixing exactly
+four distinct colors, and exactly one may exist: the hub, an
+eight-cell ring in a four-by-four bounding box. hd_edge_ reads
+each side of the box - top row, bottom row, left column, right
+column - as exactly two adjacent cells of one color and records
+the color, the direction, and the start of the pair; the four
+side colors must all differ. arc2_sb_blank_ builds an
+all-background canvas of the input size and hd_put_ paints the
+hub back unchanged. hd_dock_ then walks every other component:
+the shape must be single-colored, and its color is looked up
+among the sides - a shape owning no side is dropped. For a
+matching shape, hd_orient_ normalizes the cells to the
+bounding-box corner and tries the four quarter-turn rotations
+in order through hd_rot_, which maps (R, C) to (C, H-1-R) per
+turn; hd_face_ collects the side line facing the hub and
+hd_centered_ accepts it only when the side length is even and
+the line holds exactly the two centered positions. hd_place_
+computes the corner that parks the rotated bounding box flush
+against the hub side - one cell above, below, left, or right -
+with the first contact cell aligned to the edge start, and
+scc_paint_ writes the docked cells after a bounds check. The
+induce clause dispatches early, directly after junction_hub,
+requiring equal first-pair dimensions and five to eight
+distinct colors in the first input, then verifying every
+training pair.
+
+The lesson of the wave is that centered contact is what makes
+the docking unique. The second training pair's left shape also
+owns a three-cell side whose two cells would touch the hub edge
+rows, but only its bottom side holds exactly the two centered
+positions, so a plain adjacency check would accept an off-center
+fit that the centered-contact condition rejects - and the same
+condition throws out the full-length sides too, pinning both
+the rotation and the translation uniquely. A second lesson is
+that the rotations are pure quarter turns with no reflection,
+which the first training pair proves in both directions: the
+same shape family docks left by a clockwise turn and right by a
+counterclockwise turn. A third lesson extends Waves 95 and 96:
+the side colors permute freely across pairs, so each side's
+role is derived from its own two edge cells at answer time,
+never memorized from color identities.
+
+Key predicates:
+  hd_hub_/1            - component mixing exactly four colors
+  hd_edge_/5           - one hub side: two adjacent same cells
+  hd_put_/3            - write one colored cell onto the grid
+  hd_dock_/7           - dock or drop one loose shape
+  hd_orient_/7         - first quarter turn with centered contact
+  hd_rot_/7            - rotate cells K quarter turns clockwise
+  hd_face_/4           - side line facing the hub
+  hd_centered_/2       - exactly the two centered positions
+  hd_place_/7          - flush corner against the hub side
+  arc2_transform(hub_dock, +Grid, -Out)
+  arc2_induce_rule(+Pairs, hub_dock)
+
+Task solved: 2c181942 (3 training pairs + 1 test case).
+Score: 93/120 = 77.50% to 94/120 = 78.33%.
