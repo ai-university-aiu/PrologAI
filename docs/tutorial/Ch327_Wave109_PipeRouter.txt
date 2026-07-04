@@ -1,0 +1,71 @@
+Chapter 327: Wave 109 - pipe_router (WP-367, Layer 342)
+
+pipe_router solves ARC-AGI-2 task e87109e9. The task gives three
+training pairs and one test case, on inputs of 25x24 and 30x24
+with outputs of 19x24 and 24x24. Every input is a two-part scene:
+a six-row legend strip of framed color swatches across the top,
+and a playing field below holding a majority-color background,
+colored rectangular blocks, and one square seed of 8s. The
+background is 3, 1, 7, and 9 across the four grids, so every role
+is read off each grid rather than memorized. The output is the
+field alone, legend dropped, with a network of color-8 pipes
+painted onto it.
+
+Rule: split off the six legend rows; decode each six-wide swatch
+from the second legend row - the colored interior pixel (neither
+0 nor frame color 5) names a block color, and the side of the
+swatch the pixel occupies is a one-bit instruction, left half
+meaning blocks of that color turn pipes LEFT and right half
+meaning they turn pipes RIGHT; read the majority color of the
+field as the background and bound the square seed of 8s, whose
+side length is the pipe width; shoot four pipes from the seed,
+one per orthogonal direction, each as wide as the seed; march
+each pipe one front line at a time, painting background cells 8
+and treating pipe cells and the seed as passable, ending the pipe
+when its front line leaves the grid; and when a front line
+contains any block cell, stop beside the block, paint the head
+square as a corner, turn left or right by the blocking color's
+legend handedness, and march on from the corner.
+
+The delicate part is the turn direction. Sixteen block-hit turns
+occur across the four grids, and they follow no fixed chirality,
+no larger-extent rule, no nearest-edge rule, and no path-order
+story - single-snake readings, legend-order chains, torus wraps,
+and spatial clockwise cycles all fail on some grid. Cataloguing
+all sixteen turns as independent events and asking what per-color
+property predicts them gave the answer: the swatch pixel side
+matches sixteen of sixteen, so the legend is a per-color
+instruction table and the left-to-right order of the swatches is
+irrelevant.
+
+Two generalizations matter. The painted network branches from one
+point in all four directions, so it is modeled as four
+independent pipes leaving a seed rather than one continuous path.
+And the training seeds are 2x2 while the test seed is 3x3, so the
+stroke width is derived from the seed bounding box rather than
+hard-coded. The induce clause dispatches early, directly after
+cavity_paint, requiring rows one and six of the first input
+entirely frame color 5 and the first output exactly six rows
+shorter than the first input at equal width, then verifying every
+training pair exactly. The complete rule was written in plain
+English and verified cell by cell against every grid before any
+Prolog, and the integrated rule passed the single-task test and
+the full regression on the first compile.
+
+Key predicates:
+  prl_turn_map_/2      - legend swatches to Color-Turn pairs
+  prl_swatch_/4        - one swatch pixel to a handedness
+  prl_seed_/6          - square 8-seed bounding box and width
+  prl_march_/12        - front-line marcher with block turns
+  prl_front_cells_/4   - cells of one front line
+  prl_cell_rc_/5       - lateral/travel axis to row/column
+  prl_obstacle_/4      - first block cell in a front line
+  prl_turn_/3          - direction rotation by handedness
+  prl_corner_/5        - head square span at a turn
+  prl_next_front_/4    - restart line beside the corner
+  prl_render_/3        - paint the collected cells 8
+  arc2_transform(pipe_router, +Grid, -Out)
+  arc2_induce_rule(+Pairs, pipe_router)
+
+Task solved: e87109e9 (3 training pairs + 1 test case).
+Score: 105/120 = 87.50% to 106/120 = 88.33%.
