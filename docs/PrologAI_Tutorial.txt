@@ -22426,3 +22426,67 @@ Key predicates:
 
 Task solved: a47bf94d (3 training pairs + 1 test case).
 Score: 77/120 = 64.17% to 78/120 = 65.00%.
+
+
+Chapter 300: Wave 82 - twin_lift (WP-340, Layer 315)
+
+twin_lift solves ARC-AGI-2 task 62593bfd. The task gives two training
+pairs on 28x19 and 30x30 grids and one test case on a 25x25 grid.
+Each grid scatters four to six small shapes over a uniform
+background, and the background color differs across grids: 0 in the
+first training grid, 5 in the second, and 1 in the test grid. In the
+output every shape whose cell count matches the cell count of at
+least one other shape has floated straight up until flush with the
+top edge, and every shape whose cell count is unique among all
+shapes has sunk straight down until flush with the bottom edge.
+Every shape keeps its columns, its internal form, and its colors.
+
+Rule: count the cells of every 8-connected shape; twins (shapes
+sharing a cell count with another shape) float flush to the top
+edge, loners (shapes with a unique cell count) sink flush to the
+bottom edge, columns unchanged.
+
+Algorithm:
+
+The background is the most frequent color in the grid - counted, not
+assumed, because the three grids use three different backgrounds.
+Every non-background cell is collected with its coordinates and
+color, and the cells are grouped into 8-connected components by
+greedy flood fill; connectivity ignores color, so a shape spanning
+two colors moves as one unit while two same-colored shapes apart
+from each other move independently. The cell count of every
+component is recorded in a size census. A component whose size
+occurs two or more times in the census shifts up by its topmost row;
+a component whose size occurs exactly once shifts down by the grid
+height minus one minus its bottommost row; columns never change.
+The output grid is rebuilt row by row: cells claimed by a shifted
+component take that component's cell colors, and every other cell
+takes the background color. The induce clause dispatches early,
+directly after wire_relay, requiring preserved dimensions, 8 to 150
+foreground cells, at least three components, at least one twin-sized
+pair, and at least one unique-sized shape before verifying every
+training pair.
+
+The lesson: when a task offers only two training pairs, the
+falsifying instance may live in the test input itself. The reference
+description of this task speaks of ranking colors by dominance, but
+the test grid holds two color-3 shapes that move in opposite
+directions - a 12-cell ring that sinks and a 7-cell staircase that
+rises - so no per-color rule can be right. Checking every candidate
+mechanism against all fifteen shapes visible across the three grids
+eliminated positional, symmetry, density, and protrusion stories one
+by one and left exactly one survivor: the twin-size census.
+
+Key predicates:
+  tw_background_/2     - most frequent color as background
+  tw_runs_/2           - count-color pairs for a sorted value list
+  tw_near_/3           - 8-neighborhood adjacency test
+  tw_components_/2     - 8-connected components of foreground cells
+  tw_grow_/5           - greedy flood fill of one component
+  tw_shifted_/4        - shift one component to its target edge
+  tw_row_/5            - rebuild one output row
+  arc2_transform(twin_lift, +Grid, -Out)
+  arc2_induce_rule(+Pairs, twin_lift)
+
+Task solved: 62593bfd (2 training pairs + 1 test case).
+Score: 78/120 = 65.00% to 79/120 = 65.83%.
