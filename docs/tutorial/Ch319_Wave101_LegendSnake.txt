@@ -1,0 +1,96 @@
+Chapter 319: Wave 101 - legend_snake (WP-359, Layer 334)
+
+legend_snake solves ARC-AGI-2 task 195c6913. The task gives
+three training pairs and one test case. The grids range from
+20x20 to 30x30, and the output always keeps the input size.
+Every input shows two large regions of two dominant colors
+meeting along a jagged diagonal boundary, with stray cells of
+each color scattered inside the other region. Near the top-left
+corner a legend strip of two-by-two blocks, separated by single
+background columns, spells out a color sequence - 2, 2, 8 in
+the first pair, 4, 1 in the second, 2, 2, 3 in the third, and
+1, 2, 8, 3 in the test. Elsewhere a lone two-by-two block of
+one extra color - 4, 9, 8, and 6 across the four grids - names
+the turn color. Single marker cells of the legend's first color
+sit on the left edge inside one of the regions. In the output
+every marker has fired a snake path eastward through its own
+region, painted with the legend pattern repeating cyclically;
+every time the path ran into the other region, the blocking
+cell took the turn color and the snake pivoted north, then east
+again at the next block, climbing the boundary like a
+staircase; and the legend strip and the lone turn block have
+been erased to the region color around them.
+
+Rule: read the two region colors as the two most frequent
+colors; collect every two-by-two block of a non-region color,
+taking the blocks that share a top row as the legend pattern
+and the lone leftover as the turn color; erase them; and walk
+each left-edge marker eastward through its own region, painting
+the pattern cyclically with the marker as position zero,
+marking every blocking cell with the turn color, and pivoting
+east to north or north to east without spending a pattern
+position.
+
+Algorithm:
+
+The transform first calls ls_region_colors_, which flattens the
+grid, counts the palette with clumped, and keeps the two most
+frequent colors as the regions A and B. ls_blocks_ enumerates
+every cell by row and column index and keeps each cell whose
+color is neither A nor B and whose right, lower, and diagonal
+neighbors repeat that color - the two-by-two blocks of the
+scene. ls_legend_ picks the top row shared by at least two
+blocks: those blocks, sorted by column, spell the repeating
+pattern left to right, and exactly one block must remain, whose
+color is the turn color. ls_markers_ collects every left-edge
+row whose first cell carries the pattern's head color and whose
+second cell differs from it, reading each marker's region color
+from that neighboring cell. ls_erase_ then paints the four
+cells of the turn block and of every legend block with the
+region color that ls_fill_color_ probes from the block's four
+orthogonal neighbors, reusing hb_paint_. Finally ls_path_
+launches each marker's snake at pattern position one heading
+east, and ls_walk_ with ls_step_ does the walking: an off-grid
+next cell ends the path silently; a next cell of the marker's
+region color takes the pattern color at position mod length and
+advances the position; any other cell is a block - it takes the
+turn color, spends no pattern position, and ls_turn_ pivots the
+heading from east to north or from north to east, resuming from
+the last path cell only if the pivoted neighbor holds the
+region color, otherwise the path ends after the single mark.
+Region membership is always read from the untouched input grid
+while colors accumulate on the erased working copy, so painted
+pattern cells can never block a later snake. The induce clause
+dispatches early, directly after corner_glyph, requiring equal
+first-pair dimensions, a legend strip with a lone turn block,
+and at least one edge marker, then verifying every training
+pair.
+
+The lesson of the wave is that the turn bookkeeping carries the
+whole task. The turn mark spends no pattern position, so the
+cyclic pattern flows unbroken around every staircase corner -
+verified position by position across all six snakes of the four
+grids - and the second training pair's lower snake, whose pivot
+direction is blocked immediately, proves that a blocked pivot
+ends the path quietly after exactly one mark. The legend strip
+is the program and the grid is the machine: reading the strip
+left to right as a cyclic program executed by edge-launched
+walkers turns a daunting scene into thirty lines of walking
+code.
+
+Key predicates:
+  ls_region_colors_/3  - two most frequent colors as regions
+  ls_blocks_/4         - two-by-two blocks of non-region colors
+  ls_legend_/4         - legend pattern and lone turn block
+  ls_markers_/3        - left-edge marker rows
+  ls_erase_/6          - erase one block to its region color
+  ls_fill_color_/6     - region color probed beside a block
+  ls_path_/7           - launch one marker's snake eastward
+  ls_walk_/12          - walk, paint, and pivot the snake
+  ls_step_/15          - one region step or one turn mark
+  ls_turn_/4           - east pivots to north, north to east
+  arc2_transform(legend_snake, +Grid, -Out)
+  arc2_induce_rule(+Pairs, legend_snake)
+
+Task solved: 195c6913 (3 training pairs + 1 test case).
+Score: 97/120 = 80.83% to 98/120 = 81.67%.
