@@ -1,0 +1,83 @@
+Chapter 317: Wave 99 - hole_beacon (WP-357, Layer 332)
+
+hole_beacon solves ARC-AGI-2 task de809cff. The task gives two
+training pairs and one test case. The grids are 20x20 in
+training and 30x30 in the test, and the output always keeps the
+input size. Every input holds two large rectilinear regions of
+two distinct colors on a zero background - 3 and 4 in the first
+pair, 1 and 2 in the second, 1 and 6 in the test - disturbed by
+three kinds of single-cell noise: background holes punched
+inside the regions, wrong-colored cells embedded inside the
+regions, and colored strays scattered over the background. The
+output cleans all three kinds of noise and marks every hole
+with a 3x3 beacon whose ring takes the RIVAL region's color and
+whose center is painted 8; the test grid carries twenty-four
+beacons, some overlapping each other's rings.
+
+Rule: label every cell region A, region B, or background by a
+majority vote over its orthogonal cross neighborhood at
+distances one and two, ties broken by the cell's own color;
+run the identical vote a second time over the first pass's
+labels; erase strays, repair wrong colors, and stamp every
+background hole inside a region as a beacon - a rival-colored
+3x3 ring around an 8 center, centers painted after all rings.
+
+Algorithm:
+
+The transform first reads the palette: hb_colors_ flattens the
+grid and sorts it, requiring exactly [0, A, B] and binding the
+two region colors. hb_label_pass_ then labels every cell:
+hb_vote_ collects the values of the eight in-bounds cross
+probes enumerated by hb_probe_ - one and two steps up, down,
+left, and right - and tallies the votes for A, for B, and for
+the background. A unique maximum labels the cell directly; on a
+tie the cell keeps its own input color when that color is among
+the tied leaders and falls to background otherwise, which is
+what lets a region cell at a convex corner survive with three
+same-color neighbors while a colored bump on a straight edge is
+erased with the same three. The same pass then runs a second
+time, voting over the first pass's labels instead of the raw
+colors - strays that the first pass silenced to background now
+stay silent in every neighbor's vote. The final label grid is
+itself the base output: background labels erase strays, region
+labels repair wrong-colored cells and keep clean cells.
+hb_centers_ then collects every cell whose input color is zero
+yet whose label names a region - the holes - and hb_ring_ folds
+over them, painting the rival region's color over every
+in-bounds cell of each 3x3 stamp area through hb_paint_, which
+clips at the grid edges. hb_center_ folds over the centers last
+and paints each one 8, so adjacent beacons whose rings overlap
+each other's centers keep every center visible. The induce
+clause dispatches early, directly after twin_beam, requiring
+equal first-pair dimensions, a first-input palette of exactly
+zero plus two colors, and an 8 in the first output, then
+verifying every training pair.
+
+The lesson of the wave is that denoising by local majority is
+fragile exactly where the noise clusters. On the test grid two
+stray cells sit two steps from a background cell near the
+region border, and the raw-color vote tips four to three toward
+the region - stamping a beacon where none belongs. A
+distance-weighted vote repairs the test but breaks both
+training pairs at region corners. The cure is the second vote
+pass: after pass one the strays already carry background
+labels, so the revote falls to background and the spurious
+beacon never appears. This is the Wave 98 non-local-state
+lesson in reverse - here the transform's own intermediate
+labels are the state that separates two locally identical
+votes.
+
+Key predicates:
+  hb_colors_/3         - palette read: exactly [0, A, B]
+  hb_label_pass_/5     - one full cross-vote labeling pass
+  hb_probe_/2          - the eight cross offsets at 1 and 2
+  hb_vote_/7           - majority label with own-color tie-break
+  hb_centers_/3        - input-zero cells labeled as a region
+  hb_ring_/5           - stamp one rival-colored 3x3 ring
+  hb_paint_/4          - paint one in-bounds cell, clip outside
+  hb_center_/4         - paint one beacon center 8
+  arc2_transform(hole_beacon, +Grid, -Out)
+  arc2_induce_rule(+Pairs, hole_beacon)
+
+Task solved: de809cff (2 training pairs + 1 test case).
+Score: 95/120 = 79.17% to 96/120 = 80.00%.
