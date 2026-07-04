@@ -22839,3 +22839,84 @@ Key predicates:
 
 Task solved: c7f57c3e (2 training pairs + 1 test case).
 Score: 83/120 = 69.17% to 84/120 = 70.00%.
+
+
+Chapter 306: Wave 88 - band_jigsaw (WP-346, Layer 321)
+
+band_jigsaw solves ARC-AGI-2 task 16b78196. The task gives two
+training pairs and one test case, all on 30x30 grids, with every
+output the same size as its input. Each grid holds one wide band
+component whose bounding box spans the full grid width - or, in the
+test case, the full grid height - with ragged, notched edges, plus
+three to five small single-color shapes scattered around it. The
+output keeps the band exactly where it is, erases the shapes from
+their original positions, and restacks every shape flush against
+the band so the pieces interlock like a jigsaw puzzle.
+
+Rule: every shape is translated - never rotated, flipped, or
+recolored - so that the shapes on each side of the band exactly
+tile the region between the band's ragged edge profile and a
+perfectly straight outer edge, plugging the band's notches on the
+way; the side split, the intervals, and every placement are found
+by search.
+
+Algorithm:
+
+The majority color is the background, and the foreground cells
+group into 8-connected components with the reused helpers
+tw_background_ and tw_components_ from the twin_lift pack. bj_span_
+selects the unique component whose bounding box spans a full grid
+dimension as the band, and bj_canon_dims_ with bj_canon_cells_
+transposes a vertical band into the canonical horizontal frame.
+bj_profile_ reads the band's bottom profile as the maximum band row
+per column and its top profile as the minimum, and bj_flipnum_
+reflects the top profile vertically so both sides solve as a
+bottom-side chain. bj_partition_ assigns each shape to a side by
+backtracking search, bj_norm_ normalizes each shape to a sorted
+cell list at its bounding-box corner, and bj_flipnorm_ does the
+same after a vertical flip for the far side. bj_chain_ picks a
+column interval at least as wide as the widest assigned shape and
+forces the straight outer edge row from the exact-area equation -
+interval width times outer row minus profile sum equals total shape
+area - then bj_tile_ exact-tiles the region by anchored exact
+cover: the row-major first uncovered cell must host some unused
+shape's row-major first cell. bj_unflip_ and bj_uncanon_cell_ map
+the placements back, and the reused tt_render_ paints band plus
+placements onto a fresh background canvas. The induce clause
+dispatches early, directly after twin_toggle, requiring preserved
+dimensions, 20 to 500 foreground cells, exactly one full-span
+component, and two to eight movable shapes of at most 40 cells
+before verifying every training pair.
+
+The lesson: the human-steps description splits the shapes into wide
+ones above the band and narrow ones below, but the second training
+pair stacks all three shapes below the band, so the side split must
+be searched rather than assumed. Hand-tracing all six grids before
+coding exposed the real invariant - a straight outer edge - and
+that edge turns out to be a computed quantity, not a searched one:
+given an interval, arithmetic forces it, collapsing the packing
+search to a handful of exact-cover calls. The test grid rotates the
+whole scene ninety degrees, with a vertical band and chains on its
+left and right, so the orientation-general canonicalization by
+transposition plus vertical flip was mandatory, exactly as the
+Wave 85-87 surveys predicted. The rule passed both training pairs
+and the test case on the first prototype run and the full
+regression on the first compile.
+
+Key predicates:
+  bj_span_/4           - full-span band selection and orientation
+  bj_canon_dims_/5     - canonical dimensions under transposition
+  bj_canon_cells_/3    - cells into the canonical frame
+  bj_profile_/4        - per-column band edge profile
+  bj_partition_/3      - side assignment by search
+  bj_norm_/2           - row-major normalized shape cells
+  bj_flipnorm_/3       - normalize after a vertical flip
+  bj_chain_/5          - interval choice and forced outer edge
+  bj_tile_/3           - anchored exact-cover tiling
+  bj_unflip_/3         - placements back out of the flipped frame
+  bj_uncanon_cell_/3   - placements back to the original frame
+  arc2_transform(band_jigsaw, +Grid, -Out)
+  arc2_induce_rule(+Pairs, band_jigsaw)
+
+Task solved: 16b78196 (2 training pairs + 1 test case).
+Score: 84/120 = 70.00% to 85/120 = 70.83%.
