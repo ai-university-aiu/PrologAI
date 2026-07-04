@@ -1,0 +1,74 @@
+Chapter 329: Wave 111 - fractal_stamp (WP-369, Layer 344)
+
+fractal_stamp solves ARC-AGI-2 task a32d8b75. The task gives
+three training pairs on 20x30 grids and one test case on a 30x30
+grid. Every input carries one or two LEGEND PANELS beside
+full-height divider columns of color 6 - each training grid has a
+single panel on the left, and the test grid has one panel on each
+side. The output drops the panels and the dividers entirely, so
+only the PLAYING FIELD between them survives: training outputs
+are 20x24 and the test output is 30x20.
+
+Each panel is a four-part stamping program. Above the panel's
+first all-6 separator row lies the glyph zone, holding a STAMP
+glyph drawn in exactly two colors and a larger LAYOUT glyph drawn
+in exactly one color. Between the two separator rows lies the
+ANCHOR BOX, holding a single 4 whose corner position names the
+corner of the field where the painting is anchored flush. Below
+the second separator lies the ROTATION BOX, holding a two-cell
+7-domino needle: vertical in the upper half commands no rotation,
+vertical in the lower half a half turn, horizontal in the right
+half a quarter turn clockwise, horizontal in the left half three
+quarter turns.
+
+Rule: find every full-height 6-column and give each one a panel
+toward the nearer grid edge, keeping the middle as the field; per
+panel, split the glyph zone into 8-connected components, take the
+two-color component as the stamp (cut at its bounding box, its
+two colors exchanged) and the one-color component as the layout
+(a boolean mask over its bounding box); decode the anchor corner
+and the needle rotation; then rotate the mask, scale it up by the
+stamp's height and width, place the region flush at the anchored
+field corner, and paint a full stamp copy at every set mask cell
+while every clear cell keeps the field pixels. Several panels
+fold over the shared field one after another.
+
+The delicate part is that the anchor and the rotation form a
+TWO-PART command that only makes sense read jointly. Across the
+five panels of the task the pairs are top-left with no turn,
+top-right with a quarter turn, bottom-right with a half turn,
+bottom-right with no turn, and top-left with a half turn - the
+same corner appears with two different rotations and the same
+rotation with two different corners, so any single-marker theory
+collapses, yet the pair predicts all five placements exactly.
+
+Two details matter. Box interiors are obtained by trimming every
+all-6 column from the box rows rather than assuming fixed border
+widths - the divider-adjacent border column otherwise shifts the
+interior center and misreads a vertical needle as horizontal,
+the one bug the Python prototype caught before any Prolog was
+written. And the painted stamp is the legend glyph's NEGATIVE -
+its two colors exchanged - echoing Wave 110, where reflected
+snakes showed their undersides. The induce clause dispatches
+early, directly after snake_dock, requiring equal heights, a
+strictly narrower output, and a full-height 6-column on the
+first pair, then verifying every training pair exactly. The
+integrated rule passed the single-task test and the full
+regression on the first compile.
+
+Key predicates (arc_benchmark_2.pl):
+  frs_divider_cols_/3  - full-height 6-columns
+  frs_panels_/5        - panel spans and the field range
+  frs_apply_panel_/4   - one panel's stamping program
+  frs_comps_/2         - 8-connected glyph components
+  frs_glyphs_/4        - stamp and layout identification
+  frs_swap_grid_/4     - exchange the stamp's two colors
+  frs_interior_cols_/4 - trim all-6 border columns from a box
+  frs_marker_cells_/5  - the 4 anchor and the 7-domino needle
+  frs_rot_mask_/3      - quarter-turn mask rotation
+  frs_place_/6         - scale, anchor, and paint the layout
+  arc2_transform(fractal_stamp, +Grid, -Out)
+  arc2_induce_rule(+Pairs, fractal_stamp)
+
+Task solved: a32d8b75 (3 training pairs + 1 test case).
+Score: 107/120 = 89.17% to 108/120 = 90.00%.
