@@ -23415,3 +23415,87 @@ Key predicates:
 
 Task solved: 4e34c42c (2 training pairs + 1 test case).
 Score: 90/120 = 75.00% to 91/120 = 75.83%.
+
+Chapter 313: Wave 95 - short_circuit (WP-353, Layer 328)
+
+short_circuit solves ARC-AGI-2 task 7b0280bc. The task gives
+three training pairs and one test case. The grids are 18x18,
+15x15, and 20x20 in training and 30x30 in the test, and the
+output always keeps the input size. Every scene draws a wiring
+network on a uniform background using exactly three foreground
+colors: a terminal color forming exactly two blocks, a marker
+color forming small junction blocks, and a body color forming
+the wire segments that bend, run diagonally, and branch between
+them. In the first training pair the terminals are 1-blocks and
+the junctions 2-blocks on 0-wires; in the third pair the roles
+flip, with 2-block terminals and 1-block junctions on 6-wires;
+in the test the terminals are 3x3 blocks of 0s, the junctions
+blocks of 9s, and the wires runs of 1s. The output recolors
+exactly one route through the network - the route with the
+fewest stops between the two terminals - and leaves everything
+else untouched.
+
+Rule: find the fewest-node route between the two terminal
+blocks through the graph of same-color components and recolor
+its intermediate nodes - wire body cells to 5 and junction
+marker cells to 3 - keeping the terminals, the dead-end spurs,
+and every longer alternative route unchanged.
+
+Algorithm:
+
+The transform first takes the most common color as the
+background with arc2_bg_color_ and ranks the exactly three
+foreground colors by ascending cell count with scc_palette_ and
+its run-length encoder scc_runs_: the rarest color is the
+terminals, the middle one the junction markers, and the most
+frequent the wire body. scc_fgcells_ lists every foreground cell
+keyed by position, and the Wave 94 helpers sw_parts_ and
+sw_flood_ - reused verbatim - group those cells into whole
+same-color components under eight-way adjacency. scc_tag_
+attaches its color to every component, and the terminal color
+must form exactly two components. scc_index_ maps every cell to
+its component number, and scc_adj_ builds the adjacency list of
+the component graph through scc_neigh_, joining two components
+whenever any pair of their cells is eight-adjacent. scc_bfs_
+runs a breadth-first search from one terminal component to the
+other, expanding whole paths and marking components visited on
+enqueue, which yields the route with the fewest nodes. Finally
+scc_recolor_ strips the two terminals off the route ends and
+paints every cell of every intermediate component with
+scc_paint_ and arc2_set_cell_ - 3 when the component carries the
+junction marker color, 5 otherwise. The induce clause dispatches
+early, directly after seam_weld, requiring equal first-pair
+dimensions and exactly four distinct colors in the first input,
+then verifying every training pair.
+
+The lesson of the wave is that the network is a genuine graph,
+not a pair of disjoint routes. Junction blocks carry three or
+more attached segments, dead-end spurs hang directly off the
+terminals, and in the test grid one junction block serves both
+the shortest route and a long alternative - so no split into
+candidate routes can work, and only a breadth-first search over
+the component graph picks the right path. Counting nodes is the
+right metric: in every pair the recolored route is the unique
+fewest-node path between the two terminals, with no cell-count
+or Euclidean tie-break needed. A second lesson is that color
+roles must be derived per grid: the same color draws the wires
+in one pair and the junctions in another, so the rule ranks the
+three foreground colors by cell count instead of memorizing
+identities.
+
+Key predicates:
+  scc_palette_/5       - rank foreground colors by cell count
+  scc_runs_/2          - run-length encode a sorted cell list
+  scc_fgcells_/3       - list foreground cells keyed by position
+  scc_tag_/3           - attach its color to every component
+  scc_index_/2         - map every cell to its component number
+  scc_adj_/3           - adjacency list of the component graph
+  scc_neigh_/4         - components eight-adjacent to one node
+  scc_bfs_/5           - fewest-node route between terminals
+  scc_recolor_/5       - recolor the intermediate route nodes
+  scc_paint_/4         - write one color over listed cells
+  arc2_transform(short_circuit, +Grid, -Out)
+  arc2_induce_rule(+Pairs, short_circuit)
+
+Task solved: 7b0280bc (3 training pairs + 1 test case).
+Score: 91/120 = 75.83% to 92/120 = 76.67%.
