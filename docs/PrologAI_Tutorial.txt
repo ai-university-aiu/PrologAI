@@ -22689,3 +22689,79 @@ Key predicates:
 
 Task solved: 6ffbe589 (3 training pairs + 1 test case).
 Score: 81/120 = 67.50% to 82/120 = 68.33%.
+
+
+Chapter 304: Wave 86 - xray_frame (WP-344, Layer 319)
+
+xray_frame solves ARC-AGI-2 task a6f40cea. The task gives three
+training pairs and one test case, on inputs of 20x20, 30x30, 22x22,
+and 24x24 with small cropped outputs of 4x7, 13x14, 7x8, and 8x10.
+Each input holds one large rectangular frame of a single color
+whose interior is uniformly filled - with the background color in
+two grids and with a distinct fill color in the others - plus
+several partial rectangle outlines drawn outside the frame. The
+outlines visibly slide under the frame: their edges break off at
+the frame boundary and, in one grid, re-emerge on the far side.
+Two grids include outlines whose edges alternate two colors cell
+by cell.
+
+Rule: the output is the frame interior with every shape's hidden
+cells restored, as if the frame were transparent - an x-ray of the
+occluded region; each shape's bounding-box perimeter is completed
+through the frame, single-color shapes restore their own color,
+and two-color alternating shapes restore the color-swapped mirror
+(vertical first, then horizontal) of the visible cell inside the
+shape's own bounding box.
+
+Algorithm:
+
+The majority color is the background. Candidate frames are found by
+xr_ring_: single-color 8-connected components (via the reused
+helper tw_components_ from the twin_lift pack) whose cells form
+exactly the perimeter of their bounding box, at least 3x3, with a
+uniformly single-colored interior; xr_frame_ keeps the largest
+candidate by bounding-box area, so the small perfect boxes
+elsewhere in the test grid remain ordinary shapes. xr_shapes_
+collects every non-background cell strictly outside the frame's
+bounding box, groups the cells into 8-connected components, and
+merges components sharing an identical color set - reuniting
+outline halves that the frame split apart. xr_hidden_ walks each
+shape's bounding-box perimeter and keeps the cells strictly inside
+the frame interior, and xr_restore_ paints them: a single-color
+shape paints its own color, while a two-color shape reflects the
+hidden cell to the opposite edge of its own bounding box (vertical
+mirror first, horizontal as fallback), reads the visible color
+there with xr_visible_, and paints the swapped color with xr_swap_.
+xr_out_cell_ assembles the interior crop with the restored cells
+overlaid. The induce clause dispatches early, directly after
+dial_rotor, requiring a strictly smaller output whose dimensions
+equal the frame interior dimensions before verifying every
+training pair.
+
+The lesson: the two-color alternating outlines are a trap for every
+positional-parity reading. Every visible cell of every two-color
+shape in all four grids obeys a plain (row + column) checkerboard,
+and the checkerboard correctly restores three of the four
+alternating shapes - but the 9/8 shape in the third training pair
+demands the exact anti-checkerboard in its hidden cells. Plain
+alternation continuation, perimeter-path alternation,
+border-skipping alternation, 180-degree rotation, and periodic
+translation all fail on at least one shape. Only the color-swapped
+mirror within the shape's own bounding box explains every hidden
+cell of every shape, and writing out every hidden cell of every
+training pair by hand before coding is what exposed both the trap
+and its escape. The rule passed the single-task test and the full
+regression on the first compile.
+
+Key predicates:
+  xr_frame_/6          - largest perfect ring with uniform interior
+  xr_ring_/7           - one candidate single-color ring
+  xr_shapes_/7         - outside shapes merged by color set
+  xr_hidden_/9         - hidden perimeter cells inside the interior
+  xr_restore_/13       - restored color via the swap-mirror rule
+  xr_out_cell_/5       - interior crop cell with overlay
+  arc2_transform(xray_frame, +Grid, -Out)
+  arc2_induce_rule(+Pairs, xray_frame)
+
+Task solved: a6f40cea (3 training pairs + 1 test case).
+Score: 82/120 = 68.33% to 83/120 = 69.17%.
