@@ -1,0 +1,62 @@
+Chapter 297: Wave 79 - master_fragment (WP-337, Layer 312)
+
+master_fragment solves ARC-AGI-2 task 269e22fb. The task gives five
+training pairs whose inputs range from 8x10 to 16x8 grids (the test
+input is 10x10) and whose outputs are all 20x20. Each grid uses
+exactly two colors - four pairs use 7 and 8, one pair uses 0 and 3.
+Every training output is one shared canonical two-color master
+pattern, reproduced up to one of the eight dihedral isometries and
+one of the two possible two-color bijections, and every input is a
+contiguous rectangular fragment cut directly from its own output. The
+task is to recognize where the fragment came from and answer with the
+full master pattern rendered in the fragment's orientation and
+colors.
+
+Rule: store the first training output as the canonical master; the
+answer is the unique candidate among the eight isometries of the
+master crossed with the two color bijections that contains the input
+fragment as an exact contiguous subgrid.
+
+Algorithm:
+
+Induction stores the first training output verbatim as the canonical
+master pattern - the rule's single learned parameter, carried as the
+argument of master_fragment(Master). Cheap guards come first: the
+output must be at least as tall and as wide as the input and strictly
+larger overall, the master must use exactly two colors, and every
+training output must share the master dimensions exactly. The
+transform then reads the two colors of the fragment and the two
+colors of the master and enumerates sixteen full-size candidates: the
+eight dihedral isometries of the master - identity, three rotations,
+two axis mirrors, and two diagonal mirrors, built from the registry
+transforms rotate_90_cw, rotate_180, rotate_90_ccw, reverse_rows,
+vertical_flip, and transpose - crossed with the two possible
+two-color bijections onto the fragment palette. A candidate survives
+only when the fragment appears inside it as an exact contiguous
+subgrid, checked by sliding the fragment over every feasible row and
+column offset. The surviving candidates are deduplicated with sort/2
+and exactly one must remain: that unique candidate is the answer, so
+an ambiguous fragment fails rather than guessing. Induction verifies
+the transform on every training pair with forall.
+
+The lesson: this is the first wave whose induced rule carries a whole
+learned grid as a rule argument, rather than colors or scalar
+parameters. The parameterized-rule machinery introduced for
+recolor_plus(A, B) extends cleanly to grid-valued parameters: the
+early dispatch clause binds the master from the first training output
+and the transform treats it as data. A second lesson: the uniqueness
+demand doubles as both the correctness proof and the induction
+verifier - each of the five training pairs admits exactly one
+candidate among sixteen, so the rule is self-checking, and the same
+check answered the test case on the first run.
+
+Key predicates:
+  mf_colors_/2         - sorted list of the distinct cell colors
+  mf_iso_/2            - the eight dihedral isometries of a grid
+  mf_recolor_/3        - repaint a grid through a two-color bijection
+  mf_subgrid_/2        - fragment appears as a contiguous subgrid
+  arc2_transform(master_fragment(Master), +Grid, -Out)
+  arc2_induce_rule(+Pairs, master_fragment(Master))
+
+Task solved: 269e22fb (5 training pairs + 1 test case).
+Score: 75/120 = 62.50% to 76/120 = 63.33%.
