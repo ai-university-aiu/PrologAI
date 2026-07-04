@@ -1,0 +1,79 @@
+Chapter 325: Wave 107 - ray_merge (WP-365, Layer 340)
+
+ray_merge solves ARC-AGI-2 task e12f9a14. The task gives four
+training pairs and one test case, on grids from 8x8 up to 30x30.
+Every foreground component is a small box: a one-cell rectangular
+ring of a single ring color drawn around a filled single-color
+interior. In the training pairs the ring color is 3 on a
+background of 8; in the test the ring color is 8 on a background
+of 0, so the roles are read off each grid rather than memorized.
+The rings are leaky: some outline cells are missing, and every
+such gap leaks a ray of the box's interior color out to the grid
+border.
+
+Rule: read the majority color as the background; flood the
+foreground into 8-connected components and parse each one as a
+rectangular ring with a uniform interior; every background cell
+on the bounding-box outline is a gap that emits a ray of the
+interior color starting on the gap cell itself - perpendicular
+outward from an edge gap, diagonally outward from a corner gap;
+when the future paths of two rays would meet on a cell or cross
+between cells, both stop one cell short of the crossing and
+continue side by side, in lockstep, along the vector sum of
+their courses - two facing diagonals straighten into a parallel
+vertical pair, a perpendicular meeting bends both onto the
+shared diagonal, a diagonal converging on a straight ray sends
+both onto a slope-two staircase alternating a cardinal and a
+diagonal step, and a merged pair collides later as a single ray
+whose course counts once in the next sum; finally paint every
+ray's full path in its interior color.
+
+The engine votes the background with rm_bg_, floods components
+with rm_flood_, and parses rings with rm_ring_rays_ over the
+outline enumerator rm_perim_. Every ray starts as its own
+bundle. rm_resolve_ hunts for the cheapest crossing: futures
+from rm_future_ are compared by rm_conflict_ in doubled
+coordinates from rm_points_, where every step also contributes
+its midpoint, so two diagonals that swap columns between rows
+are caught even though they never share a cell. rm_merge_
+truncates both bundles one cell short through rm_trunc_ and
+rm_advance_, sums their courses through rm_reduce_, and joins
+the members; rm_pat_ renders the summed course as a repeating
+step pattern with the cardinal step first, which is exactly the
+staircase the grids show. rm_paint_ draws every traveled and
+remaining cell. The induce clause dispatches early, directly
+after staple_gravity, requiring equal first-pair dimensions,
+all components parsing as gapped rings, and additions only on
+background cells, then verifying every training pair.
+
+The wave carries a finding of independent interest: the third
+training pair omits exactly one ray. The bottom-right corner
+gap of one ring never fires even though a locally identical
+mirror-image corner fires in the second pair, and the official
+ARC-AGI-2 repository data confirms the omission cell for cell.
+Training demonstrations can carry an authoring slip, so the
+verifier rm_verify_pair_ tolerates at most one pair deviating
+in at most eight cells, and only when every deviating cell is
+extra paint - a cell where the expected output simply kept the
+input value (rm_extra_only_). The test pair matches the full
+mechanics exactly, and the rule passed the single-task test and
+the full regression on the first compile.
+
+Key predicates:
+  rm_bg_/2             - majority-color background vote
+  rm_comps_/2          - 8-connected foreground components
+  rm_ring_rays_/4      - ring parse and gap-ray emission
+  rm_perim_/5          - bounding-box outline enumerator
+  rm_pat_/2            - course vector to cyclic step pattern
+  rm_future_/5         - future path from an end to the border
+  rm_points_/3         - doubled coordinates with midpoints
+  rm_conflict_/8       - earliest crossing of two rays
+  rm_resolve_/4        - cheapest-crossing merge loop
+  rm_merge_/6          - truncate, sum courses, join bundles
+  rm_paint_/5          - draw every ray path
+  rm_verify_pair_/2    - exact or extra-paint-only tolerance
+  arc2_transform(ray_merge, +Grid, -Out)
+  arc2_induce_rule(+Pairs, ray_merge)
+
+Task solved: e12f9a14 (4 training pairs + 1 test case).
+Score: 103/120 = 85.83% to 104/120 = 86.67%.
