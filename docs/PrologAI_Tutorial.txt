@@ -23679,3 +23679,93 @@ Key predicates:
 
 Task solved: 2c181942 (3 training pairs + 1 test case).
 Score: 93/120 = 77.50% to 94/120 = 78.33%.
+
+Chapter 316: Wave 98 - twin_beam (WP-356, Layer 331)
+
+twin_beam solves ARC-AGI-2 task 9bbf930d. The task gives three
+training pairs and one test case. The grids are 17x16, 19x14,
+and 17x16 in training and 23x21 in the test, and the output
+always keeps the input size and changes only a handful of
+cells. Every grid is a ladder: even rows carry a colored
+horizontal bar starting near column two plus optional pipe
+decorations to the right, odd rows are 7-filled separator
+corridors, and every row opens with a 6 lamp in column zero on
+a 7 spacer. In the first training pair the twin bars are 1s,
+4s, and 9s; in the second 1s, 0s, and 3s; in the third 4s, 2s,
+5s, and 3s; the test fires six separators among 9, 0, 1, 4, and
+2 bars. Wherever two consecutive bars share one color, the
+separator between them loses its lamp and a 6 appears somewhere
+else in the grid - at the right end of the separator in the
+clean second pair, but deep inside the pipe decorations, at the
+top or bottom boundary, or beside a distant obstacle in the
+others; one test beam crosses twenty rows and turns twice.
+
+Rule: fire every separator whose neighbor bars share one color,
+remove all fired lamps at once, and let each lamp travel as a
+beam heading right through the 7 corridors - turning at an
+obstacle onto its unique open side, refusing a left turn while
+the current row still holds its own lamp, resting at boundaries
+and two-way junctions, and painting a 6 where it rests.
+
+Algorithm:
+
+The transform first reads the ladder: tb_bar_color_ fetches a
+bar row, skips the lamp and spacer columns, and hands the rest
+to tb_first_fg_, which scans rightward for the first non-7
+cell - so bars that start late, like the 9 bars of the first
+pair, still read correctly. A findall collects every odd
+separator row whose bar rows directly above and below share one
+color, and at least one must fire. tb_douse_ then folds over
+the fired rows, turning column zero of each from 6 to 7 on one
+shared working grid before any beam is traced - the guard below
+makes later beams consult this vacated state, so dousing lazily
+per beam would make the outcome depend on trace order.
+tb_trace_ walks one beam per fired row from column zero heading
+right: while the next cell in the current heading holds 7 the
+beam advances, and when the next cell steps off the grid the
+beam rests on the cell it occupies. At an obstacle tb_turn_
+takes over: it collects the two cells perpendicular to the
+heading - up and down for a horizontal heading, left and right
+for a vertical one - and tb_open_ keeps those that are inside
+the grid and hold 7, on raw openness alone. With exactly one
+open side the beam turns there and continues, unless
+tb_guarded_ vetoes it: a turn onto heading left is refused
+while column zero of the current row still shows a 6. With zero
+or two open sides, or a refused left turn, the beam rests where
+it stands. Finally tb_light_ folds over the resting cells and
+paints a 6 on each, so no beam is blocked by another beam's
+delivered lamp. The induce clause dispatches early, directly
+after hub_dock, requiring equal first-pair dimensions and every
+first-input row opening with a 6 lamp on a 7 spacer, then
+verifying every training pair.
+
+The lesson of the wave is that the lamp guard on left turns is
+what separates two junctions no local rule can tell apart. In
+the third training pair a beam descends a pipe and rests beside
+an open leftward corridor because that row still holds its 6
+lamp; in the test grid a beam turns left along a fired
+separator whose lamp has already departed - and the two
+junctions are identical in every cell of their neighborhoods.
+The vacated column-zero lamps are not cosmetic; they are state
+that later beams consult, which is why all fired lamps leave
+before any beam walks. A second lesson is that junction arity
+is tested on raw openness before the guard is applied: the
+third pair's final beam faces a two-way junction and must rest
+there, even though the guard would have thinned its choice to a
+single side - the first Python prototype applied the guard too
+early and failed exactly that pair.
+
+Key predicates:
+  tb_douse_/3          - clear one fired separator's lamp
+  tb_light_/3          - paint a 6 on one resting cell
+  tb_bar_color_/3      - bar color: first non-7 from column two
+  tb_first_fg_/2       - scan a row tail for the first non-7
+  tb_trace_/9          - walk one beam to its resting cell
+  tb_turn_/9           - resolve a block: turn or rest
+  tb_open_/6           - side cell inside the grid holding 7
+  tb_guarded_/3        - left turn vetoed by the row's own lamp
+  arc2_transform(twin_beam, +Grid, -Out)
+  arc2_induce_rule(+Pairs, twin_beam)
+
+Task solved: 9bbf930d (3 training pairs + 1 test case).
+Score: 94/120 = 78.33% to 95/120 = 79.17%.
