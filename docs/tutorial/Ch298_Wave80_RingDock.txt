@@ -1,0 +1,61 @@
+Chapter 298: Wave 80 - ring_dock (WP-338, Layer 313)
+
+ring_dock solves ARC-AGI-2 task b5ca7ac4. The task gives three
+training pairs on 22x22 grids and one test case on a 22x25 grid. Each
+grid scatters six to eight five-by-five ring objects over a solid
+background - every ring is a one-cell uniform border of color 8 or
+color 2 around a solid three-by-three uniform interior of some other
+color. In the output every 8-bordered ring has slid horizontally into
+a parking lane against the left edge and every 2-bordered ring
+against the right edge, each ring keeping its rows exactly. Same-side
+rings whose rows overlap pack side by side against the ring already
+parked nearer the edge, and rings starting on the wrong side of the
+grid cross the whole board to reach their lane.
+
+Rule: detect the five-by-five rings, learn which border color goes
+left and which goes right, and pack each side's rings against its
+edge in edge-nearest order, with collision scoped to same-side rings.
+
+Algorithm:
+
+The background is the most frequent color. Ring detection scans every
+feasible top-left corner for a sixteen-cell uniform non-background
+border around a nine-cell uniform interior of a different
+non-background color, and a total-coverage guard demands that the
+grid's non-background cell count equal exactly twenty-five times the
+ring count, so the fixed-size detector can never miss content or fire
+on a false positive. The rings split by border color into left movers
+and right movers - the assignment of the two border colors to the two
+directions is the induced rule parameter pair ring_dock(L, R), found
+by trying both assignments and keeping the one under which every
+training pair transforms correctly. Each side then gets its own fresh
+background canvas: left movers sort by ascending column (edge-nearest
+first, ties by row) and each in turn slides leftward one column at a
+time until the grid edge or an already-parked same-side ring blocks
+it, then stamps its five-by-five block; right movers do the mirror
+image toward the right edge. Finally the two side canvases merge cell
+by cell into the output, preferring non-background cells.
+
+The lesson: collision must be scoped to destination. The first
+prototype slid every ring over one shared canvas and failed two of
+the three training pairs - a right mover was blocked by a left mover
+sitting in its path, even though the training outputs show the two
+groups passing straight through each other as they trade sides. One
+canvas per side, merged afterward, fixed all three training pairs at
+once. A second lesson: sorting each side's movers by distance to
+their target edge makes stepwise sliding equivalent to final-position
+packing, so the slide loop needs no lookahead and stays glass-box.
+
+Key predicates:
+  rd_ring_/3           - detect one five-by-five ring object
+  rd_rings_/3          - collect every ring object in the grid
+  rd_slide_left_/5     - slide a ring leftward until blocked
+  rd_slide_right_/6    - slide a ring rightward until blocked
+  rd_place_left_/4     - park all left movers in edge-nearest order
+  rd_place_right_/5    - park all right movers in edge-nearest order
+  rd_merge_/4          - overlay the two side canvases
+  arc2_transform(ring_dock(L, R), +Grid, -Out)
+  arc2_induce_rule(+Pairs, ring_dock(L, R))
+
+Task solved: b5ca7ac4 (3 training pairs + 1 test case).
+Score: 76/120 = 63.33% to 77/120 = 64.17%.
