@@ -24131,3 +24131,91 @@ Key predicates:
 
 Task solved: 4a21e3da (3 training pairs + 1 test case).
 Score: 98/120 = 81.67% to 99/120 = 82.50%.
+
+Chapter 321: Wave 103 - tower_donate (WP-361, Layer 336)
+
+tower_donate solves ARC-AGI-2 task 9aaea919. The task gives
+three training pairs and one test case, all on 30x30 grids, and
+the output always keeps the input size. Every input shows
+towers of diamond glyphs standing on a uniform background. A
+glyph is a three-row, five-column stamp: the middle row is
+solid in the glyph color, and the top and bottom rows carry the
+color over the middle three cells with background corners. The
+glyphs stack upward from the bottom of the grid, one background
+row between glyphs, so consecutive centers sit four rows apart,
+and every glyph of a tower shares one color. The bottom grid
+row carries five-wide marker bars aligned exactly under
+specific towers: bars of color 2 and bars of color 3, with the
+remaining towers unmarked. In the output the markers have done
+their work and vanished: every tower under a color-2 bar keeps
+its height but is repainted gray with color 5, every tower
+under a color-3 bar has grown taller in its own color, and the
+unmarked towers are untouched.
+
+Rule: read the background as the most frequent color; scan the
+bottom row into five-wide bars of colors 2 (donor) and 3
+(receiver); detect the diamond glyphs and group them into
+single-color towers by column window; sum the donor tower
+heights into the donated total; repaint every donor tower gray
+5 at its own height; grow every receiver tower by the donated
+total, stacking new glyphs on top four rows apart; erase the
+bars.
+
+Algorithm:
+
+The transform first calls td_background_, which flattens the
+grid, counts the palette with clumped, and takes the most
+frequent color as the background. td_bars_ with td_row_runs_
+and td_take_run_ scans the bottom grid row left to right,
+skipping background cells and reading each non-background run;
+every run must be exactly five cells wide and colored 2 or 3,
+and each becomes a bar term holding its color and start column.
+td_glyphs_ enumerates every candidate center row and window
+start column, and td_glyph_ tests the full thirteen-cell
+diamond pattern - a solid five-wide middle row, three-wide top
+and bottom arcs over the middle columns, and background corners
+- collecting each hit with its center row, start column, and
+color. td_towers_ groups the glyphs by their five-wide column
+window, requires every glyph of a group to share one color, and
+sorts the center rows top to bottom; every bar must sit exactly
+under a tower's window. The donation is then plain arithmetic:
+the glyph counts of all towers under color-2 bars sum into the
+donated total. td_gray_tower_ walks each donor's centers and
+td_paint_glyph_ repaints its thirteen cells with color 5, so
+the donor keeps its exact height and silhouette. td_grow_tower_
+takes each receiver tower's topmost center row and paints the
+donated number of new glyphs in the tower's own color, each
+center four rows above the previous one. Finally td_erase_bar_
+with td_set_bg_ wipes the five cells of every marker bar back
+to the background. The induce clause dispatches early, directly
+after ray_scatter, requiring equal first-pair dimensions, a
+bottom row holding only five-wide bars of colors 2 and 3 with
+at least one of each, at least one glyph, and every bar aligned
+under a tower, then verifying every training pair.
+
+The lesson of the wave is to look for a conserved quantity
+flowing between marked columns. The three training receivers
+grow by two, one, and three glyphs while the three donors stand
+two, one, and three glyphs tall - a match that would also fit a
+rule reading the donor as a mere gauge. The test grid settles
+it: two donor bars over two one-glyph towers grow the single
+receiver by exactly two glyphs, so the donations must be summed
+across all donors. Reading all four grids before theorizing
+made the arithmetic obvious in one pass, and the rule passed
+the single-task test and the full regression on the first
+compile.
+
+Key predicates:
+  td_background_/2     - most frequent color is the background
+  td_bars_/3           - five-wide bottom-row marker bars
+  td_glyphs_/3         - all thirteen-cell diamond glyphs
+  td_towers_/2         - single-color towers by column window
+  td_gray_tower_/3     - repaint one donor tower gray 5
+  td_grow_tower_/4     - stack donated glyphs on a receiver
+  td_paint_glyph_/5    - paint one diamond glyph
+  td_erase_bar_/5      - erase one marker bar to background
+  arc2_transform(tower_donate, +Grid, -Out)
+  arc2_induce_rule(+Pairs, tower_donate)
+
+Task solved: 9aaea919 (3 training pairs + 1 test case).
+Score: 99/120 = 82.50% to 100/120 = 83.33%.
