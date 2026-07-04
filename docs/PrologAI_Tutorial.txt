@@ -23853,3 +23853,90 @@ Key predicates:
 
 Task solved: de809cff (2 training pairs + 1 test case).
 Score: 95/120 = 79.17% to 96/120 = 80.00%.
+
+Chapter 318: Wave 100 - corner_glyph (WP-358, Layer 333)
+
+corner_glyph solves ARC-AGI-2 task 4c416de3 - on the one
+hundredth wave of the climb. The task gives three training
+pairs and one test case. The grids range from 19x22 to 23x23,
+and the output always keeps the input size. Every input holds
+boxes outlined in the zero border color on a solid background -
+1, 8, 2, and 3 across the four grids - some clipped by the grid
+edge. One box corner already carries a full multi-cell
+decoration, the template, and the template shape differs in
+every grid: a two-by-two outward block plus two inward diagonal
+cells in the first pair, a six-cell zigzag band in the second,
+a four-cell corner cross in the third, and a six-cell hook in
+the test. Other corners carry just a single colored cell - a
+glyph - sitting at one specific position of the shape: its most
+inward cell on the corner's own diagonal. The output completes
+every glyph into the full decoration, painted in the glyph's
+color and mirrored into that corner's orientation, while
+unmarked corners stay bare.
+
+Rule: detect every box corner with its outward orientation by a
+tolerant L-junction test; learn the template shape from the one
+corner holding at least three same-colored cells nearby, each
+cell stored as an offset in the corner's own frame; take the
+shape's most inward diagonal offset as the marker position; and
+stamp the complete shape, in the marker cell's color, at every
+corner whose marker cell holds a non-background, non-zero
+color.
+
+Algorithm:
+
+The transform first reads the background with arc2_bg_color_
+and requires it to differ from zero. cg_corner_ then scans
+every cell and every orientation frame (u, v): a corner cell is
+never background, cg_arm_ validates the two border arms running
+inward - their first four in-bounds cells must never show the
+background, though decoration cells may overwrite border cells
+anywhere on the arm, and at least two zero border cells must
+survive per arm - while cg_not_zero_ confirms that no border
+continues outward and the inward diagonal cell is interior.
+cg_template_ enumerates the detected corners and collects every
+non-background, non-zero cell within Chebyshev distance two in
+frame coordinates (p = dr times u, q = dc times v); a color
+reaching at least three cells is the template and its offsets
+are the shape, so one canonical shape serves all four corner
+orientations. cg_marker_ takes the shape's most inward offset
+on its own diagonal - p equals q, p negative, p minimal - as
+the marker position; the first pair's template reaches two
+diagonal steps inward while the other grids reach one, so the
+marker is read off the learned shape, never hard-coded. The
+transform then reads each corner's marker cell and keeps every
+corner whose marker holds a color that is neither background
+nor zero, and cg_stamp_ folds over them, mapping every shape
+offset through the corner's own frame and painting the marker
+color via hb_paint_, which clips at the grid edges. Template
+corners pass the marker test and repaint themselves unchanged,
+so the stamp is idempotent. The induce clause dispatches early,
+directly after hole_beacon, requiring equal first-pair
+dimensions, a nonzero background, zero borders present, and a
+template corner found, then verifying every training pair.
+
+The lesson of the wave is that when decorations overwrite the
+very structure that locates them - corner stamps painting over
+their own box borders - the detector must be exactly as
+tolerant as the decoration is destructive, and no more. The
+first arm test demanded exact zeros at distances three and four
+and lost two corners of the third pair's five-cell box, because
+the template at one corner sits within arm reach of the
+opposite corner. Forbidding only background on the arm while
+counting two surviving zeros admits every true corner and,
+checked against all thirty-one corners of the four grids, not
+one impostor: every false candidate still fails on the zero
+count or on the perpendicular arm.
+
+Key predicates:
+  cg_not_zero_/3       - cell out of bounds or not a border zero
+  cg_arm_/6            - tolerant inward border arm test
+  cg_corner_/6         - box corner with its outward frame
+  cg_template_/4       - template color and shape in frame offsets
+  cg_marker_/2         - most inward diagonal offset of the shape
+  cg_stamp_/4          - stamp one corner's decoration
+  arc2_transform(corner_glyph, +Grid, -Out)
+  arc2_induce_rule(+Pairs, corner_glyph)
+
+Task solved: 4c416de3 (3 training pairs + 1 test case).
+Score: 96/120 = 80.00% to 97/120 = 80.83%.
