@@ -24931,3 +24931,67 @@ Key predicates (arc_benchmark_2.pl):
 
 Task solved: 446ef5d2 (2 training pairs + 1 test case).
 Score: 108/120 = 90.00% to 109/120 = 90.83%.
+
+Chapter 331: Wave 113 - bbox_fill repair (WP-371, Layer 346)
+
+Wave 113 is a REPAIR wave. It does not add a new rule; it corrects
+one decision inside an existing rule, bbox_fill, so that the rule
+finally solves ARC-AGI-2 task 9385bd28. The score rises from
+109/120 = 90.83% to 110/120 = 91.67%.
+
+This kind of wave is worth studying because it shows how a rule can
+pass every training pair and still be wrong. bbox_fill reads a
+two-column LEGEND at the bottom-left of the grid: each row maps a
+marker color to a fill color. Elsewhere, every marker color paints
+two three-cell L-trominoes - opposite corners of a rectangle - and
+the output draws that rectangle SOLID in its fill color, keeping the
+marker cells. When several rectangles overlap, a stacking order
+decides which fill is visible.
+
+The original rule stacked rectangles by BOUNDING-BOX AREA, drawing
+the smallest one last so it sat on top. In all four training pairs
+the rectangles NEST - a small rectangle wholly inside a larger one -
+and there the smallest-area rule is correct, so induction accepted
+it. But the held-out test does not nest, it CROSSES: a color-2
+rectangle two columns wide runs the full height of the grid and
+passes through three horizontal bars, none of which contains the
+stripe or one another. At the twelve cells where the stripe meets a
+bar, the correct answer keeps the STRIPE, but smallest-area order
+let the shorter bars win. Twelve cells wrong.
+
+The diagnosis is the lesson. Smallest-area-on-top and
+earliest-legend-on-top are INDISTINGUISHABLE whenever rectangles
+nest, because a nested inner rectangle is simultaneously the smaller
+shape AND the earlier legend entry. The two laws diverge only when
+rectangles cross, and no training pair crosses. The legend's own
+top-to-bottom order is the puzzle author's explicit z-order
+declaration - a first-class signal, more trustworthy than the
+geometric proxy of area that merely happened to agree with it on the
+training data.
+
+The repair is a single change of sort key. Where the rule sorted its
+rectangle records ascending by bounding-box area, it now sorts them
+ascending by LEGEND INDEX (the zero-based position of each
+marker-to-fill mapping in the legend), and the fill lookup returns
+the first matching rectangle in that order - the earliest legend
+entry, on top. Confirming by hand: the test legend maps, in order,
+2->2, 5->9, 3->9, 1->4, 4->6; color 2 (first) wins all twelve
+crossing cells, while color 4 (last) still yields its own crossings
+to the earlier bars. Both behaviors are exactly correct, and because
+legend order equals area order on every nested training pair, all
+four training pairs still pass. A full 120-task regression shows the
+net effect is precisely plus one, with no other task changed.
+
+Key predicates changed (arc_benchmark_2.pl):
+  arc2_transform(bbox_fill, +Grid, -Out)
+    - builds its rectangle-info list keyed by legend index and
+      keysorts on that key (was: keyed by bounding-box area)
+  arc2_bxf_fill_for_/4
+    - the first matching rectangle is now the topmost by legend
+      order (was: the smallest by area)
+
+No predicates were added or removed; the repair touches only the
+stacking key.
+
+Task solved: 9385bd28 (4 training pairs + 1 test case).
+Score: 109/120 = 90.83% to 110/120 = 91.67%.
