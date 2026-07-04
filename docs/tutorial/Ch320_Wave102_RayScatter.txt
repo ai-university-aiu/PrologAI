@@ -1,0 +1,93 @@
+Chapter 320: Wave 102 - ray_scatter (WP-360, Layer 335)
+
+ray_scatter solves ARC-AGI-2 task 4a21e3da. The task gives
+three training pairs and one test case. The training grids are
+18x18 and the test grid is 20x20, and the output always keeps
+the input size. Every input shows exactly three colors: a
+uniform background, one connected blob of a single color
+sitting near the middle of the grid, and one or two lone marker
+cells resting on the grid border - on the top and right edges
+in the first pair, the top edge in the second, and the bottom
+edge in the third and in the test. In the output the blob has
+been blasted apart. Each marker has fired a ray into the grid
+along its own row or column, reaching exactly as far as the
+farthest blob cell on that line; the background cells along the
+ray are painted the marker color, while the blob cells lying on
+the line keep their color and stay welded in place. Every other
+blob cell has flown away: the blob's side pieces have
+translated rigidly into the corners of the grid, each landing
+flush against two walls with its shape preserved cell for cell
+- and in the two-ray pair, the bottom-left piece has vanished
+entirely.
+
+Rule: rank the three colors by frequency into background, blob,
+and marker; fire one ray per border marker to the farthest blob
+cell on its line, painting background positions marker-colored;
+anchor the on-line blob cells; split the rest into quadrant or
+side pieces; translate each piece flush into its corner - away
+from each ray across the line, toward the marker's edge along a
+single ray - and delete any piece whose corner touches no
+marker edge.
+
+Algorithm:
+
+The transform first calls rs_scene_, which flattens the grid,
+counts the palette with clumped, and requires exactly three
+colors ranked by frequency - the background, the blob, and a
+marker color of at most two cells - collecting the marker and
+blob cell positions. rs_rays_ and rs_ray_ turn each border
+marker into a directed ray term: vertical firing downward from
+the top row or upward from the bottom row, horizontal firing
+rightward from the left column or leftward from the right
+column. rs_ray_far_ collects the blob cells on each ray's line
+and takes the farthest one in the travel direction as the
+stopping point, and rs_draw_ray_ with rs_ray_span_ and
+rs_ray_cell_ paints every line position between the marker and
+the stop - blob positions keep the blob color, background
+positions take the marker color. rs_on_ray_ then anchors every
+blob cell whose column matches a vertical ray or whose row
+matches a horizontal ray; these cells never move. The remaining
+movable cells are grouped by rs_groups_ with rs_key_: against a
+horizontal ray the row side picks the vertical half, otherwise
+the vertical marker's own edge does, and against a vertical ray
+the column side picks the horizontal half, otherwise the
+horizontal marker's edge does - giving the four quadrants
+around a two-ray crossing or the two sides of a single line.
+Finally rs_place_ lands each group: rs_corner_edges_ names the
+two walls of the destination corner, and the group survives
+only if one of them holds a marker (rs_marker_edges_);
+rs_offsets_ computes the rigid shift that puts the group's
+bounding box flush against both walls, and rs_shift_put_ paints
+the translated cells in the blob color. The induce clause
+dispatches early, directly after legend_snake, requiring equal
+first-pair dimensions, exactly three colors with the rarest on
+the border, and every ray line crossing the blob, then
+verifying every training pair.
+
+The lesson of the wave is to re-read the data before
+theorizing. A first reading of the second training pair
+invented a phantom missing cell, and three cell-deletion
+hypotheses died against clean counterexamples before a careful
+re-print of the expected output showed the piece intact all
+along. The real anomaly was one whole missing quadrant,
+explained by one clean test: the destination corner must touch
+an edge that holds a marker. The rest of the task is plain
+bookkeeping - anchored line cells never move, and every other
+cell rides its piece's rigid translation into a corner.
+
+Key predicates:
+  rs_scene_/6          - rank colors, collect markers and blob
+  rs_rays_/4           - one directed ray term per marker
+  rs_ray_far_/3        - farthest blob cell on a ray line
+  rs_draw_ray_/6       - paint one ray marker-colored over bg
+  rs_on_ray_/2         - anchor blob cells on a ray line
+  rs_groups_/3         - quadrant or side pieces of the blob
+  rs_marker_edges_/4   - border edges holding markers
+  rs_place_/7          - corner survival test and placement
+  rs_offsets_/7        - corner-flush rigid translation
+  rs_shift_put_/6      - paint one translated piece cell
+  arc2_transform(ray_scatter, +Grid, -Out)
+  arc2_induce_rule(+Pairs, ray_scatter)
+
+Task solved: 4a21e3da (3 training pairs + 1 test case).
+Score: 98/120 = 81.67% to 99/120 = 82.50%.
