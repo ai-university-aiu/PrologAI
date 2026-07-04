@@ -1,0 +1,78 @@
+Chapter 334: Wave 116 - concentric_rings repair (WP-374, Layer 349)
+
+Wave 116 is a one-line repair of an existing glass-box rule,
+concentric_rings, that finally solves ARC-AGI-2 task 13e47133. The
+score rises from 112/120 = 93.33% to 113/120 = 94.17%.
+
+This chapter is a lesson in how a rule can pass every training
+example and still hide a wrong choice of distance metric.
+
+THE TASK
+
+Each grid is a background field walled by a divider color - the
+most frequent non-background color - into regions. Every walled
+region is filled with concentric rectangular rings, like the
+contour lines of a hill. A cell's ring index is its distance from
+the region boundary, where the boundary is the grid edge or any
+cell touching a divider wall: the outer ring is index zero and the
+index grows inward. Small single-cell markers inside a region name
+the color cycle - a marker at ring K colors ring K, empty rings
+default to background, and the cycle repeats outward.
+
+In the two training pairs the divider draws one plain rectangle. In
+the held-out test it draws several NESTED boxes, one inside another.
+
+THE FAULT
+
+The solver already reproduced both training pairs exactly, yet it
+missed the test by twenty-nine cells - every one a single color off,
+a uniform shift of exactly one ring. When a rule nails training but
+slips on the test by a uniform one-ring shift, the color logic is
+not the suspect; the geometry is.
+
+The ring distance was computed by a multi-source breadth-first
+search from the boundary, expanding with FOUR-connected steps - up,
+down, left, right - which measures Manhattan distance. For a plain
+rectangle that is correct: Manhattan distance from the four edges is
+exactly min(top, bottom, left, right), the concentric-ring index, so
+both training rectangles came out right. But where two nested boxes
+meet, the region has a CONCAVE corner, and Manhattan distance cannot
+cut across a corner. It walks around and arrives one step late,
+over-counting the ring by one along the diagonal - the twenty-nine
+cells.
+
+THE REPAIR
+
+Let the distance propagate with EIGHT-connected steps, which
+measures Chebyshev distance. Chebyshev distance from the boundary
+keeps the ring index constant along a box corner, so the rings
+become true concentric rectangles even around concave corners.
+
+The change is a single call: inside arc2_cri_bfs_, the ring-distance
+breadth-first search, the neighbour helper moves from
+arc2_cri_nbrs_ (four-connected) to arc2_cri_nbrs8_ (eight-connected).
+The region flood-fill and the boundary test stay four-connected and
+are untouched.
+
+WHY IT IS SAFE
+
+The fault was invisible in training precisely because both training
+regions are simple rectangles, where Manhattan and Chebyshev
+boundary-distance coincide. Only the test's nested boxes create the
+concave corners that separate the two metrics. After the repair, all
+twenty-nine miscolored test cells are corrected, both training pairs
+still reproduce exactly, and a full run of the 120-task benchmark
+shows the other 119 tasks unchanged.
+
+THE LESSON
+
+Concentric rectangles are a Chebyshev object, not a Manhattan one.
+When a solver reproduces training exactly yet misses the test by a
+uniform one-ring shift, suspect the distance metric before the color
+logic, and remember that easy training geometry can make two
+different metrics agree.
+
+Predicate touched: arc2_cri_bfs_ now calls arc2_cri_nbrs8_.
+
+Task solved: 13e47133 (2 training pairs + 1 test case).
+Score: 112/120 = 93.33% to 113/120 = 94.17%.
