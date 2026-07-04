@@ -1,0 +1,67 @@
+Chapter 302: Wave 84 - motif_shadow (WP-342, Layer 317)
+
+motif_shadow solves ARC-AGI-2 task 64efde09. The task gives two
+training pairs on 26x29 and 21x27 grids and one test case on a
+29x29 grid, all over background 8. Each input holds two to four
+rectangular motifs, each two cells wide and seven or nine cells
+long, plus exactly three singleton marker cells sitting on the grid
+edges. The motif palettes differ across grids - colors 4, 2, and 3
+in the first training input, colors 4, 2, and 1 in the second, and
+colors 1, 4, 2, and 3 in the test - but every motif carries a run
+of color 2 along exactly one of its long sides.
+
+Rule: each motif's anchor end is the long-axis end farther from its
+color-2 run; the three edge markers each align with one motif and
+teach an offset-to-color lesson measured from the anchor end, plus
+the grid-wide polarity saying whether rays exit on the same cross
+side as the 2-run or on the opposite side; every motif then casts
+one full ray per lesson, perpendicular to its long axis, from its
+exit side out to the grid edge, painting only background cells.
+
+Algorithm:
+
+The background is the most frequent color, and the 8-connected
+foreground components split into motif rectangles and singleton
+markers; the helpers tw_background_ and tw_components_ from the
+twin_lift pack are reused unchanged. A motif rectangle is two cells
+wide, at least four cells long, fills its bounding box completely,
+and holds color-2 cells on exactly one long side; its anchor end is
+the long-axis end farther from that 2-run. A marker on the left or
+right grid edge aligns with the vertical motif whose row span holds
+the marker row, and a marker on the top or bottom edge aligns with
+the horizontal motif whose column span holds the marker column; the
+marker teaches the lesson pairing its axis offset from the anchor
+end with its color, and votes on the polarity by comparing its side
+of the motif with the motif's 2-run side. All votes must agree.
+Every motif then casts one ray per deduplicated lesson at the
+lesson offset from its own anchor end, from its exit side out to
+the grid edge, and the rebuild gives a background cell under a ray
+the ray color while every other cell keeps its input value. The
+induce clause dispatches early, directly after stripe_cycle,
+requiring preserved dimensions, 10 to 200 foreground cells, at
+least two parsing motif rectangles, and exactly three singleton
+markers before verifying every training pair.
+
+The lesson: the exit direction is a grid parameter, not a motif
+parameter. In the first training grid every motif exits on the same
+side as its color-2 run, in the second training grid and the test
+grid every motif exits on the opposite side, and no structural
+feature of the motifs separates the cases - even their palettes
+change from grid to grid. The markers decide it: each marker lies
+on the ray of its own color, so its side of the aligned motif
+reveals the polarity of the whole grid. What looked like an
+inconsistent rule became a single parameter read off the input at
+answer time, and the rule passed the single-task test and the full
+regression on the first compile.
+
+Key predicates:
+  ms_classify_/3       - split components into motifs and markers
+  ms_motif_/2          - parse one motif rectangle with its anchor
+  ms_lesson_/7         - one marker's offset-color-polarity lesson
+  ms_ray_/6            - the ray cells cast by one motif
+  ms_row_/5            - rebuild one output row under the rays
+  arc2_transform(motif_shadow, +Grid, -Out)
+  arc2_induce_rule(+Pairs, motif_shadow)
+
+Task solved: 64efde09 (2 training pairs + 1 test case).
+Score: 80/120 = 66.67% to 81/120 = 67.50%.
