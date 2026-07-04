@@ -22765,3 +22765,77 @@ Key predicates:
 
 Task solved: a6f40cea (3 training pairs + 1 test case).
 Score: 82/120 = 68.33% to 83/120 = 69.17%.
+
+
+Chapter 305: Wave 87 - twin_toggle (WP-345, Layer 320)
+
+twin_toggle solves ARC-AGI-2 task c7f57c3e. The task gives two
+training pairs and one test case, on grids of 18x18, 18x18, and
+28x28, with every output the same size as its input. Each grid
+holds several shapes on a uniform majority-color background. In the
+first pair the shapes are small plants - a flower of 1s with a 2
+center above a stem and a base - and the stem-and-base region is
+drawn either in colors 2 and 3 or entirely in color 8. In the
+second pair the shapes are X-bodies of 1s with a 2 center carrying
+either a single 4 attached below or a single 6 attached above. The
+test mixes 3-center and 6-center bodies with a 2-decoration above
+or a 4-decoration below, and some shapes are exact scaled-up copies
+of the small ones: scale 2 in training and scale 3 in the test.
+
+Rule: every grid contains integer-scaled copies of exactly two
+variant templates that share an identical body of same-colored
+cells under a best-overlap alignment; the output redraws every
+shape as the other variant at its own scale, positioned so the
+shared body cells stay exactly where they were.
+
+Algorithm:
+
+The majority color is the background, and the foreground cells
+group into 8-connected components with the reused helpers
+tw_background_ and tw_components_ from the twin_lift pack.
+tt_shape_ crops each component to its bounding box on a clean local
+canvas holding only its own cells, and tt_reduce_ fully reduces the
+crop by the largest integer scale whose square blocks are all
+uniform - tt_blocky_ checks the blocks and tt_shrink_ samples them
+- yielding a canonical template and a scale factor, so the scale-2
+and scale-3 copies collapse onto the same canonical templates as
+their small twins. The grid must present exactly two distinct
+canonical templates. tt_align_ scores every translation offset of
+the second template against the first by the count of overlapping
+cells agreeing in color and keeps the maximum; those agreeing cells
+are the shared body. tt_draw_ then redraws every shape as the OTHER
+template, upscaled by the shape's own scale factor and positioned
+through the alignment offset so the shared body stays fixed, and
+tt_render_ paints the toggled cells onto a fresh background canvas
+after a bounds check. The induce clause dispatches early, directly
+after xray_frame, requiring preserved dimensions, a sparse
+foreground of 8 to 400 cells, at least two components, and exactly
+two canonical templates before verifying every training pair.
+
+The lesson: the human-steps description frames this task as three
+color roles - a base, a mid, and a pivot - with an adjacency test
+choosing between a color swap and a color promotion. That reading
+is hard to code and does not generalize: the first pair recolors a
+stem and base, the second pair moves a marker from below one shape
+to above another while changing 4 to 6, and the test does both at
+once. Dumping all six grids and writing the complete rule in plain
+English before coding revealed the far simpler twin-toggle
+invariant, and one uniform mechanism - canonicalize, pair, align,
+toggle - covers all three decoration styles with no per-color
+reasoning at all. The rule passed both training pairs and the test
+case on the first prototype run and the full regression on the
+first compile.
+
+Key predicates:
+  tt_shape_/3          - canonical template, scale, and origin
+  tt_reduce_/5         - maximal uniform block reduction
+  tt_blocky_/4         - every SxS block is uniform
+  tt_shrink_/5         - sample block colors into the template
+  tt_align_/5          - best same-colored overlap offset
+  tt_draw_/7           - one toggled twin cell
+  tt_render_/5         - fresh canvas with the toggled shapes
+  arc2_transform(twin_toggle, +Grid, -Out)
+  arc2_induce_rule(+Pairs, twin_toggle)
+
+Task solved: c7f57c3e (2 training pairs + 1 test case).
+Score: 83/120 = 69.17% to 84/120 = 70.00%.
