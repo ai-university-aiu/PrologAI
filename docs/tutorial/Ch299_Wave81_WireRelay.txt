@@ -1,0 +1,71 @@
+Chapter 299: Wave 81 - wire_relay (WP-339, Layer 314)
+
+wire_relay solves ARC-AGI-2 task a47bf94d. The task gives three
+training pairs on 22x22 grids and one test case on a 26x26 grid. Each
+grid holds a maze of wires drawn in color 8, crossing marks of color
+5 where two wires pass through each other, and solid rectangular
+blocks of color 9 that wires enter and leave. Every wire runs from a
+tip pointing up or left to a tip pointing down or right, and a
+colored figure - a solid three-by-three square, a four-cell diamond
+outline, or a five-cell diagonal X - sits centered two cells beyond
+one of the two tips. In the output every wire carries its figure
+color to both ends: a diamond outline appears two cells beyond the
+up-or-left tip and a diagonal X two cells beyond the down-or-right
+tip, the input squares are erased, and the wire structure is
+untouched.
+
+Rule: find every wire tip, trace each wire through crossings and
+blocks to its far tip, read the wire color from whichever end holds
+a figure, and draw the diamond at the up-or-left end and the X at
+the down-or-right end.
+
+Algorithm:
+
+A wire tip is any color-8 cell with exactly one orthogonal neighbor
+among the structure colors 5, 8, and 9; each tip records its inward
+direction. From each tip the tracer walks the wire one cell at a
+time, always preferring the straight-ahead cell when it is
+structural - this carries the walk through 8585 crossing marks
+without switching wires - and otherwise turning into the unique
+perpendicular structural neighbor, stopping when neither exists; a
+fuel bound of twice the cell count guards against cyclic structures
+on foreign grids. When the straight-ahead cell is a color-9 block,
+the whole block region is flood filled and the walk jumps across it:
+straight through to the wire cell directly beyond the region when
+one exists, otherwise to the block's only other adjacent wire cell,
+resuming in the outward direction of that exit. The two tips of each
+wire then pair up: the tip whose outward direction is north or west
+takes the four-cell diamond outline and the tip pointing south or
+east takes the five-cell diagonal X, both centered two cells beyond
+their tips; the wire color is read from whichever slot already holds
+a figure, and figures present at both ends must agree. The output
+keeps every structural cell, paints the diamond and X cells of every
+wire in its relay color, and clears every other cell to background.
+
+The lesson: hidden test grids exercise degrees of freedom the
+training pairs leave dormant. The first prototype crossed blocks by
+walking straight through their cells and passed all three training
+pairs, but the test grid hides a corner turn inside a three-by-four
+block - a wire enters heading west and leaves heading south, which
+the straight-walk shortcut silently truncated. Modeling the block by
+its function - a connector of its perimeter wires with a
+straight-through preference and a unique-other-exit fallback - fixed
+the test while leaving every training trace unchanged. A second
+lesson: straight-preference tracing is the entire crossing logic; no
+special case for the crossing marks is needed because the marks are
+structural cells like any other.
+
+Key predicates:
+  wr_endpoint_/2       - detect a wire tip and its inward direction
+  wr_trace_/7          - walk a wire to its far tip under a fuel bound
+  wr_region_/4         - flood fill a color-9 block region
+  wr_block_jump_/9     - jump a block straight or to its only other exit
+  wr_center_/5         - figure slot center two cells beyond a tip
+  wr_fig_color_/4      - read the figure color in a slot box
+  wr_wires_/3          - pair tips into colored wires
+  wr_draws_/2          - diamond and X cells of every wire
+  arc2_transform(wire_relay, +Grid, -Out)
+  arc2_induce_rule(+Pairs, wire_relay)
+
+Task solved: a47bf94d (3 training pairs + 1 test case).
+Score: 77/120 = 64.17% to 78/120 = 65.00%.
