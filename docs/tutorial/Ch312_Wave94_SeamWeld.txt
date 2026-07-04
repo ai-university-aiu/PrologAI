@@ -1,0 +1,85 @@
+Chapter 312: Wave 94 - seam_weld (WP-352, Layer 327)
+
+seam_weld solves ARC-AGI-2 task 4e34c42c. The task gives two
+training pairs and one test case. The inputs are 23x25, 30x20,
+and 26x20 scenes, and the outputs are 5x12, 5x22, and 14x19 - the
+output size follows the welded assembly, not the input. Every
+scene scatters several multi-color pieces on a uniform
+background, and the pieces carry duplicated connector stubs: a
+same-color cell cluster drawn identically on two different
+pieces. In the first training pair the stub is a 9,1,4,1,9
+column shared by two pieces; in the second it is a 5-3
+checkerboard corner and a three-cell bar of 8s; in the test the
+stubs include half-rings capped with a 6 or a 7, a corner of 8s,
+and a lone pair of 2 marker cells. The output is the single
+assembly obtained by welding the pieces so that every duplicated
+stub sits exactly on top of its twin.
+
+Rule: weld the pieces stub on stub. The largest piece seeds a
+canvas; every remaining piece is placed so that all landed cells
+agree exactly with the written canvas and at least one whole
+same-color component of the piece coincides with a whole
+same-color component of the canvas; the union bounding box of
+the finished weld is the answer.
+
+Algorithm:
+
+The transform first takes the most common color as the
+background with arc2_bg_color_ and groups the non-background
+cells into side-connected multi-color pieces with sw_pieces_,
+each carried as its full bounding-box subgrid cut by
+sw_subgrid_. sw_records_ counts the cells of each piece and
+splits it into whole same-color components under eight-way
+adjacency with sw_parts_ and sw_flood_ - these components are
+the candidate connector stubs. The piece holding the most
+non-background cells is written onto an empty canvas at the
+origin by sw_write_, background cells of the bounding box
+included. sw_assemble_ then welds the remaining pieces one per
+round: sw_placement_ enumerates the unplaced pieces largest
+first and every offset touching the written canvas, row offsets
+before column offsets; sw_agree_ demands that every bounding-box
+cell landing on already-written canvas content agree exactly,
+background included, and counts the agreeing non-background
+cells as the score; sw_stub_ demands that at least one whole
+same-color component of the piece land entirely on written cells
+and coincide exactly with one whole same-color component of the
+canvas, recomputed each round by sw_canvas_comps_; sw_better_
+keeps the earliest placement with the strictly highest score.
+When every piece is placed, sw_render_ reads the union bounding
+box of the canvas back as the output with the background filling
+unwritten cells. The induce clause dispatches early, directly
+after demo_transfer, requiring a first input at least fifteen
+rows tall and a first output at least two rows tall and shorter
+than the input, then verifying every training pair.
+
+The lesson of the wave is component totality. A prototype using
+plain greedy overlap welding - exact agreement plus maximum
+overlap count - picked spurious placements in two of the three
+grids: a large 1-frame brushed a 1-ring through three
+accidentally agreeing cells, and a 4-body glued itself onto a
+4-cap. The correct weld always superimposes a complete
+same-color component of one piece onto a complete same-color
+component of the other, while spurious welds only ever cover
+components partially - and because the smallest legitimate weld
+in the task joins just two marker cells, no overlap-size
+threshold can replace the totality condition. A second lesson is
+that the key-piece pattern needs no special handling: the small
+piece duplicating one end of a larger piece simply welds on top
+of that end and adds nothing to the union bounding box.
+
+Key predicates:
+  sw_pieces_/3         - extract pieces, largest first
+  sw_records_/4        - bounding box, size, and stubs per piece
+  sw_parts_/5          - whole same-color stub components
+  sw_flood_/5          - flood fill one connected part
+  sw_write_/5          - write a full bounding box to the canvas
+  sw_assemble_/4       - weld loop, one piece per round
+  sw_placement_/12     - enumerate one valid weld placement
+  sw_agree_/8          - exact-agreement check with weld score
+  sw_stub_/5           - whole stub onto whole canvas stub
+  sw_render_/3         - union bounding box readback
+  arc2_transform(seam_weld, +Grid, -Out)
+  arc2_induce_rule(+Pairs, seam_weld)
+
+Task solved: 4e34c42c (2 training pairs + 1 test case).
+Score: 90/120 = 75.00% to 91/120 = 75.83%.
