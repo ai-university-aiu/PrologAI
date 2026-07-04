@@ -23008,3 +23008,81 @@ Key predicates:
 
 Task solved: 88bcf3b4 (5 training pairs + 1 test case).
 Score: 85/120 = 70.83% to 86/120 = 71.67%.
+
+
+Chapter 308: Wave 90 - compartment_tally (WP-348, Layer 323)
+
+compartment_tally solves ARC-AGI-2 task 89565ca0. The task gives
+three training pairs and one test case, with inputs from 22x20 up
+to 30x28 and tiny census outputs from 3x4 up to 5x6. Each input
+holds one scattered noise color plus three to five box colors on a
+majority background. Every box color draws exactly one rectangular
+outline, possibly subdivided by internal partition lines - full or
+partial - into table-like compartments, one to six per box. The
+boxes nest inside each other, overlap, and cross each other's
+lines, and the scattered noise cells land everywhere, including on
+top of box-line cells. The output is a census: one row per box,
+sorted by compartment count ascending, each row painting the box
+color once per compartment and padding with the noise color out to
+the maximum count.
+
+Rule: the census digits are structural - each box's number is the
+count of compartments its partition lines enclose, found by flood
+fill with guarded single-cell wall repair, and the boxes are listed
+from fewest to most compartments with ties broken by the leftmost
+bounding-box column.
+
+Algorithm:
+
+The majority color is the background with the reused helper
+tw_background_, and ww_groups_ collects one cell set per remaining
+color. ct_comps_ counts the 4-connected fragments of every color's
+cell set, and the color with the most fragments is the scattered
+noise color, because noise cells are mostly isolated singletons
+while box outlines cohere into a few large fragments. For each
+remaining color, ct_box_ frames the box with the reused ww_ends_
+bounding box and collects every open cell strictly inside it. The
+wall test ct_wall_ marks a cell as blocking when it carries the box
+color itself, or - the guarded repair - when it is non-background
+and both its vertical neighbors or both its horizontal neighbors
+carry the box color, which restores partition cells that noise or
+another box's crossing line overwrote while keeping genuine
+single-row and single-column compartments open. ct_comps_ then
+counts the 4-connected open regions with the ct_grow_ flood fill,
+and that region count is the box's compartment count. Nested and
+crossing boxes need no special handling, because their cells are
+not walls for the box under analysis and closed outlines passing
+through do not split compartments. Finally the boxes sort by
+compartment count with msort - the b(N, C1, R1, V) term order gives
+the leftmost-column tie-break for free - and ct_row_ emits one
+census row per box, the box color repeated once per compartment,
+padded with the noise color to the maximum count. The induce clause
+dispatches early, directly after wire_wrap, requiring the first
+pair's output strictly smaller than its input in both dimensions,
+census bounds of two to nine, and a distinct foreground color count
+equal to the output height plus one, then verifies every training
+pair.
+
+The lesson of the wave is the guarded gap repair. A naive flood
+fill with walls of the box color only leaks through every partition
+cell that noise or a crossing box overwrote, undercounting the
+compartments. Repairing every flanked cell fixes the leaks but
+walls off genuine single-row and single-column compartments, whose
+interior background cells are also flanked by two parallel lines.
+Guarding the repair to non-background cells fixes both failure
+modes at once: real gaps are always noise or crossing cells, never
+background.
+
+Key predicates:
+  ct_box_/5            - one tallied box term per box color
+  ct_wall_/5           - guarded wall test for the flood fill
+  ct_wall_x_/6         - wall classification of one cell
+  ct_comps_/2          - 4-connected component count of a cell set
+  ct_comps_s_/2        - component count of an ordered cell set
+  ct_grow_/3           - absorb one component's cells
+  ct_row_/5            - one census row for one box
+  arc2_transform(compartment_tally, +Grid, -Out)
+  arc2_induce_rule(+Pairs, compartment_tally)
+
+Task solved: 89565ca0 (3 training pairs + 1 test case).
+Score: 86/120 = 71.67% to 87/120 = 72.50%.
