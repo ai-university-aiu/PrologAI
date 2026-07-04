@@ -24403,3 +24403,87 @@ Key predicates:
 
 Task solved: 5545f144 (3 training pairs + 1 test case).
 Score: 101/120 = 84.17% to 102/120 = 85.00%.
+
+Chapter 324: Wave 106 - staple_gravity (WP-364, Layer 339)
+
+staple_gravity solves ARC-AGI-2 task b6f77b65. The task gives
+five training pairs and one test case, all on 12x12 grids. The
+corner cell at row zero, column zero carries a lone indicator
+color, and the rest of the grid holds a standing scaffold of
+colored pieces: vertical poles, horizontal bars, and single
+wedged cells, interlocked so tightly that pieces hide cells
+inside each other. The indicator names the piece color to
+delete. When no piece carries that color the output is the
+unchanged input - the first training pair shows exactly this.
+Otherwise the named pieces vanish and the survivors settle under
+gravity, each rigid piece falling straight down until something
+holds it again.
+
+Rule: read the indicator color in the corner; group every other
+foreground cell into same-color 4-connected components; split
+each component into rigid pieces - maximal vertical runs of at
+least two cells are poles, the leftover horizontal runs are
+bars, and a bar welds onto a pole as its foot only when one of
+its ends touches the pole's bottom cell; extend every pole
+whose bottom sits directly above a foreign bar cell one hidden
+cell into that bar; delete the pieces of the indicator color;
+then settle - a piece is supported when it touches the bottom
+row, when a supported piece owns the cell directly below one of
+its cells, when it shares a cell with a supported piece, or
+when a horizontal segment of it has both outside flanks inside
+supported pieces, the supported set grows as a least fixpoint,
+and every unsupported piece falls one row per tick until the
+whole scaffold is supported; finally redraw the scene with all
+vertical cells first and all horizontal cells after, so bars
+sit in front of the pole bottoms impaled inside them.
+
+The engine reads the scene with sg_cells_ and floods same-color
+components with sg_flood_. sg_vsplit_ and sg_vext_ cut the
+maximal vertical runs, sg_hsplit_ and sg_hext_ group the
+leftovers into bars, and sg_weld_ with sg_foot_ welds a foot
+bar onto the pole whose bottom cell it flanks. sg_impale_ pushes
+each pole bottom one hidden cell into a foreign bar beneath it,
+which is how a piece can show seven cells in an input and eight
+in its output. sg_support_fix_ grows the supported set through
+the four conditions in sg_supported_, sg_occ_, and sg_pinched_,
+and sg_settle_ ticks sg_drop_ over the unsupported pieces until
+the scaffold stands still. sg_render_ paints vertical cells,
+then horizontal cells, onto a fresh background with the corner
+indicator restored. The induce clause dispatches early, directly
+after dot_crawler, requiring equal first-pair heights, a nonzero
+corner indicator, an otherwise empty top row, an empty second
+row, and the same output corner, then verifying every training
+pair.
+
+The lesson of the wave is to treat a stable scene as a statics
+problem: every piece in the input already has a reason not to
+fall, and cataloguing those reasons - bars pinched between two
+poles, poles impaled one cell deep inside bars, single cells
+wedged between neighbors - is what reveals the true piece
+shapes. A piece that appears to flip upside down between input
+and output dissolves into a pole plus a separate one-cell piece
+wedged against its top, and cell counts that change between
+input and output are the fingerprint of two pieces sharing one
+cell. Because support grows as a fixpoint from the floor upward,
+a falling piece supports nothing, and a lintel slides past a
+still-falling pole to land only when both flanks have settled.
+The rule passed the single-task test and the full regression on
+the first compile.
+
+Key predicates:
+  sg_cells_/2          - foreground cells minus the corner
+  sg_comps_/2          - same-color 4-connected components
+  sg_vsplit_/2         - maximal vertical runs as poles
+  sg_hsplit_/2         - leftover horizontal runs as bars
+  sg_weld_/4           - foot bars welded onto pole bottoms
+  sg_impale_/2         - hidden pole cells inside bars
+  sg_support_fix_/4    - least-fixpoint supported set
+  sg_supported_/5      - floor, rest, shared-cell, pinch tests
+  sg_pinched_/4        - two-sided horizontal flank support
+  sg_settle_/4         - one-row-per-tick gravity loop
+  sg_render_/5         - vertical cells first, bars in front
+  arc2_transform(staple_gravity, +Grid, -Out)
+  arc2_induce_rule(+Pairs, staple_gravity)
+
+Task solved: b6f77b65 (5 training pairs + 1 test case).
+Score: 102/120 = 85.00% to 103/120 = 85.83%.
