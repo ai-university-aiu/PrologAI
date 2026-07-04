@@ -25107,3 +25107,44 @@ task.
 
 Task solved: da515329 (3 training pairs + 1 test case).
 Score: 111/120 = 92.50% to 112/120 = 93.33%.
+
+
+Chapter 334: Wave 116 - concentric_rings repair (WP-374, Layer 349)
+================================================================
+
+Wave 116 is a one-line repair of the existing glass-box rule
+concentric_rings, solving ARC-AGI-2 task 13e47133 and raising the
+score from 112/120 = 93.33% to 113/120 = 94.17%.
+
+Each grid is a background field walled by a divider color into
+regions, and every region fills with concentric rectangular rings
+whose ring index is the cell's distance from the region boundary
+(the grid edge or a cell adjacent to a divider wall); single-cell
+markers name the color cycle by ring. In training the divider draws
+one plain rectangle; in the test it draws several nested boxes.
+
+The solver reproduced both training pairs exactly yet missed the
+test by twenty-nine cells, each a single color off - a uniform
+one-ring shift. The cause was the distance metric: ring distance
+was propagated with four-connected (Manhattan) steps. For a plain
+rectangle Manhattan boundary-distance equals the concentric-ring
+index, so training passed; but where nested boxes meet, the region
+has concave corners, and Manhattan distance walks around a corner
+and over-counts the ring by one.
+
+The fix is one call: inside arc2_cri_bfs_, the ring-distance
+breadth-first search moves from arc2_cri_nbrs_ (four-connected) to
+arc2_cri_nbrs8_ (eight-connected), so the distance becomes Chebyshev
+and the rings are true concentric rectangles even around concave
+corners. The region flood-fill and boundary test stay four-connected.
+
+All twenty-nine miscolored test cells are corrected, both training
+pairs still reproduce exactly, and the other 119 tasks are unchanged.
+The lesson: concentric rectangles are a Chebyshev object, not a
+Manhattan one, so suspect the metric before the color logic when a
+rule misses the test by a uniform one-ring shift.
+
+Predicate touched: arc2_cri_bfs_ now calls arc2_cri_nbrs8_.
+
+Task solved: 13e47133 (2 training pairs + 1 test case).
+Score: 112/120 = 93.33% to 113/120 = 94.17%.
