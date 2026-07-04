@@ -1,0 +1,86 @@
+Chapter 307: Wave 89 - wire_wrap (WP-347, Layer 322)
+
+wire_wrap solves ARC-AGI-2 task 88bcf3b4. The task gives five
+training pairs and one test case, all with same-size inputs and
+outputs, on grids from 7x7 up to 22x22. Each grid holds one or more
+three-color systems on a uniform background: a straight orthogonal
+line segment, a crumpled meandering wire attached orthogonally to
+one endpoint of the line, and a separate marker shape - a single
+cell, a short bar, a zigzag, or a staircase blob. The output keeps
+the line and the marker exactly where they are, erases the crumpled
+wire, and re-lays it as a clean path that leaves the line end, runs
+diagonally to the marker, bends snugly around the marker's near
+face, and departs on the mirrored diagonal.
+
+Rule: the re-laid wire is pure geometry - a diagonal approach from
+the attachment cell toward the marker, clamped to the marker's near
+lane; a hug laying one cell beyond each marker row's or column's
+near edge from the contact side to the far side; and a mirrored
+45-degree departure ray - truncated at the input wire's exact cell
+count or the grid edge, whichever comes first.
+
+Algorithm:
+
+The majority color is the background with the reused helper
+tw_background_, and ww_groups_ collects one component per remaining
+color, each verified as a single 8-connected set by ww_connected_
+over the reused tw_components_. ww_straight_ recognizes lines as
+straight orthogonal segments of at least three cells, ww_ends_
+yields their endpoints, and ww_orth_ pairs each line with the
+crumpled wire whose cell touches an endpoint orthogonally; the
+leftover components are markers, and ww_nearest_ gives each system
+the marker nearest to its attachment endpoint by Chebyshev
+distance. ww_sign_ takes, per axis, the sign of the marker centroid
+minus the line endpoint - a zero component is tie-broken by the
+side where the input wire's mass lies - and ww_approach_ walks that
+diagonal from the attachment cell, each axis clamped to the lane
+one cell outside the marker's bounding box, until the path is
+8-adjacent to the marker. ww_ctype_ classifies the contact as a row
+contact (marker cell ahead along the row axis, directly or across
+the diagonal) or a column contact (marker cell aside along the
+column axis), and ww_face_ lays the hug cells one column beyond
+each marker row's near edge or one row beyond each marker column's
+near edge, ordered from the contact side to the far side. ww_ray_
+casts the departure ray with the lateral component of the approach
+diagonal reversed, ww_ingrid_prefix_ cuts the chained path at the
+first off-grid cell, the path is truncated to the input wire's cell
+count, and the reused tt_render_ paints lines, markers, and re-laid
+wires onto a fresh background canvas. The induce clause dispatches
+early, directly after band_jigsaw, requiring preserved dimensions,
+6 to 250 foreground cells, and a distinct foreground color count
+that is a positive multiple of three of at most nine before
+verifying every training pair.
+
+The lesson: the wire's length is not always conserved - two of the
+five training pairs lose wire cells because the re-laid path hits
+the grid edge before the length is spent, which falsifies every
+rigid-transform, rotation, and length-preserving reading of the
+task. The wire is not moved; it is recomputed, and the input wire
+contributes only its color, its cell count, its attachment cell,
+and a tie-break side. Hand-tracing all seven line-wire-marker
+systems (five training, two in the test) before coding exposed the
+same four phases every time, and the face-based hug follows zigzag
+and staircase contours with no special cases where contour-walk and
+taut-string formulations kept failing. The rule passed all five
+training pairs and the test case on the first prototype run and the
+full regression on the first compile.
+
+Key predicates:
+  ww_groups_/2         - one component per foreground color
+  ww_connected_/1      - single 8-connected set check
+  ww_straight_/1       - straight orthogonal segment check
+  ww_ends_/3           - bounding-box endpoints of a segment
+  ww_orth_/2           - orthogonal adjacency of two cells
+  ww_nearest_/3        - nearest-marker assignment per system
+  ww_path_/7           - four-phase wire path construction
+  ww_sign_/3           - approach diagonal sign with tie-break
+  ww_approach_/10      - clamped diagonal walk to first adjacency
+  ww_ctype_/7          - row-contact or column-contact decision
+  ww_face_/9           - near-face hug cells in walk order
+  ww_ray_/6            - mirrored 45-degree departure ray
+  ww_ingrid_prefix_/4  - cut the path at the grid edge
+  arc2_transform(wire_wrap, +Grid, -Out)
+  arc2_induce_rule(+Pairs, wire_wrap)
+
+Task solved: 88bcf3b4 (5 training pairs + 1 test case).
+Score: 85/120 = 70.83% to 86/120 = 71.67%.
