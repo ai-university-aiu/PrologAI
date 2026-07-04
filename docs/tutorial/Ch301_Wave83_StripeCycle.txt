@@ -1,0 +1,59 @@
+Chapter 301: Wave 83 - stripe_cycle (WP-341, Layer 316)
+
+stripe_cycle solves ARC-AGI-2 task 221dfab4. The task gives two
+training pairs on 29x22 grids and one test case on a 25x25 grid. One
+edge row of each input carries a horizontal bar of color 4: the
+bottom row in both training inputs but the top row in the test
+input. The bar's columns are the stripe columns. The rest of the
+grid scatters one-color shapes over a majority background -
+background 1 with color-8 shapes in the first training pair,
+background 8 with color-2 shapes in the second, and background 8
+with color-6 shapes in the test.
+
+Rule: repaint every row by a six-row palette keyed to its cyclic
+distance D from the marker row; D of 0 or 2 paints the stripe
+columns with the marker color 4, odd D paints them with the
+background color, and D of 4 paints the stripe columns with the
+overlay color 3 while also overlaying 3 on every non-background
+cell of that row outside the stripes.
+
+Algorithm:
+
+The background is the most frequent color in the grid - counted, not
+assumed, because the grids use backgrounds 1 and 8; the helper
+tw_background_ from the twin_lift pack is reused unchanged. The
+marker row is whichever of the top row and the bottom row holds
+cells of color 4, and the columns of those cells are the stripe
+columns. Every row is then rebuilt under the palette entry for its
+cyclic distance D, the absolute row difference from the marker row
+modulo six. At D of 0 or 2 the stripe columns take the marker color
+4 and every other cell keeps its input value. At odd D the stripe
+columns take the background color and every other cell keeps its
+input value. At D of 4 the stripe columns take the overlay color 3,
+and every non-background cell of the row outside the stripes is
+also overlaid with 3, while background cells outside the stripes
+keep their value. Nothing else in the grid moves. The induce clause
+dispatches early, directly after twin_lift, requiring preserved
+dimensions, a color-4 marker bar of at least two cells in an edge
+row, and no color-4 cell outside the marker row before verifying
+every training pair.
+
+The lesson: the palette anchor was the whole task. Both training
+grids put the marker bar in the bottom row at row 28, and 28 mod 6
+equals 4, so a palette counted from row zero reproduces both
+training outputs perfectly and still fails the hidden test - the
+test grid moves the bar to the top row, where a row-zero count
+would paint the marker bar itself green. Anchoring the cycle at the
+marker row survives both placements. When two readings tie on the
+training pairs, the test input often breaks the tie; reading every
+visible grid before coding turned a trap into a first-compile pass.
+
+Key predicates:
+  st_marker_/3         - find the color-4 edge marker bar
+  st_row_/5            - rebuild one output row under the palette
+  st_cell_/6           - palette value of one cell
+  arc2_transform(stripe_cycle, +Grid, -Out)
+  arc2_induce_rule(+Pairs, stripe_cycle)
+
+Task solved: 221dfab4 (2 training pairs + 1 test case).
+Score: 79/120 = 65.83% to 80/120 = 66.67%.
