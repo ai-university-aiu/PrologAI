@@ -23086,3 +23086,80 @@ Key predicates:
 
 Task solved: 89565ca0 (3 training pairs + 1 test case).
 Score: 86/120 = 71.67% to 87/120 = 72.50%.
+
+
+Chapter 309: Wave 91 - catalog_query (WP-349, Layer 324)
+
+catalog_query solves ARC-AGI-2 task d8e07eb2. The task gives five
+training pairs and one test case, and all twelve grids are 30x22
+with dimensions preserved. Every input carries the same fixed body:
+a four-by-four catalog of sixteen three-by-three colored shapes,
+laid out at a five-cell pitch between two solid separator rows of
+color 6 at rows 5 and 27. Above the upper separator sits the header
+band, showing up to four query shapes in slots at the same column
+pitch; below the lower separator sits a two-row footer band of
+blank background. Each query shape is an exact cell-for-cell copy
+of one catalog block, colors included. The output highlights every
+matched catalog block by turning the background 8 cells of its
+five-by-five frame box - the block plus a one-cell border - to
+color 3, keeping all shape cells; when all matched blocks share one
+catalog row or one catalog column, the header band is highlighted
+the same way and the footer rows fill with color 3, and otherwise
+the header stays untouched and the footer rows fill with color 2.
+
+Rule: the header queries the catalog - every query shape looks up
+its exact match in the fixed shape table and lights up that entry's
+frame box, and the aligned-or-scattered verdict over all matches
+decides the header highlight and the footer color.
+
+Algorithm:
+
+The transform first checks the fixed frame: exactly thirty rows,
+exactly twenty-two columns, and solid color-6 separator rows at
+rows 5 and 27. cq_block_ cuts a three-by-three block out of the
+grid with three cq_seg_ row segments, and a findall over the row
+and column block indices collects the sixteen catalog blocks,
+block (i, j) at rows 8 + 5i to 10 + 5i and columns 2 + 5j to
+4 + 5j. A second findall cuts the header slots out of rows 1 to 3
+at the same column pitch and keeps the slots that fail cq_blank_,
+so a slot counts as a query only when it holds at least one non-8
+cell - the training pairs show both three-query and four-query
+headers. Matching is a plain member unification of each query
+block against the catalog terms: because the blocks are ground
+lists of color codes, cell-for-cell equality including colors
+falls out of unification, and same_length over slots and matches
+guards that every query matched exactly once. The color exactness
+matters, because the catalog carries same-shape different-color
+decoys, such as a ring-of-eight shape that appears once in color 1
+and once in color 2. The alignment verdict then asks whether all
+matched positions share one catalog row index or one catalog
+column index. Rendering is a per-cell walk with cq_paint_: footer
+background cells fill with 3 when aligned and 2 otherwise, header
+background cells promote to 3 only when aligned, background cells
+inside any matched block's five-by-five frame box promote to 3,
+and every other cell keeps its color. Adjacent frame boxes merge
+into one continuous band with no dedicated banding logic, because
+only background cells are promoted. The induce clause dispatches
+early, directly after compartment_tally, requiring the fixed
+30x22 frame and the two solid separator rows on the first pair,
+then verifies every training pair.
+
+The lesson of the wave is that the verdict is global, not local.
+Two training pairs highlight the header and paint the footer 3,
+three leave the header alone and paint the footer 2, and no single
+match explains the split - only the survey of all matches against
+a shared catalog row or column does. The second lesson is fixed
+scenery: when every training input carries the same body, the body
+is a lookup table, and all the variation lives in the small query
+region.
+
+Key predicates:
+  cq_block_/4          - cut one three-by-three block at (R1, C1)
+  cq_seg_/4            - cut one three-cell row segment
+  cq_blank_/1          - test a block for background-only content
+  cq_paint_/6          - paint one output cell by region and verdict
+  arc2_transform(catalog_query, +Grid, -Out)
+  arc2_induce_rule(+Pairs, catalog_query)
+
+Task solved: d8e07eb2 (5 training pairs + 1 test case).
+Score: 87/120 = 72.50% to 88/120 = 73.33%.
