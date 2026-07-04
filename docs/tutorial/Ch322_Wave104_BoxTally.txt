@@ -1,0 +1,83 @@
+Chapter 322: Wave 104 - box_tally (WP-362, Layer 337)
+
+box_tally solves ARC-AGI-2 task 8f215267. The task gives three
+training pairs and one test case, all grids 23 columns wide and
+20 to 27 rows tall, and the output always keeps the input size.
+Every input shows, along the left side, a stack of hollow
+rectangular boxes - one-cell-thick frames five rows tall and
+eleven columns wide, each in its own color, each with a pure
+background interior - while the rest of the grid is sprinkled
+with small scattered shapes of assorted colors: dominoes,
+two-by-two squares, two-by-three blocks, plus signs, and
+diamonds. In the output the scatter is gone: every box frame
+stands exactly where it stood, its interior clean except for a
+short row of dots of the box's own color printed on the middle
+interior row, right-aligned starting two columns left of the
+right frame edge and spaced two cells apart. Each box has
+counted the separate scatter pieces of its own color, and
+scatter colors owning no box simply vanish.
+
+Rule: read the background as the most frequent color; split
+every non-background color into 4-connected components; a
+component that is exactly the border of its own bounding box of
+at least three by three is a hollow box, everything else is
+scatter; start from a blank background canvas, redraw every box
+frame in place, and print one dot of the box color per scatter
+component of that color on the middle interior row, at columns
+right edge minus two, minus four, and so on.
+
+Algorithm:
+
+The transform first calls td_background_, which flattens the
+grid, counts the palette with clumped, and takes the most
+frequent color as the background. bt_fg_cells_ collects every
+non-background cell as a position-color triple and bt_colors_
+lists the distinct foreground colors. For each color,
+bt_color_pts_ keeps that color's positions and bt_comps_ with
+bt_grow_ groups them into 4-connected components by flood fill
+over unit Manhattan neighbors. bt_hollow_box_ classifies a
+component: bt_bbox_ computes its bounding box, the box must
+span at least three rows and three columns, bt_border_
+enumerates the sorted border positions of that bounding box,
+and the component must equal the border exactly - a frame with
+nothing missing and nothing extra. bt_color_boxes_ counts each
+color's scatter components and pairs every box of that color
+with the tally. Rendering starts from bt_blank_, a canvas of
+pure background at the input size; bt_draw_entry_ paints each
+box via bt_draw_frame_, which writes the border cells with
+arc2_set_cell_, and bt_draw_dots_, which places the tally dots
+on the middle interior row at columns right edge minus two
+times one through the tally. The induce clause dispatches
+early, directly after tower_donate, requiring equal first-pair
+dimensions, at least two foreground colors, at least two hollow
+boxes with pure background interiors, and pairwise distinct box
+colors, then verifying every training pair.
+
+The lesson of the wave is to distrust a prior wave's surface
+reading. The task had been shelved for seven waves under a
+stale note about instruction patches and stripe counts; a fresh
+dump of the actual grids dissolved it in minutes. The
+discriminating observation is that the tally counts components
+rather than cells: the color-8 scatter of the first training
+pair totals ten cells in four pieces of four different shapes
+and the box prints exactly four dots, while the zero-scatter
+color-2 box of the third training pair stays empty. Distractor
+colors owning no box confirm the erase-everything baseline. The
+rule passed the single-task test and the full regression on the
+first compile.
+
+Key predicates:
+  bt_fg_cells_/3       - non-background cells with colors
+  bt_comps_/2          - 4-connected components by flood fill
+  bt_bbox_/2           - bounding box of a component
+  bt_border_/2         - sorted border of a bounding box
+  bt_hollow_box_/1     - component equals its bounding-box border
+  bt_color_boxes_/3    - boxes paired with scatter tallies
+  bt_blank_/4          - background canvas of the input size
+  bt_draw_frame_/4     - repaint one box frame
+  bt_draw_dots_/5      - right-aligned tally dots, spaced two
+  arc2_transform(box_tally, +Grid, -Out)
+  arc2_induce_rule(+Pairs, box_tally)
+
+Task solved: 8f215267 (3 training pairs + 1 test case).
+Score: 100/120 = 83.33% to 101/120 = 84.17%.
