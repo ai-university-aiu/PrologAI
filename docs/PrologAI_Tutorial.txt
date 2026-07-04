@@ -25059,3 +25059,51 @@ and never regress a passing task.
 
 Task solved: 35ab12c3 (3 training pairs + 1 test case).
 Score: 110/120 = 91.67% to 111/120 = 92.50%.
+
+================================================================
+Chapter 333: Wave 115 - pinwheel_spiral (WP-373, Layer 348)
+================================================================
+
+Wave 115 adds a new glass-box rule, pinwheel_spiral, solving
+ARC-AGI-2 task da515329 and raising the score from 111/120 =
+92.50% to 112/120 = 93.33%.
+
+The input holds one foreground object: a plus sign of a single
+color, with an empty center, on a uniform background. The output
+fills the whole grid with a dense interlocking spiral. Read the
+plus as a pinwheel hub - its four equal arms each start a square
+spiral that winds outward, always turning clockwise. The four
+spirals are ninety-degree rotations of one another, so their walls
+mesh with a one-cell gap everywhere, forming a period-two pinwheel
+that tiles the board.
+
+One hidden parameter runs everything: the arm length L, from
+center to tip. It sets the outward run max(1, L-1), the sideways
+jog max(0, L-2), and the trailing run max(2, L), while the leading
+run of each spiral layer grows by four - 2, 6, 10, 14, and so on.
+Each arm is a turtle that walks to its tip, turns clockwise, and
+repeats those layered runs, clipped where it leaves the grid.
+
+The discriminator: because jog = max(0, L-2) is zero at L = 1 and
+L = 2, the two smaller training pairs have straight spiral sides
+and are reproduced by a naive runs-1-4-8-12 model that hides the
+law; only the L = 3 pair exposes the stepped sides, and the
+unified turtle alone reproduces all three training pairs and the
+held-out arm-length-4 test.
+
+Key predicates added (arc_benchmark_2.pl):
+  arc2_transform(pinwheel_spiral, +Grid, -Out)
+  arc2_induce_rule(pinwheel_spiral) - single-plus-seed pre-filter
+    plus exact verification of every training pair
+  ps_seed_/6, ps_nonbg_/3, ps_cell_/4, ps_majority_/2,
+    ps_count_/3, ps_arms_/7, ps_arm_/9, ps_cw_/4, ps_layers_/7,
+    ps_walk_/5, ps_line_/8, ps_coord_set_/2, ps_render_/6,
+    ps_row_/6, ps_pick_/6
+
+No predicate was modified; the block is appended near the early
+dispatch rules and the induce clause is gated by an exact training
+match, so it can only add solutions and never regress a passing
+task.
+
+Task solved: da515329 (3 training pairs + 1 test case).
+Score: 111/120 = 92.50% to 112/120 = 93.33%.
