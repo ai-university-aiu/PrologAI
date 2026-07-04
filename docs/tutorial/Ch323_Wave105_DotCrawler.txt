@@ -1,0 +1,99 @@
+Chapter 323: Wave 105 - dot_crawler (WP-363, Layer 338)
+
+dot_crawler solves ARC-AGI-2 task 5545f144. The task gives three
+training pairs and one test case. The training inputs are 10x26,
+8x27, and 12x25 grids split into two, four, and two equal panels
+by full-height columns of a single non-background color; the
+test input is a single 15x15 panel with no separators at all,
+and the output always keeps one panel's size. Each panel shows
+cells of one foreground color: a multi-cell shape - the
+crawler - plus a sprinkling of single cells - the dots. The
+panels are not layers to be combined. They are TIME: successive
+snapshots of one crawl. The dots are a route whose consecutive
+stops always share a row or a column, the crawler's protruding
+nose cell rides exactly on top of each visited dot, and visited
+dots vanish from later panels. The output shows only the final
+frame: a clean background panel with the crawler docked
+nose-first on the last dot of the route, its body rotated by
+the quarter turn that points the nose along the final leg.
+
+Rule: read the background as the most frequent color; split the
+grid at full-height uniform non-background columns and keep the
+leftmost panel; group the panel's foreground into 8-connected
+components - the largest is the crawler, the single cells are
+the dots; find the nose as the shape cell sitting alone on one
+edge of the shape's bounding box whose outward ray hits a dot
+and whose greedy nearest-aligned-dot chain consumes every dot;
+dock the crawler on the final chain dot, nose exactly on the
+dot, body offsets rotated from the nose heading onto the
+direction of the last leg.
+
+Algorithm:
+
+The transform first calls td_background_, which flattens the
+grid, counts the palette with clumped, and takes the most
+frequent color as the background. dc_panels_ finds every
+separator via dc_sep_col_ - a column whose cells all carry one
+uniform non-background color - and cuts the columns into ranges
+with dc_ranges_ and dc_slice_, keeping the leftmost panel as
+the scene and its dimensions as the output size. bt_fg_cells_
+collects the panel's foreground cells, which must all share one
+color, and dc_comps8_ with dc_grow8_ groups their positions
+into 8-connected components by flood fill over king-move
+neighbors; dc_by_size_ ranks them so the largest component is
+the crawler and every single-cell component is a dot.
+dc_nose_cand_ enumerates the nose candidates: for each of up,
+down, left, and right, dc_extreme_cell_ takes the shape cells
+on that edge of the bounding box computed by bt_bbox_ and
+admits the cell only when it is alone there. dc_first_dot_
+fires the outward ray and keys the in-line dots by distance,
+dc_nearest_ picks the closest, and dc_chain_ then greedily hops
+to the nearest remaining dot sharing the current row or column
+until the pool is empty - a candidate is valid only when the
+chain consumes every dot. When two candidates survive (the
+chain read forward and backward), dc_pick_nose_ consults the
+second panel through dc_panel_dots_: the true first stop is
+already consumed or covered by the shape there, while the false
+one still sits free as a dot. Docking is pure geometry:
+dc_arrival_ and dc_dir_ read the direction of the last chain
+leg, dc_turns_ counts the clockwise quarter turns from the nose
+heading onto it via dc_cw_, dc_rot_offs_ rotates the shape's
+nose-relative offsets by that many turns, and the rotated cells
+are painted around the final dot on a bt_blank_ background
+canvas with arc2_set_cell_. The induce clause dispatches early,
+directly after box_tally, requiring equal first-pair heights,
+an output width equal to the leftmost panel width, a single
+foreground color, a crawler of at least three cells, and only
+single-cell siblings, then verifying every training pair.
+
+The lesson of the wave is to account for every dot before
+theorizing. The task had been shelved since Wave 90 under a
+wrong panel-overlay reading; the key that opened it was noticing
+that the dots form an orthogonal chain from the shape's tip and
+that the panels are successive snapshots of the walk, so the
+test grid - a single frame with no separators - is solved by
+exactly the same reading. The discriminating observation is the
+full-consumption nose test: the second training grid presents
+two lone edge cells whose chains are exact reverses of each
+other, and only the second-panel snapshot separates the route's
+true start from its end. The rule passed the single-task test
+and the full regression on the first compile.
+
+Key predicates:
+  dc_panels_/3         - cut panels at separator columns
+  dc_sep_col_/3        - full-height uniform non-bg column
+  dc_comps8_/2         - 8-connected components by flood fill
+  dc_by_size_/2        - components ranked largest first
+  dc_nose_cand_/5      - lone edge cell with a full chain
+  dc_extreme_cell_/4   - sole shape cell on a bbox edge
+  dc_first_dot_/4      - nearest dot on the outward ray
+  dc_chain_/4          - greedy nearest aligned-dot walk
+  dc_pick_nose_/7      - second-panel tie-break
+  dc_arrival_/3        - direction of the last chain leg
+  dc_turns_/3          - clockwise quarter turns between headings
+  dc_rot_offs_/3       - rotate nose-relative offsets
+  arc2_transform(dot_crawler, +Grid, -Out)
+  arc2_induce_rule(+Pairs, dot_crawler)
+
+Task solved: 5545f144 (3 training pairs + 1 test case).
+Score: 101/120 = 84.17% to 102/120 = 85.00%.
