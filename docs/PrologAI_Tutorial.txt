@@ -22157,3 +22157,72 @@ Key predicates:
 
 Task solved: f560132c (2 training pairs + 1 test case).
 Score: 73/120 = 60.83% to 74/120 = 61.67%.
+
+
+Chapter 296: Wave 78 - gadget_assembly (WP-336, Layer 311)
+
+gadget_assembly solves ARC-AGI-2 task cbebaa4b. Each input grid (22x22
+in training, 26x26 in the test) scatters five to seven gadget pieces
+over the background. Each piece is an 8-connected component of one
+body color carrying color-2 connector studs on its boundary. The task
+is to slide the pieces together - translation only, no rotation - so
+that every stud coincides exactly with its partner stud on another
+piece, assembling all pieces into one connected machine on an output
+canvas of the same size. The tell-tale signature: the color-2 cell
+count halves from input to output (16 to 8, 16 to 8, and 24 to 12
+across the three grids) because paired studs merge into one cell,
+while every other color keeps its exact cell count.
+
+Rule: studs pair by exact coincidence under translation with opposite
+facings, and the connection graph's center piece keeps its exact
+input position while the machine assembles around it.
+
+Algorithm:
+
+The background is the most common cell value. All non-background
+cells are grouped into 8-connected components over mixed colors,
+reusing the Wave 76 extraction engine unmodified. Each piece's
+color-2 cells are its connector studs; a stud's outward facing is
+read from its unique 4-adjacent non-stud cell of the same piece - the
+stud points away from its body neighbor. Piece 1 seeds the assembly
+at translation (0,0), and a backtracking search repeatedly takes the
+first open stud and tries every stud of every unplaced piece as its
+mate: the mate must face the opposite direction, and the whole piece
+is translated by the delta that brings the two studs into exact
+coincidence. A placement is accepted only if every colliding cell is
+a stud landing on an open stud with opposite facing; each coincidence
+closes both studs and records a connection edge. The search succeeds
+when every piece is placed and no stud remains open. The recorded
+edges form the machine's connection graph; breadth-first search gives
+each piece's eccentricity, and the center piece - the one with
+minimum eccentricity - is translated back to its exact input
+position, carrying the whole assembly with it. The machine is painted
+on a fresh background canvas of the input's dimensions. The induction
+pre-filter requires equal input and output dimensions, an output
+color-2 count exactly half the input's, and every other color count
+preserved, then verifies all pairs with forall.
+
+The lesson: the anchor is a graph-theoretic role. Wave 76 anchored on
+a colored stud and Wave 77 on a role-bearing palette piece; Wave 78
+anchors on the center of the connection graph, which in all three
+grids is a simple path (5, 5, and 7 pieces long) with a unique
+center. In this task the center always happens to be the color-4
+piece, but the rule reads the center from the graph structure, not
+from any color. A second lesson: committing to the first open stud is
+complete, because coinciding studs pair at placement time, so an open
+stud can never belong to two placed pieces - backtracking is needed
+only over the mate choices.
+
+Key predicates:
+  ga_prep_/4           - piece occupancy cells and open studs with facings
+  ga_dir_/4            - stud outward direction from its unique body neighbor
+  ga_opp_/2            - two stud facings are compatible for pairing
+  ga_loop_/8           - backtracking place-one-piece-per-open-stud search
+  ga_merge_/8          - collision check that pairs coinciding studs
+  ga_center_/3         - connection graph center by minimum eccentricity
+  ga_render_/5         - assembled cells painted on a background canvas
+  pf_comps_/2          - 8-connected mixed-color components (reused)
+  arc2_transform(gadget_assembly, +Grid, -Out)
+
+Task solved: cbebaa4b (2 training pairs + 1 test case).
+Score: 74/120 = 61.67% to 75/120 = 62.50%.
