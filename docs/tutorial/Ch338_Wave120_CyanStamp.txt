@@ -1,0 +1,79 @@
+Chapter 338: Wave 120 - cyan_stamp (WP-378, Layer 353)
+
+Wave 120 adds a new glass-box rule, cyan_stamp, that solves ARC-AGI-2
+task abc82100. The score rises from 116/120 = 96.67% to 117/120 =
+97.50%.
+
+This chapter teaches a rule that reads a grid as a tiny instruction
+language: little cyan glyphs are stamps, and a two-cell arrow beside
+each glyph names which colored dots to overprint and what color to
+print them in.
+
+THE TASK
+
+Each grid is drawn on a black background. Sitting on it are one or more
+small symbols made of cyan cells (color 8), and scattered elsewhere are
+lone colored dots.
+
+A symbol is a cluster of cyan cells - the shape that will be stamped.
+Beside one edge of each symbol is a two-cell domino pointing inward:
+the cell touching the symbol names one color, and the cell one step
+farther out names another. Everywhere else on the grid are single
+colored dots.
+
+In the answer the cyan symbols and their little dominoes are gone. In
+their place, every colored dot that matches the source color has been
+overpainted with a copy of the symbol shape, drawn in the target color.
+
+THE RULE
+
+Group the cyan cells. Join cyan cells that touch, including diagonally,
+into 8-connected symbols. Each symbol is one stamp.
+
+Read the domino. Take the symbol's bounding box and look just outside
+each edge, scanning top, then bottom, then left, then right. The first
+place where two cells in a row - one touching the box edge, the next
+one step farther out - are both non-black and non-cyan is the
+instruction. The near cell (touching the box) gives the target paint
+color; the far cell gives the source dot color.
+
+Fix the origin and the shape. The origin is the box-edge cell the
+domino points at, one inward step from the near cell. The shape is the
+list of (row, column) offsets from that origin to every cyan cell of
+the symbol.
+
+Stamp and erase. Start from a blank grid. For every lone dot whose
+color matches a source color, paint the matching symbol shape at that
+dot in the target color, offset by offset. Erase all cyan symbols and
+both domino cells. Every other colored cell - one that is neither a
+source dot nor part of a symbol - copies straight through to the same
+place.
+
+THE DISCRIMINATING OBSERVATION
+
+The reading of the domino is what turns a pile of colored cells into a
+language. The two cells are not decoration: their order encodes a
+mapping. The inner cell is the ink the stamp will be printed in; the
+outer cell is the address, the color of the dots to print on. Reading
+them the other way around, or ignoring the scan order of the four
+edges, breaks at least one of the four training pairs. Only the
+near-is-target, far-is-source reading, with the origin taken as the
+inward step the domino points at, reproduces all four training pairs
+and the held-out test grid cell for cell.
+
+A second subtlety is that stamps overlap. Two shapes printed on nearby
+dots can cover the same cell, and a printed shape can even land where a
+symbol used to be. Rendering the whole board in row-major order - each
+source dot painting its offsets, each pass-through cell writing its own
+color - composes these overlaps exactly as the reference solver does.
+
+Predicates added: arc2_transform(cyan_stamp)/3,
+arc2_induce_rule(_, cyan_stamp), and the cs_* helpers. The induce
+clause is gated by a cheap pre-filter that fires only when the first
+training input holds at least one cyan cell, so the symbol reader runs
+solely for this task. The source-color map is a balanced-tree
+association map and the erasable cells an ordered set, so each lookup
+during the whole-grid render costs only a logarithmic step.
+
+Task solved: abc82100 (4 training pairs + 1 test case).
+Score: 116/120 = 96.67% to 117/120 = 97.50%.
