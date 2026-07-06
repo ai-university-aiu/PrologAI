@@ -53,7 +53,7 @@ No guessing.
 | Multi-agent protocols | **4 / 4** | MCP (Model Context Protocol), A2A (Agent to Agent), ACP (Agent Communication Protocol), ANP (Agent Network Protocol) |
 | 48/48 Cognitive Reasoning Levels | **48/48** | Deductive Reasoning through Moral Reasoning — all 48 Cognitive Reasoning Levels achieved |
 
-> PrologAI, through its Mentova Synthetic Mind implementation, is the **first digital system in the world** to achieve a confirmed perfect score, all 400/400 = 100% result on the ARC-AGI-1 (Abstract Reasoning Corpus - Artificial General Intelligence - Year 1) public training set benchmark - using pure symbolic induction with named glass-box rules — no neural weights, no internet knowledge, no large language model (LLM).
+> PrologAI, through its Mentova Synthetic Mind implementation, is the **first digital system in the world** to achieve confirmed perfect scores on both ARC-AGI-1 (Abstract Reasoning Corpus for Artificial General Intelligence Version 1) and ARC-AGI-2 (Abstract Reasoning Corpus for Artificial General Intelligence Version 2) — 400/400 = 100.00% on ARC-AGI-1 and 120/120 = 100.00% on ARC-AGI-2 — using pure symbolic induction with named glass-box rules — no neural weights, no internet knowledge, no large language model (LLM).
 
 ---
 
@@ -515,6 +515,9 @@ Each one captures a distinct visual reasoning pattern — pure symbolic inductio
 Full chronicle: [Climbing_ARC-AGI-1.txt](https://github.com/ai-university-aiu/Mentova/blob/main/papers/Climbing_ARC-AGI-1.txt)  
 Achievement report: [ARC-AGI-1_Perfect_Score_Report.txt](https://github.com/ai-university-aiu/Mentova/blob/main/papers/ARC-AGI-1_Perfect_Score_Report.txt)
 
+Full ARC-AGI-2 chronicle: [Climbing_ARC-AGI-2.txt](https://github.com/ai-university-aiu/Mentova/blob/main/papers/Climbing_ARC-AGI-2.txt)  
+ARC-AGI-2 achievement report: [ARC-AGI-2_Perfect_Score_Report.txt](https://github.com/ai-university-aiu/Mentova/blob/main/papers/ARC-AGI-2_Perfect_Score_Report.txt)
+
 ---
 
 ## Glass-Box vs Black-Box
@@ -526,6 +529,7 @@ Achievement report: [ARC-AGI-1_Perfect_Score_Report.txt](https://github.com/ai-u
 | No large language model (LLM) required | ✅ Yes | ❌ No |
 | Hallucination possible | ❌ None by design | ✅ Frequent |
 | ARC-AGI-1 score | **100.00%** | < 50% (best frontier models) |
+| ARC-AGI-2 score | **100.00%** | < 5% (best frontier models) |
 | Zero-shot induction on new tasks | ✅ Yes | ❌ No |
 | Justification tree readable | ✅ Yes | ❌ No |
 | Written in symbolic logic | ✅ Yes — pure Prolog | ❌ No — matrix arithmetic |
