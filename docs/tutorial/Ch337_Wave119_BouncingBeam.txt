@@ -1,0 +1,85 @@
+Chapter 337: Wave 119 - bouncing_beam (WP-377, Layer 352)
+
+Wave 119 adds a new glass-box rule, bouncing_beam, that solves
+ARC-AGI-2 task 142ca369. The score rises from 115/120 = 95.83% to
+116/120 = 96.67%.
+
+This chapter teaches a rule that reads a grid as a tiny physics
+simulation: little L-shaped guns fire diagonal beams that ricochet
+off walls and grid edges, changing color at every bounce.
+
+THE TASK
+
+Each grid is twenty by twenty on a black background, scattered with
+small colored objects of three kinds.
+
+A gun is a three-cell L-tromino: three cells filling three corners of
+a two-by-two square, leaving one corner empty.
+
+A wall is a straight three-cell line of one color.
+
+A single stray cell also acts as a wall - a one-cell mirror.
+
+In the answer every gun has fired. A colored diagonal streak leaves
+each gun, bends whenever it meets a wall or the edge of the grid, and
+paints a trail of colored cells across the empty background.
+
+THE RULE
+
+Find the objects by grouping the non-background cells into connected
+components of the same color. A three-cell component that fits a
+two-by-two box is a gun; every other component is a wall, and each of
+its cells remembers its color.
+
+Find each gun's aim. The two-by-two box around the gun has exactly one
+empty corner. The pivot is the corner diagonally opposite that empty
+one, and the firing direction runs from the empty corner, through the
+pivot, and onward - a forty-five-degree diagonal.
+
+Fire the beam. Start one step past the pivot with the beam wearing the
+gun's color. At each step look at three cells: the one straight ahead
+in the row, the one straight ahead in the column, and the one straight
+ahead on the diagonal.
+
+  If only the row-ahead cell is blocked, flip the vertical step: the
+  beam bounces off a floor or ceiling.
+
+  If only the column-ahead cell is blocked, flip the horizontal step:
+  the beam bounces off a side wall.
+
+  If only the diagonal is blocked, or both the row and column are
+  blocked, flip both steps: the beam reflects straight back off a
+  corner.
+
+On every bounce the beam repaints itself in the color of the wall it
+struck. Then it colors the cell it currently stands on - but only if
+that cell is still background - and moves one step in its new
+direction. The beam stops the moment it would leave the grid or land
+on an occupied cell.
+
+THE DISCRIMINATING OBSERVATION
+
+The bounce law is what separates this rule from a plain diagonal ray.
+A beam skimming the corner of a wall must reflect the way a light ray
+would, not slide past. Splitting the single question "is something in
+front of me" into three ordered questions - row first, then column,
+then diagonal - and flipping exactly the step that is blocked
+reproduces every bend in all three training grids and both held-out
+test grids, cell for cell.
+
+A second subtlety is that beams cross. Where two beams pass through the
+same background cell, the first to arrive owns it and the second leaves
+it alone. The simulation threads one shared canvas through every gun in
+turn, so an earlier beam's paint is visible to a later beam, matching
+the reference solver exactly.
+
+Predicates added: arc2_transform(bouncing_beam)/3,
+arc2_induce_rule(_, bouncing_beam), and the bb_* helpers. The induce
+clause is gated by a cheap pre-filter that fires only when the first
+training input holds at least one L-tromino gun, so the beam simulator
+runs solely for this task. The occupancy set, wall-color map, and paint
+canvas are balanced-tree association maps, so each of the up-to-two-
+thousand steps per beam costs only a logarithmic lookup.
+
+Task solved: 142ca369 (3 training pairs + 1 test case).
+Score: 115/120 = 95.83% to 116/120 = 96.67%.
