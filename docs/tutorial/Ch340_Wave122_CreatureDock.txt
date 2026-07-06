@@ -1,0 +1,80 @@
+Chapter 340: Wave 122 - creature_dock (WP-380, Layer 355)
+
+Wave 122 adds a new glass-box rule, creature_dock, that solves ARC-AGI-2
+task 6e4f6532. The score rises from 118/120 = 98.33% to 119/120 =
+99.17% (ledger; benchmark runner: 118/120, with task 6e4f6532 passing
+within the 10-second per-task limit; one earlier task remains excluded
+from the timed loop).
+
+This chapter teaches a rule that reads a grid as a scene of living
+pieces and their sockets: creatures that must be picked up, turned to
+face the right way, and set down onto the socket their body was cut from.
+
+THE TASK
+
+The board is a colored frame of structural bands - whole rows or whole
+columns painted a single color - wrapped around a plain background field.
+Floating inside are creatures (touching clusters of cyan color-8 body
+cells, a maroon color-9 core, and a few colored tips) and locks (isolated
+maroon-only patches, each shaped like the core of one creature).
+
+In the output every creature is lifted off the field and re-docked onto
+the lock whose maroon shape matches its core, rotated and mirrored so its
+colored tips best aim toward the frame.
+
+THE RULE
+
+Step 1 - Find the structural bands. Repeatedly mark any not-yet-marked
+row whose remaining columns all carry a single color, and any
+not-yet-marked column whose remaining rows all carry a single color,
+until neither pass adds anything. This fixpoint peels the frame apart
+even when no outer row or column is uniform on its own - a solid top band
+can hide the uniformity of a side band until the band above is removed.
+
+Step 2 - Identify field and frame. The background is the most common
+non-structural color. Border cells are the structural cells whose color
+differs from the background, each tagged with its position and color.
+Foreground cells are the non-structural non-background cells.
+
+Step 3 - Group the pieces. Split the foreground into 8-connected
+components. A component with any cyan cell is a creature; an all-maroon
+component is a lock.
+
+Step 4 - Clear the field. Erase every creature and lock to the background.
+
+Step 5 - Re-dock each creature. For each creature, try every unused lock
+across all eight isometries (four rotations by two mirror states). When
+the rotated maroon core matches the lock shape, rotate the whole creature
+the same way, slide it so the core lands on the lock, and score the
+orientation: each colored tip earns a point when it lies on the same side
+of the lock's center as the border band that shares its color (columns
+for a vertical band, rows for a horizontal band). Keep the highest score,
+paint the placement, and mark the lock used.
+
+THE DISCRIMINATING OBSERVATION
+
+The tip-to-border scoring is the discriminating detail. A maroon core is
+often symmetric enough to fit a lock in several rotations or mirror
+states, so the core shape alone leaves the orientation ambiguous. The
+colored tips break the tie: the correct docking aims each tip toward the
+border band that shares its color, judged from the lock's center.
+
+Predicates added: arc2_transform(creature_dock)/3,
+arc2_induce_rule(_, creature_dock), and the cd_* helpers: cd_solve_/2,
+cd_gate_/1, cd_has_uniform_line_/1, cd_dims_/3, cd_structural_/5,
+cd_struct_fix_/7, cd_pass_rows_/7, cd_row_uniform_/4, cd_pass_cols_/7,
+cd_col_uniform_/4, cd_bg_/6, cd_most_common_/2, cd_first_seen_/3,
+cd_count_pairs_/3, cd_argmax_/2, cd_border_cells_/7, cd_fg_cells_/7,
+cd_components_/2, cd_comp_loop_/4, cd_flood_/6, cd_neighbors8_/3,
+cd_partition_/4, cd_colorof_/3, cd_erase_/5, cd_place_all_/8,
+cd_place_loop_/9, cd_creature_cells_/3, cd_best_placement_/6,
+cd_candidate_/7, cd_core_coords_/2, cd_rot_coords_/3, cd_rot_cells_/3,
+cd_mirror_/2, cd_norm_set_/4, cd_translate_/4, cd_placed_core_/2,
+cd_lock_center_/3, cd_score_/5, cd_color_dirs_/3, cd_tip_ok_/5,
+cd_apply_placed_/5. The induce clause is gated by a cheap pre-filter that
+fires only when the first training input holds a cyan cell, a maroon
+cell, and at least one fully uniform row or column, so the staged solver
+runs solely for this task.
+
+Task solved: 6e4f6532 (2 training pairs + 1 test case).
+Score: 118/120 = 98.33% to 119/120 = 99.17% (ledger).
