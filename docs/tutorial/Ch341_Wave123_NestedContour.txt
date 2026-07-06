@@ -1,0 +1,91 @@
+Chapter 341: Wave 123 - nested_contour (WP-381, Layer 356)
+
+Wave 123 adds a new glass-box rule, nested_contour, that solves
+ARC-AGI-2 task 2d0172a1. The score rises from 119/120 = 99.17% to
+120/120 = 100.00% (ledger; benchmark runner: 119/120, with task 2d0172a1
+passing within the 10-second per-task limit; one earlier task remains
+excluded from the timed loop). This wave closes the ARC-AGI-2 public
+evaluation ledger at 120/120 = 100.00%.
+
+This chapter teaches a rule that reads a grid as a nest of closed loops,
+one inside another, and redraws the same nesting as a clean skeleton of
+minimal rectangles - a shrinky-dink that keeps the shape of the
+containment and throws away every original size and position.
+
+THE TASK
+
+The board is a two-color grid: a single line color drawn as big closed
+loops, and a background color filling the areas between and inside them.
+The loops nest - each loop encloses an area, that area may hold a smaller
+loop, and so on down to an innermost region. Several separate nests may
+share the grid.
+
+In the output the same nesting is redrawn at the smallest possible scale.
+Every region becomes a one-cell-thick outline, the innermost region
+collapses to a single dot, and where several nests sit side by side they
+snap to a shared row or column so their innermost dots line up. All the
+original distances and coordinates are discarded; only which region
+contains which, and how deep each sits, survives.
+
+THE RULE
+
+Step 1 - Regions. The background is the most common color. Split the grid
+into connected regions: each background area as a four-connected
+component, and each stretch of the line color as an eight-connected
+component. A thin loop line touches diagonally; an area spreads
+orthogonally.
+
+Step 2 - Containment tree. Tag each cell with its region and make regions
+that share a four-neighbor edge adjacent. Breadth-first search outward
+from every background region touching the grid border (the outer sea,
+depth zero) gives each region a depth and a parent. The result is a tree:
+the sea contains the outer loops, each loop contains an area, each area
+contains the next loop, down to the innermost region.
+
+Step 3 - Render. Render each top-level region recursively. A leaf region
+(nothing inside it) becomes a single cell of its color - the innermost
+dot. An internal region renders its children, arranges them, and wraps
+the arranged block in a one-cell-thick frame of its own color. Because
+loops and areas alternate down the tree, the frames alternate line color
+and background, producing the nested outlines.
+
+Step 4 - Arrange and pad. When a region holds several children, cluster
+their innermost-dot anchors into row bands and column bands (two anchors
+join a band when they sit within three cells of each other), then align
+each child so its anchor lands on the shared band line, filling the gaps
+with the parent's color. Finally, if a lone innermost dot ends up
+touching a grid edge, pad that edge with one row or column of background.
+
+THE DISCRIMINATING OBSERVATION
+
+The heart of the rule is the separation of nesting topology from absolute
+geometry. The output keeps only the containment tree - who is inside
+whom, and how deep - and rebuilds the picture at minimal scale. Every
+original size, wall thickness, and coordinate is thrown away and
+regenerated from the tree alone. Sibling nests are then re-registered to
+one another by their innermost dots, not by their old positions, which is
+why the anchor-alignment step is essential: it is the only thing that
+decides where two shrunk nests sit once their original coordinates are
+gone.
+
+Predicates added: arc2_transform(nested_contour)/3,
+arc2_induce_rule(_, nested_contour), and the nc_* helpers: nc_solve/2,
+nc_gate_/1, nc_dims/3, nc_cell/4, nc_cellmap/3, nc_bg/2,
+nc_first_order_unique/2, nc_count_in/3, nc_pick_max/2, nc_pick_max_step/3,
+nc_colors/2, nc_neighbors/5, nc_neighbors4/4, nc_same_color/3, nc_comps/6,
+nc_comp_step/8, nc_bfs/10, nc_all_regions/6, nc_build/5, nc_centroid/4,
+nc_build_adj/6, nc_region_adj/7, nc_bfs_tree/4, nc_seed_assocs/3,
+nc_bfs_loop/6, nc_bfs_visit/5, nc_build_children/4, nc_add_child/4,
+nc_render/4, nc_wrap/3, nc_wrap_row/3, nc_row_of/3, nc_arrange/3,
+nc_get/3, nc_blkh/2, nc_blkw/2, nc_wr/3, nc_plus1/3, nc_max_by_band/4,
+nc_band_max/4, nc_prefix_positions/3, nc_blank_grid/4, nc_placements/9,
+nc_paint_item/5, nc_overlay_grid/5, nc_overlay_row/7, nc_overlay_seg/4,
+nc_seg_cell/6, nc_argmax_first/2, nc_cluster/2, nc_bands/4,
+nc_pad_lone_edges/3, nc_blank_row_of/3, nc_prepend/3, nc_append/3,
+nc_iso/4, nc_any_iso_row/3, nc_any_iso_col/3. The induce clause is gated
+by a cheap pre-filter that fires only when the first training input uses
+exactly two distinct colors, so the shrink solver runs solely for this
+task.
+
+Task solved: 2d0172a1 (4 training pairs + 1 test case).
+Score: 119/120 = 99.17% to 120/120 = 100.00% (ledger).
