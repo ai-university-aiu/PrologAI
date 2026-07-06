@@ -543,6 +543,8 @@ ARC-AGI-2 achievement report: [ARC-AGI-2_Perfect_Score_Report.txt](https://githu
 
 It runs 48 reasoning types, achieved a confirmed perfect score of 400/400 = 100% on ARC-AGI-1 (Abstract Reasoning Corpus - Artificial General Intelligence - Year 1), and has solved the ARC-AGI-2 public evaluation set in full at 120/120 = 100.00% (benchmark runner and ledger both 120/120, zero tasks pending), Wave 124 complete - the summit.
 
+Mentova now has a public text-only web chat interface (Acc_423). Any person with a browser can hold a typed conversation with Mentova, ask it to justify every answer, and watch it honestly admit when it does not know. Mentors can propose new facts through a review-gated teaching path. Start the chat server with bin/mentova_chat_start.sh.
+
 No large language model (LLM).
 
 No neural weights.
