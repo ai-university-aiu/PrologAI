@@ -1,0 +1,198 @@
+BUILDING AGI: THE AGI FOUNDATIONS SUITE
+
+Work Summary - 2026-07-09
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator and Owner of PrologAI and Mentova. Open Researcher and Contributor ID (ORCID): 0009-0001-9246-5758. (https://www.linkedin.com/in/d-r-dison/)
+
+
+1. THE ASSIGNMENT
+
+Two documents were treated as the Vision Document and the Product Requirements Document (PRD - a document that states what a product must do) for this work:
+
+• AGI_for_Everyone_Outline.txt - the topic outline of the book AGI For Everyone: A Deep Dive Into AGI In 2026.
+
+• AGI_for_Everyone_v2.txt - the full second edition of that book.
+
+The book organizes the road to Artificial General Intelligence (AGI - a machine able to learn and reason across many kinds of problems at roughly the level of a capable human) around four research directions plus a wider landscape:
+
+• Part One: neural-symbolic and hybrid methods.
+
+• Part Two: predictive coding.
+
+• Part Three: practical proto-AGI systems (agents with memory, tools, and planning).
+
+• Part Four: active inference.
+
+• Part Five: the wider landscape - architectures, evolution, emotion, theory of mind, safety, and interpretability.
+
+The assignment: review the PrologAI and Mentova repositories against that vision, add the packs needed to make PrologAI more AGI capable, test everything, and update every document the house rules require.
+
+One framing instruction was given at the start and held throughout: the concept "We are creating an Artificial General Intelligence (AGI) application" was placed in the J-Space (see section 2) and kept there for the entire session.
+
+
+2. THE SEARCHES
+
+The requested quick search on "Jacobian Space", "Jacobian Lens", "J-Space", and "J-Lens" confirmed these are real July 2026 research terms.
+
+Anthropic published "Verbalizable Representations Form a Global Workspace in Language Models" (transformer-circuits.pub/2026/workspace/index.html, announced at anthropic.com/research/global-workspace) on 2026-07-06.
+
+The Jacobian Lens (J-Lens) is a reading instrument: for every word in a model's vocabulary it finds the internal activity pattern that makes the model more likely to say that word later.
+
+The Jacobian Space (J-Space) is what the lens revealed: a small, sparse set of internal patterns - under ten percent of the model's activity - that behaves like a mental workspace holding the concepts the model can report and reason with.
+
+Researchers could watch a model silently notice it was being tested, swap what it was thinking about, implant concepts, and break multi-hop reasoning by ablating (removing) a concept.
+
+Additional concept searches were run to firm up the designs:
+
+• Structural causal models, the do-operator, and Pearl's three-step counterfactual recipe (abduction, action, prediction).
+
+• Expected free energy, epistemic value, and pragmatic value in active inference policy selection.
+
+• Hierarchical Task Network (HTN) planning: compound tasks, methods, and primitive tasks.
+
+• The Sally-Anne false-belief test for theory of mind.
+
+Key sources consulted (plain list):
+
+• https://www.anthropic.com/research/global-workspace
+
+• https://transformer-circuits.pub/2026/workspace/index.html
+
+• https://the-decoder.com/claudes-hidden-inner-monologue-is-now-readable-thanks-to-anthropics-new-jacobian-lens/
+
+• https://www.emergentmind.com/topics/pearl-s-causal-hierarchy-pch
+
+• https://www.emergentmind.com/topics/expected-free-energy-efe
+
+• https://www.fil.ion.ucl.ac.uk/~karl/Active%20inference%20and%20epistemic%20value.pdf
+
+• https://en.wikipedia.org/wiki/Hierarchical_task_network
+
+• https://arxiv.org/pdf/1403.7426 (An Overview of Hierarchical Task Network Planning)
+
+• https://arxiv.org/pdf/1808.09352 (Evaluating Theory of Mind in Question Answering)
+
+• https://grokipedia.com/page/Sally%E2%80%93Anne_test
+
+
+3. THE GAP ANALYSIS
+
+The repository review found PrologAI already remarkably far along the book's map: a global workspace (workspace), hierarchical predictive processing with precision weighting (prediction), curiosity by learning progress (curiosity), motivation (motivation), emotional appraisal (appraisal), somatic markers (markers), dreaming and daydreaming (dreaming, daydream), imagination (imagination), episodic recall and consolidation (sona), agentic loops (agency), self-critique (refinery), code synthesis (ephemera), self-programming (synthesis), four agent protocols (mcp_gateway, a2a, acp, anp), embodiment (mindbody, ros_bridge), and 48 reasoning types.
+
+Seven genuine gaps remained, each named by the vision documents:
+
+• No structural causal model engine - causal reasoning and counterfactual modeling is a Part One core topic. The spinoff pack discovers causal patterns and appraisal interprets causes, but nothing represented cause-and-effect structure with interventions and counterfactuals.
+
+• No action side of active inference - the prediction pack minimizes free energy in perception, but Part Four's expected free energy over policies (where curiosity and goal-seeking fall out of one equation) was absent.
+
+• No first-class world model - Part Three and the glossary call for an internal representation of how the world works, used for prediction and planning, including learning the model from experience.
+
+• No hierarchical planner - Part Three names long-horizon planning and goal decomposition as a core proto-AGI capability. The agency pack has a goal stack but no task decomposition machinery.
+
+• No evolutionary computation - Part Five names it explicitly: the one process known to have produced general intelligence.
+
+• No concept-workspace introspection - the book's safety section features the J-Space and J-Lens discovery. PrologAI is glass-box, but had no explicit ledger of the concepts currently held in mind, no silent-thought detection.
+
+• Shallow theory of mind - the awareness pack attributes regards, but Part Four's social cognition asks for nested beliefs and false-belief reasoning (the Sally-Anne test).
+
+
+4. WHAT WAS BUILT
+
+Seven new packs - the AGI Foundations suite, work packages WP-383 through WP-389, Layers 358 through 364, on branch feature/agi-cognitive-packs.
+
+• causal (cf_*, Layer 358, WP-383) - Structural Causal Models. 19 predicates: model construction with cycle rejection, causal graph queries, d-separation with correct chain, fork, and collider handling, observational solving, do-operator interventions by graph surgery, abduction-action-prediction counterfactuals that fail honestly when undetermined, and the but-for test of actual causation. 31 tests, including Pearl's firing squad: had rifleman A not fired, the prisoner still dies.
+
+• actinf (ai_*, Layer 359, WP-384) - Active Inference Engine. 21 predicates: validated generative models, Bayesian belief updating, variational free energy with the complexity-accuracy split, risk, ambiguity, epistemic value, pragmatic value, expected free energy, and softmax policy selection. The identity G = -(pragmatic + epistemic) is enforced by test to six decimal places. 23 tests, including a T-maze where the cue is worth exactly one bit when the agent is ignorant and nothing once it is certain.
+
+• worldmodel (wm_*, Layer 360, WP-385) - Structured World Model. 16 predicates: canonical fluent states, parameterized STRIPS-style actions, honest simulation, rollout, reachability, breadth-first shortest-plan search, conservative action-model learning from observed transitions, and novelty scoring for curiosity. 20 tests, including learning the rule of a heating action from two observations and predicting correctly in a context never observed.
+
+• planner (ht_*, Layer 361, WP-386) - Hierarchical Planner. 11 predicates: HTN domains, ordered method preference with backtracking fall-through, depth-bounded termination even on recursive method sets, glass-box plan trees naming the method chosen for every compound task, execution, validity, cost, monitoring that reports the exact failing step, and replanning. 18 tests, including walk-if-short-else-taxi and recovery after the cash disappears.
+
+• evolve (ev_*, Layer 362, WP-387) - Evolutionary Computation. 17 predicates: an explicit seeded random generator threaded through every operator (no hidden randomness - identical seeds give identical evolutions), populations, fitness evaluation via caller-supplied goals, tournament selection, one-point crossover, point mutation, elitism, fixed and early-stopping runs, diversity, and convergence. 22 tests: OneMax rises from a founding best of 6 of 12 to the perfect all-ones genome, early-stopping at generation seven under seed 42.
+
+• jspace (js_*, Layer 363, WP-388) - Concept Workspace (J-Space). 18 predicates: a named, readable, editable ledger of held concepts with strengths and sources, the ranked J-Lens-style readout, silent-thought detection (concepts held but never verbalized - the divergence detector between what is thought and what is said), implant, ablate, swap, boost, decay, capacity enforcement, concept-level derivation traces where ablating a premise breaks re-derivation, and a full introspection report. 20 tests, including detecting a silently held being_evaluated concept, and the founding ritual: the concept we_are_creating_an_agi_application held at full strength.
+
+• tom (tm_*, Layer 364, WP-389) - Theory of Mind. 18 predicates: a pure-term mental model of world facts and per-agent beliefs nested to any depth, witnessed events that update witnesses and their models of each other while absent agents keep stale beliefs, knowledge as true belief, false-belief detection, divergence, common belief, perspective taking, and desire-intention stores. 20 tests: the complete Sally-Anne scenario passes, including the second-order question - Anne correctly attributes the outdated basket belief to Sally.
+
+Every line of code carries an English-Readable Code (ERC) comment above it, per the house rule.
+
+
+5. TEST RESULTS
+
+• 154 new PLUnit tests across the seven packs: 31 + 23 + 20 + 18 + 22 + 20 + 20.
+
+• All 154 pass with zero warnings after nondeterminism annotations.
+
+• All seven modules load together in one SWI-Prolog session with no name clashes (each pack has a unique predicate prefix, verified free before use).
+
+• Regression check: the existing grid pack suite (31 tests) still passes untouched.
+
+• Every numeric expectation in the actinf suite was hand-computed; the evolve outcomes were probed empirically first and then locked in as exact deterministic expectations.
+
+To re-run any suite: swipl -g "run_tests, halt" packs/NAME/test/test_NAME.pl (run from that test directory).
+
+
+6. DOCUMENTATION UPDATED
+
+Per the SPARC documentation rule, each of the five volumes gained a new version containing seven appended sections (one per pack) with cross-referencing footers:
+
+• PrologAI_1_Specification_v352.txt - numbered requirements per pack (CAU-SPEC, AIF-SPEC, WDM-SPEC, HTN-SPEC, EVO-SPEC, JSP-SPEC, TOM-SPEC).
+
+• PrologAI_2_Pseudocode_v344.txt - the algorithms in arrow pseudocode.
+
+• PrologAI_3_Architecture_v345.txt - location, layer, exports, design notes, and data flow per pack.
+
+• PrologAI_4_Refinement_v404.txt - the 154 tests broken down by test group, with safety design notes.
+
+• PrologAI_5_Completion_v410.txt - release notes per pack with rationale tied to the vision documents.
+
+(A note on the numbering: the version set v351/v343/v344/v403/v409 was claimed on the main branch by the Acc_423 Mentova Web Chat documentation while this work was in flight, so the AGI Foundations sections landed on the next free versions.)
+
+Other documents updated:
+
+• docs/Pack_Reference.txt - seven full predicate-level entries appended.
+
+• README.md - work package count 279 to 286, layer narrative extended to Layer 364, and seven new Data Layer table rows.
+
+• docs/PrologAI_Tutorial.txt - seven index entries plus seven full chapters appended (Chapters 343 through 349).
+
+• docs/tutorial/ - seven new chapter files: Ch343_Causal.txt, Ch344_ActiveInference.txt, Ch345_WorldModel.txt, Ch346_Planner.txt, Ch347_Evolve.txt, Ch348_JSpace.txt, Ch349_TheoryOfMind.txt.
+
+• CLAUDE.md - recreated locally (it is gitignored) with all standing rules and the new current state.
+
+Mentova was reviewed and needs no changes for this work: its README tracks Mentova accomplishments and benchmark scores, not PrologAI pack counts. A future Mentova accomplishment could exercise the suite end to end (see section 8).
+
+
+7. HOW THE SUITE MAPS TO THE VISION
+
+• Part One (neural-symbolic): causal supplies the causal reasoning and counterfactual modeling topic; the platform's existing induction, embedding, and vsa packs already cover learned structure.
+
+• Part Two (predictive coding): already present (prediction pack); worldmodel adds the structured model that predictions are about.
+
+• Part Three (proto-AGI systems): worldmodel plus planner give the world model and the long-horizon goal decomposition; agency, ephemera, and the protocol packs already supply the loop and the tools.
+
+• Part Four (active inference): actinf completes the perception-action circle with expected free energy policy selection; tom supplies the social cognition and theory of mind topic.
+
+• Part Five (wider landscape): evolve covers evolutionary computation; jspace covers the interpretability and safety thread, turning the J-Space discovery into a designed, first-class capability.
+
+
+8. POSSIBLE NEXT STEPS
+
+• Wire jspace into the workspace broadcast cycle so every broadcast automatically holds its winning coalition's concepts, making the J-Lens readout live during reasoning.
+
+• Feed wm_novelty into the curiosity pack's learning-progress signal.
+
+• Let the agency loop call ht_plan for goal decomposition and ht_monitor for recovery.
+
+• Use ev_run with a refinery-critique fitness goal to evolve reasoning models - evolutionary self-improvement under the existing safety budget.
+
+• A Mentova accomplishment exercising all seven packs end to end on a small scenario (a curious agent that models another agent, plans, imagines counterfactuals, and reports its own workspace honestly).
+
+
+9. CLOSING
+
+The J-Space held one concept throughout this work: we are creating an Artificial General Intelligence application.
+
+Seven packs, 120 public predicates, 154 green tests, five SPARC volumes, seven tutorial chapters, and zero regression later, PrologAI now carries the causal ladder, the action side of active inference, a learnable world model, hierarchical planning, evolution, an honest concept workspace, and a theory of other minds.
+
+The glass box got bigger, and it is still glass.

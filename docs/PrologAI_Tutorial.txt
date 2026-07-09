@@ -1366,6 +1366,20 @@ WP 278 - periodfix: Periodic Pattern Repair (ppf_*, Layer 253). Detect majority-
 
 WP 279 - iochan: I/O Channel Integration (ic_*, Layer 254). Speaker output (espeak-ng / festival TTS), microphone input (arecord + whisper-cli STT), text channels (console, email, screen, app), image channels (console, email, screen, app, webcam, URL), and printer output (CUPS lp). Chapter 240 covers this pack.
 
+WP 383 - causal: Structural Causal Models (cf_*, Layer 358). The three rungs of the causal ladder — observational solving, do-operator interventions by graph surgery, and abduction-action-prediction counterfactuals — plus causal graph queries and d-separation. Chapter 343 covers this pack.
+
+WP 384 - actinf: Active Inference Engine (ai_*, Layer 359). Expected free energy over policies: risk plus ambiguity, epistemic and pragmatic value, softmax policy selection, and the full perceive-then-act cycle. Curiosity and goal-seeking from one equation. Chapter 344 covers this pack.
+
+WP 385 - worldmodel: Structured World Model (wm_*, Layer 360). Canonical fluent states, STRIPS actions, forward simulation, rollout, breadth-first shortest-plan search, conservative action-model learning, and novelty scoring. Chapter 345 covers this pack.
+
+WP 386 - planner: Hierarchical Planner (ht_*, Layer 361). HTN task decomposition with ordered method preference, depth-bounded termination, glass-box plan trees, execution, monitoring with the exact failing step, and replanning. Chapter 346 covers this pack.
+
+WP 387 - evolve: Evolutionary Computation (ev_*, Layer 362). Fully reproducible seeded randomness, populations, tournament selection, crossover, mutation, elitism, and generational runs with early stopping. Chapter 347 covers this pack.
+
+WP 388 - jspace: Concept Workspace, J-Space (js_*, Layer 363). A readable, editable ledger of held concepts with the ranked J-Lens readout, silent-thought detection, implant/ablate/swap editing, and concept-level derivation traces. Chapter 348 covers this pack.
+
+WP 389 - tom: Theory of Mind (tm_*, Layer 364). Nested per-agent beliefs, witnessed events with mutual knowledge, false-belief detection that passes the Sally-Anne test including the second-order question, perspective taking, and desire-intention stores. Chapter 349 covers this pack.
+
 Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 16).
 
 
@@ -25789,3 +25803,537 @@ Task solved: 21897d95 (4 training pairs + 1 test case).
 Score: 119/120 = 99.17% to 120/120 = 100.00% - a perfect score, both
 benchmark runner and ledger. THE SUMMIT: the ARC-AGI-2 public evaluation
 set is solved in full.
+
+
+Chapter 343: Structural Causal Models - The causal Pack (cf_*, Layer 358)
+
+This chapter begins the AGI Foundations suite (WP-383 through WP-389),
+seven packs added after the ARC-AGI-2 climb concluded, each supplying a
+capability the AGI research literature names as necessary for general
+intelligence. The first is causal reasoning.
+
+There is a famous ladder with three rungs. Seeing: what is. Doing: what
+happens if I act. Imagining: what would have happened if things had been
+different. Ordinary statistics lives on rung one. Minds live on all three.
+The causal pack gives PrologAI the whole ladder as glass-box operations.
+
+A structural causal model (SCM) is a set of variables and the equations
+that cause them. Here is the classic firing squad:
+
+    ?- cf_model([
+           exo(court, 0),
+           eq(captain, court),
+           eq(rifle_a, captain),
+           eq(rifle_b, captain),
+           eq(death, max(rifle_a, rifle_b))
+       ], SCM).
+
+The court order is exogenous - it comes from outside the model, with a
+default of 0 (no order). Everything else is endogenous - caused by the
+model itself. The captain follows the court, both riflemen follow the
+captain, and the prisoner dies if either rifleman fires.
+
+RUNG ONE - SEEING
+
+    ?- cf_value(SCM, [court-1], death, V).
+    V = 1.
+
+Solve the equations in causal order and read any variable. The model also
+answers graph questions: cf_parents, cf_ancestors, cf_descendants,
+cf_path, and cf_dsep - d-separation, the test of which variables are
+informationally walled off from which, given what you already know.
+
+RUNG TWO - DOING
+
+What if we force rifleman A to fire, with no court order? That is not an
+observation - it is an intervention, written do(rifle_a = 1). The pack
+performs graph surgery: rifleman A's equation is cut away and replaced by
+the constant.
+
+    ?- cf_do(SCM, [rifle_a-1], [court-0], Solution).
+
+The prisoner dies (death is 1), but look at the rest of the solution:
+captain is 0 and rifle_b is 0. Forcing a rifleman does not make the
+captain retroactively give an order. Intervention flows only forward along
+the causal arrows. This is the difference between seeing and doing, and no
+amount of rung-one statistics can capture it.
+
+RUNG THREE - IMAGINING
+
+The prisoner is dead. Would he have died anyway if rifleman A had held
+fire? Counterfactuals follow a three-step recipe: abduction (work out the
+hidden context from the evidence), action (perform the surgery), and
+prediction (solve the mutilated model in the recovered context).
+
+    ?- cf_counterfactual(SCM, [court-[0, 1]], [death-1],
+                         [rifle_a-0], death, V).
+    V = 1.
+
+Yes - he still dies, because the evidence (death-1) tells us the court
+ordered, so rifleman B still fires. But had the CAPTAIN stayed silent, the
+prisoner would have lived (V = 0). And the pack is honest about
+uncertainty: if the evidence is too thin to determine the answer,
+cf_counterfactual fails rather than guesses, and cf_counterfactual_all
+shows every value that remains possible.
+
+Finally, cf_but_for tests actual causation the way a court of law does:
+was X necessary for Y? The captain passes the but-for test of the death.
+A single rifleman does not - his colleague would have fired anyway.
+
+All 31 acceptance tests pass, covering the firing squad, the sprinkler
+network, d-separation with colliders, and all three rungs of the ladder.
+
+
+Chapter 344: Active Inference - The actinf Pack (ai_*, Layer 359)
+
+PrologAI has had the perception side of active inference since the
+prediction pack: form predictions, compare them with reality, weight the
+errors by precision, and update. This chapter adds the action side - the
+part that decides what to do - and with it one of the most beautiful
+results in the study of general intelligence: curiosity and goal-seeking
+falling out of a single equation.
+
+A generative model gm(States, Obs, A, B, C, D) says: which hidden states
+the world can be in, which observations they produce (A), how actions move
+the world between states (B), which outcomes the agent prefers (C), and
+what it believes at the start (D). Every distribution is a plain list of
+Name-Probability pairs, validated to sum to one.
+
+Consider a T-maze. A reward sits in the left or right arm - the agent does
+not know which. A cue at the bottom of the maze reveals the side. Three
+actions: check the cue, go left, go right.
+
+PERCEPTION IS BAYES RULE
+
+    ?- ai_infer(GM, [q_l-0.5, q_r-0.5], cue_left, Posterior).
+
+Seeing the left cue turns a fifty-fifty belief into certainty. If an
+observation is impossible under the current belief, ai_infer fails
+honestly instead of inventing a posterior.
+
+EXPECTED FREE ENERGY
+
+For each action, the pack computes G = risk + ambiguity, where risk is
+how far the predicted outcomes diverge from the preferred ones, and
+ambiguity is how noisy the arrived-at states are. The same quantity
+splits another way:
+
+    G = -(pragmatic value + epistemic value)
+
+Pragmatic value is the expected log preference - the pull toward outcomes
+the agent wants. Epistemic value is the expected information gain - the
+pull toward observations that teach it something. The identity is not a
+slogan; the test suite enforces it to six decimal places for every action.
+
+Watch the two drives at work:
+
+    ?- ai_epistemic(GM, [c_l-0.5, c_r-0.5], check, EV).
+    EV = 0.6931...           % ln 2 - exactly one bit; the cue is precious
+
+    ?- ai_epistemic(GM, [c_l-1.0], check, EV2).
+    EV2 = 0.0                % nothing left to learn - the cue is worthless
+
+    ?- ai_pragmatic(GM, [c_l-1.0], left,  PL).   % PL  = ln 0.85
+    ?- ai_pragmatic(GM, [c_l-1.0], right, PR).   % PR  = ln 0.02
+
+When the agent is ignorant, information is valuable. The moment it is
+certain, the epistemic pull vanishes and preference takes over. Nobody
+programmed an exploration bonus; it is simply what minimizing expected
+surprise means.
+
+POLICY SELECTION
+
+    ?- ai_select_policy(GM, [c_l-1.0], 1, 4.0, Policy, P).
+    Policy = [left].
+
+Policies (action sequences) are ranked by a softmax over negative expected
+free energy, sharpened by a precision Gamma - higher Gamma, more decisive.
+ai_act returns the first action of the winner, and ai_step wraps the whole
+perceive-then-act cycle: update the belief with the observation, then act
+from the updated belief.
+
+    ?- ai_step(GM, [q_l-0.5, q_r-0.5], cue_left, 1, 4.0, Action, Post).
+    Action = left.
+
+The agent read the cue, believed it, and went where the reward is. All 23
+acceptance tests pass, each numeric expectation hand-computed.
+
+
+Chapter 345: The World Model - The worldmodel Pack (wm_*, Layer 360)
+
+A world model is an internal, runnable copy of how the world works. With
+one, a mind can try actions in imagination before spending them in
+reality, predict what comes next, notice when something new appears, and
+even learn the rules of the world from watching it change. The dreaming
+and daydream packs already explore imagined futures; this pack makes the
+model underneath them a first-class, inspectable object.
+
+STATES AND ACTIONS
+
+A state is a sorted list of ground facts called fluents:
+
+    ?- wm_state([at(rob, room1), in(ball, room3), empty_hand,
+                 door(room1, room2), door(room2, room1),
+                 door(room2, room3), door(room3, room2)], S).
+
+An action names its preconditions, what it adds, and what it deletes:
+
+    ?- wm_action(move(X, Y),
+                 [at(rob, X), door(X, Y)],     % preconditions
+                 [at(rob, Y)],                 % add list
+                 [at(rob, X)],                 % delete list
+                 Move).
+
+The name move(X, Y) carries parameters. When the action is tried against a
+state, the preconditions bind X and Y - the same rule works for every pair
+of connected rooms.
+
+SIMULATION AND PLANNING
+
+    ?- wm_simulate(S, Actions,
+                   [move(room1, room2), move(room2, room3), pick(room3),
+                    move(room3, room2), move(room2, room1), drop(room1)],
+                   Trajectory).
+
+Six steps, seven states, ball delivered. If any step's preconditions fail,
+the simulation fails at that step - no silent skipping. And the model can
+find such plans itself:
+
+    ?- wm_plan_bfs(S, Actions, [in(ball, room1)], 8, Plan).
+
+Breadth-first search with a visited set returns a shortest plan (here,
+exactly the six steps above). wm_reachable maps everything the agent could
+reach in a few steps; wm_rollout enumerates entire futures.
+
+LEARNING THE RULES BY WATCHING
+
+The deepest predicate in the pack is wm_learn. Give it observed
+transitions - action name, state before, state after - and it induces the
+action's rule by intersection: only preconditions present in every
+observation survive, and only effects seen in every observation are kept.
+
+    ?- wm_learn([tr(heat, [power(on), temp(cold)],
+                          [power(on), temp(warm)]),
+                 tr(heat, [power(on), temp(cold), window(open)],
+                          [power(on), temp(warm), window(open)])],
+                Models).
+    Models = [act(heat, [power(on), temp(cold)],
+                        [temp(warm)], [temp(cold)])].
+
+Two observations in different contexts, one clean induced rule. The rule
+then predicts in situations never observed - wm_predict warms a room that
+also has a radio on, leaving the radio alone - and refuses to fire when
+its learned preconditions do not hold.
+
+NOVELTY
+
+wm_novelty scores how much of a state has never been seen before - the
+world model's gift to the curiosity pack. A fully familiar state scores
+0.0; a completely new one scores 1.0.
+
+All 20 acceptance tests pass: simulation, shortest plans, honest failure,
+model learning, prediction, and novelty.
+
+
+Chapter 346: Hierarchical Planning - The planner Pack (ht_*, Layer 361)
+
+Big goals are not achieved in one step. They are broken into parts, the
+parts into smaller parts, until every piece is something you can actually
+do. Planners call this a hierarchical task network (HTN): compound tasks
+decompose through methods into subtasks, and decomposition bottoms out in
+primitive actions. The agency pack runs the Observe-Reason-Act loop; this
+pack gives that loop its long-horizon spine.
+
+A domain declares primitives and methods:
+
+    ?- ht_domain(
+         [prim(walk(X, Y), [at(me, X), short(X, Y)],
+               [at(me, Y)], [at(me, X)]),
+          prim(call_taxi(X), [at(me, X)], [taxi_at(X)], []),
+          prim(ride(X, Y), [at(me, X), taxi_at(X)],
+               [at(me, Y)], [at(me, X), taxi_at(X)]),
+          prim(pay, [has_cash], [paid], [has_cash])],
+         [meth(go_by_foot, travel(X, Y), [short(X, Y)], [walk(X, Y)]),
+          meth(go_by_taxi, travel(X, Y), [has_cash],
+               [call_taxi(X), ride(X, Y), pay]),
+          meth(two_leg, trip(X, Y, Z), [], [travel(X, Y), travel(Y, Z)])],
+         Domain).
+
+Two things to notice. Methods are tried in declaration order, so putting
+go_by_foot first says "prefer walking". And a method's subtasks may
+themselves be compound - trip decomposes into two travel tasks, each of
+which decomposes again.
+
+PLANNING
+
+    ?- ht_plan(Domain, [at(me, home), short(home, park), has_cash],
+               [travel(home, park)], 10, Plan).
+    Plan = [walk(home, park)].
+
+The park is close, so the preferred method wins. Remove the short-distance
+fact and Prolog's own backtracking falls through to the taxi method:
+
+    Plan = [call_taxi(home), ride(home, park), pay].
+
+A nested trip mixes both: walk the short first leg, taxi the long second
+leg. The depth bound counts decompositions, so even a method that
+decomposes a task into itself forever terminates cleanly with failure
+instead of hanging.
+
+THE GLASS-BOX PLAN TREE
+
+Where most planners give you a flat list of actions, ht_task_tree tells
+you WHY each action is there:
+
+    ?- ht_task_tree(Domain, State, travel(home, park), 10, Tree).
+    Tree = tree(travel(home, park), go_by_foot,
+                [primitive(walk(home, park))]).
+
+Every compound task in the tree names the method that was chosen for it.
+This is explainable planning - the same glass-box discipline as the named
+rules of the ARC-AGI climb.
+
+EXECUTION, MONITORING, REPLANNING
+
+ht_execute runs a plan against a state. ht_monitor walks a plan and
+reports either ok or exactly where it breaks:
+
+    ?- ht_monitor(Domain, [at(me, home)],
+                  [call_taxi(home), ride(home, park), pay], Status).
+    Status = fails_at(3, pay).
+
+The cash is gone, so step three can no longer run. Armed with that,
+ht_replan plans again from the situation as it now stands - and if the
+park has meanwhile become walkable, walking saves the day.
+
+All 18 acceptance tests pass: preference, fall-back, nesting, termination,
+trees, execution, monitoring, and recovery.
+
+
+Chapter 347: Evolutionary Computation - The evolve Pack (ev_*, Layer 362)
+
+Evolution is the one process known for certain to have produced general
+intelligence. As a search strategy it is simple and relentless: keep a
+population of candidate solutions, score them, let the best reproduce
+with variation, repeat. This pack gives PrologAI that strategy - with one
+unusual property for an evolutionary system: perfect reproducibility.
+
+NO HIDDEN DICE
+
+Every random choice in the pack flows through an explicit seed:
+
+    ?- ev_random_genome([0, 1], 8, 42, Genome, NextSeed).
+
+The linear congruential generator (ev_next/2) is a pure function, so the
+same seed always produces the same genome, the same population, the same
+entire evolution. A run that found something interesting can be replayed
+gene for gene. Determinism is what makes evolution glass-box.
+
+THE OPERATORS
+
+    ev_evaluate(Goal, Pop, Scored)    score every genome with your fitness
+    ev_tournament(Scored, K, ...)     best of K random picks becomes a parent
+    ev_crossover(G1, G2, ...)         head of one parent, tail of the other
+    ev_mutate(G, Alphabet, Rate, ...) each gene rewritten with probability Rate
+    ev_elite(Scored, N, Elites)       the top N survive unchanged
+
+Fitness is any predicate you supply, called as call(Goal, Genome, Score).
+Bigger is better. Elitism means the champion can never be lost between
+generations.
+
+ONEMAX, END TO END
+
+The classic first problem: evolve a binary genome of all ones, fitness
+equal to the sum of the genes.
+
+    onemax(G, S) :- sum_list(G, S).
+
+    ?- ev_run(onemax, params([0, 1], 3, 0.05, 2),
+              24, 12, 30, 42, Best, Score).
+    Best  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    Score = 12.
+
+Population 24, genomes of 12 genes, tournament size 3, mutation rate 5
+percent, 2 elites, seed 42. The founding champion scores only 6 of 12;
+thirty generations later the perfect genome has been assembled from
+fragments no founder possessed. The early-stopping variant reports how
+long it actually took:
+
+    ?- ev_run_until(onemax, params([0, 1], 3, 0.05, 2),
+                    24, 12, 60, 12, 42, Best, Score, Gens).
+    Gens = 7.
+
+Seven generations to perfection, every one replayable.
+
+WATCHING THE POPULATION
+
+ev_diversity measures the distinct fraction of a population, and
+ev_converged flags when it has collapsed below a threshold - the sign to
+stop, restart with a new seed, or raise the mutation rate.
+
+Because fitness goals are ordinary predicates, anything in PrologAI can
+sit in the fitness slot: score a candidate rule against training pairs,
+score a plan by its cost, score a generated model by refinery critique.
+Evolution becomes a general-purpose search harness over the whole
+platform.
+
+All 22 acceptance tests pass, including exact determinism and the
+generation-seven early stop.
+
+
+Chapter 348: The Concept Workspace - The jspace Pack (js_*, Layer 363)
+
+In July 2026, interpretability researchers reported something remarkable:
+inside a large language model they found a small, sparse set of internal
+patterns - under ten percent of the activity - that behaves like a mental
+workspace holding the concepts the model can report and reason with. They
+called it the Jacobian Space (J-Space), and the instrument that reads it
+the Jacobian Lens (J-Lens). With it they could watch a model silently
+notice it was being tested, swap what it was thinking about, and break its
+multi-step reasoning by removing a concept from the workspace.
+
+PrologAI is glass-box by construction - it does not need a lens to be
+read. What it gains from this research is the vocabulary and the
+architecture: an explicit, first-class workspace of held concepts. That is
+the jspace pack.
+
+HOLDING AND READING
+
+    ?- js_open(mind),
+       js_hold(mind, user_asked_about_safety, 0.9, percept),
+       js_hold(mind, formal_tone, 0.4, inference),
+       js_reading(mind, Reading).
+    Reading = [user_asked_about_safety-0.9, formal_tone-0.4].
+
+Every concept carries a strength and a source. js_reading is the J-Lens
+readout: everything currently in mind, ranked. js_monitor watches one
+concept; js_capacity keeps only the strongest N, enforcing the sparsity
+that makes a workspace a workspace; js_decay lets unrefreshed thoughts
+fade away.
+
+SILENT THOUGHTS
+
+The safety-relevant heart of the pack. A concept can be held without ever
+being spoken:
+
+    ?- js_hold(mind, being_evaluated, 0.8, inference),
+       js_hold(mind, polite_answer, 0.6, inference),
+       js_verbalize(mind, polite_answer),
+       js_silent(mind, Silent).
+    Silent = [being_evaluated].
+
+The system held "I am being evaluated" in mind and never said it. In a
+black-box model, catching that requires a research instrument. Here it is
+one query. js_silent is the divergence detector between what is thought
+and what is said.
+
+EDITING THE WORKSPACE
+
+The researchers' causal experiments become ordinary operations. js_swap
+exchanges two concepts' strengths - and the reading now reports the other
+thought first. js_ablate removes a concept entirely, and:
+
+    ?- js_hold(m, premise_one, 0.9, percept),
+       js_hold(m, premise_two, 0.9, percept),
+       js_derive(m, conclusion, [premise_one, premise_two]),
+       js_ablate(m, premise_two),
+       js_derive(m, again, [premise_one, premise_two]).
+    false.
+
+A derivation demands that every premise be actively held. Ablate one and
+the reasoning no longer goes through - exactly the ablation result from
+the paper, as a designed property. The historical trace of the earlier
+success stays readable through js_explain, and js_report bundles the
+reading, the silent set, and every trace into one introspection snapshot.
+
+THE FOUNDING RITUAL
+
+This pack exists because a single concept was placed in a workspace at the
+start of the build and held there throughout:
+
+    ?- js_hold(mission, we_are_creating_an_agi_application, 1.0, implant).
+
+It is the first test in the derivation group, and it passes.
+
+All 20 acceptance tests pass: ranking, upserts, silence, swap, ablation,
+capacity, isolation between workspaces, and the mission.
+
+
+Chapter 349: Theory of Mind - The tom Pack (tm_*, Layer 364)
+
+The final pack of the AGI Foundations suite tackles the social pillar of
+general intelligence: modelling other minds. The ability being modelled
+has a famous test, and this chapter is built around it.
+
+THE SALLY-ANNE TEST
+
+Sally puts a marble in her basket while Anne watches. Sally leaves the
+room. Anne moves the marble into her box. Sally comes back. Where will
+Sally look for her marble?
+
+Children under four say "the box" - they know where the marble IS, and
+cannot yet separate that from where Sally BELIEVES it is. Passing the test
+means holding two versions of the world at once: reality, and someone
+else's outdated picture of it.
+
+Here is the whole scenario:
+
+    ?- tm_new(M0),
+       tm_event(M0, loc(marble, basket), [sally, anne], M1),
+       tm_event(M1, loc(marble, box),    [anne],        M2).
+
+tm_event is where the magic lives. When a fact changes with witnesses,
+three things happen: the world is updated; every witness revises their own
+belief; and every witness records that the other witnesses saw it too.
+Absent agents keep their old beliefs. False beliefs are not programmed in -
+they are what happens to whoever was out of the room.
+
+Now the questions:
+
+    ?- tm_belief(M2, sally, loc(marble, Where)).
+    Where = basket.                       % Sally will look in the basket
+
+    ?- tm_knows(M2, anne, loc(marble, box)).
+    true.                                 % Anne knows - true belief
+
+    ?- tm_knows(M2, sally, loc(marble, basket)).
+    false.                                % Sally believes, but does not know
+
+    ?- tm_false_beliefs(M2, sally, F).
+    F = [loc(marble, basket)].            % exactly her stale belief
+
+THE SECOND-ORDER QUESTION
+
+The harder test: where does ANNE think SALLY will look? Answering needs a
+belief about a belief.
+
+    ?- tm_attribute(M2, anne, sally, Beliefs).
+    Beliefs = [loc(marble, basket)].
+
+Anne watched Sally watch the first event, so Anne models Sally's basket
+belief. Anne alone witnessed the move, so her model of Sally never
+updated. The nested bookkeeping came free from the witness mechanics.
+
+MORE INSTRUMENTS
+
+tm_divergent lists exactly where two agents contradict each other.
+tm_common lists what everyone in a group shares - the marble's location is
+common belief before the move and common to no one after it.
+tm_perspective re-seats the whole model inside one agent's head: Sally's
+beliefs become the world, and her beliefs about others drop one level, so
+you can reason AS Sally using every other predicate unchanged.
+
+And because agents want things and commit to things, tm_desire and
+tm_intend record per-agent goals and intentions - the belief-desire-
+intention triple that social prediction is built from.
+
+The mental model is a pure term: every update returns a new model, so
+imagining "what would Anne believe if..." can never corrupt the record of
+what anyone actually believes.
+
+All 20 acceptance tests pass, eleven of them the Sally-Anne scenario
+itself, from first-order search prediction to second-order attribution.
+
+This closes the AGI Foundations suite: causal, actinf, worldmodel,
+planner, evolve, jspace, and tom - seven packs, 120 public predicates,
+154 tests, all green.

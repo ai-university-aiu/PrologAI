@@ -1,0 +1,73 @@
+Chapter 346: Hierarchical Planning - The planner Pack (ht_*, Layer 361)
+
+Big goals are not achieved in one step. They are broken into parts, the
+parts into smaller parts, until every piece is something you can actually
+do. Planners call this a hierarchical task network (HTN): compound tasks
+decompose through methods into subtasks, and decomposition bottoms out in
+primitive actions. The agency pack runs the Observe-Reason-Act loop; this
+pack gives that loop its long-horizon spine.
+
+A domain declares primitives and methods:
+
+    ?- ht_domain(
+         [prim(walk(X, Y), [at(me, X), short(X, Y)],
+               [at(me, Y)], [at(me, X)]),
+          prim(call_taxi(X), [at(me, X)], [taxi_at(X)], []),
+          prim(ride(X, Y), [at(me, X), taxi_at(X)],
+               [at(me, Y)], [at(me, X), taxi_at(X)]),
+          prim(pay, [has_cash], [paid], [has_cash])],
+         [meth(go_by_foot, travel(X, Y), [short(X, Y)], [walk(X, Y)]),
+          meth(go_by_taxi, travel(X, Y), [has_cash],
+               [call_taxi(X), ride(X, Y), pay]),
+          meth(two_leg, trip(X, Y, Z), [], [travel(X, Y), travel(Y, Z)])],
+         Domain).
+
+Two things to notice. Methods are tried in declaration order, so putting
+go_by_foot first says "prefer walking". And a method's subtasks may
+themselves be compound - trip decomposes into two travel tasks, each of
+which decomposes again.
+
+PLANNING
+
+    ?- ht_plan(Domain, [at(me, home), short(home, park), has_cash],
+               [travel(home, park)], 10, Plan).
+    Plan = [walk(home, park)].
+
+The park is close, so the preferred method wins. Remove the short-distance
+fact and Prolog's own backtracking falls through to the taxi method:
+
+    Plan = [call_taxi(home), ride(home, park), pay].
+
+A nested trip mixes both: walk the short first leg, taxi the long second
+leg. The depth bound counts decompositions, so even a method that
+decomposes a task into itself forever terminates cleanly with failure
+instead of hanging.
+
+THE GLASS-BOX PLAN TREE
+
+Where most planners give you a flat list of actions, ht_task_tree tells
+you WHY each action is there:
+
+    ?- ht_task_tree(Domain, State, travel(home, park), 10, Tree).
+    Tree = tree(travel(home, park), go_by_foot,
+                [primitive(walk(home, park))]).
+
+Every compound task in the tree names the method that was chosen for it.
+This is explainable planning - the same glass-box discipline as the named
+rules of the ARC-AGI climb.
+
+EXECUTION, MONITORING, REPLANNING
+
+ht_execute runs a plan against a state. ht_monitor walks a plan and
+reports either ok or exactly where it breaks:
+
+    ?- ht_monitor(Domain, [at(me, home)],
+                  [call_taxi(home), ride(home, park), pay], Status).
+    Status = fails_at(3, pay).
+
+The cash is gone, so step three can no longer run. Armed with that,
+ht_replan plans again from the situation as it now stands - and if the
+park has meanwhile become walkable, walking saves the day.
+
+All 18 acceptance tests pass: preference, fall-back, nesting, termination,
+trees, execution, monitoring, and recovery.
