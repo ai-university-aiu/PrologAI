@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       286 work packages — the complete cognitive engine (see below)
+├── packs/       287 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,11 +78,11 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transformation packs that handle structured data, currently reaching Layer 364 (tom) with WP-274 through WP-277 enhancing four existing packs for ARC-AGI-2, WP-278 adding the periodfix periodic-pattern-repair pack, WP-279 adding the iochan I/O channel integration pack (speaker, microphone, text/image/printer channels), and WP-383 through WP-389 adding the seven-pack AGI Foundations suite — causal (structural causal models and counterfactuals), actinf (expected-free-energy policy selection), worldmodel (structured simulation, planning search, and model learning), planner (hierarchical task decomposition), evolve (evolutionary computation), jspace (the readable concept workspace), and tom (theory of mind with nested false beliefs) — at Layers 358 through 364.
+Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transformation packs that handle structured data, currently reaching Layer 364 (tom) with WP-274 through WP-277 enhancing four existing packs for ARC-AGI-2, WP-278 adding the periodfix periodic-pattern-repair pack, WP-279 adding the iochan I/O channel integration pack (speaker, microphone, text/image/printer channels), WP-383 through WP-389 adding the seven-pack AGI Foundations suite — causal (structural causal models and counterfactuals), actinf (expected-free-energy policy selection), worldmodel (structured simulation, planning search, and model learning), planner (hierarchical task decomposition), evolve (evolutionary computation), jspace (the readable concept workspace), and tom (theory of mind with nested false beliefs) — at Layers 358 through 364, and WP-390 adding the nexus integration layer (Layer 365) that wires four of those foundations into the cognitive core.
 
 The full layer table is in Architecture Section 0.4.
 
-### The 286 Work Packages
+### The 287 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -363,6 +363,7 @@ Everything is inspectable.
 | `evolve` | Evolutionary Computation: fully reproducible seeded randomness, random populations, fitness evaluation, tournament selection, one-point crossover, point mutation, elitism, fixed and early-stopping generational runs, diversity, and convergence detection (ev_*, Layer 362) (WP-387) |
 | `jspace` | Concept Workspace (J-Space): a readable, editable ledger of the concepts held in mind with strengths and sources, the ranked J-Lens readout, silent-thought detection, implant / ablate / swap / decay / capacity editing, and concept-level derivation traces (js_*, Layer 363) (WP-388) |
 | `tom` | Theory of Mind: nested per-agent beliefs, witnessed events with mutual knowledge, knowledge as true belief, false-belief detection that passes Sally-Anne including the second-order question, belief divergence, common belief, perspective taking, and desire-intention stores (tm_*, Layer 364) (WP-389) |
+| `nexus` | AGI Foundations Integration Layer: the capstone that wires four foundations into the cognitive core — workspace broadcasts hold their winning coalition's concepts in a live J-Space readout, world-model novelty feeds the curiosity learning-progress signal, the agency loop decomposes goals with the planner and recovers by monitoring and replanning, and evolution improves reasoning models scored by refinery critique under a bounded budget. Pure plumbing, respecting the strictly acyclic layer order (nx_*, Layer 365) (WP-390) |
 | `seqinfer` (enhanced) | Sequential Rule Inference + ARC-AGI-2 Candidates: sq_arc2_candidates/1 adds 66-entry integer-color candidate list for multi-step search (sq_*, Layer 195) (WP-274, PR 363) |
 | `hyp` (enhanced) | Hypothesis Generation + Spatial/Structural/Sequence: hy_spatial_hyp/3, hy_structural_hyp/3, hy_sequence_hyp/4 extend hypothesis search to grid-level shifts, structural patterns, and two-step color maps (hy_*, Layer 74) (WP-275, PR 363) |
 | `condxf` (enhanced) | Conditional Scene Transform + Gate Inference: xc_infer_gate/3 infers the gate_color that separates training pairs by change signature (xc_*, Layer 187) (WP-276, PR 363) |
