@@ -19114,3 +19114,257 @@ mc_db_init(DataDir):
   ensure_directory(DataDir), db_attach(DbFile, []), mc_ensure_schema.
 
 Acc: Acc_423. SPARC: Specification v351, Pseudocode v343, Architecture v344, Refinement v403, Completion v409.
+
+causal Pack Pseudocode (cf_*, Layer 358, WP 383)
+
+MODEL CONSTRUCTION
+
+  cf_model(Decls, SCM):
+    Exos <- every exo(U, Default) in Decls
+    Eqs <- every eq(X, Expr) in Decls
+    check names unique and every referenced variable declared
+    Order <- Kahn topological sort of Eqs; fail on any cycle
+    SCM <- scm(Exos, Order, Eqs)
+
+RUNG ONE, SEEING
+
+  cf_solve(SCM, Context, Solution):
+    Env <- each exogenous U bound from Context, else its Default
+    for each X in Order: V <- evaluate eq(X, Expr) in Env; extend Env
+    Solution <- Env
+
+RUNG TWO, DOING
+
+  cf_intervene(SCM, X-V pairs, SCM2):
+    for each X: require X endogenous; replace eq(X, _) with eq(X, V)
+  cf_do <- intervene then solve; cf_effect <- read one variable
+
+RUNG THREE, IMAGINING
+
+  cf_counterfactual(SCM, Domains, Evidence, Ints, Y, V):
+    abduction  -> enumerate exogenous contexts over Domains whose
+                  solution matches every Evidence pair
+    action     -> mutilate the model with the interventions
+    prediction -> solve each mutilated context and read Y
+    V is returned only if every consistent context agrees
+
+D-SEPARATION
+
+  cf_dsep(SCM, X, Y, Zs):
+    for every undirected simple path X..Y:
+      some middle node must block it:
+        chain or fork  -> blocked iff the node is in Zs
+        collider       -> blocked iff neither the node nor any
+                          descendant of it is in Zs
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+actinf Pack Pseudocode (ai_*, Layer 359, WP 384)
+
+PERCEPTION
+
+  ai_infer(GM, Belief, Obs, Posterior):
+    weighted(s) <- Belief(s) * A(Obs | s) for every state
+    Posterior <- normalize(weighted); fail when total mass is zero
+
+  ai_predict_states(GM, Belief, Action, Next):
+    Next(s2) <- sum over s of Belief(s) * B(s2 | s, Action)
+  ai_predict_obs(GM, Belief, Qo):
+    Qo(o) <- sum over s of Belief(s) * A(o | s)
+
+FREE ENERGY
+
+  ai_free_energy(GM, Prior, Obs, F, Complexity, Accuracy):
+    Post <- ai_infer(Prior, Obs)
+    Complexity <- KL(Post || Prior)
+    Accuracy <- sum over s of Post(s) * ln A(Obs | s)
+    F <- Complexity - Accuracy    (equals surprise for exact inference)
+
+EXPECTED FREE ENERGY
+
+  ai_efe_action(GM, Belief, Action, G):
+    Next <- predict_states(Belief, Action); Qo <- predict_obs(Next)
+    Risk <- KL(Qo || C); Ambiguity <- sum Next(s) * entropy(A(. | s))
+    G <- Risk + Ambiguity
+  identity: G = -(pragmatic + epistemic) where
+    pragmatic <- sum Qo(o) * ln C(o)
+    epistemic <- mutual information of arrived-at states and outcomes
+  ai_efe(policy) <- sum of ai_efe_action along the rolled-forward belief
+
+POLICY SELECTION
+
+  ai_select_policy(GM, Belief, Horizon, Gamma, Policy, P):
+    weight(pi) <- exp(-Gamma * G(pi)) over all action sequences
+    Dist <- normalize(weights); Policy <- highest-probability entry
+  ai_step: Posterior <- infer(Belief, Obs); Action <- first of winner
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+worldmodel Pack Pseudocode (wm_*, Layer 360, WP 385)
+
+STATES AND STEPS
+
+  wm_state(Fluents) <- sort and de-duplicate
+  wm_step(State, Actions, Name, State2):
+    copy an action schema; unify its preconditions against State,
+    binding parameters; State2 <- sort((State minus Del) plus Add)
+
+PLANNING SEARCH
+
+  wm_plan_bfs(State, Actions, Goal, MaxDepth, Plan):
+    queue <- [node(State, [], 0)]; visited <- [State]
+    pop node: if Goal holds -> return reversed plan
+    else if depth < MaxDepth -> enqueue unvisited successors
+    breadth-first order guarantees a shortest plan
+
+ROLLOUT AND REACHABILITY
+
+  wm_rollout: enumerate every action sequence to the depth with its
+    final state; wm_reachable: expand layer by layer, stop when a
+    layer adds nothing new
+
+MODEL LEARNING
+
+  wm_learn(Transitions, Models):
+    group tr(Name, Before, After) by Name
+    Pre <- intersection of all Befores
+    Add <- intersection of all (After minus Before)
+    Del <- intersection of all (Before minus After)
+    Model <- act(Name, Pre, Add, Del)
+
+NOVELTY
+
+  wm_novelty(Known, State) <- fraction of State's fluents absent from
+    the union of Known; 0.0 for the empty state
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+planner Pack Pseudocode (ht_*, Layer 361, WP 386)
+
+ORDERED DECOMPOSITION
+
+  ht_plan(Domain, State, Tasks, MaxDepth, Plan):
+    decompose(State, [Task | Rest], Depth):
+      primitive branch:
+        find prim(Name, Pre, Add, Del) whose Name unifies with Task
+        preconditions bind against State; apply effects
+        emit Name into the plan; continue with Rest
+      compound branch (requires Depth > 0):
+        find meth(MName, Head, Pre, Subs) in declaration order
+        Head unifies with Task; preconditions bind against State
+        continue with Subs ++ Rest at Depth - 1
+    backtracking falls through to later methods and bindings
+
+PLAN TREES
+
+  ht_task_tree: same recursion, but each primitive becomes
+    primitive(Name) and each decomposition becomes
+    tree(Task, MName, SubTrees) — the glass-box explanation
+
+EXECUTION AND MONITORING
+
+  ht_execute: apply each primitive in order; fail on the first
+    inapplicable step
+  ht_monitor: walk the plan; report ok, or fails_at(Index, Action)
+    at the first step whose preconditions no longer hold
+  ht_replan <- ht_plan from the new situation
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+evolve Pack Pseudocode (ev_*, Layer 362, WP 387)
+
+DETERMINISTIC RANDOMNESS
+
+  ev_next(Seed) <- (Seed * 1103515245 + 12345) mod 2^31
+  every operator threads the seed in and out, so a run is a pure
+  function of its starting seed
+
+ONE GENERATION
+
+  ev_next_generation(Goal, Scored, params(Alphabet, K, Rate, EliteN)):
+    Elites <- top EliteN genomes, preserved unchanged
+    repeat until the population size is restored:
+      P1 <- best of K random picks (tournament)
+      P2 <- best of K random picks
+      Child <- one-point crossover of P1 and P2, cut strictly inside
+      Child <- each gene rewritten with probability Rate
+    next population <- Elites ++ Children
+
+FULL RUNS
+
+  ev_run: found a random population, evaluate, iterate the
+    generations, always tracking the best genome ever seen
+  ev_run_until: same loop, stopping as soon as the champion reaches
+    the target score, reporting the generations used
+
+MEASURES
+
+  ev_diversity <- distinct genomes / population size
+  ev_converged <- diversity at or below the threshold
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+jspace Pack Pseudocode (js_*, Layer 363, WP 388)
+
+THE LEDGER
+
+  js_hold(Space, Concept, Strength, Source):
+    require Strength >= 0
+    retract any previous entry for Concept in Space
+    assert js_concept_(Space, Concept, Strength, Source)
+
+  js_reading(Space) <- all held concepts ranked by strength
+  js_active(Space) <- the positively activated ones
+
+EDITING THE WORKSPACE
+
+  js_ablate  -> retract the concept and its verbal marks
+  js_swap    -> exchange the strengths of two held concepts
+  js_boost   -> add a delta, floored at zero
+  js_decay   -> multiply every strength by the factor; drop < 1e-6
+  js_capacity-> ablate everything below the strongest N
+
+SILENT THOUGHTS
+
+  js_verbalize(Space, Concept): require the concept held; log it once
+  js_silent(Space) <- active concepts with no verbalization log entry
+
+DERIVATIONS
+
+  js_derive(Space, Conclusion, Required):
+    require every Required concept actively held (strength > 0)
+    assert js_trace_(Space, Conclusion, Required)
+    ablating a premise afterwards breaks re-derivation but leaves
+    the historical trace readable through js_explain
+  js_report <- report(Reading, Silent, Traces)
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+tom Pack Pseudocode (tm_*, Layer 364, WP 389)
+
+CONFLICTS AND UPSERTS
+
+  conflicts(F1, F2):
+    believes(A, G1) vs believes(A, G2) -> conflicts(G1, G2)
+    otherwise same two-argument relation, same subject, different value
+  upsert(Fact, Facts) <- drop every fact Fact conflicts with or
+    duplicates, then append Fact
+
+WITNESSED EVENTS
+
+  tm_event(M, Fact, Witnesses):
+    world <- upsert(Fact)
+    for each witness W: W's beliefs <- upsert(Fact)
+    for each ordered pair W, V of distinct witnesses:
+      W's beliefs <- upsert(believes(V, Fact))
+    absent agents keep their old beliefs — false beliefs are born here
+
+QUESTIONS
+
+  tm_knows(A, F) <- A believes F and the world holds F
+  tm_false_beliefs(A) <- A's beliefs that conflict with a world fact
+  tm_attribute(Observer, Target) <- every F with
+    Observer believing believes(Target, F)
+  tm_divergent(A, B) <- all conflicting belief pairs of A and B
+  tm_common(Agents) <- beliefs held identically by every agent
+
+PERSPECTIVE
+
+  tm_perspective(M, A):
+    new world <- A's plain beliefs
+    new beliefs <- A's believes(X, F) terms, unwrapped one level
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.

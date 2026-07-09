@@ -21401,3 +21401,251 @@ Files: src/mentova/mentova_chat.pl, src/mentova/chat_db.pl,
   assets/chat/chat.css, sql/setup.sql, bin/mentova_chat_start.sh,
   mentova-chat-docs/ (6 living documents at v1).
 Acc: Acc_423. SPARC: Specification v351, Pseudocode v343, Architecture v344, Refinement v403, Completion v409.
+
+causal Pack Specification: Structural Causal Models (cf_*, Layer 358, WP 383)
+
+CAU-SPEC-001: The causal pack (Layer 358) provides nineteen predicates for the
+three rungs of the causal ladder: seeing (observational solving), doing
+(do-operator interventions), and imagining (counterfactuals by the
+abduction-action-prediction recipe).
+CAU-SPEC-002: A model is built by cf_model/2 from exo(U, Default) and
+eq(X, Expr) declarations; construction fails on cyclic dependency graphs,
+undeclared variable references, and duplicate names.
+CAU-SPEC-003: The expression language covers numbers, variable name atoms,
+addition, subtraction, multiplication, min/2, max/2, and if(Cond, Then, Else)
+with gt/lt/geq/leq/eqv comparisons and and/or/not connectives.
+CAU-SPEC-004: Graph queries expose direct causes (cf_parents/3), direct
+effects (cf_children/3), transitive closures (cf_ancestors/3,
+cf_descendants/3), directed path tests (cf_path/3), and d-separation with
+correct chain, fork, and collider semantics including collider descendants
+(cf_dsep/4).
+CAU-SPEC-005: Rung one: cf_solve/3 evaluates every equation in topological
+order under an exogenous context; cf_value/4 reads one variable.
+CAU-SPEC-006: Rung two: cf_intervene/3 performs graph surgery, replacing the
+equation of an endogenous variable with a constant; interventions on
+exogenous variables are rejected. cf_do/4 and cf_effect/5 solve the
+mutilated model.
+CAU-SPEC-007: Rung three: cf_abduce/4 enumerates exogenous contexts
+consistent with observed evidence over declared value domains;
+cf_counterfactual/6 succeeds only when the counterfactual value is uniquely
+determined; cf_counterfactual_all/6 reports the full set of possible values.
+CAU-SPEC-008: cf_but_for/5 implements the but-for test of actual causation:
+some alternative setting of the candidate cause changes the outcome.
+CAU-SPEC-009: Architectural placement: causal sits in the Data Layer at
+Layer 358, above the last ARC-AGI-2 wave (Layer 357). It depends only on
+library(lists).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+actinf Pack Specification: Active Inference Engine (ai_*, Layer 359, WP 384)
+
+AIF-SPEC-001: The actinf pack (Layer 359) provides twenty-one predicates for
+the action side of active inference: expected free energy over policies,
+with goal-seeking (pragmatic value) and curiosity (epistemic value) falling
+out of one quantity. It complements the prediction pack (Layer 24 area),
+which covers the perception side.
+AIF-SPEC-002: A generative model gm(States, Obs, A, B, C, D) is validated by
+ai_model/7: every likelihood row, transition row, preference distribution,
+and prior must be a distribution over declared names summing to one within
+1.0e-6; a missing transition row means the state persists.
+AIF-SPEC-003: Perception: ai_infer/4 performs the exact Bayesian belief
+update and fails honestly on impossible observations; ai_predict_states/4
+pushes a belief through an action; ai_predict_obs/3 mixes likelihood rows
+into a predicted outcome distribution.
+AIF-SPEC-004: ai_surprise/4 is the negative log evidence of an observation;
+ai_free_energy/6 returns variational free energy decomposed into complexity
+(KL from prior to posterior) minus accuracy (expected log likelihood), and
+equals surprise under exact inference.
+AIF-SPEC-005: Action: ai_risk/4 is the KL divergence from predicted outcomes
+to preferences; ai_ambiguity/4 is the expected outcome entropy of the
+arrived-at states; ai_efe_action/4 is their sum; ai_efe/4 accumulates over
+an action sequence with the belief rolled forward.
+AIF-SPEC-006: ai_pragmatic/4 is the expected log preference and
+ai_epistemic/4 the expected information gain (mutual information between
+arrived-at states and outcomes); the identity G = -(pragmatic + epistemic)
+holds and is enforced by test.
+AIF-SPEC-007: Policy selection: ai_policies/3 enumerates action sequences to
+a horizon; ai_policy_dist/5 forms the softmax distribution over negative
+expected free energy sharpened by a precision Gamma; ai_select_policy/6
+returns the most plausible policy; ai_act/5 returns its first action;
+ai_step/7 is the full perceive-then-act cycle.
+AIF-SPEC-008: All logarithms are natural; probabilities inside logarithms
+are floored at 1.0e-12 so the mathematics never crashes on zeros.
+AIF-SPEC-009: Architectural placement: actinf sits at Layer 359 with no
+cross-pack dependencies; it depends only on library(lists).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+worldmodel Pack Specification: Structured World Model (wm_*, Layer 360, WP 385)
+
+WDM-SPEC-001: The worldmodel pack (Layer 360) provides sixteen predicates
+for a structured, inspectable model of how the world works: canonical
+states, STRIPS-style actions, forward simulation, rollout, breadth-first
+planning search, action-model learning, and novelty scoring.
+WDM-SPEC-002: A state is a sorted, duplicate-free list of ground fluent
+terms built by wm_state/2; wm_holds/2 and wm_goal_holds/2 test fluents and
+goals.
+WDM-SPEC-003: An action act(Name, Pre, Add, Del) may carry parameters in a
+compound Name; preconditions bind the parameters against the state
+(wm_applicable/2), and wm_apply/3 deletes then adds effects, restoring the
+canonical form.
+WDM-SPEC-004: wm_step/4 takes one named grounded step from a repertoire;
+wm_successors/3 enumerates every Name-State2 pair; wm_simulate/4 runs a
+plan and returns the full state trajectory, failing honestly on an
+inapplicable step.
+WDM-SPEC-005: wm_plan_bfs/5 searches breadth-first with a visited set and a
+depth bound and returns a shortest plan; the empty plan is returned when
+the goal already holds.
+WDM-SPEC-006: wm_reachable/4 collects every state reachable within a depth;
+wm_rollout/4 enumerates every action sequence up to a depth with its final
+state.
+WDM-SPEC-007: wm_learn/2 induces one act/4 model per observed action name
+from tr(Name, Before, After) transitions: preconditions are the
+intersection of the before-states, effects the intersections of the gains
+and losses. wm_predict/4 applies a learned model, honouring its learned
+preconditions.
+WDM-SPEC-008: wm_novelty/3 scores a state by the fraction of its fluents
+never seen in a list of known states, returning 0.0 for the empty state;
+this is the world-model hook for the curiosity pack's learning-progress
+drive.
+WDM-SPEC-009: Architectural placement: worldmodel sits at Layer 360 with no
+cross-pack dependencies; it depends only on library(lists).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+planner Pack Specification: Hierarchical Planner (ht_*, Layer 361, WP 386)
+
+HTN-SPEC-001: The planner pack (Layer 361) provides eleven predicates for
+hierarchical task network planning: compound tasks decompose through named
+methods into subtasks and bottom out in primitive actions, giving
+long-horizon goal decomposition with glass-box plan trees.
+HTN-SPEC-002: A domain dom(Primitives, Methods) is assembled by ht_domain/3
+from prim(Name, Pre, Add, Del) and meth(MName, Task, Pre, Subtasks)
+declarations, whose list slots are shape-checked.
+HTN-SPEC-003: ht_primitive/2 and ht_compound/2 classify tasks;
+ht_methods_for/3 lists the names of the methods matching a task in
+declaration order, because declaration order encodes preference.
+HTN-SPEC-004: ht_plan/5 decomposes a task list into a primitive plan by
+ordered decomposition with state threading; Prolog backtracking falls
+through to later methods when an earlier method's preconditions fail.
+HTN-SPEC-005: The depth bound counts method decompositions and guarantees
+termination even on recursive method sets; a bound of zero forbids any
+decomposition.
+HTN-SPEC-006: ht_task_tree/5 returns the decomposition tree — tree(Task,
+Method, Children) with primitive(Name) leaves — as the glass-box
+explanation of which method was chosen for every compound task.
+HTN-SPEC-007: ht_execute/4 runs a primitive plan; ht_valid_plan/3 tests
+executability; ht_plan_cost/2 counts steps; ht_monitor/4 walks a plan and
+reports ok or fails_at(Index, Action) for the first step that can no
+longer run; ht_replan/5 plans again from the new situation.
+HTN-SPEC-008: Architectural placement: planner sits at Layer 361 and shares
+the STRIPS state convention with the worldmodel pack (Layer 360) without
+depending on it; it depends only on library(lists).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+evolve Pack Specification: Evolutionary Computation (ev_*, Layer 362, WP 387)
+
+EVO-SPEC-001: The evolve pack (Layer 362) provides seventeen predicates for
+population-based search: random genomes, fitness evaluation, tournament
+selection, one-point crossover, point mutation, elitism, generational
+stepping, fixed-length runs, and early-stopping runs.
+EVO-SPEC-002: All randomness flows through an explicit linear congruential
+generator (ev_next/2, multiplier 1103515245, increment 12345, modulus 2^31)
+threaded seed-to-seed through every operator, so every evolution is exactly
+reproducible from its seed.
+EVO-SPEC-003: A genome is a list of genes drawn from a caller-supplied
+alphabet; fitness is any caller goal called as call(Goal, Genome, Score)
+with larger scores better; meta_predicate declarations preserve the
+caller's module context.
+EVO-SPEC-004: ev_evaluate/3 pairs genomes with scores; ev_best/3 and
+ev_mean_fitness/2 summarize a scored population; ranking keeps ties.
+EVO-SPEC-005: ev_tournament/5 draws K contestants with replacement and
+returns the best; ev_crossover/5 cuts strictly inside the genome so both
+parents contribute; ev_mutate/6 rewrites each gene independently at the
+mutation rate; ev_elite/3 preserves the top genomes unchanged.
+EVO-SPEC-006: ev_next_generation/6 keeps the elites and breeds the rest by
+tournament, crossover, and mutation, preserving the population size.
+EVO-SPEC-007: ev_run/8 iterates a fixed number of generations and returns
+the best genome ever seen with its score; ev_run_until/10 stops early when
+a target score is reached and reports the generations used.
+EVO-SPEC-008: ev_diversity/2 is the distinct fraction of a population and
+ev_converged/2 tests collapse below a diversity threshold.
+EVO-SPEC-009: Acceptance evidence: with the standard parameters and seed
+42, OneMax at length 12 rises from a founding best of 6 to the perfect
+genome of all ones, in seven generations under the early-stopping run.
+EVO-SPEC-010: Architectural placement: evolve sits at Layer 362 with no
+cross-pack dependencies; it depends only on library(lists).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+jspace Pack Specification: Concept Workspace, J-Space (js_*, Layer 363, WP 388)
+
+JSP-SPEC-001: The jspace pack (Layer 363) provides eighteen predicates for
+a named workspace of the concepts the system is currently holding in mind,
+each with an activation strength and a source — a symbolic, first-class
+realization of the sparse verbalizable workspace (J-Space) that 2026
+interpretability research read out of language models through the Jacobian
+Lens (J-Lens). PrologAI is glass-box, so the workspace is readable and
+editable by construction rather than by instrument.
+JSP-SPEC-002: js_open/1 and js_close/1 create, reset, and clear named
+workspaces; workspaces are isolated from one another.
+JSP-SPEC-003: js_hold/4 implants or refreshes a concept with a non-negative
+strength and a source atom; re-holding upserts in place without
+duplication; negative strengths are rejected.
+JSP-SPEC-004: js_reading/2 is the J-Lens readout: every held concept ranked
+by strength; js_active/2 keeps the positively activated ones;
+js_strength/3 and js_source/3 read one concept and fail honestly when it
+is absent; js_monitor/3 reports present(Strength) or absent.
+JSP-SPEC-005: Editing: js_ablate/2 removes a concept; js_swap/3 exchanges
+two concepts' strengths, changing what the system reports thinking;
+js_boost/3 adjusts one strength with a floor at zero; js_decay/2 scales
+all strengths and drops those below 1.0e-6; js_capacity/2 keeps only the
+strongest N concepts, enforcing workspace sparsity.
+JSP-SPEC-006: Silent thoughts: js_verbalize/2 marks a held concept as
+spoken; js_silent/2 lists the active concepts never verbalized — the
+hidden-thought detector that flags, for example, a held being_evaluated
+concept that no output ever mentioned.
+JSP-SPEC-007: Derivations: js_derive/3 records that a conclusion was drawn
+from a set of required concepts and succeeds only while every one of them
+is actively held, so ablating a premise breaks the derivation exactly as
+ablating J-space vectors breaks multi-hop reasoning; js_explain/3 reads
+the recorded trace; js_report/2 bundles reading, silent set, and traces.
+JSP-SPEC-008: Architectural placement: jspace sits at Layer 363, beside the
+workspace pack (global broadcast) and the attention_schema pack (attention
+model), adding the concept-level readable ledger; it depends only on
+library(lists) and its own dynamic store.
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+tom Pack Specification: Theory of Mind (tm_*, Layer 364, WP 389)
+
+TOM-SPEC-001: The tom pack (Layer 364) provides eighteen predicates for
+modelling other minds: per-agent beliefs nested to any depth, witnessed
+events, knowledge as true belief, false-belief detection, belief
+comparison, perspective taking, and desire and intention stores.
+TOM-SPEC-002: The mental model tm(World, Beliefs, Desires, Intentions) is a
+pure term; every update returns a new model, so reasoning about
+hypothetical minds needs no state rollback.
+TOM-SPEC-003: Two facts conflict when they are the same two-argument
+relation about the same subject with different values; nested
+believes(Agent, Fact) terms conflict recursively on the inner facts.
+Upserting replaces exactly what the new fact conflicts with or duplicates.
+TOM-SPEC-004: tm_event/4 applies a witnessed event: the world is updated,
+every witness revises their own belief, and every ordered pair of distinct
+witnesses gains a second-order belief that the other witness saw it too;
+absent agents' beliefs are left untouched — which is where false beliefs
+are born.
+TOM-SPEC-005: tm_knows/3 defines knowledge as belief the world confirms;
+tm_false_beliefs/3 lists an agent's beliefs the world contradicts.
+TOM-SPEC-006: tm_attribute/4 reads what one agent thinks another believes;
+tm_divergent/4 pairs up the contradictions between two agents;
+tm_common/3 lists the beliefs every listed agent shares.
+TOM-SPEC-007: tm_perspective/3 re-seats the model inside one agent's head:
+their plain beliefs become the world, their nested beliefs drop one level,
+enabling reasoning as the other agent.
+TOM-SPEC-008: Acceptance evidence: the pack passes the Sally-Anne
+false-belief test end to end — Sally searches the basket, Anne knows the
+box, the detector flags exactly Sally's stale belief, and Anne correctly
+attributes the basket belief to Sally (the second-order question).
+TOM-SPEC-009: tm_desire/4, tm_desires/3, tm_intend/4, and tm_intentions/3
+record per-agent goals and commitments once each, giving the
+belief-desire-intention triple for social prediction.
+TOM-SPEC-010: Architectural placement: tom sits at Layer 364, deepening the
+awareness pack's pai_tom_attribute/2 regard mechanism into a full nested
+false-belief apparatus; it depends only on library(lists).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.

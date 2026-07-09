@@ -12495,3 +12495,191 @@ URL routes: GET /, GET /mentor, GET /assets/..., POST /api/chat,
   GET /api/mentor/queue.
 
 Acc: Acc_423. SPARC: Specification v351, Pseudocode v343, Architecture v344, Refinement v403, Completion v409.
+
+WP-383: causal Pack (cf_*, Layer 358)
+Location: packs/causal/
+  prolog/causal.pl       - module causal, 19 public predicates
+  test/test_causal.pl    - 31 PLUnit tests
+  pack.pl                - manifest
+Layer: 358, Prefix: cf_
+Dependencies: library(lists)
+Exports: cf_model/2, cf_variables/2, cf_exogenous/2, cf_endogenous/2,
+  cf_parents/3, cf_children/3, cf_ancestors/3, cf_descendants/3, cf_path/3,
+  cf_dsep/4, cf_solve/3, cf_value/4, cf_intervene/3, cf_do/4, cf_effect/5,
+  cf_abduce/4, cf_counterfactual/6, cf_counterfactual_all/6, cf_but_for/5
+Design notes:
+- A model is a pure scm(Exos, Order, Eqs) term; Order is a Kahn topological
+  sort computed once at construction, so solving is a single fold.
+- Interventions are graph surgery on the equation list; the old order stays
+  valid because surgery only removes edges.
+- Counterfactuals are honest: cf_counterfactual/6 fails when the abduced
+  contexts disagree on the answer, and cf_counterfactual_all/6 exposes the
+  full value set instead.
+- d-separation enumerates undirected simple paths and classifies each
+  middle node as chain, fork, or collider, including collider descendants.
+Data flow: declarations -> validated scm term -> solve / do / counterfactual
+  answers as Var-Value pair lists.
+Score impact: 0 new ARC-AGI-2 tasks (AGI foundation pack — causal ladder).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP-384: actinf Pack (ai_*, Layer 359)
+Location: packs/actinf/
+  prolog/actinf.pl       - module actinf, 21 public predicates
+  test/test_actinf.pl    - 23 PLUnit tests
+  pack.pl                - manifest
+Layer: 359, Prefix: ai_
+Dependencies: library(lists)
+Exports: ai_model/7, ai_actions/2, ai_prior/2, ai_normalize/2, ai_prob/3,
+  ai_infer/4, ai_predict_states/4, ai_predict_obs/3, ai_surprise/4,
+  ai_free_energy/6, ai_risk/4, ai_ambiguity/4, ai_pragmatic/4,
+  ai_epistemic/4, ai_efe_action/4, ai_efe/4, ai_policies/3,
+  ai_policy_dist/5, ai_select_policy/6, ai_act/5, ai_step/7
+Design notes:
+- Distributions are Name-Probability pair lists validated to sum to one
+  within 1.0e-6; a missing transition row defaults to state persistence,
+  which keeps fixtures small.
+- All logarithms are floored at 1.0e-12, so KL and entropy terms never
+  crash on structural zeros.
+- The identity G = -(pragmatic + epistemic) is maintained and enforced by a
+  regression test, tying the implementation to the active inference
+  literature's decomposition.
+- Complements the prediction pack (perception-side hierarchy, pai_*): this
+  pack adds the action side — policy selection by expected free energy.
+Data flow: generative model + belief + observation -> posterior -> expected
+  free energy per policy -> softmax policy distribution -> next action.
+Score impact: 0 new ARC-AGI-2 tasks (AGI foundation pack — active inference).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP-385: worldmodel Pack (wm_*, Layer 360)
+Location: packs/worldmodel/
+  prolog/worldmodel.pl     - module worldmodel, 16 public predicates
+  test/test_worldmodel.pl  - 20 PLUnit tests
+  pack.pl                  - manifest
+Layer: 360, Prefix: wm_
+Dependencies: library(lists)
+Exports: wm_state/2, wm_action/5, wm_holds/2, wm_goal_holds/2,
+  wm_applicable/2, wm_apply/3, wm_step/4, wm_successors/3, wm_simulate/4,
+  wm_plan_bfs/5, wm_reachable/4, wm_rollout/4, wm_diff/4, wm_learn/2,
+  wm_predict/4, wm_novelty/3
+Design notes:
+- States are canonical (sorted, duplicate-free), so the BFS visited set is
+  a plain membership check and trajectories are comparable with ==.
+- Action schemas carry parameters in a compound Name; copy_term keeps the
+  schema reusable while member-unification of preconditions grounds it.
+- wm_learn/2 is conservative induction: only fluents present in every
+  observation survive into preconditions and effects.
+- wm_novelty/3 is the world-model hook for curiosity: unseen fluents score.
+Data flow: fluents -> canonical state -> grounded steps -> trajectories,
+  plans, reachable sets; observed transitions -> induced action models.
+Score impact: 0 new ARC-AGI-2 tasks (AGI foundation pack — world model).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP-386: planner Pack (ht_*, Layer 361)
+Location: packs/planner/
+  prolog/planner.pl      - module planner, 11 public predicates
+  test/test_planner.pl   - 18 PLUnit tests
+  pack.pl                - manifest
+Layer: 361, Prefix: ht_
+Dependencies: library(lists)
+Exports: ht_domain/3, ht_primitive/2, ht_compound/2, ht_methods_for/3,
+  ht_plan/5, ht_task_tree/5, ht_execute/4, ht_valid_plan/3, ht_plan_cost/2,
+  ht_monitor/4, ht_replan/5
+Design notes:
+- Ordered decomposition in the SHOP tradition: subtasks are spliced in
+  front of the remaining tasks and the state is threaded left to right.
+- Method declaration order encodes preference; backtracking supplies the
+  fall-through (walk if short, otherwise taxi).
+- The depth bound decrements only on decomposition, so recursive method
+  sets terminate while long primitive sequences stay unbounded.
+- ht_task_tree/5 mirrors the planner exactly but returns tree(Task,
+  Method, Children) — the glass-box account of every choice.
+- Shares the STRIPS state convention with worldmodel (Layer 360) without
+  depending on it.
+Data flow: domain + state + task list -> primitive plan -> execution,
+  validity, cost, monitoring, replanning.
+Score impact: 0 new ARC-AGI-2 tasks (AGI foundation pack — planning).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP-387: evolve Pack (ev_*, Layer 362)
+Location: packs/evolve/
+  prolog/evolve.pl       - module evolve, 17 public predicates
+  test/test_evolve.pl    - 22 PLUnit tests
+  pack.pl                - manifest
+Layer: 362, Prefix: ev_
+Dependencies: library(lists)
+Exports: ev_next/2, ev_rand_float/3, ev_rand_int/4, ev_random_genome/5,
+  ev_population/6, ev_evaluate/3, ev_best/3, ev_mean_fitness/2,
+  ev_tournament/5, ev_crossover/5, ev_mutate/6, ev_elite/3,
+  ev_next_generation/6, ev_run/8, ev_run_until/10, ev_diversity/2,
+  ev_converged/2
+Design notes:
+- No hidden randomness: an explicit linear congruential generator seed is
+  threaded through every operator, so evolution is a pure function of its
+  seed and identical runs are byte-identical — reproducibility as a
+  first-class property.
+- Fitness is a caller-module closure (meta_predicate), so any pack can
+  supply a fitness goal without namespace friction.
+- Elitism guarantees the champion never regresses between generations.
+- OneMax acceptance: seed 42, pop 24, genes 12 -> founding best 6, perfect
+  12 within thirty generations, early stop at generation seven.
+Data flow: alphabet + seed -> population -> scored -> elites + offspring
+  (tournament, crossover, mutation) -> next generation -> best ever.
+Score impact: 0 new ARC-AGI-2 tasks (AGI foundation pack — evolution).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP-388: jspace Pack (js_*, Layer 363)
+Location: packs/jspace/
+  prolog/jspace.pl       - module jspace, 18 public predicates
+  test/test_jspace.pl    - 20 PLUnit tests
+  pack.pl                - manifest
+Layer: 363, Prefix: js_
+Dependencies: library(lists); dynamic js_concept_/4, js_verbal_/2,
+  js_trace_/3
+Exports: js_open/1, js_close/1, js_hold/4, js_strength/3, js_source/3,
+  js_active/2, js_reading/2, js_ablate/2, js_swap/3, js_boost/3,
+  js_decay/2, js_capacity/2, js_verbalize/2, js_silent/2, js_monitor/3,
+  js_derive/3, js_explain/3, js_report/2
+Design notes:
+- A symbolic realization of the J-Space finding: language models hold a
+  small sparse workspace of verbalizable concepts, readable through the
+  Jacobian Lens. PrologAI's version is readable and editable by
+  construction — the glass box needs no lens, but gains the lens's
+  vocabulary: readout, silent thoughts, implant, ablate, swap.
+- js_silent/2 is the safety-relevant divergence detector: concepts held in
+  mind that never reached the output (for example, being_evaluated).
+- js_derive/3 gives concept-level causal traces; ablation of a premise
+  breaks re-derivation, mirroring the ablation results in the research.
+- js_capacity/2 enforces the sparsity that makes a workspace a workspace.
+- Sits beside workspace (broadcast arbiter) and attention_schema (self
+  model of attention); jspace adds the concept ledger between them.
+Data flow: hold/boost/decay/swap edits -> ranked reading -> silent set,
+  monitors, derivation traces -> introspection report.
+Score impact: 0 new ARC-AGI-2 tasks (AGI foundation pack — introspection).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP-389: tom Pack (tm_*, Layer 364)
+Location: packs/tom/
+  prolog/tom.pl          - module tom, 18 public predicates
+  test/test_tom.pl       - 20 PLUnit tests
+  pack.pl                - manifest
+Layer: 364, Prefix: tm_
+Dependencies: library(lists)
+Exports: tm_new/1, tm_world_add/3, tm_world/2, tm_fact/2, tm_believe/4,
+  tm_belief/3, tm_beliefs/3, tm_event/4, tm_knows/3, tm_false_beliefs/3,
+  tm_attribute/4, tm_divergent/4, tm_common/3, tm_perspective/3,
+  tm_desire/4, tm_desires/3, tm_intend/4, tm_intentions/3
+Design notes:
+- The mental model is a pure term; updates return new models, so nested
+  hypotheticals (what would Anne believe if...) need no rollback machinery.
+- Conflict-driven upserts give belief revision for free: a new location
+  displaces the old one, in the world and in any agent's head, recursively
+  through believes/2 nesting.
+- tm_event/4 encodes the epistemics of witnessing: witnesses update, and
+  update about each other (mutual knowledge), while absent agents keep
+  stale beliefs — the mechanism that generates false beliefs.
+- Passes Sally-Anne end to end, including the second-order attribution
+  question, deepening the awareness pack's regard-based theory of mind.
+Data flow: events + witnesses -> world and per-agent belief stores ->
+  knowledge, false-belief, divergence, attribution, perspective queries.
+Score impact: 0 new ARC-AGI-2 tasks (AGI foundation pack — social minds).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.

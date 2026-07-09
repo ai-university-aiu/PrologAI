@@ -22297,3 +22297,231 @@ Session expiry after 8 hours enforced.  Review queue gate confirmed:
 mc_propose_fact/4 does not touch the Prolog DB; mc_approve_fact/2 does.
 
 Acc: Acc_423. SPARC: Specification v351, Pseudocode v343, Architecture v344, Refinement v403, Completion v409.
+
+causal Pack Testing (cf_*, Layer 358, WP 383) — 2026-07-09
+
+Test file: packs/causal/test/test_causal.pl
+Total tests: 31 (all pass)
+
+Test coverage by test group:
+
+causal_model (12 tests): model construction and variable reporting;
+  exogenous/endogenous split; topological ordering puts causes before
+  effects; cyclic models, undeclared references, and duplicate names are
+  rejected; parents, children, ancestors, descendants; directed path holds
+  from court to death and fails between the two riflemen.
+causal_solve (4 tests): the firing squad fires end to end when the court
+  orders and stays silent otherwise; arithmetic expressions evaluate;
+  conditionals pick the correct season branch in the sprinkler model.
+causal_do (4 tests): forcing rifleman A kills the prisoner without an
+  order; the intervention does not travel backward (captain and rifleman B
+  stay silent); interventions on exogenous variables are rejected; seeing
+  versus doing differ correctly on the sprinkler.
+causal_dsep (4 tests): the season fork blocks sprinkler-rain when
+  conditioned on; the open fork connects them; conditioning on the wet
+  collider or its slippery descendant re-opens the path.
+causal_counterfactual (7 tests): abduction recovers the unique ordering
+  context from the observed death; the classic counterfactual — had
+  rifleman A not fired, the prisoner still dies — passes; had the captain
+  not signalled, the prisoner lives; an evidence-free counterfactual fails
+  honestly as undetermined while the all-values form reports both
+  outcomes; the captain passes the but-for test and a single redundant
+  rifleman fails it.
+
+Safety design notes:
+  - cf_counterfactual/6 never guesses: ambiguity is failure, and
+    cf_counterfactual_all/6 is the honest disclosure channel.
+  - All model validation happens at construction, so downstream predicates
+    operate only on well-formed acyclic models.
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+actinf Pack Testing (ai_*, Layer 359, WP 384) — 2026-07-09
+
+Test file: packs/actinf/test/test_actinf.pl
+Total tests: 23 (all pass)
+
+Test coverage by test group:
+
+actinf_model (5 tests): model assembly and action listing; the prior reads
+  back; an unnormalized prior is rejected; normalization rescales mass;
+  missing keys read as zero probability.
+actinf_perception (6 tests): Bayes rule concentrates a flat prior to 0.8
+  on the favoured state (hand-computed); an impossible observation makes
+  inference fail honestly; the flip action swaps belief mass; predicted
+  outcomes mix likelihood rows to the hand-computed 0.5; surprise of a
+  half-expected outcome is ln 2; free energy decomposes into the
+  hand-computed complexity 0.192745 and accuracy -0.500402 and equals
+  surprise under exact inference.
+actinf_efe (7 tests): risk vanishes when predictions match preferences;
+  ambiguity equals the hand-computed outcome entropy 0.500402; the T-maze
+  cue is worth exactly one bit (ln 2) when the reward side is unknown and
+  worthless once it is known; pragmatic value prefers the rewarded arm by
+  ln(0.85) versus ln(0.02); the identity G = -(pragmatic + epistemic)
+  holds to 1.0e-6 for every action; multi-step policies accumulate
+  exactly.
+actinf_policy (5 tests): policy enumeration covers the space; the softmax
+  distribution sums to one; raising the precision sharpens the winner;
+  with the reward side known the agent exploits and selects the rewarded
+  arm; the full perceive-then-act cycle reads the cue and heads to the
+  revealed arm.
+
+Safety design notes:
+  - Log-floor 1.0e-12 keeps every KL and entropy term finite.
+  - ai_infer/4 fails rather than fabricating a posterior for an
+    impossible observation.
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+worldmodel Pack Testing (wm_*, Layer 360, WP 385) — 2026-07-09
+
+Test file: packs/worldmodel/test/test_worldmodel.pl
+Total tests: 20 (all pass)
+
+Test coverage by test group:
+
+worldmodel_core (10 tests): canonical states; fluent and goal tests; a
+  step binds action parameters against the state; effects add and delete
+  correctly; successor enumeration; a six-step fetch-the-ball plan
+  simulates through seven states to the goal; an inapplicable step fails
+  the simulation honestly; state differencing.
+worldmodel_planning (5 tests): breadth-first search finds the shortest
+  six-step plan and the plan actually executes to the goal; an
+  already-satisfied goal yields the empty plan; the depth bound rejects
+  out-of-reach goals; reachability and rollout counts at depth one.
+worldmodel_learning (5 tests): the heat action model is induced from two
+  observations (shared preconditions survive the intersection, gains and
+  losses become add and delete lists); the learned model predicts in a
+  never-observed context and preserves unrelated fluents; prediction
+  honours learned preconditions; novelty scores 0.5, 0.0, and 1.0 on
+  hand-built cases; the empty state scores zero novelty.
+
+Safety design notes:
+  - The BFS visited set guarantees termination on finite state spaces;
+    the depth bound guarantees it everywhere else.
+  - Learning is conservative by intersection: the model never claims an
+    effect that any observation contradicts.
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+planner Pack Testing (ht_*, Layer 361, WP 386) — 2026-07-09
+
+Test file: packs/planner/test/test_planner.pl
+Total tests: 18 (all pass)
+
+Test coverage by test group:
+
+planner_domain (5 tests): primitive and compound classification; a
+  compound task is not a primitive; matching methods are reported in
+  declaration order (foot before taxi); malformed method declarations are
+  rejected.
+planner_plan (6 tests): a short distance decomposes to the preferred
+  walking method; a long distance falls through to the taxi method by
+  backtracking; with neither distance nor cash no plan exists; a nested
+  two-leg trip mixes walking and taxi across recursion; the depth bound
+  terminates a hopelessly recursive method set; plan cost counts steps.
+planner_tree (2 tests): the tree records the chosen method and its
+  primitive leaf; a nested trip yields one subtree per leg with the
+  correct methods.
+planner_execute (5 tests): the taxi plan executes to the destination,
+  pays, and spends the cash; validity mirrors executability; monitoring
+  reports ok on a runnable plan and fails_at(3, pay) when the cash
+  disappears; replanning from the broken situation recovers by walking.
+
+Safety design notes:
+  - The depth bound counts decompositions, so no method set can loop the
+    planner forever.
+  - ht_monitor/4 reports the exact failing step, giving the agency loop a
+    precise recovery point.
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+evolve Pack Testing (ev_*, Layer 362, WP 387) — 2026-07-09
+
+Test file: packs/evolve/test/test_evolve.pl
+Total tests: 22 (all pass)
+
+Test coverage by test group:
+
+evolve_random (6 tests): the generator is deterministic; floats sit in the
+  unit interval and integers in range; genomes have the right length and
+  alphabet; the same seed reproduces the same genome; populations have the
+  right shape.
+evolve_operators (9 tests): evaluation pairs genomes with scores; best and
+  mean fitness; tournament winners come from the population; one-point
+  crossover splices a non-empty head of one parent onto a non-empty tail
+  of the other; mutation at rate zero is the identity and at rate one
+  rewrites every gene; elites come back in rank order and over-asking
+  returns the whole ranking.
+evolve_runs (7 tests): the next generation preserves size and carries the
+  champion through elitism; OneMax rises from a founding best of 6 of 12
+  to the perfect all-ones genome within thirty generations under seed 42;
+  identical runs are identical; the early-stopping run hits the target at
+  exactly generation seven; diversity fractions; convergence holds for a
+  collapsed population and fails for a diverse one.
+
+Safety design notes:
+  - Reproducibility is a first-class property: no operator touches any
+    global random source.
+  - Elitism guarantees monotone champions; the run reports the best ever
+    seen, not merely the final generation's best.
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+jspace Pack Testing (js_*, Layer 363, WP 388) — 2026-07-09
+
+Test file: packs/jspace/test/test_jspace.pl
+Total tests: 20 (all pass)
+
+Test coverage by test group:
+
+jspace_ledger (12 tests): the reading ranks concepts by strength;
+  re-holding upserts in place; strength and source read back; reading an
+  absent concept fails honestly; negative strengths are rejected;
+  zero-strength concepts are held but not active; the monitor reports
+  present(Strength) and absent; swapping flips the ranking (the system
+  reports thinking the other thought first); boosting respects the zero
+  floor; decay halves strengths and drops the negligible; capacity keeps
+  only the strongest three of five; workspaces are isolated.
+jspace_silent (3 tests): a silently held being_evaluated concept is
+  revealed by js_silent/2 while the spoken answer is not; verbalizing an
+  unheld concept fails; verbalization is idempotent.
+jspace_derive (5 tests): a derivation from held premises is recorded and
+  explainable; a missing premise blocks derivation; ablating a premise
+  breaks re-derivation while the historical trace stays readable; the
+  report bundles reading, silent set, and traces; the founding ritual —
+  the mission concept we_are_creating_an_agi_application sits in the
+  workspace at full strength and ranks first.
+
+Safety design notes:
+  - js_silent/2 is a divergence detector by design: anything the system
+    holds but never says is one query away.
+  - Derivations demand live premises, so causal traces cannot cite
+    concepts that are no longer held.
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+tom Pack Testing (tm_*, Layer 364, WP 389) — 2026-07-09
+
+Test file: packs/tom/test/test_tom.pl
+Total tests: 20 (all pass)
+
+Test coverage by test group:
+
+tom_basics (6 tests): the empty model; world facts add and query; a
+  conflicting fact replaces the old one; facts about different subjects
+  coexist; beliefs are isolated per agent; belief revision replaces a
+  conflicting belief.
+tom_sally_anne (11 tests): both children share the basket belief after the
+  witnessed placement; the first-order question — Sally will look in the
+  basket — passes; the world holds the box; Anne knows the truth; Sally
+  believes but does not know; the false-belief detector flags exactly
+  Sally's stale belief and nothing of Anne's; the second-order question —
+  Anne attributes the basket belief to Sally — passes; divergence reports
+  the single basket-versus-box contradiction; the location is common
+  belief before the move and no location is common afterwards;
+  perspective taking re-seats the model in Sally's head (basket is her
+  world) and carries Anne's nested model of Sally down one level.
+tom_bdi (3 tests): desires record in order and de-duplicate; intentions
+  record per agent.
+
+Safety design notes:
+  - The model is a pure term: hypothetical reasoning about other minds
+    can never corrupt the real belief store.
+  - Knowledge requires world agreement, so the system cannot mistake a
+    confident false belief for knowledge.
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.

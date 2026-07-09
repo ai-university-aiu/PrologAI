@@ -9843,3 +9843,153 @@ See Mentova docs/PrologAI_5_Completion_v412.txt for full checklist.
 
 Acc: Acc_423. Tutorial: no new chapter required (web chat, not a reasoning pack).
 SPARC: Specification v351, Pseudocode v343, Architecture v344, Refinement v403, Completion v409.
+
+WP 383: causal Pack (cf_*, Layer 358) release note (2026-07-09)
+New pack: packs/causal/ with 3 files (pack.pl, prolog/causal.pl, test/test_causal.pl).
+New predicates (19 public, cf_* prefix):
+  cf_model/2, cf_variables/2, cf_exogenous/2, cf_endogenous/2, cf_parents/3,
+  cf_children/3, cf_ancestors/3, cf_descendants/3, cf_path/3, cf_dsep/4,
+  cf_solve/3, cf_value/4, cf_intervene/3, cf_do/4, cf_effect/5, cf_abduce/4,
+  cf_counterfactual/6, cf_counterfactual_all/6, cf_but_for/5
+Tests: 31 PLUnit tests; all pass. Fixtures: Pearl's firing squad and the
+  sprinkler network, covering all three rungs of the causal ladder and
+  d-separation with colliders.
+Rationale: the AGI vision documents name causal reasoning and
+  counterfactual modelling as a core requirement of hybrid systems; the
+  platform had causal pattern discovery (spinoff) and causal appraisal
+  (appraisal) but no structural causal model engine. This pack supplies
+  seeing, doing, and imagining as first-class glass-box operations.
+Architecture: Layer 358 in the Data Layer; no cross-pack dependencies.
+Part of the seven-pack AGI Foundations suite (WP 383-389).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP 384: actinf Pack (ai_*, Layer 359) release note (2026-07-09)
+New pack: packs/actinf/ with 3 files (pack.pl, prolog/actinf.pl, test/test_actinf.pl).
+New predicates (21 public, ai_* prefix):
+  ai_model/7, ai_actions/2, ai_prior/2, ai_normalize/2, ai_prob/3,
+  ai_infer/4, ai_predict_states/4, ai_predict_obs/3, ai_surprise/4,
+  ai_free_energy/6, ai_risk/4, ai_ambiguity/4, ai_pragmatic/4,
+  ai_epistemic/4, ai_efe_action/4, ai_efe/4, ai_policies/3,
+  ai_policy_dist/5, ai_select_policy/6, ai_act/5, ai_step/7
+Tests: 23 PLUnit tests; all pass. Fixtures: a hand-computed two-state model
+  and a T-maze with an information-bearing cue; the identity
+  G = -(pragmatic + epistemic) is enforced to 1.0e-6.
+Rationale: the prediction pack minimizes free energy on the perception
+  side; the AGI vision documents (Part Four, Active Inference) call for the
+  action side — policy selection by expected free energy, where curiosity
+  and goal-seeking fall out of one equation. The agent checks the cue value
+  when ignorant and heads straight for the reward when certain.
+Architecture: Layer 359 in the Data Layer; no cross-pack dependencies.
+Part of the seven-pack AGI Foundations suite (WP 383-389).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP 385: worldmodel Pack (wm_*, Layer 360) release note (2026-07-09)
+New pack: packs/worldmodel/ with 3 files (pack.pl, prolog/worldmodel.pl, test/test_worldmodel.pl).
+New predicates (16 public, wm_* prefix):
+  wm_state/2, wm_action/5, wm_holds/2, wm_goal_holds/2, wm_applicable/2,
+  wm_apply/3, wm_step/4, wm_successors/3, wm_simulate/4, wm_plan_bfs/5,
+  wm_reachable/4, wm_rollout/4, wm_diff/4, wm_learn/2, wm_predict/4,
+  wm_novelty/3
+Tests: 20 PLUnit tests; all pass. Fixture: a robot, three rooms, and a
+  ball; a six-step fetch plan is found by breadth-first search and
+  verified by simulation; an action model is learned from observations
+  and predicts in a novel context.
+Rationale: the AGI vision documents call for structured world models used
+  for prediction and planning. The dreaming and daydream packs explore
+  world models stochastically; this pack makes the model itself
+  first-class — inspectable transition rules, honest simulation, shortest
+  plans, conservative model learning, and a novelty signal for curiosity.
+Architecture: Layer 360 in the Data Layer; no cross-pack dependencies.
+Part of the seven-pack AGI Foundations suite (WP 383-389).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP 386: planner Pack (ht_*, Layer 361) release note (2026-07-09)
+New pack: packs/planner/ with 3 files (pack.pl, prolog/planner.pl, test/test_planner.pl).
+New predicates (11 public, ht_* prefix):
+  ht_domain/3, ht_primitive/2, ht_compound/2, ht_methods_for/3, ht_plan/5,
+  ht_task_tree/5, ht_execute/4, ht_valid_plan/3, ht_plan_cost/2,
+  ht_monitor/4, ht_replan/5
+Tests: 18 PLUnit tests; all pass. Fixture: a travel domain where walking
+  is preferred and the taxi is the fall-back; a recursive method set
+  proves the depth bound terminates; monitoring pinpoints fails_at(3, pay)
+  when the cash disappears.
+Rationale: the AGI vision documents name long-horizon planning and goal
+  decomposition among the core proto-AGI capabilities. The agency pack
+  runs the Observe-Reason-Act loop; this pack gives it a hierarchical
+  task network to decompose large goals into executable steps, with the
+  decomposition tree as the glass-box explanation of every choice.
+Architecture: Layer 361 in the Data Layer; shares the STRIPS state
+  convention with worldmodel (Layer 360) without depending on it.
+Part of the seven-pack AGI Foundations suite (WP 383-389).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP 387: evolve Pack (ev_*, Layer 362) release note (2026-07-09)
+New pack: packs/evolve/ with 3 files (pack.pl, prolog/evolve.pl, test/test_evolve.pl).
+New predicates (17 public, ev_* prefix):
+  ev_next/2, ev_rand_float/3, ev_rand_int/4, ev_random_genome/5,
+  ev_population/6, ev_evaluate/3, ev_best/3, ev_mean_fitness/2,
+  ev_tournament/5, ev_crossover/5, ev_mutate/6, ev_elite/3,
+  ev_next_generation/6, ev_run/8, ev_run_until/10, ev_diversity/2,
+  ev_converged/2
+Tests: 22 PLUnit tests; all pass. Acceptance: OneMax at 12 genes rises
+  from a founding best of 6 to the perfect all-ones genome (seed 42),
+  early-stopping at generation seven; identical seeds give identical runs.
+Rationale: the AGI vision documents list evolutionary computation among
+  the wider landscape of general intelligence methods — the one process
+  known to have produced general intelligence. The platform had no
+  population-based search; this pack adds it with reproducibility as a
+  first-class property (explicit seed threading, no hidden randomness).
+Architecture: Layer 362 in the Data Layer; no cross-pack dependencies;
+  fitness goals are caller-module closures via meta_predicate.
+Part of the seven-pack AGI Foundations suite (WP 383-389).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP 388: jspace Pack (js_*, Layer 363) release note (2026-07-09)
+New pack: packs/jspace/ with 3 files (pack.pl, prolog/jspace.pl, test/test_jspace.pl).
+New predicates (18 public, js_* prefix):
+  js_open/1, js_close/1, js_hold/4, js_strength/3, js_source/3,
+  js_active/2, js_reading/2, js_ablate/2, js_swap/3, js_boost/3,
+  js_decay/2, js_capacity/2, js_verbalize/2, js_silent/2, js_monitor/3,
+  js_derive/3, js_explain/3, js_report/2
+Private state (3 dynamic facts): js_concept_/4, js_verbal_/2, js_trace_/3.
+Tests: 20 PLUnit tests; all pass. Highlights: silent-thought detection
+  reveals a held being_evaluated concept that no output mentioned;
+  ablating a premise breaks re-derivation while history stays readable;
+  the founding ritual holds we_are_creating_an_agi_application at full
+  strength.
+Rationale: 2026 interpretability research read a sparse workspace of
+  verbalizable concepts (the Jacobian Space, J-Space) out of language
+  models through the Jacobian Lens, and could watch silent evaluation
+  awareness, swap concepts, and break reasoning by ablation. PrologAI is
+  glass-box by construction, so this pack supplies the same workspace as
+  a first-class object — readable, editable, and honest about what was
+  thought but never said. It is the safety-facing introspection layer of
+  the AGI Foundations suite.
+Architecture: Layer 363 in the Data Layer; sits beside workspace (global
+  broadcast) and attention_schema (attention model); no cross-pack
+  dependencies.
+Part of the seven-pack AGI Foundations suite (WP 383-389).
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
+
+WP 389: tom Pack (tm_*, Layer 364) release note (2026-07-09)
+New pack: packs/tom/ with 3 files (pack.pl, prolog/tom.pl, test/test_tom.pl).
+New predicates (18 public, tm_* prefix):
+  tm_new/1, tm_world_add/3, tm_world/2, tm_fact/2, tm_believe/4,
+  tm_belief/3, tm_beliefs/3, tm_event/4, tm_knows/3, tm_false_beliefs/3,
+  tm_attribute/4, tm_divergent/4, tm_common/3, tm_perspective/3,
+  tm_desire/4, tm_desires/3, tm_intend/4, tm_intentions/3
+Tests: 20 PLUnit tests; all pass. Acceptance: the full Sally-Anne
+  false-belief scenario — first-order (Sally searches the basket),
+  knowledge versus belief, false-belief detection, divergence, common
+  belief before and after the move, perspective taking, and the
+  second-order attribution (Anne knows Sally never saw the move).
+Rationale: the AGI vision documents (Part Four) call for social
+  cognition, theory of mind, and intersubjective modelling. The awareness
+  pack attributes regards; this pack deepens that into nested beliefs,
+  witnessed-event epistemics that generate false beliefs mechanically,
+  and the belief-desire-intention triple for social prediction.
+Architecture: Layer 364 in the Data Layer; no cross-pack dependencies.
+Completes the seven-pack AGI Foundations suite (WP 383-389): causal,
+  actinf, worldmodel, planner, evolve, jspace, tom — 120 new public
+  predicates, 154 new tests, all green, zero regression.
+SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
