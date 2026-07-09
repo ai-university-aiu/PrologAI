@@ -1380,6 +1380,8 @@ WP 388 - jspace: Concept Workspace, J-Space (js_*, Layer 363). A readable, edita
 
 WP 389 - tom: Theory of Mind (tm_*, Layer 364). Nested per-agent beliefs, witnessed events with mutual knowledge, false-belief detection that passes the Sally-Anne test including the second-order question, perspective taking, and desire-intention stores. Chapter 349 covers this pack.
 
+WP 390 - nexus: AGI Foundations Integration Layer (nx_*, Layer 365). The capstone that wires four foundations into the cognitive core: workspace broadcasts hold their winning coalition's concepts in a live J-Space readout, world-model novelty feeds the curiosity learning-progress signal, the agency loop decomposes goals with the planner and recovers by monitoring and replanning, and evolution improves reasoning models scored by refinery critique. Pure plumbing, respecting the acyclic layer order. Chapter 350 covers this pack.
+
 Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 16).
 
 
@@ -26337,3 +26339,99 @@ itself, from first-order search prediction to second-order attribution.
 This closes the AGI Foundations suite: causal, actinf, worldmodel,
 planner, evolve, jspace, and tom - seven packs, 120 public predicates,
 154 tests, all green.
+
+
+Chapter 350: The Integration Layer - The nexus Pack (nx_*, Layer 365)
+
+The seven AGI Foundations packs of Chapters 343 through 349 were each built
+as a self-contained capability. A capability that sits on a shelf, however,
+is not yet a mind. This chapter is about the wiring that makes those
+capabilities participate in PrologAI's living cognition - the nexus pack.
+
+Two ideas make nexus possible and keep it honest.
+
+First, the layer rule. Every pack has a layer number, and a pack may only
+call packs strictly below it. The workspace lives near the bottom of the
+stack (its broadcast is one of the oldest parts of the mind); the J-Space
+concept workspace lives near the top, at Layer 363. So the workspace cannot
+call J-Space - that would be a low floor reaching up to a high one, which
+the acyclic rule forbids. The solution is a capstone: nexus sits at Layer
+365, above everything it touches, and reaches DOWN to both sides. Nothing
+ever depends on nexus, so the building of packs still rests on tested
+foundations all the way up.
+
+Second, nexus adds no cognition of its own. It is pure plumbing. Every
+junction is a named, inspectable predicate, and nx_wirings/1 will tell you
+exactly what it connects:
+
+    ?- nx_wirings(W).
+    W = [ wiring(jspace_from_workspace, ...),
+          wiring(curiosity_from_worldmodel, ...),
+          wiring(agency_with_planner, ...),
+          wiring(evolve_with_refinery, ...) ].
+
+THE FOUR WIRINGS
+
+Wiring one makes the J-Lens readout live. The workspace already lets any
+actor subscribe to its broadcast bus; nexus subscribes a hook that, on every
+broadcast, holds the winning coalition's concepts in a J-Space workspace at
+the broadcast's salience.
+
+    ?- js_open(mind), nx_bind_workspace(mind).
+
+Now, whenever the workspace broadcasts, mind holds what the mind is
+broadcasting, ranked by salience - the readable concept workspace of Chapter
+348, updated in real time by the attention arbiter of the global workspace.
+nx_replay_broadcasts/2 lets you feed a whole reasoning episode offline, and
+nx_broadcast_reading/2 shows the result.
+
+Wiring two turns the world model into a curiosity signal. The curiosity pack
+learns from prediction error and rewards learning PROGRESS, not raw error.
+nexus feeds it the world model's novelty: as an agent explores and a region
+becomes familiar, novelty falls, and falling novelty is exactly what
+curiosity reads as progress.
+
+    ?- nx_curiosity_explore(kitchen,
+           [[at(door)], [at(door),saw(stove)], [at(door),saw(stove)]], P).
+    P = 0.5.     % positive — the agent is learning the kitchen
+
+A room full of unrelated novelties keeps novelty flat and returns zero
+progress: the built-in guard against being mesmerized by noise.
+
+Wiring three gives the agency loop a planner. The agency loop runs
+observe-reason-act with a step budget; its reason-goal is a predicate that
+decides what to do next. nexus supplies a reason-goal that decomposes the
+current goal with ht_plan, and one that additionally checks the plan against
+the current world with ht_monitor and replans when the world has moved.
+
+    ?- nx_plan_and_run(Domain, State, travel(home, park), 5, Outcome).
+    Outcome = done(achieved(travel(home,park), [walk(home,park)])).
+
+If no plan exists, the loop does not invent one - it escalates to human
+oversight (no_plan, or cannot_recover after a failed replan). That
+escalation path is the safety valve of the whole wiring.
+
+Wiring four lets the mind evolve its own reasoning. The refinery scores an
+output by how many criteria it passes; the evolve pack searches by fitness.
+nexus makes the refinery score the fitness, so evolution improves reasoning
+models under critique, within a bounded generation budget.
+
+    ?- nx_evolve_with_critique(Criteria, Params, 24, 5, 80, 1.0, 5, Best, S, G).
+    Best = [observe, deduce, observe, induce, conclude], S = 1.0, G = 6.
+
+Six generations of variation and selection assembled a valid
+observe-deduce-conclude reasoning trace that no founder possessed - self
+improvement, glass-box and reproducible.
+
+WHY IT MATTERS
+
+Each wiring is a single predicate you can read, test, and trust. Together
+they turn seven shelved capabilities into a mind that broadcasts what it is
+thinking into a readable workspace, grows curious about what it is learning,
+plans and recovers toward its goals, and improves its own reasoning - all
+without a single pack ever depending on something above it.
+
+All 22 acceptance tests pass, including an end-to-end test in which the
+workspace's own broadcast-subscriber list dispatches concepts into a
+J-Space. The companion Mentova accomplishment, Acc_424, puts all seven
+foundations to work in one connected episode of a curious agent's cognition.
