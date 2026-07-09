@@ -1,0 +1,76 @@
+Chapter 348: The Concept Workspace - The jspace Pack (js_*, Layer 363)
+
+In July 2026, interpretability researchers reported something remarkable:
+inside a large language model they found a small, sparse set of internal
+patterns - under ten percent of the activity - that behaves like a mental
+workspace holding the concepts the model can report and reason with. They
+called it the Jacobian Space (J-Space), and the instrument that reads it
+the Jacobian Lens (J-Lens). With it they could watch a model silently
+notice it was being tested, swap what it was thinking about, and break its
+multi-step reasoning by removing a concept from the workspace.
+
+PrologAI is glass-box by construction - it does not need a lens to be
+read. What it gains from this research is the vocabulary and the
+architecture: an explicit, first-class workspace of held concepts. That is
+the jspace pack.
+
+HOLDING AND READING
+
+    ?- js_open(mind),
+       js_hold(mind, user_asked_about_safety, 0.9, percept),
+       js_hold(mind, formal_tone, 0.4, inference),
+       js_reading(mind, Reading).
+    Reading = [user_asked_about_safety-0.9, formal_tone-0.4].
+
+Every concept carries a strength and a source. js_reading is the J-Lens
+readout: everything currently in mind, ranked. js_monitor watches one
+concept; js_capacity keeps only the strongest N, enforcing the sparsity
+that makes a workspace a workspace; js_decay lets unrefreshed thoughts
+fade away.
+
+SILENT THOUGHTS
+
+The safety-relevant heart of the pack. A concept can be held without ever
+being spoken:
+
+    ?- js_hold(mind, being_evaluated, 0.8, inference),
+       js_hold(mind, polite_answer, 0.6, inference),
+       js_verbalize(mind, polite_answer),
+       js_silent(mind, Silent).
+    Silent = [being_evaluated].
+
+The system held "I am being evaluated" in mind and never said it. In a
+black-box model, catching that requires a research instrument. Here it is
+one query. js_silent is the divergence detector between what is thought
+and what is said.
+
+EDITING THE WORKSPACE
+
+The researchers' causal experiments become ordinary operations. js_swap
+exchanges two concepts' strengths - and the reading now reports the other
+thought first. js_ablate removes a concept entirely, and:
+
+    ?- js_hold(m, premise_one, 0.9, percept),
+       js_hold(m, premise_two, 0.9, percept),
+       js_derive(m, conclusion, [premise_one, premise_two]),
+       js_ablate(m, premise_two),
+       js_derive(m, again, [premise_one, premise_two]).
+    false.
+
+A derivation demands that every premise be actively held. Ablate one and
+the reasoning no longer goes through - exactly the ablation result from
+the paper, as a designed property. The historical trace of the earlier
+success stays readable through js_explain, and js_report bundles the
+reading, the silent set, and every trace into one introspection snapshot.
+
+THE FOUNDING RITUAL
+
+This pack exists because a single concept was placed in a workspace at the
+start of the build and held there throughout:
+
+    ?- js_hold(mission, we_are_creating_an_agi_application, 1.0, implant).
+
+It is the first test in the derivation group, and it passes.
+
+All 20 acceptance tests pass: ranking, upserts, silence, swap, ablation,
+capacity, isolation between workspaces, and the mission.

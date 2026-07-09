@@ -61,7 +61,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       279 work packages — the complete cognitive engine (see below)
+├── packs/       286 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -78,11 +78,11 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transformation packs that handle structured data, currently reaching Layer 254 (iochan) with WP-274 through WP-277 enhancing four existing packs for ARC-AGI-2, WP-278 adding the periodfix periodic-pattern-repair pack, and WP-279 adding the iochan I/O channel integration pack (speaker, microphone, text/image/printer channels).
+Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transformation packs that handle structured data, currently reaching Layer 364 (tom) with WP-274 through WP-277 enhancing four existing packs for ARC-AGI-2, WP-278 adding the periodfix periodic-pattern-repair pack, WP-279 adding the iochan I/O channel integration pack (speaker, microphone, text/image/printer channels), and WP-383 through WP-389 adding the seven-pack AGI Foundations suite — causal (structural causal models and counterfactuals), actinf (expected-free-energy policy selection), worldmodel (structured simulation, planning search, and model learning), planner (hierarchical task decomposition), evolve (evolutionary computation), jspace (the readable concept workspace), and tom (theory of mind with nested false beliefs) — at Layers 358 through 364.
 
 The full layer table is in Architecture Section 0.4.
 
-### The 279 Work Packages
+### The 286 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -356,6 +356,13 @@ Everything is inspectable.
 | `taskcat` | Task Type Classification: Categorize, Is Single Rule, Is Multi-Step, Has Context Gate, Has Symbol Table, Suggest Strategies, Preserves Dims, Preserves Colors, Consistent Change Count, Max Change Count, Distinct Change Patterns, Is Fill Task, Is Deletion Task, Confidence (tc_*, Layer 252) (PR 362) |
 | `periodfix` | Periodic Pattern Repair: List and Grid Period Detection, Majority-Vote Tile Construction, Violation Finding, Full and Single-Corruption Repair, and Best-Period Search (ppf_*, Layer 253) (PR 366) |
 | `iochan` | I/O Channel Integration: Speaker output (espeak-ng / festival TTS), microphone input (arecord + whisper-cli STT), text channels (console / email / screen / app), image channels (console / email / screen / app / webcam / URL), and printer output (CUPS lp) (ic_*, Layer 254) (WP-279) |
+| `causal` | Structural Causal Models: acyclic model construction, causal graph queries with d-separation (chains, forks, colliders), observational solving, do-operator interventions by graph surgery, abduction-action-prediction counterfactuals, and the but-for test of actual causation (cf_*, Layer 358) (WP-383) |
+| `actinf` | Active Inference Engine: validated generative models, Bayesian belief updating, variational free energy with the complexity-accuracy split, expected free energy as risk plus ambiguity, epistemic and pragmatic value, and softmax policy selection — curiosity and goal-seeking from one equation (ai_*, Layer 359) (WP-384) |
+| `worldmodel` | Structured World Model: canonical fluent states, parameterized STRIPS actions, forward simulation, rollout, breadth-first shortest-plan search, conservative action-model learning from observed transitions, and novelty scoring for curiosity (wm_*, Layer 360) (WP-385) |
+| `planner` | Hierarchical Planner: HTN task decomposition with ordered method preference and depth-bounded termination, glass-box plan trees naming every chosen method, plan execution, validity, cost, monitoring with the exact failing step, and replanning (ht_*, Layer 361) (WP-386) |
+| `evolve` | Evolutionary Computation: fully reproducible seeded randomness, random populations, fitness evaluation, tournament selection, one-point crossover, point mutation, elitism, fixed and early-stopping generational runs, diversity, and convergence detection (ev_*, Layer 362) (WP-387) |
+| `jspace` | Concept Workspace (J-Space): a readable, editable ledger of the concepts held in mind with strengths and sources, the ranked J-Lens readout, silent-thought detection, implant / ablate / swap / decay / capacity editing, and concept-level derivation traces (js_*, Layer 363) (WP-388) |
+| `tom` | Theory of Mind: nested per-agent beliefs, witnessed events with mutual knowledge, knowledge as true belief, false-belief detection that passes Sally-Anne including the second-order question, belief divergence, common belief, perspective taking, and desire-intention stores (tm_*, Layer 364) (WP-389) |
 | `seqinfer` (enhanced) | Sequential Rule Inference + ARC-AGI-2 Candidates: sq_arc2_candidates/1 adds 66-entry integer-color candidate list for multi-step search (sq_*, Layer 195) (WP-274, PR 363) |
 | `hyp` (enhanced) | Hypothesis Generation + Spatial/Structural/Sequence: hy_spatial_hyp/3, hy_structural_hyp/3, hy_sequence_hyp/4 extend hypothesis search to grid-level shifts, structural patterns, and two-step color maps (hy_*, Layer 74) (WP-275, PR 363) |
 | `condxf` (enhanced) | Conditional Scene Transform + Gate Inference: xc_infer_gate/3 infers the gate_color that separates training pairs by change signature (xc_*, Layer 187) (WP-276, PR 363) |

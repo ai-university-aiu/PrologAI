@@ -1,0 +1,69 @@
+Chapter 347: Evolutionary Computation - The evolve Pack (ev_*, Layer 362)
+
+Evolution is the one process known for certain to have produced general
+intelligence. As a search strategy it is simple and relentless: keep a
+population of candidate solutions, score them, let the best reproduce
+with variation, repeat. This pack gives PrologAI that strategy - with one
+unusual property for an evolutionary system: perfect reproducibility.
+
+NO HIDDEN DICE
+
+Every random choice in the pack flows through an explicit seed:
+
+    ?- ev_random_genome([0, 1], 8, 42, Genome, NextSeed).
+
+The linear congruential generator (ev_next/2) is a pure function, so the
+same seed always produces the same genome, the same population, the same
+entire evolution. A run that found something interesting can be replayed
+gene for gene. Determinism is what makes evolution glass-box.
+
+THE OPERATORS
+
+    ev_evaluate(Goal, Pop, Scored)    score every genome with your fitness
+    ev_tournament(Scored, K, ...)     best of K random picks becomes a parent
+    ev_crossover(G1, G2, ...)         head of one parent, tail of the other
+    ev_mutate(G, Alphabet, Rate, ...) each gene rewritten with probability Rate
+    ev_elite(Scored, N, Elites)       the top N survive unchanged
+
+Fitness is any predicate you supply, called as call(Goal, Genome, Score).
+Bigger is better. Elitism means the champion can never be lost between
+generations.
+
+ONEMAX, END TO END
+
+The classic first problem: evolve a binary genome of all ones, fitness
+equal to the sum of the genes.
+
+    onemax(G, S) :- sum_list(G, S).
+
+    ?- ev_run(onemax, params([0, 1], 3, 0.05, 2),
+              24, 12, 30, 42, Best, Score).
+    Best  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    Score = 12.
+
+Population 24, genomes of 12 genes, tournament size 3, mutation rate 5
+percent, 2 elites, seed 42. The founding champion scores only 6 of 12;
+thirty generations later the perfect genome has been assembled from
+fragments no founder possessed. The early-stopping variant reports how
+long it actually took:
+
+    ?- ev_run_until(onemax, params([0, 1], 3, 0.05, 2),
+                    24, 12, 60, 12, 42, Best, Score, Gens).
+    Gens = 7.
+
+Seven generations to perfection, every one replayable.
+
+WATCHING THE POPULATION
+
+ev_diversity measures the distinct fraction of a population, and
+ev_converged flags when it has collapsed below a threshold - the sign to
+stop, restart with a new seed, or raise the mutation rate.
+
+Because fitness goals are ordinary predicates, anything in PrologAI can
+sit in the fitness slot: score a candidate rule against training pairs,
+score a plan by its cost, score a generated model by refinery critique.
+Evolution becomes a general-purpose search harness over the whole
+platform.
+
+All 22 acceptance tests pass, including exact determinism and the
+generation-seven early stop.

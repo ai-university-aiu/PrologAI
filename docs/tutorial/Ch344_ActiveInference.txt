@@ -1,0 +1,73 @@
+Chapter 344: Active Inference - The actinf Pack (ai_*, Layer 359)
+
+PrologAI has had the perception side of active inference since the
+prediction pack: form predictions, compare them with reality, weight the
+errors by precision, and update. This chapter adds the action side - the
+part that decides what to do - and with it one of the most beautiful
+results in the study of general intelligence: curiosity and goal-seeking
+falling out of a single equation.
+
+A generative model gm(States, Obs, A, B, C, D) says: which hidden states
+the world can be in, which observations they produce (A), how actions move
+the world between states (B), which outcomes the agent prefers (C), and
+what it believes at the start (D). Every distribution is a plain list of
+Name-Probability pairs, validated to sum to one.
+
+Consider a T-maze. A reward sits in the left or right arm - the agent does
+not know which. A cue at the bottom of the maze reveals the side. Three
+actions: check the cue, go left, go right.
+
+PERCEPTION IS BAYES RULE
+
+    ?- ai_infer(GM, [q_l-0.5, q_r-0.5], cue_left, Posterior).
+
+Seeing the left cue turns a fifty-fifty belief into certainty. If an
+observation is impossible under the current belief, ai_infer fails
+honestly instead of inventing a posterior.
+
+EXPECTED FREE ENERGY
+
+For each action, the pack computes G = risk + ambiguity, where risk is
+how far the predicted outcomes diverge from the preferred ones, and
+ambiguity is how noisy the arrived-at states are. The same quantity
+splits another way:
+
+    G = -(pragmatic value + epistemic value)
+
+Pragmatic value is the expected log preference - the pull toward outcomes
+the agent wants. Epistemic value is the expected information gain - the
+pull toward observations that teach it something. The identity is not a
+slogan; the test suite enforces it to six decimal places for every action.
+
+Watch the two drives at work:
+
+    ?- ai_epistemic(GM, [c_l-0.5, c_r-0.5], check, EV).
+    EV = 0.6931...           % ln 2 - exactly one bit; the cue is precious
+
+    ?- ai_epistemic(GM, [c_l-1.0], check, EV2).
+    EV2 = 0.0                % nothing left to learn - the cue is worthless
+
+    ?- ai_pragmatic(GM, [c_l-1.0], left,  PL).   % PL  = ln 0.85
+    ?- ai_pragmatic(GM, [c_l-1.0], right, PR).   % PR  = ln 0.02
+
+When the agent is ignorant, information is valuable. The moment it is
+certain, the epistemic pull vanishes and preference takes over. Nobody
+programmed an exploration bonus; it is simply what minimizing expected
+surprise means.
+
+POLICY SELECTION
+
+    ?- ai_select_policy(GM, [c_l-1.0], 1, 4.0, Policy, P).
+    Policy = [left].
+
+Policies (action sequences) are ranked by a softmax over negative expected
+free energy, sharpened by a precision Gamma - higher Gamma, more decisive.
+ai_act returns the first action of the winner, and ai_step wraps the whole
+perceive-then-act cycle: update the belief with the observation, then act
+from the updated belief.
+
+    ?- ai_step(GM, [q_l-0.5, q_r-0.5], cue_left, 1, 4.0, Action, Post).
+    Action = left.
+
+The agent read the cue, believed it, and went where the reward is. All 23
+acceptance tests pass, each numeric expectation hand-computed.

@@ -1873,3 +1873,144 @@ I/O Channel Integration: Speaker, Microphone, Text, Image, and Printer Channels 
     ic_channel_info(+ChannelId,-Info): retrieve info(ChannelId,ChannelType,Config) for a registered channel.
     ic_list_channels(+ChannelType,-Channels): list all registered channels of a type as [chan(Id,Config),...].
     ic_channel_status(+ChannelId,-Status): return ready if the channel exists in the registry, unavailable otherwise.
+
+causal
+Structural Causal Models: Interventions and Counterfactuals (cf_*, Layer 358)
+    cf_model(+Decls,-SCM): build a structural causal model from exo(U,Default) and eq(X,Expr) declarations; fails on cycles, undeclared references, and duplicate names.
+    cf_variables(+SCM,-Vars): every variable name, exogenous then endogenous.
+    cf_exogenous(+SCM,-Us): the exogenous (outside-caused) variable names.
+    cf_endogenous(+SCM,-Xs): the endogenous variable names in causal order.
+    cf_parents(+SCM,+X,-Parents): the direct causes of X.
+    cf_children(+SCM,+X,-Children): the direct effects of X.
+    cf_ancestors(+SCM,+X,-As): the transitive causes of X.
+    cf_descendants(+SCM,+X,-Ds): the transitive effects of X.
+    cf_path(+SCM,+X,+Y): a directed causal path runs from X to Y.
+    cf_dsep(+SCM,+X,+Y,+Zs): X and Y are d-separated given conditioning set Zs, with correct chain, fork, and collider handling including collider descendants.
+    cf_solve(+SCM,+Context,-Solution): rung one (seeing) — evaluate every equation in topological order under an exogenous context.
+    cf_value(+SCM,+Context,+X,-V): one variable's observational value.
+    cf_intervene(+SCM,+Interventions,-SCM2): rung two (doing) — graph surgery replacing intervened equations with constants; exogenous targets are rejected.
+    cf_do(+SCM,+Interventions,+Context,-Solution): solve the mutilated model.
+    cf_effect(+SCM,+Interventions,+Context,+Y,-V): one variable's value under interventions.
+    cf_abduce(+SCM,+Domains,+Evidence,-Context): enumerate exogenous contexts consistent with the evidence.
+    cf_counterfactual(+SCM,+Domains,+Evidence,+Ints,+Y,-V): rung three (imagining) — abduction, action, prediction; succeeds only when the value is uniquely determined.
+    cf_counterfactual_all(+SCM,+Domains,+Evidence,+Ints,+Y,-Vs): every counterfactual value the evidence allows.
+    cf_but_for(+SCM,+Context,+X,+Alts,+Y): the but-for test of actual causation — some alternative setting of X changes Y.
+
+actinf
+Active Inference Engine: Expected Free Energy and Policy Selection (ai_*, Layer 359)
+    ai_model(+States,+Obs,+A,+B,+C,+D,-GM): build and validate a generative model; all distributions must sum to one within 1.0e-6; missing transitions default to persistence.
+    ai_actions(+GM,-Actions): the distinct action names.
+    ai_prior(+GM,-Prior): the prior belief over states.
+    ai_normalize(+Dist,-Norm): rescale a Name-Prob pair list to sum one.
+    ai_prob(+Dist,+Key,-P): probability of a key, zero when absent.
+    ai_infer(+GM,+Belief,+Obs,-Posterior): exact Bayesian update; fails honestly on impossible observations.
+    ai_predict_states(+GM,+Belief,+Action,-Next): push a belief through a transition.
+    ai_predict_obs(+GM,+Belief,-ObsDist): predicted outcome distribution.
+    ai_surprise(+GM,+Belief,+Obs,-S): negative log evidence of an observation.
+    ai_free_energy(+GM,+Prior,+Obs,-F,-Complexity,-Accuracy): variational free energy decomposed into complexity minus accuracy; equals surprise under exact inference.
+    ai_risk(+GM,+Belief,+Action,-Risk): KL divergence from predicted to preferred outcomes.
+    ai_ambiguity(+GM,+Belief,+Action,-Amb): expected outcome entropy of the arrived-at states.
+    ai_pragmatic(+GM,+Belief,+Action,-V): expected log preference — the goal-seeking drive.
+    ai_epistemic(+GM,+Belief,+Action,-V): expected information gain — the curiosity drive.
+    ai_efe_action(+GM,+Belief,+Action,-G): one-step expected free energy, risk plus ambiguity; the identity G = -(pragmatic + epistemic) holds.
+    ai_efe(+GM,+Belief,+Policy,-G): expected free energy accumulated over an action sequence.
+    ai_policies(+GM,+Horizon,-Policies): every action sequence of the horizon.
+    ai_policy_dist(+GM,+Belief,+Horizon,+Gamma,-Dist): softmax distribution over policies sharpened by precision Gamma.
+    ai_select_policy(+GM,+Belief,+Horizon,+Gamma,-Policy,-P): the most plausible policy.
+    ai_act(+GM,+Belief,+Horizon,+Gamma,-Action): first action of the selected policy.
+    ai_step(+GM,+Belief,+Obs,+Horizon,+Gamma,-Action,-Posterior): the full perceive-then-act cycle.
+
+worldmodel
+Structured World Model: Simulation, Planning Search, and Model Learning (wm_*, Layer 360)
+    wm_state(+Fluents,-State): normalize a fluent list into a canonical sorted state.
+    wm_action(+Name,+Pre,+Add,+Del,-Action): build a STRIPS-style action; Name may carry parameters.
+    wm_holds(+State,+Fluent): the fluent is present.
+    wm_goal_holds(+State,+Goal): every goal fluent is present.
+    wm_applicable(+State,+Action): preconditions hold, binding action parameters.
+    wm_apply(+State,+Action,-State2): delete then add effects, restoring canonical form.
+    wm_step(+State,+Actions,?Name,-State2): take one named grounded step from a repertoire.
+    wm_successors(+State,+Actions,-Pairs): every Name-State2 successor.
+    wm_simulate(+State,+Actions,+Plan,-Trajectory): run a plan, returning all visited states; fails on an inapplicable step.
+    wm_plan_bfs(+State,+Actions,+Goal,+MaxDepth,-Plan): breadth-first search for a shortest plan with a visited set and depth bound.
+    wm_reachable(+State,+Actions,+Depth,-States): all states reachable within the depth.
+    wm_rollout(+State,+Actions,+Depth,-Rollouts): every action sequence up to the depth with its final state.
+    wm_diff(+S1,+S2,-Added,-Removed): fluent-level difference of two states.
+    wm_learn(+Transitions,-Models): induce one action model per observed name from tr(Name,Before,After) records by conservative intersection.
+    wm_predict(+Models,+State,+Name,-State2): predict with a learned model, honouring its learned preconditions.
+    wm_novelty(+KnownStates,+State,-Score): fraction of the state's fluents never seen before — the curiosity hook.
+
+planner
+Hierarchical Planner: HTN Decomposition, Plan Trees, and Monitoring (ht_*, Layer 361)
+    ht_domain(+Primitives,+Methods,-Domain): assemble a domain from prim(Name,Pre,Add,Del) and meth(MName,Task,Pre,Subtasks) declarations.
+    ht_primitive(+Domain,+Task): the task matches a primitive action.
+    ht_compound(+Domain,+Task): the task matches a decomposition method.
+    ht_methods_for(+Domain,+Task,-Names): matching method names in declaration (preference) order.
+    ht_plan(+Domain,+State,+Tasks,+MaxDepth,-Plan): ordered decomposition to a primitive plan; backtracking falls through to later methods; the depth bound guarantees termination.
+    ht_task_tree(+Domain,+State,+Task,+MaxDepth,-Tree): the glass-box decomposition tree — tree(Task,Method,Children) with primitive(Name) leaves.
+    ht_execute(+Domain,+State,+Plan,-Final): run a primitive plan.
+    ht_valid_plan(+Domain,+State,+Plan): the plan executes end to end.
+    ht_plan_cost(+Plan,-Cost): step count.
+    ht_monitor(+Domain,+State,+Plan,-Status): ok, or fails_at(Index,Action) for the first step that can no longer run.
+    ht_replan(+Domain,+State,+Tasks,+MaxDepth,-Plan): plan again from the new situation.
+
+evolve
+Evolutionary Computation: Reproducible Population Search (ev_*, Layer 362)
+    ev_next(+Seed,-Seed2): one step of the linear congruential generator; all randomness is explicit and reproducible.
+    ev_rand_float(+Seed,-F,-Seed2): uniform float in [0,1).
+    ev_rand_int(+Seed,+N,-I,-Seed2): uniform integer in [0,N).
+    ev_random_genome(+Alphabet,+Length,+Seed,-Genome,-Seed2): one random genome.
+    ev_population(+Alphabet,+Length,+Size,+Seed,-Pop,-Seed2): a founding population.
+    ev_evaluate(:Goal,+Pop,-Scored): score every genome with a caller-supplied fitness goal.
+    ev_best(+Scored,-Genome,-Score): the champion.
+    ev_mean_fitness(+Scored,-Mean): mean score.
+    ev_tournament(+Scored,+K,+Seed,-Winner,-Seed2): best of K random picks.
+    ev_crossover(+G1,+G2,+Seed,-Child,-Seed2): one-point crossover, cut strictly inside.
+    ev_mutate(+Genome,+Alphabet,+Rate,+Seed,-Mutant,-Seed2): per-gene point mutation.
+    ev_elite(+Scored,+N,-Elites): the top genomes, preserved unchanged.
+    ev_next_generation(:Goal,+Scored,+Params,+Seed,-Pop2,-Seed2): elites plus tournament-crossover-mutation offspring; params(Alphabet,K,Rate,EliteN).
+    ev_run(:Goal,+Params,+Size,+Length,+Gens,+Seed,-Best,-Score): full loop, tracking the best ever seen.
+    ev_run_until(:Goal,+Params,+Size,+Length,+MaxGens,+Target,+Seed,-Best,-Score,-Gens): early stop at a target score.
+    ev_diversity(+Pop,-D): distinct fraction of the population.
+    ev_converged(+Scored,+Threshold): diversity has collapsed to the bar.
+
+jspace
+Concept Workspace (J-Space): Readable, Editable Held Concepts (js_*, Layer 363)
+    js_open(+Space): create or reset a named workspace.
+    js_close(+Space): clear a workspace completely.
+    js_hold(+Space,+Concept,+Strength,+Source): implant or refresh a concept; upserts in place; negative strengths rejected.
+    js_strength(+Space,+Concept,-S): activation strength; fails honestly when absent.
+    js_source(+Space,+Concept,-Source): where the concept came from.
+    js_active(+Space,-Concepts): positively activated concepts, ranked.
+    js_reading(+Space,-Reading): the J-Lens readout — every held concept ranked by strength.
+    js_ablate(+Space,+Concept): remove a concept; derivations requiring it stop going through.
+    js_swap(+Space,+C1,+C2): exchange two strengths, changing what the system reports thinking.
+    js_boost(+Space,+Concept,+Delta): adjust one strength with a floor at zero.
+    js_decay(+Space,+Factor): scale all strengths; drop those below 1.0e-6.
+    js_capacity(+Space,+N): keep only the strongest N — workspace sparsity.
+    js_verbalize(+Space,+Concept): mark a held concept as spoken.
+    js_silent(+Space,-Silent): held-but-never-verbalized concepts — the hidden-thought detector.
+    js_monitor(+Space,+Concept,-Status): present(Strength) or absent.
+    js_derive(+Space,+Conclusion,+Required): record a conclusion drawn from actively held concepts.
+    js_explain(+Space,+Conclusion,-Concepts): which concepts produced a conclusion.
+    js_report(+Space,-Report): report(Reading,Silent,Traces) — the full introspection snapshot.
+
+tom
+Theory of Mind: Nested Beliefs, False Beliefs, and Perspective (tm_*, Layer 364)
+    tm_new(-M): an empty mental model tm(World,Beliefs,Desires,Intentions), a pure term.
+    tm_world_add(+M,+Fact,-M2): upsert a fact into the real world, replacing what it conflicts with.
+    tm_world(+M,-Facts): every world fact.
+    tm_fact(+M,?Fact): query the world by unification.
+    tm_believe(+M,+Agent,+Fact,-M2): upsert one agent's belief; Fact may be believes(Agent2,Fact2) nested to any depth.
+    tm_belief(+M,+Agent,?Fact): query one agent's beliefs.
+    tm_beliefs(+M,+Agent,-Facts): every belief of one agent.
+    tm_event(+M,+Fact,+Witnesses,-M2): the world changes; witnesses revise their beliefs and their beliefs about each other; absent agents keep stale beliefs — where false beliefs are born.
+    tm_knows(+M,+Agent,?Fact): knowledge is belief the world confirms.
+    tm_false_beliefs(+M,+Agent,-Facts): beliefs the world contradicts.
+    tm_attribute(+M,+Observer,+Target,-Facts): what one agent thinks another believes — the second-order question.
+    tm_divergent(+M,+A,+B,-Pairs): the contradictions between two agents' beliefs.
+    tm_common(+M,+Agents,-Facts): beliefs every listed agent shares.
+    tm_perspective(+M,+Agent,-M2): re-seat the model inside one agent's head; plain beliefs become the world, nested beliefs drop one level.
+    tm_desire(+M,+Agent,+Goal,-M2): record a goal once.
+    tm_desires(+M,+Agent,-Goals): every recorded desire.
+    tm_intend(+M,+Agent,+Act,-M2): record a commitment once.
+    tm_intentions(+M,+Agent,-Acts): every recorded intention.

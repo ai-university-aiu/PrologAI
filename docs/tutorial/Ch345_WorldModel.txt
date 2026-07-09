@@ -1,0 +1,74 @@
+Chapter 345: The World Model - The worldmodel Pack (wm_*, Layer 360)
+
+A world model is an internal, runnable copy of how the world works. With
+one, a mind can try actions in imagination before spending them in
+reality, predict what comes next, notice when something new appears, and
+even learn the rules of the world from watching it change. The dreaming
+and daydream packs already explore imagined futures; this pack makes the
+model underneath them a first-class, inspectable object.
+
+STATES AND ACTIONS
+
+A state is a sorted list of ground facts called fluents:
+
+    ?- wm_state([at(rob, room1), in(ball, room3), empty_hand,
+                 door(room1, room2), door(room2, room1),
+                 door(room2, room3), door(room3, room2)], S).
+
+An action names its preconditions, what it adds, and what it deletes:
+
+    ?- wm_action(move(X, Y),
+                 [at(rob, X), door(X, Y)],     % preconditions
+                 [at(rob, Y)],                 % add list
+                 [at(rob, X)],                 % delete list
+                 Move).
+
+The name move(X, Y) carries parameters. When the action is tried against a
+state, the preconditions bind X and Y - the same rule works for every pair
+of connected rooms.
+
+SIMULATION AND PLANNING
+
+    ?- wm_simulate(S, Actions,
+                   [move(room1, room2), move(room2, room3), pick(room3),
+                    move(room3, room2), move(room2, room1), drop(room1)],
+                   Trajectory).
+
+Six steps, seven states, ball delivered. If any step's preconditions fail,
+the simulation fails at that step - no silent skipping. And the model can
+find such plans itself:
+
+    ?- wm_plan_bfs(S, Actions, [in(ball, room1)], 8, Plan).
+
+Breadth-first search with a visited set returns a shortest plan (here,
+exactly the six steps above). wm_reachable maps everything the agent could
+reach in a few steps; wm_rollout enumerates entire futures.
+
+LEARNING THE RULES BY WATCHING
+
+The deepest predicate in the pack is wm_learn. Give it observed
+transitions - action name, state before, state after - and it induces the
+action's rule by intersection: only preconditions present in every
+observation survive, and only effects seen in every observation are kept.
+
+    ?- wm_learn([tr(heat, [power(on), temp(cold)],
+                          [power(on), temp(warm)]),
+                 tr(heat, [power(on), temp(cold), window(open)],
+                          [power(on), temp(warm), window(open)])],
+                Models).
+    Models = [act(heat, [power(on), temp(cold)],
+                        [temp(warm)], [temp(cold)])].
+
+Two observations in different contexts, one clean induced rule. The rule
+then predicts in situations never observed - wm_predict warms a room that
+also has a radio on, leaving the radio alone - and refuses to fire when
+its learned preconditions do not hold.
+
+NOVELTY
+
+wm_novelty scores how much of a state has never been seen before - the
+world model's gift to the curiosity pack. A fully familiar state scores
+0.0; a completely new one scores 1.0.
+
+All 20 acceptance tests pass: simulation, shortest plans, honest failure,
+model learning, prediction, and novelty.

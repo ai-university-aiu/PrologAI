@@ -1,0 +1,78 @@
+Chapter 349: Theory of Mind - The tom Pack (tm_*, Layer 364)
+
+The final pack of the AGI Foundations suite tackles the social pillar of
+general intelligence: modelling other minds. The ability being modelled
+has a famous test, and this chapter is built around it.
+
+THE SALLY-ANNE TEST
+
+Sally puts a marble in her basket while Anne watches. Sally leaves the
+room. Anne moves the marble into her box. Sally comes back. Where will
+Sally look for her marble?
+
+Children under four say "the box" - they know where the marble IS, and
+cannot yet separate that from where Sally BELIEVES it is. Passing the test
+means holding two versions of the world at once: reality, and someone
+else's outdated picture of it.
+
+Here is the whole scenario:
+
+    ?- tm_new(M0),
+       tm_event(M0, loc(marble, basket), [sally, anne], M1),
+       tm_event(M1, loc(marble, box),    [anne],        M2).
+
+tm_event is where the magic lives. When a fact changes with witnesses,
+three things happen: the world is updated; every witness revises their own
+belief; and every witness records that the other witnesses saw it too.
+Absent agents keep their old beliefs. False beliefs are not programmed in -
+they are what happens to whoever was out of the room.
+
+Now the questions:
+
+    ?- tm_belief(M2, sally, loc(marble, Where)).
+    Where = basket.                       % Sally will look in the basket
+
+    ?- tm_knows(M2, anne, loc(marble, box)).
+    true.                                 % Anne knows - true belief
+
+    ?- tm_knows(M2, sally, loc(marble, basket)).
+    false.                                % Sally believes, but does not know
+
+    ?- tm_false_beliefs(M2, sally, F).
+    F = [loc(marble, basket)].            % exactly her stale belief
+
+THE SECOND-ORDER QUESTION
+
+The harder test: where does ANNE think SALLY will look? Answering needs a
+belief about a belief.
+
+    ?- tm_attribute(M2, anne, sally, Beliefs).
+    Beliefs = [loc(marble, basket)].
+
+Anne watched Sally watch the first event, so Anne models Sally's basket
+belief. Anne alone witnessed the move, so her model of Sally never
+updated. The nested bookkeeping came free from the witness mechanics.
+
+MORE INSTRUMENTS
+
+tm_divergent lists exactly where two agents contradict each other.
+tm_common lists what everyone in a group shares - the marble's location is
+common belief before the move and common to no one after it.
+tm_perspective re-seats the whole model inside one agent's head: Sally's
+beliefs become the world, and her beliefs about others drop one level, so
+you can reason AS Sally using every other predicate unchanged.
+
+And because agents want things and commit to things, tm_desire and
+tm_intend record per-agent goals and intentions - the belief-desire-
+intention triple that social prediction is built from.
+
+The mental model is a pure term: every update returns a new model, so
+imagining "what would Anne believe if..." can never corrupt the record of
+what anyone actually believes.
+
+All 20 acceptance tests pass, eleven of them the Sally-Anne scenario
+itself, from first-order search prediction to second-order attribution.
+
+This closes the AGI Foundations suite: causal, actinf, worldmodel,
+planner, evolve, jspace, and tom - seven packs, 120 public predicates,
+154 tests, all green.

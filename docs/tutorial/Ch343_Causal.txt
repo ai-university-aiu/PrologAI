@@ -1,0 +1,77 @@
+Chapter 343: Structural Causal Models - The causal Pack (cf_*, Layer 358)
+
+This chapter begins the AGI Foundations suite (WP-383 through WP-389),
+seven packs added after the ARC-AGI-2 climb concluded, each supplying a
+capability the AGI research literature names as necessary for general
+intelligence. The first is causal reasoning.
+
+There is a famous ladder with three rungs. Seeing: what is. Doing: what
+happens if I act. Imagining: what would have happened if things had been
+different. Ordinary statistics lives on rung one. Minds live on all three.
+The causal pack gives PrologAI the whole ladder as glass-box operations.
+
+A structural causal model (SCM) is a set of variables and the equations
+that cause them. Here is the classic firing squad:
+
+    ?- cf_model([
+           exo(court, 0),
+           eq(captain, court),
+           eq(rifle_a, captain),
+           eq(rifle_b, captain),
+           eq(death, max(rifle_a, rifle_b))
+       ], SCM).
+
+The court order is exogenous - it comes from outside the model, with a
+default of 0 (no order). Everything else is endogenous - caused by the
+model itself. The captain follows the court, both riflemen follow the
+captain, and the prisoner dies if either rifleman fires.
+
+RUNG ONE - SEEING
+
+    ?- cf_value(SCM, [court-1], death, V).
+    V = 1.
+
+Solve the equations in causal order and read any variable. The model also
+answers graph questions: cf_parents, cf_ancestors, cf_descendants,
+cf_path, and cf_dsep - d-separation, the test of which variables are
+informationally walled off from which, given what you already know.
+
+RUNG TWO - DOING
+
+What if we force rifleman A to fire, with no court order? That is not an
+observation - it is an intervention, written do(rifle_a = 1). The pack
+performs graph surgery: rifleman A's equation is cut away and replaced by
+the constant.
+
+    ?- cf_do(SCM, [rifle_a-1], [court-0], Solution).
+
+The prisoner dies (death is 1), but look at the rest of the solution:
+captain is 0 and rifle_b is 0. Forcing a rifleman does not make the
+captain retroactively give an order. Intervention flows only forward along
+the causal arrows. This is the difference between seeing and doing, and no
+amount of rung-one statistics can capture it.
+
+RUNG THREE - IMAGINING
+
+The prisoner is dead. Would he have died anyway if rifleman A had held
+fire? Counterfactuals follow a three-step recipe: abduction (work out the
+hidden context from the evidence), action (perform the surgery), and
+prediction (solve the mutilated model in the recovered context).
+
+    ?- cf_counterfactual(SCM, [court-[0, 1]], [death-1],
+                         [rifle_a-0], death, V).
+    V = 1.
+
+Yes - he still dies, because the evidence (death-1) tells us the court
+ordered, so rifleman B still fires. But had the CAPTAIN stayed silent, the
+prisoner would have lived (V = 0). And the pack is honest about
+uncertainty: if the evidence is too thin to determine the answer,
+cf_counterfactual fails rather than guesses, and cf_counterfactual_all
+shows every value that remains possible.
+
+Finally, cf_but_for tests actual causation the way a court of law does:
+was X necessary for Y? The captain passes the but-for test of the death.
+A single rifleman does not - his colleague would have fired anyway.
+
+All 31 acceptance tests pass, covering the firing squad, the sprinkler
+network, d-separation with colliders, and all three rungs of the ladder.
