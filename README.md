@@ -62,7 +62,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       287 work packages — the complete cognitive engine (see below)
+├── packs/       293 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -79,11 +79,11 @@ This guarantees the dependency graph is acyclic: packs build from the bottom up,
 
 The first 59 layers are the cognitive substrate (Lattice, actors, reasoning engine, episodic memory, and the interoperability gateways).
 
-Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transformation packs that handle structured data, currently reaching Layer 364 (tom) with WP-274 through WP-277 enhancing four existing packs for ARC-AGI-2, WP-278 adding the periodfix periodic-pattern-repair pack, WP-279 adding the iochan I/O channel integration pack (speaker, microphone, text/image/printer channels), WP-383 through WP-389 adding the seven-pack AGI Foundations suite — causal (structural causal models and counterfactuals), actinf (expected-free-energy policy selection), worldmodel (structured simulation, planning search, and model learning), planner (hierarchical task decomposition), evolve (evolutionary computation), jspace (the readable concept workspace), and tom (theory of mind with nested false beliefs) — at Layers 358 through 364, and WP-390 adding the nexus integration layer (Layer 365) that wires four of those foundations into the cognitive core.
+Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transformation packs that handle structured data, currently reaching Layer 364 (tom) with WP-274 through WP-277 enhancing four existing packs for ARC-AGI-2, WP-278 adding the periodfix periodic-pattern-repair pack, WP-279 adding the iochan I/O channel integration pack (speaker, microphone, text/image/printer channels), WP-383 through WP-389 adding the seven-pack AGI Foundations suite — causal (structural causal models and counterfactuals), actinf (expected-free-energy policy selection), worldmodel (structured simulation, planning search, and model learning), planner (hierarchical task decomposition), evolve (evolutionary computation), jspace (the readable concept workspace), and tom (theory of mind with nested false beliefs) — at Layers 358 through 364, WP-390 adding the nexus integration layer (Layer 365) that wires four of those foundations into the cognitive core, and WP-391 through WP-396 adding the six-pack Causalontology suite (co_noun, co_hinge, co_core, co_learn, co_plan, co_arc3) — the process-first Master Ontology in which reified causation governs the verbs, a thin backbone hosts the nouns, and realizable entities form the hinge — at Layers 366 through 371.
 
 The full layer table is in Architecture Section 0.4.
 
-### The 287 Work Packages
+### The 293 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -98,6 +98,12 @@ Everything is inspectable.
 | Pack | What it Does |
 |---|---|
 | `nexus` | AGI Foundations Integration Layer: the capstone that wires four foundations into the cognitive core — workspace broadcasts hold their winning coalition's concepts in a live J-Space readout, world-model novelty feeds the curiosity learning-progress signal, the agency loop decomposes goals with the planner and recovers by monitoring and replanning, and evolution improves reasoning models scored by refinery critique under a bounded budget. Pure plumbing, respecting the strictly acyclic layer order (nx_*, Layer 365) (WP-390) |
+| `co_core` | Causalontology Core — the reified Causal Relation Object with causes, effects, a temporal window that is part of the mechanism, four modalities, strength, context, and provenance; temporal succession strictly separated from causal production ("after" is never "because"); timing-gated abduction; hierarchical mechanism sub-graphs with a consistency check; subsumption import of external causal vocabularies as degenerate provisional relations; and the glass-box why (co_*, Layer 368) (WP-393) |
+| `co_noun` | Causalontology Noun Backbone — the thin continuant layer: categories, acyclic is-a and part-of hierarchies with a decidable projection check, and confidence-scored alignment of external classes, so no adopter must abandon its own nouns (co_*, Layer 366) (WP-391) |
+| `co_hinge` | Causalontology Hinge — qualities and the realizable entities (dispositions, functions, roles) that inhere in objects yet are realized in occurrents, with the realization seam queryable in both directions (co_*, Layer 367) (WP-392) |
+| `co_learn` | Causalontology Learning — causal structure acquired by embodied intervention: induce at 0.70, confirm to 0.99, posit the disposition each new relation reveals, tag hazards preventive into a closed-world avoid-set, count null effects compactly, and weigh observation-only relations down (co_*, Layer 369) (WP-394) |
+| `co_plan` | Causalontology Planning — procedures as sequence-cause relations, backward planning whose steps must be achievable and never avoided, bounded backward chaining over the causal graph, and honest plan execution (co_*, Layer 370) (WP-395) |
+| `co_arc3` | Causalontology ARC-AGI-3 Harness — the game-agnostic perceive-learn-plan-act loop over pluggable environments: frames to occurrents, frame diffs to induced relations, plan-first choice with curiosity fallback, hazards never repeated, a glass-box episode trace, and a guarded HTTP bridge to the live benchmark (co_*, Layer 371) (WP-396) |
 | `causal` | Structural Causal Models: acyclic model construction, causal graph queries with d-separation (chains, forks, colliders), observational solving, do-operator interventions by graph surgery, abduction-action-prediction counterfactuals, and the but-for test of actual causation (cf_*, Layer 358) (WP-383) |
 | `actinf` | Active Inference Engine: validated generative models, Bayesian belief updating, variational free energy with the complexity-accuracy split, expected free energy as risk plus ambiguity, epistemic and pragmatic value, and softmax policy selection — curiosity and goal-seeking from one equation (ai_*, Layer 359) (WP-384) |
 | `worldmodel` | Structured World Model: canonical fluent states, parameterized STRIPS actions, forward simulation, rollout, breadth-first shortest-plan search, conservative action-model learning from observed transitions, and novelty scoring for curiosity (wm_*, Layer 360) (WP-385) |
