@@ -1,6 +1,6 @@
 /*  PrologAI — Causalontology Hinge  (WP-392, Layer 367)
 
-    The HINGE layer of the Causalontology Master Ontology (Causalontology_v5,
+    The HINGE layer of the Causalontology Foundational Ontology (Causalontology_v5,
     Sections 3.3 and 5): the specifically dependent continuants. Qualities
     are exhibited whenever borne; realizable entities — dispositions,
     functions, and roles — inhere in objects yet are realized in occurrents.
