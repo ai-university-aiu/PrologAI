@@ -1,6 +1,6 @@
 /*  PrologAI — Causalontology Noun Backbone  (WP-391, Layer 366)
 
-    The NOUN layer of the Causalontology Master Ontology (Causalontology_v5,
+    The NOUN layer of the Causalontology Foundational Ontology (Causalontology_v5,
     Sections 3.3 and 5): a deliberately thin upper-level backbone that hosts
     the continuants — the things that endure — and serves as an alignment
     pivot for external domain ontologies. It defers all domain depth to the

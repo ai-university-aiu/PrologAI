@@ -1,6 +1,6 @@
 /*  PrologAI — Causalontology Core  (WP-393, Layer 368)
 
-    The VERB layer of the Causalontology Master Ontology (Causalontology_v5,
+    The VERB layer of the Causalontology Foundational Ontology (Causalontology_v5,
     Sections 3-5). Its fundamental unit is the reified Causal Relation
     Object (CRO):
 
