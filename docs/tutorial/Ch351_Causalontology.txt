@@ -1,0 +1,106 @@
+Chapter 351: Causalontology - The co_noun, co_hinge, co_core, co_learn, co_plan, and co_arc3 Packs (co_*, Layers 366-371)
+
+A general intelligence must do more than recognize what things are. It must
+model how and why things happen - predict the consequences of its actions,
+diagnose the causes of what it observes, plan its way to goals, and avoid
+harm. Causalontology is PrologAI's answer: an explicit, learnable,
+hierarchical model of cause and effect, acquired by doing rather than merely
+by observing, realized as six packs.
+
+THE OLDEST BOUNDARY IN ONTOLOGY
+
+The world divides into things that endure - nouns, continuants - and things
+that unfold and bring other things about - verbs, occurrents. Causalontology
+governs the verbs, defers on the nouns, and joins the two with a hinge.
+
+The co_noun pack is the thin noun backbone: continuants with categories,
+acyclic is-a and part-of hierarchies, and confidence-scored alignment so an
+external ontology's classes can pivot onto the backbone without anyone
+abandoning their own work.
+
+The co_hinge pack holds the realizables - dispositions, functions, and
+roles - which are noun-shaped (they inhere in objects) yet verb-facing
+(they are realized in processes). The realization seam is queryable both
+ways: from a button's pressable disposition to the pressing that realizes
+it, and back.
+
+THE FUNDAMENTAL UNIT
+
+The co_core pack reifies causation itself. Its unit is the Causal Relation
+Object:
+
+    cro(Id, Causes, Effects,
+        temporal(Dmin, Dmax, Unit),   % the delay window IS the mechanism
+        Modality,                     % necessary|sufficient|contributory|preventive
+        Strength,                     % in [0,1]
+        Context,
+        prov(Source, Evidence, Conf)).
+
+Three disciplines are enforced. First, mere sequence is never production:
+
+    ?- co_precedes_add(rooster_crow, sunrise),
+       co_after_but_not_because(rooster_crow, sunrise).
+    true.    % the rooster does not cause the dawn
+
+Second, timing is mechanism. The clinician's question - "how long ago did
+you eat?" - becomes a gate: a candidate cause is admitted only if the
+elapsed time falls inside its window.
+
+    ?- co_temporal_abduction(state(gastroenteritis),
+           [ate(spoiled_shellfish)-elapsed(3, hours),
+            ate(undercooked_poultry)-elapsed(2, hours)], Ranked).
+    Ranked = [0.7-ate(spoiled_shellfish)].
+    % the poultry is excluded PURELY on timing: two hours is before its window
+
+Third, mechanisms decompose. A coarse relation carries a sub-graph of finer
+relations, and co_hierarchy_consistent checks that the parts genuinely chain
+from the parent's causes to its effects.
+
+And the subsumption argument is executable: co_import_external turns a bare
+external relation like ConceptNet's "Causes" into a degenerate provisional
+CRO - some fields unspecified - which co_refine_import then fills. One may
+replace a representation only if one already contains it.
+
+LEARNING BY DOING
+
+The co_learn pack acquires structure by intervention. The agent acts,
+observes, and induces a relation at strength 0.70; a repeated intervention
+confirms it to 0.90 and beyond, capped at 0.99. On first inducing
+press(b_red), it posits on the noun side the pressable disposition the
+verb-side causation revealed - the hinge populated from the bottom up. Harm
+is tagged preventive and enters a closed-world avoid-set; null effects are
+counted compactly rather than reified; and a relation that was merely
+observed, never intervened on, is flagged observational and weighted down
+to 0.30. Doing beats seeing, and the provenance says which was which.
+
+PLANNING, SAFELY
+
+The co_plan pack composes procedures - relations whose cause is a sequence -
+and plans backward from a goal, refusing any plan through an avoided action.
+Where no procedure exists, co_plan_chain assembles one by bounded backward
+search over the causal graph:
+
+    ?- co_plan_chain(light(on), 5, Plan).
+    Plan = [flip(switch), power(on)].
+
+THE HARNESS
+
+The co_arc3 pack closes the loop against interactive environments - the
+shape of the ARC-AGI-3 benchmark, where an agent is dropped without
+instructions and must discover the mechanics by acting. An environment is a
+pluggable quadruple of goals (reset, act, actions, solved), frames become
+occurrents, frame diffs become induced relations, and action selection is
+plan-first with curiosity fallback - never a learned hazard.
+
+In the acceptance suite, the harness faces a mock volume-control game whose
+mechanics it has never seen. It tries the innocuous action, touches the
+spike exactly once, tags it preventive, never touches it again, discovers
+that the transfer control raises the level, and wins within budget - with a
+glass-box trace of every step. A guarded HTTP bridge speaks the same
+environment shape to the live ARC-AGI-3 REST API; the benchmark itself
+remains, as the source document insists, a labeled and falsifiable bet.
+
+All 44 acceptance tests pass across the six packs, including the
+specification's cross-layer query: an object that bears a realizable that
+is realized in a process that participates in a causal relation, traversed
+from noun to hinge to verb to predicted effect in one glass-box query.
