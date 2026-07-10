@@ -2157,3 +2157,20 @@ ARC-AGI-3 Protocol: The Exact March-2026 Agents-API Vocabulary (co_*, Layer 375)
     cap_available_actions(-Actions): the canonical action superset.
     cap_action_payload(+ActionTerm,+GameId,-Dict): the JSON body an action posts (select carries x,y).
     cap_env(+BaseUrl,+ApiKey,+GameId,-Env): a guarded arc3_env speaking the live protocol, ready for co_arc3_play.
+
+co_hsteps
+ARC-AGI-3 Human-Step Ladder in J-Space: Six Phases, Thirty Micro-Steps (co_*, Layer 376)
+    hs_phase(?PhaseId,?Name): the six phases (orient, explore, goal, plan, execute, transfer).
+    hs_step(?StepId,?PhaseId,?Description): the thirty human micro-steps and their phase.
+    hs_ladder(-StepIds): all thirty step ids in canonical order.
+    hs_phase_of(+StepId,-PhaseId): the phase a step belongs to.
+    hs_phase_capability(?PhaseId,?Capability): the suite pack each phase draws on.
+    hs_reset(+Space): open a J-Space workspace at the first step.
+    hs_enter(+Space,+StepId): hold a step as the active concept, decaying earlier ones.
+    hs_current(+Space,-StepId): the step currently held strongest.
+    hs_advance(+Space,-StepId): move to the next step in the ladder and hold it.
+    hs_reading(+Space,-Reading): the J-Lens readout of the workspace.
+    hs_sensitivity(+Transitions,-Sensitivity): how many cells each action changed.
+    hs_controllable(+Transitions,-Colour): the object the agent controls (most-moved centroid).
+    hs_jacobian(+Transitions,+Colour,-Jacobian): the controllable's displacement per action (jac(Action,DR,DC)).
+    hs_goal_gradient(+Jacobian,+FromCell,+GoalCell,-RankedActions): actions ranked by progress toward the goal cell.
