@@ -96,6 +96,7 @@ Everything is inspectable.
 
 | Pack | What it Does |
 |---|---|
+| `nexus` | AGI Foundations Integration Layer: the capstone that wires four foundations into the cognitive core — workspace broadcasts hold their winning coalition's concepts in a live J-Space readout, world-model novelty feeds the curiosity learning-progress signal, the agency loop decomposes goals with the planner and recovers by monitoring and replanning, and evolution improves reasoning models scored by refinery critique under a bounded budget. Pure plumbing, respecting the strictly acyclic layer order (nx_*, Layer 365) (WP-390) |
 | `causal` | Structural Causal Models: acyclic model construction, causal graph queries with d-separation (chains, forks, colliders), observational solving, do-operator interventions by graph surgery, abduction-action-prediction counterfactuals, and the but-for test of actual causation (cf_*, Layer 358) (WP-383) |
 | `actinf` | Active Inference Engine: validated generative models, Bayesian belief updating, variational free energy with the complexity-accuracy split, expected free energy as risk plus ambiguity, epistemic and pragmatic value, and softmax policy selection — curiosity and goal-seeking from one equation (ai_*, Layer 359) (WP-384) |
 | `worldmodel` | Structured World Model: canonical fluent states, parameterized STRIPS actions, forward simulation, rollout, breadth-first shortest-plan search, conservative action-model learning from observed transitions, and novelty scoring for curiosity (wm_*, Layer 360) (WP-385) |
@@ -103,7 +104,6 @@ Everything is inspectable.
 | `evolve` | Evolutionary Computation: fully reproducible seeded randomness, random populations, fitness evaluation, tournament selection, one-point crossover, point mutation, elitism, fixed and early-stopping generational runs, diversity, and convergence detection (ev_*, Layer 362) (WP-387) |
 | `jspace` | Concept Workspace (J-Space): a readable, editable ledger of the concepts held in mind with strengths and sources, the ranked J-Lens readout, silent-thought detection, implant / ablate / swap / decay / capacity editing, and concept-level derivation traces (js_*, Layer 363) (WP-388) |
 | `tom` | Theory of Mind: nested per-agent beliefs, witnessed events with mutual knowledge, knowledge as true belief, false-belief detection that passes Sally-Anne including the second-order question, belief divergence, common belief, perspective taking, and desire-intention stores (tm_*, Layer 364) (WP-389) |
-| `nexus` | AGI Foundations Integration Layer: the capstone that wires four foundations into the cognitive core — workspace broadcasts hold their winning coalition's concepts in a live J-Space readout, world-model novelty feeds the curiosity learning-progress signal, the agency loop decomposes goals with the planner and recovers by monitoring and replanning, and evolution improves reasoning models scored by refinery critique under a bounded budget. Pure plumbing, respecting the strictly acyclic layer order (nx_*, Layer 365) (WP-390) |
 
 **Core Platform**
 
