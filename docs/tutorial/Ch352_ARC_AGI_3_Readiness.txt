@@ -1,0 +1,97 @@
+Chapter 352: The ARC-AGI-3 Readiness Suite - The co_explore, co_goalinfer, co_effic, and co_arc3proto Packs (co_*, Layers 372-375)
+
+The co_arc3 harness of Chapter 351 closes the perceive-learn-plan-act loop
+against an interactive environment. That is the skeleton of an ARC-AGI-3
+agent, but the benchmark asks for four things the bare loop leaves to the
+caller: explore an unknown world efficiently, work out what winning means
+when no one says, spend actions frugally, and speak the live protocol
+exactly. This suite is those four things, one pack each.
+
+WHY A LOOP IS NOT YET AN AGENT
+
+ARC-AGI-3 drops an agent into a turn-based grid world of up to sixty-four by
+sixty-four cells in sixteen colours, with no instructions, no rules, and no
+stated goal. Frontier language models score under one percent; humans solve
+every environment. The two strongest agents in the developer preview did not
+win by reasoning harder in the abstract - they won by exploring well. One
+learned to predict which actions change the frame and stopped wasting turns
+on dead ones. The other built a graph of the states it had seen and pruned
+actions that only led back into loops. Both discoveries are behaviours, not
+insights, and behaviours can be packaged.
+
+EXPLORING WITHOUT INSTRUCTIONS
+
+The co_explore pack is the exploration policy. It remembers each state it has
+seen by a canonical, order-free signature - the grid's dimensions and its
+colour histogram - so that a state it is about to re-enter is recognised as a
+loop rather than mistaken for progress. It ranks the environment's available
+actions best-first: an action the learned causal graph predicts will change
+the world is always preferred to one predicted to do nothing, and among
+equals the least-tried action wins, which is curiosity by another name. A
+learned hazard is never chosen at all.
+
+One action needs special care. ARC-AGI-3's complex action, ACTION6, is a
+click at some cell of the grid - up to four thousand and ninety-six
+possibilities if enumerated blindly. co_explore does not enumerate them. It
+perceives the objects in the frame and offers only their centroids as click
+targets, so the click space shrinks from thousands of cells to a handful of
+salient ones. The bare click marker in an action list is expanded to exactly
+those concrete select(X, Y) actions, with x the column and y the row, as the
+protocol expects.
+
+INFERRING THE UNSTATED GOAL
+
+The co_goalinfer pack works out what winning looks like. The environment
+never says; it only reports, after each action, whether the state is
+NOT_FINISHED, WIN, or GAME_OVER. So the pack watches the frame changes - the
+deltas - that immediately precede a win, and accumulates support for the
+features they share. A win most often means a cell became some particular
+colour, so the pack tallies the new colours each winning delta introduced;
+across several wins the true target reinforces while incidental changes
+average out. A colour that also shows up before a loss is discounted, so a
+feature common to both winning and losing is not mistaken for the goal. The
+result is offered two ways: as the abstract reach_colour(Colour) and as the
+changed(_, _, _, Colour) occurrent that co_arc3_goal_set can register and
+co_plan can aim at, together with a confidence reading of how strongly the
+leading hypothesis dominates.
+
+SPENDING ACTIONS FRUGALLY
+
+The co_effic pack is the efficiency governor, because ARC-AGI-3 does not only
+ask whether an agent wins a level but how efficiently. A level's score
+compares the agent's action count against a human baseline - the second-best
+human's number of actions - and the benchmark caps spending at five times
+that baseline so brute force cannot buy a win. The pack counts actions per
+level, holds the baseline, turns it into the budget, reports whether the
+agent is still within it, and computes the scores the benchmark uses: the
+per-level score is the square of the human-to-agent ratio capped at one, so
+matching the human scores one and doubling the human's actions scores a
+quarter; the environment score is the weighted mean of its level scores with
+early levels weighted least; and the total is the mean of environment scores
+as a percentage. An agent that ignores all this can complete every level and
+still score near zero.
+
+SPEAKING THE PROTOCOL EXACTLY
+
+The co_arc3proto pack pins down the live protocol. The co_arc3 bridge is kept
+deliberately loose because the API routes drift between releases; this pack
+holds the March-2026 vocabulary as inspectable facts, so speaking the current
+protocol is precise and a later drift is a one-file change. The five simple
+actions map to ACTION1 through ACTION5, the cell-select maps to ACTION6 with
+its x and y, undo maps to ACTION7, and reset maps to RESET, each issued to
+/api/cmd/COMMAND; the scorecard opens and closes at its own routes. A frame
+is validated for shape and colour - within sixty-four cells each way, colours
+zero to fifteen - and a reply's state is read as one of the four values, with
+WIN and GAME_OVER terminal and WIN the win. Finally, cap_env packages all of
+this as the arc3_env quadruple co_arc3_play consumes, with every network call
+guarded so no test depends on the wire.
+
+THE SUITE AS A WHOLE
+
+Perceive with grid, explore with co_explore, model with co_core, infer the
+goal with co_goalinfer, plan with co_plan under the budget of co_effic, and
+act through the exact vocabulary of co_arc3proto - all orchestrated by the
+co_arc3 loop. Twenty-seven acceptance tests pass across the four packs, and
+they load cleanly alongside the whole Causalontology suite. The benchmark
+result itself remains, as always, a labelled and falsifiable bet, to be
+reported only once measured.
