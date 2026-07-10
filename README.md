@@ -92,9 +92,22 @@ Nothing is hidden.
 
 Everything is inspectable.
 
+**Artificial General Intelligence (AGI) Packs**
+
+| Pack | What it Does |
+|---|---|
+| `causal` | Structural Causal Models: acyclic model construction, causal graph queries with d-separation (chains, forks, colliders), observational solving, do-operator interventions by graph surgery, abduction-action-prediction counterfactuals, and the but-for test of actual causation (cf_*, Layer 358) (WP-383) |
+| `actinf` | Active Inference Engine: validated generative models, Bayesian belief updating, variational free energy with the complexity-accuracy split, expected free energy as risk plus ambiguity, epistemic and pragmatic value, and softmax policy selection — curiosity and goal-seeking from one equation (ai_*, Layer 359) (WP-384) |
+| `worldmodel` | Structured World Model: canonical fluent states, parameterized STRIPS actions, forward simulation, rollout, breadth-first shortest-plan search, conservative action-model learning from observed transitions, and novelty scoring for curiosity (wm_*, Layer 360) (WP-385) |
+| `planner` | Hierarchical Planner: HTN task decomposition with ordered method preference and depth-bounded termination, glass-box plan trees naming every chosen method, plan execution, validity, cost, monitoring with the exact failing step, and replanning (ht_*, Layer 361) (WP-386) |
+| `evolve` | Evolutionary Computation: fully reproducible seeded randomness, random populations, fitness evaluation, tournament selection, one-point crossover, point mutation, elitism, fixed and early-stopping generational runs, diversity, and convergence detection (ev_*, Layer 362) (WP-387) |
+| `jspace` | Concept Workspace (J-Space): a readable, editable ledger of the concepts held in mind with strengths and sources, the ranked J-Lens readout, silent-thought detection, implant / ablate / swap / decay / capacity editing, and concept-level derivation traces (js_*, Layer 363) (WP-388) |
+| `tom` | Theory of Mind: nested per-agent beliefs, witnessed events with mutual knowledge, knowledge as true belief, false-belief detection that passes Sally-Anne including the second-order question, belief divergence, common belief, perspective taking, and desire-intention stores (tm_*, Layer 364) (WP-389) |
+| `nexus` | AGI Foundations Integration Layer: the capstone that wires four foundations into the cognitive core — workspace broadcasts hold their winning coalition's concepts in a live J-Space readout, world-model novelty feeds the curiosity learning-progress signal, the agency loop decomposes goals with the planner and recovers by monitoring and replanning, and evolution improves reasoning models scored by refinery critique under a bounded budget. Pure plumbing, respecting the strictly acyclic layer order (nx_*, Layer 365) (WP-390) |
+
 **Core Platform**
 
-| Pack | What it does |
+| Pack | What it Does |
 |---|---|
 | `kernel` | The minimal kernel — lattice-resident rewrite rules and a kernel interpreter with full trace. The lowest layer of the cognitive stack. |
 | `lattice` | The Persistent Shared Memory Network — the unified knowledge store that every other pack reads and writes. |
@@ -104,7 +117,7 @@ Everything is inspectable.
 
 **Perception and Attention**
 
-| Pack | What it does |
+| Pack | What it Does |
 |---|---|
 | `perception` | The Perceptual Detector Suite — specialist detectors, a locator, and a mapper that convert raw percepts into Lattice facts. |
 | `attention` | The Attention Economy (ECAN — Economic Attention Networks — Adaptation) — STI (Short-Term Importance) / LTI (Long-Term Importance) wages, rent, spreading activation, and economic forgetting. Salience is a first-class citizen. |
@@ -113,7 +126,7 @@ Everything is inspectable.
 
 **Memory and Knowledge**
 
-| Pack | What it does |
+| Pack | What it Does |
 |---|---|
 | `beliefs` | Belief Structures and Propagators — per-node_fact scorecards with incremental local propagation. Every belief has a strength and a source. |
 | `frames` | Reference Frames and Voting Consensus — the Thousand Brains pattern applied to symbolic cognition. Multiple reference frames vote on every percept. |
@@ -124,7 +137,7 @@ Everything is inspectable.
 
 **Reasoning Engine**
 
-| Pack | What it does |
+| Pack | What it Does |
 |---|---|
 | `probabilistic` | Distribution Semantics Probabilistic Layer — ProbLog-style exact and sampled inference. Probabilities are first-class reasoning objects. |
 | `defeasible` | Justified Defeasible Reasoning — defaults with exceptions and readable justification trees. "Normally true, unless..." is a formal operation. |
@@ -135,7 +148,7 @@ Everything is inspectable.
 
 **Affect, Motivation, and Metacognition**
 
-| Pack | What it does |
+| Pack | What it Does |
 |---|---|
 | `motivation` | Motivational Modulation (Psi model) — a global modulator bus, affect regions, and named motives. Goals are grounded in drives, not just programmed. |
 | `appraisal` | Staged Appraisal and Coping (EMA model) — causal interpretation, appraisal variables, and coping selection. PrologAI evaluates events emotionally before deciding how to respond. |
@@ -148,7 +161,7 @@ Everything is inspectable.
 
 **Language and Embodiment**
 
-| Pack | What it does |
+| Pack | What it Does |
 |---|---|
 | `language` | Time-Linear Language — database semantics with word_traces, hear, think_path, and speak. Language is grounded in time and memory, not in statistical patterns. |
 | `mindbody` | The Mind-Body Interface — herald protocol, body enrollment, percept relay, and command dispatch. Any body (game, robot, screen) attaches here. |
@@ -157,7 +170,7 @@ Everything is inspectable.
 
 **Learning and Self-Programming**
 
-| Pack | What it does |
+| Pack | What it Does |
 |---|---|
 | `synthesis` | The Self-Programming Seed — model synthesis, scoring, composition, and lifecycle management. PrologAI can write and evaluate new reasoning models. |
 | `spinoff` | Marginal Attribution Spinoff Learning — Drescher-style discovery of rare-but-reliable action effects. PrologAI finds causal patterns hidden in low-frequency events. |
@@ -167,7 +180,7 @@ Everything is inspectable.
 
 **Multi-Agent Protocols**
 
-| Pack | What it does |
+| Pack | What it Does |
 |---|---|
 | `mcp_gateway` | MCP (Model Context Protocol) Gateway — a compliant HTTP server exposing PrologAI's full capability to the AI agent ecosystem. |
 | `a2a` | Agent-to-Agent (A2A) Interoperability — the A2A protocol and durable agent mail. PrologAI agents communicate reliably with any A2A-compliant peer. |
@@ -176,7 +189,7 @@ Everything is inspectable.
 
 **Data Layer**
 
-| Pack | What it does |
+| Pack | What it Does |
 |---|---|
 | `vector_backend` | The Vector Backend |
 | `vsa` | Compositional Vector Binding (VSA — Vector Symbolic Architecture) |
@@ -356,14 +369,6 @@ Everything is inspectable.
 | `taskcat` | Task Type Classification: Categorize, Is Single Rule, Is Multi-Step, Has Context Gate, Has Symbol Table, Suggest Strategies, Preserves Dims, Preserves Colors, Consistent Change Count, Max Change Count, Distinct Change Patterns, Is Fill Task, Is Deletion Task, Confidence (tc_*, Layer 252) (PR 362) |
 | `periodfix` | Periodic Pattern Repair: List and Grid Period Detection, Majority-Vote Tile Construction, Violation Finding, Full and Single-Corruption Repair, and Best-Period Search (ppf_*, Layer 253) (PR 366) |
 | `iochan` | I/O Channel Integration: Speaker output (espeak-ng / festival TTS), microphone input (arecord + whisper-cli STT), text channels (console / email / screen / app), image channels (console / email / screen / app / webcam / URL), and printer output (CUPS lp) (ic_*, Layer 254) (WP-279) |
-| `causal` | Structural Causal Models: acyclic model construction, causal graph queries with d-separation (chains, forks, colliders), observational solving, do-operator interventions by graph surgery, abduction-action-prediction counterfactuals, and the but-for test of actual causation (cf_*, Layer 358) (WP-383) |
-| `actinf` | Active Inference Engine: validated generative models, Bayesian belief updating, variational free energy with the complexity-accuracy split, expected free energy as risk plus ambiguity, epistemic and pragmatic value, and softmax policy selection — curiosity and goal-seeking from one equation (ai_*, Layer 359) (WP-384) |
-| `worldmodel` | Structured World Model: canonical fluent states, parameterized STRIPS actions, forward simulation, rollout, breadth-first shortest-plan search, conservative action-model learning from observed transitions, and novelty scoring for curiosity (wm_*, Layer 360) (WP-385) |
-| `planner` | Hierarchical Planner: HTN task decomposition with ordered method preference and depth-bounded termination, glass-box plan trees naming every chosen method, plan execution, validity, cost, monitoring with the exact failing step, and replanning (ht_*, Layer 361) (WP-386) |
-| `evolve` | Evolutionary Computation: fully reproducible seeded randomness, random populations, fitness evaluation, tournament selection, one-point crossover, point mutation, elitism, fixed and early-stopping generational runs, diversity, and convergence detection (ev_*, Layer 362) (WP-387) |
-| `jspace` | Concept Workspace (J-Space): a readable, editable ledger of the concepts held in mind with strengths and sources, the ranked J-Lens readout, silent-thought detection, implant / ablate / swap / decay / capacity editing, and concept-level derivation traces (js_*, Layer 363) (WP-388) |
-| `tom` | Theory of Mind: nested per-agent beliefs, witnessed events with mutual knowledge, knowledge as true belief, false-belief detection that passes Sally-Anne including the second-order question, belief divergence, common belief, perspective taking, and desire-intention stores (tm_*, Layer 364) (WP-389) |
-| `nexus` | AGI Foundations Integration Layer: the capstone that wires four foundations into the cognitive core — workspace broadcasts hold their winning coalition's concepts in a live J-Space readout, world-model novelty feeds the curiosity learning-progress signal, the agency loop decomposes goals with the planner and recovers by monitoring and replanning, and evolution improves reasoning models scored by refinery critique under a bounded budget. Pure plumbing, respecting the strictly acyclic layer order (nx_*, Layer 365) (WP-390) |
 | `seqinfer` (enhanced) | Sequential Rule Inference + ARC-AGI-2 Candidates: sq_arc2_candidates/1 adds 66-entry integer-color candidate list for multi-step search (sq_*, Layer 195) (WP-274, PR 363) |
 | `hyp` (enhanced) | Hypothesis Generation + Spatial/Structural/Sequence: hy_spatial_hyp/3, hy_structural_hyp/3, hy_sequence_hyp/4 extend hypothesis search to grid-level shifts, structural patterns, and two-step color maps (hy_*, Layer 74) (WP-275, PR 363) |
 | `condxf` (enhanced) | Conditional Scene Transform + Gate Inference: xc_infer_gate/3 infers the gate_color that separates training pairs by change signature (xc_*, Layer 187) (WP-276, PR 363) |
@@ -420,7 +425,7 @@ Everything is inspectable.
 
 **Platform Utilities**
 
-| Pack | What it does |
+| Pack | What it Does |
 |---|---|
 | `tooling` | Tool Use Pattern — tool registry, discovery, selection, gated invocation, and reliability learning. Every external tool is a first-class reasoning object. |
 | `libraries` | Utility Libraries — similarity, types, collections, generators, tasks, problems, config, peers, macros, and convenience predicates. The shared foundation everything else builds on. |
