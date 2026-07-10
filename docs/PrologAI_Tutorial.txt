@@ -1386,6 +1386,8 @@ WP 391-396 - the Causalontology suite: co_noun, co_hinge, co_core, co_learn, co_
 
 WP 397-400 - the ARC-AGI-3 Readiness suite: co_explore, co_goalinfer, co_effic, co_arc3proto (co_*, Layers 372-375). Four packs that carry the Causalontology harness the last mile to the interactive benchmark: a novelty-seeking, loop-avoiding exploration policy that prefers actions predicted to change the world and turns the ACTION6 cell-select into a few object-centroid clicks; inference of the unstated win condition from the frame changes that precede a win; a human-baseline efficiency governor that budgets actions and computes the benchmark's RHAE-style scores; and the exact March-2026 ARC-AGI-3 protocol vocabulary with a guarded environment adapter. Chapter 352 covers this suite.
 
+WP 401 - co_hsteps, the ARC-AGI-3 Human-Step Ladder in J-Space (co_*, Layer 376). The six-phase, thirty-micro-step process a human follows in an interactive game with no instructions - orient, explore and model, infer the goal, plan, execute and monitor, transfer - encoded as ordered facts and held step-by-step as concepts in the Jacobian Space workspace (the jspace pack) so the Jacobian Lens reads out which human step the agent is on. It also makes the probe phase concrete with a discrete action-response Jacobian that names the controllable object, gives its per-action displacement, and ranks actions along the goal gradient. Chapter 353 covers this pack.
+
 Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 16).
 
 
@@ -26646,3 +26648,78 @@ co_arc3 loop. Twenty-seven acceptance tests pass across the four packs, and
 they load cleanly alongside the whole Causalontology suite. The benchmark
 result itself remains, as always, a labelled and falsifiable bet, to be
 reported only once measured.
+
+
+Chapter 353: The ARC-AGI-3 Human-Step Ladder in J-Space - The co_hsteps Pack (co_*, Layer 376)
+
+The Readiness suite of Chapter 352 gives an agent the four capabilities the
+ARC-AGI-3 benchmark rewards. This chapter is about the order a human puts them
+in. A person dropped into one of these games with no instructions does not
+flail; they follow a recognisable process, and co_hsteps encodes that process
+and holds it, step by step, in the Jacobian Space workspace.
+
+WHAT THE HUMAN STUDY FOUND
+
+The ARC Prize human study was the most exhaustive in the series: 458 people, in
+person, ninety-minute sessions, each environment seen once with a single
+attempt so that what was measured was learning a novel problem, not repeating a
+solved one. The finding that matters here is the shape of play. A player spends
+actions in two ways - exploration, to learn the mechanics and the goal, and
+execution, to reach it - and good players explore briefly, then execute. The
+whole arc, expanded, is six phases and thirty micro-steps: orient to the frame,
+probe the controls and build a model, infer the unstated goal, plan an
+efficient route, execute while monitoring, and carry what was learned into the
+next level.
+
+THE LADDER AS DATA
+
+co_hsteps encodes all of that as ordered facts. hs_phase names the six phases;
+hs_step gives each of the thirty micro-steps its text and its phase; hs_ladder
+lists them in canonical order; and hs_phase_capability records which pack each
+phase leans on - orientation on perception, exploration on co_explore, goal
+inference on co_goalinfer, planning on co_plan, execution on co_effic, and
+transfer on the causal core. The ladder is a first-class object the agent can
+read, not a comment buried in a loop.
+
+HOLDING THE STEP IN J-SPACE
+
+The point of the pack is not just to list the steps but to know which one the
+agent is on, and to make that knowable from outside. The jspace pack of the
+AGI Foundations suite is the Jacobian Space (J-Space): a small, readable
+workspace of the concepts a mind is currently holding, each with a strength,
+read through the Jacobian Lens (J-Lens). co_hsteps holds the current human step
+there. hs_reset opens the workspace at the first step; hs_enter fades the
+earlier steps and holds the new one at full strength; hs_current reads the
+strongest held step back; hs_advance walks to the next; and hs_reading is the
+J-Lens readout of the whole process so far. As the agent plays, the workspace
+becomes a running, inspectable account of the human process it is executing -
+glass-box by construction.
+
+THE JACOBIAN MADE CONCRETE
+
+The second phase of the human ladder - probe the controls, see what you move -
+has an exact mathematical shape, and co_hsteps supplies it. Given the
+transitions observed by trying each action from the same starting state, the
+pack assembles the discrete action-response Jacobian. hs_sensitivity reports
+how many cells each action changed, which separates live actions from dead
+ones. hs_controllable names the object the agent controls: the non-background
+colour whose centre of mass moves the most across the actions - the formal
+version of a human noticing which thing on the screen answers to the controls.
+hs_jacobian is then the column of partial derivatives of that object's
+position with respect to each action, one jac(Action, DR, DC) entry per action.
+And hs_goal_gradient ranks the actions by how much each moves the controllable
+toward a goal cell - the discrete gradient the execution phase simply descends.
+
+THE SUITE IN HUMAN ORDER
+
+So the packs of Chapters 351 and 352 supply the capabilities, and co_hsteps
+supplies the sequence: orient with perception, probe to build the Jacobian and
+find what you control, infer the goal from the changes that precede a win, plan
+down the goal gradient under the efficiency budget, execute while monitoring,
+and transfer the learned relations to the next level - with the current step
+visible in J-Space at every moment. Eight acceptance tests pass, and the pack
+loads cleanly beside the whole Causalontology and Readiness suites. On the
+Mentova side a solo controller walks this ladder over a navigation game,
+keeping the process live in the J-Lens as it plays, and the companion dossier
+docs/ARC-AGI-3_Human_Steps_v1.txt records the full ladder in the J-Space
+framing.
