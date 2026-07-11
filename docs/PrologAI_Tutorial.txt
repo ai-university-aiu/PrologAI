@@ -1388,6 +1388,8 @@ WP 397-400 - the ARC-AGI-3 Readiness suite: co_explore, co_goalinfer, co_effic, 
 
 WP 401 - co_hsteps, the ARC-AGI-3 Human-Step Ladder in J-Space (co_*, Layer 376). The six-phase, thirty-micro-step process a human follows in an interactive game with no instructions - orient, explore and model, infer the goal, plan, execute and monitor, transfer - encoded as ordered facts and held step-by-step as concepts in the Jacobian Space workspace (the jspace pack) so the Jacobian Lens reads out which human step the agent is on. It also makes the probe phase concrete with a discrete action-response Jacobian that names the controllable object, gives its per-action displacement, and ranks actions along the goal gradient. Chapter 353 covers this pack.
 
+WP 402 - co_graph, Causalontology State-Graph Exploration (co_*, Layer 377). The systematic, graph-structured exploration that beat every frontier language model on ARC-AGI-3 - third on the public leaderboard, a median thirty levels against five for the language-plus-DSL baseline. It builds a directed graph whose nodes are frame hashes and whose edges are observed state-to-action-to-next-state transitions, marks each tried state-action pair tested and each no-change action dead, and chooses by the winning hierarchical rule: probe an untested non-dead action in the current state, otherwise take the first step on the shortest path to the nearest state that still has an untested action. The graph persists across attempts, giving the carry-forward the benchmark rewards. Chapter 354 covers this pack.
+
 Each of these is covered further in the Advanced Topics chapters (Chapters 9 through 16).
 
 
@@ -26723,3 +26725,71 @@ Mentova side a solo controller walks this ladder over a navigation game,
 keeping the process live in the J-Lens as it plays, and the companion dossier
 docs/ARC-AGI-3_Human_Steps_v1.txt records the full ladder in the J-Space
 framing.
+
+
+Chapter 354: Causalontology State-Graph Exploration - The co_graph Pack (co_*, Layer 377)
+
+The ARC-AGI-3 Readiness suite of Chapter 352 gave the agent an exploration
+policy that prefers actions likely to change the world and avoids returning to
+a state it has already seen. Chapter 354 adds the technique that, in practice,
+beat every frontier language model on the benchmark: not a bigger model, but a
+directed graph of where the agent has been and where it has not.
+
+WHY A GRAPH WINS
+
+When the ARC Prize ran its developer preview and its first milestone, the
+agents that scored were not the language-model policies - those scored under one
+percent. The agent that placed third on the public leaderboard, and the
+strongest preview entries, all did the same simple thing: they kept a directed
+graph of the states they had seen and the actions they had tried, and always
+moved toward the nearest place they had not fully explored. That one agent
+solved a median of thirty levels across six games where the language-plus-a-
+domain-specific-language baseline solved five. The lesson is that in a sparse-
+feedback world with no instructions, systematic coverage beats clever guessing.
+
+THE GRAPH
+
+co_graph builds exactly that. A node is a frame hash - a canonical identifier of
+the exact grid, so an object in a new position is a new node, which is what lets
+the agent tell states apart. An edge is an observed transition: from this state,
+this action led to that state. cg_note records one transition and, in the same
+step, marks the action tested from the state it was taken in, and marks it dead
+if the state did not change - a dead action is one that wastes a turn, and it is
+never offered again.
+
+THE WINNING RULE
+
+Action selection is the hierarchical rule the winning agents used, and it is
+three lines:
+
+    cg_choose(Sig, Actions, Action) :-
+        ( cg_untested(Sig, Actions, A)        -> Action = A
+        ; cg_toward_frontier(Sig, Actions, A) -> Action = A
+        ; fail ).
+
+First, if the current state has an untested, non-dead action, take it - probe
+here, in the caller's order, so salient clicks come first. Otherwise, breadth-
+first over the known graph, find the nearest reachable state that still has an
+untested action, and take the first step of the shortest path toward it - go to
+the frontier. If nothing reachable is left to explore, fail, and the caller
+falls back to its own last resort. The breadth-first search returns the first
+action of the shortest path, so the agent never wanders: it heads straight for
+the edge of the map.
+
+CARRY-FORWARD
+
+The graph is not cleared between attempts of the same game. A later run inherits
+every state and transition the earlier run mapped, so the agent resumes at the
+frontier instead of re-treading known ground - the carry-forward across levels
+that the benchmark explicitly rewards, achieved for free by keeping the graph.
+
+THE PLACE OF THE PACK
+
+co_explore ranks single actions by novelty and predicted change; co_graph is the
+memory and the map that turns those local preferences into global coverage. In
+Mentova, the live solo player consults co_graph first - probe an untested action
+or head to the frontier - and only falls back to least-tried curiosity when the
+graph says the reachable space is exhausted. Six acceptance tests pass, and the
+pack has no dependencies, so it drops into any interactive-environment agent.
+The benchmark result itself remains, as always, a labelled and falsifiable bet,
+to be reported only once measured.

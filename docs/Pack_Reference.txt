@@ -2174,3 +2174,16 @@ ARC-AGI-3 Human-Step Ladder in J-Space: Six Phases, Thirty Micro-Steps (co_*, La
     hs_controllable(+Transitions,-Colour): the object the agent controls (most-moved centroid).
     hs_jacobian(+Transitions,+Colour,-Jacobian): the controllable's displacement per action (jac(Action,DR,DC)).
     hs_goal_gradient(+Jacobian,+FromCell,+GoalCell,-RankedActions): actions ranked by progress toward the goal cell.
+
+co_graph
+Causalontology State-Graph Exploration: The Winning ARC-AGI-3 Technique (co_*, Layer 377)
+    cg_reset/0: forget the whole exploration graph.
+    cg_signature(+Frame,-Signature): a canonical id of a frame (exact grid distinguishes states).
+    cg_note(+FromSig,+Action,+ToSig): record a transition; mark it tested, and dead when the state did not change.
+    cg_node(?Sig) / cg_edge(?From,?Action,?To): query the known states and transitions.
+    cg_tested(?Sig,?Action) / cg_dead(?Sig,?Action): query the tried and the no-change pairs.
+    cg_untested(+Sig,+Actions,-Action): the first untested, non-dead action in a state (caller's order is the priority).
+    cg_has_untested(+Sig,+Actions): the state still has an untested action.
+    cg_toward_frontier(+Sig,+Actions,-FirstAction): the first step on the shortest path to the nearest unexplored state.
+    cg_choose(+Sig,+Actions,-Action): the winning hierarchical rule — probe untested here, else head to the frontier.
+    cg_stats(-stats(Nodes,Edges,Tested,Dead)): a summary of the graph's size.
