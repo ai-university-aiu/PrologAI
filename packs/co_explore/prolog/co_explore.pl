@@ -34,6 +34,16 @@
       cox_expand_actions/3   -- +Actions, +Frame, -Expanded (clicks made concrete)
       cox_rank/4             -- +Actions, +Tried, +Frame, -Ranked (best first)
       cox_choose/4           -- +Actions, +Tried, +Frame, -Action (the best one)
+
+    A caller that plays many ARC-AGI-3 environments keeps each environment's
+    learned causal graph and avoid-set under its own game id, as g(Game, Action).
+    The game-scoped variants below read exactly that game's learnings:
+
+      cox_predict_change/2   -- +Game, +Action  (this game predicts a change)
+      cox_rank/5             -- +Game, +Actions, +Tried, +Frame, -Ranked
+      cox_choose/5           -- +Game, +Actions, +Tried, +Frame, -Action
+      cox_choose_change/5    -- +Game, +Actions, +Tried, +Frame, -Action
+                                (best predicted-change action, or fail if none)
 */
 
 % Declare this module and list every exported predicate with its correct arity.
@@ -61,7 +71,15 @@
     % cox_rank/4: order the available actions best-first.
     cox_rank/4,
     % cox_choose/4: the single best action to try next.
-    cox_choose/4
+    cox_choose/4,
+    % cox_predict_change/2: a game-keyed action is predicted to change the world.
+    cox_predict_change/2,
+    % cox_rank/5: order one game's actions best-first (game-keyed causal graph).
+    cox_rank/5,
+    % cox_choose/5: the single best action to try next for one game.
+    cox_choose/5,
+    % cox_choose_change/5: the best predicted-change action, or fail if none.
+    cox_choose_change/5
 ]).
 
 % Import the verb layer's forward predictor to tell live actions from dead ones.
@@ -144,17 +162,30 @@ cox_predict_change(Action) :-
 % Salient click targets for the ACTION6 cell-select action
 % ---------------------------------------------------------------------------
 
-% Define cox_salient_cells: the click-worthy cells of a frame.
+% Define cox_salient_cells: the click-worthy cells of a frame, largest object
+% first. The strongest ARC-AGI-3 agents try the biggest, most button-like
+% candidates before small ones, so the click budget is spent where an
+% interactive control is most likely to be; ordering by object size is a simple,
+% robust proxy for that salience.
 cox_salient_cells(Frame, Cells) :-
     % Treat colour zero as the background; every other object is a target.
     gob_all_objects(Frame, 0, Objects),
-    % The centroid of each object is one salient cell.
-    findall(cell(R, C),
+    % Pair each object's centroid with its size, negated so a keysort puts the
+    % largest object first.
+    findall(NegSize - cell(R, C),
         % Take each detected object with its member cells.
         ( member(ob(_Colour, ObjCells, _BBox), Objects),
+          % Its size in cells.
+          length(ObjCells, Size),
+          % Negated for descending order.
+          NegSize is -Size,
           % Reduce the object's cells to their integer centroid.
           cox_centroid(ObjCells, R, C) ),
-        Cells).
+        Keyed),
+    % Order by descending object size (largest, most salient candidate first).
+    keysort(Keyed, Sorted),
+    % Keep just the ordered centroid cells.
+    findall(cell(R, C), member(_ - cell(R, C), Sorted), Cells).
 
 % cox_centroid(+Cells, -R, -C): the rounded centroid of a cell list.
 cox_centroid(Cells, R, C) :-
@@ -235,6 +266,76 @@ cox_tries_of(Action, Tried, Count) :-
 cox_choose(Actions, Tried, Frame, Action) :-
     % Rank the actions.
     cox_rank(Actions, Tried, Frame, [Action | _]).
+
+% ---------------------------------------------------------------------------
+% Game-scoped policy — the same ranking, but for a caller that keys its learned
+% causal relations and hazards by a game id, as g(Game, Action). ARC-AGI-3
+% environments differ from one another, so an agent that plays many of them
+% keeps each environment's learnings under its own game id; these predicates let
+% the exploration policy read exactly that environment's causal graph and
+% avoid-set while never confusing it with another's.
+% ---------------------------------------------------------------------------
+
+% Define cox_predict_change/2: the game's causal graph predicts the action has
+% an effect (its cause is keyed to this game, as g(Game, Action)).
+cox_predict_change(Game, Action) :-
+    % Ask the verb layer to forward-predict the game-keyed action's effects.
+    co_predict(g(Game, Action), Effects),
+    % A live action is one predicted to produce at least one effect.
+    Effects \== [].
+
+% cox_change_rank(+Game, +Action, -Rank): 0 when predicted to change, else 1.
+cox_change_rank(Game, Action, Rank) :-
+    % A predicted-change action ranks 0 (first); a dead one ranks 1.
+    ( cox_predict_change(Game, Action) -> Rank = 0 ; Rank = 1 ).
+
+% Define cox_rank/5: order a game's available actions best-first, reading that
+% game's causal graph and avoid-set. Clicks are made concrete first.
+cox_rank(Game, Actions, Tried, Frame, Ranked) :-
+    % Make the click marker concrete before ranking.
+    cox_expand_actions(Actions, Frame, Concrete),
+    % Score each permissible action by (change-rank, tries).
+    findall(key(ChangeRank, Count)-Action,
+        % Take each concrete action.
+        ( member(Action, Concrete),
+          % Never rank a hazard this game has learned to avoid.
+          \+ co_avoid(g(Game, Action)),
+          % Rank predicted-change actions ahead of dead ones.
+          cox_change_rank(Game, Action, ChangeRank),
+          % Look up how many times the action has been tried.
+          cox_tries_of(Action, Tried, Count) ),
+        Scored),
+    % Order by the composite key: live-and-least-tried first.
+    keysort(Scored, Sorted),
+    % Drop the keys, keeping just the ordered actions.
+    findall(A, member(_-A, Sorted), Ranked).
+
+% Define cox_choose/5: the single best action to try next for this game.
+cox_choose(Game, Actions, Tried, Frame, Action) :-
+    % Rank this game's actions and take the head.
+    cox_rank(Game, Actions, Tried, Frame, [Action | _]).
+
+% Define cox_choose_change/5: the best action ONLY when at least one action is
+% predicted to change the world; fails when none is, so a caller can then fall
+% back to a graph-frontier search. This is the causal-first half of the policy.
+cox_choose_change(Game, Actions, Tried, Frame, Action) :-
+    % Make the click marker concrete before ranking.
+    cox_expand_actions(Actions, Frame, Concrete),
+    % Keep only predicted-change, non-avoided actions, scored by tries.
+    findall(Count-A,
+        % Take each concrete action.
+        ( member(A, Concrete),
+          % Never a learned hazard.
+          \+ co_avoid(g(Game, A)),
+          % Only actions this game's causal graph predicts will change the world.
+          cox_predict_change(Game, A),
+          % How many times it has been tried.
+          cox_tries_of(A, Tried, Count) ),
+        Scored),
+    % There must be at least one predicted-change action.
+    Scored \== [],
+    % Take the least-tried predicted-change action.
+    keysort(Scored, [_-Action | _]).
 
 % Import the aggregate library for the seen-state count.
 :- use_module(library(aggregate), [aggregate_all/3]).
