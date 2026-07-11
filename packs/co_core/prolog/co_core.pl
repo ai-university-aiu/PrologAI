@@ -60,6 +60,12 @@
     co_cro_assert/1,
     % co_new_cro/8: assert a CRO under a fresh identifier.
     co_new_cro/8,
+    % co_cro_find/4: find an existing relation by causes, effects, and modality.
+    co_cro_find/4,
+    % co_new_cro_unique/8: assert-if-new front door (no duplicate relations).
+    co_new_cro_unique/8,
+    % co_cro_dedup/1: remove content-duplicate relations, keeping the first.
+    co_cro_dedup/1,
     % co_the_cro/2: fetch one CRO as a whole term.
     co_the_cro/2,
     % co_cro/8: open query over the CRO store.
@@ -175,6 +181,63 @@ co_new_cro(Causes, Effects, Temporal, Modality, Strength, Context, Prov, Id) :-
     gensym(cro_, Id),
     % Assert through the validating front door.
     co_cro_assert(cro(Id, Causes, Effects, Temporal, Modality, Strength, Context, Prov)).
+
+% ---------------------------------------------------------------------------
+% FACT EXISTENCE — do not clutter the verb layer with duplicate relations
+% ---------------------------------------------------------------------------
+
+% co_cro_find(+Causes, +Effects, +Modality, -Id): the identifier of an existing
+% relation with the same causes, effects, and modality, if one is present. Two
+% relations are the same relation when those three agree; the strength, timing,
+% and provenance are how a relation is refined, not what makes it distinct.
+co_cro_find(Causes, Effects, Modality, Id) :-
+    % A stored relation with matching causes, effects, and modality.
+    co_cro_(Id, Causes, Effects, _, Modality, _, _, _),
+    % The first match suffices.
+    !.
+
+% co_new_cro_unique(+Causes,+Effects,+Temporal,+Modality,+Strength,+Context,+Prov,
+% -Id): the canonical assert-if-new front door for the verb layer. If a relation
+% with the same causes, effects, and modality already exists, return its id and add
+% nothing (the repeat is evidence, so its strength is raised a little); otherwise
+% create a new relation. Ingest paths call this so re-running never duplicates.
+co_new_cro_unique(Causes, Effects, Temporal, Modality, Strength, Context, Prov, Id) :-
+    % Reuse an existing relation when present...
+    (   co_cro_find(Causes, Effects, Modality, Existing)
+    ->  Id = Existing,
+        % A repeated assertion is confirmation; nudge the strength up (capped).
+        catch(co_strengthen(Existing, 0.05), _, true)
+    % ...otherwise create a genuinely new one.
+    ;   co_new_cro(Causes, Effects, Temporal, Modality, Strength, Context, Prov, Id)
+    ).
+
+% co_cro_dedup(-Removed): remove content-duplicate relations, keeping the first of
+% each (Causes, Effects, Modality) group and retracting the rest. Removed is how
+% many were pruned. Cleans a store that accumulated duplicates before assert-if-new.
+co_cro_dedup(Removed) :-
+    % Every relation as a keyed record (content is the key, id the value).
+    findall(k(Causes, Effects, Modality) - Id,
+        co_cro_(Id, Causes, Effects, _, Modality, _, _, _),
+        Pairs),
+    % Group by content.
+    keysort(Pairs, Sorted),
+    % Collect the ids to prune (every id after the first in each content group).
+    co_dedup_collect(Sorted, none, ToPrune),
+    % Retract each duplicate relation.
+    forall(member(Pid, ToPrune), retractall(co_cro_(Pid, _, _, _, _, _, _, _))),
+    % How many were removed.
+    length(ToPrune, Removed).
+
+% co_dedup_collect(+SortedPairs, +PrevKey, -ToPrune): keep the first id of each
+% content group, mark the rest for pruning.
+co_dedup_collect([], _, []).
+co_dedup_collect([Key - _Id | Rest], PrevKey, ToPrune) :-
+    % A new content group: keep this id.
+    Key \== PrevKey, !,
+    co_dedup_collect(Rest, Key, ToPrune).
+co_dedup_collect([Key - Id | Rest], Key, [Id | ToPrune]) :-
+    % A repeat: this id is a duplicate to prune.
+    co_dedup_collect(Rest, Key, ToPrune).
 
 % Define co_the_cro: fetch one relation as a whole term.
 co_the_cro(Id, cro(Id, Causes, Effects, Temporal, Modality, Strength, Context, Prov)) :-

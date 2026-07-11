@@ -16,6 +16,12 @@
 :- module(node_facts, [
     % Continue the multi-line expression started above.
     anchor_node/4,          % +Relation, +Args, +Referents, -Id
+    % node_fact_find/4: find an existing node-fact by exact content.
+    node_fact_find/4,       % +Relation, +Args, +Referents, -Id
+    % anchor_node_unique/4: anchor a node-fact only if an identical one is absent.
+    anchor_node_unique/4,   % +Relation, +Args, +Referents, -Id
+    % node_facts_dedup/1: remove content-duplicate node-facts, keeping the first.
+    node_facts_dedup/1,     % -Removed
     % Continue the multi-line expression started above.
     prune_node/1,           % +Id
     % Continue the multi-line expression started above.
@@ -191,6 +197,62 @@ anchor_node(Relation, Args, Referents, Id) :-
 :- multifile post_anchor_node_hook/5.
 % State a fact for 'post anchor node hook' with the arguments listed below.
 post_anchor_node_hook(_, _, _, _, _).   % default: no-op (always present so predicate exists)
+
+% ---------------------------------------------------------------------------
+% FACT EXISTENCE — do not clutter the lattice with duplicate node-facts
+% ---------------------------------------------------------------------------
+
+% node_fact_find(+Relation, +Args, +Referents, -Id): the id of an existing node-
+% fact with exactly this content in the default nexus, if one is present. A fact is
+% the same fact when its relation, its arguments, and its referents all match.
+node_fact_find(Relation, Args, Referents, Id) :-
+    % The nexus new facts would be anchored into.
+    default_nexus(Nexus),
+    % A stored node-fact in that nexus with identical content.
+    lattice_node_fact(Nexus, Id, Relation, Args, Referents),
+    % The first match is enough.
+    !.
+
+% anchor_node_unique(+Relation, +Args, +Referents, -Id): the canonical assert-if-
+% new front door. If an identical node-fact already exists in the default nexus,
+% return its id and add nothing; otherwise anchor a new node-fact. This is what
+% every ingest path should call so re-running an import never clutters the lattice.
+anchor_node_unique(Relation, Args, Referents, Id) :-
+    % Reuse the existing fact when present...
+    (   node_fact_find(Relation, Args, Referents, Existing)
+    ->  Id = Existing
+    % ...otherwise anchor a genuinely new one.
+    ;   anchor_node(Relation, Args, Referents, Id)
+    ).
+
+% node_facts_dedup(-Removed): remove content-duplicate node-facts across every
+% nexus, keeping the first-anchored of each (Nexus, Relation, Args, Referents)
+% group and pruning the rest. Removed is how many were pruned. This cleans a store
+% that accumulated duplicates before the assert-if-new door was in place.
+node_facts_dedup(Removed) :-
+    % Every stored node-fact as a keyed record (content is the key, id the value).
+    findall(k(Nexus, Relation, Args, Referents) - Id,
+        lattice_node_fact(Nexus, Id, Relation, Args, Referents),
+        Pairs),
+    % Group by content; within a group the ids are the duplicates.
+    keysort(Pairs, Sorted),
+    % Collect the ids to prune (every id after the first in each content group).
+    nf_dedup_collect(Sorted, none, ToPrune),
+    % Prune each duplicate through the standard node deletion.
+    forall(member(Pid, ToPrune), prune_node(Pid)),
+    % How many were removed.
+    length(ToPrune, Removed).
+
+% nf_dedup_collect(+SortedPairs, +PrevKey, -ToPrune): walk the content-sorted pairs,
+% keeping the first id of each content group and marking the rest for pruning.
+nf_dedup_collect([], _, []).
+nf_dedup_collect([Key - _Id | Rest], PrevKey, ToPrune) :-
+    % A new content group: keep this id (the first), do not prune it.
+    Key \== PrevKey, !,
+    nf_dedup_collect(Rest, Key, ToPrune).
+nf_dedup_collect([Key - Id | Rest], Key, [Id | ToPrune]) :-
+    % A repeat of the current content group: this id is a duplicate to prune.
+    nf_dedup_collect(Rest, Key, ToPrune).
 
 % ---------------------------------------------------------------------------
 % Pluggable embedding hook (PR 16)
