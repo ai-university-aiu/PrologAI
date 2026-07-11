@@ -49,8 +49,7 @@ run_tests :-
         ( anchor_node_unique(likes, [bob, coffee], [], _),
           count_fact(likes, [bob, coffee], 1) )),
 
-    % AC-NF-004: node_facts_dedup cleans duplicates made through the RAW door.
-    % Anchor two identical facts with the raw anchor_node, then dedup removes one.
+    % AC-NF-004: node_facts_dedup cleans EXACT duplicates made through the RAW door.
     report('AC-NF-004',
         ( anchor_node(likes, [carol, water], [], _),
           anchor_node(likes, [carol, water], [], _),
@@ -58,4 +57,35 @@ run_tests :-
           node_facts_dedup(Removed), Removed >= 1,
           count_fact(likes, [carol, water], 1) )),
 
-    format("~n", []).
+    % --- the nuance: near-duplicates are variants, not duplicates ---
+
+    % AC-NF-005: a NEAR-duplicate — the same core fact (likes, [dave, tea]) but a
+    % DIFFERENT referent (a different citation) — is NOT merged. Both are kept.
+    report('AC-NF-005',
+        ( anchor_node_unique(likes, [dave, tea], [source(book_a)], IdA),
+          anchor_node_unique(likes, [dave, tea], [source(book_b)], IdB),
+          IdA \== IdB,
+          count_fact(likes, [dave, tea], 2) )),
+
+    % AC-NF-006: the two are linked as variants and the delta names the differing
+    % referents (the nugget surfaced for attention, not dropped).
+    report('AC-NF-006',
+        ( node_fact_variant(_, _, Deltas),
+          member(added(source(book_b)), Deltas),
+          member(removed(source(book_a)), Deltas) )),
+
+    % AC-NF-007: the nuanced door reports status — exact for an identical anchor,
+    % variant for a referent-differing one.
+    report('AC-NF-007',
+        ( anchor_node_nuanced(likes, [dave, tea], [source(book_a)], _, S1),
+          S1 = exact(_),
+          anchor_node_nuanced(likes, [dave, tea], [source(book_c)], _, S2),
+          S2 = variant(_, _) )),
+
+    % AC-NF-008: node_facts_dedup does NOT remove variants — all survive.
+    report('AC-NF-008',
+        ( node_facts_dedup(_), count_fact(likes, [dave, tea], Cnt), Cnt >= 2 )),
+
+    % Show the flagged variants.
+    ( node_fact_variants(V) -> true ; V = [] ),
+    format("~nflagged node-fact variants: ~q~n~n", [V]).
