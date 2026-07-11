@@ -47,7 +47,11 @@
     % cgi_goal_occurrent/1: the goal as a changed/4 occurrent for the planner.
     cgi_goal_occurrent/1,
     % cgi_confidence/1: how strongly the leading hypothesis dominates.
-    cgi_confidence/1
+    cgi_confidence/1,
+    % cgi_snapshot/1: the accumulated goal-inference evidence, for persistence.
+    cgi_snapshot/1,
+    % cgi_restore/1: reload the goal-inference evidence from a snapshot.
+    cgi_restore/1
 ]).
 
 % Import list helpers used to extract distinct colours from a delta.
@@ -181,3 +185,27 @@ cgi_confidence(Confidence) :-
 
 % Import the list utility for taking the last element.
 :- use_module(library(lists), [last/2]).
+
+% ---------------------------------------------------------------------------
+% Persistence — snapshot the accumulated evidence out, and restore it back in
+% ---------------------------------------------------------------------------
+
+% cgi_snapshot(-state(Feats, Wins)): the accumulated per-colour support tallies as a
+% ground list of feat(Colour, Net), plus the running win count. A serialisable copy
+% of everything goal inference has learned, so a caller can write it to disk.
+cgi_snapshot(state(Feats, Wins)) :-
+    % Collect every colour's net support.
+    findall(feat(Colour, Net), cgi_feat_(Colour, Net), Feats),
+    % Read the win count (zero before any reset).
+    cgi_win_count(Wins).
+
+% cgi_restore(+state(Feats, Wins)): replace the accumulated evidence with a snapshot.
+% Existing tallies and the win count are dropped first, so restore is idempotent.
+cgi_restore(state(Feats, Wins)) :-
+    % Drop the old tallies and win count.
+    retractall(cgi_feat_(_, _)),
+    retractall(cgi_wins_(_)),
+    % Re-assert each colour's tally.
+    forall(member(feat(Colour, Net), Feats), assertz(cgi_feat_(Colour, Net))),
+    % Restore the win count.
+    assertz(cgi_wins_(Wins)).
