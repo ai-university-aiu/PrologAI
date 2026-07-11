@@ -1,8 +1,9 @@
-/*  Tests for co_core fact-existence / assert-if-new  (dedup facility)
+/*  Tests for co_core fact existence — exact merge, near-duplicate variants
 
-    Proves the verb layer will not be cluttered with duplicate relations:
-    co_new_cro_unique reuses an existing relation, co_cro_find locates it, and
-    co_cro_dedup cleans a store that already has duplicates.
+    Proves the nuance: only an EXACT duplicate relation is merged and strengthened,
+    while a NEAR-duplicate (same core causes/effects, differing in a detail) is kept
+    as a separate, linked variant with its delta recorded for attention — never
+    silently merged. co_cro_dedup removes only exact duplicates, not variants.
 
     Run:
       swipl -p library=packs/co_core/prolog -g run_tests -t halt \
@@ -53,8 +54,7 @@ run_tests :-
     report('AC-DD-004',
         ( co_cro(Idx, [a], [b], _, sufficient, S, _, _), Idx = Id0x, S > 0.7 )),
 
-    % AC-DD-005: co_cro_dedup cleans duplicates made through the RAW door. Create
-    % two identical relations with the raw co_new_cro, then dedup removes one.
+    % AC-DD-005: co_cro_dedup cleans EXACT duplicates made through the RAW door.
     report('AC-DD-005',
         ( co_new_cro([x], [y], temporal(0,0,instant), sufficient, 0.7, [], P, _),
           co_new_cro([x], [y], temporal(0,0,instant), sufficient, 0.7, [], P, _),
@@ -62,4 +62,37 @@ run_tests :-
           co_cro_dedup(Removed), Removed >= 1,
           count_cro([x], [y], 1) )),
 
-    format("~n", []).
+    % --- the nuance: near-duplicates are variants, not duplicates ---
+
+    % AC-DD-006: a NEAR-duplicate — same core (m->n) but a DIFFERENT provenance —
+    % is NOT merged. Both are kept, and the ids differ.
+    P1 = prov(draft_one, evidence_a, 0.7),
+    P2 = prov(draft_two, evidence_b, 0.7),
+    report('AC-DD-006',
+        ( co_new_cro_unique([m], [n], temporal(0,0,instant), sufficient, 0.7, [], P1, IdA),
+          co_new_cro_unique([m], [n], temporal(0,0,instant), sufficient, 0.7, [], P2, IdB),
+          IdA \== IdB,
+          count_cro([m], [n], 2) )),
+
+    % AC-DD-007: the two are linked as variants, and the delta names the field that
+    % differs (the provenance) — the nugget surfaced for attention, not dropped.
+    report('AC-DD-007',
+        ( co_cro_variant(Canon, Var, Deltas),
+          member(delta(prov, _, _), Deltas),
+          ( Canon == IdA ; Canon == IdB ), ( Var == IdA ; Var == IdB ) )),
+
+    % AC-DD-008: the nuanced door reports status directly — exact for an identical
+    % assertion, variant for a detail-differing one.
+    report('AC-DD-008',
+        ( co_new_cro_nuanced([m], [n], temporal(0,0,instant), sufficient, 0.7, [], P1, _, S1),
+          S1 = exact(_),
+          co_new_cro_nuanced([m], [n], temporal(0,0,instant), preventive, 0.7, [], P1, _, S2),
+          S2 = variant(_, D2), member(delta(modality, sufficient, preventive), D2) )),
+
+    % AC-DD-009: co_cro_dedup does NOT remove variants — the near-duplicates survive.
+    report('AC-DD-009',
+        ( co_cro_dedup(_), count_cro([m], [n], N), N >= 2 )),
+
+    % Show the flagged variants.
+    ( co_cro_variants(V) -> true ; V = [] ),
+    format("~nflagged variants: ~q~n~n", [V]).

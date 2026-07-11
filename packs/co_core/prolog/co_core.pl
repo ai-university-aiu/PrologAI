@@ -60,11 +60,23 @@
     co_cro_assert/1,
     % co_new_cro/8: assert a CRO under a fresh identifier.
     co_new_cro/8,
-    % co_cro_find/4: find an existing relation by causes, effects, and modality.
+    % co_cro_find/4: coarse finder by causes, effects, and modality.
     co_cro_find/4,
-    % co_new_cro_unique/8: assert-if-new front door (no duplicate relations).
+    % co_cro_find_exact/7: find a relation identical in every defining field.
+    co_cro_find_exact/7,
+    % co_cro_find_core/3: find a relation with the same core (causes+effects).
+    co_cro_find_core/3,
+    % co_cro_delta/6: the fields in which a candidate differs from a relation.
+    co_cro_delta/6,
+    % co_new_cro_unique/8: assert-if-new front door (exact merges; near kept).
     co_new_cro_unique/8,
-    % co_cro_dedup/1: remove content-duplicate relations, keeping the first.
+    % co_new_cro_nuanced/9: assert door reporting exact/variant/new status.
+    co_new_cro_nuanced/9,
+    % co_cro_variant/3: query the near-duplicate variant links and their deltas.
+    co_cro_variant/3,
+    % co_cro_variants/1: all variant links, for surfacing flagged near-duplicates.
+    co_cro_variants/1,
+    % co_cro_dedup/1: remove only EXACT-duplicate relations, keeping variants.
     co_cro_dedup/1,
     % co_the_cro/2: fetch one CRO as a whole term.
     co_the_cro/2,
@@ -183,48 +195,119 @@ co_new_cro(Causes, Effects, Temporal, Modality, Strength, Context, Prov, Id) :-
     co_cro_assert(cro(Id, Causes, Effects, Temporal, Modality, Strength, Context, Prov)).
 
 % ---------------------------------------------------------------------------
-% FACT EXISTENCE — do not clutter the verb layer with duplicate relations
+% FACT EXISTENCE — merge only EXACT duplicates; keep near-duplicates as variants
 % ---------------------------------------------------------------------------
+%
+% The nuance the mentor asked for: a subtle difference in a relation may be a
+% nugget of gold, so only a relation identical in EVERY defining field is treated
+% as a duplicate and merged (its strength raised as confirmation). A near-duplicate
+% — the same core relation (same causes and effects) that differs in any detail
+% (modality, timing, enabling context, or provenance) — is NOT merged: both are
+% kept, they are linked as variants of each other, and the delta (exactly which
+% fields differ) is recorded so it can be surfaced for attention. A relation with a
+% different core is simply new. The mutable strength is not part of a relation's
+% identity (it is how a relation is reinforced), so it is excluded from the match.
 
-% co_cro_find(+Causes, +Effects, +Modality, -Id): the identifier of an existing
-% relation with the same causes, effects, and modality, if one is present. Two
-% relations are the same relation when those three agree; the strength, timing,
-% and provenance are how a relation is refined, not what makes it distinct.
+% co_cro_variant_/3: (CanonicalId, VariantId, Deltas) — two relations that share a
+% core but differ in some detail, with the list of differing fields.
+:- dynamic co_cro_variant_/3.
+
+% co_cro_find(+Causes, +Effects, +Modality, -Id): a coarse finder kept for callers
+% that want the first relation matching causes, effects, and modality. This is NOT
+% the merge test — merging uses the exact finder below.
 co_cro_find(Causes, Effects, Modality, Id) :-
     % A stored relation with matching causes, effects, and modality.
     co_cro_(Id, Causes, Effects, _, Modality, _, _, _),
     % The first match suffices.
     !.
 
-% co_new_cro_unique(+Causes,+Effects,+Temporal,+Modality,+Strength,+Context,+Prov,
-% -Id): the canonical assert-if-new front door for the verb layer. If a relation
-% with the same causes, effects, and modality already exists, return its id and add
-% nothing (the repeat is evidence, so its strength is raised a little); otherwise
-% create a new relation. Ingest paths call this so re-running never duplicates.
-co_new_cro_unique(Causes, Effects, Temporal, Modality, Strength, Context, Prov, Id) :-
-    % Reuse an existing relation when present...
-    (   co_cro_find(Causes, Effects, Modality, Existing)
-    ->  Id = Existing,
-        % A repeated assertion is confirmation; nudge the strength up (capped).
-        catch(co_strengthen(Existing, 0.05), _, true)
-    % ...otherwise create a genuinely new one.
-    ;   co_new_cro(Causes, Effects, Temporal, Modality, Strength, Context, Prov, Id)
+% co_cro_find_exact(+Causes,+Effects,+Temporal,+Modality,+Context,+Prov, -Id): the
+% id of a relation identical in EVERY defining field (strength excluded). Only such
+% a relation is a true duplicate to merge.
+co_cro_find_exact(Causes, Effects, Temporal, Modality, Context, Prov, Id) :-
+    % All defining fields unify; the strength is left free.
+    co_cro_(Id, Causes, Effects, Temporal, Modality, _Strength, Context, Prov),
+    % The first exact match suffices.
+    !.
+
+% co_cro_find_core(+Causes, +Effects, -Id): the id of an existing relation with the
+% same core — the same causes and effects — regardless of the other fields. A core
+% match that is not an exact match is a near-duplicate (a variant).
+co_cro_find_core(Causes, Effects, Id) :-
+    % The first relation relating the same cause to the same effect.
+    co_cro_(Id, Causes, Effects, _, _, _, _, _),
+    % One is enough.
+    !.
+
+% co_cro_delta(+ExistingId, +Temporal,+Modality,+Context,+Prov, -Deltas): the list
+% of fields in which a candidate differs from an existing relation, each as
+% delta(Field, ExistingValue, NewValue). Empty when only the strength differs.
+co_cro_delta(ExistingId, Temporal, Modality, Context, Prov, Deltas) :-
+    % The existing relation's non-core fields.
+    co_cro_(ExistingId, _, _, T0, M0, _, C0, P0),
+    % Collect each differing field.
+    findall(delta(Field, Old, New),
+        ( member(f(Field, Old, New),
+              [ f(temporal, T0, Temporal), f(modality, M0, Modality),
+                f(context,  C0, Context),  f(prov,     P0, Prov) ]),
+          Old \== New ),
+        Deltas).
+
+% co_new_cro_nuanced(+Causes,+Effects,+Temporal,+Modality,+Strength,+Context,+Prov,
+% -Id, -Status): the nuanced assert door. Status is exact(ExistingId) when an
+% identical relation was merged, variant(CanonicalId, Deltas) when a near-duplicate
+% was kept and linked, or new when the relation had no core match.
+co_new_cro_nuanced(Causes, Effects, Temporal, Modality, Strength, Context, Prov, Id, Status) :-
+    (   % EXACT duplicate: merge — reuse the id and raise its strength as evidence.
+        co_cro_find_exact(Causes, Effects, Temporal, Modality, Context, Prov, Ex)
+    ->  Id = Ex,
+        catch(co_strengthen(Ex, 0.05), _, true),
+        Status = exact(Ex)
+    ;   % NEAR duplicate: same core, differs in a detail — keep both, link, flag.
+        co_cro_find_core(Causes, Effects, Canonical)
+    ->  co_new_cro(Causes, Effects, Temporal, Modality, Strength, Context, Prov, Id),
+        co_cro_delta(Canonical, Temporal, Modality, Context, Prov, Deltas),
+        assertz(co_cro_variant_(Canonical, Id, Deltas)),
+        Status = variant(Canonical, Deltas)
+    ;   % Genuinely new relation.
+        co_new_cro(Causes, Effects, Temporal, Modality, Strength, Context, Prov, Id),
+        Status = new
     ).
 
-% co_cro_dedup(-Removed): remove content-duplicate relations, keeping the first of
-% each (Causes, Effects, Modality) group and retracting the rest. Removed is how
-% many were pruned. Cleans a store that accumulated duplicates before assert-if-new.
+% co_new_cro_unique(+Causes,+Effects,+Temporal,+Modality,+Strength,+Context,+Prov,
+% -Id): the assert-if-new front door ingest paths call. It merges only an EXACT
+% duplicate; a near-duplicate is kept as a linked variant (see co_new_cro_nuanced),
+% so a subtle difference is never silently merged away. Returns the relation's id.
+co_new_cro_unique(Causes, Effects, Temporal, Modality, Strength, Context, Prov, Id) :-
+    co_new_cro_nuanced(Causes, Effects, Temporal, Modality, Strength, Context, Prov, Id, _Status).
+
+% co_cro_variant(?CanonicalId, ?VariantId, ?Deltas): query the variant links — the
+% near-duplicate relations kept apart and the fields in which each differs.
+co_cro_variant(CanonicalId, VariantId, Deltas) :-
+    co_cro_variant_(CanonicalId, VariantId, Deltas).
+
+% co_cro_variants(-List): every variant link as variant(Canonical, Variant, Deltas),
+% for surfacing the flagged near-duplicates that want attention.
+co_cro_variants(List) :-
+    findall(variant(C, V, D), co_cro_variant_(C, V, D), List).
+
+% co_cro_dedup(-Removed): remove only EXACT-duplicate relations, keeping the first
+% of each fully-identical group and retracting the rest; near-duplicate variants
+% are never removed. Removed is how many were pruned.
 co_cro_dedup(Removed) :-
-    % Every relation as a keyed record (content is the key, id the value).
-    findall(k(Causes, Effects, Modality) - Id,
-        co_cro_(Id, Causes, Effects, _, Modality, _, _, _),
+    % Key each relation by its FULL defining content (strength excluded).
+    findall(k(Causes, Effects, Temporal, Modality, Context, Prov) - Id,
+        co_cro_(Id, Causes, Effects, Temporal, Modality, _S, Context, Prov),
         Pairs),
-    % Group by content.
+    % Group by identical content.
     keysort(Pairs, Sorted),
-    % Collect the ids to prune (every id after the first in each content group).
+    % Every id after the first in each identical group is an exact duplicate.
     co_dedup_collect(Sorted, none, ToPrune),
-    % Retract each duplicate relation.
-    forall(member(Pid, ToPrune), retractall(co_cro_(Pid, _, _, _, _, _, _, _))),
+    % Retract each exact duplicate; leave variant links untouched.
+    forall(member(Pid, ToPrune),
+        ( retractall(co_cro_(Pid, _, _, _, _, _, _, _)),
+          retractall(co_cro_variant_(_, Pid, _)),
+          retractall(co_cro_variant_(Pid, _, _)) )),
     % How many were removed.
     length(ToPrune, Removed).
 

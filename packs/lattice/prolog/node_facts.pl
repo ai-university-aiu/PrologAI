@@ -16,11 +16,21 @@
 :- module(node_facts, [
     % Continue the multi-line expression started above.
     anchor_node/4,          % +Relation, +Args, +Referents, -Id
-    % node_fact_find/4: find an existing node-fact by exact content.
+    % node_fact_find/4: find a node-fact matching relation, args, AND referents.
     node_fact_find/4,       % +Relation, +Args, +Referents, -Id
-    % anchor_node_unique/4: anchor a node-fact only if an identical one is absent.
+    % node_fact_find_core/3: find a node-fact by relation and args (any referents).
+    node_fact_find_core/3,  % +Relation, +Args, -Id
+    % node_fact_delta/3: how a candidate's referents differ from a node-fact's.
+    node_fact_delta/3,      % +ExistingId, +Referents, -Deltas
+    % anchor_node_unique/4: reuse an EXACT fact; keep a near-duplicate as a variant.
     anchor_node_unique/4,   % +Relation, +Args, +Referents, -Id
-    % node_facts_dedup/1: remove content-duplicate node-facts, keeping the first.
+    % anchor_node_nuanced/5: anchor door reporting exact/variant/new status.
+    anchor_node_nuanced/5,  % +Relation, +Args, +Referents, -Id, -Status
+    % node_fact_variant/3: query the near-duplicate variant links and their deltas.
+    node_fact_variant/3,    % ?CanonicalId, ?VariantId, ?Deltas
+    % node_fact_variants/1: all variant links, for surfacing flagged near-duplicates.
+    node_fact_variants/1,   % -List
+    % node_facts_dedup/1: remove only EXACT-duplicate node-facts, keeping variants.
     node_facts_dedup/1,     % -Removed
     % Continue the multi-line expression started above.
     prune_node/1,           % +Id
@@ -199,31 +209,88 @@ anchor_node(Relation, Args, Referents, Id) :-
 post_anchor_node_hook(_, _, _, _, _).   % default: no-op (always present so predicate exists)
 
 % ---------------------------------------------------------------------------
-% FACT EXISTENCE — do not clutter the lattice with duplicate node-facts
+% FACT EXISTENCE — merge only EXACT node-facts; keep near-duplicates as variants
 % ---------------------------------------------------------------------------
+%
+% A subtle difference in a node-fact may be a nugget of gold, so only a node-fact
+% identical in EVERY part — its relation, its arguments, AND its referents — is a
+% duplicate to reuse. A near-duplicate — the same core fact (same relation and
+% arguments) whose referents differ (a different citation, grade, game, or other
+% provenance) — is NOT merged: both are kept, linked as variants, and the delta in
+% their referents is recorded so it can be surfaced for attention. A fact with
+% different arguments is simply new.
 
-% node_fact_find(+Relation, +Args, +Referents, -Id): the id of an existing node-
-% fact with exactly this content in the default nexus, if one is present. A fact is
-% the same fact when its relation, its arguments, and its referents all match.
+% node_fact_variant_/3: (CanonicalId, VariantId, Deltas) — two node-facts that share
+% a core (relation + args) but differ in their referents, with the recorded delta.
+:- dynamic node_fact_variant_/3.
+
+% node_fact_find(+Relation, +Args, +Referents, -Id): the id of a node-fact matching
+% in EVERY part — relation, arguments, and referents — in the default nexus. Only
+% such a fact is a true duplicate.
 node_fact_find(Relation, Args, Referents, Id) :-
     % The nexus new facts would be anchored into.
     default_nexus(Nexus),
-    % A stored node-fact in that nexus with identical content.
+    % A stored node-fact with identical content.
     lattice_node_fact(Nexus, Id, Relation, Args, Referents),
     % The first match is enough.
     !.
 
-% anchor_node_unique(+Relation, +Args, +Referents, -Id): the canonical assert-if-
-% new front door. If an identical node-fact already exists in the default nexus,
-% return its id and add nothing; otherwise anchor a new node-fact. This is what
-% every ingest path should call so re-running an import never clutters the lattice.
-anchor_node_unique(Relation, Args, Referents, Id) :-
-    % Reuse the existing fact when present...
-    (   node_fact_find(Relation, Args, Referents, Existing)
-    ->  Id = Existing
-    % ...otherwise anchor a genuinely new one.
-    ;   anchor_node(Relation, Args, Referents, Id)
+% node_fact_find_core(+Relation, +Args, -Id): the id of an existing node-fact with
+% the same core — the same relation and arguments — regardless of its referents. A
+% core match that is not an exact match is a near-duplicate (a variant).
+node_fact_find_core(Relation, Args, Id) :-
+    % The nexus new facts would be anchored into.
+    default_nexus(Nexus),
+    % The first stored node-fact with the same relation and arguments.
+    lattice_node_fact(Nexus, Id, Relation, Args, _AnyReferents),
+    % One is enough.
+    !.
+
+% node_fact_delta(+ExistingId, +Referents, -Deltas): how a candidate's referents
+% differ from an existing node-fact's — the referents only in the existing one and
+% those only in the candidate. Empty when the referents match.
+node_fact_delta(ExistingId, Referents, Deltas) :-
+    % The existing fact's referents.
+    lattice_node_fact(_, ExistingId, _, _, Refs0),
+    % Referents present before but not now, and present now but not before.
+    findall(removed(R), ( member(R, Refs0), \+ member(R, Referents) ), Removed),
+    findall(added(R),   ( member(R, Referents), \+ member(R, Refs0) ), Added),
+    % The delta is the two lists together (empty when identical).
+    append(Removed, Added, Deltas).
+
+% anchor_node_nuanced(+Relation, +Args, +Referents, -Id, -Status): the nuanced
+% assert door. Status is exact(ExistingId) when an identical fact was reused,
+% variant(CanonicalId, Deltas) when a near-duplicate was kept and linked, or new.
+anchor_node_nuanced(Relation, Args, Referents, Id, Status) :-
+    (   % EXACT duplicate: reuse the existing fact.
+        node_fact_find(Relation, Args, Referents, Existing)
+    ->  Id = Existing, Status = exact(Existing)
+    ;   % NEAR duplicate: same core, referents differ — keep both, link, flag.
+        node_fact_find_core(Relation, Args, Canonical)
+    ->  anchor_node(Relation, Args, Referents, Id),
+        node_fact_delta(Canonical, Referents, Deltas),
+        assertz(node_fact_variant_(Canonical, Id, Deltas)),
+        Status = variant(Canonical, Deltas)
+    ;   % Genuinely new fact.
+        anchor_node(Relation, Args, Referents, Id),
+        Status = new
     ).
+
+% anchor_node_unique(+Relation, +Args, +Referents, -Id): the assert-if-new front
+% door ingest paths call. It reuses only an EXACT duplicate; a near-duplicate is
+% kept as a linked variant, so a subtle difference is never silently merged away.
+anchor_node_unique(Relation, Args, Referents, Id) :-
+    anchor_node_nuanced(Relation, Args, Referents, Id, _Status).
+
+% node_fact_variant(?CanonicalId, ?VariantId, ?Deltas): query the variant links —
+% the near-duplicate node-facts kept apart and how their referents differ.
+node_fact_variant(CanonicalId, VariantId, Deltas) :-
+    node_fact_variant_(CanonicalId, VariantId, Deltas).
+
+% node_fact_variants(-List): every variant link as variant(Canonical, Variant,
+% Deltas), for surfacing the flagged near-duplicates that want attention.
+node_fact_variants(List) :-
+    findall(variant(C, V, D), node_fact_variant_(C, V, D), List).
 
 % node_facts_dedup(-Removed): remove content-duplicate node-facts across every
 % nexus, keeping the first-anchored of each (Nexus, Relation, Args, Referents)
