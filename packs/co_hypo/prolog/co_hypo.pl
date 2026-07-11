@@ -58,7 +58,11 @@
     % hy_stale/1: the committed hypothesis has been contradicted — re-orient.
     hy_stale/1,
     % hy_stats/2: a summary of a model's hypotheses.
-    hy_stats/2
+    hy_stats/2,
+    % hy_snapshot/2: a model's hypotheses and commitment, for persistence.
+    hy_snapshot/2,
+    % hy_restore/2: reload a model's hypotheses and commitment from a snapshot.
+    hy_restore/2
 ]).
 
 % List and aggregate helpers.
@@ -221,6 +225,29 @@ hy_stale(Model) :-
 hy_stats(Model, stats(N, Committed)) :-
     aggregate_all(count, hy_ev_(Model, _, _, _), N),
     ( hy_committed_(Model, H) -> Committed = H ; Committed = none ).
+
+% ---------------------------------------------------------------------------
+% PERSISTENCE — snapshot a model's hypotheses and commitment out, restore them in
+% ---------------------------------------------------------------------------
+
+% hy_snapshot(+Model, -state(Ev, Committed)): the model's evidence tallies as a
+% ground list of ev(Hypothesis, Support, Contradict), plus the committed hypothesis
+% (or the atom none). A serialisable copy of the model's whole hypothesis state, so
+% a caller can write it to disk. Thresholds are global policy, not per-model, so
+% they are not part of a model's snapshot.
+hy_snapshot(Model, state(Ev, Committed)) :-
+    findall(ev(Hypothesis, S, C), hy_ev_(Model, Hypothesis, S, C), Ev),
+    ( hy_committed_(Model, HC) -> Committed = HC ; Committed = none ).
+
+% hy_restore(+Model, +state(Ev, Committed)): replace this model's hypotheses and
+% commitment with the snapshot. The model's existing evidence and commitment are
+% dropped first, so restore is idempotent.
+hy_restore(Model, state(Ev, Committed)) :-
+    retractall(hy_ev_(Model, _, _, _)),
+    retractall(hy_committed_(Model, _)),
+    forall(member(ev(Hypothesis, S, C), Ev),
+        assertz(hy_ev_(Model, Hypothesis, S, C))),
+    ( Committed == none -> true ; assertz(hy_committed_(Model, Committed)) ).
 
 % Install the default thresholds at load time.
 :- initialization(( \+ hy_threshold_(_, _, _) -> assertz(hy_threshold_(0.70, 0.15, 0.40)) ; true )).

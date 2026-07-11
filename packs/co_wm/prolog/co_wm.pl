@@ -51,7 +51,11 @@
     % wm_law/3: an action whose effect is context-free — a general law.
     wm_law/3,
     % wm_stats/2: a summary of the model.
-    wm_stats/2
+    wm_stats/2,
+    % wm_snapshot/2: the model's learned transitions for a model, for persistence.
+    wm_snapshot/2,
+    % wm_restore/2: reload a model's learned transitions from a snapshot.
+    wm_restore/2
 ]).
 
 % List and aggregate helpers.
@@ -189,3 +193,24 @@ wm_law(Model, Action, Effect) :-
 wm_stats(Model, stats(Contexts, Transitions)) :-
     ( setof(Cx, A^E^N^wm_obs_(Model, Cx, A, E, N), Cs) -> length(Cs, Contexts) ; Contexts = 0 ),
     aggregate_all(count, wm_obs_(Model, _, _, _, _), Transitions).
+
+% ---------------------------------------------------------------------------
+% PERSISTENCE — snapshot the learned model out, and restore it back in
+% ---------------------------------------------------------------------------
+
+% wm_snapshot(+Model, -Obs): the model's learned transitions as a ground list of
+% obs(Context, Action, Effect, Count) terms — a serialisable copy of everything the
+% model has learned for this Model, so a caller can write it to disk and later
+% restore it. Empty list when the model holds nothing.
+wm_snapshot(Model, Obs) :-
+    findall(obs(Context, Action, Effect, Count),
+        wm_obs_(Model, Context, Action, Effect, Count),
+        Obs).
+
+% wm_restore(+Model, +Obs): replace this Model's transitions with the snapshot. The
+% Model's existing observations are dropped first so restore is idempotent (loading
+% the same snapshot twice yields the same model, not doubled counts).
+wm_restore(Model, Obs) :-
+    retractall(wm_obs_(Model, _, _, _, _)),
+    forall(member(obs(Context, Action, Effect, Count), Obs),
+        assertz(wm_obs_(Model, Context, Action, Effect, Count))).
