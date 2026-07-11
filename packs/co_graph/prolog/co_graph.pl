@@ -186,23 +186,33 @@ cg_toward_frontier(Sig, Actions, FirstAction) :-
     % Seed the breadth-first search with the current state's successors, each
     % tagged by the first action taken to leave the current state.
     findall(q(To, A), cg_edge_(Sig, A, To), Seed),
+    % A node-expansion budget so a very large carried-forward graph cannot make the
+    % frontier search unbounded; on hitting it the search simply fails and the
+    % caller falls through to another rule.
+    cg_frontier_budget(Budget),
     % Search outward, never revisiting the start.
-    cg_bfs(Seed, [Sig], Actions, FirstAction).
+    cg_bfs(Seed, [Sig], Actions, Budget, FirstAction).
 
-% cg_bfs(+Queue, +Visited, +Actions, -FirstAction): breadth-first to a frontier.
-% The queue holds q(Node, FirstAction) — the node and the first action that led
-% toward it. The first dequeued node that is a frontier yields its first action.
-cg_bfs([q(Node, FirstAction) | Rest], Visited, Actions, Result) :-
+% cg_frontier_budget(-N): the maximum nodes the frontier search expands.
+cg_frontier_budget(4096).
+
+% cg_bfs(+Queue, +Visited, +Actions, +Budget, -FirstAction): breadth-first to a
+% frontier. The queue holds q(Node, FirstAction) — the node and the first action
+% that led toward it. The first dequeued node that is a frontier yields its first
+% action. Budget counts down per node expanded; at zero the search gives up.
+cg_bfs(_, _, _, 0, _) :- !, fail.
+cg_bfs([q(Node, FirstAction) | Rest], Visited, Actions, Budget, Result) :-
     (   \+ memberchk(Node, Visited), cg_has_untested(Node, Actions)
     % This reachable node still has an untested action: go toward it.
     ->  Result = FirstAction
     % Already visited: skip it.
     ;   memberchk(Node, Visited)
-    ->  cg_bfs(Rest, Visited, Actions, Result)
+    ->  cg_bfs(Rest, Visited, Actions, Budget, Result)
     % New but fully-tested node: enqueue its successors, keeping the first action.
     ;   findall(q(To, FirstAction), cg_edge_(Node, _A, To), Succ),
         append(Rest, Succ, Queue),
-        cg_bfs(Queue, [Node | Visited], Actions, Result)
+        Budget1 is Budget - 1,
+        cg_bfs(Queue, [Node | Visited], Actions, Budget1, Result)
     ).
 
 % ---------------------------------------------------------------------------
