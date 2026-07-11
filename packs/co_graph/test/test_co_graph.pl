@@ -92,5 +92,39 @@ test(stats) :-
     % Two dead pairs (idle at A and at B).
     Dead =:= 2.
 
+% Two games share the one graph store, each prefixing its signatures, and the
+% per-game statistics count only that game's subgraph — no bleed between games.
+test(prefix_isolation) :-
+    co_graph:cg_reset,
+    % Game one records two transitions among its own prefixed states.
+    cg_note('g1::a', move, 'g1::b'),
+    cg_note('g1::b', idle, 'g1::b'),
+    % Game two records one transition among its own prefixed states.
+    cg_note('g2::a', move, 'g2::b'),
+    % Game one sees only its own two nodes, two edges, two tested, one dead.
+    cg_stats_for('g1::', stats(N1, E1, T1, D1)),
+    N1 =:= 2, E1 =:= 2, T1 =:= 2, D1 =:= 1,
+    % Game two sees only its own two nodes, one edge, one tested, no dead.
+    cg_stats_for('g2::', stats(N2, E2, T2, D2)),
+    N2 =:= 2, E2 =:= 1, T2 =:= 1, D2 =:= 0,
+    % A game that has recorded nothing sees an empty subgraph.
+    cg_stats_for('g3::', stats(0, 0, 0, 0)).
+
+% The frontier search never crosses game prefixes: from game one's fully-tested
+% state the choice stays within game one, and game two's untested state is not
+% reachable as a frontier.
+test(no_cross_game_frontier, [fail]) :-
+    co_graph:cg_reset,
+    % Game one is fully explored: move tested, idle dead — no frontier of its own.
+    cg_note('g1::a', move, 'g1::b'),
+    cg_note('g1::a', idle, 'g1::a'),
+    cg_note('g1::b', move, 'g1::a'),
+    cg_note('g1::b', idle, 'g1::b'),
+    % Game two has an untested frontier, but it is a separate, unlinked subgraph.
+    cg_note('g2::a', move, 'g2::b'),
+    % From game one there is no untested action and no reachable frontier, so the
+    % choice fails rather than wandering into game two.
+    cg_choose('g1::a', [move, idle], _).
+
 % Close the test unit.
 :- end_tests(co_graph).
