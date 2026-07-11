@@ -1,22 +1,27 @@
 /*  PrologAI — Causalontology Exploration Policy  (WP-397, Layer 372)
 
-    ARC-AGI-3 gives an agent no instructions, no rules and no goal: it must
-    explore an unknown interactive environment, discover which actions change
-    the world, and avoid wasting turns re-visiting states it has already seen.
-    The two strongest ARC-AGI-3 developer-preview agents both won on exactly
-    this behaviour — one learned to predict which actions cause a frame to
-    change, the other built a state graph and pruned actions that create loops.
-    This pack packages that behaviour as a reusable, glass-box policy that
-    plugs into the co_arc3 harness alongside its plan-first action selection.
+    This pack is a general-purpose exploration policy for ANY unknown
+    interactive environment — one that gives an agent no instructions, no rules
+    and no goal, so the agent must explore, discover which actions change the
+    world, and avoid wasting turns re-visiting states it has already seen. It is
+    not tied to any one environment: the caller supplies the available actions
+    and the current frame, and the policy ranks them. ARC-AGI-3 is one such
+    environment and the motivating example — its two strongest developer-preview
+    agents both won on exactly this behaviour (one learned to predict which
+    actions change a frame, the other built a state graph and pruned looping
+    actions) — but the same policy drives exploration of any new environment it
+    is pointed at. It is a reusable, glass-box policy that plugs into the co_arc3
+    harness alongside its plan-first action selection.
 
     The policy ranks the environment's available actions by, in order:
       1. whether the learned causal graph predicts the action changes state
          (a predicted-change action is always preferred to a dead one);
       2. how few times the action has already been tried (curiosity).
-    Actions on the learned avoid-set are never chosen. The ACTION6 cell-select
-    action (a click at some (x,y) on a grid up to 64x64) is not enumerated
-    blindly over 4096 cells: it is expanded only to the salient cells — the
-    centroids of the perceived objects — so the click space stays small.
+    Actions on the learned avoid-set are never chosen. A cell-select / pointing
+    action (a click at some (x,y) on a grid, whatever the grid's size) is not
+    enumerated blindly over every cell: it is expanded only to the salient cells
+    — the centroids of the perceived objects, largest object first — so the
+    click space stays small however large the grid.
 
     Frames seen so far are remembered by a canonical signature (dimensions
     plus colour histogram) so that a returned-to state is recognised as a loop.
@@ -35,9 +40,9 @@
       cox_rank/4             -- +Actions, +Tried, +Frame, -Ranked (best first)
       cox_choose/4           -- +Actions, +Tried, +Frame, -Action (the best one)
 
-    A caller that plays many ARC-AGI-3 environments keeps each environment's
-    learned causal graph and avoid-set under its own game id, as g(Game, Action).
-    The game-scoped variants below read exactly that game's learnings:
+    A caller that explores many environments keeps each environment's learned
+    causal graph and avoid-set under its own id, as g(Game, Action). The
+    game-scoped variants below read exactly that environment's learnings:
 
       cox_predict_change/2   -- +Game, +Action  (this game predicts a change)
       cox_rank/5             -- +Game, +Actions, +Tried, +Frame, -Ranked
@@ -159,11 +164,11 @@ cox_predict_change(Action) :-
     Effects \== [].
 
 % ---------------------------------------------------------------------------
-% Salient click targets for the ACTION6 cell-select action
+% Salient click targets for a cell-select / pointing action
 % ---------------------------------------------------------------------------
 
 % Define cox_salient_cells: the click-worthy cells of a frame, largest object
-% first. The strongest ARC-AGI-3 agents try the biggest, most button-like
+% first. The strongest exploration agents try the biggest, most button-like
 % candidates before small ones, so the click budget is spent where an
 % interactive control is most likely to be; ordering by object size is a simple,
 % robust proxy for that salience.
@@ -210,7 +215,7 @@ cox_centroid(Cells, R, C) :-
 cox_click_targets(Frame, Targets) :-
     % Find the salient cells.
     cox_salient_cells(Frame, Cells),
-    % Map each cell to an ARC-AGI-3 click where x is the column and y the row.
+    % Map each cell to a select(X,Y) click where x is the column and y the row.
     findall(select(X, Y),
         % Take each salient cell.
         ( member(cell(Y, X), Cells) ),
@@ -269,11 +274,11 @@ cox_choose(Actions, Tried, Frame, Action) :-
 
 % ---------------------------------------------------------------------------
 % Game-scoped policy — the same ranking, but for a caller that keys its learned
-% causal relations and hazards by a game id, as g(Game, Action). ARC-AGI-3
-% environments differ from one another, so an agent that plays many of them
-% keeps each environment's learnings under its own game id; these predicates let
-% the exploration policy read exactly that environment's causal graph and
-% avoid-set while never confusing it with another's.
+% causal relations and hazards by an environment id, as g(Game, Action). Unknown
+% environments differ from one another, so an agent that explores many of them
+% keeps each environment's learnings under its own id; these predicates let the
+% exploration policy read exactly that environment's causal graph and avoid-set
+% while never confusing it with another's.
 % ---------------------------------------------------------------------------
 
 % Define cox_predict_change/2: the game's causal graph predicts the action has
