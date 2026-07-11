@@ -38,6 +38,16 @@
       cg_toward_frontier/3  -- +Signature, +Actions, -FirstAction
       cg_choose/3           -- +Signature, +Actions, -Action  (hierarchical rule)
       cg_stats/1            -- -stats(Nodes, Edges, Tested, Dead)
+      cg_stats_for/2        -- +Prefix, -stats(Nodes, Edges, Tested, Dead)
+
+    One graph store serves many games at once. A caller keeps games apart by
+    prefixing every signature with a game id (for example "ls20::" before the
+    frame term), so one game's states can never be confused with another's — the
+    breadth-first frontier search only ever reaches nodes sharing the current
+    node's prefix, because no edge ever crosses from one game's states to
+    another's. cg_stats_for/2 reports the size of just one game's subgraph by
+    counting only the nodes and transitions whose source signature carries the
+    given prefix.
 */
 
 % Declare this module and list every exported predicate with its correct arity.
@@ -65,7 +75,9 @@
     % cg_choose/3: the hierarchical graph-informed action choice.
     cg_choose/3,
     % cg_stats/1: a summary of the graph's size.
-    cg_stats/1
+    cg_stats/1,
+    % cg_stats_for/2: a summary of one prefixed subgraph's size.
+    cg_stats_for/2
 ]).
 
 % Import list helpers.
@@ -225,3 +237,20 @@ cg_stats(stats(Nodes, Edges, Tested, Dead)) :-
     aggregate_all(count, cg_tested_(_, _), Tested),
     % Count the dead pairs.
     aggregate_all(count, cg_dead_(_, _), Dead).
+
+% Define cg_stats_for: a summary of just the subgraph whose signatures carry the
+% given prefix, so one game's map can be read without another game's bleeding in.
+cg_stats_for(Prefix, stats(Nodes, Edges, Tested, Dead)) :-
+    % Count the nodes whose signature begins with the prefix.
+    aggregate_all(count, ( cg_node_(S), cg_has_prefix(S, Prefix) ), Nodes),
+    % Count the edges leaving a node with the prefix.
+    aggregate_all(count, ( cg_edge_(S, _, _), cg_has_prefix(S, Prefix) ), Edges),
+    % Count the tested pairs at a node with the prefix.
+    aggregate_all(count, ( cg_tested_(S, _), cg_has_prefix(S, Prefix) ), Tested),
+    % Count the dead pairs at a node with the prefix.
+    aggregate_all(count, ( cg_dead_(S, _), cg_has_prefix(S, Prefix) ), Dead).
+
+% cg_has_prefix(+Signature, +Prefix): the signature begins with the prefix.
+cg_has_prefix(Signature, Prefix) :-
+    % A leading match of the whole prefix.
+    sub_atom(Signature, 0, _, _, Prefix).
