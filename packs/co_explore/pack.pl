@@ -2,8 +2,8 @@
 name(co_explore).
 % State the fact: version('1.0.0').
 version('1.0.0').
-% State the fact: title('PrologAI Causalontology Exploration Policy — novelty-seeking, state-change-predicting, loop-avoiding action selection with salient click targeting for ARC-AGI-3 (WP-397)').
-title('PrologAI Causalontology Exploration Policy — novelty-seeking, state-change-predicting, loop-avoiding action selection with salient click targeting for ARC-AGI-3 (WP-397)').
+% State the fact: title('PrologAI Causalontology Exploration Policy — novelty-seeking, state-change-predicting, loop-avoiding action selection with salient click targeting for any unknown interactive environment (WP-397)').
+title('PrologAI Causalontology Exploration Policy — novelty-seeking, state-change-predicting, loop-avoiding action selection with salient click targeting for any unknown interactive environment (WP-397)').
 % State the fact: author('PrologAI Community', 'ai.university.aiu@gmail.com').
 author('PrologAI Community', 'ai.university.aiu@gmail.com').
 % State the fact: home('https://github.com/ai-university-aiu/PrologAI').

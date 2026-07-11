@@ -1,10 +1,12 @@
 /*  PrologAI — Causalontology Exploration Policy Test Suite  (WP-397)
 
-    Checks the four behaviours the pack exists for: a canonical signature that
+    Checks the behaviours the pack exists for: a canonical signature that
     recognises a returned-to state as a loop, salient click targeting that
-    turns the ACTION6 marker into a handful of object-centroid clicks rather
-    than 4096 blind cells, curiosity ranking that prefers the least-tried
-    action, and the avoid-set being honoured.
+    turns the click marker into a handful of object-centroid clicks (largest
+    object first) rather than every cell of the grid, curiosity ranking that
+    prefers the least-tried action, the avoid-set being honoured, and the
+    game-scoped policy reading one environment's learnings without touching
+    another's.
 
     Run with the full library path:
         swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/co_explore/test/test_co_explore.pl
