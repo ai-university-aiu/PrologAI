@@ -20,6 +20,8 @@
 :- use_module(library(co_explore)).
 % Load the learner so its avoid-set can be exercised.
 :- use_module(library(co_learn)).
+% Load the verb layer so its relation store can be cleared between tests.
+:- use_module(library(co_core)).
 
 % A small frame with one non-background object of colour one.
 sample_frame([[0,0,0],[0,1,1],[0,1,0]]).
@@ -94,6 +96,67 @@ test(avoid_honoured, [true(A == action(2))]) :-
     sample_frame(F),
     % Even untried, the avoided action(1) must not be chosen.
     cox_choose([action(1), action(2)], [], F, A).
+
+% A frame with two objects of different sizes: the larger object's centroid is
+% offered as a click target before the smaller one's.
+two_object_frame([[2,2,2,0,0],
+                  [2,2,2,0,0],
+                  [2,2,2,0,0],
+                  [0,0,0,0,5],
+                  [0,0,0,0,0]]).
+
+% The salient click targets are ordered largest object first.
+test(salient_largest_first, [true(Targets == [select(1,1), select(4,3)])]) :-
+    % Fetch the two-object frame.
+    two_object_frame(F),
+    % The larger colour-2 block (centroid row 1,col 1) precedes the single
+    % colour-5 cell (row 3,col 4) -> select(x=col,y=row).
+    cox_click_targets(F, Targets).
+
+% A game-keyed causal relation makes its action predicted-to-change for that
+% game only — another game with no such relation predicts nothing.
+test(game_predicted_change) :-
+    % Clear the learner and the verb layer.
+    co_core_reset, co_learn_reset,
+    % Teach that, in game ls20, action(up) causes a move.
+    co_learn_causal(g(ls20, action(up)), moved),
+    % In ls20 that action is predicted to change the world.
+    cox_predict_change(ls20, action(up)),
+    % In a different game the same action is not predicted (no relation there).
+    \+ cox_predict_change(vc33, action(up)).
+
+% The game-scoped choice prefers this game's predicted-change action over an
+% untried but unknown one.
+test(game_prefers_predicted_change, [true(A == action(up))]) :-
+    % Start clean.
+    co_core_reset, co_learn_reset, cox_reset,
+    % Teach ls20 that action(up) changes the world.
+    co_learn_causal(g(ls20, action(up)), moved),
+    % Fetch the sample frame.
+    sample_frame(F),
+    % action(up) is predicted-change (tried once); action(down) is unknown (untried).
+    cox_choose(ls20, [action(up), action(down)], [action(up)-1], F, A).
+
+% cox_choose_change/5 fails when nothing is predicted to change, so the caller
+% can fall back to a graph-frontier search.
+test(game_change_fails_when_none) :-
+    % Start clean: no learned relations at all.
+    co_core_reset, co_learn_reset, cox_reset,
+    % Fetch the sample frame.
+    sample_frame(F),
+    % With no predicted-change action, the causal-first choice fails.
+    \+ cox_choose_change(ls20, [action(up), action(down)], [], F, _).
+
+% A hazard the game learned to avoid, keyed g(Game,Action), is never chosen.
+test(game_avoid_honoured, [true(A == action(down))]) :-
+    % Start clean.
+    co_core_reset, co_learn_reset, cox_reset,
+    % Mark action(up) a hazard in game ls20 only.
+    co_learn_preventive(g(ls20, action(up)), penalty),
+    % Fetch the sample frame.
+    sample_frame(F),
+    % Even untried, the avoided action(up) must not be chosen for ls20.
+    cox_choose(ls20, [action(up), action(down)], [], F, A).
 
 % Close the test unit.
 :- end_tests(co_explore).
