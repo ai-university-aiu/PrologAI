@@ -56,13 +56,62 @@
 :- use_module(library(lists), [member/2, max_list/2, min_list/2, sum_list/2]).
 % Import aggregation.
 :- use_module(library(aggregate), [aggregate_all/3]).
+% Import term hashing for the per-frame perception cache.
+:- use_module(library(terms), [term_hash/2]).
+
+% ---------------------------------------------------------------------------
+% Per-frame segmentation cache — segment a frame once, not once per caller
+% ---------------------------------------------------------------------------
+%
+% A connected-component segmentation of a 64x64 grid is the expensive part of
+% whole-grid perception, and cs_inventory, cs_bars, cs_object_count, and
+% cs_salient_cells ALL derive from cs_objects — so a single choice that reads the
+% inventory, the meters, and the salient cells would segment the same frame three
+% times. This cache computes each whole-grid perception once per frame and hands
+% the stored answer to every later caller. It is keyed by a cheap hash of the
+% frame and keeps only the latest frame's entry per kind, so it stays tiny and
+% never serves a stale frame: a new frame's hash misses and evicts the old one.
+
+% cs_cache_/3: (Kind, FrameHash, Value) — one memoised perception for one frame.
+:- dynamic cs_cache_/3.
+
+% cs_cache_clear/0: drop the whole perception cache. The keep-latest policy
+% already bounds the cache to the current frame, so this is only for a caller
+% that wants to release the memory explicitly (e.g. between games).
+cs_cache_clear :-
+    % Forget every cached perception.
+    retractall(cs_cache_(_, _, _)).
+
+% cs_cached(+Kind, +Frame, :Compute, -Value): return Kind's value for this exact
+% frame, computing it once via Compute(Frame, Value) on a miss and storing it.
+% Only the latest frame's entry per kind is kept, so the cache never grows.
+:- meta_predicate cs_cached(+, +, 2, -).
+cs_cached(Kind, Frame, Compute, Value) :-
+    % A cheap hash of the frame is the cache key.
+    term_hash(Frame, H),
+    (   % Hit: the value for this exact frame is already stored.
+        cs_cache_(Kind, H, V0)
+    ->  Value = V0
+    ;   % Miss: compute once (Compute must succeed, as the direct predicate did),
+        % drop any stale entry of this kind, store the fresh one, and return it.
+        call(Compute, Frame, V1),
+        retractall(cs_cache_(Kind, _, _)),
+        assertz(cs_cache_(Kind, H, V1)),
+        Value = V1
+    ).
 
 % ---------------------------------------------------------------------------
 % Background
 % ---------------------------------------------------------------------------
 
 % Define cs_background: the background is the colour that covers the most cells.
+% Cached per frame — the object segmentation and the avatar locator both need it.
 cs_background(Frame, Bg) :-
+    % Serve the cached background, computing it once per frame.
+    cs_cached(background, Frame, cs_background_compute, Bg).
+
+% cs_background_compute(+Frame, -Bg): the uncached background computation.
+cs_background_compute(Frame, Bg) :-
     % The colours present.
     gd_colors(Frame, Colours),
     % Pair each colour with how many cells carry it.
@@ -81,8 +130,15 @@ cs_background(Frame, Bg) :-
 % ---------------------------------------------------------------------------
 
 % Define cs_objects: every non-background object as obj(Colour, Size, Centroid,
-% BBox), ordered largest object first.
+% BBox), ordered largest object first. Cached per frame so the inventory, meters,
+% object count, and salient cells all share ONE segmentation of the same frame.
 cs_objects(Frame, Objects) :-
+    % Serve the cached segmentation, computing it once per frame.
+    cs_cached(objects, Frame, cs_objects_compute, Objects).
+
+% cs_objects_compute(+Frame, -Objects): the uncached connected-component
+% segmentation — the expensive full-grid pass the cache above amortises.
+cs_objects_compute(Frame, Objects) :-
     % The background to segment against.
     ( cs_background(Frame, Bg) -> true ; Bg = 0 ),
     % Connected components over every non-background colour.
