@@ -1,9 +1,9 @@
-% State the fact: this pack is named co_rel.
-name(co_rel).
+% State the fact: this pack is named co_distill.
+name(co_distill).
 % State the fact: this is version 1.0.0.
 version('1.0.0').
 % State the fact: the title carries the work-package number.
-title('PrologAI Causalontology Object Relations — reason over relations between objects (adjacency, containment, alignment, offset vectors, ordinal size) rather than raw pixels (WP-408)').
+title('PrologAI Causalontology Consolidation — merge duplicate records, compress a reliable sequence into one composite, and forget stale low-value material past a grace period (WP-416)').
 % State the fact: the author and contact address.
 author('PrologAI Community', 'ai.university.aiu@gmail.com').
 % State the fact: the project home page.

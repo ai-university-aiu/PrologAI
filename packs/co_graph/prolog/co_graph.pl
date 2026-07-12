@@ -193,8 +193,16 @@ cg_toward_frontier(Sig, Actions, FirstAction) :-
     % Search outward, never revisiting the start.
     cg_bfs(Seed, [Sig], Actions, Budget, FirstAction).
 
-% cg_frontier_budget(-N): the maximum nodes the frontier search expands.
-cg_frontier_budget(4096).
+% cg_frontier_budget(-N): the maximum nodes the frontier search expands in one
+% step. The graph grows all game (and across attempts), and every expansion does
+% a memberchk over the visited set of whole-grid signature atoms, so an unbounded
+% (or very loose) budget makes each late-game step re-walk thousands of nodes —
+% the cost that helped stall the last sweep. A tight bound keeps per-step frontier
+% cost constant no matter how large the map gets: the nearest unexplored state is
+% almost always a few edges away, so this still finds it, and when it genuinely
+% cannot within the budget the search fails and the caller falls back to another
+% exploration rule rather than paying an ever-growing search on every step.
+cg_frontier_budget(256).
 
 % cg_bfs(+Queue, +Visited, +Actions, +Budget, -FirstAction): breadth-first to a
 % frontier. The queue holds q(Node, FirstAction) — the node and the first action
