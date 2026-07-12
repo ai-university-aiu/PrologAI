@@ -1,10 +1,10 @@
-% State the fact: this pack is named co_rel.
-name(co_rel).
+% State the fact: this pack is named co_trace.
+name(co_trace).
 % State the fact: this is version 1.0.0.
 version('1.0.0').
-% State the fact: the title carries the work-package number.
-title('PrologAI Causalontology Object Relations — reason over relations between objects (adjacency, containment, alignment, offset vectors, ordinal size) rather than raw pixels (WP-408)').
-% State the fact: the author and contact address.
+% State the fact: the human-readable title carries the work-package number.
+title('PrologAI Causalontology Episodic Memory — a reified store of experience-cases (context, action, outcome, valence) with feature-cued recall, replay, and reinforcement (WP-409)').
+% State the fact: name the author and the contact address.
 author('PrologAI Community', 'ai.university.aiu@gmail.com').
 % State the fact: the project home page.
 home('https://github.com/ai-university-aiu/PrologAI').

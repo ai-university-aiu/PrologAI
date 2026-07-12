@@ -1,9 +1,9 @@
-% State the fact: this pack is named co_rel.
-name(co_rel).
+% State the fact: this pack is named co_temper.
+name(co_temper).
 % State the fact: this is version 1.0.0.
 version('1.0.0').
 % State the fact: the title carries the work-package number.
-title('PrologAI Causalontology Object Relations — reason over relations between objects (adjacency, containment, alignment, offset vectors, ordinal size) rather than raw pixels (WP-408)').
+title('PrologAI Causalontology Affect — appraise events into valence and arousal, hold a running temperament, pre-flavor options by remembered feeling, and expose a coping signal (WP-412)').
 % State the fact: the author and contact address.
 author('PrologAI Community', 'ai.university.aiu@gmail.com').
 % State the fact: the project home page.

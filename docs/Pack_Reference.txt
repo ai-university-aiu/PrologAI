@@ -2191,3 +2191,94 @@ Causalontology State-Graph Exploration: The Winning ARC-AGI-3 Technique (co_*, L
     cg_choose(+Sig,+Actions,-Action): the winning hierarchical rule — probe untested here, else head to the frontier.
     cg_stats(-stats(Nodes,Edges,Tested,Dead)): a summary of the whole graph's size.
     cg_stats_for(+Prefix,-stats(Nodes,Edges,Tested,Dead)): a summary of just the subgraph whose signatures carry the prefix, so many games can share one store and each reads only its own map (no cross-game bleed).
+
+co_trace
+Causalontology Episodic Memory (co_*, Layer 384)
+    ct_reset/0: forget every stored episode.
+    ct_record(+Context,+Action,+Outcome,+Valence): store one experience-case.
+    ct_record(+Context,+Action,+Outcome,+Valence,-Id): store and return the case id.
+    ct_episode(?Id,?Context,?Action,?Outcome,?Valence,?Recency): query stored cases.
+    ct_similarity(+Cue,+Id,-Score): Jaccard overlap of a cue with a case's context, in [0,1].
+    ct_remind(+Cue,+K,-TopK): the best K episodes for a cue, most similar first.
+    ct_recall(+Cue,-Id,-Score): the single best-matching episode (bumps its hit count).
+    ct_replay(+Id,-Action,-Outcome,-Valence): read back what a case did and how it turned out.
+    ct_reinforce(+Id,+Delta): nudge a case's valence, clamped to [-1,1].
+    ct_hits(?Id,?Hits) / ct_count(-N) / ct_stats(-stats(Count,MeanValence)): store statistics.
+
+co_salience
+Causalontology Attention and Broadcast (co_*, Layer 385)
+    sl_reset/0: clear all candidates and restore default weights.
+    sl_set_weights(+Wnovelty,+Wrelevance,+Waffect) / sl_weights(?Wn,?Wr,?Wa): the salience weights.
+    sl_offer(+Item,+Novelty,+Relevance,+Affect): a specialist offers a candidate (affect in [-1,1]).
+    sl_score(?Item,-Salience): the transparent weighted sum (affect counts by magnitude).
+    sl_candidates(-Pairs): all candidates as Salience-Item, most salient first.
+    sl_working_set(+K,-Items): the best K items currently in mind.
+    sl_broadcast(-Item,-Salience): the single most salient winner of the cognitive cycle.
+    sl_forget(+Item) / sl_count(-N): drop a candidate; count the pool.
+
+co_impetus
+Causalontology Motivation (co_*, Layer 386)
+    im_reset/0: forget all needs, restore the default satisfied threshold.
+    im_set_threshold(+Epsilon) / im_threshold(?Epsilon): the satisfied-pressure threshold.
+    im_need_add(+Name,+Target,+Actual): register a homeostatic need with a set-point.
+    im_set_actual(+Name,+Actual): update a need's current reading.
+    im_need(?Name,?Target,?Actual) / im_pressure(+Name,-Pressure): read needs; the gap size.
+    im_satisfied(+Name): the need's pressure is at or below threshold.
+    im_goal_of(+Name,-Goal): the restore(Name) goal that would close the gap.
+    im_agenda(-Goals): the prioritized, never-empty agenda (explore when nothing presses).
+    im_top_goal(-Goal) / im_count(-N): the single most pressing goal; how many needs.
+
+co_temper
+Causalontology Affect (co_*, Layer 387)
+    tp_reset/0: forget all appraisals and the temperament.
+    tp_appraise(+Event,+GoalCongruence,+Expectedness,-appraisal(V,A)): valence in [-1,1], arousal in [0,1].
+    tp_appraisal(?Event,?Valence,?Arousal): read back an event's last stored feeling.
+    tp_temper(-Valence,-Arousal): the running mood (mean valence and arousal).
+    tp_flavor(+Option,-Bias): the remembered valence of an option, else zero (a somatic marker).
+    tp_prefer(+Options,-Best,-Bias): pick the option that feels best.
+    tp_coping(-Signal): read the mood as thriving | steady | struggling.
+    tp_count(-N): how many events have a stored feeling.
+
+co_gauge
+Causalontology Metacognition (co_*, Layer 388)
+    gu_reset/0: forget the attempt log, restore default thresholds.
+    gu_set_thresholds(+MinAttempts,+ConfusionRate,+GoodRate) / gu_thresholds(?Min,?Conf,?Good).
+    gu_attempt(+Strategy,+Outcome): record one attempt (Outcome = success | failure).
+    gu_stats(?Strategy,-Attempts,-Successes) / gu_calibration(+Strategy,-Rate): per-strategy tallies and rate.
+    gu_best_strategy(-Strategy,-Rate): the best-calibrated tried strategy.
+    gu_confused(?Strategy): strategies with enough attempts and a rate at or below the low mark.
+    gu_progress(-Trend): the overall learning trend (improving | flat | declining).
+    gu_recommend(-Recommendation): use(S) | seek_guidance | explore.
+    gu_count(-N): total attempts logged.
+
+co_ward
+Causalontology Safety Governor (co_*, Layer 389)
+    wd_reset/0: clear the constitution, hazards, and veto log (only an operator reset, never learning).
+    wd_forbid(+Pattern,+Reason): add a constitutional constraint (a pattern may carry variables).
+    wd_avoid_add(+Action): mirror in a learned hazard from co_core's preventive relations.
+    wd_constraint(?Pattern,?Reason) / wd_forbidden(+Action): read the constitution; does any prohibition match?
+    wd_check(+Action,-Verdict): allow | veto(Reason); every veto is appended to the immutable log.
+    wd_permit(+Action): succeeds only when the action is allowed.
+    wd_veto_log(-Entries): the append-only log, oldest first (veto(Seq,Action,Reason)).
+    wd_veto_count(-N) / wd_constraint_count(-N): log and constitution sizes.
+
+co_mend
+Causalontology Repair (co_*, Layer 390)
+    md_reset/0: forget all repair knowledge.
+    md_inverse_add(+Action,+InverseAction): teach that one action reverses another.
+    md_neutralizer_add(+Effect,+Action): teach that an action cancels an effect.
+    md_reroute_add(+Goal,+AlternateGoal): teach an alternate goal for a blocked one.
+    md_inverse(?A,?Inv) / md_neutralizer(?E,?A) / md_reroute(?G,?Alt): read the repair relations.
+    md_classify(+Disturbance,-Kind): reversible | side_effect | blocked | unknown.
+    md_compensate(+Disturbance,-Plan,-Grade): the preferred repair — inversion, then neutralization, then reroute, then accept.
+    md_can_compensate(+Disturbance): a real repair exists (grade not none).
+
+co_distill
+Causalontology Consolidation (co_*, Layer 391)
+    di_reset/0: empty the store, restart the recency clock.
+    di_add(+Key,+Value): insert a record, or MERGE on a repeated key (bumps uses, refreshes value/recency).
+    di_touch(+Key): mark an existing record used again.
+    di_compress(+Name,+Sequence,-Composite): reify a repeated sequence as one composite record and term.
+    di_record(?Key,?Value,?Uses,?Recency): query the stored records.
+    di_forget(+MinUses,+GraceCutoff,-Dropped): prune records both low-value AND stale; count the drops.
+    di_time(-Now) / di_count(-N) / di_stats(-stats(Count,TotalUses)): the clock and store statistics.
