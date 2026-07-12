@@ -2282,3 +2282,44 @@ Causalontology Consolidation (co_*, Layer 391)
     di_record(?Key,?Value,?Uses,?Recency): query the stored records.
     di_forget(+MinUses,+GraceCutoff,-Dropped): prune records both low-value AND stale; count the drops.
     di_time(-Now) / di_count(-N) / di_stats(-stats(Count,TotalUses)): the clock and store statistics.
+
+co_ground
+Causalontology Clue Grounding (co_*, Layer 392)
+    gr_reset/0: forget caller-added grounding rules (built-ins remain).
+    gr_rule_add(+Keyword,+RefVar,+Template): add a caller keyword template mentioning RefVar.
+    gr_builtin(?Keyword,?Ref,?Assertions): the fixed built-in keyword-to-Causalontology mapping.
+    gr_lookup(+Keyword,+Ref,-Assertions): ground one keyword (a custom rule wins over a built-in).
+    gr_ground(+Clue,+Ref,-Assertions): ground a whole clue (phrase atom or word list) against a referent.
+    gr_is_clue(+Clue): whether a clue grounds to anything.
+    gr_keywords(-Keywords): every keyword the pack knows.
+    gr_provenance(-prov(human_hint,0.9)): the high-confidence, defeasible provenance a grounded hint carries.
+
+co_kin
+Causalontology Theory of Mind (co_*, Layer 393)
+    kn_reset/0: forget all agents, targets, moves, beliefs, and truths.
+    kn_candidate_add(+Agent,+TargetCell): register a place the agent might be heading to.
+    kn_note_move(+Agent,+FromCell,+ToCell): record one observed step (cells are cell(Row,Col)).
+    kn_approach(+Agent,+TargetCell,-NetApproach): net grid distance the agent closed toward a target.
+    kn_infer_goal(+Agent,-TargetCell): the candidate the agent's moves most consistently approach.
+    kn_predict_next(+Agent,+CurrentCell,-NextCell): the agent's likely next step toward its inferred goal.
+    kn_belief_add(+Agent,+Fact) / kn_truth_add(+Fact): record a belief; record a ground truth.
+    kn_believes(?Agent,?Fact) / kn_true(?Fact): query beliefs and truths.
+    kn_false_belief(?Agent,?Fact): a belief the agent holds that the true state contradicts (Sally-Anne).
+
+co_liken
+Causalontology Analogy (co_*, Layer 394)
+    lk_objects(+Relations,-Objects): the distinct objects a relation set mentions (rel(Type,A,B)).
+    lk_map_object(+Mapping,+Object,-Image): apply an object mapping (list of Src-Tgt pairs).
+    lk_preserved(+Mapping,+Source,+Target,-Count): how many source relations line up in the target.
+    lk_analogy(+Source,+Target,-Mapping,-Score): the injective object mapping that preserves the most relations.
+    lk_transfer(+Mapping,+Term,-Image): carry a term (a rule, goal, or disposition) from source objects to their target images.
+
+co_forge
+Causalontology Concept Formation (co_*, Layer 395)
+    fg_reset/0: forget all items and reset concept identifiers.
+    fg_observe(+ItemId,+Features): record or replace an observed feature bundle.
+    fg_item(?ItemId,?Features): query observed items.
+    fg_shared(+IdA,+IdB,-SharedFeatures): the features two items have in common.
+    fg_induce(+MinShared,-Concepts): seed-cluster the items into concept(ConceptId,SharedFeatures,Members).
+    fg_classify(+Features,+Concepts,-ConceptId): the first concept whose defining core is a subset of the features.
+    fg_count(-N): how many items have been observed.
