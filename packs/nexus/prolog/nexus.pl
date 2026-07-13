@@ -1,6 +1,6 @@
 /*  PrologAI — Nexus: AGI Foundations Integration Layer  (WP-390, Layer 365)
 
-    The seven AGI Foundations packs (causal, actinf, worldmodel, planner,
+    The seven AGI Foundations packs (causal, actinf, co_wm, planner,
     evolve, jspace, tom) were built as self-contained capabilities. This
     pack is the capstone that wires four of them into PrologAI's existing
     cognitive core, respecting the strictly acyclic layer order: nexus
@@ -16,7 +16,7 @@
                                 reasoning. (nx_bind_workspace/1,
                                 nx_hold_broadcast/2, nx_replay_broadcasts/2.)
 
-      2. curiosity <- worldmodel  wm_novelty feeds the curiosity pack's
+      2. curiosity <- co_wm  wm_novelty feeds the curiosity pack's
                                 learning-progress signal: a falling novelty
                                 stream over an explored trajectory reads as
                                 positive learning progress. (nx_observe_novelty/5,
@@ -69,7 +69,7 @@
     nx_replay_broadcasts/2,
     % nx_broadcast_reading/2: the live J-Lens readout after broadcasts.
     nx_broadcast_reading/2,
-    % nx_novelty_signal/3: worldmodel novelty of a state against known states.
+    % nx_novelty_signal/3: co_wm novelty of a state against known states.
     nx_novelty_signal/3,
     % nx_observe_novelty/5: feed one novelty reading as a curiosity error.
     nx_observe_novelty/5,
@@ -95,7 +95,7 @@
 % Import the J-Space workspace predicates used by wiring one.
 :- use_module(library(jspace), [js_hold/4, js_reading/2]).
 % Import the world-model novelty predicate used by wiring two.
-:- use_module(library(worldmodel), [wm_novelty/3]).
+:- use_module(library(co_wm), [wm_novelty/3]).
 % Import the hierarchical planner predicates used by wiring three.
 :- use_module(library(planner), [ht_plan/5, ht_monitor/4]).
 % Import the evolutionary run predicate used by wiring four.
@@ -128,7 +128,7 @@ nx_wirings([
     % Wiring one connects the J-Space workspace to the global workspace.
     wiring(jspace_from_workspace, "workspace broadcast -> J-Space held concepts"),
     % Wiring two connects curiosity to the world model's novelty signal.
-    wiring(curiosity_from_worldmodel, "wm_novelty -> curiosity learning progress"),
+    wiring(curiosity_from_co_wm, "wm_novelty -> curiosity learning progress"),
     % Wiring three connects the agency loop to the hierarchical planner.
     wiring(agency_with_planner, "ht_plan / ht_monitor -> agency loop decomposition and recovery"),
     % Wiring four connects evolutionary search to refinery critique.
@@ -175,7 +175,7 @@ nx_broadcast_reading(JSpace, Reading) :-
     js_reading(JSpace, Reading).
 
 % ===========================================================================
-% WIRING TWO — curiosity <- worldmodel novelty
+% WIRING TWO — curiosity <- co_wm novelty
 % ===========================================================================
 
 % nx_novelty_signal(+KnownStates, +State, -Novelty): world-model novelty.

@@ -1920,24 +1920,34 @@ Active Inference Engine: Expected Free Energy and Policy Selection (ai_*, Layer 
     ai_act(+GM,+Belief,+Horizon,+Gamma,-Action): first action of the selected policy.
     ai_step(+GM,+Belief,+Obs,+Horizon,+Gamma,-Action,-Posterior): the full perceive-then-act cycle.
 
-worldmodel
-Structured World Model: Simulation, Planning Search, and Model Learning (wm_*, Layer 360)
-    wm_state(+Fluents,-State): normalize a fluent list into a canonical sorted state.
-    wm_action(+Name,+Pre,+Add,+Del,-Action): build a STRIPS-style action; Name may carry parameters.
-    wm_holds(+State,+Fluent): the fluent is present.
-    wm_goal_holds(+State,+Goal): every goal fluent is present.
-    wm_applicable(+State,+Action): preconditions hold, binding action parameters.
-    wm_apply(+State,+Action,-State2): delete then add effects, restoring canonical form.
-    wm_step(+State,+Actions,?Name,-State2): take one named grounded step from a repertoire.
-    wm_successors(+State,+Actions,-Pairs): every Name-State2 successor.
-    wm_simulate(+State,+Actions,+Plan,-Trajectory): run a plan, returning all visited states; fails on an inapplicable step.
-    wm_plan_bfs(+State,+Actions,+Goal,+MaxDepth,-Plan): breadth-first search for a shortest plan with a visited set and depth bound.
-    wm_reachable(+State,+Actions,+Depth,-States): all states reachable within the depth.
-    wm_rollout(+State,+Actions,+Depth,-Rollouts): every action sequence up to the depth with its final state.
-    wm_diff(+S1,+S2,-Added,-Removed): fluent-level difference of two states.
-    wm_learn(+Transitions,-Models): induce one action model per observed name from tr(Name,Before,After) records by conservative intersection.
-    wm_predict(+Models,+State,+Name,-State2): predict with a learned model, honouring its learned preconditions.
-    wm_novelty(+KnownStates,+State,-Score): fraction of the state's fluents never seen before — the curiosity hook.
+co_wm
+Causalontology World Model — the single, two-mode, canonical world model (co_*, Layer 382). It absorbed the former worldmodel pack (WP-385) so there is one home for both paradigms; nothing was lost, and the former wm_predict/4 name collision was resolved.
+    MODE 1 — the learned transition model:
+    wm_reset/0: forget the learned model.
+    wm_observe(+Model,+Context,+Action,+Effect): record one observed transition.
+    wm_predict(+Model,+Context,+Action,-Effect) / wm_predict(..,-Effect,-Confidence): majority effect and its share, with fall-back to the action-general rule.
+    wm_known(+Model,+Context,+Action): has this (context, action) been seen?
+    wm_verify(+Model,+Context,+Action,+Observed,-Result): match | mismatch(Predicted,Observed) | novel.
+    wm_repair(+Model,+Context,+Action,+Observed): fold the observed truth in.
+    wm_rollout(+Model,+Context,+ActionSeq,-PredictedEffects): predict the effects of a sequence (plan-in-model).
+    wm_law(+Model,?Action,?Effect): an action whose effect is context-free — a general law.
+    wm_stats(+Model,-stats(Contexts,Transitions)) / wm_snapshot(+Model,-Obs) / wm_restore(+Model,+Obs): summary and persistence.
+    MODE 2 — the structured simulate-and-plan model (absorbed from worldmodel):
+    wm_state(+Fluents,-State): canonical sorted state.
+    wm_action(+Name,+Pre,+Add,+Del,-Action): build a STRIPS-style action.
+    wm_holds(+State,+Fluent) / wm_goal_holds(+State,+Goal): membership and goal tests.
+    wm_applicable(+State,+Action) / wm_apply(+State,+Action,-State2): precondition match and effect application.
+    wm_step(+State,+Actions,?Name,-State2) / wm_successors(+State,+Actions,-Pairs): one grounded step; all successors.
+    wm_simulate(+State,+Actions,+Plan,-Trajectory): run a plan, returning the state trajectory.
+    wm_plan_bfs(+State,+Actions,+Goal,+MaxDepth,-Plan): breadth-first shortest plan.
+    wm_reachable(+State,+Actions,+Depth,-States): all states within a depth.
+    wm_enumerate(+State,+Actions,+Depth,-Rollouts): every action sequence to a depth with its final state (was worldmodel's wm_rollout/4, renamed to avoid the Mode-1 collision).
+    wm_diff(+S1,+S2,-Added,-Removed): fluent-level difference.
+    wm_learn(+Transitions,-Models): induce STRIPS action models from tr(Name,Before,After) records.
+    wm_model_predict(+Models,+State,+Name,-State2): predict with a learned STRIPS model (was worldmodel's wm_predict/4, renamed).
+    wm_novelty(+KnownStates,+State,-Score): fraction of a state's fluents never seen before.
+    CAUSALONTOLOGY BRIDGE:
+    wm_as_cros(+Model,-CROs): emit the learned Mode-1 transitions as reified cro/8 terms for the shared store.
 
 planner
 Hierarchical Planner: HTN Decomposition, Plan Trees, and Monitoring (ht_*, Layer 361)
