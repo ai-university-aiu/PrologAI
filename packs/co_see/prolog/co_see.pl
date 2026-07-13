@@ -174,11 +174,13 @@ cs_centroid(Cells, R, C) :-
 
 % cs_bbox(+Cells, -R0, -C0, -R1, -C1): the bounding box of a cell list.
 cs_bbox(Cells, R0, C0, R1, C1) :-
-    % The rows and columns.
+    % The row coordinates.
     findall(RR, member(r(RR, _), Cells), Rows),
+    % The column coordinates.
     findall(CC, member(r(_, CC), Cells), Cols),
-    % The extremes.
+    % The extreme rows.
     min_list(Rows, R0), max_list(Rows, R1),
+    % The extreme columns.
     min_list(Cols, C0), max_list(Cols, C1).
 
 % Define cs_object_count: how many objects the grid holds.
@@ -204,8 +206,11 @@ cs_inventory(Frame, Items) :-
 % cs_role(+Size,+R0,+C0,+R1,+C1,+Area,-Role): a shape-based role guess.
 % A thin, long object is a meter (life-bar / timer / counter).
 cs_role(_, R0, C0, R1, C1, _, meter) :-
+    % The object's height and width.
     Height is R1 - R0 + 1, Width is C1 - C0 + 1,
+    % Its thin side and its long side.
     min_list([Height, Width], Thin), max_list([Height, Width], Long),
+    % Thin (at most two) and long (at least five) makes it a meter.
     Thin =< 2, Long >= 5, !.
 % A single cell is a dot (often a target or collectible).
 cs_role(1, _, _, _, _, _, dot) :- !.
@@ -249,6 +254,7 @@ cs_bars(Frame, Bars) :-
 cs_changed_cells(Frame0, Frame1, Cells) :-
     % The dimensions (assume the two frames share them).
     gd_size(Frame0, H, W),
+    % The last row and column indices.
     H1 is H - 1, W1 is W - 1,
     % Every cell whose value changed.
     findall(cell(R, C),
@@ -281,13 +287,15 @@ cs_avatar_move(Frame0, Frame1, cell(R, C)) :-
 
 % cs_centroid_cells(+Cells, -R, -C): the rounded centroid of a cell(R,C) list.
 cs_centroid_cells(Cells, R, C) :-
-    % The rows and columns.
+    % The row coordinates.
     findall(RR, member(cell(RR, _), Cells), Rows),
+    % The column coordinates.
     findall(CC, member(cell(_, CC), Cells), Cols),
     % How many.
     length(Cells, N), N > 0,
-    % The rounded means.
+    % Sum the rows and columns.
     sum_list(Rows, SumR), sum_list(Cols, SumC),
+    % The rounded means.
     R is round(SumR / N), C is round(SumC / N).
 
 % Import nth1/nth0 for the inventory ids.

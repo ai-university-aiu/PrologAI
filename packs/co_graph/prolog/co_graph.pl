@@ -209,17 +209,24 @@ cg_frontier_budget(256).
 % that led toward it. The first dequeued node that is a frontier yields its first
 % action. Budget counts down per node expanded; at zero the search gives up.
 cg_bfs(_, _, _, 0, _) :- !, fail.
+% The recursive clause dequeues the front node and either reports it as the
+% frontier or expands it.
 cg_bfs([q(Node, FirstAction) | Rest], Visited, Actions, Budget, Result) :-
+    % Test whether the dequeued node is fresh and still has an untested action.
     (   \+ memberchk(Node, Visited), cg_has_untested(Node, Actions)
     % This reachable node still has an untested action: go toward it.
     ->  Result = FirstAction
     % Already visited: skip it.
     ;   memberchk(Node, Visited)
+    % Drop the seen node and carry on with the rest of the queue.
     ->  cg_bfs(Rest, Visited, Actions, Budget, Result)
     % New but fully-tested node: enqueue its successors, keeping the first action.
     ;   findall(q(To, FirstAction), cg_edge_(Node, _A, To), Succ),
+        % Append those successors to the back of the queue.
         append(Rest, Succ, Queue),
+        % Spend one unit of the expansion budget.
         Budget1 is Budget - 1,
+        % Recurse with this node now marked visited.
         cg_bfs(Queue, [Node | Visited], Actions, Budget1, Result)
     ).
 

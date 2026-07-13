@@ -67,6 +67,7 @@
 
 % List and aggregate helpers.
 :- use_module(library(lists), [member/2, reverse/2]).
+% Counting aggregation helper.
 :- use_module(library(aggregate), [aggregate_all/3]).
 
 % ---------------------------------------------------------------------------
@@ -82,8 +83,11 @@
 
 % hy_reset: clear all hypotheses, commitments, and restore default thresholds.
 hy_reset :-
+    % Forget every hypothesis's evidence.
     retractall(hy_ev_(_, _, _, _)),
+    % Forget every model's commitment.
     retractall(hy_committed_(_, _)),
+    % Forget any custom thresholds.
     retractall(hy_threshold_(_, _, _)),
     % Defaults: commit at 0.70; a challenger must lead the committed hypothesis by
     % 0.15 in score to switch (hysteresis — normally reached only once the committed
@@ -93,12 +97,16 @@ hy_reset :-
 
 % hy_set_thresholds(+Commit, +Switch, +Abandon): set the commitment thresholds.
 hy_set_thresholds(Commit, Switch, Abandon) :-
+    % Insist all three thresholds are numbers.
     number(Commit), number(Switch), number(Abandon),
+    % Drop any thresholds currently in force.
     retractall(hy_threshold_(_, _, _)),
+    % Install the new thresholds.
     assertz(hy_threshold_(Commit, Switch, Abandon)).
 
 % hy_thresholds(-Commit, -Switch, -Abandon): the current thresholds, with defaults.
 hy_thresholds(Commit, Switch, Abandon) :-
+    % Read the stored thresholds if present, else fall back to the built-in defaults.
     ( hy_threshold_(C, S, A) -> Commit = C, Switch = S, Abandon = A
     ; Commit = 0.70, Switch = 0.25, Abandon = 0.40 ).
 
@@ -109,28 +117,39 @@ hy_thresholds(Commit, Switch, Abandon) :-
 % hy_propose(+Model, +Hypothesis, -Id): register a candidate hypothesis. If it is
 % already present it is reused (no duplicate); the id is the hypothesis term.
 hy_propose(Model, Hypothesis, Hypothesis) :-
+    % Reuse it if it already exists, otherwise assert it with an empty tally.
     ( hy_ev_(Model, Hypothesis, _, _) -> true
     ; assertz(hy_ev_(Model, Hypothesis, 0, 0)) ).
 
 % hy_support(+Model, +Hypothesis): record one confirming observation.
 hy_support(Model, Hypothesis) :-
+    % Make sure the hypothesis exists first.
     hy_propose(Model, Hypothesis, _),
+    % Take its current evidence tally out.
     retract(hy_ev_(Model, Hypothesis, S, C)),
+    % Increment the supporting count.
     S1 is S + 1,
+    % Put the updated tally back.
     assertz(hy_ev_(Model, Hypothesis, S1, C)).
 
 % hy_contradict(+Model, +Hypothesis): record one disconfirming observation.
 hy_contradict(Model, Hypothesis) :-
+    % Make sure the hypothesis exists first.
     hy_propose(Model, Hypothesis, _),
+    % Take its current evidence tally out.
     retract(hy_ev_(Model, Hypothesis, S, C)),
+    % Increment the contradicting count.
     C1 is C + 1,
+    % Put the updated tally back.
     assertz(hy_ev_(Model, Hypothesis, S, C1)).
 
 % hy_score(+Model, +Hypothesis, -Score): the Laplace-smoothed support fraction —
 % (Support + 1) / (Support + Contradict + 2). A hypothesis with no evidence scores
 % 0.5; consistent support drives it toward 1, consistent contradiction toward 0.
 hy_score(Model, Hypothesis, Score) :-
+    % Read the hypothesis's evidence tally.
     hy_ev_(Model, Hypothesis, S, C),
+    % Compute the Laplace-smoothed support fraction.
     Score is (S + 1) / (S + C + 2).
 
 % ---------------------------------------------------------------------------
@@ -142,17 +161,24 @@ hy_score(Model, Hypothesis, Score) :-
 hy_ranked(Model, Ranked) :-
     % Each hypothesis keyed by a sort key that puts the best first.
     findall(k(NegScore, NegEvidence) - hyp(H, Score),
+        % For every hypothesis of this model,
         ( hy_ev_(Model, H, S, C),
+          % compute its score,
           hy_score(Model, H, Score),
+          % negate the score so a higher score sorts earlier,
           NegScore is -Score,
+          % and negate the total evidence so more evidence breaks ties earlier.
           NegEvidence is -(S + C) ),
+        % Collect the keyed hypotheses.
         Keyed),
     % Sort ascending by the negated keys (so highest score, most evidence, first).
     keysort(Keyed, Sorted),
+    % Strip the keys, keeping only the hyp(Hypothesis, Score) values in order.
     findall(Hyp, member(_ - Hyp, Sorted), Ranked).
 
 % hy_best(+Model, -Hypothesis, -Score): the single best hypothesis.
 hy_best(Model, Hypothesis, Score) :-
+    % Take the head of the ranked list.
     hy_ranked(Model, [hyp(Hypothesis, Score) | _]).
 
 % ---------------------------------------------------------------------------
@@ -165,8 +191,11 @@ hy_best(Model, Hypothesis, Score) :-
 % score has collapsed below the abandon floor, or a challenger leads it by the
 % wider switch margin — the hysteresis that holds a good model through a surprise.
 hy_update_commitment(Model) :-
+    % Read the three thresholds in force.
     hy_thresholds(Commit, Switch, Abandon),
+    % Get the model's hypotheses ranked best-first.
     hy_ranked(Model, Ranked),
+    % Branch on whether a hypothesis is already committed.
     (   hy_committed_(Model, HC)
     % A hypothesis is already committed: decide keep / switch / drop.
     ->  hy_committed_decision(Model, HC, Ranked, Commit, Switch, Abandon)
@@ -177,9 +206,13 @@ hy_update_commitment(Model) :-
 % hy_fresh_commit(+Model, +Ranked, +Commit): commit the best hypothesis when it
 % clears the commit threshold and leads the runner-up by the commit lead (0.10).
 hy_fresh_commit(Model, [hyp(HB, SB) | Rest], Commit) :-
+    % The best must clear the commit threshold.
     SB >= Commit,
+    % If there is a runner-up, the best must lead it by the commit margin.
     ( Rest = [hyp(_, SR) | _] -> SB - SR >= 0.05 ; true ),
+    % Commit to this decision.
     !,
+    % Record the best hypothesis as committed.
     assertz(hy_committed_(Model, HB)).
 % Otherwise commit to nothing yet (keep exploring).
 hy_fresh_commit(_, _, _).
@@ -191,14 +224,18 @@ hy_committed_decision(Model, HC, Ranked, Commit, Switch, Abandon) :-
     ( member(hyp(HC, SC), Ranked) -> true ; SC = 0.0 ),
     % The best challenger that is NOT the committed hypothesis.
     ( member(hyp(HCh, SCh), Ranked), HCh \== HC -> true ; HCh = none, SCh = 0.0 ),
+    % Decide among collapse, switch, and keep.
     (   % Collapsed: the committed model is now worse than the abandon floor.
         SC < Abandon
+    % Drop the collapsed commitment.
     ->  retractall(hy_committed_(Model, _)),
         % If a challenger is strong, adopt it at once; else re-open exploration.
         ( SCh >= Commit -> assertz(hy_committed_(Model, HCh)) ; true )
     ;   % A challenger beats it by the wider switch margin: switch.
         HCh \== none, SCh - SC >= Switch, SCh >= Commit
+    % Drop the old commitment first.
     ->  retractall(hy_committed_(Model, _)),
+        % Adopt the winning challenger.
         assertz(hy_committed_(Model, HCh))
     ;   % Otherwise KEEP the committed hypothesis (hysteresis holds it).
         true
@@ -206,14 +243,18 @@ hy_committed_decision(Model, HC, Ranked, Commit, Switch, Abandon) :-
 
 % hy_committed(+Model, -Hypothesis): the model's committed hypothesis, if any.
 hy_committed(Model, Hypothesis) :-
+    % Read the stored commitment.
     hy_committed_(Model, Hypothesis).
 
 % hy_stale(+Model): the committed hypothesis is under real pressure — its score has
 % dropped to or below the midpoint despite being committed, a signal to re-orient
 % (gather more evidence or generate new hypotheses) before it must be abandoned.
 hy_stale(Model) :-
+    % There must be a committed hypothesis.
     hy_committed_(Model, HC),
+    % Read its current score.
     hy_score(Model, HC, SC),
+    % It is stale when that score has fallen to or below the midpoint.
     SC =< 0.5.
 
 % ---------------------------------------------------------------------------
@@ -223,7 +264,9 @@ hy_stale(Model) :-
 % hy_stats(+Model, -stats(N, Committed)): how many hypotheses the model holds and
 % which, if any, is committed.
 hy_stats(Model, stats(N, Committed)) :-
+    % Count the model's hypotheses.
     aggregate_all(count, hy_ev_(Model, _, _, _), N),
+    % Report the committed hypothesis, or the atom none if there is none.
     ( hy_committed_(Model, H) -> Committed = H ; Committed = none ).
 
 % ---------------------------------------------------------------------------
@@ -236,17 +279,23 @@ hy_stats(Model, stats(N, Committed)) :-
 % a caller can write it to disk. Thresholds are global policy, not per-model, so
 % they are not part of a model's snapshot.
 hy_snapshot(Model, state(Ev, Committed)) :-
+    % Collect every hypothesis's evidence tally as an ev/3 term.
     findall(ev(Hypothesis, S, C), hy_ev_(Model, Hypothesis, S, C), Ev),
+    % Record the committed hypothesis, or the atom none if there is none.
     ( hy_committed_(Model, HC) -> Committed = HC ; Committed = none ).
 
 % hy_restore(+Model, +state(Ev, Committed)): replace this model's hypotheses and
 % commitment with the snapshot. The model's existing evidence and commitment are
 % dropped first, so restore is idempotent.
 hy_restore(Model, state(Ev, Committed)) :-
+    % Drop the model's existing evidence.
     retractall(hy_ev_(Model, _, _, _)),
+    % Drop the model's existing commitment.
     retractall(hy_committed_(Model, _)),
+    % Re-assert every evidence tally from the snapshot.
     forall(member(ev(Hypothesis, S, C), Ev),
         assertz(hy_ev_(Model, Hypothesis, S, C))),
+    % Restore the committed hypothesis unless the snapshot recorded none.
     ( Committed == none -> true ; assertz(hy_committed_(Model, Committed)) ).
 
 % Install the default thresholds at load time.

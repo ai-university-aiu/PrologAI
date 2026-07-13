@@ -85,18 +85,26 @@ cr_aligned_col(A, B) :- cr_centroid(A, _, C), cr_centroid(B, _, C).
 % cr_adjacent(+A, +B): A's and B's bounding boxes touch or overlap (their boxes,
 % expanded by one cell, intersect) — the pusher-next-to-block relation.
 cr_adjacent(A, B) :-
+    % A's bounding box.
     cr_box(A, AR0, AC0, AR1, AC1),
+    % B's bounding box.
     cr_box(B, BR0, BC0, BR1, BC1),
     % Expand A by one cell and test for box intersection with B.
     AR0e is AR0 - 1, AC0e is AC0 - 1, AR1e is AR1 + 1, AC1e is AC1 + 1,
+    % The expanded rows of A overlap B's rows.
     AR0e =< BR1, BR0 =< AR1e,
+    % The expanded columns of A overlap B's columns.
     AC0e =< BC1, BC0 =< AC1e.
 
 % cr_contains(+A, +B): A's bounding box strictly encloses B's — key-inside-lock.
 cr_contains(A, B) :-
+    % A and B are two distinct objects.
     cr_id(A, IdA), cr_id(B, IdB), IdA \== IdB,
+    % A's bounding box.
     cr_box(A, AR0, AC0, AR1, AC1),
+    % B's bounding box.
     cr_box(B, BR0, BC0, BR1, BC1),
+    % A's box covers B's box on every side.
     AR0 =< BR0, AC0 =< BC0, BR1 =< AR1, BC1 =< AC1,
     % Strictly larger on at least one side (not the same box).
     ( AR0 < BR0 ; AC0 < BC0 ; BR1 < AR1 ; BC1 < AC1 ).
@@ -108,7 +116,9 @@ cr_contains(A, B) :-
 % cr_vector(+A, +B, -DRow, -DCol): the centroid offset from A to B — the primitive
 % for leader-follower and vector-guided movement.
 cr_vector(A, B, DRow, DCol) :-
+    % The two centroids.
     cr_centroid(A, RA, CA), cr_centroid(B, RB, CB),
+    % The offset from A to B in rows and columns.
     DRow is RB - RA, DCol is CB - CA.
 
 % cr_larger(+A, +B): A has strictly more cells than B.
@@ -123,13 +133,17 @@ cr_same_size(A, B) :- cr_size(A, S), cr_size(B, S).
 % cr_nearest(+A, +Objects, -B, -Dist): the object in Objects nearest to A by
 % Manhattan distance between centroids (A itself is excluded).
 cr_nearest(A, Objects, B, Dist) :-
+    % A's own id, so it can be excluded from the search.
     cr_id(A, IdA),
+    % Pair every other object with its Manhattan distance from A.
     findall(D - Obj,
         ( member(Obj, Objects), cr_id(Obj, IdO), IdO \== IdA,
           cr_centroid(A, RA, CA), cr_centroid(Obj, RO, CO),
           D is abs(RA - RO) + abs(CA - CO) ),
         Pairs),
+    % There is at least one other object.
     Pairs \== [],
+    % Sort by distance and take the nearest as B.
     keysort(Pairs, [Dist - B | _]).
 
 % ---------------------------------------------------------------------------
@@ -140,20 +154,29 @@ cr_nearest(A, Objects, B, Dist) :-
 % rel(Type, IdA, IdB) (or rel(vector, IdA, IdB, DRow, DCol) for offsets). This is
 % the structured description a mechanic is matched against.
 cr_relations(Objects, Relations) :-
+    % Collect every relation that holds over the object list.
     findall(Rel, cr_one_relation(Objects, Rel), Relations).
 
 % cr_one_relation(+Objects, -Rel): one relation between a distinct ordered pair.
 cr_one_relation(Objects, Rel) :-
     % A distinct ordered pair of objects.
     member(A, Objects), member(B, Objects),
+    % The two objects are different.
     cr_id(A, IdA), cr_id(B, IdB), IdA \== IdB,
     % Enumerate the relation types that hold for (A, B).
     ( cr_left_of(A, B),      Rel = rel(left_of, IdA, IdB)
+    % A is above B.
     ; cr_above(A, B),        Rel = rel(above, IdA, IdB)
+    % A and B share a centroid row.
     ; cr_aligned_row(A, B),  Rel = rel(aligned_row, IdA, IdB)
+    % A and B share a centroid column.
     ; cr_aligned_col(A, B),  Rel = rel(aligned_col, IdA, IdB)
+    % A is adjacent to B.
     ; cr_adjacent(A, B),     Rel = rel(adjacent, IdA, IdB)
+    % A contains B.
     ; cr_contains(A, B),     Rel = rel(contains, IdA, IdB)
+    % A is larger than B.
     ; cr_larger(A, B),       Rel = rel(larger, IdA, IdB)
+    % The offset vector from A to B.
     ; cr_vector(A, B, DR, DC), Rel = rel(vector, IdA, IdB, DR, DC)
     ).
