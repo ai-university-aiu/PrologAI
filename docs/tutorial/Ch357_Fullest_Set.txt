@@ -1,0 +1,93 @@
+================================================================================
+Chapter 357: The Fullest Set - Imagination, Priming, Regulation, and Lore
+(co_*, Layers 396 through 399)
+================================================================================
+
+By the end of Chapter 356 the Causalontology family already spanned every major
+faculty a body of work on building minds (referred to internally as
+THE_BUILDING_FILES) describes. This chapter adds the four packs that fill the
+last partial gaps - the ones that were only touched, not fully covered - so the
+family reaches genuine faculty-completeness. As always each pack is
+self-contained, glass-box, commented line by line, tested, and given a new name
+rather than borrowing the source's terms. Every co_ pack lives in the PrologAI
+repository at github.com/ai-university-aiu/PrologAI.
+
+This chapter also records a piece of housekeeping done in the same wave: the six
+packs that still used a hand-rolled test printer were converted to the standard
+PLUnit test framework, and seven packs were tightened so that every line of code
+carries an English comment. That change touched only comments and test scaffolding
+- no behaviour changed - and it was checked mechanically to be sure.
+
+
+co_muse - Imagination (WP-421, Layer 396)
+--------------------------------------------------------------------------------
+A mind should be able to think before it acts: to try an action in its head,
+watch what would happen, and keep the useful discoveries - all without touching
+the real world. The danger is confusing the imagined with the real, so co_muse
+keeps several parallel "realities": what is observed (actual fact), what is
+desired (goals), what is expected (predictions), what is imagined (scenarios
+being tried), and what is recalled (from memory). To imagine, it rolls a starting
+state forward through a set of known transitions, recording each state it visits
+in the imagined reality only. A "what if" is therefore explored fully yet stays
+sealed off from fact. co_muse can score whether an imagined path reaches a goal
+and pick the candidate plan that reaches it in the fewest steps. Crucially, a
+finding crosses from imagined into observed reality only by a deliberate
+promotion - never by the act of imagining - so a hypothetical can never quietly
+become a belief. This is the part co_wm's in-model rollout did not provide: the
+quarantine and the discipline.
+
+
+co_prime - Priming (WP-422, Layer 397)
+--------------------------------------------------------------------------------
+Think of how the word "salt" brings "pepper" to mind. That is priming: when
+something becomes active, the things associated with it become relevant too, more
+weakly the further away they are. co_prime holds a graph of weighted
+associations, and from a set of active starting nodes it lets activation flow
+outward along the links, fading by a decay at each hop. A node's activation is
+the strongest path that reaches it. The calculation is a plain, terminating
+relaxation - never a trained weight - so you can always read why a node is
+primed. co_prime is the natural partner of co_salience from Chapter 355:
+salience picks the single most important item from the things offered to the
+mind, while priming decides what becomes relevant, and available to be offered,
+in the first place.
+
+
+co_hone - Regulation (WP-423, Layer 398)
+--------------------------------------------------------------------------------
+When a behaviour gets feedback, the feedback comes in four flavours, set by
+whether the result was expected and whether it was good: a success you predicted
+is confirming, a failure you predicted is disappointing, a success you did not
+predict is serendipitous, and a failure you did not predict is shocking. co_hone
+tracks a behaviour's reliability and names each new result this way. Its deeper
+trick is discrimination learning. When one behaviour both succeeds and fails, the
+right fix is not to water it down but to split it: find the feature of the
+situation that is present in every win and no loss (or every loss and no win) and
+refine the rule to require that feature, or to shun it. co_learn from the early
+chapters induces causal relations and co_gauge from Chapter 355 watches whole
+strategies; co_hone works at the level of a single behaviour, sharpening it.
+
+
+co_lore - Lore (WP-424, Layer 399)
+--------------------------------------------------------------------------------
+A mind should not only remember what happened but learn the lesson of it.
+co_lore records experiences as a situation, the response taken, and how it turned
+out. From a pile of these it notices a theme - a situation-pattern that keeps
+recurring - recalls the lessons of past situations whose pattern is present now,
+ranks the responses by how often they turned out good, and distils a maxim: do
+the response that usually works, or, if none does, avoid the one most tied to a
+bad result. Where co_trace stores individual experience-cases and co_forge groups
+objects into concepts, co_lore sits above experience and turns repetition into
+standing advice.
+
+
+Where the family stands now
+--------------------------------------------------------------------------------
+With imagination, priming, regulation, and lore in place, the Causalontology
+family is faculty-complete against THE_BUILDING_FILES: it perceives, remembers
+and forgets, attends and is primed, is motivated and feels, reasons causally,
+hypothesises and verifies, models and imagines the world, plans and repairs,
+watches itself, keeps itself safe, understands other minds, grounds language,
+draws analogies, forms concepts, regulates its behaviours, and learns the lessons
+of its own history. What began as a process-first causal ontology that could play
+an interactive game is now a broad, honest, glass-box cognitive architecture - a
+new synthetic-mind substrate, built in PrologAI.

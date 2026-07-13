@@ -60,6 +60,7 @@
 
 % List and aggregate helpers.
 :- use_module(library(lists), [member/2, max_member/2]).
+% Import the whole-store counting and summing helper.
 :- use_module(library(aggregate), [aggregate_all/3]).
 
 % ---------------------------------------------------------------------------
@@ -76,8 +77,11 @@ wm_reset :- retractall(wm_obs_(_, _, _, _, _)).
 % wm_observe(+Model, +Context, +Action, +Effect): record one observed transition,
 % incrementing its tally.
 wm_observe(Model, Context, Action, Effect) :-
+    % Take the current tally for this transition, or start from zero.
     ( retract(wm_obs_(Model, Context, Action, Effect, N)) -> true ; N = 0 ),
+    % Add one to the tally.
     N1 is N + 1,
+    % Store the raised tally back.
     assertz(wm_obs_(Model, Context, Action, Effect, N1)).
 
 % ---------------------------------------------------------------------------
@@ -86,6 +90,7 @@ wm_observe(Model, Context, Action, Effect) :-
 
 % wm_predict(+Model, +Context, +Action, -Effect): the predicted effect.
 wm_predict(Model, Context, Action, Effect) :-
+    % Defer to the confidence-bearing predictor and drop the confidence.
     wm_predict(Model, Context, Action, Effect, _Conf).
 
 % wm_predict(+Model, +Context, +Action, -Effect, -Confidence): the effect the model
@@ -94,6 +99,7 @@ wm_predict(Model, Context, Action, Effect) :-
 % action-general rule aggregated over every context (the simplicity bias — a law
 % that holds regardless of context is preferred and is what transfers).
 wm_predict(Model, Context, Action, Effect, Confidence) :-
+    % Choose the prediction scope: this exact context, or the general rule.
     (   wm_obs_(Model, Context, Action, _, _)
     % Context-specific prediction.
     ->  wm_majority(Model, Context, Action, Effect, Confidence)
@@ -107,9 +113,11 @@ wm_predict(Model, Context, Action, Effect, Confidence) :-
 wm_majority(Model, Scope, Action, Effect, Confidence) :-
     % Total effect-counts for the scope.
     findall(Count - Eff, wm_scope_count(Model, Scope, Action, Eff, Count), Pairs),
+    % There must be at least one observed effect.
     Pairs \== [],
     % The total number of observations.
     aggregate_all(sum(N), member(N - _, Pairs), Total),
+    % Guard against dividing by an empty total.
     Total > 0,
     % The most frequent effect.
     max_member(Best - Effect, Pairs),
@@ -119,18 +127,25 @@ wm_majority(Model, Scope, Action, Effect, Confidence) :-
 % wm_scope_count(+Model, +Scope, +Action, -Effect, -Count): effect counts within a
 % scope. A specific context reads its own tallies; any_context sums across contexts.
 wm_scope_count(Model, any_context, Action, Effect, Count) :-
+    % Commit to the any_context aggregation clause.
     !,
     % Distinct effects for the action anywhere.
     setof(E, Cx^N^wm_obs_(Model, Cx, Action, E, N), Effects),
+    % Take each distinct effect in turn.
     member(Effect, Effects),
+    % Sum its counts across every context.
     aggregate_all(sum(N), wm_obs_(Model, _, Action, Effect, N), Count).
+% A specific context reads its own stored tallies directly.
 wm_scope_count(Model, Context, Action, Effect, Count) :-
+    % Read the tally for exactly this context.
     wm_obs_(Model, Context, Action, Effect, Count).
 
 % wm_known(+Model, +Context, +Action): the model has seen this action in this exact
 % context, or (fall-back) anywhere.
 wm_known(Model, Context, Action) :-
+    % True if the action was seen in this exact context.
     ( wm_obs_(Model, Context, Action, _, _) -> true
+    % Otherwise fall back to having seen the action in any context.
     ; wm_obs_(Model, _, Action, _, _) ).
 
 % ---------------------------------------------------------------------------
@@ -141,9 +156,13 @@ wm_known(Model, Context, Action) :-
 % predicted with what actually happened. Result is match, mismatch(Predicted,
 % Observed), or novel when the model had no prediction to test.
 wm_verify(Model, Context, Action, Observed, Result) :-
+    % Try to obtain the model's prediction for this context and action.
     (   wm_predict(Model, Context, Action, Predicted, _)
+    % When the prediction agrees with reality the result is a match.
     ->  ( Predicted == Observed -> Result = match
+        % When it disagrees the result names both effects — the repair signal.
         ; Result = mismatch(Predicted, Observed) )
+    % With no prediction to test, the observation is novel.
     ;   Result = novel
     ).
 
@@ -152,6 +171,7 @@ wm_verify(Model, Context, Action, Observed, Result) :-
 % repair is simply recording the truth — the model is never argued with, only
 % shown more evidence.
 wm_repair(Model, Context, Action, Observed) :-
+    % Repair is simply recording the observed truth as one more observation.
     wm_observe(Model, Context, Action, Observed).
 
 % ---------------------------------------------------------------------------
@@ -162,9 +182,13 @@ wm_repair(Model, Context, Action, Observed) :-
 % each action in a sequence, so a caller can score a plan inside the model without
 % spending real actions. The context is held fixed across the rollout unless the
 % caller threads a changing one; each step predicts under the current context.
+% An empty action sequence predicts no effects.
 wm_rollout(_, _, [], []).
+% A non-empty sequence predicts the head action, then rolls the rest forward.
 wm_rollout(Model, Context, [Action | As], [Effect | Es]) :-
+    % Predict this action's effect, or mark it unknown when the model cannot.
     ( wm_predict(Model, Context, Action, Effect, _) -> true ; Effect = unknown ),
+    % Roll the remaining actions forward under the same context.
     wm_rollout(Model, Context, As, Es).
 
 % ---------------------------------------------------------------------------
@@ -178,6 +202,7 @@ wm_rollout(Model, Context, [Action | As], [Effect | Es]) :-
 wm_law(Model, Action, Effect) :-
     % An action the model has seen.
     setof(A, Cx^E^N^wm_obs_(Model, Cx, A, E, N), Actions),
+    % Take each seen action in turn.
     member(Action, Actions),
     % The distinct effects ever seen for it.
     setof(E, Cx^N^wm_obs_(Model, Cx, Action, E, N), Effects),
@@ -191,7 +216,9 @@ wm_law(Model, Action, Effect) :-
 % wm_stats(+Model, -stats(Contexts, Transitions)): how many distinct contexts and
 % (context, action, effect) transitions the model holds.
 wm_stats(Model, stats(Contexts, Transitions)) :-
+    % Count the distinct contexts, or zero when the model is empty.
     ( setof(Cx, A^E^N^wm_obs_(Model, Cx, A, E, N), Cs) -> length(Cs, Contexts) ; Contexts = 0 ),
+    % Count every stored transition.
     aggregate_all(count, wm_obs_(Model, _, _, _, _), Transitions).
 
 % ---------------------------------------------------------------------------
@@ -203,6 +230,7 @@ wm_stats(Model, stats(Contexts, Transitions)) :-
 % model has learned for this Model, so a caller can write it to disk and later
 % restore it. Empty list when the model holds nothing.
 wm_snapshot(Model, Obs) :-
+    % Collect every stored transition of this model as an obs/4 term.
     findall(obs(Context, Action, Effect, Count),
         wm_obs_(Model, Context, Action, Effect, Count),
         Obs).
@@ -211,6 +239,8 @@ wm_snapshot(Model, Obs) :-
 % Model's existing observations are dropped first so restore is idempotent (loading
 % the same snapshot twice yields the same model, not doubled counts).
 wm_restore(Model, Obs) :-
+    % Drop this model's existing transitions so restore is idempotent.
     retractall(wm_obs_(Model, _, _, _, _)),
+    % Assert each transition from the snapshot back into the store.
     forall(member(obs(Context, Action, Effect, Count), Obs),
         assertz(wm_obs_(Model, Context, Action, Effect, Count))).

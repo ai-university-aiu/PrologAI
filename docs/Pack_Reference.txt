@@ -2323,3 +2323,50 @@ Causalontology Concept Formation (co_*, Layer 395)
     fg_induce(+MinShared,-Concepts): seed-cluster the items into concept(ConceptId,SharedFeatures,Members).
     fg_classify(+Features,+Concepts,-ConceptId): the first concept whose defining core is a subset of the features.
     fg_count(-N): how many items have been observed.
+
+co_muse
+Causalontology Imagination (co_*, Layer 396)
+    mu_reset/0: clear every reality partition and the transition model.
+    mu_realities(-Names): the five standard partitions (observed, desired, expected, imagined, recalled).
+    mu_assert(+Reality,+Fact) / mu_holds(?Reality,?Fact) / mu_clear(+Reality): place, query, and empty a partition.
+    mu_transition_add(+State,+Action,+NextState): record a known transition used for imagining.
+    mu_imagine(+Start,+ActionSeq,-Trajectory): roll a start state forward, sealing each visited state in the imagined reality.
+    mu_reaches(+Start,+ActionSeq,-EndState): the final state a sequence reaches.
+    mu_evaluate(+Trajectory,+GoalState,-Score): 1.0 if the goal is reached, else 0.0.
+    mu_steps_to(+Trajectory,+GoalState,-Steps): the step index at which the goal first appears.
+    mu_best_plan(+Start,+CandidateSeqs,+GoalState,-BestSeq): the candidate reaching the goal in fewest steps.
+    mu_quarantined(?Fact): a fact imagined but not observed (sealed off from fact).
+    mu_promote(+FromReality,+Fact,+ToReality): the only, deliberate way an imagined finding crosses into another reality.
+
+co_prime
+Causalontology Priming (co_*, Layer 397)
+    pr_reset/0: forget every association.
+    pr_link_add(+From,+To,+Weight) / pr_link(?From,?To,?Weight): add and query weighted associations (Weight in (0,1]).
+    pr_neighbors(+Node,-Neighbours): the distinct nodes a node links to.
+    pr_node_count(-N): how many distinct nodes appear in the graph.
+    pr_spread(+Sources,+Decay,-Activations): activation of every reached node (widest-path relaxation), as Node-Level.
+    pr_activation(+Sources,+Decay,+Node,-Level): the activation of one node (0.0 if unreached).
+    pr_primed(+Sources,+Decay,+K,-TopK): the best K primed non-source nodes, strongest first.
+
+co_hone
+Causalontology Regulation (co_*, Layer 398)
+    ho_reset/0: forget all rules and trials.
+    ho_rule_add(+RuleId,+Action,+Context) / ho_rule(?RuleId,?Action,?Context): register and query a behaviour (Context a feature list or any).
+    ho_feedback(+RuleId,+Outcome,+ObservedContext): record a trial (Outcome = success | failure).
+    ho_stats(+RuleId,-Successes,-Attempts) / ho_reliability(+RuleId,-Reliability): tallies and success rate.
+    ho_classify(+RuleId,+Outcome,-Flavour): one of confirming, disappointing, serendipitous, shocking (or novel with no history).
+    ho_needs_discrimination(+RuleId): the rule has both a win and a loss.
+    ho_discriminate(+RuleId,-Discriminator): the feature separating wins from losses, discriminator(F,present_predicts(success|failure)), or none.
+    ho_refine(+RuleId,+Discriminator,-RefinedContext): the refined context (require F, or add not(F)).
+
+co_lore
+Causalontology Lore (co_*, Layer 399)
+    lo_reset/0: forget all experience.
+    lo_record(+Situation,+Response,+Result): record an experience (Result = good | bad).
+    lo_experience(?Situation,?Response,?Result): query recorded experience.
+    lo_theme(?Situation,-Count): recurring situations (Count >= 2) - "this keeps happening."
+    lo_lesson(+CurrentSituation,-Response,-Result): the lessons of past situations whose pattern is present now (subset match).
+    lo_responses(+CurrentSituation,-Ranked): the responses for a situation as resp(R,GoodFraction,Total), best first.
+    lo_advise(+CurrentSituation,-Response,-Confidence): the response that most often turned out good.
+    lo_maxim(?Situation,-Maxim): the standing advice for a theme - do(R) if a response usually works, else avoid(R).
+    lo_count(-N): how many experiences are recorded.

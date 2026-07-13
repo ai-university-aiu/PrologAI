@@ -202,6 +202,7 @@ hp_waypoints(Pre, Post, N, Points) :-
 
 % hp_fresh_points(+K, -Points): K fresh unique waypoint terms.
 hp_fresh_points(0, []) :- !.
+% Make one waypoint with a unique index, then recurse for the remaining ones.
 hp_fresh_points(K, [wp(N) | Rest]) :-
     % One more to make.
     K > 0,
@@ -214,6 +215,7 @@ hp_fresh_points(K, [wp(N) | Rest]) :-
 % hp_reify_children(+Children, +Points, -ChildIds): reify each child over the
 % slice between consecutive waypoints, so child i runs Points[i] -> Points[i+1].
 hp_reify_children([], _, []).
+% Reify the head child over its slice, then recurse over the remaining children.
 hp_reify_children([Child | Rest], [P0, P1 | Ps], [Id | Ids]) :-
     % Reify this child over its slice.
     hp_reify_(Child, Id, P0, P1),
@@ -275,6 +277,7 @@ hp_render_(hnode(Goal, _Method, Children), Depth, [Line | Rest]) :-
 
 % hp_indent(+Depth, -Pad): two spaces per level.
 hp_indent(0, '') :- !.
+% Deeper levels take one level less of padding plus two more spaces.
 hp_indent(Depth, Pad) :-
     % One level less.
     Depth > 0, Depth1 is Depth - 1,
@@ -283,19 +286,31 @@ hp_indent(Depth, Pad) :-
     atom_concat(Pad0, '  ', Pad).
 
 % hp_label(+Goal, -Label): a readable label for a node goal.
+% The top goal reads as "Win Game: <name>".
 hp_label(win(G), Label) :- !, atom_concat('Win Game: ', G, Label).
+% The middle loop node carries a fixed descriptive label.
 hp_label(ooda_loop, 'OODA loop (see, observe, orient, decide, act, re-observe & update rules)') :- !.
+% A phase node reuses the per-phase readable name.
 hp_label(phase(P), Label) :- !, hp_phase_label(P, Label).
+% An operation leaf reads as "op: <name>".
 hp_label(op(Op), Label) :- !, atom_concat('op: ', Op, Label).
+% A control leaf reads as "control: <action term>".
 hp_label(control(A), Label) :- !, term_to_atom(A, AText), atom_concat('control: ', AText, Label).
+% Anything else falls back to its plain term text.
 hp_label(Other, Label) :- term_to_atom(Other, Label).
 
 % hp_phase_label(+Phase, -Label): a readable name for each OODA phase.
+% See: perceive the whole grid.
 hp_phase_label(see, 'see (perceive the whole grid)').
+% Observe: meters, avatar, frame diff.
 hp_phase_label(observe, 'observe (meters, avatar, frame diff)').
+% Orient: priors, archetype, objects and hazards.
 hp_phase_label(orient, 'orient (priors, archetype, objects & hazards)').
+% Decide: causal change, frontier, curiosity.
 hp_phase_label(decide, 'decide (causal change, frontier, curiosity)').
+% Act: environment controls.
 hp_phase_label(act, 'act (environment controls)').
+% Re-observe and update: learn delta, graph, hazards.
 hp_phase_label(reobserve_update, 're-observe & update rules (learn delta, graph, hazards)').
 
 % hp_render_json(+Tree, -Dict): a nested dict rendering for JSON consumers (the
@@ -323,6 +338,7 @@ hp_render_json(hnode(Goal, Method, Children), Dict) :-
 hp_classify_basis(replay(win),           act,    control(replay_winning_path)) :- !.
 % Human navigation hints are acting toward a target.
 hp_classify_basis(toward(_),             act,    op(navigate_to_target)) :- !.
+% Following a human hint is acting on given advice.
 hp_classify_basis(human_hint(_),         act,    op(follow_human_hint)) :- !.
 % Object-targeted curiosity is orienting on an object then going to it.
 hp_classify_basis(explore(object(_)),    act,    op(go_to_object)) :- !.

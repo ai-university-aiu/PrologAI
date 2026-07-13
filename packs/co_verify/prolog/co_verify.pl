@@ -80,8 +80,9 @@
 % Import aggregation for the distinct-state count.
 :- use_module(library(aggregate), [aggregate_all/3]).
 
-% The lookahead and choice predicates call a caller-supplied transition model.
+% The lookahead predicate calls a caller-supplied transition model.
 :- meta_predicate vb_lookahead_fatal(4, +, +, +).
+% The safe-choice predicate likewise calls that caller-supplied model.
 :- meta_predicate vb_choose_safe(4, +, +, +, -).
 
 % ---------------------------------------------------------------------------
@@ -101,8 +102,9 @@ vb_reset :-
     retractall(vb_fatal_(_, _, _)),
     % Forget every dead state.
     retractall(vb_dead_(_, _)),
-    % Restore the default threshold.
+    % Forget any stored threshold.
     retractall(vb_threshold_(_)),
+    % Restore the default threshold of two.
     assertz(vb_threshold_(2)).
 
 % vb_set_threshold(+K): set the number of distinct states an action must have been
@@ -110,8 +112,9 @@ vb_reset :-
 vb_set_threshold(K) :-
     % Only a sensible threshold is accepted.
     integer(K), K >= 1,
-    % Replace the stored threshold.
+    % Forget the previous threshold.
     retractall(vb_threshold_(_)),
+    % Store the new threshold.
     assertz(vb_threshold_(K)).
 
 % vb_threshold(-K): the current threshold, defaulting to two.
@@ -192,6 +195,7 @@ vb_predict_fatal(Model, State, Action) :-
 % vb_partition(+Model, +State, +Actions, -Safe, -Risky): split the action set into
 % those not predicted fatal and those predicted fatal, each keeping input order.
 vb_partition(_, _, [], [], []).
+% vb_partition/5 (step): place the head action, then recurse on the tail.
 vb_partition(Model, State, [A | As], Safe, Risky) :-
     % Recurse on the rest.
     vb_partition(Model, State, As, Safe0, Risky0),
@@ -205,8 +209,9 @@ vb_partition(Model, State, [A | As], Safe, Risky) :-
 % (in their original order) and the predicted-fatal ones last. Nothing is dropped,
 % so if every option is risky the least-bad is still reachable.
 vb_rank(Model, State, Actions, Ranked) :-
-    % Split, then concatenate safe ahead of risky.
+    % Split into safe and risky.
     vb_partition(Model, State, Actions, Safe, Risky),
+    % Concatenate the safe ones ahead of the risky ones.
     append(Safe, Risky, Ranked).
 
 % ---------------------------------------------------------------------------
@@ -223,6 +228,7 @@ vb_lookahead_fatal(StepModel, Model, State, Action) :-
     -> true
     % ...simulating it lands in a state already known to be dead.
     ;  call(StepModel, State, Action, NextState),
+       % The simulated next state is one already known to be dead.
        vb_dead_state(Model, NextState)
     ).
 
@@ -235,6 +241,7 @@ vb_choose_safe(StepModel, Model, State, Actions, Best) :-
     Actions \== [],
     % Prefer an action that survives the lookahead.
     (   member(Best, Actions),
+        % ...that does not look fatal one step ahead.
         \+ vb_lookahead_fatal(StepModel, Model, State, Best)
     ->  true
     % Otherwise take the least-risky (safe-first) action.

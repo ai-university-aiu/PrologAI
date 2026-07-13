@@ -1,98 +1,133 @@
 /*  Tests for co_hplan — Hierarchical Planning (WP-404, Layer 379)
 
-    Each acceptance criterion prints PASS or FAIL.
-
-    Run with the co_core, co_plan, co_learn, and co_hplan prolog dirs on the path:
-      swipl -p library=... -g run_tests -t halt packs/co_hplan/test/test_co_hplan.pl
+    A standard PLUnit suite. Run with the full library path so co_core and
+    co_plan (which co_hplan requires) resolve:
+        swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/co_hplan/test/test_co_hplan.pl
 */
 
-% Load the pack under test.
-:- use_module('../prolog/co_hplan').
-% Load the CRO core, to read the reified plan back.
+% Declare this file as a test module.
+:- module(test_co_hplan, []).
+% Load the PLUnit test framework.
+:- use_module(library(plunit)).
+% Load the module under test from the library path.
+:- use_module(library(co_hplan)).
+% Load the CRO core, used to read the reified plan back out of the graph.
 :- use_module(library(co_core)).
-% List helpers.
-:- use_module(library(lists), [member/2, memberchk/2, flatten/2]).
+% List helpers used inside the tests.
+:- use_module(library(lists), [member/2, memberchk/2]).
 
-% report(+Id, +Goal): print PASS or FAIL for one criterion.
-report(Id, Goal) :-
-    ( catch(Goal, E, (format("  error: ~q~n", [E]), fail))
-    -> V = 'PASS' ; V = 'FAIL' ),
-    format("~w: ~w~n", [Id, V]).
+% Open the test block for co_hplan.
+:- begin_tests(co_hplan).
 
-% run_tests: exercise the hierarchical planner and its Causalontology mesh.
-run_tests :-
-    % Announce.
-    format("~n=== co_hplan — Hierarchical Planning ===~n~n", []),
-    % A clean slate.
-    co_core_reset, hp_reset,
+% The six OODA-style phase names come back in their canonical order.
+test(ooda_phases_in_order) :-
+    % Read the phase list.
+    hp_ooda_phases(Phases),
+    % It is exactly the six phases, in order.
+    assertion(Phases == [see, observe, orient, decide, act, reobserve_update]).
+
+% Each phase decomposes into concrete, named operations.
+test(phase_ops_concrete) :-
+    % The observe phase reads meters, locates the avatar, and diffs the frame.
+    hp_phase_ops(observe, ObsOps),
+    assertion(ObsOps == [read_meters, locate_avatar, diff_frame]),
+    % With no game actions, the act phase keeps its generic operation.
+    hp_phase_ops(act, ActOps),
+    assertion(ActOps == [perform_chosen_action]).
+
+% The top of the plan is Win Game, decomposing to a single OODA-loop node
+% that holds the six phases in order.
+test(win_plan_shape) :-
     % A small concrete action set for a game.
     Actions = [action(1), action(2), select(x, y)],
-    % Build the plan tree for a game.
+    % Build the three-level plan tree.
     hp_win_plan(ls20, Actions, Tree),
+    % The top is win(ls20) with one ooda_loop child.
+    assertion(Tree = hnode(win(ls20), strategy, [hnode(ooda_loop, cycle, _)])),
+    % The loop node holds the six phases in order.
+    Tree = hnode(_, _, [hnode(ooda_loop, _, Phases)]),
+    findall(P, member(hnode(phase(P), _, _), Phases), Ps),
+    assertion(Ps == [see, observe, orient, decide, act, reobserve_update]).
 
-    % AC-HP-001: the top is Win Game, decomposing to a single OODA-loop node.
-    report('AC-HP-001',
-        ( Tree = hnode(win(ls20), strategy, [hnode(ooda_loop, cycle, _)]) )),
+% The act phase's leaves are the game's real controls when actions are given.
+test(act_leaves_are_controls) :-
+    % Build a plan with a concrete control set.
+    Actions = [action(1), action(2), select(x, y)],
+    hp_win_plan(ls20, Actions, Tree),
+    % Reach into the act phase and check its leaves.
+    Tree = hnode(_, _, [hnode(_, _, Phases)]),
+    once(member(hnode(phase(act), _, ActLeaves), Phases)),
+    assertion(memberchk(hnode(control(action(1)), primitive, []), ActLeaves)),
+    assertion(memberchk(hnode(control(select(x, y)), primitive, []), ActLeaves)).
 
-    % AC-HP-002: the OODA node holds the six phases, in order.
-    report('AC-HP-002',
-        ( Tree = hnode(_, _, [hnode(ooda_loop, _, Phases)]),
-          findall(P, member(hnode(phase(P), _, _), Phases), Ps),
-          Ps == [see, observe, orient, decide, act, reobserve_update] )),
+% Reifying the tree creates a root CRO carrying a mechanism sub-graph.
+test(reify_builds_mechanism) :-
+    % Start from a clean CRO store and a clean plan.
+    co_core_reset, hp_reset,
+    % Build and reify a plan.
+    hp_win_plan(ls20, [action(1), action(2), select(x, y)], Tree),
+    hp_reify(Tree, RootId),
+    % The root has a non-empty mechanism sub-graph.
+    co_mechanism(RootId, Subs),
+    assertion(Subs \== []).
 
-    % AC-HP-003: the act phase's leaves are the game's real controls.
-    report('AC-HP-003',
-        ( Tree = hnode(_, _, [hnode(_, _, Phases2)]),
-          member(hnode(phase(act), _, ActLeaves), Phases2),
-          memberchk(hnode(control(action(1)), primitive, []), ActLeaves),
-          memberchk(hnode(control(select(x, y)), primitive, []), ActLeaves) )),
+% The plan can be read back PURELY from the CRO graph, and the reconstructed
+% top goal and its six ordered phases match the original.
+test(plan_from_cros_roundtrip) :-
+    % A clean slate, then build and reify.
+    co_core_reset, hp_reset,
+    hp_win_plan(ls20, [action(1), action(2), select(x, y)], Tree),
+    hp_reify(Tree, Root),
+    % Rebuild the tree from the causal graph alone.
+    hp_plan_from_cros(Root, Rebuilt),
+    % The reconstructed top goal is win(ls20).
+    assertion(Rebuilt = hnode(win(ls20), reified, _)),
+    % The same six phases appear in the same order.
+    Rebuilt = hnode(_, _, [hnode(ooda_loop, _, RPhases)]),
+    findall(P, member(hnode(phase(P), _, _), RPhases), RPs),
+    assertion(RPs == [see, observe, orient, decide, act, reobserve_update]).
 
-    % AC-HP-004: reifying the tree creates a root CRO with a mechanism sub-graph.
-    report('AC-HP-004',
-        ( hp_reify(Tree, RootId),
-          co_mechanism(RootId, Subs), Subs \== [] )),
+% The whole reified hierarchy is causally consistent — every coarse relation
+% agrees with the composition of its mechanism.
+test(reified_hierarchy_consistent) :-
+    % A clean slate, then build and reify.
+    co_core_reset, hp_reset,
+    hp_win_plan(ls20, [action(1), action(2), select(x, y)], Tree),
+    hp_reify(Tree, Root),
+    % Consistency holds across the whole hierarchy.
+    assertion(hp_consistent(Root)).
 
-    % Reify once for the reads below.
-    ( hp_reify(Tree, Root) -> true ; Root = none ),
+% The indented text rendering shows the nested levels of the plan.
+test(render_shows_levels) :-
+    % Build a plan and render it to lines.
+    hp_win_plan(ls20, [action(1), action(2), select(x, y)], Tree),
+    hp_render(Tree, Lines),
+    % The top goal, the loop, and a deep leaf all appear.
+    assertion(( member(L1, Lines), sub_atom(L1, _, _, _, 'Win Game') )),
+    assertion(( member(L2, Lines), sub_atom(L2, _, _, _, 'OODA') )),
+    assertion(( member(L3, Lines), sub_atom(L3, _, _, _, 'perceive the whole grid') )).
 
-    % AC-HP-005: the plan can be read back PURELY from the CRO graph, and the
-    % reconstructed top goal is win(ls20).
-    report('AC-HP-005',
-        ( hp_plan_from_cros(Root, Rebuilt),
-          Rebuilt = hnode(win(ls20), reified, _) )),
+% The JSON rendering is a nested dict whose loop node holds six phase dicts.
+test(render_json_nested) :-
+    % Build a plan and render it to a nested dict.
+    hp_win_plan(ls20, [action(1), action(2), select(x, y)], Tree),
+    hp_render_json(Tree, Dict),
+    % The single child is the loop; its children are the six phases.
+    get_dict(children, Dict, [OodaDict]),
+    get_dict(children, OodaDict, PhaseDicts),
+    assertion(length(PhaseDicts, 6)).
 
-    % AC-HP-006: the reconstructed plan has the same six phases in order.
-    report('AC-HP-006',
-        ( hp_plan_from_cros(Root, Rebuilt2),
-          Rebuilt2 = hnode(_, _, [hnode(ooda_loop, _, RPhases)]),
-          findall(P, member(hnode(phase(P), _, _), RPhases), RPs),
-          RPs == [see, observe, orient, decide, act, reobserve_update] )),
+% A solo choice basis is located within the plan as an OODA phase plus a leaf,
+% with a total default for unknown bases.
+test(classify_basis) :-
+    % Causal-change ranking is deciding by predicted effect.
+    assertion(hp_classify_basis(explore(causal), decide, op(predict_causal_change))),
+    % Object-targeted curiosity is acting toward the object.
+    assertion(hp_classify_basis(explore(object(pos(1,2))), act, op(go_to_object))),
+    % Replaying a known winning path is acting on a settled plan.
+    assertion(hp_classify_basis(replay(win), act, control(replay_winning_path))),
+    % Any unrecognised basis defaults to a plain decision.
+    assertion(hp_classify_basis(anything_unknown, decide, op(choose_action))).
 
-    % AC-HP-007: the whole reified hierarchy is causally consistent — every coarse
-    % relation agrees with the composition of its mechanism (the mesh is coherent).
-    report('AC-HP-007', hp_consistent(Root)),
-
-    % AC-HP-008: the text rendering shows the nested levels.
-    report('AC-HP-008',
-        ( hp_render(Tree, Lines),
-          ( member(L1, Lines), sub_atom(L1, _, _, _, 'Win Game') ),
-          ( member(L2, Lines), sub_atom(L2, _, _, _, 'OODA') ),
-          ( member(L3, Lines), sub_atom(L3, _, _, _, 'perceive the whole grid') ) )),
-
-    % AC-HP-009: the JSON rendering is a nested dict with children.
-    report('AC-HP-009',
-        ( hp_render_json(Tree, Dict),
-          get_dict(children, Dict, [OodaDict]),
-          get_dict(children, OodaDict, PhaseDicts),
-          length(PhaseDicts, 6) )),
-
-    % AC-HP-010: a solo choice basis is located within the plan (OODA phase + leaf).
-    report('AC-HP-010',
-        ( hp_classify_basis(explore(causal), decide, op(predict_causal_change)),
-          hp_classify_basis(explore(object(pos(1,2))), act, op(go_to_object)) )),
-
-    % Show the plan as the glass box renders it.
-    ( hp_render(Tree, Show) -> true ; Show = [] ),
-    format("~nThe plan tree:~n", []),
-    forall(member(Ln, Show), format("  ~w~n", [Ln])),
-    format("~n", []).
+% Close the test block for co_hplan.
+:- end_tests(co_hplan).
