@@ -4,7 +4,7 @@
     that tracks how well each strategy is doing, notices the tell-tale of being
     stuck — error that stays high while nothing improves — and decides whether to
     keep going, switch approach, or ask for help. The co_ family had an efficiency
-    governor (co_effic) but no self-monitor of this kind; this pack is it.
+    governor (efficiency_governor) but no self-monitor of this kind; this pack is it.
 
     The system reports the OUTCOME of each attempt under a named strategy:
 

@@ -5,7 +5,7 @@
     action before it is taken, able always to veto with a reason, keeping an
     immutable record of what it stopped, and unmodifiable by the system it
     guards. Causalontology already marks a relation "preventive" inside co_core
-    and predicts fatal moves in co_verify, but there was no separate governor
+    and predicts fatal moves in verification, but there was no separate governor
     that owns the last word. This pack is that governor.
 
     It holds two kinds of prohibition:

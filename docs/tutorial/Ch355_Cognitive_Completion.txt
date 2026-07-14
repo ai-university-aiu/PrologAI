@@ -22,9 +22,9 @@ named rule), carries an English comment above each line of code, and ships a
 passing test suite.
 
 
-co_trace - Episodic Memory (WP-409, Layer 384)
+episodic_memory - Episodic Memory (WP-409, Layer 384)
 --------------------------------------------------------------------------------
-The mind kept no record of past episodes it could be reminded of. co_trace is
+The mind kept no record of past episodes it could be reminded of. episodic_memory is
 that record. Each experience is a small reified case:
 
     episode(Id, Context, Action, Outcome, Valence, Recency, Hits)
@@ -33,8 +33,8 @@ Context is a set of feature atoms describing the situation; Valence is how
 good or bad it was, in the band minus-one to plus-one. Recall is by feature
 overlap: the similarity of a present cue to a stored case is the Jaccard overlap
 of their feature sets (shared features over total distinct features), so the most
-relevant memory surfaces first. ct_recall returns the single best match and bumps
-its hit count; ct_reinforce nudges a case's valence when it proves useful. This
+relevant memory surfaces first. episodic_memory_recall returns the single best match and bumps
+its hit count; episodic_memory_reinforce nudges a case's valence when it proves useful. This
 is the glass-box analogue of an associative, case-based memory.
 
 
@@ -109,9 +109,9 @@ to an alternate (re-routing), else to accept it and move on. It classifies the
 disturbance and grades the repair it achieves.
 
 
-co_distill - Consolidation (WP-416, Layer 391)
+consolidation - Consolidation (WP-416, Layer 391)
 --------------------------------------------------------------------------------
-You cannot build a learning system without committing to forgetting. co_distill
+You cannot build a learning system without committing to forgetting. consolidation
 is the night shift that keeps memory compact. Re-adding a record under the same
 key merges rather than duplicates, bumping a use count and refreshing the value;
 a reliably repeated sequence is compressed into one composite; and stale,
