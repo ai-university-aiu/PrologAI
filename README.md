@@ -3,12 +3,12 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/ARC--AGI--1-400%2F400%20%3D%20100%25-brightgreen?style=for-the-badge" alt="ARC-AGI-1: 400/400">
-  <img src="https://img.shields.io/badge/ARC--AGI--2-120%2F120%20%3D%20100%25-crimson?style=for-the-badge" alt="ARC-AGI-2: 120/120">
-  <img src="https://img.shields.io/badge/SWI--Prolog-9.0.4%2B-8A2BE2?style=for-the-badge" alt="SWI-Prolog 9.0.4+">
-  <img src="https://img.shields.io/badge/reasoning-48%20types-5865F2?style=for-the-badge" alt="48 Reasoning Types">
-  <img src="https://img.shields.io/badge/protocols-MCP%20%7C%20A2A%20%7C%20ACP%20%7C%20ANP-0075CA?style=for-the-badge" alt="MCP | A2A | ACP | ANP">
-  <img src="https://img.shields.io/badge/license-Attribution%20No%20Profit%20No%20Problem-orange?style=for-the-badge" alt="The Attribution Always; No Profit, No Problem License.">
+  <img src="https://img.shields.io/badge/ARC--AGI--1-400%2F400%20%3D%20100%25-FFCE59?style=for-the-badge" alt="ARC-AGI-1: 400/400">
+  <img src="https://img.shields.io/badge/ARC--AGI--2-120%2F120%20%3D%20100%25-FA842F?style=for-the-badge" alt="ARC-AGI-2: 120/120">
+  <img src="https://img.shields.io/badge/SWI--Prolog-9.0.4%2B-E44B19?style=for-the-badge" alt="SWI-Prolog 9.0.4+">
+  <img src="https://img.shields.io/badge/reasoning-48%20types-B22313?style=for-the-badge" alt="48 Reasoning Types">
+  <img src="https://img.shields.io/badge/protocols-MCP%20%7C%20A2A%20%7C%20ACP%20%7C%20ANP-670100?style=for-the-badge" alt="MCP | A2A | ACP | ANP">
+  <img src="https://img.shields.io/badge/license-Attribution%20No%20Profit%20No%20Problem-3A0000?style=for-the-badge" alt="The Attribution Always; No Profit, No Problem License.">
 </p>
 
 <p align="center">
