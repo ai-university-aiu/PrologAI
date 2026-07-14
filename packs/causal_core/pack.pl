@@ -1,5 +1,5 @@
-% State the fact: name(co_core).
-name(co_core).
+% State the fact: name(causal_core).
+name(causal_core).
 % State the fact: version('1.0.0').
 version('1.0.0').
 % State the fact: title('PrologAI Causalontology Core — the reified Causal Relation Object: temporal windows, modality, strength, hierarchy, subsumption import, and glass-box why (WP-393)').

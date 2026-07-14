@@ -10,7 +10,7 @@
       re-routing      abandon the blocked goal and head for an alternate one
 
     The co_ family could plan toward a goal (co_plan) and refuse a hazard
-    (co_core, verification, safety_governor), but nothing knew how to recover once a wrong
+    (causal_core, verification, safety_governor), but nothing knew how to recover once a wrong
     thing had already happened. This pack is that recovery, as glass-box rules.
 
     A DISTURBANCE is one of:

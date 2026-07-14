@@ -35,7 +35,7 @@ test(pattern_family) :-
     assertion(safety_governor:safety_governor_forbidden(touch(anything))),
     assertion(safety_governor:safety_governor_forbidden(touch(fire))).
 
-% A learned hazard mirrored from co_core is enforced.
+% A learned hazard mirrored from causal_core is enforced.
 test(learned_hazard) :-
     safety_governor:safety_governor_reset,
     safety_governor:safety_governor_avoid_add(step_on(lava)),

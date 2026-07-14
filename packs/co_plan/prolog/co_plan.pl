@@ -40,7 +40,7 @@
 ]).
 
 % Import the verb layer this pack plans over.
-:- use_module(library(co_core), [co_cro/8, co_new_cro/8]).
+:- use_module(library(causal_core), [causal_core_cro/8, causal_core_new_cro/8]).
 % Import the avoid-set the planner must respect.
 :- use_module(library(co_learn), [co_avoid/1]).
 % Import list helpers.
@@ -60,18 +60,18 @@ co_compose_procedure(Seq, Goal, Id) :-
     % Non-empty.
     Seq \== [],
     % Do not duplicate an existing procedure for this goal and sequence.
-    (   co_cro(Id0, [sequence(Seq)], [Goal], _, _, _, _, _)
+    (   causal_core_cro(Id0, [sequence(Seq)], [Goal], _, _, _, _, _)
     % Already composed: return the existing identifier.
     ->  Id = Id0
     % New: reify it at the canonical composed strength.
-    ;   co_new_cro([sequence(Seq)], [Goal], temporal(0, 1, short), sufficient,
+    ;   causal_core_new_cro([sequence(Seq)], [Goal], temporal(0, 1, short), sufficient,
                    0.60, [], prov(composition, composed_procedure, 0.60), Id)
     ).
 
 % Define co_procedure: query the procedure relations.
 co_procedure(Id, Seq, Goal) :-
     % A procedure is a relation whose single cause is a sequence.
-    co_cro(Id, [sequence(Seq)], [Goal], _, _, _, _, _).
+    causal_core_cro(Id, [sequence(Seq)], [Goal], _, _, _, _, _).
 
 % ---------------------------------------------------------------------------
 % ACHIEVABILITY AND SAFETY
@@ -80,7 +80,7 @@ co_procedure(Id, Seq, Goal) :-
 % Define co_achievable: the agent knows a non-preventive relation for it.
 co_achievable(Action) :-
     % Some relation has this action as a cause.
-    co_cro(_, [Action], [_], _, Modality, _, _, _),
+    causal_core_cro(_, [Action], [_], _, Modality, _, _, _),
     % Preventive relations mark hazards, not abilities.
     Modality \== preventive,
     % One witness suffices.
@@ -99,7 +99,7 @@ co_plan_safe(Plan) :-
 % every step is achievable and not avoided (Section 4.5).
 co_plan(Goal, Plan) :-
     % A procedure relation produces the goal.
-    co_cro(_, [sequence(Seq)], [Goal], _, _, _, _, _),
+    causal_core_cro(_, [sequence(Seq)], [Goal], _, _, _, _, _),
     % Every step must be achievable.
     forall(member(Step, Seq), co_achievable(Step)),
     % And none may be a learned hazard.
@@ -124,7 +124,7 @@ co_chain_back(Goal, Depth, Seen, [Action | Rest]) :-
     % Depth must remain.
     Depth > 0,
     % A non-preventive relation produces the goal.
-    co_cro(_, [Cause], Effects, _, Modality, _, _, _),
+    causal_core_cro(_, [Cause], Effects, _, Modality, _, _, _),
     % Preventive relations are never planned through.
     Modality \== preventive,
     % The goal is among its effects.
@@ -147,7 +147,7 @@ co_chain_back(Goal, Depth, Seen, [Action | Rest]) :-
 % a directly performable action.
 co_action_like(Cause) :-
     % Nothing in the store produces it.
-    \+ ( co_cro(_, _, Effects, _, M, _, _, _), M \== preventive,
+    \+ ( causal_core_cro(_, _, Effects, _, M, _, _, _), M \== preventive,
          memberchk(Cause, Effects) ).
 
 % ---------------------------------------------------------------------------

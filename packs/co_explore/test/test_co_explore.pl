@@ -23,7 +23,7 @@
 % Load the learner so its avoid-set can be exercised.
 :- use_module(library(co_learn)).
 % Load the verb layer so its relation store can be cleared between tests.
-:- use_module(library(co_core)).
+:- use_module(library(causal_core)).
 
 % A small frame with one non-background object of colour one.
 sample_frame([[0,0,0],[0,1,1],[0,1,0]]).

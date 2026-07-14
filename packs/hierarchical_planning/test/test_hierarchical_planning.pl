@@ -1,6 +1,6 @@
 /*  Tests for hierarchical_planning — Hierarchical Planning (WP-404, Layer 379)
 
-    A standard PLUnit suite. Run with the full library path so co_core and
+    A standard PLUnit suite. Run with the full library path so causal_core and
     co_plan (which hierarchical_planning requires) resolve:
         swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/hierarchical_planning/test/test_hierarchical_planning.pl
 */
@@ -12,7 +12,7 @@
 % Load the module under test from the library path.
 :- use_module(library(hierarchical_planning)).
 % Load the CRO core, used to read the reified plan back out of the graph.
-:- use_module(library(co_core)).
+:- use_module(library(causal_core)).
 % List helpers used inside the tests.
 :- use_module(library(lists), [member/2, memberchk/2]).
 
@@ -68,7 +68,7 @@ test(reify_builds_mechanism) :-
     hierarchical_planning_win_plan(ls20, [action(1), action(2), select(x, y)], Tree),
     hierarchical_planning_reify(Tree, RootId),
     % The root has a non-empty mechanism sub-graph.
-    co_mechanism(RootId, Subs),
+    causal_core_mechanism(RootId, Subs),
     assertion(Subs \== []).
 
 % The plan can be read back PURELY from the CRO graph, and the reconstructed
