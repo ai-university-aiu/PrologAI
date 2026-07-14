@@ -1,5 +1,5 @@
-% State the fact: name(co_wm).
-name(co_wm).
+% State the fact: name(world_model).
+name(world_model).
 % State the fact: version.
 version('1.0.0').
 % State the fact: title.

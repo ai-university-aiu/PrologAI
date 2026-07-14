@@ -1,13 +1,13 @@
 /*  Round-trip tests for the cognitive-pack snapshot/restore exports.
 
-    Proves that co_wm, co_hypo, and co_goalinfer can each serialise their learned
+    Proves that world_model, co_hypo, and co_goalinfer can each serialise their learned
     state out to a ground term and rebuild an identical state from it — the property
     Mentova relies on to persist a play session's cognition to disk and share it
     across the solo, human-guided, and AI-guided players.
 */
 
 % Load the three packs under test from their pack directories.
-:- use_module('../prolog/co_wm').
+:- use_module('../prolog/world_model').
 :- use_module('../../co_hypo/prolog/co_hypo').
 :- use_module('../../co_goalinfer/prolog/co_goalinfer').
 
@@ -17,29 +17,29 @@ ok(Name) :- format("PASS ~w~n", [Name]).
 bad(Name) :- format("FAIL ~w~n", [Name]), nb_setval(fails, 1).
 
 % ===========================================================================
-% co_wm — a model's transitions survive a snapshot/restore round-trip.
+% world_model — a model's transitions survive a snapshot/restore round-trip.
 % ===========================================================================
 test_wm :-
-    wm_reset,
+    world_model_reset,
     % Teach a small model two transitions for game g1 and one for g2.
-    wm_observe(g1, ctxA, act1, moved),
-    wm_observe(g1, ctxA, act1, moved),
-    wm_observe(g1, ctxB, act2, blocked),
-    wm_observe(g2, ctxA, act1, spun),
+    world_model_observe(g1, ctxA, act1, moved),
+    world_model_observe(g1, ctxA, act1, moved),
+    world_model_observe(g1, ctxB, act2, blocked),
+    world_model_observe(g2, ctxA, act1, spun),
     % Snapshot g1 only.
-    wm_snapshot(g1, Snap),
+    world_model_snapshot(g1, Snap),
     ( Snap == [obs(ctxA, act1, moved, 2), obs(ctxB, act2, blocked, 1)]
     -> ok('WM-001 snapshot captures exactly g1 with counts')
     ;  bad('WM-001'), format("   got ~q~n", [Snap]) ),
     % Wipe g1, then restore it from the snapshot.
-    wm_reset,
-    wm_restore(g1, Snap),
-    ( wm_predict(g1, ctxA, act1, moved, _), wm_predict(g1, ctxB, act2, blocked, _)
+    world_model_reset,
+    world_model_restore(g1, Snap),
+    ( world_model_predict(g1, ctxA, act1, moved, _), world_model_predict(g1, ctxB, act2, blocked, _)
     -> ok('WM-002 restored model predicts as before')
     ;  bad('WM-002') ),
     % Restore is idempotent: loading twice does not double the counts.
-    wm_restore(g1, Snap),
-    ( wm_snapshot(g1, Snap) -> ok('WM-003 restore is idempotent') ; bad('WM-003') ).
+    world_model_restore(g1, Snap),
+    ( world_model_snapshot(g1, Snap) -> ok('WM-003 restore is idempotent') ; bad('WM-003') ).
 
 % ===========================================================================
 % co_hypo — a model's hypotheses and commitment survive the round-trip.

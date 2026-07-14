@@ -10,5 +10,5 @@ author('PrologAI Community', 'ai.university.aiu@gmail.com').
 home('https://github.com/ai-university-aiu/PrologAI').
 % State the fact: download('https://github.com/ai-university-aiu/PrologAI/releases').
 download('https://github.com/ai-university-aiu/PrologAI/releases').
-% State the fact: requires([jspace, co_wm, planner, evolve, workspace, curiosity, agency, refinery]).
-requires([jspace, co_wm, planner, evolve, workspace, curiosity, agency, refinery]).
+% State the fact: requires([jspace, world_model, planner, evolve, workspace, curiosity, agency, refinery]).
+requires([jspace, world_model, planner, evolve, workspace, curiosity, agency, refinery]).

@@ -25,7 +25,7 @@
 % Load the packs whose constructors and readers the tests call directly.
 :- use_module(library(jspace), [js_open/1, js_strength/3, js_reading/2, js_active/2]).
 :- use_module(library(planner), [ht_domain/3]).
-:- use_module(library(co_wm), [wm_novelty/3]).
+:- use_module(library(world_model), [world_model_novelty/3]).
 
 % ===========================================================================
 % TEST FIXTURES AND CRITERION HELPERS
@@ -83,7 +83,7 @@ test(four_wirings) :-
     % There are four of them.
     length(Wirings, 4),
     % The four expected wiring keys are present.
-    forall(member(K, [jspace_from_workspace, curiosity_from_co_wm,
+    forall(member(K, [jspace_from_workspace, curiosity_from_world_model,
                        agency_with_planner, evolve_with_refinery]),
            memberchk(wiring(K, _), Wirings)).
 
@@ -183,7 +183,7 @@ test(bind_idempotent) :-
 :- end_tests(nexus_workspace).
 
 % ===========================================================================
-% WIRING TWO — curiosity <- co_wm novelty
+% WIRING TWO — curiosity <- world_model novelty
 % ===========================================================================
 
 :- begin_tests(nexus_curiosity).
@@ -193,7 +193,7 @@ test(novelty_signal_delegates) :-
     % Nexus and the world model must agree on the novelty of a state.
     nx_novelty_signal([[a, b]], [a, c], NX),
     % Compute the same novelty directly from the world model.
-    wm_novelty([[a, b]], [a, c], WM),
+    world_model_novelty([[a, b]], [a, c], WM),
     % The two must match exactly.
     close_to(NX, WM),
     % And the value is the expected half-novel fraction.
