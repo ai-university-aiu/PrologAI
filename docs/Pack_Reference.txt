@@ -1907,29 +1907,29 @@ Structural Causal Models: Interventions and Counterfactuals (cf_*, Layer 358)
     causal_counterfactual_all(+SCM,+Domains,+Evidence,+Ints,+Y,-Vs): every counterfactual value the evidence allows.
     causal_but_for(+SCM,+Context,+X,+Alts,+Y): the but-for test of actual causation — some alternative setting of X changes Y.
 
-actinf
+active_inference
 Active Inference Engine: Expected Free Energy and Policy Selection (ai_*, Layer 359)
-    ai_model(+States,+Obs,+A,+B,+C,+D,-GM): build and validate a generative model; all distributions must sum to one within 1.0e-6; missing transitions default to persistence.
-    ai_actions(+GM,-Actions): the distinct action names.
-    ai_prior(+GM,-Prior): the prior belief over states.
-    ai_normalize(+Dist,-Norm): rescale a Name-Prob pair list to sum one.
-    ai_prob(+Dist,+Key,-P): probability of a key, zero when absent.
-    ai_infer(+GM,+Belief,+Obs,-Posterior): exact Bayesian update; fails honestly on impossible observations.
-    ai_predict_states(+GM,+Belief,+Action,-Next): push a belief through a transition.
-    ai_predict_obs(+GM,+Belief,-ObsDist): predicted outcome distribution.
-    ai_surprise(+GM,+Belief,+Obs,-S): negative log evidence of an observation.
-    ai_free_energy(+GM,+Prior,+Obs,-F,-Complexity,-Accuracy): variational free energy decomposed into complexity minus accuracy; equals surprise under exact inference.
-    ai_risk(+GM,+Belief,+Action,-Risk): KL divergence from predicted to preferred outcomes.
-    ai_ambiguity(+GM,+Belief,+Action,-Amb): expected outcome entropy of the arrived-at states.
-    ai_pragmatic(+GM,+Belief,+Action,-V): expected log preference — the goal-seeking drive.
-    ai_epistemic(+GM,+Belief,+Action,-V): expected information gain — the curiosity drive.
-    ai_efe_action(+GM,+Belief,+Action,-G): one-step expected free energy, risk plus ambiguity; the identity G = -(pragmatic + epistemic) holds.
-    ai_efe(+GM,+Belief,+Policy,-G): expected free energy accumulated over an action sequence.
-    ai_policies(+GM,+Horizon,-Policies): every action sequence of the horizon.
-    ai_policy_dist(+GM,+Belief,+Horizon,+Gamma,-Dist): softmax distribution over policies sharpened by precision Gamma.
-    ai_select_policy(+GM,+Belief,+Horizon,+Gamma,-Policy,-P): the most plausible policy.
-    ai_act(+GM,+Belief,+Horizon,+Gamma,-Action): first action of the selected policy.
-    ai_step(+GM,+Belief,+Obs,+Horizon,+Gamma,-Action,-Posterior): the full perceive-then-act cycle.
+    active_inference_model(+States,+Obs,+A,+B,+C,+D,-GM): build and validate a generative model; all distributions must sum to one within 1.0e-6; missing transitions default to persistence.
+    active_inference_actions(+GM,-Actions): the distinct action names.
+    active_inference_prior(+GM,-Prior): the prior belief over states.
+    active_inference_normalize(+Dist,-Norm): rescale a Name-Prob pair list to sum one.
+    active_inference_prob(+Dist,+Key,-P): probability of a key, zero when absent.
+    active_inference_infer(+GM,+Belief,+Obs,-Posterior): exact Bayesian update; fails honestly on impossible observations.
+    active_inference_predict_states(+GM,+Belief,+Action,-Next): push a belief through a transition.
+    active_inference_predict_obs(+GM,+Belief,-ObsDist): predicted outcome distribution.
+    active_inference_surprise(+GM,+Belief,+Obs,-S): negative log evidence of an observation.
+    active_inference_free_energy(+GM,+Prior,+Obs,-F,-Complexity,-Accuracy): variational free energy decomposed into complexity minus accuracy; equals surprise under exact inference.
+    active_inference_risk(+GM,+Belief,+Action,-Risk): KL divergence from predicted to preferred outcomes.
+    active_inference_ambiguity(+GM,+Belief,+Action,-Amb): expected outcome entropy of the arrived-at states.
+    active_inference_pragmatic(+GM,+Belief,+Action,-V): expected log preference — the goal-seeking drive.
+    active_inference_epistemic(+GM,+Belief,+Action,-V): expected information gain — the curiosity drive.
+    active_inference_efe_action(+GM,+Belief,+Action,-G): one-step expected free energy, risk plus ambiguity; the identity G = -(pragmatic + epistemic) holds.
+    active_inference_efe(+GM,+Belief,+Policy,-G): expected free energy accumulated over an action sequence.
+    active_inference_policies(+GM,+Horizon,-Policies): every action sequence of the horizon.
+    active_inference_policy_dist(+GM,+Belief,+Horizon,+Gamma,-Dist): softmax distribution over policies sharpened by precision Gamma.
+    active_inference_select_policy(+GM,+Belief,+Horizon,+Gamma,-Policy,-P): the most plausible policy.
+    active_inference_act(+GM,+Belief,+Horizon,+Gamma,-Action): first action of the selected policy.
+    active_inference_step(+GM,+Belief,+Obs,+Horizon,+Gamma,-Action,-Posterior): the full perceive-then-act cycle.
 
 world_model
 Causalontology World Model — the single, two-mode, canonical world model (co_*, Layer 382). It absorbed the former worldmodel pack (WP-385) so there is one home for both paradigms; nothing was lost, and the former world_model_predict/4 name collision was resolved.
