@@ -1,147 +1,90 @@
-/*  PrologAI — Dreaming Engine Tests  (PR 52)
+/*  PrologAI — Dreaming Engine Test Suite  (PR 52)
 
-    Acceptance tests for the dreaming pack.
-    Each test uses a dedicated MindId (test_mind_N) so dream journal
-    entries do not bleed between tests.
+    Acceptance tests for the dreaming pack, standardized onto PLUnit test()
+    blocks (no behaviour change from the earlier bespoke harness). Each test
+    uses a dedicated MindId (test_mind_N) so dream journal entries do not bleed
+    between tests.
+
+    Run with the full library path:
+        swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/dreaming/test/test_dreaming.pl
 */
 
-% Declare this file as the 'test_dreaming' module.
+% Declare this file as a test module.
 :- module(test_dreaming, []).
-
+% Load the PLUnit framework.
+:- use_module(library(plunit)).
 % Load the dreaming module under test.
-:- use_module('../prolog/dreaming').
+:- use_module(library(dreaming)).
 
-% ---------------------------------------------------------------------------
+% Open the dreaming acceptance test block.
+:- begin_tests(dreaming).
+
 % AC-PR52-001: pai_dream_record/4 persists a journal entry.
-% ---------------------------------------------------------------------------
-
-% Define the test clause for AC-PR52-001.
-test_dream_record :-
+test(dream_record) :-
     % Record a test entry in the dream journal.
-    pai_dream_record(test_mind_1, slow_wave, test_content, DreamId),
-    % Confirm the DreamId is a compound term of the form dream(_, _).
-    DreamId = dream(test_mind_1, _),
-    % Retrieve the journal for test_mind_1 and confirm the entry is present.
-    pai_dream_journal(test_mind_1, Journal),
-    % Check that the journal contains at least one entry.
-    Journal \= [],
-    % Write a pass message.
-    write('AC-PR52-001 PASS: pai_dream_record/4 persists a journal entry.'), nl.
+    dreaming:pai_dream_record(test_mind_1, slow_wave, test_content, DreamId),
+    % The identifier is a dream/2 term keyed to this mind.
+    assertion(DreamId = dream(test_mind_1, _)),
+    % Retrieve the journal for this mind.
+    dreaming:pai_dream_journal(test_mind_1, Journal),
+    % The journal is non-empty.
+    assertion(Journal \= []).
 
-% ---------------------------------------------------------------------------
-% AC-PR52-002: pai_dream_journal/2 returns entries for the correct MindId.
-% ---------------------------------------------------------------------------
-
-% Define the test clause for AC-PR52-002.
-test_dream_journal_isolation :-
-    % Record entries for two different minds.
-    pai_dream_record(test_mind_2a, slow_wave, content_a, _),
-    % Record a second entry for a different mind.
-    pai_dream_record(test_mind_2b, rem, content_b, _),
-    % Retrieve the journal for test_mind_2a.
-    pai_dream_journal(test_mind_2a, JournalA),
-    % Retrieve the journal for test_mind_2b.
-    pai_dream_journal(test_mind_2b, JournalB),
-    % Confirm test_mind_2a's journal contains exactly one entry.
+% AC-PR52-002: pai_dream_journal/2 isolates entries by MindId.
+test(dream_journal_isolation) :-
+    % Record an entry for the first mind.
+    dreaming:pai_dream_record(test_mind_2a, slow_wave, content_a, _),
+    % Record an entry for a second, different mind.
+    dreaming:pai_dream_record(test_mind_2b, rem, content_b, _),
+    % Retrieve the first mind's journal.
+    dreaming:pai_dream_journal(test_mind_2a, JournalA),
+    % Retrieve the second mind's journal.
+    dreaming:pai_dream_journal(test_mind_2b, JournalB),
+    % The first mind's journal has at least one entry.
     length(JournalA, LenA),
-    LenA >= 1,
-    % Confirm test_mind_2b's journal contains exactly one entry.
+    % Confirm that length is one or more.
+    assertion(LenA >= 1),
+    % The second mind's journal has at least one entry.
     length(JournalB, LenB),
-    LenB >= 1,
-    % Confirm the two journals are distinct.
-    JournalA \= JournalB,
-    % Write a pass message.
-    write('AC-PR52-002 PASS: pai_dream_journal/2 isolates entries by MindId.'), nl.
+    % Confirm that length is one or more.
+    assertion(LenB >= 1),
+    % The two journals are distinct.
+    assertion(JournalA \= JournalB).
 
-% ---------------------------------------------------------------------------
 % AC-PR52-003: pai_dream_generative_replay/3 succeeds with empty SONA.
-% ---------------------------------------------------------------------------
+test(generative_replay_empty_sona) :-
+    % Call generative replay; with no SONA loaded, the result is empty.
+    dreaming:pai_dream_generative_replay(test_mind_3, 5, Replayed),
+    % Confirm the replayed list is empty.
+    assertion(Replayed == []).
 
-% Define the test clause for AC-PR52-003.
-test_generative_replay_empty_sona :-
-    % Call generative replay; with no SONA loaded, Replayed must be [].
-    pai_dream_generative_replay(test_mind_3, 5, Replayed),
-    % Confirm Replayed is the empty list.
-    Replayed = [],
-    % Write a pass message.
-    write('AC-PR52-003 PASS: pai_dream_generative_replay/3 succeeds with empty SONA.'), nl.
-
-% ---------------------------------------------------------------------------
 % AC-PR52-004: pai_dream_slow_wave/3 returns a consolidated/2 term.
-% ---------------------------------------------------------------------------
-
-% Define the test clause for AC-PR52-004.
-test_slow_wave :-
-    % Run the slow-wave phase for test_mind_4 with a count of 3.
-    pai_dream_slow_wave(test_mind_4, 3, Consolidated),
+test(slow_wave) :-
+    % Run the slow-wave phase for this mind with a count of three.
+    dreaming:pai_dream_slow_wave(test_mind_4, 3, Consolidated),
     % Confirm the result is a consolidated/2 term.
-    Consolidated = consolidated(_, _),
-    % Write a pass message.
-    write('AC-PR52-004 PASS: pai_dream_slow_wave/3 returns a consolidated/2 term.'), nl.
+    assertion(Consolidated = consolidated(_, _)).
 
-% ---------------------------------------------------------------------------
 % AC-PR52-005: pai_dream_rem/3 returns a rem/2 term.
-% ---------------------------------------------------------------------------
-
-% Define the test clause for AC-PR52-005.
-test_rem :-
-    % Run the REM phase for test_mind_5 with a depth of 5.
-    pai_dream_rem(test_mind_5, 5, Hypotheticals),
+test(rem) :-
+    % Run the REM phase for this mind with a depth of five.
+    dreaming:pai_dream_rem(test_mind_5, 5, Hypotheticals),
     % Confirm the result is a rem/2 term.
-    Hypotheticals = rem(_, _),
-    % Write a pass message.
-    write('AC-PR52-005 PASS: pai_dream_rem/3 returns a rem/2 term.'), nl.
+    assertion(Hypotheticals = rem(_, _)).
 
-% ---------------------------------------------------------------------------
-% AC-PR52-006: pai_dream_counterfactual/4 returns no_known_facts for unknown node.
-% ---------------------------------------------------------------------------
-
-% Define the test clause for AC-PR52-006.
-test_counterfactual_unknown_node :-
+% AC-PR52-006: pai_dream_counterfactual/4 reports no_known_facts for an unknown node.
+test(counterfactual_unknown_node) :-
     % Call counterfactual on a node that does not exist in the Lattice.
-    pai_dream_counterfactual(test_mind_6, nonexistent_node_xyz, 3, Alternatives),
-    % Confirm the pack reports no_known_facts.
-    Alternatives = counterfactual(nonexistent_node_xyz, no_known_facts),
-    % Write a pass message.
-    write('AC-PR52-006 PASS: pai_dream_counterfactual/4 returns no_known_facts for unknown node.'), nl.
+    dreaming:pai_dream_counterfactual(test_mind_6, nonexistent_node_xyz, 3, Alternatives),
+    % Confirm the pack reports no_known_facts for that node.
+    assertion(Alternatives = counterfactual(nonexistent_node_xyz, no_known_facts)).
 
-% ---------------------------------------------------------------------------
 % AC-PR52-007: pai_dream_cycle/2 returns a complete dream_report/5 term.
-% ---------------------------------------------------------------------------
-
-% Define the test clause for AC-PR52-007.
-test_dream_cycle :-
-    % Run a full dream cycle for test_mind_7.
-    pai_dream_cycle(test_mind_7, Report),
+test(dream_cycle) :-
+    % Run a full dream cycle for this mind.
+    dreaming:pai_dream_cycle(test_mind_7, Report),
     % Confirm the report has the expected dream_report/5 structure.
-    Report = dream_report(mind(test_mind_7), hypnagogic(_), slow_wave(_), rem(_), hypnopompic(_)),
-    % Write a pass message.
-    write('AC-PR52-007 PASS: pai_dream_cycle/2 returns a complete dream_report/5 term.'), nl.
+    assertion(Report = dream_report(mind(test_mind_7), hypnagogic(_), slow_wave(_), rem(_), hypnopompic(_))).
 
-% ---------------------------------------------------------------------------
-% Run all tests
-% ---------------------------------------------------------------------------
-
-% Define the clause for 'run tests': execute all seven acceptance tests.
-:- initialization(run_tests, main).
-
-% Define the clause for 'run tests': call each test predicate in order.
-run_tests :-
-    % Write the test suite header.
-    write('--- Dreaming Pack Acceptance Tests (PR 52) ---'), nl,
-    % Run test AC-PR52-001.
-    test_dream_record,
-    % Run test AC-PR52-002.
-    test_dream_journal_isolation,
-    % Run test AC-PR52-003.
-    test_generative_replay_empty_sona,
-    % Run test AC-PR52-004.
-    test_slow_wave,
-    % Run test AC-PR52-005.
-    test_rem,
-    % Run test AC-PR52-006.
-    test_counterfactual_unknown_node,
-    % Run test AC-PR52-007.
-    test_dream_cycle,
-    % Write the test suite footer.
-    write('--- All 7 tests passed. ---'), nl.
+% Close the dreaming acceptance test block.
+:- end_tests(dreaming).
