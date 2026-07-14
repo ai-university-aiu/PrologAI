@@ -1,5 +1,5 @@
-% State the fact: this pack is named co_gauge.
-name(co_gauge).
+% State the fact: this pack is named metacognition.
+name(metacognition).
 % State the fact: this is version 1.0.0.
 version('1.0.0').
 % State the fact: the title carries the work-package number.

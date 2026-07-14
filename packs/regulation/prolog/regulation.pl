@@ -9,7 +9,7 @@
     to average it away but to SPLIT it — to find the feature of the situation that
     separates the wins from the losses, and refine the rule to require (or avoid)
     it. That is discrimination learning. causal_learning induces causal relations and
-    co_gauge watches whole strategies; this pack refines an individual behaviour.
+    metacognition watches whole strategies; this pack refines an individual behaviour.
 
     A behaviour is a rule:
 
