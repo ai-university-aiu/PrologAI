@@ -73,7 +73,7 @@
 % Import the interventional learner that induces the relations.
 :- use_module(library(causal_learning), [causal_learning_causal/2, causal_learning_preventive/2, causal_learning_avoid/1]).
 % Import the planner used when a route to the goal is known.
-:- use_module(library(co_plan), [co_plan_chain/3]).
+:- use_module(library(causal_planner), [causal_planner_chain/3]).
 % Import the grid pack for frame perception and diffs.
 :- use_module(library(grid), [gd_size/3, gd_cell/4, gd_diff/3]).
 % Import list helpers.
@@ -162,7 +162,7 @@ arc3_harness_choose(Actions, _LastFrame, Action) :-
     % A registered goal with a plan to it takes precedence.
     arc3_harness_goal_(Goal),
     % Search the causal graph backward from the goal.
-    co_plan_chain(Goal, 8, [Action | _]),
+    causal_planner_chain(Goal, 8, [Action | _]),
     % The chosen step must be among the environment's actions.
     memberchk(Action, Actions),
     % The avoid-set is absolute.

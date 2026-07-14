@@ -1382,7 +1382,7 @@ WP 389 - tom: Theory of Mind (theory_of_mind_*, Layer 364). Nested per-agent bel
 
 WP 390 - nexus: AGI Foundations Integration Layer (nx_*, Layer 365). The capstone that wires four foundations into the cognitive core: workspace broadcasts hold their winning coalition's concepts in a live J-Space readout, world-model novelty feeds the curiosity learning-progress signal, the agency loop decomposes goals with the planner and recovers by monitoring and replanning, and evolution improves reasoning models scored by refinery critique. Pure plumbing, respecting the acyclic layer order. Chapter 350 covers this pack.
 
-WP 391-396 - the Causalontology suite: noun_backbone, realizable_hinge, causal_core, causal_learning, co_plan, arc3_harness (co_*, Layers 366-371). The process-first Foundational Ontology: reified Causal Relation Objects with temporal windows as mechanism, four modalities, strength, and provenance; a thin continuant backbone with external alignment; the realizable hinge; learning by embodied intervention with a closed-world avoid-set; safe backward planning; and a game-agnostic perceive-learn-plan-act harness for interactive environments with a guarded bridge to ARC-AGI-3. Chapter 351 covers this suite.
+WP 391-396 - the Causalontology suite: noun_backbone, realizable_hinge, causal_core, causal_learning, causal_planner, arc3_harness (co_*, Layers 366-371). The process-first Foundational Ontology: reified Causal Relation Objects with temporal windows as mechanism, four modalities, strength, and provenance; a thin continuant backbone with external alignment; the realizable hinge; learning by embodied intervention with a closed-world avoid-set; safe backward planning; and a game-agnostic perceive-learn-plan-act harness for interactive environments with a guarded bridge to ARC-AGI-3. Chapter 351 covers this suite.
 
 WP 397-400 - the ARC-AGI-3 Readiness suite: curiosity, goal_inference, efficiency_governor, arc3_protocol (co_*, Layers 372-375). Four packs that carry the Causalontology harness the last mile to the interactive benchmark: a novelty-seeking, loop-avoiding exploration policy that prefers actions predicted to change the world and turns the ACTION6 cell-select into a few object-centroid clicks; inference of the unstated win condition from the frame changes that precede a win; a human-baseline efficiency governor that budgets actions and computes the benchmark's RHAE-style scores; and the exact March-2026 ARC-AGI-3 protocol vocabulary with a guarded environment adapter. Chapter 352 covers this suite.
 
@@ -26477,7 +26477,7 @@ J-Space. The companion Mentova accomplishment, Acc_424, puts all seven
 foundations to work in one connected episode of a curious agent's cognition.
 
 
-Chapter 351: Causalontology - The noun_backbone, realizable_hinge, causal_core, causal_learning, co_plan, and arc3_harness Packs (co_*, Layers 366-371)
+Chapter 351: Causalontology - The noun_backbone, realizable_hinge, causal_core, causal_learning, causal_planner, and arc3_harness Packs (co_*, Layers 366-371)
 
 A general intelligence must do more than recognize what things are. It must
 model how and why things happen - predict the consequences of its actions,
@@ -26554,12 +26554,12 @@ to 0.30. Doing beats seeing, and the provenance says which was which.
 
 PLANNING, SAFELY
 
-The co_plan pack composes procedures - relations whose cause is a sequence -
+The causal_planner pack composes procedures - relations whose cause is a sequence -
 and plans backward from a goal, refusing any plan through an avoided action.
-Where no procedure exists, co_plan_chain assembles one by bounded backward
+Where no procedure exists, causal_planner_chain assembles one by bounded backward
 search over the causal graph:
 
-    ?- co_plan_chain(light(on), 5, Plan).
+    ?- causal_planner_chain(light(on), 5, Plan).
     Plan = [flip(switch), power(on)].
 
 THE HARNESS
@@ -26639,7 +26639,7 @@ average out. A colour that also shows up before a loss is discounted, so a
 feature common to both winning and losing is not mistaken for the goal. The
 result is offered two ways: as the abstract reach_colour(Colour) and as the
 changed(_, _, _, Colour) occurrent that arc3_harness_goal_set can register and
-co_plan can aim at, together with a confidence reading of how strongly the
+causal_planner can aim at, together with a confidence reading of how strongly the
 leading hypothesis dominates.
 
 SPENDING ACTIONS FRUGALLY
@@ -26676,7 +26676,7 @@ guarded so no test depends on the wire.
 THE SUITE AS A WHOLE
 
 Perceive with grid, explore with curiosity, model with causal_core, infer the
-goal with goal_inference, plan with co_plan under the budget of efficiency_governor, and
+goal with goal_inference, plan with causal_planner under the budget of efficiency_governor, and
 act through the exact vocabulary of arc3_protocol - all orchestrated by the
 arc3_harness loop. Twenty-seven acceptance tests pass across the four packs, and
 they load cleanly alongside the whole Causalontology suite. The benchmark
@@ -26711,7 +26711,7 @@ human_steps encodes all of that as ordered facts. human_steps_phase names the si
 human_steps_step gives each of the thirty micro-steps its text and its phase; human_steps_ladder
 lists them in canonical order; and human_steps_phase_capability records which pack each
 phase leans on - orientation on perception, exploration on curiosity, goal
-inference on goal_inference, planning on co_plan, execution on efficiency_governor, and
+inference on goal_inference, planning on causal_planner, execution on efficiency_governor, and
 transfer on the causal core. The ladder is a first-class object the agent can
 read, not a comment buried in a loop.
 

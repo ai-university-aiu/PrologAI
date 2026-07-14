@@ -4,7 +4,7 @@
     presses opens it, and a learned hazard is never planned through.
 
     Run with the full library path:
-        swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/co_plan/test/test_co_plan.pl
+        swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/causal_planner_plan/test/test_co_plan.pl
 */
 
 % Declare this file as a test module.
@@ -14,7 +14,7 @@
 :- use_module(library(plunit)).
 
 % Load the module under test.
-:- use_module(library(co_plan)).
+:- use_module(library(causal_planner)).
 % Load the verb layer the planner reads.
 :- use_module(library(causal_core)).
 % Load the learner whose avoid-set the planner respects.
@@ -51,28 +51,28 @@ fresh :-
 % executor(+Step, -Result): a toy executor that performs a press.
 executor(press(B), pressed(B)).
 
-:- begin_tests(co_plan).
+:- begin_tests(causal_planner).
 
 % A composed procedure plans backward from its goal.
 test(procedure_plans, [nondet]) :-
     % Learn the world.
     fresh,
     % Compose the unlock procedure.
-    co_compose_procedure([press(b_red), press(b_green), press(b_blue)],
+    causal_planner_compose_procedure([press(b_red), press(b_green), press(b_blue)],
                          door(open), Id),
     % It is queryable as a procedure.
-    co_procedure(Id, [press(b_red), press(b_green), press(b_blue)], door(open)),
+    causal_planner_procedure(Id, [press(b_red), press(b_green), press(b_blue)], door(open)),
     % Planning to the goal returns the sequence.
-    co_plan(door(open), [press(b_red), press(b_green), press(b_blue)]).
+    causal_planner_plan(door(open), [press(b_red), press(b_green), press(b_blue)]).
 
 % Composing the same procedure twice returns the same relation.
 test(procedure_idempotent) :-
     % Learn the world.
     fresh,
     % Compose once.
-    co_compose_procedure([press(b_red)], lamp(on), Id1),
+    causal_planner_compose_procedure([press(b_red)], lamp(on), Id1),
     % Compose again.
-    co_compose_procedure([press(b_red)], lamp(on), Id2),
+    causal_planner_compose_procedure([press(b_red)], lamp(on), Id2),
     % The identifiers agree.
     Id1 == Id2.
 
@@ -83,18 +83,18 @@ test(hazard_never_planned, [fail]) :-
     % Learn the hazard.
     causal_learning_intervene(test_co_plan:world_act, touch(spike), hazard),
     % Compose a procedure that would pass through the spike.
-    co_compose_procedure([press(b_red), touch(spike)], door(open), _),
+    causal_planner_compose_procedure([press(b_red), touch(spike)], door(open), _),
     % No safe plan exists.
-    co_plan(door(open), _).
+    causal_planner_plan(door(open), _).
 
 % A plan is refused when a step is not achievable at all.
 test(unachievable_refused, [fail]) :-
     % Learn the world.
     fresh,
     % A procedure with a step the agent knows nothing about.
-    co_compose_procedure([press(b_red), utter(spell)], door(open), _),
+    causal_planner_compose_procedure([press(b_red), utter(spell)], door(open), _),
     % No plan: the spell is not achievable.
-    co_plan(door(open), _).
+    causal_planner_plan(door(open), _).
 
 % Backward chaining assembles a plan the agent was never given.
 test(chain_assembles_plan, [nondet]) :-
@@ -109,22 +109,22 @@ test(chain_assembles_plan, [nondet]) :-
     causal_core_new_cro([power(on)], [light(on)], temporal(0, 0, instant),
                sufficient, 0.9, [], prov(kb, asserted, 0.9), _),
     % Chain backward from the light to the flip.
-    co_plan_chain(light(on), 5, Plan),
+    causal_planner_chain(light(on), 5, Plan),
     % The assembled plan starts with the performable action.
     Plan == [flip(switch), power(on)].
 
 % Execution runs each step through the caller's executor.
 test(execute_runs_steps) :-
     % Run a two-step plan through the toy executor.
-    co_execute(test_co_plan:executor, [press(b_red), press(b_green)], Result),
+    causal_planner_execute(test_co_plan:executor, [press(b_red), press(b_green)], Result),
     % The last step's outcome is the result.
     Result == pressed(b_green).
 
 % A failing step stops the plan honestly.
 test(execute_fails_honestly) :-
     % The executor knows only presses.
-    co_execute(test_co_plan:executor, [press(b_red), utter(spell)], Result),
+    causal_planner_execute(test_co_plan:executor, [press(b_red), utter(spell)], Result),
     % The failure names the step.
     Result == failed_at(utter(spell)).
 
-:- end_tests(co_plan).
+:- end_tests(causal_planner).

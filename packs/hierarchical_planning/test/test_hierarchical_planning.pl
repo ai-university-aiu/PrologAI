@@ -1,7 +1,7 @@
 /*  Tests for hierarchical_planning — Hierarchical Planning (WP-404, Layer 379)
 
     A standard PLUnit suite. Run with the full library path so causal_core and
-    co_plan (which hierarchical_planning requires) resolve:
+    causal_planner (which hierarchical_planning requires) resolve:
         swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/hierarchical_planning/test/test_hierarchical_planning.pl
 */
 
