@@ -18,7 +18,7 @@
 % Load the module under test.
 :- use_module(library(human_steps)).
 % Load the J-Space workspace so the readout can be inspected directly.
-:- use_module(library(jspace), [js_active/2]).
+:- use_module(library(jacobian_space), [jacobian_space_active/2]).
 % Load list helpers.
 :- use_module(library(lists), [member/2]).
 

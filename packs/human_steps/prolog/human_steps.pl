@@ -10,7 +10,7 @@
     This pack makes that process a first-class, inspectable object. It encodes
     the six phases and thirty micro-steps of the human ladder as ordered facts,
     and it holds the step the agent is currently on as a concept in a J-Space
-    workspace (the jspace pack — the Jacobian Space, read through the Jacobian
+    workspace (the jacobian_space pack — the Jacobian Space, read through the Jacobian
     Lens), so that at any moment the J-Lens readout says which human step the
     agent is executing and why. Walking the ladder leaves a glass-box trace of
     the whole human process in the workspace.
@@ -83,8 +83,8 @@
 ]).
 
 % Import the J-Space concept workspace (the Jacobian Space and its Lens).
-:- use_module(library(jspace),
-    [js_open/1, js_hold/4, js_active/2, js_reading/2, js_decay/2]).
+:- use_module(library(jacobian_space),
+    [jacobian_space_open/1, jacobian_space_hold/4, jacobian_space_active/2, jacobian_space_reading/2, jacobian_space_decay/2]).
 % Import grid measurement and cell access for the Jacobian.
 :- use_module(library(grid), [gd_size/3, gd_cell/4, gd_diff/3, gd_colors/2]).
 % Import list helpers.
@@ -217,7 +217,7 @@ human_steps_phase_of(StepId, PhaseId) :-
 % Define human_steps_reset: open a fresh J-Space workspace at the first step.
 human_steps_reset(Space) :-
     % Clear the workspace.
-    js_open(Space),
+    jacobian_space_open(Space),
     % Enter the first step of the ladder.
     human_steps_enter(Space, 'I.1').
 
@@ -226,14 +226,14 @@ human_steps_enter(Space, StepId) :-
     % The step must be a real one.
     human_steps_step(StepId, _, _),
     % Fade the previously held steps so the current one dominates the readout.
-    js_decay(Space, 0.5),
+    jacobian_space_decay(Space, 0.5),
     % Hold the current step at full strength, sourced as a human step.
-    js_hold(Space, hstep(StepId), 1.0, human_step).
+    jacobian_space_hold(Space, hstep(StepId), 1.0, human_step).
 
 % Define human_steps_current: the step currently held strongest in the workspace.
 human_steps_current(Space, StepId) :-
     % Take the ranked active concepts.
-    js_active(Space, Concepts),
+    jacobian_space_active(Space, Concepts),
     % The first held step, being the strongest, is the current one.
     once(( member(hstep(StepId), Concepts) )).
 
@@ -254,8 +254,8 @@ human_steps_advance(Space, Next) :-
 
 % Define human_steps_reading: the J-Lens readout of the workspace.
 human_steps_reading(Space, Reading) :-
-    % Delegate to the Jacobian Lens of the jspace pack.
-    js_reading(Space, Reading).
+    % Delegate to the Jacobian Lens of the jacobian_space pack.
+    jacobian_space_reading(Space, Reading).
 
 % ---------------------------------------------------------------------------
 % The discrete action-response Jacobian (Phase II made concrete)

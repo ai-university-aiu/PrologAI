@@ -1,7 +1,7 @@
 /*  PrologAI — Nexus: AGI Foundations Integration Layer  (WP-390, Layer 365)
 
     The seven AGI Foundations packs (causal, active_inference, world_model, planner,
-    evolve, jspace, tom) were built as self-contained capabilities. This
+    evolve, jacobian_space, tom) were built as self-contained capabilities. This
     pack is the capstone that wires four of them into PrologAI's existing
     cognitive core, respecting the strictly acyclic layer order: nexus
     sits at Layer 365, above every pack it touches, so it may call up into
@@ -10,7 +10,7 @@
 
     Four wirings, one per bullet of the Building_AGI next-steps list:
 
-      1. jspace  <- workspace   Every workspace broadcast holds its winning
+      1. jacobian_space  <- workspace   Every workspace broadcast holds its winning
                                 coalition's concepts in a J-Space workspace,
                                 so the readable J-Lens readout is live during
                                 reasoning. (nexus_bind_workspace/1,
@@ -93,7 +93,7 @@
 
 % Foundation packs (Layers 358-363), each depending only on library(lists).
 % Import the J-Space workspace predicates used by wiring one.
-:- use_module(library(jspace), [js_hold/4, js_reading/2]).
+:- use_module(library(jacobian_space), [jacobian_space_hold/4, jacobian_space_reading/2]).
 % Import the world-model novelty predicate used by wiring two.
 :- use_module(library(world_model), [world_model_novelty/3]).
 % Import the hierarchical planner predicates used by wiring three.
@@ -136,7 +136,7 @@ nexus_wirings([
 ]).
 
 % ===========================================================================
-% WIRING ONE — jspace <- workspace broadcast
+% WIRING ONE — jacobian_space <- workspace broadcast
 % ===========================================================================
 
 % nexus_hold_broadcast(+JSpace, +BroadcastContent): hold a winner's concepts.
@@ -150,7 +150,7 @@ nexus_hold_broadcast(JSpace, broadcast_content(_CId, _Relation, Ids, Salience)) 
         % Take each concept id the coalition carried.
         member(Concept, Ids),
         % Implant or refresh it, sourced as a workspace broadcast.
-        js_hold(JSpace, Concept, Strength, workspace_broadcast)
+        jacobian_space_hold(JSpace, Concept, Strength, workspace_broadcast)
     ).
 
 % nexus_bind_workspace(+JSpace): subscribe the J-Space hook to the broadcast bus.
@@ -172,7 +172,7 @@ nexus_replay_broadcasts(JSpace, Broadcasts) :-
 % nexus_broadcast_reading(+JSpace, -Reading): the live J-Lens readout.
 nexus_broadcast_reading(JSpace, Reading) :-
     % The readout is simply the ranked J-Space reading after broadcasts.
-    js_reading(JSpace, Reading).
+    jacobian_space_reading(JSpace, Reading).
 
 % ===========================================================================
 % WIRING TWO — curiosity <- world_model novelty
