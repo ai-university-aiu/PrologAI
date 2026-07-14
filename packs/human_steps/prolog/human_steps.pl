@@ -111,7 +111,7 @@ human_steps_phase(6, 'Level Progression and Carry-Forward Learning').
 % Orientation is perception of the grid.
 human_steps_phase_capability(1, perception).
 % Exploration is the exploration policy and this pack's Jacobian.
-human_steps_phase_capability(2, co_explore).
+human_steps_phase_capability(2, curiosity).
 % Goal inference is the goal inferencer.
 human_steps_phase_capability(3, goal_inference).
 % Planning is the planner under the efficiency governor.

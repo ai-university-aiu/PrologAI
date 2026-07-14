@@ -105,7 +105,7 @@
 % Import the workspace broadcast-subscription predicate for wiring one.
 :- use_module(library(workspace), [pai_broadcast_subscribe/1]).
 % Import the curiosity learning-progress predicates for wiring two.
-:- use_module(library(curiosity), [pai_observe_error/3, pai_learning_progress/2]).
+:- use_module(library(curiosity), [curiosity_observe_error/3, curiosity_learning_progress/2]).
 % Import the agency loop predicates for wiring three.
 :- use_module(library(agency), [ag_loop_create/3, ag_loop_run/3]).
 % Import the refinery scoring and critique predicates for wiring four.
@@ -189,7 +189,7 @@ nx_observe_novelty(Region, KnownStates, State, Timestamp, Novelty) :-
     % Measure how novel the state is against everything seen so far.
     nx_novelty_signal(KnownStates, State, Novelty),
     % Feed that novelty into curiosity as the region's prediction error.
-    pai_observe_error(Region, Novelty, Timestamp).
+    curiosity_observe_error(Region, Novelty, Timestamp).
 
 % nx_curiosity_explore(+Region, +Trajectory, -Progress): a whole trajectory.
 % As exploration revisits familiar structure, novelty falls, which curiosity
@@ -198,7 +198,7 @@ nx_curiosity_explore(Region, Trajectory, Progress) :-
     % Walk the trajectory, accumulating the states already seen.
     foldl(nx_explore_step(Region), Trajectory, 0-[], _),
     % Read back the learning progress the falling novelty produced.
-    pai_learning_progress(Region, Progress).
+    curiosity_learning_progress(Region, Progress).
 
 % nx_explore_step(+Region, +State, +Index0-Known0, -Index1-Known1): one step.
 nx_explore_step(Region, State, Index0-Known0, Index1-Known1) :-

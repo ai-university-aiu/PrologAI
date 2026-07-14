@@ -1,4 +1,4 @@
-Chapter 352: The ARC-AGI-3 Readiness Suite - The co_explore, co_goalinfer, co_effic, and co_arc3proto Packs (co_*, Layers 372-375)
+Chapter 352: The ARC-AGI-3 Readiness Suite - The curiosity, co_goalinfer, co_effic, and co_arc3proto Packs (co_*, Layers 372-375)
 
 The arc3_harness harness of Chapter 351 closes the perceive-learn-plan-act loop
 against an interactive environment. That is the skeleton of an ARC-AGI-3
@@ -21,7 +21,7 @@ insights, and behaviours can be packaged.
 
 EXPLORING WITHOUT INSTRUCTIONS
 
-The co_explore pack is the exploration policy. It remembers each state it has
+The curiosity pack is the exploration policy. It remembers each state it has
 seen by a canonical, order-free signature - the grid's dimensions and its
 colour histogram - so that a state it is about to re-enter is recognised as a
 loop rather than mistaken for progress. It ranks the environment's available
@@ -32,7 +32,7 @@ learned hazard is never chosen at all.
 
 One action needs special care. ARC-AGI-3's complex action, ACTION6, is a
 click at some cell of the grid - up to four thousand and ninety-six
-possibilities if enumerated blindly. co_explore does not enumerate them. It
+possibilities if enumerated blindly. curiosity does not enumerate them. It
 perceives the objects in the frame and offers only their centroids as click
 targets, so the click space shrinks from thousands of cells to a handful of
 salient ones. The bare click marker in an action list is expanded to exactly
@@ -88,7 +88,7 @@ guarded so no test depends on the wire.
 
 THE SUITE AS A WHOLE
 
-Perceive with grid, explore with co_explore, model with causal_core, infer the
+Perceive with grid, explore with curiosity, model with causal_core, infer the
 goal with co_goalinfer, plan with co_plan under the budget of co_effic, and
 act through the exact vocabulary of co_arc3proto - all orchestrated by the
 arc3_harness loop. Twenty-seven acceptance tests pass across the four packs, and
