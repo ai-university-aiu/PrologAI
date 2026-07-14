@@ -38,7 +38,7 @@ world_act(_, none).
 % fresh/0: reset every layer the learner touches.
 fresh :-
     % Clear the verb layer.
-    co_core_reset,
+    causal_core_reset,
     % Clear the hinge.
     co_hinge_reset,
     % Clear the learning state.

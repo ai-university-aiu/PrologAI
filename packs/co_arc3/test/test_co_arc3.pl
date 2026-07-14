@@ -87,7 +87,7 @@ mock_env(arc3_env(test_co_arc3:mock_reset,
 % fresh/0: clear every layer the harness touches.
 fresh :-
     % Clear the verb layer.
-    co_core_reset,
+    causal_core_reset,
     % Clear the hinge.
     co_hinge_reset,
     % Clear the learning state.

@@ -30,7 +30,7 @@
 % A lawful CRO round-trips with its full payload.
 test(cro_roundtrip) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % Assert the canonical example relation.
     causal_core_cro_assert(cro(c1, [press(b_red)], [light(red, on)],
                       temporal(0, 0, instant), sufficient, 0.7, [],
@@ -41,7 +41,7 @@ test(cro_roundtrip) :-
 % An unlawful modality is refused.
 test(bad_modality_refused, [fail]) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % The modality must be one of the four.
     causal_core_cro_assert(cro(c1, [a], [b], temporal(0, 0, instant), maybe, 0.5, [],
                       prov(kb, asserted, 0.5))).
@@ -49,7 +49,7 @@ test(bad_modality_refused, [fail]) :-
 % A strength outside the unit interval is refused.
 test(bad_strength_refused, [fail]) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % Strength is a fraction.
     causal_core_cro_assert(cro(c1, [a], [b], temporal(0, 0, instant), sufficient, 1.5, [],
                       prov(kb, asserted, 0.5))).
@@ -57,7 +57,7 @@ test(bad_strength_refused, [fail]) :-
 % A disordered temporal window is refused: the window is the mechanism.
 test(bad_window_refused, [fail]) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % The minimum delay cannot exceed the maximum.
     causal_core_cro_assert(cro(c1, [a], [b], temporal(6, 1, hours), sufficient, 0.5, [],
                       prov(kb, asserted, 0.5))).
@@ -65,7 +65,7 @@ test(bad_window_refused, [fail]) :-
 % Confirmation raises strength, capped at 0.99.
 test(strengthen_capped) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % A relation at 0.7.
     causal_core_new_cro([a], [b], temporal(0, 0, instant), sufficient, 0.7, [],
                prov(agent, learned_by_intervention, 0.7), Id),
@@ -87,7 +87,7 @@ test(strengthen_capped) :-
 % Prediction reads effects from relations, never preventive ones.
 test(predict_excludes_preventive, [nondet]) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % A productive relation.
     causal_core_new_cro([press(b)], [light(on)], temporal(0, 0, instant), sufficient,
                0.7, [], prov(agent, learned_by_intervention, 0.7), _),
@@ -112,7 +112,7 @@ test(predict_excludes_preventive, [nondet]) :-
 % Mere sequence is never read as production.
 test(after_is_not_because) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % The rooster crows before the sunrise.
     causal_core_precedes_add(rooster_crow, sunrise),
     % The succession is recorded.
@@ -125,7 +125,7 @@ test(after_is_not_because) :-
 % The clinician's question: a cause is excluded purely on timing.
 test(temporal_abduction_gate, [nondet]) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % Spoiled shellfish acts within one to six hours.
     causal_core_new_cro([ate(spoiled_shellfish)], [state(gastroenteritis)],
                temporal(1, 6, hours), contributory, 0.7, [],
@@ -161,7 +161,7 @@ test(temporal_abduction_gate, [nondet]) :-
 % A coarse relation is consistent with the composition of its parts.
 test(hierarchy_consistent, [nondet]) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % The coarse relation: fuel burns to motion.
     causal_core_new_cro([ignite], [motion], temporal(0, 1, seconds), sufficient, 0.8,
                [], prov(kb, asserted, 0.8), Parent),
@@ -184,7 +184,7 @@ test(hierarchy_consistent, [nondet]) :-
 % An incoherent decomposition fails the consistency check.
 test(hierarchy_inconsistent, [fail]) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % The coarse relation.
     causal_core_new_cro([ignite], [motion], temporal(0, 1, seconds), sufficient, 0.8,
                [], prov(kb, asserted, 0.8), Parent),
@@ -199,7 +199,7 @@ test(hierarchy_inconsistent, [fail]) :-
 % The subsumption argument: import a degenerate external verb, then refine.
 test(import_and_refine) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % ConceptNet's bare "Causes" becomes a provisional degenerate CRO.
     causal_core_import_external(conceptnet, smoking, cancer, Id),
     % It is flagged provisional.
@@ -218,7 +218,7 @@ test(import_and_refine) :-
 % The glass-box why returns the full story of a relation.
 test(why_full_story) :-
     % A fresh verb layer.
-    co_core_reset,
+    causal_core_reset,
     % One relation.
     causal_core_new_cro([press(b)], [light(on)], temporal(0, 0, instant), sufficient,
                0.7, [], prov(agent, learned_by_intervention, 0.7), Id),
@@ -234,7 +234,7 @@ test(why_full_story) :-
 % realizable realized in a process that participates in a causal relation.
 test(cross_layer_acceptance, [nondet]) :-
     % Fresh layers.
-    co_core_reset,
+    causal_core_reset,
     % Fresh noun layer.
     co_noun_reset,
     % Fresh hinge.

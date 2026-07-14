@@ -29,7 +29,7 @@
         of any relation.
 
     Predicates:
-      co_core_reset/0            -- clear the verb layer
+      causal_core_reset/0            -- clear the verb layer
       causal_core_cro_assert/1            -- +CRO           (validated)
       causal_core_new_cro/8               -- +Causes..+Prov, -Id (fresh identifier)
       causal_core_the_cro/2               -- ?Id, -CRO
@@ -54,8 +54,8 @@
 
 % Declare this module and list every exported predicate with its correct arity.
 :- module(causal_core, [
-    % co_core_reset/0: clear the verb layer.
-    co_core_reset/0,
+    % causal_core_reset/0: clear the verb layer.
+    causal_core_reset/0,
     % causal_core_cro_assert/1: assert a validated CRO.
     causal_core_cro_assert/1,
     % causal_core_new_cro/8: assert a CRO under a fresh identifier.
@@ -132,8 +132,8 @@
 % causal_core_mechanism_/2: (ParentId, SubIds) — hierarchical decomposition.
 :- dynamic causal_core_mechanism_/2.
 
-% Define co_core_reset: clear every verb-layer store.
-co_core_reset :-
+% Define causal_core_reset: clear every verb-layer store.
+causal_core_reset :-
     % Drop the relations.
     retractall(causal_core_cro_(_, _, _, _, _, _, _, _)),
     % Drop the succession records.
