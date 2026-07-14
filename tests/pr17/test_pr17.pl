@@ -55,8 +55,8 @@
 :- use_module(library(lattice),    [lattice_open/2, lattice_close/1]).
 % Import [set_default_nexus/1] from the built-in 'node_facts' library.
 :- use_module(library(node_facts), [set_default_nexus/1]).
-% Import [pai_register_sentinel/6] from the built-in 'sentinels' library.
-:- use_module(library(sentinels),  [pai_register_sentinel/6]).
+% Import [sentinels_register/6] from the built-in 'sentinels' library.
+:- use_module(library(sentinels),  [sentinels_register/6]).
 % Import [sona_absorb/1] from the built-in 'sona' library.
 :- use_module(library(sona),       [sona_absorb/1]).
 % Load the built-in 'refinement' library so its predicates are available here.
@@ -317,7 +317,7 @@ test(sandbox_fails_on_constitutional_violation) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(reflect_sentinel_descriptor) :-
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(test_domain, 50, pattern([test_cond]),
+    sentinels_register(test_domain, 50, pattern([test_cond]),
                           % Continue the multi-line expression started above.
                           [test_obj], test_action, 'Test sentinel'),
     % State a fact for 'pai reflect sentinel' with the arguments listed below.

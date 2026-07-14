@@ -142,7 +142,7 @@ Everything is inspectable.
 | `kernel` | The minimal kernel — lattice-resident rewrite rules and a kernel interpreter with full trace. The lowest layer of the cognitive stack. |
 | `lattice` | The Persistent Shared Memory Network — the unified knowledge store that every other pack reads and writes. |
 | `actors` | The Actor Framework — cyclic_actor, receptor, and pub-sub messaging. Every cognitive process runs as an actor. |
-| `sentinels` | Neuro-Symbolic Opportunistic Forward Chaining — the constitutional guard layer that monitors for violations and fires proactively. |
+| `sentinels` | Neuro-Symbolic Opportunistic Forward Chaining (sentinels_*) — the constitutional guard layer that monitors for violations and fires proactively; a registry (`sentinels_register`, `sentinels_list`, `sentinels_retract`, ...) and a firing engine (`sentinels_evaluate`). |
 | `types` | Gradual Lattice Types — an off-by-default type checker where types are first-class Lattice node_facts, not annotations. |
 
 **Perception and Attention**
@@ -181,7 +181,7 @@ Everything is inspectable.
 | `motivation` | Motivation (motivation_*, Layer 386, WP-411) — the inner reason to act, converged into one pack: homeostatic **needs** carry a target set-point, the gap from the current reading becomes **pressure**, pressures become a prioritized, never-empty **agenda** of self-generated restore goals (an idle mind explores rather than stalls), and a global **modulator bus** (arousal, execution speed, resolution) with affect regions and named motives grounds those goals in drives. Absorbed the older Psi modulation pack. |
 | `appraisal` | Staged Appraisal and Coping (EMA model) — causal interpretation, appraisal variables, and coping selection. PrologAI evaluates events emotionally before deciding how to respond. |
 | `markers` | Somatic Markers — affective pre-selection for deliberation. High-stakes options are flagged before the reasoning engine even starts. |
-| `reflection` | Reflection Pattern Actors — motivation, daydream, regulation, compensation, coping, exploration, discovery, imitation, play, gating, impasse, and meta-control. The full repertoire of reflective behaviors. |
+| `reflection` | Reflection Pattern Actors (reflection_*) — motivation, daydream, regulation, compensation, coping, exploration, discovery, imitation, play, gating, impasse, and meta-control cycles (`reflection_install_actors` registers them all). The full repertoire of reflective behaviors. |
 | `awareness` | Situational Awareness — evolving regards, theory-of-mind, and self-reconciliation. PrologAI models its situation, the other agents around it, and its own mental state simultaneously. |
 | `assessment` | Intelligence Assessment — Bayley, Piagetian, and CHC (Cattell-Horn-Carroll) frameworks plus consciousness-indicator coverage. PrologAI can measure its own cognitive level. |
 

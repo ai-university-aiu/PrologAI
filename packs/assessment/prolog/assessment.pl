@@ -374,7 +374,7 @@ consciousness_indicator(recurrent_processing, _, present) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
-        ( sentinels:pai_sentinel_entry(_, _, _, _, _, _) -> true ; fail ),
+        ( sentinels:sentinels_entry(_, _, _, _, _, _) -> true ; fail ),
         % Continue the multi-line expression started above.
         _, fail
     % Continue the multi-line expression started above.

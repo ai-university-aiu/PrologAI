@@ -15,16 +15,16 @@
 % Declare this file as the 'sentinel_engine' module and list its exported predicates.
 :- module(sentinel_engine, [
     % Continue the multi-line expression started above.
-    evaluate_sentinels/5,        % +Nexus, +Id, +Relation, +Args, +Referents
+    sentinels_evaluate/5,        % +Nexus, +Id, +Relation, +Args, +Referents
     % Continue the multi-line expression started above.
-    sentinel_fire_threshold/1    % -Threshold (default 0.75)
+    sentinels_fire_threshold/1    % -Threshold (default 0.75)
 % Close the expression opened above.
 ]).
 
 % Load the built-in 'sentinels' library so its predicates are available here.
-:- use_module(library(sentinels),      [pai_sentinel_entry/6,
+:- use_module(library(sentinels),      [sentinels_entry/6,
                                         % Continue the multi-line expression started above.
-                                        pai_sentinel_domain_active/1]).
+                                        sentinels_domain_active/1]).
 % Import [kindle_node/1] from the built-in 'node_facts' library.
 :- use_module(library(node_facts),     [kindle_node/1]).
 % Import [hash_project/3, cosine_similarity/3] from the built-in 'backend_prolog' library.
@@ -36,13 +36,13 @@
 % Default similarity threshold
 % ---------------------------------------------------------------------------
 
-% Declare 'sentinel_sim_threshold/1' as dynamic — its facts may be added or removed at runtime.
-:- dynamic sentinel_sim_threshold/1.
+% Declare 'sentinels_sim_threshold/1' as dynamic — its facts may be added or removed at runtime.
+:- dynamic sentinels_sim_threshold/1.
 % State the fact: sentinel sim threshold(0.75).
-sentinel_sim_threshold(0.75).
+sentinels_sim_threshold(0.75).
 
 % Define a clause for 'sentinel fire threshold': succeed when the following conditions hold.
-sentinel_fire_threshold(T) :- sentinel_sim_threshold(T).
+sentinels_fire_threshold(T) :- sentinels_sim_threshold(T).
 
 % ---------------------------------------------------------------------------
 % Hook into anchor_node — multifile clause in node_facts module
@@ -54,23 +54,23 @@ sentinel_fire_threshold(T) :- sentinel_sim_threshold(T).
 % Execute: node_facts:post_anchor_node_hook(Nexus, Id, Relation, Args, Referents) :-.
 node_facts:post_anchor_node_hook(Nexus, Id, Relation, Args, Referents) :-
     % State the fact: evaluate sentinels(Nexus, Id, Relation, Args, Referents).
-    evaluate_sentinels(Nexus, Id, Relation, Args, Referents).
+    sentinels_evaluate(Nexus, Id, Relation, Args, Referents).
 
 % ---------------------------------------------------------------------------
-% evaluate_sentinels/5
+% sentinels_evaluate/5
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'evaluate sentinels': succeed when the following conditions hold.
-evaluate_sentinels(Nexus, Id, Relation, Args, Referents) :-
+sentinels_evaluate(Nexus, Id, Relation, Args, Referents) :-
     % Check that 'Change' is unifiable with 'node_fact(Id, Relation, Args, Referents)'.
     Change = node_fact(Id, Relation, Args, Referents),
     % Collect all sentinels from active domains, sorted by priority desc
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(Priority-Domain-Pattern-Objectives-Action, (
         % Continue the multi-line expression started above.
-        pai_sentinel_entry(Domain, Priority, Pattern, Objectives, Action, _),
+        sentinels_entry(Domain, Priority, Pattern, Objectives, Action, _),
         % Continue the multi-line expression started above.
-        pai_sentinel_domain_active(Domain)
+        sentinels_domain_active(Domain)
     % Continue the multi-line expression started above.
     ), Raw),
     % Sort list 'Raw' into 'Asc', keeping duplicates.
@@ -78,22 +78,22 @@ evaluate_sentinels(Nexus, Id, Relation, Args, Referents) :-
     % State a fact for 'reverse' with the arguments listed below.
     reverse(Asc, ByPriority),
     % State the fact: evaluate ordered(Nexus, Change, ByPriority).
-    evaluate_ordered(Nexus, Change, ByPriority).
+    sentinels_evaluate_ordered(Nexus, Change, ByPriority).
 
 % State the fact: evaluate ordered(_, _, []).
-evaluate_ordered(_, _, []).
+sentinels_evaluate_ordered(_, _, []).
 % Define a clause for 'evaluate ordered': succeed when the following conditions hold.
-evaluate_ordered(Nexus, Change, [_-_-Pattern-Objectives-Action | Rest]) :-
-    % Execute: ( matches_sentinel(Change, Pattern).
-    ( matches_sentinel(Change, Pattern)
+sentinels_evaluate_ordered(Nexus, Change, [_-_-Pattern-Objectives-Action | Rest]) :-
+    % Execute: ( sentinels_matches(Change, Pattern).
+    ( sentinels_matches(Change, Pattern)
     % If the condition above succeeded, perform the following action.
-    ->  fire_sentinel(Nexus, Change, Objectives, Action)
+    ->  sentinels_fire(Nexus, Change, Objectives, Action)
     % Otherwise (else branch), perform the following action.
     ;   true
     % Close the expression opened above.
     ),
     % State the fact: evaluate ordered(Nexus, Change, Rest).
-    evaluate_ordered(Nexus, Change, Rest).
+    sentinels_evaluate_ordered(Nexus, Change, Rest).
 
 % ---------------------------------------------------------------------------
 % Phase 1 — logical unification (non-destructive via \+\+)
@@ -101,13 +101,13 @@ evaluate_ordered(Nexus, Change, [_-_-Pattern-Objectives-Action | Rest]) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'matches sentinel': succeed when the following conditions hold.
-matches_sentinel(Change, Pattern) :-
+sentinels_matches(Change, Pattern) :-
     % Succeed only if '\+ Change = Pattern.      % Phase 1: logical unification' cannot be proved (negation as failure).
     \+ \+ Change = Pattern.      % Phase 1: logical unification
 % Define a clause for 'matches sentinel': succeed when the following conditions hold.
-matches_sentinel(Change, Pattern) :-
+sentinels_matches(Change, Pattern) :-
     % State a fact for 'sentinel sim threshold' with the arguments listed below.
-    sentinel_sim_threshold(Thresh),
+    sentinels_sim_threshold(Thresh),
     % State a fact for 'term to atom' with the arguments listed below.
     term_to_atom(Change, CA),
     % State a fact for 'term to atom' with the arguments listed below.
@@ -122,14 +122,14 @@ matches_sentinel(Change, Pattern) :-
     Score >= Thresh.             % Phase 2: semantic similarity
 
 % ---------------------------------------------------------------------------
-% fire_sentinel/4
+% sentinels_fire/4
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'fire sentinel': succeed when the following conditions hold.
-fire_sentinel(_Nexus, Change, Objectives, Action) :-
+sentinels_fire(_Nexus, Change, Objectives, Action) :-
     % Kindle each objective node
     % State a fact for 'maplist safe' with the arguments listed below.
-    maplist_safe(kindle_node, Objectives),
+    sentinels_maplist_safe(kindle_node, Objectives),
     % Execute the sentinel's action
     % State a fact for 'catch' with the arguments listed below.
     catch(call(Action), Err,
@@ -152,10 +152,10 @@ fire_sentinel(_Nexus, Change, Objectives, Action) :-
     ).
 
 % State the fact: maplist safe(_, []).
-maplist_safe(_, []).
+sentinels_maplist_safe(_, []).
 % Define a clause for 'maplist safe': succeed when the following conditions hold.
-maplist_safe(Goal, [H|T]) :-
+sentinels_maplist_safe(Goal, [H|T]) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(call(Goal, H), _, true),
     % State the fact: maplist safe(Goal, T).
-    maplist_safe(Goal, T).
+    sentinels_maplist_safe(Goal, T).

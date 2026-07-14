@@ -8,8 +8,8 @@
 % Declare this file as the 'prologai_expand' module, making [load_pai_file/1] available to other modules.
 :- module(prologai_expand, [load_pai_file/1]).
 
-% Import [pai_register_sentinel/6] from the built-in 'sentinels' library.
-:- use_module(library(sentinels), [pai_register_sentinel/6]).
+% Import [sentinels_register/6] from the built-in 'sentinels' library.
+:- use_module(library(sentinels), [sentinels_register/6]).
 
 % ---------------------------------------------------------------------------
 % .pai file detection helper
@@ -35,11 +35,11 @@ current_source_is_pai :-
 %  Surface syntax:
 %      sentinel(Domain, Priority, Pattern, Objectives, Action, Doc).
 %  Expands to:
-%      :- pai_register_sentinel(Domain, Priority, Pattern, Objectives, Action, Doc).
+%      :- sentinels_register(Domain, Priority, Pattern, Objectives, Action, Doc).
 % Execute: user:term_expansion(sentinel(Domain, Priority, Pattern, Objectives, Action, Doc),.
 user:term_expansion(sentinel(Domain, Priority, Pattern, Objectives, Action, Doc),
                     % Continue the multi-line expression started above.
-                    (:- pai_register_sentinel(Domain, Priority, Pattern,
+                    (:- sentinels_register(Domain, Priority, Pattern,
                                               % Continue the multi-line expression started above.
                                               Objectives, Action, Doc))) :-
     % Call the goal 'current_source_is_pai'.

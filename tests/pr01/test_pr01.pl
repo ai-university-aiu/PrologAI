@@ -56,7 +56,7 @@
 % Execute: clean_test_sentinels :-.
 clean_test_sentinels :-
     % State the fact: sentinel retract(general).
-    sentinel_retract(general).
+    sentinels_retract(general).
 
 % ---------------------------------------------------------------------------
 % Tests
@@ -113,7 +113,7 @@ test(swi_stdlib_compat) :-
     % State the fact: predicate property(lists:member(_, _), defined).
     predicate_property(lists:member(_, _), defined).
 
-% AC-PR01-003 — .pai file declares a sentinel; sentinel_list/2 confirms registration
+% AC-PR01-003 — .pai file declares a sentinel; sentinels_list/2 confirms registration
 % State a fact for 'test' with the arguments listed below.
 test(sentinel_registration_via_pai,
      % Continue the multi-line expression started above.
@@ -127,7 +127,7 @@ test(sentinel_registration_via_pai,
     % State a fact for 'load files' with the arguments listed below.
     load_files(PAIFile, []),
     % State a fact for 'sentinel list' with the arguments listed below.
-    sentinel_list(general, Sentinels),
+    sentinels_list(general, Sentinels),
     % Check that 'Sentinels' is not unifiable with '[]'.
     Sentinels \= [].
 
@@ -145,7 +145,7 @@ test(sentinel_content_after_pai_load,
     % State a fact for 'load files' with the arguments listed below.
     load_files(PAIFile, []),
     % State a fact for 'sentinel list' with the arguments listed below.
-    sentinel_list(general, Sentinels),
+    sentinels_list(general, Sentinels),
     % State a fact for 'memberchk' with the arguments listed below.
     memberchk(sentinel(general, 100, percept([apple|_]), [], pr01_test_action, _),
               % Supply 'Sentinels' as the next argument to the expression above.
