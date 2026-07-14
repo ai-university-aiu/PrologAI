@@ -2226,17 +2226,23 @@ Causalontology Attention and Broadcast (co_*, Layer 385)
     sl_broadcast(-Item,-Salience): the single most salient winner of the cognitive cycle.
     sl_forget(+Item) / sl_count(-N): drop a candidate; count the pool.
 
-co_impetus
-Causalontology Motivation (co_*, Layer 386)
-    im_reset/0: forget all needs, restore the default satisfied threshold.
-    im_set_threshold(+Epsilon) / im_threshold(?Epsilon): the satisfied-pressure threshold.
-    im_need_add(+Name,+Target,+Actual): register a homeostatic need with a set-point.
-    im_set_actual(+Name,+Actual): update a need's current reading.
-    im_need(?Name,?Target,?Actual) / im_pressure(+Name,-Pressure): read needs; the gap size.
-    im_satisfied(+Name): the need's pressure is at or below threshold.
-    im_goal_of(+Name,-Goal): the restore(Name) goal that would close the gap.
-    im_agenda(-Goals): the prioritized, never-empty agenda (explore when nothing presses).
-    im_top_goal(-Goal) / im_count(-N): the single most pressing goal; how many needs.
+motivation
+Motivation (motivation_*, Layer 386; converged with the Psi modulator bus)
+    motivation_reset/0: forget all needs, restore the default satisfied threshold.
+    motivation_set_threshold(+Epsilon) / motivation_threshold(?Epsilon): the satisfied-pressure threshold.
+    motivation_need_add(+Name,+Target,+Actual): register a homeostatic need with a set-point.
+    motivation_set_actual(+Name,+Actual): update a need's current reading.
+    motivation_need(?Name,?Target,?Actual) / motivation_pressure(+Name,-Pressure): read needs; the gap size.
+    motivation_satisfied(+Name): the need's pressure is at or below threshold.
+    motivation_goal_of(+Name,-Goal): the restore(Name) goal that would close the gap.
+    motivation_agenda(-Goals): the prioritized, never-empty agenda (explore when nothing presses).
+    motivation_top_goal(-Goal) / motivation_count(-N): the single most pressing goal; how many needs.
+    motivation_modulator(+Dial,?Value): read or set arousal / execution_speed / resolution (clamped).
+    motivation_affect_region(+Name,?Region): define or query a named region in modulator space.
+    motivation_motive(+Goal,+Type,-Motive): the appetitive or aversive urge bound to a goal.
+    motivation_modulator_update(+Needs): blend a list of need(Category,Urgency) into the dials.
+    motivation_modulator_decay/0: decay every dial toward its baseline one tick.
+    motivation_daydream_budget(-Budget): the daydream actor's compute share, 1 minus arousal.
 
 affect
 Causalontology Affect (co_*, Layer 387)
