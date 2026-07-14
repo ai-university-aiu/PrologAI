@@ -40,9 +40,20 @@ ARC-AGI Grid Perception and Manipulation (PR 56)
     native grid operations for the ARC-AGI benchmark: dimensions (`gd_size/3`), zero-based cell access (`gd_cell/4`, `gd_row/3`, `gd_col/3`), color analysis (`gd_colors/2`, `gd_color_count/3`, `gd_color_map/3`), 4-connected object extraction (`gd_objects/3`, `gd_connected/3`), bounding box (`gd_bounding_box/3`), seven spatial transformations (rotate 90/180/270, reflect h/v/d1/d2), translation, cropping, overlay compositing, diff, symmetry detection (`gd_symmetry/2`), flood fill (`gd_fill/5`), uniform grid construction (`gd_make/4`), and single-cell mutation (`gd_set_cell/5`). The perceptual foundation for ARC-AGI solving.
 
 analogy
-ARC-AGI Structural Analogy and Transformation Inference (PR 57)
-
-    infers the transformation rule from (input, output) training pairs and applies it to test inputs. Covers the full D4 dihedral group (8 spatial isometries: identity, rot90, rot180, rot270, ref_h, ref_v, ref_d1, ref_d2) combined with color substitution maps. Key predicates: `ay_solve_from_examples/3`, `ay_examples_isometry/3`, `ay_apply_isometry/3`, `ay_isometry_candidates/3`, `ay_normalize_shape/2`, `ay_shape_equal/2`. The inferential foundation for ARC-AGI solving.
+Analogy (analogy_*, Layer 394, WP-419; converged with the ARC grid-analogy pack)
+    Relational structure-mapping half —
+    analogy_objects(+Relations,-Objects): the distinct objects a relation set mentions (rel(Type,A,B)).
+    analogy_map_object(+Mapping,+Object,-Image): apply an object mapping (list of Src-Tgt pairs).
+    analogy_preserved(+Mapping,+Source,+Target,-Count): how many source relations line up in the target.
+    analogy_structure_map(+Source,+Target,-Mapping,-Score): the injective object mapping that preserves the most relations.
+    analogy_transfer(+Mapping,+Term,-Image): carry a term (a rule, goal, or disposition) from source objects to their target images.
+    Grid-analogy half (absorbed from the ARC pack) —
+    analogy_solve_from_examples(+Examples,+Input,-Output): infer the transform from (input,output) train pairs and apply it.
+    analogy_examples_isometry(+Examples,-Iso,-ColorMap) / analogy_apply_isometry(+Iso,+Grid,-Grid2): the D4 dihedral group (identity, rot90/180/270, ref_h/v/d1/d2).
+    analogy_grid_isometry(+A,+B,-Iso) / analogy_isometry_candidates(+A,+B,-Isos): grids equal up to isometry.
+    analogy_infer_color_map(+A,+B,-Map) / analogy_apply_color_map(+Map,+Grid,-Grid2) / analogy_grid_color_map(+A,+B,-Map): colour permutations.
+    analogy_normalize_shape(+Shape,-Norm) / analogy_shape_equal(+A,+B) / analogy_shape_isometry(+A,+B,-Iso): shape equality up to isometry.
+    analogy_shape_bbox(+Shape,-BBox) / analogy_shape_size(+Shape,-N) / analogy_match_objects(+A,+B,-Pairs) / analogy_object_offset(+A,+B,-Offset): shape and object geometry.
 
 scene
 ARC-AGI Scene Model and Object-Centric Reasoning (PR 58)
@@ -2315,14 +2326,6 @@ Theory of Mind (theory_of_mind_*, Layer 393; converged with the AGI-Foundations 
     theory_of_mind_perspective(+M,+Agent,-M2): re-seat the model inside one agent's head.
     theory_of_mind_desire(+M,+Agent,+Goal,-M2) / theory_of_mind_desires(+M,+Agent,-Goals): record and read desires.
     theory_of_mind_intend(+M,+Agent,+Act,-M2) / theory_of_mind_intentions(+M,+Agent,-Acts): record and read intentions.
-
-co_liken
-Causalontology Analogy (co_*, Layer 394)
-    lk_objects(+Relations,-Objects): the distinct objects a relation set mentions (rel(Type,A,B)).
-    lk_map_object(+Mapping,+Object,-Image): apply an object mapping (list of Src-Tgt pairs).
-    lk_preserved(+Mapping,+Source,+Target,-Count): how many source relations line up in the target.
-    lk_analogy(+Source,+Target,-Mapping,-Score): the injective object mapping that preserves the most relations.
-    lk_transfer(+Mapping,+Term,-Image): carry a term (a rule, goal, or disposition) from source objects to their target images.
 
 concept_formation
 Causalontology Concept Formation (co_*, Layer 395)
