@@ -23,7 +23,7 @@
 :- use_module(library(nexus)).
 
 % Load the packs whose constructors and readers the tests call directly.
-:- use_module(library(jspace), [js_open/1, js_strength/3, js_reading/2, js_active/2]).
+:- use_module(library(jacobian_space), [jacobian_space_open/1, jacobian_space_strength/3, jacobian_space_reading/2, jacobian_space_active/2]).
 :- use_module(library(planner), [planner_domain/3]).
 :- use_module(library(world_model), [world_model_novelty/3]).
 
@@ -90,7 +90,7 @@ test(four_wirings) :-
 :- end_tests(nexus_introspection).
 
 % ===========================================================================
-% WIRING ONE — jspace <- workspace broadcast
+% WIRING ONE — jacobian_space <- workspace broadcast
 % ===========================================================================
 
 :- begin_tests(nexus_workspace).
@@ -98,22 +98,22 @@ test(four_wirings) :-
 % Holding a broadcast places its winning coalition's concepts in the J-Space.
 test(hold_broadcast_direct) :-
     % A fresh workspace.
-    js_open(w_hold),
+    jacobian_space_open(w_hold),
     % Route one broadcast through the hook the live workspace would call.
     nexus_hold_broadcast(w_hold, broadcast_content(c1, goal, [find_marble, hungry], 0.7)),
     % Both concepts are now held at the broadcast salience.
-    js_strength(w_hold, find_marble, S1),
+    jacobian_space_strength(w_hold, find_marble, S1),
     % Check the first concept's strength.
     close_to(S1, 0.7),
     % Check the second concept's strength.
-    js_strength(w_hold, hungry, S2),
+    jacobian_space_strength(w_hold, hungry, S2),
     % The second concept carries the same salience.
     close_to(S2, 0.7).
 
 % Replaying an episode ranks the J-Lens readout by broadcast salience.
 test(replay_ranks_by_salience) :-
     % A fresh workspace.
-    js_open(w_replay),
+    jacobian_space_open(w_replay),
     % Replay a two-broadcast reasoning episode.
     nexus_replay_broadcasts(w_replay, [
         broadcast_content(c1, goal, [find_marble], 0.6),
@@ -129,28 +129,28 @@ test(replay_ranks_by_salience) :-
 % Salience outside the unit interval is clamped to a valid strength.
 test(salience_clamped) :-
     % A fresh workspace.
-    js_open(w_clamp),
+    jacobian_space_open(w_clamp),
     % A pathological broadcast with an out-of-range salience.
     nexus_hold_broadcast(w_clamp, broadcast_content(c1, x, [concept], 1.7)),
     % The held strength is clamped to the maximum.
-    js_strength(w_clamp, concept, S),
+    jacobian_space_strength(w_clamp, concept, S),
     % Check the clamp.
     close_to(S, 1.0).
 
 % An empty coalition holds nothing.
 test(empty_coalition) :-
     % A fresh workspace.
-    js_open(w_empty),
+    jacobian_space_open(w_empty),
     % A broadcast that carried no content.
     nexus_hold_broadcast(w_empty, broadcast_content(c1, x, [], 0.5)),
     % The workspace remains empty.
-    js_active(w_empty, []).
+    jacobian_space_active(w_empty, []).
 
 % Binding registers the hook on the real workspace broadcast list, and the
 % workspace's own dispatch call then holds the concepts — end to end.
 test(bind_subscribes_and_dispatches, [nondet]) :-
     % A fresh workspace.
-    js_open(w_bind),
+    jacobian_space_open(w_bind),
     % Bind the J-Space to the workspace broadcast bus.
     nexus_bind_workspace(w_bind),
     % The workspace now lists our hook among its broadcast subscribers.
@@ -159,18 +159,18 @@ test(bind_subscribes_and_dispatches, [nondet]) :-
     call(nexus:nexus_hold_broadcast(w_bind),
          broadcast_content(c9, theme, [alpha, beta], 0.8)),
     % The dispatched concepts landed in the J-Space at the broadcast salience.
-    js_strength(w_bind, alpha, SA),
+    jacobian_space_strength(w_bind, alpha, SA),
     % Check the first dispatched concept.
     close_to(SA, 0.8),
     % Check the second dispatched concept.
-    js_strength(w_bind, beta, SB),
+    jacobian_space_strength(w_bind, beta, SB),
     % The second concept carries the same salience.
     close_to(SB, 0.8).
 
 % Binding twice is idempotent — no duplicate subscriber.
 test(bind_idempotent) :-
     % A fresh workspace.
-    js_open(w_idem),
+    jacobian_space_open(w_idem),
     % Bind once.
     nexus_bind_workspace(w_idem),
     % Bind again.

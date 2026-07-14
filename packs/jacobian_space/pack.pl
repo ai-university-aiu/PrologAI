@@ -1,5 +1,5 @@
-% State the fact: name(jspace).
-name(jspace).
+% State the fact: name(jacobian_space).
+name(jacobian_space).
 % State the fact: version('1.0.0').
 version('1.0.0').
 % State the fact: title('PrologAI Concept Workspace (J-Space) — readable, editable ledger of held concepts with silent-thought detection (WP-388)').
