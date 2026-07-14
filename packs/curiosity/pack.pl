@@ -11,4 +11,4 @@ home('https://github.com/ai-university-aiu/PrologAI').
 % State the fact: where releases are downloaded from.
 download('https://github.com/ai-university-aiu/PrologAI/releases').
 % State the fact: this pack needs the grid, gridobj, and causal libraries plus node facts.
-requires([causal_core, causal_learning, grid, gridobj, node_facts]).
+requires([causal_core, causal_learning, grid, gridobj]).
