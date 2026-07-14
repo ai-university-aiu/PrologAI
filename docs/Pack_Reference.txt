@@ -2137,15 +2137,15 @@ Causalontology Exploration Policy: Novelty-Seeking, Loop-Avoiding Action Selecti
     cox_rank(+Game,+Actions,+Tried,+Frame,-Ranked) / cox_choose(+Game,+Actions,+Tried,+Frame,-Action): the same ranking read against one game's causal graph and avoid-set, so many environments share the policy without bleeding into each other.
     cox_choose_change(+Game,+Actions,+Tried,+Frame,-Action): the best predicted-change action for the game, or fail if none is predicted (so a caller can fall back to a graph-frontier search).
 
-co_goalinfer
+goal_inference
 Causalontology Goal Inference: Hypothesising the Unstated Win Condition (co_*, Layer 373)
-    cgi_reset/0: forget all recorded outcomes.
-    cgi_observe(+Delta,+State): record a frame delta and the state it produced (win, game_over or ongoing).
-    cgi_win_count(-N): how many wins have been observed.
-    cgi_feature_support(?Colour,?Net): the net support (wins minus losses) per colour.
-    cgi_hypothesise_goal(-Goal): the best-supported abstract goal, reach_colour(Colour).
-    cgi_goal_occurrent(-Occurrent): the goal as a changed(_,_,_,Colour) occurrent the planner can aim at.
-    cgi_confidence(-Confidence): how strongly the leading hypothesis dominates.
+    goal_inference_reset/0: forget all recorded outcomes.
+    goal_inference_observe(+Delta,+State): record a frame delta and the state it produced (win, game_over or ongoing).
+    goal_inference_win_count(-N): how many wins have been observed.
+    goal_inference_feature_support(?Colour,?Net): the net support (wins minus losses) per colour.
+    goal_inference_hypothesise_goal(-Goal): the best-supported abstract goal, reach_colour(Colour).
+    goal_inference_goal_occurrent(-Occurrent): the goal as a changed(_,_,_,Colour) occurrent the planner can aim at.
+    goal_inference_confidence(-Confidence): how strongly the leading hypothesis dominates.
 
 efficiency_governor
 Causalontology Efficiency Governor: Action Budgeting and RHAE-Style Scoring (co_*, Layer 374)

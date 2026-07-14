@@ -113,7 +113,7 @@ human_steps_phase_capability(1, perception).
 % Exploration is the exploration policy and this pack's Jacobian.
 human_steps_phase_capability(2, co_explore).
 % Goal inference is the goal inferencer.
-human_steps_phase_capability(3, co_goalinfer).
+human_steps_phase_capability(3, goal_inference).
 % Planning is the planner under the efficiency governor.
 human_steps_phase_capability(4, co_plan).
 % Execution spends actions under the efficiency governor.

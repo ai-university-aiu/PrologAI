@@ -1384,7 +1384,7 @@ WP 390 - nexus: AGI Foundations Integration Layer (nx_*, Layer 365). The capston
 
 WP 391-396 - the Causalontology suite: co_noun, co_hinge, co_core, co_learn, co_plan, co_arc3 (co_*, Layers 366-371). The process-first Foundational Ontology: reified Causal Relation Objects with temporal windows as mechanism, four modalities, strength, and provenance; a thin continuant backbone with external alignment; the realizable hinge; learning by embodied intervention with a closed-world avoid-set; safe backward planning; and a game-agnostic perceive-learn-plan-act harness for interactive environments with a guarded bridge to ARC-AGI-3. Chapter 351 covers this suite.
 
-WP 397-400 - the ARC-AGI-3 Readiness suite: co_explore, co_goalinfer, efficiency_governor, arc3_protocol (co_*, Layers 372-375). Four packs that carry the Causalontology harness the last mile to the interactive benchmark: a novelty-seeking, loop-avoiding exploration policy that prefers actions predicted to change the world and turns the ACTION6 cell-select into a few object-centroid clicks; inference of the unstated win condition from the frame changes that precede a win; a human-baseline efficiency governor that budgets actions and computes the benchmark's RHAE-style scores; and the exact March-2026 ARC-AGI-3 protocol vocabulary with a guarded environment adapter. Chapter 352 covers this suite.
+WP 397-400 - the ARC-AGI-3 Readiness suite: co_explore, goal_inference, efficiency_governor, arc3_protocol (co_*, Layers 372-375). Four packs that carry the Causalontology harness the last mile to the interactive benchmark: a novelty-seeking, loop-avoiding exploration policy that prefers actions predicted to change the world and turns the ACTION6 cell-select into a few object-centroid clicks; inference of the unstated win condition from the frame changes that precede a win; a human-baseline efficiency governor that budgets actions and computes the benchmark's RHAE-style scores; and the exact March-2026 ARC-AGI-3 protocol vocabulary with a guarded environment adapter. Chapter 352 covers this suite.
 
 WP 401 - human_steps, the ARC-AGI-3 Human-Step Ladder in J-Space (co_*, Layer 376). The six-phase, thirty-micro-step process a human follows in an interactive game with no instructions - orient, explore and model, infer the goal, plan, execute and monitor, transfer - encoded as ordered facts and held step-by-step as concepts in the Jacobian Space workspace (the jspace pack) so the Jacobian Lens reads out which human step the agent is on. It also makes the probe phase concrete with a discrete action-response Jacobian that names the controllable object, gives its per-action displacement, and ranks actions along the goal gradient. Chapter 353 covers this pack.
 
@@ -26585,7 +26585,7 @@ is realized in a process that participates in a causal relation, traversed
 from noun to hinge to verb to predicted effect in one glass-box query.
 
 
-Chapter 352: The ARC-AGI-3 Readiness Suite - The co_explore, co_goalinfer, efficiency_governor, and arc3_protocol Packs (co_*, Layers 372-375)
+Chapter 352: The ARC-AGI-3 Readiness Suite - The co_explore, goal_inference, efficiency_governor, and arc3_protocol Packs (co_*, Layers 372-375)
 
 The co_arc3 harness of Chapter 351 closes the perceive-learn-plan-act loop
 against an interactive environment. That is the skeleton of an ARC-AGI-3
@@ -26628,7 +26628,7 @@ protocol expects.
 
 INFERRING THE UNSTATED GOAL
 
-The co_goalinfer pack works out what winning looks like. The environment
+The goal_inference pack works out what winning looks like. The environment
 never says; it only reports, after each action, whether the state is
 NOT_FINISHED, WIN, or GAME_OVER. So the pack watches the frame changes - the
 deltas - that immediately precede a win, and accumulates support for the
@@ -26676,7 +26676,7 @@ guarded so no test depends on the wire.
 THE SUITE AS A WHOLE
 
 Perceive with grid, explore with co_explore, model with co_core, infer the
-goal with co_goalinfer, plan with co_plan under the budget of efficiency_governor, and
+goal with goal_inference, plan with co_plan under the budget of efficiency_governor, and
 act through the exact vocabulary of arc3_protocol - all orchestrated by the
 co_arc3 loop. Twenty-seven acceptance tests pass across the four packs, and
 they load cleanly alongside the whole Causalontology suite. The benchmark
@@ -26711,7 +26711,7 @@ human_steps encodes all of that as ordered facts. human_steps_phase names the si
 human_steps_step gives each of the thirty micro-steps its text and its phase; human_steps_ladder
 lists them in canonical order; and human_steps_phase_capability records which pack each
 phase leans on - orientation on perception, exploration on co_explore, goal
-inference on co_goalinfer, planning on co_plan, execution on efficiency_governor, and
+inference on goal_inference, planning on co_plan, execution on efficiency_governor, and
 transfer on the causal core. The ladder is a first-class object the agent can
 read, not a comment buried in a loop.
 
@@ -26882,7 +26882,7 @@ system reads.
 
 co_impetus - Motivation (WP-411, Layer 386)
 --------------------------------------------------------------------------------
-The family could infer an environment's goal (co_goalinfer) but had no goals of
+The family could infer an environment's goal (goal_inference) but had no goals of
 its own, so it had no reason to act when none was handed to it. co_impetus gives
 it that inner reason. A need is a quantity the system wants to hold at a target
 set-point; the gap between target and the current reading is a pressure; and a

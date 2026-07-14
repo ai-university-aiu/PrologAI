@@ -1,5 +1,5 @@
-% State the fact: name(co_hypo).
-name(co_hypo).
+% State the fact: name(hypothesis).
+name(hypothesis).
 % State the fact: version('1.0.0').
 version('1.0.0').
 % State the fact: the pack title.
