@@ -1,4 +1,4 @@
-Chapter 344: Active Inference - The actinf Pack (ai_*, Layer 359)
+Chapter 344: Active Inference - The active_inference Pack (ai_*, Layer 359)
 
 PrologAI has had the perception side of active inference since the
 prediction pack: form predictions, compare them with reality, weight the
@@ -19,10 +19,10 @@ actions: check the cue, go left, go right.
 
 PERCEPTION IS BAYES RULE
 
-    ?- ai_infer(GM, [q_l-0.5, q_r-0.5], cue_left, Posterior).
+    ?- active_inference_infer(GM, [q_l-0.5, q_r-0.5], cue_left, Posterior).
 
 Seeing the left cue turns a fifty-fifty belief into certainty. If an
-observation is impossible under the current belief, ai_infer fails
+observation is impossible under the current belief, active_inference_infer fails
 honestly instead of inventing a posterior.
 
 EXPECTED FREE ENERGY
@@ -41,14 +41,14 @@ slogan; the test suite enforces it to six decimal places for every action.
 
 Watch the two drives at work:
 
-    ?- ai_epistemic(GM, [c_l-0.5, c_r-0.5], check, EV).
+    ?- active_inference_epistemic(GM, [c_l-0.5, c_r-0.5], check, EV).
     EV = 0.6931...           % ln 2 - exactly one bit; the cue is precious
 
-    ?- ai_epistemic(GM, [c_l-1.0], check, EV2).
+    ?- active_inference_epistemic(GM, [c_l-1.0], check, EV2).
     EV2 = 0.0                % nothing left to learn - the cue is worthless
 
-    ?- ai_pragmatic(GM, [c_l-1.0], left,  PL).   % PL  = ln 0.85
-    ?- ai_pragmatic(GM, [c_l-1.0], right, PR).   % PR  = ln 0.02
+    ?- active_inference_pragmatic(GM, [c_l-1.0], left,  PL).   % PL  = ln 0.85
+    ?- active_inference_pragmatic(GM, [c_l-1.0], right, PR).   % PR  = ln 0.02
 
 When the agent is ignorant, information is valuable. The moment it is
 certain, the epistemic pull vanishes and preference takes over. Nobody
@@ -57,16 +57,16 @@ surprise means.
 
 POLICY SELECTION
 
-    ?- ai_select_policy(GM, [c_l-1.0], 1, 4.0, Policy, P).
+    ?- active_inference_select_policy(GM, [c_l-1.0], 1, 4.0, Policy, P).
     Policy = [left].
 
 Policies (action sequences) are ranked by a softmax over negative expected
 free energy, sharpened by a precision Gamma - higher Gamma, more decisive.
-ai_act returns the first action of the winner, and ai_step wraps the whole
+active_inference_act returns the first action of the winner, and active_inference_step wraps the whole
 perceive-then-act cycle: update the belief with the observation, then act
 from the updated belief.
 
-    ?- ai_step(GM, [q_l-0.5, q_r-0.5], cue_left, 1, 4.0, Action, Post).
+    ?- active_inference_step(GM, [q_l-0.5, q_r-0.5], cue_left, 1, 4.0, Action, Post).
     Action = left.
 
 The agent read the cue, believed it, and went where the reward is. All 23

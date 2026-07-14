@@ -1,5 +1,5 @@
-% State the fact: name(actinf).
-name(actinf).
+% State the fact: name(active_inference).
+name(active_inference).
 % State the fact: version('1.0.0').
 version('1.0.0').
 % State the fact: title('PrologAI Active Inference Engine — expected free energy, epistemic and pragmatic value, policy selection (WP-384)').

@@ -1,6 +1,6 @@
 /*  PrologAI — Nexus: AGI Foundations Integration Layer  (WP-390, Layer 365)
 
-    The seven AGI Foundations packs (causal, actinf, world_model, planner,
+    The seven AGI Foundations packs (causal, active_inference, world_model, planner,
     evolve, jspace, tom) were built as self-contained capabilities. This
     pack is the capstone that wires four of them into PrologAI's existing
     cognitive core, respecting the strictly acyclic layer order: nexus

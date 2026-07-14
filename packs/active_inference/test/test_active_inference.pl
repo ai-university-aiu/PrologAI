@@ -1,6 +1,6 @@
 /*  PrologAI — Active Inference Pack Test Suite  (WP-384)
 
-    Acceptance tests for all ai_* predicates, including hand-computed
+    Acceptance tests for all active_inference_* predicates, including hand-computed
     numeric checks and the identity G = -(pragmatic + epistemic).
 
     Run with:
@@ -11,7 +11,7 @@
 :- use_module(library(plunit)).
 
 % Load the module under test.
-:- use_module('../prolog/actinf').
+:- use_module('../prolog/active_inference').
 
 % ===========================================================================
 % TEST FIXTURE MODELS
@@ -30,7 +30,7 @@ tight(A, B) :-
 % A two-state model with noisy observations, for numeric hand-checks.
 two_state(GM) :-
     % Assemble and validate the generative model.
-    ai_model(
+    active_inference_model(
         % The two hidden states.
         [s1, s2],
         % The two observations.
@@ -49,7 +49,7 @@ two_state(GM) :-
 % The same two-state model with indifferent preferences, for the risk test.
 two_state_flat_pref(GM) :-
     % Assemble and validate the generative model.
-    ai_model(
+    active_inference_model(
         % The two hidden states.
         [s1, s2],
         % The two observations.
@@ -67,7 +67,7 @@ two_state_flat_pref(GM) :-
 % The T-maze: an unknown reward side, a cue that reveals it, and two arms.
 tmaze(GM) :-
     % Assemble and validate the generative model.
-    ai_model(
+    active_inference_model(
         % States pair a location with the true reward side (l or r).
         [c_l, c_r, q_l, q_r, l_l, l_r, r_l, r_r],
         % The five observations.
@@ -104,7 +104,7 @@ test(model_builds) :-
     % Build the two-state model.
     two_state(GM),
     % Ask for the distinct actions.
-    ai_actions(GM, Actions),
+    active_inference_actions(GM, Actions),
     % Both actions must be present.
     Actions == [flip, stay].
 
@@ -113,12 +113,12 @@ test(prior) :-
     % Build the two-state model.
     two_state(GM),
     % Read the prior back.
-    ai_prior(GM, [s1-0.5, s2-0.5]).
+    active_inference_prior(GM, [s1-0.5, s2-0.5]).
 
 % A prior that does not sum to one is rejected.
 test(bad_prior_rejected, [fail]) :-
     % The prior mass here sums to 1.4.
-    ai_model([s1, s2], [o1],
+    active_inference_model([s1, s2], [o1],
         % A trivially valid likelihood table.
         [lik(s1, [o1-1.0]), lik(s2, [o1-1.0])],
         % A single persistence action.
@@ -132,7 +132,7 @@ test(bad_prior_rejected, [fail]) :-
 % Normalization rescales mass to one.
 test(normalize) :-
     % Normalize an unnormalized pair list.
-    ai_normalize([a-2.0, b-6.0], N),
+    active_inference_normalize([a-2.0, b-6.0], N),
     % Read the first mass.
     memberchk(a-PA, N),
     % Check the first mass.
@@ -145,7 +145,7 @@ test(normalize) :-
 % Missing keys read as zero probability.
 test(prob_missing_zero) :-
     % Ask for a key that is not present.
-    ai_prob([a-1.0], b, P),
+    active_inference_prob([a-1.0], b, P),
     % The mass must be zero.
     P =:= 0.0.
 
@@ -162,7 +162,7 @@ test(infer_bayes) :-
     % Build the two-state model.
     two_state(GM),
     % Update the flat prior with the first observation.
-    ai_infer(GM, [s1-0.5, s2-0.5], o1, Post),
+    active_inference_infer(GM, [s1-0.5, s2-0.5], o1, Post),
     % Read the posterior mass of the first state.
     memberchk(s1-P1, Post),
     % Hand computation: 0.4 / 0.5 = 0.8.
@@ -171,7 +171,7 @@ test(infer_bayes) :-
 % An impossible observation makes inference fail honestly.
 test(infer_impossible, [fail]) :-
     % Build a one-state model that can never emit o2.
-    ai_model([x], [o1, o2],
+    active_inference_model([x], [o1, o2],
         % The state emits only the first observation.
         [lik(x, [o1-1.0, o2-0.0])],
         % A single persistence action.
@@ -182,14 +182,14 @@ test(infer_impossible, [fail]) :-
         [x-1.0],
         GM),
     % The impossible observation cannot be explained.
-    ai_infer(GM, [x-1.0], o2, _).
+    active_inference_infer(GM, [x-1.0], o2, _).
 
 % The flip action swaps the belief between the two states.
 test(predict_states_flip) :-
     % Build the two-state model.
     two_state(GM),
     % Push certainty about s1 through the flip action.
-    ai_predict_states(GM, [s1-1.0], flip, Next),
+    active_inference_predict_states(GM, [s1-1.0], flip, Next),
     % All the mass must arrive at s2.
     memberchk(s2-P, Next),
     % Check the arrived mass.
@@ -200,7 +200,7 @@ test(predict_obs) :-
     % Build the two-state model.
     two_state(GM),
     % Predict outcomes under the flat prior.
-    ai_predict_obs(GM, [s1-0.5, s2-0.5], Qo),
+    active_inference_predict_obs(GM, [s1-0.5, s2-0.5], Qo),
     % Read the predicted mass of the first observation.
     memberchk(o1-P, Qo),
     % Hand computation: 0.5 * 0.8 + 0.5 * 0.2 = 0.5.
@@ -211,7 +211,7 @@ test(surprise) :-
     % Build the two-state model.
     two_state(GM),
     % Surprise of the first observation under the flat prior.
-    ai_surprise(GM, [s1-0.5, s2-0.5], o1, S),
+    active_inference_surprise(GM, [s1-0.5, s2-0.5], o1, S),
     % Hand computation: -ln(0.5) = 0.693147.
     close_to(S, 0.693147).
 
@@ -220,7 +220,7 @@ test(free_energy_decomposition) :-
     % Build the two-state model.
     two_state(GM),
     % Compute free energy and its decomposition.
-    ai_free_energy(GM, [s1-0.5, s2-0.5], o1, F, Complexity, Accuracy),
+    active_inference_free_energy(GM, [s1-0.5, s2-0.5], o1, F, Complexity, Accuracy),
     % Hand computation: complexity is 0.192745.
     close_to(Complexity, 0.192745),
     % Hand computation: accuracy is -0.500402.
@@ -228,7 +228,7 @@ test(free_energy_decomposition) :-
     % Free energy is complexity minus accuracy.
     tight(F, Complexity - Accuracy),
     % With exact inference, free energy equals surprise.
-    ai_surprise(GM, [s1-0.5, s2-0.5], o1, S),
+    active_inference_surprise(GM, [s1-0.5, s2-0.5], o1, S),
     % Compare the two quantities.
     close_to(F, S).
 
@@ -245,7 +245,7 @@ test(risk_zero_when_matched) :-
     % Build the variant whose preferences equal its predictions.
     two_state_flat_pref(GM),
     % Risk of staying under the flat prior.
-    ai_risk(GM, [s1-0.5, s2-0.5], stay, Risk),
+    active_inference_risk(GM, [s1-0.5, s2-0.5], stay, Risk),
     % The divergence must be essentially zero.
     close_to(Risk, 0.0).
 
@@ -254,7 +254,7 @@ test(ambiguity_value) :-
     % Build the two-state model.
     two_state(GM),
     % Ambiguity of staying under the flat prior.
-    ai_ambiguity(GM, [s1-0.5, s2-0.5], stay, Amb),
+    active_inference_ambiguity(GM, [s1-0.5, s2-0.5], stay, Amb),
     % Hand computation: the entropy of (0.8, 0.2) is 0.500402.
     close_to(Amb, 0.500402).
 
@@ -263,7 +263,7 @@ test(epistemic_cue_one_bit) :-
     % Build the T-maze model.
     tmaze(GM),
     % Information gain of checking the cue from the flat prior.
-    ai_epistemic(GM, [c_l-0.5, c_r-0.5], check, EV),
+    active_inference_epistemic(GM, [c_l-0.5, c_r-0.5], check, EV),
     % Hand computation: ln 2 = 0.693147.
     close_to(EV, 0.693147).
 
@@ -272,7 +272,7 @@ test(epistemic_vanishes_when_certain) :-
     % Build the T-maze model.
     tmaze(GM),
     % Information gain of checking when the side is known.
-    ai_epistemic(GM, [c_l-1.0], check, EV),
+    active_inference_epistemic(GM, [c_l-1.0], check, EV),
     % Nothing remains to learn.
     close_to(EV, 0.0).
 
@@ -281,11 +281,11 @@ test(pragmatic_prefers_reward) :-
     % Build the T-maze model.
     tmaze(GM),
     % Pragmatic value of the correct arm.
-    ai_pragmatic(GM, [c_l-1.0], left, PVLeft),
+    active_inference_pragmatic(GM, [c_l-1.0], left, PVLeft),
     % Hand computation: ln(0.85) = -0.162519.
     close_to(PVLeft, -0.162519),
     % Pragmatic value of the wrong arm.
-    ai_pragmatic(GM, [c_l-1.0], right, PVRight),
+    active_inference_pragmatic(GM, [c_l-1.0], right, PVRight),
     % Hand computation: ln(0.02) = -3.912023.
     close_to(PVRight, -3.912023),
     % The correct arm must score higher.
@@ -300,11 +300,11 @@ test(efe_identity) :-
     % Check the identity for each action.
     forall(member(Action, [check, left, right]),
         % Compare the two computations of expected free energy.
-        ( ai_efe_action(GM, Belief, Action, G),
+        ( active_inference_efe_action(GM, Belief, Action, G),
           % Pragmatic value of the action.
-          ai_pragmatic(GM, Belief, Action, PV),
+          active_inference_pragmatic(GM, Belief, Action, PV),
           % Epistemic value of the action.
-          ai_epistemic(GM, Belief, Action, EV),
+          active_inference_epistemic(GM, Belief, Action, EV),
           % The negated sum must equal G.
           Sum is -(PV + EV),
           % Enforce the identity tightly.
@@ -317,13 +317,13 @@ test(efe_policy_accumulates, [nondet]) :-
     % The flat prior over the reward side.
     Belief = [c_l-0.5, c_r-0.5],
     % One-step expected free energy of checking.
-    ai_efe_action(GM, Belief, check, G1),
+    active_inference_efe_action(GM, Belief, check, G1),
     % Belief after checking.
-    ai_predict_states(GM, Belief, check, Next),
+    active_inference_predict_states(GM, Belief, check, Next),
     % One-step expected free energy of the follow-up.
-    ai_efe_action(GM, Next, left, G2),
+    active_inference_efe_action(GM, Next, left, G2),
     % Two-step policy value.
-    ai_efe(GM, Belief, [check, left], G),
+    active_inference_efe(GM, Belief, [check, left], G),
     % The policy value must equal the sum of its steps.
     tight(G, G1 + G2).
 
@@ -340,7 +340,7 @@ test(policies_enumerated) :-
     % Build the two-state model.
     two_state(GM),
     % Enumerate all two-step policies over two actions.
-    ai_policies(GM, 2, Policies),
+    active_inference_policies(GM, 2, Policies),
     % There must be exactly four.
     length(Policies, 4).
 
@@ -349,7 +349,7 @@ test(policy_dist_sums_to_one) :-
     % Build the T-maze model.
     tmaze(GM),
     % Build the distribution at unit precision.
-    ai_policy_dist(GM, [c_l-0.5, c_r-0.5], 1, 1.0, Dist),
+    active_inference_policy_dist(GM, [c_l-0.5, c_r-0.5], 1, 1.0, Dist),
     % Extract the probabilities.
     findall(P, member(_-P, Dist), Ps),
     % Sum them.
@@ -364,9 +364,9 @@ test(gamma_sharpens) :-
     % The flat prior over the reward side.
     Belief = [c_l-0.5, c_r-0.5],
     % Distribution at low precision.
-    ai_select_policy(GM, Belief, 1, 1.0, _, PLow),
+    active_inference_select_policy(GM, Belief, 1, 1.0, _, PLow),
     % Distribution at high precision.
-    ai_select_policy(GM, Belief, 1, 4.0, _, PHigh),
+    active_inference_select_policy(GM, Belief, 1, 4.0, _, PHigh),
     % The winner's probability must grow with precision.
     PHigh > PLow.
 
@@ -375,7 +375,7 @@ test(select_exploits_when_certain) :-
     % Build the T-maze model.
     tmaze(GM),
     % Select a one-step policy knowing the reward is left.
-    ai_select_policy(GM, [c_l-1.0], 1, 4.0, Policy, _),
+    active_inference_select_policy(GM, [c_l-1.0], 1, 4.0, Policy, _),
     % The rewarded arm wins.
     Policy == [left].
 
@@ -386,7 +386,7 @@ test(step_cycle) :-
     % At the cue location with the side still unknown.
     Belief = [q_l-0.5, q_r-0.5],
     % Perceive the left cue and choose the next action.
-    ai_step(GM, Belief, cue_left, 1, 4.0, Action, Posterior),
+    active_inference_step(GM, Belief, cue_left, 1, 4.0, Action, Posterior),
     % The posterior concentrates on the left context.
     memberchk(q_l-P, Posterior),
     % Check the posterior mass.
