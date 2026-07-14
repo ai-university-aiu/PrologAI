@@ -49,7 +49,7 @@
 % List helpers.
 :- use_module(library(lists), [member/2, select/3]).
 
-% obj(Id, cell(R,C), bbox(R0,C0,R1,C1), Size) is the object shape (from co_see).
+% obj(Id, cell(R,C), bbox(R0,C0,R1,C1), Size) is the object shape (from grid_perception).
 
 % object_relations_centroid(+Obj, -R, -C): the object's centroid.
 object_relations_centroid(obj(_, cell(R, C), _, _), R, C).

@@ -14,38 +14,38 @@
     or a piece). Bars and meters (a thin, long run of one colour, usually at an
     edge) are singled out because that is what a life-bar, timer, or counter looks
     like. The avatar — the thing the player controls — is found the way a person
-    finds it: it is whatever moved on the grid after an action, so cs_avatar_move
+    finds it: it is whatever moved on the grid after an action, so grid_perception_avatar_move
     reports the centroid of the region that changed between two frames.
 
     Predicates:
-      cs_background/2   -- +Frame, -Bg        (the most common colour = background)
-      cs_objects/2      -- +Frame, -Objects   (obj(Colour,Size,Centroid,BBox), big first)
-      cs_object_count/2 -- +Frame, -N
-      cs_inventory/2    -- +Frame, -Items     (seen(Id,Colour,Size,Centroid,Role))
-      cs_salient_cells/2-- +Frame, -Cells     (object centroids, largest object first)
-      cs_bars/2         -- +Frame, -Bars      (bar(Colour,Orient,Length,Centroid))
-      cs_changed_cells/3-- +Frame0,+Frame1,-Cells (cells that differ)
-      cs_avatar_move/3  -- +Frame0,+Frame1,-Centroid (what moved = the avatar)
+      grid_perception_background/2   -- +Frame, -Bg        (the most common colour = background)
+      grid_perception_objects/2      -- +Frame, -Objects   (obj(Colour,Size,Centroid,BBox), big first)
+      grid_perception_object_count/2 -- +Frame, -N
+      grid_perception_inventory/2    -- +Frame, -Items     (seen(Id,Colour,Size,Centroid,Role))
+      grid_perception_salient_cells/2-- +Frame, -Cells     (object centroids, largest object first)
+      grid_perception_bars/2         -- +Frame, -Bars      (bar(Colour,Orient,Length,Centroid))
+      grid_perception_changed_cells/3-- +Frame0,+Frame1,-Cells (cells that differ)
+      grid_perception_avatar_move/3  -- +Frame0,+Frame1,-Centroid (what moved = the avatar)
 */
 
 % Declare this module and its whole-grid perception interface.
-:- module(co_see, [
-    % cs_background/2: the background colour (the most common one).
-    cs_background/2,
-    % cs_objects/2: every object with its colour, size, centroid, and box.
-    cs_objects/2,
-    % cs_object_count/2: how many objects are on the grid.
-    cs_object_count/2,
-    % cs_inventory/2: the inventory, each object tagged with a role guess.
-    cs_inventory/2,
-    % cs_salient_cells/2: object centroids, largest object first.
-    cs_salient_cells/2,
-    % cs_bars/2: the bar/meter-like objects (life-bars, timers, counters).
-    cs_bars/2,
-    % cs_changed_cells/3: the cells that differ between two frames.
-    cs_changed_cells/3,
-    % cs_avatar_move/3: the centroid of what moved — the avatar.
-    cs_avatar_move/3
+:- module(grid_perception, [
+    % grid_perception_background/2: the background colour (the most common one).
+    grid_perception_background/2,
+    % grid_perception_objects/2: every object with its colour, size, centroid, and box.
+    grid_perception_objects/2,
+    % grid_perception_object_count/2: how many objects are on the grid.
+    grid_perception_object_count/2,
+    % grid_perception_inventory/2: the inventory, each object tagged with a role guess.
+    grid_perception_inventory/2,
+    % grid_perception_salient_cells/2: object centroids, largest object first.
+    grid_perception_salient_cells/2,
+    % grid_perception_bars/2: the bar/meter-like objects (life-bars, timers, counters).
+    grid_perception_bars/2,
+    % grid_perception_changed_cells/3: the cells that differ between two frames.
+    grid_perception_changed_cells/3,
+    % grid_perception_avatar_move/3: the centroid of what moved — the avatar.
+    grid_perception_avatar_move/3
 ]).
 
 % Import grid measurement and reading.
@@ -64,39 +64,39 @@
 % ---------------------------------------------------------------------------
 %
 % A connected-component segmentation of a 64x64 grid is the expensive part of
-% whole-grid perception, and cs_inventory, cs_bars, cs_object_count, and
-% cs_salient_cells ALL derive from cs_objects — so a single choice that reads the
+% whole-grid perception, and grid_perception_inventory, grid_perception_bars, grid_perception_object_count, and
+% grid_perception_salient_cells ALL derive from grid_perception_objects — so a single choice that reads the
 % inventory, the meters, and the salient cells would segment the same frame three
 % times. This cache computes each whole-grid perception once per frame and hands
 % the stored answer to every later caller. It is keyed by a cheap hash of the
 % frame and keeps only the latest frame's entry per kind, so it stays tiny and
 % never serves a stale frame: a new frame's hash misses and evicts the old one.
 
-% cs_cache_/3: (Kind, FrameHash, Value) — one memoised perception for one frame.
-:- dynamic cs_cache_/3.
+% grid_perception_cache_/3: (Kind, FrameHash, Value) — one memoised perception for one frame.
+:- dynamic grid_perception_cache_/3.
 
-% cs_cache_clear/0: drop the whole perception cache. The keep-latest policy
+% grid_perception_cache_clear/0: drop the whole perception cache. The keep-latest policy
 % already bounds the cache to the current frame, so this is only for a caller
 % that wants to release the memory explicitly (e.g. between games).
-cs_cache_clear :-
+grid_perception_cache_clear :-
     % Forget every cached perception.
-    retractall(cs_cache_(_, _, _)).
+    retractall(grid_perception_cache_(_, _, _)).
 
-% cs_cached(+Kind, +Frame, :Compute, -Value): return Kind's value for this exact
+% grid_perception_cached(+Kind, +Frame, :Compute, -Value): return Kind's value for this exact
 % frame, computing it once via Compute(Frame, Value) on a miss and storing it.
 % Only the latest frame's entry per kind is kept, so the cache never grows.
-:- meta_predicate cs_cached(+, +, 2, -).
-cs_cached(Kind, Frame, Compute, Value) :-
+:- meta_predicate grid_perception_cached(+, +, 2, -).
+grid_perception_cached(Kind, Frame, Compute, Value) :-
     % A cheap hash of the frame is the cache key.
     term_hash(Frame, H),
     (   % Hit: the value for this exact frame is already stored.
-        cs_cache_(Kind, H, V0)
+        grid_perception_cache_(Kind, H, V0)
     ->  Value = V0
     ;   % Miss: compute once (Compute must succeed, as the direct predicate did),
         % drop any stale entry of this kind, store the fresh one, and return it.
         call(Compute, Frame, V1),
-        retractall(cs_cache_(Kind, _, _)),
-        assertz(cs_cache_(Kind, H, V1)),
+        retractall(grid_perception_cache_(Kind, _, _)),
+        assertz(grid_perception_cache_(Kind, H, V1)),
         Value = V1
     ).
 
@@ -104,14 +104,14 @@ cs_cached(Kind, Frame, Compute, Value) :-
 % Background
 % ---------------------------------------------------------------------------
 
-% Define cs_background: the background is the colour that covers the most cells.
+% Define grid_perception_background: the background is the colour that covers the most cells.
 % Cached per frame — the object segmentation and the avatar locator both need it.
-cs_background(Frame, Bg) :-
+grid_perception_background(Frame, Bg) :-
     % Serve the cached background, computing it once per frame.
-    cs_cached(background, Frame, cs_background_compute, Bg).
+    grid_perception_cached(background, Frame, grid_perception_background_compute, Bg).
 
-% cs_background_compute(+Frame, -Bg): the uncached background computation.
-cs_background_compute(Frame, Bg) :-
+% grid_perception_background_compute(+Frame, -Bg): the uncached background computation.
+grid_perception_background_compute(Frame, Bg) :-
     % The colours present.
     gd_colors(Frame, Colours),
     % Pair each colour with how many cells carry it.
@@ -129,18 +129,18 @@ cs_background_compute(Frame, Bg) :-
 % Objects and the inventory
 % ---------------------------------------------------------------------------
 
-% Define cs_objects: every non-background object as obj(Colour, Size, Centroid,
+% Define grid_perception_objects: every non-background object as obj(Colour, Size, Centroid,
 % BBox), ordered largest object first. Cached per frame so the inventory, meters,
 % object count, and salient cells all share ONE segmentation of the same frame.
-cs_objects(Frame, Objects) :-
+grid_perception_objects(Frame, Objects) :-
     % Serve the cached segmentation, computing it once per frame.
-    cs_cached(objects, Frame, cs_objects_compute, Objects).
+    grid_perception_cached(objects, Frame, grid_perception_objects_compute, Objects).
 
-% cs_objects_compute(+Frame, -Objects): the uncached connected-component
+% grid_perception_objects_compute(+Frame, -Objects): the uncached connected-component
 % segmentation — the expensive full-grid pass the cache above amortises.
-cs_objects_compute(Frame, Objects) :-
+grid_perception_objects_compute(Frame, Objects) :-
     % The background to segment against.
-    ( cs_background(Frame, Bg) -> true ; Bg = 0 ),
+    ( grid_perception_background(Frame, Bg) -> true ; Bg = 0 ),
     % Connected components over every non-background colour.
     catch(gob_all_objects(Frame, Bg, Raw), _, Raw = []),
     % Summarise each component: colour, size, centroid, and bounding box.
@@ -149,16 +149,16 @@ cs_objects_compute(Frame, Objects) :-
           length(Cells, Size),
           Size > 0,
           NegSize is -Size,
-          cs_centroid(Cells, CR, CC),
-          cs_bbox(Cells, R0, C0, R1, C1) ),
+          grid_perception_centroid(Cells, CR, CC),
+          grid_perception_bbox(Cells, R0, C0, R1, C1) ),
         Keyed),
     % Largest object first.
     keysort(Keyed, Sorted),
     % Drop the sort keys.
     findall(O, member(_ - O, Sorted), Objects).
 
-% cs_centroid(+Cells, -R, -C): the rounded centroid of a list of r(R,C) cells.
-cs_centroid(Cells, R, C) :-
+% grid_perception_centroid(+Cells, -R, -C): the rounded centroid of a list of r(R,C) cells.
+grid_perception_centroid(Cells, R, C) :-
     % The row coordinates.
     findall(RR, member(r(RR, _), Cells), Rows),
     % The column coordinates.
@@ -172,8 +172,8 @@ cs_centroid(Cells, R, C) :-
     % Round the means.
     R is round(SumR / N), C is round(SumC / N).
 
-% cs_bbox(+Cells, -R0, -C0, -R1, -C1): the bounding box of a cell list.
-cs_bbox(Cells, R0, C0, R1, C1) :-
+% grid_perception_bbox(+Cells, -R0, -C0, -R1, -C1): the bounding box of a cell list.
+grid_perception_bbox(Cells, R0, C0, R1, C1) :-
     % The row coordinates.
     findall(RR, member(r(RR, _), Cells), Rows),
     % The column coordinates.
@@ -183,29 +183,29 @@ cs_bbox(Cells, R0, C0, R1, C1) :-
     % The extreme columns.
     min_list(Cols, C0), max_list(Cols, C1).
 
-% Define cs_object_count: how many objects the grid holds.
-cs_object_count(Frame, N) :-
+% Define grid_perception_object_count: how many objects the grid holds.
+grid_perception_object_count(Frame, N) :-
     % Count the segmented objects.
-    cs_objects(Frame, Objects),
+    grid_perception_objects(Frame, Objects),
     length(Objects, N).
 
-% Define cs_inventory: the objects, each tagged with a shape-based role guess, in
+% Define grid_perception_inventory: the objects, each tagged with a shape-based role guess, in
 % salience order (largest first). Roles: meter (a bar), dot (a single cell),
 % field (a large block), or piece (anything else).
-cs_inventory(Frame, Items) :-
+grid_perception_inventory(Frame, Items) :-
     % The objects, largest first.
-    cs_objects(Frame, Objects),
+    grid_perception_objects(Frame, Objects),
     % The grid area, to judge "large".
     ( gd_size(Frame, H, W) -> Area is H * W ; Area = 4096 ),
     % Tag each object with an id and a role.
     findall(seen(Id, Colour, Size, cell(CR, CC), Role),
         ( nth1(Id, Objects, obj(Colour, Size, cell(CR, CC), bbox(R0, C0, R1, C1))),
-          cs_role(Size, R0, C0, R1, C1, Area, Role) ),
+          grid_perception_role(Size, R0, C0, R1, C1, Area, Role) ),
         Items).
 
-% cs_role(+Size,+R0,+C0,+R1,+C1,+Area,-Role): a shape-based role guess.
+% grid_perception_role(+Size,+R0,+C0,+R1,+C1,+Area,-Role): a shape-based role guess.
 % A thin, long object is a meter (life-bar / timer / counter).
-cs_role(_, R0, C0, R1, C1, _, meter) :-
+grid_perception_role(_, R0, C0, R1, C1, _, meter) :-
     % The object's height and width.
     Height is R1 - R0 + 1, Width is C1 - C0 + 1,
     % Its thin side and its long side.
@@ -213,17 +213,17 @@ cs_role(_, R0, C0, R1, C1, _, meter) :-
     % Thin (at most two) and long (at least five) makes it a meter.
     Thin =< 2, Long >= 5, !.
 % A single cell is a dot (often a target or collectible).
-cs_role(1, _, _, _, _, _, dot) :- !.
+grid_perception_role(1, _, _, _, _, _, dot) :- !.
 % A block covering a large share of the grid is a field/wall.
-cs_role(Size, _, _, _, _, Area, field) :- Size * 5 >= Area, !.
+grid_perception_role(Size, _, _, _, _, Area, field) :- Size * 5 >= Area, !.
 % Anything else is a piece.
-cs_role(_, _, _, _, _, _, piece).
+grid_perception_role(_, _, _, _, _, _, piece).
 
-% Define cs_salient_cells: the object centroids, largest object first — the
+% Define grid_perception_salient_cells: the object centroids, largest object first — the
 % "what should I look at / go touch" list.
-cs_salient_cells(Frame, Cells) :-
+grid_perception_salient_cells(Frame, Cells) :-
     % The objects, largest first.
-    cs_objects(Frame, Objects),
+    grid_perception_objects(Frame, Objects),
     % Their centroids in order.
     findall(cell(R, C), member(obj(_, _, cell(R, C), _), Objects), Cells).
 
@@ -231,11 +231,11 @@ cs_salient_cells(Frame, Cells) :-
 % Bars and meters — never ablate a counter; report it
 % ---------------------------------------------------------------------------
 
-% Define cs_bars: the bar/meter-like objects — a thin, long run of one colour,
+% Define grid_perception_bars: the bar/meter-like objects — a thin, long run of one colour,
 % which is what a life-bar, timer, or progress counter looks like.
-cs_bars(Frame, Bars) :-
+grid_perception_bars(Frame, Bars) :-
     % Every object.
-    cs_objects(Frame, Objects),
+    grid_perception_objects(Frame, Objects),
     % Keep the thin, long ones and describe them.
     findall(bar(Colour, Orient, Length, cell(CR, CC)),
         ( member(obj(Colour, _, cell(CR, CC), bbox(R0, C0, R1, C1)), Objects),
@@ -250,8 +250,8 @@ cs_bars(Frame, Bars) :-
 % Change and the avatar
 % ---------------------------------------------------------------------------
 
-% Define cs_changed_cells: the cells whose colour differs between two frames.
-cs_changed_cells(Frame0, Frame1, Cells) :-
+% Define grid_perception_changed_cells: the cells whose colour differs between two frames.
+grid_perception_changed_cells(Frame0, Frame1, Cells) :-
     % The dimensions (assume the two frames share them).
     gd_size(Frame0, H, W),
     % The last row and column indices.
@@ -264,17 +264,17 @@ cs_changed_cells(Frame0, Frame1, Cells) :-
           V0 \== V1 ),
         Cells).
 
-% Define cs_avatar_move: the centroid of what moved between two frames — the
+% Define grid_perception_avatar_move: the centroid of what moved between two frames — the
 % avatar. A person spots the avatar as the thing that answered the controller;
 % this reports the centre of the region that changed, biased to the cells the
 % avatar moved INTO (non-background in the new frame).
-cs_avatar_move(Frame0, Frame1, cell(R, C)) :-
+grid_perception_avatar_move(Frame0, Frame1, cell(R, C)) :-
     % Everything that changed.
-    cs_changed_cells(Frame0, Frame1, Changed),
+    grid_perception_changed_cells(Frame0, Frame1, Changed),
     % There must be a change to locate.
     Changed \== [],
     % The new frame's background.
-    ( cs_background(Frame1, Bg1) -> true ; Bg1 = 0 ),
+    ( grid_perception_background(Frame1, Bg1) -> true ; Bg1 = 0 ),
     % The changed cells that are now non-background — where the avatar moved to.
     findall(cell(RR, CC),
         ( member(cell(RR, CC), Changed),
@@ -283,10 +283,10 @@ cs_avatar_move(Frame0, Frame1, cell(R, C)) :-
     % Prefer the moved-into cells; fall back to all changed cells.
     ( NewCells \== [] -> Pick = NewCells ; Pick = Changed ),
     % The centroid of those cells.
-    cs_centroid_cells(Pick, R, C).
+    grid_perception_centroid_cells(Pick, R, C).
 
-% cs_centroid_cells(+Cells, -R, -C): the rounded centroid of a cell(R,C) list.
-cs_centroid_cells(Cells, R, C) :-
+% grid_perception_centroid_cells(+Cells, -R, -C): the rounded centroid of a cell(R,C) list.
+grid_perception_centroid_cells(Cells, R, C) :-
     % The row coordinates.
     findall(RR, member(cell(RR, _), Cells), Rows),
     % The column coordinates.

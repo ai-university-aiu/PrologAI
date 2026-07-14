@@ -1,5 +1,5 @@
-% State the fact: name(co_see).
-name(co_see).
+% State the fact: name(grid_perception).
+name(grid_perception).
 % State the fact: version('1.0.0').
 version('1.0.0').
 % State the fact: the pack title.

@@ -5,7 +5,7 @@
     system wants to hold at a target set-point (charge, signal, a task counter).
     The gap between the target and the current reading is felt as a PRESSURE, and
     a pressure is what turns into a goal. The co_ family could already infer an
-    environment's goal (co_goalinfer), but it had no goals of its own; this pack
+    environment's goal (goal_inference), but it had no goals of its own; this pack
     gives it that inner reason to act.
 
     A NEED is:

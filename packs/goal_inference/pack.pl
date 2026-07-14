@@ -1,5 +1,5 @@
-% State the fact: name(co_goalinfer).
-name(co_goalinfer).
+% State the fact: name(goal_inference).
+name(goal_inference).
 % State the fact: version('1.0.0').
 version('1.0.0').
 % State the fact: title('PrologAI Causalontology Goal Inference — hypothesising the unstated win condition of an ARC-AGI-3 environment from the frame changes that precede a win (WP-398)').
