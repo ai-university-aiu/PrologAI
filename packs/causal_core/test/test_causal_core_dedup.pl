@@ -29,7 +29,7 @@ count_cro(Causes, Effects, N) :-
 run_tests :-
     format("~n=== causal_core — fact existence / assert-if-new ===~n~n", []),
     % A clean store.
-    co_core_reset,
+    causal_core_reset,
     P = prov(test, evidence, 0.7),
 
     % AC-DD-001: the first unique assertion creates the relation.

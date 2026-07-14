@@ -119,7 +119,7 @@ test(salient_largest_first, [true(Targets == [select(1,1), select(4,3)])]) :-
 % game only — another game with no such relation predicts nothing.
 test(game_predicted_change) :-
     % Clear the learner and the verb layer.
-    co_core_reset, co_learn_reset,
+    causal_core_reset, co_learn_reset,
     % Teach that, in game ls20, action(up) causes a move.
     co_learn_causal(g(ls20, action(up)), moved),
     % In ls20 that action is predicted to change the world.
@@ -131,7 +131,7 @@ test(game_predicted_change) :-
 % untried but unknown one.
 test(game_prefers_predicted_change, [true(A == action(up))]) :-
     % Start clean.
-    co_core_reset, co_learn_reset, cox_reset,
+    causal_core_reset, co_learn_reset, cox_reset,
     % Teach ls20 that action(up) changes the world.
     co_learn_causal(g(ls20, action(up)), moved),
     % Fetch the sample frame.
@@ -143,7 +143,7 @@ test(game_prefers_predicted_change, [true(A == action(up))]) :-
 % can fall back to a graph-frontier search.
 test(game_change_fails_when_none) :-
     % Start clean: no learned relations at all.
-    co_core_reset, co_learn_reset, cox_reset,
+    causal_core_reset, co_learn_reset, cox_reset,
     % Fetch the sample frame.
     sample_frame(F),
     % With no predicted-change action, the causal-first choice fails.
@@ -152,7 +152,7 @@ test(game_change_fails_when_none) :-
 % A hazard the game learned to avoid, keyed g(Game,Action), is never chosen.
 test(game_avoid_honoured, [true(A == action(down))]) :-
     % Start clean.
-    co_core_reset, co_learn_reset, cox_reset,
+    causal_core_reset, co_learn_reset, cox_reset,
     % Mark action(up) a hazard in game ls20 only.
     co_learn_preventive(g(ls20, action(up)), penalty),
     % Fetch the sample frame.

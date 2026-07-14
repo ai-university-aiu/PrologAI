@@ -36,7 +36,7 @@ world_act(_, none).
 % fresh/0: reset every layer, then learn the three presses.
 fresh :-
     % Clear the verb layer.
-    co_core_reset,
+    causal_core_reset,
     % Clear the hinge.
     co_hinge_reset,
     % Clear the learning state.
@@ -99,7 +99,7 @@ test(unachievable_refused, [fail]) :-
 % Backward chaining assembles a plan the agent was never given.
 test(chain_assembles_plan, [nondet]) :-
     % A fresh verb layer without procedures.
-    co_core_reset,
+    causal_core_reset,
     % Clear the learning state.
     co_learn_reset,
     % A two-link causal chain: flip causes power; power causes light.

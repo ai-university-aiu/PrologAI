@@ -63,7 +63,7 @@ test(act_leaves_are_controls) :-
 % Reifying the tree creates a root CRO carrying a mechanism sub-graph.
 test(reify_builds_mechanism) :-
     % Start from a clean CRO store and a clean plan.
-    co_core_reset, hierarchical_planning_reset,
+    causal_core_reset, hierarchical_planning_reset,
     % Build and reify a plan.
     hierarchical_planning_win_plan(ls20, [action(1), action(2), select(x, y)], Tree),
     hierarchical_planning_reify(Tree, RootId),
@@ -75,7 +75,7 @@ test(reify_builds_mechanism) :-
 % top goal and its six ordered phases match the original.
 test(plan_from_cros_roundtrip) :-
     % A clean slate, then build and reify.
-    co_core_reset, hierarchical_planning_reset,
+    causal_core_reset, hierarchical_planning_reset,
     hierarchical_planning_win_plan(ls20, [action(1), action(2), select(x, y)], Tree),
     hierarchical_planning_reify(Tree, Root),
     % Rebuild the tree from the causal graph alone.
@@ -91,7 +91,7 @@ test(plan_from_cros_roundtrip) :-
 % agrees with the composition of its mechanism.
 test(reified_hierarchy_consistent) :-
     % A clean slate, then build and reify.
-    co_core_reset, hierarchical_planning_reset,
+    causal_core_reset, hierarchical_planning_reset,
     hierarchical_planning_win_plan(ls20, [action(1), action(2), select(x, y)], Tree),
     hierarchical_planning_reify(Tree, Root),
     % Consistency holds across the whole hierarchy.
