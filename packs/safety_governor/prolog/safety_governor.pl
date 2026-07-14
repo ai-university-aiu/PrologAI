@@ -4,7 +4,7 @@
     learning: a guard holding a human-set constitution, checking every risky
     action before it is taken, able always to veto with a reason, keeping an
     immutable record of what it stopped, and unmodifiable by the system it
-    guards. Causalontology already marks a relation "preventive" inside co_core
+    guards. Causalontology already marks a relation "preventive" inside causal_core
     and predicts fatal moves in verification, but there was no separate governor
     that owns the last word. This pack is that governor.
 
@@ -14,7 +14,7 @@
                                    must never be taken, with the reason why. A
                                    pattern may contain variables, so forbid
                                    touch(_) bans touching anything.
-      avoid(Action)                a learned hazard mirrored in from co_core's
+      avoid(Action)                a learned hazard mirrored in from causal_core's
                                    preventive relations, so the governor enforces
                                    what the model learned to fear.
 
@@ -65,7 +65,7 @@
 
 % constraint/2 is a constitutional rule; add-only within a session, so dynamic.
 :- dynamic constraint/2.
-% avoid/1 is a learned hazard mirrored from co_core; dynamic.
+% avoid/1 is a learned hazard mirrored from causal_core; dynamic.
 :- dynamic avoid/1.
 % veto/3 is one append-only log entry: Seq, Action, Reason.
 :- dynamic veto/3.
@@ -89,7 +89,7 @@ safety_governor_forbid(Pattern, Reason) :-
     % A duplicate pattern-and-reason is not stored twice.
     ( constraint(Pattern, Reason) -> true ; assertz(constraint(Pattern, Reason)) ).
 
-% safety_governor_avoid_add/1: mirror in a learned hazard from co_core's preventive relations.
+% safety_governor_avoid_add/1: mirror in a learned hazard from causal_core's preventive relations.
 safety_governor_avoid_add(Action) :-
     % Do not store the same hazard twice.
     ( avoid(Action) -> true ; assertz(avoid(Action)) ).

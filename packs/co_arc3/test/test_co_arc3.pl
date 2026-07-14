@@ -20,7 +20,7 @@
 % Load the module under test.
 :- use_module(library(co_arc3)).
 % Load the verb layer the harness induces relations into.
-:- use_module(library(co_core)).
+:- use_module(library(causal_core)).
 % Load the learner whose avoid-set the harness enforces.
 :- use_module(library(co_learn)).
 % Load the hinge cleared alongside.
@@ -129,9 +129,9 @@ test(episode_wins_and_avoids_hazard, [nondet]) :-
     % The spike was tried once, learned, and avoided.
     co_avoid(action(spike)),
     % The preventive relation was reified.
-    co_cro(_, [action(spike)], [penalty], _, preventive, _, _, _),
+    causal_core_cro(_, [action(spike)], [penalty], _, preventive, _, _, _),
     % The transfer mechanic was induced as a causal relation.
-    co_cro(_, [action(transfer)], [delta(_)], _, sufficient, _, _, _),
+    causal_core_cro(_, [action(transfer)], [delta(_)], _, sufficient, _, _, _),
     % The glass-box trace recorded the hazard step.
     co_arc3_trace(Trace),
     % The hazard appears exactly once in the whole episode.
@@ -147,7 +147,7 @@ test(plan_overrides_curiosity, [nondet]) :-
     % Fresh layers.
     fresh,
     % A learned relation: transfer produces the level-raising delta.
-    co_new_cro([action(transfer)], [delta([changed(0, 0, 1, 2)])],
+    causal_core_new_cro([action(transfer)], [delta([changed(0, 0, 1, 2)])],
                temporal(0, 0, instant), sufficient, 0.7, [],
                prov(agent, learned_by_intervention, 0.7), _),
     % Register that delta as the goal.

@@ -16,7 +16,7 @@
 % Load the module under test.
 :- use_module(library(co_plan)).
 % Load the verb layer the planner reads.
-:- use_module(library(co_core)).
+:- use_module(library(causal_core)).
 % Load the learner whose avoid-set the planner respects.
 :- use_module(library(co_learn)).
 % Load the hinge cleared alongside.
@@ -103,10 +103,10 @@ test(chain_assembles_plan, [nondet]) :-
     % Clear the learning state.
     co_learn_reset,
     % A two-link causal chain: flip causes power; power causes light.
-    co_new_cro([flip(switch)], [power(on)], temporal(0, 0, instant),
+    causal_core_new_cro([flip(switch)], [power(on)], temporal(0, 0, instant),
                sufficient, 0.9, [], prov(agent, learned_by_intervention, 0.9), _),
     % The second link.
-    co_new_cro([power(on)], [light(on)], temporal(0, 0, instant),
+    causal_core_new_cro([power(on)], [light(on)], temporal(0, 0, instant),
                sufficient, 0.9, [], prov(kb, asserted, 0.9), _),
     % Chain backward from the light to the flip.
     co_plan_chain(light(on), 5, Plan),

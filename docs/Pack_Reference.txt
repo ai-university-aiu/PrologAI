@@ -2068,25 +2068,25 @@ Causalontology Hinge: Qualities and Realizables with the Realization Seam (co_*,
     co_bearer_realizables(+Bearer,-Realizables): everything an object bears.
     co_hinge_of_occurrent(+OccurrentType,-RealizableId): the seam backward.
 
-co_core
+causal_core
 Causalontology Core: The Reified Causal Relation Object (co_*, Layer 368)
     co_core_reset/0: clear the verb layer.
-    co_cro_assert(+CRO): assert with full-payload validation (four modalities, unit strength, ordered window, provenance).
-    co_new_cro(+Causes,+Effects,+Temporal,+Modality,+Strength,+Context,+Prov,-Id): fresh identifier.
-    co_the_cro(?Id,-CRO) / co_cro/8: fetch and open query.
-    co_strengthen(+Id,+Delta): confirmation, capped at 0.99.
-    co_predict(+Cause,-Effect): forward prediction, never through preventive relations.
-    co_preventive(?Id): the hazard relations.
-    co_precedes_add/2, co_precedes/2: mere temporal succession.
-    co_causally_linked(+Cause,+Effect): production, only ever through a CRO.
-    co_after_but_not_because(+A,+B): sequence that is not production.
-    co_temporal_admissible(+Cause,+Effect,+elapsed(T,Unit)): the timing gate.
-    co_temporal_abduction(+Effect,+Candidates,-Ranked): abduction filtered by temporal windows, ranked by strength.
-    co_decompose_add(+ParentId,+SubIds) / co_mechanism/2: hierarchical mechanism sub-graphs.
-    co_hierarchy_consistent(+ParentId): the coarse relation agrees with the composition of its parts.
-    co_import_external(+Source,+Cause,+Effect,-Id): subsumption — a degenerate provisional import.
-    co_provisional(?Id) / co_refine_import(+Id,+Temporal,+Modality,+Strength): refine into an owned relation.
-    co_why(+Id,-Why): the glass-box story of a relation.
+    causal_core_cro_assert(+CRO): assert with full-payload validation (four modalities, unit strength, ordered window, provenance).
+    causal_core_new_cro(+Causes,+Effects,+Temporal,+Modality,+Strength,+Context,+Prov,-Id): fresh identifier.
+    causal_core_the_cro(?Id,-CRO) / causal_core_cro/8: fetch and open query.
+    causal_core_strengthen(+Id,+Delta): confirmation, capped at 0.99.
+    causal_core_predict(+Cause,-Effect): forward prediction, never through preventive relations.
+    causal_core_preventive(?Id): the hazard relations.
+    causal_core_precedes_add/2, causal_core_precedes/2: mere temporal succession.
+    causal_core_causally_linked(+Cause,+Effect): production, only ever through a CRO.
+    causal_core_after_but_not_because(+A,+B): sequence that is not production.
+    causal_core_temporal_admissible(+Cause,+Effect,+elapsed(T,Unit)): the timing gate.
+    causal_core_temporal_abduction(+Effect,+Candidates,-Ranked): abduction filtered by temporal windows, ranked by strength.
+    causal_core_decompose_add(+ParentId,+SubIds) / causal_core_mechanism/2: hierarchical mechanism sub-graphs.
+    causal_core_hierarchy_consistent(+ParentId): the coarse relation agrees with the composition of its parts.
+    causal_core_import_external(+Source,+Cause,+Effect,-Id): subsumption — a degenerate provisional import.
+    causal_core_provisional(?Id) / causal_core_refine_import(+Id,+Temporal,+Modality,+Strength): refine into an owned relation.
+    causal_core_why(+Id,-Why): the glass-box story of a relation.
 
 co_learn
 Causalontology Learning: Causal Structure Acquired by Intervention (co_*, Layer 369)
@@ -2265,7 +2265,7 @@ safety_governor
 Causalontology Safety Governor (co_*, Layer 389)
     safety_governor_reset/0: clear the constitution, hazards, and veto log (only an operator reset, never learning).
     safety_governor_forbid(+Pattern,+Reason): add a constitutional constraint (a pattern may carry variables).
-    safety_governor_avoid_add(+Action): mirror in a learned hazard from co_core's preventive relations.
+    safety_governor_avoid_add(+Action): mirror in a learned hazard from causal_core's preventive relations.
     safety_governor_constraint(?Pattern,?Reason) / safety_governor_forbidden(+Action): read the constitution; does any prohibition match?
     safety_governor_check(+Action,-Verdict): allow | veto(Reason); every veto is appended to the immutable log.
     safety_governor_permit(+Action): succeeds only when the action is allowed.

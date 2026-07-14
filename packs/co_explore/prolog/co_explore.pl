@@ -88,7 +88,7 @@
 ]).
 
 % Import the verb layer's forward predictor to tell live actions from dead ones.
-:- use_module(library(co_core), [co_predict/2]).
+:- use_module(library(causal_core), [causal_core_predict/2]).
 % Import the learned avoid-set so hazards are never chosen.
 :- use_module(library(co_learn), [co_avoid/1]).
 % Import grid measurement and colour reading for the signature.
@@ -159,7 +159,7 @@ cox_seen_count(N) :-
 % Define cox_predict_change: the causal graph predicts the action has an effect.
 cox_predict_change(Action) :-
     % Ask the verb layer to forward-predict the action's effects.
-    co_predict(Action, Effects),
+    causal_core_predict(Action, Effects),
     % A live action is one predicted to produce at least one effect.
     Effects \== [].
 
@@ -285,7 +285,7 @@ cox_choose(Actions, Tried, Frame, Action) :-
 % an effect (its cause is keyed to this game, as g(Game, Action)).
 cox_predict_change(Game, Action) :-
     % Ask the verb layer to forward-predict the game-keyed action's effects.
-    co_predict(g(Game, Action), Effects),
+    causal_core_predict(g(Game, Action), Effects),
     % A live action is one predicted to produce at least one effect.
     Effects \== [].
 

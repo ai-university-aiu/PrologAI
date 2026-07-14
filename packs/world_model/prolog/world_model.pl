@@ -544,7 +544,7 @@ world_model_novelty(KnownStates, State, Score) :-
 % ===========================================================================
 
 % world_model_as_cros(+Model, -CROs): emit each learned (Mode 1) transition as a reified
-% Causal Relation Object of the co_core shape, so the model can be written into the
+% Causal Relation Object of the causal_core shape, so the model can be written into the
 % shared store and read by the rest of the family. The cause is the action, the
 % effect is the observed effect, the strength is the effect's share of the
 % observations in its context, and the provenance records that world_model learned it.

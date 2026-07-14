@@ -11,4 +11,4 @@ home('https://github.com/ai-university-aiu/PrologAI').
 % State the fact: download.
 download('https://github.com/ai-university-aiu/PrologAI/releases').
 % State the fact: requires the Causalontology core.
-requires([co_core]).
+requires([causal_core]).

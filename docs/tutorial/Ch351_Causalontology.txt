@@ -1,4 +1,4 @@
-Chapter 351: Causalontology - The co_noun, co_hinge, co_core, co_learn, co_plan, and co_arc3 Packs (co_*, Layers 366-371)
+Chapter 351: Causalontology - The co_noun, co_hinge, causal_core, co_learn, co_plan, and co_arc3 Packs (co_*, Layers 366-371)
 
 A general intelligence must do more than recognize what things are. It must
 model how and why things happen - predict the consequences of its actions,
@@ -26,7 +26,7 @@ it, and back.
 
 THE FUNDAMENTAL UNIT
 
-The co_core pack reifies causation itself. Its unit is the Causal Relation
+The causal_core pack reifies causation itself. Its unit is the Causal Relation
 Object:
 
     cro(Id, Causes, Effects,
@@ -38,27 +38,27 @@ Object:
 
 Three disciplines are enforced. First, mere sequence is never production:
 
-    ?- co_precedes_add(rooster_crow, sunrise),
-       co_after_but_not_because(rooster_crow, sunrise).
+    ?- causal_core_precedes_add(rooster_crow, sunrise),
+       causal_core_after_but_not_because(rooster_crow, sunrise).
     true.    % the rooster does not cause the dawn
 
 Second, timing is mechanism. The clinician's question - "how long ago did
 you eat?" - becomes a gate: a candidate cause is admitted only if the
 elapsed time falls inside its window.
 
-    ?- co_temporal_abduction(state(gastroenteritis),
+    ?- causal_core_temporal_abduction(state(gastroenteritis),
            [ate(spoiled_shellfish)-elapsed(3, hours),
             ate(undercooked_poultry)-elapsed(2, hours)], Ranked).
     Ranked = [0.7-ate(spoiled_shellfish)].
     % the poultry is excluded PURELY on timing: two hours is before its window
 
 Third, mechanisms decompose. A coarse relation carries a sub-graph of finer
-relations, and co_hierarchy_consistent checks that the parts genuinely chain
+relations, and causal_core_hierarchy_consistent checks that the parts genuinely chain
 from the parent's causes to its effects.
 
-And the subsumption argument is executable: co_import_external turns a bare
+And the subsumption argument is executable: causal_core_import_external turns a bare
 external relation like ConceptNet's "Causes" into a degenerate provisional
-CRO - some fields unspecified - which co_refine_import then fills. One may
+CRO - some fields unspecified - which causal_core_refine_import then fills. One may
 replace a representation only if one already contains it.
 
 LEARNING BY DOING

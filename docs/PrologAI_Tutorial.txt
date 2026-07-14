@@ -1382,7 +1382,7 @@ WP 389 - tom: Theory of Mind (tm_*, Layer 364). Nested per-agent beliefs, witnes
 
 WP 390 - nexus: AGI Foundations Integration Layer (nx_*, Layer 365). The capstone that wires four foundations into the cognitive core: workspace broadcasts hold their winning coalition's concepts in a live J-Space readout, world-model novelty feeds the curiosity learning-progress signal, the agency loop decomposes goals with the planner and recovers by monitoring and replanning, and evolution improves reasoning models scored by refinery critique. Pure plumbing, respecting the acyclic layer order. Chapter 350 covers this pack.
 
-WP 391-396 - the Causalontology suite: co_noun, co_hinge, co_core, co_learn, co_plan, co_arc3 (co_*, Layers 366-371). The process-first Foundational Ontology: reified Causal Relation Objects with temporal windows as mechanism, four modalities, strength, and provenance; a thin continuant backbone with external alignment; the realizable hinge; learning by embodied intervention with a closed-world avoid-set; safe backward planning; and a game-agnostic perceive-learn-plan-act harness for interactive environments with a guarded bridge to ARC-AGI-3. Chapter 351 covers this suite.
+WP 391-396 - the Causalontology suite: co_noun, co_hinge, causal_core, co_learn, co_plan, co_arc3 (co_*, Layers 366-371). The process-first Foundational Ontology: reified Causal Relation Objects with temporal windows as mechanism, four modalities, strength, and provenance; a thin continuant backbone with external alignment; the realizable hinge; learning by embodied intervention with a closed-world avoid-set; safe backward planning; and a game-agnostic perceive-learn-plan-act harness for interactive environments with a guarded bridge to ARC-AGI-3. Chapter 351 covers this suite.
 
 WP 397-400 - the ARC-AGI-3 Readiness suite: co_explore, goal_inference, efficiency_governor, arc3_protocol (co_*, Layers 372-375). Four packs that carry the Causalontology harness the last mile to the interactive benchmark: a novelty-seeking, loop-avoiding exploration policy that prefers actions predicted to change the world and turns the ACTION6 cell-select into a few object-centroid clicks; inference of the unstated win condition from the frame changes that precede a win; a human-baseline efficiency governor that budgets actions and computes the benchmark's RHAE-style scores; and the exact March-2026 ARC-AGI-3 protocol vocabulary with a guarded environment adapter. Chapter 352 covers this suite.
 
@@ -26477,7 +26477,7 @@ J-Space. The companion Mentova accomplishment, Acc_424, puts all seven
 foundations to work in one connected episode of a curious agent's cognition.
 
 
-Chapter 351: Causalontology - The co_noun, co_hinge, co_core, co_learn, co_plan, and co_arc3 Packs (co_*, Layers 366-371)
+Chapter 351: Causalontology - The co_noun, co_hinge, causal_core, co_learn, co_plan, and co_arc3 Packs (co_*, Layers 366-371)
 
 A general intelligence must do more than recognize what things are. It must
 model how and why things happen - predict the consequences of its actions,
@@ -26505,7 +26505,7 @@ it, and back.
 
 THE FUNDAMENTAL UNIT
 
-The co_core pack reifies causation itself. Its unit is the Causal Relation
+The causal_core pack reifies causation itself. Its unit is the Causal Relation
 Object:
 
     cro(Id, Causes, Effects,
@@ -26517,27 +26517,27 @@ Object:
 
 Three disciplines are enforced. First, mere sequence is never production:
 
-    ?- co_precedes_add(rooster_crow, sunrise),
-       co_after_but_not_because(rooster_crow, sunrise).
+    ?- causal_core_precedes_add(rooster_crow, sunrise),
+       causal_core_after_but_not_because(rooster_crow, sunrise).
     true.    % the rooster does not cause the dawn
 
 Second, timing is mechanism. The clinician's question - "how long ago did
 you eat?" - becomes a gate: a candidate cause is admitted only if the
 elapsed time falls inside its window.
 
-    ?- co_temporal_abduction(state(gastroenteritis),
+    ?- causal_core_temporal_abduction(state(gastroenteritis),
            [ate(spoiled_shellfish)-elapsed(3, hours),
             ate(undercooked_poultry)-elapsed(2, hours)], Ranked).
     Ranked = [0.7-ate(spoiled_shellfish)].
     % the poultry is excluded PURELY on timing: two hours is before its window
 
 Third, mechanisms decompose. A coarse relation carries a sub-graph of finer
-relations, and co_hierarchy_consistent checks that the parts genuinely chain
+relations, and causal_core_hierarchy_consistent checks that the parts genuinely chain
 from the parent's causes to its effects.
 
-And the subsumption argument is executable: co_import_external turns a bare
+And the subsumption argument is executable: causal_core_import_external turns a bare
 external relation like ConceptNet's "Causes" into a degenerate provisional
-CRO - some fields unspecified - which co_refine_import then fills. One may
+CRO - some fields unspecified - which causal_core_refine_import then fills. One may
 replace a representation only if one already contains it.
 
 LEARNING BY DOING
@@ -26675,7 +26675,7 @@ guarded so no test depends on the wire.
 
 THE SUITE AS A WHOLE
 
-Perceive with grid, explore with co_explore, model with co_core, infer the
+Perceive with grid, explore with co_explore, model with causal_core, infer the
 goal with goal_inference, plan with co_plan under the budget of efficiency_governor, and
 act through the exact vocabulary of arc3_protocol - all orchestrated by the
 co_arc3 loop. Twenty-seven acceptance tests pass across the four packs, and
@@ -26920,7 +26920,7 @@ safety_governor - Safety Governor (WP-414, Layer 389)
 A conscience must sit apart from the mind's own learning. safety_governor holds an
 immutable constitution of forbidden action patterns (a pattern may carry a
 variable, so forbidding touch of anything bans the whole family) plus learned
-hazards mirrored in from co_core's preventive relations. It checks a proposed
+hazards mirrored in from causal_core's preventive relations. It checks a proposed
 action before it is taken and returns allow, or veto with a stated reason, and
 every veto is appended to a log the mind's own learning cannot rewrite. There is
 no predicate to weaken a constraint - the constitution is add-only within a

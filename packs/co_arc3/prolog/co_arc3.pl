@@ -69,7 +69,7 @@
 ]).
 
 % Import the verb layer whose relations the harness induces and reads.
-:- use_module(library(co_core), [co_cro/8, co_predict/2]).
+:- use_module(library(causal_core), [causal_core_cro/8, causal_core_predict/2]).
 % Import the interventional learner that induces the relations.
 :- use_module(library(co_learn), [co_learn_causal/2, co_learn_preventive/2, co_avoid/1]).
 % Import the planner used when a route to the goal is known.

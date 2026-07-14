@@ -119,7 +119,7 @@ human_steps_phase_capability(4, co_plan).
 % Execution spends actions under the efficiency governor.
 human_steps_phase_capability(5, efficiency_governor).
 % Transfer carries learned relations forward across levels.
-human_steps_phase_capability(6, co_core).
+human_steps_phase_capability(6, causal_core).
 
 % ---------------------------------------------------------------------------
 % The thirty micro-steps
