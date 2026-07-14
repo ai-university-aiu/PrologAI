@@ -25862,7 +25862,7 @@ The causal pack gives PrologAI the whole ladder as glass-box operations.
 A structural causal model (SCM) is a set of variables and the equations
 that cause them. Here is the classic firing squad:
 
-    ?- cf_model([
+    ?- causal_model([
            exo(court, 0),
            eq(captain, court),
            eq(rifle_a, captain),
@@ -25877,12 +25877,12 @@ captain, and the prisoner dies if either rifleman fires.
 
 RUNG ONE - SEEING
 
-    ?- cf_value(SCM, [court-1], death, V).
+    ?- causal_value(SCM, [court-1], death, V).
     V = 1.
 
 Solve the equations in causal order and read any variable. The model also
-answers graph questions: cf_parents, cf_ancestors, cf_descendants,
-cf_path, and cf_dsep - d-separation, the test of which variables are
+answers graph questions: causal_parents, causal_ancestors, causal_descendants,
+causal_path, and causal_dsep - d-separation, the test of which variables are
 informationally walled off from which, given what you already know.
 
 RUNG TWO - DOING
@@ -25892,7 +25892,7 @@ observation - it is an intervention, written do(rifle_a = 1). The pack
 performs graph surgery: rifleman A's equation is cut away and replaced by
 the constant.
 
-    ?- cf_do(SCM, [rifle_a-1], [court-0], Solution).
+    ?- causal_do(SCM, [rifle_a-1], [court-0], Solution).
 
 The prisoner dies (death is 1), but look at the rest of the solution:
 captain is 0 and rifle_b is 0. Forcing a rifleman does not make the
@@ -25907,7 +25907,7 @@ fire? Counterfactuals follow a three-step recipe: abduction (work out the
 hidden context from the evidence), action (perform the surgery), and
 prediction (solve the mutilated model in the recovered context).
 
-    ?- cf_counterfactual(SCM, [court-[0, 1]], [death-1],
+    ?- causal_counterfactual(SCM, [court-[0, 1]], [death-1],
                          [rifle_a-0], death, V).
     V = 1.
 
@@ -25915,10 +25915,10 @@ Yes - he still dies, because the evidence (death-1) tells us the court
 ordered, so rifleman B still fires. But had the CAPTAIN stayed silent, the
 prisoner would have lived (V = 0). And the pack is honest about
 uncertainty: if the evidence is too thin to determine the answer,
-cf_counterfactual fails rather than guesses, and cf_counterfactual_all
+causal_counterfactual fails rather than guesses, and causal_counterfactual_all
 shows every value that remains possible.
 
-Finally, cf_but_for tests actual causation the way a court of law does:
+Finally, causal_but_for tests actual causation the way a court of law does:
 was X necessary for Y? The captain passes the but-for test of the death.
 A single rifleman does not - his colleague would have fired anyway.
 
@@ -26088,7 +26088,7 @@ pack gives that loop its long-horizon spine.
 
 A domain declares primitives and methods:
 
-    ?- ht_domain(
+    ?- planner_domain(
          [prim(walk(X, Y), [at(me, X), short(X, Y)],
                [at(me, Y)], [at(me, X)]),
           prim(call_taxi(X), [at(me, X)], [taxi_at(X)], []),
@@ -26108,7 +26108,7 @@ which decomposes again.
 
 PLANNING
 
-    ?- ht_plan(Domain, [at(me, home), short(home, park), has_cash],
+    ?- planner_plan(Domain, [at(me, home), short(home, park), has_cash],
                [travel(home, park)], 10, Plan).
     Plan = [walk(home, park)].
 
@@ -26124,10 +26124,10 @@ instead of hanging.
 
 THE GLASS-BOX PLAN TREE
 
-Where most planners give you a flat list of actions, ht_task_tree tells
+Where most planners give you a flat list of actions, planner_task_tree tells
 you WHY each action is there:
 
-    ?- ht_task_tree(Domain, State, travel(home, park), 10, Tree).
+    ?- planner_task_tree(Domain, State, travel(home, park), 10, Tree).
     Tree = tree(travel(home, park), go_by_foot,
                 [primitive(walk(home, park))]).
 
@@ -26137,15 +26137,15 @@ rules of the ARC-AGI climb.
 
 EXECUTION, MONITORING, REPLANNING
 
-ht_execute runs a plan against a state. ht_monitor walks a plan and
+planner_execute runs a plan against a state. planner_monitor walks a plan and
 reports either ok or exactly where it breaks:
 
-    ?- ht_monitor(Domain, [at(me, home)],
+    ?- planner_monitor(Domain, [at(me, home)],
                   [call_taxi(home), ride(home, park), pay], Status).
     Status = fails_at(3, pay).
 
 The cash is gone, so step three can no longer run. Armed with that,
-ht_replan plans again from the situation as it now stands - and if the
+planner_replan plans again from the situation as it now stands - and if the
 park has meanwhile become walkable, walking saves the day.
 
 All 18 acceptance tests pass: preference, fall-back, nesting, termination,
@@ -26164,20 +26164,20 @@ NO HIDDEN DICE
 
 Every random choice in the pack flows through an explicit seed:
 
-    ?- ev_random_genome([0, 1], 8, 42, Genome, NextSeed).
+    ?- evolve_random_genome([0, 1], 8, 42, Genome, NextSeed).
 
-The linear congruential generator (ev_next/2) is a pure function, so the
+The linear congruential generator (evolve_next/2) is a pure function, so the
 same seed always produces the same genome, the same population, the same
 entire evolution. A run that found something interesting can be replayed
 gene for gene. Determinism is what makes evolution glass-box.
 
 THE OPERATORS
 
-    ev_evaluate(Goal, Pop, Scored)    score every genome with your fitness
-    ev_tournament(Scored, K, ...)     best of K random picks becomes a parent
-    ev_crossover(G1, G2, ...)         head of one parent, tail of the other
-    ev_mutate(G, Alphabet, Rate, ...) each gene rewritten with probability Rate
-    ev_elite(Scored, N, Elites)       the top N survive unchanged
+    evolve_evaluate(Goal, Pop, Scored)    score every genome with your fitness
+    evolve_tournament(Scored, K, ...)     best of K random picks becomes a parent
+    evolve_crossover(G1, G2, ...)         head of one parent, tail of the other
+    evolve_mutate(G, Alphabet, Rate, ...) each gene rewritten with probability Rate
+    evolve_elite(Scored, N, Elites)       the top N survive unchanged
 
 Fitness is any predicate you supply, called as call(Goal, Genome, Score).
 Bigger is better. Elitism means the champion can never be lost between
@@ -26190,7 +26190,7 @@ equal to the sum of the genes.
 
     onemax(G, S) :- sum_list(G, S).
 
-    ?- ev_run(onemax, params([0, 1], 3, 0.05, 2),
+    ?- evolve_run(onemax, params([0, 1], 3, 0.05, 2),
               24, 12, 30, 42, Best, Score).
     Best  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     Score = 12.
@@ -26201,7 +26201,7 @@ thirty generations later the perfect genome has been assembled from
 fragments no founder possessed. The early-stopping variant reports how
 long it actually took:
 
-    ?- ev_run_until(onemax, params([0, 1], 3, 0.05, 2),
+    ?- evolve_run_until(onemax, params([0, 1], 3, 0.05, 2),
                     24, 12, 60, 12, 42, Best, Score, Gens).
     Gens = 7.
 
@@ -26209,8 +26209,8 @@ Seven generations to perfection, every one replayable.
 
 WATCHING THE POPULATION
 
-ev_diversity measures the distinct fraction of a population, and
-ev_converged flags when it has collapsed below a threshold - the sign to
+evolve_diversity measures the distinct fraction of a population, and
+evolve_converged flags when it has collapsed below a threshold - the sign to
 stop, restart with a new seed, or raise the mutation rate.
 
 Because fitness goals are ordinary predicates, anything in PrologAI can
@@ -26401,10 +26401,10 @@ ever depends on nexus, so the building of packs still rests on tested
 foundations all the way up.
 
 Second, nexus adds no cognition of its own. It is pure plumbing. Every
-junction is a named, inspectable predicate, and nx_wirings/1 will tell you
+junction is a named, inspectable predicate, and nexus_wirings/1 will tell you
 exactly what it connects:
 
-    ?- nx_wirings(W).
+    ?- nexus_wirings(W).
     W = [ wiring(jspace_from_workspace, ...),
           wiring(curiosity_from_worldmodel, ...),
           wiring(agency_with_planner, ...),
@@ -26417,13 +26417,13 @@ actor subscribe to its broadcast bus; nexus subscribes a hook that, on every
 broadcast, holds the winning coalition's concepts in a J-Space workspace at
 the broadcast's salience.
 
-    ?- js_open(mind), nx_bind_workspace(mind).
+    ?- js_open(mind), nexus_bind_workspace(mind).
 
 Now, whenever the workspace broadcasts, mind holds what the mind is
 broadcasting, ranked by salience - the readable concept workspace of Chapter
 348, updated in real time by the attention arbiter of the global workspace.
-nx_replay_broadcasts/2 lets you feed a whole reasoning episode offline, and
-nx_broadcast_reading/2 shows the result.
+nexus_replay_broadcasts/2 lets you feed a whole reasoning episode offline, and
+nexus_broadcast_reading/2 shows the result.
 
 Wiring two turns the world model into a curiosity signal. The curiosity pack
 learns from prediction error and rewards learning PROGRESS, not raw error.
@@ -26431,7 +26431,7 @@ nexus feeds it the world model's novelty: as an agent explores and a region
 becomes familiar, novelty falls, and falling novelty is exactly what
 curiosity reads as progress.
 
-    ?- nx_curiosity_explore(kitchen,
+    ?- nexus_curiosity_explore(kitchen,
            [[at(door)], [at(door),saw(stove)], [at(door),saw(stove)]], P).
     P = 0.5.     % positive — the agent is learning the kitchen
 
@@ -26441,10 +26441,10 @@ progress: the built-in guard against being mesmerized by noise.
 Wiring three gives the agency loop a planner. The agency loop runs
 observe-reason-act with a step budget; its reason-goal is a predicate that
 decides what to do next. nexus supplies a reason-goal that decomposes the
-current goal with ht_plan, and one that additionally checks the plan against
-the current world with ht_monitor and replans when the world has moved.
+current goal with planner_plan, and one that additionally checks the plan against
+the current world with planner_monitor and replans when the world has moved.
 
-    ?- nx_plan_and_run(Domain, State, travel(home, park), 5, Outcome).
+    ?- nexus_plan_and_run(Domain, State, travel(home, park), 5, Outcome).
     Outcome = done(achieved(travel(home,park), [walk(home,park)])).
 
 If no plan exists, the loop does not invent one - it escalates to human
@@ -26456,7 +26456,7 @@ output by how many criteria it passes; the evolve pack searches by fitness.
 nexus makes the refinery score the fitness, so evolution improves reasoning
 models under critique, within a bounded generation budget.
 
-    ?- nx_evolve_with_critique(Criteria, Params, 24, 5, 80, 1.0, 5, Best, S, G).
+    ?- nexus_evolve_with_critique(Criteria, Params, 24, 5, 80, 1.0, 5, Best, S, G).
     Best = [observe, deduce, observe, induce, conclude], S = 1.0, G = 6.
 
 Six generations of variation and selection assembled a valid

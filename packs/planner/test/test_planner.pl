@@ -19,7 +19,7 @@
 % The travel domain: walk short distances, take a taxi otherwise.
 travel_domain(Domain) :-
     % Assemble the domain from primitives and methods.
-    ht_domain(
+    planner_domain(
         % The four primitive actions.
         [prim(walk(X1, Y1), [at(me, X1), short(X1, Y1)], [at(me, Y1)], [at(me, X1)]),
          prim(call_taxi(X2), [at(me, X2)], [taxi_at(X2)], []),
@@ -34,7 +34,7 @@ travel_domain(Domain) :-
 % A recursive domain used to prove the depth bound terminates.
 loopy_domain(Domain) :-
     % A single method that decomposes a task into itself forever.
-    ht_domain([], [meth(loop_m, loopy, [], [loopy])], Domain).
+    planner_domain([], [meth(loop_m, loopy, [], [loopy])], Domain).
 
 % ===========================================================================
 % DOMAIN CLASSIFICATION
@@ -47,35 +47,35 @@ test(primitive_recognized) :-
     % Build the travel domain.
     travel_domain(D),
     % Walking is a primitive action.
-    ht_primitive(D, walk(home, park)).
+    planner_primitive(D, walk(home, park)).
 
 % Compound tasks are recognized.
 test(compound_recognized) :-
     % Build the travel domain.
     travel_domain(D),
     % Travelling is a compound task.
-    ht_compound(D, travel(home, park)).
+    planner_compound(D, travel(home, park)).
 
 % A compound task is not a primitive.
 test(compound_not_primitive, [fail]) :-
     % Build the travel domain.
     travel_domain(D),
     % Travelling has no primitive declaration.
-    ht_primitive(D, travel(home, park)).
+    planner_primitive(D, travel(home, park)).
 
 % The matching methods are reported in declaration order.
 test(methods_in_order) :-
     % Build the travel domain.
     travel_domain(D),
     % Both travel methods match a travel task.
-    ht_methods_for(D, travel(home, park), Names),
+    planner_methods_for(D, travel(home, park), Names),
     % Walking is declared first, so it is preferred.
     Names == [go_by_foot, go_by_taxi].
 
 % A malformed method declaration is rejected.
 test(bad_method_rejected, [fail]) :-
     % The subtasks slot must be a list.
-    ht_domain([], [meth(bad, t, [], not_a_list)], _).
+    planner_domain([], [meth(bad, t, [], not_a_list)], _).
 
 :- end_tests(planner_domain).
 
@@ -92,7 +92,7 @@ test(plan_prefers_walking) :-
     % Home and park are within walking distance.
     State = [at(me, home), short(home, park), has_cash],
     % Plan the journey.
-    ht_plan(D, State, [travel(home, park)], 10, Plan),
+    planner_plan(D, State, [travel(home, park)], 10, Plan),
     % The first plan found uses the preferred method.
     Plan == [walk(home, park)],
     % Commit to the first plan.
@@ -105,7 +105,7 @@ test(plan_falls_back_to_taxi) :-
     % No short-distance fluent, so walking is impossible.
     State = [at(me, home), has_cash],
     % Plan the journey.
-    ht_plan(D, State, [travel(home, park)], 10, Plan),
+    planner_plan(D, State, [travel(home, park)], 10, Plan),
     % The taxi method expands to its three primitive steps.
     Plan == [call_taxi(home), ride(home, park), pay],
     % Commit to the first plan.
@@ -116,7 +116,7 @@ test(plan_impossible, [fail]) :-
     % Build the travel domain.
     travel_domain(D),
     % No way to travel at all.
-    ht_plan(D, [at(me, home)], [travel(home, park)], 10, _).
+    planner_plan(D, [at(me, home)], [travel(home, park)], 10, _).
 
 % Nested compound tasks decompose recursively across two legs.
 test(plan_nested_trip) :-
@@ -125,7 +125,7 @@ test(plan_nested_trip) :-
     % The first leg is walkable; the second needs a taxi.
     State = [at(me, home), short(home, park), has_cash],
     % Plan the two-leg trip.
-    ht_plan(D, State, [trip(home, park, museum)], 10, Plan),
+    planner_plan(D, State, [trip(home, park, museum)], 10, Plan),
     % Walking covers leg one; the taxi covers leg two.
     Plan == [walk(home, park), call_taxi(park), ride(park, museum), pay],
     % Commit to the first plan.
@@ -136,12 +136,12 @@ test(depth_bound_terminates, [fail]) :-
     % Build the recursive domain.
     loopy_domain(D),
     % The looping task can never bottom out.
-    ht_plan(D, [], [loopy], 5, _).
+    planner_plan(D, [], [loopy], 5, _).
 
 % The plan cost counts the primitive steps.
 test(plan_cost) :-
     % Cost of a three-step plan.
-    ht_plan_cost([a, b, c], Cost),
+    planner_plan_cost([a, b, c], Cost),
     % Check the count.
     Cost =:= 3.
 
@@ -160,7 +160,7 @@ test(tree_shows_method) :-
     % Home and park are within walking distance.
     State = [at(me, home), short(home, park), has_cash],
     % Build the decomposition tree.
-    ht_task_tree(D, State, travel(home, park), 10, Tree),
+    planner_task_tree(D, State, travel(home, park), 10, Tree),
     % The tree names the chosen method and its primitive leaf.
     Tree == tree(travel(home, park), go_by_foot, [primitive(walk(home, park))]),
     % Commit to the first tree.
@@ -173,7 +173,7 @@ test(tree_nested) :-
     % The first leg is walkable; the second needs a taxi.
     State = [at(me, home), short(home, park), has_cash],
     % Build the decomposition tree.
-    ht_task_tree(D, State, trip(home, park, museum), 10, Tree),
+    planner_task_tree(D, State, trip(home, park, museum), 10, Tree),
     % The root uses the two-leg method.
     Tree = tree(trip(home, park, museum), two_leg, [Leg1, Leg2]),
     % Leg one decomposes by foot.
@@ -198,7 +198,7 @@ test(execute_taxi_plan, [nondet]) :-
     % Start at home with cash.
     State = [at(me, home), has_cash],
     % Run the three-step taxi plan.
-    ht_execute(D, State, [call_taxi(home), ride(home, park), pay], Final),
+    planner_execute(D, State, [call_taxi(home), ride(home, park), pay], Final),
     % The traveller arrived.
     memberchk(at(me, park), Final),
     % The fare was paid.
@@ -211,7 +211,7 @@ test(valid_plan, [nondet]) :-
     % Build the travel domain.
     travel_domain(D),
     % Start at home with cash.
-    ht_valid_plan(D, [at(me, home), has_cash],
+    planner_valid_plan(D, [at(me, home), has_cash],
         % The full taxi plan.
         [call_taxi(home), ride(home, park), pay]).
 
@@ -220,7 +220,7 @@ test(monitor_ok, [nondet]) :-
     % Build the travel domain.
     travel_domain(D),
     % Start at home with cash.
-    ht_monitor(D, [at(me, home), has_cash],
+    planner_monitor(D, [at(me, home), has_cash],
         % The full taxi plan.
         [call_taxi(home), ride(home, park), pay], Status),
     % Every step runs.
@@ -231,7 +231,7 @@ test(monitor_detects_break) :-
     % Build the travel domain.
     travel_domain(D),
     % The cash disappeared before execution.
-    ht_monitor(D, [at(me, home)],
+    planner_monitor(D, [at(me, home)],
         % The full taxi plan.
         [call_taxi(home), ride(home, park), pay], Status),
     % The third step, paying, is the first to fail.
@@ -244,7 +244,7 @@ test(replan_recovers) :-
     % The new situation: no cash, but the park is now walkable.
     State = [at(me, home), short(home, park)],
     % Plan again from the new situation.
-    ht_replan(D, State, [travel(home, park)], 10, Plan),
+    planner_replan(D, State, [travel(home, park)], 10, Plan),
     % Walking saves the day.
     Plan == [walk(home, park)],
     % Commit to the first plan.
