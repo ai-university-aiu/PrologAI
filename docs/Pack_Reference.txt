@@ -2114,19 +2114,24 @@ Causalontology ARC-AGI-3 Harness: Game-Agnostic Perceive-Learn-Plan-Act (co_*, L
     arc3_harness_tries(+Action,-Count): the curiosity counters.
     arc3_harness_http_env(+BaseUrl,+ApiKey,+Game,-Env): the guarded live bridge to the REST API.
 
-co_explore
-Causalontology Exploration Policy: Novelty-Seeking, Loop-Avoiding Action Selection (co_*, Layer 372)
-    cox_reset/0: forget every remembered state signature.
-    cox_signature(+Frame,-Signature): the canonical, order-free signature of a frame (dimensions plus colour histogram).
-    cox_mark_seen(+Frame) / cox_is_novel(+Frame) / cox_would_loop(+Frame): remember, and recognise novel versus returned-to states.
-    cox_seen_count(-N): how many distinct states are remembered.
-    cox_predict_change(+Action): the causal graph predicts the action has an effect (a live action, not a dead one).
-    cox_salient_cells(+Frame,-Cells) / cox_click_targets(+Frame,-Targets): object centroids as click candidates (largest object first), and as select(X,Y) actions.
-    cox_expand_actions(+Actions,+Frame,-Expanded): replace the bare click marker with concrete select targets.
-    cox_rank(+Actions,+Tried,+Frame,-Ranked) / cox_choose(+Actions,+Tried,+Frame,-Action): order the actions best-first (predicted-change then least-tried, hazards never), and take the best.
-    cox_predict_change(+Game,+Action): the game's own causal graph (relations keyed g(Game,Action)) predicts the action has an effect.
-    cox_rank(+Game,+Actions,+Tried,+Frame,-Ranked) / cox_choose(+Game,+Actions,+Tried,+Frame,-Action): the same ranking read against one game's causal graph and avoid-set, so many environments share the policy without bleeding into each other.
-    cox_choose_change(+Game,+Actions,+Tried,+Frame,-Action): the best predicted-change action for the game, or fail if none is predicted (so a caller can fall back to a graph-frontier search).
+curiosity
+Curiosity (curiosity_*, Layer 372, WP-398; converged with the intrinsic-motivation curiosity pack)
+    Exploration-policy half —
+    curiosity_reset/0: forget every remembered state signature.
+    curiosity_signature(+Frame,-Signature): the canonical, order-free signature of a frame (dimensions plus colour histogram).
+    curiosity_mark_seen(+Frame) / curiosity_is_novel(+Frame) / curiosity_would_loop(+Frame): remember, and recognise novel versus returned-to states.
+    curiosity_seen_count(-N): how many distinct states are remembered.
+    curiosity_predict_change(+Action) / curiosity_predict_change(+Game,+Action): the causal graph predicts the action has an effect.
+    curiosity_salient_cells(+Frame,-Cells) / curiosity_click_targets(+Frame,-Targets): object centroids as click candidates (largest object first), and as select(X,Y) actions.
+    curiosity_expand_actions(+Actions,+Frame,-Expanded): replace the bare click marker with concrete select targets.
+    curiosity_rank(+Actions,+Tried,+Frame,-Ranked) / curiosity_choose(+Actions,+Tried,+Frame,-Action): order actions best-first (predicted-change then least-tried, hazards never), and take the best.
+    curiosity_rank(+Game,+Actions,+Tried,+Frame,-Ranked) / curiosity_choose(+Game,+Actions,+Tried,+Frame,-Action): the same ranking read against one game's causal graph and avoid-set.
+    curiosity_choose_change(+Game,+Actions,+Tried,+Frame,-Action): the best predicted-change action for the game, or fail if none is predicted.
+    Intrinsic-motivation half (absorbed from the curiosity pack) —
+    curiosity_observe_error(+Region,+Error,+Timestamp): record one prediction-error reading for a region.
+    curiosity_learning_progress(+Region,-Progress): whether error is falling (progress) rather than merely high.
+    curiosity_urge(+Region,-Urge) / curiosity_frontier(-Region): the curiosity urge per region; the frontier region of greatest progress.
+    curiosity_self_propose_task(+A,+B,-Task) / curiosity_update/0: self-propose the next task; decay habituation one tick.
 
 goal_inference
 Causalontology Goal Inference: Hypothesising the Unstated Win Condition (co_*, Layer 373)

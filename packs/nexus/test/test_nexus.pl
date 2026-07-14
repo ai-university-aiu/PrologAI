@@ -206,7 +206,7 @@ test(observe_novelty_records) :-
     % The novelty is total.
     close_to(Nov, 1.0),
     % The curiosity region now has one recorded error to learn from.
-    curiosity:pai_learning_progress(reg_obs, _).
+    curiosity:curiosity_learning_progress(reg_obs, _).
 
 % A trajectory whose novelty falls reads as positive learning progress.
 test(falling_novelty_is_progress) :-
