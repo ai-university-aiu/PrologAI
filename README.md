@@ -202,7 +202,7 @@ Everything is inspectable.
 | `spinoff` | Marginal Attribution Spinoff Learning — Drescher-style discovery of rare-but-reliable action effects. PrologAI finds causal patterns hidden in low-frequency events. |
 | `embedding` | Pluggable Embedding Provider — hash_projection, local_model, and external_service backends with automatic re-embedding maintenance. |
 | `refinement` | The Continual Refinement Harness — reset-free recursive self-improvement (RSI) with a constitutional sandbox pipeline. Self-improvement without losing alignment. |
-| `dreaming` | The Dreaming Engine — three-phase idle-period dream cycle: Slow-Wave (NREM-analog) generative replay and memory consolidation; REM-analog stochastic world-model exploration generating hypothetical node pairings tagged imagined; and a fully inspectable dream journal. Inspired by Sleep Replay Consolidation, DreamerV3, and NeuroDream. |
+| `dreaming` | The Dreaming Engine (dreaming_*) — three-phase idle-period dream cycle: Slow-Wave (NREM-analog) generative replay and memory consolidation; REM-analog stochastic world-model exploration generating hypothetical node pairings tagged imagined; and a fully inspectable dream journal. The Lattice-integrated engine kept separate from the imagination convergence; its predicates are now pack-qualified. Inspired by Sleep Replay Consolidation, DreamerV3, and NeuroDream. |
 
 **Multi-Agent Protocols**
 

@@ -2566,7 +2566,7 @@ Example session:
     ?- use_module(library(dreaming)).
 
     % Run a full dream cycle for the mind named my_mind.
-    ?- pai_dream_cycle(my_mind, Report).
+    ?- dreaming_cycle(my_mind, Report).
     Report = dream_report(
         mind(my_mind),
         hypnagogic(dream(my_mind, 1)),
@@ -2576,7 +2576,7 @@ Example session:
     ).
 
     % Inspect the dream journal afterward.
-    ?- pai_dream_journal(my_mind, Journal).
+    ?- dreaming_journal(my_mind, Journal).
     Journal = [
         entry(dream(my_mind,1), hypnagogic, entering_sleep),
         entry(dream(my_mind,2), slow_wave,  slow_wave(replayed(0), banker_cycle(done))),
@@ -2585,7 +2585,7 @@ Example session:
     ].
 
     % Generate a counterfactual branch from a known Lattice node.
-    ?- pai_dream_counterfactual(my_mind, some_node_id, 3, Alternatives).
+    ?- dreaming_counterfactual(my_mind, some_node_id, 3, Alternatives).
     Alternatives = counterfactual(some_node_id, no_known_facts).
 
 The dream journal entries (hypnagogic=1, slow_wave=2, rem=3, hypnopompic=4) show the complete four-phase cycle in order. When SONA is loaded with trajectories and the attention pack holds high-LTI nodes, the slow_wave replay list and the rem hypotheticals list will be non-empty.
