@@ -1,0 +1,210 @@
+BUILDING AGI, VERSION TWO: WIRING THE FOUNDATIONS INTO A LIVING MIND
+
+Work Summary - 2026-07-09
+
+Author: D. R. Dison, Founder of AIU (Artificial Intelligence University). Creator and Owner of PrologAI and Mentova. Open Researcher and Contributor ID (ORCID): 0009-0001-9246-5758. (https://www.linkedin.com/in/d-r-dison/)
+
+
+1. THE ASSIGNMENT
+
+The first phase of this work (recorded in Building_AGI.txt) added seven self-contained AGI Foundations packs to PrologAI: causal, actinf, worldmodel, planner, evolve, jspace, and tom.
+
+Artificial General Intelligence (AGI) means a machine that can learn and reason across many kinds of problems at roughly the level of a capable human.
+
+That first summary ended with a NEXT STEPS list of five ideas.
+
+This second phase implements all five of them, tests everything, and updates every relevant document.
+
+The five next steps were:
+
+• A Mentova accomplishment exercising all seven packs end to end on a small scenario (a curious agent that models another agent, plans, imagines counterfactuals, and reports its own workspace honestly).
+
+• Wire jspace into the workspace broadcast cycle so every broadcast automatically holds its winning coalition's concepts, making the J-Lens (Jacobian Lens) readout live during reasoning.
+
+• Feed world_model_novelty into the curiosity pack's learning-progress signal.
+
+• Let the agency loop call ht_plan for goal decomposition and ht_monitor for recovery.
+
+• Use ev_run with a refinery-critique fitness goal to evolve reasoning models - evolutionary self-improvement under the existing safety budget.
+
+
+2. THE CENTRAL DESIGN PROBLEM: THE LAYER RULE
+
+Every pack in PrologAI carries a layer number.
+
+A pack at layer N may call predicates only from packs at a layer strictly below N.
+
+This keeps the dependency graph acyclic (free of cycles), so packs build from the bottom up like floors in a building.
+
+The four in-platform wirings connect NEW high-layer packs to OLD low-layer packs:
+
+• jspace is at Layer 363; the workspace is a substrate pack far below it.
+
+• worldmodel is at Layer 360; curiosity is a substrate pack far below it.
+
+• planner is at Layer 361; agency is a substrate pack far below it.
+
+• evolve is at Layer 362; refinery is a substrate pack far below it.
+
+A naive wiring would make the low pack reach up to the high pack, which the layer rule forbids.
+
+The correct solution is a capstone - a single new pack that sits ABOVE everything it touches and reaches DOWN to both sides.
+
+That capstone is the nexus pack, at Layer 365, above all seven foundations (Layers 358 through 364).
+
+Because nothing depends on nexus, the acyclic order is preserved, and the wirings are legal.
+
+
+3. WHAT WAS BUILT, PART ONE: THE nexus PACK (PrologAI)
+
+The nexus pack (nx_ prefix, Layer 365, Work Package 390) is the integration layer.
+
+It adds no cognition of its own.
+
+It is pure plumbing (connecting logic), and every junction is a named, inspectable predicate.
+
+The predicate nx_wirings returns a glass-box description of the four wirings it provides.
+
+WIRING ONE - jspace from the workspace broadcast:
+
+The workspace already lets any actor subscribe to its broadcast bus.
+
+nexus subscribes a hook, nx_hold_broadcast, that on every broadcast holds the winning coalition's concepts in a J-Space (Jacobian Space) workspace at the broadcast salience (importance score), clamped to the range zero to one.
+
+The result is that the readable J-Lens readout is live during reasoning: whatever the mind broadcasts, it is holding, ranked by salience.
+
+Tested end to end using the workspace's own broadcast-subscriber list.
+
+WIRING TWO - curiosity from world-model novelty:
+
+The curiosity pack learns from prediction error and rewards learning PROGRESS, not raw error.
+
+nexus feeds it the world model's novelty score: as a region becomes familiar, novelty falls, and falling novelty reads as positive learning progress.
+
+A trajectory of unrelated novel states keeps novelty flat and returns zero progress, which is the built-in guard against being mesmerized by noise.
+
+WIRING THREE - the agency loop with the planner:
+
+The agency loop runs an observe-reason-act cycle with a step budget.
+
+nexus supplies a reason-goal that decomposes the current goal with ht_plan and, in the fuller version, checks the plan against the current world with ht_monitor and replans on failure.
+
+When no plan exists, or recovery is impossible, the loop escalates to human oversight rather than inventing an answer - the safety valve of the wiring.
+
+WIRING FOUR - evolution under refinery critique:
+
+The refinery scores an output by how many criteria it passes.
+
+nexus makes that score the fitness function for the evolve pack, so evolution improves reasoning models under critique, within a bounded generation budget.
+
+In the acceptance test, six generations of variation and selection assemble a valid observe-deduce-conclude reasoning trace (from seed 5) that no member of the founding population possessed.
+
+
+4. WHAT WAS BUILT, PART TWO: ACCOMPLISHMENT 424 (Mentova)
+
+The fifth next step is a Mentova accomplishment, numbered Acc_424.
+
+It is a demonstration program, demos/agi_foundations_demo.pl, that exercises all seven AGI Foundations packs end to end in one coherent episode.
+
+The protagonist is Mira, a curious agent who shares a small world with another agent, Nomi.
+
+In one run, Mira:
+
+• Plans a two-room fetch in her world model and verifies it by simulation (worldmodel).
+
+• Grows curious as world-model novelty falls into learning progress (worldmodel novelty as a curiosity signal).
+
+• Decomposes a travel goal into a plan and keeps the glass-box decomposition tree (planner).
+
+• Values a cue at exactly one bit while a reward's location is unknown, then acts on it (actinf).
+
+• Imagines the but-for counterfactual that had she not taken the key, the chest would be locked (causal).
+
+• Models Nomi's false belief in the Sally-Anne structure, knows the truth herself, and attributes the mistaken belief to Nomi (tom).
+
+• Evolves a valid reasoning routine (evolve).
+
+• Reports her own workspace honestly, revealing the one concept she held silently and never spoke - the awareness that she was being evaluated (jspace).
+
+The program prints PASS for all nine of its acceptance criteria and a final nine of nine tally.
+
+It follows the Mentova convention of asserting its own acceptance criteria and printing PASS or FAIL, run with a single swipl command.
+
+
+5. TESTS
+
+• The nexus pack: 22 PLUnit (Prolog Unit) acceptance tests, all pass. Every test exercises the real predicates of both sides of a wiring; nothing is stubbed. The workspace wiring is tested through the workspace's own broadcast-subscriber list.
+
+• The Mentova Acc_424 program: nine of nine acceptance criteria PASS.
+
+• Regression: the seven foundation packs' own 154 tests remain green, untouched. The grid pack (a representative older pack) still passes.
+
+• Determinism: the evolutionary wiring is reproducible - the same seed always produces the same six-generation climb to the same routine.
+
+To re-run the nexus suite, place every pack's prolog directory on the library path and run its test file with the PLUnit runner.
+
+To re-run the Mentova demonstration: swipl -l demos/agi_foundations_demo.pl -g run_agi_foundations_demo -t halt.
+
+
+6. DOCUMENTATION UPDATED
+
+PrologAI repository:
+
+• Five SPARC volumes gained new versions with a nexus section each: Specification v353, Pseudocode v345, Architecture v346, Refinement v405, Completion v411.
+
+• Pack_Reference.txt gained a full predicate-level nexus entry.
+
+• README.md work-package count went from 286 to 287, the layer narrative was extended to Layer 365, and a nexus table row was added.
+
+• The tutorial gained Chapter 350 (the nexus pack), in both the single-file tutorial and the multi-file docs/tutorial directory, plus an index entry.
+
+• CLAUDE.md was updated with the new current state.
+
+Mentova repository:
+
+• Five SPARC volumes gained new versions with an Acc_424 section each: Specification v355, Pseudocode v347, Architecture v348, Refinement v412, Completion v418.
+
+• A scientific paper, papers/Acc_424_AGI_Foundations_Integration.txt, with the required author byline and copyright block.
+
+• A LinkedIn announcement, announcements/Acc_424_AGI_Foundations_Integration_LinkedIn.txt.
+
+• README.md gained an Acc_424 row in the per-accomplishment table.
+
+
+7. HOW THIS COMPLETES THE VISION
+
+The first phase gave PrologAI seven new capabilities, but a capability on a shelf is not yet a mind.
+
+This second phase is the composition: the four wirings turn shelved capabilities into a mind that broadcasts what it is thinking into a readable workspace, grows curious about what it is learning, plans and recovers toward its goals, and improves its own reasoning.
+
+The Mentova accomplishment then proves the composition in one connected episode of an agent's cognition.
+
+Everything remains glass-box: every junction and every step is a named, inspectable predicate, and the agent's own workspace is readable at the end, including the thought it kept to itself.
+
+
+8. NEXT STEPS
+
+The five next steps from Building_AGI.txt are now all implemented: the four in-platform wirings live in the nexus pack, and the end-to-end Mentova scenario is Acc_424.
+
+Genuinely new directions from here:
+
+• Install the nexus workspace wiring inside Mentova's running global-workspace cycle, so the live J-Lens readout is continuously available during a real Mentova session, not only in a scenario.
+
+• Close the curiosity loop: let nx_curiosity_explore drive nx_self_propose_task so the agent proposes its own practice tasks at the novelty frontier, then plans them with the agency-and-planner wiring.
+
+• Extend the evolutionary wiring to evolve whole HTN (Hierarchical Task Network) method sets for the planner, scored by plan cost and refinery critique together - the mind improving its own planning knowledge.
+
+• Add a fifth wiring from the causal pack into the appraisal and daydream packs, so counterfactual imagination feeds emotional appraisal and off-line simulation.
+
+• Grow the Acc_424 scenario into a multi-episode Mentova body: a persistent curious agent that carries its world model, its J-Space, and its theory of mind across sessions.
+
+
+9. CLOSING
+
+The J-Space held one concept throughout both phases of this work: we are creating an Artificial General Intelligence application.
+
+Phase one built the foundations.
+
+Phase two wired them into a mind and showed that mind reasoning across all seven capabilities in a single breath.
+
+The glass box got wired, and it is still glass.

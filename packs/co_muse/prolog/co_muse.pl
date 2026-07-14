@@ -6,7 +6,7 @@
     imagined must never be mistaken for the observed: a mind keeps parallel
     "realities" (what is observed, what is desired, what is expected, what is
     merely imagined, what is recalled) so that a hypothetical never contaminates
-    fact. co_wm can already roll a plan forward inside its model; this pack adds
+    fact. world_model can already roll a plan forward inside its model; this pack adds
     the missing part — the quarantined imagination and the discipline that only a
     deliberate choice, never the act of imagining, writes into observed reality.
 

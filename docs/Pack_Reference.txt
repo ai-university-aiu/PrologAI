@@ -1920,34 +1920,34 @@ Active Inference Engine: Expected Free Energy and Policy Selection (ai_*, Layer 
     ai_act(+GM,+Belief,+Horizon,+Gamma,-Action): first action of the selected policy.
     ai_step(+GM,+Belief,+Obs,+Horizon,+Gamma,-Action,-Posterior): the full perceive-then-act cycle.
 
-co_wm
-Causalontology World Model — the single, two-mode, canonical world model (co_*, Layer 382). It absorbed the former worldmodel pack (WP-385) so there is one home for both paradigms; nothing was lost, and the former wm_predict/4 name collision was resolved.
+world_model
+Causalontology World Model — the single, two-mode, canonical world model (co_*, Layer 382). It absorbed the former worldmodel pack (WP-385) so there is one home for both paradigms; nothing was lost, and the former world_model_predict/4 name collision was resolved.
     MODE 1 — the learned transition model:
-    wm_reset/0: forget the learned model.
-    wm_observe(+Model,+Context,+Action,+Effect): record one observed transition.
-    wm_predict(+Model,+Context,+Action,-Effect) / wm_predict(..,-Effect,-Confidence): majority effect and its share, with fall-back to the action-general rule.
-    wm_known(+Model,+Context,+Action): has this (context, action) been seen?
-    wm_verify(+Model,+Context,+Action,+Observed,-Result): match | mismatch(Predicted,Observed) | novel.
-    wm_repair(+Model,+Context,+Action,+Observed): fold the observed truth in.
-    wm_rollout(+Model,+Context,+ActionSeq,-PredictedEffects): predict the effects of a sequence (plan-in-model).
-    wm_law(+Model,?Action,?Effect): an action whose effect is context-free — a general law.
-    wm_stats(+Model,-stats(Contexts,Transitions)) / wm_snapshot(+Model,-Obs) / wm_restore(+Model,+Obs): summary and persistence.
+    world_model_reset/0: forget the learned model.
+    world_model_observe(+Model,+Context,+Action,+Effect): record one observed transition.
+    world_model_predict(+Model,+Context,+Action,-Effect) / world_model_predict(..,-Effect,-Confidence): majority effect and its share, with fall-back to the action-general rule.
+    world_model_known(+Model,+Context,+Action): has this (context, action) been seen?
+    world_model_verify(+Model,+Context,+Action,+Observed,-Result): match | mismatch(Predicted,Observed) | novel.
+    world_model_repair(+Model,+Context,+Action,+Observed): fold the observed truth in.
+    world_model_rollout(+Model,+Context,+ActionSeq,-PredictedEffects): predict the effects of a sequence (plan-in-model).
+    world_model_law(+Model,?Action,?Effect): an action whose effect is context-free — a general law.
+    world_model_stats(+Model,-stats(Contexts,Transitions)) / world_model_snapshot(+Model,-Obs) / world_model_restore(+Model,+Obs): summary and persistence.
     MODE 2 — the structured simulate-and-plan model (absorbed from worldmodel):
-    wm_state(+Fluents,-State): canonical sorted state.
-    wm_action(+Name,+Pre,+Add,+Del,-Action): build a STRIPS-style action.
-    wm_holds(+State,+Fluent) / wm_goal_holds(+State,+Goal): membership and goal tests.
-    wm_applicable(+State,+Action) / wm_apply(+State,+Action,-State2): precondition match and effect application.
-    wm_step(+State,+Actions,?Name,-State2) / wm_successors(+State,+Actions,-Pairs): one grounded step; all successors.
-    wm_simulate(+State,+Actions,+Plan,-Trajectory): run a plan, returning the state trajectory.
-    wm_plan_bfs(+State,+Actions,+Goal,+MaxDepth,-Plan): breadth-first shortest plan.
-    wm_reachable(+State,+Actions,+Depth,-States): all states within a depth.
-    wm_enumerate(+State,+Actions,+Depth,-Rollouts): every action sequence to a depth with its final state (was worldmodel's wm_rollout/4, renamed to avoid the Mode-1 collision).
-    wm_diff(+S1,+S2,-Added,-Removed): fluent-level difference.
-    wm_learn(+Transitions,-Models): induce STRIPS action models from tr(Name,Before,After) records.
-    wm_model_predict(+Models,+State,+Name,-State2): predict with a learned STRIPS model (was worldmodel's wm_predict/4, renamed).
-    wm_novelty(+KnownStates,+State,-Score): fraction of a state's fluents never seen before.
+    world_model_state(+Fluents,-State): canonical sorted state.
+    world_model_action(+Name,+Pre,+Add,+Del,-Action): build a STRIPS-style action.
+    world_model_holds(+State,+Fluent) / world_model_goal_holds(+State,+Goal): membership and goal tests.
+    world_model_applicable(+State,+Action) / world_model_apply(+State,+Action,-State2): precondition match and effect application.
+    world_model_step(+State,+Actions,?Name,-State2) / world_model_successors(+State,+Actions,-Pairs): one grounded step; all successors.
+    world_model_simulate(+State,+Actions,+Plan,-Trajectory): run a plan, returning the state trajectory.
+    world_model_plan_bfs(+State,+Actions,+Goal,+MaxDepth,-Plan): breadth-first shortest plan.
+    world_model_reachable(+State,+Actions,+Depth,-States): all states within a depth.
+    world_model_enumerate(+State,+Actions,+Depth,-Rollouts): every action sequence to a depth with its final state (was worldmodel's world_model_rollout/4, renamed to avoid the Mode-1 collision).
+    world_model_diff(+S1,+S2,-Added,-Removed): fluent-level difference.
+    world_model_learn(+Transitions,-Models): induce STRIPS action models from tr(Name,Before,After) records.
+    world_model_model_predict(+Models,+State,+Name,-State2): predict with a learned STRIPS model (was worldmodel's world_model_predict/4, renamed).
+    world_model_novelty(+KnownStates,+State,-Score): fraction of a state's fluents never seen before.
     CAUSALONTOLOGY BRIDGE:
-    wm_as_cros(+Model,-CROs): emit the learned Mode-1 transitions as reified cro/8 terms for the shared store.
+    world_model_as_cros(+Model,-CROs): emit the learned Mode-1 transitions as reified cro/8 terms for the shared store.
 
 planner
 Hierarchical Planner: HTN Decomposition, Plan Trees, and Monitoring (ht_*, Layer 361)
@@ -2032,7 +2032,7 @@ AGI Foundations Integration Layer (nx_*, Layer 365)
     nx_bind_workspace(+JSpace): subscribe the J-Space hook to the workspace broadcast bus via pai_broadcast_subscribe, making the J-Lens readout live.
     nx_replay_broadcasts(+JSpace,+Broadcasts): apply a sequence of broadcast terms (a reasoning episode) into a J-Space.
     nx_broadcast_reading(+JSpace,-Reading): the live ranked J-Lens readout after broadcasts.
-    nx_novelty_signal(+KnownStates,+State,-Novelty): the world model's novelty of a state against known states (wm_novelty).
+    nx_novelty_signal(+KnownStates,+State,-Novelty): the world model's novelty of a state against known states (world_model_novelty).
     nx_observe_novelty(+Region,+KnownStates,+State,+Timestamp,-Novelty): compute novelty and record it as a curiosity prediction error.
     nx_curiosity_explore(+Region,+Trajectory,-Progress): feed a trajectory's falling novelty as curiosity errors and read back learning progress.
     nx_agency_plan_reason(+Domain,+State,+LoopId,+CurrentGoal,-Thought,-Action): the agency reason-goal that decomposes achieve(Task) with ht_plan or escalates.

@@ -15,7 +15,7 @@
                                          for a compound task.
 
     States are sorted lists of ground fluent terms, exactly as in the
-    co_wm pack. The depth bound counts method decompositions and
+    world_model pack. The depth bound counts method decompositions and
     guarantees termination even on recursive method sets.
 
     The plan tree (ht_task_tree/5) is the glass-box explanation of a
