@@ -6,10 +6,10 @@
     pack does that inference by watching the frame changes (deltas) that
     immediately precede a reported WIN and accumulating support for the
     features they share. The feature with the most support across observed
-    wins becomes the hypothesised goal, which the co_arc3 harness can then
-    register with co_arc3_goal_set/1 and plan toward.
+    wins becomes the hypothesised goal, which the arc3_harness harness can then
+    register with arc3_harness_goal_set/1 and plan toward.
 
-    The delta format matches the co_arc3 harness: a list of
+    The delta format matches the arc3_harness harness: a list of
     changed(Row, Col, OldColour, NewColour) occurrents. From each winning
     delta this pack extracts the distinct NewColour values that appeared — a
     win most often means "a cell became this colour" (a goal reached, a target

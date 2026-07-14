@@ -4,7 +4,7 @@
     that light lamps, and a spike that hurts.
 
     Run with the full library path:
-        swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/co_learn/test/test_co_learn.pl
+        swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/causal_learning/test/test_co_learn.pl
 */
 
 % Declare this file as a test module.
@@ -14,11 +14,11 @@
 :- use_module(library(plunit)).
 
 % Load the module under test.
-:- use_module(library(co_learn)).
+:- use_module(library(causal_learning)).
 % Load the verb layer the learner writes into.
 :- use_module(library(causal_core)).
 % Load the hinge the learner populates from the bottom up.
-:- use_module(library(co_hinge)).
+:- use_module(library(realizable_hinge)).
 
 % ---------------------------------------------------------------------------
 % The ground-truth micro-world, hidden from the agent.
@@ -40,18 +40,18 @@ fresh :-
     % Clear the verb layer.
     causal_core_reset,
     % Clear the hinge.
-    co_hinge_reset,
+    realizable_hinge_reset,
     % Clear the learning state.
-    co_learn_reset.
+    causal_learning_reset.
 
-:- begin_tests(co_learn).
+:- begin_tests(causal_learning).
 
 % Induction: a first intervention creates the relation at strength 0.70.
 test(induce_at_seventy) :-
     % A fresh world.
     fresh,
     % The first press.
-    co_intervene(test_co_learn:world_act, press(b_red), learned(light(red, on))),
+    causal_learning_intervene(test_co_learn:world_act, press(b_red), learned(light(red, on))),
     % The relation exists at the canonical initial strength.
     causal_core_cro(_, [press(b_red)], [light(red, on)], _, sufficient, 0.7, _,
            prov(agent, learned_by_intervention, _)).
@@ -61,9 +61,9 @@ test(confirm_raises_strength) :-
     % A fresh world.
     fresh,
     % The first press induces.
-    co_intervene(test_co_learn:world_act, press(b_red), _),
+    causal_learning_intervene(test_co_learn:world_act, press(b_red), _),
     % The second press confirms.
-    co_intervene(test_co_learn:world_act, press(b_red), _),
+    causal_learning_intervene(test_co_learn:world_act, press(b_red), _),
     % The strength rose from 0.70 to 0.90.
     causal_core_cro(_, [press(b_red)], [light(red, on)], _, _, S, _, _),
     % Check the rise.
@@ -74,26 +74,26 @@ test(disposition_posited, [nondet]) :-
     % A fresh world.
     fresh,
     % The first press induces.
-    co_intervene(test_co_learn:world_act, press(b_red), _),
+    causal_learning_intervene(test_co_learn:world_act, press(b_red), _),
     % The button now bears a disposition on the noun side.
-    co_realizable(D, disposition, b_red),
+    realizable_hinge_realizable(D, disposition, b_red),
     % Realized in the pressing occurrent — the seam holds.
-    co_realized_in(D, press(b_red)).
+    realizable_hinge_realized_in(D, press(b_red)).
 
 % A hazard is tagged preventive and enters the avoid-set.
 test(hazard_avoided) :-
     % A fresh world.
     fresh,
     % Touching the spike hurts.
-    co_intervene(test_co_learn:world_act, touch(spike), hazard),
+    causal_learning_intervene(test_co_learn:world_act, touch(spike), hazard),
     % The action is on the avoid-set.
-    co_avoid(touch(spike)),
+    causal_learning_avoid(touch(spike)),
     % The preventive relation was reified at hazard strength.
     causal_core_cro(Id, [touch(spike)], [penalty], _, preventive, 0.9, _, _),
     % Queryable as preventive.
     causal_core_preventive(Id),
     % A repeated hazard is not double-recorded.
-    co_intervene(test_co_learn:world_act, touch(spike), hazard),
+    causal_learning_intervene(test_co_learn:world_act, touch(spike), hazard),
     % Still exactly one preventive relation for it.
     findall(I, causal_core_cro(I, [touch(spike)], [penalty], _, preventive, _, _, _), [_]).
 
@@ -102,11 +102,11 @@ test(null_effects_compact) :-
     % A fresh world.
     fresh,
     % Waving produces nothing, twice.
-    co_intervene(test_co_learn:world_act, wave(hand), none),
+    causal_learning_intervene(test_co_learn:world_act, wave(hand), none),
     % Again.
-    co_intervene(test_co_learn:world_act, wave(hand), none),
+    causal_learning_intervene(test_co_learn:world_act, wave(hand), none),
     % The counter holds two.
-    co_null_effects(wave(hand), 2),
+    causal_learning_null_effects(wave(hand), 2),
     % No relation was reified for the non-effect.
     \+ causal_core_cro(_, [wave(hand)], _, _, _, _, _, _).
 
@@ -115,18 +115,18 @@ test(observation_weighted_down) :-
     % A fresh world.
     fresh,
     % A relation learned by intervention.
-    co_intervene(test_co_learn:world_act, press(b_red), _),
+    causal_learning_intervene(test_co_learn:world_act, press(b_red), _),
     % A relation merely observed.
-    co_observe(clouds, rain),
+    causal_learning_observe(clouds, rain),
     % The interventional relation is marked as such.
     causal_core_cro(IdI, [press(b_red)], _, _, _, _, _, _),
     % The mark holds.
-    co_interventional(IdI),
+    causal_learning_interventional(IdI),
     % The observational relation is flagged and weak.
     causal_core_cro(IdO, [clouds], [rain], _, contributory, 0.3, Context, _),
     % The flag is in its context.
     memberchk(observational, Context),
     % And it is not interventional.
-    \+ co_interventional(IdO).
+    \+ causal_learning_interventional(IdO).
 
-:- end_tests(co_learn).
+:- end_tests(causal_learning).

@@ -21,7 +21,7 @@
 % Load the module under test.
 :- use_module(library(co_explore)).
 % Load the learner so its avoid-set can be exercised.
-:- use_module(library(co_learn)).
+:- use_module(library(causal_learning)).
 % Load the verb layer so its relation store can be cleared between tests.
 :- use_module(library(causal_core)).
 
@@ -91,9 +91,9 @@ test(avoid_honoured, [true(A == action(2))]) :-
     % Start from empty exploration memory.
     cox_reset,
     % Clear then seed the learner's avoid-set with a hazard.
-    co_learn_reset,
+    causal_learning_reset,
     % Mark action(1) as a hazard to avoid.
-    co_learn_preventive(action(1), penalty),
+    causal_learning_preventive(action(1), penalty),
     % Fetch the sample frame.
     sample_frame(F),
     % Even untried, the avoided action(1) must not be chosen.
@@ -119,9 +119,9 @@ test(salient_largest_first, [true(Targets == [select(1,1), select(4,3)])]) :-
 % game only — another game with no such relation predicts nothing.
 test(game_predicted_change) :-
     % Clear the learner and the verb layer.
-    causal_core_reset, co_learn_reset,
+    causal_core_reset, causal_learning_reset,
     % Teach that, in game ls20, action(up) causes a move.
-    co_learn_causal(g(ls20, action(up)), moved),
+    causal_learning_causal(g(ls20, action(up)), moved),
     % In ls20 that action is predicted to change the world.
     cox_predict_change(ls20, action(up)),
     % In a different game the same action is not predicted (no relation there).
@@ -131,9 +131,9 @@ test(game_predicted_change) :-
 % untried but unknown one.
 test(game_prefers_predicted_change, [true(A == action(up))]) :-
     % Start clean.
-    causal_core_reset, co_learn_reset, cox_reset,
+    causal_core_reset, causal_learning_reset, cox_reset,
     % Teach ls20 that action(up) changes the world.
-    co_learn_causal(g(ls20, action(up)), moved),
+    causal_learning_causal(g(ls20, action(up)), moved),
     % Fetch the sample frame.
     sample_frame(F),
     % action(up) is predicted-change (tried once); action(down) is unknown (untried).
@@ -143,7 +143,7 @@ test(game_prefers_predicted_change, [true(A == action(up))]) :-
 % can fall back to a graph-frontier search.
 test(game_change_fails_when_none) :-
     % Start clean: no learned relations at all.
-    causal_core_reset, co_learn_reset, cox_reset,
+    causal_core_reset, causal_learning_reset, cox_reset,
     % Fetch the sample frame.
     sample_frame(F),
     % With no predicted-change action, the causal-first choice fails.
@@ -152,9 +152,9 @@ test(game_change_fails_when_none) :-
 % A hazard the game learned to avoid, keyed g(Game,Action), is never chosen.
 test(game_avoid_honoured, [true(A == action(down))]) :-
     % Start clean.
-    causal_core_reset, co_learn_reset, cox_reset,
+    causal_core_reset, causal_learning_reset, cox_reset,
     % Mark action(up) a hazard in game ls20 only.
-    co_learn_preventive(g(ls20, action(up)), penalty),
+    causal_learning_preventive(g(ls20, action(up)), penalty),
     % Fetch the sample frame.
     sample_frame(F),
     % Even untried, the avoided action(up) must not be chosen for ls20.

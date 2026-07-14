@@ -2043,30 +2043,30 @@ AGI Foundations Integration Layer (nx_*, Layer 365)
     nx_evolve_with_critique(+Criteria,+Params,+Size,+Length,+MaxGens,+Bar,+Seed,-Best,-Score,-Gens): evolve reasoning models scored by refinery critique under a bounded generation budget.
     nx_critique_report(+Criteria,+Genome,-Critique): the remaining refinery issues of a genome.
 
-co_noun
+noun_backbone
 Causalontology Noun Backbone: Thin Continuant Layer and Alignment Pivot (co_*, Layer 366)
-    co_noun_reset/0: clear the noun layer.
-    co_continuant_add(+Id,+Category): register a continuant.
-    co_continuant(?Id,?Category): query the continuants.
-    co_isa_add(+Sub,+Super): add a subsumption edge, refusing cycles.
-    co_isa(?Sub,?Super): transitive subsumption.
-    co_part_of_add(+Part,+Whole): add a parthood edge, refusing cycles.
-    co_part_of(?Part,?Whole): transitive parthood.
-    co_backbone_acyclic/0: the decidable projection consistency check.
-    co_align_add(+ExternalClass,+BackboneId,+Confidence): confidence-scored external alignment.
-    co_alignment(?External,?Backbone,?Confidence): query the alignments.
-    co_resolve(+External,-Backbone,-Confidence): the highest-confidence match.
+    noun_backbone_reset/0: clear the noun layer.
+    noun_backbone_continuant_add(+Id,+Category): register a continuant.
+    noun_backbone_continuant(?Id,?Category): query the continuants.
+    noun_backbone_isa_add(+Sub,+Super): add a subsumption edge, refusing cycles.
+    noun_backbone_isa(?Sub,?Super): transitive subsumption.
+    noun_backbone_part_of_add(+Part,+Whole): add a parthood edge, refusing cycles.
+    noun_backbone_part_of(?Part,?Whole): transitive parthood.
+    noun_backbone_acyclic/0: the decidable projection consistency check.
+    noun_backbone_align_add(+ExternalClass,+BackboneId,+Confidence): confidence-scored external alignment.
+    noun_backbone_alignment(?External,?Backbone,?Confidence): query the alignments.
+    noun_backbone_resolve(+External,-Backbone,-Confidence): the highest-confidence match.
 
-co_hinge
+realizable_hinge
 Causalontology Hinge: Qualities and Realizables with the Realization Seam (co_*, Layer 367)
-    co_hinge_reset/0: clear the hinge layer.
-    co_quality_add(+Id,+Quality,+Bearer) / co_quality/3: qualities, exhibited whenever borne.
-    co_realizable_add(+Id,+Kind,+Bearer): only disposition, function, or role.
-    co_realizable(?Id,?Kind,?Bearer): query the realizables.
-    co_realized_in_add(+RealizableId,+OccurrentType): the seam into the verbs.
-    co_realized_in(?RealizableId,?OccurrentType): query the seam forward.
-    co_bearer_realizables(+Bearer,-Realizables): everything an object bears.
-    co_hinge_of_occurrent(+OccurrentType,-RealizableId): the seam backward.
+    realizable_hinge_reset/0: clear the hinge layer.
+    realizable_hinge_quality_add(+Id,+Quality,+Bearer) / realizable_hinge_quality/3: qualities, exhibited whenever borne.
+    realizable_hinge_realizable_add(+Id,+Kind,+Bearer): only disposition, function, or role.
+    realizable_hinge_realizable(?Id,?Kind,?Bearer): query the realizables.
+    realizable_hinge_realized_in_add(+RealizableId,+OccurrentType): the seam into the verbs.
+    realizable_hinge_realized_in(?RealizableId,?OccurrentType): query the seam forward.
+    realizable_hinge_bearer_realizables(+Bearer,-Realizables): everything an object bears.
+    realizable_hinge_of_occurrent(+OccurrentType,-RealizableId): the seam backward.
 
 causal_core
 Causalontology Core: The Reified Causal Relation Object (co_*, Layer 368)
@@ -2088,17 +2088,17 @@ Causalontology Core: The Reified Causal Relation Object (co_*, Layer 368)
     causal_core_provisional(?Id) / causal_core_refine_import(+Id,+Temporal,+Modality,+Strength): refine into an owned relation.
     causal_core_why(+Id,-Why): the glass-box story of a relation.
 
-co_learn
+causal_learning
 Causalontology Learning: Causal Structure Acquired by Intervention (co_*, Layer 369)
-    co_learn_reset/0: clear the learning state.
-    co_intervene(:ActGoal,+Action,-Outcome): do, observe, and learn in one turn.
-    co_learn_causal(+Action,+Effect): induce at 0.70 or confirm by +0.2 capped at 0.99.
-    co_learn_preventive(+Action,+Effect): tag the hazard at 0.90 and avoid it forever.
-    co_avoid(?Action): the closed-world avoid-set.
-    co_null_effects(+Action,-Count): null effects stored compactly (the frame problem).
-    co_observe(+Cause,+Effect): observational-only, flagged and weighted down to 0.30.
-    co_interventional(+Id): relations backed by doing rather than seeing.
-    co_posit_disposition(+Action): verb-side causation reveals a noun-side disposition.
+    causal_learning_reset/0: clear the learning state.
+    causal_learning_intervene(:ActGoal,+Action,-Outcome): do, observe, and learn in one turn.
+    causal_learning_causal(+Action,+Effect): induce at 0.70 or confirm by +0.2 capped at 0.99.
+    causal_learning_preventive(+Action,+Effect): tag the hazard at 0.90 and avoid it forever.
+    causal_learning_avoid(?Action): the closed-world avoid-set.
+    causal_learning_null_effects(+Action,-Count): null effects stored compactly (the frame problem).
+    causal_learning_observe(+Cause,+Effect): observational-only, flagged and weighted down to 0.30.
+    causal_learning_interventional(+Id): relations backed by doing rather than seeing.
+    causal_learning_posit_disposition(+Action): verb-side causation reveals a noun-side disposition.
 
 co_plan
 Causalontology Planning: Procedures and Safe Backward Chaining (co_*, Layer 370)
@@ -2110,18 +2110,18 @@ Causalontology Planning: Procedures and Safe Backward Chaining (co_*, Layer 370)
     co_plan_safe(+Plan): no step on the avoid-set.
     co_execute(:ExecGoal,+Plan,-Result): run a plan, stopping honestly at a failing step.
 
-co_arc3
+arc3_harness
 Causalontology ARC-AGI-3 Harness: Game-Agnostic Perceive-Learn-Plan-Act (co_*, Layer 371)
-    co_arc3_reset/0: clear the harness state.
-    co_arc3_perceive(+Frame,-Occurrents): a frame becomes cell_state occurrents.
-    co_arc3_delta(+Frame0,+Frame1,-Delta): the change occurrents between frames.
-    co_arc3_goal_set(+Goal) / co_arc3_goal(?Goal): the goal the planner aims at.
-    co_arc3_choose(+Actions,+LastFrame,-Action): plan-first, curiosity fallback, hazards never.
-    co_arc3_step(+Env,+Frame,-Action,-Frame1): one observe-choose-act-learn turn.
-    co_arc3_play(+Env,+Budget,-Outcome): the full episode loop, won(Steps) or budget_exhausted.
-    co_arc3_trace(-Steps): the glass-box episode trace.
-    co_arc3_tries(+Action,-Count): the curiosity counters.
-    co_arc3_http_env(+BaseUrl,+ApiKey,+Game,-Env): the guarded live bridge to the REST API.
+    arc3_harness_reset/0: clear the harness state.
+    arc3_harness_perceive(+Frame,-Occurrents): a frame becomes cell_state occurrents.
+    arc3_harness_delta(+Frame0,+Frame1,-Delta): the change occurrents between frames.
+    arc3_harness_goal_set(+Goal) / arc3_harness_goal(?Goal): the goal the planner aims at.
+    arc3_harness_choose(+Actions,+LastFrame,-Action): plan-first, curiosity fallback, hazards never.
+    arc3_harness_step(+Env,+Frame,-Action,-Frame1): one observe-choose-act-learn turn.
+    arc3_harness_play(+Env,+Budget,-Outcome): the full episode loop, won(Steps) or budget_exhausted.
+    arc3_harness_trace(-Steps): the glass-box episode trace.
+    arc3_harness_tries(+Action,-Count): the curiosity counters.
+    arc3_harness_http_env(+BaseUrl,+ApiKey,+Game,-Env): the guarded live bridge to the REST API.
 
 co_explore
 Causalontology Exploration Policy: Novelty-Seeking, Loop-Avoiding Action Selection (co_*, Layer 372)
@@ -2169,7 +2169,7 @@ ARC-AGI-3 Protocol: The Exact March-2026 Agents-API Vocabulary (co_*, Layer 375)
     arc3_protocol_max_dim(-Dim) / arc3_protocol_colour_count(-Count) / arc3_protocol_valid_frame(+Frame): the 64 dimension cap, the 16 colours, and a frame shape-and-colour check.
     arc3_protocol_available_actions(-Actions): the canonical action superset.
     arc3_protocol_action_payload(+ActionTerm,+GameId,-Dict): the JSON body an action posts (select carries x,y).
-    arc3_protocol_env(+BaseUrl,+ApiKey,+GameId,-Env): a guarded arc3_env speaking the live protocol, ready for co_arc3_play.
+    arc3_protocol_env(+BaseUrl,+ApiKey,+GameId,-Env): a guarded arc3_env speaking the live protocol, ready for arc3_harness_play.
 
 human_steps
 ARC-AGI-3 Human-Step Ladder in J-Space: Six Phases, Thirty Micro-Steps (co_*, Layer 376)

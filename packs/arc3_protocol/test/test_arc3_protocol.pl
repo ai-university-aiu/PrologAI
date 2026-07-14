@@ -4,7 +4,7 @@
     action maps to ACTION6 (not the older action-five encoding), commands route
     under /api/cmd, the four game states are present with WIN and GAME_OVER
     terminal, frames are validated for shape and colour, and arc3_protocol_env yields a
-    well-formed arc3_env term the co_arc3 harness can consume. No test touches
+    well-formed arc3_env term the arc3_harness harness can consume. No test touches
     the network.
 
     Run with the full library path:

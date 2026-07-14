@@ -42,7 +42,7 @@
 % Import the verb layer this pack plans over.
 :- use_module(library(causal_core), [causal_core_cro/8, causal_core_new_cro/8]).
 % Import the avoid-set the planner must respect.
-:- use_module(library(co_learn), [co_avoid/1]).
+:- use_module(library(causal_learning), [causal_learning_avoid/1]).
 % Import list helpers.
 :- use_module(library(lists), [member/2, memberchk/2]).
 
@@ -89,7 +89,7 @@ co_achievable(Action) :-
 % Define co_plan_safe: no step of the plan is on the avoid-set.
 co_plan_safe(Plan) :-
     % Every step must be clear of the avoid-set.
-    forall(member(Step, Plan), \+ co_avoid(Step)).
+    forall(member(Step, Plan), \+ causal_learning_avoid(Step)).
 
 % ---------------------------------------------------------------------------
 % PLANNING — first by procedure, then by backward graph search

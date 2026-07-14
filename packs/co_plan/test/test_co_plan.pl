@@ -18,9 +18,9 @@
 % Load the verb layer the planner reads.
 :- use_module(library(causal_core)).
 % Load the learner whose avoid-set the planner respects.
-:- use_module(library(co_learn)).
+:- use_module(library(causal_learning)).
 % Load the hinge cleared alongside.
-:- use_module(library(co_hinge)).
+:- use_module(library(realizable_hinge)).
 
 % world_act(+Action, -Effect): the same micro-world as the learning tests.
 world_act(press(b_red), light(red, on)) :- !.
@@ -38,15 +38,15 @@ fresh :-
     % Clear the verb layer.
     causal_core_reset,
     % Clear the hinge.
-    co_hinge_reset,
+    realizable_hinge_reset,
     % Clear the learning state.
-    co_learn_reset,
+    causal_learning_reset,
     % Learn the three button relations by intervention.
-    co_intervene(test_co_plan:world_act, press(b_red), _),
+    causal_learning_intervene(test_co_plan:world_act, press(b_red), _),
     % The green button.
-    co_intervene(test_co_plan:world_act, press(b_green), _),
+    causal_learning_intervene(test_co_plan:world_act, press(b_green), _),
     % The blue button.
-    co_intervene(test_co_plan:world_act, press(b_blue), _).
+    causal_learning_intervene(test_co_plan:world_act, press(b_blue), _).
 
 % executor(+Step, -Result): a toy executor that performs a press.
 executor(press(B), pressed(B)).
@@ -81,7 +81,7 @@ test(hazard_never_planned, [fail]) :-
     % Learn the world.
     fresh,
     % Learn the hazard.
-    co_intervene(test_co_plan:world_act, touch(spike), hazard),
+    causal_learning_intervene(test_co_plan:world_act, touch(spike), hazard),
     % Compose a procedure that would pass through the spike.
     co_compose_procedure([press(b_red), touch(spike)], door(open), _),
     % No safe plan exists.
@@ -101,7 +101,7 @@ test(chain_assembles_plan, [nondet]) :-
     % A fresh verb layer without procedures.
     causal_core_reset,
     % Clear the learning state.
-    co_learn_reset,
+    causal_learning_reset,
     % A two-link causal chain: flip causes power; power causes light.
     causal_core_new_cro([flip(switch)], [power(on)], temporal(0, 0, instant),
                sufficient, 0.9, [], prov(agent, learned_by_intervention, 0.9), _),

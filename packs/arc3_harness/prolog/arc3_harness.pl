@@ -22,56 +22,56 @@
     follow it; else let curiosity choose the least-tried, non-avoided
     action. Learned hazards are enforced: an avoided action is never chosen.
 
-    The live bridge (Section 9.3): co_arc3_http_env/4 builds an environment
+    The live bridge (Section 9.3): arc3_harness_http_env/4 builds an environment
     whose goals speak JSON over HTTP to an ARC-AGI-3 endpoint, guarded by
     catch and never load-bearing for any test — exact routes change between
     releases, so the loop structure is the stable part and the base URL and
     key are the caller's.
 
     Predicates:
-      co_arc3_reset/0        -- clear harness state (tries, goals, episodes)
-      co_arc3_perceive/2     -- +Frame, -Occurrents
-      co_arc3_delta/3        -- +Frame0, +Frame1, -DeltaOccurrents
-      co_arc3_goal_set/1     -- +GoalOccurrent (the inferred or given goal)
-      co_arc3_goal/1         -- ?GoalOccurrent
-      co_arc3_choose/3       -- +Actions, +LastFrame, -Action
-      co_arc3_step/4         -- +Env, +Frame, -Action, -Frame1  (one turn)
-      co_arc3_play/3         -- +Env, +Budget, -Outcome (won(Steps)|budget_exhausted)
-      co_arc3_trace/1        -- -Steps (the episode trace, glass-box)
-      co_arc3_tries/2        -- +Action, -Count
-      co_arc3_http_env/4     -- +BaseUrl, +ApiKey, +Game, -Env (guarded bridge)
+      arc3_harness_reset/0        -- clear harness state (tries, goals, episodes)
+      arc3_harness_perceive/2     -- +Frame, -Occurrents
+      arc3_harness_delta/3        -- +Frame0, +Frame1, -DeltaOccurrents
+      arc3_harness_goal_set/1     -- +GoalOccurrent (the inferred or given goal)
+      arc3_harness_goal/1         -- ?GoalOccurrent
+      arc3_harness_choose/3       -- +Actions, +LastFrame, -Action
+      arc3_harness_step/4         -- +Env, +Frame, -Action, -Frame1  (one turn)
+      arc3_harness_play/3         -- +Env, +Budget, -Outcome (won(Steps)|budget_exhausted)
+      arc3_harness_trace/1        -- -Steps (the episode trace, glass-box)
+      arc3_harness_tries/2        -- +Action, -Count
+      arc3_harness_http_env/4     -- +BaseUrl, +ApiKey, +Game, -Env (guarded bridge)
 */
 
 % Declare this module and list every exported predicate with its correct arity.
-:- module(co_arc3, [
-    % co_arc3_reset/0: clear the harness state.
-    co_arc3_reset/0,
-    % co_arc3_perceive/2: abstract a frame into occurrents.
-    co_arc3_perceive/2,
-    % co_arc3_delta/3: the change occurrents between two frames.
-    co_arc3_delta/3,
-    % co_arc3_goal_set/1: register the goal occurrent to plan toward.
-    co_arc3_goal_set/1,
-    % co_arc3_goal/1: query the registered goal.
-    co_arc3_goal/1,
-    % co_arc3_choose/3: plan-first, curiosity-fallback action selection.
-    co_arc3_choose/3,
-    % co_arc3_step/4: one observe-choose-act-learn turn.
-    co_arc3_step/4,
-    % co_arc3_play/3: the full episode loop under a step budget.
-    co_arc3_play/3,
-    % co_arc3_trace/1: the glass-box episode trace.
-    co_arc3_trace/1,
-    % co_arc3_tries/2: how often each action has been tried.
-    co_arc3_tries/2,
-    % co_arc3_http_env/4: the guarded live bridge to the REST API.
-    co_arc3_http_env/4
+:- module(arc3_harness, [
+    % arc3_harness_reset/0: clear the harness state.
+    arc3_harness_reset/0,
+    % arc3_harness_perceive/2: abstract a frame into occurrents.
+    arc3_harness_perceive/2,
+    % arc3_harness_delta/3: the change occurrents between two frames.
+    arc3_harness_delta/3,
+    % arc3_harness_goal_set/1: register the goal occurrent to plan toward.
+    arc3_harness_goal_set/1,
+    % arc3_harness_goal/1: query the registered goal.
+    arc3_harness_goal/1,
+    % arc3_harness_choose/3: plan-first, curiosity-fallback action selection.
+    arc3_harness_choose/3,
+    % arc3_harness_step/4: one observe-choose-act-learn turn.
+    arc3_harness_step/4,
+    % arc3_harness_play/3: the full episode loop under a step budget.
+    arc3_harness_play/3,
+    % arc3_harness_trace/1: the glass-box episode trace.
+    arc3_harness_trace/1,
+    % arc3_harness_tries/2: how often each action has been tried.
+    arc3_harness_tries/2,
+    % arc3_harness_http_env/4: the guarded live bridge to the REST API.
+    arc3_harness_http_env/4
 ]).
 
 % Import the verb layer whose relations the harness induces and reads.
 :- use_module(library(causal_core), [causal_core_cro/8, causal_core_predict/2]).
 % Import the interventional learner that induces the relations.
-:- use_module(library(co_learn), [co_learn_causal/2, co_learn_preventive/2, co_avoid/1]).
+:- use_module(library(causal_learning), [causal_learning_causal/2, causal_learning_preventive/2, causal_learning_avoid/1]).
 % Import the planner used when a route to the goal is known.
 :- use_module(library(co_plan), [co_plan_chain/3]).
 % Import the grid pack for frame perception and diffs.
@@ -83,34 +83,34 @@
 % Internal state
 % ---------------------------------------------------------------------------
 
-% co_tries_/2: (Action, Count) — the curiosity counter.
-:- dynamic co_tries_/2.
-% co_goal_/1: the goal occurrent the planner aims at.
-:- dynamic co_goal_/1.
-% co_trace_/1: step(N, Action, Outcome) — the glass-box episode trace.
-:- dynamic co_trace_/1.
-% co_step_no_/1: the episode step counter.
-:- dynamic co_step_no_/1.
+% arc3_harness_tries_/2: (Action, Count) — the curiosity counter.
+:- dynamic arc3_harness_tries_/2.
+% arc3_harness_goal_/1: the goal occurrent the planner aims at.
+:- dynamic arc3_harness_goal_/1.
+% arc3_harness_trace_/1: step(N, Action, Outcome) — the glass-box episode trace.
+:- dynamic arc3_harness_trace_/1.
+% arc3_harness_step_no_/1: the episode step counter.
+:- dynamic arc3_harness_step_no_/1.
 
-% Define co_arc3_reset: clear the harness state for a fresh episode.
-co_arc3_reset :-
+% Define arc3_harness_reset: clear the harness state for a fresh episode.
+arc3_harness_reset :-
     % Drop the curiosity counters.
-    retractall(co_tries_(_, _)),
+    retractall(arc3_harness_tries_(_, _)),
     % Drop the registered goal.
-    retractall(co_goal_(_)),
+    retractall(arc3_harness_goal_(_)),
     % Drop the trace.
-    retractall(co_trace_(_)),
+    retractall(arc3_harness_trace_(_)),
     % Reset the step counter.
-    retractall(co_step_no_(_)),
+    retractall(arc3_harness_step_no_(_)),
     % Start counting from zero.
-    assertz(co_step_no_(0)).
+    assertz(arc3_harness_step_no_(0)).
 
 % ---------------------------------------------------------------------------
 % PERCEPTION INTO OCCURRENTS (Section 9.5)
 % ---------------------------------------------------------------------------
 
-% Define co_arc3_perceive: a frame becomes cell_state occurrents.
-co_arc3_perceive(Frame, Occurrents) :-
+% Define arc3_harness_perceive: a frame becomes cell_state occurrents.
+arc3_harness_perceive(Frame, Occurrents) :-
     % Measure the frame.
     gd_size(Frame, Rows, Cols),
     % Bounds for enumeration.
@@ -127,8 +127,8 @@ co_arc3_perceive(Frame, Occurrents) :-
           gd_cell(Frame, R, C, V) ),
         Occurrents).
 
-% Define co_arc3_delta: the change occurrents between successive frames.
-co_arc3_delta(Frame0, Frame1, Delta) :-
+% Define arc3_harness_delta: the change occurrents between successive frames.
+arc3_harness_delta(Frame0, Frame1, Delta) :-
     % The grid pack computes the raw cell differences.
     gd_diff(Frame0, Frame1, Diffs),
     % Each difference becomes a change occurrent.
@@ -141,122 +141,122 @@ co_arc3_delta(Frame0, Frame1, Delta) :-
 % THE GOAL
 % ---------------------------------------------------------------------------
 
-% Define co_arc3_goal_set: register the goal occurrent to plan toward.
-co_arc3_goal_set(Goal) :-
+% Define arc3_harness_goal_set: register the goal occurrent to plan toward.
+arc3_harness_goal_set(Goal) :-
     % One goal at a time.
-    retractall(co_goal_(_)),
+    retractall(arc3_harness_goal_(_)),
     % Record it.
-    assertz(co_goal_(Goal)).
+    assertz(arc3_harness_goal_(Goal)).
 
-% Define co_arc3_goal: query the registered goal.
-co_arc3_goal(Goal) :-
+% Define arc3_harness_goal: query the registered goal.
+arc3_harness_goal(Goal) :-
     % Read the store.
-    co_goal_(Goal).
+    arc3_harness_goal_(Goal).
 
 % ---------------------------------------------------------------------------
 % ACTION SELECTION — plan first, curiosity second, hazards never (Section 9.4)
 % ---------------------------------------------------------------------------
 
-% Define co_arc3_choose: follow a plan when one exists; else be curious.
-co_arc3_choose(Actions, _LastFrame, Action) :-
+% Define arc3_harness_choose: follow a plan when one exists; else be curious.
+arc3_harness_choose(Actions, _LastFrame, Action) :-
     % A registered goal with a plan to it takes precedence.
-    co_goal_(Goal),
+    arc3_harness_goal_(Goal),
     % Search the causal graph backward from the goal.
     co_plan_chain(Goal, 8, [Action | _]),
     % The chosen step must be among the environment's actions.
     memberchk(Action, Actions),
     % The avoid-set is absolute.
-    \+ co_avoid(Action),
+    \+ causal_learning_avoid(Action),
     % Commit to the planned action.
     !.
 % Otherwise curiosity picks the least-tried, non-avoided action.
-co_arc3_choose(Actions, _LastFrame, Action) :-
+arc3_harness_choose(Actions, _LastFrame, Action) :-
     % Score every permissible action by how often it has been tried.
     findall(N-A,
         % Take each available action.
         ( member(A, Actions),
           % Never a learned hazard.
-          \+ co_avoid(A),
+          \+ causal_learning_avoid(A),
           % Fetch its try count.
-          co_arc3_tries(A, N) ),
+          arc3_harness_tries(A, N) ),
         Scored),
     % There must be something permissible left to try.
     Scored \== [],
     % Least-tried first.
     msort(Scored, [_-Action | _]).
 
-% Define co_arc3_tries: how often an action has been tried.
-co_arc3_tries(Action, Count) :-
+% Define arc3_harness_tries: how often an action has been tried.
+arc3_harness_tries(Action, Count) :-
     % Read the counter, zero when untried.
-    ( co_tries_(Action, C) -> Count = C ; Count = 0 ).
+    ( arc3_harness_tries_(Action, C) -> Count = C ; Count = 0 ).
 
-% co_count_try(+Action): bump the curiosity counter.
-co_count_try(Action) :-
+% arc3_harness_count_try(+Action): bump the curiosity counter.
+arc3_harness_count_try(Action) :-
     % Fetch and bump.
-    (   retract(co_tries_(Action, N))
+    (   retract(arc3_harness_tries_(Action, N))
     % Increment an existing counter.
     ->  N1 is N + 1
     % First try.
     ;   N1 = 1
     ),
     % Store it back.
-    assertz(co_tries_(Action, N1)).
+    assertz(arc3_harness_tries_(Action, N1)).
 
 % ---------------------------------------------------------------------------
 % THE LOOP (Section 9.4)
 % ---------------------------------------------------------------------------
 
-% Define co_arc3_step: one observe-choose-act-learn turn.
-co_arc3_step(arc3_env(_, ActGoal, ActionsGoal, _), Frame, Action, Frame1) :-
+% Define arc3_harness_step: one observe-choose-act-learn turn.
+arc3_harness_step(arc3_env(_, ActGoal, ActionsGoal, _), Frame, Action, Frame1) :-
     % Ask the environment which actions it affords.
     call(ActionsGoal, Actions),
     % Choose by plan or curiosity, never a hazard.
-    co_arc3_choose(Actions, Frame, Action),
+    arc3_harness_choose(Actions, Frame, Action),
     % Count the try for curiosity.
-    co_count_try(Action),
+    arc3_harness_count_try(Action),
     % Doing: perform the action and receive the next frame.
     call(ActGoal, Action, Frame1),
     % The diff between the frames is the observed effect.
-    co_arc3_delta(Frame, Frame1, Delta),
+    arc3_harness_delta(Frame, Frame1, Delta),
     % Learn from what followed.
     (   Delta == []
     % Nothing changed: record the turn without inducing a relation.
-    ->  co_record(Action, none)
+    ->  arc3_harness_record(Action, none)
     % A penalty marker in the delta is a hazard.
     ;   memberchk(changed(_, _, _, 15), Delta)
-    ->  co_learn_preventive(Action, penalty),
+    ->  causal_learning_preventive(Action, penalty),
         % Record the hazard turn.
-        co_record(Action, hazard)
+        arc3_harness_record(Action, hazard)
     % Otherwise the delta is the effect the action produced.
-    ;   co_learn_causal(Action, delta(Delta)),
+    ;   causal_learning_causal(Action, delta(Delta)),
         % Record the learning turn.
-        co_record(Action, learned(delta(Delta)))
+        arc3_harness_record(Action, learned(delta(Delta)))
     ).
 
-% co_record(+Action, +Outcome): append one step to the glass-box trace.
-co_record(Action, Outcome) :-
+% arc3_harness_record(+Action, +Outcome): append one step to the glass-box trace.
+arc3_harness_record(Action, Outcome) :-
     % Bump the step counter.
-    retract(co_step_no_(N)),
+    retract(arc3_harness_step_no_(N)),
     % The next step number.
     N1 is N + 1,
     % Store the counter back.
-    assertz(co_step_no_(N1)),
+    assertz(arc3_harness_step_no_(N1)),
     % Record the step.
-    assertz(co_trace_(step(N1, Action, Outcome))).
+    assertz(arc3_harness_trace_(step(N1, Action, Outcome))).
 
-% Define co_arc3_play: the full episode under a step budget.
-co_arc3_play(Env, Budget, Outcome) :-
+% Define arc3_harness_play: the full episode under a step budget.
+arc3_harness_play(Env, Budget, Outcome) :-
     % Start from a fresh harness state.
-    co_arc3_reset,
+    arc3_harness_reset,
     % Unpack the reset goal.
     Env = arc3_env(ResetGoal, _, _, _),
     % Reset the game and receive the first frame.
     call(ResetGoal, Frame0),
     % Run the episode.
-    co_arc3_episode(Env, Frame0, 0, Budget, Outcome).
+    arc3_harness_episode(Env, Frame0, 0, Budget, Outcome).
 
-% co_arc3_episode(+Env, +Frame, +Steps, +Budget, -Outcome): the recursion.
-co_arc3_episode(Env, Frame, Steps, Budget, Outcome) :-
+% arc3_harness_episode(+Env, +Frame, +Steps, +Budget, -Outcome): the recursion.
+arc3_harness_episode(Env, Frame, Steps, Budget, Outcome) :-
     % Unpack the win test.
     Env = arc3_env(_, _, _, SolvedGoal),
     % Decide the state of the episode.
@@ -267,17 +267,17 @@ co_arc3_episode(Env, Frame, Steps, Budget, Outcome) :-
     ;   Steps >= Budget
     ->  Outcome = budget_exhausted
     % Otherwise take one turn and continue.
-    ;   co_arc3_step(Env, Frame, _Action, Frame1),
+    ;   arc3_harness_step(Env, Frame, _Action, Frame1),
         % One more step has been spent.
         Steps1 is Steps + 1,
         % Continue the episode.
-        co_arc3_episode(Env, Frame1, Steps1, Budget, Outcome)
+        arc3_harness_episode(Env, Frame1, Steps1, Budget, Outcome)
     ).
 
-% Define co_arc3_trace: the glass-box episode trace, in step order.
-co_arc3_trace(Steps) :-
+% Define arc3_harness_trace: the glass-box episode trace, in step order.
+arc3_harness_trace(Steps) :-
     % Collect the recorded steps.
-    findall(step(N, A, O), co_trace_(step(N, A, O)), Unsorted),
+    findall(step(N, A, O), arc3_harness_trace_(step(N, A, O)), Unsorted),
     % Order them by step number.
     msort(Unsorted, Steps).
 
@@ -285,68 +285,68 @@ co_arc3_trace(Steps) :-
 % THE LIVE BRIDGE (Section 9.3) — guarded, never load-bearing for tests
 % ---------------------------------------------------------------------------
 
-% Define co_arc3_http_env: an environment whose goals speak to the REST API.
+% Define arc3_harness_http_env: an environment whose goals speak to the REST API.
 % Exact routes change between releases (Appendix C), so the caller supplies
 % the base URL; every call is guarded and fails honestly when offline.
-co_arc3_http_env(BaseUrl, ApiKey, Game, arc3_env(
+arc3_harness_http_env(BaseUrl, ApiKey, Game, arc3_env(
     % The reset goal opens and resets the game.
-    co_arc3:co_http_reset(BaseUrl, ApiKey, Game),
+    arc3_harness:arc3_harness_http_reset(BaseUrl, ApiKey, Game),
     % The act goal posts one action and reads the next frame.
-    co_arc3:co_http_act(BaseUrl, ApiKey, Game),
+    arc3_harness:arc3_harness_http_act(BaseUrl, ApiKey, Game),
     % The actions goal reports the numbered ARC-AGI-3 action set.
-    co_arc3:co_http_actions(BaseUrl, ApiKey, Game),
+    arc3_harness:arc3_harness_http_actions(BaseUrl, ApiKey, Game),
     % The solved goal reads the win flag of the last response.
-    co_arc3:co_http_solved)).
+    arc3_harness:arc3_harness_http_solved)).
 
-% co_last_http_state_/1: the last JSON state the bridge received.
-:- dynamic co_last_http_state_/1.
+% arc3_harness_last_http_state_/1: the last JSON state the bridge received.
+:- dynamic arc3_harness_last_http_state_/1.
 
-% co_http_reset(+BaseUrl, +ApiKey, +Game, -Frame0): reset over HTTP.
-co_http_reset(BaseUrl, ApiKey, Game, Frame0) :-
+% arc3_harness_http_reset(+BaseUrl, +ApiKey, +Game, -Frame0): reset over HTTP.
+arc3_harness_http_reset(BaseUrl, ApiKey, Game, Frame0) :-
     % Any transport failure makes the bridge fail honestly.
-    catch(co_http_json(BaseUrl, ApiKey, Game, reset, _{}, Reply), _, fail),
+    catch(arc3_harness_http_json(BaseUrl, ApiKey, Game, reset, _{}, Reply), _, fail),
     % Remember the state for the win test.
-    retractall(co_last_http_state_(_)),
+    retractall(arc3_harness_last_http_state_(_)),
     % Store the reply.
-    assertz(co_last_http_state_(Reply)),
+    assertz(arc3_harness_last_http_state_(Reply)),
     % The reply carries the first frame as a grid.
     Frame0 = Reply.frame.
 
-% co_http_act(+BaseUrl, +ApiKey, +Game, +Action, -Frame1): one action.
-co_http_act(BaseUrl, ApiKey, Game, Action, Frame1) :-
+% arc3_harness_http_act(+BaseUrl, +ApiKey, +Game, +Action, -Frame1): one action.
+arc3_harness_http_act(BaseUrl, ApiKey, Game, Action, Frame1) :-
     % Encode the action term as its number or coordinates.
-    co_http_action_payload(Action, Payload),
+    arc3_harness_http_action_payload(Action, Payload),
     % Any transport failure makes the bridge fail honestly.
-    catch(co_http_json(BaseUrl, ApiKey, Game, action, Payload, Reply), _, fail),
+    catch(arc3_harness_http_json(BaseUrl, ApiKey, Game, action, Payload, Reply), _, fail),
     % Remember the state for the win test.
-    retractall(co_last_http_state_(_)),
+    retractall(arc3_harness_last_http_state_(_)),
     % Store the reply.
-    assertz(co_last_http_state_(Reply)),
+    assertz(arc3_harness_last_http_state_(Reply)),
     % The reply carries the next frame.
     Frame1 = Reply.frame.
 
-% co_http_actions(+BaseUrl, +ApiKey, +Game, -Actions): the numbered set.
-co_http_actions(_, _, _, Actions) :-
+% arc3_harness_http_actions(+BaseUrl, +ApiKey, +Game, -Actions): the numbered set.
+arc3_harness_http_actions(_, _, _, Actions) :-
     % The stable ARC-AGI-3 shape: directional actions, the complex action,
     % and cell selection; per-game subsets are learned by trying.
     Actions = [action(1), action(2), action(3), action(4), action(6)].
 
-% co_http_solved(+_Frame): the last reply carried the win flag.
-co_http_solved(_) :-
+% arc3_harness_http_solved(+_Frame): the last reply carried the win flag.
+arc3_harness_http_solved(_) :-
     % Read the remembered state.
-    co_last_http_state_(Reply),
+    arc3_harness_last_http_state_(Reply),
     % The state reports the level as won.
     catch(Reply.state == "WIN", _, fail).
 
-% co_http_action_payload(+Action, -Payload): action term to JSON payload.
-co_http_action_payload(action(N), _{action: N}) :- !.
+% arc3_harness_http_action_payload(+Action, -Payload): action term to JSON payload.
+arc3_harness_http_action_payload(action(N), _{action: N}) :- !.
 % A cell selection carries its coordinates.
-co_http_action_payload(select(X, Y), _{action: 5, x: X, y: Y}) :- !.
+arc3_harness_http_action_payload(select(X, Y), _{action: 5, x: X, y: Y}) :- !.
 % Any other term is passed by number if it is one.
-co_http_action_payload(N, _{action: N}) :- integer(N).
+arc3_harness_http_action_payload(N, _{action: N}) :- integer(N).
 
-% co_http_json(+BaseUrl, +ApiKey, +Game, +Route, +Payload, -Reply): POST JSON.
-co_http_json(BaseUrl, ApiKey, Game, Route, Payload, Reply) :-
+% arc3_harness_http_json(+BaseUrl, +ApiKey, +Game, +Route, +Payload, -Reply): POST JSON.
+arc3_harness_http_json(BaseUrl, ApiKey, Game, Route, Payload, Reply) :-
     % The HTTP client is loaded lazily so the pack works offline.
     use_module(library(http/http_open)),
     % The JSON codec too.

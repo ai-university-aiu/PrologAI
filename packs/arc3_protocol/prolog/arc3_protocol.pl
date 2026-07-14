@@ -1,6 +1,6 @@
 /*  PrologAI — ARC-AGI-3 Protocol  (WP-400, Layer 375)
 
-    The co_arc3 harness keeps its live HTTP bridge deliberately loose because
+    The arc3_harness harness keeps its live HTTP bridge deliberately loose because
     the exact API routes drift between releases. This pack pins down the
     vocabulary of the March-2026 ARC-AGI-3 agents API as inspectable facts, so
     that the loop can speak the current protocol precisely and a later drift is
@@ -19,7 +19,7 @@
     GAME_OVER; WIN and GAME_OVER are terminal, and WIN is the win.
 
     arc3_protocol_env/4 packages all of this as an arc3_env(Reset, Act, Actions, Solved)
-    term the co_arc3 harness can play directly. Every network call is guarded
+    term the arc3_harness harness can play directly. Every network call is guarded
     with catch and fails honestly when offline, so no test depends on the wire.
 
     Predicates:
@@ -195,7 +195,7 @@ arc3_protocol_action_payload(select(X, Y), GameId, _{game_id: GameId, x: X, y: Y
 arc3_protocol_action_payload(_Action, GameId, _{game_id: GameId}).
 
 % ---------------------------------------------------------------------------
-% The guarded env adapter for the co_arc3 harness
+% The guarded env adapter for the arc3_harness harness
 % ---------------------------------------------------------------------------
 
 % arc3_protocol_last_/1: the last JSON reply the adapter received, for the win test.
