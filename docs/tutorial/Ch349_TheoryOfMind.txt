@@ -1,4 +1,4 @@
-Chapter 349: Theory of Mind - The tom Pack (tm_*, Layer 364)
+Chapter 349: Theory of Mind - The tom Pack (theory_of_mind_*, Layer 364)
 
 The final pack of the AGI Foundations suite tackles the social pillar of
 general intelligence: modelling other minds. The ability being modelled
@@ -17,11 +17,11 @@ else's outdated picture of it.
 
 Here is the whole scenario:
 
-    ?- tm_new(M0),
-       tm_event(M0, loc(marble, basket), [sally, anne], M1),
-       tm_event(M1, loc(marble, box),    [anne],        M2).
+    ?- theory_of_mind_new(M0),
+       theory_of_mind_event(M0, loc(marble, basket), [sally, anne], M1),
+       theory_of_mind_event(M1, loc(marble, box),    [anne],        M2).
 
-tm_event is where the magic lives. When a fact changes with witnesses,
+theory_of_mind_event is where the magic lives. When a fact changes with witnesses,
 three things happen: the world is updated; every witness revises their own
 belief; and every witness records that the other witnesses saw it too.
 Absent agents keep their old beliefs. False beliefs are not programmed in -
@@ -29,16 +29,16 @@ they are what happens to whoever was out of the room.
 
 Now the questions:
 
-    ?- tm_belief(M2, sally, loc(marble, Where)).
+    ?- theory_of_mind_belief(M2, sally, loc(marble, Where)).
     Where = basket.                       % Sally will look in the basket
 
-    ?- tm_knows(M2, anne, loc(marble, box)).
+    ?- theory_of_mind_knows(M2, anne, loc(marble, box)).
     true.                                 % Anne knows - true belief
 
-    ?- tm_knows(M2, sally, loc(marble, basket)).
+    ?- theory_of_mind_knows(M2, sally, loc(marble, basket)).
     false.                                % Sally believes, but does not know
 
-    ?- tm_false_beliefs(M2, sally, F).
+    ?- theory_of_mind_false_beliefs(M2, sally, F).
     F = [loc(marble, basket)].            % exactly her stale belief
 
 THE SECOND-ORDER QUESTION
@@ -46,7 +46,7 @@ THE SECOND-ORDER QUESTION
 The harder test: where does ANNE think SALLY will look? Answering needs a
 belief about a belief.
 
-    ?- tm_attribute(M2, anne, sally, Beliefs).
+    ?- theory_of_mind_attribute(M2, anne, sally, Beliefs).
     Beliefs = [loc(marble, basket)].
 
 Anne watched Sally watch the first event, so Anne models Sally's basket
@@ -55,15 +55,15 @@ updated. The nested bookkeeping came free from the witness mechanics.
 
 MORE INSTRUMENTS
 
-tm_divergent lists exactly where two agents contradict each other.
-tm_common lists what everyone in a group shares - the marble's location is
+theory_of_mind_divergent lists exactly where two agents contradict each other.
+theory_of_mind_common lists what everyone in a group shares - the marble's location is
 common belief before the move and common to no one after it.
-tm_perspective re-seats the whole model inside one agent's head: Sally's
+theory_of_mind_perspective re-seats the whole model inside one agent's head: Sally's
 beliefs become the world, and her beliefs about others drop one level, so
 you can reason AS Sally using every other predicate unchanged.
 
-And because agents want things and commit to things, tm_desire and
-tm_intend record per-agent goals and intentions - the belief-desire-
+And because agents want things and commit to things, theory_of_mind_desire and
+theory_of_mind_intend record per-agent goals and intentions - the belief-desire-
 intention triple that social prediction is built from.
 
 The mental model is a pure term: every update returns a new model, so

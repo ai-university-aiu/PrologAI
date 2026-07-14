@@ -2004,26 +2004,6 @@ Concept Workspace (J-Space): Readable, Editable Held Concepts (js_*, Layer 363)
     js_explain(+Space,+Conclusion,-Concepts): which concepts produced a conclusion.
     js_report(+Space,-Report): report(Reading,Silent,Traces) — the full introspection snapshot.
 
-tom
-Theory of Mind: Nested Beliefs, False Beliefs, and Perspective (tm_*, Layer 364)
-    tm_new(-M): an empty mental model tm(World,Beliefs,Desires,Intentions), a pure term.
-    tm_world_add(+M,+Fact,-M2): upsert a fact into the real world, replacing what it conflicts with.
-    tm_world(+M,-Facts): every world fact.
-    tm_fact(+M,?Fact): query the world by unification.
-    tm_believe(+M,+Agent,+Fact,-M2): upsert one agent's belief; Fact may be believes(Agent2,Fact2) nested to any depth.
-    tm_belief(+M,+Agent,?Fact): query one agent's beliefs.
-    tm_beliefs(+M,+Agent,-Facts): every belief of one agent.
-    tm_event(+M,+Fact,+Witnesses,-M2): the world changes; witnesses revise their beliefs and their beliefs about each other; absent agents keep stale beliefs — where false beliefs are born.
-    tm_knows(+M,+Agent,?Fact): knowledge is belief the world confirms.
-    tm_false_beliefs(+M,+Agent,-Facts): beliefs the world contradicts.
-    tm_attribute(+M,+Observer,+Target,-Facts): what one agent thinks another believes — the second-order question.
-    tm_divergent(+M,+A,+B,-Pairs): the contradictions between two agents' beliefs.
-    tm_common(+M,+Agents,-Facts): beliefs every listed agent shares.
-    tm_perspective(+M,+Agent,-M2): re-seat the model inside one agent's head; plain beliefs become the world, nested beliefs drop one level.
-    tm_desire(+M,+Agent,+Goal,-M2): record a goal once.
-    tm_desires(+M,+Agent,-Goals): every recorded desire.
-    tm_intend(+M,+Agent,+Act,-M2): record a commitment once.
-    tm_intentions(+M,+Agent,-Acts): every recorded intention.
 
 nexus
 AGI Foundations Integration Layer (nx_*, Layer 365)
@@ -2310,17 +2290,31 @@ Causalontology Clue Grounding (co_*, Layer 392)
     grounding_keywords(-Keywords): every keyword the pack knows.
     grounding_provenance(-prov(human_hint,0.9)): the high-confidence, defeasible provenance a grounded hint carries.
 
-co_kin
-Causalontology Theory of Mind (co_*, Layer 393)
-    kn_reset/0: forget all agents, targets, moves, beliefs, and truths.
-    kn_candidate_add(+Agent,+TargetCell): register a place the agent might be heading to.
-    kn_note_move(+Agent,+FromCell,+ToCell): record one observed step (cells are cell(Row,Col)).
-    kn_approach(+Agent,+TargetCell,-NetApproach): net grid distance the agent closed toward a target.
-    kn_infer_goal(+Agent,-TargetCell): the candidate the agent's moves most consistently approach.
-    kn_predict_next(+Agent,+CurrentCell,-NextCell): the agent's likely next step toward its inferred goal.
-    kn_belief_add(+Agent,+Fact) / kn_truth_add(+Fact): record a belief; record a ground truth.
-    kn_believes(?Agent,?Fact) / kn_true(?Fact): query beliefs and truths.
-    kn_false_belief(?Agent,?Fact): a belief the agent holds that the true state contradicts (Sally-Anne).
+theory_of_mind
+Theory of Mind (theory_of_mind_*, Layer 393; converged with the AGI-Foundations tom pack)
+    Movement / goal-inference half —
+    theory_of_mind_reset/0: forget all agents, targets, moves, beliefs, and truths.
+    theory_of_mind_candidate_add(+Agent,+TargetCell): register a place the agent might be heading to.
+    theory_of_mind_note_move(+Agent,+FromCell,+ToCell): record one observed step (cells are cell(Row,Col)).
+    theory_of_mind_approach(+Agent,+TargetCell,-NetApproach): net grid distance the agent closed toward a target.
+    theory_of_mind_infer_goal(+Agent,-TargetCell): the candidate the agent's moves most consistently approach.
+    theory_of_mind_predict_next(+Agent,+CurrentCell,-NextCell): the agent's likely next step toward its inferred goal.
+    theory_of_mind_belief_add(+Agent,+Fact) / theory_of_mind_truth_add(+Fact): record a belief; record a ground truth.
+    theory_of_mind_believes(?Agent,?Fact) / theory_of_mind_true(?Fact): query beliefs and truths.
+    theory_of_mind_false_belief(?Agent,?Fact): a belief the agent holds that the true state contradicts (Sally-Anne).
+    Nested mental-model half (absorbed from tom) —
+    theory_of_mind_new(-M): an empty mental model tm(World,Beliefs,Desires,Intentions), a pure term.
+    theory_of_mind_world_add(+M,+Fact,-M2) / theory_of_mind_world(+M,-Facts) / theory_of_mind_fact(+M,?Fact): real-world facts.
+    theory_of_mind_believe(+M,+Agent,+Fact,-M2): upsert one agent's belief; Fact may be nested to any depth.
+    theory_of_mind_belief(+M,+Agent,?Fact) / theory_of_mind_beliefs(+M,+Agent,-Facts): query one agent's beliefs.
+    theory_of_mind_event(+M,+Fact,+Witnesses,-M2): the world changes; witnesses revise, absent agents keep stale beliefs.
+    theory_of_mind_knows(+M,+Agent,?Fact): knowledge is belief the world confirms.
+    theory_of_mind_false_beliefs(+M,+Agent,-Facts): beliefs the world contradicts.
+    theory_of_mind_attribute(+M,+Observer,+Target,-Facts): what one agent thinks another believes (second-order).
+    theory_of_mind_divergent(+M,+A,+B,-Pairs) / theory_of_mind_common(+M,+Agents,-Facts): belief contradictions; shared beliefs.
+    theory_of_mind_perspective(+M,+Agent,-M2): re-seat the model inside one agent's head.
+    theory_of_mind_desire(+M,+Agent,+Goal,-M2) / theory_of_mind_desires(+M,+Agent,-Goals): record and read desires.
+    theory_of_mind_intend(+M,+Agent,+Act,-M2) / theory_of_mind_intentions(+M,+Agent,-Acts): record and read intentions.
 
 co_liken
 Causalontology Analogy (co_*, Layer 394)

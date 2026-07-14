@@ -1378,7 +1378,7 @@ WP 387 - evolve: Evolutionary Computation (ev_*, Layer 362). Fully reproducible 
 
 WP 388 - jspace: Concept Workspace, J-Space (js_*, Layer 363). A readable, editable ledger of held concepts with the ranked J-Lens readout, silent-thought detection, implant/ablate/swap editing, and concept-level derivation traces. Chapter 348 covers this pack.
 
-WP 389 - tom: Theory of Mind (tm_*, Layer 364). Nested per-agent beliefs, witnessed events with mutual knowledge, false-belief detection that passes the Sally-Anne test including the second-order question, perspective taking, and desire-intention stores. Chapter 349 covers this pack.
+WP 389 - tom: Theory of Mind (theory_of_mind_*, Layer 364). Nested per-agent beliefs, witnessed events with mutual knowledge, false-belief detection that passes the Sally-Anne test including the second-order question, perspective taking, and desire-intention stores. Chapter 349 covers this pack.
 
 WP 390 - nexus: AGI Foundations Integration Layer (nx_*, Layer 365). The capstone that wires four foundations into the cognitive core: workspace broadcasts hold their winning coalition's concepts in a live J-Space readout, world-model novelty feeds the curiosity learning-progress signal, the agency loop decomposes goals with the planner and recovers by monitoring and replanning, and evolution improves reasoning models scored by refinery critique. Pure plumbing, respecting the acyclic layer order. Chapter 350 covers this pack.
 
@@ -1408,7 +1408,7 @@ WP 416 - consolidation, Causalontology Consolidation (co_*, Layer 391). Merge du
 
 WP 417 - grounding, Causalontology Clue Grounding (co_*, Layer 392). Turn a human natural-language clue and a referent into Causalontology assertions (continuant, disposition, goal, or preventive) tagged as a defeasible human hint - the grounding seam of Causalontology_v5 Section 10. Chapter 356 covers this pack.
 
-WP 418 - co_kin, Causalontology Theory of Mind (co_*, Layer 393). Infer another agent's goal from the targets its moves approach, predict its next step, and name a false belief the true state contradicts. Chapter 356 covers this pack.
+WP 418 - theory_of_mind, Causalontology Theory of Mind (co_*, Layer 393). Infer another agent's goal from the targets its moves approach, predict its next step, and name a false belief the true state contradicts. Chapter 356 covers this pack.
 
 WP 419 - co_liken, Causalontology Analogy (co_*, Layer 394). Map the objects of one situation onto another so the relations line up, score the match, and transfer a known rule across the mapping. Chapter 356 covers this pack.
 
@@ -26301,7 +26301,7 @@ All 20 acceptance tests pass: ranking, upserts, silence, swap, ablation,
 capacity, isolation between workspaces, and the mission.
 
 
-Chapter 349: Theory of Mind - The tom Pack (tm_*, Layer 364)
+Chapter 349: Theory of Mind - The tom Pack (theory_of_mind_*, Layer 364)
 
 The final pack of the AGI Foundations suite tackles the social pillar of
 general intelligence: modelling other minds. The ability being modelled
@@ -26320,11 +26320,11 @@ else's outdated picture of it.
 
 Here is the whole scenario:
 
-    ?- tm_new(M0),
-       tm_event(M0, loc(marble, basket), [sally, anne], M1),
-       tm_event(M1, loc(marble, box),    [anne],        M2).
+    ?- theory_of_mind_new(M0),
+       theory_of_mind_event(M0, loc(marble, basket), [sally, anne], M1),
+       theory_of_mind_event(M1, loc(marble, box),    [anne],        M2).
 
-tm_event is where the magic lives. When a fact changes with witnesses,
+theory_of_mind_event is where the magic lives. When a fact changes with witnesses,
 three things happen: the world is updated; every witness revises their own
 belief; and every witness records that the other witnesses saw it too.
 Absent agents keep their old beliefs. False beliefs are not programmed in -
@@ -26332,16 +26332,16 @@ they are what happens to whoever was out of the room.
 
 Now the questions:
 
-    ?- tm_belief(M2, sally, loc(marble, Where)).
+    ?- theory_of_mind_belief(M2, sally, loc(marble, Where)).
     Where = basket.                       % Sally will look in the basket
 
-    ?- tm_knows(M2, anne, loc(marble, box)).
+    ?- theory_of_mind_knows(M2, anne, loc(marble, box)).
     true.                                 % Anne knows - true belief
 
-    ?- tm_knows(M2, sally, loc(marble, basket)).
+    ?- theory_of_mind_knows(M2, sally, loc(marble, basket)).
     false.                                % Sally believes, but does not know
 
-    ?- tm_false_beliefs(M2, sally, F).
+    ?- theory_of_mind_false_beliefs(M2, sally, F).
     F = [loc(marble, basket)].            % exactly her stale belief
 
 THE SECOND-ORDER QUESTION
@@ -26349,7 +26349,7 @@ THE SECOND-ORDER QUESTION
 The harder test: where does ANNE think SALLY will look? Answering needs a
 belief about a belief.
 
-    ?- tm_attribute(M2, anne, sally, Beliefs).
+    ?- theory_of_mind_attribute(M2, anne, sally, Beliefs).
     Beliefs = [loc(marble, basket)].
 
 Anne watched Sally watch the first event, so Anne models Sally's basket
@@ -26358,15 +26358,15 @@ updated. The nested bookkeeping came free from the witness mechanics.
 
 MORE INSTRUMENTS
 
-tm_divergent lists exactly where two agents contradict each other.
-tm_common lists what everyone in a group shares - the marble's location is
+theory_of_mind_divergent lists exactly where two agents contradict each other.
+theory_of_mind_common lists what everyone in a group shares - the marble's location is
 common belief before the move and common to no one after it.
-tm_perspective re-seats the whole model inside one agent's head: Sally's
+theory_of_mind_perspective re-seats the whole model inside one agent's head: Sally's
 beliefs become the world, and her beliefs about others drop one level, so
 you can reason AS Sally using every other predicate unchanged.
 
-And because agents want things and commit to things, tm_desire and
-tm_intend record per-agent goals and intentions - the belief-desire-
+And because agents want things and commit to things, theory_of_mind_desire and
+theory_of_mind_intend record per-agent goals and intentions - the belief-desire-
 intention triple that social prediction is built from.
 
 The mental model is a pure term: every update returns a new model, so
@@ -26997,9 +26997,9 @@ defeasible, so if acting later contradicts the clue, the system can revise it -
 an honest mistake in a clue is corrected by evidence rather than frozen in.
 
 
-co_kin - Theory of Mind (WP-418, Layer 393)
+theory_of_mind - Theory of Mind (WP-418, Layer 393)
 --------------------------------------------------------------------------------
-A complete mind must be able to think about other minds. co_kin does two things.
+A complete mind must be able to think about other minds. theory_of_mind does two things.
 First, it works out what another agent wants by watching it move: you tell the
 pack which places the agent might be heading to and report its steps, and it
 picks the target the agent's moves most consistently get closer to, then predicts
@@ -27008,7 +27008,7 @@ separate from what is actually true, so it can point to a false belief - a thing
 the agent believes that the real state contradicts. This is the classic
 Sally-Anne test of theory of mind: Sally believes the ball is where she left it,
 though it has quietly been moved, and a mind with theory of mind can represent
-that Sally is mistaken. co_kin is the Causalontology-native version of that
+that Sally is mistaken. theory_of_mind is the Causalontology-native version of that
 ability; the wider system already had a separate, non-Causalontology one.
 
 
