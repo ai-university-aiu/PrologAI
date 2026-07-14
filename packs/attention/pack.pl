@@ -1,12 +1,14 @@
-% State the fact: name(attention).
+% State the fact: this pack is named attention.
 name(attention).
-% State the fact: version('1.0.0').
+% State the fact: this is version 1.0.0.
 version('1.0.0').
-% State the fact: title('PrologAI Attention Economy (ECAN Adaptation) — STI/LTI wages, rent, spreading, and economic forgetting (PR 32)').
-title('PrologAI Attention Economy (ECAN Adaptation) — STI/LTI wages, rent, spreading, and economic forgetting (PR 32)').
-% State the fact: author('PrologAI Community', 'ai.university.aiu@gmail.com').
+% State the fact: the title carries the work-package number and the convergence.
+title('PrologAI Attention — salience scoring with a single-winner broadcast, converged with the STI/LTI attention-economy banker and the predictive attention schema (WP-410)').
+% State the fact: the author and contact address.
 author('PrologAI Community', 'ai.university.aiu@gmail.com').
-% State the fact: home('https://github.com/ai-university-aiu/PrologAI').
+% State the fact: the project home page.
 home('https://github.com/ai-university-aiu/PrologAI').
-% State the fact: download('https://github.com/ai-university-aiu/PrologAI/releases').
+% State the fact: where releases are downloaded from.
 download('https://github.com/ai-university-aiu/PrologAI/releases').
+% State the fact: this pack needs nothing beyond the standard library.
+requires([]).

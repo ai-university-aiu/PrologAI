@@ -2206,16 +2206,26 @@ Causalontology Episodic Memory (co_*, Layer 384)
     episodic_memory_reinforce(+Id,+Delta): nudge a case's valence, clamped to [-1,1].
     episodic_memory_hits(?Id,?Hits) / episodic_memory_count(-N) / episodic_memory_stats(-stats(Count,MeanValence)): store statistics.
 
-co_salience
-Causalontology Attention and Broadcast (co_*, Layer 385)
-    sl_reset/0: clear all candidates and restore default weights.
-    sl_set_weights(+Wnovelty,+Wrelevance,+Waffect) / sl_weights(?Wn,?Wr,?Wa): the salience weights.
-    sl_offer(+Item,+Novelty,+Relevance,+Affect): a specialist offers a candidate (affect in [-1,1]).
-    sl_score(?Item,-Salience): the transparent weighted sum (affect counts by magnitude).
-    sl_candidates(-Pairs): all candidates as Salience-Item, most salient first.
-    sl_working_set(+K,-Items): the best K items currently in mind.
-    sl_broadcast(-Item,-Salience): the single most salient winner of the cognitive cycle.
-    sl_forget(+Item) / sl_count(-N): drop a candidate; count the pool.
+attention
+Attention (attention_*, Layer 385, WP-410; converged with the attention-economy and attention-schema packs)
+    Salience / single-winner-broadcast half —
+    attention_reset/0: clear all candidates and restore default weights.
+    attention_set_weights(+Wnovelty,+Wrelevance,+Waffect) / attention_weights(?Wn,?Wr,?Wa): the salience weights.
+    attention_offer(+Item,+Novelty,+Relevance,+Affect): a specialist offers a candidate (affect in [-1,1]).
+    attention_score(?Item,-Salience): the transparent weighted sum (affect counts by magnitude).
+    attention_candidates(-Pairs): all candidates as Salience-Item, most salient first.
+    attention_working_set(+K,-Items): the best K items currently in mind.
+    attention_broadcast(-Item,-Salience): the single most salient winner of the cognitive cycle.
+    attention_forget(+Item) / attention_count(-N): drop a candidate; count the pool.
+    Attention-economy half (absorbed from the attention pack) —
+    attention_level(+Node,+Dimension,?Value): the STI or LTI importance of a node.
+    attention_wage(+Node,+Rate,-Credits) / attention_banker_cycle/0: pay wages and run one banker rent-and-spread cycle.
+    attention_link(+A,+B) / attention_spread(+Node,-Reached): co-activation links and importance spreading.
+    attention_metrics(-Metrics) / attention_evict_lowest_lti(-Node): economy totals; evict the lowest-LTI node.
+    Attention-schema half (absorbed from the attention_schema pack) —
+    attention_schema(+Input,-Prediction) / attention_predict(+Input,-Predicted): the predictive self-model of attention.
+    attention_schema_score(+Actual,+Predicted,-Score): how accurate the schema was.
+    attention_schema_enable/0 / attention_schema_disable/0: turn the schema on or off.
 
 motivation
 Motivation (motivation_*, Layer 386; converged with the Psi modulator bus)

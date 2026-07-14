@@ -93,7 +93,7 @@
 
 % Soft dependency on attention — load only if the library is available.
 :- ignore(catch(use_module(library(attention),
-                            [pai_attention/3, pai_banker_cycle/0]),
+                            [attention_level/3, attention_banker_cycle/0]),
                 _,
                 true)).
 
@@ -198,7 +198,7 @@ pai_dream_slow_wave(MindId, Count, Consolidated) :-
     % Run generative replay on the top Count SONA trajectories.
     pai_dream_generative_replay(MindId, Count, Replayed),
     % Run one full attention-economy banker cycle; ignore errors if pack absent.
-    catch(pai_banker_cycle, _, true),
+    catch(attention_banker_cycle, _, true),
     % Compute how many trajectories were replayed.
     length(Replayed, N),
     % Build the slow-wave content descriptor.
@@ -235,7 +235,7 @@ dream_high_lti_nodes(Nodes) :-
                 % Collect NodeId values.
                 NodeId,
                 % Find all nodes where LTI value is positive.
-                (   attention:pai_attention(NodeId, lti, V),
+                (   attention:attention_level(NodeId, lti, V),
                     V > 0
                 ),
                 Nodes0

@@ -1392,7 +1392,7 @@ WP 402 - state_graph, Causalontology State-Graph Exploration (co_*, Layer 377). 
 
 WP 409 - episodic_memory, Causalontology Episodic Memory (co_*, Layer 384). The case memory the co_ family lacked: every experience is a small reified case (context, action, outcome, valence) recalled by feature overlap, replayed, and reinforced. Chapter 355 covers this pack.
 
-WP 410 - co_salience, Causalontology Attention and Broadcast (co_*, Layer 385). Specialists offer items with novelty, relevance, and affect; a weighted sum scores them; a bounded working set holds the best few; one winner is broadcast per cognitive cycle. Chapter 355 covers this pack.
+WP 410 - attention, Causalontology Attention and Broadcast (co_*, Layer 385). Specialists offer items with novelty, relevance, and affect; a weighted sum scores them; a bounded working set holds the best few; one winner is broadcast per cognitive cycle. Chapter 355 covers this pack.
 
 WP 411 - motivation, Causalontology Motivation (co_*, Layer 386). Homeostatic set-points whose gap from the current reading becomes pressure, turned into a never-empty prioritized agenda of self-generated goals. Chapter 355 covers this pack.
 
@@ -1416,7 +1416,7 @@ WP 420 - concept_formation, Causalontology Concept Formation (co_*, Layer 395). 
 
 WP 421 - imagination, Causalontology Imagination (co_*, Layer 396). Roll a start state forward through a transition model into a quarantined imagined reality, score whether it reaches a goal, pick the fewest-step plan, and cross a finding into fact only by deliberate promotion. Chapter 357 covers this pack.
 
-WP 422 - priming, Causalontology Priming (co_*, Layer 397). Spread activation over a weighted association graph with per-hop decay, so whatever is active makes its neighbours relevant - the complement to co_salience. Chapter 357 covers this pack.
+WP 422 - priming, Causalontology Priming (co_*, Layer 397). Spread activation over a weighted association graph with per-hop decay, so whatever is active makes its neighbours relevant - the complement to attention. Chapter 357 covers this pack.
 
 WP 423 - regulation, Causalontology Regulation (co_*, Layer 398). Classify feedback into the four flavours and split a behaviour that both wins and loses by finding the discriminating feature. Chapter 357 covers this pack.
 
@@ -26867,7 +26867,7 @@ its hit count; episodic_memory_reinforce nudges a case's valence when it proves 
 is the glass-box analogue of an associative, case-based memory.
 
 
-co_salience - Attention and Broadcast (WP-410, Layer 385)
+attention - Attention and Broadcast (WP-410, Layer 385)
 --------------------------------------------------------------------------------
 A mind needs one integrating rhythm. Many specialists offer things that might
 matter; a spotlight scores them; a bounded few are held in mind at once; and
@@ -26875,8 +26875,8 @@ exactly one winner is broadcast to the whole system each cognitive cycle. A
 specialist offers an item with three plain numbers - novelty (surprise),
 relevance (bearing on the goal), and affect (emotional charge) - and salience is
 a transparent weighted sum in which affect counts by its magnitude, because both
-a strong good and a strong bad feeling grab attention. sl_working_set is the best
-K items the mind holds now; sl_broadcast is the single winner the rest of the
+a strong good and a strong bad feeling grab attention. attention_working_set is the best
+K items the mind holds now; attention_broadcast is the single winner the rest of the
 system reads.
 
 
@@ -27099,7 +27099,7 @@ associations, and from a set of active starting nodes it lets activation flow
 outward along the links, fading by a decay at each hop. A node's activation is
 the strongest path that reaches it. The calculation is a plain, terminating
 relaxation - never a trained weight - so you can always read why a node is
-primed. priming is the natural partner of co_salience from Chapter 355:
+primed. priming is the natural partner of attention from Chapter 355:
 salience picks the single most important item from the things offered to the
 mind, while priming decides what becomes relevant, and available to be offered,
 in the first place.
