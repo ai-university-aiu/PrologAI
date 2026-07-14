@@ -3,7 +3,7 @@
     THE_BUILDING_FILES give a mind a network of associations and a way for
     activation to flow across it: when something becomes active, the things it is
     linked to become relevant too, more weakly the further away they are. That is
-    priming — the reason "salt" brings "pepper" to mind. co_salience already picks
+    priming — the reason "salt" brings "pepper" to mind. attention already picks
     the single most salient item from things offered to it; this pack is the
     complementary faculty that decides WHAT becomes relevant in the first place,
     by spreading activation over a graph of associations.
