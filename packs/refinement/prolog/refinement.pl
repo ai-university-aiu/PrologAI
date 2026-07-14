@@ -76,8 +76,8 @@
                                      scope_seal/1, scope_scan/5]).
 % Import [cyclic_actor/3, cyclic_actor_stop/1] from the built-in 'cyclic_actor' library.
 :- use_module(library(cyclic_actor),[cyclic_actor/3, cyclic_actor_stop/1]).
-% Import [pai_sentinel_entry/6] from the built-in 'sentinels' library.
-:- use_module(library(sentinels),   [pai_sentinel_entry/6]).
+% Import [sentinels_entry/6] from the built-in 'sentinels' library.
+:- use_module(library(sentinels),   [sentinels_entry/6]).
 % Import [member/2] from the built-in 'lists' library.
 :- use_module(library(lists),       [member/2]).
 % Import [maplist/3] from the built-in 'apply' library.
@@ -594,7 +594,7 @@ diagnose_one(repeated_plan_failure(Plan, Count)) :-
 % Define a clause for 'diagnose one': succeed when the following conditions hold.
 diagnose_one(dead_sentinel(Domain)) :-
     % State a fact for 'pai sentinel entry' with the arguments listed below.
-    pai_sentinel_entry(Domain, _, _, _, _, _),
+    sentinels_entry(Domain, _, _, _, _, _),
     % Succeed only if 'lattice:lattice_node_fact(_, _, sentinel_fired, [Domain|_], _' cannot be proved (negation as failure).
     \+ lattice:lattice_node_fact(_, _, sentinel_fired, [Domain|_], _).
 
@@ -750,8 +750,8 @@ pai_reflect_module(Module, Desc) :-
 
 % Define a clause for 'pai reflect sentinel': succeed when the following conditions hold.
 pai_reflect_sentinel(Name, Desc) :-
-    % Execute: ( pai_sentinel_entry(Name, Priority, Pattern, Objectives, Action, Doc).
-    ( pai_sentinel_entry(Name, Priority, Pattern, Objectives, Action, Doc)
+    % Execute: ( sentinels_entry(Name, Priority, Pattern, Objectives, Action, Doc).
+    ( sentinels_entry(Name, Priority, Pattern, Objectives, Action, Doc)
     % If the condition above succeeded, perform the following action.
     ->  aggregate_all(count,
                       % Continue the multi-line expression started above.

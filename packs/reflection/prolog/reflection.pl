@@ -14,34 +14,34 @@
       gating_actor      (5 000 ms) — unified gating: filters objectives by readiness
       impasse_actor     (2 000 ms) — converts dead-ends into subgoal node_facts
 
-    Sentinel actors (registered via pai_register_sentinel):
+    Sentinel actors (registered via sentinels_register):
       compensation_actor — triggered by plan_needs_revision node_facts
       discovery_actor    — triggered by percept node_facts below novelty threshold
 
     Entry points:
-      install_reflection_actors/0  — start all actors and register sentinels
-      uninstall_reflection_actors/0 — stop all actors and retract sentinels
+      reflection_install_actors/0  — start all actors and register sentinels
+      reflection_uninstall_actors/0 — stop all actors and retract sentinels
 */
 
 % Declare this file as the 'reflection' module and list its exported predicates.
 :- module(reflection, [
-    % Supply 'install_reflection_actors/0' as the next argument to the expression above.
-    install_reflection_actors/0,
-    % Supply 'uninstall_reflection_actors/0' as the next argument to the expression above.
-    uninstall_reflection_actors/0,
+    % Supply 'reflection_install_actors/0' as the next argument to the expression above.
+    reflection_install_actors/0,
+    % Supply 'reflection_uninstall_actors/0' as the next argument to the expression above.
+    reflection_uninstall_actors/0,
     % Cycle-body predicates (exported for testing without starting a thread)
-    % Supply 'motivation_cycle/0' as the next argument to the expression above.
-    motivation_cycle/0,
-    % Supply 'regulation_cycle/0' as the next argument to the expression above.
-    regulation_cycle/0,
-    % Supply 'exploration_cycle/0' as the next argument to the expression above.
-    exploration_cycle/0,
-    % Supply 'meta_control_cycle/0' as the next argument to the expression above.
-    meta_control_cycle/0,
-    % Supply 'gating_cycle/0' as the next argument to the expression above.
-    gating_cycle/0,
-    % Supply 'impasse_cycle/0' as the next argument to the expression above.
-    impasse_cycle/0
+    % Supply 'reflection_motivation_cycle/0' as the next argument to the expression above.
+    reflection_motivation_cycle/0,
+    % Supply 'reflection_regulation_cycle/0' as the next argument to the expression above.
+    reflection_regulation_cycle/0,
+    % Supply 'reflection_exploration_cycle/0' as the next argument to the expression above.
+    reflection_exploration_cycle/0,
+    % Supply 'reflection_meta_control_cycle/0' as the next argument to the expression above.
+    reflection_meta_control_cycle/0,
+    % Supply 'reflection_gating_cycle/0' as the next argument to the expression above.
+    reflection_gating_cycle/0,
+    % Supply 'reflection_impasse_cycle/0' as the next argument to the expression above.
+    reflection_impasse_cycle/0
 % Close the expression opened above.
 ]).
 
@@ -49,8 +49,8 @@
 :- use_module(library(cyclic_actor), [cyclic_actor/3, cyclic_actor_stop/1,
                                       % Continue the multi-line expression started above.
                                       cyclic_actor_list/1, cyclic_actor_status/2]).
-% Import [pai_register_sentinel/6, sentinel_retract/1] from the built-in 'sentinels' library.
-:- use_module(library(sentinels),    [pai_register_sentinel/6, sentinel_retract/1]).
+% Import [sentinels_register/6, sentinels_retract/1] from the built-in 'sentinels' library.
+:- use_module(library(sentinels),    [sentinels_register/6, sentinels_retract/1]).
 % Load the built-in 'node_facts' library so its predicates are available here.
 :- use_module(library(node_facts),   [anchor_node/4, default_nexus/1,
                                       % Continue the multi-line expression started above.
@@ -66,33 +66,33 @@
 % Reflection actor name registry
 % ---------------------------------------------------------------------------
 
-% State the fact: reflection cyclic actor(motivation_actor,   reflection:motivation_cycle,   1000).
-reflection_cyclic_actor(motivation_actor,   reflection:motivation_cycle,   1000).
-% State the fact: reflection cyclic actor(daydream_actor,     reflection:daydream_cycle,    5000).
-reflection_cyclic_actor(daydream_actor,     reflection:daydream_cycle,    5000).
-% State the fact: reflection cyclic actor(regulation_actor,   reflection:regulation_cycle,  2000).
-reflection_cyclic_actor(regulation_actor,   reflection:regulation_cycle,  2000).
-% State the fact: reflection cyclic actor(coping_actor,       reflection:coping_cycle,     10000).
-reflection_cyclic_actor(coping_actor,       reflection:coping_cycle,     10000).
-% State the fact: reflection cyclic actor(exploration_actor,  reflection:exploration_cycle, 30000).
-reflection_cyclic_actor(exploration_actor,  reflection:exploration_cycle, 30000).
-% State the fact: reflection cyclic actor(imitation_actor,    reflection:imitation_cycle,   5000).
-reflection_cyclic_actor(imitation_actor,    reflection:imitation_cycle,   5000).
-% State the fact: reflection cyclic actor(play_actor,         reflection:play_cycle,       60000).
-reflection_cyclic_actor(play_actor,         reflection:play_cycle,       60000).
-% State the fact: reflection cyclic actor(meta_control_actor, reflection:meta_control_cycle, 5000).
-reflection_cyclic_actor(meta_control_actor, reflection:meta_control_cycle, 5000).
-% State the fact: reflection cyclic actor(gating_actor,       reflection:gating_cycle,      5000).
-reflection_cyclic_actor(gating_actor,       reflection:gating_cycle,      5000).
-% State the fact: reflection cyclic actor(impasse_actor,      reflection:impasse_cycle,     2000).
-reflection_cyclic_actor(impasse_actor,      reflection:impasse_cycle,     2000).
+% State the fact: reflection cyclic actor(motivation_actor,   reflection:reflection_motivation_cycle,   1000).
+reflection_cyclic_actor(motivation_actor,   reflection:reflection_motivation_cycle,   1000).
+% State the fact: reflection cyclic actor(daydream_actor,     reflection:reflection_daydream_cycle,    5000).
+reflection_cyclic_actor(daydream_actor,     reflection:reflection_daydream_cycle,    5000).
+% State the fact: reflection cyclic actor(regulation_actor,   reflection:reflection_regulation_cycle,  2000).
+reflection_cyclic_actor(regulation_actor,   reflection:reflection_regulation_cycle,  2000).
+% State the fact: reflection cyclic actor(coping_actor,       reflection:reflection_coping_cycle,     10000).
+reflection_cyclic_actor(coping_actor,       reflection:reflection_coping_cycle,     10000).
+% State the fact: reflection cyclic actor(exploration_actor,  reflection:reflection_exploration_cycle, 30000).
+reflection_cyclic_actor(exploration_actor,  reflection:reflection_exploration_cycle, 30000).
+% State the fact: reflection cyclic actor(imitation_actor,    reflection:reflection_imitation_cycle,   5000).
+reflection_cyclic_actor(imitation_actor,    reflection:reflection_imitation_cycle,   5000).
+% State the fact: reflection cyclic actor(play_actor,         reflection:reflection_play_cycle,       60000).
+reflection_cyclic_actor(play_actor,         reflection:reflection_play_cycle,       60000).
+% State the fact: reflection cyclic actor(meta_control_actor, reflection:reflection_meta_control_cycle, 5000).
+reflection_cyclic_actor(meta_control_actor, reflection:reflection_meta_control_cycle, 5000).
+% State the fact: reflection cyclic actor(gating_actor,       reflection:reflection_gating_cycle,      5000).
+reflection_cyclic_actor(gating_actor,       reflection:reflection_gating_cycle,      5000).
+% State the fact: reflection cyclic actor(impasse_actor,      reflection:reflection_impasse_cycle,     2000).
+reflection_cyclic_actor(impasse_actor,      reflection:reflection_impasse_cycle,     2000).
 
 % ---------------------------------------------------------------------------
-% install_reflection_actors/0
+% reflection_install_actors/0
 % ---------------------------------------------------------------------------
 
-% Execute: install_reflection_actors :-.
-install_reflection_actors :-
+% Execute: reflection_install_actors :-.
+reflection_install_actors :-
     % Verify that for every solution of the Condition, the Action also holds.
     forall(
         % Continue the multi-line expression started above.
@@ -111,15 +111,15 @@ install_reflection_actors :-
         )
     % Close the expression opened above.
     ),
-    % State the zero-argument fact 'register_sentinel_actors'.
-    register_sentinel_actors.
+    % State the zero-argument fact 'reflection_register_sentinel_actors'.
+    reflection_register_sentinel_actors.
 
 % ---------------------------------------------------------------------------
-% uninstall_reflection_actors/0
+% reflection_uninstall_actors/0
 % ---------------------------------------------------------------------------
 
-% Execute: uninstall_reflection_actors :-.
-uninstall_reflection_actors :-
+% Execute: reflection_uninstall_actors :-.
+reflection_uninstall_actors :-
     % Verify that for every solution of the Condition, the Action also holds.
     forall(
         % Continue the multi-line expression started above.
@@ -129,38 +129,38 @@ uninstall_reflection_actors :-
     % Close the expression opened above.
     ),
     % State a fact for 'sentinel retract' with the arguments listed below.
-    sentinel_retract(compensation_actor),
+    sentinels_retract(compensation_actor),
     % State the fact: sentinel retract(discovery_actor).
-    sentinel_retract(discovery_actor).
+    sentinels_retract(discovery_actor).
 
 % ---------------------------------------------------------------------------
 % Sentinel actor registration
 % ---------------------------------------------------------------------------
 
-% Execute: register_sentinel_actors :-.
-register_sentinel_actors :-
+% Execute: reflection_register_sentinel_actors :-.
+reflection_register_sentinel_actors :-
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(
+    sentinels_register(
         % Continue the multi-line expression started above.
         compensation_actor, 50,
         % Continue the multi-line expression started above.
         node_fact(_, plan_needs_revision, _, _),
         % Continue the multi-line expression started above.
         [],
-        % Supply 'reflection:compensation_cycle' as the next argument to the expression above.
-        reflection:compensation_cycle,
+        % Supply 'reflection:reflection_compensation_cycle' as the next argument to the expression above.
+        reflection:reflection_compensation_cycle,
         % Continue the multi-line expression started above.
         "Generate alternative plans when the current plan needs revision"),
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(
+    sentinels_register(
         % Continue the multi-line expression started above.
         discovery_actor, 40,
         % Continue the multi-line expression started above.
         node_fact(_, percept_signal, _, _),
         % Continue the multi-line expression started above.
         [],
-        % Supply 'reflection:discovery_cycle' as the next argument to the expression above.
-        reflection:discovery_cycle,
+        % Supply 'reflection:reflection_discovery_cycle' as the next argument to the expression above.
+        reflection:reflection_discovery_cycle,
         % Continue the multi-line expression started above.
         "Detect novel percepts and publish novelty events").
 
@@ -168,8 +168,8 @@ register_sentinel_actors :-
 % Cycle bodies
 % ---------------------------------------------------------------------------
 
-% Execute: motivation_cycle :-.
-motivation_cycle :-
+% Execute: reflection_motivation_cycle :-.
+reflection_motivation_cycle :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
@@ -193,7 +193,7 @@ motivation_cycle :-
                         % Continue the multi-line expression started above.
                         member(need(NeedId, Target, Unit), Needs),
                         % Continue the multi-line expression started above.
-                        record_homeostatic_delta(Nexus, Addr, NeedId, Target, Unit)
+                        reflection_record_homeostatic_delta(Nexus, Addr, NeedId, Target, Unit)
                     % Close the expression opened above.
                     )
                 % Otherwise (else branch), perform the following action.
@@ -212,7 +212,7 @@ motivation_cycle :-
     ).
 
 % Define a clause for 'record homeostatic delta': succeed when the following conditions hold.
-record_homeostatic_delta(Nexus, Addr, NeedId, Target, Unit) :-
+reflection_record_homeostatic_delta(Nexus, Addr, NeedId, Target, Unit) :-
     % Look for the most recent interoceptive_signal for this need
     % Execute: ( node_facts:lattice_node_fact(Nexus, _, percept_signal,.
     ( node_facts:lattice_node_fact(Nexus, _, percept_signal,
@@ -235,8 +235,8 @@ record_homeostatic_delta(Nexus, Addr, NeedId, Target, Unit) :-
     % Close the expression opened above.
     ).
 
-% Execute: daydream_cycle :-.
-daydream_cycle :-
+% Execute: reflection_daydream_cycle :-.
+reflection_daydream_cycle :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
@@ -275,8 +275,8 @@ daydream_cycle :-
     % Close the expression opened above.
     ).
 
-% Execute: regulation_cycle :-.
-regulation_cycle :-
+% Execute: reflection_regulation_cycle :-.
+reflection_regulation_cycle :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
@@ -294,7 +294,7 @@ regulation_cycle :-
             % Continue the multi-line expression started above.
             member(_Id-CmdId-Success, PropSigs),
             % Continue the multi-line expression started above.
-            regulate_outcome(Nexus, CmdId, Success)
+            reflection_regulate_outcome(Nexus, CmdId, Success)
         % Close the expression opened above.
         )
     % Otherwise (else branch), perform the following action.
@@ -303,7 +303,7 @@ regulation_cycle :-
     ).
 
 % Define a clause for 'regulate outcome': succeed when the following conditions hold.
-regulate_outcome(Nexus, CmdId, Success) :-
+reflection_regulate_outcome(Nexus, CmdId, Success) :-
     % Find the original command
     % Execute: ( node_facts:lattice_node_fact(Nexus, _, body_command, [_, CmdId, _Cmd], _).
     ( node_facts:lattice_node_fact(Nexus, _, body_command, [_, CmdId, _Cmd], _)
@@ -334,8 +334,8 @@ regulate_outcome(Nexus, CmdId, Success) :-
     % Close the expression opened above.
     ).
 
-% Execute: coping_cycle :-.
-coping_cycle :-
+% Execute: reflection_coping_cycle :-.
+reflection_coping_cycle :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
@@ -371,8 +371,8 @@ coping_cycle :-
     % Close the expression opened above.
     ).
 
-% Execute: exploration_cycle :-.
-exploration_cycle :-
+% Execute: reflection_exploration_cycle :-.
+reflection_exploration_cycle :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
@@ -394,8 +394,8 @@ exploration_cycle :-
     % Close the expression opened above.
     ).
 
-% Execute: imitation_cycle :-.
-imitation_cycle :-
+% Execute: reflection_imitation_cycle :-.
+reflection_imitation_cycle :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
@@ -433,8 +433,8 @@ imitation_cycle :-
     % Close the expression opened above.
     ).
 
-% Execute: play_cycle :-.
-play_cycle :-
+% Execute: reflection_play_cycle :-.
+reflection_play_cycle :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
@@ -458,8 +458,8 @@ play_cycle :-
     % Close the expression opened above.
     ).
 
-% Execute: meta_control_cycle :-.
-meta_control_cycle :-
+% Execute: reflection_meta_control_cycle :-.
+reflection_meta_control_cycle :-
     % Check all running actors for high error counts
     % State a fact for 'cyclic actor list' with the arguments listed below.
     cyclic_actor_list(Names),
@@ -523,8 +523,8 @@ meta_control_cycle :-
     % Close the expression opened above.
     ).
 
-% Execute: gating_cycle :-.
-gating_cycle :-
+% Execute: reflection_gating_cycle :-.
+reflection_gating_cycle :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
@@ -548,8 +548,8 @@ gating_cycle :-
     % Close the expression opened above.
     ).
 
-% Execute: impasse_cycle :-.
-impasse_cycle :-
+% Execute: reflection_impasse_cycle :-.
+reflection_impasse_cycle :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
@@ -582,8 +582,8 @@ impasse_cycle :-
     ).
 
 % Sentinel action: compensation cycle
-% Execute: compensation_cycle :-.
-compensation_cycle :-
+% Execute: reflection_compensation_cycle :-.
+reflection_compensation_cycle :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
@@ -600,8 +600,8 @@ compensation_cycle :-
     ).
 
 % Sentinel action: discovery cycle
-% Execute: discovery_cycle :-.
-discovery_cycle :-
+% Execute: reflection_discovery_cycle :-.
+reflection_discovery_cycle :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.

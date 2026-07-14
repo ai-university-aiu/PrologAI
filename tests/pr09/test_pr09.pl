@@ -4,11 +4,11 @@
     AC-PR09-002: Higher priority sentinel fires before lower priority.
     AC-PR09-003: Sentinel in inactive domain does NOT fire.
     AC-PR09-004: Semantic similarity match fires sentinel (Phase 2).
-    AC-PR09-005: sentinel_retract removes a sentinel; it no longer fires.
+    AC-PR09-005: sentinels_retract removes a sentinel; it no longer fires.
     AC-PR09-006: Action exception is caught; other sentinels continue.
     AC-PR09-007: Multiple sentinels all fire on a matching change.
-    AC-PR09-008: sentinel_list/2 returns registered sentinels.
-    AC-PR09-009: sentinel_domain_deactivate suspends evaluation.
+    AC-PR09-008: sentinels_list/2 returns registered sentinels.
+    AC-PR09-009: sentinels_domain_deactivate suspends evaluation.
 */
 
 % Execute the compile-time directive: prolog_load_context(directory, TestDir),.
@@ -37,11 +37,11 @@
 % Import [anchor_node/4, set_default_nexus/1] from the built-in 'node_facts' library.
 :- use_module(library(node_facts),      [anchor_node/4, set_default_nexus/1]).
 % Load the built-in 'sentinels' library so its predicates are available here.
-:- use_module(library(sentinels),       [pai_register_sentinel/6, sentinel_retract/1,
+:- use_module(library(sentinels),       [sentinels_register/6, sentinels_retract/1,
                                          % Continue the multi-line expression started above.
-                                         sentinel_list/2, sentinel_domain_activate/1,
+                                         sentinels_list/2, sentinels_domain_activate/1,
                                          % Continue the multi-line expression started above.
-                                         sentinel_domain_deactivate/1]).
+                                         sentinels_domain_deactivate/1]).
 % Load the built-in 'sentinel_engine' library so its predicates are available here.
 :- use_module(library(sentinel_engine)).
 
@@ -62,16 +62,16 @@ pr09_setup :-
     % Remove all matching facts from the runtime knowledge base.
     retractall(user:pr09_fired(_)),
     % State the fact: sentinel retract(pr09_test).
-    sentinel_retract(pr09_test).
+    sentinels_retract(pr09_test).
 
 % Execute: pr09_cleanup :-.
 pr09_cleanup :-
     % State a fact for 'sentinel retract' with the arguments listed below.
-    sentinel_retract(pr09_test),
+    sentinels_retract(pr09_test),
     % State a fact for 'sentinel retract' with the arguments listed below.
-    sentinel_retract(pr09_priority),
+    sentinels_retract(pr09_priority),
     % State a fact for 'sentinel retract' with the arguments listed below.
-    sentinel_retract(pr09_inactive),
+    sentinels_retract(pr09_inactive),
     % State a fact for 'lattice open' with the arguments listed below.
     lattice_open('locus://localhost/pr09', N),
     % State the fact: lattice close(N).
@@ -80,7 +80,7 @@ pr09_cleanup :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(sentinel_fires_on_match) :-
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_test, 10,
+    sentinels_register(pr09_test, 10,
         % Continue the multi-line expression started above.
         node_fact(_, percept, [apple|_], _),
         % Continue the multi-line expression started above.
@@ -99,19 +99,19 @@ test(priority_ordering) :-
     % Remove all matching facts from the runtime knowledge base.
     retractall(user:pr09_fired(_)),
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_priority, 20,
+    sentinels_register(pr09_priority, 20,
         % Continue the multi-line expression started above.
         node_fact(_, fruit, _, _),
         % Continue the multi-line expression started above.
         [], assertz(user:pr09_fired(high_prio)), "High"),
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_priority, 5,
+    sentinels_register(pr09_priority, 5,
         % Continue the multi-line expression started above.
         node_fact(_, fruit, _, _),
         % Continue the multi-line expression started above.
         [], assertz(user:pr09_fired(low_prio)), "Low"),
     % State a fact for 'sentinel retract' with the arguments listed below.
-    sentinel_retract(pr09_test),  % avoid test sentinels firing on fruit too
+    sentinels_retract(pr09_test),  % avoid test sentinels firing on fruit too
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(fruit, [banana], [], _),
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
@@ -124,13 +124,13 @@ test(priority_ordering) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(inactive_domain_no_fire) :-
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_inactive, 10,
+    sentinels_register(pr09_inactive, 10,
         % Continue the multi-line expression started above.
         node_fact(_, veggie, _, _),
         % Continue the multi-line expression started above.
         [], assertz(user:pr09_fired(veggie_detected)), "Veggie"),
     % State a fact for 'sentinel domain deactivate' with the arguments listed below.
-    sentinel_domain_deactivate(pr09_inactive),
+    sentinels_domain_deactivate(pr09_inactive),
     % Remove all matching facts from the runtime knowledge base.
     retractall(user:pr09_fired(_)),
     % State a fact for 'anchor node' with the arguments listed below.
@@ -138,12 +138,12 @@ test(inactive_domain_no_fire) :-
     % Succeed only if 'user:pr09_fired(veggie_detected' cannot be proved (negation as failure).
     \+ user:pr09_fired(veggie_detected),
     % State the fact: sentinel domain activate(pr09_inactive).
-    sentinel_domain_activate(pr09_inactive).
+    sentinels_domain_activate(pr09_inactive).
 
 % Define a clause for 'test': succeed when the following conditions hold.
 test(semantic_similarity_phase2) :-
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_test, 8,
+    sentinels_register(pr09_test, 8,
         % Continue the multi-line expression started above.
         node_fact(_, percept, [orange|_], _),
         % Continue the multi-line expression started above.
@@ -156,13 +156,13 @@ test(semantic_similarity_phase2) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(sentinel_retract_stops_firing) :-
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_test, 15,
+    sentinels_register(pr09_test, 15,
         % Continue the multi-line expression started above.
         node_fact(_, temp_rel, _, _),
         % Continue the multi-line expression started above.
         [], assertz(user:pr09_fired(temp_fired)), "Temp"),
     % State a fact for 'sentinel retract' with the arguments listed below.
-    sentinel_retract(pr09_test),
+    sentinels_retract(pr09_test),
     % Remove all matching facts from the runtime knowledge base.
     retractall(user:pr09_fired(_)),
     % State a fact for 'anchor node' with the arguments listed below.
@@ -175,13 +175,13 @@ test(action_error_continues) :-
     % Remove all matching facts from the runtime knowledge base.
     retractall(user:pr09_fired(_)),
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_test, 30,
+    sentinels_register(pr09_test, 30,
         % Continue the multi-line expression started above.
         node_fact(_, err_rel, _, _),
         % Continue the multi-line expression started above.
         [], throw(sentinel_test_error), "Thrower"),
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_test, 5,
+    sentinels_register(pr09_test, 5,
         % Continue the multi-line expression started above.
         node_fact(_, err_rel, _, _),
         % Continue the multi-line expression started above.
@@ -196,13 +196,13 @@ test(multiple_sentinels_all_fire) :-
     % Remove all matching facts from the runtime knowledge base.
     retractall(user:pr09_fired(_)),
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_test, 10,
+    sentinels_register(pr09_test, 10,
         % Continue the multi-line expression started above.
         node_fact(_, multi_rel, _, _),
         % Continue the multi-line expression started above.
         [], assertz(user:pr09_fired(multi1)), "Multi1"),
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_test, 10,
+    sentinels_register(pr09_test, 10,
         % Continue the multi-line expression started above.
         node_fact(_, multi_rel, _, _),
         % Continue the multi-line expression started above.
@@ -217,26 +217,26 @@ test(multiple_sentinels_all_fire) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(sentinel_list_returns_registered) :-
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_test, 42,
+    sentinels_register(pr09_test, 42,
         % Continue the multi-line expression started above.
         node_fact(_, list_rel, _, _),
         % Continue the multi-line expression started above.
         [], true, "List test"),
     % State a fact for 'sentinel list' with the arguments listed below.
-    sentinel_list(pr09_test, L),
+    sentinels_list(pr09_test, L),
     % Check that 'L' is not unifiable with '[]'.
     L \= [].
 
 % Define a clause for 'test': succeed when the following conditions hold.
 test(domain_deactivate_reactivate) :-
     % State a fact for 'sentinel domain deactivate' with the arguments listed below.
-    sentinel_domain_deactivate(pr09_test),
+    sentinels_domain_deactivate(pr09_test),
     % State a fact for 'sentinel domain activate' with the arguments listed below.
-    sentinel_domain_activate(pr09_test),
+    sentinels_domain_activate(pr09_test),
     % Remove all matching facts from the runtime knowledge base.
     retractall(user:pr09_fired(_)),
     % State a fact for 'pai register sentinel' with the arguments listed below.
-    pai_register_sentinel(pr09_test, 10,
+    sentinels_register(pr09_test, 10,
         % Continue the multi-line expression started above.
         node_fact(_, react_rel, _, _),
         % Continue the multi-line expression started above.

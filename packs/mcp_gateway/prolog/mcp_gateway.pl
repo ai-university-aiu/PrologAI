@@ -17,8 +17,8 @@
       actor_list       — wraps cyclic_actor_list/1
       actor_start      — wraps cyclic_actor/3
       actor_stop       — wraps cyclic_actor_stop/1
-      sentinel_register — wraps pai_register_sentinel/6
-      sentinel_list    — wraps sentinel_list/2
+      sentinel_register — wraps sentinels_register/6
+      sentinels_list    — wraps sentinels_list/2
       body_enroll      — wraps manifest_body/3
       body_signal      — wraps relay_percept/2
       body_command     — wraps dispatch_command/2
@@ -70,9 +70,9 @@
                                             % Continue the multi-line expression started above.
                                             cyclic_actor_stop/1]).
 % Load the built-in 'sentinels' library so its predicates are available here.
-:- use_module(library(sentinels),          [pai_register_sentinel/6,
+:- use_module(library(sentinels),          [sentinels_register/6,
                                             % Continue the multi-line expression started above.
-                                            sentinel_list/2]).
+                                            sentinels_list/2]).
 
 % ---------------------------------------------------------------------------
 % API key store (default: empty = no auth required in dev mode)
@@ -283,11 +283,11 @@ dispatch_tool(actor_stop, Params, ok) :-
     cyclic_actor_stop(Name).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(sentinel_list, Params, SentinelTerms) :-
+dispatch_tool(sentinels_list, Params, SentinelTerms) :-
     % Check that 'Domain' is unifiable with 'Params.get(domain, general)'.
     Domain = Params.get(domain, general),
     % State a fact for 'sentinel list' with the arguments listed below.
-    sentinel_list(Domain, Sentinels),
+    sentinels_list(Domain, Sentinels),
     % State the fact: maplist([S, A]>>(term_to_atom(S, A)), Sentinels, SentinelTerms).
     maplist([S, A]>>(term_to_atom(S, A)), Sentinels, SentinelTerms).
 
