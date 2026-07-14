@@ -2337,19 +2337,28 @@ Causalontology Concept Formation (co_*, Layer 395)
     concept_formation_classify(+Features,+Concepts,-ConceptId): the first concept whose defining core is a subset of the features.
     concept_formation_count(-N): how many items have been observed.
 
-co_muse
-Causalontology Imagination (co_*, Layer 396)
-    mu_reset/0: clear every reality partition and the transition model.
-    mu_realities(-Names): the five standard partitions (observed, desired, expected, imagined, recalled).
-    mu_assert(+Reality,+Fact) / mu_holds(?Reality,?Fact) / mu_clear(+Reality): place, query, and empty a partition.
-    mu_transition_add(+State,+Action,+NextState): record a known transition used for imagining.
-    mu_imagine(+Start,+ActionSeq,-Trajectory): roll a start state forward, sealing each visited state in the imagined reality.
-    mu_reaches(+Start,+ActionSeq,-EndState): the final state a sequence reaches.
-    mu_evaluate(+Trajectory,+GoalState,-Score): 1.0 if the goal is reached, else 0.0.
-    mu_steps_to(+Trajectory,+GoalState,-Steps): the step index at which the goal first appears.
-    mu_best_plan(+Start,+CandidateSeqs,+GoalState,-BestSeq): the candidate reaching the goal in fewest steps.
-    mu_quarantined(?Fact): a fact imagined but not observed (sealed off from fact).
-    mu_promote(+FromReality,+Fact,+ToReality): the only, deliberate way an imagined finding crosses into another reality.
+imagination
+Imagination (imagination_*, Layer 396, WP-421; converged with the daydream and imagination packs)
+    Quarantined-realities half —
+    imagination_reset/0: clear every reality partition and the transition model.
+    imagination_realities(-Names): the five standard partitions (observed, desired, expected, imagined, recalled).
+    imagination_assert(+Reality,+Fact) / imagination_holds(?Reality,?Fact) / imagination_clear(+Reality): place, query, empty a partition.
+    imagination_transition_add(+State,+Action,+NextState): record a known transition used for imagining.
+    imagination_imagine(+Start,+ActionSeq,-Trajectory): roll a start state forward, sealing each visited state in the imagined reality.
+    imagination_reaches(+Start,+ActionSeq,-EndState): the final state a sequence reaches.
+    imagination_evaluate(+Trajectory,+GoalState,-Score): 1.0 if the goal is reached, else 0.0.
+    imagination_steps_to(+Trajectory,+GoalState,-Steps): the step index at which the goal first appears.
+    imagination_best_plan(+Start,+CandidateSeqs,+GoalState,-BestSeq): the candidate reaching the goal in fewest steps.
+    imagination_quarantined(?Fact): a fact imagined but not observed (sealed off from fact).
+    imagination_promote(+FromReality,+Fact,+ToReality): the only, deliberate way an imagined finding crosses into another reality.
+    Mind-wandering half (absorbed from daydream) —
+    imagination_control_goal(+Episode,-Goal): the control goal a daydream is steered toward.
+    imagination_daydream_steer(+Episode,-Product) / imagination_daydream_terminate(+DaydreamId) / imagination_daydream_product(+DaydreamId,-Product): steer, guard, and read a daydream.
+    Mindscape / reverie / tableau half (absorbed from imagination) —
+    imagination_imagine_fresh(+A,+B,+C,-D): begin a fresh imaginative episode.
+    imagination_mindscape_new(+Id,-Mindscape) / imagination_mindscape_clear(+Id) / imagination_mindscape_reality(+Id,-Reality): a mindscape of figures seen from a vantage.
+    imagination_tableau_add(+Id,+Element,-Tableau) / imagination_tableau_ground(+Id,+Element,-Grounded): build and ground a tableau.
+    imagination_reverie_frames(+Id,-Frames) / imagination_reverie_render(+Id,+Vantage,-Rendered): render a sequence of reverie frames.
 
 priming
 Causalontology Priming (co_*, Layer 397)
