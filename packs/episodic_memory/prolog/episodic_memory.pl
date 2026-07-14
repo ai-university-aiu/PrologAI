@@ -2,7 +2,7 @@
 
     THE_BUILDING_FILES argue that a mind must keep a record of past episodes it
     can be reminded of — "this reminds me of last time." The co_ family had a
-    causal store (causal_core) and a concept backbone (co_noun) but no memory of
+    causal store (causal_core) and a concept backbone (noun_backbone) but no memory of
     lived experience. This pack is that memory, built the Causalontology way:
     each episode is a small reified case that can be recalled by how much its
     context overlaps a present cue, replayed, and reinforced when it helps.

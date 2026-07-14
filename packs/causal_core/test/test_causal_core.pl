@@ -17,9 +17,9 @@
 % Load the module under test.
 :- use_module(library(causal_core)).
 % Load the noun layer for the cross-layer acceptance query.
-:- use_module(library(co_noun)).
+:- use_module(library(noun_backbone)).
 % Load the hinge for the cross-layer acceptance query.
-:- use_module(library(co_hinge)).
+:- use_module(library(realizable_hinge)).
 
 % ===========================================================================
 % THE CRO — validation, prediction, strengthening
@@ -236,25 +236,25 @@ test(cross_layer_acceptance, [nondet]) :-
     % Fresh layers.
     causal_core_reset,
     % Fresh noun layer.
-    co_noun_reset,
+    noun_backbone_reset,
     % Fresh hinge.
-    co_hinge_reset,
+    realizable_hinge_reset,
     % NOUN: the button is an object.
-    co_continuant_add(b_red, object),
+    noun_backbone_continuant_add(b_red, object),
     % HINGE: the button bears a pressable disposition.
-    co_realizable_add(d1, disposition, b_red),
+    realizable_hinge_realizable_add(d1, disposition, b_red),
     % SEAM: the disposition is realized in pressing.
-    co_realized_in_add(d1, press(b_red)),
+    realizable_hinge_realized_in_add(d1, press(b_red)),
     % VERB: pressing participates as cause in a causal relation.
     causal_core_new_cro([press(b_red)], [light(red, on)], temporal(0, 0, instant),
                sufficient, 0.7, [], prov(agent, learned_by_intervention, 0.7), _),
     % THE CROSS-LAYER QUERY: from the object, through its realizable and its
     % realizing occurrent, to the effect that occurrent produces.
-    co_continuant(Object, object),
+    noun_backbone_continuant(Object, object),
     % The object bears a realizable.
-    co_realizable(D, disposition, Object),
+    realizable_hinge_realizable(D, disposition, Object),
     % The realizable is realized in an occurrent.
-    co_realized_in(D, Occurrent),
+    realizable_hinge_realized_in(D, Occurrent),
     % That occurrent causes an effect.
     causal_core_predict(Occurrent, Effect),
     % The traversal lands exactly where it should.

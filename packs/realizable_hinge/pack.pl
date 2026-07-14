@@ -1,9 +1,9 @@
-% State the fact: name(co_noun).
-name(co_noun).
+% State the fact: name(realizable_hinge).
+name(realizable_hinge).
 % State the fact: version('1.0.0').
 version('1.0.0').
-% State the fact: title('PrologAI Causalontology Noun Backbone — thin continuant layer with subsumption, part-of, and confidence-scored external alignment (WP-391)').
-title('PrologAI Causalontology Noun Backbone — thin continuant layer with subsumption, part-of, and confidence-scored external alignment (WP-391)').
+% State the fact: title('PrologAI Causalontology Hinge — qualities and realizable entities (dispositions, functions, roles) with the realized_in seam into the verbs (WP-392)').
+title('PrologAI Causalontology Hinge — qualities and realizable entities (dispositions, functions, roles) with the realized_in seam into the verbs (WP-392)').
 % State the fact: author('PrologAI Community', 'ai.university.aiu@gmail.com').
 author('PrologAI Community', 'ai.university.aiu@gmail.com').
 % State the fact: home('https://github.com/ai-university-aiu/PrologAI').

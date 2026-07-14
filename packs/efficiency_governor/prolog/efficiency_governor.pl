@@ -7,7 +7,7 @@
     human baseline so that brute-force search cannot buy a win. An agent that
     ignores efficiency can complete every level and still score near zero.
 
-    This pack is the governor that keeps the co_arc3 harness efficiency-aware.
+    This pack is the governor that keeps the arc3_harness harness efficiency-aware.
     It counts the actions spent per level, holds the human baseline per level,
     turns a baseline into a per-level action budget (the cap), reports whether
     the agent is still within budget, and computes the efficiency scores the

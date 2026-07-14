@@ -1,6 +1,6 @@
 Chapter 352: The ARC-AGI-3 Readiness Suite - The co_explore, co_goalinfer, co_effic, and co_arc3proto Packs (co_*, Layers 372-375)
 
-The co_arc3 harness of Chapter 351 closes the perceive-learn-plan-act loop
+The arc3_harness harness of Chapter 351 closes the perceive-learn-plan-act loop
 against an interactive environment. That is the skeleton of an ARC-AGI-3
 agent, but the benchmark asks for four things the bare loop leaves to the
 caller: explore an unknown world efficiently, work out what winning means
@@ -51,7 +51,7 @@ across several wins the true target reinforces while incidental changes
 average out. A colour that also shows up before a loss is discounted, so a
 feature common to both winning and losing is not mistaken for the goal. The
 result is offered two ways: as the abstract reach_colour(Colour) and as the
-changed(_, _, _, Colour) occurrent that co_arc3_goal_set can register and
+changed(_, _, _, Colour) occurrent that arc3_harness_goal_set can register and
 co_plan can aim at, together with a confidence reading of how strongly the
 leading hypothesis dominates.
 
@@ -73,7 +73,7 @@ still score near zero.
 
 SPEAKING THE PROTOCOL EXACTLY
 
-The co_arc3proto pack pins down the live protocol. The co_arc3 bridge is kept
+The co_arc3proto pack pins down the live protocol. The arc3_harness bridge is kept
 deliberately loose because the API routes drift between releases; this pack
 holds the March-2026 vocabulary as inspectable facts, so speaking the current
 protocol is precise and a later drift is a one-file change. The five simple
@@ -83,7 +83,7 @@ its x and y, undo maps to ACTION7, and reset maps to RESET, each issued to
 is validated for shape and colour - within sixty-four cells each way, colours
 zero to fifteen - and a reply's state is read as one of the four values, with
 WIN and GAME_OVER terminal and WIN the win. Finally, cap_env packages all of
-this as the arc3_env quadruple co_arc3_play consumes, with every network call
+this as the arc3_env quadruple arc3_harness_play consumes, with every network call
 guarded so no test depends on the wire.
 
 THE SUITE AS A WHOLE
@@ -91,7 +91,7 @@ THE SUITE AS A WHOLE
 Perceive with grid, explore with co_explore, model with causal_core, infer the
 goal with co_goalinfer, plan with co_plan under the budget of co_effic, and
 act through the exact vocabulary of co_arc3proto - all orchestrated by the
-co_arc3 loop. Twenty-seven acceptance tests pass across the four packs, and
+arc3_harness loop. Twenty-seven acceptance tests pass across the four packs, and
 they load cleanly alongside the whole Causalontology suite. The benchmark
 result itself remains, as always, a labelled and falsifiable bet, to be
 reported only once measured.

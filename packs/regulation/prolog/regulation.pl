@@ -8,7 +8,7 @@
     SHOCKING. Second, when one behaviour both succeeds and fails, the fix is not
     to average it away but to SPLIT it — to find the feature of the situation that
     separates the wins from the losses, and refine the rule to require (or avoid)
-    it. That is discrimination learning. co_learn induces causal relations and
+    it. That is discrimination learning. causal_learning induces causal relations and
     co_gauge watches whole strategies; this pack refines an individual behaviour.
 
     A behaviour is a rule:

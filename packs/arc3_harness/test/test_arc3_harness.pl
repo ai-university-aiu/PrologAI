@@ -8,7 +8,7 @@
     act loop of Section 9 closed against a real (if small) game.
 
     Run with the full library path:
-        swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/co_arc3/test/test_co_arc3.pl
+        swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/arc3_harness/test/test_co_arc3.pl
 */
 
 % Declare this file as a test module.
@@ -18,13 +18,13 @@
 :- use_module(library(plunit)).
 
 % Load the module under test.
-:- use_module(library(co_arc3)).
+:- use_module(library(arc3_harness)).
 % Load the verb layer the harness induces relations into.
 :- use_module(library(causal_core)).
 % Load the learner whose avoid-set the harness enforces.
-:- use_module(library(co_learn)).
+:- use_module(library(causal_learning)).
 % Load the hinge cleared alongside.
-:- use_module(library(co_hinge)).
+:- use_module(library(realizable_hinge)).
 
 % ---------------------------------------------------------------------------
 % The mock game — hidden mechanics the harness must discover by acting.
@@ -89,18 +89,18 @@ fresh :-
     % Clear the verb layer.
     causal_core_reset,
     % Clear the hinge.
-    co_hinge_reset,
+    realizable_hinge_reset,
     % Clear the learning state.
-    co_learn_reset,
+    causal_learning_reset,
     % Clear the harness state.
-    co_arc3_reset.
+    arc3_harness_reset.
 
-:- begin_tests(co_arc3).
+:- begin_tests(arc3_harness).
 
 % Perception abstracts a frame into one occurrent per cell.
 test(perceive_occurrents) :-
     % A two-by-two frame.
-    co_arc3_perceive([[1, 2], [3, 4]], Occ),
+    arc3_harness_perceive([[1, 2], [3, 4]], Occ),
     % Four occurrents.
     length(Occ, 4),
     % Spot-check one.
@@ -109,7 +109,7 @@ test(perceive_occurrents) :-
 % The delta between frames yields the change occurrents.
 test(delta_occurrents) :-
     % One cell changed.
-    co_arc3_delta([[0, 0], [0, 0]], [[0, 7], [0, 0]], Delta),
+    arc3_harness_delta([[0, 0], [0, 0]], [[0, 7], [0, 0]], Delta),
     % Exactly that change.
     Delta == [changed(0, 1, 0, 7)].
 
@@ -121,19 +121,19 @@ test(episode_wins_and_avoids_hazard, [nondet]) :-
     % The mock game.
     mock_env(Env),
     % Play under a modest budget.
-    co_arc3_play(Env, 12, Outcome),
+    arc3_harness_play(Env, 12, Outcome),
     % The level was won.
     Outcome = won(Steps),
     % Within the budget.
     Steps =< 12,
     % The spike was tried once, learned, and avoided.
-    co_avoid(action(spike)),
+    causal_learning_avoid(action(spike)),
     % The preventive relation was reified.
     causal_core_cro(_, [action(spike)], [penalty], _, preventive, _, _, _),
     % The transfer mechanic was induced as a causal relation.
     causal_core_cro(_, [action(transfer)], [delta(_)], _, sufficient, _, _, _),
     % The glass-box trace recorded the hazard step.
-    co_arc3_trace(Trace),
+    arc3_harness_trace(Trace),
     % The hazard appears exactly once in the whole episode.
     findall(N, member(step(N, action(spike), hazard), Trace), [_]),
     % And the spike is never chosen after the hazard was learned.
@@ -151,11 +151,11 @@ test(plan_overrides_curiosity, [nondet]) :-
                temporal(0, 0, instant), sufficient, 0.7, [],
                prov(agent, learned_by_intervention, 0.7), _),
     % Register that delta as the goal.
-    co_arc3_goal_set(delta([changed(0, 0, 1, 2)])),
+    arc3_harness_goal_set(delta([changed(0, 0, 1, 2)])),
     % Bias curiosity heavily away from transfer by faking many tries.
     mock_actions(Actions),
     % Choose: the plan wins despite the curiosity counters.
-    co_arc3_choose(Actions, _, Action),
+    arc3_harness_choose(Actions, _, Action),
     % The planned action was chosen.
     Action == action(transfer).
 
@@ -166,7 +166,7 @@ test(curiosity_least_tried) :-
     % No goal is registered, so curiosity decides.
     mock_actions(Actions),
     % The first choice is the alphabetically first untried action.
-    co_arc3_choose(Actions, _, First),
+    arc3_harness_choose(Actions, _, First),
     % All counters are level, so term order breaks the tie.
     First == action(noop).
 
@@ -175,18 +175,18 @@ test(hazard_excluded_from_curiosity) :-
     % Fresh layers.
     fresh,
     % The spike is a known hazard.
-    co_learn_preventive(action(spike), penalty),
+    causal_learning_preventive(action(spike), penalty),
     % Choose among all three.
     mock_actions(Actions),
     % Whatever curiosity picks, it is never the hazard.
-    co_arc3_choose(Actions, _, Action),
+    arc3_harness_choose(Actions, _, Action),
     % The avoid-set is absolute.
     Action \== action(spike).
 
 % The live bridge constructs a well-formed guarded environment term.
 test(http_env_shape) :-
     % Build the bridge environment.
-    co_arc3_http_env('https://example.invalid/api', key123, vc33, Env),
+    arc3_harness_http_env('https://example.invalid/api', key123, vc33, Env),
     % It has the pluggable environment shape.
     Env = arc3_env(_, _, ActionsGoal, _),
     % Its action set is the stable numbered ARC-AGI-3 shape.
@@ -196,4 +196,4 @@ test(http_env_shape) :-
     % The complex action too.
     memberchk(action(6), Actions).
 
-:- end_tests(co_arc3).
+:- end_tests(arc3_harness).

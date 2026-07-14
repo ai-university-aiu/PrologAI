@@ -10,7 +10,7 @@
     agents both won on exactly this behaviour (one learned to predict which
     actions change a frame, the other built a state graph and pruned looping
     actions) — but the same policy drives exploration of any new environment it
-    is pointed at. It is a reusable, glass-box policy that plugs into the co_arc3
+    is pointed at. It is a reusable, glass-box policy that plugs into the arc3_harness
     harness alongside its plan-first action selection.
 
     The policy ranks the environment's available actions by, in order:
@@ -90,7 +90,7 @@
 % Import the verb layer's forward predictor to tell live actions from dead ones.
 :- use_module(library(causal_core), [causal_core_predict/2]).
 % Import the learned avoid-set so hazards are never chosen.
-:- use_module(library(co_learn), [co_avoid/1]).
+:- use_module(library(causal_learning), [causal_learning_avoid/1]).
 % Import grid measurement and colour reading for the signature.
 :- use_module(library(grid), [gd_size/3, gd_cell/4, gd_colors/2, gd_color_count/3]).
 % Import object detection so salient click cells are object centroids.
@@ -251,7 +251,7 @@ cox_rank(Actions, Tried, Frame, Ranked) :-
         % Take each concrete action.
         ( member(Action, Concrete),
           % Never rank a learned hazard.
-          \+ co_avoid(Action),
+          \+ causal_learning_avoid(Action),
           % A predicted-change action ranks 0 (first); a dead one ranks 1.
           ( cox_predict_change(Action) -> ChangeRank = 0 ; ChangeRank = 1 ),
           % Look up how many times the action has been tried.
@@ -304,7 +304,7 @@ cox_rank(Game, Actions, Tried, Frame, Ranked) :-
         % Take each concrete action.
         ( member(Action, Concrete),
           % Never rank a hazard this game has learned to avoid.
-          \+ co_avoid(g(Game, Action)),
+          \+ causal_learning_avoid(g(Game, Action)),
           % Rank predicted-change actions ahead of dead ones.
           cox_change_rank(Game, Action, ChangeRank),
           % Look up how many times the action has been tried.
@@ -331,7 +331,7 @@ cox_choose_change(Game, Actions, Tried, Frame, Action) :-
         % Take each concrete action.
         ( member(A, Concrete),
           % Never a learned hazard.
-          \+ co_avoid(g(Game, A)),
+          \+ causal_learning_avoid(g(Game, A)),
           % Only actions this game's causal graph predicts will change the world.
           cox_predict_change(Game, A),
           % How many times it has been tried.

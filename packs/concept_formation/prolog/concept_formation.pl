@@ -3,7 +3,7 @@
     THE_BUILDING_FILES describe a mind that grows its own ontology: it watches a
     stream of things, notices which of them share enough features to be worth a
     common name, and coins a category. The co_ family had a hand-built noun
-    backbone (co_noun) but nothing that induced a new concept from experience.
+    backbone (noun_backbone) but nothing that induced a new concept from experience.
     This pack is that inducer, kept small and glass-box.
 
     Each observed item is a bundle of feature atoms:
