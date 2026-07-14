@@ -2147,73 +2147,73 @@ Causalontology Goal Inference: Hypothesising the Unstated Win Condition (co_*, L
     cgi_goal_occurrent(-Occurrent): the goal as a changed(_,_,_,Colour) occurrent the planner can aim at.
     cgi_confidence(-Confidence): how strongly the leading hypothesis dominates.
 
-co_effic
+efficiency_governor
 Causalontology Efficiency Governor: Action Budgeting and RHAE-Style Scoring (co_*, Layer 374)
-    cef_reset/0: clear counters and baselines.
-    cef_set_baseline(+Level,+HumanActions) / cef_baseline(?Level,?HumanActions): register and query a level's human baseline.
-    cef_count(+Level) / cef_actions(?Level,?AgentActions): record and query actions spent per level.
-    cef_default_factor(-Factor): the cap multiple over the human baseline (five).
-    cef_budget(+HumanActions,+Factor,-Budget) / cef_within_budget(+Level): the action cap and whether the agent is still under it.
-    cef_level_score(+HumanActions,+AgentActions,-Score): the per-level score min(1,H/A) squared.
-    cef_env_score(+WeightedScores,-EnvScore): the weighted mean of a level's scores (early levels weighted least).
-    cef_total_score(+EnvScores,-TotalPercent): the mean of environment scores as a percentage.
-    cef_report(+Level): a printed ledger term for a level.
+    efficiency_governor_reset/0: clear counters and baselines.
+    efficiency_governor_set_baseline(+Level,+HumanActions) / efficiency_governor_baseline(?Level,?HumanActions): register and query a level's human baseline.
+    efficiency_governor_count(+Level) / efficiency_governor_actions(?Level,?AgentActions): record and query actions spent per level.
+    efficiency_governor_default_factor(-Factor): the cap multiple over the human baseline (five).
+    efficiency_governor_budget(+HumanActions,+Factor,-Budget) / efficiency_governor_within_budget(+Level): the action cap and whether the agent is still under it.
+    efficiency_governor_level_score(+HumanActions,+AgentActions,-Score): the per-level score min(1,H/A) squared.
+    efficiency_governor_env_score(+WeightedScores,-EnvScore): the weighted mean of a level's scores (early levels weighted least).
+    efficiency_governor_total_score(+EnvScores,-TotalPercent): the mean of environment scores as a percentage.
+    efficiency_governor_report(+Level): a printed ledger term for a level.
 
-co_arc3proto
+arc3_protocol
 ARC-AGI-3 Protocol: The Exact March-2026 Agents-API Vocabulary (co_*, Layer 375)
-    cap_action_command(?ActionTerm,?Command): action(1)..action(5) to ACTION1..ACTION5, select(X,Y) to ACTION6, undo to ACTION7, reset to RESET.
-    cap_command_atom(?Command) / cap_command_endpoint(?Command,?Path): the seven commands and their /api/cmd routes.
-    cap_action_endpoint(+ActionTerm,-Path): an action term's REST path.
-    cap_scorecard_endpoint(?Which,?Path): the scorecard open and close routes.
-    cap_game_state(?State) / cap_is_terminal(+State) / cap_is_win(+State): the four states (NOT_PLAYED, NOT_FINISHED, WIN, GAME_OVER), which end the level, and which is a win.
-    cap_max_dim(-Dim) / cap_colour_count(-Count) / cap_valid_frame(+Frame): the 64 dimension cap, the 16 colours, and a frame shape-and-colour check.
-    cap_available_actions(-Actions): the canonical action superset.
-    cap_action_payload(+ActionTerm,+GameId,-Dict): the JSON body an action posts (select carries x,y).
-    cap_env(+BaseUrl,+ApiKey,+GameId,-Env): a guarded arc3_env speaking the live protocol, ready for co_arc3_play.
+    arc3_protocol_action_command(?ActionTerm,?Command): action(1)..action(5) to ACTION1..ACTION5, select(X,Y) to ACTION6, undo to ACTION7, reset to RESET.
+    arc3_protocol_command_atom(?Command) / arc3_protocol_command_endpoint(?Command,?Path): the seven commands and their /api/cmd routes.
+    arc3_protocol_action_endpoint(+ActionTerm,-Path): an action term's REST path.
+    arc3_protocol_scorecard_endpoint(?Which,?Path): the scorecard open and close routes.
+    arc3_protocol_game_state(?State) / arc3_protocol_is_terminal(+State) / arc3_protocol_is_win(+State): the four states (NOT_PLAYED, NOT_FINISHED, WIN, GAME_OVER), which end the level, and which is a win.
+    arc3_protocol_max_dim(-Dim) / arc3_protocol_colour_count(-Count) / arc3_protocol_valid_frame(+Frame): the 64 dimension cap, the 16 colours, and a frame shape-and-colour check.
+    arc3_protocol_available_actions(-Actions): the canonical action superset.
+    arc3_protocol_action_payload(+ActionTerm,+GameId,-Dict): the JSON body an action posts (select carries x,y).
+    arc3_protocol_env(+BaseUrl,+ApiKey,+GameId,-Env): a guarded arc3_env speaking the live protocol, ready for co_arc3_play.
 
-co_hsteps
+human_steps
 ARC-AGI-3 Human-Step Ladder in J-Space: Six Phases, Thirty Micro-Steps (co_*, Layer 376)
-    hs_phase(?PhaseId,?Name): the six phases (orient, explore, goal, plan, execute, transfer).
-    hs_step(?StepId,?PhaseId,?Description): the thirty human micro-steps and their phase.
-    hs_ladder(-StepIds): all thirty step ids in canonical order.
-    hs_phase_of(+StepId,-PhaseId): the phase a step belongs to.
-    hs_phase_capability(?PhaseId,?Capability): the suite pack each phase draws on.
-    hs_reset(+Space): open a J-Space workspace at the first step.
-    hs_enter(+Space,+StepId): hold a step as the active concept, decaying earlier ones.
-    hs_current(+Space,-StepId): the step currently held strongest.
-    hs_advance(+Space,-StepId): move to the next step in the ladder and hold it.
-    hs_reading(+Space,-Reading): the J-Lens readout of the workspace.
-    hs_sensitivity(+Transitions,-Sensitivity): how many cells each action changed.
-    hs_controllable(+Transitions,-Colour): the object the agent controls (most-moved centroid).
-    hs_jacobian(+Transitions,+Colour,-Jacobian): the controllable's displacement per action (jac(Action,DR,DC)).
-    hs_goal_gradient(+Jacobian,+FromCell,+GoalCell,-RankedActions): actions ranked by progress toward the goal cell.
+    human_steps_phase(?PhaseId,?Name): the six phases (orient, explore, goal, plan, execute, transfer).
+    human_steps_step(?StepId,?PhaseId,?Description): the thirty human micro-steps and their phase.
+    human_steps_ladder(-StepIds): all thirty step ids in canonical order.
+    human_steps_phase_of(+StepId,-PhaseId): the phase a step belongs to.
+    human_steps_phase_capability(?PhaseId,?Capability): the suite pack each phase draws on.
+    human_steps_reset(+Space): open a J-Space workspace at the first step.
+    human_steps_enter(+Space,+StepId): hold a step as the active concept, decaying earlier ones.
+    human_steps_current(+Space,-StepId): the step currently held strongest.
+    human_steps_advance(+Space,-StepId): move to the next step in the ladder and hold it.
+    human_steps_reading(+Space,-Reading): the J-Lens readout of the workspace.
+    human_steps_sensitivity(+Transitions,-Sensitivity): how many cells each action changed.
+    human_steps_controllable(+Transitions,-Colour): the object the agent controls (most-moved centroid).
+    human_steps_jacobian(+Transitions,+Colour,-Jacobian): the controllable's displacement per action (jac(Action,DR,DC)).
+    human_steps_goal_gradient(+Jacobian,+FromCell,+GoalCell,-RankedActions): actions ranked by progress toward the goal cell.
 
-co_graph
+state_graph
 Causalontology State-Graph Exploration: The Winning ARC-AGI-3 Technique (co_*, Layer 377)
-    cg_reset/0: forget the whole exploration graph.
-    cg_signature(+Frame,-Signature): a canonical id of a frame (exact grid distinguishes states).
-    cg_note(+FromSig,+Action,+ToSig): record a transition; mark it tested, and dead when the state did not change.
-    cg_node(?Sig) / cg_edge(?From,?Action,?To): query the known states and transitions.
-    cg_tested(?Sig,?Action) / cg_dead(?Sig,?Action): query the tried and the no-change pairs.
-    cg_untested(+Sig,+Actions,-Action): the first untested, non-dead action in a state (caller's order is the priority).
-    cg_has_untested(+Sig,+Actions): the state still has an untested action.
-    cg_toward_frontier(+Sig,+Actions,-FirstAction): the first step on the shortest path to the nearest unexplored state.
-    cg_choose(+Sig,+Actions,-Action): the winning hierarchical rule — probe untested here, else head to the frontier.
-    cg_stats(-stats(Nodes,Edges,Tested,Dead)): a summary of the whole graph's size.
-    cg_stats_for(+Prefix,-stats(Nodes,Edges,Tested,Dead)): a summary of just the subgraph whose signatures carry the prefix, so many games can share one store and each reads only its own map (no cross-game bleed).
+    state_graph_reset/0: forget the whole exploration graph.
+    state_graph_signature(+Frame,-Signature): a canonical id of a frame (exact grid distinguishes states).
+    state_graph_note(+FromSig,+Action,+ToSig): record a transition; mark it tested, and dead when the state did not change.
+    state_graph_node(?Sig) / state_graph_edge(?From,?Action,?To): query the known states and transitions.
+    state_graph_tested(?Sig,?Action) / state_graph_dead(?Sig,?Action): query the tried and the no-change pairs.
+    state_graph_untested(+Sig,+Actions,-Action): the first untested, non-dead action in a state (caller's order is the priority).
+    state_graph_has_untested(+Sig,+Actions): the state still has an untested action.
+    state_graph_toward_frontier(+Sig,+Actions,-FirstAction): the first step on the shortest path to the nearest unexplored state.
+    state_graph_choose(+Sig,+Actions,-Action): the winning hierarchical rule — probe untested here, else head to the frontier.
+    state_graph_stats(-stats(Nodes,Edges,Tested,Dead)): a summary of the whole graph's size.
+    state_graph_stats_for(+Prefix,-stats(Nodes,Edges,Tested,Dead)): a summary of just the subgraph whose signatures carry the prefix, so many games can share one store and each reads only its own map (no cross-game bleed).
 
-co_trace
+episodic_memory
 Causalontology Episodic Memory (co_*, Layer 384)
-    ct_reset/0: forget every stored episode.
-    ct_record(+Context,+Action,+Outcome,+Valence): store one experience-case.
-    ct_record(+Context,+Action,+Outcome,+Valence,-Id): store and return the case id.
-    ct_episode(?Id,?Context,?Action,?Outcome,?Valence,?Recency): query stored cases.
-    ct_similarity(+Cue,+Id,-Score): Jaccard overlap of a cue with a case's context, in [0,1].
-    ct_remind(+Cue,+K,-TopK): the best K episodes for a cue, most similar first.
-    ct_recall(+Cue,-Id,-Score): the single best-matching episode (bumps its hit count).
-    ct_replay(+Id,-Action,-Outcome,-Valence): read back what a case did and how it turned out.
-    ct_reinforce(+Id,+Delta): nudge a case's valence, clamped to [-1,1].
-    ct_hits(?Id,?Hits) / ct_count(-N) / ct_stats(-stats(Count,MeanValence)): store statistics.
+    episodic_memory_reset/0: forget every stored episode.
+    episodic_memory_record(+Context,+Action,+Outcome,+Valence): store one experience-case.
+    episodic_memory_record(+Context,+Action,+Outcome,+Valence,-Id): store and return the case id.
+    episodic_memory_episode(?Id,?Context,?Action,?Outcome,?Valence,?Recency): query stored cases.
+    episodic_memory_similarity(+Cue,+Id,-Score): Jaccard overlap of a cue with a case's context, in [0,1].
+    episodic_memory_remind(+Cue,+K,-TopK): the best K episodes for a cue, most similar first.
+    episodic_memory_recall(+Cue,-Id,-Score): the single best-matching episode (bumps its hit count).
+    episodic_memory_replay(+Id,-Action,-Outcome,-Valence): read back what a case did and how it turned out.
+    episodic_memory_reinforce(+Id,+Delta): nudge a case's valence, clamped to [-1,1].
+    episodic_memory_hits(?Id,?Hits) / episodic_memory_count(-N) / episodic_memory_stats(-stats(Count,MeanValence)): store statistics.
 
 co_salience
 Causalontology Attention and Broadcast (co_*, Layer 385)
@@ -2283,15 +2283,15 @@ Causalontology Repair (co_*, Layer 390)
     repair_compensate(+Disturbance,-Plan,-Grade): the preferred repair — inversion, then neutralization, then reroute, then accept.
     repair_can_compensate(+Disturbance): a real repair exists (grade not none).
 
-co_distill
+consolidation
 Causalontology Consolidation (co_*, Layer 391)
-    di_reset/0: empty the store, restart the recency clock.
-    di_add(+Key,+Value): insert a record, or MERGE on a repeated key (bumps uses, refreshes value/recency).
-    di_touch(+Key): mark an existing record used again.
-    di_compress(+Name,+Sequence,-Composite): reify a repeated sequence as one composite record and term.
-    di_record(?Key,?Value,?Uses,?Recency): query the stored records.
-    di_forget(+MinUses,+GraceCutoff,-Dropped): prune records both low-value AND stale; count the drops.
-    di_time(-Now) / di_count(-N) / di_stats(-stats(Count,TotalUses)): the clock and store statistics.
+    consolidation_reset/0: empty the store, restart the recency clock.
+    consolidation_add(+Key,+Value): insert a record, or MERGE on a repeated key (bumps uses, refreshes value/recency).
+    consolidation_touch(+Key): mark an existing record used again.
+    consolidation_compress(+Name,+Sequence,-Composite): reify a repeated sequence as one composite record and term.
+    consolidation_record(?Key,?Value,?Uses,?Recency): query the stored records.
+    consolidation_forget(+MinUses,+GraceCutoff,-Dropped): prune records both low-value AND stale; count the drops.
+    consolidation_time(-Now) / consolidation_count(-N) / consolidation_stats(-stats(Count,TotalUses)): the clock and store statistics.
 
 grounding
 Causalontology Clue Grounding (co_*, Layer 392)

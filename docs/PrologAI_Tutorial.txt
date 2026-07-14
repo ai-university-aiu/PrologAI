@@ -1384,13 +1384,13 @@ WP 390 - nexus: AGI Foundations Integration Layer (nx_*, Layer 365). The capston
 
 WP 391-396 - the Causalontology suite: co_noun, co_hinge, co_core, co_learn, co_plan, co_arc3 (co_*, Layers 366-371). The process-first Foundational Ontology: reified Causal Relation Objects with temporal windows as mechanism, four modalities, strength, and provenance; a thin continuant backbone with external alignment; the realizable hinge; learning by embodied intervention with a closed-world avoid-set; safe backward planning; and a game-agnostic perceive-learn-plan-act harness for interactive environments with a guarded bridge to ARC-AGI-3. Chapter 351 covers this suite.
 
-WP 397-400 - the ARC-AGI-3 Readiness suite: co_explore, co_goalinfer, co_effic, co_arc3proto (co_*, Layers 372-375). Four packs that carry the Causalontology harness the last mile to the interactive benchmark: a novelty-seeking, loop-avoiding exploration policy that prefers actions predicted to change the world and turns the ACTION6 cell-select into a few object-centroid clicks; inference of the unstated win condition from the frame changes that precede a win; a human-baseline efficiency governor that budgets actions and computes the benchmark's RHAE-style scores; and the exact March-2026 ARC-AGI-3 protocol vocabulary with a guarded environment adapter. Chapter 352 covers this suite.
+WP 397-400 - the ARC-AGI-3 Readiness suite: co_explore, co_goalinfer, efficiency_governor, arc3_protocol (co_*, Layers 372-375). Four packs that carry the Causalontology harness the last mile to the interactive benchmark: a novelty-seeking, loop-avoiding exploration policy that prefers actions predicted to change the world and turns the ACTION6 cell-select into a few object-centroid clicks; inference of the unstated win condition from the frame changes that precede a win; a human-baseline efficiency governor that budgets actions and computes the benchmark's RHAE-style scores; and the exact March-2026 ARC-AGI-3 protocol vocabulary with a guarded environment adapter. Chapter 352 covers this suite.
 
-WP 401 - co_hsteps, the ARC-AGI-3 Human-Step Ladder in J-Space (co_*, Layer 376). The six-phase, thirty-micro-step process a human follows in an interactive game with no instructions - orient, explore and model, infer the goal, plan, execute and monitor, transfer - encoded as ordered facts and held step-by-step as concepts in the Jacobian Space workspace (the jspace pack) so the Jacobian Lens reads out which human step the agent is on. It also makes the probe phase concrete with a discrete action-response Jacobian that names the controllable object, gives its per-action displacement, and ranks actions along the goal gradient. Chapter 353 covers this pack.
+WP 401 - human_steps, the ARC-AGI-3 Human-Step Ladder in J-Space (co_*, Layer 376). The six-phase, thirty-micro-step process a human follows in an interactive game with no instructions - orient, explore and model, infer the goal, plan, execute and monitor, transfer - encoded as ordered facts and held step-by-step as concepts in the Jacobian Space workspace (the jspace pack) so the Jacobian Lens reads out which human step the agent is on. It also makes the probe phase concrete with a discrete action-response Jacobian that names the controllable object, gives its per-action displacement, and ranks actions along the goal gradient. Chapter 353 covers this pack.
 
-WP 402 - co_graph, Causalontology State-Graph Exploration (co_*, Layer 377). The systematic, graph-structured exploration that beat every frontier language model on ARC-AGI-3 - third on the public leaderboard, a median thirty levels against five for the language-plus-DSL baseline. It builds a directed graph whose nodes are frame hashes and whose edges are observed state-to-action-to-next-state transitions, marks each tried state-action pair tested and each no-change action dead, and chooses by the winning hierarchical rule: probe an untested non-dead action in the current state, otherwise take the first step on the shortest path to the nearest state that still has an untested action. The graph persists across attempts, giving the carry-forward the benchmark rewards. Chapter 354 covers this pack.
+WP 402 - state_graph, Causalontology State-Graph Exploration (co_*, Layer 377). The systematic, graph-structured exploration that beat every frontier language model on ARC-AGI-3 - third on the public leaderboard, a median thirty levels against five for the language-plus-DSL baseline. It builds a directed graph whose nodes are frame hashes and whose edges are observed state-to-action-to-next-state transitions, marks each tried state-action pair tested and each no-change action dead, and chooses by the winning hierarchical rule: probe an untested non-dead action in the current state, otherwise take the first step on the shortest path to the nearest state that still has an untested action. The graph persists across attempts, giving the carry-forward the benchmark rewards. Chapter 354 covers this pack.
 
-WP 409 - co_trace, Causalontology Episodic Memory (co_*, Layer 384). The case memory the co_ family lacked: every experience is a small reified case (context, action, outcome, valence) recalled by feature overlap, replayed, and reinforced. Chapter 355 covers this pack.
+WP 409 - episodic_memory, Causalontology Episodic Memory (co_*, Layer 384). The case memory the co_ family lacked: every experience is a small reified case (context, action, outcome, valence) recalled by feature overlap, replayed, and reinforced. Chapter 355 covers this pack.
 
 WP 410 - co_salience, Causalontology Attention and Broadcast (co_*, Layer 385). Specialists offer items with novelty, relevance, and affect; a weighted sum scores them; a bounded working set holds the best few; one winner is broadcast per cognitive cycle. Chapter 355 covers this pack.
 
@@ -1404,7 +1404,7 @@ WP 414 - safety_governor, Causalontology Safety Governor (co_*, Layer 389). An i
 
 WP 415 - repair, Causalontology Repair (co_*, Layer 390). On a disturbance, undo with an inverse action, else cancel a side effect with a neutralizer, else re-route a blocked goal - the Piagetian equilibration move as glass-box rules. Chapter 355 covers this pack.
 
-WP 416 - co_distill, Causalontology Consolidation (co_*, Layer 391). Merge duplicate records, compress a reliable sequence into one composite, and forget stale low-value material past a grace period. Chapter 355 covers this pack.
+WP 416 - consolidation, Causalontology Consolidation (co_*, Layer 391). Merge duplicate records, compress a reliable sequence into one composite, and forget stale low-value material past a grace period. Chapter 355 covers this pack.
 
 WP 417 - grounding, Causalontology Clue Grounding (co_*, Layer 392). Turn a human natural-language clue and a referent into Causalontology assertions (continuant, disposition, goal, or preventive) tagged as a defeasible human hint - the grounding seam of Causalontology_v5 Section 10. Chapter 356 covers this pack.
 
@@ -26585,7 +26585,7 @@ is realized in a process that participates in a causal relation, traversed
 from noun to hinge to verb to predicted effect in one glass-box query.
 
 
-Chapter 352: The ARC-AGI-3 Readiness Suite - The co_explore, co_goalinfer, co_effic, and co_arc3proto Packs (co_*, Layers 372-375)
+Chapter 352: The ARC-AGI-3 Readiness Suite - The co_explore, co_goalinfer, efficiency_governor, and arc3_protocol Packs (co_*, Layers 372-375)
 
 The co_arc3 harness of Chapter 351 closes the perceive-learn-plan-act loop
 against an interactive environment. That is the skeleton of an ARC-AGI-3
@@ -26644,7 +26644,7 @@ leading hypothesis dominates.
 
 SPENDING ACTIONS FRUGALLY
 
-The co_effic pack is the efficiency governor, because ARC-AGI-3 does not only
+The efficiency_governor pack is the efficiency governor, because ARC-AGI-3 does not only
 ask whether an agent wins a level but how efficiently. A level's score
 compares the agent's action count against a human baseline - the second-best
 human's number of actions - and the benchmark caps spending at five times
@@ -26660,7 +26660,7 @@ still score near zero.
 
 SPEAKING THE PROTOCOL EXACTLY
 
-The co_arc3proto pack pins down the live protocol. The co_arc3 bridge is kept
+The arc3_protocol pack pins down the live protocol. The co_arc3 bridge is kept
 deliberately loose because the API routes drift between releases; this pack
 holds the March-2026 vocabulary as inspectable facts, so speaking the current
 protocol is precise and a later drift is a one-file change. The five simple
@@ -26669,27 +26669,27 @@ its x and y, undo maps to ACTION7, and reset maps to RESET, each issued to
 /api/cmd/COMMAND; the scorecard opens and closes at its own routes. A frame
 is validated for shape and colour - within sixty-four cells each way, colours
 zero to fifteen - and a reply's state is read as one of the four values, with
-WIN and GAME_OVER terminal and WIN the win. Finally, cap_env packages all of
+WIN and GAME_OVER terminal and WIN the win. Finally, arc3_protocol_env packages all of
 this as the arc3_env quadruple co_arc3_play consumes, with every network call
 guarded so no test depends on the wire.
 
 THE SUITE AS A WHOLE
 
 Perceive with grid, explore with co_explore, model with co_core, infer the
-goal with co_goalinfer, plan with co_plan under the budget of co_effic, and
-act through the exact vocabulary of co_arc3proto - all orchestrated by the
+goal with co_goalinfer, plan with co_plan under the budget of efficiency_governor, and
+act through the exact vocabulary of arc3_protocol - all orchestrated by the
 co_arc3 loop. Twenty-seven acceptance tests pass across the four packs, and
 they load cleanly alongside the whole Causalontology suite. The benchmark
 result itself remains, as always, a labelled and falsifiable bet, to be
 reported only once measured.
 
 
-Chapter 353: The ARC-AGI-3 Human-Step Ladder in J-Space - The co_hsteps Pack (co_*, Layer 376)
+Chapter 353: The ARC-AGI-3 Human-Step Ladder in J-Space - The human_steps Pack (co_*, Layer 376)
 
 The Readiness suite of Chapter 352 gives an agent the four capabilities the
 ARC-AGI-3 benchmark rewards. This chapter is about the order a human puts them
 in. A person dropped into one of these games with no instructions does not
-flail; they follow a recognisable process, and co_hsteps encodes that process
+flail; they follow a recognisable process, and human_steps encodes that process
 and holds it, step by step, in the Jacobian Space workspace.
 
 WHAT THE HUMAN STUDY FOUND
@@ -26707,11 +26707,11 @@ next level.
 
 THE LADDER AS DATA
 
-co_hsteps encodes all of that as ordered facts. hs_phase names the six phases;
-hs_step gives each of the thirty micro-steps its text and its phase; hs_ladder
-lists them in canonical order; and hs_phase_capability records which pack each
+human_steps encodes all of that as ordered facts. human_steps_phase names the six phases;
+human_steps_step gives each of the thirty micro-steps its text and its phase; human_steps_ladder
+lists them in canonical order; and human_steps_phase_capability records which pack each
 phase leans on - orientation on perception, exploration on co_explore, goal
-inference on co_goalinfer, planning on co_plan, execution on co_effic, and
+inference on co_goalinfer, planning on co_plan, execution on efficiency_governor, and
 transfer on the causal core. The ladder is a first-class object the agent can
 read, not a comment buried in a loop.
 
@@ -26721,10 +26721,10 @@ The point of the pack is not just to list the steps but to know which one the
 agent is on, and to make that knowable from outside. The jspace pack of the
 AGI Foundations suite is the Jacobian Space (J-Space): a small, readable
 workspace of the concepts a mind is currently holding, each with a strength,
-read through the Jacobian Lens (J-Lens). co_hsteps holds the current human step
-there. hs_reset opens the workspace at the first step; hs_enter fades the
-earlier steps and holds the new one at full strength; hs_current reads the
-strongest held step back; hs_advance walks to the next; and hs_reading is the
+read through the Jacobian Lens (J-Lens). human_steps holds the current human step
+there. human_steps_reset opens the workspace at the first step; human_steps_enter fades the
+earlier steps and holds the new one at full strength; human_steps_current reads the
+strongest held step back; human_steps_advance walks to the next; and human_steps_reading is the
 J-Lens readout of the whole process so far. As the agent plays, the workspace
 becomes a running, inspectable account of the human process it is executing -
 glass-box by construction.
@@ -26732,21 +26732,21 @@ glass-box by construction.
 THE JACOBIAN MADE CONCRETE
 
 The second phase of the human ladder - probe the controls, see what you move -
-has an exact mathematical shape, and co_hsteps supplies it. Given the
+has an exact mathematical shape, and human_steps supplies it. Given the
 transitions observed by trying each action from the same starting state, the
-pack assembles the discrete action-response Jacobian. hs_sensitivity reports
+pack assembles the discrete action-response Jacobian. human_steps_sensitivity reports
 how many cells each action changed, which separates live actions from dead
-ones. hs_controllable names the object the agent controls: the non-background
+ones. human_steps_controllable names the object the agent controls: the non-background
 colour whose centre of mass moves the most across the actions - the formal
 version of a human noticing which thing on the screen answers to the controls.
-hs_jacobian is then the column of partial derivatives of that object's
+human_steps_jacobian is then the column of partial derivatives of that object's
 position with respect to each action, one jac(Action, DR, DC) entry per action.
-And hs_goal_gradient ranks the actions by how much each moves the controllable
+And human_steps_goal_gradient ranks the actions by how much each moves the controllable
 toward a goal cell - the discrete gradient the execution phase simply descends.
 
 THE SUITE IN HUMAN ORDER
 
-So the packs of Chapters 351 and 352 supply the capabilities, and co_hsteps
+So the packs of Chapters 351 and 352 supply the capabilities, and human_steps
 supplies the sequence: orient with perception, probe to build the Jacobian and
 find what you control, infer the goal from the changes that precede a win, plan
 down the goal gradient under the efficiency budget, execute while monitoring,
@@ -26759,7 +26759,7 @@ docs/ARC-AGI-3_Human_Steps_v1.txt records the full ladder in the J-Space
 framing.
 
 
-Chapter 354: Causalontology State-Graph Exploration - The co_graph Pack (co_*, Layer 377)
+Chapter 354: Causalontology State-Graph Exploration - The state_graph Pack (co_*, Layer 377)
 
 The ARC-AGI-3 Readiness suite of Chapter 352 gave the agent an exploration
 policy that prefers actions likely to change the world and avoids returning to
@@ -26781,10 +26781,10 @@ feedback world with no instructions, systematic coverage beats clever guessing.
 
 THE GRAPH
 
-co_graph builds exactly that. A node is a frame hash - a canonical identifier of
+state_graph builds exactly that. A node is a frame hash - a canonical identifier of
 the exact grid, so an object in a new position is a new node, which is what lets
 the agent tell states apart. An edge is an observed transition: from this state,
-this action led to that state. cg_note records one transition and, in the same
+this action led to that state. state_graph_note records one transition and, in the same
 step, marks the action tested from the state it was taken in, and marks it dead
 if the state did not change - a dead action is one that wastes a turn, and it is
 never offered again.
@@ -26794,9 +26794,9 @@ THE WINNING RULE
 Action selection is the hierarchical rule the winning agents used, and it is
 three lines:
 
-    cg_choose(Sig, Actions, Action) :-
-        ( cg_untested(Sig, Actions, A)        -> Action = A
-        ; cg_toward_frontier(Sig, Actions, A) -> Action = A
+    state_graph_choose(Sig, Actions, Action) :-
+        ( state_graph_untested(Sig, Actions, A)        -> Action = A
+        ; state_graph_toward_frontier(Sig, Actions, A) -> Action = A
         ; fail ).
 
 First, if the current state has an untested, non-dead action, take it - probe
@@ -26817,9 +26817,9 @@ that the benchmark explicitly rewards, achieved for free by keeping the graph.
 
 THE PLACE OF THE PACK
 
-co_explore ranks single actions by novelty and predicted change; co_graph is the
+co_explore ranks single actions by novelty and predicted change; state_graph is the
 memory and the map that turns those local preferences into global coverage. In
-Mentova, the live solo player consults co_graph first - probe an untested action
+Mentova, the live solo player consults state_graph first - probe an untested action
 or head to the frontier - and only falls back to least-tried curiosity when the
 graph says the reachable space is exhausted. Six acceptance tests pass, and the
 pack has no dependencies, so it drops into any interactive-environment agent.
@@ -26851,9 +26851,9 @@ named rule), carries an English comment above each line of code, and ships a
 passing test suite.
 
 
-co_trace - Episodic Memory (WP-409, Layer 384)
+episodic_memory - Episodic Memory (WP-409, Layer 384)
 --------------------------------------------------------------------------------
-The mind kept no record of past episodes it could be reminded of. co_trace is
+The mind kept no record of past episodes it could be reminded of. episodic_memory is
 that record. Each experience is a small reified case:
 
     episode(Id, Context, Action, Outcome, Valence, Recency, Hits)
@@ -26862,8 +26862,8 @@ Context is a set of feature atoms describing the situation; Valence is how
 good or bad it was, in the band minus-one to plus-one. Recall is by feature
 overlap: the similarity of a present cue to a stored case is the Jaccard overlap
 of their feature sets (shared features over total distinct features), so the most
-relevant memory surfaces first. ct_recall returns the single best match and bumps
-its hit count; ct_reinforce nudges a case's valence when it proves useful. This
+relevant memory surfaces first. episodic_memory_recall returns the single best match and bumps
+its hit count; episodic_memory_reinforce nudges a case's valence when it proves useful. This
 is the glass-box analogue of an associative, case-based memory.
 
 
@@ -26938,9 +26938,9 @@ to an alternate (re-routing), else to accept it and move on. It classifies the
 disturbance and grades the repair it achieves.
 
 
-co_distill - Consolidation (WP-416, Layer 391)
+consolidation - Consolidation (WP-416, Layer 391)
 --------------------------------------------------------------------------------
-You cannot build a learning system without committing to forgetting. co_distill
+You cannot build a learning system without committing to forgetting. consolidation
 is the night shift that keeps memory compact. Re-adding a record under the same
 key merges rather than duplicates, bumping a use count and refreshing the value;
 a reliably repeated sequence is compressed into one composite; and stale,
@@ -27016,7 +27016,7 @@ co_liken - Analogy (WP-419, Layer 394)
 --------------------------------------------------------------------------------
 Analogy is seeing that two different situations share the same shape, and
 carrying a lesson from one to the other. co_liken takes two situations, each
-written as a set of relations between objects (the same shape the co_rel pack
+written as a set of relations between objects (the same shape the object_relations pack
 produces), and finds the way of matching up their objects that makes the most
 relations line up. It scores how good the match is, and once it has the match it
 can transfer a fact - a rule, a goal, a disposition - from the first situation to
@@ -27128,7 +27128,7 @@ out. From a pile of these it notices a theme - a situation-pattern that keeps
 recurring - recalls the lessons of past situations whose pattern is present now,
 ranks the responses by how often they turned out good, and distils a maxim: do
 the response that usually works, or, if none does, avoid the one most tied to a
-bad result. Where co_trace stores individual experience-cases and concept_formation groups
+bad result. Where episodic_memory stores individual experience-cases and concept_formation groups
 objects into concepts, lore sits above experience and turns repetition into
 standing advice.
 

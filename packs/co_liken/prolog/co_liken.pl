@@ -3,11 +3,11 @@
     THE_BUILDING_FILES name analogy as one of the core modes of inference — the
     ability to see that one situation has the same shape as another and to carry
     a lesson across. The co_ family could describe a situation as a set of
-    relations (co_rel) but had no way to line two such descriptions up. This pack
+    relations (object_relations) but had no way to line two such descriptions up. This pack
     is that structure-mapping, kept small and glass-box.
 
     A situation is a list of relations, each written rel(Type, ObjectA, ObjectB),
-    exactly the shape co_rel produces. An ANALOGY is an injective mapping from the
+    exactly the shape object_relations produces. An ANALOGY is an injective mapping from the
     objects of a source situation onto the objects of a target situation that
     makes as many relations line up as possible: a source rel(Type, A, B) is
     PRESERVED when rel(Type, map(A), map(B)) is present in the target. The best

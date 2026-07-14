@@ -3,7 +3,7 @@
     THE_BUILDING_FILES describe a mind that does not just remember episodes but
     learns their lessons: it notices when a kind of situation keeps recurring (a
     "theme"), pairs problems with the responses that worked (a "lesson"), and
-    distils a piece of standing advice (a "maxim"). co_trace stores individual
+    distils a piece of standing advice (a "maxim"). episodic_memory stores individual
     experience-cases and concept_formation groups objects into concepts; this pack sits
     above experience and turns repetition into guidance.
 
