@@ -1,6 +1,6 @@
 /*  PrologAI — Causalontology Hierarchical Planning  (WP-404, Layer 379)
 
-    co_plan composes a flat sequence of actions into one higher-level procedure
+    causal_planner composes a flat sequence of actions into one higher-level procedure
     relation; that is a two-level seed, not a hierarchy. This pack makes planning
     genuinely hierarchical: a plan is a TREE with as many levels of detail as the
     task needs, each high-level step expandable into a sub-plan.

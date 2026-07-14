@@ -10,5 +10,5 @@ author('PrologAI Community', 'ai.university.aiu@gmail.com').
 home('https://github.com/ai-university-aiu/PrologAI').
 % State the fact: download('https://github.com/ai-university-aiu/PrologAI/releases').
 download('https://github.com/ai-university-aiu/PrologAI/releases').
-% State the fact: requires([causal_core, causal_learning, co_plan, grid]).
-requires([causal_core, causal_learning, co_plan, grid]).
+% State the fact: requires([causal_core, causal_learning, causal_planner, grid]).
+requires([causal_core, causal_learning, causal_planner, grid]).

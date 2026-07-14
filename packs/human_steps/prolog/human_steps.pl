@@ -115,7 +115,7 @@ human_steps_phase_capability(2, curiosity).
 % Goal inference is the goal inferencer.
 human_steps_phase_capability(3, goal_inference).
 % Planning is the planner under the efficiency governor.
-human_steps_phase_capability(4, co_plan).
+human_steps_phase_capability(4, causal_planner).
 % Execution spends actions under the efficiency governor.
 human_steps_phase_capability(5, efficiency_governor).
 % Transfer carries learned relations forward across levels.

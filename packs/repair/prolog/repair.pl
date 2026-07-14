@@ -9,7 +9,7 @@
       neutralization  do some other action that cancels the side effect
       re-routing      abandon the blocked goal and head for an alternate one
 
-    The co_ family could plan toward a goal (co_plan) and refuse a hazard
+    The co_ family could plan toward a goal (causal_planner) and refuse a hazard
     (causal_core, verification, safety_governor), but nothing knew how to recover once a wrong
     thing had already happened. This pack is that recovery, as glass-box rules.
 
