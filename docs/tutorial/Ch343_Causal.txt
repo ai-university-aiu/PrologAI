@@ -13,7 +13,7 @@ The causal pack gives PrologAI the whole ladder as glass-box operations.
 A structural causal model (SCM) is a set of variables and the equations
 that cause them. Here is the classic firing squad:
 
-    ?- cf_model([
+    ?- causal_model([
            exo(court, 0),
            eq(captain, court),
            eq(rifle_a, captain),
@@ -28,12 +28,12 @@ captain, and the prisoner dies if either rifleman fires.
 
 RUNG ONE - SEEING
 
-    ?- cf_value(SCM, [court-1], death, V).
+    ?- causal_value(SCM, [court-1], death, V).
     V = 1.
 
 Solve the equations in causal order and read any variable. The model also
-answers graph questions: cf_parents, cf_ancestors, cf_descendants,
-cf_path, and cf_dsep - d-separation, the test of which variables are
+answers graph questions: causal_parents, causal_ancestors, causal_descendants,
+causal_path, and causal_dsep - d-separation, the test of which variables are
 informationally walled off from which, given what you already know.
 
 RUNG TWO - DOING
@@ -43,7 +43,7 @@ observation - it is an intervention, written do(rifle_a = 1). The pack
 performs graph surgery: rifleman A's equation is cut away and replaced by
 the constant.
 
-    ?- cf_do(SCM, [rifle_a-1], [court-0], Solution).
+    ?- causal_do(SCM, [rifle_a-1], [court-0], Solution).
 
 The prisoner dies (death is 1), but look at the rest of the solution:
 captain is 0 and rifle_b is 0. Forcing a rifleman does not make the
@@ -58,7 +58,7 @@ fire? Counterfactuals follow a three-step recipe: abduction (work out the
 hidden context from the evidence), action (perform the surgery), and
 prediction (solve the mutilated model in the recovered context).
 
-    ?- cf_counterfactual(SCM, [court-[0, 1]], [death-1],
+    ?- causal_counterfactual(SCM, [court-[0, 1]], [death-1],
                          [rifle_a-0], death, V).
     V = 1.
 
@@ -66,10 +66,10 @@ Yes - he still dies, because the evidence (death-1) tells us the court
 ordered, so rifleman B still fires. But had the CAPTAIN stayed silent, the
 prisoner would have lived (V = 0). And the pack is honest about
 uncertainty: if the evidence is too thin to determine the answer,
-cf_counterfactual fails rather than guesses, and cf_counterfactual_all
+causal_counterfactual fails rather than guesses, and causal_counterfactual_all
 shows every value that remains possible.
 
-Finally, cf_but_for tests actual causation the way a court of law does:
+Finally, causal_but_for tests actual causation the way a court of law does:
 was X necessary for Y? The captain passes the but-for test of the death.
 A single rifleman does not - his colleague would have fired anyway.
 

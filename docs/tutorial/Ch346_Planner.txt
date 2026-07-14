@@ -9,7 +9,7 @@ pack gives that loop its long-horizon spine.
 
 A domain declares primitives and methods:
 
-    ?- ht_domain(
+    ?- planner_domain(
          [prim(walk(X, Y), [at(me, X), short(X, Y)],
                [at(me, Y)], [at(me, X)]),
           prim(call_taxi(X), [at(me, X)], [taxi_at(X)], []),
@@ -29,7 +29,7 @@ which decomposes again.
 
 PLANNING
 
-    ?- ht_plan(Domain, [at(me, home), short(home, park), has_cash],
+    ?- planner_plan(Domain, [at(me, home), short(home, park), has_cash],
                [travel(home, park)], 10, Plan).
     Plan = [walk(home, park)].
 
@@ -45,10 +45,10 @@ instead of hanging.
 
 THE GLASS-BOX PLAN TREE
 
-Where most planners give you a flat list of actions, ht_task_tree tells
+Where most planners give you a flat list of actions, planner_task_tree tells
 you WHY each action is there:
 
-    ?- ht_task_tree(Domain, State, travel(home, park), 10, Tree).
+    ?- planner_task_tree(Domain, State, travel(home, park), 10, Tree).
     Tree = tree(travel(home, park), go_by_foot,
                 [primitive(walk(home, park))]).
 
@@ -58,15 +58,15 @@ rules of the ARC-AGI climb.
 
 EXECUTION, MONITORING, REPLANNING
 
-ht_execute runs a plan against a state. ht_monitor walks a plan and
+planner_execute runs a plan against a state. planner_monitor walks a plan and
 reports either ok or exactly where it breaks:
 
-    ?- ht_monitor(Domain, [at(me, home)],
+    ?- planner_monitor(Domain, [at(me, home)],
                   [call_taxi(home), ride(home, park), pay], Status).
     Status = fails_at(3, pay).
 
 The cash is gone, so step three can no longer run. Armed with that,
-ht_replan plans again from the situation as it now stands - and if the
+planner_replan plans again from the situation as it now stands - and if the
 park has meanwhile become walkable, walking saves the day.
 
 All 18 acceptance tests pass: preference, fall-back, nesting, termination,

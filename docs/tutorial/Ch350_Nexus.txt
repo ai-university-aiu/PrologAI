@@ -18,10 +18,10 @@ ever depends on nexus, so the building of packs still rests on tested
 foundations all the way up.
 
 Second, nexus adds no cognition of its own. It is pure plumbing. Every
-junction is a named, inspectable predicate, and nx_wirings/1 will tell you
+junction is a named, inspectable predicate, and nexus_wirings/1 will tell you
 exactly what it connects:
 
-    ?- nx_wirings(W).
+    ?- nexus_wirings(W).
     W = [ wiring(jspace_from_workspace, ...),
           wiring(curiosity_from_worldmodel, ...),
           wiring(agency_with_planner, ...),
@@ -34,13 +34,13 @@ actor subscribe to its broadcast bus; nexus subscribes a hook that, on every
 broadcast, holds the winning coalition's concepts in a J-Space workspace at
 the broadcast's salience.
 
-    ?- js_open(mind), nx_bind_workspace(mind).
+    ?- js_open(mind), nexus_bind_workspace(mind).
 
 Now, whenever the workspace broadcasts, mind holds what the mind is
 broadcasting, ranked by salience - the readable concept workspace of Chapter
 348, updated in real time by the attention arbiter of the global workspace.
-nx_replay_broadcasts/2 lets you feed a whole reasoning episode offline, and
-nx_broadcast_reading/2 shows the result.
+nexus_replay_broadcasts/2 lets you feed a whole reasoning episode offline, and
+nexus_broadcast_reading/2 shows the result.
 
 Wiring two turns the world model into a curiosity signal. The curiosity pack
 learns from prediction error and rewards learning PROGRESS, not raw error.
@@ -48,7 +48,7 @@ nexus feeds it the world model's novelty: as an agent explores and a region
 becomes familiar, novelty falls, and falling novelty is exactly what
 curiosity reads as progress.
 
-    ?- nx_curiosity_explore(kitchen,
+    ?- nexus_curiosity_explore(kitchen,
            [[at(door)], [at(door),saw(stove)], [at(door),saw(stove)]], P).
     P = 0.5.     % positive — the agent is learning the kitchen
 
@@ -58,10 +58,10 @@ progress: the built-in guard against being mesmerized by noise.
 Wiring three gives the agency loop a planner. The agency loop runs
 observe-reason-act with a step budget; its reason-goal is a predicate that
 decides what to do next. nexus supplies a reason-goal that decomposes the
-current goal with ht_plan, and one that additionally checks the plan against
-the current world with ht_monitor and replans when the world has moved.
+current goal with planner_plan, and one that additionally checks the plan against
+the current world with planner_monitor and replans when the world has moved.
 
-    ?- nx_plan_and_run(Domain, State, travel(home, park), 5, Outcome).
+    ?- nexus_plan_and_run(Domain, State, travel(home, park), 5, Outcome).
     Outcome = done(achieved(travel(home,park), [walk(home,park)])).
 
 If no plan exists, the loop does not invent one - it escalates to human
@@ -73,7 +73,7 @@ output by how many criteria it passes; the evolve pack searches by fitness.
 nexus makes the refinery score the fitness, so evolution improves reasoning
 models under critique, within a bounded generation budget.
 
-    ?- nx_evolve_with_critique(Criteria, Params, 24, 5, 80, 1.0, 5, Best, S, G).
+    ?- nexus_evolve_with_critique(Criteria, Params, 24, 5, 80, 1.0, 5, Best, S, G).
     Best = [observe, deduce, observe, induce, conclude], S = 1.0, G = 6.
 
 Six generations of variation and selection assembled a valid

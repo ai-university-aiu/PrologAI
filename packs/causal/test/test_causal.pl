@@ -19,7 +19,7 @@
 % The firing squad: court orders, captain signals, two riflemen fire.
 squad_model(SCM) :-
     % Build the model from its declarations.
-    cf_model([
+    causal_model([
         % The court order is the exogenous background condition.
         exo(court, 0),
         % The captain signals exactly when the court orders.
@@ -35,7 +35,7 @@ squad_model(SCM) :-
 % The sprinkler: season drives sprinkler and rain; both wet the grass.
 sprinkler_model(SCM) :-
     % Build the model from its declarations.
-    cf_model([
+    causal_model([
         % Season 1 means dry season; season 0 means wet season.
         exo(season, 0),
         % The sprinkler runs in the dry season.
@@ -59,7 +59,7 @@ test(model_builds) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Ask for the full variable list.
-    cf_variables(SCM, Vars),
+    causal_variables(SCM, Vars),
     % All five variables must be present.
     msort(Vars, [captain, court, death, rifle_a, rifle_b]).
 
@@ -68,9 +68,9 @@ test(exo_endo_split) :-
     % Build the firing squad model.
     squad_model(SCM),
     % The only exogenous variable is the court order.
-    cf_exogenous(SCM, [court]),
+    causal_exogenous(SCM, [court]),
     % The endogenous list holds the other four variables.
-    cf_endogenous(SCM, Endo),
+    causal_endogenous(SCM, Endo),
     % Order within the list is causal, so just check the membership.
     msort(Endo, [captain, death, rifle_a, rifle_b]).
 
@@ -79,7 +79,7 @@ test(topological_order) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Ask for the endogenous order.
-    cf_endogenous(SCM, Order),
+    causal_endogenous(SCM, Order),
     % The captain must precede rifleman A.
     nth0(IC, Order, captain),
     % Locate rifleman A in the order.
@@ -94,24 +94,24 @@ test(topological_order) :-
 % A cyclic model must be rejected.
 test(cycle_rejected, [fail]) :-
     % Two variables defined in terms of each other form a cycle.
-    cf_model([eq(a, b), eq(b, a)], _).
+    causal_model([eq(a, b), eq(b, a)], _).
 
 % A reference to an undeclared variable must be rejected.
 test(undeclared_rejected, [fail]) :-
     % The equation references a name that no declaration introduces.
-    cf_model([exo(u, 0), eq(a, zz)], _).
+    causal_model([exo(u, 0), eq(a, zz)], _).
 
 % A duplicated variable name must be rejected.
 test(duplicate_rejected, [fail]) :-
     % The same name is declared twice.
-    cf_model([exo(a, 0), eq(a, 1 + 0)], _).
+    causal_model([exo(a, 0), eq(a, 1 + 0)], _).
 
 % Parents are the variables referenced by an equation.
 test(parents) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Death is caused directly by the two riflemen.
-    cf_parents(SCM, death, Ps),
+    causal_parents(SCM, death, Ps),
     % Check the parent set.
     msort(Ps, [rifle_a, rifle_b]).
 
@@ -120,7 +120,7 @@ test(children) :-
     % Build the firing squad model.
     squad_model(SCM),
     % The captain signals both riflemen.
-    cf_children(SCM, captain, Cs),
+    causal_children(SCM, captain, Cs),
     % Check the child set.
     msort(Cs, [rifle_a, rifle_b]).
 
@@ -129,7 +129,7 @@ test(ancestors) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Everything upstream of death is an ancestor.
-    cf_ancestors(SCM, death, As),
+    causal_ancestors(SCM, death, As),
     % Check the ancestor set.
     msort(As, [captain, court, rifle_a, rifle_b]).
 
@@ -138,7 +138,7 @@ test(descendants) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Everything downstream of the court order is a descendant.
-    cf_descendants(SCM, court, Ds),
+    causal_descendants(SCM, court, Ds),
     % Check the descendant set.
     msort(Ds, [captain, death, rifle_a, rifle_b]).
 
@@ -147,14 +147,14 @@ test(path_holds) :-
     % Build the firing squad model.
     squad_model(SCM),
     % The path runs court -> captain -> rifleman -> death.
-    cf_path(SCM, court, death).
+    causal_path(SCM, court, death).
 
 % No directed path runs between the two riflemen.
 test(path_fails, [fail]) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Neither rifleman causes the other.
-    cf_path(SCM, rifle_a, rifle_b).
+    causal_path(SCM, rifle_a, rifle_b).
 
 :- end_tests(causal_model).
 
@@ -169,7 +169,7 @@ test(solve_order_given) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Solve with the court order set to one.
-    cf_solve(SCM, [court-1], Solution),
+    causal_solve(SCM, [court-1], Solution),
     % The captain signals.
     memberchk(captain-1, Solution),
     % Rifleman A fires.
@@ -184,20 +184,20 @@ test(solve_no_order) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Solve with the default context.
-    cf_value(SCM, [], death, V),
+    causal_value(SCM, [], death, V),
     % The prisoner lives.
     V =:= 0.
 
 % Arithmetic expressions evaluate inside equations.
 test(solve_arithmetic) :-
     % Build a small arithmetic model.
-    cf_model([exo(x, 3), eq(y, x * 2 + 1), eq(z, y - x)], SCM),
+    causal_model([exo(x, 3), eq(y, x * 2 + 1), eq(z, y - x)], SCM),
     % Read the derived value of y.
-    cf_value(SCM, [], y, VY),
+    causal_value(SCM, [], y, VY),
     % Check the multiplication and addition.
     VY =:= 7,
     % Read the derived value of z.
-    cf_value(SCM, [], z, VZ),
+    causal_value(SCM, [], z, VZ),
     % Check the subtraction.
     VZ =:= 4.
 
@@ -206,11 +206,11 @@ test(solve_conditional) :-
     % Build the sprinkler model.
     sprinkler_model(SCM),
     % In the dry season the sprinkler runs.
-    cf_value(SCM, [season-1], sprinkler, 1),
+    causal_value(SCM, [season-1], sprinkler, 1),
     % In the dry season no rain falls.
-    cf_value(SCM, [season-1], rain, 0),
+    causal_value(SCM, [season-1], rain, 0),
     % The grass is still wet, through the sprinkler.
-    cf_value(SCM, [season-1], wet, 1).
+    causal_value(SCM, [season-1], wet, 1).
 
 :- end_tests(causal_solve).
 
@@ -225,7 +225,7 @@ test(do_forward_effect) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Force rifleman A with the court silent.
-    cf_effect(SCM, [rifle_a-1], [court-0], death, V),
+    causal_effect(SCM, [rifle_a-1], [court-0], death, V),
     % The prisoner dies.
     V =:= 1.
 
@@ -234,7 +234,7 @@ test(do_no_backtracking) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Force rifleman A with the court silent.
-    cf_do(SCM, [rifle_a-1], [court-0], Solution),
+    causal_do(SCM, [rifle_a-1], [court-0], Solution),
     % The captain never signalled.
     memberchk(captain-0, Solution),
     % Rifleman B never fired.
@@ -245,18 +245,18 @@ test(do_exogenous_rejected, [fail]) :-
     % Build the firing squad model.
     squad_model(SCM),
     % The do-operator applies only to endogenous variables.
-    cf_intervene(SCM, [court-1], _).
+    causal_intervene(SCM, [court-1], _).
 
 % Observation and intervention differ on the same variable.
 test(seeing_versus_doing) :-
     % Build the sprinkler model.
     sprinkler_model(SCM),
     % Observing a running sprinkler in the wet season keeps the rain.
-    cf_value(SCM, [season-0], rain, 1),
+    causal_value(SCM, [season-0], rain, 1),
     % Forcing the sprinkler on does not stop the rain either.
-    cf_effect(SCM, [sprinkler-1], [season-0], rain, 1),
+    causal_effect(SCM, [sprinkler-1], [season-0], rain, 1),
     % But forcing the sprinkler in the dry season still wets the grass.
-    cf_effect(SCM, [sprinkler-1], [season-1], wet, 1).
+    causal_effect(SCM, [sprinkler-1], [season-1], wet, 1).
 
 :- end_tests(causal_do).
 
@@ -271,28 +271,28 @@ test(dsep_fork_blocked) :-
     % Build the sprinkler model.
     sprinkler_model(SCM),
     % Season is the fork between sprinkler and rain.
-    cf_dsep(SCM, sprinkler, rain, [season]).
+    causal_dsep(SCM, sprinkler, rain, [season]).
 
 % Without conditioning, the fork leaves them connected.
 test(dsep_fork_open, [fail]) :-
     % Build the sprinkler model.
     sprinkler_model(SCM),
     % The path through the season is open.
-    cf_dsep(SCM, sprinkler, rain, []).
+    causal_dsep(SCM, sprinkler, rain, []).
 
 % Conditioning on the collider re-connects sprinkler and rain.
 test(dsep_collider_opened, [fail]) :-
     % Build the sprinkler model.
     sprinkler_model(SCM),
     % Wet is a collider; conditioning on it opens the path.
-    cf_dsep(SCM, sprinkler, rain, [season, wet]).
+    causal_dsep(SCM, sprinkler, rain, [season, wet]).
 
 % Conditioning on a descendant of the collider also opens the path.
 test(dsep_collider_descendant, [fail]) :-
     % Build the sprinkler model.
     sprinkler_model(SCM),
     % Slippery is downstream of the collider wet.
-    cf_dsep(SCM, sprinkler, rain, [season, slippery]).
+    causal_dsep(SCM, sprinkler, rain, [season, slippery]).
 
 :- end_tests(causal_dsep).
 
@@ -307,7 +307,7 @@ test(abduce_recovers_context, [nondet]) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Collect every context consistent with the observed death.
-    findall(Ctx, cf_abduce(SCM, [court-[0, 1]], [death-1], Ctx), Ctxs),
+    findall(Ctx, causal_abduce(SCM, [court-[0, 1]], [death-1], Ctx), Ctxs),
     % Only the ordering court explains it.
     Ctxs == [[court-1]].
 
@@ -316,7 +316,7 @@ test(counterfactual_rifleman, [nondet]) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Given the observed death, imagine rifleman A holding fire.
-    cf_counterfactual(SCM, [court-[0, 1]], [death-1], [rifle_a-0], death, V),
+    causal_counterfactual(SCM, [court-[0, 1]], [death-1], [rifle_a-0], death, V),
     % Rifleman B still fires, so the prisoner still dies.
     V =:= 1.
 
@@ -325,7 +325,7 @@ test(counterfactual_captain, [nondet]) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Given the observed death, imagine the captain silent.
-    cf_counterfactual(SCM, [court-[0, 1]], [death-1], [captain-0], death, V),
+    causal_counterfactual(SCM, [court-[0, 1]], [death-1], [captain-0], death, V),
     % Both riflemen follow the captain, so the prisoner lives.
     V =:= 0.
 
@@ -334,14 +334,14 @@ test(counterfactual_ambiguous, [fail]) :-
     % Build the firing squad model.
     squad_model(SCM),
     % No evidence constrains the court, so death has two possible values.
-    cf_counterfactual(SCM, [court-[0, 1]], [], [rifle_a-0], death, _).
+    causal_counterfactual(SCM, [court-[0, 1]], [], [rifle_a-0], death, _).
 
 % The all-values form reports the full set of possibilities.
 test(counterfactual_all_values, [nondet]) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Ask for every possible death value with no evidence.
-    cf_counterfactual_all(SCM, [court-[0, 1]], [], [rifle_a-0], death, Vs),
+    causal_counterfactual_all(SCM, [court-[0, 1]], [], [rifle_a-0], death, Vs),
     % Both outcomes remain possible.
     Vs == [0, 1].
 
@@ -350,13 +350,13 @@ test(but_for_captain, [nondet]) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Had the captain acted otherwise, death would change.
-    cf_but_for(SCM, [court-1], captain, [0], death).
+    causal_but_for(SCM, [court-1], captain, [0], death).
 
 % A single rifleman fails the but-for test because of redundancy.
 test(but_for_rifleman, [fail]) :-
     % Build the firing squad model.
     squad_model(SCM),
     % Rifleman B fires anyway, so A alone is not necessary.
-    cf_but_for(SCM, [court-1], rifle_a, [0], death).
+    causal_but_for(SCM, [court-1], rifle_a, [0], death).
 
 :- end_tests(causal_counterfactual).

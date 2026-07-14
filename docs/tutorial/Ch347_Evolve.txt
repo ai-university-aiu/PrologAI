@@ -10,20 +10,20 @@ NO HIDDEN DICE
 
 Every random choice in the pack flows through an explicit seed:
 
-    ?- ev_random_genome([0, 1], 8, 42, Genome, NextSeed).
+    ?- evolve_random_genome([0, 1], 8, 42, Genome, NextSeed).
 
-The linear congruential generator (ev_next/2) is a pure function, so the
+The linear congruential generator (evolve_next/2) is a pure function, so the
 same seed always produces the same genome, the same population, the same
 entire evolution. A run that found something interesting can be replayed
 gene for gene. Determinism is what makes evolution glass-box.
 
 THE OPERATORS
 
-    ev_evaluate(Goal, Pop, Scored)    score every genome with your fitness
-    ev_tournament(Scored, K, ...)     best of K random picks becomes a parent
-    ev_crossover(G1, G2, ...)         head of one parent, tail of the other
-    ev_mutate(G, Alphabet, Rate, ...) each gene rewritten with probability Rate
-    ev_elite(Scored, N, Elites)       the top N survive unchanged
+    evolve_evaluate(Goal, Pop, Scored)    score every genome with your fitness
+    evolve_tournament(Scored, K, ...)     best of K random picks becomes a parent
+    evolve_crossover(G1, G2, ...)         head of one parent, tail of the other
+    evolve_mutate(G, Alphabet, Rate, ...) each gene rewritten with probability Rate
+    evolve_elite(Scored, N, Elites)       the top N survive unchanged
 
 Fitness is any predicate you supply, called as call(Goal, Genome, Score).
 Bigger is better. Elitism means the champion can never be lost between
@@ -36,7 +36,7 @@ equal to the sum of the genes.
 
     onemax(G, S) :- sum_list(G, S).
 
-    ?- ev_run(onemax, params([0, 1], 3, 0.05, 2),
+    ?- evolve_run(onemax, params([0, 1], 3, 0.05, 2),
               24, 12, 30, 42, Best, Score).
     Best  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     Score = 12.
@@ -47,7 +47,7 @@ thirty generations later the perfect genome has been assembled from
 fragments no founder possessed. The early-stopping variant reports how
 long it actually took:
 
-    ?- ev_run_until(onemax, params([0, 1], 3, 0.05, 2),
+    ?- evolve_run_until(onemax, params([0, 1], 3, 0.05, 2),
                     24, 12, 60, 12, 42, Best, Score, Gens).
     Gens = 7.
 
@@ -55,8 +55,8 @@ Seven generations to perfection, every one replayable.
 
 WATCHING THE POPULATION
 
-ev_diversity measures the distinct fraction of a population, and
-ev_converged flags when it has collapsed below a threshold - the sign to
+evolve_diversity measures the distinct fraction of a population, and
+evolve_converged flags when it has collapsed below a threshold - the sign to
 stop, restart with a new seed, or raise the mutation rate.
 
 Because fitness goals are ordinary predicates, anything in PrologAI can

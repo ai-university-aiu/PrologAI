@@ -24,7 +24,7 @@
 
 % Load the packs whose constructors and readers the tests call directly.
 :- use_module(library(jspace), [js_open/1, js_strength/3, js_reading/2, js_active/2]).
-:- use_module(library(planner), [ht_domain/3]).
+:- use_module(library(planner), [planner_domain/3]).
 :- use_module(library(world_model), [world_model_novelty/3]).
 
 % ===========================================================================
@@ -39,7 +39,7 @@ close_to(A, B) :-
 % The travel domain shared with the planner pack tests.
 travel_domain(Domain) :-
     % Assemble the domain from primitives and methods.
-    ht_domain(
+    planner_domain(
         % The four primitive actions.
         [prim(walk(X1, Y1), [at(me, X1), short(X1, Y1)], [at(me, Y1)], [at(me, X1)]),
          prim(call_taxi(X2), [at(me, X2)], [taxi_at(X2)], []),
@@ -79,7 +79,7 @@ reasoning_criteria([
 % The pack describes exactly its four wirings.
 test(four_wirings) :-
     % Ask for the wiring description.
-    nx_wirings(Wirings),
+    nexus_wirings(Wirings),
     % There are four of them.
     length(Wirings, 4),
     % The four expected wiring keys are present.
@@ -100,7 +100,7 @@ test(hold_broadcast_direct) :-
     % A fresh workspace.
     js_open(w_hold),
     % Route one broadcast through the hook the live workspace would call.
-    nx_hold_broadcast(w_hold, broadcast_content(c1, goal, [find_marble, hungry], 0.7)),
+    nexus_hold_broadcast(w_hold, broadcast_content(c1, goal, [find_marble, hungry], 0.7)),
     % Both concepts are now held at the broadcast salience.
     js_strength(w_hold, find_marble, S1),
     % Check the first concept's strength.
@@ -115,12 +115,12 @@ test(replay_ranks_by_salience) :-
     % A fresh workspace.
     js_open(w_replay),
     % Replay a two-broadcast reasoning episode.
-    nx_replay_broadcasts(w_replay, [
+    nexus_replay_broadcasts(w_replay, [
         broadcast_content(c1, goal, [find_marble], 0.6),
         broadcast_content(c2, percept, [red_cube], 0.9)
     ]),
     % The live readout is strongest-first.
-    nx_broadcast_reading(w_replay, Reading),
+    nexus_broadcast_reading(w_replay, Reading),
     % The most salient percept leads the readout.
     Reading = [red_cube-0.9 | _],
     % Both concepts are present.
@@ -131,7 +131,7 @@ test(salience_clamped) :-
     % A fresh workspace.
     js_open(w_clamp),
     % A pathological broadcast with an out-of-range salience.
-    nx_hold_broadcast(w_clamp, broadcast_content(c1, x, [concept], 1.7)),
+    nexus_hold_broadcast(w_clamp, broadcast_content(c1, x, [concept], 1.7)),
     % The held strength is clamped to the maximum.
     js_strength(w_clamp, concept, S),
     % Check the clamp.
@@ -142,7 +142,7 @@ test(empty_coalition) :-
     % A fresh workspace.
     js_open(w_empty),
     % A broadcast that carried no content.
-    nx_hold_broadcast(w_empty, broadcast_content(c1, x, [], 0.5)),
+    nexus_hold_broadcast(w_empty, broadcast_content(c1, x, [], 0.5)),
     % The workspace remains empty.
     js_active(w_empty, []).
 
@@ -152,11 +152,11 @@ test(bind_subscribes_and_dispatches, [nondet]) :-
     % A fresh workspace.
     js_open(w_bind),
     % Bind the J-Space to the workspace broadcast bus.
-    nx_bind_workspace(w_bind),
+    nexus_bind_workspace(w_bind),
     % The workspace now lists our hook among its broadcast subscribers.
-    workspace:broadcast_subscriber(nexus:nx_hold_broadcast(w_bind)),
+    workspace:broadcast_subscriber(nexus:nexus_hold_broadcast(w_bind)),
     % Dispatch a broadcast exactly as workspace_cycle/0 does: call(Goal, Content).
-    call(nexus:nx_hold_broadcast(w_bind),
+    call(nexus:nexus_hold_broadcast(w_bind),
          broadcast_content(c9, theme, [alpha, beta], 0.8)),
     % The dispatched concepts landed in the J-Space at the broadcast salience.
     js_strength(w_bind, alpha, SA),
@@ -172,11 +172,11 @@ test(bind_idempotent) :-
     % A fresh workspace.
     js_open(w_idem),
     % Bind once.
-    nx_bind_workspace(w_idem),
+    nexus_bind_workspace(w_idem),
     % Bind again.
-    nx_bind_workspace(w_idem),
+    nexus_bind_workspace(w_idem),
     % Exactly one subscriber entry exists for this J-Space.
-    findall(x, workspace:broadcast_subscriber(nexus:nx_hold_broadcast(w_idem)), Xs),
+    findall(x, workspace:broadcast_subscriber(nexus:nexus_hold_broadcast(w_idem)), Xs),
     % There is a single registration.
     length(Xs, 1).
 
@@ -191,7 +191,7 @@ test(bind_idempotent) :-
 % The novelty signal delegates faithfully to the world model.
 test(novelty_signal_delegates) :-
     % Nexus and the world model must agree on the novelty of a state.
-    nx_novelty_signal([[a, b]], [a, c], NX),
+    nexus_novelty_signal([[a, b]], [a, c], NX),
     % Compute the same novelty directly from the world model.
     world_model_novelty([[a, b]], [a, c], WM),
     % The two must match exactly.
@@ -202,7 +202,7 @@ test(novelty_signal_delegates) :-
 % Observing novelty records it as a curiosity prediction error.
 test(observe_novelty_records) :-
     % A fully novel state against no history scores one.
-    nx_observe_novelty(reg_obs, [], [x, y], 0, Nov),
+    nexus_observe_novelty(reg_obs, [], [x, y], 0, Nov),
     % The novelty is total.
     close_to(Nov, 1.0),
     % The curiosity region now has one recorded error to learn from.
@@ -211,7 +211,7 @@ test(observe_novelty_records) :-
 % A trajectory whose novelty falls reads as positive learning progress.
 test(falling_novelty_is_progress) :-
     % Explore a trajectory that revisits familiar structure.
-    nx_curiosity_explore(reg_fall, [[a, b], [a, b, c], [a, b], [a, b]], Progress),
+    nexus_curiosity_explore(reg_fall, [[a, b], [a, b, c], [a, b], [a, b]], Progress),
     % Falling novelty means the region is being learned.
     Progress > 0.0,
     % The exact hand-computed progress is two thirds.
@@ -220,7 +220,7 @@ test(falling_novelty_is_progress) :-
 % A trajectory of unrelated novel states shows no learning progress.
 test(flat_novelty_no_progress) :-
     % Every state is brand new and unlike the others.
-    nx_curiosity_explore(reg_flat, [[a], [b], [c], [d]], Progress),
+    nexus_curiosity_explore(reg_flat, [[a], [b], [c], [d]], Progress),
     % Novelty stays high and flat, so there is nothing being learned.
     close_to(Progress, 0.0).
 
@@ -237,7 +237,7 @@ test(plan_and_run_reachable, [nondet]) :-
     % Build the travel domain.
     travel_domain(D),
     % Run the loop toward a walkable destination.
-    nx_plan_and_run(D, [at(me, home), short(home, park), has_cash],
+    nexus_plan_and_run(D, [at(me, home), short(home, park), has_cash],
                     travel(home, park), 5, Outcome),
     % The loop finished, carrying the decomposed plan.
     Outcome = done(achieved(travel(home, park), Plan)),
@@ -249,7 +249,7 @@ test(plan_and_run_escalates, [nondet]) :-
     % Build the travel domain.
     travel_domain(D),
     % No way to travel: no walking distance and no cash.
-    nx_plan_and_run(D, [at(me, home)], travel(home, park), 5, Outcome),
+    nexus_plan_and_run(D, [at(me, home)], travel(home, park), 5, Outcome),
     % The loop escalated rather than fabricating a plan.
     Outcome == escalated(no_plan(travel(home, park))).
 
@@ -258,7 +258,7 @@ test(unknown_goal_escalates) :-
     % Build the travel domain.
     travel_domain(D),
     % Ask the reasoner about a goal it has no competence for.
-    nx_agency_plan_reason(D, [at(me, home)], loop_1, fly(moon), Thought, Action),
+    nexus_agency_plan_reason(D, [at(me, home)], loop_1, fly(moon), Thought, Action),
     % The thought names the impasse.
     Thought == unknown_goal(fly(moon)),
     % The action escalates.
@@ -269,7 +269,7 @@ test(budget_bound) :-
     % Build the travel domain.
     travel_domain(D),
     % Run with no budget at all.
-    nx_plan_and_run(D, [at(me, home), short(home, park)],
+    nexus_plan_and_run(D, [at(me, home), short(home, park)],
                     travel(home, park), 0, Outcome),
     % The loop stops at its safety bound.
     Outcome == budget_exhausted.
@@ -283,7 +283,7 @@ test(pursue_recovers, [nondet]) :-
     % But by execution time the walkable shortcut is gone.
     WorldState = [at(me, home), has_cash],
     % Pursue the goal, monitoring against the changed world.
-    nx_pursue_and_run(D, PlanState, WorldState, travel(home, park), 5, Outcome),
+    nexus_pursue_and_run(D, PlanState, WorldState, travel(home, park), 5, Outcome),
     % The loop recovered by replanning to the taxi route.
     Outcome = done(achieved(travel(home, park), Plan)),
     % The recovered plan is the taxi sequence.
@@ -296,7 +296,7 @@ test(pursue_plan_valid, [nondet]) :-
     % The world is exactly what the plan was made for.
     State = [at(me, home), short(home, park), has_cash],
     % Pursue the goal.
-    nx_pursue_and_run(D, State, State, travel(home, park), 5, Outcome),
+    nexus_pursue_and_run(D, State, State, travel(home, park), 5, Outcome),
     % The original walking plan survives.
     Outcome == done(achieved(travel(home, park), [walk(home, park)])).
 
@@ -309,7 +309,7 @@ test(pursue_unrecoverable, [nondet]) :-
     % By execution time there is neither a shortcut nor cash.
     WorldState = [at(me, home)],
     % Pursue the goal.
-    nx_pursue_and_run(D, PlanState, WorldState, travel(home, park), 5, Outcome),
+    nexus_pursue_and_run(D, PlanState, WorldState, travel(home, park), 5, Outcome),
     % Recovery is impossible, so the loop escalates.
     Outcome == escalated(cannot_recover(travel(home, park))).
 
@@ -326,7 +326,7 @@ test(refinery_fitness_fraction) :-
     % Fetch the reasoning-operator criteria.
     reasoning_criteria(Criteria),
     % A genome that observes first and deduces but never concludes.
-    nx_refinery_fitness(Criteria, [observe, deduce, branch], Score),
+    nexus_refinery_fitness(Criteria, [observe, deduce, branch], Score),
     % Two of the three criteria pass.
     close_to(Score, 0.6666666666666666).
 
@@ -335,7 +335,7 @@ test(evolve_reaches_bar) :-
     % Fetch the reasoning-operator criteria.
     reasoning_criteria(Criteria),
     % Evolve under critique from seed 5: population 24, five operators long.
-    nx_evolve_with_critique(Criteria, params([observe, deduce, abduce, induce, conclude, branch], 3, 0.15, 2),
+    nexus_evolve_with_critique(Criteria, params([observe, deduce, abduce, induce, conclude, branch], 3, 0.15, 2),
                             24, 5, 80, 1.0, 5, Best, Score, Gens),
     % The perfect quality bar was reached.
     close_to(Score, 1.0),
@@ -344,7 +344,7 @@ test(evolve_reaches_bar) :-
     % The evolved trace is the deterministic winner for this seed.
     Best == [observe, deduce, observe, induce, conclude],
     % The winner has no remaining refinery issues.
-    nx_critique_report(Criteria, Best, []).
+    nexus_critique_report(Criteria, Best, []).
 
 % The evolutionary run is reproducible: one seed, one evolution.
 test(evolve_deterministic) :-
@@ -353,9 +353,9 @@ test(evolve_deterministic) :-
     % The operator alphabet.
     Ops = [observe, deduce, abduce, induce, conclude, branch],
     % Run once.
-    nx_evolve_with_critique(Criteria, params(Ops, 3, 0.15, 2), 24, 5, 80, 1.0, 5, B1, _, G1),
+    nexus_evolve_with_critique(Criteria, params(Ops, 3, 0.15, 2), 24, 5, 80, 1.0, 5, B1, _, G1),
     % Run again from the same seed.
-    nx_evolve_with_critique(Criteria, params(Ops, 3, 0.15, 2), 24, 5, 80, 1.0, 5, B2, _, G2),
+    nexus_evolve_with_critique(Criteria, params(Ops, 3, 0.15, 2), 24, 5, 80, 1.0, 5, B2, _, G2),
     % The winners agree.
     B1 == B2,
     % The generation counts agree.
@@ -366,7 +366,7 @@ test(critique_report_names_issues) :-
     % Fetch the reasoning-operator criteria.
     reasoning_criteria(Criteria),
     % A genome that never observes and never concludes, but does deduce.
-    nx_critique_report(Criteria, [branch, deduce, branch], Critique),
+    nexus_critique_report(Criteria, [branch, deduce, branch], Critique),
     % The two failing criteria are reported.
     memberchk(found_issue(starts_observe, fail), Critique),
     % The missing conclusion is also reported.
