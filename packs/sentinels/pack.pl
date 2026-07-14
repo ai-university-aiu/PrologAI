@@ -10,5 +10,5 @@ author('PrologAI Community', 'ai.university.aiu@gmail.com').
 home('https://github.com/ai-university-aiu/PrologAI').
 % State the fact: download('https://github.com/ai-university-aiu/PrologAI/releases').
 download('https://github.com/ai-university-aiu/PrologAI/releases').
-% State the fact: requires(prologai_expand).
-requires(prologai_expand).
+% State the fact: this pack needs nothing beyond the standard library.
+requires([]).
