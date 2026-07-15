@@ -1,5 +1,5 @@
-% State the fact: name(reflection).
-name(reflection).
+% State the fact: name(reflex_actors).
+name(reflex_actors).
 % State the fact: version('1.0.0').
 version('1.0.0').
 % State the fact: title('PrologAI Reflection Pattern Actors — motivation, daydream, regulation, compensation, coping, exploration, discovery, imitation, play, gating, impasse, meta-control (PR 13)').
