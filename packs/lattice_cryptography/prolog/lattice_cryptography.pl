@@ -50,9 +50,9 @@
     Convenience wrappers:
         lattice_cryptography_encrypt_rsa/4    +PubKey, +Plain, -Bundle, -Tag
         lattice_cryptography_decrypt_rsa/4    +PrivKey, +Bundle, +Tag, -Plain
-        lattice_cryptography_encrypt_ecdh/4   +RecipPubPoint, +Plain, -Bundle, -Tag
+        lattice_cryptography_encrypt_ecdh/5   +RecipPubPoint, +Plain, -Bundle, -Tag
         lattice_cryptography_decrypt_ecdh/5   +RecipPrivInt, +Bundle, +Tag, -Plain, +Curve
-        lattice_cryptography_encrypt_pqc/4    +RecipPubKeyFile, +Plain, -Bundle, -Tag
+        lattice_cryptography_encrypt_pqc/5    +RecipPubKeyFile, +Plain, -Bundle, -Tag
         lattice_cryptography_decrypt_pqc/4    +RecipPrivKeyFile, +Bundle, +Tag, -Plain
 
     Utility:
@@ -78,11 +78,11 @@
     % Continue the multi-line expression started above.
     lattice_cryptography_decrypt_rsa/4,
     % Continue the multi-line expression started above.
-    lattice_cryptography_encrypt_ecdh/4,
+    lattice_cryptography_encrypt_ecdh/5,
     % Continue the multi-line expression started above.
     lattice_cryptography_decrypt_ecdh/5,
     % Continue the multi-line expression started above.
-    lattice_cryptography_encrypt_pqc/4,
+    lattice_cryptography_encrypt_pqc/5,
     % Continue the multi-line expression started above.
     lattice_cryptography_decrypt_pqc/4,
     % Continue the multi-line expression started above.
@@ -307,16 +307,10 @@ lattice_cryptography_decrypt(lattice_cryptography_algo_pqc, PrivKeyFile, Bundle,
 % ERC
 % lattice_cryptography_encrypt_rsa(+PubKey, +Plaintext, -Bundle, -Tag)
 % ERC
-lattice_cryptography_encrypt_rsa(PubKey, Plaintext, Bundle, Tag) :-
-% ERC
-    lattice_cryptography_encrypt_rsa(PubKey, Plaintext, Bundle, Tag).
 
 % ERC
 % lattice_cryptography_decrypt_rsa(+PrivKey, +Bundle, +Tag, -Plaintext)
 % ERC
-lattice_cryptography_decrypt_rsa(PrivKey, Bundle, Tag, Plaintext) :-
-% ERC
-    lattice_cryptography_decrypt_rsa(PrivKey, Bundle, Tag, Plaintext).
 
 % ERC
 % lattice_cryptography_encrypt_rsa(+PubKey, +Plaintext, -Bundle, -Tag)
@@ -382,16 +376,10 @@ lattice_cryptography_decrypt_rsa(PrivKey,
 % ERC
 % lattice_cryptography_encrypt_ecdh(+RecipPubPoint, +Plaintext, -Bundle, -Tag)
 % ERC
-lattice_cryptography_encrypt_ecdh(RecipPubPoint, Plaintext, Bundle, Tag) :-
-% ERC
-    lattice_cryptography_encrypt_ecdh(prime256v1, RecipPubPoint, Plaintext, Bundle, Tag).
 
 % ERC
 % lattice_cryptography_decrypt_ecdh(+RecipPrivInt, +Bundle, +Tag, -Plaintext, +Curve)
 % ERC
-lattice_cryptography_decrypt_ecdh(RecipPrivInt, Bundle, Tag, Plaintext, Curve) :-
-% ERC
-    lattice_cryptography_decrypt_ecdh(Curve, RecipPrivInt, Bundle, Tag, Plaintext).
 
 % ERC
 % lattice_cryptography_encrypt_ecdh(+Curve, +RecipPub, +Plaintext, -Bundle, -Tag)
@@ -474,16 +462,10 @@ lattice_cryptography_decrypt_ecdh(Curve, RecipPriv,
 % ERC
 % lattice_cryptography_encrypt_pqc(+RecipPubKeyFile, +Plaintext, -Bundle, -Tag)
 % ERC
-lattice_cryptography_encrypt_pqc(RecipPubKeyFile, Plaintext, Bundle, Tag) :-
-% ERC
-    lattice_cryptography_encrypt_pqc('ML-KEM-768', RecipPubKeyFile, Plaintext, Bundle, Tag).
 
 % ERC
 % lattice_cryptography_decrypt_pqc(+RecipPrivKeyFile, +Bundle, +Tag, -Plaintext)
 % ERC
-lattice_cryptography_decrypt_pqc(RecipPrivKeyFile, Bundle, Tag, Plaintext) :-
-% ERC
-    lattice_cryptography_decrypt_pqc(RecipPrivKeyFile, Bundle, Tag, Plaintext).
 
 % ERC
 % lattice_cryptography_encrypt_pqc(+Algorithm, +RecipPubKeyFile, +Plaintext, -Bundle, -Tag)
@@ -492,7 +474,7 @@ lattice_cryptography_decrypt_pqc(RecipPrivKeyFile, Bundle, Tag, Plaintext) :-
 % ERC
 lattice_cryptography_encrypt_pqc(Algorithm, RecipPubKeyFile, Plaintext, Bundle, TagHex) :-
 % ERC
-    lattice_cryptography_require_pqc_provider(lattice_cryptography_encrypt_pqc/4),
+    lattice_cryptography_require_pqc_provider(lattice_cryptography_encrypt_pqc/5),
 % ERC
     tmp_file(lattice_cryptography_pqc_encap, EncapFile),
 % ERC
