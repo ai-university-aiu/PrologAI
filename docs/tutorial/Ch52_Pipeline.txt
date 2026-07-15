@@ -166,14 +166,14 @@ predicates into named steps:
   pl_register(bg_to_one, [_, G, G2]>>(rw_replace_color(G, 0, 1, G2))).
 
   % Register a step that scales all values by 2.
-  pl_register(scale2, [_, G, G2]>>(ar_scalar_mul(G, 2, G2))).
+  pl_register(scale2, [_, G, G2]>>(arith_scalar_mul(G, 2, G2))).
 
   % Apply both steps in sequence.
   pl_run([bg_to_one, scale2], InputGrid, OutputGrid).
 
   % Pipeline with a context-dependent step.
   % The step handler reads a color from the step term.
-  pl_register(fill_color, [fill_color(C), G, G2]>>(ar_scalar_add(G, C, G2))).
+  pl_register(fill_color, [fill_color(C), G, G2]>>(arith_scalar_add(G, C, G2))).
   pl_run([fill_color(3)], [[0,0],[0,0]], Out).
   % Out = [[3,3],[3,3]]
 

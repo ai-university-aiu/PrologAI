@@ -12,134 +12,134 @@ All predicates use the bk_* prefix.
 
 1. Block Extraction
 
-bk_extract(+Grid, +R0, +C0, +R1, +C1, -Block) extracts the rectangular
+block_extract(+Grid, +R0, +C0, +R1, +C1, -Block) extracts the rectangular
 sub-grid from row R0..R1 and column C0..C1 (inclusive, 0-indexed).
 
 Examples:
 
-?- bk_extract([[1,2,3],[4,5,6],[7,8,9]], 0, 0, 1, 1, B).
+?- block_extract([[1,2,3],[4,5,6],[7,8,9]], 0, 0, 1, 1, B).
 B = [[1,2],[4,5]].
 
-?- bk_extract([[1,2,3],[4,5,6],[7,8,9]], 1, 1, 2, 2, B).
+?- block_extract([[1,2,3],[4,5,6],[7,8,9]], 1, 1, 2, 2, B).
 B = [[5,6],[8,9]].
 
-?- bk_extract([[1,2,3],[4,5,6]], 0, 1, 0, 2, B).
+?- block_extract([[1,2,3],[4,5,6]], 0, 1, 0, 2, B).
 B = [[2,3]].
 
 
 2. Block Dimensions
 
-bk_dims(+Grid, +BH, +BW, -NR, -NC) computes the number of block rows NR
+block_dims(+Grid, +BH, +BW, -NR, -NC) computes the number of block rows NR
 and block columns NC when dividing a grid into BH-by-BW blocks.
 
 Examples:
 
-?- bk_dims([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]], 2, 2, NR, NC).
+?- block_dims([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]], 2, 2, NR, NC).
 NR = 2, NC = 2.
 
 
 3. Splitting into Strips
 
-bk_split_h(+Grid, +BH, -Strips) splits Grid into horizontal strips of
+block_split_h(+Grid, +BH, -Strips) splits Grid into horizontal strips of
 height BH rows each.
 
-bk_split_v(+Grid, +BW, -Strips) splits Grid into vertical strips of width
+block_split_v(+Grid, +BW, -Strips) splits Grid into vertical strips of width
 BW columns each.
 
 Examples:
 
-?- bk_split_h([[1,2],[3,4],[5,6],[7,8]], 2, Strips).
+?- block_split_h([[1,2],[3,4],[5,6],[7,8]], 2, Strips).
 Strips = [[[1,2],[3,4]], [[5,6],[7,8]]].
 
-?- bk_split_v([[1,2,3,4],[5,6,7,8]], 2, Strips).
+?- block_split_v([[1,2,3,4],[5,6,7,8]], 2, Strips).
 Strips = [[[1,2],[5,6]], [[3,4],[7,8]]].
 
 
 4. Tiling
 
-bk_tile_h(+Grid, +N, -Tiled) stacks N copies of Grid top to bottom.
-bk_tile_v(+Grid, +N, -Tiled) extends each row N times to the right.
+block_tile_h(+Grid, +N, -Tiled) stacks N copies of Grid top to bottom.
+block_tile_v(+Grid, +N, -Tiled) extends each row N times to the right.
 
 Examples:
 
-?- bk_tile_h([[1,2],[3,4]], 2, T).
+?- block_tile_h([[1,2],[3,4]], 2, T).
 T = [[1,2],[3,4],[1,2],[3,4]].
 
-?- bk_tile_v([[1,2],[3,4]], 2, T).
+?- block_tile_v([[1,2],[3,4]], 2, T).
 T = [[1,2,1,2],[3,4,3,4]].
 
 
 5. Counting Strips
 
-bk_count_h(+Grid, +BH, -N) counts the number of complete horizontal strips.
-bk_count_v(+Grid, +BW, -N) counts the number of complete vertical strips.
+block_count_h(+Grid, +BH, -N) counts the number of complete horizontal strips.
+block_count_v(+Grid, +BW, -N) counts the number of complete vertical strips.
 
 Examples:
 
-?- bk_count_h([[1],[2],[3],[4]], 2, N).
+?- block_count_h([[1],[2],[3],[4]], 2, N).
 N = 2.
 
-?- bk_count_v([[1,2,3,4,5,6]], 2, N).
+?- block_count_v([[1,2,3,4,5,6]], 2, N).
 N = 3.
 
 
 6. Block Mapping
 
-bk_map(+Blocks, +Goal, -Blocks2) applies a 2-argument predicate Goal to
+block_map(+Blocks, +Goal, -Blocks2) applies a 2-argument predicate Goal to
 each block in a list of blocks. Uses maplist/3 internally.
 
 Examples:
 
-?- bk_map([[[1,2],[3,4]], [[5,6],[7,8]]], length, Ns).
+?- block_map([[[1,2],[3,4]], [[5,6],[7,8]]], length, Ns).
 Ns = [2, 2].
 
-?- bk_map([[[1,2],[3,4]]], =, B2).
+?- block_map([[[1,2],[3,4]]], =, B2).
 B2 = [[[1,2],[3,4]]].
 
 
 7. Cell and Mode Queries
 
-bk_uniform(+Grid, +R, +C, -V) returns the value at position (R,C) in Grid.
+block_uniform(+Grid, +R, +C, -V) returns the value at position (R,C) in Grid.
 
-bk_mode_color(+Grid, +R0, +C0, -V) returns the most frequent value in the
+block_mode_color(+Grid, +R0, +C0, -V) returns the most frequent value in the
 2x2 block starting at (R0, C0). On ties, the lowest value wins.
 
-bk_border_color(+Grid, +R0, +C0, -Bg) returns the most frequent value
+block_border_color(+Grid, +R0, +C0, -Bg) returns the most frequent value
 among the in-bounds border cells of the 3x3 neighborhood centered at (R0,C0),
 excluding the center cell itself.
 
 Examples:
 
-?- bk_uniform([[1,2],[3,4]], 0, 1, V).
+?- block_uniform([[1,2],[3,4]], 0, 1, V).
 V = 2.
 
-?- bk_mode_color([[1,1],[1,2]], 0, 0, V).
+?- block_mode_color([[1,1],[1,2]], 0, 0, V).
 V = 1.
 
-?- bk_border_color([[0,0,0],[0,1,0],[0,0,0]], 1, 1, Bg).
+?- block_border_color([[0,0,0],[0,1,0],[0,0,0]], 1, 1, Bg).
 Bg = 0.
 
 
 8. Structural Tests
 
-bk_is_solid(+Grid, +Color, -Bool) returns Bool=1 iff every cell in Grid
+block_is_solid(+Grid, +Color, -Bool) returns Bool=1 iff every cell in Grid
 equals Color.
 
-bk_is_border(+Grid, +R, +C, -Bool) returns Bool=1 iff cell (R,C) lies on
+block_is_border(+Grid, +R, +C, -Bool) returns Bool=1 iff cell (R,C) lies on
 the outer border of Grid.
 
 Examples:
 
-?- bk_is_solid([[3,3],[3,3]], 3, Bool).
+?- block_is_solid([[3,3],[3,3]], 3, Bool).
 Bool = 1.
 
-?- bk_is_solid([[3,3],[3,4]], 3, Bool).
+?- block_is_solid([[3,3],[3,4]], 3, Bool).
 Bool = 0.
 
-?- bk_is_border([[1,2,3],[4,5,6],[7,8,9]], 0, 0, Bool).
+?- block_is_border([[1,2,3],[4,5,6],[7,8,9]], 0, 0, Bool).
 Bool = 1.
 
-?- bk_is_border([[1,2,3],[4,5,6],[7,8,9]], 1, 1, Bool).
+?- block_is_border([[1,2,3],[4,5,6],[7,8,9]], 1, 1, Bool).
 Bool = 0.
 
 
