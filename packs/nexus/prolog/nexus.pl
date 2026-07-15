@@ -107,9 +107,9 @@
 % Import the curiosity learning-progress predicates for wiring two.
 :- use_module(library(curiosity), [curiosity_observe_error/3, curiosity_learning_progress/2]).
 % Import the agency loop predicates for wiring three.
-:- use_module(library(agency), [ag_loop_create/3, ag_loop_run/3]).
+:- use_module(library(agency), [agency_loop_create/3, agency_loop_run/3]).
 % Import the refinery scoring and critique predicates for wiring four.
-:- use_module(library(refinery), [rn_score/3, rn_critique/4]).
+:- use_module(library(refinery), [refinery_score/3, refinery_critique/4]).
 
 % Import the membership helper used throughout.
 :- use_module(library(lists), [member/2]).
@@ -132,7 +132,7 @@ nexus_wirings([
     % Wiring three connects the agency loop to the hierarchical planner.
     wiring(agency_with_planner, "planner_plan / planner_monitor -> agency loop decomposition and recovery"),
     % Wiring four connects evolutionary search to refinery critique.
-    wiring(evolve_with_refinery, "rn_score -> evolve_run_until fitness, bounded generations")
+    wiring(evolve_with_refinery, "refinery_score -> evolve_run_until fitness, bounded generations")
 ]).
 
 % ===========================================================================
@@ -238,9 +238,9 @@ nexus_agency_plan_reason(_Domain, _State, _LoopId, CurrentGoal, unknown_goal(Cur
 % nexus_plan_and_run(+Domain, +State, +Task, +Budget, -Outcome): run the loop.
 nexus_plan_and_run(Domain, State, Task, Budget, Outcome) :-
     % Create a bounded agency loop whose top goal is to achieve the task.
-    ag_loop_create(achieve(Task), Budget, LoopId),
+    agency_loop_create(achieve(Task), Budget, LoopId),
     % Run the loop with the planner-backed reasoner until it terminates.
-    ag_loop_run(LoopId, nexus:nexus_agency_plan_reason(Domain, State), Outcome).
+    agency_loop_run(LoopId, nexus:nexus_agency_plan_reason(Domain, State), Outcome).
 
 % nexus_pursue_reason(+Domain, +PlanState, +WorldState, +LoopId, +CurrentGoal, -Thought, -Action):
 % a reason-goal that plans against PlanState, checks the plan against the
@@ -284,9 +284,9 @@ nexus_pursue_reason(_Domain, _PlanState, _WorldState, _LoopId, CurrentGoal, unkn
 % nexus_pursue_and_run(+Domain, +PlanState, +WorldState, +Task, +Budget, -Outcome).
 nexus_pursue_and_run(Domain, PlanState, WorldState, Task, Budget, Outcome) :-
     % Create a bounded agency loop whose top goal is to achieve the task.
-    ag_loop_create(achieve(Task), Budget, LoopId),
+    agency_loop_create(achieve(Task), Budget, LoopId),
     % Run the loop with the plan-monitor-recover reasoner until it terminates.
-    ag_loop_run(LoopId, nexus:nexus_pursue_reason(Domain, PlanState, WorldState), Outcome).
+    agency_loop_run(LoopId, nexus:nexus_pursue_reason(Domain, PlanState, WorldState), Outcome).
 
 % ===========================================================================
 % WIRING FOUR — evolve + refinery critique
@@ -296,7 +296,7 @@ nexus_pursue_and_run(Domain, PlanState, WorldState, Task, Budget, Outcome) :-
 % Shaped as call(Goal, Genome, Score) so evolve_run_until can use it as fitness.
 nexus_refinery_fitness(Criteria, Genome, Score) :-
     % A genome's fitness is the fraction of refinery criteria it passes.
-    rn_score(Genome, Criteria, Score).
+    refinery_score(Genome, Criteria, Score).
 
 % nexus_evolve_with_critique(+Criteria, +Params, +Size, +Length, +MaxGens, +Bar,
 %                         +Seed, -Best, -Score, -Gens): evolve under critique.
@@ -309,4 +309,4 @@ nexus_evolve_with_critique(Criteria, Params, Size, Length, MaxGens, Bar, Seed, B
 % nexus_critique_report(+Criteria, +Genome, -Critique): the remaining issues.
 nexus_critique_report(Criteria, Genome, Critique) :-
     % Report which criteria the evolved genome still fails, within budget.
-    rn_critique(Genome, Criteria, 30, Critique).
+    refinery_critique(Genome, Criteria, 30, Critique).

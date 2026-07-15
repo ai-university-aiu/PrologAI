@@ -27,12 +27,12 @@ Ephemeral Code Synthesis, Execution, and Skill Persistence (PR 53)
 agency
 Agentic Execution Loop (PR 54)
 
-    formal, observable, bounded goal-pursuit loop. Allocate a loop with a step budget, supply a reasoning goal, and let the loop execute Observe-Reason-Act-Observe steps until done, budget-exhausted, or escalated to human oversight. Full trace recording, goal stack management, loop detection, and safe escalation. Key predicates: `ag_loop_create/3`, `ag_loop_run/3`, `ag_detect_loop/2`, `ag_escalate/2`, `ag_loop_trace/2`.
+    formal, observable, bounded goal-pursuit loop. Allocate a loop with a step budget, supply a reasoning goal, and let the loop execute Observe-Reason-Act-Observe steps until done, budget-exhausted, or escalated to human oversight. Full trace recording, goal stack management, loop detection, and safe escalation. Key predicates: `agency_loop_create/3`, `agency_loop_run/3`, `agency_detect_loop/2`, `agency_escalate/2`, `agency_loop_trace/2`.
 
 refinery
 Evaluator-Optimizer and Metacognitive Quality Layer (PR 55)
 
-    critique outputs against named criteria, score them as a fraction in [0.0, 1.0], drive iterative improvement cycles with an improver goal, run full evaluator-optimizer loops, explore multiple reasoning paths and rank by score, and maintain a lesson database that records what went wrong and recalls it before future attempts. Key predicates: `rn_critique/4`, `rn_score/3`, `rn_optimize/5`, `rn_explore_paths/4`, `rn_learn/3`.
+    critique outputs against named criteria, score them as a fraction in [0.0, 1.0], drive iterative improvement cycles with an improver goal, run full evaluator-optimizer loops, explore multiple reasoning paths and rank by score, and maintain a lesson database that records what went wrong and recalls it before future attempts. Key predicates: `refinery_critique/4`, `refinery_score/3`, `refinery_optimize/5`, `refinery_explore_paths/4`, `refinery_learn/3`.
 
 grid
 ARC-AGI Grid Perception and Manipulation (PR 56)
@@ -58,7 +58,7 @@ Analogy (analogy_*, Layer 394, WP-419; converged with the ARC grid-analogy pack)
 scene
 ARC-AGI Scene Model and Object-Centric Reasoning (PR 58)
 
-    builds a structured object inventory from a grid. Identifies the background color, extracts all foreground objects as `obj(Color, Cells)` terms, and provides 24 predicates for object properties (size, shape, bounding box, centroid), filtering, sorting, counting, and spatial relations. Key predicates: `sc_grid_to_scene/3`, `sc_objects/2`, `sc_largest/2`, `sc_same_shape/2`, `sc_cells_touching/2`, `sc_contained_in/2`. The object-centric reasoning layer for ARC-AGI-2.
+    builds a structured object inventory from a grid. Identifies the background color, extracts all foreground objects as `obj(Color, Cells)` terms, and provides 24 predicates for object properties (size, shape, bounding box, centroid), filtering, sorting, counting, and spatial relations. Key predicates: `scene_grid_to_scene/3`, `scene_objects/2`, `scene_largest/2`, `scene_same_shape/2`, `scene_cells_touching/2`, `scene_contained_in/2`. The object-centric reasoning layer for ARC-AGI-2.
 
 quant
 Quantitative Reasoning over Object Sets (PR 59)
@@ -208,7 +208,7 @@ Grid Traversal Patterns (PR 106)
 run
 Run-Length Encoding of Grid Sequences (PR 88)
 
-    encoding a flat list to Value-Count pairs (`rn_encode/2`), decoding back to a flat list (`rn_decode/2`), encoding a single grid row (`rn_row_encode/3`) or column (`rn_col_encode/3`), encoding all rows (`rn_grid_rows/2`) or all columns (`rn_grid_cols/2`), total element count of a run list (`rn_length/2`), positional lookup in a run list (`rn_at/3`), longest run of a given value (`rn_max_run/3`), distinct run count (`rn_count_runs/3`), uniformity test (`rn_uniform/1`), leading/trailing value trimming (`rn_trim/3`), sequence repetition with boundary merging (`rn_repeat/3`), and 0-indexed position enumeration (`rn_positions/3`). 14 rn_* predicates, Layer 67.
+    encoding a flat list to Value-Count pairs (`run_encode/2`), decoding back to a flat list (`run_decode/2`), encoding a single grid row (`run_row_encode/3`) or column (`run_col_encode/3`), encoding all rows (`run_grid_rows/2`) or all columns (`run_grid_cols/2`), total element count of a run list (`run_length/2`), positional lookup in a run list (`run_at/3`), longest run of a given value (`run_max_run/3`), distinct run count (`run_count_runs/3`), uniformity test (`run_uniform/1`), leading/trailing value trimming (`run_trim/3`), sequence repetition with boundary merging (`run_repeat/3`), and 0-indexed position enumeration (`run_positions/3`). 14 rn_* predicates, Layer 67.
 
 rewrite
 Rule-Based Grid Cell Rewriting (PR 87)
@@ -228,7 +228,7 @@ Context Map Operations (PR 92)
 score
 Candidate Grid Scoring and Hypothesis Selection (PR 93)
 
-    structural grid equality (`sc_exact/2`), counting matching cells (`sc_cell_match/3`), total cell count (`sc_cell_total/2`), pixel accuracy as a float in [0.0, 1.0] (`sc_accuracy/3`), per-color recall (`sc_color_recall/4`), per-color precision (`sc_color_precision/4`), per-color F1 score (`sc_color_f1/4`), applying a rule to one training pair and measuring accuracy (`sc_pair_score/3`), mean accuracy over a list of pairs (`sc_pairs_score/3`), exact-match test for one pair (`sc_perfect/3`), all-pairs exact-match test (`sc_pairs_perfect/2`), ranking candidates by accuracy descending (`sc_rank/3`), picking the best candidate (`sc_best/3`), and filtering by a minimum accuracy threshold (`sc_threshold/4`). 14 sc_* predicates, Layer 72.
+    structural grid equality (`score_exact/2`), counting matching cells (`score_cell_match/3`), total cell count (`score_cell_total/2`), pixel accuracy as a float in [0.0, 1.0] (`score_accuracy/3`), per-color recall (`score_color_recall/4`), per-color precision (`score_color_precision/4`), per-color F1 score (`score_color_f1/4`), applying a rule to one training pair and measuring accuracy (`score_pair_score/3`), mean accuracy over a list of pairs (`score_pairs_score/3`), exact-match test for one pair (`score_perfect/3`), all-pairs exact-match test (`score_pairs_perfect/2`), ranking candidates by accuracy descending (`score_rank/3`), picking the best candidate (`score_best/3`), and filtering by a minimum accuracy threshold (`score_threshold/4`). 14 sc_* predicates, Layer 72.
 
 induct
 Rule Induction Observation Layer (PR 94)
@@ -608,7 +608,7 @@ Object Pairing and Scene Correspondence (PR 255)
 arrange
 Object Arrangement and Spatial Ordering (PR 256)
 
-    computing the integer floor-average centroid of an obj term (`ag_centroid/2`), computing the displacement vector from one centroid to another (`ag_offset/3`), testing that one object's centroid row is at most another's (`ag_row_order/2`), testing centroid column order (`ag_col_order/2`), testing that two objects share the same centroid row (`ag_row_aligned/2`), testing that two objects share the same centroid column (`ag_col_aligned/2`), stable sort of an obj list by centroid row using keysort so equal-row objects preserve input order (`ag_sort_by_row/2`), stable sort by centroid column (`ag_sort_by_col/2`), consecutive gaps between sorted distinct centroid rows (`ag_row_gaps/2`), consecutive centroid column gaps (`ag_col_gaps/2`), testing that all consecutive centroid row gaps are equal (`ag_equal_row_gaps/1`), testing equal column gaps (`ag_equal_col_gaps/1`), bounding box of all cells across all obj terms in a list (`ag_group_bbox/5`), and finding the obj in a list whose centroid is nearest a reference by Manhattan distance via keysort (`ag_nearest/3`). 14 ag_* predicates, Layer 150.
+    computing the integer floor-average centroid of an obj term (`arrange_centroid/2`), computing the displacement vector from one centroid to another (`arrange_offset/3`), testing that one object's centroid row is at most another's (`arrange_row_order/2`), testing centroid column order (`arrange_col_order/2`), testing that two objects share the same centroid row (`arrange_row_aligned/2`), testing that two objects share the same centroid column (`arrange_col_aligned/2`), stable sort of an obj list by centroid row using keysort so equal-row objects preserve input order (`arrange_sort_by_row/2`), stable sort by centroid column (`arrange_sort_by_col/2`), consecutive gaps between sorted distinct centroid rows (`arrange_row_gaps/2`), consecutive centroid column gaps (`arrange_col_gaps/2`), testing that all consecutive centroid row gaps are equal (`arrange_equal_row_gaps/1`), testing equal column gaps (`arrange_equal_col_gaps/1`), bounding box of all cells across all obj terms in a list (`arrange_group_bbox/5`), and finding the obj in a list whose centroid is nearest a reference by Manhattan distance via keysort (`arrange_nearest/3`). 14 ag_* predicates, Layer 150.
 
 xform
 Object-Level Transformation and Inference (PR 257)
@@ -769,7 +769,7 @@ Object-Pair Change Analysis and Rule Application (PR 285)
 objcopy
 Object Tiling and Multi-Copy Layout (PR 286)
 
-    Multi-copy layout of obj(Color, Cells) terms without rendering to a grid. tc_place_at places an obj with its bounding-box top-left at an explicit (R0,C0). tc_recolor_all replaces every color in a list with a uniform color. tc_tile_row creates N copies along a row, each top-left Step columns further right. tc_tile_col creates N copies along a column, each top-left Step rows further down. tc_tile_grid creates NR x NC copies at regularly spaced positions. tc_at_positions stamps one copy per position in a list of r(R,C) terms. tc_align_top shifts all objects so their minimum row equals the global minimum row. tc_align_left shifts all objects so their minimum col equals the global minimum col. tc_pack_row places objects consecutively in a horizontal row with a Gap between bounding boxes. tc_pack_col places objects consecutively in a vertical column with a Gap between bounding boxes. tc_spread_h sets each object's left edge to C0+I*Step (index I, rows unchanged). tc_spread_v sets each object's top edge to R0+I*Step (cols unchanged). tc_center places an object so its bounding box is centered in an H x W canvas. tc_flip_h reflects each cell column within canvas width W (absolute-frame, not bbox-local). 14 tc_* predicates, Layer 177.
+    Multi-copy layout of obj(Color, Cells) terms without rendering to a grid. objcopy_place_at places an obj with its bounding-box top-left at an explicit (R0,C0). objcopy_recolor_all replaces every color in a list with a uniform color. objcopy_tile_row creates N copies along a row, each top-left Step columns further right. objcopy_tile_col creates N copies along a column, each top-left Step rows further down. objcopy_tile_grid creates NR x NC copies at regularly spaced positions. objcopy_at_positions stamps one copy per position in a list of r(R,C) terms. objcopy_align_top shifts all objects so their minimum row equals the global minimum row. objcopy_align_left shifts all objects so their minimum col equals the global minimum col. objcopy_pack_row places objects consecutively in a horizontal row with a Gap between bounding boxes. objcopy_pack_col places objects consecutively in a vertical column with a Gap between bounding boxes. objcopy_spread_h sets each object's left edge to C0+I*Step (index I, rows unchanged). objcopy_spread_v sets each object's top edge to R0+I*Step (cols unchanged). objcopy_center places an object so its bounding box is centered in an H x W canvas. objcopy_flip_h reflects each cell column within canvas width W (absolute-frame, not bbox-local). 14 tc_* predicates, Layer 177.
 
 objmatch
 Object-List Correspondence and Matching (PR 287)
@@ -1836,20 +1836,20 @@ Multi-Pair Object Tracking and Cross-Pair Correspondence (mp_*, Layer 251)
 
 taskcat
 Task Type Classification and Solving Strategy Selection (tc_*, Layer 252)
-    tc_categorize(+Pairs,-Category): classify task as single_rule, multi_step, context_gated, or symbol_table.
-    tc_is_single_rule(+Pairs): succeed if pairs show consistent change count, uniform pattern, and preserved dims.
-    tc_is_multi_step(+Pairs): succeed if pairs suggest 2+ sequential steps (high max changes or multiple patterns).
-    tc_has_context_gate(+Pairs): succeed if some input color consistently separates pairs by change count.
-    tc_has_symbol_table(+Pairs): succeed if inputs consistently have more distinct colors than outputs.
-    tc_suggest_strategies(+Category,-Strategies): ordered strategy list: [simple_rule_search, seqinfer_2step, ...].
-    tc_preserves_dims(+Pairs): succeed if every pair preserves grid dimensions.
-    tc_preserves_colors(+Pairs): succeed if every pair preserves the non-bg color set.
-    tc_consistent_change_count(+Pairs): succeed if the changed cell count is the same in every pair.
-    tc_max_change_count(+Pairs,-MaxN): maximum changed cell count across all pairs.
-    tc_distinct_change_patterns(+Pairs,-N): number of distinct change patterns across all pairs.
-    tc_is_fill_task(+Pairs): succeed if all pairs change only bg-to-color cells.
-    tc_is_deletion_task(+Pairs): succeed if all pairs change only color-to-bg cells.
-    tc_confidence(+Pairs,-Score): 0.0-1.0 confidence score for the primary category.
+    taskcat_categorize(+Pairs,-Category): classify task as single_rule, multi_step, context_gated, or symbol_table.
+    taskcat_is_single_rule(+Pairs): succeed if pairs show consistent change count, uniform pattern, and preserved dims.
+    taskcat_is_multi_step(+Pairs): succeed if pairs suggest 2+ sequential steps (high max changes or multiple patterns).
+    taskcat_has_context_gate(+Pairs): succeed if some input color consistently separates pairs by change count.
+    taskcat_has_symbol_table(+Pairs): succeed if inputs consistently have more distinct colors than outputs.
+    taskcat_suggest_strategies(+Category,-Strategies): ordered strategy list: [simple_rule_search, seqinfer_2step, ...].
+    taskcat_preserves_dims(+Pairs): succeed if every pair preserves grid dimensions.
+    taskcat_preserves_colors(+Pairs): succeed if every pair preserves the non-bg color set.
+    taskcat_consistent_change_count(+Pairs): succeed if the changed cell count is the same in every pair.
+    taskcat_max_change_count(+Pairs,-MaxN): maximum changed cell count across all pairs.
+    taskcat_distinct_change_patterns(+Pairs,-N): number of distinct change patterns across all pairs.
+    taskcat_is_fill_task(+Pairs): succeed if all pairs change only bg-to-color cells.
+    taskcat_is_deletion_task(+Pairs): succeed if all pairs change only color-to-bg cells.
+    taskcat_confidence(+Pairs,-Score): 0.0-1.0 confidence score for the primary category.
 
 periodfix
 Periodic Pattern Repair: Majority-Vote Tile Detection, Violation Finding, and Single-Corruption Repair (ppf_*, Layer 253)

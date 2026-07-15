@@ -62,14 +62,14 @@ A criteria list is just a list of criterion/2 terms:
 
 CRITIQUING AN OUTPUT
 
-rn_critique(+Output, +Criteria, +MaxSteps, -Critique)
+refinery_critique(+Output, +Criteria, +MaxSteps, -Critique)
 
-    ?- rn_critique([a, b, c], Criteria, 5, Critique).
+    ?- refinery_critique([a, b, c], Criteria, 5, Critique).
     Critique = [].
 
 All criteria passed. The critique is empty.
 
-    ?- rn_critique([], Criteria, 5, Critique).
+    ?- refinery_critique([], Criteria, 5, Critique).
     Critique = [found_issue(non_empty, fail)].
 
 The non_empty criterion failed for an empty list.
@@ -81,12 +81,12 @@ Each entry in the critique is found_issue(Name, fail).
 
 SCORING AN OUTPUT
 
-rn_score(+Output, +Criteria, -Score)
+refinery_score(+Output, +Criteria, -Score)
 
-    ?- rn_score([a, b], Criteria, Score).
+    ?- refinery_score([a, b], Criteria, Score).
     Score = 1.0.
 
-    ?- rn_score([a, b, c, d, e, f], Criteria, Score).
+    ?- refinery_score([a, b, c, d, e, f], Criteria, Score).
     Score = 0.5.
 
 Score is a float between 0.0 and 1.0.
@@ -102,13 +102,13 @@ An empty criteria list returns 1.0 (vacuously perfect).
 
 ITERATIVE IMPROVEMENT
 
-rn_improve(+Output, +Criteria, :ImproverGoal, +MaxIter, -Improved)
+refinery_improve(+Output, +Criteria, :ImproverGoal, +MaxIter, -Improved)
 
 ImproverGoal is called as call(ImproverGoal, CurrentOutput, Critique, ImprovedOutput).
 
     Improver = [O, _C, I]>>(append(O, [better], I)).
 
-    ?- rn_improve([], Criteria, Improver, 5, Best).
+    ?- refinery_improve([], Criteria, Improver, 5, Best).
     Best = [better].
 
 The predicate critiques the output, applies the improver if there are issues, then re-critiques the improved output.
@@ -120,7 +120,7 @@ If MaxIter is exhausted, it returns the best output reached so far.
 
 EVALUATOR-OPTIMIZER LOOP
 
-rn_optimize(:GeneratorGoal, :EvaluatorGoal, +QualityBar, +MaxIter, -Best)
+refinery_optimize(:GeneratorGoal, :EvaluatorGoal, +QualityBar, +MaxIter, -Best)
 
 GeneratorGoal produces a candidate: call(GeneratorGoal, Candidate).
 
@@ -131,21 +131,21 @@ The loop keeps going until Score >= QualityBar or MaxIter is reached.
     Gen  = ([O]>>(O = [a, b, c])).
     Eval = ([O, S]>>(length(O, L), S is float(L)/10.0)).
 
-    ?- rn_optimize(Gen, Eval, 0.3, 5, Best).
+    ?- refinery_optimize(Gen, Eval, 0.3, 5, Best).
     Best = [a, b, c].
 
-Every attempt is logged to rn_attempt_log/4 (RunId, Iter, Candidate, Score) for later inspection.
+Every attempt is logged to refinery_attempt_log/4 (RunId, Iter, Candidate, Score) for later inspection.
 
 
 MULTI-PATH EXPLORATION (TREE OF THOUGHTS)
 
-rn_explore_paths(+Problem, :ExplorerGoal, +NumPaths, -Ranked)
+refinery_explore_paths(+Problem, :ExplorerGoal, +NumPaths, -Ranked)
 
 ExplorerGoal is called as: call(ExplorerGoal, Problem, PathId, Output, Score).
 
 The predicate calls it for each PathId from 1 to NumPaths, scores each, and returns them ranked from highest score to lowest.
 
-    ?- rn_explore_paths(my_problem, my_explorer, 3, Ranked).
+    ?- refinery_explore_paths(my_problem, my_explorer, 3, Ranked).
     Ranked = [ranked_path(2, 0.9, output_b),
               ranked_path(1, 0.7, output_a),
               ranked_path(3, 0.4, output_c)].
@@ -159,17 +159,17 @@ Lessons are short-term memories of past failures that can inform future attempts
 
 Store a lesson:
 
-    ?- rn_learn(math_problems, answer_was_negative, use_abs_value_at_end).
+    ?- refinery_learn(math_problems, answer_was_negative, use_abs_value_at_end).
 
 Recall lessons before tackling a problem type:
 
-    ?- rn_recall(math_problems, Lessons).
+    ?- refinery_recall(math_problems, Lessons).
     Lessons = [lesson(answer_was_negative, use_abs_value_at_end)].
 
 Clear lessons that are no longer needed:
 
-    ?- rn_forget(math_problems).
-    ?- rn_recall(math_problems, Lessons).
+    ?- refinery_forget(math_problems).
+    ?- refinery_recall(math_problems, Lessons).
     Lessons = [].
 
 The lesson database uses dynamic facts that persist for the lifetime of the process.
@@ -183,7 +183,7 @@ A typical quality-improvement workflow:
 2. Critique it: find what is wrong.
 3. Score it: measure how good it is.
 4. If it does not meet the quality bar, improve it using the critique.
-5. If still not good enough after MaxIter improvements, try rn_explore_paths to find a better starting point.
+5. If still not good enough after MaxIter improvements, try refinery_explore_paths to find a better starting point.
 6. Record what went wrong as a lesson for next time.
 
 The refinery pack does all of this in a composable, symbolic, fully inspectable way.
@@ -191,14 +191,14 @@ The refinery pack does all of this in a composable, symbolic, fully inspectable 
 
 SUMMARY
 
-rn_critique/4        Critique an output against a criteria list.
-rn_score/3           Score an output (fraction of criteria that pass).
-rn_improve/5         Iterative improvement loop using a critique-based improver.
-rn_optimize/5        Full evaluator-optimizer loop with run logging.
-rn_explore_paths/4   Multi-path exploration ranked by score.
-rn_learn/3           Store a lesson from a past failure.
-rn_recall/2          Recall lessons for a given problem type.
-rn_forget/1          Clear lessons for a given problem type.
+refinery_critique/4        Critique an output against a criteria list.
+refinery_score/3           Score an output (fraction of criteria that pass).
+refinery_improve/5         Iterative improvement loop using a critique-based improver.
+refinery_optimize/5        Full evaluator-optimizer loop with run logging.
+refinery_explore_paths/4   Multi-path exploration ranked by score.
+refinery_learn/3           Store a lesson from a past failure.
+refinery_recall/2          Recall lessons for a given problem type.
+refinery_forget/1          Clear lessons for a given problem type.
 
 
 WHAT COMES NEXT
