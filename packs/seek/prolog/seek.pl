@@ -267,9 +267,9 @@ seek_find_d4(Grid1, Grid2, Name) :-
 
 % seek_d4_pair_(+Name, +Grid1, -Grid2): apply the named D4 transform.
 seek_d4_pair_(identity, G, G).
-% Horizontal reflection: reverse each row.
+% Horizontal reflex_actors: reverse each row.
 seek_d4_pair_(reflect_h, G, G2) :- maplist(reverse, G, G2).
-% Vertical reflection: reverse row order.
+% Vertical reflex_actors: reverse row order.
 seek_d4_pair_(reflect_v, G, G2) :- reverse(G, G2).
 % Transpose: rows become columns.
 seek_d4_pair_(transpose, G, G2) :- seek_transpose_(G, G2).
@@ -279,7 +279,7 @@ seek_d4_pair_(rotate90, G, G2) :- seek_transpose_(G, T), maplist(reverse, T, G2)
 seek_d4_pair_(rotate180, G, G2) :- reverse(G, R), maplist(reverse, R, G2).
 % Rotate 270 degrees clockwise: reflect_h then transpose.
 seek_d4_pair_(rotate270, G, G2) :- maplist(reverse, G, H), seek_transpose_(H, G2).
-% Anti-diagonal reflection: rotate90 then reflect_v.
+% Anti-diagonal reflex_actors: rotate90 then reflect_v.
 seek_d4_pair_(anti_diag, G, G2) :-
     % Apply rotate90 = transpose then reflect_h.
     seek_transpose_(G, T),
