@@ -121,12 +121,26 @@ test(hash_project_unit_length) :-
 
 % State a fact for 'test' with the arguments listed below.
 test(bakeoff_produces_results_file,
-     % Continue the multi-line expression started above.
+     % Snapshot the committed results doc, run the bake-off, then restore it (hermetic).
      [ setup( ( nb_getval(pr02_project_root, Root),
-                % Continue the multi-line expression started above.
+                % Build the absolute path to the committed results doc.
                 atomic_list_concat([Root,'/docs/bakeoff_results.md'], F),
-                % Continue the multi-line expression started above.
-                ( exists_file(F) -> delete_file(F) ; true ) ) ) ]) :-
+                % Save its current contents so cleanup can put them back verbatim.
+                ( exists_file(F) -> read_file_to_string(F, Saved, []) ; Saved = "" ),
+                % Stash the saved contents in a global for the cleanup step.
+                nb_setval(pr02_bakeoff_saved, Saved),
+                % Remove the file so the test can verify the bake-off recreates it.
+                ( exists_file(F) -> delete_file(F) ; true ) ) ),
+       % Restore the original committed doc afterwards so the test leaves no changes.
+       cleanup( ( nb_getval(pr02_project_root, RootC),
+                  % Rebuild the path to the results doc for restoration.
+                  atomic_list_concat([RootC,'/docs/bakeoff_results.md'], FC),
+                  % Retrieve the saved original contents.
+                  nb_getval(pr02_bakeoff_saved, SavedC),
+                  % Write the saved contents back verbatim, leaving the repo clean.
+                  setup_call_cleanup(open(FC, write, S),
+                                     format(S, "~s", [SavedC]),
+                                     close(S)) ) ) ]) :-
     % State a fact for 'nb getval' with the arguments listed below.
     nb_getval(pr02_project_root, Root),
     % State a fact for 'working directory' with the arguments listed below.
