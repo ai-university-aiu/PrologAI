@@ -2324,8 +2324,8 @@ Think of SONA as the mind's ability to remember: "I saw X happen, and then Y hap
 
 Key predicates:
 
-    sona_absorb(+Trajectory) - store an experience in episodic memory.
-    sona_retrieve(+Pattern, +Limit, -Results) - retrieve matching experiences.
+    synaptic_ontological_neural_aggregator_absorb(+Trajectory) - store an experience in episodic memory.
+    synaptic_ontological_neural_aggregator_retrieve(+Pattern, +Limit, -Results) - retrieve matching experiences.
 
 A trajectory is any term representing a sequence of events:
 
@@ -2335,9 +2335,9 @@ SONA uses sparse encoding (it does not store every detail, only the significant 
 
 Example:
 
-    ?- use_module(library(sona), [sona_absorb/1, sona_retrieve/3]).
-    ?- sona_absorb(traj(events([saw(tweety, 10_30am), heard(robin, 10_35am)]))).
-    ?- sona_retrieve(traj(_), 5, Results).
+    ?- use_module(library(synaptic_ontological_neural_aggregator), [synaptic_ontological_neural_aggregator_absorb/1, synaptic_ontological_neural_aggregator_retrieve/3]).
+    ?- synaptic_ontological_neural_aggregator_absorb(traj(events([saw(tweety, 10_30am), heard(robin, 10_35am)]))).
+    ?- synaptic_ontological_neural_aggregator_retrieve(traj(_), 5, Results).
 
 
 THE GLOBAL WORKSPACE (PR 18 AND PR 32)
@@ -2399,8 +2399,8 @@ Available MCP tools include: lattice_inscribe, lattice_query, actor_list, assess
 
 To start the MCP gateway:
 
-    ?- use_module(library(mcp_gateway), [pai_mcp_start/1]).
-    ?- pai_mcp_start(7474).
+    ?- use_module(library(model_context_protocol_gateway), [prologai_mcp_start/1]).
+    ?- prologai_mcp_start(7474).
 
 
 AGENT-TO-AGENT PROTOCOL (A2A) - PR 43
@@ -2415,8 +2415,8 @@ Mentova implements the full A2A protocol including durable peer mail (messages t
 
 To start the A2A server:
 
-    ?- use_module(library(a2a), [pai_a2a_start/1]).
-    ?- pai_a2a_start(7475).
+    ?- use_module(library(agent_to_agent), [prologai_a2a_start/1]).
+    ?- prologai_a2a_start(7475).
 
 
 AGENT COMMUNICATION PROTOCOL (ACP) - PR 47
@@ -2429,8 +2429,8 @@ The agent description is served at GET /.well-known/agent.json.
 
 ACP runs are asynchronous: you submit a task and poll for the result.
 
-    ?- use_module(library(acp), [pai_acp_start/1]).
-    ?- pai_acp_start(7476).
+    ?- use_module(library(agent_communication_protocol), [agent_communication_protocol_start/1]).
+    ?- agent_communication_protocol_start(7476).
 
 
 AGENT NETWORK PROTOCOL (ANP) - PR 48
@@ -2443,9 +2443,9 @@ All ANP messages are signed with HMAC-SHA256. Incoming messages are verified bef
 
 ANP supports meta-protocol negotiation: when two agents meet, they announce which protocols they support, so they can choose the best one.
 
-    ?- use_module(library(anp), [anp_anp_did/1, anp_anp_negotiate/2]).
-    ?- anp_anp_did(DID).       % Get Mentova's DID.
-    ?- anp_anp_negotiate(peer_endpoint, Protocols).  % Negotiate protocols with a peer.
+    ?- use_module(library(agent_network_protocol), [agent_network_protocol_did/1, agent_network_protocol_negotiate/2]).
+    ?- agent_network_protocol_did(DID).       % Get Mentova's DID.
+    ?- agent_network_protocol_negotiate(peer_endpoint, Protocols).  % Negotiate protocols with a peer.
 
 
 THE ROBOT BODY (PR 46 - ROS BRIDGE)
@@ -2529,10 +2529,10 @@ IMAGINATIVE MEMORY (PR 50)
 Imaginative memory is the mind's inner stage. A mindscape is a compartmentalized canvas held in a non-observed reality, so nothing imagined can ever be mistaken for something perceived. On a mindscape you place a tableau: an arrangement of elements, each a vantage (a camera angle), a figure (an object, possibly grounded to a percept), or a motif (an animation resource). Rendering a mindscape produces a reverie: a deterministic, frame-by-frame animation in which each figure moves by its own velocity, letting the mind rehearse how a scene would unfold before acting.
 
     ?- use_module(library(imagination)).
-    ?- pai_mindscape_new(imagined, M).
-    ?- pai_tableau_add(M, [element(vantage, eye_level, []),
+    ?- prologai_mindscape_new(imagined, M).
+    ?- prologai_tableau_add(M, [element(vantage, eye_level, []),
                            element(figure, ball, [pos(0,0), vel(2,1)])], T).
-    ?- pai_reverie_render(M, 3, R), pai_reverie_frames(R, Frames).
+    ?- prologai_reverie_render(M, 3, R), prologai_reverie_frames(R, Frames).
 
 The ball starts at (0,0) and is found at (4,2) by the third frame. Asking for a mindscape in the observed reality simply fails: imagination is sandboxed away from perceived fact.
 
@@ -3064,29 +3064,29 @@ The cryptographic privacy layer lives in pack lattice_crypto, work package PR 49
 
 To load it:
 
-    ?- use_module(library(lattice_crypto)).
+    ?- use_module(library(lattice_cryptography)).
 
 You should see:
 
     true.
 
-If that fails, make sure your library path includes packs/lattice_crypto/prolog. In a fresh session from the PrologAI repository root:
+If that fails, make sure your library path includes packs/lattice_cryptography/prolog. In a fresh session from the PrologAI repository root:
 
-    ?- assertz(file_search_path(library, 'packs/lattice_crypto/prolog')).
-    ?- use_module(library(lattice_crypto)).
+    ?- assertz(file_search_path(library, 'packs/lattice_cryptography/prolog')).
+    ?- use_module(library(lattice_cryptography)).
 
 
 CHECKING WHAT IS AVAILABLE
 
 Before encrypting, you can ask PrologAI which algorithms are ready to use:
 
-    ?- lattice_crypto_crypto_available(pai_algo_rsa).
+    ?- lattice_cryptography_crypto_available(lattice_cryptography_algo_rsa).
     true.
 
-    ?- lattice_crypto_crypto_available(pai_algo_ecdh).
+    ?- lattice_cryptography_crypto_available(lattice_cryptography_algo_ecdh).
     true.
 
-    ?- lattice_crypto_crypto_available(pai_algo_pqc).
+    ?- lattice_cryptography_crypto_available(lattice_cryptography_algo_pqc).
     false.
 
 The first two should succeed on any standard installation. The third only succeeds if the OQS Provider is installed.
@@ -3100,9 +3100,9 @@ Step 1: Generate a key pair.
 
 The key pair is written to temporary PEM files (PEM is a standard format for storing cryptographic keys as text).
 
-    ?- lattice_crypto_keygen_rsa(2048, PrivFile, PubFile).
-    PrivFile = '/tmp/swipl_pai_rsa_priv_1234',
-    PubFile = '/tmp/swipl_pai_rsa_pub_5678'.
+    ?- lattice_cryptography_keygen_rsa(2048, PrivFile, PubFile).
+    PrivFile = '/tmp/swipl_prologai_rsa_priv_1234',
+    PubFile = '/tmp/swipl_prologai_rsa_pub_5678'.
 
 The variable PrivFile now holds the path to your private key file.
 The variable PubFile holds the path to your public key file.
@@ -3111,8 +3111,8 @@ Keep the private key secret. Distribute the public key freely.
 
 Step 2: Load the keys into Prolog.
 
-    ?- lattice_crypto_pem_load_private(PrivFile, PrivKey),
-       lattice_crypto_pem_load_public(PubFile, PubKey).
+    ?- lattice_cryptography_pem_load_private(PrivFile, PrivKey),
+       lattice_cryptography_pem_load_public(PubFile, PubKey).
     PrivKey = <ssl_key>(0x...),
     PubKey = <ssl_key>(0x...).
 
@@ -3120,7 +3120,7 @@ PrivKey and PubKey are now Prolog terms representing the loaded keys.
 
 Step 3: Encrypt the password.
 
-    ?- lattice_crypto_encrypt_rsa(PubKey, 'hunter2_my_bank_password', Bundle, Tag).
+    ?- lattice_cryptography_encrypt_rsa(PubKey, 'hunter2_my_bank_password', Bundle, Tag).
     Bundle = rsa_bundle('7f3a...', '2b9c...', 'a1d4...'),
     Tag = '8e2f...'.
 
@@ -3133,7 +3133,7 @@ Note: the actual hex strings will be much longer than shown above (they are abbr
 
 Step 4: Decrypt the password.
 
-    ?- lattice_crypto_decrypt_rsa(PrivKey, Bundle, Tag, Plain).
+    ?- lattice_cryptography_decrypt_rsa(PrivKey, Bundle, Tag, Plain).
     Plain = 'hunter2_my_bank_password'.
 
 The original password is recovered.
@@ -3149,7 +3149,7 @@ ECDH does not use PEM files for the recipient key. The recipient's key is stored
 
 Step 1: Generate a key pair for the recipient.
 
-    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub).
+    ?- lattice_cryptography_keygen_ecdh(prime256v1, RecipPriv, RecipPub).
     RecipPriv = 73849201...,
     RecipPub = point(114492..., 98234...).
 
@@ -3158,7 +3158,7 @@ RecipPub is a point on the P-256 curve, represented as point(X, Y) where X and Y
 
 Step 2: Encrypt the SSN using only the public key.
 
-    ?- lattice_crypto_encrypt_ecdh(RecipPub, 'SSN:123-45-6789', Bundle, Tag).
+    ?- lattice_cryptography_encrypt_ecdh(RecipPub, 'SSN:123-45-6789', Bundle, Tag).
     Bundle = ecdh_bundle(114492..., 98234..., '3f7a...', 'b2c1...'),
     Tag = 'a9e4...'.
 
@@ -3169,7 +3169,7 @@ The ECDH bundle contains:
 
 Step 3: Decrypt using only the private scalar.
 
-    ?- lattice_crypto_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
+    ?- lattice_cryptography_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
     Plain = 'SSN:123-45-6789'.
 
 The SSN is recovered.
@@ -3181,14 +3181,14 @@ EXAMPLE 3: THE GENERIC INTERFACE
 
 The generic interface lets you write code that works with any algorithm.
 
-    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       lattice_crypto_encrypt(pai_algo_ecdh, RecipPub, 'CreditCard:4111111111111111', Bundle, Tag),
-       lattice_crypto_decrypt(pai_algo_ecdh, RecipPriv, Bundle, Tag, Plain).
+    ?- lattice_cryptography_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       lattice_cryptography_encrypt(lattice_cryptography_algo_ecdh, RecipPub, 'CreditCard:4111111111111111', Bundle, Tag),
+       lattice_cryptography_decrypt(lattice_cryptography_algo_ecdh, RecipPriv, Bundle, Tag, Plain).
     Plain = 'CreditCard:4111111111111111'.
 
-To switch to RSA, change pai_algo_ecdh to pai_algo_rsa and supply RSA keys instead.
+To switch to RSA, change lattice_cryptography_algo_ecdh to lattice_cryptography_algo_rsa and supply RSA keys instead.
 
-To switch to PQC (when available), change to pai_algo_pqc and supply a PEM file path.
+To switch to PQC (when available), change to lattice_cryptography_algo_pqc and supply a PEM file path.
 
 
 WHAT HAPPENS WHEN THE TAG IS TAMPERED?
@@ -3197,10 +3197,10 @@ AES-256-GCM protects against tampering. If the ciphertext or the tag is changed 
 
 To demonstrate:
 
-    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       lattice_crypto_encrypt_ecdh(RecipPub, 'secret value', Bundle, _RealTag),
+    ?- lattice_cryptography_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       lattice_cryptography_encrypt_ecdh(RecipPub, 'secret value', Bundle, _RealTag),
        FakeTag = '00000000000000000000000000000000',
-       lattice_crypto_decrypt_ecdh(RecipPriv, Bundle, FakeTag, Plain, prime256v1).
+       lattice_cryptography_decrypt_ecdh(RecipPriv, Bundle, FakeTag, Plain, prime256v1).
     ERROR: SSL(00000000) : ...
 
 The decryption fails and raises an error. It does not silently return wrong data.
@@ -3212,8 +3212,8 @@ STORING AN ENCRYPTED VALUE IN THE LATTICE
 
 Encrypted bundles are ordinary Prolog compound terms. They can be stored in the Lattice exactly like any other value.
 
-    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       lattice_crypto_encrypt_ecdh(RecipPub, 'my_bank_password', Bundle, Tag),
+    ?- lattice_cryptography_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       lattice_cryptography_encrypt_ecdh(RecipPub, 'my_bank_password', Bundle, Tag),
        anchor_node(private_credential, bank_password, Bundle-Tag, []).
 
 The Lattice now contains a node_fact with relation type private_credential, key bank_password, and value Bundle-Tag.
@@ -3227,7 +3227,7 @@ To retrieve and decrypt:
 
     ?- live_node_facts(private_credential-bank_password, [node_fact(_,_,BundleTag,_)]),
        BundleTag = Bundle-Tag,
-       lattice_crypto_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
+       lattice_cryptography_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
     Plain = 'my_bank_password'.
 
 
@@ -3258,7 +3258,7 @@ REAL-WORLD APPLICATIONS OF THESE TECHNIQUES
 
 The mathematics behind PrologAI's crypto pack powers the entire digital economy.
 
-When you log in to your bank's website, RSA or ECDH establishes a shared secret and AES encrypts your session. That is exactly what lattice_crypto_encrypt/5 does.
+When you log in to your bank's website, RSA or ECDH establishes a shared secret and AES encrypts your session. That is exactly what lattice_cryptography_encrypt/5 does.
 
 When your phone stores a fingerprint or face ID template, it encrypts it with a key that never leaves the secure hardware chip. That is the same asymmetric-key-wraps-symmetric-key pattern.
 
@@ -3291,12 +3291,12 @@ All three use hybrid encryption: the asymmetric algorithm wraps a 256-bit AES se
 AES-256-GCM also provides authenticated integrity: any tampering with the ciphertext or tag causes decryption to fail with an error.
 
 The main predicates are:
-    lattice_crypto_keygen_rsa/3, lattice_crypto_keygen_ecdh/3, lattice_crypto_keygen_pqc/2  - key generation.
-    lattice_crypto_encrypt/5, lattice_crypto_decrypt/5                            - generic dispatch.
-    lattice_crypto_encrypt_rsa/4, lattice_crypto_decrypt_rsa/4                    - RSA convenience.
-    lattice_crypto_encrypt_ecdh/4, lattice_crypto_decrypt_ecdh/5                  - ECDH convenience.
-    lattice_crypto_encrypt_pqc/4, lattice_crypto_decrypt_pqc/4                    - PQC convenience.
-    lattice_crypto_crypto_available/1                                  - availability probe.
+    lattice_cryptography_keygen_rsa/3, lattice_cryptography_keygen_ecdh/3, lattice_cryptography_keygen_pqc/2  - key generation.
+    lattice_cryptography_encrypt/5, lattice_cryptography_decrypt/5                            - generic dispatch.
+    lattice_cryptography_encrypt_rsa/4, lattice_cryptography_decrypt_rsa/4                    - RSA convenience.
+    lattice_cryptography_encrypt_ecdh/4, lattice_cryptography_decrypt_ecdh/5                  - ECDH convenience.
+    lattice_cryptography_encrypt_pqc/4, lattice_cryptography_decrypt_pqc/4                    - PQC convenience.
+    lattice_cryptography_crypto_available/1                                  - availability probe.
 
 
 WHAT COMES NEXT
@@ -4116,47 +4116,47 @@ The quant pack answers questions about counts, frequencies, groupings, and unifo
 
 LOADING
 
-    :- use_module(library(quant)).
+    :- use_module(library(quantity)).
 
 HISTOGRAM AND FREQUENCY
 
-quant_histogram/2 returns a Color-Count list.
+quantity_histogram/2 returns a Color-Count list.
 
-    ?- quant_histogram([obj(1,[r(0,0)]),obj(1,[r(1,0)]),obj(2,[r(2,0)])], H).
+    ?- quantity_histogram([obj(1,[r(0,0)]),obj(1,[r(1,0)]),obj(2,[r(2,0)])], H).
     H = [1-2, 2-1].
 
-quant_most_frequent_color/2 and quant_least_frequent_color/2 identify extremes.
-quant_max_color_count/2 and quant_min_color_count/2 return the count values.
+quantity_most_frequent_color/2 and quantity_least_frequent_color/2 identify extremes.
+quantity_max_color_count/2 and quantity_min_color_count/2 return the count values.
 
 GROUPING
 
-quant_group_by_color/2, quant_group_by_size/2, quant_group_by_shape/2 partition
+quantity_group_by_color/2, quantity_group_by_size/2, quantity_group_by_shape/2 partition
 an object list into Color-[Objs] (or Size-[Objs] or Shape-[Objs]) pairs.
 
-    ?- scene_objects(G, Objs), quant_group_by_color(Objs, Groups).
+    ?- scene_objects(G, Objs), quantity_group_by_color(Objs, Groups).
 
 UNIQUE SHAPES
 
-quant_unique_shapes/2 returns a sorted list of distinct normalized shapes.
+quantity_unique_shapes/2 returns a sorted list of distinct normalized shapes.
 
-    ?- quant_unique_shapes(Objs, Shapes), length(Shapes, N).
+    ?- quantity_unique_shapes(Objs, Shapes), length(Shapes, N).
 
 CONDITIONAL COUNTING
 
-quant_count_where/3 counts objects satisfying a named goal.
+quantity_count_where/3 counts objects satisfying a named goal.
 
-    ?- quant_count_where(Objs, has_color_1, Count).
+    ?- quantity_count_where(Objs, has_color_1, Count).
 
-quant_exactly_n/3 and quant_at_least_n/3 assert count thresholds.
+quantity_exactly_n/3 and quantity_at_least_n/3 assert count thresholds.
 
 UNIFORMITY TESTS
 
-quant_all_same_color/1, quant_all_same_size/1, quant_all_same_shape/1 check
+quantity_all_same_color/1, quantity_all_same_size/1, quantity_all_same_shape/1 check
 if all objects in a list share the same attribute value.
 
 MULTISET MATCHING
 
-quant_colors_match/2, quant_shapes_match/2, quant_sizes_match/2 compare two
+quantity_colors_match/2, quantity_shapes_match/2, quantity_sizes_match/2 compare two
 object lists for attribute multiset equality (order-independent).
 
 WHAT COMES NEXT
@@ -7950,7 +7950,7 @@ Pack metadata: name(arith), version('1.0.0'), requires([grid]).
 
 LOADING THE PACK
 
-  :- use_module(library(arith)).
+  :- use_module(library(arithmetic)).
 
 
 PREDICATE REFERENCE
@@ -7958,189 +7958,189 @@ PREDICATE REFERENCE
 
 Cell-Wise Binary Grid Operations
 
-arith_cell_add(+Grid1, +Grid2, -Grid3)
+arithmetic_cell_add(+Grid1, +Grid2, -Grid3)
 
   Grid3[R][C] = Grid1[R][C] + Grid2[R][C] for every cell.
   Grid1 and Grid2 must have identical dimensions.
 
   % Add two 2x2 grids.
-  arith_cell_add([[1,2],[3,4]], [[5,6],[7,8]], G3).
+  arithmetic_cell_add([[1,2],[3,4]], [[5,6],[7,8]], G3).
   % G3 = [[6,8],[10,12]]
 
   % Adding a zero grid leaves the grid unchanged.
-  arith_cell_add([[1,2],[3,4]], [[0,0],[0,0]], G3).
+  arithmetic_cell_add([[1,2],[3,4]], [[0,0],[0,0]], G3).
   % G3 = [[1,2],[3,4]]
 
-arith_cell_sub(+Grid1, +Grid2, -Grid3)
+arithmetic_cell_sub(+Grid1, +Grid2, -Grid3)
 
   Grid3[R][C] = Grid1[R][C] - Grid2[R][C] for every cell.
   Subtraction can produce negative values.
 
   % Subtract two grids.
-  arith_cell_sub([[5,6],[7,8]], [[1,2],[3,4]], G3).
+  arithmetic_cell_sub([[5,6],[7,8]], [[1,2],[3,4]], G3).
   % G3 = [[4,4],[4,4]]
 
   % A grid minus itself gives all zeros.
-  arith_cell_sub([[3,4],[5,6]], [[3,4],[5,6]], G3).
+  arithmetic_cell_sub([[3,4],[5,6]], [[3,4],[5,6]], G3).
   % G3 = [[0,0],[0,0]]
 
-arith_cell_mul(+Grid1, +Grid2, -Grid3)
+arithmetic_cell_mul(+Grid1, +Grid2, -Grid3)
 
   Grid3[R][C] = Grid1[R][C] * Grid2[R][C] for every cell.
 
   % Multiply two grids.
-  arith_cell_mul([[1,2],[3,4]], [[2,3],[4,5]], G3).
+  arithmetic_cell_mul([[1,2],[3,4]], [[2,3],[4,5]], G3).
   % G3 = [[2,6],[12,20]]
 
   % Multiplying by a grid of ones is the identity.
-  arith_cell_mul([[3,4],[5,6]], [[1,1],[1,1]], G3).
+  arithmetic_cell_mul([[3,4],[5,6]], [[1,1],[1,1]], G3).
   % G3 = [[3,4],[5,6]]
 
-arith_cell_abs_diff(+Grid1, +Grid2, -Grid3)
+arithmetic_cell_abs_diff(+Grid1, +Grid2, -Grid3)
 
   Grid3[R][C] = |Grid1[R][C] - Grid2[R][C]| for every cell.
   The result is always non-negative.
 
   % Absolute difference is symmetric.
-  arith_cell_abs_diff([[1,5],[3,2]], [[4,2],[1,7]], G3).
+  arithmetic_cell_abs_diff([[1,5],[3,2]], [[4,2],[1,7]], G3).
   % G3 = [[3,3],[2,5]]
 
   % A grid minus itself gives all zeros.
-  arith_cell_abs_diff([[3,4],[5,6]], [[3,4],[5,6]], G3).
+  arithmetic_cell_abs_diff([[3,4],[5,6]], [[3,4],[5,6]], G3).
   % G3 = [[0,0],[0,0]]
 
 
 Scalar Operations
 
-arith_cell_mod(+Grid, +N, -Grid2)
+arithmetic_cell_mod(+Grid, +N, -Grid2)
 
   Grid2[R][C] = Grid[R][C] mod N for every cell.
 
   % Modulo 3.
-  arith_cell_mod([[5,6],[7,8]], 3, G2).
+  arithmetic_cell_mod([[5,6],[7,8]], 3, G2).
   % G2 = [[2,0],[1,2]]
 
   % Modulo larger than all values: unchanged.
-  arith_cell_mod([[1,2],[3,4]], 10, G2).
+  arithmetic_cell_mod([[1,2],[3,4]], 10, G2).
   % G2 = [[1,2],[3,4]]
 
-arith_scalar_add(+Grid, +N, -Grid2)
+arithmetic_scalar_add(+Grid, +N, -Grid2)
 
   Grid2[R][C] = Grid[R][C] + N for every cell.
 
   % Add 5 to every cell.
-  arith_scalar_add([[1,2],[3,4]], 5, G2).
+  arithmetic_scalar_add([[1,2],[3,4]], 5, G2).
   % G2 = [[6,7],[8,9]]
 
   % Negative N subtracts.
-  arith_scalar_add([[5,6],[7,8]], -3, G2).
+  arithmetic_scalar_add([[5,6],[7,8]], -3, G2).
   % G2 = [[2,3],[4,5]]
 
-arith_scalar_mul(+Grid, +N, -Grid2)
+arithmetic_scalar_mul(+Grid, +N, -Grid2)
 
   Grid2[R][C] = Grid[R][C] * N for every cell.
 
   % Multiply every cell by 3.
-  arith_scalar_mul([[1,2],[3,4]], 3, G2).
+  arithmetic_scalar_mul([[1,2],[3,4]], 3, G2).
   % G2 = [[3,6],[9,12]]
 
   % Multiply by 0 zeroes out the grid.
-  arith_scalar_mul([[5,6],[7,8]], 0, G2).
+  arithmetic_scalar_mul([[5,6],[7,8]], 0, G2).
   % G2 = [[0,0],[0,0]]
 
-arith_cell_clamp(+Grid, +Lo, +Hi, -Grid2)
+arithmetic_cell_clamp(+Grid, +Lo, +Hi, -Grid2)
 
   Grid2[R][C] = max(Lo, min(Hi, Grid[R][C])) for every cell.
   Values below Lo become Lo; values above Hi become Hi.
   Values already within [Lo, Hi] are unchanged.
 
   % Clamp a row to the range [2, 8].
-  arith_cell_clamp([[0,3,7,10]], 2, 8, G2).
+  arithmetic_cell_clamp([[0,3,7,10]], 2, 8, G2).
   % G2 = [[2,3,7,8]]
 
   % Clamp all values that are too high.
-  arith_cell_clamp([[7,8],[9,10]], 1, 5, G2).
+  arithmetic_cell_clamp([[7,8],[9,10]], 1, 5, G2).
   % G2 = [[5,5],[5,5]]
 
 
 Row and Column Sums
 
-arith_row_sum(+Grid, +R, -Sum)
+arithmetic_row_sum(+Grid, +R, -Sum)
 
   Sum is the arithmetic total of all cell values in row R (0-indexed).
 
   % Row 1 sums to 4+5+6 = 15.
-  arith_row_sum([[1,2,3],[4,5,6],[7,8,9]], 1, Sum).
+  arithmetic_row_sum([[1,2,3],[4,5,6],[7,8,9]], 1, Sum).
   % Sum = 15
 
   % Row of zeros sums to 0.
-  arith_row_sum([[0,0,0],[1,2,3]], 0, Sum).
+  arithmetic_row_sum([[0,0,0],[1,2,3]], 0, Sum).
   % Sum = 0
 
-arith_col_sum(+Grid, +C, -Sum)
+arithmetic_col_sum(+Grid, +C, -Sum)
 
   Sum is the arithmetic total of all cell values in column C (0-indexed).
 
   % Column 2 sums to 3+6+9 = 18.
-  arith_col_sum([[1,2,3],[4,5,6],[7,8,9]], 2, Sum).
+  arithmetic_col_sum([[1,2,3],[4,5,6],[7,8,9]], 2, Sum).
   % Sum = 18
 
-arith_row_sums(+Grid, -Sums)
+arithmetic_row_sums(+Grid, -Sums)
 
   Sums is a list where Sums[i] is the sum of all values in row i.
 
   % Sum every row.
-  arith_row_sums([[1,2],[3,4],[5,6]], Sums).
+  arithmetic_row_sums([[1,2],[3,4],[5,6]], Sums).
   % Sums = [3, 7, 11]
 
-arith_col_sums(+Grid, -Sums)
+arithmetic_col_sums(+Grid, -Sums)
 
   Sums is a list where Sums[j] is the sum of all values in column j.
 
   % Sum every column.
-  arith_col_sums([[1,2,3],[4,5,6]], Sums).
+  arithmetic_col_sums([[1,2,3],[4,5,6]], Sums).
   % Sums = [5, 7, 9]
 
 
 Grid-Wide Extremes
 
-arith_cell_max(+Grid, -Max)
+arithmetic_cell_max(+Grid, -Max)
 
   Max is the largest cell value anywhere in Grid.
 
   % Maximum of [[1,5],[3,2]] is 5.
-  arith_cell_max([[1,5],[3,2]], Max).
+  arithmetic_cell_max([[1,5],[3,2]], Max).
   % Max = 5
 
   % Maximum of negative values.
-  arith_cell_max([[-3,-1],[-5,-2]], Max).
+  arithmetic_cell_max([[-3,-1],[-5,-2]], Max).
   % Max = -1
 
-arith_cell_min(+Grid, -Min)
+arithmetic_cell_min(+Grid, -Min)
 
   Min is the smallest cell value anywhere in Grid.
 
   % Minimum of [[4,1],[3,2]] is 1.
-  arith_cell_min([[4,1],[3,2]], Min).
+  arithmetic_cell_min([[4,1],[3,2]], Min).
   % Min = 1
 
 
 IMPLEMENTATION NOTES
 
-Binary grid operations (arith_cell_add, arith_cell_sub, arith_cell_mul, arith_cell_abs_diff)
+Binary grid operations (arithmetic_cell_add, arithmetic_cell_sub, arithmetic_cell_mul, arithmetic_cell_abs_diff)
 use maplist/4 over row pairs, then maplist/4 over cell pairs. This avoids
 explicit indexing.
 
-Scalar operations (arith_cell_mod, arith_scalar_add, arith_scalar_mul, arith_cell_clamp) use
+Scalar operations (arithmetic_cell_mod, arithmetic_scalar_add, arithmetic_scalar_mul, arithmetic_cell_clamp) use
 maplist(maplist(F)), threading the scalar via partial application.
 
-arith_col_sums builds a column-index list via numlist/3 and maps arith_col_sum/3 over
-it. arith_col_sum extracts a column via maplist(nth0(C), Grid, Col).
+arithmetic_col_sums builds a column-index list via numlist/3 and maps arithmetic_col_sum/3 over
+it. arithmetic_col_sum extracts a column via maplist(nth0(C), Grid, Col).
 
-arith_cell_max and arith_cell_min flatten the grid with append/2 and delegate to
+arithmetic_cell_max and arithmetic_cell_min flatten the grid with append/2 and delegate to
 max_list/2 and min_list/2.
 
-arith_cell_clamp uses a three-way if-then-else for determinism (no choicepoints).
+arithmetic_cell_clamp uses a three-way if-then-else for determinism (no choicepoints).
 
 
 COMBINING WITH OTHER PACKS
@@ -8148,27 +8148,27 @@ COMBINING WITH OTHER PACKS
 The arith pack integrates naturally with the grid, compare, and rewrite packs:
 
   % Find how many cells exceed a threshold after scaling.
-  arith_scalar_mul(Grid, 2, Scaled),
-  arith_cell_max(Scaled, Max),
-  arith_cell_clamp(Scaled, 0, Max, Clamped),
-  arith_cell_max(Clamped, _).
+  arithmetic_scalar_mul(Grid, 2, Scaled),
+  arithmetic_cell_max(Scaled, Max),
+  arithmetic_cell_clamp(Scaled, 0, Max, Clamped),
+  arithmetic_cell_max(Clamped, _).
 
   % Compute absolute difference between input and output grids.
-  arith_cell_abs_diff(InputGrid, OutputGrid, Diff),
-  arith_cell_max(Diff, MaxChange).
+  arithmetic_cell_abs_diff(InputGrid, OutputGrid, Diff),
+  arithmetic_cell_max(Diff, MaxChange).
 
   % Scale a grid and then replace background with a different value.
-  arith_scalar_add(Grid, 1, Shifted),
-  arith_cell_clamp(Shifted, 0, 9, Final).
+  arithmetic_scalar_add(Grid, 1, Shifted),
+  arithmetic_cell_clamp(Shifted, 0, 9, Final).
 
   % Check whether all rows have equal sums (a balanced grid).
-  arith_row_sums(Grid, Sums),
+  arithmetic_row_sums(Grid, Sums),
   sort(Sums, Sorted),
   Sorted = [_].   % single unique sum => all rows equal
 
   % Column sums as a signature for comparing two grids structurally.
-  arith_col_sums(Grid1, Sig1),
-  arith_col_sums(Grid2, Sig2),
+  arithmetic_col_sums(Grid1, Sig1),
+  arithmetic_col_sums(Grid2, Sig2),
   Sig1 = Sig2.    % same column sums => structural match
 
 
@@ -8178,7 +8178,7 @@ CHAPTER 51 - THE OBJ PACK
 
 OVERVIEW
 
-The obj pack (obj_* predicate family, Layer 69) provides 14 predicates for
+The obj pack (object_* predicate family, Layer 69) provides 14 predicates for
 object-level reasoning over list-of-lists grids. An object is a 4-connected
 region of cells that all share the same color. The pack represents each object
 as the term obj(Color, SortedCells), where SortedCells is a sorted list of
@@ -8194,7 +8194,7 @@ Pack metadata: name(obj), version('1.0.0'), requires([grid, connect]).
 
 LOADING THE PACK
 
-  :- use_module(library(obj)).
+  :- use_module(library(object)).
 
 
 THE OBJECT TERM
@@ -8217,157 +8217,157 @@ PREDICATE REFERENCE
 
 Object Construction
 
-obj_from_cells(+Color, +Cells, -Obj)
+object_from_cells(+Color, +Cells, -Obj)
 
   Construct an object term. Cells is sorted internally so order does not matter.
 
   % Build an object from an unsorted cell list.
-  obj_from_cells(3, [r(1,0), r(0,0)], Obj).
+  object_from_cells(3, [r(1,0), r(0,0)], Obj).
   % Obj = obj(3, [r(0,0), r(1,0)])
 
 
 Property Extraction
 
-obj_color(+Obj, -Color)
+object_color(+Obj, -Color)
 
   Extract the color.
 
-  obj_color(obj(5, [r(0,0)]), C).
+  object_color(obj(5, [r(0,0)]), C).
   % C = 5
 
-obj_cells(+Obj, -Cells)
+object_cells(+Obj, -Cells)
 
   Extract the sorted cell list.
 
-  obj_from_cells(1, [r(2,1), r(1,0)], Obj), obj_cells(Obj, Cs).
+  object_from_cells(1, [r(2,1), r(1,0)], Obj), object_cells(Obj, Cs).
   % Cs = [r(1,0), r(2,1)]
 
-obj_size(+Obj, -N)
+object_size(+Obj, -N)
 
   N is the number of cells in the object.
 
-  obj_from_cells(2, [r(0,0), r(0,1), r(1,0)], Obj), obj_size(Obj, N).
+  object_from_cells(2, [r(0,0), r(0,1), r(1,0)], Obj), object_size(Obj, N).
   % N = 3
 
-obj_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC)
+object_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC)
 
   The axis-aligned bounding box. MinR and MinC are the top-left corner;
   MaxR and MaxC are the bottom-right corner.
 
   % L-shape at rows 2-4, cols 3-4.
-  obj_from_cells(1, [r(2,3),r(3,3),r(4,3),r(4,4)], Obj),
-  obj_bbox(Obj, MinR, MinC, MaxR, MaxC).
+  object_from_cells(1, [r(2,3),r(3,3),r(4,3),r(4,4)], Obj),
+  object_bbox(Obj, MinR, MinC, MaxR, MaxC).
   % MinR=2, MinC=3, MaxR=4, MaxC=4
 
-obj_center(+Obj, -CR, -CC)
+object_center(+Obj, -CR, -CC)
 
   Integer centroid: floor of the arithmetic mean of all row coordinates (CR)
   and all column coordinates (CC).
 
   % Three cells in a row: mean col = (0+1+2)/3 = 1.
-  obj_from_cells(1, [r(0,0),r(0,1),r(0,2)], Obj),
-  obj_center(Obj, CR, CC).
+  object_from_cells(1, [r(0,0),r(0,1),r(0,2)], Obj),
+  object_center(Obj, CR, CC).
   % CR=0, CC=1
 
-obj_shape(+Obj, -Shape)
+object_shape(+Obj, -Shape)
 
   Shape is a list of r(DR, DC) offsets where DR = R - MinR and DC = C - MinC.
   The shape is translation-independent: two objects at different positions
   have the same shape iff they have the same normalized offsets.
 
   % L-shape anywhere normalizes to the same offsets.
-  obj_from_cells(1, [r(5,7),r(6,7),r(7,7),r(7,8)], Obj),
-  obj_shape(Obj, Shape),
+  object_from_cells(1, [r(5,7),r(6,7),r(7,7),r(7,8)], Obj),
+  object_shape(Obj, Shape),
   msort(Shape, Sorted).
   % Sorted = [r(0,0), r(1,0), r(2,0), r(2,1)]
 
 
 Grid Inventory
 
-obj_inventory(+Grid, +Color, -Objects)
+object_inventory(+Grid, +Color, -Objects)
 
   Objects is the list of all 4-connected objects of Color in Grid.
   Uses the connect pack's connect_components4/3 internally.
 
   Grid = [[1,1,0],[1,0,1]],
-  obj_inventory(Grid, 1, Objs).
+  object_inventory(Grid, 1, Objs).
   % Objs: two objects - one with cells {r(0,0),r(0,1),r(1,0)} and one with {r(1,2)}.
 
   % Absent color: empty list.
-  obj_inventory([[0,0],[0,0]], 5, Objs).
+  object_inventory([[0,0],[0,0]], 5, Objs).
   % Objs = []
 
-obj_all(+Grid, -Objects)
+object_all(+Grid, -Objects)
 
   All objects of all non-zero colors, in ascending color order.
 
   Grid = [[1,0,2],[1,2,2]],
-  obj_all(Grid, Objs).
+  object_all(Grid, Objs).
   % Objs: one color-1 object + one color-2 object = 2 total
 
 
 Counting, Selection
 
-obj_count(+Grid, +Color, -N)
+object_count(+Grid, +Color, -N)
 
   N is the number of 4-connected objects of Color (0 if absent).
 
-  obj_count([[1,0,1],[0,0,0]], 1, N).
+  object_count([[1,0,1],[0,0,0]], 1, N).
   % N = 2
 
-obj_largest(+Grid, +Color, -Obj)
+object_largest(+Grid, +Color, -Obj)
 
   The largest (most cells) object of Color. Ties: first largest returned.
 
   % Two 1-objects of sizes 3 and 1: largest has size 3.
-  obj_largest([[1,1,0],[1,0,1]], 1, Obj),
-  obj_size(Obj, N).
+  object_largest([[1,1,0],[1,0,1]], 1, Obj),
+  object_size(Obj, N).
   % N = 3
 
-obj_smallest(+Grid, +Color, -Obj)
+object_smallest(+Grid, +Color, -Obj)
 
   The smallest (fewest cells) object of Color. Ties: first smallest returned.
 
-  obj_smallest([[1,1,0],[1,0,1]], 1, Obj),
-  obj_size(Obj, N).
+  object_smallest([[1,1,0],[1,0,1]], 1, Obj),
+  object_size(Obj, N).
   % N = 1
 
 
 Lookup and Sorting
 
-obj_at_cell(+Objects, +Cell, -Obj)
+object_at_cell(+Objects, +Cell, -Obj)
 
   The first object in the list that contains Cell. Fails if no object contains it.
 
-  obj_from_cells(1, [r(0,0), r(0,1)], OA),
-  obj_from_cells(2, [r(1,0)], OB),
-  obj_at_cell([OA, OB], r(0,1), Found).
+  object_from_cells(1, [r(0,0), r(0,1)], OA),
+  object_from_cells(2, [r(1,0)], OB),
+  object_at_cell([OA, OB], r(0,1), Found).
   % Found = OA
 
-obj_sort_size(+Objects, +Order, -Sorted)
+object_sort_size(+Objects, +Order, -Sorted)
 
   Sort a list of objects by size. Order is either asc (smallest first) or
   desc (largest first).
 
-  obj_from_cells(1, [r(0,0)], O1),             % size 1
-  obj_from_cells(2, [r(0,0),r(0,1)], O2),      % size 2
-  obj_from_cells(3, [r(0,0),r(0,1),r(0,2)], O3), % size 3
-  obj_sort_size([O3, O1, O2], asc, Sorted),
-  maplist(obj_size, Sorted, Sizes).
+  object_from_cells(1, [r(0,0)], O1),             % size 1
+  object_from_cells(2, [r(0,0),r(0,1)], O2),      % size 2
+  object_from_cells(3, [r(0,0),r(0,1),r(0,2)], O3), % size 3
+  object_sort_size([O3, O1, O2], asc, Sorted),
+  maplist(object_size, Sorted, Sizes).
   % Sizes = [1, 2, 3]
 
 
 IMPLEMENTATION NOTES
 
-Binary operations on the cell list (obj_bbox, obj_center, obj_shape) use maplist
+Binary operations on the cell list (object_bbox, object_center, object_shape) use maplist
 to extract coordinates, then min_list/max_list for extremes and a recursive
-obj_list_sum_ for sums.
+object_list_sum_ for sums.
 
-obj_all uses findall twice: once to collect all cell values from the grid
+object_all uses findall twice: once to collect all cell values from the grid
 (avoiding choicepoints from append/2), and once to flatten the per-color object
 lists into a single list.
 
-obj_sort_size pairs each object with its size as a key (Size-Obj), sorts by
+object_sort_size pairs each object with its size as a key (Size-Obj), sorts by
 msort (which is stable by standard term order), then strips the keys and
 optionally reverses for descending order.
 
@@ -8378,25 +8378,25 @@ The obj pack integrates naturally with the compare, transform, shape, and
 spatial packs:
 
   % Find the shape of the largest object and check if it appears elsewhere.
-  obj_largest(Grid, 1, Big),
-  obj_shape(Big, TargetShape),
-  obj_inventory(Grid, 2, OtherObjs),
-  include([O]>>(obj_shape(O, S), msort(S, SS), msort(TargetShape, SS)),
+  object_largest(Grid, 1, Big),
+  object_shape(Big, TargetShape),
+  object_inventory(Grid, 2, OtherObjs),
+  include([O]>>(object_shape(O, S), msort(S, SS), msort(TargetShape, SS)),
           OtherObjs, Matches).
 
   % Sort all non-zero objects by size to find the single smallest.
-  obj_all(Grid, AllObjs),
-  obj_sort_size(AllObjs, asc, [Smallest|_]).
+  object_all(Grid, AllObjs),
+  object_sort_size(AllObjs, asc, [Smallest|_]).
 
   % Find which object a given changed cell belongs to.
   compare_diff_cells(InputGrid, OutputGrid, Changed),
-  obj_all(OutputGrid, Objs),
+  object_all(OutputGrid, Objs),
   Changed = [Cell|_],
-  obj_at_cell(Objs, Cell, TargetObj).
+  object_at_cell(Objs, Cell, TargetObj).
 
   % Check all objects of a color have the same shape.
-  obj_inventory(Grid, Color, Objs),
-  maplist(obj_shape, Objs, Shapes),
+  object_inventory(Grid, Color, Objs),
+  maplist(object_shape, Objs, Shapes),
   sort(Shapes, [_]).  % one unique shape = all same
 
 
@@ -8569,20 +8569,20 @@ predicates into named steps:
   pipeline_register(bg_to_one, [_, G, G2]>>(rewrite_replace_color(G, 0, 1, G2))).
 
   % Register a step that scales all values by 2.
-  pipeline_register(scale2, [_, G, G2]>>(arith_scalar_mul(G, 2, G2))).
+  pipeline_register(scale2, [_, G, G2]>>(arithmetic_scalar_mul(G, 2, G2))).
 
   % Apply both steps in sequence.
   pipeline_run([bg_to_one, scale2], InputGrid, OutputGrid).
 
   % Pipeline with a context-dependent step.
   % The step handler reads a color from the step term.
-  pipeline_register(fill_color, [fill_color(C), G, G2]>>(arith_scalar_add(G, C, G2))).
+  pipeline_register(fill_color, [fill_color(C), G, G2]>>(arithmetic_scalar_add(G, C, G2))).
   pipeline_run([fill_color(3)], [[0,0],[0,0]], Out).
   % Out = [[3,3],[3,3]]
 
   % Filter to keep only objects larger than a threshold.
-  obj_all(Grid, AllObjs),
-  pipeline_filter([Obj]>>(obj_size(Obj, N), N > 2), AllObjs, BigObjs).
+  object_all(Grid, AllObjs),
+  pipeline_filter([Obj]>>(object_size(Obj, N), N > 2), AllObjs, BigObjs).
 
   % Zip input-output grid pairs and process each.
   pipeline_zip(InputGrids, OutputGrids, Pairs),
@@ -8913,57 +8913,57 @@ In compositional reasoning, a rule is induced from training pairs. Each pair
 shows an Input grid and the correct Output grid. The induct pack extracts the
 evidence from those pairs:
 
-  What cells changed? (induct_delta, induct_changed_cells)
-  What color substitutions occurred? (induct_color_map)
-  Did the grid size change? (induct_size_change)
-  What is the background? (induct_bg_color)
-  Are all pairs consistent? (induct_consistent_delta, induct_size_change_pairs)
+  What cells changed? (rule_induction_delta, rule_induction_changed_cells)
+  What color substitutions occurred? (rule_induction_color_map)
+  Did the grid size change? (rule_induction_size_change)
+  What is the background? (rule_induction_bg_color)
+  Are all pairs consistent? (rule_induction_consistent_delta, rule_induction_size_change_pairs)
 
 These observations become the inputs to hypothesis generation.
 
 SECTION 55.2 - CELL-LEVEL CHANGE
 
-induct_delta(+Input, +Output, -Delta)
+rule_induction_delta(+Input, +Output, -Delta)
 
 Delta is a list of r(R,C)-OldColor-NewColor triples for cells that changed.
 
-  induct_delta([[1,2],[3,4]], [[1,9],[3,9]], Delta).
+  rule_induction_delta([[1,2],[3,4]], [[1,9],[3,9]], Delta).
   % Delta = [r(0,1)-2-9, r(1,1)-4-9]
 
-induct_changed_cells/3 lists positions that changed. induct_invariant_cells/3 lists
-positions that stayed the same. induct_constant/2 tests identity.
+rule_induction_changed_cells/3 lists positions that changed. rule_induction_invariant_cells/3 lists
+positions that stayed the same. rule_induction_constant/2 tests identity.
 
 SECTION 55.3 - COLOR MAPS
 
-induct_color_map(+Input, +Output, -Map)
+rule_induction_color_map(+Input, +Output, -Map)
 
 Map is a list of OldColor-NewColor pairs for all changed cells.
 Fails if a color maps to two different outputs.
 
-  induct_color_map([[1,2],[1,2]], [[5,6],[5,6]], Map).
+  rule_induction_color_map([[1,2],[1,2]], [[5,6],[5,6]], Map).
   % Map = [1-5, 2-6]
 
-induct_color_map_pairs/2 intersects per-pair maps for cross-pair consistency.
-induct_common_keys/3 extracts shared entries from two maps.
+rule_induction_color_map_pairs/2 intersects per-pair maps for cross-pair consistency.
+rule_induction_common_keys/3 extracts shared entries from two maps.
 
 SECTION 55.4 - SIZE AND BACKGROUND
 
-induct_size_change/4: DRows and DCols for one pair (negative means shrinkage).
-induct_size_change_pairs/3: consistent size delta across all pairs or fails.
-induct_bg_color/2: most frequent color in one grid.
-induct_bg_color_pairs/2: consistent background across all pairs or fails.
+rule_induction_size_change/4: DRows and DCols for one pair (negative means shrinkage).
+rule_induction_size_change_pairs/3: consistent size delta across all pairs or fails.
+rule_induction_bg_color/2: most frequent color in one grid.
+rule_induction_bg_color_pairs/2: consistent background across all pairs or fails.
 
 SECTION 55.5 - COLOR SETS AND CONSISTENCY
 
-induct_color_palette/3: sorted union of all colors in one pair.
-induct_palette_pairs/3: separate input and output color sets across all pairs.
-induct_consistent_delta/2: all pairs share the same delta or fails.
+rule_induction_color_palette/3: sorted union of all colors in one pair.
+rule_induction_palette_pairs/3: separate input and output color sets across all pairs.
+rule_induction_consistent_delta/2: all pairs share the same delta or fails.
 
 SECTION 55.6 - DESIGN NOTES
 
 All cell-iteration predicates use findall for determinism.
-induct_color_map uses intersection/3 for set operations.
-induct_bg_color uses max_member/2 from library(lists) for the argmax.
+rule_induction_color_map uses intersection/3 for set operations.
+rule_induction_bg_color uses max_member/2 from library(lists) for the argmax.
 In case of a tie, max_member picks the largest color value.
 
 SECTION 55.7 - ACCEPTANCE TESTS
@@ -8985,41 +8985,41 @@ The hyp pack requires: grid, induct.
 SECTION 56.1 - THE HYPOTHESIS AS A CALLABLE
 
 In PrologAI, a hypothesis is a Prolog callable of the form Goal(Input, Output).
-The simplest hypothesis is hyp_identity/2. The most common is hyp_color_sub(Map),
+The simplest hypothesis is rule_hypothesis_identity/2. The most common is rule_hypothesis_color_sub(Map),
 a partial application that substitutes colors according to a map.
 
 SECTION 56.2 - COLOR SUBSTITUTION
 
-hyp_color_sub(+Map, +Grid, -Grid2)
+rule_hypothesis_color_sub(+Map, +Grid, -Grid2)
 
 Applies a color substitution map (list of Old-New pairs) to every cell.
 Cells not in Map are left unchanged (identity fallback).
 
-  hyp_color_sub([1-5, 2-6], [[1,2],[2,1]], Grid2).
+  rule_hypothesis_color_sub([1-5, 2-6], [[1,2],[2,1]], Grid2).
   % Grid2 = [[5,6],[6,5]]
 
-hyp_identity/2 returns grid unchanged. hyp_from_map/3 and hyp_apply_map/3
-are aliases for hyp_color_sub.
+rule_hypothesis_identity/2 returns grid unchanged. rule_hypothesis_from_map/3 and rule_hypothesis_apply_map/3
+are aliases for rule_hypothesis_color_sub.
 
 SECTION 56.3 - TESTING AND SELECTION
 
-hyp_test/4: pixel accuracy for one pair (float).
-hyp_test_all/4: mean accuracy over all pairs.
-hyp_verify/3: exact-match test for one pair.
-hyp_verify_all/2: exact-match test for all pairs.
-hyp_rank/3: rank hypothesis list by accuracy descending.
-hyp_select/3: pick the best hypothesis.
+rule_hypothesis_test/4: pixel accuracy for one pair (float).
+rule_hypothesis_test_all/4: mean accuracy over all pairs.
+rule_hypothesis_verify/3: exact-match test for one pair.
+rule_hypothesis_verify_all/2: exact-match test for all pairs.
+rule_hypothesis_rank/3: rank hypothesis list by accuracy descending.
+rule_hypothesis_select/3: pick the best hypothesis.
 
 SECTION 56.4 - MAP UTILITIES
 
-hyp_compose/4: sequential two-map substitution.
-hyp_invert_map/2: swap keys and values.
-hyp_map_lookup/3: lookup with identity fallback.
-hyp_describe/2: human-readable atom.
+rule_hypothesis_compose/4: sequential two-map substitution.
+rule_hypothesis_invert_map/2: swap keys and values.
+rule_hypothesis_map_lookup/3: lookup with identity fallback.
+rule_hypothesis_describe/2: human-readable atom.
 
 SECTION 56.5 - DESIGN NOTES
 
-hyp_select and hyp_rank have no meta_predicate declarations because their
+rule_hypothesis_select and rule_hypothesis_rank have no meta_predicate declarations because their
 output argument is plain data, not a goal. Declaring the output as a goal
 arity would cause module qualification of the returned hypothesis functor,
 breaking unification in the caller.
@@ -9042,27 +9042,27 @@ The sym pack requires: grid.
 
 SECTION 57.1 - TRANSFORMS
 
-sym_reflect_h: reverse each row (left-right mirror).
-sym_reflect_v: reverse row order (top-bottom mirror).
-sym_transpose: swap rows and columns (main diagonal reflection).
-sym_rotate90: rotate 90 CW = transpose + reflect_h.
-sym_rotate180: rotate 180 = reflect_v + reflect_h.
-sym_rotate270: rotate 270 CW = reflect_h + transpose.
+symmetry_transform_reflect_h: reverse each row (left-right mirror).
+symmetry_transform_reflect_v: reverse row order (top-bottom mirror).
+symmetry_transform_transpose: swap rows and columns (main diagonal reflection).
+symmetry_transform_rotate90: rotate 90 CW = transpose + reflect_h.
+symmetry_transform_rotate180: rotate 180 = reflect_v + reflect_h.
+symmetry_transform_rotate270: rotate 270 CW = reflect_h + transpose.
 
 SECTION 57.2 - SYMMETRY TESTS
 
-sym_has_h_symm(+Grid): grid equals its horizontal reflection.
-sym_has_v_symm(+Grid): grid equals its vertical reflection.
-sym_has_rot2_symm(+Grid): grid invariant under 180-degree rotation.
-sym_has_rot4_symm(+Grid): grid invariant under 90-degree rotation.
+symmetry_transform_has_h_symm(+Grid): grid equals its horizontal reflection.
+symmetry_transform_has_v_symm(+Grid): grid equals its vertical reflection.
+symmetry_transform_has_rot2_symm(+Grid): grid invariant under 180-degree rotation.
+symmetry_transform_has_rot4_symm(+Grid): grid invariant under 90-degree rotation.
 
-sym_symmetries(+Grid, -Symms): list of all symmetry names present (h, v, rot2, rot4).
+symmetry_transform_symmetries(+Grid, -Symms): list of all symmetry names present (h, v, rot2, rot4).
 
 SECTION 57.3 - SYMMETRIZATION AND ORBIT
 
-sym_make_h_symm: mirror left half to right (center preserved for odd width).
-sym_make_v_symm: mirror top half to bottom (center row preserved for odd height).
-sym_d4_orbit: all distinct grids reachable by the 8 D4 group elements.
+symmetry_transform_make_h_symm: mirror left half to right (center preserved for odd width).
+symmetry_transform_make_v_symm: mirror top half to bottom (center row preserved for odd height).
+symmetry_transform_d4_orbit: all distinct grids reachable by the 8 D4 group elements.
 
 SECTION 57.4 - ACCEPTANCE TESTS
 
@@ -10497,71 +10497,71 @@ that finds patterns common across all training examples.
 
 71.1 Loading the pack
 
-?- use_module(packs/diff/prolog/diff).
+?- use_module(packs/difference/prolog/difference).
 
 
 71.2 Single-pair cell diff
 
-diff_cell_diff/3 finds every cell that changed between two grids.
+difference_cell_diff/3 finds every cell that changed between two grids.
 Each changed cell is represented as a diff(R, C, OldValue, NewValue) term.
 
-?- diff_cell_diff([[1,0],[0,0]], [[1,0],[0,9]], D).
+?- difference_cell_diff([[1,0],[0,0]], [[1,0],[0,9]], D).
 D = [diff(1,1,0,9)].
 
-?- diff_cell_diff([[1,2],[3,4]], [[1,2],[3,4]], D).
+?- difference_cell_diff([[1,2],[3,4]], [[1,2],[3,4]], D).
 D = [].
 
-?- diff_cell_diff([[0,0]], [[1,2]], D).
+?- difference_cell_diff([[0,0]], [[1,2]], D).
 D = [diff(0,0,0,1), diff(0,1,0,2)].
 
 
 71.3 Background-aware cell change types
 
-diff_added/4 finds cells that went from the background value to a non-background value.
+difference_added/4 finds cells that went from the background value to a non-background value.
 
-?- diff_added([[0,0],[0,0]], [[0,0],[0,3]], 0, A).
+?- difference_added([[0,0],[0,0]], [[0,0],[0,3]], 0, A).
 A = [1-1].
 
-?- diff_added([[0,0],[0,0]], [[1,0],[0,2]], 0, A).
+?- difference_added([[0,0],[0,0]], [[1,0],[0,2]], 0, A).
 A = [0-0, 1-1].
 
-diff_removed/4 finds cells that went from non-background to background.
+difference_removed/4 finds cells that went from non-background to background.
 
-?- diff_removed([[0,5],[0,0]], [[0,0],[0,0]], 0, R).
+?- difference_removed([[0,5],[0,0]], [[0,0],[0,0]], 0, R).
 R = [0-1].
 
-?- diff_removed([[3,0],[0,7]], [[0,0],[0,0]], 0, R).
+?- difference_removed([[3,0],[0,7]], [[0,0],[0,0]], 0, R).
 R = [0-0, 1-1].
 
-diff_recolored/4 finds cells that stayed non-background but changed their color.
+difference_recolored/4 finds cells that stayed non-background but changed their color.
 
-?- diff_recolored([[1,0]], [[2,0]], 0, T).
+?- difference_recolored([[1,0]], [[2,0]], 0, T).
 T = [0-0-1-2].
 
-?- diff_recolored([[0,0]], [[1,0]], 0, T).
+?- difference_recolored([[0,0]], [[1,0]], 0, T).
 T = [].
 
-diff_stable/3 finds cells whose value did not change at all.
+difference_stable/3 finds cells whose value did not change at all.
 
-?- diff_stable([[1,0],[0,4]], [[1,9],[0,4]], S).
+?- difference_stable([[1,0],[0,4]], [[1,9],[0,4]], S).
 S = [0-0, 1-0, 1-1].
 
-?- diff_stable([[1]], [[2]], S).
+?- difference_stable([[1]], [[2]], S).
 S = [].
 
 
 71.4 Palette change
 
-diff_palette_change/4 reports which distinct colors were added to or lost from
+difference_palette_change/4 reports which distinct colors were added to or lost from
 the palette when going from Grid1 to Grid2.
 
-?- diff_palette_change([[1,1]], [[1,2]], Added, Lost).
+?- difference_palette_change([[1,1]], [[1,2]], Added, Lost).
 Added = [2], Lost = [].
 
-?- diff_palette_change([[1,2]], [[1,1]], Added, Lost).
+?- difference_palette_change([[1,2]], [[1,1]], Added, Lost).
 Added = [], Lost = [2].
 
-?- diff_palette_change([[1,0]], [[2,0]], Added, Lost).
+?- difference_palette_change([[1,0]], [[2,0]], Added, Lost).
 Added = [2], Lost = [1].
 
 
@@ -10570,87 +10570,87 @@ Added = [2], Lost = [1].
 These predicates take a list of In-Out pairs (In-Out terms) and find
 patterns that hold across every pair.
 
-diff_common_diffs/2 finds cells that CHANGED in every training pair.
+difference_common_diffs/2 finds cells that CHANGED in every training pair.
 
 ?- Pairs = [[[0,0]]-[[0,1]], [[0,0]]-[[0,1]]],
-   diff_common_diffs(Pairs, C).
+   difference_common_diffs(Pairs, C).
 C = [0-1].
 
 ?- Pairs = [[[0,0]]-[[1,0]], [[0,0]]-[[0,1]]],
-   diff_common_diffs(Pairs, C).
+   difference_common_diffs(Pairs, C).
 C = [].
 
-diff_common_stable/2 finds cells that stayed STABLE in every training pair.
+difference_common_stable/2 finds cells that stayed STABLE in every training pair.
 
 ?- Pairs = [[[1,0]]-[[1,2]], [[1,0]]-[[1,3]]],
-   diff_common_stable(Pairs, S).
+   difference_common_stable(Pairs, S).
 S = [0-0].
 
-diff_always_added/3 finds cells that transitioned BG to non-BG in EVERY pair.
+difference_always_added/3 finds cells that transitioned BG to non-BG in EVERY pair.
 
 ?- Pairs = [[[0,1]]-[[2,1]], [[0,1]]-[[3,1]]],
-   diff_always_added(Pairs, 0, A).
+   difference_always_added(Pairs, 0, A).
 A = [0-0].
 
-diff_always_removed/3 finds cells that transitioned non-BG to BG in EVERY pair.
+difference_always_removed/3 finds cells that transitioned non-BG to BG in EVERY pair.
 
 ?- Pairs = [[[1,0]]-[[0,0]], [[1,0]]-[[0,0]]],
-   diff_always_removed(Pairs, 0, R).
+   difference_always_removed(Pairs, 0, R).
 R = [0-0].
 
 
 71.6 Counting, applying, and inverting diffs
 
-diff_total_changes/3 counts how many cells differed.
+difference_total_changes/3 counts how many cells differed.
 
-?- diff_total_changes([[1,2]], [[1,2]], N).
+?- difference_total_changes([[1,2]], [[1,2]], N).
 N = 0.
 
-?- diff_total_changes([[1,2],[3,4]], [[5,6],[7,8]], N).
+?- difference_total_changes([[1,2],[3,4]], [[5,6],[7,8]], N).
 N = 4.
 
-diff_apply_diffs/3 applies a list of diff terms to a grid.
+difference_apply_diffs/3 applies a list of diff terms to a grid.
 
-?- diff_apply_diffs([[0,0],[0,0]], [diff(1,1,0,7)], G).
+?- difference_apply_diffs([[0,0],[0,0]], [diff(1,1,0,7)], G).
 G = [[0,0],[0,7]].
 
-?- diff_apply_diffs([[1,2]], [], G).
+?- difference_apply_diffs([[1,2]], [], G).
 G = [[1,2]].
 
-diff_invert_diffs/2 reverses each diff so the new value becomes the old and vice versa.
+difference_invert_diffs/2 reverses each diff so the new value becomes the old and vice versa.
 Applying the inverted diffs to the output grid recovers the input.
 
-?- diff_invert_diffs([diff(0,0,1,2)], Inv).
+?- difference_invert_diffs([diff(0,0,1,2)], Inv).
 Inv = [diff(0,0,2,1)].
 
-?- diff_invert_diffs([diff(0,0,3,4), diff(1,1,5,6)], Inv).
+?- difference_invert_diffs([diff(0,0,3,4), diff(1,1,5,6)], Inv).
 Inv = [diff(0,0,4,3), diff(1,1,6,5)].
 
-diff_filter_diffs/3 keeps only diffs matching a goal predicate.
+difference_filter_diffs/3 keeps only diffs matching a goal predicate.
 
 ?- Diffs = [diff(0,0,1,2), diff(1,0,3,4)],
-   diff_filter_diffs(Diffs, [D]>>(D = diff(0,_,_,_)), F).
+   difference_filter_diffs(Diffs, [D]>>(D = diff(0,_,_,_)), F).
 F = [diff(0,0,1,2)].
 
 
 71.7 Combining diff with other packs
 
-Use diff_common_stable with multiple training pairs to find the "background
+Use difference_common_stable with multiple training pairs to find the "background
 structure" - cells that never change and may be part of a fixed frame or
 template that the rule leaves untouched.
 
-Use diff_always_added together with the scene pack to locate cells that are
+Use difference_always_added together with the scene pack to locate cells that are
 always painted in, then infer the color and shape of the newly-added object.
 
-Use diff_cell_diff followed by diff_invert_diffs and diff_apply_diffs to "undo" a
+Use difference_cell_diff followed by difference_invert_diffs and difference_apply_diffs to "undo" a
 transformation: find what changed, invert it, and apply the inverse to the
 output to recover the original input.
 
-Use diff_palette_change across multiple pairs to identify which colors are
+Use difference_palette_change across multiple pairs to identify which colors are
 invariant (never added or lost) versus which colors participate in the
 transformation.
 
-Use diff_common_diffs to narrow the hypothesis space: if the same set of cells
+Use difference_common_diffs to narrow the hypothesis space: if the same set of cells
 changes in every training pair, the rule almost certainly targets those cells.
 Chapter 72: Object Spatial Ordering and Ranking - The Order Pack
 
@@ -10777,17 +10777,17 @@ Rank = 3.
 
 72.8 Combining with the obj pack
 
-A typical workflow extracts objects with obj_all/2 from the obj pack, then
+A typical workflow extracts objects with object_all/2 from the obj pack, then
 uses the order pack to select or sort them.
 
 Find all objects, then get the topmost:
-?- obj_all(Grid, AllObjs), order_topmost(AllObjs, TopObj).
+?- object_all(Grid, AllObjs), order_topmost(AllObjs, TopObj).
 
 Get objects sorted in reading order for sequential processing:
-?- obj_all(Grid, AllObjs), order_reading_order(AllObjs, Ordered).
+?- object_all(Grid, AllObjs), order_reading_order(AllObjs, Ordered).
 
 Identify the rightmost object and compute its centroid:
-?- obj_all(Grid, AllObjs), order_rightmost(AllObjs, Right),
+?- object_all(Grid, AllObjs), order_rightmost(AllObjs, Right),
    order_centroid(Right, CR, CC).
 Chapter 73: Grid Assembly, Concatenation, and Composition - The Assemble Pack
 
@@ -12571,163 +12571,163 @@ whether a region is uniformly filled.
 
 83.2 Cell Enumeration
 
-rect_cells(+R1, +C1, +R2, +C2, -Cells) lists all cells in the solid rectangle
+rectangle_cells(+R1, +C1, +R2, +C2, -Cells) lists all cells in the solid rectangle
 with top-left corner (R1,C1) and bottom-right corner (R2,C2). Cells are returned
 in row-major order.
 
 Example:
 
-?- rect_cells(0, 0, 2, 2, Cells).
+?- rectangle_cells(0, 0, 2, 2, Cells).
 Cells = [0-0,0-1,0-2,1-0,1-1,1-2,2-0,2-1,2-2]
 
-?- rect_cells(1, 1, 1, 1, Cells).
+?- rectangle_cells(1, 1, 1, 1, Cells).
 Cells = [1-1]
 
-rect_border(+R1, +C1, +R2, +C2, -Cells) lists only the frame cells: top row,
+rectangle_border(+R1, +C1, +R2, +C2, -Cells) lists only the frame cells: top row,
 bottom row, left column, and right column (excluding the corners already in the
 top and bottom rows). Cells are sorted in row-major order.
 
 Example:
 
-?- rect_border(0, 0, 2, 2, Cells).
+?- rectangle_border(0, 0, 2, 2, Cells).
 Cells = [0-0,0-1,0-2,1-0,1-2,2-0,2-1,2-2]
 
-rect_interior(+R1, +C1, +R2, +C2, -Cells) lists cells strictly inside the frame.
+rectangle_interior(+R1, +C1, +R2, +C2, -Cells) lists cells strictly inside the frame.
 Requires at least 3 rows and 3 columns; for thinner rectangles Cells = [].
 
 Example:
 
-?- rect_interior(0, 0, 2, 2, Cells).
+?- rectangle_interior(0, 0, 2, 2, Cells).
 Cells = [1-1]
 
-?- rect_interior(0, 0, 1, 1, Cells).
+?- rectangle_interior(0, 0, 1, 1, Cells).
 Cells = []
 
 
 83.3 Grid Drawing
 
-rect_draw(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) fills the solid rectangle
+rectangle_draw(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) fills the solid rectangle
 with Color.
 
-rect_draw_border(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) draws only the frame.
+rectangle_draw_border(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) draws only the frame.
 
-rect_draw_interior(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) fills only the
+rectangle_draw_interior(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) fills only the
 interior. If the rectangle has no interior, Result = Grid unchanged.
 
 Example:
 
 ?- Grid = [[0,0,0],[0,0,0],[0,0,0]],
-   rect_draw_border(Grid, 0, 0, 2, 2, 1, Result).
+   rectangle_draw_border(Grid, 0, 0, 2, 2, 1, Result).
 Result = [[1,1,1],[1,0,1],[1,1,1]]
 
 ?- Grid = [[1,1,1],[1,0,1],[1,1,1]],
-   rect_draw_interior(Grid, 0, 0, 2, 2, 9, Result).
+   rectangle_draw_interior(Grid, 0, 0, 2, 2, 9, Result).
 Result = [[1,1,1],[1,9,1],[1,1,1]]
 
 
 83.4 Area
 
-rect_area(+R1, +C1, +R2, +C2, -Area) computes the number of cells in the
+rectangle_area(+R1, +C1, +R2, +C2, -Area) computes the number of cells in the
 rectangle as (R2 - R1 + 1) * (C2 - C1 + 1).
 
 Example:
 
-?- rect_area(0, 0, 2, 2, Area).
+?- rectangle_area(0, 0, 2, 2, Area).
 Area = 9
 
-?- rect_area(0, 0, 1, 3, Area).
+?- rectangle_area(0, 0, 1, 3, Area).
 Area = 8
 
 
 83.5 Containment
 
-rect_contains(+R1, +C1, +R2, +C2, +R, +C) succeeds if cell (R,C) lies within
+rectangle_contains(+R1, +C1, +R2, +C2, +R, +C) succeeds if cell (R,C) lies within
 the rectangle. Inclusion is inclusive on all four sides.
 
 Example:
 
-?- rect_contains(0, 0, 2, 2, 1, 1).
+?- rectangle_contains(0, 0, 2, 2, 1, 1).
 true.
 
-?- rect_contains(0, 0, 2, 2, 0, 0).
+?- rectangle_contains(0, 0, 2, 2, 0, 0).
 true.
 
-?- rect_contains(0, 0, 2, 2, 3, 1).
+?- rectangle_contains(0, 0, 2, 2, 3, 1).
 false.
 
 
 83.6 Corners
 
-rect_corners(+R1, +C1, +R2, +C2, -Corners) returns a list of four corner cells
+rectangle_corners(+R1, +C1, +R2, +C2, -Corners) returns a list of four corner cells
 in top-left, top-right, bottom-left, bottom-right order.
 
 Example:
 
-?- rect_corners(0, 0, 2, 3, Corners).
+?- rectangle_corners(0, 0, 2, 3, Corners).
 Corners = [0-0, 0-3, 2-0, 2-3].
 
-?- rect_corners(1, 1, 1, 1, Corners).
+?- rectangle_corners(1, 1, 1, 1, Corners).
 Corners = [1-1, 1-1, 1-1, 1-1].
 
 
 83.7 Bounding Box
 
-rect_bbox(+Cells, -MinR, -MinC, -MaxR, -MaxC) computes the bounding box of a
-non-empty list of R-C cells. Cells need not form a rectangle; rect_bbox works on
+rectangle_bbox(+Cells, -MinR, -MinC, -MaxR, -MaxC) computes the bounding box of a
+non-empty list of R-C cells. Cells need not form a rectangle; rectangle_bbox works on
 any non-empty cell list.
 
 Example:
 
-?- rect_bbox([0-0, 1-2, 3-1], MinR, MinC, MaxR, MaxC).
+?- rectangle_bbox([0-0, 1-2, 3-1], MinR, MinC, MaxR, MaxC).
 MinR = 0, MinC = 0, MaxR = 3, MaxC = 2.
 
-?- rect_bbox([2-3], MinR, MinC, MaxR, MaxC).
+?- rectangle_bbox([2-3], MinR, MinC, MaxR, MaxC).
 MinR = 2, MinC = 3, MaxR = 2, MaxC = 3.
 
 
 83.8 Color Tests
 
-rect_is_solid(+Grid, +R1, +C1, +R2, +C2, -Color) succeeds if every cell in the
+rectangle_is_solid(+Grid, +R1, +C1, +R2, +C2, -Color) succeeds if every cell in the
 rectangle has the same color. Color is unified with the value of the first cell.
 
 Example:
 
-?- rect_is_solid([[5,5,5],[5,5,5],[5,5,5]], 0, 0, 2, 2, Color).
+?- rectangle_is_solid([[5,5,5],[5,5,5],[5,5,5]], 0, 0, 2, 2, Color).
 Color = 5.
 
-?- rect_is_solid([[5,5,5],[5,3,5],[5,5,5]], 0, 0, 2, 2, _).
+?- rectangle_is_solid([[5,5,5],[5,3,5],[5,5,5]], 0, 0, 2, 2, _).
 false.
 
-rect_is_frame(+Grid, +R1, +C1, +R2, +C2, -Color) succeeds if every border cell
+rectangle_is_frame(+Grid, +R1, +C1, +R2, +C2, -Color) succeeds if every border cell
 of the rectangle has the same color. It does not constrain the interior.
 
 Example:
 
-?- rect_is_frame([[1,1,1],[1,0,1],[1,1,1]], 0, 0, 2, 2, Color).
+?- rectangle_is_frame([[1,1,1],[1,0,1],[1,1,1]], 0, 0, 2, 2, Color).
 Color = 1.
 
 
 83.9 Overlap
 
-rect_overlap(+R1a, +C1a, +R2a, +C2a, +R1b, +C1b, +R2b, +C2b) succeeds if two
+rectangle_overlap(+R1a, +C1a, +R2a, +C2a, +R1b, +C1b, +R2b, +C2b) succeeds if two
 rectangles share at least one cell. The test uses interval arithmetic: the row
 intervals must overlap and the column intervals must overlap.
 
 Example:
 
-?- rect_overlap(0, 0, 2, 2, 1, 1, 3, 3).
+?- rectangle_overlap(0, 0, 2, 2, 1, 1, 3, 3).
 true.
 
-?- rect_overlap(0, 0, 4, 4, 1, 1, 3, 3).
+?- rectangle_overlap(0, 0, 4, 4, 1, 1, 3, 3).
 true.
 
-?- rect_overlap(0, 0, 1, 1, 2, 2, 3, 3).
+?- rectangle_overlap(0, 0, 1, 1, 2, 2, 3, 3).
 false.
 
 
 83.10 Scaling
 
-rect_scale(+R1, +C1, +R2, +C2, +Factor, -R2New, -C2New) scales the rectangle by
+rectangle_scale(+R1, +C1, +R2, +C2, +Factor, -R2New, -C2New) scales the rectangle by
 an integer Factor from its top-left corner. The top-left stays fixed at (R1,C1).
 The new bottom-right is:
   R2New = R1 + (R2 - R1) * Factor
@@ -12735,23 +12735,23 @@ The new bottom-right is:
 
 Example:
 
-?- rect_scale(0, 0, 2, 2, 2, R2, C2).
+?- rectangle_scale(0, 0, 2, 2, 2, R2, C2).
 R2 = 4, C2 = 4.
 
-?- rect_scale(1, 1, 2, 3, 3, R2, C2).
+?- rectangle_scale(1, 1, 2, 3, 3, R2, C2).
 R2 = 4, C2 = 7.
 
 
 83.11 Implementation Notes
 
-Determinism is maintained throughout. rect_cells uses maplist/4 (three levels of
+Determinism is maintained throughout. rectangle_cells uses maplist/4 (three levels of
 mapping) with unification lambdas [C, RC]>>(RC = R-C) to avoid the false
-choicepoints that arise from [C, R-C]>>true. rect_border uses if-then-else guards
-for each of its four sides and sort/2 to produce canonical output. rect_interior
-uses a single if-then-else. rect_fill_cells_ uses if-then-else for its base vs.
-recursive case. rect_replace_nth_ and rect_set_cell_ use cuts on their base cases.
+choicepoints that arise from [C, R-C]>>true. rectangle_border uses if-then-else guards
+for each of its four sides and sort/2 to produce canonical output. rectangle_interior
+uses a single if-then-else. rectangle_fill_cells_ uses if-then-else for its base vs.
+recursive case. rectangle_replace_nth_ and rectangle_set_cell_ use cuts on their base cases.
 
-The bounding box predicate rect_bbox uses unification lambdas [RC, R]>>(RC = R-_)
+The bounding box predicate rectangle_bbox uses unification lambdas [RC, R]>>(RC = R-_)
 to extract row indices because _ in a lambda body creates a fresh anonymous
 variable each call, making the extraction deterministic.
 
@@ -13308,144 +13308,144 @@ DC - the column displacement (positive = rightward, negative = leftward)
 For example, the vector (2, -3) means "2 rows down and 3 columns left."
 
 
-86.1 Displacement Between Cells - vec2_offset/6
+86.1 Displacement Between Cells - vector2_offset/6
 
-vec2_offset(+R1, +C1, +R2, +C2, -DR, -DC)
+vector2_offset(+R1, +C1, +R2, +C2, -DR, -DC)
 
 Compute the vector from cell (R1,C1) to cell (R2,C2).
 DR = R2 - R1, DC = C2 - C1.
 
 Example:
 
-vec2_offset(0, 0, 3, 4, DR, DC).
+vector2_offset(0, 0, 3, 4, DR, DC).
 % DR = 3, DC = 4
 
-vec2_offset(3, 4, 0, 0, DR, DC).
+vector2_offset(3, 4, 0, 0, DR, DC).
 % DR = -3, DC = -4
 
 
-86.2 Applying a Vector - vec2_add/6
+86.2 Applying a Vector - vector2_add/6
 
-vec2_add(+R, +C, +DR, +DC, -NR, -NC)
+vector2_add(+R, +C, +DR, +DC, -NR, -NC)
 
 Apply vector (DR,DC) to point (R,C). NR = R + DR, NC = C + DC.
 
 Example:
 
-vec2_add(1, 1, 2, 3, NR, NC).
+vector2_add(1, 1, 2, 3, NR, NC).
 % NR = 3, NC = 4
 
 
-86.3 Scaling - vec2_scale/5
+86.3 Scaling - vector2_scale/5
 
-vec2_scale(+DR, +DC, +K, -SDR, -SDC)
+vector2_scale(+DR, +DC, +K, -SDR, -SDC)
 
 Scale vector (DR,DC) by integer K. SDR = K * DR, SDC = K * DC.
 Negative K reverses direction. K = 0 yields the zero vector.
 
 Example:
 
-vec2_scale(1, 2, 3, SDR, SDC).
+vector2_scale(1, 2, 3, SDR, SDC).
 % SDR = 3, SDC = 6
 
-vec2_scale(2, 3, -1, SDR, SDC).
+vector2_scale(2, 3, -1, SDR, SDC).
 % SDR = -2, SDC = -3
 
 
-86.4 Negation - vec2_neg/4
+86.4 Negation - vector2_neg/4
 
-vec2_neg(+DR, +DC, -NDR, -NDC)
+vector2_neg(+DR, +DC, -NDR, -NDC)
 
 Reverse the direction of a vector. NDR = -DR, NDC = -DC.
 
 Example:
 
-vec2_neg(3, -4, NDR, NDC).
+vector2_neg(3, -4, NDR, NDC).
 % NDR = -3, NDC = 4
 
 
-86.5 Squared Length - vec2_len_sq/3
+86.5 Squared Length - vector2_len_sq/3
 
-vec2_len_sq(+DR, +DC, -LSq)
+vector2_len_sq(+DR, +DC, -LSq)
 
 Squared Euclidean length: LSq = DR^2 + DC^2. Integer arithmetic, no square
 root needed. Useful for comparing distances without floating-point arithmetic.
 
 Example:
 
-vec2_len_sq(3, 4, LSq).   % 3-4-5 right triangle
+vector2_len_sq(3, 4, LSq).   % 3-4-5 right triangle
 % LSq = 25
 
 
-86.6 Manhattan Magnitude - vec2_manhattan/3
+86.6 Manhattan Magnitude - vector2_manhattan/3
 
-vec2_manhattan(+DR, +DC, -M)
+vector2_manhattan(+DR, +DC, -M)
 
 L1 magnitude: M = |DR| + |DC|. The minimum number of 4-connected (orthogonal)
 steps to travel the vector.
 
 Example:
 
-vec2_manhattan(3, 4, M).
+vector2_manhattan(3, 4, M).
 % M = 7
 
-vec2_manhattan(-2, -3, M).
+vector2_manhattan(-2, -3, M).
 % M = 5
 
 
-86.7 Chebyshev Magnitude - vec2_chebyshev/3
+86.7 Chebyshev Magnitude - vector2_chebyshev/3
 
-vec2_chebyshev(+DR, +DC, -D)
+vector2_chebyshev(+DR, +DC, -D)
 
 L-infinity magnitude: D = max(|DR|, |DC|). The minimum number of 8-connected
 (king) steps to travel the vector.
 
 Example:
 
-vec2_chebyshev(3, 4, D).
+vector2_chebyshev(3, 4, D).
 % D = 4   (the column component dominates)
 
 
-86.8 90-Degree Rotations - vec2_rot90_cw/4 and vec2_rot90_ccw/4
+86.8 90-Degree Rotations - vector2_rot90_cw/4 and vector2_rot90_ccw/4
 
-vec2_rot90_cw(+DR, +DC, -RDR, -RDC)
+vector2_rot90_cw(+DR, +DC, -RDR, -RDC)
 
 Rotate vector 90 degrees clockwise. In row-column coordinates (row axis
 pointing downward): RDR = DC, RDC = -DR.
 
 Example:
 
-vec2_rot90_cw(0, 1, RDR, RDC).   % right -> down
+vector2_rot90_cw(0, 1, RDR, RDC).   % right -> down
 % RDR = 1, RDC = 0
 
-vec2_rot90_cw(1, 0, RDR, RDC).   % down -> left
+vector2_rot90_cw(1, 0, RDR, RDC).   % down -> left
 % RDR = 0, RDC = -1
 
-vec2_rot90_ccw(+DR, +DC, -RDR, -RDC)
+vector2_rot90_ccw(+DR, +DC, -RDR, -RDC)
 
 Rotate vector 90 degrees counter-clockwise: RDR = -DC, RDC = DR.
 
 Example:
 
-vec2_rot90_ccw(0, 1, RDR, RDC).   % right -> up
+vector2_rot90_ccw(0, 1, RDR, RDC).   % right -> up
 % RDR = -1, RDC = 0
 
 
-86.9 180-Degree Rotation - vec2_rot180/4
+86.9 180-Degree Rotation - vector2_rot180/4
 
-vec2_rot180(+DR, +DC, -RDR, -RDC)
+vector2_rot180(+DR, +DC, -RDR, -RDC)
 
 Rotate vector 180 degrees. Equivalent to negation: RDR = -DR, RDC = -DC.
 
 Example:
 
-vec2_rot180(1, 1, RDR, RDC).
+vector2_rot180(1, 1, RDR, RDC).
 % RDR = -1, RDC = -1
 
 
-86.10 Dot Product - vec2_dot/5
+86.10 Dot Product - vector2_dot/5
 
-vec2_dot(+DR1, +DC1, +DR2, +DC2, -D)
+vector2_dot(+DR1, +DC1, +DR2, +DC2, -D)
 
 Dot product: D = DR1*DR2 + DC1*DC2.
 Positive when vectors point in the same general direction.
@@ -13454,16 +13454,16 @@ Negative when vectors point in opposite directions.
 
 Example:
 
-vec2_dot(1, 0, 0, 1, D).   % perpendicular
+vector2_dot(1, 0, 0, 1, D).   % perpendicular
 % D = 0
 
-vec2_dot(1, 0, -1, 0, D).   % opposite directions
+vector2_dot(1, 0, -1, 0, D).   % opposite directions
 % D = -1
 
 
-86.11 Cross Product - vec2_cross/5
+86.11 Cross Product - vector2_cross/5
 
-vec2_cross(+DR1, +DC1, +DR2, +DC2, -C)
+vector2_cross(+DR1, +DC1, +DR2, +DC2, -C)
 
 Z-component of the 3D cross product for 2D vectors:
 C = DR1*DC2 - DC1*DR2.
@@ -13474,40 +13474,40 @@ Zero when parallel.
 
 Example:
 
-vec2_cross(1, 0, 0, 1, C).   % right to up-right is CCW
+vector2_cross(1, 0, 0, 1, C).   % right to up-right is CCW
 % C = 1
 
-vec2_cross(0, 1, 1, 0, C).   % right to down is CW
+vector2_cross(0, 1, 1, 0, C).   % right to down is CW
 % C = -1
 
 
-86.12 Parallelism Test - vec2_parallel/4
+86.12 Parallelism Test - vector2_parallel/4
 
-vec2_parallel(+DR1, +DC1, +DR2, +DC2)
+vector2_parallel(+DR1, +DC1, +DR2, +DC2)
 
 Succeed if two vectors are parallel (cross product is zero). Includes
 anti-parallel (opposite directions) and the zero vector case.
 
 Example:
 
-vec2_parallel(1, 2, 3, 6).   % same direction, different scale
-vec2_parallel(1, 1, -2, -2).   % anti-parallel
-\+ vec2_parallel(1, 0, 0, 1).   % perpendicular - fails
+vector2_parallel(1, 2, 3, 6).   % same direction, different scale
+vector2_parallel(1, 1, -2, -2).   % anti-parallel
+\+ vector2_parallel(1, 0, 0, 1).   % perpendicular - fails
 
 
-86.13 Region Translation - vec2_translate_region/4
+86.13 Region Translation - vector2_translate_region/4
 
-vec2_translate_region(+Cells, +DR, +DC, -NewCells)
+vector2_translate_region(+Cells, +DR, +DC, -NewCells)
 
 Translate a list of R-C cell coordinates by vector (DR,DC). Each cell R-C
 becomes (R+DR)-(C+DC). The order of cells is preserved.
 
 Example:
 
-vec2_translate_region([0-0, 0-1, 1-0], 2, 3, NewCells).
+vector2_translate_region([0-0, 0-1, 1-0], 2, 3, NewCells).
 % NewCells = [2-3, 2-4, 3-3]
 
-vec2_translate_region([1-1, 2-2], -1, -1, NewCells).
+vector2_translate_region([1-1, 2-2], -1, -1, NewCells).
 % NewCells = [0-0, 1-1]
 
 
@@ -13518,40 +13518,40 @@ Computing the transformation that maps one object to another:
 object_transform(FromCells, ToCells, DR, DC) :-
     FromCells = [FR-FC|_],
     ToCells   = [TR-TC|_],
-    vec2_offset(FR, FC, TR, TC, DR, DC).
+    vector2_offset(FR, FC, TR, TC, DR, DC).
 
 Checking if two objects have the same shape at a displacement:
 
 same_shape_displaced(Cells1, Cells2) :-
     Cells1 = [R1-C1|_], Cells2 = [R2-C2|_],
-    vec2_offset(R1, C1, R2, C2, DR, DC),
-    vec2_translate_region(Cells1, DR, DC, Cells2).
+    vector2_offset(R1, C1, R2, C2, DR, DC),
+    vector2_translate_region(Cells1, DR, DC, Cells2).
 
 Rotating a displacement and checking if a new target exists:
 
 rotated_target(R, C, DR, DC, NR, NC) :-
-    vec2_rot90_cw(DR, DC, RDR, RDC),
-    vec2_add(R, C, RDR, RDC, NR, NC).
+    vector2_rot90_cw(DR, DC, RDR, RDC),
+    vector2_add(R, C, RDR, RDC, NR, NC).
 
 
 86.15 Summary
 
 The vec2 pack provides a complete vocabulary for 2D integer vector arithmetic:
 
-• vec2_offset     - vector between two cells
-• vec2_add        - apply vector to a point
-• vec2_scale      - multiply a vector by a scalar
-• vec2_neg        - reverse a vector
-• vec2_len_sq     - squared Euclidean magnitude
-• vec2_manhattan  - L1 (4-connected step count) magnitude
-• vec2_chebyshev  - L-infinity (8-connected step count) magnitude
-• vec2_rot90_cw   - 90-degree clockwise rotation
-• vec2_rot90_ccw  - 90-degree counter-clockwise rotation
-• vec2_rot180     - 180-degree rotation
-• vec2_dot        - dot product
-• vec2_cross      - 2D cross product (z-component)
-• vec2_parallel   - parallelism test
-• vec2_translate_region - translate a cell list by a vector
+• vector2_offset     - vector between two cells
+• vector2_add        - apply vector to a point
+• vector2_scale      - multiply a vector by a scalar
+• vector2_neg        - reverse a vector
+• vector2_len_sq     - squared Euclidean magnitude
+• vector2_manhattan  - L1 (4-connected step count) magnitude
+• vector2_chebyshev  - L-infinity (8-connected step count) magnitude
+• vector2_rot90_cw   - 90-degree clockwise rotation
+• vector2_rot90_ccw  - 90-degree counter-clockwise rotation
+• vector2_rot180     - 180-degree rotation
+• vector2_dot        - dot product
+• vector2_cross      - 2D cross product (z-component)
+• vector2_parallel   - parallelism test
+• vector2_translate_region - translate a cell list by a vector
 
 All predicates are pure arithmetic, deterministic, and require no grid input.
 
@@ -14902,43 +14902,43 @@ value comparisons. It complements arith (arithmetic), histogram (frequency),
 and count (equality) by providing order-based queries across the value range.
 
 Threshold selectors (return sorted R-C pair lists):
-xsel_cells_lt(+Grid, +V, -Cells).         % cells with value < V
-xsel_cells_gt(+Grid, +V, -Cells).         % cells with value > V
-xsel_cells_le(+Grid, +V, -Cells).         % cells with value =< V
-xsel_cells_ge(+Grid, +V, -Cells).         % cells with value >= V
-xsel_cells_between(+Grid, +Lo, +Hi, -Cells). % cells with Lo =< value =< Hi
-xsel_cells_ne(+Grid, +V, -Cells).         % cells with value \== V
+extended_selection_cells_lt(+Grid, +V, -Cells).         % cells with value < V
+extended_selection_cells_gt(+Grid, +V, -Cells).         % cells with value > V
+extended_selection_cells_le(+Grid, +V, -Cells).         % cells with value =< V
+extended_selection_cells_ge(+Grid, +V, -Cells).         % cells with value >= V
+extended_selection_cells_between(+Grid, +Lo, +Hi, -Cells). % cells with Lo =< value =< Hi
+extended_selection_cells_ne(+Grid, +V, -Cells).         % cells with value \== V
 
 Extremum locators:
-xsel_max_cells(+Grid, -Cells).            % cells containing maximum value
-xsel_min_cells(+Grid, -Cells).            % cells containing minimum value
+extended_selection_max_cells(+Grid, -Cells).            % cells containing maximum value
+extended_selection_min_cells(+Grid, -Cells).            % cells containing minimum value
 
 Conditional replacement (produce new grid):
-xsel_threshold(+Grid, +T, +OnV, +OffV, -Grid2). % value >= T -> OnV else OffV
-xsel_replace_lt(+Grid, +V, +New, -Grid2). % replace cells < V with New
-xsel_replace_gt(+Grid, +V, +New, -Grid2). % replace cells > V with New
+extended_selection_threshold(+Grid, +T, +OnV, +OffV, -Grid2). % value >= T -> OnV else OffV
+extended_selection_replace_lt(+Grid, +V, +New, -Grid2). % replace cells < V with New
+extended_selection_replace_gt(+Grid, +V, +New, -Grid2). % replace cells > V with New
 
 Value ranking:
-xsel_rank_vals(+Grid, -Vals).             % sorted unique values (rank ladder)
-xsel_val_rank(+Grid, +V, -Rank).          % 0-based rank of value V
-xsel_rank_grid(+Grid, -RankGrid).         % replace each cell with its rank
+extended_selection_rank_vals(+Grid, -Vals).             % sorted unique values (rank ladder)
+extended_selection_val_rank(+Grid, +V, -Rank).          % 0-based rank of value V
+extended_selection_rank_grid(+Grid, -RankGrid).         % replace each cell with its rank
 
 Examples:
-xsel_cells_lt([[1,2],[3,4]], 3, Cs).      % Cs=[0-0, 0-1]
-xsel_cells_ge([[1,2],[3,4]], 3, Cs).      % Cs=[1-0, 1-1]
-xsel_cells_between([[0,1],[2,3]], 1, 2, Cs). % Cs=[0-1, 1-0]
-xsel_max_cells([[5,0],[0,5]], Cs).        % Cs=[0-0, 1-1]
-xsel_threshold([[1,3],[5,2]], 3, 1, 0, G). % G=[[0,1],[1,0]]
-xsel_replace_lt([[1,3],[2,4]], 3, 0, G).  % G=[[0,3],[0,4]]
-xsel_rank_vals([[3,1],[2,1]], Vs).        % Vs=[1,2,3]
-xsel_val_rank([[3,1],[2,1]], 3, R).       % R=2
-xsel_rank_grid([[5,3],[1,7]], G).         % G=[[2,1],[0,3]]
+extended_selection_cells_lt([[1,2],[3,4]], 3, Cs).      % Cs=[0-0, 0-1]
+extended_selection_cells_ge([[1,2],[3,4]], 3, Cs).      % Cs=[1-0, 1-1]
+extended_selection_cells_between([[0,1],[2,3]], 1, 2, Cs). % Cs=[0-1, 1-0]
+extended_selection_max_cells([[5,0],[0,5]], Cs).        % Cs=[0-0, 1-1]
+extended_selection_threshold([[1,3],[5,2]], 3, 1, 0, G). % G=[[0,1],[1,0]]
+extended_selection_replace_lt([[1,3],[2,4]], 3, 0, G).  % G=[[0,3],[0,4]]
+extended_selection_rank_vals([[3,1],[2,1]], Vs).        % Vs=[1,2,3]
+extended_selection_val_rank([[3,1],[2,1]], 3, R).       % R=2
+extended_selection_rank_grid([[5,3],[1,7]], G).         % G=[[2,1],[0,3]]
 
-xsel_cells_lt/gt/le/ge/between/ne: findall with arithmetic guard + sort/2.
-xsel_max_cells/xsel_min_cells: two-pass (max_list/min_list then findall for positions).
-xsel_threshold/replace_lt/replace_gt: nested maplist with if-then-else per cell.
-xsel_rank_vals: findall via nested member/2 + sort/2 (deduplication is free).
-xsel_val_rank/xsel_rank_val_: nth0 + cut to commit to unique match in sorted list.
+extended_selection_cells_lt/gt/le/ge/between/ne: findall with arithmetic guard + sort/2.
+extended_selection_max_cells/extended_selection_min_cells: two-pass (max_list/min_list then findall for positions).
+extended_selection_threshold/replace_lt/replace_gt: nested maplist with if-then-else per cell.
+extended_selection_rank_vals: findall via nested member/2 + sort/2 (deduplication is free).
+extended_selection_val_rank/extended_selection_rank_val_: nth0 + cut to commit to unique match in sorted list.
 
 Predicate count: 14 (xs_* prefix). Tests: 42/42. Layer: 119.
 
@@ -14950,45 +14950,45 @@ The autom pack applies neighborhood aggregation rules across an entire grid
 in a single call, producing transformed grids based on cell neighborhoods.
 
 Neighborhood count grids (produce integer grid from same-sized grid):
-autom_count_nbrs_4(+Grid, +V, -CGrid).  % each cell = count of V 4-neighbors
-autom_count_nbrs_8(+Grid, +V, -CGrid).  % each cell = count of V 8-neighbors
-autom_count_same_4(+Grid, -CGrid).       % each cell = count of same-val 4-nbrs
-autom_count_same_8(+Grid, -CGrid).       % each cell = count of same-val 8-nbrs
+automaton_count_nbrs_4(+Grid, +V, -CGrid).  % each cell = count of V 4-neighbors
+automaton_count_nbrs_8(+Grid, +V, -CGrid).  % each cell = count of V 8-neighbors
+automaton_count_same_4(+Grid, -CGrid).       % each cell = count of same-val 4-nbrs
+automaton_count_same_8(+Grid, -CGrid).       % each cell = count of same-val 8-nbrs
 
 Boolean neighbor grids (produce 1/0 grid):
-autom_any_nbr_4(+Grid, +V, -BGrid).     % 1 if any 4-neighbor = V; else 0
-autom_all_nbrs_4(+Grid, +V, -BGrid).    % 1 if all in-bounds 4-nbrs = V; else 0
-autom_any_nbr_8(+Grid, +V, -BGrid).     % 1 if any 8-neighbor = V; else 0
-autom_all_nbrs_8(+Grid, +V, -BGrid).    % 1 if all in-bounds 8-nbrs = V; else 0
+automaton_any_nbr_4(+Grid, +V, -BGrid).     % 1 if any 4-neighbor = V; else 0
+automaton_all_nbrs_4(+Grid, +V, -BGrid).    % 1 if all in-bounds 4-nbrs = V; else 0
+automaton_any_nbr_8(+Grid, +V, -BGrid).     % 1 if any 8-neighbor = V; else 0
+automaton_all_nbrs_8(+Grid, +V, -BGrid).    % 1 if all in-bounds 8-nbrs = V; else 0
 
 Isolated cell detection:
-autom_isolated_4(+Grid, +V, -Cells).    % V cells with no V 4-neighbor
-autom_isolated_8(+Grid, +V, -Cells).    % V cells with no V 8-neighbor
+automaton_isolated_4(+Grid, +V, -Cells).    % V cells with no V 4-neighbor
+automaton_isolated_8(+Grid, +V, -Cells).    % V cells with no V 8-neighbor
 
 Birth rules:
-autom_birth_4(+Grid, +Dead, +Live, +N, -Grid2). % Dead + N Live 4-nbrs -> Live
-autom_birth_8(+Grid, +Dead, +Live, +N, -Grid2). % Dead + N Live 8-nbrs -> Live
+automaton_birth_4(+Grid, +Dead, +Live, +N, -Grid2). % Dead + N Live 4-nbrs -> Live
+automaton_birth_8(+Grid, +Dead, +Live, +N, -Grid2). % Dead + N Live 8-nbrs -> Live
 
 Aggregation:
-autom_majority_4(+Grid, +Bg, -Grid2).   % each cell takes majority of self+4-nbrs
-autom_step_gol(+Grid, -Grid2).          % one step of Conway's Game of Life B3/S23
+automaton_majority_4(+Grid, +Bg, -Grid2).   % each cell takes majority of self+4-nbrs
+automaton_step_gol(+Grid, -Grid2).          % one step of Conway's Game of Life B3/S23
 
 Examples:
-autom_count_nbrs_4([[0,0,0],[0,1,0],[0,0,0]], 0, CG). % CG=[[2,2,2],[2,4,2],[2,2,2]]
-autom_count_nbrs_8([[0,0,0],[0,1,0],[0,0,0]], 1, CG). % CG=[[1,1,1],[1,0,1],[1,1,1]]
-autom_any_nbr_4([[0,0,0],[0,1,0],[0,0,0]], 1, BG).    % BG=[[0,1,0],[1,0,1],[0,1,0]]
-autom_all_nbrs_4([[1,1,1],[1,0,1],[1,1,1]], 1, BG).   % BG=[[1,0,1],[0,1,0],[1,0,1]]
-autom_isolated_4([[1,0,1],[0,0,0]], 1, Cs).            % Cs=[0-0, 0-2]
-autom_birth_4([[0,1,0],[1,0,1],[0,1,0]], 0, 1, 4, G). % G=[[0,1,0],[1,1,1],[0,1,0]]
-autom_majority_4([[1,1],[1,0]], 0, G).                  % G=[[1,1],[1,1]]
-autom_step_gol([[0,0,0],[1,1,1],[0,0,0]], G).           % G=[[0,1,0],[0,1,0],[0,1,0]]
+automaton_count_nbrs_4([[0,0,0],[0,1,0],[0,0,0]], 0, CG). % CG=[[2,2,2],[2,4,2],[2,2,2]]
+automaton_count_nbrs_8([[0,0,0],[0,1,0],[0,0,0]], 1, CG). % CG=[[1,1,1],[1,0,1],[1,1,1]]
+automaton_any_nbr_4([[0,0,0],[0,1,0],[0,0,0]], 1, BG).    % BG=[[0,1,0],[1,0,1],[0,1,0]]
+automaton_all_nbrs_4([[1,1,1],[1,0,1],[1,1,1]], 1, BG).   % BG=[[1,0,1],[0,1,0],[1,0,1]]
+automaton_isolated_4([[1,0,1],[0,0,0]], 1, Cs).            % Cs=[0-0, 0-2]
+automaton_birth_4([[0,1,0],[1,0,1],[0,1,0]], 0, 1, 4, G). % G=[[0,1,0],[1,1,1],[0,1,0]]
+automaton_majority_4([[1,1],[1,0]], 0, G).                  % G=[[1,1],[1,1]]
+automaton_step_gol([[0,0,0],[1,1,1],[0,0,0]], G).           % G=[[0,1,0],[0,1,0],[0,1,0]]
 
-autom_count_nbrs_4/8: triple-nested findall (rows, cells, directions).
-autom_any_nbr_4/8: private helper with cut on first V-neighbor; if-then-else->1/0.
-autom_all_nbrs_4/8: forall/2 over in-bounds directions; vacuously true if no nbrs.
-autom_birth_4/8: (V==Dead, N==Count -> Live ; V) per cell.
-autom_majority_4: autom_mode_ uses findall+max_list+unique-winner-or-Bg.
-autom_step_gol: count alive 8-nbrs + autom_gol_next_ (survive S23, birth B3, die).
+automaton_count_nbrs_4/8: triple-nested findall (rows, cells, directions).
+automaton_any_nbr_4/8: private helper with cut on first V-neighbor; if-then-else->1/0.
+automaton_all_nbrs_4/8: forall/2 over in-bounds directions; vacuously true if no nbrs.
+automaton_birth_4/8: (V==Dead, N==Count -> Live ; V) per cell.
+automaton_majority_4: automaton_mode_ uses findall+max_list+unique-winner-or-Bg.
+automaton_step_gol: count alive 8-nbrs + automaton_gol_next_ (survive S23, birth B3, die).
 
 Predicate count: 14 (at_* prefix). Tests: 42/42. Layer: 120.
 
@@ -15147,46 +15147,46 @@ numerical lists. It complements the cross pack (cx_*) which extracts rows,
 columns, and diagonals from grids; the numseq pack then processes those slices.
 
 Predicates:
-numseq_diff(+List, -Diffs).                  % consecutive pairwise differences
-numseq_cumsum(+List, -Sums).                 % prefix cumulative sums
-numseq_running_max(+List, -Maxs).            % running maximum
-numseq_running_min(+List, -Mins).            % running minimum
-numseq_zip_add(+A, +B, -C).                  % element-wise A[I]+B[I]
-numseq_zip_sub(+A, +B, -C).                  % element-wise A[I]-B[I]
-numseq_zip_mul(+A, +B, -C).                  % element-wise A[I]*B[I]
-numseq_zip_max(+A, +B, -C).                  % element-wise max(A[I],B[I])
-numseq_zip_min(+A, +B, -C).                  % element-wise min(A[I],B[I])
-numseq_scale(+List, +K, -Scaled).            % multiply every element by K
-numseq_offset(+List, +D, -Shifted).          % add constant D to every element
-numseq_is_sorted(+List).                     % succeeds iff non-decreasing
-numseq_is_arith(+List).                      % succeeds iff constant pairwise diff
-numseq_period(+List, +MaxP, -P).             % shortest repeating period in 1..MaxP
+numeric_sequence_diff(+List, -Diffs).                  % consecutive pairwise differences
+numeric_sequence_cumsum(+List, -Sums).                 % prefix cumulative sums
+numeric_sequence_running_max(+List, -Maxs).            % running maximum
+numeric_sequence_running_min(+List, -Mins).            % running minimum
+numeric_sequence_zip_add(+A, +B, -C).                  % element-wise A[I]+B[I]
+numeric_sequence_zip_sub(+A, +B, -C).                  % element-wise A[I]-B[I]
+numeric_sequence_zip_mul(+A, +B, -C).                  % element-wise A[I]*B[I]
+numeric_sequence_zip_max(+A, +B, -C).                  % element-wise max(A[I],B[I])
+numeric_sequence_zip_min(+A, +B, -C).                  % element-wise min(A[I],B[I])
+numeric_sequence_scale(+List, +K, -Scaled).            % multiply every element by K
+numeric_sequence_offset(+List, +D, -Shifted).          % add constant D to every element
+numeric_sequence_is_sorted(+List).                     % succeeds iff non-decreasing
+numeric_sequence_is_arith(+List).                      % succeeds iff constant pairwise diff
+numeric_sequence_period(+List, +MaxP, -P).             % shortest repeating period in 1..MaxP
 
 Examples:
-numseq_diff([1,3,6,10], Diffs).              % Diffs=[2,3,4]
-numseq_cumsum([1,2,3,4], Sums).              % Sums=[1,3,6,10]
-numseq_running_max([3,1,4,1,5,9,2], Maxs).  % Maxs=[3,3,4,4,5,9,9]
-numseq_running_min([5,3,4,1,2], Mins).      % Mins=[5,3,3,1,1]
-numseq_zip_add([1,2,3],[4,5,6],C).           % C=[5,7,9]
-numseq_zip_sub([5,6,7],[1,2,3],C).           % C=[4,4,4]
-numseq_zip_mul([2,3,4],[5,6,7],C).           % C=[10,18,28]
-numseq_zip_max([1,5,3],[4,2,6],C).           % C=[4,5,6]
-numseq_zip_min([1,5,3],[4,2,6],C).           % C=[1,2,3]
-numseq_scale([1,2,3,4], 2, S).              % S=[2,4,6,8]
-numseq_offset([5,6,7], -3, S).              % S=[2,3,4]
-numseq_is_sorted([1,2,3,4]).                 % true
-numseq_is_arith([2,4,6,8]).                  % true (step=2)
-numseq_period([1,2,1,2,1,2], 3, P).         % P=2
+numeric_sequence_diff([1,3,6,10], Diffs).              % Diffs=[2,3,4]
+numeric_sequence_cumsum([1,2,3,4], Sums).              % Sums=[1,3,6,10]
+numeric_sequence_running_max([3,1,4,1,5,9,2], Maxs).  % Maxs=[3,3,4,4,5,9,9]
+numeric_sequence_running_min([5,3,4,1,2], Mins).      % Mins=[5,3,3,1,1]
+numeric_sequence_zip_add([1,2,3],[4,5,6],C).           % C=[5,7,9]
+numeric_sequence_zip_sub([5,6,7],[1,2,3],C).           % C=[4,4,4]
+numeric_sequence_zip_mul([2,3,4],[5,6,7],C).           % C=[10,18,28]
+numeric_sequence_zip_max([1,5,3],[4,2,6],C).           % C=[4,5,6]
+numeric_sequence_zip_min([1,5,3],[4,2,6],C).           % C=[1,2,3]
+numeric_sequence_scale([1,2,3,4], 2, S).              % S=[2,4,6,8]
+numeric_sequence_offset([5,6,7], -3, S).              % S=[2,3,4]
+numeric_sequence_is_sorted([1,2,3,4]).                 % true
+numeric_sequence_is_arith([2,4,6,8]).                  % true (step=2)
+numeric_sequence_period([1,2,1,2,1,2], 3, P).         % P=2
 
 Key implementation patterns:
-numseq_diff: two-clause recursion; D is B-A; recurse on [B|T].
-numseq_cumsum: recursive helper accumulates S is Acc+H.
-numseq_running_max/min: recursive helper updating Max1 is max(H,Max0).
-nr_zip_*: maplist/3 with named per-element helper (numseq_add_, numseq_sub_, etc.).
-numseq_scale/offset: maplist/3 with helper capturing K or D from outer call.
-numseq_is_sorted: A =< B recursive guard.
-numseq_is_arith: compute D from first pair; recursive helper verifies D2=:=D.
-numseq_period: between/3 + Len mod P =:= 0 + forall+nth0 element comparison.
+numeric_sequence_diff: two-clause recursion; D is B-A; recurse on [B|T].
+numeric_sequence_cumsum: recursive helper accumulates S is Acc+H.
+numeric_sequence_running_max/min: recursive helper updating Max1 is max(H,Max0).
+nr_zip_*: maplist/3 with named per-element helper (numeric_sequence_add_, numeric_sequence_sub_, etc.).
+numeric_sequence_scale/offset: maplist/3 with helper capturing K or D from outer call.
+numeric_sequence_is_sorted: A =< B recursive guard.
+numeric_sequence_is_arith: compute D from first pair; recursive helper verifies D2=:=D.
+numeric_sequence_period: between/3 + Len mod P =:= 0 + forall+nth0 element comparison.
 
 Library imports: library(apply): maplist/3.
   library(lists): nth0/3, numlist/3.
@@ -15234,7 +15234,7 @@ gridmath_sum([[1,2],[3,4]], S).                % S=10
 gridmath_product([[1,2],[3,4]], P).            % P=24
 
 Key implementation patterns:
-gridmath_add/sub/mul/max/min/eq_mask/diff_mask: outer maplist/4 pairs rows;
+gridmath_add/sub/mul/max/min/eq_mask/difference_mask: outer maplist/4 pairs rows;
   inner maplist/4 pairs cells; named helpers ensure compatibility.
 gridmath_scale/offset/abs/clamp/modulo: outer maplist/3 pairs grid rows;
   row-level helper captures scalar; inner maplist/3 pairs cells.
@@ -15255,45 +15255,45 @@ analyzing color (value) labels in grids and lists. A "map" is a list of
 Old-New pairs.
 
 Predicates:
-colormap_apply(+Map, +Grid, -Grid2).           % substitute cells; preserve unmatched
-colormap_apply_default(+Map, +Bg, +Grid, -G2). % substitute cells; replace unmatched with Bg
-colormap_invert(+Map, +Grid, -Grid2).          % apply inverse map (swap Old-New)
-colormap_compose(+MapA, +MapB, -MapAB).        % compose: MapAB[k] = MapB[MapA[k]]
-colormap_from_grids(+GridA, +GridB, -Map).     % derive map from cell correspondences
-colormap_identity(+Palette, -Map).             % identity map V-V for each palette value
-colormap_remap(+OldVals, +NewVals, -Map).      % build map from parallel lists
-colormap_remap_list(+Map, +List, -List2).      % apply map to 1D list
-colormap_palette(+Map, -Palette).              % sorted keys of Map
-colormap_used(+Grid, -UsedVals).              % sorted distinct values in Grid
-colormap_has_key(+Map, +K).                   % succeeds iff K is a key in Map
-colormap_lookup(+Map, +K, -V).               % look up value for key K; fails if absent
-colormap_restrict(+Map, +Keys, -Map2).        % keep only entries with key in Keys
-colormap_expand(+Map, +Bg, +Palette, -Map2).  % add K-Bg for missing palette keys
+color_map_apply(+Map, +Grid, -Grid2).           % substitute cells; preserve unmatched
+color_map_apply_default(+Map, +Bg, +Grid, -G2). % substitute cells; replace unmatched with Bg
+color_map_invert(+Map, +Grid, -Grid2).          % apply inverse map (swap Old-New)
+color_map_compose(+MapA, +MapB, -MapAB).        % compose: MapAB[k] = MapB[MapA[k]]
+color_map_from_grids(+GridA, +GridB, -Map).     % derive map from cell correspondences
+color_map_identity(+Palette, -Map).             % identity map V-V for each palette value
+color_map_remap(+OldVals, +NewVals, -Map).      % build map from parallel lists
+color_map_remap_list(+Map, +List, -List2).      % apply map to 1D list
+color_map_palette(+Map, -Palette).              % sorted keys of Map
+color_map_used(+Grid, -UsedVals).              % sorted distinct values in Grid
+color_map_has_key(+Map, +K).                   % succeeds iff K is a key in Map
+color_map_lookup(+Map, +K, -V).               % look up value for key K; fails if absent
+color_map_restrict(+Map, +Keys, -Map2).        % keep only entries with key in Keys
+color_map_expand(+Map, +Bg, +Palette, -Map2).  % add K-Bg for missing palette keys
 
 Examples:
-colormap_apply([1-9,2-8],[[1,2],[3,1]],G).    % G=[[9,8],[3,9]]
-colormap_apply_default([1-9],0,[[1,3]],G).    % G=[[9,0]]
-colormap_invert([1-9,2-8],[[9,8]],G).         % G=[[1,2]]
-colormap_compose([1-2,3-4],[2-9,4-7],M).      % M=[1-9,3-7]
-colormap_from_grids([[1,2]],[[5,6]],M).       % M=[1-5,2-6]
-colormap_identity([0,1,2],M).                 % M=[0-0,1-1,2-2]
-colormap_remap([1,2,3],[9,8,7],M).            % M=[1-9,2-8,3-7]
-colormap_remap_list([1-9,2-8],[1,2,3,1],L).   % L=[9,8,3,9]
-colormap_palette([3-0,1-0,2-0],P).            % P=[1,2,3]
-colormap_used([[3,1],[2,1]],U).               % U=[1,2,3]
-colormap_has_key([1-9,2-8],1).                % true
-colormap_lookup([1-9,2-8],2,V).              % V=8
-colormap_restrict([1-9,2-8,3-7],[1,3],M).    % M=[1-9,3-7]
-colormap_expand([1-9],0,[1,2,3],M).           % M=[1-9,2-0,3-0]
+color_map_apply([1-9,2-8],[[1,2],[3,1]],G).    % G=[[9,8],[3,9]]
+color_map_apply_default([1-9],0,[[1,3]],G).    % G=[[9,0]]
+color_map_invert([1-9,2-8],[[9,8]],G).         % G=[[1,2]]
+color_map_compose([1-2,3-4],[2-9,4-7],M).      % M=[1-9,3-7]
+color_map_from_grids([[1,2]],[[5,6]],M).       % M=[1-5,2-6]
+color_map_identity([0,1,2],M).                 % M=[0-0,1-1,2-2]
+color_map_remap([1,2,3],[9,8,7],M).            % M=[1-9,2-8,3-7]
+color_map_remap_list([1-9,2-8],[1,2,3,1],L).   % L=[9,8,3,9]
+color_map_palette([3-0,1-0,2-0],P).            % P=[1,2,3]
+color_map_used([[3,1],[2,1]],U).               % U=[1,2,3]
+color_map_has_key([1-9,2-8],1).                % true
+color_map_lookup([1-9,2-8],2,V).              % V=8
+color_map_restrict([1-9,2-8,3-7],[1,3],M).    % M=[1-9,3-7]
+color_map_expand([1-9],0,[1,2,3],M).           % M=[1-9,2-0,3-0]
 
 Key implementation patterns:
-colormap_apply/apply_default/remap_list: nested maplist/3 + colormap_apply_cell_ helper
+color_map_apply/apply_default/remap_list: nested maplist/3 + color_map_apply_cell_ helper
   using if-then-else with memberchk for deterministic lookup.
-colormap_invert: findall swaps O-N to N-O then delegates to colormap_apply.
-colormap_compose: findall iterates MapA; for each K-V1 looks up V1 in MapB.
-colormap_from_grids: nth0 aligned collection + sort/2 deduplication.
-colormap_palette/used: findall collects keys/values + sort/2.
-colormap_expand: findall + \+ memberchk finds missing keys + append/3.
+color_map_invert: findall swaps O-N to N-O then delegates to color_map_apply.
+color_map_compose: findall iterates MapA; for each K-V1 looks up V1 in MapB.
+color_map_from_grids: nth0 aligned collection + sort/2 deduplication.
+color_map_palette/used: findall collects keys/values + sort/2.
+color_map_expand: findall + \+ memberchk finds missing keys + append/3.
 
 Library imports: library(lists): member/2, memberchk/2, nth0/3, append/3.
   library(apply): maplist/3. Built-in: sort/2.
@@ -15600,37 +15600,37 @@ The naggr pack provides per-cell aggregate statistics over in-bounds 4-connected
 and 8-connected neighborhoods.  Complements the automaton pack (at_*, Layer 120)
 which provides count-based neighbor operations.
 
-Predicates: naggr_sum4/2, naggr_sum8/2, naggr_max4/2, naggr_max8/2, naggr_min4/2, naggr_min8/2,
-  naggr_mean4/2, naggr_mean8/2, naggr_range4/2, naggr_range8/2, naggr_spread4/2, naggr_spread8/2,
-  naggr_diff4/2, naggr_diff8/2.
+Predicates: neighborhood_aggregate_sum4/2, neighborhood_aggregate_sum8/2, neighborhood_aggregate_max4/2, neighborhood_aggregate_max8/2, neighborhood_aggregate_min4/2, neighborhood_aggregate_min8/2,
+  neighborhood_aggregate_mean4/2, neighborhood_aggregate_mean8/2, neighborhood_aggregate_range4/2, neighborhood_aggregate_range8/2, neighborhood_aggregate_spread4/2, neighborhood_aggregate_spread8/2,
+  neighborhood_aggregate_diff4/2, neighborhood_aggregate_diff8/2.
 
 Usage examples:
 
-naggr_sum4([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[6,9,8],[13,20,17],[12,21,14]]
-naggr_sum8([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[11,19,13],[23,40,27],[17,31,19]]
-naggr_max4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[4,5,6],[7,8,9],[8,9,8]]
-naggr_max8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[5,6,6],[8,9,9],[8,9,8]]
-naggr_min4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[2,1,2],[1,2,3],[4,5,6]]
-naggr_min8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[2,1,2],[1,1,2],[4,4,5]]
-naggr_mean4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[3,3,4],[4,5,5],[6,7,7]]
-naggr_mean8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[3,3,4],[4,5,5],[5,6,6]]
-naggr_range4([[1,2,3],[4,5,6],[7,8,9]],R). % R=[[2,4,4],[6,6,6],[4,4,2]]
-naggr_range8([[1,2,3],[4,5,6],[7,8,9]],R). % R=[[3,5,4],[7,8,7],[4,5,3]]
-naggr_spread4([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[2,3,2],[3,4,3],[2,3,2]]
-naggr_spread8([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[3,5,3],[5,8,5],[3,5,3]]
-naggr_diff4([[1,2,1],[2,1,2],[1,2,1]],D). % D=[[2,3,2],[3,4,3],[2,3,2]]
-naggr_diff8([[1,2,1],[2,1,2],[1,2,1]],D). % D=[[2,3,2],[3,4,3],[2,3,2]]
+neighborhood_aggregate_sum4([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[6,9,8],[13,20,17],[12,21,14]]
+neighborhood_aggregate_sum8([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[11,19,13],[23,40,27],[17,31,19]]
+neighborhood_aggregate_max4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[4,5,6],[7,8,9],[8,9,8]]
+neighborhood_aggregate_max8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[5,6,6],[8,9,9],[8,9,8]]
+neighborhood_aggregate_min4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[2,1,2],[1,2,3],[4,5,6]]
+neighborhood_aggregate_min8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[2,1,2],[1,1,2],[4,4,5]]
+neighborhood_aggregate_mean4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[3,3,4],[4,5,5],[6,7,7]]
+neighborhood_aggregate_mean8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[3,3,4],[4,5,5],[5,6,6]]
+neighborhood_aggregate_range4([[1,2,3],[4,5,6],[7,8,9]],R). % R=[[2,4,4],[6,6,6],[4,4,2]]
+neighborhood_aggregate_range8([[1,2,3],[4,5,6],[7,8,9]],R). % R=[[3,5,4],[7,8,7],[4,5,3]]
+neighborhood_aggregate_spread4([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[2,3,2],[3,4,3],[2,3,2]]
+neighborhood_aggregate_spread8([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[3,5,3],[5,8,5],[3,5,3]]
+neighborhood_aggregate_diff4([[1,2,1],[2,1,2],[1,2,1]],D). % D=[[2,3,2],[3,4,3],[2,3,2]]
+neighborhood_aggregate_diff8([[1,2,1],[2,1,2],[1,2,1]],D). % D=[[2,3,2],[3,4,3],[2,3,2]]
 
 Empty neighborhood sentinel:
-naggr_sum4([[5]],S). % S=[[0]] - 1x1 grid has no 4-neighbors
-naggr_max4([[5]],M). % M=[[0]]
+neighborhood_aggregate_sum4([[5]],S). % S=[[0]] - 1x1 grid has no 4-neighbors
+neighborhood_aggregate_max4([[5]],M). % M=[[0]]
 
 Key implementation patterns:
-naggr_nbr4_vals_/naggr_nbr8_vals_: findall over member(DR-DC, offsets) with
+neighborhood_aggregate_nbr4_vals_/neighborhood_aggregate_nbr8_vals_: findall over member(DR-DC, offsets) with
   bounds guards NR>=0, NR<H, NC>=0, NC<W.
 Nested findall: outer collects rows; inner collects per-cell aggregates.
-naggr_spread4/8: sort/2 removes duplicates; length measures distinct set.
-naggr_diff4/8: nested findall counts same-valued neighbors; D = Total - SC.
+neighborhood_aggregate_spread4/8: sort/2 removes duplicates; length measures distinct set.
+neighborhood_aggregate_diff4/8: nested findall counts same-valued neighbors; D = Total - SC.
 
 Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2,
   sum_list/2. Built-ins: sort/2, length/2, between/3.
@@ -15681,31 +15681,31 @@ The nmode pack provides the mode (most frequent value, smallest-value tie-breaki
 for lists, grid rows, columns, the entire grid, and per-cell 4/8-connected
 neighborhood filters.  It also detects uniform and outlier cells.
 
-Predicates: nmode_mode/2, nmode_mode_all/2, nmode_mode_count/3, nmode_row/3, nmode_col/3,
-  nmode_row_modes/2, nmode_col_modes/2, nmode_grid/2, nmode_filter4/2, nmode_filter8/2,
-  nmode_uniform4/2, nmode_uniform8/2, nmode_outlier4/2, nmode_outlier8/2.
+Predicates: neighborhood_mode_mode/2, neighborhood_mode_mode_all/2, neighborhood_mode_mode_count/3, neighborhood_mode_row/3, neighborhood_mode_col/3,
+  neighborhood_mode_row_modes/2, neighborhood_mode_col_modes/2, neighborhood_mode_grid/2, neighborhood_mode_filter4/2, neighborhood_mode_filter8/2,
+  neighborhood_mode_uniform4/2, neighborhood_mode_uniform8/2, neighborhood_mode_outlier4/2, neighborhood_mode_outlier8/2.
 
 Usage examples:
 
-nmode_mode([1,2,3],M). % M=1 (all distinct; smallest wins)
-nmode_mode([1,1,2,2],M). % M=1 (tied; smallest wins)
-nmode_mode_all([1,1,2,2],Ms). % Ms=[1,2]
-nmode_mode_count([1,1,2,3],M,C). % M=1, C=2
-nmode_row_modes([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[1,4,7]
-nmode_col_modes([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[1,2,3]
-nmode_grid([[1,2,3],[4,5,6],[7,8,9]],M). % M=1
-nmode_filter4([[1,2,3],[4,5,6],[7,8,9]],F). % F=[[1,1,2],[1,2,3],[4,5,6]]
-nmode_filter8([[1,2,1],[2,1,2],[1,2,1]],F). % F=[[1,1,1],[1,1,1],[1,1,1]]
-nmode_uniform4([[1,1,1],[1,1,1],[1,1,1]],C). % C=[0-0,...,2-2] all 9 cells
-nmode_uniform4([[1,2,3],[4,5,6],[7,8,9]],C). % C=[] (all neighbors distinct)
-nmode_outlier4([[1,2,1],[2,1,2],[1,2,1]],C). % C=all 9 cells (checkerboard)
-nmode_outlier8([[1,2,1],[2,1,2],[1,2,1]],C). % C=all except center 1-1
+neighborhood_mode_mode([1,2,3],M). % M=1 (all distinct; smallest wins)
+neighborhood_mode_mode([1,1,2,2],M). % M=1 (tied; smallest wins)
+neighborhood_mode_mode_all([1,1,2,2],Ms). % Ms=[1,2]
+neighborhood_mode_mode_count([1,1,2,3],M,C). % M=1, C=2
+neighborhood_mode_row_modes([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[1,4,7]
+neighborhood_mode_col_modes([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[1,2,3]
+neighborhood_mode_grid([[1,2,3],[4,5,6],[7,8,9]],M). % M=1
+neighborhood_mode_filter4([[1,2,3],[4,5,6],[7,8,9]],F). % F=[[1,1,2],[1,2,3],[4,5,6]]
+neighborhood_mode_filter8([[1,2,1],[2,1,2],[1,2,1]],F). % F=[[1,1,1],[1,1,1],[1,1,1]]
+neighborhood_mode_uniform4([[1,1,1],[1,1,1],[1,1,1]],C). % C=[0-0,...,2-2] all 9 cells
+neighborhood_mode_uniform4([[1,2,3],[4,5,6],[7,8,9]],C). % C=[] (all neighbors distinct)
+neighborhood_mode_outlier4([[1,2,1],[2,1,2],[1,2,1]],C). % C=all 9 cells (checkerboard)
+neighborhood_mode_outlier8([[1,2,1],[2,1,2],[1,2,1]],C). % C=all except center 1-1
 
 Key implementation pattern:
-nmode_mode builds Value-Count pairs from an msort-sorted list. nmode_count_prefix_
+neighborhood_mode_mode builds Value-Count pairs from an msort-sorted list. neighborhood_mode_count_prefix_
 clause 1 (empty list) has a cut to prevent duplicate solutions in findall.
-nmode_uniform4/8 uses sort(NbrVals,[_]) as a one-step uniformity test.
-nmode_outlier4/8 computes the mode of NEIGHBORS ONLY (cell excluded).
+neighborhood_mode_uniform4/8 uses sort(NbrVals,[_]) as a one-step uniformity test.
+neighborhood_mode_outlier4/8 computes the mode of NEIGHBORS ONLY (cell excluded).
 
 Library imports: library(lists): member/2, nth0/3, max_list/2.
 Built-ins: msort/2, sort/2, length/2, between/3, findall/3.
@@ -15759,36 +15759,36 @@ floor mean, per-row and per-column sums and means, global grid mean, and
 sorted position lists for cells above or below various means.
 
 Predicates:
-varstat_sum/2, varstat_mean_floor/2, varstat_mean_round/2,
-varstat_deviation/2, varstat_abs_deviation/2,
-varstat_row_sums/2, varstat_col_sums/2,
-varstat_row_means/2, varstat_col_means/2,
-varstat_global_mean/2,
-varstat_above_mean/2, varstat_below_mean/2,
-varstat_row_above_mean/2, varstat_col_above_mean/2.
+variance_statistics_sum/2, variance_statistics_mean_floor/2, variance_statistics_mean_round/2,
+variance_statistics_deviation/2, variance_statistics_abs_deviation/2,
+variance_statistics_row_sums/2, variance_statistics_col_sums/2,
+variance_statistics_row_means/2, variance_statistics_col_means/2,
+variance_statistics_global_mean/2,
+variance_statistics_above_mean/2, variance_statistics_below_mean/2,
+variance_statistics_row_above_mean/2, variance_statistics_col_above_mean/2.
 
 Usage examples:
-varstat_sum([1,2,3],S).                              % S=6
-varstat_mean_floor([1,2,3],M).                       % M=2
-varstat_mean_floor([1,1,2],M).                       % M=1 (floor of 4/3)
-varstat_mean_round([2,4],M).                         % M=3
-varstat_deviation([1,2,3],Devs).                     % Devs=[-1,0,1]
-varstat_deviation([1,3,5],Devs).                     % Devs=[-2,0,2]
-varstat_abs_deviation([1,2,3],D).                    % D=[1,0,1]
-varstat_row_sums([[1,2,3],[4,5,6],[7,8,9]],S).       % S=[6,15,24]
-varstat_col_sums([[1,2,3],[4,5,6],[7,8,9]],S).       % S=[12,15,18]
-varstat_row_means([[1,2,3],[4,5,6],[7,8,9]],M).      % M=[2,5,8]
-varstat_col_means([[1,2,3],[4,5,6],[7,8,9]],M).      % M=[4,5,6]
-varstat_global_mean([[1,2,3],[4,5,6],[7,8,9]],M).    % M=5
-varstat_above_mean([[1,2,3],[4,5,6],[7,8,9]],C).     % C=[1-2,2-0,2-1,2-2]
-varstat_below_mean([[1,2,3],[4,5,6],[7,8,9]],C).     % C=[0-0,0-1,0-2,1-0]
-varstat_row_above_mean([[1,2,3],[4,5,6],[7,8,9]],C). % C=[0-2,1-2,2-2]
-varstat_col_above_mean([[1,2,3],[4,5,6],[7,8,9]],C). % C=[2-0,2-1,2-2]
+variance_statistics_sum([1,2,3],S).                              % S=6
+variance_statistics_mean_floor([1,2,3],M).                       % M=2
+variance_statistics_mean_floor([1,1,2],M).                       % M=1 (floor of 4/3)
+variance_statistics_mean_round([2,4],M).                         % M=3
+variance_statistics_deviation([1,2,3],Devs).                     % Devs=[-1,0,1]
+variance_statistics_deviation([1,3,5],Devs).                     % Devs=[-2,0,2]
+variance_statistics_abs_deviation([1,2,3],D).                    % D=[1,0,1]
+variance_statistics_row_sums([[1,2,3],[4,5,6],[7,8,9]],S).       % S=[6,15,24]
+variance_statistics_col_sums([[1,2,3],[4,5,6],[7,8,9]],S).       % S=[12,15,18]
+variance_statistics_row_means([[1,2,3],[4,5,6],[7,8,9]],M).      % M=[2,5,8]
+variance_statistics_col_means([[1,2,3],[4,5,6],[7,8,9]],M).      % M=[4,5,6]
+variance_statistics_global_mean([[1,2,3],[4,5,6],[7,8,9]],M).    % M=5
+variance_statistics_above_mean([[1,2,3],[4,5,6],[7,8,9]],C).     % C=[1-2,2-0,2-1,2-2]
+variance_statistics_below_mean([[1,2,3],[4,5,6],[7,8,9]],C).     % C=[0-0,0-1,0-2,1-0]
+variance_statistics_row_above_mean([[1,2,3],[4,5,6],[7,8,9]],C). % C=[0-2,1-2,2-2]
+variance_statistics_col_above_mean([[1,2,3],[4,5,6],[7,8,9]],C). % C=[2-0,2-1,2-2]
 
 Key implementation patterns:
-varstat_mean_floor uses Sum // N (floor division).
-varstat_mean_round uses float(Sum)/float(N) then round/1 (banker's rounding).
-varstat_col_above_mean enumerates in row-major order and re-computes column mean
+variance_statistics_mean_floor uses Sum // N (floor division).
+variance_statistics_mean_round uses float(Sum)/float(N) then round/1 (banker's rounding).
+variance_statistics_col_above_mean enumerates in row-major order and re-computes column mean
   per (R,C) pair via nested findall for correct sorted output.
 
 Library imports: library(lists): member/2, nth0/3, sum_list/2.
@@ -15805,34 +15805,34 @@ enumerating border values; testing shared borders; building horizontal
 transition frequency tables; and finding the most co-adjacent value.
 
 Predicates:
-cooccur_h_pairs/2, cooccur_v_pairs/2, cooccur_d_pairs_dr/2, cooccur_d_pairs_dl/2,
-cooccur_count_h/4, cooccur_count_v/4, cooccur_count_adj4/4,
-cooccur_always_adj4/3, cooccur_never_adj4/3,
-cooccur_isolated4/3, cooccur_border_vals/3, cooccur_shared_border/3,
-cooccur_row_transitions/2, cooccur_most_common_adj4/3.
+cooccurrence_h_pairs/2, cooccurrence_v_pairs/2, cooccurrence_d_pairs_dr/2, cooccurrence_d_pairs_dl/2,
+cooccurrence_count_h/4, cooccurrence_count_v/4, cooccurrence_count_adj4/4,
+cooccurrence_always_adj4/3, cooccurrence_never_adj4/3,
+cooccurrence_isolated4/3, cooccurrence_border_vals/3, cooccurrence_shared_border/3,
+cooccurrence_row_transitions/2, cooccurrence_most_common_adj4/3.
 
 Usage examples:
 G = [[1,1,1],[1,2,1],[1,1,1]].
-cooccur_h_pairs(G, P).             % P=[1-1,1-1,1-2,2-1,1-1,1-1]
-cooccur_count_adj4(G, 1, 2, N).    % N=4 (four 1-2 edges)
-cooccur_count_adj4(G, 1, 1, N).    % N=8 (eight 1-1 edges)
-cooccur_always_adj4(G, 2, 1).      % succeeds: center 2 surrounded by 1s
-cooccur_never_adj4(G, 2, 2).       % succeeds: no 2-2 adjacency
-cooccur_isolated4(G, 2, C).        % C=[1-1]
-cooccur_border_vals(G, 2, V).      % V=[1]
-cooccur_row_transitions(G, T).     % T=[1-1-4,2-1-1,1-2-1]
-cooccur_most_common_adj4(G, 1, W). % W=2
+cooccurrence_h_pairs(G, P).             % P=[1-1,1-1,1-2,2-1,1-1,1-1]
+cooccurrence_count_adj4(G, 1, 2, N).    % N=4 (four 1-2 edges)
+cooccurrence_count_adj4(G, 1, 1, N).    % N=8 (eight 1-1 edges)
+cooccurrence_always_adj4(G, 2, 1).      % succeeds: center 2 surrounded by 1s
+cooccurrence_never_adj4(G, 2, 2).       % succeeds: no 2-2 adjacency
+cooccurrence_isolated4(G, 2, C).        % C=[1-1]
+cooccurrence_border_vals(G, 2, V).      % V=[1]
+cooccurrence_row_transitions(G, T).     % T=[1-1-4,2-1-1,1-2-1]
+cooccurrence_most_common_adj4(G, 1, W). % W=2
 G3=[[1,2,3],[4,5,6],[7,8,9]].
-cooccur_v_pairs(G3, P).            % P=[1-4,4-7,2-5,5-8,3-6,6-9] (col-major)
-cooccur_d_pairs_dr(G3, P).         % P=[1-5,2-6,4-8,5-9]
-cooccur_border_vals(G3, 5, V).     % V=[2,4,6,8]
-cooccur_never_adj4(G3, 1, 9).      % succeeds: opposite corners
+cooccurrence_v_pairs(G3, P).            % P=[1-4,4-7,2-5,5-8,3-6,6-9] (col-major)
+cooccurrence_d_pairs_dr(G3, P).         % P=[1-5,2-6,4-8,5-9]
+cooccurrence_border_vals(G3, 5, V).     % V=[2,4,6,8]
+cooccurrence_never_adj4(G3, 1, 9).      % succeeds: opposite corners
 
 Key implementation patterns:
-cooccur_v_pairs: column-major order (all pairs for col 0 before col 1).
-cooccur_count_adj4: sums directed V1-V2 and V2-V1 for undirected count.
-cooccur_shared_border: cut after first match for determinism.
-cooccur_most_common_adj4: msort+last; ties resolved by largest value.
+cooccurrence_v_pairs: column-major order (all pairs for col 0 before col 1).
+cooccurrence_count_adj4: sums directed V1-V2 and V2-V1 for undirected count.
+cooccurrence_shared_border: cut after first match for determinism.
+cooccurrence_most_common_adj4: msort+last; ties resolved by largest value.
 
 Library imports: library(lists): member/2, nth0/3, last/2, append/3.
                  library(apply): include/3.
@@ -15849,90 +15849,90 @@ by index, and testing palindrome and anagram structure.
 
 Predicates:
 
-rowsig_col_at(+Grid, +C, -Col)
+row_signature_col_at(+Grid, +C, -Col)
   Col is the ordered list of values in column C, top-to-bottom (row 0 first).
 
-rowsig_all_cols(+Grid, -Cols)
+row_signature_all_cols(+Grid, -Cols)
   Cols is the list of all column lists in column order (column 0 first).
 
-rowsig_row_freq(+Grid, -Freqs)
+row_signature_row_freq(+Grid, -Freqs)
   Freqs is Row-N pairs where N is how often Row appears. Sorted by N desc;
   equal-count rows ordered by reverse standard order (largest last in msort,
   first after reverse).
 
-rowsig_col_freq(+Grid, -Freqs)
+row_signature_col_freq(+Grid, -Freqs)
   Freqs is Col-N pairs where N is how often column list Col appears. Sorted
   by N descending.
 
-rowsig_modal_row(+Grid, -Row)
+row_signature_modal_row(+Grid, -Row)
   Row is the most frequently appearing row. On tie, the largest row in
   standard order wins (msort + last). Fails if Grid is empty.
 
-rowsig_modal_col(+Grid, -Col)
+row_signature_modal_col(+Grid, -Col)
   Col is the most frequently appearing column list. Ties resolved by largest
   column (msort + last). Fails if Grid has no columns.
 
-rowsig_uniq_rows(+Grid, -Pairs)
+row_signature_uniq_rows(+Grid, -Pairs)
   Pairs is the list of R-Row terms for rows appearing exactly once, ordered
   by row index ascending.
 
-rowsig_uniq_cols(+Grid, -Pairs)
+row_signature_uniq_cols(+Grid, -Pairs)
   Pairs is the list of C-Col terms for columns appearing exactly once,
   ordered by column index ascending.
 
-rowsig_dup_row_pairs(+Grid, -Pairs)
+row_signature_dup_row_pairs(+Grid, -Pairs)
   Pairs is the list of R1-R2 index pairs where row R1 equals row R2 and
   R1 < R2. Ordered by R1 then R2.
 
-rowsig_dup_col_pairs(+Grid, -Pairs)
+row_signature_dup_col_pairs(+Grid, -Pairs)
   Pairs is the list of C1-C2 index pairs where column C1 equals column C2
   and C1 < C2. Ordered by C1 then C2.
 
-rowsig_row_palindrome(+Grid, +R)
+row_signature_row_palindrome(+Grid, +R)
   Succeeds if row R reads the same left-to-right and right-to-left.
 
-rowsig_col_palindrome(+Grid, +C)
+row_signature_col_palindrome(+Grid, +C)
   Succeeds if column C reads the same top-to-bottom and bottom-to-top.
 
-rowsig_rows_anagram(+Grid, +R1, +R2)
+row_signature_rows_anagram(+Grid, +R1, +R2)
   Succeeds if rows R1 and R2 have the same multiset of values
   (msort of both rows produces the same list).
 
-rowsig_cols_anagram(+Grid, +C1, +C2)
+row_signature_cols_anagram(+Grid, +C1, +C2)
   Succeeds if columns C1 and C2 have the same multiset of values
   (msort of both columns produces the same list).
 
 Usage examples:
 
 G = [[1,2,3],[4,5,6],[7,8,9]].
-rowsig_col_at(G, 0, Col).     % Col=[1,4,7]
-rowsig_all_cols(G, Cols).     % Cols=[[1,4,7],[2,5,8],[3,6,9]]
-rowsig_modal_row(G, Row).     % Row=[7,8,9]
-rowsig_uniq_rows(G, Pairs).   % Pairs=[0-[1,2,3],1-[4,5,6],2-[7,8,9]]
-rowsig_dup_row_pairs(G, P).   % P=[]
+row_signature_col_at(G, 0, Col).     % Col=[1,4,7]
+row_signature_all_cols(G, Cols).     % Cols=[[1,4,7],[2,5,8],[3,6,9]]
+row_signature_modal_row(G, Row).     % Row=[7,8,9]
+row_signature_uniq_rows(G, Pairs).   % Pairs=[0-[1,2,3],1-[4,5,6],2-[7,8,9]]
+row_signature_dup_row_pairs(G, P).   % P=[]
 
 G2 = [[1,2],[3,4],[1,2]].
-rowsig_row_freq(G2, Freqs).   % Freqs=[[1,2]-2,[3,4]-1]
-rowsig_modal_row(G2, Row).    % Row=[1,2]
-rowsig_uniq_rows(G2, Pairs).  % Pairs=[1-[3,4]]
-rowsig_dup_row_pairs(G2, P).  % P=[0-2]
+row_signature_row_freq(G2, Freqs).   % Freqs=[[1,2]-2,[3,4]-1]
+row_signature_modal_row(G2, Row).    % Row=[1,2]
+row_signature_uniq_rows(G2, Pairs).  % Pairs=[1-[3,4]]
+row_signature_dup_row_pairs(G2, P).  % P=[0-2]
 
-rowsig_row_palindrome([[1,2,1],[3,4,5]], 0). % succeeds
-rowsig_col_palindrome([[1,2],[3,3],[1,5]], 0). % succeeds (col0=[1,3,1])
-rowsig_rows_anagram([[1,2,3],[3,1,2],[4,5,6]], 0, 1). % succeeds
-rowsig_cols_anagram([[1,2],[3,1],[2,3]], 0, 1). % succeeds
+row_signature_row_palindrome([[1,2,1],[3,4,5]], 0). % succeeds
+row_signature_col_palindrome([[1,2],[3,3],[1,5]], 0). % succeeds (col0=[1,3,1])
+row_signature_rows_anagram([[1,2,3],[3,1,2],[4,5,6]], 0, 1). % succeeds
+row_signature_cols_anagram([[1,2],[3,1],[2,3]], 0, 1). % succeeds
 
 Key implementation notes:
 
-rowsig_modal_row and rowsig_modal_col use msort + last on Count-Element pairs.
+row_signature_modal_row and row_signature_modal_col use msort + last on Count-Element pairs.
   When all counts are equal, the largest element wins as a deterministic
   tie-breaking rule.
 
-rowsig_rows_anagram and rowsig_cols_anagram use msort (not sort) to preserve
+row_signature_rows_anagram and row_signature_cols_anagram use msort (not sort) to preserve
   duplicate values. Two rows [1,1,2] and [2,1,1] are anagrams; sort would
   collapse duplicates and mask differences.
 
-rowsig_row_palindrome and rowsig_col_palindrome use the Prolog idiom reverse(X) = X,
+row_signature_row_palindrome and row_signature_col_palindrome use the Prolog idiom reverse(X) = X,
   which unifies the list with its own reverse, succeeding iff they are equal.
 
 Library imports: library(lists): member/2, nth0/3, reverse/2, last/2.
@@ -16422,97 +16422,97 @@ sparse R-C position lists, objop accepts and returns complete grids, identifying
 objects by their color value automatically. This pack covers the workflow of "find
 the colored object and transform it."
 
-The central private helper objop_set_cells_ scans the full grid, replacing any cell
+The central private helper object_operation_set_cells_ scans the full grid, replacing any cell
 at a position in the Cells list with Val and keeping all others unchanged.
 
 
 Identifying Object Cells and Bounding Boxes
 
-objop_cells_of(+Grid, +V, -Cells): sorted list of R-C pairs where the grid holds V.
+object_operation_cells_of(+Grid, +V, -Cells): sorted list of R-C pairs where the grid holds V.
 
-    objop_cells_of([[1,0,1],[0,1,0],[1,0,0]], 1, Cells).
+    object_operation_cells_of([[1,0,1],[0,1,0],[1,0,0]], 1, Cells).
     % Cells = [0-0, 0-2, 1-1, 2-0]
 
-    objop_cells_of([[2,2],[2,2]], 2, Cells).
+    object_operation_cells_of([[2,2],[2,2]], 2, Cells).
     % Cells = [0-0, 0-1, 1-0, 1-1]
 
-    objop_cells_of([[0,0],[0,0]], 5, Cells).
+    object_operation_cells_of([[0,0],[0,0]], 5, Cells).
     % Cells = []  (color absent)
 
-objop_bbox(+Cells, -R0, -C0, -R1, -C1): bounding box of a cell list.
+object_operation_bbox(+Cells, -R0, -C0, -R1, -C1): bounding box of a cell list.
 
-    objop_bbox([0-0, 0-2, 1-1, 2-0], R0, C0, R1, C1).
+    object_operation_bbox([0-0, 0-2, 1-1, 2-0], R0, C0, R1, C1).
     % R0=0, C0=0, R1=2, C1=2
 
-    objop_bbox([2-3], R0, C0, R1, C1).
+    object_operation_bbox([2-3], R0, C0, R1, C1).
     % R0=2, C0=3, R1=2, C1=3  (single cell)
 
 
 Counting, Size, and Center
 
-objop_count(+Grid, +V, -N): number of cells with value V.
+object_operation_count(+Grid, +V, -N): number of cells with value V.
 
-    objop_count([[1,0],[1,0],[1,0]], 1, N).   % N = 3
-    objop_count([[0,0],[0,0]], 5, N).         % N = 0
+    object_operation_count([[1,0],[1,0],[1,0]], 1, N).   % N = 3
+    object_operation_count([[0,0],[0,0]], 5, N).         % N = 0
 
-objop_size(+Grid, +V, -H, -W): height H and width W of V cells' bounding box.
+object_operation_size(+Grid, +V, -H, -W): height H and width W of V cells' bounding box.
 
-    objop_size([[1,1,1],[1,1,1],[0,0,0]], 1, H, W).
+    object_operation_size([[1,1,1],[1,1,1],[0,0,0]], 1, H, W).
     % H=2, W=3
 
-    objop_size([[1],[1],[1]], 1, H, W).
+    object_operation_size([[1],[1],[1]], 1, H, W).
     % H=3, W=1
 
-objop_center(+Grid, +V, -R, -C): center of V cells' bounding box (integer division).
+object_operation_center(+Grid, +V, -R, -C): center of V cells' bounding box (integer division).
 
-    objop_center([[1,1,1],[1,1,1],[1,1,1]], 1, R, C).
+    object_operation_center([[1,1,1],[1,1,1],[1,1,1]], 1, R, C).
     % R=1, C=1
 
-    objop_center([[1,1,1]], 1, R, C).
+    object_operation_center([[1,1,1]], 1, R, C).
     % R=0, C=1
 
 
 Erasing, Repainting, and Swapping
 
-objop_erase(+Grid, +V, +Bg, -Out): replace all V cells with Bg.
+object_operation_erase(+Grid, +V, +Bg, -Out): replace all V cells with Bg.
 
-    objop_erase([[1,2,1],[2,1,2],[1,2,1]], 1, 0, Out).
+    object_operation_erase([[1,2,1],[2,1,2],[1,2,1]], 1, 0, Out).
     % Out = [[0,2,0],[2,0,2],[0,2,0]]
 
-objop_repaint(+Grid, +V, +NewV, -Out): replace all V cells with NewV.
+object_operation_repaint(+Grid, +V, +NewV, -Out): replace all V cells with NewV.
 
-    objop_repaint([[1,0,1],[0,1,0]], 1, 9, Out).
+    object_operation_repaint([[1,0,1],[0,1,0]], 1, 9, Out).
     % Out = [[9,0,9],[0,9,0]]
 
-objop_swap(+Grid, +V1, +V2, -Out): exchange all V1 and V2 cells (assumes no overlap).
+object_operation_swap(+Grid, +V1, +V2, -Out): exchange all V1 and V2 cells (assumes no overlap).
 
-    objop_swap([[1,2],[2,1]], 1, 2, Out).
+    object_operation_swap([[1,2],[2,1]], 1, 2, Out).
     % Out = [[2,1],[1,2]]
 
-    objop_swap([[1,1],[2,2]], 1, 2, Out).
+    object_operation_swap([[1,1],[2,2]], 1, 2, Out).
     % Out = [[2,2],[1,1]]
 
 
 Moving and Copying
 
-objop_move(+Grid, +V, +DR, +DC, +Bg, -Out): translate V cells by (DR, DC). Original
+object_operation_move(+Grid, +V, +DR, +DC, +Bg, -Out): translate V cells by (DR, DC). Original
 cells become Bg; cells translated outside the grid are clipped.
 
-    objop_move([[1,0,0],[0,0,0]], 1, 0, 2, 0, Out).
+    object_operation_move([[1,0,0],[0,0,0]], 1, 0, 2, 0, Out).
     % Out = [[0,0,1],[0,0,0]]  (moved right 2)
 
-    objop_move([[1,1],[0,0],[0,0]], 1, 2, 0, 0, Out).
+    object_operation_move([[1,1],[0,0],[0,0]], 1, 2, 0, 0, Out).
     % Out = [[0,0],[0,0],[1,1]]  (moved down 2)
 
-    objop_move([[0,1],[0,0]], 1, 0, 2, 0, Out).
+    object_operation_move([[0,1],[0,0]], 1, 0, 2, 0, Out).
     % Out = [[0,0],[0,0]]  (out of bounds, clipped)
 
-objop_copy(+Grid, +V, +DR, +DC, -Out): copy V cells to offset (DR, DC); originals stay.
+object_operation_copy(+Grid, +V, +DR, +DC, -Out): copy V cells to offset (DR, DC); originals stay.
 
-    objop_copy([[1,0,0],[0,0,0]], 1, 0, 1, Out).
+    object_operation_copy([[1,0,0],[0,0,0]], 1, 0, 1, Out).
     % Out = [[1,1,0],[0,0,0]]
 
-    objop_copy([[1,0],[0,0]], 1, 1, 1, Out).
+    object_operation_copy([[1,0],[0,0]], 1, 1, 1, Out).
     % Out = [[1,0],[0,1]]
 
 
@@ -16521,34 +16521,34 @@ In-Place Transformations
 All transformation predicates erase the original V cells, compute new positions
 based on the bounding box, and paint V at the new positions.
 
-objop_rotate90(+Grid, +V, +Bg, -Out): rotate V cells 90 CW around the bbox top-left.
+object_operation_rotate90(+Grid, +V, +Bg, -Out): rotate V cells 90 CW around the bbox top-left.
 Formula: normalized (r,c) maps to (c, H-1-r) where H is the bbox height.
 
-    objop_rotate90([[1,0],[1,0],[0,0]], 1, 0, Out).
+    object_operation_rotate90([[1,0],[1,0],[0,0]], 1, 0, Out).
     % Out = [[1,1],[0,0],[0,0]]  (2x1 column becomes 1x2 row)
 
-    objop_rotate90([[1,0],[1,1],[0,0]], 1, 0, Out).
+    object_operation_rotate90([[1,0],[1,1],[0,0]], 1, 0, Out).
     % Out = [[1,1],[1,0],[0,0]]  (L-shape rotated 90 CW)
 
-objop_rotate180(+Grid, +V, +Bg, -Out): rotate V cells 180 degrees within the bbox.
+object_operation_rotate180(+Grid, +V, +Bg, -Out): rotate V cells 180 degrees within the bbox.
 Formula: normalized (r,c) maps to (H-1-r, W-1-c).
 
-    objop_rotate180([[0,0,0,0],[1,1,0,1],[0,0,0,0]], 1, 0, Out).
+    object_operation_rotate180([[0,0,0,0],[1,1,0,1],[0,0,0,0]], 1, 0, Out).
     % Out = [[0,0,0,0],[1,0,1,1],[0,0,0,0]]
 
-objop_mirror_h(+Grid, +V, +Bg, -Out): flip V cells left-right within the bbox.
+object_operation_mirror_h(+Grid, +V, +Bg, -Out): flip V cells left-right within the bbox.
 Formula: normalized column c maps to W-1-c.
 
-    objop_mirror_h([[1,0],[1,1]], 1, 0, Out).
+    object_operation_mirror_h([[1,0],[1,1]], 1, 0, Out).
     % Out = [[0,1],[1,1]]
 
-    objop_mirror_h([[0,1,0,1,1],[0,0,0,0,0]], 1, 0, Out).
+    object_operation_mirror_h([[0,1,0,1,1],[0,0,0,0,0]], 1, 0, Out).
     % Out = [[0,1,1,0,1],[0,0,0,0,0]]
 
-objop_mirror_v(+Grid, +V, +Bg, -Out): flip V cells top-bottom within the bbox.
+object_operation_mirror_v(+Grid, +V, +Bg, -Out): flip V cells top-bottom within the bbox.
 Formula: normalized row r maps to H-1-r.
 
-    objop_mirror_v([[1,1],[0,1],[0,0]], 1, 0, Out).
+    object_operation_mirror_v([[1,1],[0,1],[0,0]], 1, 0, Out).
     % Out = [[0,1],[1,1],[0,0]]
 
 
@@ -16560,10 +16560,10 @@ Rotate the red (color 1) L-shape, then move it right by 3:
             [1,1,0,0,0,0],
             [0,0,0,0,0,0]].
 
-    objop_rotate90(Grid, 1, 0, G1).
+    object_operation_rotate90(Grid, 1, 0, G1).
     % G1: L rotated 90 CW
 
-    objop_move(G1, 1, 0, 3, 0, Out).
+    object_operation_move(G1, 1, 0, 3, 0, Out).
     % Out: rotated L moved 3 columns right
 
 Library imports: library(lists): member/2, memberchk/2, nth0/3, min_list/2, max_list/2.
@@ -16801,115 +16801,115 @@ and comparison/inference predicates (testing or discovering what changed between
 
 Applied Transformations
 
-xform_recolor(+Obj, +Color, -Out): create a new obj with a different color, same cells.
+isometry_recolor(+Obj, +Color, -Out): create a new obj with a different color, same cells.
 
-    xform_recolor(obj(1, [r(0,0), r(0,1)]), 5, Out).
+    isometry_recolor(obj(1, [r(0,0), r(0,1)]), 5, Out).
     % Out = obj(5, [r(0,0), r(0,1)])
 
-xform_translate(+Obj, +r(DR,DC), -Out): shift every cell by the given row-column offset.
+isometry_translate(+Obj, +r(DR,DC), -Out): shift every cell by the given row-column offset.
 
-    xform_translate(obj(1, [r(0,0), r(0,1)]), r(0,3), Out).
+    isometry_translate(obj(1, [r(0,0), r(0,1)]), r(0,3), Out).
     % Out = obj(1, [r(0,3), r(0,4)])
 
-xform_normalize(+Obj, -Out): translate an obj so that its minimum row = 0 and minimum
+isometry_normalize(+Obj, -Out): translate an obj so that its minimum row = 0 and minimum
 column = 0 (i.e., the top-left cell of the bounding box is at the origin).
 
-    xform_normalize(obj(2, [r(3,4), r(3,5), r(4,4)]), Out).
+    isometry_normalize(obj(2, [r(3,4), r(3,5), r(4,4)]), Out).
     % Out = obj(2, [r(0,0), r(0,1), r(1,0)])
 
-xform_d4(+Obj, +Op, -Out): apply a named D4 symmetry operation to an obj. The result is
+isometry_d4(+Obj, +Op, -Out): apply a named D4 symmetry operation to an obj. The result is
 placed at the same top-left corner as the input. Op must be one of:
 id, r90, r180, r270, fh, fv, fd1, fd2.
 
-    xform_d4(obj(1, [r(0,0), r(0,1)]), r90, Out).
+    isometry_d4(obj(1, [r(0,0), r(0,1)]), r90, Out).
     % r90 rotates a horizontal pair to vertical
     % Out = obj(1, [r(0,0), r(1,0)])
 
-    xform_d4(obj(2, [r(0,0), r(1,0), r(1,1)]), fh, Out).
+    isometry_d4(obj(2, [r(0,0), r(1,0), r(1,1)]), fh, Out).
     % fh flips the L-shape horizontally
     % Out = obj(2, [r(0,1), r(1,0), r(1,1)])
 
 
 Cell Identity and Offset
 
-xform_same_cells(+Obj1, +Obj2): succeed if both obj terms have the same sorted cell set
+isometry_same_cells(+Obj1, +Obj2): succeed if both obj terms have the same sorted cell set
 (ignoring color). Implemented via Prolog unification on the Cells argument.
 
-    xform_same_cells(obj(1, [r(0,0), r(0,1)]), obj(5, [r(0,0), r(0,1)])).
+    isometry_same_cells(obj(1, [r(0,0), r(0,1)]), obj(5, [r(0,0), r(0,1)])).
     % succeeds (same cells, different colors)
 
-xform_cell_offset(+Obj1, +Obj2, -r(DR,DC)): find the translation vector from Obj1 to Obj2.
+isometry_cell_offset(+Obj1, +Obj2, -r(DR,DC)): find the translation vector from Obj1 to Obj2.
 Succeeds only when both objs have the same normalized shape (pure translation). Returns
 DR = min_row(Obj2) - min_row(Obj1), DC = min_col(Obj2) - min_col(Obj1).
 
-    xform_cell_offset(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,3),r(0,4)]), Off).
+    isometry_cell_offset(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,3),r(0,4)]), Off).
     % Off = r(0,3)
 
-    xform_cell_offset(obj(1,[r(0,0),r(1,0)]), obj(1,[r(2,3),r(3,3)]), Off).
+    isometry_cell_offset(obj(1,[r(0,0),r(1,0)]), obj(1,[r(2,3),r(3,3)]), Off).
     % Off = r(2,3)
 
-xform_is_recolor(+Obj1, +Obj2): succeed when Obj1 and Obj2 have the same cells but
+isometry_is_recolor(+Obj1, +Obj2): succeed when Obj1 and Obj2 have the same cells but
 different colors.
 
-    xform_is_recolor(obj(1, [r(0,0), r(0,1)]), obj(5, [r(0,0), r(0,1)])).
+    isometry_is_recolor(obj(1, [r(0,0), r(0,1)]), obj(5, [r(0,0), r(0,1)])).
     % succeeds
 
 
 Cell Set Arithmetic
 
-xform_cells_added(+Obj1, +Obj2, -Added): cells in Obj2 not present in Obj1.
+isometry_cells_added(+Obj1, +Obj2, -Added): cells in Obj2 not present in Obj1.
 Uses subtract/3 from library(lists).
 
-    xform_cells_added(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,0),r(0,1),r(0,2)]), Added).
+    isometry_cells_added(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,0),r(0,1),r(0,2)]), Added).
     % Added = [r(0,2)]
 
-xform_cells_removed(+Obj1, +Obj2, -Removed): cells in Obj1 not present in Obj2.
+isometry_cells_removed(+Obj1, +Obj2, -Removed): cells in Obj1 not present in Obj2.
 
-    xform_cells_removed(obj(1,[r(0,0),r(0,1),r(0,2)]), obj(1,[r(0,0),r(0,1)]), Rem).
+    isometry_cells_removed(obj(1,[r(0,0),r(0,1),r(0,2)]), obj(1,[r(0,0),r(0,1)]), Rem).
     % Rem = [r(0,2)]
 
-xform_cells_kept(+Obj1, +Obj2, -Kept): cells present in both Obj1 and Obj2.
+isometry_cells_kept(+Obj1, +Obj2, -Kept): cells present in both Obj1 and Obj2.
 
-    xform_cells_kept(obj(1,[r(0,0),r(0,1),r(0,2)]),
+    isometry_cells_kept(obj(1,[r(0,0),r(0,1),r(0,2)]),
                   obj(2,[r(0,1),r(0,2),r(0,3)]), Kept).
     % Kept = [r(0,1), r(0,2)]
 
-xform_overlap_count(+Obj1, +Obj2, -N): number of cells shared by both obj terms.
+isometry_overlap_count(+Obj1, +Obj2, -N): number of cells shared by both obj terms.
 
-    xform_overlap_count(obj(1,[r(0,0),r(0,1),r(0,2)]),
+    isometry_overlap_count(obj(1,[r(0,0),r(0,1),r(0,2)]),
                      obj(2,[r(0,1),r(0,2),r(0,3)]), N).
     % N = 2
 
 
 Transformation Inference
 
-xform_any_d4(+Obj1, +Obj2, -Op): find the first D4 operation Op such that applying Op
+isometry_any_d4(+Obj1, +Obj2, -Op): find the first D4 operation Op such that applying Op
 to the normalized form of Obj1 gives the normalized form of Obj2. Tries ops in order:
 id, r90, r180, r270, fh, fv, fd1, fd2. Cuts after the first match.
 
-    xform_any_d4(obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(0,1)]), Op).
+    isometry_any_d4(obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(0,1)]), Op).
     % Op = id
 
-    xform_any_d4(obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(1,0)]), Op).
+    isometry_any_d4(obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(1,0)]), Op).
     % Op = r90  (horizontal pair and vertical pair are r90-related)
 
-xform_scale_factor(+Obj1, +Obj2, -N): find integer N >= 1 such that Obj2 has N times
+isometry_scale_factor(+Obj1, +Obj2, -N): find integer N >= 1 such that Obj2 has N times
 as many cells as Obj1. Fails if the ratio is not a positive integer.
 
-    xform_scale_factor(obj(1,[r(0,0),r(0,1)]),
+    isometry_scale_factor(obj(1,[r(0,0),r(0,1)]),
                     obj(1,[r(0,0),r(0,1),r(0,2),r(0,3)]), N).
     % N = 2  (4 cells = 2 * 2 cells)
 
-    % xform_scale_factor(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,0),r(0,1),r(0,2)]), _).
+    % isometry_scale_factor(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,0),r(0,1),r(0,2)]), _).
     % fails (3 cells is not a multiple of 2)
 
-xform_merge(+Obj1, +Obj2, -Out): merge two same-color obj terms into one with the union
+isometry_merge(+Obj1, +Obj2, -Out): merge two same-color obj terms into one with the union
 cell set. Colors must be identical. Duplicates are removed by sort/2.
 
-    xform_merge(obj(3,[r(0,0),r(0,1)]), obj(3,[r(1,0),r(1,1)]), Out).
+    isometry_merge(obj(3,[r(0,0),r(0,1)]), obj(3,[r(1,0),r(1,1)]), Out).
     % Out = obj(3, [r(0,0), r(0,1), r(1,0), r(1,1)])
 
-    xform_merge(obj(2,[r(0,0),r(0,1)]), obj(2,[r(0,1),r(0,2)]), Out).
+    isometry_merge(obj(2,[r(0,0),r(0,1)]), obj(2,[r(0,1),r(0,2)]), Out).
     % Out = obj(2, [r(0,0), r(0,1), r(0,2)])  (r(0,1) deduplicated)
 
 
@@ -17555,26 +17555,26 @@ obj(Color, Cells) terms. All transforms are computed relative to the object's ow
 bounding box, so no prior normalization is required.
 
 1. Bounding Box
-objsym_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC): bounding box of the object's cell set.
-objsym_normalize(+Obj, -NormObj): translate so bbox top-left is at r(0,0).
-objsym_translate(+Obj, +DR, +DC, -Moved): shift all cells by (DR, DC).
+object_symmetry_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC): bounding box of the object's cell set.
+object_symmetry_normalize(+Obj, -NormObj): translate so bbox top-left is at r(0,0).
+object_symmetry_translate(+Obj, +DR, +DC, -Moved): shift all cells by (DR, DC).
 
 2. Reflection and Rotation
-objsym_reflect_h(+Obj, -Reflected): mirror left-right about vertical center (new C = MinC+MaxC-C).
-objsym_reflect_v(+Obj, -Reflected): mirror top-bottom about horizontal center (new R = MinR+MaxR-R).
-objsym_rotate180(+Obj, -Rotated): rotate 180 degrees (apply both flips).
-objsym_rotate90(+Obj, -Rotated): rotate 90 degrees CW, normalized to origin (new NR=C-MinC, NC=MaxR-R).
+object_symmetry_reflect_h(+Obj, -Reflected): mirror left-right about vertical center (new C = MinC+MaxC-C).
+object_symmetry_reflect_v(+Obj, -Reflected): mirror top-bottom about horizontal center (new R = MinR+MaxR-R).
+object_symmetry_rotate180(+Obj, -Rotated): rotate 180 degrees (apply both flips).
+object_symmetry_rotate90(+Obj, -Rotated): rotate 90 degrees CW, normalized to origin (new NR=C-MinC, NC=MaxR-R).
 
 3. Symmetry Tests
-objsym_is_hsymm(+Obj): sorted cells == sorted cells of reflect_h.
-objsym_is_vsymm(+Obj): sorted cells == sorted cells of reflect_v.
-objsym_is_rot180(+Obj): sorted cells == sorted cells of rotate180.
-objsym_is_rot90(+Obj): sorted normalized cells == sorted normalized cells after rotate90.
-objsym_has_symmetry(+Obj): any symmetry test passes (cut on first).
-objsym_symmetries(+Obj, -List): list of symmetry atoms [h, v, rot180, rot90] that hold.
+object_symmetry_is_hsymm(+Obj): sorted cells == sorted cells of reflect_h.
+object_symmetry_is_vsymm(+Obj): sorted cells == sorted cells of reflect_v.
+object_symmetry_is_rot180(+Obj): sorted cells == sorted cells of rotate180.
+object_symmetry_is_rot90(+Obj): sorted normalized cells == sorted normalized cells after rotate90.
+object_symmetry_has_symmetry(+Obj): any symmetry test passes (cut on first).
+object_symmetry_symmetries(+Obj, -List): list of symmetry atoms [h, v, rot180, rot90] that hold.
 
 4. D4 Equivalence
-objsym_equivalent(+Obj1, +Obj2): same shape under any of 8 D4 orientations (color ignored).
+object_symmetry_equivalent(+Obj1, +Obj2): same shape under any of 8 D4 orientations (color ignored).
 
 Chapter 143: Object Shape Classification (objbound pack, ob_* prefix, Layer 171)
 
@@ -17582,28 +17582,28 @@ The objbound pack classifies the shape of individual obj(Color, Cells) terms
 without requiring a grid argument.
 
 1. Bounding Box Dimensions
-objbound_bbox_h(+Obj, -H): bounding box height (MaxR - MinR + 1).
-objbound_bbox_w(+Obj, -W): bounding box width (MaxC - MinC + 1).
-objbound_bbox_area(+Obj, -Area): H * W.
+object_boundary_bbox_h(+Obj, -H): bounding box height (MaxR - MinR + 1).
+object_boundary_bbox_w(+Obj, -W): bounding box width (MaxC - MinC + 1).
+object_boundary_bbox_area(+Obj, -Area): H * W.
 
 2. Shape Type Tests
-objbound_is_rect(+Obj): cell count = bbox area (no holes).
-objbound_is_hline(+Obj): H = 1.
-objbound_is_vline(+Obj): W = 1.
-objbound_is_single(+Obj): H = 1 and W = 1.
-objbound_is_square_bbox(+Obj): H = W.
+object_boundary_is_rect(+Obj): cell count = bbox area (no holes).
+object_boundary_is_hline(+Obj): H = 1.
+object_boundary_is_vline(+Obj): W = 1.
+object_boundary_is_single(+Obj): H = 1 and W = 1.
+object_boundary_is_square_bbox(+Obj): H = W.
 
 3. Holes and Hollow Objects
-objbound_holes(+Obj, -HoleCells): bbox cells not in the object.
-objbound_n_holes(+Obj, -N): hole count.
-objbound_is_hollow(+Obj): N > 0.
+object_boundary_holes(+Obj, -HoleCells): bbox cells not in the object.
+object_boundary_n_holes(+Obj, -N): hole count.
+object_boundary_is_hollow(+Obj): N > 0.
 
 4. Frame Detection
-objbound_is_frame(+Obj): H>=3, W>=3, all border cells present, no interior cells.
+object_boundary_is_frame(+Obj): H>=3, W>=3, all border cells present, no interior cells.
 
 5. Perimeter and Hull
-objbound_perimeter(+Obj, -P): total exposed cell edges.
-objbound_dense_hull(+Obj, -HullObj): solid bbox rectangle with same color.
+object_boundary_perimeter(+Obj, -P): total exposed cell edges.
+object_boundary_dense_hull(+Obj, -HullObj): solid bbox rectangle with same color.
 
 Chapter 144: Object Pair Relations (objrel Pack, or_*, Layer 172)
 
@@ -17612,30 +17612,30 @@ obj(Color, Cells) terms. Colors are ignored; all reasoning uses
 cell positions only.
 
 1. Overlap
-objrel_overlap/2: share at least one cell.
-objrel_shared_cells/3: cells in both objects.
-objrel_n_shared/3: count of shared cells.
+object_pair_relation_overlap/2: share at least one cell.
+object_pair_relation_shared_cells/3: cells in both objects.
+object_pair_relation_n_shared/3: count of shared cells.
 
 2. Adjacency
-objrel_touch4/2: 4-adjacent (Manhattan 1), no overlap.
-objrel_touch8/2: 8-adjacent (Chebyshev 1, includes diagonal), no overlap.
+object_pair_relation_touch4/2: 4-adjacent (Manhattan 1), no overlap.
+object_pair_relation_touch8/2: 8-adjacent (Chebyshev 1, includes diagonal), no overlap.
 
 3. Containment and Union
-objrel_contains/2: every cell of Obj2 is in Obj1.
-objrel_union_cells/3: sorted union of both cell sets.
+object_pair_relation_contains/2: every cell of Obj2 is in Obj1.
+object_pair_relation_union_cells/3: sorted union of both cell sets.
 
 4. Distance
-objrel_dist/3: Euclidean distance between centroids (float).
-objrel_manhattan/3: Manhattan distance between centroids.
+object_pair_relation_dist/3: Euclidean distance between centroids (float).
+object_pair_relation_manhattan/3: Manhattan distance between centroids.
 
 5. Direction and Alignment
-objrel_direction/3: compass direction (n/s/e/w/ne/nw/se/sw/same).
-objrel_aligned_h/2: same centroid row.
-objrel_aligned_v/2: same centroid column.
+object_pair_relation_direction/3: compass direction (n/s/e/w/ne/nw/se/sw/same).
+object_pair_relation_aligned_h/2: same centroid row.
+object_pair_relation_aligned_v/2: same centroid column.
 
 6. Bounding Box Gaps
-objrel_gap_rows/3: empty rows between bounding boxes (0 if touching/overlap).
-objrel_gap_cols/3: empty columns between bounding boxes.
+object_pair_relation_gap_rows/3: empty rows between bounding boxes (0 if touching/overlap).
+object_pair_relation_gap_cols/3: empty columns between bounding boxes.
 
 Chapter 145: Object List Filtering (objfilter Pack, of_*, Layer 173)
 
@@ -17643,28 +17643,28 @@ The objfilter pack selects objects from a list of obj(Color, Cells) terms
 by color, size, or shape. No cross-pack dependencies.
 
 1. Color Filters
-objfilter_by_color/3: objects of a given color.
-objfilter_not_color/3: objects excluding a given color.
+object_filter_by_color/3: objects of a given color.
+object_filter_not_color/3: objects excluding a given color.
 
 2. Size Filters
-objfilter_exact_size/3: objects with exactly N cells.
-objfilter_min_size/3: objects with >= N cells.
-objfilter_max_size/3: objects with <= N cells.
+object_filter_exact_size/3: objects with exactly N cells.
+object_filter_min_size/3: objects with >= N cells.
+object_filter_max_size/3: objects with <= N cells.
 
 3. Shape Filters
-objfilter_is_rect/2: objects filling their bounding box (no holes).
-objfilter_is_hline/2: objects spanning a single row (bbox height = 1).
-objfilter_is_vline/2: objects spanning a single column (bbox width = 1).
-objfilter_is_single/2: single-cell objects.
-objfilter_is_hollow/2: objects with at least one hole in bbox (L-shapes, frames).
+object_filter_is_rect/2: objects filling their bounding box (no holes).
+object_filter_is_hline/2: objects spanning a single row (bbox height = 1).
+object_filter_is_vline/2: objects spanning a single column (bbox width = 1).
+object_filter_is_single/2: single-cell objects.
+object_filter_is_hollow/2: objects with at least one hole in bbox (L-shapes, frames).
 
 4. Aggregate Selection
-objfilter_largest/2: object with the most cells (first on ties).
-objfilter_smallest/2: object with the fewest cells (first on ties).
+object_filter_largest/2: object with the most cells (first on ties).
+object_filter_smallest/2: object with the fewest cells (first on ties).
 
 5. Generic Meta-Predicates
-objfilter_filter/3: include(Goal, Objs, Filtered) — custom test per object.
-objfilter_partition/4: partition(Goal, Objs, In, Out) — split by goal.
+object_filter_filter/3: include(Goal, Objs, Filtered) — custom test per object.
+object_filter_partition/4: partition(Goal, Objs, In, Out) — split by goal.
 
 Chapter 145: Grid Canvas and Object Rendering (canvas Pack, cv_*, Layer 174)
 
@@ -17698,84 +17698,84 @@ canvas_blit/5: paste a subgrid at a given position.
 Chapter 146: Object Sequence and Progression Analysis (objseq Pack, oq_*, Layer 175)
 
 1. Color and Size Sequences
-objseq_color_seq/2: extract color list in list order.
-objseq_size_seq/2: extract cell-count list in list order.
+object_sequence_color_seq/2: extract color list in list order.
+object_sequence_size_seq/2: extract cell-count list in list order.
 
 2. Centroid and Step Sequences
-objseq_centroid_seq/2: centroid sequence as r(R,C) terms.
-objseq_step_seq/2: consecutive centroid deltas as dr(DR,DC) terms.
+object_sequence_centroid_seq/2: centroid sequence as r(R,C) terms.
+object_sequence_step_seq/2: consecutive centroid deltas as dr(DR,DC) terms.
 
 3. Monotone Tests
-objseq_is_growing/1: sizes strictly increasing.
-objseq_is_shrinking/1: sizes strictly decreasing.
+object_sequence_is_growing/1: sizes strictly increasing.
+object_sequence_is_shrinking/1: sizes strictly decreasing.
 
 4. Constant Step Analysis
-objseq_const_step/3: all centroid steps equal (DR, DC).
-objseq_const_row_step/2: all row steps equal DR.
-objseq_const_col_step/2: all col steps equal DC.
+object_sequence_const_step/3: all centroid steps equal (DR, DC).
+object_sequence_const_row_step/2: all row steps equal DR.
+object_sequence_const_col_step/2: all col steps equal DC.
 
 5. Periodic Sequences
-objseq_color_period/3: minimal color-sequence period P and unit cycle.
-objseq_size_period/3: minimal size-sequence period P and unit cycle.
+object_sequence_color_period/3: minimal color-sequence period P and unit cycle.
+object_sequence_size_period/3: minimal size-sequence period P and unit cycle.
 
 6. Collinearity and Prediction
-objseq_collinear/1: all centroids on a straight line.
-objseq_next_centroid/2: predict next position from constant step.
-objseq_zip_colors/3: zip two obj lists into C1-C2 color pairs.
+object_sequence_collinear/1: all centroids on a straight line.
+object_sequence_next_centroid/2: predict next position from constant step.
+object_sequence_zip_colors/3: zip two obj lists into C1-C2 color pairs.
 
 
 Chapter 147: Object-Pair Change Analysis and Rule Application (objdelta Pack, dp_*, Layer 176)
 
 1. Single-Pair Deltas
-objdelta_color_delta/3: extract C1-C2 color change from one O1-O2 pair.
-objdelta_pos_delta/3: extract dr(DR,DC) centroid displacement from one pair.
-objdelta_size_delta/3: extract size change N2-N1 from one pair.
+object_delta_color_delta/3: extract C1-C2 color change from one O1-O2 pair.
+object_delta_pos_delta/3: extract dr(DR,DC) centroid displacement from one pair.
+object_delta_size_delta/3: extract size change N2-N1 from one pair.
 
 2. Pair Tests
-objdelta_same_color/2: O1 and O2 share the same color.
-objdelta_same_form/2: O1 and O2 share the same normalised shape.
-objdelta_same_pos/2: O1 and O2 share the same centroid.
+object_delta_same_color/2: O1 and O2 share the same color.
+object_delta_same_form/2: O1 and O2 share the same normalised shape.
+object_delta_same_pos/2: O1 and O2 share the same centroid.
 
 3. Color Map Operations
-objdelta_color_map/2: extract sorted distinct C1-C2 map from a list of pairs.
-objdelta_apply_color/3: apply single C1-C2 rule; fail if color does not match.
-objdelta_apply_color_map/3: apply first matching Map entry to one object.
-objdelta_apply_map_all/3: apply Map to a list; unmatched objects unchanged.
+object_delta_color_map/2: extract sorted distinct C1-C2 map from a list of pairs.
+object_delta_apply_color/3: apply single C1-C2 rule; fail if color does not match.
+object_delta_apply_color_map/3: apply first matching Map entry to one object.
+object_delta_apply_map_all/3: apply Map to a list; unmatched objects unchanged.
 
 4. Constant Displacement
-objdelta_const_dr/2: all pairs share the same row delta DR.
-objdelta_const_dc/2: all pairs share the same col delta DC.
+object_delta_const_dr/2: all pairs share the same row delta DR.
+object_delta_const_dc/2: all pairs share the same col delta DC.
 
 5. Cell-Level Analysis
-objdelta_common_cells/3: positions in both O1 and O2.
-objdelta_cell_diff/4: Added (in O2 not O1) and Removed (in O1 not O2).
+object_delta_common_cells/3: positions in both O1 and O2.
+object_delta_cell_diff/4: Added (in O2 not O1) and Removed (in O1 not O2).
 
 
 Chapter 148: Object Tiling and Multi-Copy Layout (objcopy Pack, tc_*, Layer 177)
 
 1. Placement
-objcopy_place_at/4: place obj with bbox top-left at (R0, C0).
-objcopy_recolor_all/3: recolor all objs to a uniform color.
+object_copy_place_at/4: place obj with bbox top-left at (R0, C0).
+object_copy_recolor_all/3: recolor all objs to a uniform color.
 
 2. Tiling
-objcopy_tile_row/4: N copies along a row, Step cols apart.
-objcopy_tile_col/4: N copies along a column, Step rows apart.
-objcopy_tile_grid/6: NR x NC grid of copies.
-objcopy_at_positions/3: one copy per r(R,C) in a position list.
+object_copy_tile_row/4: N copies along a row, Step cols apart.
+object_copy_tile_col/4: N copies along a column, Step rows apart.
+object_copy_tile_grid/6: NR x NC grid of copies.
+object_copy_at_positions/3: one copy per r(R,C) in a position list.
 
 3. Alignment
-objcopy_align_top/2: all objs to minimum top row.
-objcopy_align_left/2: all objs to minimum left col.
+object_copy_align_top/2: all objs to minimum top row.
+object_copy_align_left/2: all objs to minimum left col.
 
 4. Packing
-objcopy_pack_row/5: pack in a row with Gap between bboxes.
-objcopy_pack_col/5: pack in a column with Gap between bboxes.
+object_copy_pack_row/5: pack in a row with Gap between bboxes.
+object_copy_pack_col/5: pack in a column with Gap between bboxes.
 
 5. Spreading and Centering
-objcopy_spread_h/4: redistribute at fixed column intervals.
-objcopy_spread_v/4: redistribute at fixed row intervals.
-objcopy_center/4: center in H x W canvas.
-objcopy_flip_h/3: reflect within canvas width W.
+object_copy_spread_h/4: redistribute at fixed column intervals.
+object_copy_spread_v/4: redistribute at fixed row intervals.
+object_copy_center/4: center in H x W canvas.
+object_copy_flip_h/3: reflect within canvas width W.
 
 
 Chapter 149: Object-List Correspondence and Matching (objmatch Pack, mx_*, Layer 178)
@@ -17784,30 +17784,30 @@ The objmatch pack finds correspondences between two obj(Color, Cells) term
 lists using four matching strategies and provides delta analysis on pairs.
 
 1. Matching Strategies
-objmatch_by_color/3: match by same color.
-objmatch_by_size/3: match by same cell count.
-objmatch_by_form/3: match by same normalized shape (color and position ignored).
-objmatch_by_nearest/3: greedy nearest-centroid matching.
+object_match_by_color/3: match by same color.
+object_match_by_size/3: match by same cell count.
+object_match_by_form/3: match by same normalized shape (color and position ignored).
+object_match_by_nearest/3: greedy nearest-centroid matching.
 
 2. Unmatched Objects
-objmatch_unmatched/5: extract objects from each list not appearing in any pair.
+object_match_unmatched/5: extract objects from each list not appearing in any pair.
 
 3. Pair Filtering
-objmatch_filter_changed_color/2: keep only pairs where color changed.
-objmatch_filter_same_color/2: keep only pairs where color is unchanged.
+object_match_filter_changed_color/2: keep only pairs where color changed.
+object_match_filter_same_color/2: keep only pairs where color is unchanged.
 
 4. Delta Extraction
-objmatch_color_deltas/2: c1-c2 color change per pair.
-objmatch_pos_deltas/2: dr(DR,DC) centroid displacement per pair.
-objmatch_size_deltas/2: N2-N1 size change per pair.
+object_match_color_deltas/2: c1-c2 color change per pair.
+object_match_pos_deltas/2: dr(DR,DC) centroid displacement per pair.
+object_match_size_deltas/2: N2-N1 size change per pair.
 
 5. Uniformity Tests
-objmatch_all_same_color_delta/1: all pairs share the same color change.
-objmatch_all_same_pos_delta/1: all pairs share the same positional delta.
-objmatch_all_same_size_delta/1: all pairs share the same size change.
+object_match_all_same_color_delta/1: all pairs share the same color change.
+object_match_all_same_pos_delta/1: all pairs share the same positional delta.
+object_match_all_same_size_delta/1: all pairs share the same size change.
 
 6. Positional Zip
-objmatch_zip/3: index-wise pairing of two equal-length lists.
+object_match_zip/3: index-wise pairing of two equal-length lists.
 
 Chapter 150: Object Merging, Set Operations, and Component Splitting (objmerge Pack, mg_*, Layer 179)
 
@@ -17815,28 +17815,28 @@ The objmerge pack provides cell-set operations and structural operations on
 obj(Color, Cells) terms.
 
 1. Cell-Set Operations
-objmerge_union_cells/4: sorted union of two obj cell sets.
-objmerge_intersect_cells/4: sorted intersection.
-objmerge_diff_cells/4: O1 minus O2 cell set.
-objmerge_sym_diff_cells/4: symmetric difference.
+object_merge_union_cells/4: sorted union of two obj cell sets.
+object_merge_intersect_cells/4: sorted intersection.
+object_merge_diff_cells/4: O1 minus O2 cell set.
+object_merge_sym_diff_cells/4: symmetric difference.
 
 2. Concatenation
-objmerge_concat_h/4: place O2 right of O1 bbox with Gap.
-objmerge_concat_v/4: place O2 below O1 bbox with Gap.
+object_merge_concat_h/4: place O2 right of O1 bbox with Gap.
+object_merge_concat_v/4: place O2 below O1 bbox with Gap.
 
 3. List Operations
-objmerge_merge_list/3: union of all cells in a list of objs.
-objmerge_subtract_list/4: remove cells of any obj in list from base.
+object_merge_merge_list/3: union of all cells in a list of objs.
+object_merge_subtract_list/4: remove cells of any obj in list from base.
 
 4. Bounding-Box Operations
-objmerge_expand_bbox/2: fill bounding box with obj's color.
-objmerge_hollow_bbox/2: 1-cell-wide outer frame of bounding box.
-objmerge_pad/4: add P layers of border cells with new color.
+object_merge_expand_bbox/2: fill bounding box with obj's color.
+object_merge_hollow_bbox/2: 1-cell-wide outer frame of bounding box.
+object_merge_pad/4: add P layers of border cells with new color.
 
 5. Connected Components
-objmerge_split_cc4/2: split into 4-connected component objs.
-objmerge_split_cc8/2: split into 8-connected component objs.
-objmerge_n_components4/2: count 4-connected components.
+object_merge_split_cc4/2: split into 4-connected component objs.
+object_merge_split_cc8/2: split into 8-connected component objs.
+object_merge_n_components4/2: count 4-connected components.
 
 
 Chapter 151: Object-List Aggregate Attribute Analysis (objattr, oa_*, Layer 180)
@@ -17845,26 +17845,26 @@ The objattr pack provides aggregate statistics and rankings over a list of obj(C
 terms. It gives a reasoner a bird's-eye view of a scene without manual accumulation.
 
 1. Cell and Color Counts
-objattr_total_cells/2: total cells across all objects.
-objattr_color_counts/2: Color-Count pairs (number of objects per color).
-objattr_cell_counts_by_color/2: Color-Total pairs (total cells per color).
-objattr_n_colors/2: number of distinct colors.
-objattr_n_objs_of_color/3: object count for a specific color.
+object_attribute_total_cells/2: total cells across all objects.
+object_attribute_color_counts/2: Color-Count pairs (number of objects per color).
+object_attribute_cell_counts_by_color/2: Color-Total pairs (total cells per color).
+object_attribute_n_colors/2: number of distinct colors.
+object_attribute_n_objs_of_color/3: object count for a specific color.
 
 2. Color Dominance
-objattr_dominant_color/2: color with the most total cells.
-objattr_rarest_color/2: color with the fewest total cells.
-objattr_unique_color/2: backtrackable; each color appearing in exactly one object.
+object_attribute_dominant_color/2: color with the most total cells.
+object_attribute_rarest_color/2: color with the fewest total cells.
+object_attribute_unique_color/2: backtrackable; each color appearing in exactly one object.
 
 3. Rankings
-objattr_size_rank/2: objects sorted by cell count descending.
-objattr_pos_rank/2: objects sorted by top-left corner, row-major order.
-objattr_majority_size/2: most frequently occurring cell count.
+object_attribute_size_rank/2: objects sorted by cell count descending.
+object_attribute_pos_rank/2: objects sorted by top-left corner, row-major order.
+object_attribute_majority_size/2: most frequently occurring cell count.
 
 4. Uniformity Tests
-objattr_all_same_color/1: all objects share the same color.
-objattr_all_same_size/1: all objects have the same cell count.
-objattr_all_same_form/1: all objects have the same normalized shape (position and color ignored).
+object_attribute_all_same_color/1: all objects share the same color.
+object_attribute_all_same_size/1: all objects have the same cell count.
+object_attribute_all_same_form/1: all objects have the same normalized shape (position and color ignored).
 
 
 Chapter 152: Object-List Grouping by Shared Attribute (objgroup, og_*, Layer 181)
@@ -17874,24 +17874,24 @@ sharing a common attribute value. It fills the gap between objfilter (which sele
 individual objects) and objattr (which aggregates over all objects).
 
 1. Grouping Operations
-objgroup_by_color/2: partition into Color-ObjList groups, sorted by Color.
-objgroup_by_size/2: partition into Size-ObjList groups, sorted by Size ascending.
-objgroup_by_form/2: partition by normalized shape (translate-to-origin, sort cells).
-objgroup_by_row/2: partition by top-left row, sorted ascending.
-objgroup_by_col/2: partition by top-left col, sorted ascending.
+object_group_by_color/2: partition into Color-ObjList groups, sorted by Color.
+object_group_by_size/2: partition into Size-ObjList groups, sorted by Size ascending.
+object_group_by_form/2: partition by normalized shape (translate-to-origin, sort cells).
+object_group_by_row/2: partition by top-left row, sorted ascending.
+object_group_by_col/2: partition by top-left col, sorted ascending.
 
 2. Group Inspection
-objgroup_n_groups/2: count of groups.
-objgroup_n_members/3: filter groups to those with exactly N members.
-objgroup_singletons/2: groups with exactly 1 member.
-objgroup_largest/2: the group with the most members.
-objgroup_smallest/2: the group with the fewest members.
+object_group_n_groups/2: count of groups.
+object_group_n_members/3: filter groups to those with exactly N members.
+object_group_singletons/2: groups with exactly 1 member.
+object_group_largest/2: the group with the most members.
+object_group_smallest/2: the group with the fewest members.
 
 3. Group Analysis
-objgroup_all_same_size/1: all groups have the same member count.
-objgroup_sort_desc/2: sort groups by member count descending.
-objgroup_flat/2: flatten groups back to a single obj list.
-objgroup_filter_size/4: keep groups with member count in Min..Max inclusive.
+object_group_all_same_size/1: all groups have the same member count.
+object_group_sort_desc/2: sort groups by member count descending.
+object_group_flat/2: flatten groups back to a single obj list.
+object_group_filter_size/4: keep groups with member count in Min..Max inclusive.
 
 
 Chapter 153: Scene-Level Comparison of Two Object Lists (scenecmp, sm_*, Layer 182)
@@ -17900,24 +17900,24 @@ The scenecmp pack compares two obj(Color, Cells) lists (Before and After) at the
 inventory level without requiring object-to-object matching.
 
 1. Introspection (Single Scene)
-scenecmp_n_objs/2: count of objects.
-scenecmp_total_cells/2: total cell count.
-scenecmp_colors/2: sorted distinct colors.
-scenecmp_forms/2: sorted distinct normalized shapes.
+scene_compare_n_objs/2: count of objects.
+scene_compare_total_cells/2: total cell count.
+scene_compare_colors/2: sorted distinct colors.
+scene_compare_forms/2: sorted distinct normalized shapes.
 
 2. Symmetric Comparison
-scenecmp_same_n_objs/2: same object count.
-scenecmp_same_total_cells/2: same total cell count.
-scenecmp_same_colors/2: same color set.
-scenecmp_same_forms/2: same form set.
+scene_compare_same_n_objs/2: same object count.
+scene_compare_same_total_cells/2: same total cell count.
+scene_compare_same_colors/2: same color set.
+scene_compare_same_forms/2: same form set.
 
 3. Asymmetric Comparison
-scenecmp_added_colors/3: colors in After not in Before.
-scenecmp_removed_colors/3: colors in Before not in After.
-scenecmp_added_forms/3: forms in After not in Before.
-scenecmp_removed_forms/3: forms in Before not in After.
-scenecmp_n_color_change/3: |added colors| + |removed colors|.
-scenecmp_any_change/2: any difference in count, color, or form; fails if none.
+scene_compare_added_colors/3: colors in After not in Before.
+scene_compare_removed_colors/3: colors in Before not in After.
+scene_compare_added_forms/3: forms in After not in Before.
+scene_compare_removed_forms/3: forms in Before not in After.
+scene_compare_n_color_change/3: |added colors| + |removed colors|.
+scene_compare_any_change/2: any difference in count, color, or form; fails if none.
 
 
 Chapter 154: Object-List Spatial and Attribute Query Against a Reference (objlocate, lq_*, Layer 183)
@@ -17926,26 +17926,26 @@ The objlocate pack queries a list of obj(Color, Cells) terms for those satisfyin
 spatial or attribute relationship to a given reference object.
 
 1. Directional Queries (by centroid)
-objlocate_above/3: centroid row strictly less than Ref.
-objlocate_below/3: centroid row strictly greater than Ref.
-objlocate_left_of/3: centroid col strictly less than Ref.
-objlocate_right_of/3: centroid col strictly greater than Ref.
+object_locate_above/3: centroid row strictly less than Ref.
+object_locate_below/3: centroid row strictly greater than Ref.
+object_locate_left_of/3: centroid col strictly less than Ref.
+object_locate_right_of/3: centroid col strictly greater than Ref.
 
 2. Adjacency Queries
-objlocate_touching4/3: 4-adjacent to Ref (Manhattan distance 1, no overlap).
-objlocate_touching8/3: 8-adjacent to Ref (Chebyshev distance 1, no overlap).
-objlocate_overlapping/3: sharing at least one cell with Ref.
+object_locate_touching4/3: 4-adjacent to Ref (Manhattan distance 1, no overlap).
+object_locate_touching8/3: 8-adjacent to Ref (Chebyshev distance 1, no overlap).
+object_locate_overlapping/3: sharing at least one cell with Ref.
 
 3. Attribute Queries
-objlocate_same_color/3: same color atom as Ref.
-objlocate_same_form/3: same normalized shape as Ref (translate-to-origin, sort).
-objlocate_aligned_h/3: same top-left row as Ref.
-objlocate_aligned_v/3: same top-left column as Ref.
+object_locate_same_color/3: same color atom as Ref.
+object_locate_same_form/3: same normalized shape as Ref (translate-to-origin, sort).
+object_locate_aligned_h/3: same top-left row as Ref.
+object_locate_aligned_v/3: same top-left column as Ref.
 
 4. Distance Queries
-objlocate_nearest/3: single object with smallest squared centroid distance to Ref.
-objlocate_farthest/3: single object with largest squared centroid distance to Ref.
-objlocate_n_touching4/3: count of 4-touching objects.
+object_locate_nearest/3: single object with smallest squared centroid distance to Ref.
+object_locate_farthest/3: single object with largest squared centroid distance to Ref.
+object_locate_n_touching4/3: count of 4-touching objects.
 
 
 Chapter 155: scenexf Pack - Scene-Level Uniform Transformation (sx_*, Layer 184)
@@ -17955,33 +17955,33 @@ The scenexf pack applies transformations uniformly to every object in a scene
 scenexf applies the same operation to the entire list. Layer 184, WP 205.
 
 Loading:
-:- use_module(pack(scenexf/prolog/scenexf)).
+:- use_module(pack(scenexf/prolog/scene_transform)).
 
 14 exported predicates:
 
 1. Color Transformations
-scenexf_recolor/4: replace objects of OldColor with NewColor (atom equality).
-scenexf_recolor_all/3: set all objects to NewColor.
-scenexf_apply_color_map/3: apply Old-New color pairs; unmatched objects unchanged.
+scene_transform_recolor/4: replace objects of OldColor with NewColor (atom equality).
+scene_transform_recolor_all/3: set all objects to NewColor.
+scene_transform_apply_color_map/3: apply Old-New color pairs; unmatched objects unchanged.
 
 2. Spatial Transformations
-scenexf_shift/4: translate all objects by (DR, DC); DR/DC may be negative.
-scenexf_to_origin/2: shift scene so bounding-box top-left is at r(0,0).
-scenexf_reflect_h/3: flip all objects horizontally; r(R,C) -> r(R, Width-1-C).
-scenexf_reflect_v/3: flip all objects vertically; r(R,C) -> r(Height-1-R, C).
+scene_transform_shift/4: translate all objects by (DR, DC); DR/DC may be negative.
+scene_transform_to_origin/2: shift scene so bounding-box top-left is at r(0,0).
+scene_transform_reflect_h/3: flip all objects horizontally; r(R,C) -> r(R, Width-1-C).
+scene_transform_reflect_v/3: flip all objects vertically; r(R,C) -> r(Height-1-R, C).
 
 3. Filtering
-scenexf_remove_color/3: discard all objects of Color.
-scenexf_keep_color/3: keep only objects of Color.
+scene_transform_remove_color/3: discard all objects of Color.
+scene_transform_keep_color/3: keep only objects of Color.
 
 4. Ordering
-scenexf_sort_size_desc/2: sort by cell count descending (negated-count key + msort).
-scenexf_sort_size_asc/2: sort by cell count ascending.
-scenexf_sort_pos/2: sort by top-left position row-major ascending.
+scene_transform_sort_size_desc/2: sort by cell count descending (negated-count key + msort).
+scene_transform_sort_size_asc/2: sort by cell count ascending.
+scene_transform_sort_pos/2: sort by top-left position row-major ascending.
 
 5. Selection and Deduplication
-scenexf_top_n/3: the N largest objects; if N > length, returns all sorted desc.
-scenexf_dedup_form/2: keep first object of each distinct normalized shape.
+scene_transform_top_n/3: the N largest objects; if N > length, returns all sorted desc.
+scene_transform_dedup_form/2: keep first object of each distinct normalized shape.
 
 All 41 tests pass. See docs/tutorial/Ch166_SceneXf.txt for the full chapter.
 
@@ -17992,31 +17992,31 @@ The ruleinfer pack infers which scene-level transformation was applied to a
 Before scene to produce an After scene. Layer 185, WP 206.
 
 Loading:
-:- use_module(pack(ruleinfer/prolog/ruleinfer)).
+:- use_module(pack(ruleinfer/prolog/rule_inference)).
 
 Pairs are Before-After terms. A list of pairs: [B1-A1, B2-A2, ...].
 
 14 exported predicates:
 
 1. Inference (from one Before-After pair)
-ruleinfer_infer_recolor/4: exactly one color changed (Old->New); count preserved.
-ruleinfer_infer_recolor_all/3: all After objects have same color New.
-ruleinfer_infer_color_map/3: full color substitution map from position-matched objects.
-ruleinfer_infer_keep_color/3: After keeps only Color objects from Before.
-ruleinfer_infer_remove_color/3: After is Before minus all Color objects.
-ruleinfer_infer_shift/4: uniform shift DR/DC; verified via msort on shifted Before.
-ruleinfer_infer_to_origin/2: After == Before shifted so scene bbox at r(0,0).
+rule_inference_infer_recolor/4: exactly one color changed (Old->New); count preserved.
+rule_inference_infer_recolor_all/3: all After objects have same color New.
+rule_inference_infer_color_map/3: full color substitution map from position-matched objects.
+rule_inference_infer_keep_color/3: After keeps only Color objects from Before.
+rule_inference_infer_remove_color/3: After is Before minus all Color objects.
+rule_inference_infer_shift/4: uniform shift DR/DC; verified via msort on shifted Before.
+rule_inference_infer_to_origin/2: After == Before shifted so scene bbox at r(0,0).
 
 2. Consistency (verify rule across multiple pairs)
-ruleinfer_consistent_recolor/3: recolor(Old,New) applies to all pairs.
-ruleinfer_consistent_color_map/2: color map applies to all pairs.
-ruleinfer_consistent_keep_color/2: keep_color(Color) applies to all pairs.
-ruleinfer_consistent_remove_color/2: remove_color(Color) applies to all pairs.
-ruleinfer_consistent_shift/3: shift(DR,DC) applies to all pairs.
+rule_inference_consistent_recolor/3: recolor(Old,New) applies to all pairs.
+rule_inference_consistent_color_map/2: color map applies to all pairs.
+rule_inference_consistent_keep_color/2: keep_color(Color) applies to all pairs.
+rule_inference_consistent_remove_color/2: remove_color(Color) applies to all pairs.
+rule_inference_consistent_shift/3: shift(DR,DC) applies to all pairs.
 
 3. Cross-pair queries
-ruleinfer_all_same_n_objs/1: all pairs preserve object count.
-ruleinfer_all_same_colors/1: all pairs preserve color sets.
+rule_inference_all_same_n_objs/1: all pairs preserve object count.
+rule_inference_all_same_colors/1: all pairs preserve color sets.
 
 All 41 tests pass. See docs/tutorial/Ch167_RuleInfer.txt for the full chapter.
 
@@ -18028,7 +18028,7 @@ Companion to ruleinfer (ri_*): ruleinfer infers the rule, sceneapply executes it
 Layer 186, WP 207.
 
 Loading:
-:- use_module(pack(sceneapply/prolog/sceneapply)).
+:- use_module(pack(sceneapply/prolog/scene_apply)).
 
 Rule terms: recolor(Old,New), recolor_all(New), color_map(Map), shift(DR,DC),
 to_origin, reflect_h(Width), reflect_v(Height), remove_color(Color),
@@ -18037,24 +18037,24 @@ keep_color(Color), sort_size_desc, sort_size_asc, sort_pos, top_n(N), dedup_form
 14 exported predicates:
 
 1. Application
-sceneapply_apply/3: dispatch on rule term; apply to scene.
-sceneapply_apply_seq/3: apply list of rules in order (recursive descent).
+scene_apply_apply/3: dispatch on rule term; apply to scene.
+scene_apply_apply_seq/3: apply list of rules in order (recursive descent).
 
 2. Verification
-sceneapply_verify/3: rule transforms Before to After (msort-insensitive).
-sceneapply_verify_seq/3: rule sequence transforms Before to After.
-sceneapply_verify_all/2: rule works on all Before-After pairs.
-sceneapply_verify_seq_all/2: rule sequence works on all pairs.
+scene_apply_verify/3: rule transforms Before to After (msort-insensitive).
+scene_apply_verify_seq/3: rule sequence transforms Before to After.
+scene_apply_verify_all/2: rule works on all Before-After pairs.
+scene_apply_verify_seq_all/2: rule sequence works on all pairs.
 
 3. Classification
-sceneapply_rule_type/2: color|spatial|filter|order|dedup.
-sceneapply_is_color_rule/1, sceneapply_is_spatial_rule/1, sceneapply_is_filter_rule/1: type tests.
+scene_apply_rule_type/2: color|spatial|filter|order|dedup.
+scene_apply_is_color_rule/1, scene_apply_is_spatial_rule/1, scene_apply_is_filter_rule/1: type tests.
 
 4. Utilities
-sceneapply_colors_affected/2: color atoms referenced in rule.
-sceneapply_compose/3: make two-step sequence [Rule1, Rule2].
-sceneapply_seq_len/2: length of rule sequence.
-sceneapply_rule_invertible/1: recolor, shift, reflect_h, reflect_v are invertible.
+scene_apply_colors_affected/2: color atoms referenced in rule.
+scene_apply_compose/3: make two-step sequence [Rule1, Rule2].
+scene_apply_seq_len/2: length of rule sequence.
+scene_apply_rule_invertible/1: recolor, shift, reflect_h, reflect_v are invertible.
 
 All 46 tests pass. See docs/tutorial/Ch168_SceneApply.txt for the full chapter.
 
@@ -18065,42 +18065,42 @@ The condxf pack applies transformations to a subset of objects in an
 obj(Color, Cells) scene list - those satisfying a condition - while leaving
 the remaining objects unchanged. Complements scenexf (uniform transforms).
 
-:- use_module(pack(condxf/prolog/condxf)).
+:- use_module(pack(condxf/prolog/conditional_transform)).
 
 % Partition by color
-condxf_split_color([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, Reds, Others).
+conditional_transform_split_color([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, Reds, Others).
 % Reds = [obj(r,[r(0,0)])], Others = [obj(b,[r(0,1)])]
 
 % Recolor only matching objects
-condxf_recolor_matching([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, g, Out).
+conditional_transform_recolor_matching([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, g, Out).
 % Out = [obj(g,[r(0,0)]),obj(b,[r(0,1)])]
 
 % Shift only red objects
-condxf_shift_color([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, 1, 0, Out).
+conditional_transform_shift_color([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, 1, 0, Out).
 % Out = [obj(r,[r(1,0)]),obj(b,[r(0,1)])]
 
 % Swap two colors throughout
-condxf_swap_colors([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, b, Out).
+conditional_transform_swap_colors([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, b, Out).
 % Out = [obj(b,[r(0,0)]),obj(r,[r(0,1)])]
 
 % Recolor by size comparison (gt/lt/eq/ge/le)
-condxf_recolor_by_size([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], 1, gt, y, Out).
+conditional_transform_recolor_by_size([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], 1, gt, y, Out).
 % Out = [obj(r,[r(0,0)]),obj(y,[r(0,0),r(0,1),r(0,2)])]
 
 % Largest and smallest
-condxf_largest([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], Obj).
+conditional_transform_largest([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], Obj).
 % Obj = obj(r,[r(0,0),r(0,1),r(0,2)])
 
 % Recolor the largest
-condxf_recolor_largest([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], g, Out).
+conditional_transform_recolor_largest([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], g, Out).
 % Out = [obj(r,[r(0,0)]),obj(g,[r(0,0),r(0,1),r(0,2)])]
 
 % Unique-size object
-condxf_unique_size([obj(r,[r(0,0)]),obj(b,[r(0,1)]),obj(p,[r(0,0),r(1,0),r(1,1)])], Obj).
+conditional_transform_unique_size([obj(r,[r(0,0)]),obj(b,[r(0,1)]),obj(p,[r(0,0),r(1,0),r(1,1)])], Obj).
 % Obj = obj(p,[r(0,0),r(1,0),r(1,1)])
 
 % Partition by size
-condxf_split_size([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], 1, gt, Match, NoMatch).
+conditional_transform_split_size([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], 1, gt, Match, NoMatch).
 % Match = [obj(r,[r(0,0),r(0,1),r(0,2)])], NoMatch = [obj(r,[r(0,0)])]
 
 14 xc_* predicates. 41 tests pass. Layer 187.
@@ -18112,31 +18112,31 @@ Chapter 159: scenepair Pack - Holistic Before-After Scene Pair Analysis (ps_*, L
 The scenepair pack analyzes a Before and After scene pair holistically, computing
 scene-level observables useful for transformation rule hypothesis ranking.
 
-:- use_module(pack(scenepair/prolog/scenepair)).
+:- use_module(pack(scenepair/prolog/scene_pair)).
 
 % Count change
-scenepair_same_n_objs([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(g,[r(0,0)]),obj(b,[r(0,1)])]).
+scene_pair_same_n_objs([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(g,[r(0,0)]),obj(b,[r(0,1)])]).
 
 % Added/removed objects (matched by color+form)
-scenepair_added_objs([obj(r,[r(0,0)])], [obj(r,[r(0,0)]),obj(b,[r(0,1)])], Added).
+scene_pair_added_objs([obj(r,[r(0,0)])], [obj(r,[r(0,0)]),obj(b,[r(0,1)])], Added).
 % Added = [obj(b,[r(0,1)])]
 
 % Color set observables
-scenepair_color_set_before([obj(r,[r(0,0)]),obj(b,[r(0,1)])], Colors).
+scene_pair_color_set_before([obj(r,[r(0,0)]),obj(b,[r(0,1)])], Colors).
 % Colors = [b, r]
-scenepair_same_color_set([obj(r,[r(0,0)])], [obj(r,[r(1,0)])]).
+scene_pair_same_color_set([obj(r,[r(0,0)])], [obj(r,[r(1,0)])]).
 
 % Color delta (position-matched)
-scenepair_color_delta([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(g,[r(0,0)]),obj(b,[r(0,1)])], Delta).
+scene_pair_color_delta([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(g,[r(0,0)]),obj(b,[r(0,1)])], Delta).
 % Delta = [r-g]
 
 % Transformation detectors
-scenepair_is_recolor([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(g,[r(0,0)]),obj(b,[r(0,1)])]).
-scenepair_is_recolor_all([obj(r,[r(0,0)])], [obj(g,[r(0,0)])]).
-scenepair_is_shift([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(r,[r(1,1)]),obj(b,[r(1,2)])], DR, DC).
+scene_pair_is_recolor([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(g,[r(0,0)]),obj(b,[r(0,1)])]).
+scene_pair_is_recolor_all([obj(r,[r(0,0)])], [obj(g,[r(0,0)])]).
+scene_pair_is_shift([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(r,[r(1,1)]),obj(b,[r(1,2)])], DR, DC).
 % DR = 1, DC = 1
-scenepair_is_to_origin([obj(r,[r(2,3)])], [obj(r,[r(0,0)])]).
-scenepair_size_preserved([obj(r,[r(0,0)])], [obj(g,[r(0,0)])]).
+scene_pair_is_to_origin([obj(r,[r(2,3)])], [obj(r,[r(0,0)])]).
+scene_pair_size_preserved([obj(r,[r(0,0)])], [obj(g,[r(0,0)])]).
 
 14 ps_* predicates. 41 tests pass. Layer 188.
 All 41 tests pass. See docs/tutorial/Ch170_ScenePair.txt for the full chapter.
@@ -18147,36 +18147,36 @@ Chapter 160: scenerank Pack - Rule Hypothesis Ranking for Scene Lists (rk_*, Lay
 The scenerank pack ranks candidate rule terms by coverage across Before-After
 training pairs. A pair is the term Before-After where both are obj(Color,Cells) lists.
 
-:- use_module(pack(scenerank/prolog/scenerank)).
+:- use_module(pack(scenerank/prolog/scene_rank)).
 
 Pairs = [[obj(r,[r(0,0)])]-[obj(g,[r(0,0)])], [obj(r,[r(1,0)])]-[obj(g,[r(1,0)])]].
 
 % Coverage: how many pairs does this rule correctly transform?
-scenerank_coverage(recolor(r,g), Pairs, N).    % N = 2
-scenerank_coverage(recolor(r,b), Pairs, N).    % N = 0
+scene_rank_coverage(recolor(r,g), Pairs, N).    % N = 2
+scene_rank_coverage(recolor(r,b), Pairs, N).    % N = 0
 
 % Consistency check
-scenerank_consistent(recolor(r,g), Pairs).     % succeeds
+scene_rank_consistent(recolor(r,g), Pairs).     % succeeds
 
 % Inconsistent pairs
-scenerank_inconsistent_pairs(recolor(r,b), Pairs, Bad).  % Bad = Pairs
+scene_rank_inconsistent_pairs(recolor(r,b), Pairs, Bad).  % Bad = Pairs
 
 % Rank candidates by coverage descending
-scenerank_rank_rules([recolor(r,g), shift(1,0)], Pairs, Ranked).
+scene_rank_rank_rules([recolor(r,g), shift(1,0)], Pairs, Ranked).
 % Ranked = [recolor(r,g), shift(1,0)]
 
 % Best rule
-scenerank_best_rule([recolor(r,b), recolor(r,g)], Pairs, Best).
+scene_rank_best_rule([recolor(r,b), recolor(r,g)], Pairs, Best).
 % Best = recolor(r,g)
 
 % Perfect rules (coverage == pair count)
-scenerank_perfect_rules([recolor(r,g), shift(1,0)], Pairs, [recolor(r,g)]).
+scene_rank_perfect_rules([recolor(r,g), shift(1,0)], Pairs, [recolor(r,g)]).
 
 % Coverage ratio
-scenerank_coverage_ratio(recolor(r,g), Pairs, Num/Den).  % 2/2
+scene_rank_coverage_ratio(recolor(r,g), Pairs, Num/Den).  % 2/2
 
 % Top 2 rules as Coverage-Rule pairs
-scenerank_top_n_rules([recolor(r,g), shift(1,0), recolor(r,b)], Pairs, 2, TopN).
+scene_rank_top_n_rules([recolor(r,g), shift(1,0), recolor(r,b)], Pairs, 2, TopN).
 % TopN = [2-recolor(r,g), 0-shift(1,0)]  (order depends on pair content)
 
 14 rk_* predicates. 41 tests pass. Layer 189.
@@ -18188,17 +18188,17 @@ Chapter 161: colortable Pack - Color Substitution Table Learning and Application
 The colortable pack learns and applies color substitution tables from obj(Color,
 Cells) scene pairs. A table is a list of From-To color pairs.
 
-:- use_module(pack(colortable/prolog/colortable)).
+:- use_module(pack(colortable/prolog/color_table)).
 
 % Infer a color map from one Before-After scene pair
-colortable_infer_from_pair([obj(r,[r(0,0)])], [obj(b,[r(0,0)])], Map).
+color_table_infer_from_pair([obj(r,[r(0,0)])], [obj(b,[r(0,0)])], Map).
 % Map contains r-b
 
 % Learn a consistent map from multiple pairs
-colortable_learn_map(Pairs, Map, Stats).
+color_table_learn_map(Pairs, Map, Stats).
 
 % Apply a learned map to a new scene
-colortable_apply_map(Map, [obj(r,[r(0,0)])], Out).
+color_table_apply_map(Map, [obj(r,[r(0,0)])], Out).
 % Out = [obj(b,[r(0,0)])]
 
 14 ct_* predicates. 44 tests pass. Layer 190.
@@ -18231,14 +18231,14 @@ Chapter 163: transformgen Pack - Scene Rule Candidate Generation (tg_*, Layer 19
 The transformgen pack systematically generates candidate transformation rule terms
 from a scene. These candidates are then ranked and tested by gridsolve or scenerank.
 
-:- use_module(pack(transformgen/prolog/transformgen)).
+:- use_module(pack(transformgen/prolog/transform_generate)).
 
 % Collect all distinct colors in a scene
-transformgen_scene_colors([obj(r,[r(0,0)]),obj(b,[r(1,0)])], Colors).
+transform_generate_scene_colors([obj(r,[r(0,0)]),obj(b,[r(1,0)])], Colors).
 % Colors = [b, r]
 
 % Generate recolor-all candidates
-transformgen_recolor_candidates([obj(r,[r(0,0)])], Cands).
+transform_generate_recolor_candidates([obj(r,[r(0,0)])], Cands).
 
 % Generate full candidate set (recolor, shift, etc.)
 tg_candidates(Scene, Pairs, Cands).
@@ -18252,18 +18252,18 @@ Chapter 164: multicolor Pack - Multi-Color Scene Analysis (mc_*, Layer 193)
 The multicolor pack provides frequency analysis, color partitioning, and
 color-indexed queries over obj(Color,Cells) scene lists.
 
-:- use_module(pack(multicolor/prolog/multicolor)).
+:- use_module(pack(multicolor/prolog/multi_color)).
 
 % Count objects per color
-multicolor_color_counts([obj(r,[r(0,0)]),obj(r,[r(1,0)]),obj(b,[r(0,1)])], Counts).
+multi_color_color_counts([obj(r,[r(0,0)]),obj(r,[r(1,0)]),obj(b,[r(0,1)])], Counts).
 % Counts = [b-1, r-2]
 
 % How many objects of a given color
-multicolor_count_of_color([obj(r,[r(0,0)])], r, N).
+multi_color_count_of_color([obj(r,[r(0,0)])], r, N).
 % N = 1
 
 % The color appearing most often
-multicolor_majority_color(Scene, Color).
+multi_color_majority_color(Scene, Color).
 
 14 mc_* predicates. 42 tests pass. Layer 193.
 All 42 tests pass. See docs/tutorial/Ch175_MultiColor.txt for the full chapter.
@@ -18274,16 +18274,16 @@ Chapter 165: sceneinv Pack - Scene Invariant Detection (si_*, Layer 194)
 The sceneinv pack detects invariant properties of a scene across all training
 Before-After pairs: properties that hold in every Before or every After.
 
-:- use_module(pack(sceneinv/prolog/sceneinv)).
+:- use_module(pack(sceneinv/prolog/scene_invariant)).
 
 % Count of Before objects invariant across all pairs
-sceneinv_n_before(Pairs, N).
+scene_invariant_n_before(Pairs, N).
 
 % Count of After objects invariant across all pairs
-sceneinv_n_after(Pairs, N).
+scene_invariant_n_after(Pairs, N).
 
 % Colors invariant in all Before scenes
-sceneinv_colors_before(Pairs, Colors).
+scene_invariant_colors_before(Pairs, Colors).
 
 14 si_* predicates. 46 tests pass. Layer 194.
 All 46 tests pass. See docs/tutorial/Ch176_SceneInv.txt for the full chapter.
@@ -18294,13 +18294,13 @@ Chapter 166: seqinfer Pack - Sequential Rule Inference (sq_*, Layer 195)
 The seqinfer pack searches for a sequence of transformation steps that maps each
 Before scene to its corresponding After scene, supporting multi-step explanations.
 
-:- use_module(pack(seqinfer/prolog/seqinfer)).
+:- use_module(pack(seqinfer/prolog/sequence_inference)).
 
 % Apply a sequence of rules to a scene
-seqinfer_apply(Scene, [recolor(r,b), shift(1,0)], OutScene).
+sequence_inference_apply(Scene, [recolor(r,b), shift(1,0)], OutScene).
 
 % Verify a rule sequence explains all training pairs
-seqinfer_verify(Pairs, Seq, Stats).
+sequence_inference_verify(Pairs, Seq, Stats).
 
 % Search for a short rule sequence explaining all pairs
 sq_infer(Pairs, Seq).
@@ -19569,15 +19569,15 @@ learning symbol-to-value mappings from training pairs. A symbol table is a list
 of sym(Feature, Value) terms that encode what each observable feature of an input
 object means in the output.
 
-Predicates: symtab_build_table/2, symtab_identify_symbols/2, symtab_contrastive_learn/2,
-symtab_apply_table/3, symtab_hole_count/2, symtab_lookup/3, symtab_entry_consistent/2,
-symtab_color_feature/2, symtab_size_feature/2, symtab_position_feature/3, symtab_is_symbol/2,
-symtab_candidate_symbols/2, symtab_score_table/3, symtab_best_table/3.
+Predicates: symbol_table_build_table/2, symbol_table_identify_symbols/2, symbol_table_contrastive_learn/2,
+symbol_table_apply_table/3, symbol_table_hole_count/2, symbol_table_lookup/3, symbol_table_entry_consistent/2,
+symbol_table_color_feature/2, symbol_table_size_feature/2, symbol_table_position_feature/3, symbol_table_is_symbol/2,
+symbol_table_candidate_symbols/2, symbol_table_score_table/3, symbol_table_best_table/3.
 
 Key design: symbol tables are sym(Feature,Value) lists. Features are color(C),
-size(N), holes(N), or pos(Q). symtab_contrastive_learn intersects candidate sym
+size(N), holes(N), or pos(Q). symbol_table_contrastive_learn intersects candidate sym
 entries across all training pairs, keeping only entries consistent with every pair.
-symtab_hole_count uses bbox-area minus cell-count approximation. symtab_best_table
+symbol_table_hole_count uses bbox-area minus cell-count approximation. symbol_table_best_table
 selects the highest-scoring candidate table.
 
 See docs/tutorial/Ch229_SymTab.txt for full details and examples.
@@ -19645,15 +19645,15 @@ The multipair pack (Work Package 272, Layer 251) provides fourteen predicates fo
 tracking object identity and correspondence across multiple training pairs. Objects
 are identified by color (bg=0). Training pairs are pair(InputGrid, OutputGrid) terms.
 
-Predicates: multipair_track_objects/2, multipair_invariant_objects/2, multipair_role_objects/3,
-multipair_cross_pair_match/2, multipair_all_input_objects/2, multipair_color_frequency/3,
-multipair_universal_colors/2, multipair_variable_colors/2, multipair_disappeared_objects/2,
-multipair_appeared_objects/2, multipair_stable_color_objects/2, multipair_modal_object_count/2,
-multipair_consistent_count/1, multipair_singleton_color/2.
+Predicates: multi_pair_track_objects/2, multi_pair_invariant_objects/2, multi_pair_role_objects/3,
+multi_pair_cross_pair_match/2, multi_pair_all_input_objects/2, multi_pair_color_frequency/3,
+multi_pair_universal_colors/2, multi_pair_variable_colors/2, multi_pair_disappeared_objects/2,
+multi_pair_appeared_objects/2, multi_pair_stable_color_objects/2, multi_pair_modal_object_count/2,
+multi_pair_consistent_count/1, multi_pair_singleton_color/2.
 
 Key design: tracked(Idx, Color, PairIdxList) identity terms; po(PairIdx, Color)
 input objects; match(I, J, CommonColors) correspondence terms.
-multipair_universal_colors and multipair_variable_colors are guaranteed disjoint.
+multi_pair_universal_colors and multi_pair_variable_colors are guaranteed disjoint.
 
 See docs/tutorial/Ch233_MultiPair.txt for full details and examples.
 
@@ -19664,28 +19664,28 @@ The taskcat pack (Work Package 273, Layer 252) provides fourteen predicates for
 classifying grid transformation tasks by type and selecting solving strategies.
 The four task categories are: single_rule, multi_step, context_gated, symbol_table.
 
-Predicates: taskcat_categorize/2, taskcat_is_single_rule/1, taskcat_is_multi_step/1,
-taskcat_has_context_gate/1, taskcat_has_symbol_table/1, taskcat_suggest_strategies/2,
-taskcat_preserves_dims/1, taskcat_preserves_colors/1, taskcat_consistent_change_count/1,
-taskcat_max_change_count/2, taskcat_distinct_change_patterns/2, taskcat_is_fill_task/1,
-taskcat_is_deletion_task/1, taskcat_confidence/2.
+Predicates: task_category_categorize/2, task_category_is_single_rule/1, task_category_is_multi_step/1,
+task_category_has_context_gate/1, task_category_has_symbol_table/1, task_category_suggest_strategies/2,
+task_category_preserves_dims/1, task_category_preserves_colors/1, task_category_consistent_change_count/1,
+task_category_max_change_count/2, task_category_distinct_change_patterns/2, task_category_is_fill_task/1,
+task_category_is_deletion_task/1, task_category_confidence/2.
 
-Key design: Chain of Responsibility ordering in taskcat_categorize (simplest wins).
-taskcat_suggest_strategies returns ordered fallback strategy lists per category.
-taskcat_confidence provides a 0.0-1.0 score using dims, count, and pattern uniformity.
+Key design: Chain of Responsibility ordering in task_category_categorize (simplest wins).
+task_category_suggest_strategies returns ordered fallback strategy lists per category.
+task_category_confidence provides a 0.0-1.0 score using dims, count, and pattern uniformity.
 
 See docs/tutorial/Ch234_TaskCat.txt for full details and examples.
 
 
 Chapter 235: seqinfer Enhancement - ARC-AGI-2 Candidates (WP-274)
 
-seqinfer_arc2_candidates/1 returns a 66-entry list of integer-color scene-level rule
-candidates for use with seqinfer_infer_2step and seqinfer_infer_3step on harder tasks.
+sequence_inference_arc2_candidates/1 returns a 66-entry list of integer-color scene-level rule
+candidates for use with sequence_inference_infer_2step and sequence_inference_infer_3step on harder tasks.
 
-    seqinfer_arc2_candidates(Rules),
-    seqinfer_infer_2step(Rules, TrainingPairs, BestSeq).
+    sequence_inference_arc2_candidates(Rules),
+    sequence_inference_infer_2step(Rules, TrainingPairs, BestSeq).
 
-Uses integer colors 0-9 (standard ARC encoding). Extends seqinfer_default_rules with
+Uses integer colors 0-9 (standard ARC encoding). Extends sequence_inference_default_rules with
 more recolor pairs (colors 1-6), larger shift deltas, and top_n operators.
 
 
@@ -19693,22 +19693,22 @@ Chapter 236: hyp Enhancement - Spatial, Structural, Sequence Hypotheses (WP-275)
 
 Three new hypothesis types extend the hyp pack beyond color substitutions:
 
-hyp_spatial_hyp(+Pairs, +Moves, -Hyp): find the first DR-DC shift that explains all pairs.
-    hyp_spatial_hyp(Pairs, [0-1, 1-0, 0-(-1), (-1)-0], shift(DR, DC)).
+rule_hypothesis_spatial_hyp(+Pairs, +Moves, -Hyp): find the first DR-DC shift that explains all pairs.
+    rule_hypothesis_spatial_hyp(Pairs, [0-1, 1-0, 0-(-1), (-1)-0], shift(DR, DC)).
 
-hyp_structural_hyp(+Pairs, +Patterns, -Hyp): find the first structural pattern consistent
+rule_hypothesis_structural_hyp(+Pairs, +Patterns, -Hyp): find the first structural pattern consistent
 with all pairs.
-    hyp_structural_hyp(Pairs, [dims_preserved, colors_preserved], structural(Pat)).
+    rule_hypothesis_structural_hyp(Pairs, [dims_preserved, colors_preserved], structural(Pat)).
 
-hyp_sequence_hyp(+Pairs, +Maps1, +Maps2, -Hyp): find a two-step color-map hypothesis.
-    hyp_sequence_hyp(Pairs, [[1-2]], [[2-3]], seq([1-2], [2-3])).
+rule_hypothesis_sequence_hyp(+Pairs, +Maps1, +Maps2, -Hyp): find a two-step color-map hypothesis.
+    rule_hypothesis_sequence_hyp(Pairs, [[1-2]], [[2-3]], seq([1-2], [2-3])).
 
 
 Chapter 237: condxf Enhancement - Context Gate Inference (WP-276)
 
-condxf_infer_gate/3 infers which scene-object color acts as a context gate:
+conditional_transform_infer_gate/3 infers which scene-object color acts as a context gate:
 
-    condxf_infer_gate(Pairs, [], gate_color(GateColor)).
+    conditional_transform_infer_gate(Pairs, [], gate_color(GateColor)).
 
 For each sorted candidate color, the predicate partitions pairs into those that
 contain the color in their input scene vs those that do not, then checks whether
@@ -19746,35 +19746,35 @@ differs from the tile at that phase.
 
 Core predicates:
 
-    periodfix_list_period(+List, -P)           % smallest exact period with no violations
-    periodfix_majority(+List, -Mode)           % most common element (mode)
-    periodfix_tile_from_list(+List, +P, -Tile) % majority-vote tile of length P
-    periodfix_violations_list(+L, +P, +Tile, -Violations) % viol(Idx,Actual,Expected) list
-    periodfix_repair_list(+L, +P, +Tile, -Repaired)        % replace all violations
-    periodfix_best_period_list(+L, -P, -NViol) % period 1..N//2 minimizing violations
-    periodfix_tile_2d(+Grid, +PH, +PW, -Tile)  % PH-by-PW majority-vote tile for a grid
-    periodfix_violations_2d(+Grid, +Tile, +PH, +PW, -Violations) % 2D violations
-    periodfix_repair_grid(+Grid, +Tile, +PH, +PW, -Repaired)     % replace 2D violations
-    periodfix_best_periods(+Grid, -PH, -PW)    % (PH,PW) minimizing total 2D violations
+    period_fix_list_period(+List, -P)           % smallest exact period with no violations
+    period_fix_majority(+List, -Mode)           % most common element (mode)
+    period_fix_tile_from_list(+List, +P, -Tile) % majority-vote tile of length P
+    period_fix_violations_list(+L, +P, +Tile, -Violations) % viol(Idx,Actual,Expected) list
+    period_fix_repair_list(+L, +P, +Tile, -Repaired)        % replace all violations
+    period_fix_best_period_list(+L, -P, -NViol) % period 1..N//2 minimizing violations
+    period_fix_tile_2d(+Grid, +PH, +PW, -Tile)  % PH-by-PW majority-vote tile for a grid
+    period_fix_violations_2d(+Grid, +Tile, +PH, +PW, -Violations) % 2D violations
+    period_fix_repair_grid(+Grid, +Tile, +PH, +PW, -Repaired)     % replace 2D violations
+    period_fix_best_periods(+Grid, -PH, -PW)    % (PH,PW) minimizing total 2D violations
 
 Single-violation repair (for exactly one corrupted cell):
 
-    periodfix_single_violation_list(+L, +P, +Tile, -Violation) % true iff exactly 1 mismatch
-    periodfix_repair_single_list(+L, +P, +Tile, -Repaired)     % repair the unique mismatch
-    periodfix_single_violation_2d(+Grid, +Tile, +PH, +PW, -V)  % true iff exactly 1 2D mismatch
-    periodfix_repair_single_grid(+Grid, +Tile, +PH, +PW, -Rep) % repair the unique 2D mismatch
+    period_fix_single_violation_list(+L, +P, +Tile, -Violation) % true iff exactly 1 mismatch
+    period_fix_repair_single_list(+L, +P, +Tile, -Repaired)     % repair the unique mismatch
+    period_fix_single_violation_2d(+Grid, +Tile, +PH, +PW, -V)  % true iff exactly 1 2D mismatch
+    period_fix_repair_single_grid(+Grid, +Tile, +PH, +PW, -Rep) % repair the unique 2D mismatch
 
 Example:
 
-    :- use_module(library(periodfix)).
+    :- use_module(library(period_fix)).
 
-    ?- periodfix_best_period_list([1,2,1,2,1,3], P, NViol).
+    ?- period_fix_best_period_list([1,2,1,2,1,3], P, NViol).
     P = 2, NViol = 1.
 
-    ?- periodfix_tile_from_list([1,2,1,2,1,3], 2, Tile).
+    ?- period_fix_tile_from_list([1,2,1,2,1,3], 2, Tile).
     Tile = [1,2].
 
-    ?- periodfix_repair_list([1,2,1,2,1,3], 2, [1,2], Repaired).
+    ?- period_fix_repair_list([1,2,1,2,1,3], 2, [1,2], Repaired).
     Repaired = [1,2,1,2,1,2].
 
 See docs/tutorial/Ch239_Periodfix.txt for full details and examples.
@@ -19808,76 +19808,76 @@ Configuration terms for each type:
 
 REGISTERING CHANNELS
 
-    :- use_module(library(iochan)).
+    :- use_module(library(io_channel)).
 
     % Register a custom email channel.
-    ?- iochan_register_channel(text_out, email_config('user@example.com', 'Alert'), ChanId).
+    ?- io_channel_register_channel(text_out, email_config('user@example.com', 'Alert'), ChanId).
     ChanId = chan_6.
 
     % Check its status.
-    ?- iochan_channel_status(chan_6, Status).
+    ?- io_channel_channel_status(chan_6, Status).
     Status = ready.
 
     % List all text-output channels.
-    ?- iochan_list_channels(text_out, Channels).
+    ?- io_channel_list_channels(text_out, Channels).
     Channels = [chan(chan_1, console_config), chan(chan_6, email_config(...))].
 
 TEXT OUTPUT
 
     % Write to the console (pre-registered as chan_1).
-    ?- iochan_text_out(console_config, 'Hello from PrologAI!', Status).
+    ?- io_channel_text_out(console_config, 'Hello from PrologAI!', Status).
     Hello from PrologAI!
     Status = ok.
 
     % Write to an email channel.
-    ?- iochan_text_out(chan_6, 'Alert: reasoning complete.', Status).
+    ?- io_channel_text_out(chan_6, 'Alert: reasoning complete.', Status).
     Status = ok.    % (if sendmail is installed)
 
 TEXT INPUT
 
     % Read a line from the console.
-    ?- iochan_text_in(console_config, Text).
+    ?- io_channel_text_in(console_config, Text).
     |: Hello
     Text = "Hello".
 
 SPEAKER OUTPUT
 
     % Speak text aloud using espeak-ng (festival as fallback).
-    ?- iochan_speak('PrologAI is now speaking.', Status).
+    ?- io_channel_speak('PrologAI is now speaking.', Status).
     Status = ok.    % (if espeak-ng or festival is installed)
 
     % Speak to a named speaker channel.
-    ?- iochan_register_channel(audio_out, speaker_config('hw:0,0'), SpkId),
-       iochan_speak_to(SpkId, 'Channel test.', Status).
+    ?- io_channel_register_channel(audio_out, speaker_config('hw:0,0'), SpkId),
+       io_channel_speak_to(SpkId, 'Channel test.', Status).
 
 MICROPHONE INPUT
 
     % Record 5 seconds from the default mic and transcribe.
-    ?- iochan_listen(5, Transcript).
+    ?- io_channel_listen(5, Transcript).
     Transcript = "what I just said".    % (if arecord + whisper-cli installed)
 
 IMAGE OUTPUT
 
     % Display an image in the terminal (requires img2txt).
-    ?- iochan_image_out(console_config, '/path/to/image.png', Status).
+    ?- io_channel_image_out(console_config, '/path/to/image.png', Status).
 
     % Email an image attachment.
-    ?- iochan_image_out(email_config('user@example.com', 'Photo'), '/path/to/photo.jpg', S).
+    ?- io_channel_image_out(email_config('user@example.com', 'Photo'), '/path/to/photo.jpg', S).
 
 IMAGE INPUT
 
     % Capture from a webcam.
-    ?- iochan_register_channel(image_in, webcam_config('/dev/video0'), CamId),
-       iochan_image_in(CamId, ImagePath).
+    ?- io_channel_register_channel(image_in, webcam_config('/dev/video0'), CamId),
+       io_channel_image_in(CamId, ImagePath).
 
 PRINTER OUTPUT
 
     % Print text to the default CUPS printer.
-    ?- iochan_register_channel(printer, printer_config('', []), PrintId),
-       iochan_print_text(PrintId, 'PrologAI report.', Status).
+    ?- io_channel_register_channel(printer, printer_config('', []), PrintId),
+       io_channel_print_text(PrintId, 'PrologAI report.', Status).
 
     % Print an image.
-    ?- iochan_print_image(PrintId, '/path/to/diagram.png', Status).
+    ?- io_channel_print_image(PrintId, '/path/to/diagram.png', Status).
 
 All hardware-dependent predicates degrade gracefully: if the required external program
 (espeak-ng, festival, arecord, whisper-cli, sendmail, mutt, xdotool, img2txt,

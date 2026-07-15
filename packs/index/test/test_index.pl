@@ -37,13 +37,13 @@ test(sum_grid_3) :-
     G = [[0,1,2]].
 
 % index_diff_grid: cell(R,C) = R-C (may be negative).
-test(diff_grid_1) :-
+test(difference_grid_1) :-
     index_diff_grid(3, 3, G),
     G = [[0,-1,-2],[1,0,-1],[2,1,0]].
-test(diff_grid_2) :-
+test(difference_grid_2) :-
     index_diff_grid(2, 2, G),
     G = [[0,-1],[1,0]].
-test(diff_grid_3) :-
+test(difference_grid_3) :-
     index_diff_grid(2, 3, G),
     G = [[0,-1,-2],[1,0,-1]].
 

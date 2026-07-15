@@ -19,131 +19,131 @@ Layer: 179. No dependencies on other packs.
 All four set operations take two obj terms and a new Color, producing a new
 obj term with the result colored with Color.
 
-objmerge_union_cells(+O1, +O2, +Color, -Merged)
+object_merge_union_cells(+O1, +O2, +Color, -Merged)
 
 Sorted union of the two cell sets.
 
-    objmerge_union_cells(obj(r,[r(0,0)]), obj(b,[r(0,1)]), x, U).
+    object_merge_union_cells(obj(r,[r(0,0)]), obj(b,[r(0,1)]), x, U).
     % U = obj(x, [r(0,0), r(0,1)])
 
-objmerge_intersect_cells(+O1, +O2, +Color, -Result)
+object_merge_intersect_cells(+O1, +O2, +Color, -Result)
 
 Cells present in both O1 and O2.
 
-    objmerge_intersect_cells(obj(r,[r(0,0),r(0,1)]), obj(b,[r(0,1),r(0,2)]), x, I).
+    object_merge_intersect_cells(obj(r,[r(0,0),r(0,1)]), obj(b,[r(0,1),r(0,2)]), x, I).
     % I = obj(x, [r(0,1)])
 
-objmerge_diff_cells(+O1, +O2, +Color, -Result)
+object_merge_diff_cells(+O1, +O2, +Color, -Result)
 
 Cells in O1 but not in O2.
 
-    objmerge_diff_cells(obj(r,[r(0,0),r(0,1)]), obj(b,[r(0,1)]), x, D).
+    object_merge_diff_cells(obj(r,[r(0,0),r(0,1)]), obj(b,[r(0,1)]), x, D).
     % D = obj(x, [r(0,0)])
 
-objmerge_sym_diff_cells(+O1, +O2, +Color, -Result)
+object_merge_sym_diff_cells(+O1, +O2, +Color, -Result)
 
 Cells in exactly one of O1 and O2.
 
-    objmerge_sym_diff_cells(obj(r,[r(0,0),r(0,1)]), obj(b,[r(0,1),r(0,2)]), x, S).
+    object_merge_sym_diff_cells(obj(r,[r(0,0),r(0,1)]), obj(b,[r(0,1),r(0,2)]), x, S).
     % S = obj(x, [r(0,0), r(0,2)])
 
 161.3 Concatenation
 
-objmerge_concat_h(+O1, +O2, +Gap, -Merged)
+object_merge_concat_h(+O1, +O2, +Gap, -Merged)
 
 Place O2 immediately to the right of O1's bounding box, with Gap blank columns
 between them. The merged obj uses O1's color.
 
-    objmerge_concat_h(obj(r,[r(0,0),r(0,1)]), obj(b,[r(0,0)]), 0, Merged).
+    object_merge_concat_h(obj(r,[r(0,0),r(0,1)]), obj(b,[r(0,0)]), 0, Merged).
     % O2 placed at col 2: Merged = obj(r, [r(0,0),r(0,1),r(0,2)])
 
-objmerge_concat_v(+O1, +O2, +Gap, -Merged)
+object_merge_concat_v(+O1, +O2, +Gap, -Merged)
 
 Place O2 immediately below O1's bounding box, with Gap blank rows between.
 
 161.4 List Operations
 
-objmerge_merge_list(+Objs, +Color, -Merged)
+object_merge_merge_list(+Objs, +Color, -Merged)
 
 Union of all cells from all objects in the list, recolored to Color.
 
-    objmerge_merge_list([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])], x, M).
+    object_merge_merge_list([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])], x, M).
     % M = obj(x, [r(0,0), r(0,1), r(1,0)])
 
-objmerge_subtract_list(+Base, +RemoveList, +Color, -Result)
+object_merge_subtract_list(+Base, +RemoveList, +Color, -Result)
 
 Remove all cells of any obj in RemoveList from Base's cell set.
 
-    objmerge_subtract_list(obj(r,[r(0,0),r(0,1),r(0,2)]), [obj(x,[r(0,0)])], x, R).
+    object_merge_subtract_list(obj(r,[r(0,0),r(0,1),r(0,2)]), [obj(x,[r(0,0)])], x, R).
     % R = obj(x, [r(0,1), r(0,2)])
 
 161.5 Bounding-Box Operations
 
-objmerge_expand_bbox(+Obj, -Expanded)
+object_merge_expand_bbox(+Obj, -Expanded)
 
 Fill the bounding box of Obj with Obj's color. Every cell within MinR..MaxR
 and MinC..MaxC is included.
 
     Lshape = obj(r, [r(0,0),r(1,0),r(2,0),r(2,1)]),
-    objmerge_expand_bbox(Lshape, E).
+    object_merge_expand_bbox(Lshape, E).
     % E = obj(r, ...) with 6 cells (3x2 bbox)
 
-objmerge_hollow_bbox(+Obj, -Hollow)
+object_merge_hollow_bbox(+Obj, -Hollow)
 
 Replace Obj with the 1-cell-wide outer frame of its bounding box. Interior
 cells are excluded. The result is sorted to remove corner duplicates.
 
     Sq3 = obj(r, [r(0,0)..r(2,2)]),  % 3x3
-    objmerge_hollow_bbox(Sq3, H).
+    object_merge_hollow_bbox(Sq3, H).
     % H has 8 border cells; center r(1,1) excluded
 
-objmerge_pad(+Obj, +P, +Color, -Padded)
+object_merge_pad(+Obj, +P, +Color, -Padded)
 
 Add P layers of cells around Obj's bounding box, all colored Color. The
 result covers (MinR-P, MinC-P) to (MaxR+P, MaxC+P).
 
-    objmerge_pad(obj(r,[r(0,0)]), 1, x, P).
+    object_merge_pad(obj(r,[r(0,0)]), 1, x, P).
     % P = obj(x, ...) — 9 cells (3x3 around the dot)
 
 161.6 Connected Components
 
-objmerge_split_cc4(+Obj, -Parts)
+object_merge_split_cc4(+Obj, -Parts)
 
 Split Obj into a list of 4-connected component obj terms, each with Obj's
 color. Uses BFS flood-fill.
 
     Two = obj(r, [r(0,0), r(2,2)]),  % two isolated dots
-    objmerge_split_cc4(Two, Parts).
+    object_merge_split_cc4(Two, Parts).
     % Parts = [obj(r,[r(0,0)]), obj(r,[r(2,2)])]
 
-objmerge_split_cc8(+Obj, -Parts)
+object_merge_split_cc8(+Obj, -Parts)
 
-Same as objmerge_split_cc4 but uses 8-adjacency (includes diagonals).
+Same as object_merge_split_cc4 but uses 8-adjacency (includes diagonals).
 
     Diag = obj(r, [r(0,0), r(1,1)]),  % diagonal pair
-    objmerge_split_cc8(Diag, Parts).
+    object_merge_split_cc8(Diag, Parts).
     % Parts = [obj(r,[r(0,0),r(1,1)])]  % one 8-connected component
 
-objmerge_n_components4(+Obj, -N)
+object_merge_n_components4(+Obj, -N)
 
-Count of 4-connected components. Calls objmerge_split_cc4 and returns the length.
+Count of 4-connected components. Calls object_merge_split_cc4 and returns the length.
 
 161.7 Summary
 
 Predicate                  Description
-objmerge_union_cells/4           sorted union of two obj cell sets
-objmerge_intersect_cells/4       sorted intersection of two obj cell sets
-objmerge_diff_cells/4            O1 minus O2 cell set
-objmerge_sym_diff_cells/4        symmetric difference of two cell sets
-objmerge_concat_h/4              place O2 right of O1 with gap
-objmerge_concat_v/4              place O2 below O1 with gap
-objmerge_merge_list/3            union of all cells in a list of objs
-objmerge_subtract_list/4         remove cells of any obj in list from base
-objmerge_expand_bbox/2           fill bounding box with obj's color
-objmerge_hollow_bbox/2           1-cell-wide outer frame of bounding box
-objmerge_pad/4                   add P layers of border cells with new color
-objmerge_split_cc4/2             split into 4-connected component objs
-objmerge_split_cc8/2             split into 8-connected component objs
-objmerge_n_components4/2         count 4-connected components
+object_merge_union_cells/4           sorted union of two obj cell sets
+object_merge_intersect_cells/4       sorted intersection of two obj cell sets
+object_merge_diff_cells/4            O1 minus O2 cell set
+object_merge_sym_diff_cells/4        symmetric difference of two cell sets
+object_merge_concat_h/4              place O2 right of O1 with gap
+object_merge_concat_v/4              place O2 below O1 with gap
+object_merge_merge_list/3            union of all cells in a list of objs
+object_merge_subtract_list/4         remove cells of any obj in list from base
+object_merge_expand_bbox/2           fill bounding box with obj's color
+object_merge_hollow_bbox/2           1-cell-wide outer frame of bounding box
+object_merge_pad/4                   add P layers of border cells with new color
+object_merge_split_cc4/2             split into 4-connected component objs
+object_merge_split_cc8/2             split into 8-connected component objs
+object_merge_n_components4/2         count 4-connected components
 
 This is WP 200, PrologAI Layer 179.

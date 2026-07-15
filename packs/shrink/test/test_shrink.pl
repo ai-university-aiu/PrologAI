@@ -145,24 +145,24 @@ test(find_scale_n3) :-
 
 % shrink_obj_shrink tests.
 
-test(obj_shrink_2x2_block) :-
+test(object_shrink_2x2_block) :-
     % 2x2 block at origin all maps to r(0,0).
     shrink_obj_shrink(obj(red,[r(0,0),r(0,1),r(1,0),r(1,1)]), 2, R),
     R == obj(red,[r(0,0)]).
 
-test(obj_shrink_offset_block) :-
+test(object_shrink_offset_block) :-
     % 2x2 block at rows 2-3, cols 4-5.
     shrink_obj_shrink(obj(blue,[r(2,4),r(2,5),r(3,4),r(3,5)]), 2, R),
     R == obj(blue,[r(1,2)]).
 
-test(obj_shrink_l_shape) :-
+test(object_shrink_l_shape) :-
     % L-shape scaled by 2: cells at r(0,0) r(0,1) r(0,2) r(0,3) r(2,0) r(2,1).
     shrink_obj_shrink(obj(x,[r(0,0),r(0,1),r(0,2),r(0,3),r(2,0),r(2,1)]), 2, R),
     % r(0,0)//2=r(0,0), r(0,1)//2=r(0,0), r(0,2)//2=r(0,1), r(0,3)//2=r(0,1),
     % r(2,0)//2=r(1,0), r(2,1)//2=r(1,0).  Sort+dedup = [r(0,0),r(0,1),r(1,0)].
     R == obj(x,[r(0,0),r(0,1),r(1,0)]).
 
-test(obj_shrink_n1) :-
+test(object_shrink_n1) :-
     % Factor 1: coords unchanged.
     shrink_obj_shrink(obj(a,[r(3,5),r(3,6)]), 1, R),
     R == obj(a,[r(3,5),r(3,6)]).

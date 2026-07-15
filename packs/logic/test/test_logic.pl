@@ -68,15 +68,15 @@ test(not_all_fg) :-
 
 :- begin_tests(logic_diff).
 
-test(diff_basic) :-
+test(difference_basic) :-
     logic_diff([[1,0],[0,1]], [[0,0],[0,1]], 0, G),
     G = [[1,0],[0,0]].
 
-test(diff_nothing_left) :-
+test(difference_nothing_left) :-
     logic_diff([[1,0],[0,0]], [[1,0],[0,0]], 0, G),
     G = [[0,0],[0,0]].
 
-test(diff_all_left) :-
+test(difference_all_left) :-
     logic_diff([[1,1],[1,1]], [[0,0],[0,0]], 0, G),
     G = [[1,1],[1,1]].
 

@@ -13,89 +13,89 @@ In compositional reasoning, a rule is induced from training pairs. Each pair
 shows an Input grid and the correct Output grid. The induct pack extracts the
 evidence from those pairs:
 
-  What cells changed? (induct_delta, induct_changed_cells)
-  What color substitutions occurred? (induct_color_map)
-  Did the grid size change? (induct_size_change)
-  What is the background? (induct_bg_color)
-  Are all pairs consistent? (induct_consistent_delta, induct_size_change_pairs)
+  What cells changed? (rule_induction_delta, rule_induction_changed_cells)
+  What color substitutions occurred? (rule_induction_color_map)
+  Did the grid size change? (rule_induction_size_change)
+  What is the background? (rule_induction_bg_color)
+  Are all pairs consistent? (rule_induction_consistent_delta, rule_induction_size_change_pairs)
 
 These observations become the inputs to hypothesis generation.
 
 SECTION 55.2 - CELL-LEVEL CHANGE
 
-induct_delta(+Input, +Output, -Delta)
+rule_induction_delta(+Input, +Output, -Delta)
 
 Delta is a list of r(R,C)-OldColor-NewColor triples for cells that changed.
 If no cells changed, Delta = [].
 
-  induct_delta([[1,2],[3,4]], [[1,9],[3,9]], Delta).
+  rule_induction_delta([[1,2],[3,4]], [[1,9],[3,9]], Delta).
   % Delta = [r(0,1)-2-9, r(1,1)-4-9]
 
-induct_changed_cells(+Input, +Output, -Cells) lists r(R,C) positions that changed.
-induct_invariant_cells(+Input, +Output, -Cells) lists positions that stayed the same.
-induct_constant(+Input, +Output) succeeds if Output is identical to Input.
+rule_induction_changed_cells(+Input, +Output, -Cells) lists r(R,C) positions that changed.
+rule_induction_invariant_cells(+Input, +Output, -Cells) lists positions that stayed the same.
+rule_induction_constant(+Input, +Output) succeeds if Output is identical to Input.
 
 SECTION 55.3 - COLOR MAPS
 
-induct_color_map(+Input, +Output, -Map)
+rule_induction_color_map(+Input, +Output, -Map)
 
 Map is a list of OldColor-NewColor pairs for all changed cells. Deduplicates
 across cells. Fails if a color maps to two different outputs (conflict).
 
-  induct_color_map([[1,2],[1,2]], [[5,6],[5,6]], Map).
+  rule_induction_color_map([[1,2],[1,2]], [[5,6],[5,6]], Map).
   % Map = [1-5, 2-6]
 
-induct_color_map_pairs(+Pairs, -Map) intersects per-pair maps to find the color
+rule_induction_color_map_pairs(+Pairs, -Map) intersects per-pair maps to find the color
 substitutions that are consistent across all training pairs.
 
-induct_common_keys(+Map1, +Map2, -Common) extracts shared entries from two maps.
+rule_induction_common_keys(+Map1, +Map2, -Common) extracts shared entries from two maps.
 
 SECTION 55.4 - SIZE ANALYSIS
 
-induct_size_change(+Input, +Output, -DRows, -DCols)
+rule_induction_size_change(+Input, +Output, -DRows, -DCols)
 
 DRows = Rows(Output) - Rows(Input). Negative means shrinkage.
 
-  induct_size_change([[1,2],[3,4]], [[1,2],[3,4],[5,6]], DR, DC).
+  rule_induction_size_change([[1,2],[3,4]], [[1,2],[3,4],[5,6]], DR, DC).
   % DR = 1, DC = 0
 
-induct_size_change_pairs(+Pairs, -DRows, -DCols) verifies all pairs have the same
+rule_induction_size_change_pairs(+Pairs, -DRows, -DCols) verifies all pairs have the same
 size change and returns that change. Fails if inconsistent.
 
 SECTION 55.5 - COLOR SETS
 
-induct_color_palette(+Input, +Output, -Palette) returns the sorted union of all
+rule_induction_color_palette(+Input, +Output, -Palette) returns the sorted union of all
 colors appearing in either grid.
 
-induct_palette_pairs(+Pairs, -InColors, -OutColors) separately accumulates colors
+rule_induction_palette_pairs(+Pairs, -InColors, -OutColors) separately accumulates colors
 from all input grids and all output grids. Useful for detecting which colors
 are introduced or eliminated by the rule.
 
 SECTION 55.6 - BACKGROUND COLOR
 
-induct_bg_color(+Grid, -BgColor)
+rule_induction_bg_color(+Grid, -BgColor)
 
 BgColor is the most frequently occurring color in Grid. In case of a tie,
 returns the largest color value (max_member behavior).
 
-induct_bg_color_pairs(+Pairs, -BgColor) verifies all input grids agree on the
+rule_induction_bg_color_pairs(+Pairs, -BgColor) verifies all input grids agree on the
 same background color and returns it. Fails if inconsistent.
 
 SECTION 55.7 - CROSS-PAIR CONSISTENCY
 
-induct_consistent_delta(+Pairs, -Delta) succeeds if all pairs share the same
+rule_induction_consistent_delta(+Pairs, -Delta) succeeds if all pairs share the same
 delta (same positions change, same old colors, same new colors). Returns
 that shared delta.
 
-induct_size_change_pairs/3 and induct_bg_color_pairs/2 provide similar cross-pair
+rule_induction_size_change_pairs/3 and rule_induction_bg_color_pairs/2 provide similar cross-pair
 consistency checks for size and background respectively.
 
 SECTION 55.8 - DESIGN NOTES
 
-induct_delta and all cell-iteration predicates use findall for determinism.
-induct_color_map uses intersection/3 from library(lists) for set operations.
-induct_check_consistent_map_ uses member/2 to check for conflicting mappings.
-induct_bg_color uses max_member/2 from library(lists) for the argmax.
+rule_induction_delta and all cell-iteration predicates use findall for determinism.
+rule_induction_color_map uses intersection/3 from library(lists) for set operations.
+rule_induction_check_consistent_map_ uses member/2 to check for conflicting mappings.
+rule_induction_bg_color uses max_member/2 from library(lists) for the argmax.
 
 SECTION 55.9 - ACCEPTANCE TESTS
 

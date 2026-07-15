@@ -159,7 +159,7 @@ Everything is inspectable.
 | `beliefs` | Belief Structures and Propagators — per-node_fact scorecards with incremental local propagation. Every belief has a strength and a source. |
 | `frames` | Reference Frames and Voting Consensus — the Thousand Brains pattern applied to symbolic cognition. Multiple reference frames vote on every percept. |
 | `tabling` | Incremental Tabling Truth Maintenance — automatic, real-time consistency of all derived Lattice relations. No stale inferences. |
-| `sona` | SONA (Synaptic Ontological Neural Aggregator) — continuous learning with Elastic Weight Consolidation, improved version (EWC++) catastrophic-forgetting protection, a ReasoningBank for episodic recall, and memory consolidation. |
+| `synaptic_ontological_neural_aggregator` | SONA (Synaptic Ontological Neural Aggregator) — continuous learning with Elastic Weight Consolidation, improved version (EWC++) catastrophic-forgetting protection, a ReasoningBank for episodic recall, and memory consolidation. |
 | `imagination` | Imagination (imagination_*, Layer 396, WP-421) — one faculty converged from three: five quarantined **realities** (observed, desired, expected, imagined, recalled) with a transition model and a deliberate promotion discipline, so a "what if" is explored fully yet sealed off from fact (the Causalontology realities half); **mind-wandering** steered from a seed episode toward a control goal (absorbed from the daydream pack); and **mindscapes, tableaux, and rendered reveries** for forming and manipulating mental images (absorbed from the imagination pack). The Lattice-integrated `dreaming` engine is kept separate. |
 | `acquisition` | Developmental Language Acquisition — phoneme chaining, word grounding, and tier promotion. PrologAI learns language the way a child does. |
 
@@ -190,8 +190,8 @@ Everything is inspectable.
 | Pack | What it Does |
 |---|---|
 | `language` | Time-Linear Language — database semantics with word_traces, hear, think_path, and speak. Language is grounded in time and memory, not in statistical patterns. |
-| `mindbody` | The Mind-Body Interface — herald protocol, body enrollment, percept relay, and command dispatch. Any body (game, robot, screen) attaches here. |
-| `ros_bridge` | The ROS 2 Bridge — robot embodiment via the Mind-Body pattern. PrologAI can reason inside a physical robot. |
+| `mind_body` | The Mind-Body Interface — herald protocol, body enrollment, percept relay, and command dispatch. Any body (game, robot, screen) attaches here. |
+| `robot_operating_system_bridge` | The ROS 2 Bridge — robot embodiment via the Mind-Body pattern. PrologAI can reason inside a physical robot. |
 | `computer_use` | Computer Use — a screen-and-input body with sandboxed desktop control. PrologAI can perceive a screen and act on it. |
 
 **Learning and Self-Programming**
@@ -208,25 +208,25 @@ Everything is inspectable.
 
 | Pack | What it Does |
 |---|---|
-| `mcp_gateway` | MCP (Model Context Protocol) Gateway — a compliant HTTP server exposing PrologAI's full capability to the AI agent ecosystem. |
-| `a2a` | Agent-to-Agent (A2A) Interoperability — the A2A protocol and durable agent mail. PrologAI agents communicate reliably with any A2A-compliant peer. |
-| `acp` | ACP (Agent Communication Protocol) Gateway — a REST endpoint for broadcast-style agent coordination. |
-| `anp` | ANP (Agent Network Protocol) Gateway — decentralized identity and peer discovery for open multi-agent networks. |
+| `model_context_protocol_gateway` | MCP (Model Context Protocol) Gateway — a compliant HTTP server exposing PrologAI's full capability to the AI agent ecosystem. |
+| `agent_to_agent` | Agent-to-Agent (A2A) Interoperability — the A2A protocol and durable agent mail. PrologAI agents communicate reliably with any A2A-compliant peer. |
+| `agent_communication_protocol` | ACP (Agent Communication Protocol) Gateway — a REST endpoint for broadcast-style agent coordination. |
+| `agent_network_protocol` | ANP (Agent Network Protocol) Gateway — decentralized identity and peer discovery for open multi-agent networks. |
 
 **Data Layer**
 
 | Pack | What it Does |
 |---|---|
 | `vector_backend` | The Vector Backend |
-| `vsa` | Compositional Vector Binding (VSA — Vector Symbolic Architecture) |
-| `lattice_crypto` | Lattice Cryptographic Privacy Layer |
+| `vector_symbolic_architecture` | Compositional Vector Binding (VSA — Vector Symbolic Architecture) |
+| `lattice_cryptography` | Lattice Cryptographic Privacy Layer |
 | `ephemera` | Ephemeral Code Synthesis, Execution, and Skill Persistence (PR 53) |
 | `agency` | Agentic Execution Loop (PR 54) |
 | `refinery` | Evaluator-Optimizer and Metacognitive Quality Layer (PR 55) |
 | `grid` | ARC-AGI Grid Perception and Manipulation (PR 56) |
 | `analogy` | Analogy (analogy_*, Layer 394, WP-419) — one faculty converged from two: relational **structure mapping** over rel(Type,A,B) sets that finds the injective object mapping preserving the most relations and transfers a rule/goal/disposition across it (the solar-system-to-atom analogy; the Causalontology relational half), plus **grid analogy** — the D4 dihedral isometries, colour-substitution maps, shape equality up to isometry, and solve-from-examples transform inference (absorbed from the ARC grid-analogy pack). |
 | `scene` | ARC-AGI Scene Model and Object-Centric Reasoning (PR 58) |
-| `quant` | Quantitative Reasoning over Object Sets (PR 59) |
+| `quantity` | Quantitative Reasoning over Object Sets (PR 59) |
 | `pattern` | Periodic Pattern Detection, Tiling, and Repetition (PR 60) |
 | `compose` | Sequential Rule Pipelines and Transformation Composition (PR 61) |
 | `motion` | Spatial Movement, Gravity, and Distance for Grid-Based Reasoning (PR 62) |
@@ -257,12 +257,12 @@ Everything is inspectable.
 | `walk` | Grid Traversal Patterns (PR 106) |
 | `run` | Run-Length Encoding of Grid Sequences (PR 88) |
 | `rewrite` | Rule-Based Grid Cell Rewriting (PR 87) |
-| `arith` | Cell-Wise Arithmetic on Grids (PR 89) |
+| `arithmetic` | Cell-Wise Arithmetic on Grids (PR 89) |
 | `context` | Context Map Operations (PR 92) |
 | `score` | Candidate Grid Scoring and Hypothesis Selection (PR 93) |
-| `induct` | Rule Induction Observation Layer (PR 94) |
-| `sym` | Spatial Symmetry Transforms and Symmetry Testing (PR 96) |
-| `hyp` | Hypothesis Application, Testing, and Selection (PR 95) |
+| `rule_induction` | Rule Induction Observation Layer (PR 94) |
+| `symmetry_transform` | Spatial Symmetry Transforms and Symmetry Testing (PR 96) |
+| `rule_hypothesis` | Hypothesis Application, Testing, and Selection (PR 95) |
 | `seek` | Spatial Pattern Search and Transform Discovery (PR 97) |
 | `remap` | Color Remapping and Palette Manipulation (PR 98) |
 | `logic` | Boolean and Mask Grid Operations (PR 99) |
@@ -285,18 +285,18 @@ Everything is inspectable.
 | `panel` | Grid Panel Detection and Splitting (PR 135) |
 | `cellset` | Sparse Cell Set Operations (PR 138) |
 | `locate` | Pattern Location and Subgrid Matching (PR 139) |
-| `xsel` | Extended Cell Selection by Value Comparison (PR 140) |
-| `autom` | Cellular Automaton Neighborhood Aggregation (PR 141) |
+| `extended_selection` | Extended Cell Selection by Value Comparison (PR 140) |
+| `automaton` | Cellular Automaton Neighborhood Aggregation (PR 141) |
 | `cross` | 1D Cross-Section Extraction from 2D Grids (PR 142) |
 | `mask` | Boolean Mask Operations on 2D Grids (PR 143) |
 | `table` | Grid-as-Table Operations (PR 144) |
-| `numseq` | Numerical Sequence Operations on 1D Lists (PR 145) |
-| `gridmath` | Cell-Wise Arithmetic on 2D Grids (PR 146) |
+| `numeric_sequence` | Numerical Sequence Operations on 1D Lists (PR 145) |
+| `grid_math` | Cell-Wise Arithmetic on 2D Grids (PR 146) |
 | `block` | Rectangular Sub-Grid Block Decomposition (PR 148) |
 | `topology` | Grid Topology and Connected Component Analysis (PR 151) |
 | `distance` | Cell Distance and Proximity Computation (PR 150) |
 | `edge` | Grid Edge Detection and Boundary Analysis (PR 149) |
-| `colormap` | Color Lookup Table and Palette Substitution (PR 147) |
+| `color_map` | Color Lookup Table and Palette Substitution (PR 147) |
 | `bound` | Bounding Box Extraction and Placement (PR 137) |
 | `scan` | Grid Cell Enumeration and Manipulation (PR 136) |
 | `interleave` | Row and Column Interleaving, Weaving, and Stride Selection (PR 134) |
@@ -307,9 +307,9 @@ Everything is inspectable.
 | `hull` | Convex Hull and Polygon Geometry (PR 128) |
 | `enclosure` | Interior and Exterior Classification (PR 127) |
 | `spread` | BFS Spreading, Distance Maps, and Reachability (PR 126) |
-| `vec2` | 2D Integer Vector Arithmetic and Geometry (PR 125) |
+| `vector2` | 2D Integer Vector Arithmetic and Geometry (PR 125) |
 | `ray` | Ray Casting and Line-of-Sight Operations (PR 124) |
-| `rect` | Rectangle Detection and Drawing (PR 122) |
+| `rectangle` | Rectangle Detection and Drawing (PR 122) |
 | `line` | Straight-Line Segment Detection and Drawing (PR 121) |
 | `recur` | Arithmetic Progression and Periodic Recurrence Detection (PR 120) |
 | `stripe` | Uniform Row and Column Stripe Detection and Filling (PR 118) |
@@ -317,26 +317,26 @@ Everything is inspectable.
 | `region` | Grid Region Extraction by Separator Lines (PR 113) |
 | `assemble` | Grid Assembly, Concatenation, and Composition (PR 112) |
 | `order` | Object Spatial Ordering and Ranking (PR 111) |
-| `diff` | Multi-Pair Grid Difference Analysis (PR 110) |
+| `difference` | Multi-Pair Grid Difference Analysis (PR 110) |
 | `pipeline` | Sequential Step Dispatch and List Utilities (PR 91) |
-| `obj` | Object Inventory and Reasoning (PR 90) |
+| `object` | Object Inventory and Reasoning (PR 90) |
 | `projection` | Row and Column Projection and Profile Analysis (PR 237) |
 | `gradient` | Row and Column Gradient and Progression Analysis (PR 238) |
 | `extrema` | 2D Grid Extrema, Local Peaks, and Threshold Filtering (PR 239) |
-| `naggr` | Per-Cell Neighborhood Value Aggregation (PR 240) |
+| `neighborhood_aggregate` | Per-Cell Neighborhood Value Aggregation (PR 240) |
 | `median` | Integer Median Computation for Lists and 2D Grids (PR 241) |
-| `nmode` | Neighborhood Mode Filter for 2D Grids (PR 242) |
+| `neighborhood_mode` | Neighborhood Mode Filter for 2D Grids (PR 242) |
 | `rank` | Dense Ranking of Integer Values in Lists and 2D Grids (PR 243) |
-| `varstat` | Mean, Sum, and Deviation Statistics for Integer Lists and 2D Grids (PR 244) |
-| `cooccur` | Value Co-Occurrence and Adjacency Analysis in 2D Grids (PR 245) |
-| `rowsig` | Row and Column Signature Analysis for 2D Grids (PR 246) |
-| `gridops` | Grid Collection Operations for Multi-Grid Analysis (PR 247) |
+| `variance_statistics` | Mean, Sum, and Deviation Statistics for Integer Lists and 2D Grids (PR 244) |
+| `cooccurrence` | Value Co-Occurrence and Adjacency Analysis in 2D Grids (PR 245) |
+| `row_signature` | Row and Column Signature Analysis for 2D Grids (PR 246) |
+| `grid_operations` | Grid Collection Operations for Multi-Grid Analysis (PR 247) |
 | `index` | Coordinate-Valued Grid Generation and Index Masking (PR 248) |
 | `splice` | Row and Column Structural Editing (PR 253) |
-| `objop` | Object-Level Grid Manipulation (PR 254) |
+| `object_operation` | Object-Level Grid Manipulation (PR 254) |
 | `pair` | Object Pairing and Scene Correspondence (PR 255) |
 | `arrange` | Object Arrangement and Spatial Ordering (PR 256) |
-| `xform` | Object-Level Transformation and Inference (PR 257) |
+| `isometry` | Object-Level Transformation and Inference (PR 257) |
 | `query` | Aggregate Queries over Object Lists (PR 258) |
 | `sift` | Object List Filtering by Attribute Predicates (PR 259) |
 | `pigment` | Bulk Color Operations on Object Scenes (PR 260) |
@@ -345,103 +345,103 @@ Everything is inspectable.
 | `proximity` | Object-Level Proximity and Distance (PR 263) |
 | `link` | Object-to-Object Correspondence Linking (PR 264) |
 | `layout` | Multi-Object Layout Analysis (PR 265) |
-| `sizeop` | Size-Based Sorting and Assignment for Object Collections (PR 267) |
-| `posop` | Position-Based Sorting, Filtering, and Assignment for Object Collections (PR 268) |
-| `objxf` | Spatial and Color Transformations for obj(Color, Cells) Terms (PR 269) |
+| `size_operation` | Size-Based Sorting and Assignment for Object Collections (PR 267) |
+| `position_operation` | Position-Based Sorting, Filtering, and Assignment for Object Collections (PR 268) |
+| `object_transform` | Spatial and Color Transformations for obj(Color, Cells) Terms (PR 269) |
 | `shrink` | Grid Downscaling and Block Decomposition (PR 270) |
-| `objmorph` | Morphological Operations on obj(Color, Cells) Terms (PR 271) |
+| `object_morph` | Morphological Operations on obj(Color, Cells) Terms (PR 271) |
 | `voronoi` | Nearest-Color Painting and Voronoi Partitioning (PR 272) |
-| `objcomp` | Object Connectivity and Component Analysis (PR 273) |
+| `object_component` | Object Connectivity and Component Analysis (PR 273) |
 | `wavefront` | Wavefront BFS Propagation Through Passable Cells (PR 274) |
-| `objfilter` | Object List Filtering and Selection for obj(Color, Cells) Terms (PR 281) |
-| `objrel` | Object Pair Relation Analysis for obj(Color, Cells) Terms (PR 280) |
+| `object_filter` | Object List Filtering and Selection for obj(Color, Cells) Terms (PR 281) |
+| `object_pair_relation` | Object Pair Relation Analysis for obj(Color, Cells) Terms (PR 280) |
 | `canvas` | Grid Canvas and Object Rendering (PR 283) |
-| `objseq` | Object Sequence and Progression Analysis (PR 284) |
-| `objdelta` | Object-Pair Change Analysis and Rule Application (PR 285) |
-| `objcopy` | Object Tiling and Multi-Copy Layout (PR 286) |
-| `objmatch` | Object-List Correspondence and Matching (PR 287) |
-| `gridnbr` | Grid Neighbor Analysis: Cell Adjacency, Morphological Ops, and Neighbor Counts (gn_*, Layer 199) (PR 308) |
-| `gridmask` | Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206) (PR 315) |
-| `gridxform` | Grid Transformations: Rotate, Flip, Transpose, Crop, Pad, Scale, Tile, Canonicalize (gx_*, Layer 207) (PR 317) |
-| `gridsymm` | Grid Symmetry: Detection, Completion, Violations, and Score (gsm_*, Layer 208) (PR 318) |
-| `gridmark` | Grid Marking and Annotation: Mark Cells, Rows, Columns, Borders, Diagonals, Rectangles, and Checkerboards (gmk_*, Layer 225) (PR 335) |
-| `gridcrop` | Grid Cropping and Padding: Bounding Box, Trim, Crop, Pad, Center, Border, and Expand (gcr_*, Layer 226) (PR 336) |
-| `gridpatch` | Grid Patch Operations: Extract, Place, Overlay, Find, Tile, Scatter, and Inpaint (gpt_*, Layer 227) (PR 337) |
-| `gridscan` | Grid Ray Scanning: First Hit, Distance, Row/Column Content, and Blocking Detection in Four Directions (gsn_*, Layer 228) (PR 338) |
-| `gridwave` | Grid Wave Propagation: Color Expansion, Contraction, Frontier Detection, and Directional Shadows (gwv_*, Layer 229) (PR 339) |
-| `gridshift` | Grid Shifting and Cyclic Rolling: Linear Shifts, Toroidal Rolls, Per-Row/Column Rolls, Color Shift, and Offset (gsh_*, Layer 230) (PR 340) |
-| `gridmap` | Grid Color Mapping: Remap, Swap, Replace, Merge, Normalize, Palette, Mask, Invert, Cycle, and Map Composition (gmp_*, Layer 231) (PR 341) |
-| `gridrefl` | Grid Reflection and Rotation: Flip, Rotate, Transpose, Anti-Diagonal, Symmetry Detection, and Symmetry Completion (grf_*, Layer 232) (PR 342) |
-| `gridextract` | Grid Object Extraction: Bounding Box Crops, Non-BG Object Isolation, Color-Region Extraction, Cell Collection, Largest/Smallest Object, Centered Crop, Region Count, and Object Registry (gxt_*, Layer 236) (PR 346) |
-| `gridblend` | Grid Blending and Layered Composition: Overlay, Underlay, Stencil, Priority Stack, Checkerboard Blend, Stripe Blend, Threshold Replace, Merge Many, Dominant Color, and Composite (gbld_*, Layer 235) (PR 345) |
-| `gridchain` | Grid Sequence Utilities: Consecutive Pairs, Sliding Windows, Zip, Take, Drop, Cycle, Interleave, Split, Dedup, Diff Counts, and Change Mask (gch_*, Layer 234) (PR 344) |
-| `gridlogic` | Grid Logical Operations: Cell-Wise AND, OR, XOR, NOT, Subtract, Common, Differ, Any, All, Majority, Unanimous, Mask, If-Then-Else, and Filter (ggl_*, Layer 233) (PR 343) |
-| `gridtile` | Grid Tiling Pattern Analysis: Period Detection, Tile Extraction, Tiling Verification, and Grid Construction from Tiles (gti_*, Layer 224) (PR 334) |
-| `gridgrav` | Grid Gravity and Sliding: Fall Down, Up, Left, Right, Blocked Fall, Column and Row Setters, Settled Test, and Gravity Score (gra_*, Layer 237) (PR 348) |
-| `gridstamp` | Grid Stamping and Canvas Operations: Stamp, Scatter, Match Finding, Pad, Unpad, Replicate, Border, Center, Extract, Replace, and Canvas (gst_*, Layer 238) (PR 349) |
-| `gridalign` | Grid Alignment and Shift Matching: Center of Mass, Translation, Offset Search, Overlap Scoring, Bounding Box Alignment, and Anchor Placement (gal_*, Layer 239) (PR 350) |
-| `gridcolorop` | Grid Color Operations: Count, Swap, Replace, Mask, Cycle, Rank, Palette Apply, and Invert (gco_*, Layer 240) (PR 351) |
-| `gridresize` | Grid Resize and Scale Operations: Integer Scale Up/Down, Mode Downsample, Double, Halve, Nearest-Neighbor Resize, Tile, Crop, Border Crop, Fit, Embed, Size, Aspect Ratio, and Square Test (grs_*, Layer 241) (PR 352) |
-| `gridobj` | Grid Object Operations: Connected Component Cells, Color, Size, Bbox, Mask, Extract, All Objects, Count, Largest, Smallest, Flood Fill, Fill Enclosed, Remove, and Move (gob_*, Layer 242) (PR 353) |
-| `gridgroupby` | Grid Group-By Operations: Group, Filter, Sort, Pair, and Count Objects by Attribute (ggb_*, Layer 243) (PR 354) |
-| `gridrelation` | Grid Object Spatial Relations: Touching, Adjacent, Distance, Above, Below, Left-Of, Right-Of, Bbox Contains, Bbox Overlap, Cells Overlap, Same Rows, Same Cols, Direction, and All Relations (grl_*, Layer 244) (PR 355) |
-| `gridtransform` | Grid Transformation Detection and Application: Color Map, Apply Map, Diff Cells, Diff Count, Same Cells, Changed Colors, Invert Map, Compose Maps, Identity Test, Apply Changes, Delta Grid, Overlay, Common Grid, and Color Permutation Test (gtr_*, Layer 245) (PR 356) |
-| `gridobjmatch` | Object Matching and Change Detection Between Object Lists: Match by Color, Nearest Centroid, and Size; Unmatched Extraction; Color-Diff Partition; Movement Vectors; Constant Move; Color Map Inference; Appeared, Disappeared, Structure, and Count Change (gom_*, Layer 246) (PR 358) |
-| `symtab` | Symbol Table Learning from Input-Output Pairs: Build Table, Identify Symbols, Contrastive Learn, Apply Table, Hole Count, Lookup, Entry Consistency, Color/Size/Position Features, Is Symbol, Candidate Symbols, Score Table, and Best Table (st_*, Layer 247) (PR 359) |
+| `object_sequence` | Object Sequence and Progression Analysis (PR 284) |
+| `object_delta` | Object-Pair Change Analysis and Rule Application (PR 285) |
+| `object_copy` | Object Tiling and Multi-Copy Layout (PR 286) |
+| `object_match` | Object-List Correspondence and Matching (PR 287) |
+| `grid_neighbor` | Grid Neighbor Analysis: Cell Adjacency, Morphological Ops, and Neighbor Counts (gn_*, Layer 199) (PR 308) |
+| `grid_mask` | Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206) (PR 315) |
+| `grid_transform` | Grid Transformations: Rotate, Flip, Transpose, Crop, Pad, Scale, Tile, Canonicalize (gx_*, Layer 207) (PR 317) |
+| `grid_symmetry` | Grid Symmetry: Detection, Completion, Violations, and Score (gsm_*, Layer 208) (PR 318) |
+| `grid_mark` | Grid Marking and Annotation: Mark Cells, Rows, Columns, Borders, Diagonals, Rectangles, and Checkerboards (gmk_*, Layer 225) (PR 335) |
+| `grid_crop` | Grid Cropping and Padding: Bounding Box, Trim, Crop, Pad, Center, Border, and Expand (gcr_*, Layer 226) (PR 336) |
+| `grid_patch` | Grid Patch Operations: Extract, Place, Overlay, Find, Tile, Scatter, and Inpaint (gpt_*, Layer 227) (PR 337) |
+| `grid_scan` | Grid Ray Scanning: First Hit, Distance, Row/Column Content, and Blocking Detection in Four Directions (gsn_*, Layer 228) (PR 338) |
+| `grid_wave` | Grid Wave Propagation: Color Expansion, Contraction, Frontier Detection, and Directional Shadows (gwv_*, Layer 229) (PR 339) |
+| `grid_shift` | Grid Shifting and Cyclic Rolling: Linear Shifts, Toroidal Rolls, Per-Row/Column Rolls, Color Shift, and Offset (gsh_*, Layer 230) (PR 340) |
+| `grid_map` | Grid Color Mapping: Remap, Swap, Replace, Merge, Normalize, Palette, Mask, Invert, Cycle, and Map Composition (gmp_*, Layer 231) (PR 341) |
+| `grid_reflection` | Grid Reflection and Rotation: Flip, Rotate, Transpose, Anti-Diagonal, Symmetry Detection, and Symmetry Completion (grf_*, Layer 232) (PR 342) |
+| `grid_extract` | Grid Object Extraction: Bounding Box Crops, Non-BG Object Isolation, Color-Region Extraction, Cell Collection, Largest/Smallest Object, Centered Crop, Region Count, and Object Registry (gxt_*, Layer 236) (PR 346) |
+| `grid_blend` | Grid Blending and Layered Composition: Overlay, Underlay, Stencil, Priority Stack, Checkerboard Blend, Stripe Blend, Threshold Replace, Merge Many, Dominant Color, and Composite (gbld_*, Layer 235) (PR 345) |
+| `grid_chain` | Grid Sequence Utilities: Consecutive Pairs, Sliding Windows, Zip, Take, Drop, Cycle, Interleave, Split, Dedup, Diff Counts, and Change Mask (gch_*, Layer 234) (PR 344) |
+| `grid_logic` | Grid Logical Operations: Cell-Wise AND, OR, XOR, NOT, Subtract, Common, Differ, Any, All, Majority, Unanimous, Mask, If-Then-Else, and Filter (ggl_*, Layer 233) (PR 343) |
+| `grid_tile` | Grid Tiling Pattern Analysis: Period Detection, Tile Extraction, Tiling Verification, and Grid Construction from Tiles (gti_*, Layer 224) (PR 334) |
+| `grid_gravity` | Grid Gravity and Sliding: Fall Down, Up, Left, Right, Blocked Fall, Column and Row Setters, Settled Test, and Gravity Score (gra_*, Layer 237) (PR 348) |
+| `grid_stamp` | Grid Stamping and Canvas Operations: Stamp, Scatter, Match Finding, Pad, Unpad, Replicate, Border, Center, Extract, Replace, and Canvas (gst_*, Layer 238) (PR 349) |
+| `grid_align` | Grid Alignment and Shift Matching: Center of Mass, Translation, Offset Search, Overlap Scoring, Bounding Box Alignment, and Anchor Placement (gal_*, Layer 239) (PR 350) |
+| `grid_color_operation` | Grid Color Operations: Count, Swap, Replace, Mask, Cycle, Rank, Palette Apply, and Invert (gco_*, Layer 240) (PR 351) |
+| `grid_resize` | Grid Resize and Scale Operations: Integer Scale Up/Down, Mode Downsample, Double, Halve, Nearest-Neighbor Resize, Tile, Crop, Border Crop, Fit, Embed, Size, Aspect Ratio, and Square Test (grs_*, Layer 241) (PR 352) |
+| `grid_object` | Grid Object Operations: Connected Component Cells, Color, Size, Bbox, Mask, Extract, All Objects, Count, Largest, Smallest, Flood Fill, Fill Enclosed, Remove, and Move (gob_*, Layer 242) (PR 353) |
+| `grid_group_by` | Grid Group-By Operations: Group, Filter, Sort, Pair, and Count Objects by Attribute (ggb_*, Layer 243) (PR 354) |
+| `grid_relation` | Grid Object Spatial Relations: Touching, Adjacent, Distance, Above, Below, Left-Of, Right-Of, Bbox Contains, Bbox Overlap, Cells Overlap, Same Rows, Same Cols, Direction, and All Relations (grl_*, Layer 244) (PR 355) |
+| `grid_color_transform` | Grid Transformation Detection and Application: Color Map, Apply Map, Diff Cells, Diff Count, Same Cells, Changed Colors, Invert Map, Compose Maps, Identity Test, Apply Changes, Delta Grid, Overlay, Common Grid, and Color Permutation Test (gtr_*, Layer 245) (PR 356) |
+| `grid_object_match` | Object Matching and Change Detection Between Object Lists: Match by Color, Nearest Centroid, and Size; Unmatched Extraction; Color-Diff Partition; Movement Vectors; Constant Move; Color Map Inference; Appeared, Disappeared, Structure, and Count Change (gom_*, Layer 246) (PR 358) |
+| `symbol_table` | Symbol Table Learning from Input-Output Pairs: Build Table, Identify Symbols, Contrastive Learn, Apply Table, Hole Count, Lookup, Entry Consistency, Color/Size/Position Features, Is Symbol, Candidate Symbols, Score Table, and Best Table (st_*, Layer 247) (PR 359) |
 | `invariant` | Cross-Pair Invariant Extraction: Grid and Output Invariants, Object Invariants, Variant Features, Consistent Delta, All/No-Grids Meta-Predicates, Color Set, Same Color Sets, Same Dims, Preserves Dims/Colors/Count, and Stable Color Map (iv_*, Layer 248) (PR 360) |
 | `contrast` | Contrastive Pair Analysis: Pairwise Delta, Covarying Features, Context Gate, Discriminating Pair, Correlated Features, Change Count, Common Context, Separates, Minimal Features, Feature Profile, Profile Diff, Stable Features, Unstable Features, and Rank Features (ca_*, Layer 249) (PR 361) |
 | `legend` | Legend and Key Region Detection: Detect Legend, Is Legend, Legend Entries, Consistent Legend, Region BBox, Separated, Region Area, All Regions, Region Color, Is Small, Same Shape, Entry Boundaries, Color Map, and Position (lg_*, Layer 250) (PR 362) |
-| `multipair` | Multi-Pair Object Tracking: Track Objects, Invariant Objects, Role Objects, Cross-Pair Match, All Input Objects, Color Frequency, Universal Colors, Variable Colors, Disappeared Objects, Appeared Objects, Stable Color Objects, Modal Object Count, Consistent Count, Singleton Color (mp_*, Layer 251) (PR 362) |
-| `taskcat` | Task Type Classification: Categorize, Is Single Rule, Is Multi-Step, Has Context Gate, Has Symbol Table, Suggest Strategies, Preserves Dims, Preserves Colors, Consistent Change Count, Max Change Count, Distinct Change Patterns, Is Fill Task, Is Deletion Task, Confidence (tc_*, Layer 252) (PR 362) |
-| `periodfix` | Periodic Pattern Repair: List and Grid Period Detection, Majority-Vote Tile Construction, Violation Finding, Full and Single-Corruption Repair, and Best-Period Search (ppf_*, Layer 253) (PR 366) |
-| `iochan` | I/O Channel Integration: Speaker output (espeak-ng / festival TTS), microphone input (arecord + whisper-cli STT), text channels (console / email / screen / app), image channels (console / email / screen / app / webcam / URL), and printer output (CUPS lp) (ic_*, Layer 254) (WP-279) |
-| `seqinfer` (enhanced) | Sequential Rule Inference + ARC-AGI-2 Candidates: seqinfer_arc2_candidates/1 adds 66-entry integer-color candidate list for multi-step search (sq_*, Layer 195) (WP-274, PR 363) |
-| `hyp` (enhanced) | Hypothesis Generation + Spatial/Structural/Sequence: hyp_spatial_hyp/3, hyp_structural_hyp/3, hyp_sequence_hyp/4 extend hypothesis search to grid-level shifts, structural patterns, and two-step color maps (hy_*, Layer 74) (WP-275, PR 363) |
-| `condxf` (enhanced) | Conditional Scene Transform + Gate Inference: condxf_infer_gate/3 infers the gate_color that separates training pairs by change signature (xc_*, Layer 187) (WP-276, PR 363) |
+| `multi_pair` | Multi-Pair Object Tracking: Track Objects, Invariant Objects, Role Objects, Cross-Pair Match, All Input Objects, Color Frequency, Universal Colors, Variable Colors, Disappeared Objects, Appeared Objects, Stable Color Objects, Modal Object Count, Consistent Count, Singleton Color (mp_*, Layer 251) (PR 362) |
+| `task_category` | Task Type Classification: Categorize, Is Single Rule, Is Multi-Step, Has Context Gate, Has Symbol Table, Suggest Strategies, Preserves Dims, Preserves Colors, Consistent Change Count, Max Change Count, Distinct Change Patterns, Is Fill Task, Is Deletion Task, Confidence (tc_*, Layer 252) (PR 362) |
+| `period_fix` | Periodic Pattern Repair: List and Grid Period Detection, Majority-Vote Tile Construction, Violation Finding, Full and Single-Corruption Repair, and Best-Period Search (ppf_*, Layer 253) (PR 366) |
+| `io_channel` | I/O Channel Integration: Speaker output (espeak-ng / festival TTS), microphone input (arecord + whisper-cli STT), text channels (console / email / screen / app), image channels (console / email / screen / app / webcam / URL), and printer output (CUPS lp) (ic_*, Layer 254) (WP-279) |
+| `sequence_inference` (enhanced) | Sequential Rule Inference + ARC-AGI-2 Candidates: seqinfer_arc2_candidates/1 adds 66-entry integer-color candidate list for multi-step search (sq_*, Layer 195) (WP-274, PR 363) |
+| `rule_hypothesis` (enhanced) | Hypothesis Generation + Spatial/Structural/Sequence: hyp_spatial_hyp/3, hyp_structural_hyp/3, hyp_sequence_hyp/4 extend hypothesis search to grid-level shifts, structural patterns, and two-step color maps (hy_*, Layer 74) (WP-275, PR 363) |
+| `conditional_transform` (enhanced) | Conditional Scene Transform + Gate Inference: condxf_infer_gate/3 infers the gate_color that separates training pairs by change signature (xc_*, Layer 187) (WP-276, PR 363) |
 | `induction` (enhanced) | Grid-Pair Induction + Cross-Pair Aggregation: induction_cross_pair_invariants/2, induction_cross_pair_variants/2 aggregate properties across all training pairs (id_*, Layer 59) (WP-277, PR 363) |
-| `gridpos` | Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222) (PR 332) |
-| `gridhist` | Grid Histogram Analysis: Per-Row and Per-Column Color Frequency, Modal, and Entropy (ghst_*, Layer 221) (PR 331) |
-| `gridseg` | Grid Segmentation by Separator Rows and Columns: Split, Trim, and Panel Extraction (gsg_*, Layer 220) (PR 330) |
-| `gridrowcol` | Grid Row and Column Comparative Analysis: Extract, Compare, Sort, and Find Matching Rows and Columns (grc_*, Layer 219) (PR 329) |
-| `griddelta` | Grid Delta Analysis: Difference Detection, Change Maps, Color Transitions, and Grid Comparison (gdt_*, Layer 218) (PR 328) |
-| `gridspiral` | Grid Spiral Traversal: Clockwise Spiral Ordering, Read, Write, Rotate, and Frame Spirals (gsp_*, Layer 217) (PR 327) |
-| `gridframe` | Grid Frame Analysis: Concentric Ring Depth, Frame Extraction, Uniformity, Fill, and Peel (gfr_*, Layer 216) (PR 326) |
-| `griddiag` | Grid Diagonal Analysis: Main and Anti-Diagonal Extraction, Counting, Uniformity, and Modification (gdi_*, Layer 215) (PR 325) |
-| `gridgraph` | Grid Region Adjacency Graph: Color Adjacency, Borders, Enclosure, Spanning, and Component Analysis (ggr_*, Layer 214) (PR 324) |
-| `gridconv` | Grid Convolution: Sliding Window, Pattern Matching, Density Maps, and Square Morphology (gcv_*, Layer 213) (PR 323) |
-| `gridmorph` | Grid Morphological Operations: Dilation, Erosion, Opening, Closing, Fill, and Gradient (gmo_*, Layer 212) (PR 322) |
-| `gridedge` | Grid Edge and Boundary Detection: Edge Cells, Boundaries, Corners, Endpoints, and Transition Maps (ge_*, Layer 211) (PR 321) |
-| `gridstitch` | Grid Assembly: Concatenation, Splitting, Tiling, Border, and Repetition (gst_*, Layer 210) (PR 320) |
-| `gridcolor` | Grid Color Analysis: Count, Histogram, Recolor, Color Map, Threshold, Dominant, Fraction (gc_*, Layer 209) (PR 319) |
-| `gridpath` | Grid Pathfinding: BFS Shortest Path, Distance Maps, Flood-N, Wavefront, Line-of-Sight, and Region Path (gpa_*, Layer 205) (PR 314) |
-| `gridflood` | Grid Flood-Fill, Region Analysis, Hole Filling, and Connected Components (gf_*, Layer 204) (PR 313) |
-| `gridrun` | Grid Run-Length Encoding and Stripe Analysis: Row/Column Runs, Uniformity, Striped Grids, and Alternating Patterns (grl_*, Layer 203) (PR 312) |
-| `gridscale` | Grid Block-Pixel Scaling: Upsample, Downsample, Scale Factor, Tile Inference, Pad, and Resize (gsc_*, Layer 202) (PR 311) |
-| `gridperiod` | Grid Periodic Pattern Detection and Extension: Row/Column Period, Tiling, Autocorrelation, and Wrap-Shift (gper_*, Layer 201) (PR 310) |
-| `griddist` | Grid Distance Transform: Cell-to-Color Distances, BFS Flood, Voronoi, and Morphological N-Step Ops (gd_*, Layer 200) (PR 309) |
-| `gridtask` | Grid Task: End-to-End Raw Grid Task Solver (gt_*, Layer 198) (PR 307) |
-| `gridparse` | Grid Parse: Conversion between Raw Grid Format and obj Scene Representation (PR 306) |
-| `gridquery` | Grid Query and Manipulation: Size, Color, Region, Diff, Structural Ops (PR 305) |
-| `seqinfer` | Sequential Rule Inference: Multi-Step Scene Transformation Search (PR 304) |
-| `sceneinv` | Scene Invariant Detection across Training Pairs (PR 303) |
-| `multicolor` | Multi-Color Scene Analysis: Frequency, Partition, and Color-Indexed Queries (PR 302) |
-| `transformgen` | Systematic Generation of Scene Transformation Rule Candidates (PR 301) |
-| `gridsolve` | End-to-End Scene Puzzle Solver (PR 300) |
-| `colortable` | Color Substitution Table Learning and Application (PR 299) |
-| `scenerank` | Rule Hypothesis Ranking for Scene Lists (PR 298) |
-| `scenepair` | Holistic Before-After Scene Pair Analysis (PR 297) |
-| `condxf` | Conditional and Selective Scene Transformation (PR 296) |
-| `sceneapply` | Scene-Level Rule Term Evaluation Engine (PR 295) |
-| `ruleinfer` | Scene-Level Transformation Rule Inference from Object-List Pairs (PR 294) |
-| `scenexf` | Scene-Level Uniform Transformation of All Objects (PR 293) |
-| `objlocate` | Object-List Spatial and Attribute Query Against a Reference Object (PR 292) |
-| `scenecmp` | Scene-Level Comparison of Two Object Lists (PR 291) |
-| `objgroup` | Object-List Grouping by Shared Attribute (PR 290) |
-| `objattr` | Object-List Aggregate Attribute Analysis (PR 289) |
-| `objmerge` | Object Merging, Set Operations, and Component Splitting (PR 288) |
-| `objbound` | Object Shape Classification and Bounding Box Analysis (PR 277) |
-| `objsym` | Object Symmetry Analysis for obj(Color, Cells) Terms (PR 276) |
-| `objchain` | Linear Chain Analysis for obj(Color, Cells) Sequences (PR 275) |
+| `grid_position` | Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222) (PR 332) |
+| `grid_histogram` | Grid Histogram Analysis: Per-Row and Per-Column Color Frequency, Modal, and Entropy (ghst_*, Layer 221) (PR 331) |
+| `grid_segment` | Grid Segmentation by Separator Rows and Columns: Split, Trim, and Panel Extraction (gsg_*, Layer 220) (PR 330) |
+| `grid_row_column` | Grid Row and Column Comparative Analysis: Extract, Compare, Sort, and Find Matching Rows and Columns (grc_*, Layer 219) (PR 329) |
+| `grid_delta` | Grid Delta Analysis: Difference Detection, Change Maps, Color Transitions, and Grid Comparison (gdt_*, Layer 218) (PR 328) |
+| `grid_spiral` | Grid Spiral Traversal: Clockwise Spiral Ordering, Read, Write, Rotate, and Frame Spirals (gsp_*, Layer 217) (PR 327) |
+| `grid_frame` | Grid Frame Analysis: Concentric Ring Depth, Frame Extraction, Uniformity, Fill, and Peel (gfr_*, Layer 216) (PR 326) |
+| `grid_diagonal` | Grid Diagonal Analysis: Main and Anti-Diagonal Extraction, Counting, Uniformity, and Modification (gdi_*, Layer 215) (PR 325) |
+| `grid_graph` | Grid Region Adjacency Graph: Color Adjacency, Borders, Enclosure, Spanning, and Component Analysis (ggr_*, Layer 214) (PR 324) |
+| `grid_convolution` | Grid Convolution: Sliding Window, Pattern Matching, Density Maps, and Square Morphology (gcv_*, Layer 213) (PR 323) |
+| `grid_morph` | Grid Morphological Operations: Dilation, Erosion, Opening, Closing, Fill, and Gradient (gmo_*, Layer 212) (PR 322) |
+| `grid_edge` | Grid Edge and Boundary Detection: Edge Cells, Boundaries, Corners, Endpoints, and Transition Maps (ge_*, Layer 211) (PR 321) |
+| `grid_stitch` | Grid Assembly: Concatenation, Splitting, Tiling, Border, and Repetition (gst_*, Layer 210) (PR 320) |
+| `grid_color` | Grid Color Analysis: Count, Histogram, Recolor, Color Map, Threshold, Dominant, Fraction (gc_*, Layer 209) (PR 319) |
+| `grid_path` | Grid Pathfinding: BFS Shortest Path, Distance Maps, Flood-N, Wavefront, Line-of-Sight, and Region Path (gpa_*, Layer 205) (PR 314) |
+| `grid_flood` | Grid Flood-Fill, Region Analysis, Hole Filling, and Connected Components (gf_*, Layer 204) (PR 313) |
+| `grid_run` | Grid Run-Length Encoding and Stripe Analysis: Row/Column Runs, Uniformity, Striped Grids, and Alternating Patterns (grl_*, Layer 203) (PR 312) |
+| `grid_scale` | Grid Block-Pixel Scaling: Upsample, Downsample, Scale Factor, Tile Inference, Pad, and Resize (gsc_*, Layer 202) (PR 311) |
+| `grid_period` | Grid Periodic Pattern Detection and Extension: Row/Column Period, Tiling, Autocorrelation, and Wrap-Shift (gper_*, Layer 201) (PR 310) |
+| `grid_distance` | Grid Distance Transform: Cell-to-Color Distances, BFS Flood, Voronoi, and Morphological N-Step Ops (gd_*, Layer 200) (PR 309) |
+| `grid_task` | Grid Task: End-to-End Raw Grid Task Solver (gt_*, Layer 198) (PR 307) |
+| `grid_parse` | Grid Parse: Conversion between Raw Grid Format and obj Scene Representation (PR 306) |
+| `grid_query` | Grid Query and Manipulation: Size, Color, Region, Diff, Structural Ops (PR 305) |
+| `sequence_inference` | Sequential Rule Inference: Multi-Step Scene Transformation Search (PR 304) |
+| `scene_invariant` | Scene Invariant Detection across Training Pairs (PR 303) |
+| `multi_color` | Multi-Color Scene Analysis: Frequency, Partition, and Color-Indexed Queries (PR 302) |
+| `transform_generate` | Systematic Generation of Scene Transformation Rule Candidates (PR 301) |
+| `grid_solve` | End-to-End Scene Puzzle Solver (PR 300) |
+| `color_table` | Color Substitution Table Learning and Application (PR 299) |
+| `scene_rank` | Rule Hypothesis Ranking for Scene Lists (PR 298) |
+| `scene_pair` | Holistic Before-After Scene Pair Analysis (PR 297) |
+| `conditional_transform` | Conditional and Selective Scene Transformation (PR 296) |
+| `scene_apply` | Scene-Level Rule Term Evaluation Engine (PR 295) |
+| `rule_inference` | Scene-Level Transformation Rule Inference from Object-List Pairs (PR 294) |
+| `scene_transform` | Scene-Level Uniform Transformation of All Objects (PR 293) |
+| `object_locate` | Object-List Spatial and Attribute Query Against a Reference Object (PR 292) |
+| `scene_compare` | Scene-Level Comparison of Two Object Lists (PR 291) |
+| `object_group` | Object-List Grouping by Shared Attribute (PR 290) |
+| `object_attribute` | Object-List Aggregate Attribute Analysis (PR 289) |
+| `object_merge` | Object Merging, Set Operations, and Component Splitting (PR 288) |
+| `object_boundary` | Object Shape Classification and Bounding Box Analysis (PR 277) |
+| `object_symmetry` | Object Symmetry Analysis for obj(Color, Cells) Terms (PR 276) |
+| `object_chain` | Linear Chain Analysis for obj(Color, Cells) Sequences (PR 275) |
 | `weave` | List Interlacing, Slicing, and Cycling (PR 266) |
 | `border` | Concentric Ring Analysis for 2D Grids (PR 252) |
 | `warp` | Shear, Cyclic Shift, and Non-Uniform Grid Warping (PR 251) |

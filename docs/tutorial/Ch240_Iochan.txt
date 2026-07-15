@@ -6,7 +6,7 @@ ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
 Work Package: 279
 Layer: 254
 Predicate prefix: ic_
-File: packs/iochan/prolog/iochan.pl
+File: packs/io_channel/prolog/io_channel.pl
 
 
 WHAT IS THE IOCHAN PACK?
@@ -58,117 +58,117 @@ FOURTEEN PUBLIC PREDICATES
 
 CHANNEL REGISTRY
 
-    iochan_register_channel(+Type, +Config, -ChannelId)
+    io_channel_register_channel(+Type, +Config, -ChannelId)
         Register a configuration under a type. Returns a unique channel ID atom (chan_N).
         Five default channels are pre-registered at load time.
 
-    iochan_channel_info(+ChannelId, -Info)
+    io_channel_channel_info(+ChannelId, -Info)
         Returns info(ChannelId, Type, Config) for a registered channel.
 
-    iochan_list_channels(+Type, -Channels)
+    io_channel_list_channels(+Type, -Channels)
         Returns [chan(Id, Config), ...] for all registered channels of the given type.
 
-    iochan_channel_status(+ChannelId, -Status)
+    io_channel_channel_status(+ChannelId, -Status)
         Returns ready if the channel exists, unavailable otherwise.
 
 TEXT I/O
 
-    iochan_text_out(+Channel, +Text, -Status)
+    io_channel_text_out(+Channel, +Text, -Status)
         Dispatch Text to the named channel. Channel may be a registered ChannelId or a
         config term directly.
 
-    iochan_text_in(+Channel, -Text)
+    io_channel_text_in(+Channel, -Text)
         Read text from the named channel into Text.
 
 IMAGE I/O
 
-    iochan_image_out(+Channel, +ImagePath, -Status)
+    io_channel_image_out(+Channel, +ImagePath, -Status)
         Send the image at ImagePath to the named channel.
 
-    iochan_image_in(+Channel, -ImagePath)
+    io_channel_image_in(+Channel, -ImagePath)
         Capture an image from the named channel; return the file path.
 
 AUDIO (SPEAKER AND MICROPHONE)
 
-    iochan_speak(+Text, -Status)
+    io_channel_speak(+Text, -Status)
         Synthesize speech from Text via espeak-ng (festival fallback) through the
         default speaker (speaker_config('')).
 
-    iochan_speak_to(+Channel, +Text, -Status)
+    io_channel_speak_to(+Channel, +Text, -Status)
         Synthesize speech and route to a named audio-output channel.
 
-    iochan_listen(+DurationSecs, -Transcript)
+    io_channel_listen(+DurationSecs, -Transcript)
         Record audio for DurationSecs from the default microphone (mic_config('')) and
         transcribe via whisper-cli. Returns '' if duration=0 or hardware is unavailable.
 
-    iochan_listen_from(+Channel, +DurationSecs, -Transcript)
+    io_channel_listen_from(+Channel, +DurationSecs, -Transcript)
         Record from a named audio-input channel and transcribe.
 
 PRINTER
 
-    iochan_print_text(+Channel, +Text, -Status)
+    io_channel_print_text(+Channel, +Text, -Status)
         Send text to a registered printer channel using the CUPS lp command.
 
-    iochan_print_image(+Channel, +ImagePath, -Status)
+    io_channel_print_image(+Channel, +ImagePath, -Status)
         Send an image file to a registered printer channel using the CUPS lp command.
 
 
 EXAMPLES
 
-    :- use_module(library(iochan)).
+    :- use_module(library(io_channel)).
 
     % --- Text output ---
 
     % Write to the pre-registered console channel.
-    ?- iochan_text_out(console_config, 'Hello from PrologAI!', S).
+    ?- io_channel_text_out(console_config, 'Hello from PrologAI!', S).
     Hello from PrologAI!
     S = ok.
 
     % Register and use an email channel.
-    ?- iochan_register_channel(text_out, email_config('me@example.com','Alert'), Ch),
-       iochan_text_out(Ch, 'Reasoning complete.', S).
+    ?- io_channel_register_channel(text_out, email_config('me@example.com','Alert'), Ch),
+       io_channel_text_out(Ch, 'Reasoning complete.', S).
     Ch = chan_6, S = ok.    % requires sendmail
 
     % --- Speaker ---
 
-    ?- iochan_speak('PrologAI is listening.', Status).
+    ?- io_channel_speak('PrologAI is listening.', Status).
     Status = ok.            % requires espeak-ng or festival
 
     % Register a specific audio device and speak to it.
-    ?- iochan_register_channel(audio_out, speaker_config('hw:1,0'), SpkId),
-       iochan_speak_to(SpkId, 'Custom device test.', Status).
+    ?- io_channel_register_channel(audio_out, speaker_config('hw:1,0'), SpkId),
+       io_channel_speak_to(SpkId, 'Custom device test.', Status).
 
     % --- Microphone ---
 
-    ?- iochan_listen(5, Transcript).
+    ?- io_channel_listen(5, Transcript).
     Transcript = "hello prolog ai".   % requires arecord + whisper-cli
 
     % --- Image output ---
 
-    ?- iochan_image_out(console_config, '/home/user/diagram.png', Status).
+    ?- io_channel_image_out(console_config, '/home/user/diagram.png', Status).
     % ASCII art of diagram printed to terminal (requires img2txt)
     Status = ok.
 
     % Email an image.
-    ?- iochan_image_out(email_config('colleague@example.com','Result'), '/tmp/out.png', S).
+    ?- io_channel_image_out(email_config('colleague@example.com','Result'), '/tmp/out.png', S).
 
     % --- Image input ---
 
-    ?- iochan_register_channel(image_in, webcam_config('/dev/video0'), CamId),
-       iochan_image_in(CamId, ImagePath).
-    ImagePath = '/tmp/iochan_webcam_capture_123456'.
+    ?- io_channel_register_channel(image_in, webcam_config('/dev/video0'), CamId),
+       io_channel_image_in(CamId, ImagePath).
+    ImagePath = '/tmp/io_channel_webcam_capture_123456'.
 
-    ?- iochan_register_channel(image_in, url_config('https://example.com/img.jpg'), UrlId),
-       iochan_image_in(UrlId, Path).
+    ?- io_channel_register_channel(image_in, url_config('https://example.com/img.jpg'), UrlId),
+       io_channel_image_in(UrlId, Path).
 
     % --- Printer ---
 
-    ?- iochan_register_channel(printer, printer_config('', []), PrintId),
-       iochan_print_text(PrintId, 'PrologAI report\n', Status).
+    ?- io_channel_register_channel(printer, printer_config('', []), PrintId),
+       io_channel_print_text(PrintId, 'PrologAI report\n', Status).
     % Prints to default CUPS printer (requires lp)
 
-    ?- iochan_register_channel(printer, printer_config('HP_Color', ['fit-to-page']), PId),
-       iochan_print_image(PId, '/tmp/diagram.pdf', Status).
+    ?- io_channel_register_channel(printer, printer_config('HP_Color', ['fit-to-page']), PId),
+       io_channel_print_image(PId, '/tmp/diagram.pdf', Status).
 
 
 GRACEFUL DEGRADATION
@@ -186,21 +186,21 @@ error terms rather than propagating exceptions to the caller:
 This means iochan predicates are safe to call in reasoning chains where the exact
 I/O environment is unknown. You can check Status and branch accordingly:
 
-    ?- iochan_speak('Alert!', Status),
+    ?- io_channel_speak('Alert!', Status),
        ( Status = ok -> true ; format("Speech unavailable: ~w~n", [Status]) ).
 
 
 EXERCISES
 
-1. Register a text-output channel of type app_config, then inspect it with iochan_channel_info.
+1. Register a text-output channel of type app_config, then inspect it with io_channel_channel_info.
 
-2. Write a Prolog loop that calls iochan_speak/2 to announce each element of a list aloud.
+2. Write a Prolog loop that calls io_channel_speak/2 to announce each element of a list aloud.
 
 3. Register two printer channels (one with an empty name for the default printer,
-   one for a named printer). List all printer channels with iochan_list_channels.
+   one for a named printer). List all printer channels with io_channel_list_channels.
 
-4. Use iochan_listen/2 to record 3 seconds, then use iochan_text_out to write the transcript
+4. Use io_channel_listen/2 to record 3 seconds, then use io_channel_text_out to write the transcript
    to the console channel.
 
 5. Set up an image input channel with file_config for a local file, then pass the
-   captured ImagePath to iochan_image_out targeting the console channel.
+   captured ImagePath to io_channel_image_out targeting the console channel.

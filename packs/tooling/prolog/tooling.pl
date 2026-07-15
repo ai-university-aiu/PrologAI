@@ -266,8 +266,8 @@ dispatch_binding(mcp(Server, ToolName), _Tool, Args, Result) :-
     Result = mcp_result(Server, ToolName, Args).
 % Define a clause for 'dispatch binding': succeed when the following conditions hold.
 dispatch_binding(a2a(Skill), _Tool, Args, Result) :-
-    % Check that 'Result' is unifiable with 'a2a_result(Skill, Args)'.
-    Result = a2a_result(Skill, Args).
+    % Check that 'Result' is unifiable with 'agent_to_agent_result(Skill, Args)'.
+    Result = agent_to_agent_result(Skill, Args).
 % Define a clause for 'dispatch binding': succeed when the following conditions hold.
 dispatch_binding(body(Cap), _Tool, Args, Result) :-
     % Check that 'Result' is unifiable with 'body_result(Cap, Args)'.

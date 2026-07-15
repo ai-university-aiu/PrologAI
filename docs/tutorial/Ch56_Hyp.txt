@@ -9,86 +9,86 @@ The hyp pack requires: grid, induct.
 SECTION 56.1 - THE HYPOTHESIS AS A CALLABLE
 
 In PrologAI, a hypothesis is a Prolog callable of the form Goal(Input, Output).
-The simplest hypothesis is hyp_identity/2, which returns the input unchanged.
-The most common hypothesis is hyp_color_sub(Map), a partial application that
+The simplest hypothesis is rule_hypothesis_identity/2, which returns the input unchanged.
+The most common hypothesis is rule_hypothesis_color_sub(Map), a partial application that
 substitutes colors according to a map.
 
 The hyp pack treats hypotheses uniformly: any 2-argument callable can be passed
-to hyp_test, hyp_verify, hyp_rank, or hyp_select.
+to rule_hypothesis_test, rule_hypothesis_verify, rule_hypothesis_rank, or rule_hypothesis_select.
 
 SECTION 56.2 - COLOR SUBSTITUTION
 
-hyp_color_sub(+Map, +Grid, -Grid2)
+rule_hypothesis_color_sub(+Map, +Grid, -Grid2)
 
 Applies a color substitution map (list of Old-New pairs) to every cell.
 Cells whose color is not in the map are left unchanged.
 
-  hyp_color_sub([1-5, 2-6], [[1,2],[2,1]], Grid2).
+  rule_hypothesis_color_sub([1-5, 2-6], [[1,2],[2,1]], Grid2).
   % Grid2 = [[5,6],[6,5]]
 
-hyp_identity(+Grid, -Grid2) returns Grid unchanged.
-hyp_from_map(+Map, +Grid, -Grid2) is the same as hyp_color_sub; useful as a
-partial-application goal (hyp_from_map([1-5]) calls like hyp_color_sub([1-5])).
+rule_hypothesis_identity(+Grid, -Grid2) returns Grid unchanged.
+rule_hypothesis_from_map(+Map, +Grid, -Grid2) is the same as rule_hypothesis_color_sub; useful as a
+partial-application goal (rule_hypothesis_from_map([1-5]) calls like rule_hypothesis_color_sub([1-5])).
 
-hyp_apply_map/3 is another alias for hyp_color_sub.
+rule_hypothesis_apply_map/3 is another alias for rule_hypothesis_color_sub.
 
 SECTION 56.3 - TESTING HYPOTHESES
 
-hyp_test(+Goal, +Input, +Expected, -Acc)
+rule_hypothesis_test(+Goal, +Input, +Expected, -Acc)
 
 Apply Goal to Input and measure pixel accuracy against Expected. Acc is a
 float in [0.0, 1.0]. Uses float(Match)/float(Total) for consistent float output.
 
-hyp_test_all(+Goal, +Pairs, -MeanAcc, -Accs)
+rule_hypothesis_test_all(+Goal, +Pairs, -MeanAcc, -Accs)
 
 Test Goal on all training pairs. Returns the mean accuracy and the per-pair
 accuracy list. This is the standard ARC-AGI evaluation:
 
-  hyp_test_all(hyp_color_sub([1-5]), Pairs, Mean, _).
+  rule_hypothesis_test_all(rule_hypothesis_color_sub([1-5]), Pairs, Mean, _).
 
 SECTION 56.4 - EXACT MATCH
 
-hyp_verify(+Goal, +Input, +Expected) succeeds if Goal produces Output = Expected.
+rule_hypothesis_verify(+Goal, +Input, +Expected) succeeds if Goal produces Output = Expected.
 
-hyp_verify_all(+Goal, +Pairs) succeeds if Goal solves every pair exactly.
+rule_hypothesis_verify_all(+Goal, +Pairs) succeeds if Goal solves every pair exactly.
 This is the ARC-AGI pass criterion.
 
 SECTION 56.5 - SELECTION AND RANKING
 
-hyp_rank(+Goals, +Pairs, -Ranked) ranks a list of hypothesis goals by mean
+rule_hypothesis_rank(+Goals, +Pairs, -Ranked) ranks a list of hypothesis goals by mean
 accuracy descending. Ranked is a list of MeanAcc-Goal pairs.
 
-hyp_select(+Goals, +Pairs, -Best) picks the best hypothesis from the list.
+rule_hypothesis_select(+Goals, +Pairs, -Best) picks the best hypothesis from the list.
 
 SECTION 56.6 - MAP UTILITIES
 
-hyp_compose(+Map1, +Map2, +Grid, -Grid2) applies Map1 then Map2 (sequential
+rule_hypothesis_compose(+Map1, +Map2, +Grid, -Grid2) applies Map1 then Map2 (sequential
 color substitution). Useful for two-step color transformation.
 
-hyp_invert_map(+Map, -Inverted) swaps keys and values. Used to infer the
+rule_hypothesis_invert_map(+Map, -Inverted) swaps keys and values. Used to infer the
 reverse mapping from output colors back to input colors.
 
-hyp_map_lookup(+Map, +Color, -New) looks up Color in Map. Returns Color itself
+rule_hypothesis_map_lookup(+Map, +Color, -New) looks up Color in Map. Returns Color itself
 if not found (identity fallback). Useful for checking whether a color is
 in the substitution domain.
 
 SECTION 56.7 - DESCRIBING HYPOTHESES
 
-hyp_describe(+Goal, -Desc) converts a hypothesis to a human-readable atom.
+rule_hypothesis_describe(+Goal, -Desc) converts a hypothesis to a human-readable atom.
 Useful for logging and debugging.
 
 SECTION 56.8 - DESIGN NOTES
 
-hyp_color_sub uses if-then-else in the lookup helper for determinism; no
+rule_hypothesis_color_sub uses if-then-else in the lookup helper for determinism; no
 choicepoints from member/2.
 
-hyp_test uses findall-based cell counting (hyp_cell_match_) for determinism
+rule_hypothesis_test uses findall-based cell counting (rule_hypothesis_cell_match_) for determinism
 and float/1 conversion to avoid integer division.
 
-hyp_describe uses cuts in the first two clauses to prevent the catch-all
+rule_hypothesis_describe uses cuts in the first two clauses to prevent the catch-all
 from leaving a choicepoint.
 
-hyp_select and hyp_rank have no meta_predicate declarations because their
+rule_hypothesis_select and rule_hypothesis_rank have no meta_predicate declarations because their
 output argument is plain data, not a goal argument. Adding meta_predicate
 with a goal arity on the output would cause module qualification of the
 returned hypothesis functor, breaking unification in the caller.

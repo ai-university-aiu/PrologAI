@@ -6,7 +6,7 @@ ORCID 0009-0001-9246-5758, linkedin.com/in/d-r-dison/
 Work Package: 278
 Layer: 253
 Predicate prefix: ppf_
-File: packs/periodfix/prolog/periodfix.pl
+File: packs/period_fix/prolog/period_fix.pl
 
 
 WHAT IS THE PERIODFIX PACK?
@@ -30,91 +30,91 @@ FOURTEEN PUBLIC PREDICATES
 
 1D List Operations:
 
-    periodfix_list_period(+List, -P)
+    period_fix_list_period(+List, -P)
         P is the smallest exact period of List: List[i] = List[i mod P] for all i with
         zero violations. Fails if no period in 1..length-1 exists with zero violations.
 
-    periodfix_majority(+List, -Mode)
+    period_fix_majority(+List, -Mode)
         Mode is the most common element in the non-empty list List. On ties the element
         that appears first in sorted order wins.
 
-    periodfix_tile_from_list(+List, +P, -Tile)
+    period_fix_tile_from_list(+List, +P, -Tile)
         Tile is the majority-vote tile: Tile[p] = mode of all List[i] where i mod P = p.
         Length of Tile is P.
 
-    periodfix_violations_list(+List, +P, +Tile, -Violations)
+    period_fix_violations_list(+List, +P, +Tile, -Violations)
         Violations is the list of viol(Index, Actual, Expected) terms for each position
         where List[i] differs from Tile[i mod P].
 
-    periodfix_repair_list(+List, +P, +Tile, -Repaired)
+    period_fix_repair_list(+List, +P, +Tile, -Repaired)
         Repaired is List with every violation replaced by the Tile value at that phase.
 
-    periodfix_best_period_list(+List, -P, -NViol)
+    period_fix_best_period_list(+List, -P, -NViol)
         P in 1..max(1,N//2) that minimizes the violation count. NViol is that count.
         Ties broken by smallest P. Caps at N//2 to exclude the trivial full-length period.
 
-    periodfix_single_violation_list(+List, +P, +Tile, -Violation)
+    period_fix_single_violation_list(+List, +P, +Tile, -Violation)
         Succeeds (and binds Violation to viol(Idx,Actual,Expected)) iff List has exactly
         one violation against the tile. Fails for 0 or 2+ violations.
 
-    periodfix_repair_single_list(+List, +P, +Tile, -Repaired)
+    period_fix_repair_single_list(+List, +P, +Tile, -Repaired)
         Repairs the unique violation. Fails if 0 or 2+ violations.
 
 2D Grid Operations:
 
-    periodfix_tile_2d(+Grid, +PH, +PW, -Tile)
+    period_fix_tile_2d(+Grid, +PH, +PW, -Tile)
         Tile is a PH-by-PW majority-vote 2D tile: Tile[r][c] is the mode of all
         Grid cells at (R,C) where R mod PH = r and C mod PW = c.
 
-    periodfix_violations_2d(+Grid, +Tile, +PH, +PW, -Violations)
+    period_fix_violations_2d(+Grid, +Tile, +PH, +PW, -Violations)
         Violations is the list of viol(R, C, Actual, Expected) for each cell where
         Grid[R][C] differs from Tile[R mod PH][C mod PW].
 
-    periodfix_repair_grid(+Grid, +Tile, +PH, +PW, -Repaired)
+    period_fix_repair_grid(+Grid, +Tile, +PH, +PW, -Repaired)
         Repaired is Grid with every 2D violation replaced by the Tile value at that phase.
 
-    periodfix_best_periods(+Grid, -PH, -PW)
+    period_fix_best_periods(+Grid, -PH, -PW)
         (PH, PW) in 1..H//2 x 1..W//2 that minimizes total 2D violations. Caps at half
         dimensions to exclude trivial periods.
 
-    periodfix_single_violation_2d(+Grid, +Tile, +PH, +PW, -Violation)
+    period_fix_single_violation_2d(+Grid, +Tile, +PH, +PW, -Violation)
         Succeeds iff Grid has exactly one 2D violation (binds Violation to viol/4).
 
-    periodfix_repair_single_grid(+Grid, +Tile, +PH, +PW, -Repaired)
+    period_fix_repair_single_grid(+Grid, +Tile, +PH, +PW, -Repaired)
         Repairs the unique 2D violation. Fails if 0 or 2+ violations.
 
 
 EXAMPLES
 
-    :- use_module(library(periodfix)).
+    :- use_module(library(period_fix)).
 
     % 1D: find period and repair.
-    ?- periodfix_best_period_list([1,2,1,2,1,3], P, NViol).
+    ?- period_fix_best_period_list([1,2,1,2,1,3], P, NViol).
     P = 2, NViol = 1.
 
-    ?- periodfix_tile_from_list([1,2,1,2,1,3], 2, Tile).
+    ?- period_fix_tile_from_list([1,2,1,2,1,3], 2, Tile).
     Tile = [1,2].
 
-    ?- periodfix_repair_list([1,2,1,2,1,3], 2, [1,2], Repaired).
+    ?- period_fix_repair_list([1,2,1,2,1,3], 2, [1,2], Repaired).
     Repaired = [1,2,1,2,1,2].
 
     % Single-violation repair:
-    ?- periodfix_repair_single_list([1,2,1,2,1,3], 2, [1,2], R).
+    ?- period_fix_repair_single_list([1,2,1,2,1,3], 2, [1,2], R).
     R = [1,2,1,2,1,2].
 
     % 2D: a 2-by-3 grid with period (2,2) and one corrupted cell.
     Grid = [[1,2,1,2],[2,1,2,1],[1,2,9,2],[2,1,2,1]].
-    ?- periodfix_best_periods(Grid, PH, PW).
+    ?- period_fix_best_periods(Grid, PH, PW).
     PH = 2, PW = 2.
 
-    ?- periodfix_tile_2d([[1,2,1,2],[2,1,2,1],[1,2,9,2],[2,1,2,1]], 2, 2, Tile).
+    ?- period_fix_tile_2d([[1,2,1,2],[2,1,2,1],[1,2,9,2],[2,1,2,1]], 2, 2, Tile).
     Tile = [[1,2],[2,1]].
 
-    ?- periodfix_violations_2d([[1,2,1,2],[2,1,2,1],[1,2,9,2],[2,1,2,1]],
+    ?- period_fix_violations_2d([[1,2,1,2],[2,1,2,1],[1,2,9,2],[2,1,2,1]],
                          [[1,2],[2,1]], 2, 2, Vs).
     Vs = [viol(2,2,9,1)].
 
-    ?- periodfix_repair_single_grid([[1,2,1,2],[2,1,2,1],[1,2,9,2],[2,1,2,1]],
+    ?- period_fix_repair_single_grid([[1,2,1,2],[2,1,2,1],[1,2,9,2],[2,1,2,1]],
                               [[1,2],[2,1]], 2, 2, Repaired).
     % Repaired grid has 1 at (2,2) instead of 9.
 
@@ -132,12 +132,12 @@ The same logic handles column sequences via a transpose-repair-transpose pass.
 EXERCISES
 
 1. Find the period of the list [a,b,c,a,b,c,a,b,c]:
-   ?- periodfix_list_period([a,b,c,a,b,c,a,b,c], P).
+   ?- period_fix_list_period([a,b,c,a,b,c,a,b,c], P).
 
 2. Repair [r,g,b,r,g,b,r,x,b] (one error at index 7, expected g):
-   ?- periodfix_best_period_list([r,g,b,r,g,b,r,x,b], P, NViol),
-      periodfix_tile_from_list([r,g,b,r,g,b,r,x,b], P, Tile),
-      periodfix_repair_list([r,g,b,r,g,b,r,x,b], P, Tile, Repaired).
+   ?- period_fix_best_period_list([r,g,b,r,g,b,r,x,b], P, NViol),
+      period_fix_tile_from_list([r,g,b,r,g,b,r,x,b], P, Tile),
+      period_fix_repair_list([r,g,b,r,g,b,r,x,b], P, Tile, Repaired).
 
 3. Create a 4x4 grid where Grid[r][c] = (r+c) mod 3, corrupt one cell,
-   then use periodfix_best_periods and periodfix_repair_single_grid to restore it.
+   then use period_fix_best_periods and period_fix_repair_single_grid to restore it.

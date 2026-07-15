@@ -6,47 +6,47 @@ The quant pack answers questions about counts, frequencies, groupings, and unifo
 
 LOADING
 
-    :- use_module(library(quant)).
+    :- use_module(library(quantity)).
 
 HISTOGRAM AND FREQUENCY
 
-quant_histogram/2 returns a Color-Count list.
+quantity_histogram/2 returns a Color-Count list.
 
-    ?- quant_histogram([obj(1,[r(0,0)]),obj(1,[r(1,0)]),obj(2,[r(2,0)])], H).
+    ?- quantity_histogram([obj(1,[r(0,0)]),obj(1,[r(1,0)]),obj(2,[r(2,0)])], H).
     H = [1-2, 2-1].
 
-quant_most_frequent_color/2 and quant_least_frequent_color/2 identify extremes.
-quant_max_color_count/2 and quant_min_color_count/2 return the count values.
+quantity_most_frequent_color/2 and quantity_least_frequent_color/2 identify extremes.
+quantity_max_color_count/2 and quantity_min_color_count/2 return the count values.
 
 GROUPING
 
-quant_group_by_color/2, quant_group_by_size/2, quant_group_by_shape/2 partition
+quantity_group_by_color/2, quantity_group_by_size/2, quantity_group_by_shape/2 partition
 an object list into Color-[Objs] (or Size-[Objs] or Shape-[Objs]) pairs.
 
-    ?- scene_objects(G, Objs), quant_group_by_color(Objs, Groups).
+    ?- scene_objects(G, Objs), quantity_group_by_color(Objs, Groups).
 
 UNIQUE SHAPES
 
-quant_unique_shapes/2 returns a sorted list of distinct normalized shapes.
+quantity_unique_shapes/2 returns a sorted list of distinct normalized shapes.
 
-    ?- quant_unique_shapes(Objs, Shapes), length(Shapes, N).
+    ?- quantity_unique_shapes(Objs, Shapes), length(Shapes, N).
 
 CONDITIONAL COUNTING
 
-quant_count_where/3 counts objects satisfying a named goal.
+quantity_count_where/3 counts objects satisfying a named goal.
 
-    ?- quant_count_where(Objs, has_color_1, Count).
+    ?- quantity_count_where(Objs, has_color_1, Count).
 
-quant_exactly_n/3 and quant_at_least_n/3 assert count thresholds.
+quantity_exactly_n/3 and quantity_at_least_n/3 assert count thresholds.
 
 UNIFORMITY TESTS
 
-quant_all_same_color/1, quant_all_same_size/1, quant_all_same_shape/1 check
+quantity_all_same_color/1, quantity_all_same_size/1, quantity_all_same_shape/1 check
 if all objects in a list share the same attribute value.
 
 MULTISET MATCHING
 
-quant_colors_match/2, quant_shapes_match/2, quant_sizes_match/2 compare two
+quantity_colors_match/2, quantity_shapes_match/2, quantity_sizes_match/2 compare two
 object lists for attribute multiset equality (order-independent).
 
 WHAT COMES NEXT

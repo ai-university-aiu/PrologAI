@@ -112,18 +112,18 @@ test(xor_one_nonbg) :-
 
 :- begin_tests(overlay_diff).
 
-test(diff_basic) :-
+test(difference_basic) :-
     A = [[1,2],[3,4]],
     B = [[1,0],[3,0]],
     overlay_diff(A, B, 0, Result),
     Result = [[0,2],[0,4]].
 
-test(diff_all_same) :-
+test(difference_all_same) :-
     A = [[1,2],[3,4]],
     overlay_diff(A, A, 0, Result),
     Result = [[0,0],[0,0]].
 
-test(diff_all_different) :-
+test(difference_all_different) :-
     A = [[1,2]], B = [[3,4]],
     overlay_diff(A, B, 0, Result),
     Result = [[1,2]].

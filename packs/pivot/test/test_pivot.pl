@@ -272,7 +272,7 @@ test(orbit_diagonal) :-
 % --- pivot_sym_closure/3 ---
 
 % pivot_sym_closure of a single cell equals its orbit.
-test(sym_closure_single) :-
+test(symmetry_transform_closure_single) :-
     % Closure of one cell = its orbit.
     pivot_orbit(0-0, 1-0, Orbit),
     pivot_sym_closure(0-0, [1-0], Closure),
@@ -281,14 +281,14 @@ test(sym_closure_single) :-
     S1 = S2.
 
 % pivot_sym_closure of a D4-symmetric set is the set itself.
-test(sym_closure_already_symmetric) :-
+test(symmetry_transform_closure_already_symmetric) :-
     % The 4 cardinal neighbors form a D4-symmetric set.
     pivot_sym_closure(0-0, [1-0, 0-1, (-1)-0, 0-(-1)], Closure),
     % Closure = same 4 cells.
     length(Closure, 4).
 
 % pivot_sym_closure of an empty list is empty.
-test(sym_closure_empty) :-
+test(symmetry_transform_closure_empty) :-
     % No cells to close.
     pivot_sym_closure(0-0, [], Closure),
     Closure = [].

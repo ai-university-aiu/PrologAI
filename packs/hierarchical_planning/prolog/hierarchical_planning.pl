@@ -91,7 +91,7 @@ hierarchical_planning_ooda_phases([see, observe, orient, decide, act, reobserve_
 % See: take in the entire grid.
 hierarchical_planning_phase_ops(see, [perceive_whole_grid]).
 % Observe: read what the grid says about the situation.
-hierarchical_planning_phase_ops(observe, [read_meters, locate_avatar, diff_frame]).
+hierarchical_planning_phase_ops(observe, [read_meters, locate_avatar, difference_frame]).
 % Orient: make sense of it with prior knowledge.
 hierarchical_planning_phase_ops(orient, [apply_priors, identify_archetype, rank_objects_and_hazards]).
 % Decide: choose the next action.

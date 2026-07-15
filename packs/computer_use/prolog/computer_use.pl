@@ -19,22 +19,22 @@
     control whenever a page exposes structure.
 
     Predicates:
-        pai_screen_observe/1    — -Elements: perceive screen; return node_facts
-        pai_computer_act/2      — +Action, -Confirmation: actuate with gate
-        pai_browser_navigate/2  — +URL, -PageElements: navigate and extract
-        pai_page_extract/2      — +Source, -Content: quarantine page content
+        computer_use_screen_observe/1    — -Elements: perceive screen; return node_facts
+        computer_use_act/2      — +Action, -Confirmation: actuate with gate
+        computer_use_browser_navigate/2  — +URL, -PageElements: navigate and extract
+        computer_use_page_extract/2      — +Source, -Content: quarantine page content
 */
 
 % Declare this file as the 'computer_use' module and list its exported predicates.
 :- module(computer_use, [
-    % Supply 'pai_screen_observe/1' as the next argument to the expression above.
-    pai_screen_observe/1,
-    % Supply 'pai_computer_act/2' as the next argument to the expression above.
-    pai_computer_act/2,
-    % Supply 'pai_browser_navigate/2' as the next argument to the expression above.
-    pai_browser_navigate/2,
-    % Supply 'pai_page_extract/2' as the next argument to the expression above.
-    pai_page_extract/2
+    % Supply 'computer_use_screen_observe/1' as the next argument to the expression above.
+    computer_use_screen_observe/1,
+    % Supply 'computer_use_act/2' as the next argument to the expression above.
+    computer_use_act/2,
+    % Supply 'computer_use_browser_navigate/2' as the next argument to the expression above.
+    computer_use_browser_navigate/2,
+    % Supply 'computer_use_page_extract/2' as the next argument to the expression above.
+    computer_use_page_extract/2
 % Close the expression opened above.
 ]).
 
@@ -109,7 +109,7 @@ next_tab_id(Id) :-
     assertz(tab_counter(N1)), Id = tab(N1).
 
 % ---------------------------------------------------------------------------
-% pai_screen_observe/1 — take a virtual screenshot and extract elements
+% computer_use_screen_observe/1 — take a virtual screenshot and extract elements
 %
 %   Returns a list of screen_element/4 terms extracted from the virtual
 %   desktop state.  In a real deployment, this calls the system's screenshot
@@ -120,7 +120,7 @@ next_tab_id(Id) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai screen observe': succeed when the following conditions hold.
-pai_screen_observe(Elements) :-
+computer_use_screen_observe(Elements) :-
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(element(Id, Type, Loc, Attrs),
             % Continue the multi-line expression started above.
@@ -137,7 +137,7 @@ register_screen_element(Type, Location, Attributes, ElementId) :-
     assertz(screen_element(ElementId, Type, Location, Attributes)).
 
 % ---------------------------------------------------------------------------
-% pai_computer_act/2 — gate and dispatch an action
+% computer_use_act/2 — gate and dispatch an action
 %
 %   Actions:
 %       click(ElementId)            — click a screen element
@@ -154,7 +154,7 @@ register_screen_element(Type, Location, Attributes, ElementId) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai computer act': succeed when the following conditions hold.
-pai_computer_act(Action, Confirmation) :-
+computer_use_act(Action, Confirmation) :-
     % Execute: ( irreversible_action(Action).
     ( irreversible_action(Action)
     % If the condition above succeeded, perform the following action.
@@ -237,18 +237,18 @@ computer_use_action(hotkey(Keys), hotkey_sent(Keys)).
 computer_use_action(submit_form(FormId), submitted(FormId)).
 
 % ---------------------------------------------------------------------------
-% pai_browser_navigate/2 — structured browser navigation
+% computer_use_browser_navigate/2 — structured browser navigation
 %
 %   Navigates to URL, extracts page structure (simulated), and returns
 %   a list of page_element/3 terms (Type, Location, Content).
-%   Content from untrusted sources lands in quarantine via pai_page_extract/2.
+%   Content from untrusted sources lands in quarantine via computer_use_page_extract/2.
 %   Browser control is preferred over raw pixel control when page has structure.
 %
 %   PageElements: list of page_element(Type, Location, Content)
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai browser navigate': succeed when the following conditions hold.
-pai_browser_navigate(URL, PageElements) :-
+computer_use_browser_navigate(URL, PageElements) :-
     % State a fact for 'next tab id' with the arguments listed below.
     next_tab_id(TabId),
     % Add a new fact or rule to the runtime knowledge base.
@@ -260,7 +260,7 @@ pai_browser_navigate(URL, PageElements) :-
     % State a fact for 'maplist' with the arguments listed below.
     maplist([page_element(T, L, C), page_element(T, L, QC)]>>(
         % Continue the multi-line expression started above.
-        pai_page_extract(C, QC)
+        computer_use_page_extract(C, QC)
     % Continue the multi-line expression started above.
     ), RawElements, PageElements).
 
@@ -294,7 +294,7 @@ simulate_page_elements(URL, Elements) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_page_extract/2 — quarantine on-screen/page content
+% computer_use_page_extract/2 — quarantine on-screen/page content
 %
 %   Wraps content as quarantined(ContentId, Source, Content).
 %   Content is NEVER executed as a command — it must be explicitly
@@ -305,7 +305,7 @@ simulate_page_elements(URL, Elements) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai page extract': succeed when the following conditions hold.
-pai_page_extract(RawContent, quarantined(ContentId, screen, RawContent)) :-
+computer_use_page_extract(RawContent, quarantined(ContentId, screen, RawContent)) :-
     % State a fact for 'next quarantine id' with the arguments listed below.
     next_quarantine_id(ContentId),
     % Add a new fact or rule to the runtime knowledge base.

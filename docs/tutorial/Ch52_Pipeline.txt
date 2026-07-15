@@ -166,20 +166,20 @@ predicates into named steps:
   pipeline_register(bg_to_one, [_, G, G2]>>(rewrite_replace_color(G, 0, 1, G2))).
 
   % Register a step that scales all values by 2.
-  pipeline_register(scale2, [_, G, G2]>>(arith_scalar_mul(G, 2, G2))).
+  pipeline_register(scale2, [_, G, G2]>>(arithmetic_scalar_mul(G, 2, G2))).
 
   % Apply both steps in sequence.
   pipeline_run([bg_to_one, scale2], InputGrid, OutputGrid).
 
   % Pipeline with a context-dependent step.
   % The step handler reads a color from the step term.
-  pipeline_register(fill_color, [fill_color(C), G, G2]>>(arith_scalar_add(G, C, G2))).
+  pipeline_register(fill_color, [fill_color(C), G, G2]>>(arithmetic_scalar_add(G, C, G2))).
   pipeline_run([fill_color(3)], [[0,0],[0,0]], Out).
   % Out = [[3,3],[3,3]]
 
   % Filter to keep only objects larger than a threshold.
-  obj_all(Grid, AllObjs),
-  pipeline_filter([Obj]>>(obj_size(Obj, N), N > 2), AllObjs, BigObjs).
+  object_all(Grid, AllObjs),
+  pipeline_filter([Obj]>>(object_size(Obj, N), N > 2), AllObjs, BigObjs).
 
   % Zip input-output grid pairs and process each.
   pipeline_zip(InputGrids, OutputGrids, Pairs),

@@ -75,7 +75,7 @@
 % Import grid measurement and colour reading for the signature.
 :- use_module(library(grid), [grid_size/3, grid_cell/4, grid_colors/2, grid_color_count/3]).
 % Import object detection so salient click cells are object centroids.
-:- use_module(library(gridobj), [gridobj_all_objects/3]).
+:- use_module(library(grid_object), [grid_object_all_objects/3]).
 % Import list helpers.
 :- use_module(library(lists), [member/2, memberchk/2]).
 
@@ -155,7 +155,7 @@ curiosity_predict_change(Action) :-
 % robust proxy for that salience.
 curiosity_salient_cells(Frame, Cells) :-
     % Treat colour zero as the background; every other object is a target.
-    gridobj_all_objects(Frame, 0, Objects),
+    grid_object_all_objects(Frame, 0, Objects),
     % Pair each object's centroid with its size, negated so a keysort puts the
     % largest object first.
     findall(NegSize - cell(R, C),

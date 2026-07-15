@@ -9,64 +9,64 @@ and all interior objects (degree 2). A cycle is when all objects have degree 2.
 
 Basic Touching and Degree
 
-    % objchain_touches(+Obj1, +Obj2): 4-adjacency test
+    % object_chain_touches(+Obj1, +Obj2): 4-adjacency test
     A = obj(a,[r(0,0)]), B = obj(b,[r(0,1)]),
-    objchain_touches(A, B).  % true
+    object_chain_touches(A, B).  % true
 
-    % objchain_degree(+Obj, +Objs, -N)
-    objchain_degree(A, [A,B,C], D).  % D = 1 (A is an endpoint)
-    objchain_degree(B, [A,B,C], D).  % D = 2 (B is interior)
+    % object_chain_degree(+Obj, +Objs, -N)
+    object_chain_degree(A, [A,B,C], D).  % D = 1 (A is an endpoint)
+    object_chain_degree(B, [A,B,C], D).  % D = 2 (B is interior)
 
 Chain Detection
 
-    % objchain_is_chain(+Objs): is this set of objects a linear path?
-    objchain_is_chain([]).          % true (empty)
-    objchain_is_chain([A]).         % true (trivial)
-    objchain_is_chain([A,B]).       % true if A touches B
-    objchain_is_chain([A,B,C,D,E]). % true if forms a linear path
+    % object_chain_is_chain(+Objs): is this set of objects a linear path?
+    object_chain_is_chain([]).          % true (empty)
+    object_chain_is_chain([A]).         % true (trivial)
+    object_chain_is_chain([A,B]).       % true if A touches B
+    object_chain_is_chain([A,B,C,D,E]). % true if forms a linear path
 
-    % objchain_has_cycle(+Objs): do objects form a closed cycle?
-    objchain_has_cycle([A,B,C,D]).  % true if all degrees = 2 and N >= 3
+    % object_chain_has_cycle(+Objs): do objects form a closed cycle?
+    object_chain_has_cycle([A,B,C,D]).  % true if all degrees = 2 and N >= 3
 
 Finding Endpoints and Linearizing
 
-    % objchain_endpoints(+Objs, -E1, -E2): the two degree-1 endpoints
-    objchain_endpoints([A,B,C,D,E], E1, E2).
+    % object_chain_endpoints(+Objs, -E1, -E2): the two degree-1 endpoints
+    object_chain_endpoints([A,B,C,D,E], E1, E2).
     % {E1, E2} = {A, E}
 
-    % objchain_linearize(+Objs, -Ordered): put objects in path order
-    objchain_linearize([E,C,A,D,B], Ordered).
+    % object_chain_linearize(+Objs, -Ordered): put objects in path order
+    object_chain_linearize([E,C,A,D,B], Ordered).
     % Ordered = [A,B,C,D,E] or [E,D,C,B,A]
 
-    % objchain_from_endpoint(+Objs, +Start, -Ordered): order from specific endpoint
-    objchain_from_endpoint([A,B,C], A, Ord).
+    % object_chain_from_endpoint(+Objs, +Start, -Ordered): order from specific endpoint
+    object_chain_from_endpoint([A,B,C], A, Ord).
     % Ord = [A,B,C]
 
 Indexing and Sequences
 
-    % objchain_nth(+Ordered, +N, -Obj): 0-based indexing
-    objchain_nth([A,B,C,D,E], 2, Obj).  % Obj = C
+    % object_chain_nth(+Ordered, +N, -Obj): 0-based indexing
+    object_chain_nth([A,B,C,D,E], 2, Obj).  % Obj = C
 
-    % objchain_color_seq(+Ordered, -Colors): color of each object in order
-    objchain_color_seq([A,B,C], Colors).  % Colors = [a,b,c]
+    % object_chain_color_seq(+Ordered, -Colors): color of each object in order
+    object_chain_color_seq([A,B,C], Colors).  % Colors = [a,b,c]
 
-    % objchain_sub(+Ordered, +I, +J, -Sub): sub-chain (0-based, inclusive)
-    objchain_sub([A,B,C,D,E], 1, 3, Sub).  % Sub = [B,C,D]
+    % object_chain_sub(+Ordered, +I, +J, -Sub): sub-chain (0-based, inclusive)
+    object_chain_sub([A,B,C,D,E], 1, 3, Sub).  % Sub = [B,C,D]
 
 Other Operations
 
-    % objchain_reverse(+Ordered, -Rev)
-    objchain_reverse([A,B,C], Rev).  % Rev = [C,B,A]
+    % object_chain_reverse(+Ordered, -Rev)
+    object_chain_reverse([A,B,C], Rev).  % Rev = [C,B,A]
 
-    % objchain_length(+Objs, -N)
-    objchain_length([A,B,C,D,E], N).  % N = 5
+    % object_chain_length(+Objs, -N)
+    object_chain_length([A,B,C,D,E], N).  % N = 5
 
-    % objchain_is_linear_path(+Ordered): verify ordered sequence is valid
-    objchain_is_linear_path([A,B,C,D,E]).  % true if all consecutive pairs touch
+    % object_chain_is_linear_path(+Ordered): verify ordered sequence is valid
+    object_chain_is_linear_path([A,B,C,D,E]).  % true if all consecutive pairs touch
 
 Direction Analysis
 
-    % objchain_direction(+Ordered, -Dir): h, v, or other
-    objchain_direction([A,B,C,D,E], Dir).  % Dir = h if all in same row
-    objchain_direction([V1,V2,V3], Dir).   % Dir = v if all in same col
-    objchain_direction([P,Q,S], Dir).      % Dir = other for L-shape
+    % object_chain_direction(+Ordered, -Dir): h, v, or other
+    object_chain_direction([A,B,C,D,E], Dir).  % Dir = h if all in same row
+    object_chain_direction([V1,V2,V3], Dir).   % Dir = v if all in same col
+    object_chain_direction([P,Q,S], Dir).      % Dir = other for L-shape

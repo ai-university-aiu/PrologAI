@@ -123,15 +123,15 @@ Rank = 3.
 
 72.8 Combining with the obj pack
 
-A typical workflow extracts objects with obj_all/2 from the obj pack, then
+A typical workflow extracts objects with object_all/2 from the obj pack, then
 uses the order pack to select or sort them.
 
 Find all objects, then get the topmost:
-?- obj_all(Grid, AllObjs), order_topmost(AllObjs, TopObj).
+?- object_all(Grid, AllObjs), order_topmost(AllObjs, TopObj).
 
 Get objects sorted in reading order for sequential processing:
-?- obj_all(Grid, AllObjs), order_reading_order(AllObjs, Ordered).
+?- object_all(Grid, AllObjs), order_reading_order(AllObjs, Ordered).
 
 Identify the rightmost object and compute its centroid:
-?- obj_all(Grid, AllObjs), order_rightmost(AllObjs, Right),
+?- object_all(Grid, AllObjs), order_rightmost(AllObjs, Right),
    order_centroid(Right, CR, CC).

@@ -30,7 +30,7 @@ test(ooda_phases_in_order) :-
 test(phase_ops_concrete) :-
     % The observe phase reads meters, locates the avatar, and diffs the frame.
     hierarchical_planning_phase_ops(observe, ObsOps),
-    assertion(ObsOps == [read_meters, locate_avatar, diff_frame]),
+    assertion(ObsOps == [read_meters, locate_avatar, difference_frame]),
     % With no game actions, the act phase keeps its generic operation.
     hierarchical_planning_phase_ops(act, ActOps),
     assertion(ActOps == [perform_chosen_action]).

@@ -18,20 +18,20 @@ p2([[0,1],[1,0]]).
 
 :- begin_tests(compare_diff_cells).
 
-test(diff_one_cell) :-
+test(difference_one_cell) :-
     g1(A), g2(B), compare_diff_cells(A, B, Diffs),
     Diffs = [r(1,1)].
 
-test(diff_none) :-
+test(difference_none) :-
     ga(A), gb(B), compare_diff_cells(A, B, Diffs),
     Diffs = [].
 
-test(diff_full_row) :-
+test(difference_full_row) :-
     gc(A), gd(B), compare_diff_cells(A, B, Diffs),
     msort(Diffs, Sorted),
     Sorted = [r(0,0), r(0,1), r(0,2)].
 
-test(diff_all_cells) :-
+test(difference_all_cells) :-
     p1(A), p2(B), compare_diff_cells(A, B, Diffs),
     msort(Diffs, Sorted),
     Sorted = [r(0,0), r(0,1), r(1,0), r(1,1)].
@@ -116,15 +116,15 @@ test(changed_from_absent) :-
 
 :- begin_tests(compare_diff_map).
 
-test(diff_map_one_cell) :-
+test(difference_map_one_cell) :-
     g1(A), g2(B), compare_diff_map(A, B, Map),
     Map = [[0,0,0],[0,1,0],[0,0,0]].
 
-test(diff_map_none) :-
+test(difference_map_none) :-
     ga(A), gb(B), compare_diff_map(A, B, Map),
     Map = [[0,0],[0,0]].
 
-test(diff_map_all) :-
+test(difference_map_all) :-
     p1(A), p2(B), compare_diff_map(A, B, Map),
     Map = [[1,1],[1,1]].
 

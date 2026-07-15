@@ -4,7 +4,7 @@
     cyclic_actor_stop/1  — gracefully stop an actor; blocks until exited
     cyclic_actor_list/1  — list all running actor names
     cyclic_actor_status/2 — cycle_count, error_count, state
-    pai_declare_actor/3  — load-time hook called from .pai cyclic_actor/3 expansion
+    actors_declare_actor/3  — load-time hook called from .pai cyclic_actor/3 expansion
 
     Actor names are globally unique.  Duplicate creation throws
     actor_error(already_exists, Name).
@@ -24,14 +24,14 @@
     % Continue the multi-line expression started above.
     cyclic_actor_status/2, % +Name, -Status
     % Continue the multi-line expression started above.
-    pai_declare_actor/3    % +Name, :Goal, +DelayMs  (expansion hook)
+    actors_declare_actor/3    % +Name, :Goal, +DelayMs  (expansion hook)
 % Close the expression opened above.
 ]).
 
 % Declare the following predicate as accepting callable (higher-order) arguments.
 :- meta_predicate cyclic_actor(+, 0, +).
 % Declare the following predicate as accepting callable (higher-order) arguments.
-:- meta_predicate pai_declare_actor(+, 0, +).
+:- meta_predicate actors_declare_actor(+, 0, +).
 
 % Import [maplist/2] from the built-in 'apply' library.
 :- use_module(library(apply), [maplist/2]).
@@ -278,10 +278,10 @@ cyclic_actor_status(Name, Status) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_declare_actor/3 — called from .pai expansion of cyclic_actor/3
+% actors_declare_actor/3 — called from .pai expansion of cyclic_actor/3
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai declare actor': succeed when the following conditions hold.
-pai_declare_actor(Name, Goal, DelayMs) :-
+actors_declare_actor(Name, Goal, DelayMs) :-
     % State the fact: cyclic actor(Name, Goal, DelayMs).
     cyclic_actor(Name, Goal, DelayMs).

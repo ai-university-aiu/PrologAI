@@ -14,119 +14,119 @@ Layer 193. Pack prefix: mc_*. Work Package 214.
 Exported Predicates
 
 
-multicolor_color_counts(+Scene, -Counts)
+multi_color_color_counts(+Scene, -Counts)
 
 Sorted Color-N pairs, one per distinct color.
 
 Example:
 
-multicolor_color_counts([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(1,0)])], Counts).
+multi_color_color_counts([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(1,0)])], Counts).
 % Counts = [b-1, r-2]
 
 
-multicolor_count_of_color(+Scene, +Color, -N)
+multi_color_count_of_color(+Scene, +Color, -N)
 
 Object count for a given color. N=0 if Color not present.
 
 Example:
 
-multicolor_count_of_color([obj(r,[r(0,0)]), obj(r,[r(0,1)])], r, N).
+multi_color_count_of_color([obj(r,[r(0,0)]), obj(r,[r(0,1)])], r, N).
 % N = 2
 
 
-multicolor_color_present(+Scene, +Color)
+multi_color_color_present(+Scene, +Color)
 
 Succeed if Color appears at least once in Scene.
 
 
-multicolor_dominant_color(+Scene, -Color)
+multi_color_dominant_color(+Scene, -Color)
 
 Color with the most objects. Ties broken by standard Prolog term order.
 
 Example:
 
-multicolor_dominant_color([obj(r,[r(0,0)]), obj(r,[r(0,1)]), obj(b,[r(1,0)])], Color).
+multi_color_dominant_color([obj(r,[r(0,0)]), obj(r,[r(0,1)]), obj(b,[r(1,0)])], Color).
 % Color = r
 
 
-multicolor_rarest_color(+Scene, -Color)
+multi_color_rarest_color(+Scene, -Color)
 
 Color with the fewest objects. Ties broken by term order.
 
 
-multicolor_singleton_colors(+Scene, -Colors)
+multi_color_singleton_colors(+Scene, -Colors)
 
 All colors that appear in exactly one object.
 
 Example:
 
-multicolor_singleton_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(1,0)])], Colors).
+multi_color_singleton_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(1,0)])], Colors).
 % Colors = [b]
 
 
-multicolor_unique_color(+Scene, -Color)
+multi_color_unique_color(+Scene, -Color)
 
 Backtrackable: each color with count 1.
 
 
-multicolor_color_freq_rank(+Scene, +N, -Color)
+multi_color_color_freq_rank(+Scene, +N, -Color)
 
 The Nth most frequent color (1 = most frequent). Fails if N exceeds the number
 of distinct colors.
 
 Example:
 
-multicolor_color_freq_rank(Scene, 1, MostFrequent).
-multicolor_color_freq_rank(Scene, 2, SecondMostFrequent).
+multi_color_color_freq_rank(Scene, 1, MostFrequent).
+multi_color_color_freq_rank(Scene, 2, SecondMostFrequent).
 
 
-multicolor_color_partition(+Scene, -Groups)
+multi_color_color_partition(+Scene, -Groups)
 
 Color-Objs pairs, one per distinct color. Objs is the list of all objects
 of that color.
 
 Example:
 
-multicolor_color_partition([obj(r,[r(0,0)]), obj(b,[r(0,1)])], Groups).
+multi_color_color_partition([obj(r,[r(0,0)]), obj(b,[r(0,1)])], Groups).
 % Groups = [b-[obj(b,[r(0,1)])], r-[obj(r,[r(0,0)])]]
 
 
-multicolor_pair_colors(+Scene, -Pairs)
+multi_color_pair_colors(+Scene, -Pairs)
 
 All unordered color pairs as C1-C2 with C1 @< C2.
 
 Example:
 
-multicolor_pair_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])], Pairs).
+multi_color_pair_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])], Pairs).
 % Pairs = [b-g, b-r, g-r]
 
 
-multicolor_equal_count_pairs(+Scene, -Pairs)
+multi_color_equal_count_pairs(+Scene, -Pairs)
 
 Color pairs that have equal object count.
 
 Example:
 
-multicolor_equal_count_pairs([obj(r,[r(0,0)]), obj(b,[r(0,1)])], Pairs).
+multi_color_equal_count_pairs([obj(r,[r(0,0)]), obj(b,[r(0,1)])], Pairs).
 % Pairs = [b-r]  (both have count 1)
 
 
-multicolor_majority_color(+Scene, -Color)
+multi_color_majority_color(+Scene, -Color)
 
 Color whose object count exceeds half the total scene size. Fails if none exists.
 
 Example:
 
-multicolor_majority_color([obj(r,[r(0,0)]), obj(r,[r(0,1)]), obj(r,[r(1,0)]), obj(b,[r(1,1)])], Color).
+multi_color_majority_color([obj(r,[r(0,0)]), obj(r,[r(0,1)]), obj(r,[r(1,0)]), obj(b,[r(1,1)])], Color).
 % Color = r  (3 out of 4 objects = 75%)
 
 
-multicolor_n_distinct_colors(+Scene, -N)
+multi_color_n_distinct_colors(+Scene, -N)
 
 Number of distinct colors in the scene.
 
 
-multicolor_color_index(+Scene, +Color, -Index)
+multi_color_color_index(+Scene, +Color, -Index)
 
 1-based frequency rank for a given color. The most frequent color has index 1.
 
@@ -139,7 +139,7 @@ None. Uses library(lists) and library(apply).
 Test Coverage
 
 All 42 acceptance criteria (AC-MC-001 through AC-MC-042) defined in
-Refinement v227 Part 204 are exercised in packs/multicolor/test/test_multicolor.pl.
+Refinement v227 Part 204 are exercised in packs/multi_color/test/test_multi_color.pl.
 All 42 tests pass.
 
 

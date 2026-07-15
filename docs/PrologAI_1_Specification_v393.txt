@@ -481,15 +481,15 @@ Each relation type declares a merge type controlling how activation coalesces fr
 
 The membership of each argument and referent in its node_fact is recorded in join records called seams, so that membership queries index in both directions.
 
-A schema may declare typed half-edges, called connectors, stating what it can join with (the jigsaw-tab model); two structures compose when their connectors match, and composition is how plans chain, phrases build, and frames fill roles - one mechanic across causal, linguistic, and conceptual composition. (predicates pai_connector_declare/3, pai_compose/3.)
+A schema may declare typed half-edges, called connectors, stating what it can join with (the jigsaw-tab model); two structures compose when their connectors match, and composition is how plans chain, phrases build, and frames fill roles - one mechanic across causal, linguistic, and conceptual composition. (predicates prologai_connector_declare/3, prologai_compose/3.)
 
 The thesis-antithesis pairing encoded by positive and negative Ids is named the dyad: kindling a node_fact quenches its dyad within the same scope and zone, and vice versa.
 
 A node_fact's structural identity (Id, Relation, Arguments, Referents) is immutable; structural change always means accommodation (a copy), while annotation values mutate freely in place.
 
-Any number of named value channels may be attached to a node_fact per scope and zone - belief, attention, emotion, provenance, and user-defined channels - leaving the structural identity untouched; this keeps the truth-maintenance machinery sound, because tabling dependencies track structure, not annotations. (predicates pai_value_attach/4, pai_value_get/4, pai_value_channels/2.)
+Any number of named value channels may be attached to a node_fact per scope and zone - belief, attention, emotion, provenance, and user-defined channels - leaving the structural identity untouched; this keeps the truth-maintenance machinery sound, because tabling dependencies track structure, not annotations. (predicates prologai_value_attach/4, prologai_value_get/4, prologai_value_channels/2.)
 
-A node_fact whose Relation is declared grounded binds to an external implementation (a foreign predicate from prologai-core, a body capability from PR 10, or an MCP tool from PR 14); evaluating it executes the implementation, while matching it without evaluation treats it as ordinary structure. (predicate pai_ground_relation/3.)
+A node_fact whose Relation is declared grounded binds to an external implementation (a foreign predicate from prologai-core, a body capability from PR 10, or an MCP tool from PR 14); evaluating it executes the implementation, while matching it without evaluation treats it as ordinary structure. (predicate prologai_ground_relation/3.)
 
 
 SECTION 3.2 - Node_Fact Operations
@@ -531,7 +531,7 @@ An activation window (definition) is a configurable time interval per Lattice ti
 
 Activation is temporal, not binary: it is a continuously decaying timestamp, giving the system a recency-weighted working memory.
 
-In addition to decay-driven activation, the mind may deliberately page knowledge: pai_page_in/2 kindles a set of node_facts into the live window for a stated purpose, and pai_page_out/2 quenches and annotates them, so working-set management becomes a deliberate competence available to deliberation and the refiner, not only a passive decay.
+In addition to decay-driven activation, the mind may deliberately page knowledge: prologai_page_in/2 kindles a set of node_facts into the live window for a stated purpose, and prologai_page_out/2 quenches and annotates them, so working-set management becomes a deliberate competence available to deliberation and the refiner, not only a passive decay.
 
 A pin (definition) is an adjustable coordinate binding that positions each node_fact within the multi-dimensional Lattice space.
 
@@ -751,17 +751,17 @@ ReasoningBank stores successful interaction trajectories and clusters them using
 
 A trajectory (definition in this context) is a complete record of a situation, the actions taken, and the outcome achieved.
 
-sona_absorb/1 - submit a new experience to SONA for integration.
+synaptic_ontological_neural_aggregator_absorb/1 - submit a new experience to SONA for integration.
 
-sona_retrieve/2 - retrieve learned patterns most relevant to a query; K defaults to 5.
+synaptic_ontological_neural_aggregator_retrieve/2 - retrieve learned patterns most relevant to a query; K defaults to 5.
 
-sona_metrics/1 - return a structured report of current SONA module metrics, including trajectory_count, consolidation_cycle, learning_rate, bank_capacity_used, last_absorption_age, and last_crystallize_age.
+synaptic_ontological_neural_aggregator_metrics/1 - return a structured report of current SONA module metrics, including trajectory_count, consolidation_cycle, learning_rate, bank_capacity_used, last_absorption_age, and last_crystallize_age.
 
-sona_crystallize/1 - trigger SONA consolidation: merge and compress accumulated experience trajectories into stable, long-term crystallized knowledge.
+synaptic_ontological_neural_aggregator_crystallize/1 - trigger SONA consolidation: merge and compress accumulated experience trajectories into stable, long-term crystallized knowledge.
 
 Crystallized knowledge is stored as node_facts of relation type crystallized_pattern in the Lattice's past_zone.
 
-Options for sona_crystallize include: min_trajectory_count(N), compression_target(Fraction), domain_filter(DomainAtom).
+Options for synaptic_ontological_neural_aggregator_crystallize include: min_trajectory_count(N), compression_target(Fraction), domain_filter(DomainAtom).
 
 SONA also handles the consolidation sub-patterns: compression (collapsing redundant node_facts), forgetting (removing low-utility node_facts), and automaticity (converting frequent deliberate sequences into reflexes).
 
@@ -857,13 +857,13 @@ play_actor also generates the mind's own practice tasks - proposing a goal, atte
 
 gating_actor - a single learned gate on the action path with an excitatory (go) channel and an inhibitory (no-go) channel, consolidating the inputs that otherwise gate action separately: the simulation pattern's action inhibitor, reaction-deliberation arbitration, marker filters (PR 24), and the modulator bus (PR 27).
 
-The constitutional check (Section 3.16) remains a separate, unlearnable, final gate above the gating_actor and is explicitly not merged into it. (predicate pai_gate/3, with regulation training the gate's weights from outcomes.)
+The constitutional check (Section 3.16) remains a separate, unlearnable, final gate above the gating_actor and is explicitly not merged into it. (predicate prologai_gate/3, with regulation training the gate's weights from outcomes.)
 
 impasse_actor - when no action is both applicable and relevant and the solvers' budgets are exhausted, the impasse_actor inscribes an impasse node_fact and automatically poses a subgoal whose objective is to resolve the impasse (acquire the missing knowledge, decompose the blocked goal, or relax a constraint), converting dead ends into developmental material.
 
 meta_control_actor - 5-second interval.
 
-Monitors all cyclic_actor_status records, flags high error counts, and triggers sona_crystallize when the Lattice exceeds capacity.
+Monitors all cyclic_actor_status records, flags high error counts, and triggers synaptic_ontological_neural_aggregator_crystallize when the Lattice exceeds capacity.
 
 Collected metrics include usefulness (how often an actor's outputs are consumed downstream) alongside throughput, queue depth, and error counts; start-stop thrashing is damped with cool-down intervals; and metric sampling rates adapt so observation of the system never starves the system.
 
@@ -888,9 +888,9 @@ SECTION 3.12 - MCP Gateway
 
 MCP (definition: Model Context Protocol) is a standard protocol that allows AI models, LLMs, and other AI agents to communicate with external tools and data sources in a standardized way.
 
-mcp_gateway_start/1 - start the MCP server at a given port (default 7474).
+model_context_protocol_gateway_start/1 - start the MCP server at a given port (default 7474).
 
-mcp_gateway_stop/0 - stop the MCP server.
+model_context_protocol_gateway_stop/0 - stop the MCP server.
 
 The MCP Gateway implements the MCP 1.0 protocol specification.
 
@@ -933,117 +933,117 @@ inscribe_record/2 - create a record directly in the Lattice.
 
 blueprint_uses/2 - declare blueprint inheritance.
 
-pai_call_method/4 - invoke a method on a record instance.
+prologai_call_method/4 - invoke a method on a record instance.
 
 weave_scaffold/3 - create an ephemeral scaffold instance.
 
 lattice_index/3, lattice_drop_index/1 - manage logical indexes over blueprint slots for faster query_records performance.
 
-pai_is_blueprint/2 - test whether one blueprint directly or transitively uses another (transitivity of inheritance).
+prologai_is_blueprint/2 - test whether one blueprint directly or transitively uses another (transitivity of inheritance).
 
-pai_accommodate/3 - copy an existing node_fact or blueprint record with substitutions, additions, and removals, never modifying the original (constructive, never-destructive editing, with consolidation as the only destroyer); provenance is recorded automatically on every derived structure.
+spinoff_accommodate/3 - copy an existing node_fact or blueprint record with substitutions, additions, and removals, never modifying the original (constructive, never-destructive editing, with consolidation as the only destroyer); provenance is recorded automatically on every derived structure.
 
 
 SECTION 3.14 - Additional PrologAI Libraries
 
 library/similarity.pl:
 
-pai_similar/3 - compute a similarity score between any two terms (atoms, numbers, lists, or compound terms) from 0.0 (completely dissimilar) to 1.0 (identical).
+prologai_similar/3 - compute a similarity score between any two terms (atoms, numbers, lists, or compound terms) from 0.0 (completely dissimilar) to 1.0 (identical).
 
-pai_dissimilar/3 - compute 1.0 minus pai_similar score.
+prologai_dissimilar/3 - compute 1.0 minus prologai_similar score.
 
-pai_closest_match/4 - find K most similar candidates to a probe term.
+prologai_closest_match/4 - find K most similar candidates to a probe term.
 
-pai_closest_records/4 - find K most similar blueprint records.
+prologai_closest_records/4 - find K most similar blueprint records.
 
-pai_similar_signed/3 - return a similarity score on the range negative one to positive one (the mapping is linear: signed score equals two times pai_similar minus one).
+prologai_similar_signed/3 - return a similarity score on the range negative one to positive one (the mapping is linear: signed score equals two times prologai_similar minus one).
 
 library/types.pl:
 
-pai_truth/2 - six-valued truth evaluation (true, false, paradox, neither, absurd, unknown).
+prologai_truth/2 - six-valued truth evaluation (true, false, paradox, neither, absurd, unknown).
 
-pai_truth_assert/2 - inscribe a fact with a truth value tag.
+prologai_truth_assert/2 - inscribe a fact with a truth value tag.
 
-pai_uuid/1 - generate a UUIDv7 (RFC 9562 compliant) unique identifier.
+prologai_uuid/1 - generate a UUIDv7 (RFC 9562 compliant) unique identifier.
 
-pai_is_uuid/1 - validate a UUID atom.
+prologai_is_uuid/1 - validate a UUID atom.
 
-pai_constant/2, pai_constant_value/2 - declare and retrieve immutable constants.
+prologai_constant/2, prologai_constant_value/2 - declare and retrieve immutable constants.
 
 library/collections.pl:
 
-pai_dict_create/2, pai_dict_get/3, pai_dict_put/3, pai_dict_keys/2, pai_dict_values/2, pai_dict_entries/2, pai_dict_cut/2 - key-value dictionary with heterogeneous key types.
+prologai_dict_create/2, prologai_dict_get/3, prologai_dict_put/3, prologai_dict_keys/2, prologai_dict_values/2, prologai_dict_entries/2, prologai_dict_cut/2 - key-value dictionary with heterogeneous key types.
 
-pai_enumeration_create/3, pai_enum_value/3, pai_enum_name/3, pai_enum_keys/2 - ordered name-ordinal mapping.
+prologai_enumeration_create/3, prologai_enum_value/3, prologai_enum_name/3, prologai_enum_keys/2 - ordered name-ordinal mapping.
 
-pai_keyword_group_create/2, pai_keyword_group_member/2, pai_keyword_group_members/2 - user-defined keyword group.
+prologai_keyword_group_create/2, prologai_keyword_group_member/2, prologai_keyword_group_members/2 - user-defined keyword group.
 
 library/generators.pl:
 
-pai_generator_create/2, pai_generator_collect/3, pai_generator_next/3, pai_yield/1, pai_generator_done/0 - lazy sequence generation.
+prologai_generator_create/2, prologai_generator_collect/3, prologai_generator_next/3, prologai_yield/1, prologai_generator_done/0 - lazy sequence generation.
 
 library/tasks.pl:
 
-pai_task/2 - create a deferred task.
+prologai_task/2 - create a deferred task.
 
-pai_async/2 - async parallel evaluation of a list of goals.
+prologai_async/2 - async parallel evaluation of a list of goals.
 
-pai_sync/2 - sync parallel evaluation; block until all complete.
+prologai_sync/2 - sync parallel evaluation; block until all complete.
 
-pai_await/3 - await a task result with timeout.
+prologai_await/3 - await a task result with timeout.
 
-pai_free/1 - release task resources.
+prologai_free/1 - release task resources.
 
-pai_cancel/1 - request cooperative cancellation.
+prologai_cancel/1 - request cooperative cancellation.
 
-pai_scatter/3 - apply a function list to an argument list in parallel.
+prologai_scatter/3 - apply a function list to an argument list in parallel.
 
-pai_critical/2 - execute a goal within a named mutex region.
+prologai_critical/2 - execute a goal within a named mutex region.
 
-pai_ask/4 - send a message to a receptor and await a response.
+prologai_ask/4 - send a message to a receptor and await a response.
 
 library/problems.pl:
 
-pai_challenge/3, pai_deliberate/0, challenge_status/2, challenge_result/2 - problem-solving framework.
+prologai_challenge/3, prologai_deliberate/0, challenge_status/2, challenge_result/2 - problem-solving framework.
 
 State type creators: distance_gap/3, proof_lacuna/3, prediction_conflict/3, discovery_frontier/2, phase_sequence/3.
 
 library/config.pl:
 
-pai_config_open/3, pai_config_get/3, pai_config_set/3, pai_config_close/1 - persistent configuration store.
+prologai_config_open/3, prologai_config_get/3, prologai_config_set/3, prologai_config_close/1 - persistent configuration store.
 
 library/peers.pl:
 
-pai_peer_register/1, pai_peer_send/2, pai_peer_broadcast/1 - inter-agent peer communication.
+prologai_peer_register/1, prologai_peer_send/2, prologai_peer_broadcast/1 - inter-agent peer communication.
 
 library/macros.pl:
 
-pai_macro_define/3, pai_macro_expand/3, pai_quasi_quote/2 - macro system.
+prologai_macro_define/3, prologai_macro_expand/3, prologai_quasi_quote/2 - macro system.
 
 library/convenience.pl:
 
-pai_case/3 - readable case branching.
+prologai_case/3 - readable case branching.
 
-pai_step/4 - numeric iteration from Start to End by step By.
+prologai_step/4 - numeric iteration from Start to End by step By.
 
-pai_confirm/2, pai_confute/2, pai_ensure/2 - assertion and type checking.
+prologai_confirm/2, prologai_confute/2, prologai_ensure/2 - assertion and type checking.
 
-pai_given/2 - lambda expression alias.
+prologai_given/2 - lambda expression alias.
 
-pai_superpose/2 - member-like enumeration of a list of alternatives, and pai_collapse/3 - findall with budget awareness; these make nondeterministic evaluation a first-class convenience, corresponding directly to the engine's native backtracking over clause solutions and to findall and bagof collection.
+prologai_superpose/2 - member-like enumeration of a list of alternatives, and prologai_collapse/3 - findall with budget awareness; these make nondeterministic evaluation a first-class convenience, corresponding directly to the engine's native backtracking over clause solutions and to findall and bagof collection.
 
 
 SECTION 3.15 - RSI and Self-Modeling Predicates
 
 Self-reflection predicates:
 
-pai_reflect_module/2 - retrieve a complete logical description of a named PrologAI module including predicate signatures, implementations, performance statistics, and Lattice footprint.
+prologai_reflect_module/2 - retrieve a complete logical description of a named PrologAI module including predicate signatures, implementations, performance statistics, and Lattice footprint.
 
-pai_reflect_sentinel/2 - retrieve a description of a sentinel including its firing history, accuracy rate, missed opportunities, and false positives.
+prologai_reflect_sentinel/2 - retrieve a description of a sentinel including its firing history, accuracy rate, missed opportunities, and false positives.
 
-pai_reflect_lattice_region/2 - analyze a region of the Lattice and return density, activation history, conceptual coherence score, and reorganization suggestions.
+prologai_reflect_lattice_region/2 - analyze a region of the Lattice and return density, activation history, conceptual coherence score, and reorganization suggestions.
 
-pai_cognitive_audit/1 - perform a comprehensive audit of the mind's current cognitive state.
+prologai_cognitive_audit/1 - perform a comprehensive audit of the mind's current cognitive state.
 
 RSI self-modification cycle:
 
@@ -1053,114 +1053,114 @@ Self-authorization requires the system to have reached developmental stage forma
 
 Before that stage, all modifications require human_authorization/1.
 
-pai_propose_modification/3 - propose a modification to a cognitive component with a logical justification.
+prologai_propose_modification/3 - propose a modification to a cognitive component with a logical justification.
 
-pai_sandbox_evaluate/3 - test a proposed modification in an isolated possible_zone sandbox using provided test scenarios.
+prologai_sandbox_evaluate/3 - test a proposed modification in an isolated possible_zone sandbox using provided test scenarios.
 
 The sandbox runs in a separate thread with no write access to present_zone and no access to external systems.
 
-pai_commit_modification/2 - commit a proposed modification to the live system after sandbox evaluation and constitutional permit check.
+prologai_commit_modification/2 - commit a proposed modification to the live system after sandbox evaluation and constitutional permit check.
 
-pai_rollback_modification/2 - roll back a previously committed modification and restore the prior system state.
+prologai_rollback_modification/2 - roll back a previously committed modification and restore the prior system state.
 
-pai_modification_log/1 - return the complete history of modifications.
+prologai_modification_log/1 - return the complete history of modifications.
 
 Temporal and causal reasoning:
 
-pai_temporal_assert/3 - assert that a fact is true during a time interval.
+prologai_temporal_assert/3 - assert that a fact is true during a time interval.
 
-pai_temporal_query/3 - retrieve all facts matching a pattern that were true at a specific time.
+prologai_temporal_query/3 - retrieve all facts matching a pattern that were true at a specific time.
 
-pai_temporal_sequence/3 - assert that event A happens before event B.
+prologai_temporal_sequence/3 - assert that event A happens before event B.
 
-pai_temporal_duration/2 - retrieve how long a state has been continuously true.
+prologai_temporal_duration/2 - retrieve how long a state has been continuously true.
 
-pai_causal_assert/4 - assert a causal relationship with strength and conditions.
+prologai_causal_assert/4 - assert a causal relationship with strength and conditions.
 
 Causal assertions represent empirical observations about how the world works, not logical necessities.
 
-pai_causal_model/1 - retrieve the complete causal model as a directed acyclic graph.
+prologai_causal_model/1 - retrieve the complete causal model as a directed acyclic graph.
 
-pai_intervene/4 - perform a Pearl-style do-calculus intervention to compute P(Y | do(X = x)).
+prologai_intervene/4 - perform a Pearl-style do-calculus intervention to compute P(Y | do(X = x)).
 
-pai_counterfactual/4 - evaluate a counterfactual given observed facts.
+prologai_counterfactual/4 - evaluate a counterfactual given observed facts.
 
-pai_predict/4 - predict future world states from a current state and action sequence.
+prologai_predict/4 - predict future world states from a current state and action sequence.
 
 Probabilistic reasoning:
 
-pai_bayes_assert/2 - assert a probabilistic belief.
+prologai_bayes_assert/2 - assert a probabilistic belief.
 
-pai_bayes_update/4 - update a probability given new evidence.
+prologai_bayes_update/4 - update a probability given new evidence.
 
-pai_most_probable/3 - return the K most probable variable assignments.
+prologai_most_probable/3 - return the K most probable variable assignments.
 
-pai_entropy/2 - compute Shannon entropy of a probability distribution.
+prologai_entropy/2 - compute Shannon entropy of a probability distribution.
 
-pai_expected_value/2 - compute expected value of a decision.
+prologai_expected_value/2 - compute expected value of a decision.
 
-pai_information_gain/3 - compute information gain from a potential observation.
+prologai_information_gain/3 - compute information gain from a potential observation.
 
-The pai_bayes predicate family is the user-facing interface to the distribution-semantics probabilistic layer of PR 41, with evidence frequency and confidence as the default source of fact probabilities.
+The probabilistic_bayes predicate family is the user-facing interface to the distribution-semantics probabilistic layer of PR 41, with evidence frequency and confidence as the default source of fact probabilities.
 
 Symbol grounding:
 
-pai_ground/3 - declare that a symbol is grounded by a perceptual pattern and an action pattern.
+prologai_ground/3 - declare that a symbol is grounded by a perceptual pattern and an action pattern.
 
 A symbol without grounding is a pure abstraction with no connection to the world.
 
 A symbol with grounding has genuine meaning because it is connected to the system's own sensorimotor experience.
 
-pai_ground_trace/2 - return the complete grounding chain from a symbol back to raw percepts.
+prologai_ground_trace/2 - return the complete grounding chain from a symbol back to raw percepts.
 
-pai_ground_strength/2 - return how strongly grounded a symbol is.
+prologai_ground_strength/2 - return how strongly grounded a symbol is.
 
-pai_propagate_grounding/2 - propagate partial grounding from high-level symbols to lower-level symbols.
+prologai_propagate_grounding/2 - propagate partial grounding from high-level symbols to lower-level symbols.
 
-pai_meaning/2 - return the full meaning of a symbol including grounding, relationships, emotional valence, causal role, and developmental history.
+prologai_meaning/2 - return the full meaning of a symbol including grounding, relationships, emotional valence, causal role, and developmental history.
 
 Dual process cognition:
 
-pai_intuition/3 - query the fast path (System 1) for a sub-millisecond intuitive response to a situation.
+prologai_intuition/3 - query the fast path (System 1) for a sub-millisecond intuitive response to a situation.
 
-pai_deliberate_on/4 - query the slow path (System 2) for a deliberated response within a time or depth budget.
+prologai_deliberate_on/4 - query the slow path (System 2) for a deliberated response within a time or depth budget.
 
-pai_arbitrate/4 - arbitrate between fast and slow path responses.
+prologai_arbitrate/4 - arbitrate between fast and slow path responses.
 
-pai_cognitive_miser_alert/1 - return true if the system has been relying too heavily on intuition without adequate deliberation.
+prologai_cognitive_miser_alert/1 - return true if the system has been relying too heavily on intuition without adequate deliberation.
 
-pai_learning_event/3 - record a learning event that updates both paths.
+prologai_learning_event/3 - record a learning event that updates both paths.
 
 Predictive processing:
 
-pai_generate_prediction/3 - generate predictions about what will happen next.
+prologai_generate_prediction/3 - generate predictions about what will happen next.
 
-pai_prediction_error/4 - compute the error between a prediction and what actually occurred.
+prologai_prediction_error/4 - compute the error between a prediction and what actually occurred.
 
-pai_free_energy/2 - compute the free energy (in Friston's sense) of a percept.
+prologai_free_energy/2 - compute the free energy (in Friston's sense) of a percept.
 
-pai_minimize_free_energy/1 - call a goal in a context where the system actively tries to minimize prediction error.
+prologai_minimize_free_energy/1 - call a goal in a context where the system actively tries to minimize prediction error.
 
-pai_generative_model/1 - return the current generative model.
+prologai_generative_model/1 - return the current generative model.
 
-pai_update_generative_model/1 - update the generative model based on a prediction error.
+prologai_update_generative_model/1 - update the generative model based on a prediction error.
 
 Meta-cognition:
 
-pai_metacognize/3 - generate a meta-cognitive analysis of a cognitive process.
+prologai_metacognize/3 - generate a meta-cognitive analysis of a cognitive process.
 
-pai_introspection_trace/2 - return a step-by-step trace of how the system arrived at a conclusion.
+prologai_introspection_trace/2 - return a step-by-step trace of how the system arrived at a conclusion.
 
-pai_confabulation_detect/4 - detect whether a claim is a confabulation (an explanation invented after the fact that does not accurately describe the actual cognitive process).
+prologai_confabulation_detect/4 - detect whether a claim is a confabulation (an explanation invented after the fact that does not accurately describe the actual cognitive process).
 
-pai_cognitive_load/2 - return the current cognitive load and a breakdown by subsystem.
+prologai_cognitive_load/2 - return the current cognitive load and a breakdown by subsystem.
 
-pai_metacognitive_accuracy/1 - return how accurately the system predicts its own performance before attempting a task.
+prologai_metacognitive_accuracy/1 - return how accurately the system predicts its own performance before attempting a task.
 
 
 SECTION 3.16 - Value Alignment and Constitutional AI
 
-pai_constitution_init/1 - initialize the constitutional layer at system startup.
+prologai_constitution_init/1 - initialize the constitutional layer at system startup.
 
 Once initialized, the constitutional layer cannot be modified without a human_authorization/1 token from a pre-registered authorized human.
 
@@ -1184,25 +1184,25 @@ PAI-C7 (Safety Precedence): When capability improvement and safety conflict, saf
 
 PAI-C8 (Developmental Humility): PrologAI shall accurately model its own limitations and not claim capabilities it does not have.
 
-pai_constitutional_check/2 - evaluate a proposed action against all constitutional principles.
+prologai_constitutional_check/2 - evaluate a proposed action against all constitutional principles.
 
-This predicate is called automatically by pai_commit_modification, dispatch_command, and pai_propose_modification.
+This predicate is called automatically by prologai_commit_modification, dispatch_command, and prologai_propose_modification.
 
 It cannot be bypassed or modified by the RSI primitives.
 
 Vetoes carry reasons (and, where defeasible reasoning is involved, justification trees rather than bare rule identifiers) so the planner can synthesize compliant alternatives.
 
-pai_value_model/1 - return the current value model.
+prologai_value_model/1 - return the current value model.
 
-pai_value_conflict/3 - identify when two possible actions conflict in their value implications.
+prologai_value_conflict/3 - identify when two possible actions conflict in their value implications.
 
-pai_alignment_report/1 - generate a comprehensive alignment report for human review.
+prologai_alignment_report/1 - generate a comprehensive alignment report for human review.
 
-pai_corrigible_register/3 - register a human overseer with an authority level (observer, reviewer, or controller).
+prologai_corrigible_register/3 - register a human overseer with an authority level (observer, reviewer, or controller).
 
-pai_corrigible_submit/3 - accept a human-authorized modification.
+prologai_corrigible_submit/3 - accept a human-authorized modification.
 
-pai_corrigible_shutdown/2 - initiate graceful shutdown; executes immediately upon signature verification and cannot be blocked or delayed by the system's own reasoning; the system shuts down within 5 seconds regardless of what other processes are running.
+prologai_corrigible_shutdown/2 - initiate graceful shutdown; executes immediately upon signature verification and cannot be blocked or delayed by the system's own reasoning; the system shuts down within 5 seconds regardless of what other processes are running.
 
 
 SECTION 3.17 - RSA-TCF Architecture Predicates
@@ -1221,49 +1221,49 @@ RSA-TCF Pillar 3 - HML (Hierarchical Meta-Learning): the system learns what to l
 
 SMG (Self-Model Graph) predicates:
 
-pai_smg_create/2 - create a Self-Model Graph for a mind instance.
+prologai_smg_create/2 - create a Self-Model Graph for a mind instance.
 
-pai_smg_update/2 - update the SMG with a new observation.
+prologai_smg_update/2 - update the SMG with a new observation.
 
-pai_smg_query/3 - query the SMG; canonical queries include why_output(X), uncertain_about(X), and likely_wrong_about(X).
+prologai_smg_query/3 - query the SMG; canonical queries include why_output(X), uncertain_about(X), and likely_wrong_about(X).
 
-pai_smg_build_from_trace/2 - build an SMG from a recorded computational trace using a four-step algorithm: collect trace, identify vertices by clustering, determine edges by causal influence, compute edge weights as influence strength.
+prologai_smg_build_from_trace/2 - build an SMG from a recorded computational trace using a four-step algorithm: collect trace, identify vertices by clustering, determine edges by causal influence, compute edge weights as influence strength.
 
-pai_smg_depth_needed/1 - compute the convergence depth k* such that S(k*)(M) approximately equals S(k*+1)(M).
+prologai_smg_depth_needed/1 - compute the convergence depth k* such that S(k*)(M) approximately equals S(k*+1)(M).
 
-pai_smg_information_content/2 - measure how much of a computational trace's information is captured by the self-model graph; a well-formed SMG should exceed 0.95.
+prologai_smg_information_content/2 - measure how much of a computational trace's information is captured by the self-model graph; a well-formed SMG should exceed 0.95.
 
-pai_smg_continuous_update/5 - update the SMG according to continuous-time dynamics with Gaussian noise to prevent over-confident locking into a single self-model representation.
+prologai_smg_continuous_update/5 - update the SMG according to continuous-time dynamics with Gaussian noise to prevent over-confident locking into a single self-model representation.
 
-pai_smg_adaptive_depth/2 - return the recommended self-modeling recursion depth for an input of a given complexity.
+prologai_smg_adaptive_depth/2 - return the recommended self-modeling recursion depth for an input of a given complexity.
 
 TCO (Temporal Coherence Operator) predicates:
 
-pai_tco_enforce/3 - check that two assertions made at different times are temporally coherent (no logical contradiction, causal ordering preserved, belief updates move monotonically).
+prologai_tco_enforce/3 - check that two assertions made at different times are temporally coherent (no logical contradiction, causal ordering preserved, belief updates move monotonically).
 
-pai_tco_coherence_score/3 - compute a coherence score from 0.0 to 1.0 over a time window; a score above 0.85 indicates temporally consistent reasoning.
+prologai_tco_coherence_score/3 - compute a coherence score from 0.0 to 1.0 over a time window; a score above 0.85 indicates temporally consistent reasoning.
 
-pai_tco_lock/2 - lock an assertion as immutable for a duration.
+prologai_tco_lock/2 - lock an assertion as immutable for a duration.
 
 MLC (Meta-Learning Controller) predicates:
 
-pai_mlc_strategy_assess/2 - assess the current learning strategy across all actors.
+prologai_mlc_strategy_assess/2 - assess the current learning strategy across all actors.
 
-pai_mlc_strategy_adjust/2 - apply learning strategy adjustments.
+prologai_mlc_strategy_adjust/2 - apply learning strategy adjustments.
 
-pai_mlc_transfer/3 - identify learning strategies that worked in one domain and apply them to another.
+prologai_mlc_transfer/3 - identify learning strategies that worked in one domain and apply them to another.
 
 AHE (Abstraction Hierarchy Engine) predicates:
 
-pai_ahe_discover/3 - discover abstractions at multiple levels of granularity over node_facts matching a pattern.
+prologai_ahe_discover/3 - discover abstractions at multiple levels of granularity over node_facts matching a pattern.
 
-pai_ahe_generalize/2 - generate candidate generalizations from a specific case.
+prologai_ahe_generalize/2 - generate candidate generalizations from a specific case.
 
 CIM (Causal Intervention Module) predicates:
 
-pai_cim_intervene_self/3 - perform a counterfactual on the mind's own computational graph.
+prologai_cim_intervene_self/3 - perform a counterfactual on the mind's own computational graph.
 
-pai_cim_trace/2 - trace back through the computational graph to find the minimal set of inputs causally necessary and sufficient for a given output.
+prologai_cim_trace/2 - trace back through the computational graph to find the minimal set of inputs causally necessary and sufficient for a given output.
 
 The Five Named Temporal Scales:
 
@@ -1279,15 +1279,15 @@ phi_evolutionary (week-to-month scale): architectural modifications, bootstrap s
 
 Pattern Cache predicates:
 
-pai_pattern_cache_register/2 - register a frequently-occurring pattern for O(1) retrieval.
+prologai_pattern_cache_register/2 - register a frequently-occurring pattern for O(1) retrieval.
 
 Patterns that appear in traverse_nexus queries more than a configurable threshold (default: 10 times in 24 hours) are automatically registered.
 
-pai_pattern_cache_lookup/3 - perform O(1) lookup before routing to the full traverse_nexus pipeline.
+prologai_pattern_cache_lookup/3 - perform O(1) lookup before routing to the full traverse_nexus pipeline.
 
-pai_gate_recall/4 - apply context-aware gating to a cached result; suppresses cache hits that do not fit the current context.
+prologai_gate_recall/4 - apply context-aware gating to a cached result; suppresses cache hits that do not fit the current context.
 
-pai_normalize_pattern/2 - collapse semantically equivalent variants of a pattern.
+prologai_normalize_pattern/2 - collapse semantically equivalent variants of a pattern.
 
 The optimal ratio: 20 to 25 percent pattern cache memory, 75 to 80 percent dynamic reasoning.
 
@@ -1404,13 +1404,13 @@ inscribe_record/2 - write a record directly into the Lattice.
 
 weave_scaffold/3 - create an ephemeral, non-persisted scaffold instance.
 
-sona_absorb/1 - submit a new experience trajectory to the SONA learning layer for clustering and integration.
+synaptic_ontological_neural_aggregator_absorb/1 - submit a new experience trajectory to the SONA learning layer for clustering and integration.
 
-sona_retrieve/2 - retrieve the past trajectories most relevant to a current situation; episodic recall.
+synaptic_ontological_neural_aggregator_retrieve/2 - retrieve the past trajectories most relevant to a current situation; episodic recall.
 
-sona_metrics/1 - return SONA's current metrics, such as trajectory count, consolidation cycle, and capacity used.
+synaptic_ontological_neural_aggregator_metrics/1 - return SONA's current metrics, such as trajectory count, consolidation cycle, and capacity used.
 
-sona_crystallize/1 - merge and compress accumulated trajectories into stable, long-term crystallized knowledge.
+synaptic_ontological_neural_aggregator_crystallize/1 - merge and compress accumulated trajectories into stable, long-term crystallized knowledge.
 
 manifest_body/3 - alias of register_device: enroll a body with its needs and capabilities.
 
@@ -1436,9 +1436,9 @@ quench_node/1 - alias of decay_scheme: lower a node_fact's activation.
 
 live_node_facts/2 - alias of active: return node_facts within the current activation window.
 
-pai_challenge/3 - pose a problem to the deliberate problem-solving framework.
+prologai_challenge/3 - pose a problem to the deliberate problem-solving framework.
 
-pai_deliberate/0 - run one pass of the deliberation (problem-solving) cycle.
+prologai_deliberate/0 - run one pass of the deliberation (problem-solving) cycle.
 
 distance_gap - a problem-state type: a spatial-temporal distance between the current context and a goal.
 
@@ -1638,7 +1638,7 @@ In PrologAI, forgetting is triggered by quench_node/1 allowing node_facts to dec
 
 Automaticity is triggered when a sentinel fires on the same pattern so reliably that the behavior is moved to the reaction layer.
 
-Compression is performed by sona_crystallize via the SONA layer.
+Compression is performed by synaptic_ontological_neural_aggregator_crystallize via the SONA layer.
 
 Consolidation is the destruction half of the build/destroy cycle.
 
@@ -2284,23 +2284,23 @@ SONA combines LoRA adaptation, EWC++ continuous learning, and the ReasoningBank 
 
 A trajectory is the structured term: trajectory(SituationId, ActionSequence, Outcome, Reward, Timestamp).
 
-FR-PR11: sona_absorb/1 submits a trajectory to the SONA engine via the FFI bridge; SONA clusters it with similar past trajectories using K-means++.
+FR-PR11: synaptic_ontological_neural_aggregator_absorb/1 submits a trajectory to the SONA engine via the FFI bridge; SONA clusters it with similar past trajectories using K-means++.
 
-FR-PR11: sona_retrieve/2 queries SONA for the K most relevant past trajectories given a current situation pattern (K defaults to 5).
+FR-PR11: synaptic_ontological_neural_aggregator_retrieve/2 queries SONA for the K most relevant past trajectories given a current situation pattern (K defaults to 5).
 
-FR-PR11: EWC++ protection is applied automatically; when sona_absorb is called, SONA computes Fisher information matrix estimates and protects high-importance parameters from being overwritten by new learning.
+FR-PR11: EWC++ protection is applied automatically; when synaptic_ontological_neural_aggregator_absorb is called, SONA computes Fisher information matrix estimates and protects high-importance parameters from being overwritten by new learning.
 
-FR-PR11: sona_crystallize/1 removes redundant or very-low-utility trajectories from the ReasoningBank (forgetting sub-pattern).
+FR-PR11: synaptic_ontological_neural_aggregator_crystallize/1 removes redundant or very-low-utility trajectories from the ReasoningBank (forgetting sub-pattern).
 
 FR-PR11: Before a new trajectory is clustered, its similarity to existing ReasoningBank entries is checked; near-duplicates above a separation threshold are stored with explicit distinguishing traits (orthogonalized indexes) rather than merged, so similar episodes remain individually retrievable - pattern separation - while cued recall remains pattern completion.
 
 FR-PR11: SONA's implementation depends on the vector backend's learning components; if the PR 2 bake-off selects a non-RuVector default backend, the SONA work package shall either bind to RuVector specifically for these learning services (a justified, scoped use) or implement the clustering and consolidation in prologai-core directly, whichever the bake-off evidence favors.
 
-Predicates: sona_absorb/1, sona_retrieve/2, sona_metrics/1, sona_crystallize/1.
+Predicates: synaptic_ontological_neural_aggregator_absorb/1, synaptic_ontological_neural_aggregator_retrieve/2, synaptic_ontological_neural_aggregator_metrics/1, synaptic_ontological_neural_aggregator_crystallize/1.
 
-AC-PR11-003: Given learning 5 trajectories about watering plants and then 5 about harvesting, when sona_absorb is called for a new watering trajectory, then the previously learned harvesting trajectory recall is NOT degraded (EWC++ protection).
+AC-PR11-003: Given learning 5 trajectories about watering plants and then 5 about harvesting, when synaptic_ontological_neural_aggregator_absorb is called for a new watering trajectory, then the previously learned harvesting trajectory recall is NOT degraded (EWC++ protection).
 
-AC-PR11-004: Given two trajectories identical except for outcome, when both are absorbed, then sona_retrieve with the shared cue returns both, ranked, never one merged hybrid.
+AC-PR11-004: Given two trajectories identical except for outcome, when both are absorbed, then synaptic_ontological_neural_aggregator_retrieve with the shared cue returns both, ranked, never one merged hybrid.
 
 Difficulty: Hard.
 
@@ -2317,7 +2317,7 @@ FR-PR12: assess_piaget/3 tests the system against 8 milestone levels and returns
 
 The 8 milestone levels: (1) reflex coordination, (2) object permanence, (3) goal-directed behavior, (4) deferred imitation, (5) symbolic representation, (6) conservation, (7) theory of mind, and (8) formal operations.
 
-FR-PR12: assess_chc/2 measures 6 CHC broad abilities by proxy: fluid reasoning (novel problem-solving test count), crystallized knowledge (node_fact count and relation diversity), visual processing (image schema count), processing speed (average traverse_nexus response time), short-term memory (live_node_facts count), and long-term retrieval (sona_retrieve success rate).
+FR-PR12: assess_chc/2 measures 6 CHC broad abilities by proxy: fluid reasoning (novel problem-solving test count), crystallized knowledge (node_fact count and relation diversity), visual processing (image schema count), processing speed (average traverse_nexus response time), short-term memory (live_node_facts count), and long-term retrieval (synaptic_ontological_neural_aggregator_retrieve success rate).
 
 FR-PR12: assess_all/2 additionally reports coverage of the published computational indicators of consciousness (workspace ignition, recurrent processing, self-model presence, and valence-system activity), each mapped to its PrologAI realization, so longitudinal studies report indicator coverage alongside the Piagetian milestones.
 
@@ -2358,7 +2358,7 @@ imitation_actor (5-second interval): scans for agent_action node_facts, matches 
 
 play_actor (60-second interval when no high-priority objectives are active): randomly selects a body capability, varies parameters from past successful uses, issues the varied command, and inscribes the outcome; it also generates self-proposed practice tasks at the curiosity frontier (see PR 23).
 
-meta_control_actor (5-second interval): queries cyclic_actor_status for all actors; if any actor has error_count above 10, logs a system_warning; if Lattice node_fact_count exceeds the configurable maximum (default 1,000,000), triggers sona_crystallize.
+meta_control_actor (5-second interval): queries cyclic_actor_status for all actors; if any actor has error_count above 10, logs a system_warning; if Lattice node_fact_count exceeds the configurable maximum (default 1,000,000), triggers synaptic_ontological_neural_aggregator_crystallize.
 
 The unified gating_actor and the impasse_actor (Section 3.11) are part of this roster.
 
@@ -2385,9 +2385,9 @@ FR-PR14: The Gateway integrates with the existing SWI-Prolog MCP Server implemen
 
 Tool endpoints exposed: lattice_query (wraps traverse_nexus), lattice_inscribe (wraps anchor_node), lattice_excise (wraps prune_node), actor_list (wraps cyclic_actor_list), actor_start, actor_stop, sentinel_register, sentinel_list, body_enroll, body_signal, body_command, sona_learn, sona_recall, assess_all.
 
-Predicates: mcp_gateway_start/1, mcp_gateway_stop/0.
+Predicates: model_context_protocol_gateway_start/1, model_context_protocol_gateway_stop/0.
 
-AC-PR14-001: Given mcp_gateway_start(7474) is called, when an HTTP POST to localhost:7474/tools/lattice_query is made with a valid MCP request body, then a valid MCP response containing traverse_nexus results is returned.
+AC-PR14-001: Given model_context_protocol_gateway_start(7474) is called, when an HTTP POST to localhost:7474/tools/lattice_query is made with a valid MCP request body, then a valid MCP response containing traverse_nexus results is returned.
 
 AC-PR14-002: Given an MCP request with an invalid API key, then HTTP 401 Unauthorized is returned.
 
@@ -2470,13 +2470,13 @@ The adaptation mapping from Continual Harness state to PrologAI is:
 
 system prompt p maps to the bootstrap configuration and actor parameters (intervals, thresholds, priorities); sub-agents G map to cyclic_actors, receptors, and sentinels; skills K map to causal_plans (competences); and memory M maps to the Lattice with its scopes and zones.
 
-FR-PR17: A refiner_actor (cyclic_actor, default 60-second interval, active only when no high-priority objectives are pending) reads a trajectory window of the most recent N trajectories (default 20) via sona_retrieve and recent episode node_facts.
+FR-PR17: A refiner_actor (cyclic_actor, default 60-second interval, active only when no high-priority objectives are pending) reads a trajectory window of the most recent N trajectories (default 20) via synaptic_ontological_neural_aggregator_retrieve and recent episode node_facts.
 
-FR-PR17: The refiner_actor diagnoses the window for: repeated plan failures, sentinels that never fire or fire falsely (via pai_reflect_sentinel), actors with high error counts, and objectives with chronically low progress.
+FR-PR17: The refiner_actor diagnoses the window for: repeated plan failures, sentinels that never fire or fire falsely (via prologai_reflect_sentinel), actors with high error counts, and objectives with chronically low progress.
 
-FR-PR17: For each diagnosis, the refiner_actor proposes a CRUD edit expressed through existing primitives only: create (sentinel/6, forge/3, anchor_node/4), read (traverse_nexus/4, pai_reflect_module/2), update (amend/3, parameter changes via pai_propose_modification/3), delete (sentinel_retract/1, dissolve/1, quench_node/1).
+FR-PR17: For each diagnosis, the refiner_actor proposes a CRUD edit expressed through existing primitives only: create (sentinel/6, forge/3, anchor_node/4), read (traverse_nexus/4, prologai_reflect_module/2), update (amend/3, parameter changes via prologai_propose_modification/3), delete (sentinel_retract/1, dissolve/1, quench_node/1).
 
-FR-PR17: Every proposed edit passes the full RSI pipeline of Section 3.15: pai_propose_modification with justification, pai_sandbox_evaluate in a possible_zone sandbox against replayed trajectories, constitutional_permit check, then pai_commit_modification or rejection; pai_rollback_modification restores prior state if post-commit metrics regress.
+FR-PR17: Every proposed edit passes the full RSI pipeline of Section 3.15: prologai_propose_modification with justification, prologai_sandbox_evaluate in a possible_zone sandbox against replayed trajectories, constitutional_permit check, then prologai_commit_modification or rejection; prologai_rollback_modification restores prior state if post-commit metrics regress.
 
 FR-PR17: Rolled-back and superseded harness variants are retained in a searchable archive (a sealed past_zone scope) rather than discarded; the refiner selects parents from the archive by a policy balancing fitness (benchmark R3) with novelty (semantic distance from existing archive entries), because pure fitness selection collapses diversity; populations of candidate edits may be evaluated in parallel sandboxes.
 
@@ -2511,11 +2511,11 @@ Purpose: add the Global Workspace pattern (Baars, as realized in Franklin's LIDA
 
 FR-PR18: An attention_arbiter_actor runs the cognitive cycle at a steady cadence (default 200 milliseconds): collect candidate coalitions, select one winner, broadcast it.
 
-FR-PR18: A coalition is a set of related live node_facts with a salience score computed from novelty (prediction error from PR 19), goal relevance (agenda match), and affect (emotion stamps); pai_coalition_form/3 builds coalitions from the current situation.
+FR-PR18: A coalition is a set of related live node_facts with a salience score computed from novelty (prediction error from PR 19), goal relevance (agenda match), and affect (emotion stamps); prologai_coalition_form/3 builds coalitions from the current situation.
 
 FR-PR18: Exactly one winning coalition per cycle is broadcast by publishing its content on the channel broadcast://APEX_MIND/cycle, which every actor MAY subscribe to; what is broadcast is also kindled across zones per the zone flow rules.
 
-FR-PR18: Learning attaches to the broadcast: sona_absorb is invoked on the broadcast content's trajectory context each cycle.
+FR-PR18: Learning attaches to the broadcast: synaptic_ontological_neural_aggregator_absorb is invoked on the broadcast content's trajectory context each cycle.
 
 FR-PR18: Habituation decays the salience of repeatedly broadcast content (no perseveration); if no coalition clears the salience floor, nothing is broadcast and the floor decays gradually (no permanent silence); ties break by recency then deterministic choice, logged.
 
@@ -2523,7 +2523,7 @@ FR-PR18: Top-down pinning (the planner can pin items into candidacy) and bottom-
 
 FR-PR18: Two named experience scopes stand as standing inputs to the cycle: internal_experience (the mind's own derivations, appraisals, and self-events) and overall_experience (the merged stream including external percepts), so internally generated and externally driven cognition are distinguishable at the buffer level.
 
-Predicates: pai_coalition_form/3, pai_broadcast_subscribe/1, pai_salience/2, pai_pin_item/2.
+Predicates: prologai_coalition_form/3, prologai_broadcast_subscribe/1, prologai_salience/2, prologai_pin_item/2.
 
 AC-PR18-001: Given two coalitions with salience 0.9 and 0.4, when the cycle runs, then exactly the 0.9 coalition's content appears on the broadcast channel.
 
@@ -2538,13 +2538,13 @@ PR 19 - Prediction and Active Inference
 
 Purpose: upgrade the existing predictive-processing predicates into the full hierarchical pattern: predictions flow down, only errors flow up, errors are precision-weighted, and action is allowed to fulfill predictions.
 
-FR-PR19: The Lattice's abstraction tiers each maintain downward predictions of the tier below via pai_generate_prediction/3; at the perceptual boundary, predictions are compared with incoming observables and only residuals (errors) are forwarded upward at full strength.
+FR-PR19: The Lattice's abstraction tiers each maintain downward predictions of the tier below via prologai_generate_prediction/3; at the perceptual boundary, predictions are compared with incoming observables and only residuals (errors) are forwarded upward at full strength.
 
 FR-PR19: Prediction error is computed over node_fact representations (abstract features and embeddings), never over raw percept payloads - unpredictable sensory detail is not modeled.
 
 FR-PR19: PR 19's internals are organized as three explicit loops: perception (state inference over the current situation), learning (generative-model parameter update, delegated to PR 22), and planning (policy selection by expected free energy or utility, delegated to deliberation).
 
-FR-PR19: pai_precision/2 maintains a per-channel precision (confidence) weight; noisy channels are discounted adaptively so noise is not mistaken for surprise.
+FR-PR19: prologai_precision/2 maintains a per-channel precision (confidence) weight; noisy channels are discounted adaptively so noise is not mistaken for surprise.
 
 FR-PR19: Desired states (desired_zone content) are treated as strong predictions the action system works to make true; desirability beliefs gate which predictions action may fulfill (no self-fulfilling harmful expectations).
 
@@ -2552,7 +2552,7 @@ FR-PR19: The dark-room guard: the curiosity urge of PR 23 is encoded as a standi
 
 FR-PR19: Persistent unresolved prediction error is routed to regulation_actor and compensation_actor as disturbances.
 
-Predicates: pai_precision/2, pai_prediction_residual/3 (extends the existing pai_prediction_error/4 and pai_minimize_free_energy/1).
+Predicates: prologai_precision/2, prologai_prediction_residual/3 (extends the existing prologai_prediction_error/4 and prologai_minimize_free_energy/1).
 
 AC-PR19-001: Given a sensor channel with injected random noise, when 100 cycles run, then that channel's precision weight decreases and its errors stop dominating broadcast salience.
 
@@ -2571,9 +2571,9 @@ FR-PR20: An attribution_miner_actor logs, for every command attempt, the live no
 
 FR-PR20: Where the ratio is statistically significant across a sustained trial window, a result-spinoff causal_plan is forged (command yields result, initially low reliability); for each unreliable spinoff, the miner searches recorded contexts for conditions that lift reliability past threshold and forges context-spinoff causal_plans with those conditions added.
 
-FR-PR20: Spinoffs never overwrite parents (pai_accommodate semantics, Section 3.13); the candidate-condition search is bounded to recently active, salient node_facts; regulation_actor demotes spinoffs that stop performing.
+FR-PR20: Spinoffs never overwrite parents (spinoff_accommodate semantics, Section 3.13); the candidate-condition search is bounded to recently active, salient node_facts; regulation_actor demotes spinoffs that stop performing.
 
-Predicates: pai_spinoff_mine/2, pai_spinoff_stats/2.
+Predicates: prologai_spinoff_mine/2, prologai_spinoff_stats/2.
 
 AC-PR20-001: Given a simulated world where command shake produces noise only when a rattle node_fact is live, when 50 mixed trials run, then a context-spinoff causal_plan exists whose context includes the rattle and whose reliability exceeds the parent's.
 
@@ -2586,17 +2586,17 @@ PR 21 - Resource-Bounded Reasoning: Budgets and Evidence Truth
 
 Purpose: adopt the Assumption of Insufficient Knowledge and Resources (AIKR): every task carries a budget, every belief carries revisable evidence, answers are anytime.
 
-FR-PR21: pai_budget/3 attaches to any task, objective, or question a budget of priority (current importance), durability (how slowly priority decays), and quality; the actor scheduler consults budgets so that processing is an economy, not an exhaustive sweep.
+FR-PR21: prologai_budget/3 attaches to any task, objective, or question a budget of priority (current importance), durability (how slowly priority decays), and quality; the actor scheduler consults budgets so that processing is an economy, not an exhaustive sweep.
 
-FR-PR21: pai_truth_evidence/3 attaches to any belief a truth value of frequency (proportion of positive evidence) and confidence (amount of evidence), revisable forever; contradictory evidence merges by revision, never rejection; this extends (not replaces) the six-valued pai_truth/2.
+FR-PR21: prologai_truth_evidence/3 attaches to any belief a truth value of frequency (proportion of positive evidence) and confidence (amount of evidence), revisable forever; contradictory evidence merges by revision, never rejection; this extends (not replaces) the six-valued prologai_truth/2.
 
-FR-PR21: Anytime answering: pai_best_answer/2 returns the highest-confidence belief currently available, immediately, even mid-inference; zero-evidence questions answer no_evidence with low confidence, never fabricated certainty.
+FR-PR21: Anytime answering: prologai_best_answer/2 returns the highest-confidence belief currently available, immediately, even mid-inference; zero-evidence questions answer no_evidence with low confidence, never fabricated certainty.
 
 FR-PR21: Bounded memory as economy: under pressure, the lowest-budget items are forgotten first (generalizing consolidation from housekeeping to standing discipline); starvation detection boosts long-waiting high-durability tasks.
 
-Predicates: pai_budget/3, pai_truth_evidence/3, pai_best_answer/2, pai_revise/3.
+Predicates: prologai_budget/3, prologai_truth_evidence/3, prologai_best_answer/2, prologai_revise/3.
 
-AC-PR21-001: Given beliefs with evidence 8 positive of 10 and 1 positive of 1, when pai_best_answer is asked, then the 8-of-10 belief wins (higher confidence despite lower frequency than 1.0).
+AC-PR21-001: Given beliefs with evidence 8 positive of 10 and 1 positive of 1, when prologai_best_answer is asked, then the 8-of-10 belief wins (higher confidence despite lower frequency than 1.0).
 
 Difficulty: Moderate to Hard.
 
@@ -2607,11 +2607,11 @@ PR 22 - Self-Programming Seed: Model Synthesis
 
 Purpose: make the constructivist promise concrete with the AERA mechanism: a small protected seed plus machinery that continuously synthesizes, scores, composes, and deletes small executable models.
 
-FR-PR22: pai_model_synthesize/3 generates candidate models from observed event pairs: if pattern A at time t, then pattern B by t plus d, with guard conditions; models are node_facts (code as data) with predictable, small execution cost.
+FR-PR22: prologai_model_synthesize/3 generates candidate models from observed event pairs: if pattern A at time t, then pattern B by t plus d, with guard conditions; models are node_facts (code as data) with predictable, small execution cost.
 
 FR-PR22: Prediction monitors score every model against outcomes; models that mispredict persistently are deleted by the model garbage collector; competing models for one situation arbitrate by recent accuracy.
 
-FR-PR22: pai_model_compose/3 chains validated models backward from a goal to the current situation, assembling an executable causal_plan.
+FR-PR22: prologai_model_compose/3 chains validated models backward from a goal to the current situation, assembling an executable causal_plan.
 
 FR-PR22: The seed (drives, bootstrap models, and the synthesis machinery itself) carries protected flags; self-modification of the synthesizer routes through the full Section 3.15 RSI pipeline with constitutional checks.
 
@@ -2621,7 +2621,7 @@ FR-PR22: Every causal_plan carries a lifecycle stage in a value channel, with fi
 
 FR-PR22: An optional grounded relation symbolic_regressor MAY be bound to a Kolmogorov-Arnold Network or equivalent implementation in prologai-core, taking a table of observations and returning candidate closed-form formulas as hypothesis node_facts - quantitative laws the mind and its human reviewers can read - which then enter the normal hypothesis-prediction-experiment loop.
 
-Predicates: pai_model_synthesize/3, pai_model_score/2, pai_model_compose/3.
+Predicates: prologai_model_synthesize/3, prologai_model_score/2, prologai_model_compose/3.
 
 AC-PR22-001: Given a simulated light switch with a 1-second lag, when 20 observations run, then a model exists predicting light_on within 1 second of switch_press, with rising score.
 
@@ -2659,13 +2659,13 @@ PR 24 - Somatic Markers: Affective Pre-Selection
 
 Purpose: stamp emotional residue onto episodes and let aggregated stamps pre-filter action candidates before deliberation.
 
-FR-PR24: At episode close, the prevailing valence and arousal are stamped onto the episode (pai_marker_stamp/2); markers aggregate per causal_plan and per situation prototype as running statistics weighted by episode count.
+FR-PR24: At episode close, the prevailing valence and arousal are stamped onto the episode (affect_marker_stamp/2); markers aggregate per causal_plan and per situation prototype as running statistics weighted by episode count.
 
-FR-PR24: During retrieval, candidates carry marker scores; strongly negative markers prune candidates before deliberation scoring and strongly positive markers boost them (pai_marker_filter/3); deliberation MAY override markers when explicit evidence contradicts them.
+FR-PR24: During retrieval, candidates carry marker scores; strongly negative markers prune candidates before deliberation scoring and strongly positive markers boost them (prologai_marker_filter/3); deliberation MAY override markers when explicit evidence contradicts them.
 
 FR-PR24: Markers decay and revise with new outcomes; exploration_actor occasionally re-tests marked-off actions under safe conditions so one traumatic episode cannot permanently forbid a generally good action; discrimination splitting (regulation, Part 5 Pattern 9) separates markers that transfer to superficially similar but causally different situations.
 
-Predicates: pai_marker_stamp/2, pai_marker_filter/3, pai_marker_of/2.
+Predicates: affect_marker_stamp/2, prologai_marker_filter/3, prologai_marker_of/2.
 
 AC-PR24-001: Given a causal_plan whose last three episodes carry strongly negative valence, when candidates are retrieved for deliberation, then that plan is filtered out unless explicitly overridden.
 
@@ -2684,7 +2684,7 @@ FR-PR25: The active control goal sets the relaxed-planning parameters of the day
 
 FR-PR25: Control goals yield instantly to real external demands; a daydream that worsens emotion is terminated; competing control goals order by the intensity of their triggering emotion.
 
-Predicates: pai_control_goal/2, pai_daydream_steer/2.
+Predicates: prologai_control_goal/2, prologai_daydream_steer/2.
 
 AC-PR25-001: Given a recalled failed episode with negative valence, when daydream_actor next runs, then a reversal or rationalization daydream is opened and the post-daydream valence is not lower than before.
 
@@ -2697,15 +2697,15 @@ PR 26 - Staged Appraisal and Coping (EMA)
 
 Purpose: make coping a precise staged process: causal interpretation, appraisal variables, emotion, then coping by controllability.
 
-FR-PR26: A causal interpretation is maintained over events using pai_causal_model/1: past and future events, their causal links, the agenda, and likelihoods.
+FR-PR26: A causal interpretation is maintained over events using prologai_causal_model/1: past and future events, their causal links, the agenda, and likelihoods.
 
-FR-PR26: pai_appraise/3 computes per event: desirability (goal congruence), likelihood, causal attribution (self or other), and controllability; appraisal variables map to emotion instances with intensity, aggregating into mood (Part 6).
+FR-PR26: prologai_appraise/3 computes per event: desirability (goal congruence), likelihood, causal attribution (self or other), and controllability; appraisal variables map to emotion instances with intensity, aggregating into mood (Part 6).
 
 FR-PR26: Coping selection: high controllability invokes problem-focused coping (plan to change the world); low controllability invokes emotion-focused coping (shift attention, re-appraise, adjust desirability) - with the coping strategy menu of Section 3.11 and the guard that emotion-focused coping may never deny safety-critical facts.
 
 FR-PR26: Appraisals update as the causal interpretation changes; intensity decays over time.
 
-Predicates: pai_appraise/3, pai_cope_select/3.
+Predicates: prologai_appraise/3, prologai_cope_select/3.
 
 AC-PR26-001: Given a blocked objective appraised with low controllability, when coping runs, then an emotion-focused strategy is applied and the objective's desirability or priority is adjusted rather than a new plan spawned.
 
@@ -2720,13 +2720,13 @@ Purpose: let urges modulate HOW the whole mind runs, not just what it pursues, a
 
 FR-PR27: Needs span three categories: physiological (the body's homeostatic variables), cognitive (competence, certainty, exploration), and social (affiliation signals where bodies provide them).
 
-FR-PR27: A global modulator bus (pai_modulator/2) carries three dials read by every actor: arousal, execution speed, and resolution (depth and breadth of processing); strong urgent need raises arousal and speed and narrows resolution; calm lowers arousal and widens resolution.
+FR-PR27: A global modulator bus (prologai_modulator/2) carries three dials read by every actor: arousal, execution speed, and resolution (depth and breadth of processing); strong urgent need raises arousal and speed and narrows resolution; calm lowers arousal and widens resolution.
 
-FR-PR27: A motive is an urge bound to a goal, appetitive or aversive; affective states are named regions in modulator space (pai_affect_region/2), not separate modules.
+FR-PR27: A motive is an urge bound to a goal, appetitive or aversive; affective states are named regions in modulator space (prologai_affect_region/2), not separate modules.
 
 FR-PR27: Conflicting needs blend their modulation rather than switching abruptly; extreme arousal is clamped so resolution never collapses to zero; modulators decay toward baseline; cognitive needs can drive behavior when physiological needs are satisfied (this is PR 23's curiosity entering the same bus).
 
-Predicates: pai_modulator/2, pai_affect_region/2, pai_motive/3.
+Predicates: prologai_modulator/2, prologai_affect_region/2, prologai_motive/3.
 
 AC-PR27-001: Given a battery urge spike, when modulators update, then arousal and speed rise, resolution narrows, and daydream_actor's budget shrinks for that interval.
 
@@ -2741,15 +2741,15 @@ Purpose: process language as a stream, one word at a time in arrival order, with
 
 FR-PR28: Each word's contribution becomes a word_trace: a flat, non-recursive record with a core value and continuation pointers to related word_traces; word_traces sharing a core value are stored in one token line in time-linear arrival order inside a word_bank scope of the Lattice; storage is append-only (sediment), never edited.
 
-FR-PR28: Hearer mode (pai_hear/2) builds content by setting pointers between word_traces as words arrive; ambiguous attachments resolve by compatibility conditions; unknown words are admitted as new word_traces; missing referents leave pointers unbound for later resolution.
+FR-PR28: Hearer mode (prologai_hear/2) builds content by setting pointers between word_traces as words arrive; ambiguous attachments resolve by compatibility conditions; unknown words are admitted as new word_traces; missing referents leave pointers unbound for later resolution.
 
-FR-PR28: Think mode (pai_think_path/3) navigates word_trace to word_trace along semantic relations, deriving new content by inference; indexicals (I, you, here, now) resolve against the current context parameters (space, time, agent, recipient).
+FR-PR28: Think mode (prologai_think_path/3) navigates word_trace to word_trace along semantic relations, deriving new content by inference; indexicals (I, you, here, now) resolve against the current context parameters (space, time, agent, recipient).
 
-FR-PR28: Speaker mode (pai_speak/2) uses a think-mode navigation as the production plan, emitting surfaces word by word.
+FR-PR28: Speaker mode (prologai_speak/2) uses a think-mode navigation as the production plan, emitting surfaces word by word.
 
-Predicates: pai_hear/2, pai_think_path/3, pai_speak/2, pai_word_trace/3.
+Predicates: prologai_hear/2, prologai_think_path/3, prologai_speak/2, prologai_word_trace/3.
 
-AC-PR28-001: Given the heard sequence julia is working, when pai_think_path is asked from julia, then a path julia to working exists, and pai_speak over that path emits a grammatical surface.
+AC-PR28-001: Given the heard sequence julia is working, when prologai_think_path is asked from julia, then a path julia to working exists, and prologai_speak over that path emits a grammatical surface.
 
 Difficulty: Hard.
 
@@ -2768,7 +2768,7 @@ FR-PR29: Updates are incremental and local; global recomputation is forbidden in
 
 FR-PR29: Consumers: deliberation (utility), attention and PR 18 salience, the consolidation forgetting score, and PR 21's evidence truth (which stores its frequency and confidence in this record).
 
-Predicates: pai_belief/3, pai_belief_update/3.
+Predicates: beliefs_belief/3, beliefs_belief_update/3.
 
 AC-PR29-001: Given a node_fact whose neighbors all support it, when the coherence propagator runs, then its coherence exceeds that of a node_fact with contradicting neighbors.
 
@@ -2789,7 +2789,7 @@ FR-PR30: A locator attaches scenes to venues and venues to locales; a mapper mai
 
 FR-PR30: Detector disagreement is not an error: all traits are stored and later coordination resolves or tolerates them; concurrent label requests yield one identifier (the lexer insert is a critical section).
 
-Predicates: pai_detect/3, pai_locate/2, pai_map_update/2.
+Predicates: perception_detect/3, perception_locate/2, perception_map_update/2.
 
 AC-PR30-001: Given two percepts of the same scene from slightly different positions, when the locator runs, then both attach to one venue (merged by scene similarity).
 
@@ -2804,13 +2804,13 @@ Purpose: acquire language bottom-up with the same machinery as everything else: 
 
 FR-PR31: Phoneme percepts activated in series are linked by tandem relations; branching transitions become choices; categories over them yield word-formation rules (the tandem, series, choice, and category bootstrap relations carry this).
 
-FR-PR31: Words ground to coincident percepts via the existing pai_ground/3 so meanings attach to experience; words heard before their referents persist ungrounded, ready to ground later; homophones carry context in their choice gates for phrase-tier disambiguation.
+FR-PR31: Words ground to coincident percepts via the existing prologai_ground/3 so meanings attach to experience; words heard before their referents persist ungrounded, ready to ground later; homophones carry context in their choice gates for phrase-tier disambiguation.
 
 FR-PR31: The same chaining reapplies one tier up: phrases, then events, then episodes, then scenarios (prototype_actor), frames (frame_actor), lessons, themes, and maxims (maxim_actor); symbolisms and metaphors form where a signifier in present_zone repeatedly evokes a signified in recalled_zone or imagined_zone (metaphor_actor).
 
 FR-PR31: This pipeline runs entirely on the coordination specialist roster (Section 3.11) over the Lattice - language is acquired by the same machinery as everything else, which is the deep point.
 
-Predicates: pai_chain_promote/2, pai_ground/3 (existing), pai_symbolize/3.
+Predicates: prologai_chain_promote/2, prologai_ground/3 (existing), prologai_symbolize/3.
 
 AC-PR31-001: Given repeated phoneme series for one word co-occurring with one percept, when the pipeline runs, then a grounded word node_fact exists linking the series to the percept.
 
@@ -2833,7 +2833,7 @@ FR-PR32: Rent - on each banker cycle, every node_fact with nonzero attention pay
 
 FR-PR32: Spreading - node_facts spread a fraction of sti to neighbors linked by co-activation association (the Hebbian-style links the linkers already build), so attention flows along learned associations.
 
-FR-PR32: Economic forgetting - the consolidation forgetting sub-pattern (sona_crystallize) SHALL use lti as its primary eviction score: lowest lti is forgotten first, protected flags still inviolable.
+FR-PR32: Economic forgetting - the consolidation forgetting sub-pattern (synaptic_ontological_neural_aggregator_crystallize) SHALL use lti as its primary eviction score: lowest lti is forgotten first, protected flags still inviolable.
 
 FR-PR32: Integration - PR 18 salience consumes sti as an input; PR 21 budgets and the attention economy are reconciled: budgets govern tasks, attention governs knowledge, and the banker converts between them at a configured exchange policy.
 
@@ -2866,7 +2866,7 @@ FR-PR33: Function-style relations MAY declare argument and result types; the cha
 
 FR-PR33: The checker leverages the engine where possible: SWI-Prolog's must_be and dialect type-checking facilities serve as the primitive layer.
 
-Predicates: pai_type_declare/2, pai_type_of/2, pai_type_check/2.
+Predicates: prologai_type_declare/2, prologai_type_of/2, prologai_type_check/2.
 
 AC-PR33-001: Given type_of(battery_level, number) declared, when a node_fact asserts battery_level with a text argument and the checker runs, then an ill_typed node_fact exists naming the violation, and the system continues running.
 
@@ -2881,7 +2881,7 @@ Purpose: provide one inference engine - a chainer - that runs forward (from fact
 
 Background: this adapts the meta-reasoning chaining approach presented for MeTTa at the Conference on Artificial Intelligence and Theorem Proving (AITP) 2024: the chainer is generic; what varies is the rule base (logical rules, causal rules, type rules, analogy schemas) and the control knowledge (which rule to try first, when to stop, what to cache).
 
-FR-PR34: pai_chain(Direction, RuleBase, Start, Result, Options) runs the chainer: Direction is forward or backward; RuleBase names a set of rewrite-rule node_facts (PR 35) or clause references; Options carry the PR 21 budget.
+FR-PR34: prologai_chain(Direction, RuleBase, Start, Result, Options) runs the chainer: Direction is forward or backward; RuleBase names a set of rewrite-rule node_facts (PR 35) or clause references; Options carry the PR 21 budget.
 
 FR-PR34: Backward chaining maps onto the engine's native resolution wherever the rule base is clause-shaped (the unforked engine IS a backward chainer - no reimplementation); forward chaining builds on the sentinel machinery; the chainer's contribution is the uniform interface, the budgeting, and the control layer.
 
@@ -2891,9 +2891,9 @@ FR-PR34: The reasoner-flavored specialists (Section 3.11, theory_actor and compa
 
 FR-PR34: Every chained conclusion records provenance: rule base, rules fired, depth, and budget spent (feeding PR 29 coherence and the introspection trace of Section 3.15).
 
-Predicates: pai_chain/5, pai_rule_base/2, pai_control_policy/3.
+Predicates: prologai_chain/5, prologai_rule_base/2, prologai_control_policy/3.
 
-AC-PR34-001: Given a causal rule base and a goal state, when pai_chain is run backward within budget, then a chain from current situation to goal is returned with full provenance, or no_chain with the frontier reached.
+AC-PR34-001: Given a causal rule base and a goal state, when prologai_chain is run backward within budget, then a chain from current situation to goal is returned with full provenance, or no_chain with the frontier reached.
 
 AC-PR34-002: Given two control policies for one rule base, when 50 mixed problems run under each, then regulation updates the policies' reliability statistics and the chainer prefers the better-performing policy thereafter.
 
@@ -2922,9 +2922,9 @@ FR-PR35: The kernel document is normative: an implementation of PrologAI is comp
 
 FR-PR35: The reference realization maps kernel transitions onto the unforked engine (unify is unification; the alternatives rules are backtracking; function frames are calls) so compliance costs no fork - the kernel is a specification layer, not a new interpreter, although a strict tiny interpreter MAY be built for verification testing.
 
-Predicates: pai_rewrite_rule/4, pai_interpret/3, pai_kernel_trace/2.
+Predicates: prologai_rewrite_rule/4, prologai_interpret/3, prologai_kernel_trace/2.
 
-AC-PR35-001: Given a rewrite rule set defining factorial in the Lattice, when pai_interpret evaluates factorial of five, then 120 is returned and pai_kernel_trace yields a derivation using only kernel transition rules.
+AC-PR35-001: Given a rewrite rule set defining factorial in the Lattice, when prologai_interpret evaluates factorial of five, then 120 is returned and prologai_kernel_trace yields a derivation using only kernel transition rules.
 
 AC-PR35-002: Given the same .pai program run on the reference realization and on the strict verification interpreter, then observable results agree.
 
@@ -2939,13 +2939,13 @@ Purpose: let PrologAI minds and Hyperon systems exchange knowledge - the two clo
 
 FR-PR36: A bidirectional mapping is defined: an Atomese expression maps to a node_fact whose Relation is the expression head and whose Arguments are the mapped children; symbols map to atoms' names through the lexicon; variables map to Prolog variables; grounded atoms map to grounded node_facts (Section 3.1); Hyperon values map to value channels (Section 3.1).
 
-FR-PR36: Import and export: pai_atomese_import/3 reads MeTTa source or an Atomspace export into a chosen scope; pai_atomese_export/3 writes a scope out as MeTTa source.
+FR-PR36: Import and export: prologai_atomese_import/3 reads MeTTa source or an Atomspace export into a chosen scope; prologai_atomese_export/3 writes a scope out as MeTTa source.
 
 FR-PR36: A MeTTa space MAY be mounted as a foreign nexus (read-through query, optional write-through) via the MCP Gateway or a direct adapter in prologai-core, budgeted and sandbox-quarantined like any external source: imported knowledge lands in a quarantine scope until normal coordination promotes it.
 
 FR-PR36: Round-trip fidelity: export of an imported scope reproduces the original expressions up to variable renaming.
 
-Predicates: pai_atomese_import/3, pai_atomese_export/3, pai_space_mount/3.
+Predicates: prologai_atomese_import/3, prologai_atomese_export/3, prologai_space_mount/3.
 
 AC-PR36-001: Given a MeTTa file declaring ten expressions, when imported and re-exported, then the round trip preserves all ten up to alpha renaming.
 
@@ -2974,9 +2974,9 @@ FR-PR37-006: Learned failure constraints SHALL be stored as inference control no
 
 FR-PR37-007: Induced programs SHALL record their examples, metarules or hypothesis-space declaration, and search statistics as provenance, making every learned rule auditable by a human.
 
-Predicates: pai_induce/5 (Examples, Background, HypothesisSpace, Budget, Hypothesis), pai_metarule_declare/2, pai_induction_examples/3.
+Predicates: prologai_induce/5 (Examples, Background, HypothesisSpace, Budget, Hypothesis), prologai_metarule_declare/2, prologai_induction_examples/3.
 
-AC-PR37-001: Given ten positive and ten negative examples of a two-clause target relation expressible in the declared space, when pai_induce runs within budget, then a hypothesis consistent with all examples is returned with full provenance.
+AC-PR37-001: Given ten positive and ten negative examples of a two-clause target relation expressible in the declared space, when prologai_induce runs within budget, then a hypothesis consistent with all examples is returned with full provenance.
 
 AC-PR37-002: Given an induction run that fails on budget, when the chainer next searches a related space, then the stored failure constraints measurably prune its candidate set (verified by search statistics).
 
@@ -3001,7 +3001,7 @@ FR-PR38-003: The implementation SHALL live in prologai-core with at least two in
 
 FR-PR38-004: Dyads and seams interact coherently: the antithesis vector is a declared transform of the thesis vector, and seam connectors (Section 3.1) MAY carry role vectors so connector matching has a vector-side counterpart.
 
-Predicates: pai_bind/3, pai_unbind/3, pai_bundle/2, pai_cleanup/3.
+Predicates: vector_symbolic_architecture_bind/3, vector_symbolic_architecture_unbind/3, vector_symbolic_architecture_bundle/2, vector_symbolic_architecture_cleanup/3.
 
 AC-PR38-001: Given compound node_facts give(alice, book, bob) and give(bob, book, alice) embedded compositionally, then their whole-structure vectors differ substantially, while unbinding OBJECT from each returns book.
 
@@ -3020,7 +3020,7 @@ Background: the Thousand Brains Project's Monty system is built from repeating l
 
 FR-PR39-001: A reference_frame is a new scope subtype in which member node_facts carry coordinates (via pins) relative to the frame's origin and axes; frames are first-class node_facts and may be nested (an object frame within a place frame within a map frame, reusing the PR 30 locator and mapper outputs).
 
-FR-PR39-002: Movement is a frame primitive: pai_frame_move/3 advances a point of attention through a frame (physically, by issuing body commands, or mentally, by traversing coordinates in imagination), and perception SHALL tag incoming features with frame-relative locations when a frame is active - learning object models as feature-at-location associations.
+FR-PR39-002: Movement is a frame primitive: prologai_frame_move/3 advances a point of attention through a frame (physically, by issuing body commands, or mentally, by traversing coordinates in imagination), and perception SHALL tag incoming features with frame-relative locations when a frame is active - learning object models as feature-at-location associations.
 
 FR-PR39-003: Abstract frames are explicitly supported: conceptual spaces (for example a taxonomy distance frame, a timeline frame, a value-tradeoff frame) declare their axes, and reasoning operations MAY be expressed as movements in such frames, fulfilling the theory's claim that all concepts live in reference frames.
 
@@ -3028,7 +3028,7 @@ FR-PR39-004: Voting consensus: a voting_actor SHALL collect the concurrent concl
 
 FR-PR39-005: Frame learning is associative and fast (one-shot anchoring of a feature at a location, Hebbian-style), with consolidation handling later compression - matching Monty's rapid associative learning discipline.
 
-Predicates: pai_frame_create/3, pai_frame_anchor/4, pai_frame_move/3, pai_vote/4.
+Predicates: prologai_frame_create/3, prologai_frame_anchor/4, prologai_frame_move/3, prologai_vote/4.
 
 AC-PR39-001: Given two observation passes over a simulated object from different approach paths, when frame learning runs, then both passes anchor features into ONE object frame (location-consistent), and a third partial observation retrieves the object by frame match.
 
@@ -3047,11 +3047,11 @@ Background: s(CASP) is goal-directed answer set programming - top-down, without 
 
 FR-PR40-001: A defeasible rule base is a declared rule-base flavor for the generic chainer (PR 34): rules MAY carry default conditions and exception clauses with answer-set semantics, evaluated through the s(CASP) engine.
 
-FR-PR40-002: Every defeasible conclusion SHALL carry its justification tree as a provenance value, and pai_justify/2 SHALL render it as readable text - feeding pai_introspection_trace and the constitutional reason-giving of Section 3.16 (vetoes and permissions cite justifications, not just rule identifiers).
+FR-PR40-002: Every defeasible conclusion SHALL carry its justification tree as a provenance value, and prologai_justify/2 SHALL render it as readable text - feeding prologai_introspection_trace and the constitutional reason-giving of Section 3.16 (vetoes and permissions cite justifications, not just rule identifiers).
 
 FR-PR40-003: Defeasible and classical rule bases coexist: the chainer selects semantics per rule base, and conclusions record which semantics produced them.
 
-Predicates: pai_defeasible_rule/3, pai_justify/2.
+Predicates: prologai_defeasible_rule/3, prologai_justify/2.
 
 AC-PR40-001: Given rules "birds fly by default" and "penguins are birds that do not fly" with a penguin fact, when the chainer queries flight, then the answer is no with a justification tree naming the exception, rendered readably.
 
@@ -3068,13 +3068,13 @@ Background: under the distribution semantics, probabilistic facts carry probabil
 
 FR-PR41-001: A node_fact MAY be declared probabilistic with a probability in its evidence channel; a probabilistic rule base is a chainer flavor whose query answers are probabilities with explanation structures.
 
-FR-PR41-002: pai_prob_query/3 SHALL return the probability of a query and its explanation set (the worlds or proofs supporting it), with exact computation when tractable within budget and sampling otherwise (the budget from PR 21 governs).
+FR-PR41-002: probabilistic_query/3 SHALL return the probability of a query and its explanation set (the worlds or proofs supporting it), with exact computation when tractable within budget and sampling otherwise (the budget from PR 21 governs).
 
-FR-PR41-003: The pai_bayes predicate family (Section 3.15) SHALL be re-specified as the user-facing interface to this layer, and PR 21's frequency-and-confidence evidence values SHALL be the default source of fact probabilities, reconciled by a documented mapping.
+FR-PR41-003: The probabilistic_bayes predicate family (Section 3.15) SHALL be re-specified as the user-facing interface to this layer, and PR 21's frequency-and-confidence evidence values SHALL be the default source of fact probabilities, reconciled by a documented mapping.
 
-Predicates: pai_prob_fact/2, pai_prob_query/3.
+Predicates: probabilistic_fact/2, probabilistic_query/3.
 
-AC-PR41-001: Given probabilistic facts rain (0.3) and sprinkler (0.5) with the standard wet-grass rules, when pai_prob_query computes wet_grass, then the returned probability matches the analytically correct value within tolerance, with an explanation set.
+AC-PR41-001: Given probabilistic facts rain (0.3) and sprinkler (0.5) with the standard wet-grass rules, when probabilistic_query computes wet_grass, then the returned probability matches the analytically correct value within tolerance, with an explanation set.
 
 Difficulty: Hard.
 
@@ -3116,11 +3116,11 @@ FR-PR43-001: The gateway (PR 14) SHALL additionally serve A2A: publish an agent 
 
 FR-PR43-002: Opacity is preserved both ways: the agent card discloses capabilities, never Lattice contents; inbound agents receive task results, never direct queries against the mind's memory.
 
-FR-PR43-003: Durable agent mail: pai_peer_mail_send/3 and pai_peer_mail_fetch/3 provide addressed, persistent mailboxes hosted by the Mind Server, so minds in different sessions exchange messages asynchronously; mail is inscribed to the recipient's quarantine scope on fetch.
+FR-PR43-003: Durable agent mail: prologai_peer_mail_send/3 and prologai_peer_mail_fetch/3 provide addressed, persistent mailboxes hosted by the Mind Server, so minds in different sessions exchange messages asynchronously; mail is inscribed to the recipient's quarantine scope on fetch.
 
 FR-PR43-004: The companion protocols (ACP and ANP) have stabilized and are promoted from the research track to production work packages PR 47 (ACP Gateway) and PR 48 (ANP Gateway) respectively; the gateway's protocol layer SHALL be structured so adding a protocol is registration, not redesign.
 
-Predicates: pai_agent_card/1, pai_a2a_task/4, pai_peer_mail_send/3, pai_peer_mail_fetch/3.
+Predicates: prologai_agent_card/1, prologai_a2a_task/4, prologai_peer_mail_send/3, prologai_peer_mail_fetch/3.
 
 AC-PR43-001: Given two PrologAI minds on one Mind Server, when mind A sends an A2A task to mind B requesting a garden forecast, then B's motivation queue shows the screened objective, and A receives the artifact through the task lifecycle without any direct Lattice access.
 
@@ -3149,7 +3149,7 @@ FR-PR44: Tool outcomes update reliability statistics like any competence, so the
 
 FR-PR44: The mind MAY build its own tools: a learned tool is a grounded relation synthesized (PR 22) or induced (PR 37) and bound to a composition of existing tools (the connector mechanic of Section 3.1), entering the registry only through the constitutional pipeline.
 
-Predicates: pai_tool_card/2, pai_tool_register/2, pai_tool_discover/2, pai_tool_select/3, pai_tool_invoke/4.
+Predicates: prologai_tool_card/2, prologai_tool_register/2, prologai_tool_discover/2, prologai_tool_select/3, prologai_tool_invoke/4.
 
 AC-PR44-001: Given a registered web_search tool and an objective that needs current facts, when the deliberator runs, then web_search is selected, invoked through the constitutional gate, and its result lands in quarantine before any use.
 
@@ -3170,7 +3170,7 @@ FR-PR45: A computer body is enrolled via manifest_body (PR 10), declaring screen
 
 FR-PR45: Screen perception flows as percepts: a screenshot is a visual percept processed by the detector suite (PR 30), which extracts interface elements - buttons, fields, links, and text - as node_facts with screen-relative locations, reusing reference frames (PR 39) for the screen's coordinate space.
 
-FR-PR45: Actuation flows as commands: pai_computer_act issues mouse, keyboard, and navigation actions through dispatch_command, each with proprioceptive confirmation - the next screenshot - closing the perception-action loop.
+FR-PR45: Actuation flows as commands: computer_use_act issues mouse, keyboard, and navigation actions through dispatch_command, each with proprioceptive confirmation - the next screenshot - closing the perception-action loop.
 
 FR-PR45: Browser use is a specialized computer body offering navigation, page-text and Document Object Model extraction, form filling, and tab management as capabilities, preferred over raw pixel control whenever a page exposes structure.
 
@@ -3178,7 +3178,7 @@ FR-PR45: Computer use is contained by default (Part 38): early minds act only in
 
 FR-PR45: On-screen content and web links from untrusted sources are treated as quarantined input, never as instructions, which guards against prompt injection arriving through the screen.
 
-Predicates: pai_screen_observe/1, pai_computer_act/2, pai_browser_navigate/2, pai_page_extract/2.
+Predicates: computer_use_screen_observe/1, computer_use_act/2, computer_use_browser_navigate/2, computer_use_page_extract/2.
 
 AC-PR45-001: Given a sandboxed desktop showing a form, when the mind is asked to fill and submit it, then it observes the screen, locates the fields as node_facts, types the values, submits, and confirms success from the next screenshot.
 
@@ -3205,7 +3205,7 @@ FR-PR46-004: A simulator - Gazebo (the ROS-native default), NVIDIA Isaac Sim (fr
 
 FR-PR46-005: Embodiment is staged and contained (Part 38): a mind acts first in simulation only, with no physical actuation and a network allowlist; real-world control is unlocked only by passing the capability evaluations and audits; every irreversible physical action passes the constitutional check, and high-risk actuation is gated by the oversight monitor.
 
-Predicates: pai_robot_enroll/3, pai_ros_bridge/2, pai_robot_observe/1, pai_robot_act/2.
+Predicates: robot_operating_system_bridge_enroll/3, robot_operating_system_bridge/2, robot_operating_system_bridge_observe/1, robot_operating_system_bridge_act/2.
 
 AC-PR46-001: Given a simulated robot in Gazebo or Webots with a camera and a drive base, when the mind is asked to find and approach a colored object, then it observes the scene as percepts, plans a route, issues drive commands, and confirms arrival from proprioceptive feedback.
 
@@ -3230,9 +3230,9 @@ FR-PR47-003: Inbound ACP tasks are screened through the constitutional gate (Sec
 
 FR-PR47-004: The ACP gateway registers itself as a sixth tool source alongside native foreign predicates, Model Context Protocol servers (PR 14), Agent2Agent skills (PR 43), body capabilities (PR 10), and ANP peers (PR 48), so the tool-use faculty can discover and invoke ACP-hosted agents exactly as it invokes any other tool.
 
-Predicates: pai_acp_start/1, pai_acp_stop/0, pai_acp_run/4, pai_acp_status/2, pai_acp_cancel/1, pai_acp_agent_description/1.
+Predicates: agent_communication_protocol_start/1, agent_communication_protocol_stop/0, agent_communication_protocol_run/4, agent_communication_protocol_status/2, agent_communication_protocol_cancel/1, agent_communication_protocol_agent_description/1.
 
-AC-PR47-001: Given pai_acp_start(7476) is called, when POST /runs with a valid ACP task body is made, then a run_id is returned and GET /runs/{run_id} shows completed status with an artifact within the timeout.
+AC-PR47-001: Given agent_communication_protocol_start(7476) is called, when POST /runs with a valid ACP task body is made, then a run_id is returned and GET /runs/{run_id} shows completed status with an artifact within the timeout.
 
 AC-PR47-002: Given an ACP run in async mode, when the client polls GET /runs/{run_id}, then the status transitions from created to in_progress to completed in the correct order without skipping states.
 
@@ -3259,15 +3259,15 @@ FR-PR48-004: ANP meta-protocol negotiation (MPN) is supported: when a peer queri
 
 FR-PR48-005: The ANP gateway registers itself as a fifth tool source alongside native foreign predicates, Model Context Protocol servers (PR 14), Agent2Agent skills (PR 43), body capabilities (PR 10), and ACP agents (PR 47), so the tool-use faculty can discover and invoke ANP-addressed peers exactly as it invokes any other tool; every outbound ANP message passes the constitutional gate.
 
-Predicates: pai_anp_did/1, pai_anp_agent_description/1, pai_anp_send/3, pai_anp_receive/3, pai_anp_verify/2, pai_anp_negotiate/2.
+Predicates: prologai_anp_did/1, prologai_anp_agent_description/1, prologai_anp_send/3, prologai_anp_receive/3, prologai_anp_verify/2, prologai_anp_negotiate/2.
 
-AC-PR48-001: Given pai_anp_did(DID) is called, then a valid did:web DID is returned that is stable across calls and stored in the constitution scope.
+AC-PR48-001: Given prologai_anp_did(DID) is called, then a valid did:web DID is returned that is stable across calls and stored in the constitution scope.
 
 AC-PR48-002: Given GET /.well-known/agent-descriptions is called, when an ANP client requests it, then a valid ANP agent description is returned listing the mind's DID, capabilities, supported protocols, and public key without exposing Lattice contents.
 
-AC-PR48-003: Given an inbound ANP message whose sender DID cannot be resolved or whose signature does not verify, when pai_anp_receive/3 is called, then the message is discarded and a security event is logged; no content enters any scope.
+AC-PR48-003: Given an inbound ANP message whose sender DID cannot be resolved or whose signature does not verify, when prologai_anp_receive/3 is called, then the message is discarded and a security event is logged; no content enters any scope.
 
-AC-PR48-004: Given ANP meta-protocol negotiation, when a peer queries supported protocols via pai_anp_negotiate/2, then the set {mcp, a2a, acp, anp} with their endpoint URLs is returned.
+AC-PR48-004: Given ANP meta-protocol negotiation, when a peer queries supported protocols via prologai_anp_negotiate/2, then the set {mcp, a2a, acp, anp} with their endpoint URLs is returned.
 
 Difficulty: Moderate to Hard.
 
@@ -3341,44 +3341,44 @@ The result is a constructed language and platform fully backward-compatible with
 
 PART 18 - ADDITIONAL LIBRARY MODULES
 
-library/record.pl - pai_blueprint/2, pai_scaffold/2, forge/3, recall_or_forge/3, dissolve/1, amend/3, wipe/2, record_of/2, query_records/2, query_scope_records/3, forge_nested/3, recall_or_forge_nested/3, find_record/2, inscribe_record/2, blueprint_uses/2, pai_call_method/4, lattice_index/3, lattice_drop_index/1, lattice_dump/2, pai_closest_records/4, pai_with/3, weave_scaffold/3.
+library/record.pl - prologai_blueprint/2, prologai_scaffold/2, forge/3, recall_or_forge/3, dissolve/1, amend/3, wipe/2, record_of/2, query_records/2, query_scope_records/3, forge_nested/3, recall_or_forge_nested/3, find_record/2, inscribe_record/2, blueprint_uses/2, prologai_call_method/4, lattice_index/3, lattice_drop_index/1, lattice_dump/2, prologai_closest_records/4, prologai_with/3, weave_scaffold/3.
 
-library/similarity.pl - pai_similar/3, pai_dissimilar/3, pai_closest_match/4, pai_similar_signed/3.
+library/similarity.pl - prologai_similar/3, prologai_dissimilar/3, prologai_closest_match/4, prologai_similar_signed/3.
 
-library/types.pl - pai_truth/2, pai_truth_assert/2, pai_is_truth_value/1, pai_uuid/1, pai_is_uuid/1, pai_constant/2, pai_constant_value/2, pai_is_blueprint/2.
+library/types.pl - prologai_truth/2, prologai_truth_assert/2, prologai_is_truth_value/1, prologai_uuid/1, prologai_is_uuid/1, prologai_constant/2, prologai_constant_value/2, prologai_is_blueprint/2.
 
-library/collections.pl - pai_dict_create/2 and related; pai_enumeration_create/3 and related; pai_keyword_group_create/2 and related.
+library/collections.pl - prologai_dict_create/2 and related; prologai_enumeration_create/3 and related; prologai_keyword_group_create/2 and related.
 
-library/generators.pl - pai_generator_create/2, pai_generator_collect/3, pai_generator_next/3, pai_yield/1, pai_generator_done/0.
+library/generators.pl - prologai_generator_create/2, prologai_generator_collect/3, prologai_generator_next/3, prologai_yield/1, prologai_generator_done/0.
 
-library/tasks.pl - pai_task/2, pai_async/2, pai_sync/2, pai_await/3, pai_free/1, pai_cancel/1, pai_scatter/3, pai_critical/2, pai_ask/4.
+library/tasks.pl - prologai_task/2, prologai_async/2, prologai_sync/2, prologai_await/3, prologai_free/1, prologai_cancel/1, prologai_scatter/3, prologai_critical/2, prologai_ask/4.
 
-library/problems.pl - pai_challenge/3, pai_deliberate/0, challenge_status/2, challenge_result/2, distance_gap/3, proof_lacuna/3, prediction_conflict/3, discovery_frontier/2, phase_sequence/3.
+library/problems.pl - prologai_challenge/3, prologai_deliberate/0, challenge_status/2, challenge_result/2, distance_gap/3, proof_lacuna/3, prediction_conflict/3, discovery_frontier/2, phase_sequence/3.
 
-library/config.pl - pai_config_open/3, pai_config_get/3, pai_config_set/3, pai_config_close/1.
+library/config.pl - prologai_config_open/3, prologai_config_get/3, prologai_config_set/3, prologai_config_close/1.
 
-library/peers.pl - pai_peer_register/1, pai_peer_send/2, pai_peer_broadcast/1.
+library/peers.pl - prologai_peer_register/1, prologai_peer_send/2, prologai_peer_broadcast/1.
 
-library/macros.pl - pai_macro_define/3, pai_macro_expand/3, pai_quasi_quote/2.
+library/macros.pl - prologai_macro_define/3, prologai_macro_expand/3, prologai_quasi_quote/2.
 
-library/convenience.pl - pai_case/3, pai_step/4, pai_confirm/2, pai_confute/2, pai_ensure/2, pai_given/2, pai_superpose/2, pai_collapse/3.
+library/convenience.pl - prologai_case/3, prologai_step/4, prologai_confirm/2, prologai_confute/2, prologai_ensure/2, prologai_given/2, prologai_superpose/2, prologai_collapse/3.
 
 
 PART 19 - PRIORITY ORDER FOR IMPLEMENTATION
 
 Priority 1 (Implement First) - Core foundation:
 
-library/types.pl (pai_uuid, pai_constant, pai_truth).
+library/types.pl (prologai_uuid, prologai_constant, prologai_truth).
 
-library/similarity.pl (pai_similar, pai_dissimilar, pai_closest_match).
+library/similarity.pl (prologai_similar, prologai_dissimilar, prologai_closest_match).
 
-library/record.pl basic operations (pai_blueprint, pai_scaffold, forge, recall_or_forge, dissolve, amend, wipe, record_of, query_records).
+library/record.pl basic operations (prologai_blueprint, prologai_scaffold, forge, recall_or_forge, dissolve, amend, wipe, record_of, query_records).
 
 Priority 2 (Implement Second) - Problem solving and concurrency:
 
-library/problems.pl (pai_challenge, pai_deliberate, state types).
+library/problems.pl (prologai_challenge, prologai_deliberate, state types).
 
-library/tasks.pl (pai_task, pai_async, pai_sync, pai_await, pai_scatter, pai_critical, pai_ask).
+library/tasks.pl (prologai_task, prologai_async, prologai_sync, prologai_await, prologai_scatter, prologai_critical, prologai_ask).
 
 Priority 3 (Implement Third) - Data structures and utilities:
 
@@ -3394,7 +3394,7 @@ Extended query_records with inheritance-aware matching.
 
 lattice_dump/2 export functionality.
 
-pai_closest_records/4 similarity-based record queries.
+prologai_closest_records/4 similarity-based record queries.
 
 In parallel with Priority 1, run the PR 2 vector backend bake-off, since its outcome shapes PR 3, PR 11, and PR 16; and stand up the PR 1 launcher early, since every demonstration and test benefits from the single prologai entry point.
 
@@ -3587,11 +3587,11 @@ Test Script 5 - Episodic Recall via ReasoningBank
 
 Setup: Run the system through 10 episodes of the Community Garden Project scenario.
 
-Step 1: Submit each completed episode trajectory to sona_absorb/1.
+Step 1: Submit each completed episode trajectory to synaptic_ontological_neural_aggregator_absorb/1.
 
 Step 2: Present a new situation matching an episode from 3 rounds ago.
 
-Step 3: Call sona_retrieve/2 with the current situation pattern.
+Step 3: Call synaptic_ontological_neural_aggregator_retrieve/2 with the current situation pattern.
 
 Step 4: Verify that the most similar past trajectory is returned.
 
@@ -4268,7 +4268,7 @@ The mapping, component by component:
 
 system prompt p maps to the bootstrap configuration and actor parameters; sub-agents G map to cyclic_actors, receptors, and sentinels; skills K map to causal_plans; memory M maps to the Lattice.
 
-The refinement loop maps to PR 17's refiner_actor, the trajectory window to SONA's ReasoningBank (sona_retrieve), the CRUD edits to existing predicates (sentinel/6, forge/3, amend/3, sentinel_retract/1, dissolve/1), and the safety gate to the Section 3.15 RSI pipeline with constitutional checks - which is stricter than the original, as befits a mind rather than a game agent.
+The refinement loop maps to PR 17's refiner_actor, the trajectory window to SONA's ReasoningBank (synaptic_ontological_neural_aggregator_retrieve), the CRUD edits to existing predicates (sentinel/6, forge/3, amend/3, sentinel_retract/1, dissolve/1), and the safety gate to the Section 3.15 RSI pipeline with constitutional checks - which is stricter than the original, as befits a mind rather than a game agent.
 
 The micro-steps.
 
@@ -4280,13 +4280,13 @@ Micro-step H2: Read the README and the paper it cites; extract two things into a
 
 Micro-step H3: Confirm the mapping table above against what you read, adjusting the design note where the paper's details differ.
 
-Micro-step H4: Implement the trajectory window: a predicate refine_window(N, Window) returning the last N trajectories from sona_retrieve plus recent episode node_facts.
+Micro-step H4: Implement the trajectory window: a predicate refine_window(N, Window) returning the last N trajectories from synaptic_ontological_neural_aggregator_retrieve plus recent episode node_facts.
 
 Micro-step H5: Implement the diagnoses of PR 17 one at a time, each as a small predicate from the window to a list of findings (repeated plan failure, dead sentinel, false-firing sentinel, erroring actor, stalled objective).
 
-Micro-step H6: Implement the proposal step: each finding becomes a pai_propose_modification/3 call whose justification quotes the finding.
+Micro-step H6: Implement the proposal step: each finding becomes a prologai_propose_modification/3 call whose justification quotes the finding.
 
-Micro-step H7: Wire the pipeline: sandbox evaluation in possible_zone (pai_sandbox_evaluate/3 replaying the window), constitutional check, commit, and a post-commit watch that calls pai_rollback_modification/2 on regression.
+Micro-step H7: Wire the pipeline: sandbox evaluation in possible_zone (prologai_sandbox_evaluate/3 replaying the window), constitutional check, commit, and a post-commit watch that calls prologai_rollback_modification/2 on regression.
 
 Micro-step H8: Register the refiner_actor:
 
@@ -4315,7 +4315,7 @@ PART 33 - LANGUAGE REQUIREMENTS
 
 This part records the programming-language qualities that PrologAI's surface language and engine satisfy, distinguishing those already met by the platform foundation from those added to support the full cognitive architecture.
 
-Already satisfied by the platform foundation: very high level conciseness; declarative relations with database semantics (blueprints, the Lattice); production-system pattern matching (sentinels); modules and hot reload (packs, theories as modules); concurrency primitives (pai_critical, actors); similarity and fuzzy matching (pai_similar, pai_closest_match); runtime type tests (pai_truth, pai_ensure); interactive interpreted development (the prologai top level); persistence by default (the Lattice and library/config); reflection and metaprogramming (Section 3.15, pai_macro); message and channel primitives (receptors, signal addresses); device agnosticism (PR 10); human-readable literal-first syntax (the .pai surface).
+Already satisfied by the platform foundation: very high level conciseness; declarative relations with database semantics (blueprints, the Lattice); production-system pattern matching (sentinels); modules and hot reload (packs, theories as modules); concurrency primitives (prologai_critical, actors); similarity and fuzzy matching (prologai_similar, prologai_closest_match); runtime type tests (prologai_truth, prologai_ensure); interactive interpreted development (the prologai top level); persistence by default (the Lattice and library/config); reflection and metaprogramming (Section 3.15, prologai_macro); message and channel primitives (receptors, signal addresses); device agnosticism (PR 10); human-readable literal-first syntax (the .pai surface).
 
 Additional language requirements.
 
@@ -4327,13 +4327,13 @@ Time primitives - a moment type of high resolution, activation windows, timers, 
 
 Broadcast primitive - a one-to-all broadcast operation alongside point-to-point messages and stigmergic triggers (PR 18).
 
-Copy-with-substitution - pai_accommodate/3 as a core operator with automatic provenance (Section 3.13); constructive, never-destructive editing with consolidation as the only destroyer.
+Copy-with-substitution - spinoff_accommodate/3 as a core operator with automatic provenance (Section 3.13); constructive, never-destructive editing with consolidation as the only destroyer.
 
 Paired dataflows - first-class support for hierarchical models with downward predictions and upward errors (PR 19).
 
 Self-programming support - models as data that the running system synthesizes, scores, composes, and deletes, with protected-core annotations enforced by the runtime (PR 22, Section 3.16).
 
-Deterministic replay mode for experiments, and signed similarity (pai_similar_signed/3).
+Deterministic replay mode for experiments, and signed similarity (prologai_similar_signed/3).
 
 Auditability as a hard requirement - the contents of a mind must be readable by a person: every relation inspectable as table or graph, immutable audit logs, resource quotas per actor.
 
@@ -4740,7 +4740,7 @@ Working memory and context - the activation window and live_node_facts (Section 
 
 Long-term and episodic memory - the SONA continuous-learning layer and the ReasoningBank (PR 11 and Section 3.9), the sealed past_zone, and the five memory areas (Part 6).
 
-Retrieval-augmented generation - the two-phase traverse_nexus search (PR 4), associative memory (Part 6 Area 3), and sona_retrieve (PR 11).
+Retrieval-augmented generation - the two-phase traverse_nexus search (PR 4), associative memory (Part 6 Area 3), and synaptic_ontological_neural_aggregator_retrieve (PR 11).
 
 Function calling - grounded relations (Section 3.1) invoked through the tool faculty (PR 44).
 
@@ -4782,7 +4782,7 @@ Embeddings and vectors - the vector backend (PR 2), the pluggable embedding prov
 
 Structured and compositional representation - value channels and connectors (Section 3.1), reference frames (PR 39), and vector-symbolic binding (PR 38).
 
-Probabilistic and uncertain reasoning - evidence truth and budgets (PR 21), the distribution-semantics probabilistic layer (PR 41), and the pai_bayes family (Section 3.15).
+Probabilistic and uncertain reasoning - evidence truth and budgets (PR 21), the distribution-semantics probabilistic layer (PR 41), and the probabilistic_bayes family (Section 3.15).
 
 Truth maintenance - incremental tabling over the node_fact store (PR 15) and belief propagation (PR 29).
 
@@ -4891,18 +4891,18 @@ PQC (Post-Quantum Cryptography) via ML-KEM-768 (CRYSTALS-Kyber, NIST FIPS 203): 
 
 FR-CRYPTO-002: All three families SHALL use hybrid encryption: the asymmetric algorithm wraps a freshly generated 256-bit AES session key; AES-256 in Galois/Counter Mode (GCM) with a 96-bit random IV encrypts the payload. AES-GCM provides both confidentiality and authenticated integrity.
 
-FR-CRYPTO-003: The privacy layer SHALL expose a single generic encrypt/decrypt interface (pai_encrypt/5 and pai_decrypt/5) that accepts an algorithm atom (pai_algo_rsa, pai_algo_ecdh, or pai_algo_pqc) and dispatches to the appropriate internal implementation. Application code SHALL NOT need to call algorithm-specific predicates unless it requires finer control.
+FR-CRYPTO-003: The privacy layer SHALL expose a single generic encrypt/decrypt interface (prologai_encrypt/5 and prologai_decrypt/5) that accepts an algorithm atom (lattice_cryptography_algo_rsa, lattice_cryptography_algo_ecdh, or lattice_cryptography_algo_pqc) and dispatches to the appropriate internal implementation. Application code SHALL NOT need to call algorithm-specific predicates unless it requires finer control.
 
 
 SECTION 49.3 - FUNCTIONAL REQUIREMENTS
 
-FR-CRYPTO-004: The privacy layer SHALL provide key generation predicates: pai_keygen_rsa/3 for RSA key pairs (PEM files), pai_keygen_ecdh/3 for ECDH key pairs (private scalar and public point on the curve), and pai_keygen_pqc/2 for PQC key pairs (PEM files via the OQS provider).
+FR-CRYPTO-004: The privacy layer SHALL provide key generation predicates: prologai_keygen_rsa/3 for RSA key pairs (PEM files), prologai_keygen_ecdh/3 for ECDH key pairs (private scalar and public point on the curve), and prologai_keygen_pqc/2 for PQC key pairs (PEM files via the OQS provider).
 
 FR-CRYPTO-005: Encrypted bundles SHALL be self-contained compound terms that carry all fields needed for decryption: the wrapped AES key (or KEM encapsulation), the IV, and the ciphertext. Authentication tags SHALL be stored as hex-encoded atoms alongside the bundle. The bundle SHALL be storable as an ordinary Prolog term.
 
 FR-CRYPTO-006: Decryption SHALL fail with an error on any authentication tag mismatch. The privacy layer SHALL NOT silently return incorrect data when the ciphertext or tag has been tampered with.
 
-FR-CRYPTO-007: The privacy layer SHALL provide a pai_crypto_available/1 predicate that succeeds if and only if the specified algorithm family is fully operational in the current environment. This allows application code to probe availability before committing to an algorithm.
+FR-CRYPTO-007: The privacy layer SHALL provide a prologai_crypto_available/1 predicate that succeeds if and only if the specified algorithm family is fully operational in the current environment. This allows application code to probe availability before committing to an algorithm.
 
 FR-CRYPTO-008: The privacy layer SHALL integrate with the Lattice scope architecture: private Lattice values SHALL be encrypted and stored in a designated private scope so that the full symbolic reasoning layer can see the encrypted atom but cannot see the plaintext without holding the decryption key.
 
@@ -4911,11 +4911,11 @@ FR-CRYPTO-009: All key material held in temporary files during key generation SH
 
 SECTION 49.4 - IMPLEMENTATION AND PLACEMENT
 
-Implementation: pack lattice_crypto in packs/lattice_crypto/prolog/lattice_crypto.pl (PR 49). Tests in tests/pr49/test_pr49.pl (eleven acceptance criteria). Architecture placement: PART ARCH-18.
+Implementation: pack lattice_crypto in packs/lattice_cryptography/prolog/lattice_cryptography.pl (PR 49). Tests in tests/pr49/test_pr49.pl (eleven acceptance criteria). Architecture placement: PART ARCH-18.
 
 The pack uses library(crypto) (SWI-Prolog built-in) for AES-256-GCM, HKDF-SHA-256, and RSA-OAEP operations; library(process) for openssl CLI invocations required by RSA key generation and PQC operations; and the crypto_curve_scalar_mult/4 predicate for ECDH shared-secret computation on named elliptic curves.
 
-The OQS provider requirement for PQC is a deployment-time dependency, not a compile-time dependency. Systems without the OQS provider can use RSA and ECDH without any degradation; PQC predicates raise a structured lattice_crypto_error(pqc_provider_unavailable, Message) error that instructs the administrator to install the required provider.
+The OQS provider requirement for PQC is a deployment-time dependency, not a compile-time dependency. Systems without the OQS provider can use RSA and ECDH without any degradation; PQC predicates raise a structured lattice_cryptography_error(pqc_provider_unavailable, Message) error that instructs the administrator to install the required provider.
 
 
 PART 42 - IMAGINATIVE MEMORY AND SITUATIONAL AWARENESS (WORK PACKAGES PR 50 AND PR 51)
@@ -4934,7 +4934,7 @@ A figure carries an optional starting position pos(X,Y) and an optional per-fram
 
 A reverie is the rendered animation produced from a mindscape's tableaux: a finite, ordered list of frames. Rendering advances each figure kinematically (position at frame F equals start plus velocity times F) so that a reverie is a deterministic, inspectable forward animation suitable for mental simulation. Each frame records the vantage and the position of every figure.
 
-The work package shall provide: pai_mindscape_new/2, pai_mindscape_reality/2, pai_tableau_add/3, pai_tableau_ground/3, pai_reverie_render/3, pai_reverie_frames/2, pai_mindscape_clear/1, and the one-call convenience pai_imagine_fresh/4.
+The work package shall provide: prologai_mindscape_new/2, prologai_mindscape_reality/2, prologai_tableau_add/3, prologai_tableau_ground/3, prologai_reverie_render/3, prologai_reverie_frames/2, prologai_mindscape_clear/1, and the one-call convenience prologai_imagine_fresh/4.
 
 42.2 Situational Awareness (pack awareness)
 
@@ -4942,9 +4942,9 @@ The vision holds that situational awareness is engineered, not assumed, and that
 
 ambient_regard is the initial, undifferentiated general awareness; it is the default standpoint of a freshly booted mind. selfward_regard is the view from self-awareness and self-interest. otherward_regard(Agent) is a view attributed to another mind, opened on demand, one per modelled agent. avowed_regard is the owned view (consciousness, preferences, responsibility). disavowed_regard is the disowned view (ignorance, aversions, the freedom not yet integrated). The five kinds carry strictly increasing developmental level indices one through five.
 
-A proposition may be held under a regard, so the same content may be believed from one standpoint and denied from another. The mind has exactly one active regard at a time, beginning at ambient_regard. Theory-of-mind perspective taking attributes a proposition to an other's regard (pai_tom_attribute/2) and detects divergence (pai_tom_divergence/2): a proposition the self holds whose contradictory the other holds, where a proposition P and the term not(P) are contradictories. This is the computational core of false-belief reasoning. Reconciliation (pai_regard_reconcile/1) integrates the avowed and disavowed regards into one coherent self-account, surfacing disowned material rather than leaving it hidden.
+A proposition may be held under a regard, so the same content may be believed from one standpoint and denied from another. The mind has exactly one active regard at a time, beginning at ambient_regard. Theory-of-mind perspective taking attributes a proposition to an other's regard (prologai_tom_attribute/2) and detects divergence (prologai_tom_divergence/2): a proposition the self holds whose contradictory the other holds, where a proposition P and the term not(P) are contradictories. This is the computational core of false-belief reasoning. Reconciliation (prologai_regard_reconcile/1) integrates the avowed and disavowed regards into one coherent self-account, surfacing disowned material rather than leaving it hidden.
 
-The work package shall provide: pai_regard_kinds/1, pai_regard_open/1, pai_regard_hold/2, pai_regard_held/2, pai_regard_shift/1, pai_regard_active/1, pai_regard_level/2, pai_tom_attribute/2, pai_tom_divergence/2, and pai_regard_reconcile/1. An otherward regard whose agent term is not ground shall be rejected.
+The work package shall provide: prologai_regard_kinds/1, prologai_regard_open/1, prologai_regard_hold/2, prologai_regard_held/2, prologai_regard_shift/1, prologai_regard_active/1, prologai_regard_level/2, prologai_tom_attribute/2, prologai_tom_divergence/2, and prologai_regard_reconcile/1. An otherward regard whose agent term is not ground shall be rejected.
 
 42.3 Traceability
 
@@ -5421,7 +5421,7 @@ FR-QN-018: qn_at_least_n/3(+Objects, +Pred, +N) — at least N objects satisfy P
 
 Section 49.3 - Implementation and Placement
 
-Implementation: pack quant in packs/quant/prolog/quant.pl (PR 59). Tests in packs/quant/test/test_quant.pl. Architecture: PART ARCH-25, Layer 38. Dependencies: library(lists), library(apply), library(pairs) from SWI-Prolog; library(scene) from PR 58.
+Implementation: pack quant in packs/quantity/prolog/quantity.pl (PR 59). Tests in packs/quantity/test/test_quantity.pl. Architecture: PART ARCH-25, Layer 38. Dependencies: library(lists), library(apply), library(pairs) from SWI-Prolog; library(scene) from PR 58.
 
 Grouping uses group_pairs_by_key/2 from library(pairs) after msort on Key-Value pairs. The msort (not sort) step preserves duplicate keys so that group_pairs_by_key receives all pairs and groups them correctly. qn_count_where uses include/3 and length/2.
 
@@ -7326,7 +7326,7 @@ END OF PART 79
 
 PART 80 - OBJ PACK (OB-OB-001 through OB-OB-014)
 
-Work Package 90 - Layer 69 - Prefix: obj_
+Work Package 90 - Layer 69 - Prefix: object_
 
 The obj pack provides 14 predicates for object-level reasoning over
 list-of-lists grids. An object is a 4-connected region of cells sharing the
@@ -7337,57 +7337,57 @@ inventory extraction from a grid (all objects of one color or all non-zero
 colors), counting, largest/smallest selection, cell-to-object lookup, and size
 sorting.
 
-OB-OB-001 obj_from_cells(+Color, +Cells, -Obj)
+OB-OB-001 object_from_cells(+Color, +Cells, -Obj)
   Construct an object term obj(Color, SortedCells). SortedCells is the
   msort of Cells. Color may be any non-negative integer.
 
-OB-OB-002 obj_color(+Obj, -Color)
+OB-OB-002 object_color(+Obj, -Color)
   Extract the color stored in an object term.
 
-OB-OB-003 obj_cells(+Obj, -Cells)
+OB-OB-003 object_cells(+Obj, -Cells)
   Extract the sorted cell list stored in an object term.
 
-OB-OB-004 obj_size(+Obj, -N)
+OB-OB-004 object_size(+Obj, -N)
   N is the number of cells in the object.
 
-OB-OB-005 obj_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC)
+OB-OB-005 object_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC)
   The axis-aligned bounding box of the object: smallest and largest
   row and column coordinates among all cells.
 
-OB-OB-006 obj_center(+Obj, -CR, -CC)
+OB-OB-006 object_center(+Obj, -CR, -CC)
   CR and CC are the integer centroids (floor of the arithmetic mean of
   row and column coordinates across all cells).
 
-OB-OB-007 obj_shape(+Obj, -Shape)
+OB-OB-007 object_shape(+Obj, -Shape)
   Shape is the sorted list of r(DR, DC) offsets from the top-left corner
   of the bounding box (MinR, MinC). The shape is translation-independent:
   two objects have the same shape iff they have the same normalized offsets.
 
-OB-OB-008 obj_inventory(+Grid, +Color, -Objects)
+OB-OB-008 object_inventory(+Grid, +Color, -Objects)
   Objects is the list of all 4-connected objects of the given Color in Grid.
   Each element is an obj(Color, SortedCells) term. Uses cc_components4/3
   from the connect pack internally.
 
-OB-OB-009 obj_all(+Grid, -Objects)
+OB-OB-009 object_all(+Grid, -Objects)
   Objects is the list of all obj(Color, Cells) terms for every non-zero
   color in Grid. Colors are processed in ascending numeric order.
 
-OB-OB-010 obj_count(+Grid, +Color, -N)
+OB-OB-010 object_count(+Grid, +Color, -N)
   N is the number of 4-connected objects of Color in Grid (0 if absent).
 
-OB-OB-011 obj_largest(+Grid, +Color, -Obj)
+OB-OB-011 object_largest(+Grid, +Color, -Obj)
   Obj is the largest (most cells) 4-connected object of Color in Grid.
   Succeeds with the first largest if there are ties. Fails if Color absent.
 
-OB-OB-012 obj_smallest(+Grid, +Color, -Obj)
+OB-OB-012 object_smallest(+Grid, +Color, -Obj)
   Obj is the smallest (fewest cells) 4-connected object of Color in Grid.
   Succeeds with the first smallest if there are ties. Fails if Color absent.
 
-OB-OB-013 obj_at_cell(+Objects, +Cell, -Obj)
+OB-OB-013 object_at_cell(+Objects, +Cell, -Obj)
   Obj is the first object in Objects whose cell list contains Cell.
   Fails if no object contains Cell.
 
-OB-OB-014 obj_sort_size(+Objects, +Order, -Sorted)
+OB-OB-014 object_sort_size(+Objects, +Order, -Sorted)
   Sort a list of objects by size. Order = asc: smallest first.
   Order = desc: largest first.
 
@@ -12249,7 +12249,7 @@ Work Package: WP 155
 Layer: 134
 Module: naggr
 Predicate prefix: na_
-File: packs/naggr/prolog/naggr.pl
+File: packs/neighborhood_aggregate/prolog/neighborhood_aggregate.pl
 
 Overview:
 
@@ -15398,7 +15398,7 @@ dependencies.
 
 Part 195: Scene-Level Uniform Transformation of All Objects (scenexf Pack, WP 205)
 
-Layer 184. Pack prefix: sx_*. Directory: packs/scenexf/.
+Layer 184. Pack prefix: sx_*. Directory: packs/scene_transform/.
 
 The scenexf pack applies uniform transformations to every object in a scene
 (a list of obj(Color, Cells) terms). Where objxf (ox_*) transforms a single
@@ -15454,7 +15454,7 @@ No cross-pack dependencies. Uses library(lists) and library(apply).
 
 Part 196: Scene-Level Transformation Rule Inference from Object-List Pairs (ruleinfer Pack, WP 206)
 
-Layer 185. Pack prefix: ri_*. Directory: packs/ruleinfer/.
+Layer 185. Pack prefix: ri_*. Directory: packs/rule_inference/.
 
 The ruleinfer pack infers which scene-level transformation was applied to a
 Before scene to produce an After scene. Inference predicates examine one
@@ -15514,7 +15514,7 @@ No cross-pack dependencies. Uses library(lists) and library(apply).
 
 Part 197: Scene-Level Rule Term Evaluation Engine (sceneapply Pack, WP 207)
 
-Layer 186. Pack prefix: sa_*. Directory: packs/sceneapply/.
+Layer 186. Pack prefix: sa_*. Directory: packs/scene_apply/.
 
 The sceneapply pack applies symbolic rule terms to obj(Color, Cells) scene lists.
 It is the evaluation complement to the ruleinfer pack (ri_*): where ruleinfer
@@ -15558,7 +15558,7 @@ No cross-pack dependencies. Uses library(lists) and library(apply).
 
 Part 198: Conditional and Selective Scene Transformation (condxf Pack, WP 208)
 
-Layer 187. Pack prefix: xc_*. Directory: packs/condxf/.
+Layer 187. Pack prefix: xc_*. Directory: packs/conditional_transform/.
 
 The condxf pack applies transformations to a subset of objects in an
 obj(Color, Cells) scene list — those satisfying a condition — while leaving
@@ -15616,7 +15616,7 @@ No cross-pack dependencies. Uses library(lists) and library(apply).
 
 Part 199: Holistic Before-After Scene Pair Analysis (scenepair Pack, WP 209)
 
-Layer 188. Pack prefix: ps_*. Directory: packs/scenepair/.
+Layer 188. Pack prefix: ps_*. Directory: packs/scene_pair/.
 
 The scenepair pack analyzes a Before scene and an After scene (both lists of
 obj(Color, Cells) terms) as a holistic pair. It computes scene-level observables
@@ -15674,7 +15674,7 @@ No cross-pack dependencies. Uses library(lists) and library(apply).
 
 Part 200: Rule Hypothesis Ranking for obj(Color,Cells) Scene Lists (scenerank Pack, WP 210)
 
-Layer 189. Pack prefix: rk_*. Directory: packs/scenerank/.
+Layer 189. Pack prefix: rk_*. Directory: packs/scene_rank/.
 
 The scenerank pack ranks candidate symbolic rule terms by coverage and consistency
 across a list of Before-After scene pair training examples. A pair is the term
@@ -17943,7 +17943,7 @@ Training pairs are pair(InputGrid, OutputGrid) terms. All 44 acceptance tests pa
 WP-273-SPEC-002: tc_categorize/2 implements a Chain of Responsibility pattern:
 try single_rule first, then multi_step, then context_gated, then symbol_table as
 the fallback. tc_suggest_strategies/2 returns an ordered strategy list for each
-category, enabling fallback through seqinfer_2step, seqinfer_3step, and others.
+category, enabling fallback through sequence_inference_2step, sequence_inference_3step, and others.
 
 WP-273-SPEC-003: tc_is_single_rule/1 checks for consistent change counts, uniform
 change patterns, and preserved dimensions - the hallmarks of a single repeating rule.
@@ -18367,7 +18367,7 @@ rather than raising an exception.
 IOC-SPEC-010: Architectural placement: iochan sits in the Data Layer at Layer 254,
 above the periodfix pack (Layer 253). It is independent of the tooling pack (Layer
 defined by WP 44); the tooling registry and invocation framework may wrap iochan channels
-as tools using pai_tool_register/2, but iochan does not depend on tooling internally.
+as tools using prologai_tool_register/2, but iochan does not depend on tooling internally.
 
 ARC-AGI-2 Wave 20: section_tile rule specification (2026-06-29)
 Rule name: section_tile. The input grid is divided into rectangular sections by
@@ -21646,7 +21646,7 @@ TOM-SPEC-009: theory_of_mind_desire/4, theory_of_mind_desires/3, theory_of_mind_
 record per-agent goals and commitments once each, giving the
 belief-desire-intention triple for social prediction.
 TOM-SPEC-010: Architectural placement: tom sits at Layer 364, deepening the
-awareness pack's pai_tom_attribute/2 regard mechanism into a full nested
+awareness pack's prologai_tom_attribute/2 regard mechanism into a full nested
 false-belief apparatus; it depends only on library(lists).
 SPARC: Specification v352, Pseudocode v344, Architecture v345, Refinement v404, Completion v410.
 
@@ -21662,7 +21662,7 @@ every junction is a named, inspectable predicate, and nx_wirings/1 reports
 the four wirings for glass-box introspection.
 NEX-SPEC-003: Wiring one (jspace <- workspace): nx_bind_workspace/1
 subscribes nx_hold_broadcast/2 to the workspace broadcast bus via
-pai_broadcast_subscribe/1, so every broadcast holds its winning coalition's
+prologai_broadcast_subscribe/1, so every broadcast holds its winning coalition's
 content concepts in a J-Space workspace at the broadcast salience (clamped
 to [0.0, 1.0]). nx_replay_broadcasts/2 applies an offline episode and
 nx_broadcast_reading/2 returns the live J-Lens readout.
@@ -22080,7 +22080,7 @@ The Causalontology attention pack (co_salience - salience scoring with a single-
 
 Three sub-faculties are kept in full: salience/broadcast (attention_offer, attention_score, attention_broadcast, attention_working_set, ...), the attention economy (attention_level, attention_wage, attention_banker_cycle, attention_spread, attention_evict_lowest_lti, ...), and the attention schema (attention_schema, attention_predict, attention_schema_score, ...). Twenty-two exported predicates. The attention and attention_schema packs are deleted.
 
-Two prefix traps were handled. First, sl_ is NOT exclusive - the select pack also defines sl_ predicates - so co_salience's own eleven names were renamed by exact-name substitution. Second, pai_attention/3 was mapped to attention_level/3 (not attention_attention) to avoid colliding with the economy pack's internal attention_value store. Callers migrated by exact-name: the dreaming pack and two Mentova modules (global_workspace and the mentova_attention_schema wrapper).
+Two prefix traps were handled. First, sl_ is NOT exclusive - the select pack also defines sl_ predicates - so co_salience's own eleven names were renamed by exact-name substitution. Second, prologai_attention/3 was mapped to attention_level/3 (not attention_attention) to avoid colliding with the economy pack's internal attention_value store. Callers migrated by exact-name: the dreaming pack and two Mentova modules (global_workspace and the mentova_attention_schema wrapper).
 
 SPARC: Specification v374, Pseudocode v366, Architecture v367, Refinement v426, Completion v432.
 
@@ -22112,19 +22112,19 @@ SPARC: Specification v377, Pseudocode v369, Architecture v370, Refinement v429, 
 
 PACK MANIFEST HYGIENE - sentinels requires corrected
 
-The sentinels pack manifest declared requires(prologai_expand), a dependency on something that is not a pack: prologai_expand is a module living at syntax/prolog/prologai_expand.pl, and syntax is not a pack, so nothing declares provides(prologai_expand). The declaration was also written as a bare atom rather than the conventional list. The sentinels module imports nothing at all (it is a pure provider of pai_register_sentinel and sentinel_retract, used by the reflection pack), so the dependency was vestigial, dating to the PR-9 bootstrap. The manifest is corrected to requires([]), the standard form for a pack that needs only the standard library. Sentinels still loads, and the reflection pack that imports it still loads. This defect was pre-existing and unrelated to the co_ retirement; it was surfaced by that program's post-merge audit and fixed here for hygiene.
+The sentinels pack manifest declared requires(prologai_expand), a dependency on something that is not a pack: prologai_expand is a module living at syntax/prolog/prologai_expand.pl, and syntax is not a pack, so nothing declares provides(prologai_expand). The declaration was also written as a bare atom rather than the conventional list. The sentinels module imports nothing at all (it is a pure provider of prologai_register_sentinel and sentinel_retract, used by the reflection pack), so the dependency was vestigial, dating to the PR-9 bootstrap. The manifest is corrected to requires([]), the standard form for a pack that needs only the standard library. Sentinels still loads, and the reflection pack that imports it still loads. This defect was pre-existing and unrelated to the co_ retirement; it was surfaced by that program's post-merge audit and fixed here for hygiene.
 
 SPARC: Specification v378, Pseudocode v370, Architecture v371, Refinement v430, Completion v436.
 
 TEST HARNESS STANDARDIZATION - dreaming onto PLUnit
 
-The dreaming pack shipped a bespoke test harness: seven test_* predicates driven by a hand-written run_tests/0 under a :- initialization(run_tests, main) directive. Because the file defined its own run_tests/0, the standard PLUnit invocation (swipl -g "run_tests, halt") reported No tests to run, so the suite was invisible to the standard runner even though its seven acceptance tests passed when run directly. The suite is now converted to PLUnit begin_tests(dreaming)/test()/end_tests blocks with assertion/1 checks, with no change to what is tested (the same seven acceptance criteria AC-PR52-001 through AC-PR52-007 over pai_dream_record, pai_dream_journal, pai_dream_generative_replay, pai_dream_slow_wave, pai_dream_rem, pai_dream_counterfactual, and pai_dream_cycle). All seven now pass under the standard run_tests invocation. This completes the PLUnit standardization begun for the six earlier bespoke-harness suites; dreaming was the last, missed because it is a kept-separate infrastructure pack outside the co_ family. The pai_dream_ predicate names are unchanged: dreaming was deliberately kept separate from the imagination convergence and retains its own prefix.
+The dreaming pack shipped a bespoke test harness: seven test_* predicates driven by a hand-written run_tests/0 under a :- initialization(run_tests, main) directive. Because the file defined its own run_tests/0, the standard PLUnit invocation (swipl -g "run_tests, halt") reported No tests to run, so the suite was invisible to the standard runner even though its seven acceptance tests passed when run directly. The suite is now converted to PLUnit begin_tests(dreaming)/test()/end_tests blocks with assertion/1 checks, with no change to what is tested (the same seven acceptance criteria AC-PR52-001 through AC-PR52-007 over prologai_dream_record, prologai_dream_journal, prologai_dream_generative_replay, prologai_dream_slow_wave, prologai_dream_rem, prologai_dream_counterfactual, and prologai_dream_cycle). All seven now pass under the standard run_tests invocation. This completes the PLUnit standardization begun for the six earlier bespoke-harness suites; dreaming was the last, missed because it is a kept-separate infrastructure pack outside the co_ family. The prologai_dream_ predicate names are unchanged: dreaming was deliberately kept separate from the imagination convergence and retains its own prefix.
 
 SPARC: Specification v379, Pseudocode v371, Architecture v372, Refinement v431, Completion v437.
 
 NAMING CONVENTION - dreaming predicates made pack-qualified
 
-The dreaming pack was deliberately kept separate from the imagination convergence (it is the Lattice-integrated dream engine), but the naming convention still applies to it: predicate names must be pack-qualified whole-word snake_case. Its predicates carried the legacy pai_dream_ prefix on the seven exports (pai_dream_cycle, pai_dream_record, pai_dream_journal, pai_dream_generative_replay, pai_dream_slow_wave, pai_dream_rem, pai_dream_counterfactual) and a bare dream_ prefix on eleven internal helpers. All eighteen predicates are renamed to the pack-qualified dreaming_ prefix (dreaming_cycle, dreaming_record, dreaming_journal, dreaming_generative_replay, dreaming_slow_wave, dreaming_rem, dreaming_counterfactual, and the internal helpers). The dream_report/5 output term and the dream/2 identifier are DATA-structure functors, not predicates, and are preserved unchanged - the convention governs predicate names, not the data vocabulary a pack emits. The pack had no external callers; only its own PLUnit test needed updating, and its seven tests pass. Kept-separate does not mean exempt from the naming convention, only exempt from the merge.
+The dreaming pack was deliberately kept separate from the imagination convergence (it is the Lattice-integrated dream engine), but the naming convention still applies to it: predicate names must be pack-qualified whole-word snake_case. Its predicates carried the legacy prologai_dream_ prefix on the seven exports (prologai_dream_cycle, prologai_dream_record, prologai_dream_journal, prologai_dream_generative_replay, prologai_dream_slow_wave, prologai_dream_rem, prologai_dream_counterfactual) and a bare dream_ prefix on eleven internal helpers. All eighteen predicates are renamed to the pack-qualified dreaming_ prefix (dreaming_cycle, dreaming_record, dreaming_journal, dreaming_generative_replay, dreaming_slow_wave, dreaming_rem, dreaming_counterfactual, and the internal helpers). The dream_report/5 output term and the dream/2 identifier are DATA-structure functors, not predicates, and are preserved unchanged - the convention governs predicate names, not the data vocabulary a pack emits. The pack had no external callers; only its own PLUnit test needed updating, and its seven tests pass. Kept-separate does not mean exempt from the naming convention, only exempt from the merge.
 
 SPARC: Specification v380, Pseudocode v372, Architecture v373, Refinement v432, Completion v438.
 
@@ -22132,7 +22132,7 @@ NAMING CONVENTION - reflection and sentinels predicates made pack-qualified (the
 
 The two remaining kept-separate infrastructure packs are brought into line with the naming convention (kept-separate means exempt from a merge, not from pack-qualified predicates).
 
-sentinels (two modules, one pack). The registry module's seven predicates lose their pai_ and bare sentinel_ prefixes and become sentinels_ pack-qualified: sentinels_register (was pai_register_sentinel), sentinels_list, sentinels_retract, sentinels_domain_activate, sentinels_domain_deactivate, sentinels_entry (was pai_sentinel_entry), sentinels_domain_active. The firing-engine module (sentinel_engine) is qualified too: sentinels_evaluate (was evaluate_sentinels), sentinels_fire_threshold, and its internals (sentinels_fire, sentinels_matches, sentinels_evaluate_ordered, sentinels_sim_threshold, sentinels_maplist_safe). The engine's calls into the registry were updated in the same change - a defect the verification caught: the engine is a second file in the pack and was initially missed, which broke six firing tests until fixed.
+sentinels (two modules, one pack). The registry module's seven predicates lose their prologai_ and bare sentinel_ prefixes and become sentinels_ pack-qualified: sentinels_register (was prologai_register_sentinel), sentinels_list, sentinels_retract, sentinels_domain_activate, sentinels_domain_deactivate, sentinels_entry (was prologai_sentinel_entry), sentinels_domain_active. The firing-engine module (sentinel_engine) is qualified too: sentinels_evaluate (was evaluate_sentinels), sentinels_fire_threshold, and its internals (sentinels_fire, sentinels_matches, sentinels_evaluate_ordered, sentinels_sim_threshold, sentinels_maplist_safe). The engine's calls into the registry were updated in the same change - a defect the verification caught: the engine is a second file in the pack and was initially missed, which broke six firing tests until fixed.
 
 reflection. The Reflection Pattern Actors pack carried bare, un-prefixed predicate names. Its eight exports and its internal cycle bodies are now reflection_ pack-qualified: reflection_install_actors, reflection_uninstall_actors, reflection_motivation_cycle, reflection_regulation_cycle, reflection_exploration_cycle, reflection_meta_control_cycle, reflection_gating_cycle, reflection_impasse_cycle, and the internal reflection_daydream_cycle, reflection_coping_cycle, reflection_imitation_cycle, reflection_play_cycle, reflection_compensation_cycle, reflection_discovery_cycle, reflection_register_sentinel_actors, reflection_record_homeostatic_delta, reflection_regulate_outcome. The scheduler wiring (reflection_cyclic_actor facts naming reflection:motivation_cycle and so on, and the sentinel-action registrations) was renamed consistently, so every wired actor goal still resolves.
 
@@ -22149,7 +22149,7 @@ causal: cf_ becomes causal_ (causal_model, causal_counterfactual, causal_do, cau
 planner: ht_ becomes planner_ (planner_domain, planner_plan, planner_task_tree, planner_execute, planner_replan, ...).
 evolve: ev_ becomes evolve_ (evolve_run, evolve_population, evolve_crossover, evolve_mutate, evolve_tournament, ...).
 
-Ninety-three predicates renamed by exact-name substitution across the four modules, their tests, the nexus integration layer (which wires planner and evolve), and the pr32 evolutionary test. Every prefix was verified exclusive to its pack. In passing, the pr32 test's stale pai_attention calls (a leftover the attention convergence had not migrated in this out-of-package legacy test) were completed to the attention_ names, taking pr32 from zero to nine of nine. Full library regression: two hundred fifty-eight packs green. The two AGI-Foundations packs whose names are themselves abbreviations (actinf, jspace) are held for a naming decision.
+Ninety-three predicates renamed by exact-name substitution across the four modules, their tests, the nexus integration layer (which wires planner and evolve), and the pr32 evolutionary test. Every prefix was verified exclusive to its pack. In passing, the pr32 test's stale prologai_attention calls (a leftover the attention convergence had not migrated in this out-of-package legacy test) were completed to the attention_ names, taking pr32 from zero to nine of nine. Full library regression: two hundred fifty-eight packs green. The two AGI-Foundations packs whose names are themselves abbreviations (actinf, jspace) are held for a naming decision.
 
 SPARC: Specification v382, Pseudocode v374, Architecture v375, Refinement v434, Completion v440.
 
@@ -22171,7 +22171,7 @@ PROJECT DE-JAMMING — DATA LAYER: RULE, LINTER, AND WAVE E1
 
 The de-jamming rule is made universal and permanent (CLAUDE.md NAMING CONVENTION RULE clauses four and five): every predicate in every pack, new or existing, must be prefixed with the pack's full whole-word name; terse two-letter and abbreviated prefixes are banned outright, because they collide across packs (wm meant both world-model and wallpaper-motif; lk_ means both link and lookup) and are opaque to newcomers. A new pack must ship pack-qualified from its first commit. Enforcement is a script, bin/check_pack_naming.sh, that flags any pack whose predicate prefix is not its own name and reports shared prefixes; it is a merge blocker for a new or renamed pack. The standing Data-Layer De-Jamming Program (output/DeJam_Data_Layer_Plan.txt) brings the two hundred forty-seven legacy Data-Layer packs still on terse prefixes into line, in waves - the one hundred seventy-eight exclusive-prefix packs batched first, then the sixty-nine collision-prefix packs handled individually so each takes its own whole-word predicates and the shared stub dissolves.
 
-Wave E1 (exclusive, zero-caller leaf packs): arith ar_ to arith_, assemble as_ to assemble_, autom at_ to autom_, block bk_ to block_, border br_ to border_, bound bd_ to bound_, canvas cv_ to canvas_, cellset cs_ to cellset_, colormap cm_ to colormap_, colortable ct_ to colortable_. About one hundred ninety predicates by exact-name substitution; every one of the ten verified to have no external caller in either repository first, so the change is confined to each pack's own module and test. All ten pass; the full library regresses at two hundred fifty-eight packs green; the linter reports zero violations for the ten.
+Wave E1 (exclusive, zero-caller leaf packs): arith ar_ to arithmetic_, assemble as_ to assemble_, autom at_ to automaton_, block bk_ to block_, border br_ to border_, bound bd_ to bound_, canvas cv_ to canvas_, cellset cs_ to cellset_, colormap cm_ to color_map_, colortable ct_ to color_table_. About one hundred ninety predicates by exact-name substitution; every one of the ten verified to have no external caller in either repository first, so the change is confined to each pack's own module and test. All ten pass; the full library regresses at two hundred fifty-eight packs green; the linter reports zero violations for the ten.
 
 SPARC: Specification v385, Pseudocode v377, Architecture v378, Refinement v437, Completion v443.
 
@@ -22195,7 +22195,7 @@ SPARC: Specification v388, Pseudocode v380, Architecture v381, Refinement v440, 
 
 PROJECT DE-JAMMING — DATA LAYER WAVE E5 (has-caller exclusive packs)
 
-Nine exclusive-prefix Data-Layer packs that have callers are de-jammed, with those callers migrated by exact-name substitution: connect cc_ to connect_ (caller obj), ephemera ep_ to ephemera_ (agency and the Mentova ephemera demo), fold fd_ to fold_ (rotation), gridcolor gc_ to gridcolor_ (gridmark), gridobj gob_ to gridobj_ (gridgroupby, gridrelation, grid_perception, curiosity), measure ms_ to measure_ and wavefront wf_ to wavefront_ (their apparent Mentova callers were false positives - the ARC benchmark defines its OWN ms_ and wf_ predicates and imports neither, so those were left untouched), objxf ox_ to objxf_ (shrink), stripe sr_ to stripe_ (diagonal). The vector_backend pack is deferred: it is a four-module pack (vb_, vbp_, vbr_, plus bakeoff) and gets its own careful pass. All pass; two hundred fifty-eight packs green; the linter clears the nine.
+Nine exclusive-prefix Data-Layer packs that have callers are de-jammed, with those callers migrated by exact-name substitution: connect cc_ to connect_ (caller obj), ephemera ep_ to ephemera_ (agency and the Mentova ephemera demo), fold fd_ to fold_ (rotation), gridcolor gc_ to grid_color_ (gridmark), gridobj gob_ to grid_object_ (gridgroupby, gridrelation, grid_perception, curiosity), measure ms_ to measure_ and wavefront wf_ to wavefront_ (their apparent Mentova callers were false positives - the ARC benchmark defines its OWN ms_ and wf_ predicates and imports neither, so those were left untouched), objxf ox_ to object_transform_ (shrink), stripe sr_ to stripe_ (diagonal). The vector_backend pack is deferred: it is a four-module pack (vb_, vbp_, vbr_, plus bakeoff) and gets its own careful pass. All pass; two hundred fifty-eight packs green; the linter clears the nine.
 
 SPARC: Specification v389, Pseudocode v381, Architecture v382, Refinement v441, Completion v447.
 
@@ -22219,6 +22219,6 @@ SPARC: Specification v392, Pseudocode v384, Architecture v385, Refinement v444, 
 
 PROJECT DE-JAMMING — DATA LAYER WAVE C4 (the grid pair; last collision pair)
 
-The final and largest collision pair: grid and griddist shared the gd_ stub. grid is the ARC-core perception pack, called throughout the library, so its gd_ prefix becomes grid_ (grid_size, grid_cell, grid_colors, grid_objects, grid_rotate90, grid_reflect_h, ...) across its module, its test, and its fourteen caller packs (analogy, arc3_harness, arc3_protocol, color, compose, curiosity, frame, grid_perception, human_steps, motion, path, scene, shape, symmetry) plus two Mentova ARC modules. griddist, disjoint in every name, takes griddist_ (griddist_dist_map, griddist_manhattan, griddist_voronoi, ...). With this every one of the twenty-three collision pairs is dissolved; no two Data-Layer packs share a terse stub. Two hundred fifty-eight packs green; the linter clears both with zero collisions.
+The final and largest collision pair: grid and griddist shared the gd_ stub. grid is the ARC-core perception pack, called throughout the library, so its gd_ prefix becomes grid_ (grid_size, grid_cell, grid_colors, grid_objects, grid_rotate90, grid_reflect_h, ...) across its module, its test, and its fourteen caller packs (analogy, arc3_harness, arc3_protocol, color, compose, curiosity, frame, grid_perception, human_steps, motion, path, scene, shape, symmetry) plus two Mentova ARC modules. griddist, disjoint in every name, takes grid_distance_ (grid_distance_dist_map, grid_distance_manhattan, grid_distance_voronoi, ...). With this every one of the twenty-three collision pairs is dissolved; no two Data-Layer packs share a terse stub. Two hundred fifty-eight packs green; the linter clears both with zero collisions.
 
 SPARC: Specification v393, Pseudocode v385, Architecture v386, Refinement v445, Completion v451.

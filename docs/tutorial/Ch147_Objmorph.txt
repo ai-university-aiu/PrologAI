@@ -13,14 +13,14 @@ dilation, single-step and iterated erosion, and compound opening and closing.
 
 147.2 Neighborhood Generators
 
-objmorph_neighbors4(+Cell, -Neighbors) returns the 4 orthogonally adjacent cells.
+object_morph_neighbors4(+Cell, -Neighbors) returns the 4 orthogonally adjacent cells.
 
-    ?- objmorph_neighbors4(r(2,3), N).
+    ?- object_morph_neighbors4(r(2,3), N).
     N = [r(1,3), r(3,3), r(2,2), r(2,4)].
 
-objmorph_neighbors8(+Cell, -Neighbors) returns all 8 neighbors including diagonals.
+object_morph_neighbors8(+Cell, -Neighbors) returns all 8 neighbors including diagonals.
 
-    ?- objmorph_neighbors8(r(0,0), N).
+    ?- object_morph_neighbors8(r(0,0), N).
     N = [r(-1,-1),r(-1,0),r(-1,1),r(0,-1),r(0,1),r(1,-1),r(1,0),r(1,1)].
 
 Both predicates always return the fixed number of cells (4 or 8) regardless
@@ -28,101 +28,101 @@ of grid boundaries; coordinates may be negative.
 
 147.3 Boundary and Interior (4-Connectivity)
 
-objmorph_boundary4(+Obj, -Boundary): a cell is a boundary4 cell if at least one of
+object_morph_boundary4(+Obj, -Boundary): a cell is a boundary4 cell if at least one of
 its 4 neighbors is outside the cell set.
 
-    ?- objmorph_boundary4(obj(red,[r(0,0),r(0,1),r(1,0),r(1,1)]), R).
+    ?- object_morph_boundary4(obj(red,[r(0,0),r(0,1),r(1,0),r(1,1)]), R).
     R = obj(red,[r(0,0),r(0,1),r(1,0),r(1,1)]).  % all 4 boundary for 2x2
 
-objmorph_interior4(+Obj, -Interior): a cell is interior4 only if all 4 neighbors
+object_morph_interior4(+Obj, -Interior): a cell is interior4 only if all 4 neighbors
 are inside the cell set. A 3x3 square has exactly one interior cell.
 
-    ?- objmorph_interior4(obj(b,[r(0,0),r(0,1),r(0,2),r(1,0),r(1,1),r(1,2),
+    ?- object_morph_interior4(obj(b,[r(0,0),r(0,1),r(0,2),r(1,0),r(1,1),r(1,2),
                           r(2,0),r(2,1),r(2,2)]), I).
     I = obj(b,[r(1,1)]).
 
 147.4 Boundary and Interior (8-Connectivity)
 
-objmorph_boundary8 and objmorph_interior8 work like their 4-connected counterparts but
+object_morph_boundary8 and object_morph_interior8 work like their 4-connected counterparts but
 require all 8 neighbors to be inside for a cell to be interior8. This is
 stricter: a 5x5 square has 9 interior8 cells (the inner 3x3) but 8 interior4
 cells in a 3x3 is just the center.
 
-    ?- square_cells(5, C), objmorph_interior8(obj(b,C), I), I = obj(b,IL), length(IL, N).
+    ?- square_cells(5, C), object_morph_interior8(obj(b,C), I), I = obj(b,IL), length(IL, N).
     N = 9.
 
 147.5 Dilation
 
-objmorph_dilate4(+Obj, -Result): expand the cell set by one 4-connected step. Each
+object_morph_dilate4(+Obj, -Result): expand the cell set by one 4-connected step. Each
 original cell contributes its 4 neighbors; the original cells are kept.
 
-    ?- objmorph_dilate4(obj(red,[r(0,0)]), R).
+    ?- object_morph_dilate4(obj(red,[r(0,0)]), R).
     R = obj(red,[r(-1,0),r(0,-1),r(0,0),r(0,1),r(1,0)]).
 
-objmorph_dilate8(+Obj, -Result): expand by one 8-connected step. A single cell
+object_morph_dilate8(+Obj, -Result): expand by one 8-connected step. A single cell
 expands to a 3x3 block of 9 cells.
 
-    ?- objmorph_dilate8(obj(a,[r(5,5)]), obj(a,D)), length(D, N).
+    ?- object_morph_dilate8(obj(a,[r(5,5)]), obj(a,D)), length(D, N).
     N = 9.
 
 147.6 Erosion
 
-objmorph_erode4(+Obj, -Result): shrink by one 4-connected step; delegates to
-objmorph_interior4. Removes all boundary4 cells.
+object_morph_erode4(+Obj, -Result): shrink by one 4-connected step; delegates to
+object_morph_interior4. Removes all boundary4 cells.
 
-objmorph_erode8(+Obj, -Result): shrink by one 8-connected step; delegates to
-objmorph_interior8. Stricter — more cells are removed.
+object_morph_erode8(+Obj, -Result): shrink by one 8-connected step; delegates to
+object_morph_interior8. Stricter — more cells are removed.
 
-    ?- square_cells(4, C), objmorph_erode4(obj(b,C), E), E = obj(b,EL), length(EL, N).
+    ?- square_cells(4, C), object_morph_erode4(obj(b,C), E), E = obj(b,EL), length(EL, N).
     N = 4.  % inner 2x2 survives
 
 147.7 Iterated Operations
 
-objmorph_dilate4_n(+Obj, +N, -Result) and objmorph_erode4_n(+Obj, +N, -Result) apply
+object_morph_dilate4_n(+Obj, +N, -Result) and object_morph_erode4_n(+Obj, +N, -Result) apply
 their respective operations N times. N=0 is the identity.
 
-    ?- objmorph_dilate4_n(obj(x,[r(0,0)]), 2, obj(x,D)), length(D, N).
+    ?- object_morph_dilate4_n(obj(x,[r(0,0)]), 2, obj(x,D)), length(D, N).
     N = 13.  % diamond of Manhattan radius 2
 
-    ?- square_cells(5, C), objmorph_erode4_n(obj(b,C), 2, E).
+    ?- square_cells(5, C), object_morph_erode4_n(obj(b,C), 2, E).
     E = obj(b,[r(2,2)]).  % center only after two erosions
 
 147.8 Opening and Closing
 
-objmorph_open4(+Obj, -Result): erosion followed by dilation. Removes thin
+object_morph_open4(+Obj, -Result): erosion followed by dilation. Removes thin
 protrusions while preserving bulk shapes.
 
-    ?- square_cells(3, C), objmorph_open4(obj(b,C), obj(b,O)), sort(O, S).
+    ?- square_cells(3, C), object_morph_open4(obj(b,C), obj(b,O)), sort(O, S).
     S = [r(0,1),r(1,0),r(1,1),r(1,2),r(2,1)].  % plus shape
 
-objmorph_close4(+Obj, -Result): dilation followed by erosion. Fills small gaps
+object_morph_close4(+Obj, -Result): dilation followed by erosion. Fills small gaps
 while preserving bulk shapes.
 
-    ?- objmorph_close4(obj(red,[r(0,0)]), R).
+    ?- object_morph_close4(obj(red,[r(0,0)]), R).
     R = obj(red,[r(0,0)]).  % single cell is closed back to itself
 
 147.9 Predicate Reference
 
 Neighborhood:
-  objmorph_neighbors4(+Cell, -Neighbors)
-  objmorph_neighbors8(+Cell, -Neighbors)
+  object_morph_neighbors4(+Cell, -Neighbors)
+  object_morph_neighbors8(+Cell, -Neighbors)
 
 Boundary and Interior:
-  objmorph_boundary4(+Obj, -Boundary)
-  objmorph_interior4(+Obj, -Interior)
-  objmorph_boundary8(+Obj, -Boundary)
-  objmorph_interior8(+Obj, -Interior)
+  object_morph_boundary4(+Obj, -Boundary)
+  object_morph_interior4(+Obj, -Interior)
+  object_morph_boundary8(+Obj, -Boundary)
+  object_morph_interior8(+Obj, -Interior)
 
 Single-Step Morphology:
-  objmorph_dilate4(+Obj, -Result)
-  objmorph_erode4(+Obj, -Result)
-  objmorph_dilate8(+Obj, -Result)
-  objmorph_erode8(+Obj, -Result)
+  object_morph_dilate4(+Obj, -Result)
+  object_morph_erode4(+Obj, -Result)
+  object_morph_dilate8(+Obj, -Result)
+  object_morph_erode8(+Obj, -Result)
 
 Iterated Morphology:
-  objmorph_dilate4_n(+Obj, +N, -Result)
-  objmorph_erode4_n(+Obj, +N, -Result)
+  object_morph_dilate4_n(+Obj, +N, -Result)
+  object_morph_erode4_n(+Obj, +N, -Result)
 
 Compound Operations:
-  objmorph_open4(+Obj, -Result)
-  objmorph_close4(+Obj, -Result)
+  object_morph_open4(+Obj, -Result)
+  object_morph_close4(+Obj, -Result)

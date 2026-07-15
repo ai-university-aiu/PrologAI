@@ -302,7 +302,7 @@ test(equal_same) :-
     grid_equal(G, G).
 
 % AC-GD-007-b: grid_diff finds changed cells.
-test(diff_cells) :-
+test(difference_cells) :-
     % Two grids differing in one cell.
     G1 = [[0,0],[0,0]],
     G2 = [[0,0],[0,1]],
@@ -312,7 +312,7 @@ test(diff_cells) :-
     Diffs = [r(1,1,0,1)].
 
 % AC-GD-007-c: grid_diff returns empty list for equal grids.
-test(diff_empty) :-
+test(difference_empty) :-
     % Same grid twice.
     test_grid_3x3(G),
     grid_diff(G, G, []).

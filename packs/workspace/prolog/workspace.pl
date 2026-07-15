@@ -384,7 +384,7 @@ workspace_broadcast_subscribe(Goal) :-
 %   2. Select winner (highest salience above floor, with bottom-up capture)
 %   3. Broadcast winner on broadcast://APEX_MIND/cycle
 %   4. Kindle winner's content across zones
-%   5. Attach learning: sona_absorb
+%   5. Attach learning: synaptic_ontological_neural_aggregator_absorb
 %   6. Habituate winner
 %   7. Decay salience floor if no winner
 % ---------------------------------------------------------------------------
@@ -499,11 +499,11 @@ attach_learning(CId, Relation, Ids) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
-        ( use_module(library(sona), [sona_absorb/1]),
+        ( use_module(library(synaptic_ontological_neural_aggregator), [synaptic_ontological_neural_aggregator_absorb/1]),
           % Continue the multi-line expression started above.
           get_time(T),
           % Continue the multi-line expression started above.
-          sona:sona_absorb(trajectory(CId, [broadcast, Relation, Ids],
+          sona:synaptic_ontological_neural_aggregator_absorb(trajectory(CId, [broadcast, Relation, Ids],
                                        % Continue the multi-line expression started above.
                                        broadcast_cycle, 0.5, T))
         % Close the expression opened above.

@@ -14,80 +14,80 @@ sentinel value 0.
 
 Predicates:
 
-naggr_sum4(+Grid, -SumGrid)
+neighborhood_aggregate_sum4(+Grid, -SumGrid)
   Each output cell is the sum of in-bounds 4-neighbor values.
 
-naggr_sum8(+Grid, -SumGrid)
+neighborhood_aggregate_sum8(+Grid, -SumGrid)
   Each output cell is the sum of in-bounds 8-neighbor values.
 
-naggr_max4(+Grid, -MaxGrid)
+neighborhood_aggregate_max4(+Grid, -MaxGrid)
   Each output cell is the maximum in-bounds 4-neighbor value; 0 if none.
 
-naggr_max8(+Grid, -MaxGrid)
+neighborhood_aggregate_max8(+Grid, -MaxGrid)
   Each output cell is the maximum in-bounds 8-neighbor value; 0 if none.
 
-naggr_min4(+Grid, -MinGrid)
+neighborhood_aggregate_min4(+Grid, -MinGrid)
   Each output cell is the minimum in-bounds 4-neighbor value; 0 if none.
 
-naggr_min8(+Grid, -MinGrid)
+neighborhood_aggregate_min8(+Grid, -MinGrid)
   Each output cell is the minimum in-bounds 8-neighbor value; 0 if none.
 
-naggr_mean4(+Grid, -MeanGrid)
+neighborhood_aggregate_mean4(+Grid, -MeanGrid)
   Each output cell is floor(sum/count) of in-bounds 4-neighbors; 0 if none.
 
-naggr_mean8(+Grid, -MeanGrid)
+neighborhood_aggregate_mean8(+Grid, -MeanGrid)
   Each output cell is floor(sum/count) of in-bounds 8-neighbors; 0 if none.
 
-naggr_range4(+Grid, -RangeGrid)
+neighborhood_aggregate_range4(+Grid, -RangeGrid)
   Each output cell is max - min of in-bounds 4-neighbors; 0 if fewer than 2.
 
-naggr_range8(+Grid, -RangeGrid)
+neighborhood_aggregate_range8(+Grid, -RangeGrid)
   Each output cell is max - min of in-bounds 8-neighbors; 0 if fewer than 2.
 
-naggr_spread4(+Grid, -SpreadGrid)
+neighborhood_aggregate_spread4(+Grid, -SpreadGrid)
   Each output cell is the count of distinct values among 4-neighbors.
 
-naggr_spread8(+Grid, -SpreadGrid)
+neighborhood_aggregate_spread8(+Grid, -SpreadGrid)
   Each output cell is the count of distinct values among 8-neighbors.
 
-naggr_diff4(+Grid, -DiffGrid)
+neighborhood_aggregate_diff4(+Grid, -DiffGrid)
   Each output cell is the count of 4-neighbors whose value differs from the cell.
 
-naggr_diff8(+Grid, -DiffGrid)
+neighborhood_aggregate_diff8(+Grid, -DiffGrid)
   Each output cell is the count of 8-neighbors whose value differs from the cell.
 
 Example:
 
-?- naggr_sum4([[1,2,3],[4,5,6],[7,8,9]], S).
+?- neighborhood_aggregate_sum4([[1,2,3],[4,5,6],[7,8,9]], S).
 S = [[6,9,8],[13,20,17],[12,21,14]].
 
-?- naggr_max4([[1,2,3],[4,5,6],[7,8,9]], M).
+?- neighborhood_aggregate_max4([[1,2,3],[4,5,6],[7,8,9]], M).
 M = [[4,5,6],[7,8,9],[8,9,8]].
 
-?- naggr_mean4([[1,2,3],[4,5,6],[7,8,9]], M).
+?- neighborhood_aggregate_mean4([[1,2,3],[4,5,6],[7,8,9]], M).
 M = [[3,3,4],[4,5,5],[6,7,7]].
 
-?- naggr_range4([[1,2,3],[4,5,6],[7,8,9]], R).
+?- neighborhood_aggregate_range4([[1,2,3],[4,5,6],[7,8,9]], R).
 R = [[2,4,4],[6,6,6],[4,4,2]].
 
-?- naggr_spread4([[1,2,3],[4,5,6],[7,8,9]], S).
+?- neighborhood_aggregate_spread4([[1,2,3],[4,5,6],[7,8,9]], S).
 S = [[2,3,2],[3,4,3],[2,3,2]].
 
-?- naggr_diff4([[1,2,1],[2,1,2],[1,2,1]], D).
+?- neighborhood_aggregate_diff4([[1,2,1],[2,1,2],[1,2,1]], D).
 D = [[2,3,2],[3,4,3],[2,3,2]].
 
 Implementation notes:
 
-Both private helpers naggr_nbr4_vals_ and naggr_nbr8_vals_ use findall over member
+Both private helpers neighborhood_aggregate_nbr4_vals_ and neighborhood_aggregate_nbr8_vals_ use findall over member
 of offset lists with explicit bounds guards NR>=0, NR<H, NC>=0, NC<W.
 
 All 14 public predicates use nested findall: outer collects one row per row
 index R, inner collects one aggregate value per column index C.
 
-naggr_spread4 and naggr_spread8 call sort/2 (built-in) to deduplicate neighbor values
+neighborhood_aggregate_spread4 and neighborhood_aggregate_spread8 call sort/2 (built-in) to deduplicate neighbor values
 before measuring the length of the unique set.
 
-naggr_diff4 and naggr_diff8 retrieve the cell value via nth0, then count same-valued
+neighborhood_aggregate_diff4 and neighborhood_aggregate_diff8 retrieve the cell value via nth0, then count same-valued
 neighbors via a nested findall with =:= comparison, and subtract from total.
 
 All 42 acceptance tests pass under SWI-Prolog.

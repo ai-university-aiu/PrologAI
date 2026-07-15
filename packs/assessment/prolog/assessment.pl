@@ -398,7 +398,7 @@ consciousness_indicator(valence_system, _Nexus, present) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
-        ( current_predicate(affect:pai_marker_stamp/4) -> true ; fail ),
+        ( current_predicate(affect:affect_marker_stamp/4) -> true ; fail ),
         % Continue the multi-line expression started above.
         _, fail
     % Continue the multi-line expression started above.

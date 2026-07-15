@@ -21,68 +21,68 @@ Two objects are considered the same if they share the same color atom and the
 same normalized form. The normalized form is computed by translating the top-left
 corner of the object's cell set to r(0,0) and sorting the resulting cells. This
 means two objects that are the same shape but at different positions in the grid
-are considered identical by scenepair_added_objs and scenepair_removed_objs.
+are considered identical by scene_pair_added_objs and scene_pair_removed_objs.
 
 
 Exported Predicates
 
 
-scenepair_same_n_objs(+Before, +After)
+scene_pair_same_n_objs(+Before, +After)
 
 Succeed if Before and After contain the same number of objects.
 
 Example:
 
-scenepair_same_n_objs([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(g,[r(0,0)]),obj(b,[r(0,1)])]).
+scene_pair_same_n_objs([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(g,[r(0,0)]),obj(b,[r(0,1)])]).
 % true — both have 2 objects
 
 
-scenepair_added_objs(+Before, +After, -Added)
+scene_pair_added_objs(+Before, +After, -Added)
 
 List of objects in After that have no color-and-form match in Before.
 
 Example:
 
-scenepair_added_objs([obj(r,[r(0,0)])], [obj(r,[r(0,0)]),obj(b,[r(0,1)])], Added).
+scene_pair_added_objs([obj(r,[r(0,0)])], [obj(r,[r(0,0)]),obj(b,[r(0,1)])], Added).
 % Added = [obj(b,[r(0,1)])]
 
 
-scenepair_removed_objs(+Before, +After, -Removed)
+scene_pair_removed_objs(+Before, +After, -Removed)
 
 List of objects in Before that have no color-and-form match in After.
 
 Example:
 
-scenepair_removed_objs([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(r,[r(0,0)])], Removed).
+scene_pair_removed_objs([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(r,[r(0,0)])], Removed).
 % Removed = [obj(b,[r(0,1)])]
 
 
-scenepair_n_added(+Before, +After, -N) and scenepair_n_removed(+Before, +After, -N)
+scene_pair_n_added(+Before, +After, -N) and scene_pair_n_removed(+Before, +After, -N)
 
 Integer count of added and removed objects respectively.
 
 
-scenepair_color_set_before(+Before, -Colors) and scenepair_color_set_after(+After, -Colors)
+scene_pair_color_set_before(+Before, -Colors) and scene_pair_color_set_after(+After, -Colors)
 
 Sorted list of distinct color atoms in Before or After. Duplicates are removed.
 
 Example:
 
-scenepair_color_set_before([obj(r,[r(0,0)]),obj(b,[r(0,1)])], Colors).
+scene_pair_color_set_before([obj(r,[r(0,0)]),obj(b,[r(0,1)])], Colors).
 % Colors = [b, r]
 
 
-scenepair_same_color_set(+Before, +After)
+scene_pair_same_color_set(+Before, +After)
 
 Succeed if both scenes have the same distinct-color set.
 
 Example:
 
-scenepair_same_color_set([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(r,[r(0,2)]),obj(b,[r(0,3)])]).
+scene_pair_same_color_set([obj(r,[r(0,0)]),obj(b,[r(0,1)])], [obj(r,[r(0,2)]),obj(b,[r(0,3)])]).
 % true — same color atoms {r, b}
 
 
-scenepair_color_delta(+Before, +After, -Delta)
+scene_pair_color_delta(+Before, +After, -Delta)
 
 List of OldColor-NewColor pairs for position-matched object pairs where the
 color changed. If Before and After have different lengths, Delta is []. Duplicate
@@ -90,37 +90,37 @@ pairs are suppressed.
 
 Example:
 
-scenepair_color_delta([obj(r,[r(0,0)]),obj(b,[r(0,1)])],
+scene_pair_color_delta([obj(r,[r(0,0)]),obj(b,[r(0,1)])],
                [obj(g,[r(0,0)]),obj(b,[r(0,1)])],
                Delta).
 % Delta = [r-g]  — r became g; b stayed b
 
 
-scenepair_is_recolor(+Before, +After)
+scene_pair_is_recolor(+Before, +After)
 
 Succeed if exactly one color in Before was replaced by exactly one other color
 in After. This detects the recolor(Old, New) rule type. Requires same length.
 
 Example:
 
-scenepair_is_recolor([obj(r,[r(0,0)]),obj(b,[r(0,1)])],
+scene_pair_is_recolor([obj(r,[r(0,0)]),obj(b,[r(0,1)])],
               [obj(g,[r(0,0)]),obj(b,[r(0,1)])]).
 % true — r replaced by g
 
 
-scenepair_is_recolor_all(+Before, +After)
+scene_pair_is_recolor_all(+Before, +After)
 
 Succeed if all objects in After have the same color (exactly one distinct color
 in After). This detects the recolor_all(New) rule type.
 
 Example:
 
-scenepair_is_recolor_all([obj(r,[r(0,0)]),obj(b,[r(0,1)])],
+scene_pair_is_recolor_all([obj(r,[r(0,0)]),obj(b,[r(0,1)])],
                   [obj(g,[r(0,0)]),obj(g,[r(0,1)])]).
 % true — everything is g
 
 
-scenepair_is_shift(+Before, +After, -DR, -DC)
+scene_pair_is_shift(+Before, +After, -DR, -DC)
 
 Succeed and bind DR and DC if all objects were translated uniformly by (DR, DC).
 Uses the first Before object to derive a candidate shift, then verifies the entire
@@ -128,31 +128,31 @@ scene. A cut makes the predicate deterministic.
 
 Example:
 
-scenepair_is_shift([obj(r,[r(0,0)]),obj(b,[r(0,1)])],
+scene_pair_is_shift([obj(r,[r(0,0)]),obj(b,[r(0,1)])],
             [obj(r,[r(1,1)]),obj(b,[r(1,2)])],
             DR, DC).
 % DR = 1, DC = 1
 
 
-scenepair_is_to_origin(+Before, +After)
+scene_pair_is_to_origin(+Before, +After)
 
 Succeed if After equals Before shifted so the scene bounding box top-left is at
 r(0,0). Corresponds to the to_origin rule.
 
 Example:
 
-scenepair_is_to_origin([obj(r,[r(2,3)])], [obj(r,[r(0,0)])]).
+scene_pair_is_to_origin([obj(r,[r(2,3)])], [obj(r,[r(0,0)])]).
 % true — r(2,3) shifted to r(0,0)
 
 
-scenepair_size_preserved(+Before, +After)
+scene_pair_size_preserved(+Before, +After)
 
 Succeed if Before and After have the same length and each position-matched pair
 of objects has the same cell count.
 
 Example:
 
-scenepair_size_preserved([obj(r,[r(0,0)])], [obj(g,[r(0,0)])]).
+scene_pair_size_preserved([obj(r,[r(0,0)])], [obj(g,[r(0,0)])]).
 % true — both have 1 cell; only color changed
 
 
@@ -162,30 +162,30 @@ Use the scenepair predicates as a first-pass filter to characterize a training
 pair before searching for a specific rule:
 
 analyze_pair(Before, After) :-
-    (scenepair_same_n_objs(Before, After)    -> format("same count~n") ; true),
-    (scenepair_same_color_set(Before, After) -> format("same colors~n") ; true),
-    (scenepair_is_recolor(Before, After)     -> format("single recolor~n") ; true),
-    (scenepair_is_recolor_all(Before, After) -> format("recolor all~n") ; true),
-    (scenepair_is_shift(Before, After, DR, DC) ->
+    (scene_pair_same_n_objs(Before, After)    -> format("same count~n") ; true),
+    (scene_pair_same_color_set(Before, After) -> format("same colors~n") ; true),
+    (scene_pair_is_recolor(Before, After)     -> format("single recolor~n") ; true),
+    (scene_pair_is_recolor_all(Before, After) -> format("recolor all~n") ; true),
+    (scene_pair_is_shift(Before, After, DR, DC) ->
         format("shift ~w ~w~n", [DR, DC]) ; true),
-    (scenepair_is_to_origin(Before, After)   -> format("to_origin~n") ; true),
-    (scenepair_size_preserved(Before, After) -> format("size preserved~n") ; true).
+    (scene_pair_is_to_origin(Before, After)   -> format("to_origin~n") ; true),
+    (scene_pair_size_preserved(Before, After) -> format("size preserved~n") ; true).
 
 
 Private Helpers
 
-scenepair_color_/2         - extract color atom
-scenepair_cells_/2         - extract cells list
-scenepair_size_/2          - cell count
-scenepair_norm_/2          - normalized form (translate to origin, msort)
-scenepair_match_/2         - color+form match of one object in a list
-scenepair_distinct_colors_/2 - sorted distinct colors with dedup
-scenepair_dedup_/2         - remove consecutive duplicates from sorted list
-scenepair_topleft_/2       - top-left r(MinR,MinC) of an object
-scenepair_scene_bbox_/5    - scene bounding box (MinR,MaxR,MinC,MaxC)
-scenepair_shift_obj_/4     - shift one object by (DR,DC)
-scenepair_color_delta_acc_/3 - accumulate OldColor-NewColor pairs
-scenepair_same_size_/2     - assert two objects have equal cell count
+scene_pair_color_/2         - extract color atom
+scene_pair_cells_/2         - extract cells list
+scene_pair_size_/2          - cell count
+scene_pair_norm_/2          - normalized form (translate to origin, msort)
+scene_pair_match_/2         - color+form match of one object in a list
+scene_pair_distinct_colors_/2 - sorted distinct colors with dedup
+scene_pair_dedup_/2         - remove consecutive duplicates from sorted list
+scene_pair_topleft_/2       - top-left r(MinR,MinC) of an object
+scene_pair_scene_bbox_/5    - scene bounding box (MinR,MaxR,MinC,MaxC)
+scene_pair_shift_obj_/4     - shift one object by (DR,DC)
+scene_pair_color_delta_acc_/3 - accumulate OldColor-NewColor pairs
+scene_pair_same_size_/2     - assert two objects have equal cell count
 
 
 Dependencies
@@ -196,7 +196,7 @@ None. Uses library(lists) and library(apply).
 Test Coverage
 
 All 41 acceptance criteria (AC-PS-001 through AC-PS-041) defined in
-Refinement v222 Part 199 are exercised in packs/scenepair/test/test_scenepair.pl.
+Refinement v222 Part 199 are exercised in packs/scene_pair/test/test_scene_pair.pl.
 All 41 tests pass.
 
 

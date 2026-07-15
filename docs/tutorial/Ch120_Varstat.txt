@@ -10,78 +10,78 @@ predicate name contains _round, which uses floating-point rounding.
 
 Predicates:
 
-varstat_sum(+List, -Sum)
+variance_statistics_sum(+List, -Sum)
   Sum is the integer total of all values in List.
 
-varstat_mean_floor(+List, -Mean)
+variance_statistics_mean_floor(+List, -Mean)
   Mean is the floor of the arithmetic mean: sum(List) // length(List).
   Fails when List is empty.
 
-varstat_mean_round(+List, -Mean)
+variance_statistics_mean_round(+List, -Mean)
   Mean is the rounded arithmetic mean using float division and banker's
   rounding (round/1). Fails when List is empty.
 
-varstat_deviation(+List, -Devs)
+variance_statistics_deviation(+List, -Devs)
   Devs[I] = List[I] - floor_mean(List). Signed integer deviations.
 
-varstat_abs_deviation(+List, -AbsDevs)
+variance_statistics_abs_deviation(+List, -AbsDevs)
   AbsDevs[I] = |List[I] - floor_mean(List)|. Non-negative integer deviations.
 
-varstat_row_sums(+Grid, -Sums)
+variance_statistics_row_sums(+Grid, -Sums)
   Sums[R] is the integer sum of all values in row R.
 
-varstat_col_sums(+Grid, -Sums)
+variance_statistics_col_sums(+Grid, -Sums)
   Sums[C] is the integer sum of all values in column C.
 
-varstat_row_means(+Grid, -Means)
+variance_statistics_row_means(+Grid, -Means)
   Means[R] is the floor mean of all values in row R.
 
-varstat_col_means(+Grid, -Means)
+variance_statistics_col_means(+Grid, -Means)
   Means[C] is the floor mean of all values in column C.
 
-varstat_global_mean(+Grid, -Mean)
+variance_statistics_global_mean(+Grid, -Mean)
   Mean is the floor mean of all cell values across the entire grid.
 
-varstat_above_mean(+Grid, -Cells)
+variance_statistics_above_mean(+Grid, -Cells)
   Sorted R-C positions of cells strictly above the global floor mean.
 
-varstat_below_mean(+Grid, -Cells)
+variance_statistics_below_mean(+Grid, -Cells)
   Sorted R-C positions of cells strictly below the global floor mean.
 
-varstat_row_above_mean(+Grid, -Cells)
+variance_statistics_row_above_mean(+Grid, -Cells)
   Sorted R-C positions of cells strictly above the floor mean of their row.
 
-varstat_col_above_mean(+Grid, -Cells)
+variance_statistics_col_above_mean(+Grid, -Cells)
   Sorted R-C positions of cells strictly above the floor mean of their column.
 
 Usage examples:
 
-varstat_sum([1,2,3], S).             % S=6
-varstat_sum([0,0,0], S).             % S=0
-varstat_mean_floor([1,2,3], M).      % M=2
-varstat_mean_floor([1,1,2], M).      % M=1 (floor of 4/3)
-varstat_mean_round([1,2,3], M).      % M=2
-varstat_mean_round([2,4], M).        % M=3
-varstat_deviation([1,2,3], Devs).    % Devs=[-1,0,1]
-varstat_deviation([1,3,5], Devs).    % Devs=[-2,0,2] (floor mean=3)
-varstat_abs_deviation([1,2,3], D).   % D=[1,0,1]
-varstat_row_sums([[1,2,3],[4,5,6],[7,8,9]], S).  % S=[6,15,24]
-varstat_col_sums([[1,2,3],[4,5,6],[7,8,9]], S).  % S=[12,15,18]
-varstat_row_means([[1,2,3],[4,5,6],[7,8,9]], M). % M=[2,5,8]
-varstat_col_means([[1,2,3],[4,5,6],[7,8,9]], M). % M=[4,5,6]
-varstat_global_mean([[1,2,3],[4,5,6],[7,8,9]], M). % M=5 (45//9)
-varstat_above_mean([[1,2,3],[4,5,6],[7,8,9]], C). % C=[1-2,2-0,2-1,2-2] (values 6,7,8,9)
-varstat_below_mean([[1,2,3],[4,5,6],[7,8,9]], C). % C=[0-0,0-1,0-2,1-0] (values 1,2,3,4)
-varstat_row_above_mean([[1,2,3],[4,5,6],[7,8,9]], C). % C=[0-2,1-2,2-2] (rightmost col)
-varstat_col_above_mean([[1,2,3],[4,5,6],[7,8,9]], C). % C=[2-0,2-1,2-2] (bottom row)
+variance_statistics_sum([1,2,3], S).             % S=6
+variance_statistics_sum([0,0,0], S).             % S=0
+variance_statistics_mean_floor([1,2,3], M).      % M=2
+variance_statistics_mean_floor([1,1,2], M).      % M=1 (floor of 4/3)
+variance_statistics_mean_round([1,2,3], M).      % M=2
+variance_statistics_mean_round([2,4], M).        % M=3
+variance_statistics_deviation([1,2,3], Devs).    % Devs=[-1,0,1]
+variance_statistics_deviation([1,3,5], Devs).    % Devs=[-2,0,2] (floor mean=3)
+variance_statistics_abs_deviation([1,2,3], D).   % D=[1,0,1]
+variance_statistics_row_sums([[1,2,3],[4,5,6],[7,8,9]], S).  % S=[6,15,24]
+variance_statistics_col_sums([[1,2,3],[4,5,6],[7,8,9]], S).  % S=[12,15,18]
+variance_statistics_row_means([[1,2,3],[4,5,6],[7,8,9]], M). % M=[2,5,8]
+variance_statistics_col_means([[1,2,3],[4,5,6],[7,8,9]], M). % M=[4,5,6]
+variance_statistics_global_mean([[1,2,3],[4,5,6],[7,8,9]], M). % M=5 (45//9)
+variance_statistics_above_mean([[1,2,3],[4,5,6],[7,8,9]], C). % C=[1-2,2-0,2-1,2-2] (values 6,7,8,9)
+variance_statistics_below_mean([[1,2,3],[4,5,6],[7,8,9]], C). % C=[0-0,0-1,0-2,1-0] (values 1,2,3,4)
+variance_statistics_row_above_mean([[1,2,3],[4,5,6],[7,8,9]], C). % C=[0-2,1-2,2-2] (rightmost col)
+variance_statistics_col_above_mean([[1,2,3],[4,5,6],[7,8,9]], C). % C=[2-0,2-1,2-2] (bottom row)
 
 Key implementation notes:
 
-varstat_mean_floor uses floor integer division: Sum // N.
-varstat_mean_round uses float(Sum) / float(N) then round/1, which applies
+variance_statistics_mean_floor uses floor integer division: Sum // N.
+variance_statistics_mean_round uses float(Sum) / float(N) then round/1, which applies
   banker's rounding (round half to even): round(1.5)=2, round(2.5)=2.
 
-varstat_col_above_mean enumerates in row-major order (R outer, C inner) to
+variance_statistics_col_above_mean enumerates in row-major order (R outer, C inner) to
   produce a sorted result. For each (R,C) it re-computes the column mean
   via a nested findall. This is O(H*W*H) but simple and correct.
 

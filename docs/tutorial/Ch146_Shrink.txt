@@ -1,8 +1,8 @@
 Chapter 146: The Shrink Pack - Grid Downscaling and Block Decomposition
 
 The shrink pack (dn_* prefix, Layer 164) provides 14 predicates for working with
-grids and objects at reduced scale. It is the inverse of the objxf pack's objxf_scale_up
-predicate: where objxf_scale_up expands each cell to an NxN block, the shrink pack
+grids and objects at reduced scale. It is the inverse of the objxf pack's object_transform_scale_up
+predicate: where object_transform_scale_up expands each cell to an NxN block, the shrink pack
 collapses each NxN block back to a single cell.
 
 This chapter explains all 14 predicates with examples.
@@ -160,8 +160,8 @@ matches Obj1 (normalized to origin). Tries N from 2 to 30.
        shrink_scale_factor(Obj1, Obj2, N).
     N = 2.
 
-Relationship to objxf_scale_up: if shrink_scale_factor(Obj1, Obj2, N) succeeds, then
-objxf_scale_up(Obj1', N, Obj2') where Obj1' and Obj2' are normalized versions of
+Relationship to object_transform_scale_up: if shrink_scale_factor(Obj1, Obj2, N) succeeds, then
+object_transform_scale_up(Obj1', N, Obj2') where Obj1' and Obj2' are normalized versions of
 Obj1 and Obj2.
 
 
@@ -217,7 +217,7 @@ Returns a flat list of all N*N values in block (I,J), listed row by row.
 
 Section 146.9: Relationship to Other Packs
 
-The objxf pack (ox_*) provides objxf_scale_up/3 which expands a single cell to an
+The objxf pack (ox_*) provides object_transform_scale_up/3 which expands a single cell to an
 NxN block. The shrink pack is its inverse: shrink_obj_shrink collapses a group of
 NxN cells back to a single coordinate.
 
@@ -230,7 +230,7 @@ The scene pack (sc_*) extracts obj terms from grids. A typical pipeline:
     scene_grid_to_scene -> scene_objects         (extract objects)
     shrink_scale_factor(Template, Obj, N)      (find scale factor)
     shrink_obj_shrink(Obj, N, Compact)         (get compact form)
-    objxf_scale_up(Compact, N, Expanded)      (verify round-trip)
+    object_transform_scale_up(Compact, N, Expanded)      (verify round-trip)
 
 
 Section 146.10: Quick Reference

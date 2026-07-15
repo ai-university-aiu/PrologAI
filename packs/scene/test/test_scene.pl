@@ -102,49 +102,49 @@ test(scene_objects_count) :-
 
 :- begin_tests(scene_properties).
 
-% obj_size: the large red object in grid_bg_clear has 3 cells.
-test(obj_size_large) :-
+% object_size: the large red object in grid_bg_clear has 3 cells.
+test(object_size_large) :-
     grid_bg_clear(G),
     scene_objects(G, Objects),
     scene_objects_of_color(Objects, 1, RedObjs),
     RedObjs = [Obj],
     scene_obj_size(Obj, 3).
 
-% obj_size: the blue object has 1 cell.
-test(obj_size_small) :-
+% object_size: the blue object has 1 cell.
+test(object_size_small) :-
     grid_bg_clear(G),
     scene_objects(G, Objects),
     scene_objects_of_color(Objects, 2, BlueObjs),
     BlueObjs = [Obj],
     scene_obj_size(Obj, 1).
 
-% obj_bbox: the large red L-shape in grid_bg_clear spans rows 1-2, cols 1-2.
-test(obj_bbox_red) :-
+% object_bbox: the large red L-shape in grid_bg_clear spans rows 1-2, cols 1-2.
+test(object_bbox_red) :-
     grid_bg_clear(G),
     scene_objects(G, Objects),
     scene_objects_of_color(Objects, 1, [Obj]),
     scene_obj_bbox(Obj, r(1,1), r(2,2)).
 
-% obj_centroid: single-cell object centroid is the cell itself.
-test(obj_centroid_single) :-
+% object_centroid: single-cell object centroid is the cell itself.
+test(object_centroid_single) :-
     grid_bg_clear(G),
     scene_objects(G, Objects),
     scene_objects_of_color(Objects, 2, [Obj]),
     scene_obj_centroid(Obj, 3, 3).
 
-% obj_shape: single-cell object normalizes to [r(0,0)].
-test(obj_shape_single) :-
+% object_shape: single-cell object normalizes to [r(0,0)].
+test(object_shape_single) :-
     grid_bg_clear(G),
     scene_objects(G, Objects),
     scene_objects_of_color(Objects, 2, [Obj]),
     scene_obj_shape(Obj, [r(0,0)]).
 
-% obj_color: accessor returns the stored color.
-test(obj_color) :-
+% object_color: accessor returns the stored color.
+test(object_color) :-
     scene_obj_color(obj(7, [r(0,0)]), 7).
 
-% obj_cells: accessor returns the stored cells.
-test(obj_cells) :-
+% object_cells: accessor returns the stored cells.
+test(object_cells) :-
     scene_obj_cells(obj(3, [r(1,2)]), [r(1,2)]).
 
 :- end_tests(scene_properties).

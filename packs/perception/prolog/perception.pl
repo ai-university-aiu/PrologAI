@@ -21,25 +21,25 @@
         Maintains a hierarchy: locale → place → area → region → map.
 
     Predicates:
-        pai_detect/3        — +PerceptRef, +DetectorList, -TraitSets
-        pai_locate/2        — +SceneTraits, -VenueId
-        pai_map_update/2    — +VenueId, +LocaleHint
-        pai_venue_of/2      — +SceneId, -VenueId (query)
-        pai_locale_of/2     — +VenueId, -LocaleId (query)
+        perception_detect/3        — +PerceptRef, +DetectorList, -TraitSets
+        perception_locate/2        — +SceneTraits, -VenueId
+        perception_map_update/2    — +VenueId, +LocaleHint
+        perception_venue_of/2      — +SceneId, -VenueId (query)
+        perception_locale_of/2     — +VenueId, -LocaleId (query)
 */
 
 % Declare this file as the 'perception' module and list its exported predicates.
 :- module(perception, [
-    % Supply 'pai_detect/3' as the next argument to the expression above.
-    pai_detect/3,
-    % Supply 'pai_locate/2' as the next argument to the expression above.
-    pai_locate/2,
-    % Supply 'pai_map_update/2' as the next argument to the expression above.
-    pai_map_update/2,
-    % Supply 'pai_venue_of/2' as the next argument to the expression above.
-    pai_venue_of/2,
-    % Supply 'pai_locale_of/2' as the next argument to the expression above.
-    pai_locale_of/2
+    % Supply 'perception_detect/3' as the next argument to the expression above.
+    perception_detect/3,
+    % Supply 'perception_locate/2' as the next argument to the expression above.
+    perception_locate/2,
+    % Supply 'perception_map_update/2' as the next argument to the expression above.
+    perception_map_update/2,
+    % Supply 'perception_venue_of/2' as the next argument to the expression above.
+    perception_venue_of/2,
+    % Supply 'perception_locale_of/2' as the next argument to the expression above.
+    perception_locale_of/2
 % Close the expression opened above.
 ]).
 
@@ -135,7 +135,7 @@ next_scene_id(Id) :-
 perception_merge_threshold(0.3).  % Jaccard similarity >= this → same venue
 
 % ---------------------------------------------------------------------------
-% pai_detect/3
+% perception_detect/3
 %
 %   PerceptRef: an atom identifying a percept (e.g. clip_001)
 %   DetectorList: list of detector names to apply; [] = all detectors
@@ -143,7 +143,7 @@ perception_merge_threshold(0.3).  % Jaccard similarity >= this → same venue
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai detect': succeed when the following conditions hold.
-pai_detect(PerceptRef, DetectorList, TraitSets) :-
+perception_detect(PerceptRef, DetectorList, TraitSets) :-
     % Check that '( DetectorList' is unifiable with '[]'.
     ( DetectorList = []
     % If the condition above succeeded, perform the following action.
@@ -282,7 +282,7 @@ nth1(1, [H|_], H) :- !.
 nth1(N, [_|T], E) :- N > 1, N1 is N - 1, nth1(N1, T, E).
 
 % ---------------------------------------------------------------------------
-% pai_locate/2
+% perception_locate/2
 %
 %   SceneTraits: flat list of trait atoms (the union across all detectors)
 %   VenueId:     atom identifying the venue this scene belongs to.
@@ -294,7 +294,7 @@ nth1(N, [_|T], E) :- N > 1, N1 is N - 1, nth1(N1, T, E).
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai locate': succeed when the following conditions hold.
-pai_locate(SceneTraits, VenueId) :-
+perception_locate(SceneTraits, VenueId) :-
     % Assign a scene ID for this observation
     % State a fact for 'next scene id' with the arguments listed below.
     next_scene_id(SId),
@@ -359,13 +359,13 @@ last([X], X) :- !.
 last([_|T], X) :- last(T, X).
 
 % ---------------------------------------------------------------------------
-% pai_map_update/2
+% perception_map_update/2
 %
 %   Attach a venue to a locale, and locale to a place in the map hierarchy.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai map update': succeed when the following conditions hold.
-pai_map_update(VenueId, LocaleHint) :-
+perception_map_update(VenueId, LocaleHint) :-
     % Check that '( LocaleHint' is unifiable with 'locale(LId)'.
     ( LocaleHint = locale(LId)
     % If the condition above succeeded, perform the following action.
@@ -390,18 +390,18 @@ pai_map_update(VenueId, LocaleHint) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_venue_of/2 and pai_locale_of/2 — queries
+% perception_venue_of/2 and perception_locale_of/2 — queries
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai venue of': succeed when the following conditions hold.
-pai_venue_of(SceneId, VenueId) :-
+perception_venue_of(SceneId, VenueId) :-
     % State a fact for 'venue record' with the arguments listed below.
     venue_record(VenueId, _, Scenes),
     % State the fact: memberchk(SceneId, Scenes).
     memberchk(SceneId, Scenes).
 
 % Define a clause for 'pai locale of': succeed when the following conditions hold.
-pai_locale_of(VenueId, LocaleId) :-
+perception_locale_of(VenueId, LocaleId) :-
     % Execute: ( venue_locale(VenueId, LocaleId).
     ( venue_locale(VenueId, LocaleId)
     % If the condition above succeeded, perform the following action.

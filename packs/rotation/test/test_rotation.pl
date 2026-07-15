@@ -144,17 +144,17 @@ test(is_rot4_fail, [fail]) :-
     rotation_is_rot4([[a,b],[a,b]]).
 
 % rotation_sym_order: all-same grid has order 4 (invariant under 90).
-test(sym_order_4) :-
+test(symmetry_transform_order_4) :-
     rotation_sym_order([[1,1],[1,1]], N),
     N = 4.
 
 % rotation_sym_order: [[1,2],[2,1]] has order 2 (180-invariant, not 90-invariant).
-test(sym_order_2) :-
+test(symmetry_transform_order_2) :-
     rotation_sym_order([[1,2],[2,1]], N),
     N = 2.
 
 % rotation_sym_order: [[a,b],[c,d]] (all distinct) has order 1.
-test(sym_order_1) :-
+test(symmetry_transform_order_1) :-
     rotation_sym_order([[a,b],[c,d]], N),
     N = 1.
 

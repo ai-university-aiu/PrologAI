@@ -24,18 +24,18 @@ of its bounding box.
 
 Section 144.2: Position Extraction
 
-posop_row_of(+Obj, -Row)
+position_operation_row_of(+Obj, -Row)
 
 Row is the topmost (minimum) row index of Obj's cells.
 
-    ?- posop_row_of(obj(red, [r(2,3), r(2,4), r(3,3)]), Row).
+    ?- position_operation_row_of(obj(red, [r(2,3), r(2,4), r(3,3)]), Row).
     Row = 2.
 
-posop_col_of(+Obj, -Col)
+position_operation_col_of(+Obj, -Col)
 
 Col is the leftmost (minimum) column index of Obj's cells.
 
-    ?- posop_col_of(obj(red, [r(2,3), r(2,4), r(3,3)]), Col).
+    ?- position_operation_col_of(obj(red, [r(2,3), r(2,4), r(3,3)]), Col).
     Col = 3.
 
 
@@ -43,37 +43,37 @@ Section 144.3: Position Rank Queries
 
 These three predicates tell you where an object ranks among others by position.
 
-posop_row_rank(+Objs, +Obj, -Rank)
+position_operation_row_rank(+Objs, +Obj, -Rank)
 
 Rank is the 1-based position of Obj when Objs is sorted by topmost row ascending.
 Rank 1 = topmost object. Ties (equal rows) are broken by the original input order.
 
     Objs = [obj(a,[r(4,0)]), obj(b,[r(0,0)]), obj(c,[r(2,0)])],
-    posop_row_rank(Objs, obj(b,[r(0,0)]), Rank).
+    position_operation_row_rank(Objs, obj(b,[r(0,0)]), Rank).
     Rank = 1.   % obj(b) has the smallest row (0), so it ranks first.
 
-posop_col_rank(+Objs, +Obj, -Rank)
+position_operation_col_rank(+Objs, +Obj, -Rank)
 
 Rank is the 1-based position of Obj when Objs is sorted by leftmost col ascending.
 Rank 1 = leftmost object.
 
-posop_reading_rank(+Objs, +Obj, -Rank)
+position_operation_reading_rank(+Objs, +Obj, -Rank)
 
 Rank is the 1-based position of Obj in reading order: ascending by topmost row,
 then by leftmost col within equal rows.
 
     % For objects at (0,0), (0,3), (2,0):
     % Reading order: (0,0) first, (0,3) second, (2,0) third.
-    posop_reading_rank(Objs, obj_at_2_0, Rank).
+    position_operation_reading_rank(Objs, object_at_2_0, Rank).
     Rank = 3.
 
 
 Section 144.4: Color Assignment by Position
 
 These predicates sort objects by position and then assign colors from a list.
-They are the positional complement of sizeop_assign_colors/3 in the sizeop pack.
+They are the positional complement of size_operation_assign_colors/3 in the sizeop pack.
 
-posop_assign_by_row(+Objs, +Colors, -Result)
+position_operation_assign_by_row(+Objs, +Colors, -Result)
 
 Sorts Objs by topmost row ascending, then assigns colors in that order. The
 topmost object gets Colors[1], the next gets Colors[2], and so on. If Colors is
@@ -81,20 +81,20 @@ shorter than Objs, only that many objects are recolored. If Objs is shorter,
 only that many colors are used.
 
     Objs = [obj(green,[r(3,0)]), obj(red,[r(0,0)]), obj(blue,[r(1,0)])],
-    posop_assign_by_row(Objs, [top_c, mid_c, bot_c], Result).
+    position_operation_assign_by_row(Objs, [top_c, mid_c, bot_c], Result).
     % Sort by row: r0->red, r1->blue, r3->green.
     Result = [obj(top_c,[r(0,0)]), obj(mid_c,[r(1,0)]), obj(bot_c,[r(3,0)])].
 
-posop_assign_by_col(+Objs, +Colors, -Result)
+position_operation_assign_by_col(+Objs, +Colors, -Result)
 
 Sorts Objs by leftmost col ascending, then assigns colors in that order.
 
-posop_assign_reading(+Objs, +Colors, -Result)
+position_operation_assign_reading(+Objs, +Colors, -Result)
 
 Sorts Objs in reading order (row then col), then assigns colors in that order.
 
     Objs = [obj(a,[r(0,3)]), obj(b,[r(0,0)]), obj(c,[r(1,0)])],
-    posop_assign_reading(Objs, [first, second, third], Result).
+    position_operation_assign_reading(Objs, [first, second, third], Result).
     % Reading order: (0,0)->b, (0,3)->a, (1,0)->c.
     Result = [obj(first,[r(0,0)]), obj(second,[r(0,3)]), obj(third,[r(1,0)])].
 
@@ -104,54 +104,54 @@ Section 144.5: Threshold Filtering
 These predicates split an object list into two groups based on a row or column
 boundary. Each predicate returns one of the two groups.
 
-posop_above_row(+Objs, +R, -Filtered)
+position_operation_above_row(+Objs, +R, -Filtered)
 
 Returns objects whose topmost row is strictly less than R.
 
     % For objects at rows 0, 2, 4 in a scene:
-    posop_above_row(Objs, 2, Filtered).
+    position_operation_above_row(Objs, 2, Filtered).
     % Filtered contains only the row-0 object.
 
-posop_from_row(+Objs, +R, -Filtered)
+position_operation_from_row(+Objs, +R, -Filtered)
 
 Returns objects whose topmost row is >= R (at row R or below it).
 
-    posop_from_row(Objs, 2, Filtered).
+    position_operation_from_row(Objs, 2, Filtered).
     % Filtered contains row-2 and row-4 objects.
 
-posop_left_of(+Objs, +C, -Filtered)
+position_operation_left_of(+Objs, +C, -Filtered)
 
 Returns objects whose leftmost col is strictly less than C.
 
-posop_from_col(+Objs, +C, -Filtered)
+position_operation_from_col(+Objs, +C, -Filtered)
 
 Returns objects whose leftmost col is >= C.
 
-Together, posop_above_row and posop_from_row split the scene at a horizontal boundary.
-posop_left_of and posop_from_col split it at a vertical boundary.
+Together, position_operation_above_row and position_operation_from_row split the scene at a horizontal boundary.
+position_operation_left_of and position_operation_from_col split it at a vertical boundary.
 
 
 Section 144.6: Band Filtering
 
 Band filtering keeps objects within a range of rows or columns.
 
-posop_in_row_band(+Objs, +R1, +R2, -Filtered)
+position_operation_in_row_band(+Objs, +R1, +R2, -Filtered)
 
 Returns objects whose topmost row is in the inclusive range [R1, R2].
 
     % Objects at rows 0, 2, 4. Band [0, 2]:
-    posop_in_row_band(Objs, 0, 2, Filtered).
+    position_operation_in_row_band(Objs, 0, 2, Filtered).
     % Filtered: row-0 and row-2 objects (row 4 excluded).
 
-posop_in_col_band(+Objs, +C1, +C2, -Filtered)
+position_operation_in_col_band(+Objs, +C1, +C2, -Filtered)
 
 Returns objects whose leftmost col is in the inclusive range [C1, C2].
 
 
 Section 144.7: How Reading Order Sort Works
 
-The reading-order sort (used internally by posop_sort_reading_ and exposed via
-posop_reading_rank and posop_assign_reading) uses a compound key Row-Col as the
+The reading-order sort (used internally by position_operation_sort_reading_ and exposed via
+position_operation_reading_rank and position_operation_assign_reading) uses a compound key Row-Col as the
 keysort/2 key. In SWI-Prolog's standard order of terms, the -/2 functor sorts
 first by its left argument (Row) then by its right argument (Col) when left
 arguments are equal. This gives row-then-column ordering - exactly reading order.
@@ -168,8 +168,8 @@ posop and sizeop (sz_*, Layer 161) are the two "ranking" packs:
 - sizeop ranks objects by CELL COUNT (how large they are).
 - posop ranks objects by SPATIAL POSITION (where they are).
 
-Both offer color assignment by rank (sizeop_assign_colors, posop_assign_by_row, etc.)
-and selection predicates (sizeop_smallest, posop_above_row, etc.). They are independent
+Both offer color assignment by rank (size_operation_assign_colors, position_operation_assign_by_row, etc.)
+and selection predicates (size_operation_smallest, position_operation_above_row, etc.). They are independent
 and can be combined in composite rules.
 
 The order pack (od_*, earlier layer) sorts objects by position but does not
@@ -180,25 +180,25 @@ this gap.
 Section 144.9: Quick Reference
 
 Position extraction:
-- posop_row_of/2      topmost row of an object
-- posop_col_of/2      leftmost col of an object
+- position_operation_row_of/2      topmost row of an object
+- position_operation_col_of/2      leftmost col of an object
 
 Rank queries:
-- posop_row_rank/3    1-based rank by topmost row (1 = topmost)
-- posop_col_rank/3    1-based rank by leftmost col (1 = leftmost)
-- posop_reading_rank/3 1-based rank in reading order
+- position_operation_row_rank/3    1-based rank by topmost row (1 = topmost)
+- position_operation_col_rank/3    1-based rank by leftmost col (1 = leftmost)
+- position_operation_reading_rank/3 1-based rank in reading order
 
 Color assignment by position:
-- posop_assign_by_row/3   topmost-first assignment
-- posop_assign_by_col/3   leftmost-first assignment
-- posop_assign_reading/3  reading-order assignment
+- position_operation_assign_by_row/3   topmost-first assignment
+- position_operation_assign_by_col/3   leftmost-first assignment
+- position_operation_assign_reading/3  reading-order assignment
 
 Threshold filtering:
-- posop_above_row/3   row < R
-- posop_from_row/3    row >= R
-- posop_left_of/3     col < C
-- posop_from_col/3    col >= C
+- position_operation_above_row/3   row < R
+- position_operation_from_row/3    row >= R
+- position_operation_left_of/3     col < C
+- position_operation_from_col/3    col >= C
 
 Band filtering:
-- posop_in_row_band/4 row in [R1, R2]
-- posop_in_col_band/4 col in [C1, C2]
+- position_operation_in_row_band/4 row in [R1, R2]
+- position_operation_in_col_band/4 col in [C1, C2]

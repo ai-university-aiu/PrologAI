@@ -126,26 +126,26 @@ test(unfold_v_single_col) :-
 % fold_sym_h: a 4-row grid is symmetric with fold crease between rows 1 and 2.
 % [[1,2],[3,4],[3,4],[1,2]] satisfies row I == row (2*1+1-I) = row (3-I):
 % row0=[1,2]==row3=[1,2], row1=[3,4]==row2=[3,4].
-test(sym_h_palindrome) :-
+test(symmetry_transform_h_palindrome) :-
     fold_sym_h([[1,2],[3,4],[3,4],[1,2]], 1).
 
 % fold_sym_h: a 2-row grid with identical rows is symmetric around crease after row 0.
 % Formula: row I == row (2*0+1-I) = row (1-I). row0==row1 and row1==row0.
-test(sym_h_trivial_row0) :-
+test(symmetry_transform_h_trivial_row0) :-
     fold_sym_h([[a,b],[a,b]], 0).
 
 % fold_sym_h: should fail when rows are not mirrored correctly.
-test(sym_h_fail, [fail]) :-
+test(symmetry_transform_h_fail, [fail]) :-
     fold_sym_h([[1,2],[3,4],[5,6]], 1).
 
 % fold_sym_v: a 4-col grid is symmetric with fold crease between cols 1 and 2.
 % [[1,2,2,1],[3,4,4,3]] satisfies col J == col (2*1+1-J) = col (3-J):
 % col0=[1,3]==col3=[1,3], col1=[2,4]==col2=[2,4].
-test(sym_v_palindrome) :-
+test(symmetry_transform_v_palindrome) :-
     fold_sym_v([[1,2,2,1],[3,4,4,3]], 1).
 
 % fold_sym_v: should fail when columns are not mirrored correctly.
-test(sym_v_fail, [fail]) :-
+test(symmetry_transform_v_fail, [fail]) :-
     fold_sym_v([[1,2,3],[4,5,6]], 1).
 
 % fold_find_fold_h: find fold crease in a 4-row between-rows-symmetric grid.

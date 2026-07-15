@@ -2252,8 +2252,8 @@ Think of SONA as the mind's ability to remember: "I saw X happen, and then Y hap
 
 Key predicates:
 
-    sona_absorb(+Trajectory) - store an experience in episodic memory.
-    sona_retrieve(+Pattern, +Limit, -Results) - retrieve matching experiences.
+    synaptic_ontological_neural_aggregator_absorb(+Trajectory) - store an experience in episodic memory.
+    synaptic_ontological_neural_aggregator_retrieve(+Pattern, +Limit, -Results) - retrieve matching experiences.
 
 A trajectory is any term representing a sequence of events:
 
@@ -2263,9 +2263,9 @@ SONA uses sparse encoding (it does not store every detail, only the significant 
 
 Example:
 
-    ?- use_module(library(sona), [sona_absorb/1, sona_retrieve/3]).
-    ?- sona_absorb(traj(events([saw(tweety, 10_30am), heard(robin, 10_35am)]))).
-    ?- sona_retrieve(traj(_), 5, Results).
+    ?- use_module(library(synaptic_ontological_neural_aggregator), [synaptic_ontological_neural_aggregator_absorb/1, synaptic_ontological_neural_aggregator_retrieve/3]).
+    ?- synaptic_ontological_neural_aggregator_absorb(traj(events([saw(tweety, 10_30am), heard(robin, 10_35am)]))).
+    ?- synaptic_ontological_neural_aggregator_retrieve(traj(_), 5, Results).
 
 
 THE GLOBAL WORKSPACE (PR 18 AND PR 32)
@@ -2327,8 +2327,8 @@ Available MCP tools include: lattice_inscribe, lattice_query, actor_list, assess
 
 To start the MCP gateway:
 
-    ?- use_module(library(mcp_gateway), [pai_mcp_start/1]).
-    ?- pai_mcp_start(7474).
+    ?- use_module(library(model_context_protocol_gateway), [prologai_mcp_start/1]).
+    ?- prologai_mcp_start(7474).
 
 
 AGENT-TO-AGENT PROTOCOL (A2A) - PR 43
@@ -2343,8 +2343,8 @@ Mentova implements the full A2A protocol including durable peer mail (messages t
 
 To start the A2A server:
 
-    ?- use_module(library(a2a), [pai_a2a_start/1]).
-    ?- pai_a2a_start(7475).
+    ?- use_module(library(agent_to_agent), [prologai_a2a_start/1]).
+    ?- prologai_a2a_start(7475).
 
 
 AGENT COMMUNICATION PROTOCOL (ACP) - PR 47
@@ -2357,8 +2357,8 @@ The agent description is served at GET /.well-known/agent.json.
 
 ACP runs are asynchronous: you submit a task and poll for the result.
 
-    ?- use_module(library(acp), [pai_acp_start/1]).
-    ?- pai_acp_start(7476).
+    ?- use_module(library(agent_communication_protocol), [agent_communication_protocol_start/1]).
+    ?- agent_communication_protocol_start(7476).
 
 
 AGENT NETWORK PROTOCOL (ANP) - PR 48
@@ -2371,9 +2371,9 @@ All ANP messages are signed with HMAC-SHA256. Incoming messages are verified bef
 
 ANP supports meta-protocol negotiation: when two agents meet, they announce which protocols they support, so they can choose the best one.
 
-    ?- use_module(library(anp), [pai_anp_did/1, pai_anp_negotiate/2]).
-    ?- pai_anp_did(DID).       % Get Mentova's DID.
-    ?- pai_anp_negotiate(peer_endpoint, Protocols).  % Negotiate protocols with a peer.
+    ?- use_module(library(agent_network_protocol), [prologai_anp_did/1, prologai_anp_negotiate/2]).
+    ?- prologai_anp_did(DID).       % Get Mentova's DID.
+    ?- prologai_anp_negotiate(peer_endpoint, Protocols).  % Negotiate protocols with a peer.
 
 
 THE ROBOT BODY (PR 46 - ROS BRIDGE)
@@ -2837,29 +2837,29 @@ The cryptographic privacy layer lives in pack lattice_crypto, work package PR 49
 
 To load it:
 
-    ?- use_module(library(lattice_crypto)).
+    ?- use_module(library(lattice_cryptography)).
 
 You should see:
 
     true.
 
-If that fails, make sure your library path includes packs/lattice_crypto/prolog. In a fresh session from the PrologAI repository root:
+If that fails, make sure your library path includes packs/lattice_cryptography/prolog. In a fresh session from the PrologAI repository root:
 
-    ?- assertz(file_search_path(library, 'packs/lattice_crypto/prolog')).
-    ?- use_module(library(lattice_crypto)).
+    ?- assertz(file_search_path(library, 'packs/lattice_cryptography/prolog')).
+    ?- use_module(library(lattice_cryptography)).
 
 
 CHECKING WHAT IS AVAILABLE
 
 Before encrypting, you can ask PrologAI which algorithms are ready to use:
 
-    ?- pai_crypto_available(pai_algo_rsa).
+    ?- prologai_crypto_available(lattice_cryptography_algo_rsa).
     true.
 
-    ?- pai_crypto_available(pai_algo_ecdh).
+    ?- prologai_crypto_available(lattice_cryptography_algo_ecdh).
     true.
 
-    ?- pai_crypto_available(pai_algo_pqc).
+    ?- prologai_crypto_available(lattice_cryptography_algo_pqc).
     false.
 
 The first two should succeed on any standard installation. The third only succeeds if the OQS Provider is installed.
@@ -2873,9 +2873,9 @@ Step 1: Generate a key pair.
 
 The key pair is written to temporary PEM files (PEM is a standard format for storing cryptographic keys as text).
 
-    ?- pai_keygen_rsa(2048, PrivFile, PubFile).
-    PrivFile = '/tmp/swipl_pai_rsa_priv_1234',
-    PubFile = '/tmp/swipl_pai_rsa_pub_5678'.
+    ?- prologai_keygen_rsa(2048, PrivFile, PubFile).
+    PrivFile = '/tmp/swipl_prologai_rsa_priv_1234',
+    PubFile = '/tmp/swipl_prologai_rsa_pub_5678'.
 
 The variable PrivFile now holds the path to your private key file.
 The variable PubFile holds the path to your public key file.
@@ -2884,8 +2884,8 @@ Keep the private key secret. Distribute the public key freely.
 
 Step 2: Load the keys into Prolog.
 
-    ?- pai_pem_load_private(PrivFile, PrivKey),
-       pai_pem_load_public(PubFile, PubKey).
+    ?- prologai_pem_load_private(PrivFile, PrivKey),
+       prologai_pem_load_public(PubFile, PubKey).
     PrivKey = <ssl_key>(0x...),
     PubKey = <ssl_key>(0x...).
 
@@ -2893,7 +2893,7 @@ PrivKey and PubKey are now Prolog terms representing the loaded keys.
 
 Step 3: Encrypt the password.
 
-    ?- pai_encrypt_rsa(PubKey, 'hunter2_my_bank_password', Bundle, Tag).
+    ?- prologai_encrypt_rsa(PubKey, 'hunter2_my_bank_password', Bundle, Tag).
     Bundle = rsa_bundle('7f3a...', '2b9c...', 'a1d4...'),
     Tag = '8e2f...'.
 
@@ -2906,7 +2906,7 @@ Note: the actual hex strings will be much longer than shown above (they are abbr
 
 Step 4: Decrypt the password.
 
-    ?- pai_decrypt_rsa(PrivKey, Bundle, Tag, Plain).
+    ?- prologai_decrypt_rsa(PrivKey, Bundle, Tag, Plain).
     Plain = 'hunter2_my_bank_password'.
 
 The original password is recovered.
@@ -2922,7 +2922,7 @@ ECDH does not use PEM files for the recipient key. The recipient's key is stored
 
 Step 1: Generate a key pair for the recipient.
 
-    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub).
+    ?- prologai_keygen_ecdh(prime256v1, RecipPriv, RecipPub).
     RecipPriv = 73849201...,
     RecipPub = point(114492..., 98234...).
 
@@ -2931,7 +2931,7 @@ RecipPub is a point on the P-256 curve, represented as point(X, Y) where X and Y
 
 Step 2: Encrypt the SSN using only the public key.
 
-    ?- pai_encrypt_ecdh(RecipPub, 'SSN:123-45-6789', Bundle, Tag).
+    ?- prologai_encrypt_ecdh(RecipPub, 'SSN:123-45-6789', Bundle, Tag).
     Bundle = ecdh_bundle(114492..., 98234..., '3f7a...', 'b2c1...'),
     Tag = 'a9e4...'.
 
@@ -2942,7 +2942,7 @@ The ECDH bundle contains:
 
 Step 3: Decrypt using only the private scalar.
 
-    ?- pai_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
+    ?- prologai_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
     Plain = 'SSN:123-45-6789'.
 
 The SSN is recovered.
@@ -2954,14 +2954,14 @@ EXAMPLE 3: THE GENERIC INTERFACE
 
 The generic interface lets you write code that works with any algorithm.
 
-    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       pai_encrypt(pai_algo_ecdh, RecipPub, 'CreditCard:4111111111111111', Bundle, Tag),
-       pai_decrypt(pai_algo_ecdh, RecipPriv, Bundle, Tag, Plain).
+    ?- prologai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       prologai_encrypt(lattice_cryptography_algo_ecdh, RecipPub, 'CreditCard:4111111111111111', Bundle, Tag),
+       prologai_decrypt(lattice_cryptography_algo_ecdh, RecipPriv, Bundle, Tag, Plain).
     Plain = 'CreditCard:4111111111111111'.
 
-To switch to RSA, change pai_algo_ecdh to pai_algo_rsa and supply RSA keys instead.
+To switch to RSA, change lattice_cryptography_algo_ecdh to lattice_cryptography_algo_rsa and supply RSA keys instead.
 
-To switch to PQC (when available), change to pai_algo_pqc and supply a PEM file path.
+To switch to PQC (when available), change to lattice_cryptography_algo_pqc and supply a PEM file path.
 
 
 WHAT HAPPENS WHEN THE TAG IS TAMPERED?
@@ -2970,10 +2970,10 @@ AES-256-GCM protects against tampering. If the ciphertext or the tag is changed 
 
 To demonstrate:
 
-    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       pai_encrypt_ecdh(RecipPub, 'secret value', Bundle, _RealTag),
+    ?- prologai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       prologai_encrypt_ecdh(RecipPub, 'secret value', Bundle, _RealTag),
        FakeTag = '00000000000000000000000000000000',
-       pai_decrypt_ecdh(RecipPriv, Bundle, FakeTag, Plain, prime256v1).
+       prologai_decrypt_ecdh(RecipPriv, Bundle, FakeTag, Plain, prime256v1).
     ERROR: SSL(00000000) : ...
 
 The decryption fails and raises an error. It does not silently return wrong data.
@@ -2985,8 +2985,8 @@ STORING AN ENCRYPTED VALUE IN THE LATTICE
 
 Encrypted bundles are ordinary Prolog compound terms. They can be stored in the Lattice exactly like any other value.
 
-    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       pai_encrypt_ecdh(RecipPub, 'my_bank_password', Bundle, Tag),
+    ?- prologai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       prologai_encrypt_ecdh(RecipPub, 'my_bank_password', Bundle, Tag),
        anchor_node(private_credential, bank_password, Bundle-Tag, []).
 
 The Lattice now contains a node_fact with relation type private_credential, key bank_password, and value Bundle-Tag.
@@ -3000,7 +3000,7 @@ To retrieve and decrypt:
 
     ?- live_node_facts(private_credential-bank_password, [node_fact(_,_,BundleTag,_)]),
        BundleTag = Bundle-Tag,
-       pai_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
+       prologai_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
     Plain = 'my_bank_password'.
 
 
@@ -3031,7 +3031,7 @@ REAL-WORLD APPLICATIONS OF THESE TECHNIQUES
 
 The mathematics behind PrologAI's crypto pack powers the entire digital economy.
 
-When you log in to your bank's website, RSA or ECDH establishes a shared secret and AES encrypts your session. That is exactly what pai_encrypt/5 does.
+When you log in to your bank's website, RSA or ECDH establishes a shared secret and AES encrypts your session. That is exactly what prologai_encrypt/5 does.
 
 When your phone stores a fingerprint or face ID template, it encrypts it with a key that never leaves the secure hardware chip. That is the same asymmetric-key-wraps-symmetric-key pattern.
 
@@ -3064,12 +3064,12 @@ All three use hybrid encryption: the asymmetric algorithm wraps a 256-bit AES se
 AES-256-GCM also provides authenticated integrity: any tampering with the ciphertext or tag causes decryption to fail with an error.
 
 The main predicates are:
-    pai_keygen_rsa/3, pai_keygen_ecdh/3, pai_keygen_pqc/2  - key generation.
-    pai_encrypt/5, pai_decrypt/5                            - generic dispatch.
-    pai_encrypt_rsa/4, pai_decrypt_rsa/4                    - RSA convenience.
-    pai_encrypt_ecdh/4, pai_decrypt_ecdh/5                  - ECDH convenience.
-    pai_encrypt_pqc/4, pai_decrypt_pqc/4                    - PQC convenience.
-    pai_crypto_available/1                                  - availability probe.
+    prologai_keygen_rsa/3, prologai_keygen_ecdh/3, prologai_keygen_pqc/2  - key generation.
+    prologai_encrypt/5, prologai_decrypt/5                            - generic dispatch.
+    prologai_encrypt_rsa/4, prologai_decrypt_rsa/4                    - RSA convenience.
+    prologai_encrypt_ecdh/4, prologai_decrypt_ecdh/5                  - ECDH convenience.
+    prologai_encrypt_pqc/4, prologai_decrypt_pqc/4                    - PQC convenience.
+    prologai_crypto_available/1                                  - availability probe.
 
 
 WHAT COMES NEXT
@@ -3857,7 +3857,7 @@ A PrologAI pack API should follow these conventions.
 
 Convention 1: All exported predicates use the pack prefix.
 
-If the pack is named lattice_crypto, predicates are named pai_encrypt/5, pai_decrypt/5, pai_keygen_rsa/3. They begin with pai_ (PrologAI interface) or lc_ (lattice crypto, internal helpers). Never use names that look like SWI-Prolog built-ins.
+If the pack is named lattice_crypto, predicates are named prologai_encrypt/5, prologai_decrypt/5, prologai_keygen_rsa/3. They begin with prologai_ (PrologAI interface) or lc_ (lattice crypto, internal helpers). Never use names that look like SWI-Prolog built-ins.
 
 Convention 2: Deterministic predicates succeed exactly once.
 
@@ -4057,26 +4057,26 @@ Integration tests load multiple modules and test their interactions.
 
 A Level 2 test for a pack that stores encrypted values in the Lattice:
 
-    :- begin_tests(lattice_crypto_integration).
+    :- begin_tests(lattice_cryptography_integration).
 
     test(encrypt_store_retrieve) :-
         % Load crypto pack.
-        use_module(library(lattice_crypto)),
+        use_module(library(lattice_cryptography)),
         % Load node_facts pack.
         use_module(library(node_facts)),
         % Generate an ECDH key pair.
-        pai_keygen_ecdh(prime256v1, Priv, Pub),
+        prologai_keygen_ecdh(prime256v1, Priv, Pub),
         % Encrypt a value.
-        pai_encrypt_ecdh(Pub, 'secret', Bundle, Tag),
+        prologai_encrypt_ecdh(Pub, 'secret', Bundle, Tag),
         % Store in the Lattice.
         anchor_node(private_test, test_key, Bundle-Tag, [test]),
         % Retrieve from the Lattice.
         traverse_nexus('APEX_MIND', node_fact(_, private_test, Bundle2-Tag2, _), 1, [_]),
         % Decrypt and verify.
-        pai_decrypt_ecdh(Priv, Bundle2, Tag2, Plain, prime256v1),
+        prologai_decrypt_ecdh(Priv, Bundle2, Tag2, Plain, prime256v1),
         Plain = 'secret'.
 
-    :- end_tests(lattice_crypto_integration).
+    :- end_tests(lattice_cryptography_integration).
 
 Integration tests should cover:
 • Every interaction between this pack and every pack it depends on.
@@ -4088,23 +4088,23 @@ LEVEL 3: SYSTEM TESTS
 
 System tests load the full Mentova boot sequence and test the pack in a real running mind.
 
-    :- begin_tests(lattice_crypto_system).
+    :- begin_tests(lattice_cryptography_system).
 
     test(crypto_after_boot) :-
         % Boot the Mentova mind.
         mentova_boot,
         % Verify RSA is available.
-        pai_crypto_available(pai_algo_rsa),
+        prologai_crypto_available(lattice_cryptography_algo_rsa),
         % Verify ECDH is available.
-        pai_crypto_available(pai_algo_ecdh),
+        prologai_crypto_available(lattice_cryptography_algo_ecdh),
         % Full round-trip through the system.
-        pai_keygen_ecdh(prime256v1, Priv, Pub),
-        pai_encrypt_ecdh(Pub, 'system_test', Bundle, Tag),
-        pai_decrypt_ecdh(Priv, Bundle, Tag, Plain, prime256v1),
+        prologai_keygen_ecdh(prime256v1, Priv, Pub),
+        prologai_encrypt_ecdh(Pub, 'system_test', Bundle, Tag),
+        prologai_decrypt_ecdh(Priv, Bundle, Tag, Plain, prime256v1),
         atom_string('system_test', PlainStr),
         atom_string(Plain, PlainStr).
 
-    :- end_tests(lattice_crypto_system).
+    :- end_tests(lattice_cryptography_system).
 
 System tests are slower (full boot takes several seconds) but provide the highest confidence that the pack works in production conditions.
 
@@ -4119,7 +4119,7 @@ Example file: tests/pr49/test_pr49.pl
 
     % PrologAI - Acceptance Tests for PR 49: Cryptographic Privacy Layer
     :- use_module(library(plunit)).
-    :- use_module('/home/ccaitwo/PrologAI/packs/lattice_crypto/prolog/lattice_crypto').
+    :- use_module('/home/ccaitwo/PrologAI/packs/lattice_cryptography/prolog/lattice_cryptography').
     :- use_module(library(crypto)).
 
     :- begin_tests(pr49).
@@ -4137,11 +4137,11 @@ Example file: tests/pr49/test_pr49.pl
 
     % AC-PR49-002: RSA hybrid round-trip succeeds.
     test('AC-PR49-002') :-
-        pai_keygen_rsa(2048, PrivFile, PubFile),
-        pai_pem_load_private(PrivFile, PrivKey),
-        pai_pem_load_public(PubFile, PubKey),
-        pai_encrypt_rsa(PubKey, 'bank_password', Bundle, Tag),
-        pai_decrypt_rsa(PrivKey, Bundle, Tag, Plain),
+        prologai_keygen_rsa(2048, PrivFile, PubFile),
+        prologai_pem_load_private(PrivFile, PrivKey),
+        prologai_pem_load_public(PubFile, PubKey),
+        prologai_encrypt_rsa(PubKey, 'bank_password', Bundle, Tag),
+        prologai_decrypt_rsa(PrivKey, Bundle, Tag, Plain),
         atom_string('bank_password', PlainStr),
         atom_string(Plain, PlainStr),
         catch(delete_file(PrivFile), _, true),
@@ -4784,8 +4784,8 @@ The parent (Mentova) remains unchanged. The fork (Mentova_Medical) has additiona
 
 Forks are created using PR 40 (spinoff):
 
-    ?- use_module(library(spinoff), [pai_spinoff_create/3]).
-    ?- pai_spinoff_create(mentova, mentova_medical, SpinoffId).
+    ?- use_module(library(spinoff), [prologai_spinoff_create/3]).
+    ?- prologai_spinoff_create(mentova, mentova_medical, SpinoffId).
 
 The SpinoffId identifies the new mind's nexus and actor network.
 
@@ -4808,7 +4808,7 @@ Growth path item 3 (multi-agent collaboration) will require:
 
 EXERCISES FOR CHAPTER 21
 
-1. Write a boot check predicate check_mind_health/0 that verifies all of the following after mentova_boot: the constitution has 8 principles, the APEX_MIND nexus exists, assess_piaget(mentova, 1, milestone_achieved) succeeds (after adding one percept_signal), and pai_crypto_available(pai_algo_ecdh) succeeds.
+1. Write a boot check predicate check_mind_health/0 that verifies all of the following after mentova_boot: the constitution has 8 principles, the APEX_MIND nexus exists, assess_piaget(mentova, 1, milestone_achieved) succeeds (after adding one percept_signal), and prologai_crypto_available(lattice_cryptography_algo_ecdh) succeeds.
 
 2. Design the Lattice schema for the multi-agent collaboration growth path item: what node_fact types would be created during a two-agent collaborative task? Define at least five relation types with their payload structures.
 
@@ -5158,7 +5158,7 @@ A health check predicate should be called periodically (every 60 seconds) by a m
         % Verify at least one constitutional principle exists.
         constitutional_principle(_, _),
         % Verify the crypto pack is available.
-        pai_crypto_available(pai_algo_ecdh),
+        prologai_crypto_available(lattice_cryptography_algo_ecdh),
         % Log a health check event.
         anchor_node(health_check, [status(ok)], [monitoring], _),
         format("Health check: OK~n").
@@ -5284,8 +5284,8 @@ The 14 tools exposed by PrologAI MCP:
     workspace_cycle      - run N workspace cycles.
     attention_report     - get the attention schema report.
     constitutional_check - check an action through the gate.
-    sona_absorb          - store a trajectory in episodic memory.
-    sona_retrieve        - retrieve trajectories from episodic memory.
+    synaptic_ontological_neural_aggregator_absorb          - store a trajectory in episodic memory.
+    synaptic_ontological_neural_aggregator_retrieve        - retrieve trajectories from episodic memory.
     crypto_encrypt       - encrypt a value (ECDH by default).
     crypto_decrypt       - decrypt a bundle.
     mind_health          - run a health check.
@@ -5298,7 +5298,7 @@ The API key is stored in the Lattice (encrypted, using the crypto pack) and vali
 
 Starting the MCP gateway:
 
-    ?- pai_mcp_start(7474).
+    ?- prologai_mcp_start(7474).
 
 Testing the gateway (from the terminal):
 
@@ -5317,7 +5317,7 @@ Error handling: the MCP gateway wraps every tool call in catch/3. If the tool th
 
 Tool registration: to add a new tool to the MCP gateway, call:
 
-    pai_mcp_register_tool(+ToolName, +Description, +InputSchema, +Handler)
+    prologai_mcp_register_tool(+ToolName, +Description, +InputSchema, +Handler)
 
 Handler is a Prolog predicate of arity 2: Handler(+Input, -Output).
 
@@ -5353,13 +5353,13 @@ The agent card describes:
 
 Durable peer mail: if an agent is offline when a task is submitted, the message is stored in a peer mail queue. When the agent comes online, it retrieves pending messages:
 
-    ?- pai_a2a_check_peer_mail(IncomingTasks).
+    ?- prologai_a2a_check_peer_mail(IncomingTasks).
 
 The peer mail queue is stored in the Lattice as communication_record node_facts. This makes it durable: even if Mentova restarts, the queued tasks survive.
 
 Starting the A2A server:
 
-    ?- pai_a2a_start(7475).
+    ?- prologai_a2a_start(7475).
 
 Testing from the command line:
 
@@ -5408,7 +5408,7 @@ The PrologAI ACP gateway wraps mentova_query/3 as a run. Any query type supporte
 
 Starting the ACP gateway:
 
-    ?- pai_acp_start(7476).
+    ?- agent_communication_protocol_start(7476).
 
 
 ANP DEEP DIVE (PR 48)
@@ -5432,12 +5432,12 @@ Every ANP message is signed with HMAC-SHA256 (Hash-based Message Authentication 
 
 Getting Mentova's DID:
 
-    ?- pai_anp_did(DID).
+    ?- prologai_anp_did(DID).
     DID = 'did:web:localhost'.
 
 Meta-protocol negotiation: when two agents meet, they negotiate which protocol to use:
 
-    ?- pai_anp_negotiate(peer_endpoint, Protocols).
+    ?- prologai_anp_negotiate(peer_endpoint, Protocols).
     Protocols = [mcp, a2a, acp, anp].
 
 The negotiation result is the intersection of the protocols both agents support. The agents then use the highest-capability shared protocol.
@@ -5456,10 +5456,10 @@ In a production Mentova deployment, all four protocol gateways run simultaneousl
 
 Starting all four:
 
-    ?- pai_mcp_start(7474),
-       pai_a2a_start(7475),
-       pai_acp_start(7476),
-       pai_anp_start(443).
+    ?- prologai_mcp_start(7474),
+       prologai_a2a_start(7475),
+       agent_communication_protocol_start(7476),
+       prologai_anp_start(443).
 
 External clients choose the protocol based on their own capabilities:
 • Language model clients use MCP.
@@ -5587,7 +5587,7 @@ Key concepts to master:
 • Module declaration. :- module(name, [exported/arity]).
 • ERC commenting rule. One comment above every line of code. No exceptions.
 • SPARC documentation rule. All five volumes updated. Version incremented.
-• API design conventions. Pack prefix (pai_ or pack_). Availability probes. Structured error terms.
+• API design conventions. Pack prefix (prologai_ or pack_). Availability probes. Structured error terms.
 • Feature branch workflow. feature/prNN-name. PR. Immediate merge.
 • SemVer versioning. MAJOR.MINOR.PATCH. When each increments.
 • Initialization. :- initialization(goal, now). Not top-level goals.
@@ -5678,12 +5678,12 @@ Key concepts to master:
 • Actor model. create_actor/3. send_message/2. handle_message/3. Asynchronous.
 • Sentinels. register_sentinel/2. Fires on anchor_node. Implements reflex arc.
 • Pubsub. subscribe/2. publish/2. Workspace cycle uses pubsub for broadcast.
-• SONA. sona_absorb/1. sona_retrieve/3. Trajectories. Sparse encoding.
+• SONA. synaptic_ontological_neural_aggregator_absorb/1. synaptic_ontological_neural_aggregator_retrieve/3. Trajectories. Sparse encoding.
 • Workspace cycle. Salience = novelty*0.4 + goal_relevance*0.3 + affect*0.2 - habituation.
 • Attention schema (PR 42). Graziano's theory. Tracks, predicts, and models attention.
 • Assessment framework. Piagetian 8 levels. Bayley. CHC. Consciousness indicators.
 • Growth path. Six items. Piagetian 8/8 and ARC-AGI-1 complete.
-• Fork and specialize. pai_spinoff_create/3. Independent nexus and actor network.
+• Fork and specialize. prologai_spinoff_create/3. Independent nexus and actor network.
 
 Practice Questions - Domain 4:
 
@@ -5695,13 +5695,13 @@ Q16. What is the salience formula for the workspace cycle?
 
 Answer: salience = novelty * 0.4 + goal_relevance * 0.3 + affect * 0.2 - habituation. Content with high novelty, high goal relevance, and strong affective weight rises to the top of the workspace broadcast. Habituation reduces salience for content that has been broadcast many times before.
 
-Q17. What does sona_absorb/1 do, and how is it different from anchor_node/4?
+Q17. What does synaptic_ontological_neural_aggregator_absorb/1 do, and how is it different from anchor_node/4?
 
-Answer: sona_absorb/1 stores an experience (a trajectory - a sequence of events) in episodic memory. anchor_node/4 stores a single structured fact in the Lattice. SONA (episodic memory) records "I witnessed this sequence of events." The Lattice records "this specific fact is known." SONA uses sparse encoding (only significant events) and online learning (continuous updates). The Lattice stores every anchored fact in full.
+Answer: synaptic_ontological_neural_aggregator_absorb/1 stores an experience (a trajectory - a sequence of events) in episodic memory. anchor_node/4 stores a single structured fact in the Lattice. SONA (episodic memory) records "I witnessed this sequence of events." The Lattice records "this specific fact is known." SONA uses sparse encoding (only significant events) and online learning (continuous updates). The Lattice stores every anchored fact in full.
 
 Q18. After running mentova_query(workspace, run_cycle(1), R), what happens in the Lattice?
 
-Answer: The workspace cycle (1) collects content from the Lattice and actor network, (2) selects the highest-salience content, (3) broadcasts it on the workspace_broadcast channel (pubsub), (4) all subscribers process the broadcast (assessment, attention schema, SONA each receive it), (5) SONA absorbs the broadcast as an episodic memory (sona_absorb), (6) the attention schema updates its model of what was attended to. The Lattice receives new node_facts from subscribers and from SONA.
+Answer: The workspace cycle (1) collects content from the Lattice and actor network, (2) selects the highest-salience content, (3) broadcasts it on the workspace_broadcast channel (pubsub), (4) all subscribers process the broadcast (assessment, attention schema, SONA each receive it), (5) SONA absorbs the broadcast as an episodic memory (synaptic_ontological_neural_aggregator_absorb), (6) the attention schema updates its model of what was attended to. The Lattice receives new node_facts from subscribers and from SONA.
 
 
 DOMAIN 5: SAFETY AND THE CONSTITUTIONAL LAYER
@@ -5742,9 +5742,9 @@ DOMAIN 6: INTEROPERABILITY
 
 Key concepts to master:
 
-• MCP (PR 14). JSON-RPC 2.0. 14 exposed tools. API key authentication. pai_mcp_start/1.
+• MCP (PR 14). JSON-RPC 2.0. 14 exposed tools. API key authentication. prologai_mcp_start/1.
 • A2A (PR 43). Task lifecycle: submitted -> working -> input_required -> completed. Agent cards. Durable peer mail.
-• ACP (PR 47). Run lifecycle: created -> running -> completed. IBM BeeAI compatible. pai_acp_start/1.
+• ACP (PR 47). Run lifecycle: created -> running -> completed. IBM BeeAI compatible. agent_communication_protocol_start/1.
 • ANP (PR 48). DIDs (Decentralized Identifiers). did:web method. HMAC-SHA256 signing. Meta-protocol negotiation.
 • Multi-protocol deployment. Four ports: 7474, 7475, 7476, 443.
 • Protocol selection. MCP for LLM clients. A2A for agent delegation. ACP for batch. ANP for identity.
@@ -5769,11 +5769,11 @@ DOMAIN 7: SECURITY AND CRYPTOGRAPHY
 Key concepts to master:
 
 • Hybrid encryption. Asymmetric key wraps symmetric session key. AES-256-GCM encrypts payload.
-• RSA-OAEP. pai_keygen_rsa/3. pai_encrypt_rsa/4. pai_decrypt_rsa/4. PEM files.
-• ECDH. pai_keygen_ecdh/3. prime256v1 curve. Ephemeral key pairs. Forward secrecy.
-• PQC / ML-KEM-768. NIST FIPS 203. Requires OQS Provider. pai_crypto_available check.
+• RSA-OAEP. prologai_keygen_rsa/3. prologai_encrypt_rsa/4. prologai_decrypt_rsa/4. PEM files.
+• ECDH. prologai_keygen_ecdh/3. prime256v1 curve. Ephemeral key pairs. Forward secrecy.
+• PQC / ML-KEM-768. NIST FIPS 203. Requires OQS Provider. prologai_crypto_available check.
 • AES-256-GCM. Authentication tag. Tamper detection. Encoding(utf8) returns string.
-• pai_crypto_available/1. Runtime probe. Never assume an algorithm is present.
+• prologai_crypto_available/1. Runtime probe. Never assume an algorithm is present.
 • Threat model. Lattice inspection by overseers. Harvest-now-decrypt-later (quantum threat).
 • Forward secrecy. New ephemeral key per encryption. Past sessions safe even if long-term key compromised.
 • Algorithm selection guide. RSA for legacy. ECDH as recommended default. PQC for long-lived secrets.
@@ -5784,7 +5784,7 @@ Q26. What is forward secrecy and why does ECDH provide it but RSA (as typically 
 
 Answer: Forward secrecy means that compromising a long-term key does not allow an attacker to decrypt past sessions. ECDH provides forward secrecy because a new ephemeral key pair is generated for every single encryption operation. Even if an attacker obtains the recipient's long-term private scalar, they cannot compute the ephemeral shared secret because the ephemeral private key was discarded after the encryption. RSA as typically used (with the same key pair for all encryptions) does not provide forward secrecy: if the RSA private key is compromised, all previously captured ciphertexts can be decrypted.
 
-Q27. What happens when pai_decrypt_ecdh/5 is called with a Tag that has been modified?
+Q27. What happens when prologai_decrypt_ecdh/5 is called with a Tag that has been modified?
 
 Answer: AES-256-GCM uses the authentication tag to verify that the ciphertext has not been tampered with. If the tag does not match, decryption fails and throws an SSL error. The predicate does not silently return wrong data. This is the tamper-detection property of authenticated encryption.
 
@@ -5796,7 +5796,7 @@ Q29. Write a predicate encrypt_and_store(+Key, +Plaintext, +NodeType, -Id) that 
 
 Answer:
     encrypt_and_store(RecipPub, Plaintext, NodeType, Id) :-
-        pai_encrypt_ecdh(RecipPub, Plaintext, Bundle, Tag),
+        prologai_encrypt_ecdh(RecipPub, Plaintext, Bundle, Tag),
         anchor_node(NodeType, Bundle-Tag, [private], Id).
 
 
@@ -5948,7 +5948,7 @@ Domain 6:
 • Name the four protocols, their PR numbers, and their default ports.
 • Describe the A2A task lifecycle states.
 • Explain how ANP protects against impersonation.
-• Write a pai_mcp_register_tool call for a new tool.
+• Write a prologai_mcp_register_tool call for a new tool.
 
 Domain 7:
 • Explain hybrid encryption: asymmetric wraps symmetric, step by step.

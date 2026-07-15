@@ -23,22 +23,22 @@
         (Monte-Carlo, governed by the PR-21 budget term).
 
         Fact probabilities:
-            pai_prob_fact(Fact, P) declares Fact with probability P.
-            pai_bayes values (frequency × confidence) are the default source.
+            probabilistic_fact(Fact, P) declares Fact with probability P.
+            probabilistic_bayes values (frequency × confidence) are the default source.
 
     Predicates:
-        pai_prob_fact/2    — +Fact, +Prob      (declare probabilistic fact)
-        pai_prob_query/3   — +Query, +Budget, -result(Prob, Explanations)
+        probabilistic_fact/2    — +Fact, +Prob      (declare probabilistic fact)
+        probabilistic_query/3   — +Query, +Budget, -result(Prob, Explanations)
 */
 
 % Declare this file as the 'probabilistic' module and list its exported predicates.
 :- module(probabilistic, [
-    % Supply 'pai_prob_fact/2' as the next argument to the expression above.
-    pai_prob_fact/2,
-    % Supply 'pai_prob_rule/2' as the next argument to the expression above.
-    pai_prob_rule/2,
-    % Supply 'pai_prob_query/3' as the next argument to the expression above.
-    pai_prob_query/3
+    % Supply 'probabilistic_fact/2' as the next argument to the expression above.
+    probabilistic_fact/2,
+    % Supply 'probabilistic_rule/2' as the next argument to the expression above.
+    probabilistic_rule/2,
+    % Supply 'probabilistic_query/3' as the next argument to the expression above.
+    probabilistic_query/3
 % Close the expression opened above.
 ]).
 
@@ -53,11 +53,11 @@
 :- dynamic prob_rule/2.   % Head, Body
 
 % ---------------------------------------------------------------------------
-% pai_prob_fact/2 — declare or update a probabilistic fact
+% probabilistic_fact/2 — declare or update a probabilistic fact
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai prob fact': succeed when the following conditions hold.
-pai_prob_fact(Fact, Prob) :-
+probabilistic_fact(Fact, Prob) :-
     % Check that 'number(Prob), Prob' is greater than or equal to '0.0, Prob =< 1.0'.
     number(Prob), Prob >= 0.0, Prob =< 1.0,
     % Remove all matching facts from the runtime knowledge base.
@@ -66,16 +66,16 @@ pai_prob_fact(Fact, Prob) :-
     assertz(prob_fact(Fact, Prob)).
 
 % ---------------------------------------------------------------------------
-% pai_prob_rule/2 — declare a deterministic rule for use inside worlds
+% probabilistic_rule/2 — declare a deterministic rule for use inside worlds
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai prob rule': succeed when the following conditions hold.
-pai_prob_rule(Head, Body) :-
+probabilistic_rule(Head, Body) :-
     % Add a new fact or rule to the runtime knowledge base.
     assertz(prob_rule(Head, Body)).
 
 % ---------------------------------------------------------------------------
-% pai_prob_query/3
+% probabilistic_query/3
 %
 %   Budget = budget(MaxIter) governs sampling fallback.
 %   If the explanation count is small (≤ MaxIter), use exact weighted model
@@ -86,7 +86,7 @@ pai_prob_rule(Head, Body) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai prob query': succeed when the following conditions hold.
-pai_prob_query(Query, Budget, result(TotalProb, Explanations)) :-
+probabilistic_query(Query, Budget, result(TotalProb, Explanations)) :-
     % Check that 'Budget' is unifiable with 'budget(MaxIter)'.
     Budget = budget(MaxIter),
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).

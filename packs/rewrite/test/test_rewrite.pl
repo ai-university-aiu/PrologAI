@@ -148,17 +148,17 @@ test(stamp_partial_oob) :-
 
 :- begin_tests(rewrite_rw_diff_apply).
 
-test(diff_two_cells) :-
+test(difference_two_cells) :-
     % Apply r(0,0)->9 and r(1,1)->8 to a 2x2 grid of 1s.
     rewrite_diff_apply([[1,1],[1,1]], [r(0,0)-9, r(1,1)-8], G2),
     G2 = [[9,1],[1,8]].
 
-test(diff_empty) :-
+test(difference_empty) :-
     % Empty diff: grid unchanged.
     rewrite_diff_apply([[1,2],[3,4]], [], G2),
     G2 = [[1,2],[3,4]].
 
-test(diff_oob_ignored) :-
+test(difference_oob_ignored) :-
     % Out-of-bounds r(5,5) in diff: silently ignored.
     rewrite_diff_apply([[1,0]], [r(5,5)-9], G2),
     G2 = [[1,0]].

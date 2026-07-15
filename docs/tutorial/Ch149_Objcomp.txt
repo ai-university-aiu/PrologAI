@@ -11,99 +11,99 @@ adjacent columns, or same column with adjacent rows) to any cell of the second.
 
 149.2 The Touching Relation
 
-objcomp_touches(+Obj1, +Obj2): true when any cell of Obj1 is 4-adjacent to any
+object_component_touches(+Obj1, +Obj2): true when any cell of Obj1 is 4-adjacent to any
 cell of Obj2. Cuts after finding the first adjacent cell pair.
 
-    ?- objcomp_touches(obj(a,[r(0,0)]), obj(b,[r(0,1)])).
+    ?- object_component_touches(obj(a,[r(0,0)]), obj(b,[r(0,1)])).
     true.
 
-    ?- objcomp_touches(obj(a,[r(0,0)]), obj(b,[r(0,3)])).
+    ?- object_component_touches(obj(a,[r(0,0)]), obj(b,[r(0,3)])).
     false.
 
 149.3 Pair and Adjacency Queries
 
-objcomp_touching_pairs(+Objs, -Pairs): list of O1-O2 pairs where both objects are
+object_component_touching_pairs(+Objs, -Pairs): list of O1-O2 pairs where both objects are
 in Objs and they touch. Each unordered pair appears once.
 
     ?- Objs = [obj(a,[r(0,0)]), obj(b,[r(0,1)]), obj(c,[r(2,2)])],
-       objcomp_touching_pairs(Objs, Pairs).
+       object_component_touching_pairs(Objs, Pairs).
     Pairs = [obj(a,...)-obj(b,...)].  % only a-b touch
 
-objcomp_adj_list(+Objs, -AdjList): Obj-[Neighbors] pairs for every object.
+object_component_adj_list(+Objs, -AdjList): Obj-[Neighbors] pairs for every object.
 
-objcomp_degree(+Obj, +Objs, -N): count of touching neighbors.
+object_component_degree(+Obj, +Objs, -N): count of touching neighbors.
 
-    ?- objcomp_degree(obj(a,[r(0,0)]), [obj(a,[r(0,0)]),obj(b,[r(0,1)]),obj(c,[r(2,2)])], D).
+    ?- object_component_degree(obj(a,[r(0,0)]), [obj(a,[r(0,0)]),obj(b,[r(0,1)]),obj(c,[r(2,2)])], D).
     D = 1.  % a touches only b
 
 149.4 Isolation
 
-objcomp_isolated(+Objs, -Isolated): objects that do not touch any other in Objs.
+object_component_isolated(+Objs, -Isolated): objects that do not touch any other in Objs.
 
-    ?- objcomp_isolated([obj(a,[r(0,0)]),obj(b,[r(0,1)]),obj(c,[r(5,5)])], I).
+    ?- object_component_isolated([obj(a,[r(0,0)]),obj(b,[r(0,1)]),obj(c,[r(5,5)])], I).
     I = [obj(c,[r(5,5)])].
 
 149.5 Connected Components
 
-objcomp_connected(+Obj, +Objs, -Component): all objects reachable from Obj through
+object_component_connected(+Obj, +Objs, -Component): all objects reachable from Obj through
 the touching relation, including Obj itself. Uses BFS.
 
     % A-B touch, B-F touch, F-C touch. D touches A. E is isolated.
-    % objcomp_connected(A, [A,B,C,D,E,F], Comp) returns [A,B,C,D,F].
+    % object_component_connected(A, [A,B,C,D,E,F], Comp) returns [A,B,C,D,F].
 
-objcomp_components(+Objs, -Components): all touching-connected components. Each
+object_component_components(+Objs, -Components): all touching-connected components. Each
 component is a sorted list. Useful when you need to know how objects cluster.
 
-objcomp_num_components(+Objs, -N): number of components.
+object_component_num_components(+Objs, -N): number of components.
 
-    ?- objcomp_num_components([obj(a,[r(0,0)]),obj(b,[r(0,1)]),obj(c,[r(5,5)])], N).
+    ?- object_component_num_components([obj(a,[r(0,0)]),obj(b,[r(0,1)]),obj(c,[r(5,5)])], N).
     N = 2.  % {a,b} and {c}
 
 149.6 Component Selection
 
-objcomp_largest_component(+Objs, -Component): the component with the most objects.
+object_component_largest_component(+Objs, -Component): the component with the most objects.
 
-objcomp_smallest_component(+Objs, -Component): the component with the fewest objects.
+object_component_smallest_component(+Objs, -Component): the component with the fewest objects.
 
-objcomp_singleton_components(+Objs, -Singles): components of size exactly 1.
+object_component_singleton_components(+Objs, -Singles): components of size exactly 1.
 
-objcomp_shared_components(+Objs, -Groups): components of size 2 or more.
+object_component_shared_components(+Objs, -Groups): components of size 2 or more.
 
 149.7 Degree Aggregates
 
-objcomp_max_degree(+Objs, -MaxDeg): maximum touch degree across all objects.
+object_component_max_degree(+Objs, -MaxDeg): maximum touch degree across all objects.
 
-objcomp_sort_by_degree(+Objs, -Sorted): objects sorted ascending by degree.
+object_component_sort_by_degree(+Objs, -Sorted): objects sorted ascending by degree.
 Objects with degree 0 (isolated) come first.
 
-    ?- objcomp_sort_by_degree(Objs, [First|_]),
-       objcomp_degree(First, Objs, D).
+    ?- object_component_sort_by_degree(Objs, [First|_]),
+       object_component_degree(First, Objs, D).
     D = 0.  % isolated objects come first
 
 149.8 Predicate Reference
 
 Touching:
-  objcomp_touches(+Obj1, +Obj2)
+  object_component_touches(+Obj1, +Obj2)
 
 Pairs and adjacency:
-  objcomp_touching_pairs(+Objs, -Pairs)
-  objcomp_adj_list(+Objs, -AdjList)
-  objcomp_degree(+Obj, +Objs, -N)
+  object_component_touching_pairs(+Objs, -Pairs)
+  object_component_adj_list(+Objs, -AdjList)
+  object_component_degree(+Obj, +Objs, -N)
 
 Isolation:
-  objcomp_isolated(+Objs, -Isolated)
+  object_component_isolated(+Objs, -Isolated)
 
 Connected components:
-  objcomp_connected(+Obj, +Objs, -Component)
-  objcomp_components(+Objs, -Components)
-  objcomp_num_components(+Objs, -N)
+  object_component_connected(+Obj, +Objs, -Component)
+  object_component_components(+Objs, -Components)
+  object_component_num_components(+Objs, -N)
 
 Component selection:
-  objcomp_largest_component(+Objs, -Component)
-  objcomp_smallest_component(+Objs, -Component)
-  objcomp_singleton_components(+Objs, -Singles)
-  objcomp_shared_components(+Objs, -Groups)
+  object_component_largest_component(+Objs, -Component)
+  object_component_smallest_component(+Objs, -Component)
+  object_component_singleton_components(+Objs, -Singles)
+  object_component_shared_components(+Objs, -Groups)
 
 Degree aggregates:
-  objcomp_max_degree(+Objs, -MaxDeg)
-  objcomp_sort_by_degree(+Objs, -Sorted)
+  object_component_max_degree(+Objs, -MaxDeg)
+  object_component_sort_by_degree(+Objs, -Sorted)

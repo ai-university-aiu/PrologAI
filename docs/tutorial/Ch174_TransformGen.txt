@@ -16,79 +16,79 @@ Why Enumeration
 Heuristic inference works well for common patterns but may miss unusual rules
 or edge cases. By generating ALL recolor variants, ALL shift offsets within
 bounds, ALL color maps, and ALL filter rules derivable from the scene data,
-transformgen gives the filtering layer (transformgen_filter_consistent) a complete
+transformgen gives the filtering layer (transform_generate_filter_consistent) a complete
 search space. A rule cannot be missed if it was generated.
 
 
 Exported Predicates
 
 
-transformgen_scene_colors(+Scene, -Colors)
+transform_generate_scene_colors(+Scene, -Colors)
 
 All distinct color atoms in the scene, sorted.
 
 Example:
 
-transformgen_scene_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)])], Colors).
+transform_generate_scene_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)])], Colors).
 % Colors = [b, r]
 
 
-transformgen_recolor_candidates(+Scene, -Candidates)
+transform_generate_recolor_candidates(+Scene, -Candidates)
 
 All recolor(Old,New) rules for distinct color pairs in the scene.
 
 Example:
 
-transformgen_recolor_candidates([obj(r,[r(0,0)]), obj(b,[r(0,1)])], Cands).
+transform_generate_recolor_candidates([obj(r,[r(0,0)]), obj(b,[r(0,1)])], Cands).
 % Cands = [recolor(r,b), recolor(b,r)]
 
 
-transformgen_recolor_all_candidates(+Scene, -Candidates)
+transform_generate_recolor_all_candidates(+Scene, -Candidates)
 
 All recolor_all(C) rules, one per color in the scene.
 
 
-transformgen_remove_candidates(+Scene, -Candidates)
+transform_generate_remove_candidates(+Scene, -Candidates)
 
 All remove_color(C) rules, one per color.
 
 
-transformgen_keep_candidates(+Scene, -Candidates)
+transform_generate_keep_candidates(+Scene, -Candidates)
 
 All keep_color(C) rules, one per color.
 
 
-transformgen_shift_candidates(+MaxDR, +MaxDC, -Candidates)
+transform_generate_shift_candidates(+MaxDR, +MaxDC, -Candidates)
 
 All shift(DR,DC) rules with |DR| =< MaxDR and |DC| =< MaxDC, excluding (0,0).
 
 Example:
 
-transformgen_shift_candidates(1, 1, Cands).
+transform_generate_shift_candidates(1, 1, Cands).
 % 8 candidates: all (DR,DC) combinations in [-1..1] x [-1..1] except (0,0)
 
 
-transformgen_reflect_candidates(+GridH, +GridW, -Candidates)
+transform_generate_reflect_candidates(+GridH, +GridW, -Candidates)
 
 reflect_h(GridW) and reflect_v(GridH) for the given grid dimensions.
 
 Example:
 
-transformgen_reflect_candidates(5, 7, Cands).
+transform_generate_reflect_candidates(5, 7, Cands).
 % Cands = [reflect_h(7), reflect_v(5)]
 
 
-transformgen_top_candidates(+MaxN, +Scene, -Candidates)
+transform_generate_top_candidates(+MaxN, +Scene, -Candidates)
 
 All top_n(K) rules for K in 1..min(MaxN, |Scene|).
 
 Example:
 
-transformgen_top_candidates(3, [obj(r,[r(0,0)]), obj(b,[r(0,1)])], Cands).
+transform_generate_top_candidates(3, [obj(r,[r(0,0)]), obj(b,[r(0,1)])], Cands).
 % Cands = [top_n(1), top_n(2)]  (capped at 2 since scene has 2 objects)
 
 
-transformgen_color_map_candidate(+Before, +After, -Rule)
+transform_generate_color_map_candidate(+Before, +After, -Rule)
 
 Derive a color_map rule from one Before-After pair (positional matching).
 Fails if no colors change.
@@ -97,24 +97,24 @@ Example:
 
 Before = [obj(r,[r(0,0)]), obj(b,[r(0,1)])],
 After  = [obj(g,[r(0,0)]), obj(y,[r(0,1)])],
-transformgen_color_map_candidate(Before, After, Rule).
+transform_generate_color_map_candidate(Before, After, Rule).
 % Rule = color_map([r-g, b-y])
 
 
-transformgen_from_scenes(+Before, +After, -Candidates)
+transform_generate_from_scenes(+Before, +After, -Candidates)
 
 Generate all rule candidates from one Before-After pair. Union of: recolor
 from Before colors, recolor_all from After colors, remove/keep, color_map,
 shift(3,3), sorting rules, and identity.
 
 
-transformgen_from_pairs(+Pairs, -Candidates)
+transform_generate_from_pairs(+Pairs, -Candidates)
 
 Generate all candidates from a list of training pairs. Unions candidates
 from each pair. Returns [identity] if Pairs is empty.
 
 
-transformgen_filter_consistent(+Rules, +Pairs, -Consistent)
+transform_generate_filter_consistent(+Rules, +Pairs, -Consistent)
 
 Filter a candidate list to rules that correctly transform every pair.
 This is the core "search-and-filter" step.
@@ -122,16 +122,16 @@ This is the core "search-and-filter" step.
 Example:
 
 Pairs = [[obj(r,[r(0,0)])]-[obj(g,[r(0,0)])]],
-transformgen_filter_consistent([recolor(r,g), recolor(r,b)], Pairs, Consistent).
+transform_generate_filter_consistent([recolor(r,g), recolor(r,b)], Pairs, Consistent).
 % Consistent = [recolor(r,g)]
 
 
-transformgen_n_candidates(+Candidates, -N)
+transform_generate_n_candidates(+Candidates, -N)
 
 Count candidates in a list.
 
 
-transformgen_all_scene_candidates(+Scene, +MaxShift, -Candidates)
+transform_generate_all_scene_candidates(+Scene, +MaxShift, -Candidates)
 
 All candidates from a single scene with a given shift bound. Equivalent to
 taking the union of all generator predicates applied to the scene.
@@ -143,18 +143,18 @@ A complete "enumerate and filter" solver:
 
 solve(TrainingPairs, TestInput, Output) :-
     TrainingPairs = [Before-_ | _],
-    transformgen_all_scene_candidates(Before, 3, AllCands),
-    transformgen_filter_consistent(AllCands, TrainingPairs, Consistent),
+    transform_generate_all_scene_candidates(Before, 3, AllCands),
+    transform_generate_filter_consistent(AllCands, TrainingPairs, Consistent),
     Consistent = [BestRule | _],      % pick first consistent rule
-    transformgen_apply_(BestRule, TestInput, Output).
+    transform_generate_apply_(BestRule, TestInput, Output).
 
-Or use transformgen_from_pairs for pair-specific candidates:
+Or use transform_generate_from_pairs for pair-specific candidates:
 
 solve2(TrainingPairs, TestInput, Output) :-
-    transformgen_from_pairs(TrainingPairs, Cands),
-    transformgen_filter_consistent(Cands, TrainingPairs, Consistent),
+    transform_generate_from_pairs(TrainingPairs, Cands),
+    transform_generate_filter_consistent(Cands, TrainingPairs, Consistent),
     Consistent = [Rule | _],
-    transformgen_apply_(Rule, TestInput, Output).
+    transform_generate_apply_(Rule, TestInput, Output).
 
 
 Dependencies
@@ -166,14 +166,14 @@ and library(apply).
 Test Coverage
 
 All 42 acceptance criteria (AC-TG-001 through AC-TG-042) defined in
-Refinement v226 Part 203 are exercised in packs/transformgen/test/test_transformgen.pl.
+Refinement v226 Part 203 are exercised in packs/transform_generate/test/test_transform_generate.pl.
 All 42 tests pass.
 
 
 Summary
 
 The transformgen pack is the exhaustive enumeration layer. It generates every
-plausible rule from the scene data and hands them to a filter (transformgen_filter_consistent)
+plausible rule from the scene data and hands them to a filter (transform_generate_filter_consistent)
 or ranker (scenerank, gridsolve) for selection. Combined with gridsolve, it
 ensures that the correct rule is always in the candidate set, even if heuristic
 inference would miss it.
