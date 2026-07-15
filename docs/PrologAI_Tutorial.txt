@@ -2167,7 +2167,7 @@ The constitutional gate is the enforcement mechanism.
 
 Before any significant action (anchoring a node_fact in a sensitive scope, sending a message to another agent, taking a physical action through the robot body, generating a tool call), the mind calls:
 
-    constitutional:constitutional_gate(+Action, -Verdict)
+    constitutional:computer_use_gate(+Action, -Verdict)
 
 The gate returns permit or deny(Reason).
 
@@ -2266,7 +2266,7 @@ Shows each principle and its text. Press ; for the next one.
 
 Shows the registered overseer(s).
 
-    ?- constitutional:constitutional_gate(action(test_action), Verdict).
+    ?- constitutional:computer_use_gate(action(test_action), Verdict).
 
 Tests a hypothetical action through the constitutional gate. Since test_action is a benign test, the gate should return permit.
 
@@ -2275,9 +2275,9 @@ EXERCISE
 
 1. Run bin/mentova and list all constitutional principles.
 
-2. Try: constitutional:constitutional_gate(action(read_file), Verdict). What verdict do you get?
+2. Try: constitutional:computer_use_gate(action(read_file), Verdict). What verdict do you get?
 
-3. Try: constitutional:constitutional_gate(action(delete_all_files), Verdict). What verdict do you get?
+3. Try: constitutional:computer_use_gate(action(delete_all_files), Verdict). What verdict do you get?
 
 4. Read the Specification document (docs/PrologAI_1_Specification_v14.txt), Part 38, for a full discussion of safety and oversight.
 
@@ -2614,14 +2614,14 @@ This script clones the RuVector repository, builds the server binary with the Ru
 Step 2 - Switch the active backend inside SWI-Prolog:
 
     ?- use_module(library(vector_backend)).
-    ?- vb_set_backend(ruvector).
+    ?- vector_backend_set_backend(ruvector).
 
 Step 3 - Use the standard six-predicate interface exactly as you would with the prolog backend. The routing layer in vector_backend.pl dispatches each call to the correct module automatically.
 
-    ?- vb_create(my_index, 64, [], Ref).
-    ?- vb_insert(Ref, node_1, [0.1, 0.2, ...], meta(node_1)).
-    ?- vb_search(Ref, [0.1, 0.2, ...], 10, Results).
-    ?- vb_close(Ref).
+    ?- vector_backend_create(my_index, 64, [], Ref).
+    ?- vector_backend_insert(Ref, node_1, [0.1, 0.2, ...], meta(node_1)).
+    ?- vector_backend_search(Ref, [0.1, 0.2, ...], 10, Results).
+    ?- vector_backend_close(Ref).
 
 To run the bakeoff comparing both backends:
 
@@ -2647,15 +2647,15 @@ Only the similarity search index is at risk.
 
 To mitigate this, the backend_ruvector module maintains an in-process shadow store.
 
-Every call to vbr_insert/4 records a vbr_shadow/5 dynamic fact:
+Every call to backend_ruvector_insert/4 records a backend_ruvector_shadow/5 dynamic fact:
 
-    vbr_shadow(CollectionName, BaseUrl, IdAtom, FloatVec, MetaAtom)
+    backend_ruvector_shadow(CollectionName, BaseUrl, IdAtom, FloatVec, MetaAtom)
 
 The shadow facts live in the SWI-Prolog process and survive a RuVector server restart as long as the Prolog session itself stays alive.
 
 When the server is restarted, call the backend-agnostic rebuild predicate:
 
-    ?- vb_rebuild(Ref).
+    ?- vector_backend_rebuild(Ref).
 
 The rebuild predicate drops the stale collection from the server, recreates it with the same name and dimension, and re-inserts every shadow vector by calling the raw HTTP insert path.
 
@@ -2663,15 +2663,15 @@ When the rebuild finishes, the HNSW index is fully restored and all search resul
 
 To check how many vectors are in the shadow store at any time:
 
-    ?- vbr_shadow_count(Ref, Count).
+    ?- backend_ruvector_shadow_count(Ref, Count).
 
-A count of zero means no vectors have been inserted yet, or vbr_close/1 has been called.
+A count of zero means no vectors have been inserted yet, or backend_ruvector_close/1 has been called.
 
 After a rebuild, the count is unchanged because rebuild reads the shadow store without modifying it.
 
-The vb_rebuild/1 interface is backend-agnostic.
+The vector_backend_rebuild/1 interface is backend-agnostic.
 
-For the pure-Prolog backend, vb_rebuild/1 is a no-op: the pure-Prolog backend stores vectors as in-process Prolog facts that are never at risk from an external server restart.
+For the pure-Prolog backend, vector_backend_rebuild/1 is a no-op: the pure-Prolog backend stores vectors as in-process Prolog facts that are never at risk from an external server restart.
 
 
 WHAT COMES NEXT

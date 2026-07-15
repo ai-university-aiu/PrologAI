@@ -40,7 +40,7 @@ The constitutional gate is the enforcement mechanism.
 
 Before any significant action (anchoring a node_fact in a sensitive scope, sending a message to another agent, taking a physical action through the robot body, generating a tool call), the mind calls:
 
-    constitutional:constitutional_gate(+Action, -Verdict)
+    constitutional:computer_use_gate(+Action, -Verdict)
 
 The gate returns permit or deny(Reason).
 
@@ -139,7 +139,7 @@ Shows each principle and its text. Press ; for the next one.
 
 Shows the registered overseer(s).
 
-    ?- constitutional:constitutional_gate(action(test_action), Verdict).
+    ?- constitutional:computer_use_gate(action(test_action), Verdict).
 
 Tests a hypothetical action through the constitutional gate. Since test_action is a benign test, the gate should return permit.
 
@@ -148,9 +148,9 @@ EXERCISE
 
 1. Run bin/mentova and list all constitutional principles.
 
-2. Try: constitutional:constitutional_gate(action(read_file), Verdict). What verdict do you get?
+2. Try: constitutional:computer_use_gate(action(read_file), Verdict). What verdict do you get?
 
-3. Try: constitutional:constitutional_gate(action(delete_all_files), Verdict). What verdict do you get?
+3. Try: constitutional:computer_use_gate(action(delete_all_files), Verdict). What verdict do you get?
 
 4. Read the Specification document (docs/PrologAI_1_Specification_v14.txt), Part 38, for a full discussion of safety and oversight.
 

@@ -8,7 +8,7 @@
                           perception_signal    -> perceiver receptor channel
                           interoceptive_signal -> motivation actor channel
                           proprioceptive_signal-> regulation actor channel
-    dispatch_command/2 — send a command from the mind to an enrolled body;
+    mindbody_dispatch_command/2 — send a command from the mind to an enrolled body;
                          awaits a proprioceptive result or synthesises a
                          timeout result (every command resolves).
     body_vitals/2     — return current vital indicators for an enrolled body.
@@ -32,7 +32,7 @@
     % Continue the multi-line expression started above.
     relay_percept/2,       % +Address, +Signal
     % Continue the multi-line expression started above.
-    dispatch_command/2,    % +Address, +Command
+    mindbody_dispatch_command/2,    % +Address, +Command
     % Continue the multi-line expression started above.
     body_vitals/2,         % +Address, -Vitals
     % Continue the multi-line expression started above.
@@ -145,7 +145,7 @@ mindbody_channel(interoceptive_signal(_, _, _), 'channel://motivation').
 mindbody_channel(proprioceptive_signal(_, _, _, _), 'channel://regulation').
 
 % ---------------------------------------------------------------------------
-% dispatch_command/2
+% mindbody_dispatch_command/2
 %
 %   Send Command to Address.  The command is stored as a node_fact so it
 %   forms part of the body's action history.  A proprioceptive result is
@@ -162,7 +162,7 @@ mindbody_channel(proprioceptive_signal(_, _, _, _), 'channel://regulation').
 :- dynamic command_result/3.       % CommandId, Address, Result
 
 % Define a clause for 'dispatch command': succeed when the following conditions hold.
-dispatch_command(Address, Command) :-
+mindbody_dispatch_command(Address, Command) :-
     % Assign a unique command ID
     % State a fact for 'gensym' with the arguments listed below.
     gensym(cmd_, CommandId),

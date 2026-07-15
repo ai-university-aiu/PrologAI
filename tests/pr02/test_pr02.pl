@@ -45,54 +45,54 @@
 % --- Six-predicate interface ---
 
 % Define a clause for 'test': succeed when the following conditions hold.
-test(vb_create_and_close) :-
+test(vector_backend_create_and_close) :-
     % State a fact for 'vb create' with the arguments listed below.
-    vb_create(test_idx, 4, [], Ref),
+    vector_backend_create(test_idx, 4, [], Ref),
     % State the fact: vb close(Ref).
-    vb_close(Ref).
+    vector_backend_close(Ref).
 
 % Define a clause for 'test': succeed when the following conditions hold.
-test(vb_insert_and_search) :-
+test(vector_backend_insert_and_search) :-
     % State a fact for 'vb create' with the arguments listed below.
-    vb_create(test_search, 4, [], Ref),
+    vector_backend_create(test_search, 4, [], Ref),
     % State a fact for 'vb insert' with the arguments listed below.
-    vb_insert(Ref, id1, [1.0, 0.0, 0.0, 0.0], meta(a)),
+    vector_backend_insert(Ref, id1, [1.0, 0.0, 0.0, 0.0], meta(a)),
     % State a fact for 'vb insert' with the arguments listed below.
-    vb_insert(Ref, id2, [0.0, 1.0, 0.0, 0.0], meta(b)),
+    vector_backend_insert(Ref, id2, [0.0, 1.0, 0.0, 0.0], meta(b)),
     % State a fact for 'vb insert' with the arguments listed below.
-    vb_insert(Ref, id3, [0.0, 0.0, 1.0, 0.0], meta(c)),
+    vector_backend_insert(Ref, id3, [0.0, 0.0, 1.0, 0.0], meta(c)),
     % State a fact for 'vb search' with the arguments listed below.
-    vb_search(Ref, [1.0, 0.0, 0.0, 0.0], 2, Results),
+    vector_backend_search(Ref, [1.0, 0.0, 0.0, 0.0], 2, Results),
     % Check that 'Results' is unifiable with '[_Score1-id1 | _]'.
     Results = [_Score1-id1 | _],
     % State the fact: vb close(Ref).
-    vb_close(Ref).
+    vector_backend_close(Ref).
 
 % Define a clause for 'test': succeed when the following conditions hold.
-test(vb_delete) :-
+test(vector_backend_delete) :-
     % State a fact for 'vb create' with the arguments listed below.
-    vb_create(test_delete, 4, [], Ref),
+    vector_backend_create(test_delete, 4, [], Ref),
     % State a fact for 'vb insert' with the arguments listed below.
-    vb_insert(Ref, del1, [1.0, 0.0, 0.0, 0.0], meta(x)),
+    vector_backend_insert(Ref, del1, [1.0, 0.0, 0.0, 0.0], meta(x)),
     % State a fact for 'vb delete' with the arguments listed below.
-    vb_delete(Ref, del1),
+    vector_backend_delete(Ref, del1),
     % State a fact for 'vb search' with the arguments listed below.
-    vb_search(Ref, [1.0, 0.0, 0.0, 0.0], 5, Results),
+    vector_backend_search(Ref, [1.0, 0.0, 0.0, 0.0], 5, Results),
     % Succeed only if 'member(_-del1, Results' cannot be proved (negation as failure).
     \+ member(_-del1, Results),
     % State the fact: vb close(Ref).
-    vb_close(Ref).
+    vector_backend_close(Ref).
 
 % Define a clause for 'test': succeed when the following conditions hold.
-test(vb_update_weights) :-
+test(vector_backend_update_weights) :-
     % State a fact for 'vb create' with the arguments listed below.
-    vb_create(test_weights, 4, [], Ref),
+    vector_backend_create(test_weights, 4, [], Ref),
     % State a fact for 'vb insert' with the arguments listed below.
-    vb_insert(Ref, w1, [1.0, 0.0, 0.0, 0.0], meta(w)),
+    vector_backend_insert(Ref, w1, [1.0, 0.0, 0.0, 0.0], meta(w)),
     % State a fact for 'vb update weights' with the arguments listed below.
-    vb_update_weights(Ref, w1, 0.05),
+    vector_backend_update_weights(Ref, w1, 0.05),
     % State the fact: vb close(Ref).
-    vb_close(Ref).
+    vector_backend_close(Ref).
 
 % --- Cosine similarity ---
 
@@ -143,7 +143,7 @@ test(bakeoff_produces_results_file,
 % Define a clause for 'test': succeed when the following conditions hold.
 test(bakeoff_winner_is_set) :-
     % State a fact for 'vb current backend' with the arguments listed below.
-    vb_current_backend(Winner),
+    vector_backend_current_backend(Winner),
     % State the fact: atom(Winner).
     atom(Winner).
 

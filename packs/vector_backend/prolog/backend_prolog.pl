@@ -3,23 +3,23 @@
     This is the development fallback; the prologai-core Rust crate provides
     a production HNSW backend (RuVector or hnswlib) once compiled.
 
-    Predicate naming: vbp_* (vector backend prolog).
+    Predicate naming: backend_prolog_* (vector backend prolog).
 */
 
 % Declare this file as the 'backend_prolog' module and list its exported predicates.
 :- module(backend_prolog, [
-    % Supply 'vbp_create/4' as the next argument to the expression above.
-    vbp_create/4,
-    % Supply 'vbp_insert/4' as the next argument to the expression above.
-    vbp_insert/4,
-    % Supply 'vbp_search/4' as the next argument to the expression above.
-    vbp_search/4,
-    % Supply 'vbp_delete/2' as the next argument to the expression above.
-    vbp_delete/2,
-    % Supply 'vbp_update_weights/3' as the next argument to the expression above.
-    vbp_update_weights/3,
-    % Supply 'vbp_close/1' as the next argument to the expression above.
-    vbp_close/1,
+    % Supply 'backend_prolog_create/4' as the next argument to the expression above.
+    backend_prolog_create/4,
+    % Supply 'backend_prolog_insert/4' as the next argument to the expression above.
+    backend_prolog_insert/4,
+    % Supply 'backend_prolog_search/4' as the next argument to the expression above.
+    backend_prolog_search/4,
+    % Supply 'backend_prolog_delete/2' as the next argument to the expression above.
+    backend_prolog_delete/2,
+    % Supply 'backend_prolog_update_weights/3' as the next argument to the expression above.
+    backend_prolog_update_weights/3,
+    % Supply 'backend_prolog_close/1' as the next argument to the expression above.
+    backend_prolog_close/1,
     % Continue the multi-line expression started above.
     hash_project/3,        % +Term, +Dim, -UnitVector
     % Continue the multi-line expression started above.
@@ -38,65 +38,65 @@
 % Internal store
 % ---------------------------------------------------------------------------
 
-% vbp_index(Ref, Name, Dimension)
-% Declare 'vbp_index/3' as dynamic — its facts may be added or removed at runtime.
-:- dynamic vbp_index/3.
+% backend_prolog_index(Ref, Name, Dimension)
+% Declare 'backend_prolog_index/3' as dynamic — its facts may be added or removed at runtime.
+:- dynamic backend_prolog_index/3.
 
-% vbp_entry(Ref, Id, Vector, Meta, Weight)
-% Declare 'vbp_entry/5' as dynamic — its facts may be added or removed at runtime.
-:- dynamic vbp_entry/5.
+% backend_prolog_entry(Ref, Id, Vector, Meta, Weight)
+% Declare 'backend_prolog_entry/5' as dynamic — its facts may be added or removed at runtime.
+:- dynamic backend_prolog_entry/5.
 
 % Index reference counter
-% Declare 'vbp_ref_counter/1' as dynamic — its facts may be added or removed at runtime.
-:- dynamic vbp_ref_counter/1.
+% Declare 'backend_prolog_ref_counter/1' as dynamic — its facts may be added or removed at runtime.
+:- dynamic backend_prolog_ref_counter/1.
 % State the fact: vbp ref counter(0).
-vbp_ref_counter(0).
+backend_prolog_ref_counter(0).
 
 % Define a clause for 'next ref': succeed when the following conditions hold.
 next_ref(Ref) :-
     % Remove a single matching fact or rule from the runtime knowledge base.
-    retract(vbp_ref_counter(N)),
+    retract(backend_prolog_ref_counter(N)),
     % Evaluate the arithmetic expression 'N + 1' and bind the result to 'N1'.
     N1 is N + 1,
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(vbp_ref_counter(N1)),
-    % Check that 'Ref' is unifiable with 'vb_ref(N1)'.
-    Ref = vb_ref(N1).
+    assertz(backend_prolog_ref_counter(N1)),
+    % Check that 'Ref' is unifiable with 'vector_backend_ref(N1)'.
+    Ref = vector_backend_ref(N1).
 
 % ---------------------------------------------------------------------------
 % Interface predicates
 % ---------------------------------------------------------------------------
 
-%! vbp_create(+Name, +Dimension, +Options, -Ref) is det.
+%! backend_prolog_create(+Name, +Dimension, +Options, -Ref) is det.
 % Define a clause for 'vbp create': succeed when the following conditions hold.
-vbp_create(Name, Dim, _Opts, Ref) :-
+backend_prolog_create(Name, Dim, _Opts, Ref) :-
     % State a fact for 'next ref' with the arguments listed below.
     next_ref(Ref),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(vbp_index(Ref, Name, Dim)).
+    assertz(backend_prolog_index(Ref, Name, Dim)).
 
-%! vbp_insert(+Ref, +Id, +Vector, +Meta) is det.
+%! backend_prolog_insert(+Ref, +Id, +Vector, +Meta) is det.
 % Define a clause for 'vbp insert': succeed when the following conditions hold.
-vbp_insert(Ref, Id, Vec, Meta) :-
-    % Execute: ( vbp_entry(Ref, Id, _, _, _).
-    ( vbp_entry(Ref, Id, _, _, _)
+backend_prolog_insert(Ref, Id, Vec, Meta) :-
+    % Execute: ( backend_prolog_entry(Ref, Id, _, _, _).
+    ( backend_prolog_entry(Ref, Id, _, _, _)
     % If the condition above succeeded, perform the following action.
-    -> retract(vbp_entry(Ref, Id, _, _, _))
+    -> retract(backend_prolog_entry(Ref, Id, _, _, _))
     % Otherwise (else branch), perform the following action.
     ;  true
     % Close the expression opened above.
     ),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(vbp_entry(Ref, Id, Vec, Meta, 1.0)).
+    assertz(backend_prolog_entry(Ref, Id, Vec, Meta, 1.0)).
 
-%! vbp_search(+Ref, +QueryVec, +K, -Results) is det.
+%! backend_prolog_search(+Ref, +QueryVec, +K, -Results) is det.
 %  Results is a list of Id-Score pairs, sorted by descending cosine similarity.
 % Define a clause for 'vbp search': succeed when the following conditions hold.
-vbp_search(Ref, Query, K, Results) :-
+backend_prolog_search(Ref, Query, K, Results) :-
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(Score-Id,
             % Continue the multi-line expression started above.
-            ( vbp_entry(Ref, Id, Vec, _, _W),
+            ( backend_prolog_entry(Ref, Id, Vec, _, _W),
               % Continue the multi-line expression started above.
               cosine_similarity(Query, Vec, Score)
             % Close the expression opened above.
@@ -118,33 +118,33 @@ vbp_search(Ref, Query, K, Results) :-
     % Check that 'Results' is unifiable with 'TopK'.
     Results = TopK.
 
-%! vbp_delete(+Ref, +Id) is det.
+%! backend_prolog_delete(+Ref, +Id) is det.
 % Define a clause for 'vbp delete': succeed when the following conditions hold.
-vbp_delete(Ref, Id) :-
+backend_prolog_delete(Ref, Id) :-
     % Remove all matching facts from the runtime knowledge base.
-    retractall(vbp_entry(Ref, Id, _, _, _)).
+    retractall(backend_prolog_entry(Ref, Id, _, _, _)).
 
-%! vbp_update_weights(+Ref, +Id, +Delta) is det.
+%! backend_prolog_update_weights(+Ref, +Id, +Delta) is det.
 % Define a clause for 'vbp update weights': succeed when the following conditions hold.
-vbp_update_weights(Ref, Id, Delta) :-
-    % Execute: ( retract(vbp_entry(Ref, Id, Vec, Meta, W)).
-    ( retract(vbp_entry(Ref, Id, Vec, Meta, W))
+backend_prolog_update_weights(Ref, Id, Delta) :-
+    % Execute: ( retract(backend_prolog_entry(Ref, Id, Vec, Meta, W)).
+    ( retract(backend_prolog_entry(Ref, Id, Vec, Meta, W))
     % If the condition above succeeded, perform the following action.
     ->  W1 is max(0.0, W + Delta),
         % Continue the multi-line expression started above.
-        assertz(vbp_entry(Ref, Id, Vec, Meta, W1))
+        assertz(backend_prolog_entry(Ref, Id, Vec, Meta, W1))
     % Otherwise (else branch), perform the following action.
     ;   true
     % Close the expression opened above.
     ).
 
-%! vbp_close(+Ref) is det.
+%! backend_prolog_close(+Ref) is det.
 % Define a clause for 'vbp close': succeed when the following conditions hold.
-vbp_close(Ref) :-
+backend_prolog_close(Ref) :-
     % Remove all matching facts from the runtime knowledge base.
-    retractall(vbp_entry(Ref, _, _, _, _)),
+    retractall(backend_prolog_entry(Ref, _, _, _, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(vbp_index(Ref, _, _)).
+    retractall(backend_prolog_index(Ref, _, _)).
 
 % ---------------------------------------------------------------------------
 % Vector arithmetic
