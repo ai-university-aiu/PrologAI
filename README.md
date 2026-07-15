@@ -257,7 +257,7 @@ Everything is inspectable.
 | `walk` | Grid Traversal Patterns (PR 106) |
 | `run` | Run-Length Encoding of Grid Sequences (PR 88) |
 | `rewrite` | Rule-Based Grid Cell Rewriting (PR 87) |
-| `arithmetic` | Cell-Wise Arithmetic on Grids (PR 89) |
+| `grid_arithmetic` | Cell-Wise Arithmetic on Grids (PR 89) |
 | `context` | Context Map Operations (PR 92) |
 | `score` | Candidate Grid Scoring and Hypothesis Selection (PR 93) |
 | `rule_induction` | Rule Induction Observation Layer (PR 94) |

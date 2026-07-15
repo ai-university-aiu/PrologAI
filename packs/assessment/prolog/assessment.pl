@@ -337,7 +337,7 @@ long_term_retrieval_score(Score) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
-        ( sona:sona_trajectory_id_counter(N),
+        ( synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_id_counter(N),
           % Continue the multi-line expression started above.
           Score is min(1.0, float(N) / 100.0) )
     % And additionally, the following condition must hold.
