@@ -31,17 +31,17 @@ dominant_grid(Grid) :-
 
 test(palette_three) :-
     three_color(G),
-    cl_palette(G, P),
+    color_palette(G, P),
     P = [1,2,3].
 
 test(palette_mono) :-
     mono(G),
-    cl_palette(G, P),
+    color_palette(G, P),
     P = [5].
 
 test(palette_with_bg) :-
     bg_grid(G),
-    cl_palette(G, P),
+    color_palette(G, P),
     P = [0,1,2].
 
 :- end_tests(color_palette).
@@ -50,17 +50,17 @@ test(palette_with_bg) :-
 
 test(count_1) :-
     three_color(G),
-    cl_count(G, 1, N),
+    color_count(G, 1, N),
     N =:= 3.
 
 test(count_bg) :-
     bg_grid(G),
-    cl_count(G, 0, N),
+    color_count(G, 0, N),
     N =:= 5.
 
 test(count_absent) :-
     mono(G),
-    cl_count(G, 9, N),
+    color_count(G, 9, N),
     N =:= 0.
 
 :- end_tests(color_count).
@@ -69,12 +69,12 @@ test(count_absent) :-
 
 test(histogram_three) :-
     three_color(G),
-    cl_histogram(G, Hist),
+    color_histogram(G, Hist),
     Hist = [1-3, 2-3, 3-3].
 
 test(histogram_bg) :-
     bg_grid(G),
-    cl_histogram(G, Hist),
+    color_histogram(G, Hist),
     Hist = [0-5, 1-2, 2-2].
 
 :- end_tests(color_histogram).
@@ -83,12 +83,12 @@ test(histogram_bg) :-
 
 test(same_palette_yes) :-
     three_color(G),
-    cl_same_palette(G, G).
+    color_same_palette(G, G).
 
 test(same_palette_no, [fail]) :-
     three_color(G),
     mono(H),
-    cl_same_palette(G, H).
+    color_same_palette(G, H).
 
 :- end_tests(color_same_palette).
 
@@ -96,20 +96,20 @@ test(same_palette_no, [fail]) :-
 
 test(replace_basic) :-
     mono(G),
-    cl_replace(G, 5, 9, G2),
+    color_replace(G, 5, 9, G2),
     G2 = [[9,9],[9,9]].
 
 test(replace_absent) :-
     mono(G),
-    cl_replace(G, 0, 9, G2),
+    color_replace(G, 0, 9, G2),
     G2 = G.
 
 test(replace_one_color) :-
     bg_grid(G),
-    cl_replace(G, 1, 9, G2),
-    cl_count(G2, 1, N),
+    color_replace(G, 1, 9, G2),
+    color_count(G2, 1, N),
     N =:= 0,
-    cl_count(G2, 9, N9),
+    color_count(G2, 9, N9),
     N9 =:= 2.
 
 :- end_tests(color_replace).
@@ -118,20 +118,20 @@ test(replace_one_color) :-
 
 test(remap_single) :-
     mono(G),
-    cl_remap(G, [5-7], G2),
+    color_remap(G, [5-7], G2),
     G2 = [[7,7],[7,7]].
 
 test(remap_two) :-
     bg_grid(G),
-    cl_remap(G, [1-9, 2-8], G2),
-    cl_count(G2, 9, N9),
-    cl_count(G2, 8, N8),
+    color_remap(G, [1-9, 2-8], G2),
+    color_count(G2, 9, N9),
+    color_count(G2, 8, N8),
     N9 =:= 2,
     N8 =:= 2.
 
 test(remap_identity) :-
     three_color(G),
-    cl_remap(G, [], G2),
+    color_remap(G, [], G2),
     G2 = G.
 
 :- end_tests(color_remap).
@@ -140,12 +140,12 @@ test(remap_identity) :-
 
 test(dominant_basic) :-
     dominant_grid(G),
-    cl_dominant(G, Color),
+    color_dominant(G, Color),
     Color =:= 1.
 
 test(dominant_mono) :-
     mono(G),
-    cl_dominant(G, Color),
+    color_dominant(G, Color),
     Color =:= 5.
 
 :- end_tests(color_dominant).
@@ -155,12 +155,12 @@ test(dominant_mono) :-
 test(rarest_basic) :-
     dominant_grid(G),
     % Grid has 8 ones, 4 zeros, 2 twos. Rarest = 2.
-    cl_rarest(G, Color),
+    color_rarest(G, Color),
     Color =:= 2.
 
 test(rarest_mono) :-
     mono(G),
-    cl_rarest(G, Color),
+    color_rarest(G, Color),
     Color =:= 5.
 
 :- end_tests(color_rarest).
@@ -169,19 +169,19 @@ test(rarest_mono) :-
 
 test(isolate_color1) :-
     bg_grid(G),
-    cl_isolate(G, 1, 0, G2),
-    cl_count(G2, 1, N1),
+    color_isolate(G, 1, 0, G2),
+    color_count(G2, 1, N1),
     N1 =:= 2,
-    cl_count(G2, 2, N2),
+    color_count(G2, 2, N2),
     N2 =:= 0.
 
 test(isolate_bg_unchanged) :-
     bg_grid(G),
-    cl_isolate(G, 0, 9, G2),
+    color_isolate(G, 0, 9, G2),
     % Only 0s remain; 1s and 2s become 9.
-    cl_count(G2, 0, N0),
+    color_count(G2, 0, N0),
     N0 =:= 5,
-    cl_count(G2, 1, N1),
+    color_count(G2, 1, N1),
     N1 =:= 0.
 
 :- end_tests(color_isolate).
@@ -190,15 +190,15 @@ test(isolate_bg_unchanged) :-
 
 test(remove_bg) :-
     bg_grid(G),
-    cl_remove(G, 0, 9, G2),
-    cl_count(G2, 0, N),
+    color_remove(G, 0, 9, G2),
+    color_count(G2, 0, N),
     N =:= 0,
-    cl_count(G2, 9, N9),
+    color_count(G2, 9, N9),
     N9 =:= 5.
 
 test(remove_absent) :-
     mono(G),
-    cl_remove(G, 0, 9, G2),
+    color_remove(G, 0, 9, G2),
     G2 = G.
 
 :- end_tests(color_remove).
@@ -207,11 +207,11 @@ test(remove_absent) :-
 
 test(is_mono_yes) :-
     mono(G),
-    cl_is_mono(G).
+    color_is_mono(G).
 
 test(is_mono_no, [fail]) :-
     three_color(G),
-    cl_is_mono(G).
+    color_is_mono(G).
 
 :- end_tests(color_is_mono).
 
@@ -219,12 +219,12 @@ test(is_mono_no, [fail]) :-
 
 test(count_three) :-
     three_color(G),
-    cl_color_count(G, N),
+    color_color_count(G, N),
     N =:= 3.
 
 test(count_one) :-
     mono(G),
-    cl_color_count(G, N),
+    color_color_count(G, N),
     N =:= 1.
 
 :- end_tests(color_color_count).
@@ -233,11 +233,11 @@ test(count_one) :-
 
 test(has_yes) :-
     three_color(G),
-    cl_has_color(G, 2).
+    color_has_color(G, 2).
 
 test(has_no, [fail]) :-
     mono(G),
-    cl_has_color(G, 9).
+    color_has_color(G, 9).
 
 :- end_tests(color_has_color).
 
@@ -245,19 +245,19 @@ test(has_no, [fail]) :-
 
 test(swap_basic) :-
     Grid = [[1,2],[2,1]],
-    cl_swap(Grid, 1, 2, G2),
+    color_swap(Grid, 1, 2, G2),
     G2 = [[2,1],[1,2]].
 
 test(swap_with_other) :-
     bg_grid(G),
-    cl_swap(G, 1, 2, G2),
+    color_swap(G, 1, 2, G2),
     % bg_grid has [0,1,0],[1,0,2],[0,2,0].
     % After swap: [0,2,0],[2,0,1],[0,1,0].
     G2 = [[0,2,0],[2,0,1],[0,1,0]].
 
 test(swap_absent) :-
     mono(G),
-    cl_swap(G, 1, 9, G2),
+    color_swap(G, 1, 9, G2),
     G2 = G.
 
 :- end_tests(color_swap).

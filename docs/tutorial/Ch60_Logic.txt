@@ -17,53 +17,53 @@ convention, 0 is the background in grid tasks, but any value can be used.
 
 60.3 Set-Style Binary Operations
 
-lg_and(+Grid1, +Grid2, +Bg, -Grid3)
+logic_and(+Grid1, +Grid2, +Bg, -Grid3)
   Grid3 keeps a cell only where BOTH grids are non-Bg.
   Value comes from Grid1.
 
 Example:
-  ?- lg_and([[1,0],[0,1]], [[1,1],[0,0]], 0, G).
+  ?- logic_and([[1,0],[0,1]], [[1,1],[0,0]], 0, G).
   G = [[1,0],[0,0]].
 
-lg_or(+Grid1, +Grid2, +Bg, -Grid3)
+logic_or(+Grid1, +Grid2, +Bg, -Grid3)
   Grid3 keeps a cell where EITHER grid is non-Bg.
   Grid1 wins on ties.
 
 Example:
-  ?- lg_or([[1,0],[0,0]], [[0,1],[0,0]], 0, G).
+  ?- logic_or([[1,0],[0,0]], [[0,1],[0,0]], 0, G).
   G = [[1,1],[0,0]].
 
-lg_xor(+Grid1, +Grid2, +Bg, -Grid3)
+logic_xor(+Grid1, +Grid2, +Bg, -Grid3)
   Grid3 keeps a cell only where EXACTLY ONE grid is non-Bg.
   When both are non-Bg, the result is Bg.
 
 Example:
-  ?- lg_xor([[1,0],[0,1]], [[0,1],[0,0]], 0, G).
+  ?- logic_xor([[1,0],[0,1]], [[0,1],[0,0]], 0, G).
   G = [[1,1],[0,1]].
 
-lg_diff(+Grid1, +Grid2, +Bg, -Grid3)
+logic_diff(+Grid1, +Grid2, +Bg, -Grid3)
   Grid3 keeps cells in Grid1 that are absent (Bg) in Grid2.
   Set difference: Grid1 minus Grid2.
 
 Example:
-  ?- lg_diff([[1,0],[0,1]], [[0,0],[0,1]], 0, G).
+  ?- logic_diff([[1,0],[0,1]], [[0,0],[0,1]], 0, G).
   G = [[1,0],[0,0]].
 
 60.4 Unary Operations
 
-lg_not(+Grid, +Bg, +Fg, -Grid2)
+logic_not(+Grid, +Bg, +Fg, -Grid2)
   Invert: Bg becomes Fg, non-Bg becomes Bg.
 
 Example:
-  ?- lg_not([[0,1],[1,0]], 0, 9, G).
+  ?- logic_not([[0,1],[1,0]], 0, 9, G).
   G = [[9,0],[0,9]].
 
-lg_overlay(+Base, +Top, +Bg, -Result)
+logic_overlay(+Base, +Top, +Bg, -Result)
   Overlay Top onto Base: Top's non-Bg cells overwrite Base.
   Top's Bg cells are transparent (Base shows through).
 
 Example:
-  ?- lg_overlay([[1,1],[1,1]], [[2,0],[0,3]], 0, R).
+  ?- logic_overlay([[1,1],[1,1]], [[2,0],[0,3]], 0, R).
   R = [[2,1],[1,3]].
 
 60.5 Mask Operations
@@ -71,91 +71,91 @@ Example:
 A mask is a grid where each cell is either a "marker" value (non-Bg) or Bg.
 Masks are created from grids and applied to grids.
 
-lg_mask_from(+Grid, +Bg, +Fg, -Mask)
+logic_mask_from(+Grid, +Bg, +Fg, -Mask)
   Create a binary mask: non-Bg cells become Fg; Bg cells stay Bg.
 
 Example:
-  ?- lg_mask_from([[1,0],[0,2]], 0, 1, M).
+  ?- logic_mask_from([[1,0],[0,2]], 0, 1, M).
   M = [[1,0],[0,1]].
 
-lg_mask_apply(+Mask, +Grid, +Bg, -Grid2)
+logic_mask_apply(+Mask, +Grid, +Bg, -Grid2)
   Apply a mask: keep Grid value where Mask is non-Bg; replace with Bg elsewhere.
 
 Example:
-  ?- lg_mask_apply([[1,0],[0,1]], [[5,6],[7,8]], 0, G).
+  ?- logic_mask_apply([[1,0],[0,1]], [[5,6],[7,8]], 0, G).
   G = [[5,0],[0,8]].
 
 Pattern: Extract foreground values from one grid using a mask from another:
-  lg_mask_from(SourceGrid, 0, 1, Mask),
-  lg_mask_apply(Mask, TargetGrid, 0, Extracted).
+  logic_mask_from(SourceGrid, 0, 1, Mask),
+  logic_mask_apply(Mask, TargetGrid, 0, Extracted).
 
 60.6 Row and Column Reduction
 
 These predicates scan rows or columns and produce a list of 0/1 flags.
 
-lg_any_row(+Grid, +Bg, -Flags)
+logic_any_row(+Grid, +Bg, -Flags)
   Flags[r] = 1 if any cell in row r is non-Bg; else 0.
 
 Example:
-  ?- lg_any_row([[1,0],[0,0],[0,2]], 0, F).
+  ?- logic_any_row([[1,0],[0,0],[0,2]], 0, F).
   F = [1,0,1].
 
-lg_any_col(+Grid, +Bg, -Flags)
+logic_any_col(+Grid, +Bg, -Flags)
   Flags[c] = 1 if any cell in column c is non-Bg; else 0.
 
 Example:
-  ?- lg_any_col([[0,1,0],[0,0,0]], 0, F).
+  ?- logic_any_col([[0,1,0],[0,0,0]], 0, F).
   F = [0,1,0].
 
-lg_all_row(+Grid, +Bg, -Flags)
+logic_all_row(+Grid, +Bg, -Flags)
   Flags[r] = 1 if ALL cells in row r are non-Bg; else 0.
 
 Example:
-  ?- lg_all_row([[1,2],[1,0],[0,0]], 0, F).
+  ?- logic_all_row([[1,2],[1,0],[0,0]], 0, F).
   F = [1,0,0].
 
-lg_all_col(+Grid, +Bg, -Flags)
+logic_all_col(+Grid, +Bg, -Flags)
   Flags[c] = 1 if ALL cells in column c are non-Bg; else 0.
 
 Example:
-  ?- lg_all_col([[1,0],[1,0]], 0, F).
+  ?- logic_all_col([[1,0],[1,0]], 0, F).
   F = [1,0].
 
 60.7 Cell-Wise Equality
 
-lg_eq(+Grid1, +Grid2, -BoolGrid)
+logic_eq(+Grid1, +Grid2, -BoolGrid)
   BoolGrid[r,c] = 1 where grids agree; 0 where they differ.
 
 Example:
-  ?- lg_eq([[1,2],[3,4]], [[1,0],[0,4]], G).
+  ?- logic_eq([[1,2],[3,4]], [[1,0],[0,4]], G).
   G = [[1,0],[0,1]].
 
-lg_neq(+Grid1, +Grid2, -BoolGrid)
+logic_neq(+Grid1, +Grid2, -BoolGrid)
   BoolGrid[r,c] = 1 where grids differ; 0 where they agree.
 
 Example:
-  ?- lg_neq([[1,2],[3,4]], [[1,0],[0,4]], G).
+  ?- logic_neq([[1,2],[3,4]], [[1,0],[0,4]], G).
   G = [[0,1],[1,0]].
 
-Note: lg_eq and lg_neq are complements: lg_eq(G1,G2,E), lg_neq(G1,G2,N)
+Note: logic_eq and logic_neq are complements: logic_eq(G1,G2,E), logic_neq(G1,G2,N)
 gives E[r,c] + N[r,c] = 1 for all cells.
 
 60.8 Common Patterns
 
 Pattern: Find where two grids differ:
-  lg_neq(Expected, Actual, Diffs),
-  lg_any_row(Diffs, 0, RowFlags).  % which rows have errors
+  logic_neq(Expected, Actual, Diffs),
+  logic_any_row(Diffs, 0, RowFlags).  % which rows have errors
 
 Pattern: Combine two foreground layers:
-  lg_or(Layer1, Layer2, 0, Combined).
+  logic_or(Layer1, Layer2, 0, Combined).
 
 Pattern: Subtract one mask from another:
-  lg_mask_from(Grid1, 0, 1, Mask1),
-  lg_mask_from(Grid2, 0, 1, Mask2),
-  lg_diff(Mask1, Mask2, 0, DiffMask).
+  logic_mask_from(Grid1, 0, 1, Mask1),
+  logic_mask_from(Grid2, 0, 1, Mask2),
+  logic_diff(Mask1, Mask2, 0, DiffMask).
 
 Pattern: Count rows with content:
-  lg_any_row(Grid, 0, Flags),
+  logic_any_row(Grid, 0, Flags),
   include([X]>>(X =:= 1), Flags, Ones),
   length(Ones, Count).
 
@@ -163,11 +163,11 @@ Pattern: Count rows with content:
 
 The logic pack's 14 predicates organize into five groups:
 
-Set operations:  lg_and/4, lg_or/4, lg_xor/4, lg_diff/4
-Unary:           lg_not/4, lg_overlay/4
-Mask ops:        lg_mask_from/4, lg_mask_apply/4
-Reduction:       lg_any_row/3, lg_any_col/3, lg_all_row/3, lg_all_col/3
-Cell-wise bool:  lg_eq/3, lg_neq/3
+Set operations:  logic_and/4, logic_or/4, logic_xor/4, logic_diff/4
+Unary:           logic_not/4, logic_overlay/4
+Mask ops:        logic_mask_from/4, logic_mask_apply/4
+Reduction:       logic_any_row/3, logic_any_col/3, logic_all_row/3, logic_all_col/3
+Cell-wise bool:  logic_eq/3, logic_neq/3
 
 All 42 PLUnit acceptance tests are in packs/logic/test/test_logic.pl.
 The Specification entry is Part 89 (LG-LG-001 through LG-LG-014).

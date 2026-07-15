@@ -184,17 +184,17 @@ COMBINING MOTION WITH COMPOSE
 
 The compose pack (Chapter 22) can wrap motion predicates into pipeline steps.
 Because motion_gravity_down takes 3 arguments (Bg, Grid, Grid2), wrap it with
-a closure approach using cp_apply:
+a closure approach using compose_apply:
 
-  ?- cp_apply(motion_gravity_down(0), [[0,1,0],[0,0,2]], G2).
+  ?- compose_apply(motion_gravity_down(0), [[0,1,0],[0,0,2]], G2).
   G2 = [[0,0,0],[0,1,2]].
 
-cp_apply calls motion_gravity_down(0, Grid, G2) by appending Grid and G2 as the
+compose_apply calls motion_gravity_down(0, Grid, G2) by appending Grid and G2 as the
 last two arguments to the term motion_gravity_down(0).
 
 You can build a pipeline that shifts then applies gravity:
 
-  ?- cp_pipe(motion_shift_grid(0,0,1), motion_gravity_down(0),
+  ?- compose_pipe(motion_shift_grid(0,0,1), motion_gravity_down(0),
              [[1,0,0],[0,0,0]], G2).
   G2 = [[0,0,0],[0,0,1]].
 

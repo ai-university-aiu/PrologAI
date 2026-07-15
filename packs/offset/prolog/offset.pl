@@ -3,30 +3,30 @@
 % circular (rolling) shifts in four directions, single-row equivalents, shifting
 % one specific color within a grid, and inferring the shift between two grids.
 :- module(offset, [
-    od_shift_row/4,
-    od_shift_row_left/4,
-    od_roll_row/3,
-    od_shift_right/4,
-    od_shift_left/4,
-    od_shift_down/4,
-    od_shift_up/4,
-    od_shift_dir/5,
-    od_roll_right/3,
-    od_roll_left/3,
-    od_roll_down/3,
-    od_roll_up/3,
-    od_shift_color/6,
-    od_infer_shift/5
+    offset_shift_row/4,
+    offset_shift_row_left/4,
+    offset_roll_row/3,
+    offset_shift_right/4,
+    offset_shift_left/4,
+    offset_shift_down/4,
+    offset_shift_up/4,
+    offset_shift_dir/5,
+    offset_roll_right/3,
+    offset_roll_left/3,
+    offset_roll_down/3,
+    offset_roll_up/3,
+    offset_shift_color/6,
+    offset_infer_shift/5
 ]).
 % Import list utilities.
 :- use_module(library(lists), [member/2, nth0/3, append/3]).
 % Import higher-order mapping.
 :- use_module(library(apply), [maplist/3]).
 
-% od_shift_row(+Row, +N, +Bg, -Shifted): Shifted is Row shifted right by N cells.
+% offset_shift_row(+Row, +N, +Bg, -Shifted): Shifted is Row shifted right by N cells.
 % The leftmost N positions become Bg; the last N elements of Row are dropped.
 % For N=0, Shifted = Row.
-od_shift_row(Row, N, Bg, Shifted) :-
+offset_shift_row(Row, N, Bg, Shifted) :-
     length(Row, W),
     WN is W - N,
 % Extract the first WN elements to keep (the last N elements are discarded).
@@ -37,10 +37,10 @@ od_shift_row(Row, N, Bg, Shifted) :-
 % Prepend the background cells before the kept elements.
     append(BgCells, Keep, Shifted).
 
-% od_shift_row_left(+Row, +N, +Bg, -Shifted): Shifted is Row shifted left by N cells.
+% offset_shift_row_left(+Row, +N, +Bg, -Shifted): Shifted is Row shifted left by N cells.
 % The rightmost N positions become Bg; the first N elements of Row are dropped.
 % For N=0, Shifted = Row.
-od_shift_row_left(Row, N, Bg, Shifted) :-
+offset_shift_row_left(Row, N, Bg, Shifted) :-
     length(Row, W),
     WN is W - N,
 % Skip the first N elements.
@@ -53,10 +53,10 @@ od_shift_row_left(Row, N, Bg, Shifted) :-
 % Append background cells after the kept elements.
     append(Keep, BgCells, Shifted).
 
-% od_roll_row(+Row, +N, -Rolled): Rolled is Row circular-shifted right by N.
+% offset_roll_row(+Row, +N, -Rolled): Rolled is Row circular-shifted right by N.
 % The last N elements wrap around to become the first N elements.
 % N is reduced modulo the row length.
-od_roll_row(Row, N, Rolled) :-
+offset_roll_row(Row, N, Rolled) :-
     length(Row, W),
 % Normalize N to [0, W-1].
     PN is N mod W,
@@ -67,21 +67,21 @@ od_roll_row(Row, N, Rolled) :-
 % Place the suffix before the prefix.
     append(Suffix, Prefix, Rolled).
 
-% od_shift_right(+Grid, +N, +Bg, -Shifted): Shifted is Grid with each row
+% offset_shift_right(+Grid, +N, +Bg, -Shifted): Shifted is Grid with each row
 % shifted right by N cells. Leftmost N columns become Bg; last N columns lost.
-od_shift_right(Grid, N, Bg, Shifted) :-
-% Apply od_shift_row to every row using a YALL lambda.
-    maplist([Row, S]>>(od_shift_row(Row, N, Bg, S)), Grid, Shifted).
+offset_shift_right(Grid, N, Bg, Shifted) :-
+% Apply offset_shift_row to every row using a YALL lambda.
+    maplist([Row, S]>>(offset_shift_row(Row, N, Bg, S)), Grid, Shifted).
 
-% od_shift_left(+Grid, +N, +Bg, -Shifted): Shifted is Grid with each row
+% offset_shift_left(+Grid, +N, +Bg, -Shifted): Shifted is Grid with each row
 % shifted left by N cells. Rightmost N columns become Bg; first N columns lost.
-od_shift_left(Grid, N, Bg, Shifted) :-
-% Apply od_shift_row_left to every row.
-    maplist([Row, S]>>(od_shift_row_left(Row, N, Bg, S)), Grid, Shifted).
+offset_shift_left(Grid, N, Bg, Shifted) :-
+% Apply offset_shift_row_left to every row.
+    maplist([Row, S]>>(offset_shift_row_left(Row, N, Bg, S)), Grid, Shifted).
 
-% od_shift_down(+Grid, +N, +Bg, -Shifted): Shifted is Grid with content shifted
+% offset_shift_down(+Grid, +N, +Bg, -Shifted): Shifted is Grid with content shifted
 % downward by N rows. The top N rows become Bg rows; the bottom N rows are lost.
-od_shift_down(Grid, N, Bg, Shifted) :-
+offset_shift_down(Grid, N, Bg, Shifted) :-
     length(Grid, H),
     HN is H - N,
 % Extract the first HN rows to keep (the last N rows are discarded).
@@ -98,9 +98,9 @@ od_shift_down(Grid, N, Bg, Shifted) :-
 % Prepend background rows above the kept rows.
     append(BgRows, Keep, Shifted).
 
-% od_shift_up(+Grid, +N, +Bg, -Shifted): Shifted is Grid with content shifted
+% offset_shift_up(+Grid, +N, +Bg, -Shifted): Shifted is Grid with content shifted
 % upward by N rows. The bottom N rows become Bg rows; the top N rows are lost.
-od_shift_up(Grid, N, Bg, Shifted) :-
+offset_shift_up(Grid, N, Bg, Shifted) :-
     Grid = [FirstRow|_],
     length(FirstRow, W),
 % Skip the first N rows.
@@ -114,27 +114,27 @@ od_shift_up(Grid, N, Bg, Shifted) :-
 % Append background rows below the kept rows.
     append(Keep, BgRows, Shifted).
 
-% od_shift_dir(+Grid, +Dir, +N, +Bg, -Shifted): dispatch shift by direction atom.
+% offset_shift_dir(+Grid, +Dir, +N, +Bg, -Shifted): dispatch shift by direction atom.
 % Dir must be one of: right, left, down, up. Uses if-then-else for determinism.
-od_shift_dir(Grid, Dir, N, Bg, Shifted) :-
-    (   Dir = right -> od_shift_right(Grid, N, Bg, Shifted)
-    ;   Dir = left  -> od_shift_left(Grid, N, Bg, Shifted)
-    ;   Dir = down  -> od_shift_down(Grid, N, Bg, Shifted)
-    ;   Dir = up    -> od_shift_up(Grid, N, Bg, Shifted)
+offset_shift_dir(Grid, Dir, N, Bg, Shifted) :-
+    (   Dir = right -> offset_shift_right(Grid, N, Bg, Shifted)
+    ;   Dir = left  -> offset_shift_left(Grid, N, Bg, Shifted)
+    ;   Dir = down  -> offset_shift_down(Grid, N, Bg, Shifted)
+    ;   Dir = up    -> offset_shift_up(Grid, N, Bg, Shifted)
     ).
 
-% od_roll_right(+Grid, +N, -Rolled): Rolled is Grid with each row circular-shifted
+% offset_roll_right(+Grid, +N, -Rolled): Rolled is Grid with each row circular-shifted
 % right by N positions (the last N cells of each row wrap to the front).
-od_roll_right(Grid, N, Rolled) :-
-    maplist([Row, R]>>(od_roll_row(Row, N, R)), Grid, Rolled).
+offset_roll_right(Grid, N, Rolled) :-
+    maplist([Row, R]>>(offset_roll_row(Row, N, R)), Grid, Rolled).
 
-% od_roll_left(+Grid, +N, -Rolled): Rolled is Grid with each row circular-shifted
+% offset_roll_left(+Grid, +N, -Rolled): Rolled is Grid with each row circular-shifted
 % left by N positions (the first N cells of each row wrap to the end).
-od_roll_left(Grid, N, Rolled) :-
-    maplist([Row, R]>>(od_roll_left_row_(Row, N, R)), Grid, Rolled).
+offset_roll_left(Grid, N, Rolled) :-
+    maplist([Row, R]>>(offset_roll_left_row_(Row, N, R)), Grid, Rolled).
 
-% od_roll_left_row_: circular left-shift a single row by N.
-od_roll_left_row_(Row, N, Rolled) :-
+% offset_roll_left_row_: circular left-shift a single row by N.
+offset_roll_left_row_(Row, N, Rolled) :-
     length(Row, W),
     PN is N mod W,
 % Take the first PN elements as the part that wraps to the end.
@@ -142,9 +142,9 @@ od_roll_left_row_(Row, N, Rolled) :-
     append(Prefix, Suffix, Row),
     append(Suffix, Prefix, Rolled).
 
-% od_roll_down(+Grid, +N, -Rolled): Rolled is Grid with rows circular-shifted
+% offset_roll_down(+Grid, +N, -Rolled): Rolled is Grid with rows circular-shifted
 % downward by N (the last N rows wrap to the top).
-od_roll_down(Grid, N, Rolled) :-
+offset_roll_down(Grid, N, Rolled) :-
     length(Grid, H),
     PN is N mod H,
 % Split at H-PN: the prefix (first H-PN rows) stays, suffix wraps to front.
@@ -153,9 +153,9 @@ od_roll_down(Grid, N, Rolled) :-
     append(Prefix, Suffix, Grid),
     append(Suffix, Prefix, Rolled).
 
-% od_roll_up(+Grid, +N, -Rolled): Rolled is Grid with rows circular-shifted
+% offset_roll_up(+Grid, +N, -Rolled): Rolled is Grid with rows circular-shifted
 % upward by N (the first N rows wrap to the bottom).
-od_roll_up(Grid, N, Rolled) :-
+offset_roll_up(Grid, N, Rolled) :-
     length(Grid, H),
     PN is N mod H,
 % The first PN rows wrap to the end.
@@ -163,12 +163,12 @@ od_roll_up(Grid, N, Rolled) :-
     append(Prefix, Suffix, Grid),
     append(Suffix, Prefix, Rolled).
 
-% od_shift_color(+Grid, +Color, +DR, +DC, +Bg, -Result): Result is Grid with
+% offset_shift_color(+Grid, +Color, +DR, +DC, +Bg, -Result): Result is Grid with
 % all cells equal to Color translated by (DR rows, DC columns). Vacated cells
 % become Bg; out-of-bounds translated cells are clipped (lost). Other colors
 % are unchanged. If a non-Color cell is displaced to by the shifted Color, the
 % Color takes priority.
-od_shift_color(Grid, Color, DR, DC, Bg, Result) :-
+offset_shift_color(Grid, Color, DR, DC, Bg, Result) :-
     length(Grid, H), H1 is H - 1,
     Grid = [FirstRow|_], length(FirstRow, W), W1 is W - 1,
     findall(Row, (
@@ -188,30 +188,30 @@ od_shift_color(Grid, Color, DR, DC, Bg, Result) :-
         ), Row)
     ), Result).
 
-% od_infer_shift(+GridA, +GridB, +Bg, -DR, -DC): DR and DC are the row and column
+% offset_infer_shift(+GridA, +GridB, +Bg, -DR, -DC): DR and DC are the row and column
 % displacement such that shifting GridA by (DR, DC) produces GridB. Positive DR
 % means downward, positive DC means rightward. Tries all integer offsets up to
 % grid dimensions and commits to the first match.
-od_infer_shift(GridA, GridB, Bg, DR, DC) :-
+offset_infer_shift(GridA, GridB, Bg, DR, DC) :-
     length(GridA, H), H1 is H - 1, NH is -(H - 1),
     GridA = [FirstRowA|_], length(FirstRowA, W), W1 is W - 1, NW is -(W - 1),
     between(NH, H1, DR),
     between(NW, W1, DC),
 % Apply the candidate shift and test if it produces GridB.
-    od_apply_shift_(GridA, DR, DC, Bg, GridB),
+    offset_apply_shift_(GridA, DR, DC, Bg, GridB),
     !.
 
-% od_apply_shift_: apply a signed (DR, DC) shift to Grid using Bg as fill.
-od_apply_shift_(Grid, DR, DC, Bg, Result) :-
+% offset_apply_shift_: apply a signed (DR, DC) shift to Grid using Bg as fill.
+offset_apply_shift_(Grid, DR, DC, Bg, Result) :-
     (   DR > 0
-    ->  od_shift_down(Grid, DR, Bg, T1)
+    ->  offset_shift_down(Grid, DR, Bg, T1)
     ;   DR < 0
-    ->  AbsDR is -DR, od_shift_up(Grid, AbsDR, Bg, T1)
+    ->  AbsDR is -DR, offset_shift_up(Grid, AbsDR, Bg, T1)
     ;   T1 = Grid
     ),
     (   DC > 0
-    ->  od_shift_right(T1, DC, Bg, Result)
+    ->  offset_shift_right(T1, DC, Bg, Result)
     ;   DC < 0
-    ->  AbsDC is -DC, od_shift_left(T1, AbsDC, Bg, Result)
+    ->  AbsDC is -DC, offset_shift_left(T1, AbsDC, Bg, Result)
     ;   Result = T1
     ).

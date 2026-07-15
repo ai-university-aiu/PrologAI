@@ -15,10 +15,10 @@ Feature is an observable property of an input object: color(C), size(N), holes(N
 Value is what that feature encodes: typically a color atom.
 
 The canonical workflow is:
-1. Extract candidate symbol objects from each training input (st_candidate_symbols/2).
-2. Perform contrastive learning across training pairs (st_contrastive_learn/2).
-3. Build the most specific consistent symbol table (st_build_table/2).
-4. Apply the table to the test input (st_apply_table/3).
+1. Extract candidate symbol objects from each training input (symtab_candidate_symbols/2).
+2. Perform contrastive learning across training pairs (symtab_contrastive_learn/2).
+3. Build the most specific consistent symbol table (symtab_build_table/2).
+4. Apply the table to the test input (symtab_apply_table/3).
 5. Use the resulting color map to transform the test input.
 
 
@@ -31,111 +31,111 @@ The canonical workflow is:
 
 Three feature extractors are available for ob/3 objects.
 
-st_color_feature(+Obj, -Feature)
+symtab_color_feature(+Obj, -Feature)
   Feature = color(C) where C is the color of Obj.
 
-st_size_feature(+Obj, -Feature)
+symtab_size_feature(+Obj, -Feature)
   Feature = size(N) where N is the number of cells in Obj.
 
-st_position_feature(+Obj, +dims(Rows,Cols), -Feature)
+symtab_position_feature(+Obj, +dims(Rows,Cols), -Feature)
   Feature = pos(Q) where Q is tl/tr/bl/br based on the top-left bounding box corner.
 
-?- st_color_feature(ob(r,[r(0,0)],r0(0,0,0,0)), F).
+?- symtab_color_feature(ob(r,[r(0,0)],r0(0,0,0,0)), F).
 % F = color(r)
 
-?- st_size_feature(ob(r,[r(0,0),r(0,1)],r0(0,0,0,1)), F).
+?- symtab_size_feature(ob(r,[r(0,0),r(0,1)],r0(0,0,0,1)), F).
 % F = size(2)
 
-?- st_position_feature(ob(r,[r(1,8)],r0(1,8,1,8)), dims(10,10), F).
+?- symtab_position_feature(ob(r,[r(1,8)],r0(1,8,1,8)), dims(10,10), F).
 % F = pos(tr)
 
 
 3. Symbol Identification
 
-st_is_symbol(+Obj, +ContentObjs)
+symtab_is_symbol(+Obj, +ContentObjs)
   Succeed if Obj is plausibly a symbol: smaller than all content objects, or a
   unique color not shared by any content object.
 
-st_candidate_symbols(+InObjs, -Candidates)
+symtab_candidate_symbols(+InObjs, -Candidates)
   Returns the smallest quartile of objects (by cell count) as symbol candidates.
 
 ?- Sym  = ob(r,[r(0,0)],r0(0,0,0,0)),                     % size 1
    Big1 = ob(b,[r(1,0),r(1,1),r(1,2)],r0(1,0,1,2)),       % size 3
    Big2 = ob(g,[r(2,0),r(2,1),r(2,2)],r0(2,0,2,2)),       % size 3
-   st_is_symbol(Sym, [Big1, Big2]).
+   symtab_is_symbol(Sym, [Big1, Big2]).
 % succeeds
 
 
 4. Hole Counting
 
-st_hole_count(+Obj, -N)
+symtab_hole_count(+Obj, -N)
   N estimates the number of enclosed background gaps using bbox area minus cell count.
   Returns 0 for solid objects, positive for objects with internal gaps.
 
-?- st_hole_count(ob(r,[r(0,0)],r0(0,0,0,0)), N).
+?- symtab_hole_count(ob(r,[r(0,0)],r0(0,0,0,0)), N).
 % N = 0   (solid 1x1 object)
 
-?- st_hole_count(ob(r,[r(0,0),r(0,1),r(1,0)],r0(0,0,1,1)), N).
+?- symtab_hole_count(ob(r,[r(0,0),r(0,1),r(1,0)],r0(0,0,1,1)), N).
 % N = 1   (L-shape with 1 missing corner in a 2x2 bbox)
 
 
 5. Symbol Table Operations
 
-st_lookup(+SymbolTable, +Feature, -Value)
+symtab_lookup(+SymbolTable, +Feature, -Value)
   Retrieve the value for Feature. Fails if absent.
 
-st_entry_consistent(+sym(F,V), +Table)
+symtab_entry_consistent(+sym(F,V), +Table)
   Succeed if no entry in Table maps F to a different value.
 
-?- st_lookup([sym(color(r),b), sym(size(3),y)], color(r), V).
+?- symtab_lookup([sym(color(r),b), sym(size(3),y)], color(r), V).
 % V = b
 
-?- st_entry_consistent(sym(color(r),b), [sym(color(g),y)]).
+?- symtab_entry_consistent(sym(color(r),b), [sym(color(g),y)]).
 % succeeds (different features, no conflict)
 
-?- \+ st_entry_consistent(sym(color(r),b), [sym(color(r),g)]).
+?- \+ symtab_entry_consistent(sym(color(r),b), [sym(color(r),g)]).
 % succeeds (same feature r maps to g, conflicts with b)
 
 
 6. Contrastive Learning
 
-st_contrastive_learn(+Pairs, -Findings)
+symtab_contrastive_learn(+Pairs, -Findings)
   Finds sym entries that are consistent across ALL training pairs.
   Pairs is a list of pair(InputObjs, OutputObjs).
 
 ?- Pairs = [pair([ob(r,[r(0,0)],r0(0,0,0,0))], [ob(b,[r(0,0)],r0(0,0,0,0))]),
             pair([ob(r,[r(1,1)],r0(1,1,1,1))], [ob(b,[r(1,1)],r0(1,1,1,1))])],
-   st_contrastive_learn(Pairs, Findings).
+   symtab_contrastive_learn(Pairs, Findings).
 % Findings includes sym(color(r), b)
 
-st_identify_symbols(+Pairs, -Symbols)
+symtab_identify_symbols(+Pairs, -Symbols)
   Finds all sym entries where input features co-vary with output color changes.
 
 
 7. Applying a Symbol Table
 
-st_apply_table(+SymbolTable, +InObjs, -ColorMap)
+symtab_apply_table(+SymbolTable, +InObjs, -ColorMap)
   ColorMap is a sorted list of cm(OldColor, NewColor) terms.
 
 ?- Table = [sym(color(r), b), sym(color(g), y)],
    InObjs = [ob(r,[r(0,0)],r0(0,0,0,0)), ob(g,[r(1,1)],r0(1,1,1,1))],
-   st_apply_table(Table, InObjs, Map).
+   symtab_apply_table(Table, InObjs, Map).
 % Map = [cm(g,y), cm(r,b)]
 
 
 8. Table Scoring and Selection
 
-st_score_table(+SymbolTable, +Pairs, -Score)
+symtab_score_table(+SymbolTable, +Pairs, -Score)
   Score is the number of training pairs correctly explained by the table.
 
-st_best_table(+Tables, +Pairs, -Best)
+symtab_best_table(+Tables, +Pairs, -Best)
   Select the highest-scoring table from a list of candidate tables.
 
-st_build_table(+Pairs, -SymbolTable)
+symtab_build_table(+Pairs, -SymbolTable)
   Full pipeline: contrastive learn, score candidates, return best table.
 
 ?- Pairs = [pair([ob(r,[r(0,0)],r0(0,0,0,0))], [ob(b,[r(0,0)],r0(0,0,0,0))])],
-   st_build_table(Pairs, Table).
+   symtab_build_table(Pairs, Table).
 % Table = [sym(color(r), b)]  (or a superset including size features)
 
 
@@ -145,12 +145,12 @@ The contrastive learning algorithm is conservative: it only retains sym entries
 that are consistent with every training pair. An entry that appears in one pair
 but is contradicted by another pair is discarded.
 
-st_hole_count uses a bounding-box approximation. A 2x3 rectangular object with
+symtab_hole_count uses a bounding-box approximation. A 2x3 rectangular object with
 all 6 cells present has hole count 0. An L-shape in a 2x2 bbox with 3 cells has
 hole count 1. For tasks where exact topological hole counting matters (objects
 with true enclosed holes), a grid-context version using flood fill is recommended.
 
-st_is_symbol uses two heuristics. The first is size: an object smaller than all
+symtab_is_symbol uses two heuristics. The first is size: an object smaller than all
 content objects is likely a symbol. The second is uniqueness: an object with a
 color not shared by any content object is likely a symbol. These heuristics work
 well on ARC-AGI-2 tasks where symbols are visually distinct from content.

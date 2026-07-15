@@ -41,31 +41,31 @@ The symmetry pack uses all eight to analyze grids.
 
 INDIVIDUAL SYMMETRY TESTS
 
-sy_is_hsymmetric(+Grid)
+symmetry_is_hsymmetric(+Grid)
   Grid equals its left-right mirror (gd_reflect_v).
 
-  ?- sy_is_hsymmetric([[1,2,1],[3,4,3]]).
+  ?- symmetry_is_hsymmetric([[1,2,1],[3,4,3]]).
   true.
 
-sy_is_vsymmetric(+Grid)
+symmetry_is_vsymmetric(+Grid)
   Grid equals its top-bottom mirror (gd_reflect_h).
 
-  ?- sy_is_vsymmetric([[1,2,3],[4,5,6],[1,2,3]]).
+  ?- symmetry_is_vsymmetric([[1,2,3],[4,5,6],[1,2,3]]).
   true.
 
-sy_is_rot180(+Grid)
+symmetry_is_rot180(+Grid)
   Grid equals its 180-degree rotation.
 
-  ?- sy_is_rot180([[1,2,3],[4,5,4],[3,2,1]]).
+  ?- symmetry_is_rot180([[1,2,3],[4,5,4],[3,2,1]]).
   true.
 
-sy_is_rot90(+Grid)
+symmetry_is_rot90(+Grid)
   Grid equals its 90-degree clockwise rotation. Requires a square grid.
 
-sy_is_diagonal(+Grid)
+symmetry_is_diagonal(+Grid)
   Grid equals its main-diagonal reflection (transpose). Requires square.
 
-sy_is_antidiagonal(+Grid)
+symmetry_is_antidiagonal(+Grid)
   Grid equals its anti-diagonal reflection. Requires square.
 
 All six tests fail for grids that lack the corresponding symmetry.
@@ -73,83 +73,83 @@ All six tests fail for grids that lack the corresponding symmetry.
 
 THE SYMMETRY GROUP
 
-sy_group(+Grid, -Group)
+symmetry_group(+Grid, -Group)
 
 Group is the list of symmetry atoms that hold for Grid. Atoms:
   h (horizontal/left-right), v (vertical/top-bottom), rot180, rot90,
   diag (main diagonal), antidiag (anti-diagonal).
 
-  ?- sy_group([[1,2,1],[3,4,3]], Group).
+  ?- symmetry_group([[1,2,1],[3,4,3]], Group).
   Group = [h].
 
-  ?- sy_group([[1,1,1],[1,2,1],[1,1,1]], Group).
+  ?- symmetry_group([[1,1,1],[1,2,1],[1,1,1]], Group).
   Group = [h, v, rot180, rot90, diag, antidiag].
 
-  ?- sy_group([[1,2,3],[4,5,6],[7,8,9]], Group).
+  ?- symmetry_group([[1,2,3],[4,5,6],[7,8,9]], Group).
   Group = [].
 
 
 ORBITS AND ROTATIONS
 
-sy_rotations(+Grid, -Rotations)
+symmetry_rotations(+Grid, -Rotations)
 
 The distinct grids reachable by 0, 90, 180, and 270 degree rotations.
 Duplicates are removed.
 
-  ?- sy_rotations([[1,2],[3,4]], Rots),
+  ?- symmetry_rotations([[1,2],[3,4]], Rots),
      length(Rots, N).
   N = 4.  % All 4 rotations are distinct for an asymmetric grid.
 
-  ?- sy_rotations([[1,1],[1,1]], Rots),
+  ?- symmetry_rotations([[1,1],[1,1]], Rots),
      length(Rots, N).
   N = 1.  % Uniform grid: all rotations are the same.
 
-sy_orbit(+Grid, -Orbit)
+symmetry_orbit(+Grid, -Orbit)
 
 The full dihedral orbit: all distinct grids reachable by any rotation or
 reflection. Maximum 8 elements.
 
-  ?- sy_orbit([[1,2,3],[4,5,6],[7,8,9]], Orbit),
+  ?- symmetry_orbit([[1,2,3],[4,5,6],[7,8,9]], Orbit),
      length(Orbit, N).
   N = 8.  % Asymmetric: full orbit of 8.
 
-  ?- sy_orbit([[1,1,1],[1,2,1],[1,1,1]], Orbit),
+  ?- symmetry_orbit([[1,1,1],[1,2,1],[1,1,1]], Orbit),
      length(Orbit, N).
   N = 1.  % Fully symmetric: orbit is just the grid itself.
 
 
 CANONICAL FORMS
 
-sy_canonical(+Grid, -Canon)
+symmetry_canonical(+Grid, -Canon)
 
 The lexicographically smallest element of the orbit. Two grids have the
 same canonical form if and only if they are equivalent under D4.
 
-  ?- sy_canonical([[1,2,3],[4,5,6],[7,8,9]], C1),
+  ?- symmetry_canonical([[1,2,3],[4,5,6],[7,8,9]], C1),
      gd_rotate90([[1,2,3],[4,5,6],[7,8,9]], R90),
-     sy_canonical(R90, C2),
+     symmetry_canonical(R90, C2),
      C1 = C2.
   true.  % Same canonical form: they are equivalent.
 
 
 EQUIVALENCE
 
-sy_equivalent(+GridA, +GridB)
+symmetry_equivalent(+GridA, +GridB)
 
 Succeed if GridA and GridB are in the same dihedral orbit (same canonical form).
 
   ?- gd_rotate90([[1,2,3],[4,5,6],[7,8,9]], R90),
-     sy_equivalent([[1,2,3],[4,5,6],[7,8,9]], R90).
+     symmetry_equivalent([[1,2,3],[4,5,6],[7,8,9]], R90).
   true.
 
-  ?- sy_equivalent([[1,2,3],[4,5,6],[7,8,9]],
+  ?- symmetry_equivalent([[1,2,3],[4,5,6],[7,8,9]],
                    [[1,1,1],[1,2,1],[1,1,1]]).
   false.  % Different orbits.
 
 
 SYMMETRY ORDER
 
-sy_order(+Grid, -N)
+symmetry_order(+Grid, -N)
 
 N is the number of D4 transforms that map Grid to itself.
 Computed as 8 divided by the orbit size.
@@ -159,34 +159,34 @@ Computed as 8 divided by the orbit size.
   N = 4: two symmetries (orbit = 2)
   N = 8: all 8 symmetries (orbit = 1)
 
-  ?- sy_order([[1,1,1],[1,2,1],[1,1,1]], N).
+  ?- symmetry_order([[1,1,1],[1,2,1],[1,1,1]], N).
   N = 8.
 
-  ?- sy_order([[1,2,3],[4,5,6],[7,8,9]], N).
+  ?- symmetry_order([[1,2,3],[4,5,6],[7,8,9]], N).
   N = 1.
 
 
 PREDICATE SUMMARY
 
 Individual symmetry tests:
-  sy_is_hsymmetric/1    - left-right symmetry
-  sy_is_vsymmetric/1    - top-bottom symmetry
-  sy_is_rot180/1        - 180-degree rotational symmetry
-  sy_is_rot90/1         - 90-degree rotational symmetry (square)
-  sy_is_diagonal/1      - main-diagonal symmetry (square)
-  sy_is_antidiagonal/1  - anti-diagonal symmetry (square)
+  symmetry_is_hsymmetric/1    - left-right symmetry
+  symmetry_is_vsymmetric/1    - top-bottom symmetry
+  symmetry_is_rot180/1        - 180-degree rotational symmetry
+  symmetry_is_rot90/1         - 90-degree rotational symmetry (square)
+  symmetry_is_diagonal/1      - main-diagonal symmetry (square)
+  symmetry_is_antidiagonal/1  - anti-diagonal symmetry (square)
 
 Group:
-  sy_group/2            - all symmetry atoms that hold
+  symmetry_group/2            - all symmetry atoms that hold
 
 Orbit:
-  sy_rotations/2        - distinct rotations
-  sy_orbit/2            - full dihedral orbit
+  symmetry_rotations/2        - distinct rotations
+  symmetry_orbit/2            - full dihedral orbit
 
 Canonical form:
-  sy_canonical/2        - lex-min element of orbit
-  sy_equivalent/2       - orbit equivalence test
-  sy_order/2            - symmetry order
+  symmetry_canonical/2        - lex-min element of orbit
+  symmetry_equivalent/2       - orbit equivalence test
+  symmetry_order/2            - symmetry order
 
 
 WHAT COMES NEXT

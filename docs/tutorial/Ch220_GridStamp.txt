@@ -6,57 +6,57 @@ finding pattern matches, resizing grids, and creating blank canvases.
 
 Predicates
 
-gst_canvas(+H, +W, +Bg, -Canvas)
+gridstamp_canvas(+H, +W, +Bg, -Canvas)
   Create an H-row by W-column grid filled entirely with Bg.
 
-gst_stamp(+Grid, +Stamp, +R0, +C0, +Bg, -Result)
+gridstamp_stamp(+Grid, +Stamp, +R0, +C0, +Bg, -Result)
   Paste Stamp onto Grid with its top-left at (R0,C0). Non-Bg cells in Stamp
   overwrite Grid cells. Bg cells in Stamp are transparent. Out-of-bounds
   Stamp cells are silently ignored.
 
-gst_stamp_all(+Grid, +Stamp, +Positions, +Bg, -Result)
-  Apply gst_stamp at each r(R,C) in Positions, left to right.
+gridstamp_stamp_all(+Grid, +Stamp, +Positions, +Bg, -Result)
+  Apply gridstamp_stamp at each r(R,C) in Positions, left to right.
 
-gst_scatter(+Grid, +Color, +Positions, +Bg, -Result)
+gridstamp_scatter(+Grid, +Color, +Positions, +Bg, -Result)
   Place Color at every r(R,C) in Positions unconditionally (opaque).
 
-gst_find_matches(+Grid, +Pattern, +Bg, -Matches)
+gridstamp_find_matches(+Grid, +Pattern, +Bg, -Matches)
   Matches is the list r(R,C) of all top-left positions where Pattern exactly
   matches the Grid subgrid. Returns [] if Pattern does not fit in Grid.
 
-gst_stamp_count(+Grid, +Pattern, +Bg, -Count)
+gridstamp_stamp_count(+Grid, +Pattern, +Bg, -Count)
   Count how many times Pattern appears in Grid.
 
-gst_pad(+Grid, +H, +W, +Bg, -Result)
+gridstamp_pad(+Grid, +H, +W, +Bg, -Result)
   Pad Grid with Bg to reach at least H rows and W columns, anchored top-left.
 
-gst_unpad(+Grid, +Bg, -Result)
+gridstamp_unpad(+Grid, +Bg, -Result)
   Crop Grid to the tight bounding box of all non-Bg content. Returns [] for
   an all-Bg grid.
 
-gst_replicate_h(+Grid, +N, +Bg, -Result)
+gridstamp_replicate_h(+Grid, +N, +Bg, -Result)
   Repeat Grid N times side by side horizontally.
 
-gst_replicate_v(+Grid, +N, +Bg, -Result)
+gridstamp_replicate_v(+Grid, +N, +Bg, -Result)
   Stack Grid N times vertically.
 
-gst_border(+Grid, +BorderColor, +T, +Bg, -Result)
+gridstamp_border(+Grid, +BorderColor, +T, +Bg, -Result)
   Surround Grid with a border of BorderColor of thickness T.
   Result dimensions: (GH+2T) x (GW+2T). T=0 returns Grid unchanged.
 
-gst_center(+Grid, +H, +W, +Bg, -Result)
+gridstamp_center(+Grid, +H, +W, +Bg, -Result)
   Place Grid at the center of an H x W Bg canvas using integer division.
 
-gst_extract(+Grid, +R0, +C0, +H, +W, -Subgrid)
+gridstamp_extract(+Grid, +R0, +C0, +H, +W, -Subgrid)
   Extract an H x W subgrid from Grid at (R0,C0).
 
-gst_replace(+Grid, +R0, +C0, +Patch, -Result)
+gridstamp_replace(+Grid, +R0, +C0, +Patch, -Result)
   Overwrite the rectangle at (R0,C0) with Patch (opaque: all cells written).
   Patch cells that fall outside Grid bounds are silently ignored.
 
 
-Key design distinction: gst_stamp is transparent (Bg cells in Stamp show
-through to Grid), while gst_scatter and gst_replace are opaque (every target
+Key design distinction: gridstamp_stamp is transparent (Bg cells in Stamp show
+through to Grid), while gridstamp_scatter and gridstamp_replace are opaque (every target
 cell is overwritten).
 
 
@@ -65,50 +65,50 @@ Example Session
 :- use_module(pack(gridstamp/prolog/gridstamp)).
 
 % Build a blank canvas and stamp a pattern onto it.
-gst_canvas(4, 4, b, C),
-gst_stamp(C, [[r,g],[y,p]], 1, 1, b, Stamped).
+gridstamp_canvas(4, 4, b, C),
+gridstamp_stamp(C, [[r,g],[y,p]], 1, 1, b, Stamped).
 % Stamped = [[b,b,b,b],[b,r,g,b],[b,y,p,b],[b,b,b,b]].
 
 % Find all positions of a single-cell pattern.
-gst_find_matches([[r,b,r],[b,r,b]], [[r]], b, M).
+gridstamp_find_matches([[r,b,r],[b,r,b]], [[r]], b, M).
 % M = [r(0,0),r(0,2),r(1,1)].
 
 % Count occurrences.
-gst_stamp_count([[r,b,r],[b,r,b]], [[r]], b, C).
+gridstamp_stamp_count([[r,b,r],[b,r,b]], [[r]], b, C).
 % C = 3.
 
 % Transparent stamp: bg in stamp does not overwrite.
-gst_stamp([[r,g],[y,p]], [[b,x],[b,b]], 0, 0, b, R).
+gridstamp_stamp([[r,g],[y,p]], [[b,x],[b,b]], 0, 0, b, R).
 % R = [[r,x],[y,p]].  (only x overwrites; b cells leave r,y,p unchanged)
 
 % Pad a small grid to 3x4.
-gst_pad([[r]], 3, 4, b, P).
+gridstamp_pad([[r]], 3, 4, b, P).
 % P = [[r,b,b,b],[b,b,b,b],[b,b,b,b]].
 
 % Trim bg border.
-gst_unpad([[b,b,b],[b,r,b],[b,b,b]], b, U).
+gridstamp_unpad([[b,b,b],[b,r,b],[b,b,b]], b, U).
 % U = [[r]].
 
 % Replicate side by side and stacked.
-gst_replicate_h([[r,g]], 3, b, H).
+gridstamp_replicate_h([[r,g]], 3, b, H).
 % H = [[r,g,r,g,r,g]].
-gst_replicate_v([[r,g]], 3, b, V).
+gridstamp_replicate_v([[r,g]], 3, b, V).
 % V = [[r,g],[r,g],[r,g]].
 
 % Add a border of thickness 1.
-gst_border([[r]], x, 1, b, B).
+gridstamp_border([[r]], x, 1, b, B).
 % B = [[x,x,x],[x,r,x],[x,x,x]].
 
 % Center a 1x1 grid on a 3x3 canvas.
-gst_center([[r]], 3, 3, b, Cen).
+gridstamp_center([[r]], 3, 3, b, Cen).
 % Cen = [[b,b,b],[b,r,b],[b,b,b]].
 
 % Extract a subgrid.
-gst_extract([[a,b,c],[d,e,f],[g,h,i]], 0, 1, 2, 2, Sub).
+gridstamp_extract([[a,b,c],[d,e,f],[g,h,i]], 0, 1, 2, 2, Sub).
 % Sub = [[b,c],[e,f]].
 
 % Replace (opaque) a patch.
-gst_replace([[b,b],[b,b]], 0, 0, [[r,g],[y,p]], Repl).
+gridstamp_replace([[b,b],[b,b]], 0, 0, [[r,g],[y,p]], Repl).
 % Repl = [[r,g],[y,p]].
 
 

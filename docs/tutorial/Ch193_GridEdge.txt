@@ -16,48 +16,48 @@ Load the pack:
 
 1. Edge Cell Detection
 
-ge_edge_cells(+Grid, +FgColor, -Cells)
+gridedge_edge_cells(+Grid, +FgColor, -Cells)
 
 Cells is the list of FgColor positions that have at least one 4-connected
 neighbor of a different color. Each cell appears exactly once.
 
 Example:
 G = [[r,r,x],[r,r,x],[x,x,x]].
-ge_edge_cells(G, r, Cells).
+gridedge_edge_cells(G, r, Cells).
 % Cells = [0-1, 1-0, 1-1]  (r cells touching x; corner 0-0 has only r neighbors)
 
-ge_edge_cells8(+Grid, +FgColor, -Cells)
+gridedge_edge_cells8(+Grid, +FgColor, -Cells)
 
-Like ge_edge_cells but uses the 8-connected (Moore) neighborhood.
+Like gridedge_edge_cells but uses the 8-connected (Moore) neighborhood.
 
-ge_is_edge(+Grid, +R-C, -Bool)
+gridedge_is_edge(+Grid, +R-C, -Bool)
 
 Bool is 'yes' if cell (R,C) has at least one 4-connected neighbor of a
 different color; 'no' otherwise.
 
 Example:
-ge_is_edge([[r,x],[x,r]], 0-0, B).
+gridedge_is_edge([[r,x],[x,r]], 0-0, B).
 % B = yes
 
 
 2. Boundary Detection
 
-ge_boundary(+Grid, +Color1, +Color2, -Cells)
+gridedge_boundary(+Grid, +Color1, +Color2, -Cells)
 
 Cells is the list of Color1 positions that have at least one 4-connected
 Color2 neighbor.
 
 Example:
 G = [[r,r,x],[r,r,x],[x,x,x]].
-ge_boundary(G, r, x, Cells).
+gridedge_boundary(G, r, x, Cells).
 % Cells = [0-1, 1-0, 1-1]
 
-ge_inner_border(+Grid, +BgColor, -Cells)
+gridedge_inner_border(+Grid, +BgColor, -Cells)
 
 Cells is the list of BgColor positions adjacent to at least one non-BgColor
 cell (the inner rim of the background).
 
-ge_outer_border(+Grid, +FgColor, -Cells)
+gridedge_outer_border(+Grid, +FgColor, -Cells)
 
 Cells is the list of non-FgColor positions adjacent to at least one FgColor
 cell (the cells immediately outside the FgColor region).
@@ -65,42 +65,42 @@ cell (the cells immediately outside the FgColor region).
 
 3. Edge Grid and Counts
 
-ge_edge_grid(+Grid, +FgColor, +EdgeColor, -Result)
+gridedge_edge_grid(+Grid, +FgColor, +EdgeColor, -Result)
 
 Result is Grid with FgColor edge cells replaced by EdgeColor; all other cells
 retain their original color.
 
 Example:
-ge_edge_grid([[r,r,x],[r,r,x],[x,x,x]], r, e, Result).
+gridedge_edge_grid([[r,r,x],[r,r,x],[x,x,x]], r, e, Result).
 % Result = [[r,e,x],[e,e,x],[x,x,x]]
 
-ge_edge_count(+Grid, +FgColor, -N)
+gridedge_edge_count(+Grid, +FgColor, -N)
 
 N is the number of FgColor edge cells.
 
-ge_edge_color_count(+Grid, +FgColor, +BgColor, -N)
+gridedge_edge_color_count(+Grid, +FgColor, +BgColor, -N)
 
 N is the number of FgColor cells adjacent to at least one BgColor cell.
 
 
 4. Neighbor Analysis
 
-ge_neighbors_diff(+Grid, +R, +C, -Neighbors)
+gridedge_neighbors_diff(+Grid, +R, +C, -Neighbors)
 
 Neighbors is the list of R-C positions among the 4-connected neighbors of
 (R,C) that have a different color from cell (R,C).
 
-ge_corners(+Grid, +FgColor, -Cells)
+gridedge_corners(+Grid, +FgColor, -Cells)
 
 Cells is the list of FgColor positions with 2 or more differently-colored
 4-connected neighbors (corners of regions).
 
-ge_endpoints(+Grid, +FgColor, -Cells)
+gridedge_endpoints(+Grid, +FgColor, -Cells)
 
 Cells is the list of FgColor positions with exactly 1 same-color 4-connected
 neighbor (line endpoints).
 
-ge_smooth_cells(+Grid, +FgColor, -Cells)
+gridedge_smooth_cells(+Grid, +FgColor, -Cells)
 
 Cells is the list of FgColor positions with no differently-colored in-bounds
 4-connected neighbor (fully interior cells).
@@ -108,7 +108,7 @@ Cells is the list of FgColor positions with no differently-colored in-bounds
 
 5. Transition Map
 
-ge_transition_map(+Grid, -Result)
+gridedge_transition_map(+Grid, -Result)
 
 Result is a grid where each cell value is the count (0..4) of 4-connected
 in-bounds neighbors with a different color. Interior uniform cells have value 0;
@@ -116,23 +116,23 @@ edge cells have 1, 2, 3, or 4.
 
 Example:
 G = [[r,r,x],[r,r,x],[x,x,x]].
-ge_transition_map(G, R).
+gridedge_transition_map(G, R).
 % R = [[0,1,1],[1,2,1],[1,1,0]]
 
 
 6. Summary of Predicates
 
-ge_edge_cells/3      - 4-connected edge cells of FgColor
-ge_edge_cells8/3     - 8-connected edge cells of FgColor
-ge_is_edge/3         - test if single cell is an edge cell
-ge_boundary/4        - Color1 cells adjacent to Color2 cells
-ge_inner_border/3    - BgColor cells adjacent to non-BgColor
-ge_outer_border/3    - non-FgColor cells adjacent to FgColor
-ge_edge_grid/4       - grid with edge cells replaced by EdgeColor
-ge_edge_count/3      - count of FgColor edge cells
-ge_neighbors_diff/4  - 4-connected neighbors with different color
-ge_corners/3         - cells with 2+ differently-colored 4-neighbors
-ge_endpoints/3       - cells with exactly 1 same-color 4-neighbor
-ge_smooth_cells/3    - cells with no differently-colored 4-neighbors
-ge_transition_map/2  - grid of per-cell differently-colored neighbor counts
-ge_edge_color_count/4 - count FgColor cells adjacent to BgColor
+gridedge_edge_cells/3      - 4-connected edge cells of FgColor
+gridedge_edge_cells8/3     - 8-connected edge cells of FgColor
+gridedge_is_edge/3         - test if single cell is an edge cell
+gridedge_boundary/4        - Color1 cells adjacent to Color2 cells
+gridedge_inner_border/3    - BgColor cells adjacent to non-BgColor
+gridedge_outer_border/3    - non-FgColor cells adjacent to FgColor
+gridedge_edge_grid/4       - grid with edge cells replaced by EdgeColor
+gridedge_edge_count/3      - count of FgColor edge cells
+gridedge_neighbors_diff/4  - 4-connected neighbors with different color
+gridedge_corners/3         - cells with 2+ differently-colored 4-neighbors
+gridedge_endpoints/3       - cells with exactly 1 same-color 4-neighbor
+gridedge_smooth_cells/3    - cells with no differently-colored 4-neighbors
+gridedge_transition_map/2  - grid of per-cell differently-colored neighbor counts
+gridedge_edge_color_count/4 - count FgColor cells adjacent to BgColor

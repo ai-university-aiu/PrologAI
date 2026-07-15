@@ -55,19 +55,19 @@ uniform_2x2(Grid) :-
 
 test(hsym_yes) :-
     hsym_grid(G),
-    sy_is_hsymmetric(G).
+    symmetry_is_hsymmetric(G).
 
 test(hsym_full) :-
     full_sym_grid(G),
-    sy_is_hsymmetric(G).
+    symmetry_is_hsymmetric(G).
 
 test(hsym_no, [fail]) :-
     asym_grid(G),
-    sy_is_hsymmetric(G).
+    symmetry_is_hsymmetric(G).
 
 test(vsym_no_is_hsym, [fail]) :-
     vsym_grid(G),
-    sy_is_hsymmetric(G).
+    symmetry_is_hsymmetric(G).
 
 :- end_tests(symmetry_hsym).
 
@@ -75,15 +75,15 @@ test(vsym_no_is_hsym, [fail]) :-
 
 test(vsym_yes) :-
     vsym_grid(G),
-    sy_is_vsymmetric(G).
+    symmetry_is_vsymmetric(G).
 
 test(vsym_full) :-
     full_sym_grid(G),
-    sy_is_vsymmetric(G).
+    symmetry_is_vsymmetric(G).
 
 test(vsym_no, [fail]) :-
     asym_grid(G),
-    sy_is_vsymmetric(G).
+    symmetry_is_vsymmetric(G).
 
 :- end_tests(symmetry_vsym).
 
@@ -91,15 +91,15 @@ test(vsym_no, [fail]) :-
 
 test(rot180_yes) :-
     rot180_grid(G),
-    sy_is_rot180(G).
+    symmetry_is_rot180(G).
 
 test(rot180_full) :-
     full_sym_grid(G),
-    sy_is_rot180(G).
+    symmetry_is_rot180(G).
 
 test(rot180_no, [fail]) :-
     asym_grid(G),
-    sy_is_rot180(G).
+    symmetry_is_rot180(G).
 
 :- end_tests(symmetry_rot180).
 
@@ -107,15 +107,15 @@ test(rot180_no, [fail]) :-
 
 test(rot90_full) :-
     full_sym_grid(G),
-    sy_is_rot90(G).
+    symmetry_is_rot90(G).
 
 test(rot90_uniform) :-
     uniform_2x2(G),
-    sy_is_rot90(G).
+    symmetry_is_rot90(G).
 
 test(rot90_asym_no, [fail]) :-
     asym_grid(G),
-    sy_is_rot90(G).
+    symmetry_is_rot90(G).
 
 :- end_tests(symmetry_rot90).
 
@@ -123,15 +123,15 @@ test(rot90_asym_no, [fail]) :-
 
 test(diag_yes) :-
     diag_grid(G),
-    sy_is_diagonal(G).
+    symmetry_is_diagonal(G).
 
 test(diag_full) :-
     full_sym_grid(G),
-    sy_is_diagonal(G).
+    symmetry_is_diagonal(G).
 
 test(diag_no, [fail]) :-
     asym_grid(G),
-    sy_is_diagonal(G).
+    symmetry_is_diagonal(G).
 
 :- end_tests(symmetry_diagonal).
 
@@ -139,15 +139,15 @@ test(diag_no, [fail]) :-
 
 test(antidiag_full) :-
     full_sym_grid(G),
-    sy_is_antidiagonal(G).
+    symmetry_is_antidiagonal(G).
 
 test(antidiag_uniform) :-
     uniform_2x2(G),
-    sy_is_antidiagonal(G).
+    symmetry_is_antidiagonal(G).
 
 test(antidiag_asym_no, [fail]) :-
     asym_grid(G),
-    sy_is_antidiagonal(G).
+    symmetry_is_antidiagonal(G).
 
 :- end_tests(symmetry_antidiagonal).
 
@@ -155,19 +155,19 @@ test(antidiag_asym_no, [fail]) :-
 
 test(group_full, [nondet]) :-
     full_sym_grid(G),
-    sy_group(G, Group),
+    symmetry_group(G, Group),
     % All 6 symmetries should hold for the fully symmetric grid.
     length(Group, 6).
 
 test(group_hsym, [nondet]) :-
     hsym_grid(G),
-    sy_group(G, Group),
+    symmetry_group(G, Group),
     member(h, Group),
     \+ member(v, Group).
 
 test(group_asym, [nondet]) :-
     asym_grid(G),
-    sy_group(G, Group),
+    symmetry_group(G, Group),
     Group = [].
 
 :- end_tests(symmetry_group).
@@ -177,19 +177,19 @@ test(group_asym, [nondet]) :-
 test(rotations_asym, [nondet]) :-
     % Asymmetric grid: all 4 rotations are distinct.
     asym_grid(G),
-    sy_rotations(G, Rots),
+    symmetry_rotations(G, Rots),
     length(Rots, 4).
 
 test(rotations_rot180, [nondet]) :-
     % rot180 grid: R0=R180, R90=R270, so 2 distinct rotations.
     rot180_grid(G),
-    sy_rotations(G, Rots),
+    symmetry_rotations(G, Rots),
     length(Rots, 2).
 
 test(rotations_full, [nondet]) :-
     % Fully symmetric: all rotations are the same, so 1 distinct.
     full_sym_grid(G),
-    sy_rotations(G, Rots),
+    symmetry_rotations(G, Rots),
     length(Rots, 1).
 
 :- end_tests(symmetry_rotations).
@@ -199,19 +199,19 @@ test(rotations_full, [nondet]) :-
 test(orbit_asym, [nondet]) :-
     % Asymmetric grid: full 8-element orbit.
     asym_grid(G),
-    sy_orbit(G, Orbit),
+    symmetry_orbit(G, Orbit),
     length(Orbit, 8).
 
 test(orbit_full, [nondet]) :-
     % Fully symmetric: orbit has 1 element.
     full_sym_grid(G),
-    sy_orbit(G, Orbit),
+    symmetry_orbit(G, Orbit),
     length(Orbit, 1).
 
 test(orbit_hsym, [nondet]) :-
     % Horizontally symmetric: orbit has 4 elements (h and v_of_h collapse).
     hsym_grid(G),
-    sy_orbit(G, Orbit),
+    symmetry_orbit(G, Orbit),
     length(Orbit, 4).
 
 :- end_tests(symmetry_orbit).
@@ -221,21 +221,21 @@ test(orbit_hsym, [nondet]) :-
 test(canonical_same_for_equiv, [nondet]) :-
     asym_grid(G),
     gd_rotate90(G, R90),
-    sy_canonical(G, C1),
-    sy_canonical(R90, C2),
+    symmetry_canonical(G, C1),
+    symmetry_canonical(R90, C2),
     gd_equal(C1, C2).
 
 test(canonical_is_in_orbit, [nondet]) :-
     asym_grid(G),
-    sy_canonical(G, Canon),
-    sy_orbit(G, Orbit),
-    include(sy_matches_canon_(Canon), Orbit, Matching),
+    symmetry_canonical(G, Canon),
+    symmetry_orbit(G, Orbit),
+    include(symmetry_matches_canon_(Canon), Orbit, Matching),
     Matching = [_].
 
 :- end_tests(symmetry_canonical).
 
-% sy_matches_canon_(Canon, Grid) - helper for include.
-sy_matches_canon_(Canon, Grid) :-
+% symmetry_matches_canon_(Canon, Grid) - helper for include.
+symmetry_matches_canon_(Canon, Grid) :-
     gd_equal(Canon, Grid).
 
 :- begin_tests(symmetry_equivalent).
@@ -243,18 +243,18 @@ sy_matches_canon_(Canon, Grid) :-
 test(equiv_rotation, [nondet]) :-
     asym_grid(G),
     gd_rotate90(G, R90),
-    sy_equivalent(G, R90).
+    symmetry_equivalent(G, R90).
 
 test(equiv_reflection, [nondet]) :-
     asym_grid(G),
     gd_reflect_v(G, Flip),
-    sy_equivalent(G, Flip).
+    symmetry_equivalent(G, Flip).
 
 test(not_equiv, [fail]) :-
     asym_grid(G),
     % A different grid (not in the orbit of asym_grid).
     full_sym_grid(H),
-    sy_equivalent(G, H).
+    symmetry_equivalent(G, H).
 
 :- end_tests(symmetry_equivalent).
 
@@ -263,19 +263,19 @@ test(not_equiv, [fail]) :-
 test(order_full, [nondet]) :-
     % Fully symmetric: order 8 (all transforms stabilize it).
     full_sym_grid(G),
-    sy_order(G, N),
+    symmetry_order(G, N),
     N =:= 8.
 
 test(order_asym, [nondet]) :-
     % Asymmetric: orbit = 8, order = 1.
     asym_grid(G),
-    sy_order(G, N),
+    symmetry_order(G, N),
     N =:= 1.
 
 test(order_rot180, [nondet]) :-
     % 180-symmetric only: orbit = 4, order = 2.
     rot180_grid(G),
-    sy_order(G, N),
+    symmetry_order(G, N),
     N =:= 2.
 
 :- end_tests(symmetry_order).
