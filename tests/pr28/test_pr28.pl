@@ -1,16 +1,16 @@
 /*  PrologAI — PR 28 Time-Linear Language (Database Semantics) Acceptance Tests
 
-    AC-PR28-001: Given the heard sequence "julia is working", when pai_think_path
+    AC-PR28-001: Given the heard sequence "julia is working", when language_think_path
                  is asked from julia, then a path julia→working exists, and
-                 pai_speak over that path emits a grammatical surface.
-    AC-PR28-002: pai_hear builds a word_trace for each word in the stream.
+                 language_speak over that path emits a grammatical surface.
+    AC-PR28-002: language_hear builds a word_trace for each word in the stream.
     AC-PR28-003: word_traces are never retracted (append-only / sediment).
     AC-PR28-004: Unknown words are admitted as new word_traces without error.
     AC-PR28-005: Grammatical subject pointer links verb to subject.
     AC-PR28-006: next pointer links each word_trace to the following one.
     AC-PR28-007: Indexical 'i' resolves to the context-bound agent.
-    AC-PR28-008: pai_think_path with max_depth(1) returns only immediate neighbors.
-    AC-PR28-009: pai_speak on an empty path returns an empty string.
+    AC-PR28-008: language_think_path with max_depth(1) returns only immediate neighbors.
+    AC-PR28-009: language_speak on an empty path returns an empty string.
 */
 
 % Execute the compile-time directive: prolog_load_context(directory, TestDir),.
@@ -28,16 +28,16 @@
 :- use_module(library(plunit)).
 % Load the built-in 'language' library so its predicates are available here.
 :- use_module(library(language), [
-    % Supply 'pai_hear/2' as the next argument to the expression above.
-    pai_hear/2,
-    % Supply 'pai_think_path/3' as the next argument to the expression above.
-    pai_think_path/3,
-    % Supply 'pai_speak/2' as the next argument to the expression above.
-    pai_speak/2,
-    % Supply 'pai_word_trace/3' as the next argument to the expression above.
-    pai_word_trace/3,
-    % Supply 'pai_set_context/2' as the next argument to the expression above.
-    pai_set_context/2
+    % Supply 'language_hear/2' as the next argument to the expression above.
+    language_hear/2,
+    % Supply 'language_think_path/3' as the next argument to the expression above.
+    language_think_path/3,
+    % Supply 'language_speak/2' as the next argument to the expression above.
+    language_speak/2,
+    % Supply 'language_word_trace/3' as the next argument to the expression above.
+    language_word_trace/3,
+    % Supply 'language_set_context/2' as the next argument to the expression above.
+    language_set_context/2
 % Close the expression opened above.
 ]).
 
@@ -66,9 +66,9 @@ pr28_cleanup :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(hear_think_speak_path) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_hear([julia, is, working], _TraceIds)),
+    once(language_hear([julia, is, working], _TraceIds)),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_think_path(julia, [], Path)),
+    once(language_think_path(julia, [], Path)),
     % Check that 'Path' is not unifiable with '[]'.
     Path \= [],
     % Check working is reachable
@@ -81,7 +81,7 @@ test(hear_think_speak_path) :-
     % Close the expression opened above.
     ),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_speak(Path, Surface)),
+    once(language_speak(Path, Surface)),
     % State a fact for 'atom' with the arguments listed below.
     atom(Surface),
     % State a fact for 'once' with the arguments listed below.
@@ -93,22 +93,22 @@ test(hear_think_speak_path) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(hear_builds_word_traces) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_hear([the, cat, sat], Ids)),
+    once(language_hear([the, cat, sat], Ids)),
     % Unify '3' with the number of elements in list 'Ids'.
     length(Ids, 3),
-    % State the fact: once(pai_word_trace(cat, _, _)).
-    once(pai_word_trace(cat, _, _)).
+    % State the fact: once(language_word_trace(cat, _, _)).
+    once(language_word_trace(cat, _, _)).
 
 %  AC-PR28-003: word_traces are never retracted (sediment)
 % Define a clause for 'test': succeed when the following conditions hold.
 test(word_traces_append_only) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_hear([hello, world], _)),
+    once(language_hear([hello, world], _)),
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(Id, language:word_trace(Id, _, _, _), Before),
     % Try to retract one — but we verify the count after hearing again
     % State a fact for 'once' with the arguments listed below.
-    once(pai_hear([foo], _)),
+    once(language_hear([foo], _)),
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(Id2, language:word_trace(Id2, _, _, _), After),
     % Unify 'NB' with the number of elements in list 'Before'.
@@ -122,17 +122,17 @@ test(word_traces_append_only) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(unknown_words_admitted) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_hear([xyzzy, qux, blargh], Ids)),
+    once(language_hear([xyzzy, qux, blargh], Ids)),
     % Unify '3' with the number of elements in list 'Ids'.
     length(Ids, 3),
-    % State the fact: once(pai_word_trace(xyzzy, _, _)).
-    once(pai_word_trace(xyzzy, _, _)).
+    % State the fact: once(language_word_trace(xyzzy, _, _)).
+    once(language_word_trace(xyzzy, _, _)).
 
 %  AC-PR28-005: grammatical subject pointer: verb points to subject
 % Define a clause for 'test': succeed when the following conditions hold.
 test(subject_pointer_set) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_hear([alice, runs, fast], [SId, VId|_])),
+    once(language_hear([alice, runs, fast], [SId, VId|_])),
     % Execute: language:word_trace(VId, _, VPtrs, _),.
     language:word_trace(VId, _, VPtrs, _),
     % State the fact: memberchk(pointer(subject, SId), VPtrs).
@@ -142,7 +142,7 @@ test(subject_pointer_set) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(next_pointer_links_words) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_hear([one, two, three], [W1Id, W2Id, _])),
+    once(language_hear([one, two, three], [W1Id, W2Id, _])),
     % Execute: language:word_trace(W1Id, _, Ptrs1, _),.
     language:word_trace(W1Id, _, Ptrs1, _),
     % State the fact: memberchk(pointer(next, W2Id), Ptrs1).
@@ -152,9 +152,9 @@ test(next_pointer_links_words) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(indexical_i_resolves) :-
     % State a fact for 'pai set context' with the arguments listed below.
-    pai_set_context(i, maria),
+    language_set_context(i, maria),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_hear([i, am, here], Ids)),
+    once(language_hear([i, am, here], Ids)),
     % Check that 'Ids' is unifiable with '[IId|_]'.
     Ids = [IId|_],
     % Execute: language:word_trace(IId, maria, _, _)..
@@ -164,9 +164,9 @@ test(indexical_i_resolves) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(think_path_max_depth_one) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_hear([bob, eats, lunch], _)),
+    once(language_hear([bob, eats, lunch], _)),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_think_path(bob, [max_depth(1)], Path)),
+    once(language_think_path(bob, [max_depth(1)], Path)),
     % Unify 'N' with the number of elements in list 'Path'.
     length(Path, N),
     % Check that 'N' is less than or equal to '2.  % at most the seed node + 1 neighbor'.
@@ -176,7 +176,7 @@ test(think_path_max_depth_one) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(speak_empty_path) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_speak([], Surface)),
+    once(language_speak([], Surface)),
     % Check that 'Surface' is unifiable with ''''.
     Surface = ''.
 

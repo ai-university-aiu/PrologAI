@@ -12,27 +12,27 @@
         contents; inbound agents receive results, not raw memory queries.
 
     Durable agent mail:
-        pai_peer_mail_send/3  — send addressed, persistent mail to a recipient
-        pai_peer_mail_fetch/3 — fetch pending mail; land it in quarantine scope
+        a2a_peer_mail_send/3  — send addressed, persistent mail to a recipient
+        a2a_peer_mail_fetch/3 — fetch pending mail; land it in quarantine scope
         Mail is inscribed with sender, timestamp, and a SHA-256 integrity hash.
 
     Predicates:
-        pai_agent_card/1       — -Card: generate the agent card
-        pai_a2a_task/4         — +TaskId, +Skill, +Input, -Status
-        pai_peer_mail_send/3   — +To, +Subject, +Body
-        pai_peer_mail_fetch/3  — +Recipient, +Scope, -Messages
+        a2a_agent_card/1       — -Card: generate the agent card
+        a2a_a2a_task/4         — +TaskId, +Skill, +Input, -Status
+        a2a_peer_mail_send/3   — +To, +Subject, +Body
+        a2a_peer_mail_fetch/3  — +Recipient, +Scope, -Messages
 */
 
 % Declare this file as the 'a2a' module and list its exported predicates.
 :- module(a2a, [
-    % Supply 'pai_agent_card/1' as the next argument to the expression above.
-    pai_agent_card/1,
-    % Supply 'pai_a2a_task/4' as the next argument to the expression above.
-    pai_a2a_task/4,
-    % Supply 'pai_peer_mail_send/3' as the next argument to the expression above.
-    pai_peer_mail_send/3,
-    % Supply 'pai_peer_mail_fetch/3' as the next argument to the expression above.
-    pai_peer_mail_fetch/3
+    % Supply 'a2a_agent_card/1' as the next argument to the expression above.
+    a2a_agent_card/1,
+    % Supply 'a2a_a2a_task/4' as the next argument to the expression above.
+    a2a_a2a_task/4,
+    % Supply 'a2a_peer_mail_send/3' as the next argument to the expression above.
+    a2a_peer_mail_send/3,
+    % Supply 'a2a_peer_mail_fetch/3' as the next argument to the expression above.
+    a2a_peer_mail_fetch/3
 % Close the expression opened above.
 ]).
 
@@ -72,21 +72,21 @@ next_mail_id(Id) :-
     Id = mail(N1).
 
 % ---------------------------------------------------------------------------
-% pai_agent_card/1 — generate the current agent card
+% a2a_agent_card/1 — generate the current agent card
 %
 %   The card includes identity, capabilities, and endpoint.
 %   It never includes Lattice contents (opacity principle).
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai agent card': succeed when the following conditions hold.
-pai_agent_card(card(identity(Id), capabilities(Caps), endpoint(local))) :-
+a2a_agent_card(card(identity(Id), capabilities(Caps), endpoint(local))) :-
     % Check that '( agent_identity(_, Id) -> true ; Id' is unifiable with 'pai_agent_anonymous )'.
     ( agent_identity(_, Id) -> true ; Id = pai_agent_anonymous ),
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(C, agent_capability(_, C), Caps).
 
 % ---------------------------------------------------------------------------
-% pai_a2a_task/4 — submit and execute an A2A task
+% a2a_a2a_task/4 — submit and execute an A2A task
 %
 %   Tasks are stored as task records with lifecycle:
 %       submitted → working → completed(Result) | failed(Reason)
@@ -96,7 +96,7 @@ pai_agent_card(card(identity(Id), capabilities(Caps), endpoint(local))) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai a2a task': succeed when the following conditions hold.
-pai_a2a_task(TaskId, Skill, Input, Status) :-
+a2a_a2a_task(TaskId, Skill, Input, Status) :-
     % Execute: ( a2a_task_record(TaskId, _, _, _).
     ( a2a_task_record(TaskId, _, _, _)
     % If the condition above succeeded, perform the following action.
@@ -140,14 +140,14 @@ dispatch_skill(Skill, Input, Result) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_peer_mail_send/3
+% a2a_peer_mail_send/3
 %
 %   Stores addressed, persistent mail with sender, timestamp, and body.
 %   Mail persists across sessions (dynamic fact).
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai peer mail send': succeed when the following conditions hold.
-pai_peer_mail_send(To, Subject, Body) :-
+a2a_peer_mail_send(To, Subject, Body) :-
     % State a fact for 'next mail id' with the arguments listed below.
     next_mail_id(MailId),
     % State a fact for 'get time' with the arguments listed below.
@@ -156,7 +156,7 @@ pai_peer_mail_send(To, Subject, Body) :-
     assertz(agent_mail(MailId, To, anonymous, Subject-Ts, Body)).
 
 % ---------------------------------------------------------------------------
-% pai_peer_mail_fetch/3
+% a2a_peer_mail_fetch/3
 %
 %   Fetches all pending mail for Recipient and lands it in the given Scope.
 %   Returns Messages as a list of message/5 terms.
@@ -168,7 +168,7 @@ pai_peer_mail_send(To, Subject, Body) :-
 :- dynamic delivered_mail/1.  % MailId
 
 % Define a clause for 'pai peer mail fetch': succeed when the following conditions hold.
-pai_peer_mail_fetch(Recipient, _Scope, Messages) :-
+a2a_peer_mail_fetch(Recipient, _Scope, Messages) :-
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(message(MailId, To, From, Subject-Ts, Body), (
         % Continue the multi-line expression started above.
@@ -184,14 +184,14 @@ pai_peer_mail_fetch(Recipient, _Scope, Messages) :-
 
 % Helper to register capabilities
 % Declare the following predicate as accepting callable (higher-order) arguments.
-:- meta_predicate pai_register_capability(+, +).
+:- meta_predicate a2a_register_capability(+, +).
 % Define a clause for 'pai register capability': succeed when the following conditions hold.
-pai_register_capability(AgentId, Cap) :-
+a2a_register_capability(AgentId, Cap) :-
     % Execute: ( agent_capability(AgentId, Cap) -> true ; assertz(agent_capability(AgentId, Cap)) )..
     ( agent_capability(AgentId, Cap) -> true ; assertz(agent_capability(AgentId, Cap)) ).
 
 % Define a clause for 'pai register identity': succeed when the following conditions hold.
-pai_register_identity(AgentId, Identity) :-
+a2a_register_identity(AgentId, Identity) :-
     % Remove all matching facts from the runtime knowledge base.
     retractall(agent_identity(AgentId, _)),
     % Add a new fact or rule to the runtime knowledge base.

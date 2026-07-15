@@ -103,7 +103,7 @@
 
 % Cognitive-core packs (substrate layers below 60).
 % Import the workspace broadcast-subscription predicate for wiring one.
-:- use_module(library(workspace), [pai_broadcast_subscribe/1]).
+:- use_module(library(workspace), [workspace_broadcast_subscribe/1]).
 % Import the curiosity learning-progress predicates for wiring two.
 :- use_module(library(curiosity), [curiosity_observe_error/3, curiosity_learning_progress/2]).
 % Import the agency loop predicates for wiring three.
@@ -157,7 +157,7 @@ nexus_hold_broadcast(JSpace, broadcast_content(_CId, _Relation, Ids, Salience)) 
 nexus_bind_workspace(JSpace) :-
     % Register nexus_hold_broadcast(JSpace) as a broadcast subscriber; the
     % workspace calls it each cycle as call(Goal, BroadcastContent).
-    pai_broadcast_subscribe(nexus:nexus_hold_broadcast(JSpace)).
+    workspace_broadcast_subscribe(nexus:nexus_hold_broadcast(JSpace)).
 
 % nexus_replay_broadcasts(+JSpace, +Broadcasts): apply a reasoning episode.
 nexus_replay_broadcasts(JSpace, Broadcasts) :-

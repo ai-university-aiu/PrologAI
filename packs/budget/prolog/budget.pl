@@ -13,36 +13,36 @@
       Frequency  — proportion of positive evidence [0,1]
       Confidence — total evidence count; higher = more trusted
 
-    pai_best_answer/2 returns the highest-confidence belief immediately
+    budget_best_answer/2 returns the highest-confidence belief immediately
     (anytime semantics).  Zero-evidence questions answer `no_evidence`.
 
     Predicates:
-      pai_budget/3         — +Task, +Budget, -TaskId  |  +Task, -Budget
-      pai_truth_evidence/3 — +Belief, +Pos, +Total     |  +Belief, -Freq, -Conf
-      pai_best_answer/2    — +Question, -Answer
-      pai_revise/3         — +Belief, +IsPositive, -NewFreq
+      budget_budget/3         — +Task, +Budget, -TaskId  |  +Task, -Budget
+      budget_truth_evidence/3 — +Belief, +Pos, +Total     |  +Belief, -Freq, -Conf
+      budget_best_answer/2    — +Question, -Answer
+      budget_revise/3         — +Belief, +IsPositive, -NewFreq
 */
 
 % Declare this file as the 'budget' module and list its exported predicates.
 :- module(budget, [
     % Continue the multi-line expression started above.
-    pai_budget/3,           % attach/query budget: +Task, +(P,D,Q)|-Budget
+    budget_budget/3,           % attach/query budget: +Task, +(P,D,Q)|-Budget
     % Continue the multi-line expression started above.
-    pai_budget_set/4,       % +Task, +Priority, +Durability, +Quality
+    budget_budget_set/4,       % +Task, +Priority, +Durability, +Quality
     % Continue the multi-line expression started above.
-    pai_budget_get/4,       % +Task, -Priority, -Durability, -Quality
+    budget_budget_get/4,       % +Task, -Priority, -Durability, -Quality
     % Continue the multi-line expression started above.
-    pai_truth_evidence/3,   % +Belief, +PosCount, +TotalCount  OR  +Belief, -Freq, -Conf
+    budget_truth_evidence/3,   % +Belief, +PosCount, +TotalCount  OR  +Belief, -Freq, -Conf
     % Continue the multi-line expression started above.
-    pai_truth_evidence_add/3,% +Belief, +IsPositive (true|false), -NewConf
+    budget_truth_evidence_add/3,% +Belief, +IsPositive (true|false), -NewConf
     % Continue the multi-line expression started above.
-    pai_best_answer/2,      % +Question, -Answer
+    budget_best_answer/2,      % +Question, -Answer
     % Continue the multi-line expression started above.
-    pai_revise/3,           % +Belief, +IsPositive, -NewFreq
+    budget_revise/3,           % +Belief, +IsPositive, -NewFreq
     % Continue the multi-line expression started above.
-    pai_budget_decay/1,     % +Task  (apply one decay step)
+    budget_budget_decay/1,     % +Task  (apply one decay step)
     % Continue the multi-line expression started above.
-    pai_forget_cheapest/1   % +MaxItems (forget lowest-budget items above limit)
+    budget_forget_cheapest/1   % +MaxItems (forget lowest-budget items above limit)
 % Close the expression opened above.
 ]).
 
@@ -67,22 +67,22 @@
 :- dynamic belief_evidence/3.   % Belief, PosCount, TotalCount
 
 % ---------------------------------------------------------------------------
-% pai_budget/3  — overloaded:
-%   mode 1: pai_budget(+Task, +PriorityDurabilityQuality, -ok)
+% budget_budget/3  — overloaded:
+%   mode 1: budget_budget(+Task, +PriorityDurabilityQuality, -ok)
 %           PriorityDurabilityQuality is a term budget(P,D,Q)
-%   mode 2: pai_budget(+Task, -Budget, unused) is confusing; use explicit preds
+%   mode 2: budget_budget(+Task, -Budget, unused) is confusing; use explicit preds
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai budget': succeed when the following conditions hold.
-pai_budget(Task, Budget, TaskId) :-
+budget_budget(Task, Budget, TaskId) :-
     % Check that '( Budget' is unifiable with 'budget(Priority, Durability, Quality)'.
     ( Budget = budget(Priority, Durability, Quality)
     % If the condition above succeeded, perform the following action.
-    ->  pai_budget_set(Task, Priority, Durability, Quality),
+    ->  budget_budget_set(Task, Priority, Durability, Quality),
         % Continue the multi-line expression started above.
         TaskId = Task
     % Otherwise (else branch), perform the following action.
-    ;   pai_budget_get(Task, Priority, Durability, Quality),
+    ;   budget_budget_get(Task, Priority, Durability, Quality),
         % Continue the multi-line expression started above.
         Budget = budget(Priority, Durability, Quality),
         % Continue the multi-line expression started above.
@@ -91,7 +91,7 @@ pai_budget(Task, Budget, TaskId) :-
     ).
 
 % Define a clause for 'pai budget set': succeed when the following conditions hold.
-pai_budget_set(Task, Priority, Durability, Quality) :-
+budget_budget_set(Task, Priority, Durability, Quality) :-
     % Evaluate the arithmetic expression 'max(0.0, min(1.0, float(Priority)))' and bind the result to 'P'.
     P is max(0.0, min(1.0, float(Priority))),
     % Evaluate the arithmetic expression 'max(1.0, float(Durability))' and bind the result to 'D'.
@@ -104,7 +104,7 @@ pai_budget_set(Task, Priority, Durability, Quality) :-
     assertz(task_budget(Task, P, D, Q)).
 
 % Define a clause for 'pai budget get': succeed when the following conditions hold.
-pai_budget_get(Task, Priority, Durability, Quality) :-
+budget_budget_get(Task, Priority, Durability, Quality) :-
     % Execute: ( task_budget(Task, Priority, Durability, Quality).
     ( task_budget(Task, Priority, Durability, Quality)
     % If the condition above succeeded, perform the following action.
@@ -115,11 +115,11 @@ pai_budget_get(Task, Priority, Durability, Quality) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_budget_decay/1 — apply one decay step to a task's priority
+% budget_budget_decay/1 — apply one decay step to a task's priority
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai budget decay': succeed when the following conditions hold.
-pai_budget_decay(Task) :-
+budget_budget_decay(Task) :-
     % Execute: ( task_budget(Task, P, D, Q).
     ( task_budget(Task, P, D, Q)
     % If the condition above succeeded, perform the following action.
@@ -134,14 +134,14 @@ pai_budget_decay(Task) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_truth_evidence/3 — attach or query evidence for a belief
+% budget_truth_evidence/3 — attach or query evidence for a belief
 %
-%   pai_truth_evidence(+Belief, +PosCount, +TotalCount)  — set evidence
-%   pai_truth_evidence(+Belief, -Frequency, -Confidence) — query (Confidence = TotalCount)
+%   budget_truth_evidence(+Belief, +PosCount, +TotalCount)  — set evidence
+%   budget_truth_evidence(+Belief, -Frequency, -Confidence) — query (Confidence = TotalCount)
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai truth evidence': succeed when the following conditions hold.
-pai_truth_evidence(Belief, Arg2, Arg3) :-
+budget_truth_evidence(Belief, Arg2, Arg3) :-
     % Execute: ( integer(Arg2), integer(Arg3).
     ( integer(Arg2), integer(Arg3)
     % If the condition above succeeded, perform the following action.
@@ -180,11 +180,11 @@ pai_truth_evidence(Belief, Arg2, Arg3) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_truth_evidence_add/3 — update evidence incrementally
+% budget_truth_evidence_add/3 — update evidence incrementally
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai truth evidence add': succeed when the following conditions hold.
-pai_truth_evidence_add(Belief, IsPositive, NewConf) :-
+budget_truth_evidence_add(Belief, IsPositive, NewConf) :-
     % Execute: ( belief_evidence(Belief, Pos, Total).
     ( belief_evidence(Belief, Pos, Total)
     % If the condition above succeeded, perform the following action.
@@ -211,7 +211,7 @@ pai_truth_evidence_add(Belief, IsPositive, NewConf) :-
     NewConf = NewTotal.
 
 % ---------------------------------------------------------------------------
-% pai_best_answer/2 — anytime answering
+% budget_best_answer/2 — anytime answering
 %
 %   Returns the highest-confidence belief matching Question.
 %   If no beliefs exist, returns no_evidence.
@@ -222,7 +222,7 @@ pai_truth_evidence_add(Belief, IsPositive, NewConf) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai best answer': succeed when the following conditions hold.
-pai_best_answer(Question, Answer) :-
+budget_best_answer(Question, Answer) :-
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(Conf-Belief-Freq, (
         % Continue the multi-line expression started above.
@@ -262,15 +262,15 @@ max_confidence([H|T], Max) :-
     ( C1 >= C2 -> Max = H ; Max = MaxT ).
 
 % ---------------------------------------------------------------------------
-% pai_revise/3 — revise a belief with new evidence
+% budget_revise/3 — revise a belief with new evidence
 %
 %   Contradictory evidence merges by revision, never rejection.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai revise': succeed when the following conditions hold.
-pai_revise(Belief, IsPositive, NewFreq) :-
+budget_revise(Belief, IsPositive, NewFreq) :-
     % State a fact for 'pai truth evidence add' with the arguments listed below.
-    pai_truth_evidence_add(Belief, IsPositive, _NewConf),
+    budget_truth_evidence_add(Belief, IsPositive, _NewConf),
     % State a fact for 'belief evidence' with the arguments listed below.
     belief_evidence(Belief, Pos, Total),
     % Check that '( Total' is greater than '0'.
@@ -283,14 +283,14 @@ pai_revise(Belief, IsPositive, NewFreq) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_forget_cheapest/1
+% budget_forget_cheapest/1
 %
 %   Under memory pressure, forget the MaxItems lowest-budget items.
 %   Starvation check: boost long-waiting high-durability tasks first.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai forget cheapest': succeed when the following conditions hold.
-pai_forget_cheapest(MaxItems) :-
+budget_forget_cheapest(MaxItems) :-
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(P-Task, task_budget(Task, P, _, _), Budgets),
     % Sort list 'Budgets' into 'Ascending', keeping duplicates.

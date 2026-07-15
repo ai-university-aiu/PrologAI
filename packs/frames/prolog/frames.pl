@@ -20,29 +20,29 @@
         reports preserved.
 
     Frame move:
-        pai_frame_move/3 advances a point of attention one step along the
+        frames_frame_move/3 advances a point of attention one step along the
         frame's declared primary axis (the axes term's first component for
         1-D frames, or dx/dy for 2-D frames).  Physical dispatch (body
         commands) is signalled by a body_move node_fact; the pure-Prolog
         default just computes the new coordinates.
 
     Predicates:
-        pai_frame_create/3   — +FrameId, +Axes, -NodeId
-        pai_frame_anchor/4   — +FrameId, +Coords, +feature(Rel,Args), -NodeId
-        pai_frame_move/3     — +FrameId, +Point, -NewPoint
-        pai_vote/4           — +Voters, +Entity, +Budget, -Consensus
+        frames_frame_create/3   — +FrameId, +Axes, -NodeId
+        frames_frame_anchor/4   — +FrameId, +Coords, +feature(Rel,Args), -NodeId
+        frames_frame_move/3     — +FrameId, +Point, -NewPoint
+        frames_vote/4           — +Voters, +Entity, +Budget, -Consensus
 */
 
 % Declare this file as the 'frames' module and list its exported predicates.
 :- module(frames, [
-    % Supply 'pai_frame_create/3' as the next argument to the expression above.
-    pai_frame_create/3,
-    % Supply 'pai_frame_anchor/4' as the next argument to the expression above.
-    pai_frame_anchor/4,
-    % Supply 'pai_frame_move/3' as the next argument to the expression above.
-    pai_frame_move/3,
-    % Supply 'pai_vote/4' as the next argument to the expression above.
-    pai_vote/4
+    % Supply 'frames_frame_create/3' as the next argument to the expression above.
+    frames_frame_create/3,
+    % Supply 'frames_frame_anchor/4' as the next argument to the expression above.
+    frames_frame_anchor/4,
+    % Supply 'frames_frame_move/3' as the next argument to the expression above.
+    frames_frame_move/3,
+    % Supply 'frames_vote/4' as the next argument to the expression above.
+    frames_vote/4
 % Close the expression opened above.
 ]).
 
@@ -56,19 +56,19 @@
 :- use_module(library(apply),      [maplist/3, foldl/4]).
 
 % ---------------------------------------------------------------------------
-% pai_frame_create/3
+% frames_frame_create/3
 %
 %   Inscribes the frame declaration as a reference_frame node_fact.
 %   Axes may be any term: axes(1) for 1-D, axes(dx(1), dy(0)) for 2-D, etc.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai frame create': succeed when the following conditions hold.
-pai_frame_create(FrameId, Axes, NodeId) :-
+frames_frame_create(FrameId, Axes, NodeId) :-
     % State the fact: anchor node(reference_frame, [FrameId, Axes], [], NodeId).
     anchor_node(reference_frame, [FrameId, Axes], [], NodeId).
 
 % ---------------------------------------------------------------------------
-% pai_frame_anchor/4
+% frames_frame_anchor/4
 %
 %   Inscribes a feature into the Lattice with frame and coordinate referents.
 %   feature(Rel, Args) is the feature's relation and argument list.
@@ -76,12 +76,12 @@ pai_frame_create(FrameId, Axes, NodeId) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai frame anchor': succeed when the following conditions hold.
-pai_frame_anchor(FrameId, Coords, feature(Rel, Args), NodeId) :-
+frames_frame_anchor(FrameId, Coords, feature(Rel, Args), NodeId) :-
     % State the fact: anchor node(Rel, Args, [frame(FrameId), coords(Coords)], NodeId).
     anchor_node(Rel, Args, [frame(FrameId), coords(Coords)], NodeId).
 
 % ---------------------------------------------------------------------------
-% pai_frame_move/3
+% frames_frame_move/3
 %
 %   Advances a point of attention one step along the frame's primary axis.
 %   The frame's Axes term determines the step:
@@ -91,7 +91,7 @@ pai_frame_anchor(FrameId, Coords, feature(Rel, Args), NodeId) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai frame move': succeed when the following conditions hold.
-pai_frame_move(FrameId, Point, NewPoint) :-
+frames_frame_move(FrameId, Point, NewPoint) :-
     % Execute: ( lattice_node_fact(_, _, reference_frame, [FrameId, Axes], _).
     ( lattice_node_fact(_, _, reference_frame, [FrameId, Axes], _)
     % If the condition above succeeded, perform the following action.
@@ -119,7 +119,7 @@ move_step(axes(DX, DY), point(X0, Y0), point(X1, Y1)) :-
 move_step(_, P, P).
 
 % ---------------------------------------------------------------------------
-% pai_vote/4
+% frames_vote/4
 %
 %   Voters: list of voter(Id, Conclusion, Confidence, Reliability)
 %   Each conclusion's weighted score = Σ (Confidence × Reliability) for
@@ -132,7 +132,7 @@ move_step(_, P, P).
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai vote': succeed when the following conditions hold.
-pai_vote(Voters, Entity, Budget, Consensus) :-
+frames_vote(Voters, Entity, Budget, Consensus) :-
     % Check that 'Budget' is unifiable with 'budget(MaxVoters)'.
     Budget = budget(MaxVoters),
     % Check that '( MaxVoters' is greater than '0'.

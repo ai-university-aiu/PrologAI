@@ -21,19 +21,19 @@
                    are ground numbers (the evaluate-one-step rule)
         recurse  — reduce sub-terms before retrying (structural induction)
 
-    pai_rewrite_rule/4  — +Pattern, +Template, +Guard, -Id
-    pai_interpret/3     — +Expression, -Result, +Options
-    pai_kernel_trace/2  — +Expression, -Trace  (list of step/3 terms)
+    kernel_rewrite_rule/4  — +Pattern, +Template, +Guard, -Id
+    kernel_interpret/3     — +Expression, -Result, +Options
+    kernel_kernel_trace/2  — +Expression, -Trace  (list of step/3 terms)
 */
 
 % Declare this file as the 'kernel' module and list its exported predicates.
 :- module(kernel, [
-    % Supply 'pai_rewrite_rule/4' as the next argument to the expression above.
-    pai_rewrite_rule/4,
-    % Supply 'pai_interpret/3' as the next argument to the expression above.
-    pai_interpret/3,
-    % Supply 'pai_kernel_trace/2' as the next argument to the expression above.
-    pai_kernel_trace/2
+    % Supply 'kernel_rewrite_rule/4' as the next argument to the expression above.
+    kernel_rewrite_rule/4,
+    % Supply 'kernel_interpret/3' as the next argument to the expression above.
+    kernel_interpret/3,
+    % Supply 'kernel_kernel_trace/2' as the next argument to the expression above.
+    kernel_kernel_trace/2
 % Close the expression opened above.
 ]).
 
@@ -45,7 +45,7 @@
 :- use_module(library(lists),      [member/2, reverse/2]).
 
 % ---------------------------------------------------------------------------
-% pai_rewrite_rule/4
+% kernel_rewrite_rule/4
 %
 %   Inscribe a rewrite rule as a node_fact in the default nexus.
 %   Pattern, Template, and Guard share variables so unification with Pattern
@@ -53,12 +53,12 @@
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai rewrite rule': succeed when the following conditions hold.
-pai_rewrite_rule(Pattern, Template, Guard, Id) :-
+kernel_rewrite_rule(Pattern, Template, Guard, Id) :-
     % State the fact: anchor node(rewrites_to, [Pattern, Template, Guard], [], Id).
     anchor_node(rewrites_to, [Pattern, Template, Guard], [], Id).
 
 % ---------------------------------------------------------------------------
-% pai_interpret/3
+% kernel_interpret/3
 %
 %   Evaluate Expression against the active rule set in the Lattice.
 %   Applies rules by unify-substitute-repeat until no rule fires,
@@ -66,12 +66,12 @@ pai_rewrite_rule(Pattern, Template, Guard, Id) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai interpret': succeed when the following conditions hold.
-pai_interpret(Expr, Result, _Opts) :-
+kernel_interpret(Expr, Result, _Opts) :-
     % State the fact: interp(Expr, Result, [], _RevTrace).
     interp(Expr, Result, [], _RevTrace).
 
 % ---------------------------------------------------------------------------
-% pai_kernel_trace/2
+% kernel_kernel_trace/2
 %
 %   Evaluate Expression and return a forward-order derivation Trace.
 %   Each element is step(Transition, Before, After) where Transition
@@ -79,7 +79,7 @@ pai_interpret(Expr, Result, _Opts) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai kernel trace': succeed when the following conditions hold.
-pai_kernel_trace(Expr, Trace) :-
+kernel_kernel_trace(Expr, Trace) :-
     % State a fact for 'interp' with the arguments listed below.
     interp(Expr, _, [], RevTrace),
     % State the fact: reverse(RevTrace, Trace).

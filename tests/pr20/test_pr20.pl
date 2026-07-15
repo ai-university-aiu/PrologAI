@@ -5,8 +5,8 @@
                  exists with context including 'rattle' and reliability >
                  unconditional parent reliability.
     AC-PR20-002: record_trial/4 stores trial records.
-    AC-PR20-003: pai_spinoff_stats/2 returns correct trial counts.
-    AC-PR20-004: pai_spinoff_mine/2 finds result-spinoffs for reliable commands.
+    AC-PR20-003: spinoff_spinoff_stats/2 returns correct trial counts.
+    AC-PR20-004: spinoff_spinoff_mine/2 finds result-spinoffs for reliable commands.
     AC-PR20-005: Spinoffs never overwrite parents (pai_accommodate semantics).
     AC-PR20-006: Context-spinoff has higher reliability than unconditional.
     AC-PR20-007: compute_marginal correctly estimates P(result|command).
@@ -46,9 +46,9 @@
 % Import [set_default_nexus/1] from the built-in 'node_facts' library.
 :- use_module(library(node_facts), [set_default_nexus/1]).
 % Load the built-in 'spinoff' library so its predicates are available here.
-:- use_module(library(spinoff),    [pai_spinoff_mine/2,
-                                    % Supply 'pai_spinoff_stats/2' as the next argument to the expression above.
-                                    pai_spinoff_stats/2,
+:- use_module(library(spinoff),    [spinoff_spinoff_mine/2,
+                                    % Supply 'spinoff_spinoff_stats/2' as the next argument to the expression above.
+                                    spinoff_spinoff_stats/2,
                                     % Continue the multi-line expression started above.
                                     record_trial/4]).
 
@@ -109,7 +109,7 @@ test(context_spinoff_rattle) :-
     ),
     % Mine spinoffs
     % State a fact for 'pai spinoff mine' with the arguments listed below.
-    pai_spinoff_mine(shake, Spinoffs),
+    spinoff_spinoff_mine(shake, Spinoffs),
     % Check that 'Spinoffs' is not unifiable with '[]'.
     Spinoffs \= [],
     % A context spinoff with rattle should exist
@@ -138,7 +138,7 @@ test(record_trial_stores_records) :-
     % Check that 'N' is greater than or equal to '2'.
     N >= 2.
 
-%  AC-PR20-003: pai_spinoff_stats returns trial counts
+%  AC-PR20-003: spinoff_spinoff_stats returns trial counts
 % Define a clause for 'test': succeed when the following conditions hold.
 test(spinoff_stats_trial_counts) :-
     % State a fact for 'record trial' with the arguments listed below.
@@ -146,7 +146,7 @@ test(spinoff_stats_trial_counts) :-
     % State a fact for 'record trial' with the arguments listed below.
     record_trial(pull, [light], [light, moved], success),
     % State a fact for 'pai spinoff stats' with the arguments listed below.
-    pai_spinoff_stats(pull, Stats),
+    spinoff_spinoff_stats(pull, Stats),
     % State a fact for 'is dict' with the arguments listed below.
     is_dict(Stats),
     % State a fact for 'get dict' with the arguments listed below.
@@ -154,7 +154,7 @@ test(spinoff_stats_trial_counts) :-
     % Check that 'Count' is greater than or equal to '2'.
     Count >= 2.
 
-%  AC-PR20-004: pai_spinoff_mine finds reliable result spinoffs
+%  AC-PR20-004: spinoff_spinoff_mine finds reliable result spinoffs
 % Define a clause for 'test': succeed when the following conditions hold.
 test(mine_finds_reliable_spinoff) :-
     % Record 10 trials where press always yields click
@@ -167,7 +167,7 @@ test(mine_finds_reliable_spinoff) :-
     % Close the expression opened above.
     ),
     % State a fact for 'pai spinoff mine' with the arguments listed below.
-    pai_spinoff_mine(press, Spinoffs),
+    spinoff_spinoff_mine(press, Spinoffs),
     % Should find a result_spinoff or context_spinoff for press → click
     % Execute: ( member(result_spinoff(press, [click], _), Spinoffs).
     ( member(result_spinoff(press, [click], _), Spinoffs)
@@ -200,9 +200,9 @@ test(spinoffs_accommodate_parents) :-
     % State a fact for 'record trial' with the arguments listed below.
     record_trial(twist, [knob], [knob, turned], success),
     % State a fact for 'pai spinoff mine' with the arguments listed below.
-    pai_spinoff_mine(twist, _),
+    spinoff_spinoff_mine(twist, _),
     % State a fact for 'pai spinoff mine' with the arguments listed below.
-    pai_spinoff_mine(twist, _),   % second call should not duplicate
+    spinoff_spinoff_mine(twist, _),   % second call should not duplicate
     % Aggregate solutions using 'count' and bind the result to a single value.
     aggregate_all(count,
                   % Continue the multi-line expression started above.
@@ -226,7 +226,7 @@ test(context_spinoff_beats_unconditional) :-
            % Continue the multi-line expression started above.
            record_trial(shake3, [rattle3], [rattle3, buzz3], success)),
     % State a fact for 'pai spinoff mine' with the arguments listed below.
-    pai_spinoff_mine(shake3, Spinoffs3),
+    spinoff_spinoff_mine(shake3, Spinoffs3),
     % Unconditional P(buzz3|shake3)
     % Execute: spinoff:compute_marginal(shake3, [buzz3], UnconditionalP, _),.
     spinoff:compute_marginal(shake3, [buzz3], UnconditionalP, _),

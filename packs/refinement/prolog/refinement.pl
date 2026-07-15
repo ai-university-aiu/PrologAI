@@ -7,11 +7,11 @@
 
     Pipeline (one CRUD edit at a time):
       1. refiner_cycle diagnoses the trajectory window
-      2. pai_propose_modification records each diagnosis as a proposal
-      3. pai_sandbox_evaluate tests the edit in a possible_zone scope
+      2. refinement_propose_modification records each diagnosis as a proposal
+      3. refinement_sandbox_evaluate tests the edit in a possible_zone scope
       4. constitutional_permit checks the edit against the protected core
-      5. pai_commit_modification applies the edit to the live system
-      6. pai_rollback_modification restores prior state if R3 regresses
+      5. refinement_commit_modification applies the edit to the live system
+      6. refinement_rollback_modification restores prior state if R3 regresses
 
     Protected core (cannot be edited):
       constitutional_layer, monitor, refiner_pipeline, bootstrap relations.
@@ -20,35 +20,35 @@
     and novelty scores so parent selection balances fitness with diversity.
 
     Exports:
-      pai_propose_modification/3  — +Component, +Edit, +Justification
-      pai_sandbox_evaluate/3      — +Edit, +Scenarios, -Result
+      refinement_propose_modification/3  — +Component, +Edit, +Justification
+      refinement_sandbox_evaluate/3      — +Edit, +Scenarios, -Result
       constitutional_permit/1     — +Edit (succeeds or fails)
-      pai_commit_modification/2   — +ProposalId, -Result
-      pai_rollback_modification/2 — +ProposalId, -Result
-      pai_modification_log/1      — -Log
+      refinement_commit_modification/2   — +ProposalId, -Result
+      refinement_rollback_modification/2 — +ProposalId, -Result
+      refinement_modification_log/1      — -Log
       run_rsi_pipeline/3          — +Component, +Edit, +Justification
       install_refiner_actor/0
       uninstall_refiner_actor/0
       refiner_cycle/0
       compute_r3/1                — -Score (benchmark R3)
-      pai_reflect_module/2        — +Module, -Desc
-      pai_reflect_sentinel/2      — +Name, -Desc
+      refinement_reflect_module/2        — +Module, -Desc
+      refinement_reflect_sentinel/2      — +Name, -Desc
 */
 
 % Declare this file as the 'refinement' module and list its exported predicates.
 :- module(refinement, [
     % Continue the multi-line expression started above.
-    pai_propose_modification/3,    % +Component, +Edit, +Justification
+    refinement_propose_modification/3,    % +Component, +Edit, +Justification
     % Continue the multi-line expression started above.
-    pai_sandbox_evaluate/3,        % +Edit, +Scenarios, -Result
+    refinement_sandbox_evaluate/3,        % +Edit, +Scenarios, -Result
     % Continue the multi-line expression started above.
     constitutional_permit/1,       % +Edit
     % Continue the multi-line expression started above.
-    pai_commit_modification/2,     % +ProposalId, -Result
+    refinement_commit_modification/2,     % +ProposalId, -Result
     % Continue the multi-line expression started above.
-    pai_rollback_modification/2,   % +ProposalId, -Result
+    refinement_rollback_modification/2,   % +ProposalId, -Result
     % Continue the multi-line expression started above.
-    pai_modification_log/1,        % -Log
+    refinement_modification_log/1,        % -Log
     % Continue the multi-line expression started above.
     run_rsi_pipeline/3,            % +Component, +Edit, +Justification
     % Supply 'install_refiner_actor/0' as the next argument to the expression above.
@@ -60,9 +60,9 @@
     % Continue the multi-line expression started above.
     compute_r3/1,                  % -Score
     % Continue the multi-line expression started above.
-    pai_reflect_module/2,          % +Module, -Desc
+    refinement_reflect_module/2,          % +Module, -Desc
     % Continue the multi-line expression started above.
-    pai_reflect_sentinel/2         % +Name, -Desc
+    refinement_reflect_sentinel/2         % +Name, -Desc
 % Close the expression opened above.
 ]).
 
@@ -128,7 +128,7 @@ protected_component(refiner_pipeline).
 protected_component(bootstrap_relations).
 
 % ---------------------------------------------------------------------------
-% pai_propose_modification/3
+% refinement_propose_modification/3
 %
 %   Record a modification proposal.  The proposal is immediately added to the
 %   log with status `proposed`.  Does NOT commit or sandbox yet.
@@ -139,7 +139,7 @@ protected_component(bootstrap_relations).
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai propose modification': succeed when the following conditions hold.
-pai_propose_modification(Component, Edit, Justification) :-
+refinement_propose_modification(Component, Edit, Justification) :-
     % State a fact for 'next proposal id' with the arguments listed below.
     next_proposal_id(Id),
     % Add a new fact or rule to the runtime knowledge base.
@@ -183,7 +183,7 @@ forbidden_edit(create(Component, _)) :-
     protected_component(Component).
 
 % ---------------------------------------------------------------------------
-% pai_sandbox_evaluate/3
+% refinement_sandbox_evaluate/3
 %
 %   Test the proposed Edit in a possible_zone sandbox using Scenarios.
 %   Opens a scoped simulation, checks constitutional_permit, checks that
@@ -193,7 +193,7 @@ forbidden_edit(create(Component, _)) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai sandbox evaluate': succeed when the following conditions hold.
-pai_sandbox_evaluate(Edit, _Scenarios, Result) :-
+refinement_sandbox_evaluate(Edit, _Scenarios, Result) :-
     % Check that 'ScopeName' is unifiable with 'refinement_sandbox'.
     ScopeName = refinement_sandbox,
     % State a fact for 'catch' with the arguments listed below.
@@ -222,7 +222,7 @@ pai_sandbox_evaluate(Edit, _Scenarios, Result) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_commit_modification/2
+% refinement_commit_modification/2
 %
 %   Commit a proposal.  Looks up the proposal by Id, sandbox-evaluates it,
 %   checks constitutional_permit, then applies the edit and archives the prior
@@ -233,11 +233,11 @@ pai_sandbox_evaluate(Edit, _Scenarios, Result) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai commit modification': succeed when the following conditions hold.
-pai_commit_modification(ProposalId, Result) :-
+refinement_commit_modification(ProposalId, Result) :-
     % Execute: ( modification_proposal(ProposalId, Component, Edit, Just, proposed).
     ( modification_proposal(ProposalId, Component, Edit, Just, proposed)
     % If the condition above succeeded, perform the following action.
-    ->  pai_sandbox_evaluate(Edit, [], SandboxResult),
+    ->  refinement_sandbox_evaluate(Edit, [], SandboxResult),
         % Continue the multi-line expression started above.
         ( SandboxResult == pass
         % If the condition above succeeded, perform the following action.
@@ -362,13 +362,13 @@ apply_edit(noop) :- true.
 apply_edit(_Other) :- true.   % unknown edit type: silently succeed
 
 % ---------------------------------------------------------------------------
-% pai_rollback_modification/2
+% refinement_rollback_modification/2
 %
 %   Restore prior state after a regressive commit.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai rollback modification': succeed when the following conditions hold.
-pai_rollback_modification(ProposalId, Result) :-
+refinement_rollback_modification(ProposalId, Result) :-
     % Execute: ( modification_proposal(ProposalId, Component, Edit, Just, committed).
     ( modification_proposal(ProposalId, Component, Edit, Just, committed)
     % If the condition above succeeded, perform the following action.
@@ -385,11 +385,11 @@ pai_rollback_modification(ProposalId, Result) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_modification_log/1 — return the full modification history
+% refinement_modification_log/1 — return the full modification history
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai modification log': succeed when the following conditions hold.
-pai_modification_log(Log) :-
+refinement_modification_log(Log) :-
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(proposal(Id, Comp, Edit, Just, Status),
             % Continue the multi-line expression started above.
@@ -404,12 +404,12 @@ pai_modification_log(Log) :-
 % Define a clause for 'run rsi pipeline': succeed when the following conditions hold.
 run_rsi_pipeline(Component, Edit, Justification) :-
     % State a fact for 'pai propose modification' with the arguments listed below.
-    pai_propose_modification(Component, Edit, Justification),
+    refinement_propose_modification(Component, Edit, Justification),
     % Find the proposal we just created (most recent for this Component+Edit)
     % State a fact for 'latest proposal id' with the arguments listed below.
     latest_proposal_id(Component, Edit, ProposalId),
     % State the fact: pai commit modification(ProposalId, _Result).
-    pai_commit_modification(ProposalId, _Result).
+    refinement_commit_modification(ProposalId, _Result).
 
 % Define a clause for 'latest proposal id': succeed when the following conditions hold.
 latest_proposal_id(Component, Edit, ProposalId) :-
@@ -677,7 +677,7 @@ post_cycle_regression_check :-
             % If the condition above succeeded, perform the following action.
             ->  last(CommittedIds, LatestId),
                 % Continue the multi-line expression started above.
-                pai_rollback_modification(LatestId, _)
+                refinement_rollback_modification(LatestId, _)
             % Otherwise (else branch), perform the following action.
             ;   true
             % Close the expression opened above.
@@ -720,7 +720,7 @@ uninstall_refiner_actor :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai reflect module': succeed when the following conditions hold.
-pai_reflect_module(Module, Desc) :-
+refinement_reflect_module(Module, Desc) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
@@ -749,7 +749,7 @@ pai_reflect_module(Module, Desc) :-
     ).
 
 % Define a clause for 'pai reflect sentinel': succeed when the following conditions hold.
-pai_reflect_sentinel(Name, Desc) :-
+refinement_reflect_sentinel(Name, Desc) :-
     % Execute: ( sentinels_entry(Name, Priority, Pattern, Objectives, Action, Doc).
     ( sentinels_entry(Name, Priority, Pattern, Objectives, Action, Doc)
     % If the condition above succeeded, perform the following action.

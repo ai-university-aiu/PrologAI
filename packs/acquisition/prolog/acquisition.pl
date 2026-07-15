@@ -9,7 +9,7 @@
         word-formation rules.
 
     Stage 2 — Word grounding:
-        Words ground to coincident percepts via pai_ground/3; words heard
+        Words ground to coincident percepts via acquisition_ground/3; words heard
         before their referents persist ungrounded, ready to ground later;
         homophones carry context in their choice gates.
 
@@ -23,28 +23,28 @@
     roster — language is acquired by the same machinery as everything else.
 
     Predicates:
-        pai_chain_phonemes/2    — +PhonemeList, -WordCandidates
-        pai_ground/3            — +WordForm, +PerceptRef, -GroundingId
-        pai_symbolize/3         — +Signifier, +Signified, -SymbolismId
-        pai_chain_promote/2     — +Units, -NextTierUnits
-        pai_word_of/2           — +Sequence, -WordForm (query)
-        pai_grounding_of/2      — +WordForm, -PerceptRef (query)
+        acquisition_chain_phonemes/2    — +PhonemeList, -WordCandidates
+        acquisition_ground/3            — +WordForm, +PerceptRef, -GroundingId
+        acquisition_symbolize/3         — +Signifier, +Signified, -SymbolismId
+        acquisition_chain_promote/2     — +Units, -NextTierUnits
+        acquisition_word_of/2           — +Sequence, -WordForm (query)
+        acquisition_grounding_of/2      — +WordForm, -PerceptRef (query)
 */
 
 % Declare this file as the 'acquisition' module and list its exported predicates.
 :- module(acquisition, [
-    % Supply 'pai_chain_phonemes/2' as the next argument to the expression above.
-    pai_chain_phonemes/2,
-    % Supply 'pai_ground/3' as the next argument to the expression above.
-    pai_ground/3,
-    % Supply 'pai_symbolize/3' as the next argument to the expression above.
-    pai_symbolize/3,
-    % Supply 'pai_chain_promote/2' as the next argument to the expression above.
-    pai_chain_promote/2,
-    % Supply 'pai_word_of/2' as the next argument to the expression above.
-    pai_word_of/2,
-    % Supply 'pai_grounding_of/2' as the next argument to the expression above.
-    pai_grounding_of/2
+    % Supply 'acquisition_chain_phonemes/2' as the next argument to the expression above.
+    acquisition_chain_phonemes/2,
+    % Supply 'acquisition_ground/3' as the next argument to the expression above.
+    acquisition_ground/3,
+    % Supply 'acquisition_symbolize/3' as the next argument to the expression above.
+    acquisition_symbolize/3,
+    % Supply 'acquisition_chain_promote/2' as the next argument to the expression above.
+    acquisition_chain_promote/2,
+    % Supply 'acquisition_word_of/2' as the next argument to the expression above.
+    acquisition_word_of/2,
+    % Supply 'acquisition_grounding_of/2' as the next argument to the expression above.
+    acquisition_grounding_of/2
 % Close the expression opened above.
 ]).
 
@@ -88,7 +88,7 @@ next_acq_id(Id) :-
 promotion_threshold(3).
 
 % ---------------------------------------------------------------------------
-% pai_chain_phonemes/2
+% acquisition_chain_phonemes/2
 %
 %   Given a list of phoneme atoms in arrival order, record the chain and
 %   promote it to a word candidate when count >= promotion_threshold.
@@ -97,7 +97,7 @@ promotion_threshold(3).
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai chain phonemes': succeed when the following conditions hold.
-pai_chain_phonemes(PhonemeList, WordCandidates) :-
+acquisition_chain_phonemes(PhonemeList, WordCandidates) :-
     % Canonicalize: join phonemes to a form atom
     % State a fact for 'atomic list concat' with the arguments listed below.
     atomic_list_concat(PhonemeList, '-', Form),
@@ -137,7 +137,7 @@ pai_chain_phonemes(PhonemeList, WordCandidates) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_ground/3
+% acquisition_ground/3
 %
 %   Ground a word form to a percept reference.
 %   Words heard before their referents persist ungrounded (no error).
@@ -145,7 +145,7 @@ pai_chain_phonemes(PhonemeList, WordCandidates) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai ground': succeed when the following conditions hold.
-pai_ground(WordForm, PerceptRef, GroundingId) :-
+acquisition_ground(WordForm, PerceptRef, GroundingId) :-
     % Check if already grounded to this percept
     % Execute: ( word_grounding(WordForm, PerceptRef, ExId).
     ( word_grounding(WordForm, PerceptRef, ExId)
@@ -159,7 +159,7 @@ pai_ground(WordForm, PerceptRef, GroundingId) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_symbolize/3
+% acquisition_symbolize/3
 %
 %   Record that Signifier (in present_zone) evokes Signified
 %   (in recalled/imagined zone).  After repeated co-occurrence,
@@ -167,7 +167,7 @@ pai_ground(WordForm, PerceptRef, GroundingId) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai symbolize': succeed when the following conditions hold.
-pai_symbolize(Signifier, Signified, SymbolismId) :-
+acquisition_symbolize(Signifier, Signified, SymbolismId) :-
     % Execute: ( retract(symbolism(ExId, Signifier, Signified, Count)).
     ( retract(symbolism(ExId, Signifier, Signified, Count))
     % If the condition above succeeded, perform the following action.
@@ -184,7 +184,7 @@ pai_symbolize(Signifier, Signified, SymbolismId) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_chain_promote/2
+% acquisition_chain_promote/2
 %
 %   Apply the same chaining logic one tier up:
 %     phonemes → words → phrases → events → episodes → …
@@ -194,7 +194,7 @@ pai_symbolize(Signifier, Signified, SymbolismId) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai chain promote': succeed when the following conditions hold.
-pai_chain_promote(Units, NextTierUnits) :-
+acquisition_chain_promote(Units, NextTierUnits) :-
     % Join unit forms to build a higher-tier unit
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(F, member(unit(F, _), Units), Forms),
@@ -208,21 +208,21 @@ pai_chain_promote(Units, NextTierUnits) :-
     NextTierUnits = [unit(CompositeForm, 1)].
 
 % ---------------------------------------------------------------------------
-% pai_word_of/2 — query: given a phoneme sequence, find the word form
+% acquisition_word_of/2 — query: given a phoneme sequence, find the word form
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai word of': succeed when the following conditions hold.
-pai_word_of(Sequence, WordForm) :-
+acquisition_word_of(Sequence, WordForm) :-
     % State a fact for 'atomic list concat' with the arguments listed below.
     atomic_list_concat(Sequence, '-', WordForm),
     % State the fact: word form(_, WordForm, _).
     word_form(_, WordForm, _).
 
 % ---------------------------------------------------------------------------
-% pai_grounding_of/2 — query: find percept refs for a word form
+% acquisition_grounding_of/2 — query: find percept refs for a word form
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai grounding of': succeed when the following conditions hold.
-pai_grounding_of(WordForm, PerceptRef) :-
+acquisition_grounding_of(WordForm, PerceptRef) :-
     % State the fact: word grounding(WordForm, PerceptRef, _).
     word_grounding(WordForm, PerceptRef, _).

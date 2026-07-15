@@ -3,13 +3,13 @@
     AC-PR36-001: Given a MeTTa file declaring ten expressions, when imported
                  and re-exported, then the round trip preserves all ten up to
                  alpha renaming.
-    AC-PR36-002: pai_atomese_import accepts a list of metta_expr/2 terms.
+    AC-PR36-002: interop_atomese_import accepts a list of metta_expr/2 terms.
     AC-PR36-003: Imported node_facts carry the atomese_scope tag in Referents.
-    AC-PR36-004: pai_atomese_export produces one line per imported expression.
-    AC-PR36-005: pai_atomese_export serializes head and args correctly.
+    AC-PR36-004: interop_atomese_export produces one line per imported expression.
+    AC-PR36-005: interop_atomese_export serializes head and args correctly.
     AC-PR36-006: Import is scoped: different scopes do not contaminate each other.
-    AC-PR36-007: pai_space_mount records a named space binding (idempotent).
-    AC-PR36-008: pai_atomese_import with MeTTa source text works correctly.
+    AC-PR36-007: interop_space_mount records a named space binding (idempotent).
+    AC-PR36-008: interop_atomese_import with MeTTa source text works correctly.
     AC-PR36-009: Zero-arg expressions (facts) round-trip as (Head).
 */
 
@@ -50,12 +50,12 @@
 :- use_module(library(node_facts),[set_default_nexus/1]).
 % Load the built-in 'interop' library so its predicates are available here.
 :- use_module(library(interop),  [
-    % Supply 'pai_atomese_import/3' as the next argument to the expression above.
-    pai_atomese_import/3,
-    % Supply 'pai_atomese_export/3' as the next argument to the expression above.
-    pai_atomese_export/3,
-    % Supply 'pai_space_mount/3' as the next argument to the expression above.
-    pai_space_mount/3
+    % Supply 'interop_atomese_import/3' as the next argument to the expression above.
+    interop_atomese_import/3,
+    % Supply 'interop_atomese_export/3' as the next argument to the expression above.
+    interop_atomese_export/3,
+    % Supply 'interop_space_mount/3' as the next argument to the expression above.
+    interop_space_mount/3
 % Close the expression opened above.
 ]).
 
@@ -113,11 +113,11 @@ test(round_trip_ten, [setup(pr36_setup)]) :-
     % State a fact for 'ten exprs' with the arguments listed below.
     ten_exprs(Exprs),
     % State a fact for 'pai atomese import' with the arguments listed below.
-    pai_atomese_import(Exprs, scope_rt, Ids),
+    interop_atomese_import(Exprs, scope_rt, Ids),
     % Unify '10' with the number of elements in list 'Ids'.
     length(Ids, 10),
     % State a fact for 'pai atomese export' with the arguments listed below.
-    pai_atomese_export(scope_rt, _, Lines),
+    interop_atomese_export(scope_rt, _, Lines),
     % Unify '10' with the number of elements in list 'Lines'.
     length(Lines, 10).
 
@@ -127,7 +127,7 @@ test(import_from_list, [setup(pr36_setup)]) :-
     % Check that 'Exprs' is unifiable with '[metta_expr(agent, [alice]), metta_expr(agent, [bob])]'.
     Exprs = [metta_expr(agent, [alice]), metta_expr(agent, [bob])],
     % State a fact for 'pai atomese import' with the arguments listed below.
-    pai_atomese_import(Exprs, scope_list, Ids),
+    interop_atomese_import(Exprs, scope_list, Ids),
     % Unify '2' with the number of elements in list 'Ids'.
     length(Ids, 2),
     % State the fact: maplist(nonvar, Ids).
@@ -137,7 +137,7 @@ test(import_from_list, [setup(pr36_setup)]) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(import_tags_scope, [setup(pr36_setup)]) :-
     % State a fact for 'pai atomese import' with the arguments listed below.
-    pai_atomese_import([metta_expr(color, [red])], scope_tag36, [Id]),
+    interop_atomese_import([metta_expr(color, [red])], scope_tag36, [Id]),
     % State a fact for 'lattice node fact' with the arguments listed below.
     lattice_node_fact(_, Id, color, [red], Refs),
     % State the fact: memberchk(atomese_scope(scope_tag36), Refs).
@@ -149,9 +149,9 @@ test(export_count_matches_import, [setup(pr36_setup)]) :-
     % Check that 'Exprs' is unifiable with '[metta_expr(x36, [a36]), metta_expr(y36, [b36]), metta_expr(z36, [c36])]'.
     Exprs = [metta_expr(x36, [a36]), metta_expr(y36, [b36]), metta_expr(z36, [c36])],
     % State a fact for 'pai atomese import' with the arguments listed below.
-    pai_atomese_import(Exprs, scope_cnt, _),
+    interop_atomese_import(Exprs, scope_cnt, _),
     % State a fact for 'pai atomese export' with the arguments listed below.
-    pai_atomese_export(scope_cnt, _, Lines),
+    interop_atomese_export(scope_cnt, _, Lines),
     % Unify '3' with the number of elements in list 'Lines'.
     length(Lines, 3).
 
@@ -159,9 +159,9 @@ test(export_count_matches_import, [setup(pr36_setup)]) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(export_serialization, [setup(pr36_setup)]) :-
     % State a fact for 'pai atomese import' with the arguments listed below.
-    pai_atomese_import([metta_expr(rule36, [rain36, wet36])], scope_ser, _),
+    interop_atomese_import([metta_expr(rule36, [rain36, wet36])], scope_ser, _),
     % State a fact for 'pai atomese export' with the arguments listed below.
-    pai_atomese_export(scope_ser, _, Lines),
+    interop_atomese_export(scope_ser, _, Lines),
     % Check that 'Lines' is unifiable with '['(rule36 rain36 wet36)']'.
     Lines = ['(rule36 rain36 wet36)'].
 
@@ -169,13 +169,13 @@ test(export_serialization, [setup(pr36_setup)]) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(scope_isolation, [setup(pr36_setup)]) :-
     % State a fact for 'pai atomese import' with the arguments listed below.
-    pai_atomese_import([metta_expr(fact36, [alpha])], scope_a36, _),
+    interop_atomese_import([metta_expr(fact36, [alpha])], scope_a36, _),
     % State a fact for 'pai atomese import' with the arguments listed below.
-    pai_atomese_import([metta_expr(fact36, [beta])],  scope_b36, _),
+    interop_atomese_import([metta_expr(fact36, [beta])],  scope_b36, _),
     % State a fact for 'pai atomese export' with the arguments listed below.
-    pai_atomese_export(scope_a36, _, LinesA),
+    interop_atomese_export(scope_a36, _, LinesA),
     % State a fact for 'pai atomese export' with the arguments listed below.
-    pai_atomese_export(scope_b36, _, LinesB),
+    interop_atomese_export(scope_b36, _, LinesB),
     % Unify '1' with the number of elements in list 'LinesA'.
     length(LinesA, 1),
     % Unify '1' with the number of elements in list 'LinesB'.
@@ -183,15 +183,15 @@ test(scope_isolation, [setup(pr36_setup)]) :-
     % Check that 'LinesA' is not unifiable with 'LinesB'.
     LinesA \= LinesB.
 
-%  AC-PR36-007: pai_space_mount registers a space binding (idempotent)
+%  AC-PR36-007: interop_space_mount registers a space binding (idempotent)
 % Define a clause for 'test': succeed when the following conditions hold.
 test(space_mount_idempotent, [setup(pr36_setup)]) :-
     % State a fact for 'nb getval' with the arguments listed below.
     nb_getval(pr36_nexus_ref, N),
     % State a fact for 'pai space mount' with the arguments listed below.
-    pai_space_mount(metta_space_36, N, [access(read)]),
+    interop_space_mount(metta_space_36, N, [access(read)]),
     % State a fact for 'pai space mount' with the arguments listed below.
-    pai_space_mount(metta_space_36, N, [access(read)]),
+    interop_space_mount(metta_space_36, N, [access(read)]),
     % Aggregate solutions using 'count' and bind the result to a single value.
     aggregate_all(count, interop:mounted_space(metta_space_36, _, _), Count),
     % Check that 'Count' is numerically equal to '1'.
@@ -203,7 +203,7 @@ test(import_from_text, [setup(pr36_setup)]) :-
     % Check that 'Source' is unifiable with ''(agent robot36)\n(knows robot36 weather)''.
     Source = '(agent robot36)\n(knows robot36 weather)',
     % State a fact for 'pai atomese import' with the arguments listed below.
-    pai_atomese_import(Source, scope_txt, Ids),
+    interop_atomese_import(Source, scope_txt, Ids),
     % Unify '2' with the number of elements in list 'Ids'.
     length(Ids, 2).
 
@@ -211,9 +211,9 @@ test(import_from_text, [setup(pr36_setup)]) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(zero_arg_round_trip, [setup(pr36_setup)]) :-
     % State a fact for 'pai atomese import' with the arguments listed below.
-    pai_atomese_import([metta_expr(raining36, [])], scope_zero, _),
+    interop_atomese_import([metta_expr(raining36, [])], scope_zero, _),
     % State a fact for 'pai atomese export' with the arguments listed below.
-    pai_atomese_export(scope_zero, _, Lines),
+    interop_atomese_export(scope_zero, _, Lines),
     % Check that 'Lines' is unifiable with '['(raining36)']'.
     Lines = ['(raining36)'].
 

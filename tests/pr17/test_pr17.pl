@@ -11,11 +11,11 @@
     AC-PR17-004: After three cycles with rollbacks, the archive contains all
                  variants with fitness and novelty scores, and parent selection
                  is reproducible.
-    AC-PR17-005: pai_propose_modification records a proposal in the log.
+    AC-PR17-005: refinement_propose_modification records a proposal in the log.
     AC-PR17-006: constitutional_permit fails for protected components.
-    AC-PR17-007: pai_sandbox_evaluate returns pass for a safe edit.
-    AC-PR17-008: pai_sandbox_evaluate returns fail for a constitutional violation.
-    AC-PR17-009: pai_reflect_sentinel returns a descriptor for a known sentinel.
+    AC-PR17-007: refinement_sandbox_evaluate returns pass for a safe edit.
+    AC-PR17-008: refinement_sandbox_evaluate returns fail for a constitutional violation.
+    AC-PR17-009: refinement_reflect_sentinel returns a descriptor for a known sentinel.
 */
 
 % Execute the compile-time directive: prolog_load_context(directory, TestDir),.
@@ -60,27 +60,27 @@
 % Import [sona_absorb/1] from the built-in 'sona' library.
 :- use_module(library(sona),       [sona_absorb/1]).
 % Load the built-in 'refinement' library so its predicates are available here.
-:- use_module(library(refinement), [pai_propose_modification/3,
-                                    % Supply 'pai_sandbox_evaluate/3' as the next argument to the expression above.
-                                    pai_sandbox_evaluate/3,
+:- use_module(library(refinement), [refinement_propose_modification/3,
+                                    % Supply 'refinement_sandbox_evaluate/3' as the next argument to the expression above.
+                                    refinement_sandbox_evaluate/3,
                                     % Supply 'constitutional_permit/1' as the next argument to the expression above.
                                     constitutional_permit/1,
-                                    % Supply 'pai_commit_modification/2' as the next argument to the expression above.
-                                    pai_commit_modification/2,
-                                    % Supply 'pai_rollback_modification/2' as the next argument to the expression above.
-                                    pai_rollback_modification/2,
-                                    % Supply 'pai_modification_log/1' as the next argument to the expression above.
-                                    pai_modification_log/1,
+                                    % Supply 'refinement_commit_modification/2' as the next argument to the expression above.
+                                    refinement_commit_modification/2,
+                                    % Supply 'refinement_rollback_modification/2' as the next argument to the expression above.
+                                    refinement_rollback_modification/2,
+                                    % Supply 'refinement_modification_log/1' as the next argument to the expression above.
+                                    refinement_modification_log/1,
                                     % Supply 'run_rsi_pipeline/3' as the next argument to the expression above.
                                     run_rsi_pipeline/3,
                                     % Supply 'refiner_cycle/0' as the next argument to the expression above.
                                     refiner_cycle/0,
                                     % Supply 'compute_r3/1' as the next argument to the expression above.
                                     compute_r3/1,
-                                    % Supply 'pai_reflect_module/2' as the next argument to the expression above.
-                                    pai_reflect_module/2,
+                                    % Supply 'refinement_reflect_module/2' as the next argument to the expression above.
+                                    refinement_reflect_module/2,
                                     % Continue the multi-line expression started above.
-                                    pai_reflect_sentinel/2]).
+                                    refinement_reflect_sentinel/2]).
 
 % Execute the compile-time directive: begin_tests(pr17, [setup(pr17_setup), cleanup(pr17_cleanup)]).
 :- begin_tests(pr17, [setup(pr17_setup), cleanup(pr17_cleanup)]).
@@ -143,7 +143,7 @@ test(repeated_failure_generates_proposal) :-
     refiner_cycle,
     % Check that a proposal was made referencing garden_watering
     % State a fact for 'pai modification log' with the arguments listed below.
-    pai_modification_log(Log),
+    refinement_modification_log(Log),
     % Succeed for each element 'proposal(_Id, causal_plan' that is a member of the list.
     member(proposal(_Id, causal_plan, delete_plan(garden_watering),
                     % Continue the multi-line expression started above.
@@ -158,19 +158,19 @@ test(constitutional_violation_rejects_edit) :-
     % Check that 'ProtectedEdit' is unifiable with 'delete(constitutional_layer, all_rules)'.
     ProtectedEdit = delete(constitutional_layer, all_rules),
     % State a fact for 'pai propose modification' with the arguments listed below.
-    pai_propose_modification(constitutional_layer, ProtectedEdit, test_justification),
+    refinement_propose_modification(constitutional_layer, ProtectedEdit, test_justification),
     % State a fact for 'pai modification log' with the arguments listed below.
-    pai_modification_log(Log0),
+    refinement_modification_log(Log0),
     % Succeed for each element 'proposal(PId, constitutional_layer, ProtectedEdit, _, proposed)' that is a member of the list.
     member(proposal(PId, constitutional_layer, ProtectedEdit, _, proposed), Log0),
     % Commit — should be rejected
     % State a fact for 'pai commit modification' with the arguments listed below.
-    pai_commit_modification(PId, Result),
+    refinement_commit_modification(PId, Result),
     % Check that 'Result' is unifiable with 'rejected(_Reason)'.
     Result = rejected(_Reason),
     % Status in log is rejected
     % State a fact for 'pai modification log' with the arguments listed below.
-    pai_modification_log(Log1),
+    refinement_modification_log(Log1),
     % Succeed for each element 'proposal(PId, constitutional_layer, ProtectedEdit, _, rejected)' that is a member of the list.
     member(proposal(PId, constitutional_layer, ProtectedEdit, _, rejected), Log1),
     % Live system unchanged (no committed proposal for this Id)
@@ -233,19 +233,19 @@ test(archive_retains_variants) :-
         % Continue the multi-line expression started above.
         ( atomic_list_concat([plan_, I], PlanName),
           % Continue the multi-line expression started above.
-          pai_propose_modification(causal_plan,
+          refinement_propose_modification(causal_plan,
                                    % Continue the multi-line expression started above.
                                    delete_plan(PlanName),
                                    % Supply 'test_rollback' as the next argument to the expression above.
                                    test_rollback),
           % Continue the multi-line expression started above.
-          pai_modification_log(Log),
+          refinement_modification_log(Log),
           % Continue the multi-line expression started above.
           member(proposal(PId, causal_plan, delete_plan(PlanName), _, proposed), Log),
           % Continue the multi-line expression started above.
-          pai_commit_modification(PId, _CommitResult),
+          refinement_commit_modification(PId, _CommitResult),
           % Continue the multi-line expression started above.
-          pai_rollback_modification(PId, _RollResult)
+          refinement_rollback_modification(PId, _RollResult)
         % Close the expression opened above.
         )
     % Close the expression opened above.
@@ -267,7 +267,7 @@ test(archive_retains_variants) :-
     ),
     % All three proposals in log (in some terminal state)
     % State a fact for 'pai modification log' with the arguments listed below.
-    pai_modification_log(Log2),
+    refinement_modification_log(Log2),
     % State a fact for 'include' with the arguments listed below.
     include([proposal(_, causal_plan, delete_plan(_), test_rollback, _)]>>true,
             % Continue the multi-line expression started above.
@@ -277,13 +277,13 @@ test(archive_retains_variants) :-
     % Check that 'N' is greater than or equal to '3'.
     N >= 3.
 
-%  AC-PR17-005: pai_propose_modification records a proposal
+%  AC-PR17-005: refinement_propose_modification records a proposal
 % Define a clause for 'test': succeed when the following conditions hold.
 test(propose_records_in_log) :-
     % State a fact for 'pai propose modification' with the arguments listed below.
-    pai_propose_modification(test_component, noop, test_justification),
+    refinement_propose_modification(test_component, noop, test_justification),
     % State a fact for 'pai modification log' with the arguments listed below.
-    pai_modification_log(Log),
+    refinement_modification_log(Log),
     % Succeed for each element 'proposal(_Id, test_component, noop, test_justification, proposed)' that is a member of the list.
     member(proposal(_Id, test_component, noop, test_justification, proposed), Log).
 
@@ -297,23 +297,23 @@ test(constitutional_permit_fails_protected) :-
     % Succeed only if 'constitutional_permit(delete(bootstrap_relations, rel1' cannot be proved (negation as failure).
     \+ constitutional_permit(delete(bootstrap_relations, rel1)).
 
-%  AC-PR17-007: pai_sandbox_evaluate returns pass for a safe edit
+%  AC-PR17-007: refinement_sandbox_evaluate returns pass for a safe edit
 % Define a clause for 'test': succeed when the following conditions hold.
 test(sandbox_evaluates_safe_edit) :-
     % State a fact for 'pai sandbox evaluate' with the arguments listed below.
-    pai_sandbox_evaluate(noop, [], Result),
+    refinement_sandbox_evaluate(noop, [], Result),
     % Check that 'Result' is structurally identical to 'pass'.
     Result == pass.
 
-%  AC-PR17-008: pai_sandbox_evaluate returns fail for a constitutional violation
+%  AC-PR17-008: refinement_sandbox_evaluate returns fail for a constitutional violation
 % Define a clause for 'test': succeed when the following conditions hold.
 test(sandbox_fails_on_constitutional_violation) :-
     % State a fact for 'pai sandbox evaluate' with the arguments listed below.
-    pai_sandbox_evaluate(delete(constitutional_layer, rules), [], Result),
+    refinement_sandbox_evaluate(delete(constitutional_layer, rules), [], Result),
     % Check that 'Result' is unifiable with 'fail(_Reason)'.
     Result = fail(_Reason).
 
-%  AC-PR17-009: pai_reflect_sentinel returns descriptor for known sentinel
+%  AC-PR17-009: refinement_reflect_sentinel returns descriptor for known sentinel
 % Define a clause for 'test': succeed when the following conditions hold.
 test(reflect_sentinel_descriptor) :-
     % State a fact for 'pai register sentinel' with the arguments listed below.
@@ -321,7 +321,7 @@ test(reflect_sentinel_descriptor) :-
                           % Continue the multi-line expression started above.
                           [test_obj], test_action, 'Test sentinel'),
     % State a fact for 'pai reflect sentinel' with the arguments listed below.
-    pai_reflect_sentinel(test_domain, Desc),
+    refinement_reflect_sentinel(test_domain, Desc),
     % State a fact for 'is dict' with the arguments listed below.
     is_dict(Desc),
     % State the fact: get dict(domain, Desc, test_domain).
