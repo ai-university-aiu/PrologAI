@@ -14,19 +14,19 @@ All predicates use the mk_* prefix.
 
 1. Creating Masks
 
-mk_from_val(+Grid, +V, -Mask) creates a binary mask where Mask[R][C] = 1
+mask_from_val(+Grid, +V, -Mask) creates a binary mask where Mask[R][C] = 1
 at positions where Grid[R][C] equals V, and 0 everywhere else.
 
-mk_from_bg(+Grid, +Bg, -Mask) creates the complementary mask: Mask[R][C] = 0
+mask_from_bg(+Grid, +Bg, -Mask) creates the complementary mask: Mask[R][C] = 0
 at positions where Grid[R][C] equals Bg, and 1 everywhere else. This marks
 all non-background positions.
 
 Examples:
 
-:- mk_from_val([[1,0,1],[0,0,1]], 1, Mask).
+:- mask_from_val([[1,0,1],[0,0,1]], 1, Mask).
 % Mask = [[1,0,1],[0,0,1]]
 
-:- mk_from_bg([[0,1,2],[0,3,0]], 0, Mask).
+:- mask_from_bg([[0,1,2],[0,3,0]], 0, Mask).
 % Mask = [[0,1,1],[0,1,0]]
 % All non-zero cells are enabled.
 
@@ -37,117 +37,117 @@ term as V or Bg, not just numbers.
 
 2. Combining Masks
 
-mk_invert(+Mask, -Mask2) flips every bit: 1 becomes 0, 0 becomes 1.
+mask_invert(+Mask, -Mask2) flips every bit: 1 becomes 0, 0 becomes 1.
 
-mk_and(+MaskA, +MaskB, -MaskC) computes element-wise AND: MaskC[R][C] = 1
+mask_and(+MaskA, +MaskB, -MaskC) computes element-wise AND: MaskC[R][C] = 1
 only if both A and B equal 1 at that position.
 
-mk_or(+MaskA, +MaskB, -MaskC) computes element-wise OR: MaskC[R][C] = 1
+mask_or(+MaskA, +MaskB, -MaskC) computes element-wise OR: MaskC[R][C] = 1
 if either A or B (or both) equal 1.
 
-mk_xor(+MaskA, +MaskB, -MaskC) computes element-wise XOR: MaskC[R][C] = 1
+mask_xor(+MaskA, +MaskB, -MaskC) computes element-wise XOR: MaskC[R][C] = 1
 if exactly one of A, B equals 1. Implemented as (A+B) mod 2.
 
 Examples:
 
-:- mk_invert([[1,0,1],[0,1,0]], M).
+:- mask_invert([[1,0,1],[0,1,0]], M).
 % M = [[0,1,0],[1,0,1]]
 
-:- mk_and([[1,1,0],[0,1,1]], [[1,0,1],[1,0,1]], M).
+:- mask_and([[1,1,0],[0,1,1]], [[1,0,1],[1,0,1]], M).
 % M = [[1,0,0],[0,0,1]]
 
-:- mk_or([[1,0,0],[0,0,0]], [[0,0,0],[0,0,1]], M).
+:- mask_or([[1,0,0],[0,0,0]], [[0,0,0],[0,0,1]], M).
 % M = [[1,0,0],[0,0,1]]
 
-:- mk_xor([[1,0],[1,1]], [[1,1],[0,1]], M).
+:- mask_xor([[1,0],[1,1]], [[1,1],[0,1]], M).
 % M = [[0,1],[1,0]]   (1 only where exactly one source is 1)
 
 
 3. Applying Masks to Grids
 
-mk_apply(+Grid, +Mask, +Bg, -Grid2) produces Grid2 where Grid2[R][C] =
+mask_apply(+Grid, +Mask, +Bg, -Grid2) produces Grid2 where Grid2[R][C] =
 Grid[R][C] if Mask[R][C] = 1, else Bg. It keeps the original value at
 enabled positions and replaces disabled positions with the background.
 
-mk_fill(+Grid, +Mask, +V, -Grid2) produces Grid2 where Grid2[R][C] = V if
+mask_fill(+Grid, +Mask, +V, -Grid2) produces Grid2 where Grid2[R][C] = V if
 Mask[R][C] = 1, else Grid[R][C]. It fills enabled positions with a constant
 and leaves disabled positions unchanged.
 
-mk_overlay(+GridA, +GridB, +Mask, -Grid2) blends two grids based on the
+mask_overlay(+GridA, +GridB, +Mask, -Grid2) blends two grids based on the
 mask: Grid2[R][C] = GridB[R][C] where Mask = 1, GridA[R][C] where Mask = 0.
 
 Examples:
 
-:- mk_apply([[1,2,3],[4,5,6]], [[1,0,1],[0,1,0]], 0, G).
+:- mask_apply([[1,2,3],[4,5,6]], [[1,0,1],[0,1,0]], 0, G).
 % G = [[1,0,3],[0,5,0]]   (non-masked positions become 0)
 
-:- mk_fill([[1,2,3],[4,5,6]], [[0,1,0],[1,0,1]], 9, G).
+:- mask_fill([[1,2,3],[4,5,6]], [[0,1,0],[1,0,1]], 9, G).
 % G = [[1,9,3],[9,5,9]]   (masked positions become 9)
 
-:- mk_overlay([[1,1],[1,1]], [[2,2],[2,2]], [[1,0],[0,1]], G).
+:- mask_overlay([[1,1],[1,1]], [[2,2],[2,2]], [[1,0],[0,1]], G).
 % G = [[2,1],[1,2]]   (take B where mask=1, A where mask=0)
 
-Note that mk_apply and mk_fill are strict duals: mk_apply keeps values at
-mask=1 positions, while mk_fill replaces values at mask=1 positions.
+Note that mask_apply and mask_fill are strict duals: mask_apply keeps values at
+mask=1 positions, while mask_fill replaces values at mask=1 positions.
 
 
 4. Querying Masks
 
-mk_where(+Mask, -Cells) returns the sorted list of R-C pairs of positions
+mask_where(+Mask, -Cells) returns the sorted list of R-C pairs of positions
 where the mask equals 1.
 
-mk_count(+Mask, -N) counts the number of 1-valued cells in the mask.
+mask_count(+Mask, -N) counts the number of 1-valued cells in the mask.
 
-mk_any(+Mask) succeeds iff at least one cell in the mask equals 1.
+mask_any(+Mask) succeeds iff at least one cell in the mask equals 1.
 
-mk_all(+Mask) succeeds iff every cell in the mask equals 1.
+mask_all(+Mask) succeeds iff every cell in the mask equals 1.
 
 Examples:
 
-:- mk_where([[1,0,1],[0,1,0]], Cells).
+:- mask_where([[1,0,1],[0,1,0]], Cells).
 % Cells = [0-0, 0-2, 1-1]
 
-:- mk_count([[1,0,1],[0,1,0]], N).
+:- mask_count([[1,0,1],[0,1,0]], N).
 % N = 3
 
-:- mk_any([[0,0],[0,1]]).        % succeeds
-:- \+ mk_any([[0,0],[0,0]]).     % fails (no 1 present)
-:- mk_all([[1,1],[1,1]]).        % succeeds
-:- \+ mk_all([[1,1],[1,0]]).     % fails (not all 1)
+:- mask_any([[0,0],[0,1]]).        % succeeds
+:- \+ mask_any([[0,0],[0,0]]).     % fails (no 1 present)
+:- mask_all([[1,1],[1,1]]).        % succeeds
+:- \+ mask_all([[1,1],[1,0]]).     % fails (not all 1)
 
-mk_any short-circuits on the first 1 found using cut.
-mk_all uses forall/2 (a built-in) over all rows and all cells.
+mask_any short-circuits on the first 1 found using cut.
+mask_all uses forall/2 (a built-in) over all rows and all cells.
 
 
 5. Extracting Values Under a Mask
 
-mk_extract(+Grid, +Mask, -Vals) returns the sorted set of distinct values
+mask_extract(+Grid, +Mask, -Vals) returns the sorted set of distinct values
 from Grid at positions where Mask = 1. sort/2 deduplicates the collected
 values.
 
 Examples:
 
-:- mk_extract([[1,2,3],[4,5,6]], [[1,0,1],[0,1,0]], Vals).
+:- mask_extract([[1,2,3],[4,5,6]], [[1,0,1],[0,1,0]], Vals).
 % Vals = [1,3,5]   (cells (0,0)=1, (0,2)=3, (1,1)=5)
 
-:- mk_extract([[1,1],[1,1]], [[1,0],[0,1]], Vals).
+:- mask_extract([[1,1],[1,1]], [[1,0],[0,1]], Vals).
 % Vals = [1]   (all masked cells have the same value; deduplicated)
 
-:- mk_extract([[1,2],[3,4]], [[0,0],[0,0]], Vals).
+:- mask_extract([[1,2],[3,4]], [[0,0],[0,0]], Vals).
 % Vals = []   (no cells enabled)
 
 
 6. Design Notes
 
-All element-wise operations (mk_from_val, mk_invert, mk_and, mk_or, mk_xor,
-mk_apply, mk_fill) use nested maplist for clean, declarative code without
+All element-wise operations (mask_from_val, mask_invert, mask_and, mask_or, mask_xor,
+mask_apply, mask_fill) use nested maplist for clean, declarative code without
 explicit index arithmetic.
 
-mk_overlay uses maplist/5 to iterate four parallel lists simultaneously
+mask_overlay uses maplist/5 to iterate four parallel lists simultaneously
 (GridA rows, GridB rows, Mask rows, and output rows). Inside each row,
 another maplist/5 iterates four parallel cell sequences.
 
-mk_xor uses arithmetic ((A+B) mod 2) rather than pattern matching, which
+mask_xor uses arithmetic ((A+B) mod 2) rather than pattern matching, which
 makes it work correctly for integer inputs including sums > 1.
 
 Library imports: library(apply): maplist/3, maplist/4, maplist/5.

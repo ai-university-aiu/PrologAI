@@ -38,10 +38,10 @@ LOADING THE PACK
 
 GRAVITY PREDICATES
 
-mv_gravity_down(+Bg, +Grid, -Grid2)
-mv_gravity_up(+Bg, +Grid, -Grid2)
-mv_gravity_left(+Bg, +Grid, -Grid2)
-mv_gravity_right(+Bg, +Grid, -Grid2)
+motion_gravity_down(+Bg, +Grid, -Grid2)
+motion_gravity_up(+Bg, +Grid, -Grid2)
+motion_gravity_left(+Bg, +Grid, -Grid2)
+motion_gravity_right(+Bg, +Grid, -Grid2)
 
 These four predicates apply gravity to an entire grid. Foreground cells (cells
 whose color is not Bg) fall toward the indicated edge. Background cells fill
@@ -50,7 +50,7 @@ the vacated space.
 Example: apply gravity downward, background color 0.
 
   ?- Grid = [[0,1,0],[0,0,2],[3,0,0]],
-     mv_gravity_down(0, Grid, G2).
+     motion_gravity_down(0, Grid, G2).
   G2 = [[0,0,0],[0,0,0],[3,1,2]].
 
 Each column is handled independently. In column 0, only the 3 is foreground;
@@ -58,56 +58,56 @@ it sinks to row 2. In column 1, only the 1 is foreground; it sinks to row 2.
 In column 2, only the 2 is foreground; it sinks to row 2.
 
   ?- Grid = [[1,0],[0,2],[0,0]],
-     mv_gravity_up(0, Grid, G2).
+     motion_gravity_up(0, Grid, G2).
   G2 = [[1,2],[0,0],[0,0]].
 
-mv_gravity_left and mv_gravity_right work the same way but on rows.
+motion_gravity_left and motion_gravity_right work the same way but on rows.
 
   ?- Grid = [[0,1,0,2],[0,0,3,0]],
-     mv_gravity_left(0, Grid, G2).
+     motion_gravity_left(0, Grid, G2).
   G2 = [[1,2,0,0],[3,0,0,0]].
 
 
 SLIDE A SINGLE COLUMN OR ROW
 
-mv_slide_col(+Bg, +Grid, +ColIndex, +Dir)  :- Grid2 unifies with 5th arg
-  Wait - the predicate is actually mv_slide_col(+Bg, +Dir, +Grid, -Grid2).
+motion_slide_col(+Bg, +Grid, +ColIndex, +Dir)  :- Grid2 unifies with 5th arg
+  Wait - the predicate is actually motion_slide_col(+Bg, +Dir, +Grid, -Grid2).
 
-mv_slide_col(+Bg, +Dir, +Grid, -Grid2)
-mv_slide_row(+Bg, +Dir, +Grid, -Grid2)
+motion_slide_col(+Bg, +Dir, +Grid, -Grid2)
+motion_slide_row(+Bg, +Dir, +Grid, -Grid2)
 
-Note: mv_slide_col and mv_slide_row do NOT take a column/row index argument.
+Note: motion_slide_col and motion_slide_row do NOT take a column/row index argument.
 They slide one entire column (Col=0 for the leftmost) or row (Row=0 for the top).
 For now they apply to the entire column 0 or row 0 - use them as building blocks.
 
 Actually, let me be precise: these predicates apply the slide to ALL columns
-(mv_slide_col) or ALL rows (mv_slide_row), the same as gravity but accepting
+(motion_slide_col) or ALL rows (motion_slide_row), the same as gravity but accepting
 an explicit direction atom.
 
-  Dir = down  (same as mv_gravity_down)
-  Dir = up    (same as mv_gravity_up)
-  Dir = left  (same as mv_gravity_left)
-  Dir = right (same as mv_gravity_right)
+  Dir = down  (same as motion_gravity_down)
+  Dir = up    (same as motion_gravity_up)
+  Dir = left  (same as motion_gravity_left)
+  Dir = right (same as motion_gravity_right)
 
-  ?- mv_slide_col(0, down, [[0,1],[2,0]], G2).
+  ?- motion_slide_col(0, down, [[0,1],[2,0]], G2).
   G2 = [[0,0],[2,1]].
 
 
 SHIFT THE ENTIRE GRID
 
-mv_shift_grid(+Bg, +DR, +DC, +Grid, -Grid2)
+motion_shift_grid(+Bg, +DR, +DC, +Grid, -Grid2)
 
 Translates every cell by (DR, DC). DR is the row offset (positive = down),
 DC is the column offset (positive = right). Cells that move outside the grid
 boundary are lost; cells entering from outside are filled with Bg.
 
-  ?- mv_shift_grid(0, 1, 0, [[1,2],[3,4]], G2).
+  ?- motion_shift_grid(0, 1, 0, [[1,2],[3,4]], G2).
   G2 = [[0,0],[1,2]].
 
-  ?- mv_shift_grid(0, 0, 1, [[1,2],[3,4]], G2).
+  ?- motion_shift_grid(0, 0, 1, [[1,2],[3,4]], G2).
   G2 = [[0,1],[0,3]].
 
-mv_shift_grid delegates to gd_translate from the grid pack.
+motion_shift_grid delegates to gd_translate from the grid pack.
 
 
 WORKING WITH SCENE OBJECTS
@@ -116,85 +116,85 @@ These predicates operate on scene terms (see the Scene Pack chapter).
 A scene has the form: scene(Rows, Cols, BgColor, Objects)
 An object has the form: obj(Color, Cells) where Cells is a sorted list of r(R,C) terms.
 
-mv_obj_translate(+DR, +DC, +Obj, -Obj2)
+motion_obj_translate(+DR, +DC, +Obj, -Obj2)
 
 Translates a single object by (DR, DC). The color is preserved; all cell
 coordinates are shifted.
 
-  ?- mv_obj_translate(1, 2, obj(red, [r(0,0), r(0,1)]), Obj2).
+  ?- motion_obj_translate(1, 2, obj(red, [r(0,0), r(0,1)]), Obj2).
   Obj2 = obj(red, [r(1,2), r(1,3)]).
 
-mv_scene_translate(+DR, +DC, +Scene, -Scene2)
+motion_scene_translate(+DR, +DC, +Scene, -Scene2)
 
 Translates every object in a scene by (DR, DC). The scene dimensions and
 background color are preserved; only object positions change.
 
   ?- Scene = scene(3, 3, 0, [obj(1, [r(0,0)])]),
-     mv_scene_translate(1, 1, Scene, Scene2).
+     motion_scene_translate(1, 1, Scene, Scene2).
   Scene2 = scene(3, 3, 0, [obj(1, [r(1,1)])]).
 
-mv_scene_to_grid(+Scene, -Grid)
+motion_scene_to_grid(+Scene, -Grid)
 
 Renders a scene to a grid. Each object's cells are painted with their color;
 all other cells take the background color.
 
   ?- Scene = scene(2, 2, 0, [obj(5, [r(0,0)]), obj(3, [r(1,1)])]),
-     mv_scene_to_grid(Scene, Grid).
+     motion_scene_to_grid(Scene, Grid).
   Grid = [[5,0],[0,3]].
 
-mv_scene_gravity(+Scene, -Scene2)
+motion_scene_gravity(+Scene, -Scene2)
 
 Applies downward gravity to a scene. Under the hood: renders the scene to
-a grid (mv_scene_to_grid), applies mv_gravity_down, then re-parses the
+a grid (motion_scene_to_grid), applies motion_gravity_down, then re-parses the
 result back into a scene (sc_grid_to_scene). Because the round-trip goes
 through a grid, objects that fall into contact may be merged into one
 object if they share the same color.
 
   ?- Scene = scene(3, 1, 0, [obj(2, [r(0,0)])]),
-     mv_scene_gravity(Scene, Scene2).
+     motion_scene_gravity(Scene, Scene2).
   Scene2 = scene(3, 1, 0, [obj(2, [r(2,0)])]).
 
 
 DISTANCE AND PROXIMITY
 
-mv_distance(+CellA, +CellB, -D)
+motion_distance(+CellA, +CellB, -D)
 
 Computes the Manhattan distance - taxicab geometry word (taxicab geometry: the
 sum of the absolute differences of coordinates, as if moving on a grid
 with no diagonal movement allowed) - between two cell terms r(R,C).
 
-  ?- mv_distance(r(0,0), r(3,4), D).
+  ?- motion_distance(r(0,0), r(3,4), D).
   D = 7.
 
-  ?- mv_distance(r(2,5), r(2,5), D).
+  ?- motion_distance(r(2,5), r(2,5), D).
   D = 0.
 
-mv_closest_cell(+Cells, +Ref, -Closest)
+motion_closest_cell(+Cells, +Ref, -Closest)
 
 Given a list of cell terms and a reference cell Ref, returns the cell in
 Cells that is closest to Ref by Manhattan distance. When multiple cells tie
 for the minimum distance, the one appearing first in the list (left-to-right
 fold) that wins any tie is returned.
 
-  ?- mv_closest_cell([r(5,5), r(1,1), r(0,1)], r(0,0), Closest).
+  ?- motion_closest_cell([r(5,5), r(1,1), r(0,1)], r(0,0), Closest).
   Closest = r(0,1).
 
 
 COMBINING MOTION WITH COMPOSE
 
 The compose pack (Chapter 22) can wrap motion predicates into pipeline steps.
-Because mv_gravity_down takes 3 arguments (Bg, Grid, Grid2), wrap it with
+Because motion_gravity_down takes 3 arguments (Bg, Grid, Grid2), wrap it with
 a closure approach using cp_apply:
 
-  ?- cp_apply(mv_gravity_down(0), [[0,1,0],[0,0,2]], G2).
+  ?- cp_apply(motion_gravity_down(0), [[0,1,0],[0,0,2]], G2).
   G2 = [[0,0,0],[0,1,2]].
 
-cp_apply calls mv_gravity_down(0, Grid, G2) by appending Grid and G2 as the
-last two arguments to the term mv_gravity_down(0).
+cp_apply calls motion_gravity_down(0, Grid, G2) by appending Grid and G2 as the
+last two arguments to the term motion_gravity_down(0).
 
 You can build a pipeline that shifts then applies gravity:
 
-  ?- cp_pipe(mv_shift_grid(0,0,1), mv_gravity_down(0),
+  ?- cp_pipe(motion_shift_grid(0,0,1), motion_gravity_down(0),
              [[1,0,0],[0,0,0]], G2).
   G2 = [[0,0,0],[0,0,1]].
 
@@ -204,27 +204,27 @@ First the grid shifts right by one column, then gravity pulls the cell down.
 SUMMARY OF PREDICATES
 
 Gravity:
-  mv_gravity_down(+Bg, +Grid, -Grid2)   - all foreground falls down
-  mv_gravity_up(+Bg, +Grid, -Grid2)     - all foreground rises up
-  mv_gravity_left(+Bg, +Grid, -Grid2)   - all foreground slides left
-  mv_gravity_right(+Bg, +Grid, -Grid2)  - all foreground slides right
+  motion_gravity_down(+Bg, +Grid, -Grid2)   - all foreground falls down
+  motion_gravity_up(+Bg, +Grid, -Grid2)     - all foreground rises up
+  motion_gravity_left(+Bg, +Grid, -Grid2)   - all foreground slides left
+  motion_gravity_right(+Bg, +Grid, -Grid2)  - all foreground slides right
 
 Sliding (whole grid, direction atom):
-  mv_slide_col(+Bg, +Dir, +Grid, -Grid2) - same as gravity, direction explicit
-  mv_slide_row(+Bg, +Dir, +Grid, -Grid2) - same as gravity, direction explicit
+  motion_slide_col(+Bg, +Dir, +Grid, -Grid2) - same as gravity, direction explicit
+  motion_slide_row(+Bg, +Dir, +Grid, -Grid2) - same as gravity, direction explicit
 
 Grid shift:
-  mv_shift_grid(+Bg, +DR, +DC, +Grid, -Grid2) - translate all cells by offset
+  motion_shift_grid(+Bg, +DR, +DC, +Grid, -Grid2) - translate all cells by offset
 
 Scene operations:
-  mv_obj_translate(+DR, +DC, +Obj, -Obj2)        - translate one object
-  mv_scene_translate(+DR, +DC, +Scene, -Scene2)  - translate all objects
-  mv_scene_to_grid(+Scene, -Grid)                - render scene to grid
-  mv_scene_gravity(+Scene, -Scene2)              - gravity via grid round-trip
+  motion_obj_translate(+DR, +DC, +Obj, -Obj2)        - translate one object
+  motion_scene_translate(+DR, +DC, +Scene, -Scene2)  - translate all objects
+  motion_scene_to_grid(+Scene, -Grid)                - render scene to grid
+  motion_scene_gravity(+Scene, -Scene2)              - gravity via grid round-trip
 
 Distance:
-  mv_distance(+CellA, +CellB, -D)               - Manhattan distance
-  mv_closest_cell(+Cells, +Ref, -Closest)        - nearest cell in list
+  motion_distance(+CellA, +CellB, -D)               - Manhattan distance
+  motion_closest_cell(+Cells, +Ref, -Closest)        - nearest cell in list
 
 
 WHAT COMES NEXT

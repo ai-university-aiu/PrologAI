@@ -1,18 +1,18 @@
 :- module(gridtile, [
-    gti_h_period/2,
-    gti_w_period/2,
-    gti_tile_size/3,
-    gti_is_tiling/3,
-    gti_extract_tile/4,
-    gti_tile_to_grid/4,
-    gti_row_is_periodic/3,
-    gti_col_is_periodic/3,
-    gti_tile_count_h/3,
-    gti_tile_count_w/3,
-    gti_matches_tile/4,
-    gti_tile_offset/5,
-    gti_all_tiles/4,
-    gti_crop_to_tile/2
+    gridtile_h_period/2,
+    gridtile_w_period/2,
+    gridtile_tile_size/3,
+    gridtile_is_tiling/3,
+    gridtile_extract_tile/4,
+    gridtile_tile_to_grid/4,
+    gridtile_row_is_periodic/3,
+    gridtile_col_is_periodic/3,
+    gridtile_tile_count_h/3,
+    gridtile_tile_count_w/3,
+    gridtile_matches_tile/4,
+    gridtile_tile_offset/5,
+    gridtile_all_tiles/4,
+    gridtile_crop_to_tile/2
 ]).
 % gridtile.pl - Layer 224: Grid Tiling Pattern Analysis (gti_* prefix).
 % Fourteen predicates for detecting, extracting, verifying, and constructing
@@ -27,16 +27,16 @@
 % --- PRIVATE HELPERS ---
 
 % Grid dimensions.
-gti_dims_(Grid, H, W) :-
+gridtile_dims_(Grid, H, W) :-
     length(Grid, H),
     (H > 0 -> Grid = [FR|_], length(FR, W) ; W = 0).
 
 % Extract column C as a top-to-bottom list.
-gti_col_(Grid, C, Col) :-
+gridtile_col_(Grid, C, Col) :-
     findall(V, (member(Row, Grid), nth0(C, Row, V)), Col).
 
 % Check if all rows in Grid with index R have Row = Grid[R mod P].
-gti_rows_have_period_(Grid, P) :-
+gridtile_rows_have_period_(Grid, P) :-
     length(Grid, H), H1 is H - 1,
     \+ (between(0, H1, R),
         R2 is R mod P,
@@ -44,16 +44,16 @@ gti_rows_have_period_(Grid, P) :-
         Row \= Row2).
 
 % Check if all columns in Grid with index C have Col = col(C mod P).
-gti_cols_have_period_(Grid, P) :-
+gridtile_cols_have_period_(Grid, P) :-
     (Grid = [FR|_] -> length(FR, W) ; W = 0),
     W1 is W - 1,
     \+ (between(0, W1, C),
         C2 is C mod P,
-        gti_col_(Grid, C, Col), gti_col_(Grid, C2, Col2),
+        gridtile_col_(Grid, C, Col), gridtile_col_(Grid, C2, Col2),
         Col \= Col2).
 
 % Extract a rectangular sub-grid rows [R0..R1], cols [C0..C1] inclusive.
-gti_subgrid_(Grid, R0, R1, C0, C1, Sub) :-
+gridtile_subgrid_(Grid, R0, R1, C0, C1, Sub) :-
     findall(Row,
         (between(R0, R1, R),
          nth0(R, Grid, GRow),
@@ -62,53 +62,53 @@ gti_subgrid_(Grid, R0, R1, C0, C1, Sub) :-
 
 % --- PUBLIC PREDICATES ---
 
-% gti_h_period(+Grid, -P)
+% gridtile_h_period(+Grid, -P)
 % P is the smallest positive integer dividing H such that every row R
 % equals row R mod P. The minimal vertical tiling period.
-gti_h_period(Grid, P) :-
+gridtile_h_period(Grid, P) :-
     length(Grid, H),
     between(1, H, P),
     0 is H mod P,
-    gti_rows_have_period_(Grid, P),
+    gridtile_rows_have_period_(Grid, P),
     !.
 
-% gti_w_period(+Grid, -P)
+% gridtile_w_period(+Grid, -P)
 % P is the smallest positive integer dividing W such that every column C
 % equals column C mod P. The minimal horizontal tiling period.
-gti_w_period(Grid, P) :-
-    gti_dims_(Grid, _, W),
+gridtile_w_period(Grid, P) :-
+    gridtile_dims_(Grid, _, W),
     between(1, W, P),
     0 is W mod P,
-    gti_cols_have_period_(Grid, P),
+    gridtile_cols_have_period_(Grid, P),
     !.
 
-% gti_tile_size(+Grid, -HP, -WP)
+% gridtile_tile_size(+Grid, -HP, -WP)
 % HP is the minimal vertical period and WP is the minimal horizontal period.
 % The minimal tile is HP rows tall and WP columns wide.
-gti_tile_size(Grid, HP, WP) :-
-    gti_h_period(Grid, HP),
-    gti_w_period(Grid, WP).
+gridtile_tile_size(Grid, HP, WP) :-
+    gridtile_h_period(Grid, HP),
+    gridtile_w_period(Grid, WP).
 
-% gti_is_tiling(+Grid, +TH, +TW)
+% gridtile_is_tiling(+Grid, +TH, +TW)
 % Succeeds if Grid is a valid tiling with a tile of height TH and width TW.
 % Requires H mod TH = 0, W mod TW = 0, and all rows/cols respect the periods.
-gti_is_tiling(Grid, TH, TW) :-
-    gti_dims_(Grid, H, W),
+gridtile_is_tiling(Grid, TH, TW) :-
+    gridtile_dims_(Grid, H, W),
     0 is H mod TH,
     0 is W mod TW,
-    gti_rows_have_period_(Grid, TH),
-    gti_cols_have_period_(Grid, TW).
+    gridtile_rows_have_period_(Grid, TH),
+    gridtile_cols_have_period_(Grid, TW).
 
-% gti_extract_tile(+Grid, +TH, +TW, -Tile)
+% gridtile_extract_tile(+Grid, +TH, +TW, -Tile)
 % Tile is the top-left TH x TW sub-grid of Grid. This is the canonical tile
 % for a grid with vertical period TH and horizontal period TW.
-gti_extract_tile(Grid, TH, TW, Tile) :-
+gridtile_extract_tile(Grid, TH, TW, Tile) :-
     TH1 is TH - 1, TW1 is TW - 1,
-    gti_subgrid_(Grid, 0, TH1, 0, TW1, Tile).
+    gridtile_subgrid_(Grid, 0, TH1, 0, TW1, Tile).
 
-% gti_tile_to_grid(+Tile, +H, +W, -Grid)
+% gridtile_tile_to_grid(+Tile, +H, +W, -Grid)
 % Grid is the H x W grid built by repeating Tile. Cell (R,C) = Tile[R mod TH][C mod TW].
-gti_tile_to_grid(Tile, H, W, Grid) :-
+gridtile_tile_to_grid(Tile, H, W, Grid) :-
     length(Tile, TH), Tile = [TR|_], length(TR, TW),
     H1 is H - 1, W1 is W - 1,
     findall(Row,
@@ -121,10 +121,10 @@ gti_tile_to_grid(Tile, H, W, Grid) :-
              Row)),
         Grid).
 
-% gti_row_is_periodic(+Row, +P, +Len)
+% gridtile_row_is_periodic(+Row, +P, +Len)
 % Succeeds if Row of length Len has period P: Row[C] = Row[C mod P] for all C.
 % Requires Len mod P = 0.
-gti_row_is_periodic(Row, P, Len) :-
+gridtile_row_is_periodic(Row, P, Len) :-
     0 is Len mod P,
     Len1 is Len - 1,
     \+ (between(0, Len1, C),
@@ -132,52 +132,52 @@ gti_row_is_periodic(Row, P, Len) :-
         nth0(C, Row, V), nth0(C2, Row, V2),
         V \= V2).
 
-% gti_col_is_periodic(+Grid, +C, +P)
+% gridtile_col_is_periodic(+Grid, +C, +P)
 % Succeeds if column C of Grid has vertical period P.
 % Requires H mod P = 0.
-gti_col_is_periodic(Grid, C, P) :-
+gridtile_col_is_periodic(Grid, C, P) :-
     length(Grid, H),
     0 is H mod P,
-    gti_col_(Grid, C, Col),
+    gridtile_col_(Grid, C, Col),
     H1 is H - 1,
     \+ (between(0, H1, R),
         R2 is R mod P,
         nth0(R, Col, V), nth0(R2, Col, V2),
         V \= V2).
 
-% gti_tile_count_h(+Grid, +TH, -Count)
+% gridtile_tile_count_h(+Grid, +TH, -Count)
 % Count is H div TH: the number of complete tile rows in Grid.
-gti_tile_count_h(Grid, TH, Count) :-
+gridtile_tile_count_h(Grid, TH, Count) :-
     length(Grid, H),
     Count is H div TH.
 
-% gti_tile_count_w(+Grid, +TW, -Count)
+% gridtile_tile_count_w(+Grid, +TW, -Count)
 % Count is W div TW: the number of complete tile columns in Grid.
-gti_tile_count_w(Grid, TW, Count) :-
-    gti_dims_(Grid, _, W),
+gridtile_tile_count_w(Grid, TW, Count) :-
+    gridtile_dims_(Grid, _, W),
     Count is W div TW.
 
-% gti_matches_tile(+Grid, +Tile, +R0, +C0)
+% gridtile_matches_tile(+Grid, +Tile, +R0, +C0)
 % Succeeds if the TH x TW sub-grid of Grid starting at (R0, C0) equals Tile.
-gti_matches_tile(Grid, Tile, R0, C0) :-
+gridtile_matches_tile(Grid, Tile, R0, C0) :-
     length(Tile, TH), Tile = [TR|_], length(TR, TW),
     R1 is R0 + TH - 1, C1 is C0 + TW - 1,
-    gti_subgrid_(Grid, R0, R1, C0, C1, Sub),
+    gridtile_subgrid_(Grid, R0, R1, C0, C1, Sub),
     Sub = Tile.
 
-% gti_tile_offset(+TH, +TW, +R, +C, -Offset)
+% gridtile_tile_offset(+TH, +TW, +R, +C, -Offset)
 % Offset is TileR-TileC: the position within the tile for grid cell (R, C).
 % TileR = R mod TH, TileC = C mod TW.
-gti_tile_offset(TH, TW, R, C, TileR-TileC) :-
+gridtile_tile_offset(TH, TW, R, C, TileR-TileC) :-
     TileR is R mod TH,
     TileC is C mod TW.
 
-% gti_all_tiles(+Grid, +TH, +TW, -Tiles)
+% gridtile_all_tiles(+Grid, +TH, +TW, -Tiles)
 % Tiles is the list of all TH x TW sub-grids when Grid is tiled by (TH,TW).
 % Tiles are listed in row-major order: left to right, top to bottom.
 % Requires H mod TH = 0 and W mod TW = 0.
-gti_all_tiles(Grid, TH, TW, Tiles) :-
-    gti_dims_(Grid, H, W),
+gridtile_all_tiles(Grid, TH, TW, Tiles) :-
+    gridtile_dims_(Grid, H, W),
     NH is H div TH, NW is W div TW,
     NH1 is NH - 1, NW1 is NW - 1,
     findall(Tile,
@@ -185,15 +185,15 @@ gti_all_tiles(Grid, TH, TW, Tiles) :-
          between(0, NW1, TC),
          R0 is TR * TH, R1 is R0 + TH - 1,
          C0 is TC * TW, C1 is C0 + TW - 1,
-         gti_subgrid_(Grid, R0, R1, C0, C1, Tile)),
+         gridtile_subgrid_(Grid, R0, R1, C0, C1, Tile)),
         Tiles).
 
-% gti_crop_to_tile(+Grid, -Tile)
+% gridtile_crop_to_tile(+Grid, -Tile)
 % Tile is the minimal tile of Grid: extract the top-left sub-grid of size
-% h_period x w_period. Combines gti_tile_size and gti_extract_tile.
-gti_crop_to_tile(Grid, Tile) :-
+% h_period x w_period. Combines gridtile_tile_size and gridtile_extract_tile.
+gridtile_crop_to_tile(Grid, Tile) :-
 % Find minimal periods.
-    gti_h_period(Grid, HP),
-    gti_w_period(Grid, WP),
+    gridtile_h_period(Grid, HP),
+    gridtile_w_period(Grid, WP),
 % Extract the top-left HP x WP region.
-    gti_extract_tile(Grid, HP, WP, Tile).
+    gridtile_extract_tile(Grid, HP, WP, Tile).

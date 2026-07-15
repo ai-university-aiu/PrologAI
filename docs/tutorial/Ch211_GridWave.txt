@@ -15,84 +15,84 @@ Dependencies: library(lists)
 
 Wave Expansion
 
-gwv_step(+Grid, +BgColor, -Stepped)
+gridwave_step(+Grid, +BgColor, -Stepped)
 One wave-expansion step. Each BgColor cell adjacent (4-connected) to exactly
 one non-BgColor color takes that color. Cells adjacent to two or more different
 non-BgColor colors remain BgColor (conflict). Non-BgColor cells are unchanged.
 
     G = [[b,b,b],[b,x,b],[b,b,b]].
-    gwv_step(G, b, S).
+    gridwave_step(G, b, S).
     % S = [[b,x,b],[x,x,x],[b,x,b]]
 
-gwv_fill(+Grid, +BgColor, -Filled)
-Apply gwv_step repeatedly until the grid reaches a fixed point (no cell changes).
+gridwave_fill(+Grid, +BgColor, -Filled)
+Apply gridwave_step repeatedly until the grid reaches a fixed point (no cell changes).
 
     G = [[x,b,y],[b,b,b],[b,b,b]].
-    gwv_fill(G, b, F).
+    gridwave_fill(G, b, F).
     % F = [[x,b,y],[x,b,y],[x,b,y]]  (conflict column preserved)
 
-gwv_fill_n(+Grid, +N, +BgColor, -Result)
+gridwave_fill_n(+Grid, +N, +BgColor, -Result)
 Apply exactly N wave-expansion steps.
 
     G = [[b,b,b],[b,x,b],[b,b,b]].
-    gwv_fill_n(G, 2, b, R).
+    gridwave_fill_n(G, 2, b, R).
     % R = [[x,x,x],[x,x,x],[x,x,x]]
 
 
 Frontier Detection
 
-gwv_frontier(+Grid, +BgColor, -Cells)
+gridwave_frontier(+Grid, +BgColor, -Cells)
 Cells is the list of R-C positions of BgColor cells that border at least one
 non-BgColor cell (4-connected), ordered row-major.
 
     G = [[b,b,b],[b,x,b],[b,b,b]].
-    gwv_frontier(G, b, F).
+    gridwave_frontier(G, b, F).
     % F = [0-1, 1-0, 1-2, 2-1]
 
-gwv_color_frontier(+Grid, +BgColor, +Color, -Cells)
-Like gwv_frontier but only cells adjacent to the specific Color.
+gridwave_color_frontier(+Grid, +BgColor, +Color, -Cells)
+Like gridwave_frontier but only cells adjacent to the specific Color.
 
-gwv_equidistant_front(+Grid, +BgColor, -Cells)
+gridwave_equidistant_front(+Grid, +BgColor, -Cells)
 Cells adjacent to two or more different non-BgColor colors (conflict boundary).
 
 
 Single-Color Expansion
 
-gwv_color_expand(+Grid, +Color, +BgColor, -Expanded)
+gridwave_color_expand(+Grid, +Color, +BgColor, -Expanded)
 One expansion step for a single Color: each BgColor cell adjacent to Color
 becomes Color. Other colors are unchanged.
 
     G = [[x,b,y],[b,b,b],[b,b,b]].
-    gwv_color_expand(G, x, b, E).
+    gridwave_color_expand(G, x, b, E).
     % E = [[x,x,y],[x,b,b],[b,b,b]]
 
-gwv_color_expand_n(+Grid, +Color, +N, +BgColor, -Result)
-Apply gwv_color_expand exactly N times.
+gridwave_color_expand_n(+Grid, +Color, +N, +BgColor, -Result)
+Apply gridwave_color_expand exactly N times.
 
 
 Shadow Casting
 
-gwv_shadow_right(+Grid, +BgColor, +ShadowColor, -Shadow)
+gridwave_shadow_right(+Grid, +BgColor, +ShadowColor, -Shadow)
 Each BgColor cell to the right of any non-BgColor cell (with no non-BgColor
 cell between them) becomes ShadowColor. Non-BgColor cells keep their value.
 
     G = [[b,b,b],[b,x,b],[b,b,b]].
-    gwv_shadow_right(G, b, s, S).
+    gridwave_shadow_right(G, b, s, S).
     % S = [[b,b,b],[b,x,s],[b,b,b]]
 
-gwv_shadow_left(+Grid, +BgColor, +ShadowColor, -Shadow)
+gridwave_shadow_left(+Grid, +BgColor, +ShadowColor, -Shadow)
 Cast shadow leftward (implemented via row reverse).
 
-gwv_shadow_down(+Grid, +BgColor, +ShadowColor, -Shadow)
+gridwave_shadow_down(+Grid, +BgColor, +ShadowColor, -Shadow)
 Cast shadow downward (implemented via grid transpose).
 
-gwv_shadow_up(+Grid, +BgColor, +ShadowColor, -Shadow)
+gridwave_shadow_up(+Grid, +BgColor, +ShadowColor, -Shadow)
 Cast shadow upward (transpose + reverse).
 
 
 Interior Contraction
 
-gwv_contract(+Grid, +BgColor, -Contracted)
+gridwave_contract(+Grid, +BgColor, -Contracted)
 One contraction step: each non-BgColor cell that has at least one in-bounds
 4-connected BgColor neighbor becomes BgColor. Out-of-bounds neighbors do NOT
 count as BgColor (distinct from morphological erosion). Isolated non-BgColor
@@ -100,22 +100,22 @@ cells with no in-bounds BgColor neighbors are unchanged.
 
     % 5x5 block: all edge x-cells contract; only center survives one step.
     block5([[b,b,b,b,b],[b,x,x,x,b],[b,x,x,x,b],[b,x,x,x,b],[b,b,b,b,b]]).
-    gwv_contract(block5, b, C).
+    gridwave_contract(block5, b, C).
     % C = [[b,b,b,b,b],[b,b,b,b,b],[b,b,x,b,b],[b,b,b,b,b],[b,b,b,b,b]]
 
-gwv_contract_n(+Grid, +N, +BgColor, -Result)
-Apply gwv_contract exactly N times.
+gridwave_contract_n(+Grid, +N, +BgColor, -Result)
+Apply gridwave_contract exactly N times.
 
 
 Round-Trip Property
 
 Expanding a single non-BgColor cell by one step (color_expand_n/1) produces a
-plus shape. Contracting the plus shape (gwv_contract) recovers the original cell.
+plus shape. Contracting the plus shape (gridwave_contract) recovers the original cell.
 
     G = [[b,b,b],[b,x,b],[b,b,b]].
-    gwv_color_expand_n(G, x, 1, b, Plus).
+    gridwave_color_expand_n(G, x, 1, b, Plus).
     % Plus = [[b,x,b],[x,x,x],[b,x,b]]
-    gwv_contract(Plus, b, Back).
+    gridwave_contract(Plus, b, Back).
     % Back = [[b,b,b],[b,x,b],[b,b,b]]  (original recovered)
 
 

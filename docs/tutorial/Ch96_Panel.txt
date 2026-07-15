@@ -14,128 +14,128 @@ columns into equal-width strips or custom-width slices.
 
 2. Detecting Divider Rows and Columns
 
-pn_is_divider_row(+Grid, +R, +Bg) succeeds if row R consists entirely of Bg.
+panel_is_divider_row(+Grid, +R, +Bg) succeeds if row R consists entirely of Bg.
 
-?- pn_is_divider_row([[1,2],[0,0],[3,4]], 1, 0).
+?- panel_is_divider_row([[1,2],[0,0],[3,4]], 1, 0).
 true.
 
-?- pn_is_divider_row([[1,2],[0,1],[3,4]], 1, 0).
+?- panel_is_divider_row([[1,2],[0,1],[3,4]], 1, 0).
 false.
 
-pn_is_divider_col(+Grid, +C, +Bg) succeeds if column C is entirely Bg.
+panel_is_divider_col(+Grid, +C, +Bg) succeeds if column C is entirely Bg.
 
-?- pn_is_divider_col([[1,0,2],[3,0,4]], 1, 0).
+?- panel_is_divider_col([[1,0,2],[3,0,4]], 1, 0).
 true.
 
-pn_divider_rows(+Grid, +Bg, -Rows) returns all divider row indices.
+panel_divider_rows(+Grid, +Bg, -Rows) returns all divider row indices.
 
-?- pn_divider_rows([[1],[0],[2],[0],[3]], 0, Rows).
+?- panel_divider_rows([[1],[0],[2],[0],[3]], 0, Rows).
 Rows = [1,3].
 
-pn_divider_cols(+Grid, +Bg, -Cols) returns all divider column indices.
+panel_divider_cols(+Grid, +Bg, -Cols) returns all divider column indices.
 
-?- pn_divider_cols([[0,1,0],[0,2,0]], 0, Cols).
+?- panel_divider_cols([[0,1,0],[0,2,0]], 0, Cols).
 Cols = [0,2].
 
 
 3. Splitting at Dividers
 
-pn_split_rows(+Grid, +RowIdxs, -Parts) splits at the given row indices.
+panel_split_rows(+Grid, +RowIdxs, -Parts) splits at the given row indices.
 The divider rows themselves are excluded from all parts.
 
-?- pn_split_rows([[r0],[r1],[div],[r3],[r4]], [2], Parts).
+?- panel_split_rows([[r0],[r1],[div],[r3],[r4]], [2], Parts).
 Parts = [[[r0],[r1]], [[r3],[r4]]].
 
-?- pn_split_rows([[a],[b],[c],[d],[e]], [1,3], Parts).
+?- panel_split_rows([[a],[b],[c],[d],[e]], [1,3], Parts).
 Parts = [[[a]], [[c]], [[e]]].
 
-pn_split_cols(+Grid, +ColIdxs, -Parts) splits at the given column indices.
+panel_split_cols(+Grid, +ColIdxs, -Parts) splits at the given column indices.
 
-?- pn_split_cols([[1,2,0,3,4]], [2], Parts).
+?- panel_split_cols([[1,2,0,3,4]], [2], Parts).
 Parts = [[[1,2]], [[3,4]]].
 
 
 4. Auto-Splitting
 
-pn_auto_split_rows(+Grid, +Bg, -Parts) detects all-Bg rows and splits at them.
+panel_auto_split_rows(+Grid, +Bg, -Parts) detects all-Bg rows and splits at them.
 
-?- pn_auto_split_rows([[1,2],[3,4],[0,0],[5,6],[7,8]], 0, Parts).
+?- panel_auto_split_rows([[1,2],[3,4],[0,0],[5,6],[7,8]], 0, Parts).
 Parts = [[[1,2],[3,4]], [[5,6],[7,8]]].
 
-pn_auto_split_cols(+Grid, +Bg, -Parts) detects all-Bg columns and splits.
+panel_auto_split_cols(+Grid, +Bg, -Parts) detects all-Bg columns and splits.
 
-?- pn_auto_split_cols([[1,0,2],[3,0,4]], 0, Parts).
+?- panel_auto_split_cols([[1,0,2],[3,0,4]], 0, Parts).
 Parts = [[[1],[3]], [[2],[4]]].
 
 
 5. Stripping Dividers
 
-pn_strip_rows(+Grid, +Bg, -Stripped) removes all all-Bg rows.
+panel_strip_rows(+Grid, +Bg, -Stripped) removes all all-Bg rows.
 
-?- pn_strip_rows([[1,2],[0,0],[3,4],[0,0],[5,6]], 0, S).
+?- panel_strip_rows([[1,2],[0,0],[3,4],[0,0],[5,6]], 0, S).
 S = [[1,2],[3,4],[5,6]].
 
-pn_strip_cols(+Grid, +Bg, -Stripped) removes all all-Bg columns.
+panel_strip_cols(+Grid, +Bg, -Stripped) removes all all-Bg columns.
 
-?- pn_strip_cols([[1,0,2],[3,0,4]], 0, S).
+?- panel_strip_cols([[1,0,2],[3,0,4]], 0, S).
 S = [[1,2],[3,4]].
 
 
 6. Quadrant Decomposition
 
-pn_quadrants(+Grid, -TL, -TR, -BL, -BR) splits at midpoints
+panel_quadrants(+Grid, -TL, -TR, -BL, -BR) splits at midpoints
 MidR = H // 2 and MidC = W // 2 into four sub-grids.
 
-?- pn_quadrants([[1,2,3,4],[5,6,7,8],[a,b,c,d],[e,f,g,h]],
+?- panel_quadrants([[1,2,3,4],[5,6,7,8],[a,b,c,d],[e,f,g,h]],
                TL, TR, BL, BR).
 TL = [[1,2],[5,6]].
 TR = [[3,4],[7,8]].
 BL = [[a,b],[e,f]].
 BR = [[c,d],[g,h]].
 
-?- pn_quadrants([[1,2],[3,4]], TL, TR, BL, BR).
+?- panel_quadrants([[1,2],[3,4]], TL, TR, BL, BR).
 TL = [[1]], TR = [[2]], BL = [[3]], BR = [[4]].
 
 
 7. Column Partitioning
 
-pn_n_col_parts(+Grid, +N, -Parts) splits columns into N equal-width strips.
+panel_n_col_parts(+Grid, +N, -Parts) splits columns into N equal-width strips.
 Grid width must be divisible by N.
 
-?- pn_n_col_parts([[1,2,3,4,5,6]], 3, Parts).
+?- panel_n_col_parts([[1,2,3,4,5,6]], 3, Parts).
 Parts = [[[1,2]], [[3,4]], [[5,6]]].
 
-?- pn_n_col_parts([[1,2,3,4],[5,6,7,8]], 2, Parts).
+?- panel_n_col_parts([[1,2,3,4],[5,6,7,8]], 2, Parts).
 Parts = [[[1,2],[5,6]], [[3,4],[7,8]]].
 
-pn_col_slices(+Grid, +Widths, -Parts) splits by a list of widths.
+panel_col_slices(+Grid, +Widths, -Parts) splits by a list of widths.
 The sum of Widths must equal the grid width.
 
-?- pn_col_slices([[1,2,3,4,5,6]], [2,3,1], Parts).
+?- panel_col_slices([[1,2,3,4,5,6]], [2,3,1], Parts).
 Parts = [[[1,2]], [[3,4,5]], [[6]]].
 
-?- pn_col_slices([[a,b,c,d],[e,f,g,h]], [1,3], Parts).
+?- panel_col_slices([[a,b,c,d],[e,f,g,h]], [1,3], Parts).
 Parts = [[[a],[e]], [[b,c,d],[f,g,h]]].
 
 
 8. Divider Presence Test
 
-pn_has_dividers(+Grid, +Bg) succeeds if any all-Bg row or column exists.
+panel_has_dividers(+Grid, +Bg) succeeds if any all-Bg row or column exists.
 
-?- pn_has_dividers([[1,2],[0,0],[3,4]], 0).
+?- panel_has_dividers([[1,2],[0,0],[3,4]], 0).
 true.    % row 1 is a divider
 
-?- pn_has_dividers([[1,0,2],[3,0,4]], 0).
+?- panel_has_dividers([[1,0,2],[3,0,4]], 0).
 true.    % column 1 is a divider
 
-?- pn_has_dividers([[1,2],[3,4]], 0).
+?- panel_has_dividers([[1,2],[3,4]], 0).
 false.
 
 
 9. Summary
 
 The 14 pn_* predicates cover detection, splitting, stripping, quadrant
-decomposition, and column partitioning. pn_auto_split_rows and
-pn_auto_split_cols are the primary high-level operations for panel-structured
-grids. pn_quadrants enables midpoint-based decomposition. pn_col_slices allows
+decomposition, and column partitioning. panel_auto_split_rows and
+panel_auto_split_cols are the primary high-level operations for panel-structured
+grids. panel_quadrants enables midpoint-based decomposition. panel_col_slices allows
 custom-width column partitioning for grids with non-uniform panel widths.

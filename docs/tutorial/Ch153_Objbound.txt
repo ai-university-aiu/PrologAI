@@ -15,82 +15,82 @@ Layer 171, module objbound, prefix ob_.
     :- use_module(library(objbound)).
 
     O = obj(a, [r(0,0), r(0,1), r(0,2), r(1,0), r(1,1), r(1,2)]),
-    ob_bbox_h(O, H),     % H = 2
-    ob_bbox_w(O, W),     % W = 3
-    ob_bbox_area(O, A).  % A = 6
+    objbound_bbox_h(O, H),     % H = 2
+    objbound_bbox_w(O, W),     % W = 3
+    objbound_bbox_area(O, A).  % A = 6
 
 3. Shape Type Tests
 
-ob_is_rect(+Obj): every cell in the bounding box is occupied (no gaps).
-ob_is_hline(+Obj): all cells in a single row (H = 1).
-ob_is_vline(+Obj): all cells in a single column (W = 1).
-ob_is_single(+Obj): exactly one cell (H = 1 and W = 1).
-ob_is_square_bbox(+Obj): bounding box is square (H = W). Does NOT require the
+objbound_is_rect(+Obj): every cell in the bounding box is occupied (no gaps).
+objbound_is_hline(+Obj): all cells in a single row (H = 1).
+objbound_is_vline(+Obj): all cells in a single column (W = 1).
+objbound_is_single(+Obj): exactly one cell (H = 1 and W = 1).
+objbound_is_square_bbox(+Obj): bounding box is square (H = W). Does NOT require the
 object itself to be a solid square.
 
     Dot = obj(d, [r(2,5)]),
-    ob_is_single(Dot),    % true
-    ob_is_hline(Dot),     % true (H=1)
-    ob_is_vline(Dot),     % true (W=1)
-    ob_is_square_bbox(Dot). % true (1=1)
+    objbound_is_single(Dot),    % true
+    objbound_is_hline(Dot),     % true (H=1)
+    objbound_is_vline(Dot),     % true (W=1)
+    objbound_is_square_bbox(Dot). % true (1=1)
 
 4. Holes and Hollow Objects
 
-ob_holes(+Obj, -HoleCells): cells in the bounding box NOT in the object.
-ob_n_holes(+Obj, -N): count of holes.
-ob_is_hollow(+Obj): true when N > 0.
+objbound_holes(+Obj, -HoleCells): cells in the bounding box NOT in the object.
+objbound_n_holes(+Obj, -N): count of holes.
+objbound_is_hollow(+Obj): true when N > 0.
 
     Frame = obj(f, [r(0,0),r(0,1),r(0,2),r(1,0),r(1,2),r(2,0),r(2,1),r(2,2)]),
-    ob_holes(Frame, [r(1,1)]),  % single interior hole
-    ob_is_hollow(Frame).        % true
+    objbound_holes(Frame, [r(1,1)]),  % single interior hole
+    objbound_is_hollow(Frame).        % true
 
 5. Frame Detection
 
-ob_is_frame(+Obj): true when the object is a hollow rectangular frame. Requires
+objbound_is_frame(+Obj): true when the object is a hollow rectangular frame. Requires
 H >= 3 and W >= 3, all border cells present, no interior cells.
 
-    ob_is_frame(Frame).  % true for the 3x3 frame above
+    objbound_is_frame(Frame).  % true for the 3x3 frame above
 
-A solid rectangle, an L-shape, or a plus sign do NOT pass ob_is_frame.
+A solid rectangle, an L-shape, or a plus sign do NOT pass objbound_is_frame.
 
 6. Perimeter
 
-ob_perimeter(+Obj, -P): total exposed edges. Each cell contributes the number
+objbound_perimeter(+Obj, -P): total exposed edges. Each cell contributes the number
 of its 4-adjacent neighbors that are NOT in the object.
 
     Dot = obj(d, [r(0,0)]),
-    ob_perimeter(Dot, 4).       % single cell: all 4 edges exposed
+    objbound_perimeter(Dot, 4).       % single cell: all 4 edges exposed
 
     H = obj(h, [r(0,0),r(0,1),r(0,2)]),
-    ob_perimeter(H, 8).         % 1x3 bar: 8 exposed edges
+    objbound_perimeter(H, 8).         % 1x3 bar: 8 exposed edges
 
     Sq = obj(s, [r(0,0),r(0,1),r(1,0),r(1,1)]),
-    ob_perimeter(Sq, 8).        % 2x2 block: each corner has 2 exposed edges
+    objbound_perimeter(Sq, 8).        % 2x2 block: each corner has 2 exposed edges
 
 7. Dense Hull
 
-ob_dense_hull(+Obj, -HullObj): produces the solid bounding-box rectangle
+objbound_dense_hull(+Obj, -HullObj): produces the solid bounding-box rectangle
 with the same color as Obj.
 
     L = obj(l, [r(0,0), r(1,0), r(1,1)]),
-    ob_dense_hull(L, obj(l, Hull)),
+    objbound_dense_hull(L, obj(l, Hull)),
     % Hull = [r(0,0), r(0,1), r(1,0), r(1,1)] — fills the 2x2 bbox
 
 8. Predicate Reference
 
-ob_bbox_h(+Obj, -H)
-ob_bbox_w(+Obj, -W)
-ob_bbox_area(+Obj, -Area)
-ob_is_rect(+Obj)
-ob_is_hline(+Obj)
-ob_is_vline(+Obj)
-ob_is_single(+Obj)
-ob_is_square_bbox(+Obj)
-ob_holes(+Obj, -HoleCells)
-ob_n_holes(+Obj, -N)
-ob_is_hollow(+Obj)
-ob_is_frame(+Obj)
-ob_perimeter(+Obj, -P)
-ob_dense_hull(+Obj, -HullObj)
+objbound_bbox_h(+Obj, -H)
+objbound_bbox_w(+Obj, -W)
+objbound_bbox_area(+Obj, -Area)
+objbound_is_rect(+Obj)
+objbound_is_hline(+Obj)
+objbound_is_vline(+Obj)
+objbound_is_single(+Obj)
+objbound_is_square_bbox(+Obj)
+objbound_holes(+Obj, -HoleCells)
+objbound_n_holes(+Obj, -N)
+objbound_is_hollow(+Obj)
+objbound_is_frame(+Obj)
+objbound_perimeter(+Obj, -P)
+objbound_dense_hull(+Obj, -HullObj)
 
 73 PLUnit tests cover all 14 predicates. This is WP 192, Layer 171.

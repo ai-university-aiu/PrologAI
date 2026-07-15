@@ -22,7 +22,7 @@ The Group Representation
 A group list produced by any og_by_* predicate is a list of Key-ObjList terms, sorted
 by Key. For example:
 
-  og_by_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], Groups)
+  objgroup_by_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], Groups)
   Groups = [b-[obj(b,[r(0,1)])], r-[obj(r,[r(0,0)]), obj(r,[r(0,2)])]]
 
 Keys are sorted (alphabetical for color, numeric ascending for size and row/col).
@@ -32,118 +32,118 @@ Within each bin, objects appear in their original input order.
 Predicate Reference
 
 
-og_by_color(+Objs, -Groups)
+objgroup_by_color(+Objs, -Groups)
 
 Partitions Objs into Color-ObjList groups.
 
-  ?- og_by_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], G).
+  ?- objgroup_by_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], G).
   G = [b-[obj(b,[r(0,1)])], r-[obj(r,[r(0,0)]), obj(r,[r(0,2)])]].
 
 
-og_by_size(+Objs, -Groups)
+objgroup_by_size(+Objs, -Groups)
 
 Partitions Objs into Size-ObjList groups, where Size is the cell count. Groups are
 sorted by Size ascending.
 
-  ?- og_by_size([obj(r,[r(0,0)]), obj(b,[r(0,1),r(0,2)]), obj(g,[r(1,0)])], G).
+  ?- objgroup_by_size([obj(r,[r(0,0)]), obj(b,[r(0,1),r(0,2)]), obj(g,[r(1,0)])], G).
   G = [1-[obj(r,[r(0,0)]), obj(g,[r(1,0)])], 2-[obj(b,[r(0,1),r(0,2)])]].
 
 
-og_by_form(+Objs, -Groups)
+objgroup_by_form(+Objs, -Groups)
 
 Partitions Objs by normalized shape. Normalization translates each object so its
 top-left cell is at r(0,0) and sorts the cell list. Two objects fall in the same
 group iff their normalized shapes are identical. Color and position are ignored.
 
-  ?- og_by_form([obj(p,[r(0,0),r(1,0),r(1,1)]),   % L-shape at origin
+  ?- objgroup_by_form([obj(p,[r(0,0),r(1,0),r(1,1)]),   % L-shape at origin
                   obj(b,[r(3,4),r(4,4),r(4,5)]),   % L-shape far away
                   obj(r,[r(0,0)])], G).             % single dot
   % Two groups: L-shape group (2 members) and dot group (1 member).
 
 
-og_by_row(+Objs, -Groups)
+objgroup_by_row(+Objs, -Groups)
 
 Partitions Objs by the row of the top-left corner, sorted ascending.
 
-  ?- og_by_row([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])], G).
+  ?- objgroup_by_row([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])], G).
   G = [0-[obj(r,[r(0,0)]), obj(b,[r(0,1)])], 1-[obj(g,[r(1,0)])]].
 
 
-og_by_col(+Objs, -Groups)
+objgroup_by_col(+Objs, -Groups)
 
 Partitions Objs by the column of the top-left corner, sorted ascending.
 
 
-og_n_groups(+Groups, -N)
+objgroup_n_groups(+Groups, -N)
 
 Unifies N with the number of groups.
 
-  ?- og_n_groups([r-[_], b-[_]], N).
+  ?- objgroup_n_groups([r-[_], b-[_]], N).
   N = 2.
 
 
-og_n_members(+Groups, +N, -Selected)
+objgroup_n_members(+Groups, +N, -Selected)
 
 Filters Groups to those with exactly N members.
 
-  ?- og_n_members([r-[A,B,C], b-[D]], 3, Selected).
+  ?- objgroup_n_members([r-[A,B,C], b-[D]], 3, Selected).
   Selected = [r-[A,B,C]].
 
 
-og_singletons(+Groups, -Singletons)
+objgroup_singletons(+Groups, -Singletons)
 
-Filters Groups to those with exactly 1 member. Equivalent to og_n_members(Groups, 1, Singletons).
+Filters Groups to those with exactly 1 member. Equivalent to objgroup_n_members(Groups, 1, Singletons).
 
-  ?- og_singletons([r-[A,B], b-[C]], Singletons).
+  ?- objgroup_singletons([r-[A,B], b-[C]], Singletons).
   Singletons = [b-[C]].
 
 
-og_largest(+Groups, -Group)
+objgroup_largest(+Groups, -Group)
 
 Unifies Group with the group that has the most members. If two groups tie, the one
 that appears first in sorted key order wins.
 
-  ?- og_largest([r-[A,B,C], b-[D]], Group).
+  ?- objgroup_largest([r-[A,B,C], b-[D]], Group).
   Group = r-[A,B,C].
 
 
-og_smallest(+Groups, -Group)
+objgroup_smallest(+Groups, -Group)
 
 Unifies Group with the group that has the fewest members.
 
-  ?- og_smallest([r-[A,B], b-[C]], Group).
+  ?- objgroup_smallest([r-[A,B], b-[C]], Group).
   Group = b-[C].
 
 
-og_all_same_size(+Groups)
+objgroup_all_same_size(+Groups)
 
 Succeeds iff all groups have the same member count. Succeeds vacuously for empty input.
 
-  ?- og_all_same_size([r-[A], b-[B], g-[C]]).
+  ?- objgroup_all_same_size([r-[A], b-[B], g-[C]]).
   true.   % all have 1 member
 
 
-og_sort_desc(+Groups, -Sorted)
+objgroup_sort_desc(+Groups, -Sorted)
 
 Unifies Sorted with Groups sorted by member count descending (largest group first).
 
-  ?- og_sort_desc([r-[A], b-[B,C,D]], Sorted).
+  ?- objgroup_sort_desc([r-[A], b-[B,C,D]], Sorted).
   Sorted = [b-[B,C,D], r-[A]].
 
 
-og_flat(+Groups, -Objs)
+objgroup_flat(+Groups, -Objs)
 
 Flattens groups into a single list of obj terms, in group order.
 
-  ?- og_flat([r-[A,B], b-[C]], Objs).
+  ?- objgroup_flat([r-[A,B], b-[C]], Objs).
   Objs = [A, B, C].
 
 
-og_filter_size(+Groups, +Min, +Max, -Filtered)
+objgroup_filter_size(+Groups, +Min, +Max, -Filtered)
 
 Keeps only groups whose member count is between Min and Max inclusive.
 
-  ?- og_filter_size([r-[A,B,C], b-[D]], 2, 5, Filtered).
+  ?- objgroup_filter_size([r-[A,B,C], b-[D]], 2, 5, Filtered).
   Filtered = [r-[A,B,C]].
 
 
@@ -159,10 +159,10 @@ Suppose a scene has objects of different colors and sizes:
 
 Find the dominant color group, the singleton groups, and check uniformity:
 
-  ?- og_by_color(Objs, Groups),
-     og_largest(Groups, LargestGroup),
-     og_singletons(Groups, Singletons),
-     og_all_same_size(Groups).
+  ?- objgroup_by_color(Objs, Groups),
+     objgroup_largest(Groups, LargestGroup),
+     objgroup_singletons(Groups, Singletons),
+     objgroup_all_same_size(Groups).
 
   Groups = [b-[obj(b,[r(0,1)])],
             g-[obj(g,[r(1,0)])],
@@ -182,8 +182,8 @@ All 41 tests pass.
 Summary
 
 The objgroup pack gives a reasoner a way to organize objects into bins before
-further analysis. After grouping, predicates like og_largest, og_singletons,
-og_all_same_size, and og_sort_desc reveal the structure of the scene at the
-group level. og_flat collapses groups back to a flat list when needed.
+further analysis. After grouping, predicates like objgroup_largest, objgroup_singletons,
+objgroup_all_same_size, and objgroup_sort_desc reveal the structure of the scene at the
+group level. objgroup_flat collapses groups back to a flat list when needed.
 
 Continue to Chapter 164 for the next pack in the PrologAI Layer sequence.

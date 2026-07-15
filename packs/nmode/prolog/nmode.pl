@@ -5,86 +5,86 @@
 % whose value differs from the neighborhood mode, neighbors only, cell excluded).
 % Ties in frequency are broken by returning the smallest tied value.
 :- module(nmode, [
-    nm_mode/2,
-    nm_mode_all/2,
-    nm_mode_count/3,
-    nm_row/3, nm_col/3,
-    nm_row_modes/2, nm_col_modes/2,
-    nm_grid/2,
-    nm_filter4/2, nm_filter8/2,
-    nm_uniform4/2, nm_uniform8/2,
-    nm_outlier4/2, nm_outlier8/2
+    nmode_mode/2,
+    nmode_mode_all/2,
+    nmode_mode_count/3,
+    nmode_row/3, nmode_col/3,
+    nmode_row_modes/2, nmode_col_modes/2,
+    nmode_grid/2,
+    nmode_filter4/2, nmode_filter8/2,
+    nmode_uniform4/2, nmode_uniform8/2,
+    nmode_outlier4/2, nmode_outlier8/2
 ]).
 % Import list utilities; msort/2, sort/2, length/2, between/3, findall/3 are built-ins.
 :- use_module(library(lists), [member/2, nth0/3, max_list/2]).
 
-% nm_mode(+List, -M): M is the mode (most frequent value) of a non-empty integer list.
+% nmode_mode(+List, -M): M is the mode (most frequent value) of a non-empty integer list.
 % Ties are broken by returning the smallest value among those tied for highest frequency.
-nm_mode(List, M) :-
+nmode_mode(List, M) :-
 % Sort preserving duplicates to group equal elements, then compute frequency pairs.
     msort(List, Sorted),
-    nm_freq_pairs_(Sorted, Pairs),
+    nmode_freq_pairs_(Sorted, Pairs),
 % Extract just the counts, find the maximum count.
-    nm_pair_vals_(Pairs, Counts),
+    nmode_pair_vals_(Pairs, Counts),
     max_list(Counts, MaxCount),
 % Collect all values with the maximum count; sort ascending so smallest is first.
     findall(V, member(V-MaxCount, Pairs), Candidates),
     sort(Candidates, [M|_]).
 
-% nm_mode_count(+List, -M, -Count): M is the mode and Count is how many times M appears.
+% nmode_mode_count(+List, -M, -Count): M is the mode and Count is how many times M appears.
 % Ties in mode are broken by the smallest value; Count is the winning frequency.
-nm_mode_count(List, M, Count) :-
+nmode_mode_count(List, M, Count) :-
 % Compute frequency pairs, find max count, then retrieve the mode.
     msort(List, Sorted),
-    nm_freq_pairs_(Sorted, Pairs),
-    nm_pair_vals_(Pairs, Counts),
+    nmode_freq_pairs_(Sorted, Pairs),
+    nmode_pair_vals_(Pairs, Counts),
     max_list(Counts, MaxCount),
     findall(V, member(V-MaxCount, Pairs), Candidates),
     sort(Candidates, [M|_]),
     Count = MaxCount.
 
-% nm_mode_all(+List, -Ms): Ms is the sorted list of all values tied for highest frequency.
-nm_mode_all(List, Ms) :-
-% Same frequency analysis as nm_mode but collect all tied values.
+% nmode_mode_all(+List, -Ms): Ms is the sorted list of all values tied for highest frequency.
+nmode_mode_all(List, Ms) :-
+% Same frequency analysis as nmode_mode but collect all tied values.
     msort(List, Sorted),
-    nm_freq_pairs_(Sorted, Pairs),
-    nm_pair_vals_(Pairs, Counts),
+    nmode_freq_pairs_(Sorted, Pairs),
+    nmode_pair_vals_(Pairs, Counts),
     max_list(Counts, MaxCount),
     findall(V, member(V-MaxCount, Pairs), Candidates),
     sort(Candidates, Ms).
 
-% nm_row(+Grid, +R, -M): M is the mode of row R (0-based) of Grid.
-nm_row(Grid, R, M) :-
+% nmode_row(+Grid, +R, -M): M is the mode of row R (0-based) of Grid.
+nmode_row(Grid, R, M) :-
 % Extract the row by index, then compute its mode.
     nth0(R, Grid, Row),
-    nm_mode(Row, M).
+    nmode_mode(Row, M).
 
-% nm_col(+Grid, +C, -M): M is the mode of column C (0-based) of Grid.
-nm_col(Grid, C, M) :-
+% nmode_col(+Grid, +C, -M): M is the mode of column C (0-based) of Grid.
+nmode_col(Grid, C, M) :-
 % Collect the column values, then compute the mode.
     findall(V, (member(Row, Grid), nth0(C, Row, V)), ColVals),
-    nm_mode(ColVals, M).
+    nmode_mode(ColVals, M).
 
-% nm_row_modes(+Grid, -Ms): Ms is the list of modes, one per row, in row order.
-nm_row_modes(Grid, Ms) :-
-% Map nm_mode over each row of the grid.
-    findall(M, (member(Row, Grid), nm_mode(Row, M)), Ms).
+% nmode_row_modes(+Grid, -Ms): Ms is the list of modes, one per row, in row order.
+nmode_row_modes(Grid, Ms) :-
+% Map nmode_mode over each row of the grid.
+    findall(M, (member(Row, Grid), nmode_mode(Row, M)), Ms).
 
-% nm_col_modes(+Grid, -Ms): Ms is the list of modes, one per column, in column order.
-nm_col_modes(Grid, Ms) :-
+% nmode_col_modes(+Grid, -Ms): Ms is the list of modes, one per column, in column order.
+nmode_col_modes(Grid, Ms) :-
 % Enumerate column indices, collect each column, compute its mode.
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0), W1 is W - 1,
-    findall(M, (between(0, W1, C), nm_col(Grid, C, M)), Ms).
+    findall(M, (between(0, W1, C), nmode_col(Grid, C, M)), Ms).
 
-% nm_grid(+Grid, -M): M is the mode of all cell values in Grid.
-nm_grid(Grid, M) :-
+% nmode_grid(+Grid, -M): M is the mode of all cell values in Grid.
+nmode_grid(Grid, M) :-
 % Flatten all cell values and compute the mode of the flat list.
     findall(V, (member(Row, Grid), member(V, Row)), Vals),
-    nm_mode(Vals, M).
+    nmode_mode(Vals, M).
 
-% nm_filter4(+Grid, -OutGrid): OutGrid[R][C] is the mode of the cell and its in-bounds
+% nmode_filter4(+Grid, -OutGrid): OutGrid[R][C] is the mode of the cell and its in-bounds
 % 4-connected neighbors combined. Useful for denoising and pattern completion.
-nm_filter4(Grid, OutGrid) :-
+nmode_filter4(Grid, OutGrid) :-
 % Build output grid via nested findall; for each cell collect self + 4-neighbor values.
     length(Grid, H), H1 is H - 1,
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0), W1 is W - 1,
@@ -95,12 +95,12 @@ nm_filter4(Grid, OutGrid) :-
                 NR is R+DR, NC is C+DC,
                 NR >= 0, NR < H, NC >= 0, NC < W,
                 nth0(NR, Grid, NRow), nth0(NC, NRow, NV)), NbrVals),
-            nm_mode([V|NbrVals], M)), Row)), OutGrid).
+            nmode_mode([V|NbrVals], M)), Row)), OutGrid).
 
-% nm_filter8(+Grid, -OutGrid): OutGrid[R][C] is the mode of the cell and its in-bounds
+% nmode_filter8(+Grid, -OutGrid): OutGrid[R][C] is the mode of the cell and its in-bounds
 % 8-connected neighbors combined.
-nm_filter8(Grid, OutGrid) :-
-% Same structure as nm_filter4 but with 8-directional offsets.
+nmode_filter8(Grid, OutGrid) :-
+% Same structure as nmode_filter4 but with 8-directional offsets.
     length(Grid, H), H1 is H - 1,
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0), W1 is W - 1,
     findall(Row, (between(0, H1, R),
@@ -111,95 +111,95 @@ nm_filter8(Grid, OutGrid) :-
                 NR is R+DR, NC is C+DC,
                 NR >= 0, NR < H, NC >= 0, NC < W,
                 nth0(NR, Grid, NRow), nth0(NC, NRow, NV)), NbrVals),
-            nm_mode([V|NbrVals], M)), Row)), OutGrid).
+            nmode_mode([V|NbrVals], M)), Row)), OutGrid).
 
-% nm_uniform4(+Grid, -Cells): Cells is the sorted list of R-C positions whose
+% nmode_uniform4(+Grid, -Cells): Cells is the sorted list of R-C positions whose
 % in-bounds 4-connected neighbors all share exactly one distinct value.
 % Corner/edge cells with only two or three neighbors can still qualify.
-nm_uniform4(Grid, Cells) :-
+nmode_uniform4(Grid, Cells) :-
 % Collect 4-neighbor values; succeed only if sort yields a singleton list.
     length(Grid, H), H1 is H - 1,
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0), W1 is W - 1,
     findall(R-C, (between(0, H1, R), between(0, W1, C),
-        nm_nbr4_vals_(Grid, H, W, R, C, NbrVals),
+        nmode_nbr4_vals_(Grid, H, W, R, C, NbrVals),
         NbrVals \= [],
         sort(NbrVals, [_])), Cells).
 
-% nm_uniform8(+Grid, -Cells): Cells is the sorted list of R-C positions whose
+% nmode_uniform8(+Grid, -Cells): Cells is the sorted list of R-C positions whose
 % in-bounds 8-connected neighbors all share exactly one distinct value.
-nm_uniform8(Grid, Cells) :-
+nmode_uniform8(Grid, Cells) :-
 % Collect 8-neighbor values; succeed only if sort yields a singleton list.
     length(Grid, H), H1 is H - 1,
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0), W1 is W - 1,
     findall(R-C, (between(0, H1, R), between(0, W1, C),
-        nm_nbr8_vals_(Grid, H, W, R, C, NbrVals),
+        nmode_nbr8_vals_(Grid, H, W, R, C, NbrVals),
         NbrVals \= [],
         sort(NbrVals, [_])), Cells).
 
-% nm_outlier4(+Grid, -Cells): Cells is the sorted list of R-C positions whose value
+% nmode_outlier4(+Grid, -Cells): Cells is the sorted list of R-C positions whose value
 % differs numerically from the mode of their in-bounds 4-connected neighbors (cell excluded).
-nm_outlier4(Grid, Cells) :-
+nmode_outlier4(Grid, Cells) :-
 % Cell is an outlier if its own value differs from the mode of its 4-neighbors alone.
     length(Grid, H), H1 is H - 1,
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0), W1 is W - 1,
     findall(R-C, (between(0, H1, R), between(0, W1, C),
         nth0(R, Grid, CRow), nth0(C, CRow, V),
-        nm_nbr4_vals_(Grid, H, W, R, C, NbrVals),
+        nmode_nbr4_vals_(Grid, H, W, R, C, NbrVals),
         NbrVals \= [],
-        nm_mode(NbrVals, NbrMode),
+        nmode_mode(NbrVals, NbrMode),
         V =\= NbrMode), Cells).
 
-% nm_outlier8(+Grid, -Cells): Cells is the sorted list of R-C positions whose value
+% nmode_outlier8(+Grid, -Cells): Cells is the sorted list of R-C positions whose value
 % differs numerically from the mode of their in-bounds 8-connected neighbors (cell excluded).
-nm_outlier8(Grid, Cells) :-
+nmode_outlier8(Grid, Cells) :-
 % Cell is an outlier if its own value differs from the mode of its 8-neighbors alone.
     length(Grid, H), H1 is H - 1,
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0), W1 is W - 1,
     findall(R-C, (between(0, H1, R), between(0, W1, C),
         nth0(R, Grid, CRow), nth0(C, CRow, V),
-        nm_nbr8_vals_(Grid, H, W, R, C, NbrVals),
+        nmode_nbr8_vals_(Grid, H, W, R, C, NbrVals),
         NbrVals \= [],
-        nm_mode(NbrVals, NbrMode),
+        nmode_mode(NbrVals, NbrMode),
         V =\= NbrMode), Cells).
 
-% nm_nbr4_vals_(+Grid, +H, +W, +R, +C, -Vals): collects in-bounds 4-neighbor values.
-nm_nbr4_vals_(Grid, H, W, R, C, Vals) :-
+% nmode_nbr4_vals_(+Grid, +H, +W, +R, +C, -Vals): collects in-bounds 4-neighbor values.
+nmode_nbr4_vals_(Grid, H, W, R, C, Vals) :-
 % Enumerate 4-direction offsets, guard bounds, collect values.
     findall(V, (member(DR-DC, [-1-0, 1-0, 0-(-1), 0-1]),
         NR is R+DR, NC is C+DC,
         NR >= 0, NR < H, NC >= 0, NC < W,
         nth0(NR, Grid, NRow), nth0(NC, NRow, V)), Vals).
 
-% nm_nbr8_vals_(+Grid, +H, +W, +R, +C, -Vals): collects in-bounds 8-neighbor values.
-nm_nbr8_vals_(Grid, H, W, R, C, Vals) :-
+% nmode_nbr8_vals_(+Grid, +H, +W, +R, +C, -Vals): collects in-bounds 8-neighbor values.
+nmode_nbr8_vals_(Grid, H, W, R, C, Vals) :-
 % Enumerate 8-direction offsets, guard bounds, collect values.
     findall(V, (member(DR-DC, [-1-(-1), -1-0, -1-1, 0-(-1), 0-1, 1-(-1), 1-0, 1-1]),
         NR is R+DR, NC is C+DC,
         NR >= 0, NR < H, NC >= 0, NC < W,
         nth0(NR, Grid, NRow), nth0(NC, NRow, V)), Vals).
 
-% nm_freq_pairs_(+SortedList, -Pairs): converts a sorted list to Value-Count pairs.
+% nmode_freq_pairs_(+SortedList, -Pairs): converts a sorted list to Value-Count pairs.
 % Consecutive equal elements are grouped; output is a list of Val-Count pairs.
-nm_freq_pairs_([], []).
-nm_freq_pairs_([H|T], Pairs) :-
+nmode_freq_pairs_([], []).
+nmode_freq_pairs_([H|T], Pairs) :-
 % Count how many leading elements equal H, then recurse on the remainder.
-    nm_count_prefix_(H, T, Count, Rest),
+    nmode_count_prefix_(H, T, Count, Rest),
     Total is Count + 1,
-    nm_freq_pairs_(Rest, RestPairs),
+    nmode_freq_pairs_(Rest, RestPairs),
     Pairs = [H-Total|RestPairs].
 
-% nm_count_prefix_(+Val, +List, -Count, -Remainder): counts leading Val occurrences.
+% nmode_count_prefix_(+Val, +List, -Count, -Remainder): counts leading Val occurrences.
 % Cut in clause 1 prevents clause 3 from matching when List is empty.
-nm_count_prefix_(_, [], 0, []) :- !.
-nm_count_prefix_(Val, [Val|T], Count, Rest) :-
+nmode_count_prefix_(_, [], 0, []) :- !.
+nmode_count_prefix_(Val, [Val|T], Count, Rest) :-
     !,
 % This element matches Val; count it and continue checking the tail.
-    nm_count_prefix_(Val, T, C1, Rest),
+    nmode_count_prefix_(Val, T, C1, Rest),
     Count is C1 + 1.
-nm_count_prefix_(_, List, 0, List).
+nmode_count_prefix_(_, List, 0, List).
 
-% nm_pair_vals_(+Pairs, -Values): extracts the count (right element) from Key-Count pairs.
-nm_pair_vals_([], []).
-nm_pair_vals_([_-V|T], [V|Vs]) :-
+% nmode_pair_vals_(+Pairs, -Values): extracts the count (right element) from Key-Count pairs.
+nmode_pair_vals_([], []).
+nmode_pair_vals_([_-V|T], [V|Vs]) :-
 % Strip the key, keep the count, recurse.
-    nm_pair_vals_(T, Vs).
+    nmode_pair_vals_(T, Vs).

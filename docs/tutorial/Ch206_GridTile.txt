@@ -12,96 +12,96 @@ a grid that can be fully described by a smaller repeated sub-grid called the til
 A grid has vertical period P if every row R equals row R mod P and H mod P = 0.
 The horizontal period is defined similarly for columns.
 
-gti_h_period/2 finds the smallest vertical period. gti_w_period/2 finds the
-smallest horizontal period. gti_tile_size/3 returns both.
+gridtile_h_period/2 finds the smallest vertical period. gridtile_w_period/2 finds the
+smallest horizontal period. gridtile_tile_size/3 returns both.
 
   G = [[a,b,a,b],[c,d,c,d],[a,b,a,b],[c,d,c,d]].
-  gti_h_period(G, HP).    % HP = 2
-  gti_w_period(G, WP).    % WP = 2
-  gti_tile_size(G, HP, WP).  % HP = 2, WP = 2
+  gridtile_h_period(G, HP).    % HP = 2
+  gridtile_w_period(G, WP).    % WP = 2
+  gridtile_tile_size(G, HP, WP).  % HP = 2, WP = 2
 
 For a non-tiling grid, the period equals the full dimension:
 
   G3 = [[a,b,c],[d,e,f],[g,h,i]].
-  gti_h_period(G3, P).  % P = 3 (no smaller period works)
+  gridtile_h_period(G3, P).  % P = 3 (no smaller period works)
 
 
 2. Tiling Verification and Extraction
 
-gti_is_tiling/3 checks if a grid is a valid tiling with a tile of given dimensions.
+gridtile_is_tiling/3 checks if a grid is a valid tiling with a tile of given dimensions.
 
-  gti_is_tiling(G, 2, 2).   % succeeds
-  gti_is_tiling(G, 3, 3).   % fails (4 mod 3 != 0)
+  gridtile_is_tiling(G, 2, 2).   % succeeds
+  gridtile_is_tiling(G, 3, 3).   % fails (4 mod 3 != 0)
 
-gti_extract_tile/4 extracts the top-left TH x TW sub-grid as the canonical tile:
+gridtile_extract_tile/4 extracts the top-left TH x TW sub-grid as the canonical tile:
 
-  gti_extract_tile(G, 2, 2, T).  % T = [[a,b],[c,d]]
+  gridtile_extract_tile(G, 2, 2, T).  % T = [[a,b],[c,d]]
 
-gti_crop_to_tile/2 combines period detection with extraction:
+gridtile_crop_to_tile/2 combines period detection with extraction:
 
-  gti_crop_to_tile(G, Tile).  % Tile = [[a,b],[c,d]]
+  gridtile_crop_to_tile(G, Tile).  % Tile = [[a,b],[c,d]]
 
 
 3. Building Grids from Tiles
 
-gti_tile_to_grid/4 builds any H x W grid by repeating a tile.
+gridtile_tile_to_grid/4 builds any H x W grid by repeating a tile.
 Cell (R,C) = Tile[R mod TH][C mod TW].
 
-  gti_tile_to_grid([[a,b],[c,d]], 4, 4, G).
+  gridtile_tile_to_grid([[a,b],[c,d]], 4, 4, G).
   % G = [[a,b,a,b],[c,d,c,d],[a,b,a,b],[c,d,c,d]]
 
-  gti_tile_to_grid([[z]], 3, 3, G).
+  gridtile_tile_to_grid([[z]], 3, 3, G).
   % G = [[z,z,z],[z,z,z],[z,z,z]]
 
 
 4. Row and Column Periodicity
 
-gti_row_is_periodic/3 checks if a single row of given length has period P:
+gridtile_row_is_periodic/3 checks if a single row of given length has period P:
 
-  gti_row_is_periodic([a,b,a,b], 2, 4).  % succeeds
-  gti_row_is_periodic([a,b,a,b], 1, 4).  % fails (a != b)
+  gridtile_row_is_periodic([a,b,a,b], 2, 4).  % succeeds
+  gridtile_row_is_periodic([a,b,a,b], 1, 4).  % fails (a != b)
 
-gti_col_is_periodic/3 checks if a column of the grid has period P:
+gridtile_col_is_periodic/3 checks if a column of the grid has period P:
 
-  gti_col_is_periodic(G, 0, 2).  % succeeds for the 4x4 tiled grid
+  gridtile_col_is_periodic(G, 0, 2).  % succeeds for the 4x4 tiled grid
 
 
 5. Tile Counting and Matching
 
-gti_tile_count_h/3 and gti_tile_count_w/3 count complete tile rows and columns:
+gridtile_tile_count_h/3 and gridtile_tile_count_w/3 count complete tile rows and columns:
 
-  gti_tile_count_h(G, 2, C).  % C = 2
-  gti_tile_count_w(G, 2, C).  % C = 2
+  gridtile_tile_count_h(G, 2, C).  % C = 2
+  gridtile_tile_count_w(G, 2, C).  % C = 2
 
-gti_matches_tile/4 checks if a specific sub-grid equals a tile:
+gridtile_matches_tile/4 checks if a specific sub-grid equals a tile:
 
-  gti_matches_tile(G, [[a,b],[c,d]], 0, 2).  % succeeds (second tile)
+  gridtile_matches_tile(G, [[a,b],[c,d]], 0, 2).  % succeeds (second tile)
 
-gti_tile_offset/5 finds the tile-relative position of a cell:
+gridtile_tile_offset/5 finds the tile-relative position of a cell:
 
-  gti_tile_offset(2, 2, 3, 3, Off).  % Off = 1-1
+  gridtile_tile_offset(2, 2, 3, 3, Off).  % Off = 1-1
 
 
 6. All Tiles
 
-gti_all_tiles/4 lists all tile sub-grids in row-major order:
+gridtile_all_tiles/4 lists all tile sub-grids in row-major order:
 
-  gti_all_tiles(G, 2, 2, Tiles).  % 4 tiles, all [[a,b],[c,d]]
+  gridtile_all_tiles(G, 2, 2, Tiles).  % 4 tiles, all [[a,b],[c,d]]
 
 
 7. Predicate Reference
 
-  gti_h_period/2        - smallest vertical period
-  gti_w_period/2        - smallest horizontal period
-  gti_tile_size/3       - tile dimensions (HP, WP)
-  gti_is_tiling/3       - verify a grid tiles with (TH, TW)
-  gti_extract_tile/4    - top-left TH x TW sub-grid
-  gti_tile_to_grid/4    - build H x W grid from tile
-  gti_row_is_periodic/3 - row period check
-  gti_col_is_periodic/3 - column period check
-  gti_tile_count_h/3    - complete tile rows (H div TH)
-  gti_tile_count_w/3    - complete tile cols (W div TW)
-  gti_matches_tile/4    - sub-grid at (R0,C0) equals tile
-  gti_tile_offset/5     - tile-relative cell position
-  gti_all_tiles/4       - all TH x TW tiles in row-major order
-  gti_crop_to_tile/2    - minimal tile extraction
+  gridtile_h_period/2        - smallest vertical period
+  gridtile_w_period/2        - smallest horizontal period
+  gridtile_tile_size/3       - tile dimensions (HP, WP)
+  gridtile_is_tiling/3       - verify a grid tiles with (TH, TW)
+  gridtile_extract_tile/4    - top-left TH x TW sub-grid
+  gridtile_tile_to_grid/4    - build H x W grid from tile
+  gridtile_row_is_periodic/3 - row period check
+  gridtile_col_is_periodic/3 - column period check
+  gridtile_tile_count_h/3    - complete tile rows (H div TH)
+  gridtile_tile_count_w/3    - complete tile cols (W div TW)
+  gridtile_matches_tile/4    - sub-grid at (R0,C0) equals tile
+  gridtile_tile_offset/5     - tile-relative cell position
+  gridtile_all_tiles/4       - all TH x TW tiles in row-major order
+  gridtile_crop_to_tile/2    - minimal tile extraction

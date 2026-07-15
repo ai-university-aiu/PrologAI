@@ -35,216 +35,216 @@ g2x2_asym([[r,b],[r,b]]).
 
 :- begin_tests(gridsymm).
 
-% --- gsm_sym_h ---
+% --- gridsymm_sym_h ---
 test(sym_h_fully_symmetric, []) :-
     g3x3_hsym(G),
-    gsm_sym_h(G).
+    gridsymm_sym_h(G).
 
 test(sym_h_d4_symmetric, []) :-
     g3x3_d4sym(G),
-    gsm_sym_h(G).
+    gridsymm_sym_h(G).
 
 test(sym_h_fails_for_asym, [fail]) :-
     g3x3_none(G),
-    gsm_sym_h(G).
+    gridsymm_sym_h(G).
 
-% --- gsm_sym_v ---
+% --- gridsymm_sym_v ---
 test(sym_v_fully_symmetric, []) :-
     g3x3_vsym(G),
-    gsm_sym_v(G).
+    gridsymm_sym_v(G).
 
 test(sym_v_d4_symmetric, []) :-
     g3x3_d4sym(G),
-    gsm_sym_v(G).
+    gridsymm_sym_v(G).
 
 test(sym_v_fails_for_asym, [fail]) :-
     g3x3_none(G),
-    gsm_sym_v(G).
+    gridsymm_sym_v(G).
 
-% --- gsm_sym_d1 ---
+% --- gridsymm_sym_d1 ---
 test(sym_d1_passes, []) :-
     g3x3_d1sym(G),
-    gsm_sym_d1(G).
+    gridsymm_sym_d1(G).
 
 test(sym_d1_fails_non_square, [fail]) :-
     g2x4_hsym(G),
-    gsm_sym_d1(G).
+    gridsymm_sym_d1(G).
 
 test(sym_d1_fails_asym, [fail]) :-
     g3x3_none(G),
-    gsm_sym_d1(G).
+    gridsymm_sym_d1(G).
 
-% --- gsm_sym_d2 ---
+% --- gridsymm_sym_d2 ---
 test(sym_d2_passes, []) :-
     g3x3_d2sym(G),
-    gsm_sym_d2(G).
+    gridsymm_sym_d2(G).
 
 test(sym_d2_fails_asym, [fail]) :-
     g3x3_none(G),
-    gsm_sym_d2(G).
+    gridsymm_sym_d2(G).
 
-% --- gsm_sym_rot90 ---
+% --- gridsymm_sym_rot90 ---
 test(sym_rot90_uniform, []) :-
     g3x3_rot90(G),
-    gsm_sym_rot90(G).
+    gridsymm_sym_rot90(G).
 
 test(sym_rot90_fails_asym, [fail]) :-
     g3x3_none(G),
-    gsm_sym_rot90(G).
+    gridsymm_sym_rot90(G).
 
 test(sym_rot90_fails_non_square, [fail]) :-
     g2x4_hsym(G),
-    gsm_sym_rot90(G).
+    gridsymm_sym_rot90(G).
 
-% --- gsm_sym_rot180 ---
+% --- gridsymm_sym_rot180 ---
 test(sym_rot180_passes, []) :-
     g3x3_rot180(G),
-    gsm_sym_rot180(G).
+    gridsymm_sym_rot180(G).
 
 test(sym_rot180_2x2_sym, []) :-
     g2x2_sym(G),
-    gsm_sym_rot180(G).
+    gridsymm_sym_rot180(G).
 
 test(sym_rot180_fails_asym, [fail]) :-
     g3x3_none(G),
-    gsm_sym_rot180(G).
+    gridsymm_sym_rot180(G).
 
-% --- gsm_symmetries ---
+% --- gridsymm_symmetries ---
 test(symmetries_d4, []) :-
     g3x3_d4sym(G),
-    gsm_symmetries(G, Syms),
+    gridsymm_symmetries(G, Syms),
     memberchk(h, Syms), memberchk(v, Syms), memberchk(rot180, Syms).
 
 test(symmetries_none_is_empty, []) :-
     g3x3_none(G),
-    gsm_symmetries(G, []).
+    gridsymm_symmetries(G, []).
 
 test(symmetries_h_only, []) :-
     g3x3_h_only(G),
-    gsm_symmetries(G, Syms),
+    gridsymm_symmetries(G, Syms),
     memberchk(h, Syms),
     \+ memberchk(v, Syms).
 
-% --- gsm_complete_h ---
+% --- gridsymm_complete_h ---
 test(complete_h_top_symmetric_result, []) :-
     G = [[r,b],[x,x]],
-    gsm_complete_h(G, top, R),
+    gridsymm_complete_h(G, top, R),
     R = [[r,b],[r,b]].
 
 test(complete_h_bottom_symmetric_result, []) :-
     G = [[x,x],[r,b]],
-    gsm_complete_h(G, bottom, R),
+    gridsymm_complete_h(G, bottom, R),
     R = [[r,b],[r,b]].
 
 test(complete_h_already_symmetric, []) :-
     g3x3_hsym(G),
-    gsm_complete_h(G, top, G).
+    gridsymm_complete_h(G, top, G).
 
-% --- gsm_complete_v ---
+% --- gridsymm_complete_v ---
 test(complete_v_left_symmetric_result, []) :-
     G = [[r,x],[b,x]],
-    gsm_complete_v(G, left, R),
+    gridsymm_complete_v(G, left, R),
     R = [[r,r],[b,b]].
 
 test(complete_v_right_symmetric_result, []) :-
     G = [[x,r],[x,b]],
-    gsm_complete_v(G, right, R),
+    gridsymm_complete_v(G, right, R),
     R = [[r,r],[b,b]].
 
 test(complete_v_already_symmetric, []) :-
     g3x3_vsym(G),
-    gsm_complete_v(G, left, G).
+    gridsymm_complete_v(G, left, G).
 
-% --- gsm_complete_rot180 ---
+% --- gridsymm_complete_rot180 ---
 test(complete_rot180_fills_bg, []) :-
     G = [[r,x],[x,x]],
-    gsm_complete_rot180(G, x, R),
+    gridsymm_complete_rot180(G, x, R),
     R = [[r,x],[x,r]].
 
 test(complete_rot180_preserves_non_bg, []) :-
     G = [[r,x],[x,b]],
-    gsm_complete_rot180(G, x, R),
+    gridsymm_complete_rot180(G, x, R),
     R = [[r,x],[x,b]].
 
 test(complete_rot180_already_symmetric, []) :-
     g3x3_rot180(G),
-    gsm_complete_rot180(G, x, G).
+    gridsymm_complete_rot180(G, x, G).
 
-% --- gsm_violations_h ---
+% --- gridsymm_violations_h ---
 test(violations_h_symmetric_is_empty, []) :-
     g3x3_hsym(G),
-    gsm_violations_h(G, []).
+    gridsymm_violations_h(G, []).
 
 test(violations_h_detects_violation, []) :-
     g3x3_h_partial(G),
-    gsm_violations_h(G, Cells),
+    gridsymm_violations_h(G, Cells),
     Cells \= [].
 
 test(violations_h_1x1_is_empty, []) :-
     g1x1(G),
-    gsm_violations_h(G, []).
+    gridsymm_violations_h(G, []).
 
-% --- gsm_violations_v ---
+% --- gridsymm_violations_v ---
 test(violations_v_symmetric_is_empty, []) :-
     g3x3_vsym(G),
-    gsm_violations_v(G, []).
+    gridsymm_violations_v(G, []).
 
 test(violations_v_detects_violation, []) :-
     g3x3_none(G),
-    gsm_violations_v(G, Cells),
+    gridsymm_violations_v(G, Cells),
     Cells \= [].
 
-% --- gsm_violations_rot180 ---
+% --- gridsymm_violations_rot180 ---
 test(violations_rot180_symmetric_is_empty, []) :-
     g3x3_rot180(G),
-    gsm_violations_rot180(G, []).
+    gridsymm_violations_rot180(G, []).
 
 test(violations_rot180_detects_violation, []) :-
     g3x3_none(G),
-    gsm_violations_rot180(G, Cells),
+    gridsymm_violations_rot180(G, Cells),
     Cells \= [].
 
-% --- gsm_score ---
+% --- gridsymm_score ---
 test(score_h_fully_symmetric_is_1, []) :-
     g3x3_hsym(G),
-    gsm_score(G, h, S),
+    gridsymm_score(G, h, S),
     S =:= 1.0.
 
 test(score_v_partially_symmetric, []) :-
     G = [[r,x,r],[r,x,b],[r,x,r]],
-    gsm_score(G, v, S),
+    gridsymm_score(G, v, S),
     S > 0.0,
     S < 1.0.
 
 test(score_rot180_fully_symmetric, []) :-
     g3x3_rot180(G),
-    gsm_score(G, rot180, S),
+    gridsymm_score(G, rot180, S),
     S =:= 1.0.
 
 test(score_h_1x1_is_1, []) :-
     g1x1(G),
-    gsm_score(G, h, S),
+    gridsymm_score(G, h, S),
     S =:= 1.0.
 
 % --- Combined tests ---
 test(complete_h_then_sym_h, []) :-
     G = [[r,b],[x,x]],
-    gsm_complete_h(G, top, R),
-    gsm_sym_h(R).
+    gridsymm_complete_h(G, top, R),
+    gridsymm_sym_h(R).
 
 test(complete_v_then_sym_v, []) :-
     G = [[r,x],[b,x]],
-    gsm_complete_v(G, left, R),
-    gsm_sym_v(R).
+    gridsymm_complete_v(G, left, R),
+    gridsymm_sym_v(R).
 
 test(sym_rot180_implies_score_1, []) :-
     g3x3_rot180(G),
-    gsm_score(G, rot180, S),
+    gridsymm_score(G, rot180, S),
     S =:= 1.0.
 
 test(violations_count_correct, []) :-
     G = [[r,x],[x,r]],
-    gsm_violations_h(G, Cells),
+    gridsymm_violations_h(G, Cells),
     length(Cells, 2).
 
 :- end_tests(gridsymm).

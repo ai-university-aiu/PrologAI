@@ -16,67 +16,67 @@ Change lists are lists of chg(R, C, OldColor, NewColor) terms.
 
 Predicates
 
-gtr_color_map(+GridA, +GridB, -Map)
+gridtransform_color_map(+GridA, +GridB, -Map)
   Map is the consistent color mapping from GridA to GridB: a sorted list of
   cm(OldColor, NewColor) pairs. Fails if any source color maps to more than one
   destination at different positions (inconsistent mapping).
 
-gtr_apply_color_map(+Grid, +Map, -Result)
+gridtransform_apply_color_map(+Grid, +Map, -Result)
   Result is Grid with each cell color replaced per Map. Unmapped colors pass through.
 
-gtr_diff_cells(+GridA, +GridB, -Cells)
+gridtransform_diff_cells(+GridA, +GridB, -Cells)
   Cells is the list of r(R,C) positions where the grids have different values.
 
-gtr_diff_count(+GridA, +GridB, -N)
+gridtransform_diff_count(+GridA, +GridB, -N)
   N is the count of positions where the grids differ.
 
-gtr_same_cells(+GridA, +GridB, -Cells)
+gridtransform_same_cells(+GridA, +GridB, -Cells)
   Cells is the list of r(R,C) positions where the grids agree.
 
-gtr_changed_colors(+GridA, +GridB, -Changes)
+gridtransform_changed_colors(+GridA, +GridB, -Changes)
   Changes is a list of chg(R,C,OldColor,NewColor) for each position that changed.
 
-gtr_invert_map(+Map, -InvMap)
+gridtransform_invert_map(+Map, -InvMap)
   InvMap swaps source and target: cm(VB,VA) for each cm(VA,VB) in Map.
   Fails if Map is not injective (two sources map to the same target).
 
-gtr_compose_maps(+MapAtoB, +MapBtoC, -MapAtoC)
+gridtransform_compose_maps(+MapAtoB, +MapBtoC, -MapAtoC)
   MapAtoC maps colors from MapAtoB's domain through MapBtoC. Only colors present
   in both maps appear in MapAtoC.
 
-gtr_is_identity_map(+Map)
+gridtransform_is_identity_map(+Map)
   Succeed if every cm(VA,VB) in Map has VA = VB. Succeeds for empty map.
 
-gtr_apply_changes(+Grid, +Changes, -Result)
+gridtransform_apply_changes(+Grid, +Changes, -Result)
   Result is Grid with each chg(R,C,_,NewColor) applied. For deterministic behavior,
   provide at most one change per cell position.
 
-gtr_delta_grid(+GridA, +GridB, +Bg, -Delta)
+gridtransform_delta_grid(+GridA, +GridB, +Bg, -Delta)
   Delta shows only changed cells: changed positions use GridB's value; unchanged
-  positions use Bg. Composes with gtr_overlay: overlay(A, delta(A,B,Bg), Bg) = B.
+  positions use Bg. Composes with gridtransform_overlay: overlay(A, delta(A,B,Bg), Bg) = B.
 
-gtr_overlay(+BaseGrid, +DeltaGrid, +Bg, -Result)
+gridtransform_overlay(+BaseGrid, +DeltaGrid, +Bg, -Result)
   Result is BaseGrid with every non-Bg cell of DeltaGrid pasted on top.
 
-gtr_common_grid(+GridA, +GridB, +Bg, -Common)
+gridtransform_common_grid(+GridA, +GridB, +Bg, -Common)
   Common keeps cells where both grids agree; differing cells become Bg.
 
-gtr_is_color_permutation(+GridA, +GridB)
+gridtransform_is_color_permutation(+GridA, +GridB)
   Succeed if GridB is a bijective color permutation of GridA: consistent mapping
   that is also injective (no two source colors map to the same target).
 
 
 Color map consistency and inversion
 
-gtr_color_map builds the map by collecting all cm(VA,VB) pairs from corresponding
+gridtransform_color_map builds the map by collecting all cm(VA,VB) pairs from corresponding
 cell positions, deduplicating with sort, then checking that no source color VA
 appears with two different targets. This means a valid map might be partial
 (not every color of GridA need appear if the grid has no cells of that color).
 
-gtr_invert_map swaps keys and values; it fails if the inverse would be
+gridtransform_invert_map swaps keys and values; it fails if the inverse would be
 inconsistent (two different VA values mapped to the same VB in the original).
 
-gtr_compose_maps produces A-to-C by chaining A-to-B and B-to-C. Colors from A
+gridtransform_compose_maps produces A-to-C by chaining A-to-B and B-to-C. Colors from A
 that have no matching intermediate color in B-to-C are silently dropped.
 
 
@@ -87,16 +87,16 @@ Example session
 % Detect color mapping.
 A = [[r,b],[b,r]],
 B = [[b,r],[r,b]],
-gtr_color_map(A, B, Map).
+gridtransform_color_map(A, B, Map).
 % Map = [cm(b,r), cm(r,b)].
 
 % Apply map to a grid.
-gtr_apply_color_map([[r,r,b]], [cm(r,g), cm(b,r)], Result).
+gridtransform_apply_color_map([[r,r,b]], [cm(r,g), cm(b,r)], Result).
 % Result = [[g,g,r]].
 
 % Diff and delta.
-gtr_diff_count([[r,b],[b,r]], [[r,b],[g,r]], 1).
-gtr_delta_grid([[r,b],[b,r]], [[r,b],[g,r]], x, [[x,x],[g,x]]).
+gridtransform_diff_count([[r,b],[b,r]], [[r,b],[g,r]], 1).
+gridtransform_delta_grid([[r,b],[b,r]], [[r,b],[g,r]], x, [[x,x],[g,x]]).
 
 
 Test coverage
@@ -105,18 +105,18 @@ Test coverage
 packs/gridtransform/test/test_gridtransform.pl. All pass.
 
 Coverage by predicate:
-  gtr_color_map: 3 tests (001-003)
-  gtr_apply_color_map: 2 tests (004-005)
-  gtr_diff_cells: 3 tests (006-008)
-  gtr_diff_count: 2 tests (009-010)
-  gtr_same_cells: 2 tests (011-012)
-  gtr_changed_colors: 2 tests (013-014)
-  gtr_invert_map: 2 tests (015-016)
-  gtr_compose_maps: 2 tests (017-018)
-  gtr_is_identity_map: 3 tests (019-021)
-  gtr_apply_changes: 2 tests (022-023)
-  gtr_delta_grid: 2 tests (024-025)
-  gtr_overlay: 2 tests (026-027)
-  gtr_common_grid: 3 tests (028-030)
-  gtr_is_color_permutation: 4 tests (031-034)
+  gridtransform_color_map: 3 tests (001-003)
+  gridtransform_apply_color_map: 2 tests (004-005)
+  gridtransform_diff_cells: 3 tests (006-008)
+  gridtransform_diff_count: 2 tests (009-010)
+  gridtransform_same_cells: 2 tests (011-012)
+  gridtransform_changed_colors: 2 tests (013-014)
+  gridtransform_invert_map: 2 tests (015-016)
+  gridtransform_compose_maps: 2 tests (017-018)
+  gridtransform_is_identity_map: 3 tests (019-021)
+  gridtransform_apply_changes: 2 tests (022-023)
+  gridtransform_delta_grid: 2 tests (024-025)
+  gridtransform_overlay: 2 tests (026-027)
+  gridtransform_common_grid: 3 tests (028-030)
+  gridtransform_is_color_permutation: 4 tests (031-034)
   integration: 10 tests (035-044)

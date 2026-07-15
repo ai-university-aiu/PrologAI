@@ -27,129 +27,129 @@ the middle ring (8 cells), then the center (1 cell).
 
 3. Getting the Spiral
 
-gsp_spiral/2 returns R-C pairs in spiral order:
+gridspiral_spiral/2 returns R-C pairs in spiral order:
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gsp_spiral(G, Cells).
+    gridspiral_spiral(G, Cells).
     % Cells = [0-0, 0-1, 0-2, 1-2, 2-2, 2-1, 2-0, 1-0, 1-1]
 
-gsp_spiral_length/2 returns H*W (total cells):
+gridspiral_spiral_length/2 returns H*W (total cells):
 
-    gsp_spiral_length(G, Len).
+    gridspiral_spiral_length(G, Len).
     % Len = 9
 
-gsp_spiral_reversed/2 returns the reverse (inner to outer):
+gridspiral_spiral_reversed/2 returns the reverse (inner to outer):
 
-    gsp_spiral_reversed(G, Rev).
+    gridspiral_spiral_reversed(G, Rev).
     % Rev = [1-1, 1-0, 2-0, 2-1, 2-2, 1-2, 0-2, 0-1, 0-0]
 
 
 4. Reading and Writing Values
 
-gsp_read_spiral/2 reads color values in spiral order:
+gridspiral_read_spiral/2 reads color values in spiral order:
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gsp_read_spiral(G, Vals).
+    gridspiral_read_spiral(G, Vals).
     % Vals = [a, b, c, f, i, h, g, d, e]
 
-gsp_write_spiral/3 writes values into spiral positions:
+gridspiral_write_spiral/3 writes values into spiral positions:
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gsp_write_spiral(G, [r, x], Result).
+    gridspiral_write_spiral(G, [r, x], Result).
     % Result = [[r,x,c],[d,e,f],[g,h,i]]   (only first 2 spiral positions changed)
 
-gsp_fill_spiral/3 is an alias for gsp_write_spiral/3.
+gridspiral_fill_spiral/3 is an alias for gridspiral_write_spiral/3.
 
 
 5. Position Lookup
 
-gsp_spiral_index/4 finds the 0-based position of a cell:
+gridspiral_spiral_index/4 finds the 0-based position of a cell:
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gsp_spiral_index(G, 0, 0, Idx).
+    gridspiral_spiral_index(G, 0, 0, Idx).
     % Idx = 0   (top-left is first)
 
-    gsp_spiral_index(G, 1, 1, Idx).
+    gridspiral_spiral_index(G, 1, 1, Idx).
     % Idx = 8   (center is last)
 
-gsp_nth_spiral/4 finds the cell at a given position:
+gridspiral_nth_spiral/4 finds the cell at a given position:
 
-    gsp_nth_spiral(G, 4, R, C).
+    gridspiral_nth_spiral(G, 4, R, C).
     % R = 2, C = 2   (position 4 = bottom-right)
 
 
 6. Frame Spirals
 
-gsp_frame_spiral/3 returns the spiral for a single frame D:
+gridspiral_frame_spiral/3 returns the spiral for a single frame D:
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gsp_frame_spiral(G, 0, Cells).
+    gridspiral_frame_spiral(G, 0, Cells).
     % Cells = [0-0, 0-1, 0-2, 1-2, 2-2, 2-1, 2-0, 1-0]   (8 border cells)
 
-    gsp_frame_spiral(G, 1, Cells).
+    gridspiral_frame_spiral(G, 1, Cells).
     % Cells = [1-1]   (center)
 
-gsp_all_frame_spirals/2 returns all frame spirals in order:
+gridspiral_all_frame_spirals/2 returns all frame spirals in order:
 
-    gsp_all_frame_spirals(G, Spirals).
+    gridspiral_all_frame_spirals(G, Spirals).
     % Spirals = [[0-0,...,1-0], [1-1]]
 
 
 7. Counting and Uniformity
 
-gsp_spiral_uniform/2 tests if all cells have the same color:
+gridspiral_spiral_uniform/2 tests if all cells have the same color:
 
     G = [[r,r,r],[r,r,r],[r,r,r]].
-    gsp_spiral_uniform(G, Bool).
+    gridspiral_spiral_uniform(G, Bool).
     % Bool = yes
 
-gsp_spiral_count/3 counts a specific color:
+gridspiral_spiral_count/3 counts a specific color:
 
     G = [[r,x,r],[x,r,x],[r,x,r]].
-    gsp_spiral_count(G, r, Count).
+    gridspiral_spiral_count(G, r, Count).
     % Count = 5
 
-    gsp_spiral_count(G, x, Count).
+    gridspiral_spiral_count(G, x, Count).
     % Count = 4
 
 
 8. Rotation and Slicing
 
-gsp_rotate_spiral/3 rotates values N steps forward along the spiral:
+gridspiral_rotate_spiral/3 rotates values N steps forward along the spiral:
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gsp_rotate_spiral(G, 1, Result).
+    gridspiral_rotate_spiral(G, 1, Result).
     % Reads [a,b,c,f,i,h,g,d,e], shifts left by 1 = [b,c,f,i,h,g,d,e,a]
     % Writes back in spiral order
 
-    gsp_rotate_spiral(G, 0, Result).
+    gridspiral_rotate_spiral(G, 0, Result).
     % Result = G   (no change)
 
-    gsp_rotate_spiral(G, 9, Result).
+    gridspiral_rotate_spiral(G, 9, Result).
     % Result = G   (full cycle, 9 mod 9 = 0)
 
-gsp_spiral_slice/4 returns cells at positions Start to End:
+gridspiral_spiral_slice/4 returns cells at positions Start to End:
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gsp_spiral_slice(G, 0, 2, Slice).
+    gridspiral_spiral_slice(G, 0, 2, Slice).
     % Slice = [0-0, 0-1, 0-2]   (first 3 = top row)
 
-    gsp_spiral_slice(G, 8, 8, Slice).
+    gridspiral_spiral_slice(G, 8, 8, Slice).
     % Slice = [1-1]   (center)
 
 
 9. Implementation Notes
 
-gsp_frame_spiral_ builds each frame's spiral from four segments:
+gridspiral_frame_spiral_ builds each frame's spiral from four segments:
 - Top row: (RowMin, ColMin) to (RowMin, ColMax)
 - Right column: (RowMin+1, ColMax) to (RowMax, ColMax)
 - Bottom row reversed: (RowMax, ColMax-1) to (RowMax, ColMin)
 - Left column reversed: (RowMax-1, ColMin) to (RowMin+1, ColMin)
 
 For thin grids (single row or column), the algorithm produces only the
-relevant segments. gsp_full_spiral_ concatenates all frame spirals.
+relevant segments. gridspiral_full_spiral_ concatenates all frame spirals.
 
-gsp_write_spiral uses gsp_build_ with a lambda that looks up each cell's
+gridspiral_write_spiral uses gridspiral_build_ with a lambda that looks up each cell's
 position in the spiral list, then checks if Vals has a value at that index.
 If Vals is shorter than H*W, remaining cells keep their original values.
 
@@ -163,17 +163,17 @@ g3x3_checker, g3x3_r, g4x4, g5x5_onion, g2x4, and g1x3 fixtures.
 
 11. Summary
 
-gsp_spiral/2          - R-C list in clockwise spiral order
-gsp_read_spiral/2     - color values in spiral order
-gsp_write_spiral/3    - write values into spiral positions
-gsp_spiral_length/2   - H*W
-gsp_spiral_index/4    - 0-based position of (R,C)
-gsp_nth_spiral/4      - (R,C) at position N
-gsp_frame_spiral/3    - spiral for frame D only
-gsp_all_frame_spirals/2 - all per-frame spirals
-gsp_spiral_uniform/2  - yes/no all cells same color
-gsp_spiral_reversed/2 - reverse spiral order
-gsp_spiral_count/3    - count Color in spiral
-gsp_fill_spiral/3     - alias for gsp_write_spiral
-gsp_rotate_spiral/3   - rotate values N steps along spiral
-gsp_spiral_slice/4    - sublist of spiral[Start..End]
+gridspiral_spiral/2          - R-C list in clockwise spiral order
+gridspiral_read_spiral/2     - color values in spiral order
+gridspiral_write_spiral/3    - write values into spiral positions
+gridspiral_spiral_length/2   - H*W
+gridspiral_spiral_index/4    - 0-based position of (R,C)
+gridspiral_nth_spiral/4      - (R,C) at position N
+gridspiral_frame_spiral/3    - spiral for frame D only
+gridspiral_all_frame_spirals/2 - all per-frame spirals
+gridspiral_spiral_uniform/2  - yes/no all cells same color
+gridspiral_spiral_reversed/2 - reverse spiral order
+gridspiral_spiral_count/3    - count Color in spiral
+gridspiral_fill_spiral/3     - alias for gridspiral_write_spiral
+gridspiral_rotate_spiral/3   - rotate values N steps along spiral
+gridspiral_spiral_slice/4    - sublist of spiral[Start..End]
