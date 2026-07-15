@@ -21,7 +21,7 @@
       sentinels_list    — wraps sentinels_list/2
       body_enroll      — wraps manifest_body/3
       body_signal      — wraps relay_percept/2
-      body_command     — wraps dispatch_command/2
+      body_command     — wraps mindbody_dispatch_command/2
       sona_learn       — wraps sona_absorb/1
       sona_recall      — wraps sona_retrieve/3
       assess_all       — wraps assess_all/2
@@ -183,7 +183,7 @@ mcp_dispatch_tool(Request) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
-        dispatch_tool(ToolName, Params, Result),
+        mcp_gateway_tool(ToolName, Params, Result),
         % Supply 'Err' as the next argument to the expression above.
         Err,
         % Continue the multi-line expression started above.
@@ -227,7 +227,7 @@ check_auth(Request) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(lattice_query, Params, Results) :-
+mcp_gateway_tool(lattice_query, Params, Results) :-
     % Check that 'Pattern' is unifiable with 'Params.get(pattern, '_')'.
     Pattern = Params.get(pattern, '_'),
     % Check that 'K' is unifiable with 'Params.get(k, 10)'.
@@ -242,7 +242,7 @@ dispatch_tool(lattice_query, Params, Results) :-
     maplist([R, S]>>(term_to_atom(R, S)), RawResults, Results).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(lattice_inscribe, Params, Id) :-
+mcp_gateway_tool(lattice_inscribe, Params, Id) :-
     % Check that 'RelRaw' is unifiable with 'Params.get(relation, none)'.
     RelRaw    = Params.get(relation, none),
     % Check that 'ArgsRaw' is unifiable with 'Params.get(args, '[]')'.
@@ -264,26 +264,26 @@ dispatch_tool(lattice_inscribe, Params, Id) :-
     anchor_node(Relation, Args, Refs, Id).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(lattice_excise, Params, ok) :-
+mcp_gateway_tool(lattice_excise, Params, ok) :-
     % Check that 'Id' is unifiable with 'Params.get(id, 0)'.
     Id = Params.get(id, 0),
     % State the fact: prune node(Id).
     prune_node(Id).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(actor_list, _Params, Names) :-
+mcp_gateway_tool(actor_list, _Params, Names) :-
     % State the fact: cyclic actor list(Names).
     cyclic_actor_list(Names).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(actor_stop, Params, ok) :-
+mcp_gateway_tool(actor_stop, Params, ok) :-
     % Check that 'Name' is unifiable with 'Params.get(name, unknown)'.
     Name = Params.get(name, unknown),
     % State the fact: cyclic actor stop(Name).
     cyclic_actor_stop(Name).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(sentinels_list, Params, SentinelTerms) :-
+mcp_gateway_tool(sentinels_list, Params, SentinelTerms) :-
     % Check that 'Domain' is unifiable with 'Params.get(domain, general)'.
     Domain = Params.get(domain, general),
     % State a fact for 'sentinel list' with the arguments listed below.
@@ -292,7 +292,7 @@ dispatch_tool(sentinels_list, Params, SentinelTerms) :-
     maplist([S, A]>>(term_to_atom(S, A)), Sentinels, SentinelTerms).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(body_enroll, Params, ok) :-
+mcp_gateway_tool(body_enroll, Params, ok) :-
     % Check that 'Address' is unifiable with 'Params.get(address, 'herald://unknown')'.
     Address = Params.get(address, 'herald://unknown'),
     % Check that 'NeedsAtom' is unifiable with 'Params.get(needs, '[]')'.
@@ -313,7 +313,7 @@ dispatch_tool(body_enroll, Params, ok) :-
     ).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(body_signal, Params, ok) :-
+mcp_gateway_tool(body_signal, Params, ok) :-
     % Check that 'Address' is unifiable with 'Params.get(address, 'herald://unknown')'.
     Address = Params.get(address, 'herald://unknown'),
     % Check that 'SigAtom' is unifiable with 'Params.get(signal, 'none')'.
@@ -330,7 +330,7 @@ dispatch_tool(body_signal, Params, ok) :-
     ).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(body_command, Params, ok) :-
+mcp_gateway_tool(body_command, Params, ok) :-
     % Check that 'Address' is unifiable with 'Params.get(address, 'herald://unknown')'.
     Address = Params.get(address, 'herald://unknown'),
     % Check that 'CmdAtom' is unifiable with 'Params.get(command, 'none')'.
@@ -340,14 +340,14 @@ dispatch_tool(body_command, Params, ok) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
-        mindbody:dispatch_command(Address, Cmd),
+        mindbody:mindbody_dispatch_command(Address, Cmd),
         % Continue the multi-line expression started above.
         _, true
     % Close the expression opened above.
     ).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(sona_learn, Params, ok) :-
+mcp_gateway_tool(sona_learn, Params, ok) :-
     % Check that 'TrajAtom' is unifiable with 'Params.get(trajectory, 'none')'.
     TrajAtom = Params.get(trajectory, 'none'),
     % State a fact for 'term to atom' with the arguments listed below.
@@ -356,7 +356,7 @@ dispatch_tool(sona_learn, Params, ok) :-
     catch(sona:sona_absorb(Traj), _, true).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(sona_recall, Params, Results) :-
+mcp_gateway_tool(sona_recall, Params, Results) :-
     % Check that 'PatAtom' is unifiable with 'Params.get(pattern, 'any')'.
     PatAtom = Params.get(pattern, 'any'),
     % Check that 'K' is unifiable with 'Params.get(k, 5)'.
@@ -377,7 +377,7 @@ dispatch_tool(sona_recall, Params, Results) :-
     ).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(assess_all, Params, ReportAtom) :-
+mcp_gateway_tool(assess_all, Params, ReportAtom) :-
     % Check that 'MindId' is unifiable with 'Params.get(mind, mind_default)'.
     MindId = Params.get(mind, mind_default),
     % State a fact for 'catch' with the arguments listed below.
@@ -394,6 +394,6 @@ dispatch_tool(assess_all, Params, ReportAtom) :-
     ).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
-dispatch_tool(Unknown, _Params, _Result) :-
-    % State the fact: throw(error(unknown_tool(Unknown), dispatch_tool/3)).
-    throw(error(unknown_tool(Unknown), dispatch_tool/3)).
+mcp_gateway_tool(Unknown, _Params, _Result) :-
+    % State the fact: throw(error(unknown_tool(Unknown), mcp_gateway_tool/3)).
+    throw(error(unknown_tool(Unknown), mcp_gateway_tool/3)).

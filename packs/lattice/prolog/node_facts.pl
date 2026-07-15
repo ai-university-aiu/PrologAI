@@ -60,9 +60,9 @@
                                         % Continue the multi-line expression started above.
                                         nexus_is_open/1]).
 % Load the built-in 'vector_backend' library so its predicates are available here.
-:- use_module(library(vector_backend), [vb_create/4, vb_insert/4,
+:- use_module(library(vector_backend), [vector_backend_create/4, vector_backend_insert/4,
                                         % Continue the multi-line expression started above.
-                                        vb_search/4]).
+                                        vector_backend_search/4]).
 % Import [hash_project/3] from the built-in 'backend_prolog' library.
 :- use_module(library(backend_prolog), [hash_project/3]).
 % Import [maplist/3] from the built-in 'apply' library.
@@ -149,7 +149,7 @@ ensure_nexus_vector_index(Nexus, VH) :-
     % Otherwise (else branch), perform the following action.
     ;   ( catch(nb_getval(node_fact_vec_dim, Dim), _, Dim = 32) -> true ; Dim = 32 ),
         % Continue the multi-line expression started above.
-        vb_create(Dim, cosine, [capacity(10000)], VH),
+        vector_backend_create(Dim, cosine, [capacity(10000)], VH),
         % Continue the multi-line expression started above.
         assertz(nexus_vector_index(Nexus, VH))
     % Close the expression opened above.
@@ -190,7 +190,7 @@ anchor_node(Relation, Args, Referents, Id) :-
     % State a fact for 'compute node vec' with the arguments listed below.
     compute_node_vec(Term, Dim, Vec),
     % State a fact for 'vb insert' with the arguments listed below.
-    vb_insert(VH, Id, Vec, []),
+    vector_backend_insert(VH, Id, Vec, []),
     % Post-anchor hook — calls ALL registered clauses (sentinel engine, pubsub, etc.)
     % State a fact for 'catch' with the arguments listed below.
     catch(
@@ -368,7 +368,7 @@ reindex_nexus(Nexus) :-
     % Close the expression opened above.
     ),
     % State a fact for 'vb create' with the arguments listed below.
-    vb_create(Dim, cosine, [capacity(10000)], NewVH),
+    vector_backend_create(Dim, cosine, [capacity(10000)], NewVH),
     % Add a new fact or rule to the runtime knowledge base.
     assertz(nexus_vector_index(Nexus, NewVH)),
     % Verify that for every solution of the Condition, the Action also holds.
@@ -382,7 +382,7 @@ reindex_nexus(Nexus) :-
               % Continue the multi-line expression started above.
               compute_node_vec(Term, Dim, Vec),
               % Continue the multi-line expression started above.
-              vb_insert(NewVH, Id, Vec, [])
+              vector_backend_insert(NewVH, Id, Vec, [])
             % Close the expression opened above.
             ),
             % Continue the multi-line expression started above.
@@ -440,7 +440,7 @@ traverse_nexus(Nexus, Pattern, K, Results) :-
       % Continue the multi-line expression started above.
       compute_node_vec(PatternAtom, Dim, QVec),
       % Continue the multi-line expression started above.
-      vb_search(VH, QVec, K, VecResults)
+      vector_backend_search(VH, QVec, K, VecResults)
     % If the condition above succeeded, perform the following action.
     ->  maplist([Score-VId, VId-Score]>>true, VecResults, VecPairs)
     % Otherwise (else branch), perform the following action.

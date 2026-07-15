@@ -4,7 +4,7 @@
     Records results to docs/bakeoff_results.md and selects the winner.
 
     The bake-off is re-runnable; the winning backend persists via
-    vb_set_backend/1.  When a Rust backend becomes available, re-run
+    vector_backend_set_backend/1.  When a Rust backend becomes available, re-run
     with the Rust backend registered to see updated results.
 */
 
@@ -49,19 +49,19 @@ run_bakeoff(Backends, Sizes) :-
     % State a fact for 'reverse' with the arguments listed below.
     reverse(Sorted, [_BestScore-Winner|_]),
     % State a fact for 'vb set backend' with the arguments listed below.
-    vb_set_backend(Winner),
+    vector_backend_set_backend(Winner),
     % State a fact for 'pairs keys values' with the arguments listed below.
     pairs_keys_values(ScorePairs, Scores, BackendList),
     % State a fact for 'pairs keys values' with the arguments listed below.
     pairs_keys_values(Scored, BackendList, Scores),
     % State a fact for 'write results' with the arguments listed below.
-    write_results(Scored, Winner),
+    bakeoff_write_results(Scored, Winner),
     % Write formatted output to the current output stream.
     format("[bakeoff] winner: ~w~n", [Winner]).
 
 %! bakeoff_winner(-Winner) is det.
 % Define a clause for 'bakeoff winner': succeed when the following conditions hold.
-bakeoff_winner(Winner) :- vb_current_backend(Winner).
+bakeoff_winner(Winner) :- vector_backend_current_backend(Winner).
 
 % ---------------------------------------------------------------------------
 % Per-backend measurement
@@ -86,9 +86,9 @@ measure_backend(Backend, Sizes, Score) :-
         % Continue the multi-line expression started above.
         member(S, EffSizes),
         % Continue the multi-line expression started above.
-        bench_insert(Backend, S, InsT),
+        bakeoff_bench_insert(Backend, S, InsT),
         % Continue the multi-line expression started above.
-        bench_search(Backend, S, SrchP50, SrchP99)
+        bakeoff_bench_search(Backend, S, SrchP50, SrchP99)
     % Continue the multi-line expression started above.
     ), Measurements),
     % State a fact for 'aggregate score' with the arguments listed below.
@@ -96,13 +96,13 @@ measure_backend(Backend, Sizes, Score) :-
     % Write formatted output to the current output stream.
     format("  score: ~4f~n", [Score]).
 
-%! bench_insert(+Backend, +N, -InsertMs) is det.
+%! bakeoff_bench_insert(+Backend, +N, -InsertMs) is det.
 % Define a clause for 'bench insert': succeed when the following conditions hold.
-bench_insert(Backend, N, InsertMs) :-
+bakeoff_bench_insert(Backend, N, InsertMs) :-
     % State a fact for 'vb set backend' with the arguments listed below.
-    vb_set_backend(Backend),
+    vector_backend_set_backend(Backend),
     % State a fact for 'vb create' with the arguments listed below.
-    vb_create(bakeoff_bench, 64, [], Ref),
+    vector_backend_create(bakeoff_bench, 64, [], Ref),
     % State a fact for 'get time' with the arguments listed below.
     get_time(T0),
     % Verify that for every solution of the Condition, the Action also holds.
@@ -110,29 +110,29 @@ bench_insert(Backend, N, InsertMs) :-
         % Continue the multi-line expression started above.
         hash_project(term(I), 64, Vec),
         % Continue the multi-line expression started above.
-        vb_insert(Ref, I, Vec, meta(I))
+        vector_backend_insert(Ref, I, Vec, meta(I))
     % Close the expression opened above.
     )),
     % State a fact for 'get time' with the arguments listed below.
     get_time(T1),
     % State a fact for 'vb close' with the arguments listed below.
-    vb_close(Ref),
+    vector_backend_close(Ref),
     % Evaluate the arithmetic expression '(T1 - T0) * 1000.0' and bind the result to 'InsertMs'.
     InsertMs is (T1 - T0) * 1000.0.
 
-%! bench_search(+Backend, +N, -P50ms, -P99ms) is det.
+%! bakeoff_bench_search(+Backend, +N, -P50ms, -P99ms) is det.
 % Define a clause for 'bench search': succeed when the following conditions hold.
-bench_search(Backend, N, P50ms, P99ms) :-
+bakeoff_bench_search(Backend, N, P50ms, P99ms) :-
     % State a fact for 'vb set backend' with the arguments listed below.
-    vb_set_backend(Backend),
+    vector_backend_set_backend(Backend),
     % State a fact for 'vb create' with the arguments listed below.
-    vb_create(bakeoff_search, 64, [], Ref),
+    vector_backend_create(bakeoff_search, 64, [], Ref),
     % Verify that for every solution of the Condition, the Action also holds.
     forall(between(1, N, I), (
         % Continue the multi-line expression started above.
         hash_project(term(I), 64, Vec),
         % Continue the multi-line expression started above.
-        vb_insert(Ref, I, Vec, meta(I))
+        vector_backend_insert(Ref, I, Vec, meta(I))
     % Close the expression opened above.
     )),
     % Check that 'Queries' is unifiable with '100'.
@@ -146,7 +146,7 @@ bench_search(Backend, N, P50ms, P99ms) :-
         % Continue the multi-line expression started above.
         get_time(S0),
         % Continue the multi-line expression started above.
-        vb_search(Ref, QVec, 20, _),
+        vector_backend_search(Ref, QVec, 20, _),
         % Continue the multi-line expression started above.
         get_time(S1),
         % Continue the multi-line expression started above.
@@ -166,7 +166,7 @@ bench_search(Backend, N, P50ms, P99ms) :-
     % Retrieve the element at the specified one-based position from the list.
     nth1(P99Idx, Sorted, P99ms),
     % State the fact: vb close(Ref).
-    vb_close(Ref).
+    vector_backend_close(Ref).
 
 %! aggregate_score(+Measurements, -Score) is det.
 % State the fact: aggregate score([], 0.0).
@@ -198,7 +198,7 @@ aggregate_score(Measurements, Score) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'write results': succeed when the following conditions hold.
-write_results(Scored, Winner) :-
+bakeoff_write_results(Scored, Winner) :-
     % State a fact for 'absolute file name' with the arguments listed below.
     absolute_file_name('docs/bakeoff_results.md',
                         % Supply 'ResultsFile' as the next argument to the expression above.
@@ -208,15 +208,15 @@ write_results(Scored, Winner) :-
     % Commit to this clause — discard all remaining choice points (cut).
     !,
     % State the fact: write results to(ResultsFile, Scored, Winner).
-    write_results_to(ResultsFile, Scored, Winner).
+    bakeoff_write_results_to(ResultsFile, Scored, Winner).
 % Define a clause for 'write results': succeed when the following conditions hold.
-write_results(Scored, Winner) :-
+bakeoff_write_results(Scored, Winner) :-
     % Fallback: write relative to CWD
     % State the fact: write results to('docs/bakeoff_results.md', Scored, Winner).
-    write_results_to('docs/bakeoff_results.md', Scored, Winner).
+    bakeoff_write_results_to('docs/bakeoff_results.md', Scored, Winner).
 
 % Define a clause for 'write results to': succeed when the following conditions hold.
-write_results_to(File, Scored, Winner) :-
+bakeoff_write_results_to(File, Scored, Winner) :-
     % State a fact for 'setup call cleanup' with the arguments listed below.
     setup_call_cleanup(
         % Continue the multi-line expression started above.

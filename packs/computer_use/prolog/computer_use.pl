@@ -158,9 +158,9 @@ pai_computer_act(Action, Confirmation) :-
     % Execute: ( irreversible_action(Action).
     ( irreversible_action(Action)
     % If the condition above succeeded, perform the following action.
-    ->  ( constitutional_gate(Action)
+    ->  ( computer_use_gate(Action)
         % If the condition above succeeded, perform the following action.
-        ->  dispatch_action(Action, Result),
+        ->  computer_use_action(Action, Result),
             % Continue the multi-line expression started above.
             next_action_id(AId),
             % Continue the multi-line expression started above.
@@ -172,7 +172,7 @@ pai_computer_act(Action, Confirmation) :-
         % Close the expression opened above.
         )
     % Otherwise (else branch), perform the following action.
-    ;   dispatch_action(Action, Result),
+    ;   computer_use_action(Action, Result),
         % Continue the multi-line expression started above.
         next_action_id(AId),
         % Continue the multi-line expression started above.
@@ -192,7 +192,7 @@ irreversible_action(navigate(URL)) :-
 irreversible_action(submit_form(_)).
 
 % Define a clause for 'constitutional gate': succeed when the following conditions hold.
-constitutional_gate(navigate(URL)) :-
+computer_use_gate(navigate(URL)) :-
     % Execute: ( allowlisted_url(URL) -> true.
     ( allowlisted_url(URL) -> true
     % Otherwise (else branch), perform the following action.
@@ -200,17 +200,17 @@ constitutional_gate(navigate(URL)) :-
     % Close the expression opened above.
     ).
 % Define a clause for 'constitutional gate': succeed when the following conditions hold.
-constitutional_gate(submit_form(FormId)) :-
+computer_use_gate(submit_form(FormId)) :-
     % State the fact: screen element(FormId, form, _, _).
     screen_element(FormId, form, _, _).
 % State the fact: constitutional gate(click(_)).
-constitutional_gate(click(_)).
+computer_use_gate(click(_)).
 % State the fact: constitutional gate(type(_, _)).
-constitutional_gate(type(_, _)).
+computer_use_gate(type(_, _)).
 % State the fact: constitutional gate(scroll(_, _)).
-constitutional_gate(scroll(_, _)).
+computer_use_gate(scroll(_, _)).
 % State the fact: constitutional gate(hotkey(_)).
-constitutional_gate(hotkey(_)).
+computer_use_gate(hotkey(_)).
 
 % Define a clause for 'allowlisted url': succeed when the following conditions hold.
 allowlisted_url(URL) :-
@@ -222,19 +222,19 @@ allowlisted_url(URL) :-
     sub_atom(U, _, _, _, Domain).
 
 % Define a clause for 'dispatch action': succeed when the following conditions hold.
-dispatch_action(click(ElementId), clicked(ElementId)) :-
+computer_use_action(click(ElementId), clicked(ElementId)) :-
     % Execute: ( screen_element(ElementId, _, _, _) -> true ; true )..
     ( screen_element(ElementId, _, _, _) -> true ; true ).
 % State the fact: dispatch action(type(ElementId, Text), typed(ElementId, Text)).
-dispatch_action(type(ElementId, Text), typed(ElementId, Text)).
+computer_use_action(type(ElementId, Text), typed(ElementId, Text)).
 % State the fact: dispatch action(navigate(URL), navigated(URL)).
-dispatch_action(navigate(URL), navigated(URL)).
+computer_use_action(navigate(URL), navigated(URL)).
 % State the fact: dispatch action(scroll(Direction, Amount), scrolled(Direction, Amount)).
-dispatch_action(scroll(Direction, Amount), scrolled(Direction, Amount)).
+computer_use_action(scroll(Direction, Amount), scrolled(Direction, Amount)).
 % State the fact: dispatch action(hotkey(Keys), hotkey_sent(Keys)).
-dispatch_action(hotkey(Keys), hotkey_sent(Keys)).
+computer_use_action(hotkey(Keys), hotkey_sent(Keys)).
 % State the fact: dispatch action(submit_form(FormId), submitted(FormId)).
-dispatch_action(submit_form(FormId), submitted(FormId)).
+computer_use_action(submit_form(FormId), submitted(FormId)).
 
 % ---------------------------------------------------------------------------
 % pai_browser_navigate/2 — structured browser navigation
