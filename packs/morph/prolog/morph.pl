@@ -1,20 +1,20 @@
 % morph.pl - Layer 84: Morphological Grid Operations (mo_* prefix).
 % ARC-AGI-2 visual reasoning: dilation, erosion, boundary detection, distance, holes.
 :- module(morph, [
-    mo_dilate/3,
-    mo_erode/3,
-    mo_dilate_n/4,
-    mo_erode_n/4,
-    mo_open/3,
-    mo_close/3,
-    mo_smooth/3,
-    mo_boundary/3,
-    mo_interior/3,
-    mo_dilate_val/4,
-    mo_grow_from/5,
-    mo_dist_to_bg/3,
-    mo_ring/4,
-    mo_fill_holes/4
+    morph_dilate/3,
+    morph_erode/3,
+    morph_dilate_n/4,
+    morph_erode_n/4,
+    morph_open/3,
+    morph_close/3,
+    morph_smooth/3,
+    morph_boundary/3,
+    morph_interior/3,
+    morph_dilate_val/4,
+    morph_grow_from/5,
+    morph_dist_to_bg/3,
+    morph_ring/4,
+    morph_fill_holes/4
 ]).
 
 % Import list operations used throughout this module.
@@ -23,9 +23,9 @@
 % Import higher-order operations used throughout this module.
 :- use_module(library(apply), [maplist/2, maplist/3, maplist/4, foldl/4]).
 
-% mo_dilate(+Grid, +Bg, -Result): expand all non-Bg regions by one 4-connected step.
+% morph_dilate(+Grid, +Bg, -Result): expand all non-Bg regions by one 4-connected step.
 % Each Bg cell adjacent to a non-Bg cell copies the value of its first non-Bg neighbor.
-mo_dilate(Grid, Bg, Result) :-
+morph_dilate(Grid, Bg, Result) :-
     % Compute grid bounds for neighbor checks.
     length(Grid, NRows), NRowsM1 is NRows - 1,
     Grid = [FR|_], length(FR, NCols), NColsM1 is NCols - 1,
@@ -47,9 +47,9 @@ mo_dilate(Grid, Bg, Result) :-
         ), ColIdxs, GRow, RRow)
     ), RowIdxs, Grid, Result).
 
-% mo_erode(+Grid, +Bg, -Result): shrink all non-Bg regions by one 4-connected step.
+% morph_erode(+Grid, +Bg, -Result): shrink all non-Bg regions by one 4-connected step.
 % Each non-Bg cell adjacent to any Bg 4-neighbor becomes Bg.
-mo_erode(Grid, Bg, Result) :-
+morph_erode(Grid, Bg, Result) :-
     % Compute grid bounds for neighbor checks.
     length(Grid, NRows), NRowsM1 is NRows - 1,
     Grid = [FR|_], length(FR, NCols), NColsM1 is NCols - 1,
@@ -68,41 +68,41 @@ mo_erode(Grid, Bg, Result) :-
         ), ColIdxs, GRow, RRow)
     ), RowIdxs, Grid, Result).
 
-% mo_dilate_n(+Grid, +Bg, +N, -Result): dilate N times; N=0 returns Grid unchanged.
-mo_dilate_n(Grid, _, 0, Grid) :- !.
-mo_dilate_n(Grid, Bg, N, Result) :-
+% morph_dilate_n(+Grid, +Bg, +N, -Result): dilate N times; N=0 returns Grid unchanged.
+morph_dilate_n(Grid, _, 0, Grid) :- !.
+morph_dilate_n(Grid, Bg, N, Result) :-
     % Fold N dilation steps over the grid using foldl.
     N > 0, numlist(1, N, Steps),
-    foldl([_, Acc, NAcc]>>(mo_dilate(Acc, Bg, NAcc)), Steps, Grid, Result).
+    foldl([_, Acc, NAcc]>>(morph_dilate(Acc, Bg, NAcc)), Steps, Grid, Result).
 
-% mo_erode_n(+Grid, +Bg, +N, -Result): erode N times; N=0 returns Grid unchanged.
-mo_erode_n(Grid, _, 0, Grid) :- !.
-mo_erode_n(Grid, Bg, N, Result) :-
+% morph_erode_n(+Grid, +Bg, +N, -Result): erode N times; N=0 returns Grid unchanged.
+morph_erode_n(Grid, _, 0, Grid) :- !.
+morph_erode_n(Grid, Bg, N, Result) :-
     % Fold N erosion steps over the grid using foldl.
     N > 0, numlist(1, N, Steps),
-    foldl([_, Acc, NAcc]>>(mo_erode(Acc, Bg, NAcc)), Steps, Grid, Result).
+    foldl([_, Acc, NAcc]>>(morph_erode(Acc, Bg, NAcc)), Steps, Grid, Result).
 
-% mo_open(+Grid, +Bg, -Result): morphological opening = erode then dilate.
+% morph_open(+Grid, +Bg, -Result): morphological opening = erode then dilate.
 % Removes small protrusions and isolated pixels.
-mo_open(Grid, Bg, Result) :-
-    mo_erode(Grid, Bg, Eroded),
-    mo_dilate(Eroded, Bg, Result).
+morph_open(Grid, Bg, Result) :-
+    morph_erode(Grid, Bg, Eroded),
+    morph_dilate(Eroded, Bg, Result).
 
-% mo_close(+Grid, +Bg, -Result): morphological closing = dilate then erode.
+% morph_close(+Grid, +Bg, -Result): morphological closing = dilate then erode.
 % Fills small gaps and notches at the boundary.
-mo_close(Grid, Bg, Result) :-
-    mo_dilate(Grid, Bg, Dilated),
-    mo_erode(Dilated, Bg, Result).
+morph_close(Grid, Bg, Result) :-
+    morph_dilate(Grid, Bg, Dilated),
+    morph_erode(Dilated, Bg, Result).
 
-% mo_smooth(+Grid, +Bg, -Result): morphological smoothing = open then close.
+% morph_smooth(+Grid, +Bg, -Result): morphological smoothing = open then close.
 % Removes protrusions and fills gaps; produces smoother object boundaries.
-mo_smooth(Grid, Bg, Result) :-
-    mo_open(Grid, Bg, Opened),
-    mo_close(Opened, Bg, Result).
+morph_smooth(Grid, Bg, Result) :-
+    morph_open(Grid, Bg, Opened),
+    morph_close(Opened, Bg, Result).
 
-% mo_boundary(+Grid, +Bg, -Result): keep only non-Bg cells on the object perimeter.
+% morph_boundary(+Grid, +Bg, -Result): keep only non-Bg cells on the object perimeter.
 % A non-Bg cell is a perimeter cell if it is on the grid edge or has a Bg 4-neighbor.
-mo_boundary(Grid, Bg, Result) :-
+morph_boundary(Grid, Bg, Result) :-
     % Compute grid bounds for edge and neighbor checks.
     length(Grid, NRows), NRowsM1 is NRows - 1,
     Grid = [FR|_], length(FR, NCols), NColsM1 is NCols - 1,
@@ -123,11 +123,11 @@ mo_boundary(Grid, Bg, Result) :-
         ), ColIdxs, GRow, RRow)
     ), RowIdxs, Grid, Result).
 
-% mo_interior(+Grid, +Bg, -Result): keep only non-Bg cells not on the perimeter.
+% morph_interior(+Grid, +Bg, -Result): keep only non-Bg cells not on the perimeter.
 % Interior cells are non-Bg cells with no Bg 4-neighbor and not on the grid edge.
-mo_interior(Grid, Bg, Result) :-
+morph_interior(Grid, Bg, Result) :-
     % Compute boundary, then interior = foreground minus boundary.
-    mo_boundary(Grid, Bg, BoundaryGrid),
+    morph_boundary(Grid, Bg, BoundaryGrid),
     % A cell is interior if it is non-Bg in Grid but Bg in BoundaryGrid.
     maplist([GRow, BRow, RRow]>>(
         maplist([GV, BV, RV]>>(
@@ -135,9 +135,9 @@ mo_interior(Grid, Bg, Result) :-
         ), GRow, BRow, RRow)
     ), Grid, BoundaryGrid, Result).
 
-% mo_dilate_val(+Grid, +Bg, +Val, -Result): dilate using a fixed fill value.
+% morph_dilate_val(+Grid, +Bg, +Val, -Result): dilate using a fixed fill value.
 % Each Bg cell adjacent to any non-Bg cell becomes Val instead of the neighbor's value.
-mo_dilate_val(Grid, Bg, Val, Result) :-
+morph_dilate_val(Grid, Bg, Val, Result) :-
     % Compute grid bounds for neighbor checks.
     length(Grid, NRows), NRowsM1 is NRows - 1,
     Grid = [FR|_], length(FR, NCols), NColsM1 is NCols - 1,
@@ -159,10 +159,10 @@ mo_dilate_val(Grid, Bg, Val, Result) :-
         ), ColIdxs, GRow, RRow)
     ), RowIdxs, Grid, Result).
 
-% mo_bfs_bg_(+Queue, +Visited, +Grid, +Bg, +MaxR, +MaxC, -ReachedBg): BFS through Bg.
+% morph_bfs_bg_(+Queue, +Visited, +Grid, +Bg, +MaxR, +MaxC, -ReachedBg): BFS through Bg.
 % Expands from Queue into connected Bg cells not yet in Visited.
-mo_bfs_bg_([], Visited, _, _, _, _, Visited).
-mo_bfs_bg_([R-C|Queue], Visited, Grid, Bg, MaxR, MaxC, ReachedBg) :-
+morph_bfs_bg_([], Visited, _, _, _, _, Visited).
+morph_bfs_bg_([R-C|Queue], Visited, Grid, Bg, MaxR, MaxC, ReachedBg) :-
     % Find Bg 4-neighbors not yet in Visited.
     findall(R2-C2, (
         member(DR-DC, [-1-0, 1-0, 0-(-1), 0-1]),
@@ -176,12 +176,12 @@ mo_bfs_bg_([R-C|Queue], Visited, Grid, Bg, MaxR, MaxC, ReachedBg) :-
     append(Visited, NewCells, NewVisited),
     append(Queue, NewCells, NewQueue0),
     sort(NewQueue0, NewQueue),
-    mo_bfs_bg_(NewQueue, NewVisited, Grid, Bg, MaxR, MaxC, ReachedBg).
+    morph_bfs_bg_(NewQueue, NewVisited, Grid, Bg, MaxR, MaxC, ReachedBg).
 
-% mo_grow_from(+Grid, +Seeds, +Bg, +Val, -Result): BFS flood from Seeds into Bg.
+% morph_grow_from(+Grid, +Seeds, +Bg, +Val, -Result): BFS flood from Seeds into Bg.
 % Expands from Bg cells adjacent to Seeds through connected Bg territory.
 % All reached Bg cells become Val; non-Bg cells and unreached Bg cells unchanged.
-mo_grow_from(Grid, Seeds, Bg, Val, Result) :-
+morph_grow_from(Grid, Seeds, Bg, Val, Result) :-
     % Compute grid bounds.
     length(Grid, NRows), NRowsM1 is NRows - 1,
     Grid = [FR|_], length(FR, NCols), NColsM1 is NCols - 1,
@@ -195,7 +195,7 @@ mo_grow_from(Grid, Seeds, Bg, Val, Result) :-
     ), InitDup),
     sort(InitDup, InitFrontier),
     % BFS through all Bg territory reachable from the initial frontier.
-    mo_bfs_bg_(InitFrontier, InitFrontier, Grid, Bg, NRowsM1, NColsM1, ReachedBg),
+    morph_bfs_bg_(InitFrontier, InitFrontier, Grid, Bg, NRowsM1, NColsM1, ReachedBg),
     % Mark all reached Bg cells with Val; leave all other cells unchanged.
     numlist(0, NRowsM1, RowIdxs), numlist(0, NColsM1, ColIdxs),
     maplist([RI, GRow, RRow]>>(
@@ -204,10 +204,10 @@ mo_grow_from(Grid, Seeds, Bg, Val, Result) :-
         ), ColIdxs, GRow, RRow)
     ), RowIdxs, Grid, Result).
 
-% mo_dist_to_bg(+Grid, +Bg, -DistGrid): L1 (Manhattan) distance to nearest Bg cell.
+% morph_dist_to_bg(+Grid, +Bg, -DistGrid): L1 (Manhattan) distance to nearest Bg cell.
 % DistGrid[R][C] = 0 for Bg cells; for non-Bg cells = min L1 distance to any Bg cell.
 % When no Bg cells are present, all non-Bg distances are 0.
-mo_dist_to_bg(Grid, Bg, DistGrid) :-
+morph_dist_to_bg(Grid, Bg, DistGrid) :-
     % Collect all Bg cell positions for distance computation.
     length(Grid, NRows), NRowsM1 is NRows - 1,
     Grid = [FR|_], length(FR, NCols), NColsM1 is NCols - 1,
@@ -235,18 +235,18 @@ mo_dist_to_bg(Grid, Bg, DistGrid) :-
         ), ColIdxs, GRow, DRow)
     ), RowIdxs, Grid, DistGrid).
 
-% mo_ring(+Grid, +Bg, +N, -Ring): cells at exactly N dilation steps from any non-Bg cell.
+% morph_ring(+Grid, +Bg, +N, -Ring): cells at exactly N dilation steps from any non-Bg cell.
 % Ring contains only cells added at exactly the Nth dilation step (not earlier steps).
 % For N=0 the ring is empty (Bg everywhere).
-mo_ring(Grid, Bg, 0, Ring) :- !,
+morph_ring(Grid, Bg, 0, Ring) :- !,
     % Ring at N=0 is empty: no cells are "newly reached" at step 0.
     maplist([GRow, RRow]>>(maplist([_, RV]>>(RV = Bg), GRow, RRow)), Grid, Ring).
-mo_ring(Grid, Bg, N, Ring) :-
+morph_ring(Grid, Bg, N, Ring) :-
     % Compute N-step and (N-1)-step dilations; ring = new cells at step N.
     N > 0,
-    mo_dilate_n(Grid, Bg, N, Dilated),
+    morph_dilate_n(Grid, Bg, N, Dilated),
     N1 is N - 1,
-    mo_dilate_n(Grid, Bg, N1, Inner),
+    morph_dilate_n(Grid, Bg, N1, Inner),
     % Ring cell: non-Bg in Dilated but Bg in Inner means it was added at step N.
     maplist([DRow, IRow, RRow]>>(
         maplist([DV, IV, RV]>>(
@@ -254,10 +254,10 @@ mo_ring(Grid, Bg, N, Ring) :-
         ), DRow, IRow, RRow)
     ), Dilated, Inner, Ring).
 
-% mo_fill_holes(+Grid, +Bg, +FillVal, -Result): fill enclosed background regions.
+% morph_fill_holes(+Grid, +Bg, +FillVal, -Result): fill enclosed background regions.
 % Bg cells not reachable from the grid border through Bg connectivity are interior holes;
 % they become FillVal. Exterior Bg cells and all non-Bg cells are unchanged.
-mo_fill_holes(Grid, Bg, FillVal, Result) :-
+morph_fill_holes(Grid, Bg, FillVal, Result) :-
     % Compute grid bounds.
     length(Grid, NRows), NRowsM1 is NRows - 1,
     Grid = [FR|_], length(FR, NCols), NColsM1 is NCols - 1,
@@ -269,7 +269,7 @@ mo_fill_holes(Grid, Bg, FillVal, Result) :-
     ), BorderBgDup),
     sort(BorderBgDup, BorderBg),
     % BFS through Bg from border seeds to find all exterior (non-enclosed) Bg cells.
-    mo_bfs_bg_(BorderBg, BorderBg, Grid, Bg, NRowsM1, NColsM1, ExteriorBg),
+    morph_bfs_bg_(BorderBg, BorderBg, Grid, Bg, NRowsM1, NColsM1, ExteriorBg),
     % Fill all Bg cells not reachable from the border (interior holes) with FillVal.
     numlist(0, NRowsM1, RowIdxs), numlist(0, NColsM1, ColIdxs),
     maplist([RI, GRow, RRow]>>(

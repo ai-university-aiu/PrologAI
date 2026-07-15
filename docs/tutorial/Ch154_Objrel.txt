@@ -14,94 +14,94 @@ Colors are ignored in every predicate. All reasoning is based on cell
 positions (r(Row, Col) terms) only.
 
 The pack has 14 exported predicates (or_* prefix) and three private
-helpers: or_centroid_, or_bbox_, and or_dir_.
+helpers: objrel_centroid_, objrel_bbox_, and objrel_dir_.
 
 Layer: 172. No dependencies on other packs.
 
 154.2 Overlap and Shared Cells
 
-or_overlap(+Obj1, +Obj2)
+objrel_overlap(+Obj1, +Obj2)
 
 Succeeds if Obj1 and Obj2 share at least one cell position.
 
     A = obj(a, [r(0,0), r(0,1)]),
     B = obj(b, [r(0,1), r(0,2)]),
-    or_overlap(A, B).        % true: both contain r(0,1)
+    objrel_overlap(A, B).        % true: both contain r(0,1)
 
-or_shared_cells(+Obj1, +Obj2, -Shared)
+objrel_shared_cells(+Obj1, +Obj2, -Shared)
 
 Shared is the list of cells present in both objects.
 
-    or_shared_cells(A, B, Shared).
+    objrel_shared_cells(A, B, Shared).
     % Shared = [r(0,1)]
 
-or_n_shared(+Obj1, +Obj2, -N)
+objrel_n_shared(+Obj1, +Obj2, -N)
 
 N is the count of shared cells.
 
-    or_n_shared(A, B, N).    % N = 1
+    objrel_n_shared(A, B, N).    % N = 1
 
 154.3 Adjacency
 
-or_touch4(+Obj1, +Obj2)
+objrel_touch4(+Obj1, +Obj2)
 
 Succeeds if the objects are 4-adjacent (Manhattan distance 1 between
 some pair of cells) but do NOT overlap.
 
     Left  = obj(l, [r(0,0)]),
     Right = obj(r, [r(0,1)]),
-    or_touch4(Left, Right).      % true: cells are east-west neighbors
+    objrel_touch4(Left, Right).      % true: cells are east-west neighbors
 
-or_touch8(+Obj1, +Obj2)
+objrel_touch8(+Obj1, +Obj2)
 
 Succeeds if the objects are 8-adjacent (Chebyshev distance 1, which
 includes diagonals) but do NOT overlap.
 
     A  = obj(a, [r(0,0)]),
     SE = obj(s, [r(1,1)]),
-    or_touch8(A, SE).            % true: diagonal neighbor
+    objrel_touch8(A, SE).            % true: diagonal neighbor
 
 154.4 Containment and Union
 
-or_contains(+Obj1, +Obj2)
+objrel_contains(+Obj1, +Obj2)
 
 Succeeds if every cell of Obj2 is also a cell of Obj1. Obj1 contains
 Obj2 as a subset.
 
     Big  = obj(g, [r(0,0),r(0,1),r(1,0),r(1,1)]),
     Tiny = obj(t, [r(0,0)]),
-    or_contains(Big, Tiny).      % true
+    objrel_contains(Big, Tiny).      % true
 
-or_union_cells(+Obj1, +Obj2, -Union)
+objrel_union_cells(+Obj1, +Obj2, -Union)
 
 Union is the sorted list of all cell positions appearing in either
 object. Duplicates from overlap are removed.
 
     H = obj(h, [r(0,0),r(0,1),r(0,2)]),
     V = obj(v, [r(0,0),r(1,0),r(2,0)]),
-    or_union_cells(H, V, Union).
+    objrel_union_cells(H, V, Union).
     % Union = [r(0,0),r(0,1),r(0,2),r(1,0),r(2,0)]  (5 cells)
 
 154.5 Distance
 
-or_dist(+Obj1, +Obj2, -D)
+objrel_dist(+Obj1, +Obj2, -D)
 
 D is the Euclidean distance between centroids. Centroids are
 (sum_rows/N, sum_cols/N) and D is a float.
 
     A = obj(a, [r(0,0)]),
     B = obj(b, [r(3,4)]),
-    or_dist(A, B, D).        % D = 5.0
+    objrel_dist(A, B, D).        % D = 5.0
 
-or_manhattan(+Obj1, +Obj2, -D)
+objrel_manhattan(+Obj1, +Obj2, -D)
 
 D is the Manhattan distance between centroids.
 
-    or_manhattan(A, B, D).   % D = 7.0  (|3-0| + |4-0|)
+    objrel_manhattan(A, B, D).   % D = 7.0  (|3-0| + |4-0|)
 
 154.6 Direction
 
-or_direction(+Obj1, +Obj2, -Dir)
+objrel_direction(+Obj1, +Obj2, -Dir)
 
 Dir is the compass direction from Obj1's centroid to Obj2's centroid.
 Dir is one of: n, s, e, w, ne, nw, se, sw, or same.
@@ -110,62 +110,62 @@ Rows increase southward; columns increase eastward.
 
     North = obj(n, [r(0,2)]),
     South = obj(s, [r(4,2)]),
-    or_direction(South, North, Dir).   % Dir = n
-    or_direction(North, South, Dir2).  % Dir2 = s
+    objrel_direction(South, North, Dir).   % Dir = n
+    objrel_direction(North, South, Dir2).  % Dir2 = s
 
 154.7 Alignment
 
-or_aligned_h(+Obj1, +Obj2)
+objrel_aligned_h(+Obj1, +Obj2)
 
 Succeeds if both objects have the same centroid row.
 
     Row2a = obj(a, [r(2,0)]),
     Row2b = obj(b, [r(2,5)]),
-    or_aligned_h(Row2a, Row2b).   % true
+    objrel_aligned_h(Row2a, Row2b).   % true
 
-or_aligned_v(+Obj1, +Obj2)
+objrel_aligned_v(+Obj1, +Obj2)
 
 Succeeds if both objects have the same centroid column.
 
     Col3a = obj(a, [r(0,3)]),
     Col3b = obj(b, [r(7,3)]),
-    or_aligned_v(Col3a, Col3b).   % true
+    objrel_aligned_v(Col3a, Col3b).   % true
 
 154.8 Bounding Box Gaps
 
-or_gap_rows(+Obj1, +Obj2, -G)
+objrel_gap_rows(+Obj1, +Obj2, -G)
 
 G is the number of empty rows between the bounding boxes of Obj1 and
 Obj2. G = 0 when bounding boxes touch or overlap in the row dimension.
 
     Top = obj(t, [r(0,0)]),
     Bot = obj(b, [r(3,0)]),
-    or_gap_rows(Top, Bot, G).    % G = 2  (rows 1 and 2 are empty between)
+    objrel_gap_rows(Top, Bot, G).    % G = 2  (rows 1 and 2 are empty between)
 
-or_gap_cols(+Obj1, +Obj2, -G)
+objrel_gap_cols(+Obj1, +Obj2, -G)
 
 G is the number of empty columns between the bounding boxes.
 
     Left  = obj(l, [r(0,0)]),
     Right = obj(r, [r(0,4)]),
-    or_gap_cols(Left, Right, G). % G = 3  (cols 1, 2, 3 are empty between)
+    objrel_gap_cols(Left, Right, G). % G = 3  (cols 1, 2, 3 are empty between)
 
 154.9 Summary
 
 Predicate           Description
-or_overlap/2        shared cell exists
-or_shared_cells/3   intersection of cell sets
-or_n_shared/3       size of intersection
-or_touch4/2         4-adjacent, no overlap
-or_touch8/2         8-adjacent (with diagonal), no overlap
-or_contains/2       Obj1 cell set contains Obj2 cell set
-or_union_cells/3    sorted union of cell sets
-or_dist/3           Euclidean centroid distance
-or_manhattan/3      Manhattan centroid distance
-or_direction/3      compass direction (n/s/e/w/ne/nw/se/sw/same)
-or_aligned_h/2      same centroid row
-or_aligned_v/2      same centroid column
-or_gap_rows/3       empty rows between bounding boxes
-or_gap_cols/3       empty columns between bounding boxes
+objrel_overlap/2        shared cell exists
+objrel_shared_cells/3   intersection of cell sets
+objrel_n_shared/3       size of intersection
+objrel_touch4/2         4-adjacent, no overlap
+objrel_touch8/2         8-adjacent (with diagonal), no overlap
+objrel_contains/2       Obj1 cell set contains Obj2 cell set
+objrel_union_cells/3    sorted union of cell sets
+objrel_dist/3           Euclidean centroid distance
+objrel_manhattan/3      Manhattan centroid distance
+objrel_direction/3      compass direction (n/s/e/w/ne/nw/se/sw/same)
+objrel_aligned_h/2      same centroid row
+objrel_aligned_v/2      same centroid column
+objrel_gap_rows/3       empty rows between bounding boxes
+objrel_gap_cols/3       empty columns between bounding boxes
 
 This is WP 193, PrologAI Layer 172.

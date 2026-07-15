@@ -15,38 +15,38 @@ Load the pack:
 
 1. Symmetry Tests
 
-gsm_sym_h(+Grid)
+gridsymm_sym_h(+Grid)
 
 Succeed if Grid is symmetric about the horizontal mid-axis (top row mirrors
 bottom row). Grid[R][C] = Grid[H-1-R][C] for all R, C.
 
-gsm_sym_v(+Grid)
+gridsymm_sym_v(+Grid)
 
 Succeed if Grid is symmetric about the vertical mid-axis (left column mirrors
 right column). Grid[R][C] = Grid[R][W-1-C] for all R, C.
 
-gsm_sym_d1(+Grid)
+gridsymm_sym_d1(+Grid)
 
 Succeed if Grid is symmetric about the main diagonal (transpose equals self).
 Only applicable to square grids; fails for non-square grids.
 
-gsm_sym_d2(+Grid)
+gridsymm_sym_d2(+Grid)
 
 Succeed if Grid is symmetric about the anti-diagonal. Only applicable to
 square grids; fails for non-square grids.
 Grid[R][C] = Grid[H-1-C][H-1-R] for all R, C.
 
-gsm_sym_rot90(+Grid)
+gridsymm_sym_rot90(+Grid)
 
 Succeed if Grid is invariant under 90-degree clockwise rotation.
 Only applicable to square grids.
 
-gsm_sym_rot180(+Grid)
+gridsymm_sym_rot180(+Grid)
 
 Succeed if Grid is invariant under 180-degree rotation.
 Works for any rectangular grid.
 
-gsm_symmetries(+Grid, -Syms)
+gridsymm_symmetries(+Grid, -Syms)
 
 Syms is the list of all symmetry types possessed by Grid, drawn from:
 [h, v, d1, d2, rot90, rot180]. Non-applicable types (d1, d2, rot90 for
@@ -54,51 +54,51 @@ non-square grids) are excluded.
 
 Example:
 G = [[r,x,r],[x,x,x],[r,x,r]].
-gsm_symmetries(G, Syms).
+gridsymm_symmetries(G, Syms).
 % Syms = [h, v, d1, d2, rot90, rot180]
 
 
 2. Symmetry Completion
 
-gsm_complete_h(+Grid, +Dir, -Result)
+gridsymm_complete_h(+Grid, +Dir, -Result)
 
 Complete Grid to be top-bottom symmetric by copying one half to the other.
 Dir = top: use top half to fill bottom. Dir = bottom: use bottom half to fill top.
 result[R][C] = Grid[min(R,H-1-R)][C] for Dir=top.
 
 Example:
-gsm_complete_h([[r,b],[x,x]], top, R).
+gridsymm_complete_h([[r,b],[x,x]], top, R).
 % R = [[r,b],[r,b]]
 
-gsm_complete_v(+Grid, +Dir, -Result)
+gridsymm_complete_v(+Grid, +Dir, -Result)
 
 Complete Grid to be left-right symmetric. Dir = left or right.
 result[R][C] = Grid[R][min(C,W-1-C)] for Dir=left.
 
-gsm_complete_rot180(+Grid, +BgColor, -Result)
+gridsymm_complete_rot180(+Grid, +BgColor, -Result)
 
 Complete Grid to be 180-rotationally symmetric. Non-BgColor cells are kept;
 BgColor cells take the color of their 180-rotational mirror if that mirror
 cell is non-BgColor.
 
 Example:
-gsm_complete_rot180([[r,x],[x,x]], x, R).
+gridsymm_complete_rot180([[r,x],[x,x]], x, R).
 % R = [[r,x],[x,r]]
 
 
 3. Violation Detection
 
-gsm_violations_h(+Grid, -Cells)
+gridsymm_violations_h(+Grid, -Cells)
 
 Cells is the list of R-C positions in the top half where Grid[R][C] differs
 from Grid[H-1-R][C]. Empty list confirms h-symmetry.
 
-gsm_violations_v(+Grid, -Cells)
+gridsymm_violations_v(+Grid, -Cells)
 
 Cells is the list of R-C positions in the left half where Grid[R][C] differs
 from Grid[R][W-1-C]. Empty list confirms v-symmetry.
 
-gsm_violations_rot180(+Grid, -Cells)
+gridsymm_violations_rot180(+Grid, -Cells)
 
 Cells is the list of first-half positions where Grid[R][C] differs from
 Grid[H-1-R][W-1-C]. Empty list confirms rot180-symmetry.
@@ -106,7 +106,7 @@ Grid[H-1-R][W-1-C]. Empty list confirms rot180-symmetry.
 
 4. Symmetry Score
 
-gsm_score(+Grid, +Type, -Score)
+gridsymm_score(+Grid, +Type, -Score)
 
 Score is the fraction [0.0..1.0] of symmetric cell pairs that match.
 Type is one of: h, v, rot180.
@@ -115,23 +115,23 @@ Score = 1.0 means fully symmetric. Score = 0.0 means no pairs match.
 
 Example:
 G = [[r,x,r],[r,x,b],[r,x,r]].
-gsm_score(G, v, S).
+gridsymm_score(G, v, S).
 % S = 0.666... (2 of 3 left-half vs right-half column pairs match)
 
 
 5. Summary of Predicates
 
-gsm_sym_h/1          - test top-bottom (horizontal mid-axis) symmetry
-gsm_sym_v/1          - test left-right (vertical mid-axis) symmetry
-gsm_sym_d1/1         - test main diagonal symmetry (square grids only)
-gsm_sym_d2/1         - test anti-diagonal symmetry (square grids only)
-gsm_sym_rot90/1      - test 90-degree rotational invariance (square grids only)
-gsm_sym_rot180/1     - test 180-degree rotational invariance (any grid)
-gsm_symmetries/2     - list all symmetry types Grid possesses
-gsm_complete_h/3     - copy top or bottom half to make h-symmetric
-gsm_complete_v/3     - copy left or right half to make v-symmetric
-gsm_complete_rot180/3 - fill BgColor cells from rotational mirror
-gsm_violations_h/2  - list positions breaking h-symmetry
-gsm_violations_v/2  - list positions breaking v-symmetry
-gsm_violations_rot180/2 - list positions breaking rot180-symmetry
-gsm_score/3          - fraction of symmetric pairs matching (h, v, rot180)
+gridsymm_sym_h/1          - test top-bottom (horizontal mid-axis) symmetry
+gridsymm_sym_v/1          - test left-right (vertical mid-axis) symmetry
+gridsymm_sym_d1/1         - test main diagonal symmetry (square grids only)
+gridsymm_sym_d2/1         - test anti-diagonal symmetry (square grids only)
+gridsymm_sym_rot90/1      - test 90-degree rotational invariance (square grids only)
+gridsymm_sym_rot180/1     - test 180-degree rotational invariance (any grid)
+gridsymm_symmetries/2     - list all symmetry types Grid possesses
+gridsymm_complete_h/3     - copy top or bottom half to make h-symmetric
+gridsymm_complete_v/3     - copy left or right half to make v-symmetric
+gridsymm_complete_rot180/3 - fill BgColor cells from rotational mirror
+gridsymm_violations_h/2  - list positions breaking h-symmetry
+gridsymm_violations_v/2  - list positions breaking v-symmetry
+gridsymm_violations_rot180/2 - list positions breaking rot180-symmetry
+gridsymm_score/3          - fraction of symmetric pairs matching (h, v, rot180)

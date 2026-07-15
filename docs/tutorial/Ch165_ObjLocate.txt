@@ -18,8 +18,8 @@ The pack exports 14 predicates under the lq_* prefix.
 
 Centroid and Distance
 
-All positional predicates (lq_above, lq_below, lq_left_of, lq_right_of, lq_nearest,
-lq_farthest) use the centroid: the arithmetic mean of row coordinates and the
+All positional predicates (objlocate_above, objlocate_below, objlocate_left_of, objlocate_right_of, objlocate_nearest,
+objlocate_farthest) use the centroid: the arithmetic mean of row coordinates and the
 arithmetic mean of column coordinates across all cells.
 
 Distance is squared Euclidean distance between centroids. This avoids the sqrt
@@ -29,102 +29,102 @@ function and keeps all arithmetic purely in the integer/float domain.
 Predicate Reference
 
 
-lq_above(+Objs, +Ref, -Found)
+objlocate_above(+Objs, +Ref, -Found)
 
 Objects in Objs whose centroid row is strictly less than Ref's centroid row.
 
-  ?- lq_above([obj(r,[r(0,0)]), obj(b,[r(3,0)])], obj(b,[r(3,0)]), Found).
+  ?- objlocate_above([obj(r,[r(0,0)]), obj(b,[r(3,0)])], obj(b,[r(3,0)]), Found).
   Found = [obj(r,[r(0,0)])].
 
 
-lq_below(+Objs, +Ref, -Found)
+objlocate_below(+Objs, +Ref, -Found)
 
 Objects with centroid row strictly greater than Ref's centroid row.
 
 
-lq_left_of(+Objs, +Ref, -Found)
+objlocate_left_of(+Objs, +Ref, -Found)
 
 Objects with centroid column strictly less than Ref's centroid column.
 
 
-lq_right_of(+Objs, +Ref, -Found)
+objlocate_right_of(+Objs, +Ref, -Found)
 
 Objects with centroid column strictly greater than Ref's centroid column.
 
 
-lq_touching4(+Objs, +Ref, -Found)
+objlocate_touching4(+Objs, +Ref, -Found)
 
 Objects in Objs that are 4-adjacent to Ref: they have a cell at Manhattan
 distance 1 from a Ref cell, and they do not overlap Ref.
 
-  ?- lq_touching4([obj(g,[r(1,0)]), obj(y,[r(2,2)])], obj(r,[r(0,0)]), Found).
+  ?- objlocate_touching4([obj(g,[r(1,0)]), obj(y,[r(2,2)])], obj(r,[r(0,0)]), Found).
   Found = [obj(g,[r(1,0)])].
 
 
-lq_touching8(+Objs, +Ref, -Found)
+objlocate_touching8(+Objs, +Ref, -Found)
 
 Objects 8-adjacent to Ref: a cell at Chebyshev distance 1 from a Ref cell,
 no overlap. Includes diagonal neighbors.
 
 
-lq_overlapping(+Objs, +Ref, -Found)
+objlocate_overlapping(+Objs, +Ref, -Found)
 
 Objects sharing at least one cell with Ref.
 
-  ?- lq_overlapping([obj(b,[r(0,0),r(0,1)])], obj(r,[r(0,0)]), Found).
+  ?- objlocate_overlapping([obj(b,[r(0,0),r(0,1)])], obj(r,[r(0,0)]), Found).
   Found = [obj(b,[r(0,0),r(0,1)])].
 
 
-lq_same_color(+Objs, +Ref, -Found)
+objlocate_same_color(+Objs, +Ref, -Found)
 
 Objects with the same color atom as Ref.
 
-  ?- lq_same_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(1,0)])],
+  ?- objlocate_same_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(1,0)])],
                     obj(r,[r(2,2)]), Found).
   Found = [obj(r,[r(0,0)]), obj(r,[r(1,0)])].
 
 
-lq_same_form(+Objs, +Ref, -Found)
+objlocate_same_form(+Objs, +Ref, -Found)
 
 Objects with the same normalized shape as Ref. Each object is translated to
 the origin and its cell list is sorted before comparison.
 
-  ?- lq_same_form([obj(p,[r(0,0),r(1,0),r(1,1)]),  % L at origin
+  ?- objlocate_same_form([obj(p,[r(0,0),r(1,0),r(1,1)]),  % L at origin
                    obj(b,[r(3,4),r(4,4),r(4,5)]),   % L far away
                    obj(r,[r(0,0)])],                  % single dot
                   obj(p,[r(0,0),r(1,0),r(1,1)]), Found).
   % Found contains both L-shapes.
 
 
-lq_aligned_h(+Objs, +Ref, -Found)
+objlocate_aligned_h(+Objs, +Ref, -Found)
 
 Objects whose top-left cell row equals Ref's top-left cell row.
 
 
-lq_aligned_v(+Objs, +Ref, -Found)
+objlocate_aligned_v(+Objs, +Ref, -Found)
 
 Objects whose top-left cell column equals Ref's top-left cell column.
 
 
-lq_nearest(+Objs, +Ref, -Nearest)
+objlocate_nearest(+Objs, +Ref, -Nearest)
 
 The single object in Objs with the smallest squared centroid distance to Ref.
 When two objects tie, the one that appears first after msort wins.
 
-  ?- lq_nearest([obj(b,[r(0,2)]), obj(y,[r(2,2)])], obj(r,[r(0,0)]), Nearest).
+  ?- objlocate_nearest([obj(b,[r(0,2)]), obj(y,[r(2,2)])], obj(r,[r(0,0)]), Nearest).
   Nearest = obj(b,[r(0,2)]).   % dist^2 = 4 vs 8
 
 
-lq_farthest(+Objs, +Ref, -Farthest)
+objlocate_farthest(+Objs, +Ref, -Farthest)
 
 The single object with the largest squared centroid distance to Ref.
 
 
-lq_n_touching4(+Objs, +Ref, -N)
+objlocate_n_touching4(+Objs, +Ref, -N)
 
 Count of objects in Objs that are 4-adjacent to Ref.
 
-  ?- lq_n_touching4([obj(g,[r(1,0)]), obj(b,[r(0,1)]), obj(y,[r(1,1)])],
+  ?- objlocate_n_touching4([obj(g,[r(1,0)]), obj(b,[r(0,1)]), obj(y,[r(1,1)])],
                      obj(r,[r(0,0)]), N).
   N = 2.   % g and b touch; y is diagonal only
 
@@ -141,13 +141,13 @@ the anchor:
            obj(r,[r(1,2)]),     % red — above, same col
            obj(y,[r(2,5)])]     % yellow — same row, right
 
-  ?- lq_above(Scene, Anchor, Above).
+  ?- objlocate_above(Scene, Anchor, Above).
   Above = [obj(r,[r(0,0)]), obj(b,[r(0,3)]), obj(r,[r(1,2)])].
 
-  ?- lq_same_color(Scene, Anchor, SameColor).
+  ?- objlocate_same_color(Scene, Anchor, SameColor).
   SameColor = [obj(r,[r(0,0)]), obj(r,[r(1,2)])].
 
-  ?- lq_nearest(Scene, Anchor, Nearest).
+  ?- objlocate_nearest(Scene, Anchor, Nearest).
   Nearest = obj(r,[r(1,2)]).   % closest centroid
 
 

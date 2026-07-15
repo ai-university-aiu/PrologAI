@@ -45,211 +45,211 @@ cycle_objs(Objs) :-
     cy1_obj(C1), cy2_obj(C2), cy3_obj(C3), cy4_obj(C4),
     Objs = [C1,C2,C3,C4].
 
-% ch_touches tests.
+% objchain_touches tests.
 
 test(touches_ab) :-
-    a_obj(A), b_obj(B), ch_touches(A, B).
+    a_obj(A), b_obj(B), objchain_touches(A, B).
 
 test(touches_bc) :-
-    b_obj(B), c_obj(C), ch_touches(B, C).
+    b_obj(B), c_obj(C), objchain_touches(B, C).
 
 test(not_touches_ac) :-
-    a_obj(A), c_obj(C), \+ ch_touches(A, C).
+    a_obj(A), c_obj(C), \+ objchain_touches(A, C).
 
 test(not_touches_ae) :-
-    a_obj(A), e_obj(E), \+ ch_touches(A, E).
+    a_obj(A), e_obj(E), \+ objchain_touches(A, E).
 
 test(touches_vertical) :-
-    v1_obj(V1), v2_obj(V2), ch_touches(V1, V2).
+    v1_obj(V1), v2_obj(V2), objchain_touches(V1, V2).
 
 test(touches_symmetric) :-
-    a_obj(A), b_obj(B), ch_touches(A, B), ch_touches(B, A).
+    a_obj(A), b_obj(B), objchain_touches(A, B), objchain_touches(B, A).
 
-% ch_degree tests.
+% objchain_degree tests.
 
 test(degree_a_in_hchain) :-
-    h_chain(Objs), a_obj(A), ch_degree(A, Objs, D), D == 1.
+    h_chain(Objs), a_obj(A), objchain_degree(A, Objs, D), D == 1.
 
 test(degree_b_in_hchain) :-
-    h_chain(Objs), b_obj(B), ch_degree(B, Objs, D), D == 2.
+    h_chain(Objs), b_obj(B), objchain_degree(B, Objs, D), D == 2.
 
 test(degree_e_in_hchain) :-
-    h_chain(Objs), e_obj(E), ch_degree(E, Objs, D), D == 1.
+    h_chain(Objs), e_obj(E), objchain_degree(E, Objs, D), D == 1.
 
 test(degree_v1_in_vchain) :-
-    v_chain(Objs), v1_obj(V1), ch_degree(V1, Objs, D), D == 1.
+    v_chain(Objs), v1_obj(V1), objchain_degree(V1, Objs, D), D == 1.
 
 test(degree_v2_interior) :-
-    v_chain(Objs), v2_obj(V2), ch_degree(V2, Objs, D), D == 2.
+    v_chain(Objs), v2_obj(V2), objchain_degree(V2, Objs, D), D == 2.
 
-% ch_is_chain tests.
+% objchain_is_chain tests.
 
 test(is_chain_empty) :-
-    ch_is_chain([]).
+    objchain_is_chain([]).
 
 test(is_chain_single) :-
-    a_obj(A), ch_is_chain([A]).
+    a_obj(A), objchain_is_chain([A]).
 
 test(is_chain_two) :-
-    a_obj(A), b_obj(B), ch_is_chain([A, B]).
+    a_obj(A), b_obj(B), objchain_is_chain([A, B]).
 
 test(is_chain_hchain5) :-
-    h_chain(Objs), ch_is_chain(Objs).
+    h_chain(Objs), objchain_is_chain(Objs).
 
 test(is_chain_vchain3) :-
-    v_chain(Objs), ch_is_chain(Objs).
+    v_chain(Objs), objchain_is_chain(Objs).
 
 test(not_chain_branching) :-
     a_obj(A), bx_obj(Bx), cx_obj(Cx), dx_obj(Dx),
-    \+ ch_is_chain([A, Bx, Cx, Dx]).
+    \+ objchain_is_chain([A, Bx, Cx, Dx]).
 
 test(not_chain_isolated) :-
-    a_obj(A), e_obj(E), \+ ch_is_chain([A, E]).
+    a_obj(A), e_obj(E), \+ objchain_is_chain([A, E]).
 
-% ch_has_cycle tests.
+% objchain_has_cycle tests.
 
 test(has_cycle_square) :-
-    cycle_objs(Objs), ch_has_cycle(Objs).
+    cycle_objs(Objs), objchain_has_cycle(Objs).
 
 test(not_cycle_linear) :-
-    h_chain(Objs), \+ ch_has_cycle(Objs).
+    h_chain(Objs), \+ objchain_has_cycle(Objs).
 
 test(not_cycle_two) :-
-    a_obj(A), b_obj(B), \+ ch_has_cycle([A, B]).
+    a_obj(A), b_obj(B), \+ objchain_has_cycle([A, B]).
 
 test(not_cycle_single) :-
-    a_obj(A), \+ ch_has_cycle([A]).
+    a_obj(A), \+ objchain_has_cycle([A]).
 
-% ch_endpoints tests.
+% objchain_endpoints tests.
 
 test(endpoints_hchain) :-
     h_chain(Objs), a_obj(A), e_obj(E),
-    ch_endpoints(Objs, E1, E2),
+    objchain_endpoints(Objs, E1, E2),
     sort([E1,E2], Sorted),
     sort([A,E], Expected),
     Sorted == Expected.
 
 test(endpoints_vchain) :-
     v_chain(Objs), v1_obj(V1), v3_obj(V3),
-    ch_endpoints(Objs, E1, E2),
+    objchain_endpoints(Objs, E1, E2),
     sort([E1,E2], Sorted),
     sort([V1,V3], Expected),
     Sorted == Expected.
 
-% ch_linearize tests.
+% objchain_linearize tests.
 
 test(linearize_hchain_length) :-
-    h_chain(Objs), ch_linearize(Objs, Ord), length(Ord, 5).
+    h_chain(Objs), objchain_linearize(Objs, Ord), length(Ord, 5).
 
 test(linearize_scrambled) :-
     % Put objects in a scrambled order; linearize should produce a valid path.
     a_obj(A), b_obj(B), c_obj(C), d_obj(D), e_obj(E),
-    ch_linearize([E,C,A,D,B], Ord),
-    ch_is_linear_path(Ord).
+    objchain_linearize([E,C,A,D,B], Ord),
+    objchain_is_linear_path(Ord).
 
 test(linearize_two) :-
     a_obj(A), b_obj(B),
-    ch_linearize([A,B], Ord),
+    objchain_linearize([A,B], Ord),
     length(Ord, 2).
 
-% ch_from_endpoint tests.
+% objchain_from_endpoint tests.
 
 test(from_endpoint_abc_order) :-
     a_obj(A), b_obj(B), c_obj(C),
-    ch_from_endpoint([A,B,C], A, Ord),
+    objchain_from_endpoint([A,B,C], A, Ord),
     Ord == [A,B,C].
 
 test(from_endpoint_reverse) :-
     a_obj(A), b_obj(B), c_obj(C),
-    ch_from_endpoint([A,B,C], C, Ord),
+    objchain_from_endpoint([A,B,C], C, Ord),
     Ord == [C,B,A].
 
-% ch_nth tests.
+% objchain_nth tests.
 
 test(nth_zero) :-
     a_obj(A), b_obj(B), c_obj(C),
-    ch_nth([A,B,C], 0, Obj), Obj == A.
+    objchain_nth([A,B,C], 0, Obj), Obj == A.
 
 test(nth_two) :-
     a_obj(A), b_obj(B), c_obj(C),
-    ch_nth([A,B,C], 2, Obj), Obj == C.
+    objchain_nth([A,B,C], 2, Obj), Obj == C.
 
-% ch_color_seq tests.
+% objchain_color_seq tests.
 
 test(color_seq_hchain) :-
-    h_chain(Objs), ch_linearize(Objs, Ord),
-    ch_color_seq(Ord, Colors),
+    h_chain(Objs), objchain_linearize(Objs, Ord),
+    objchain_color_seq(Ord, Colors),
     sort(Colors, Sorted),
     sort([a,b,c,d,e], Expected),
     Sorted == Expected.
 
 test(color_seq_single) :-
-    a_obj(A), ch_color_seq([A], Colors), Colors == [a].
+    a_obj(A), objchain_color_seq([A], Colors), Colors == [a].
 
-% ch_sub tests.
+% objchain_sub tests.
 
 test(sub_middle) :-
     a_obj(A), b_obj(B), c_obj(C), d_obj(D), e_obj(E),
-    ch_sub([A,B,C,D,E], 1, 3, Sub),
+    objchain_sub([A,B,C,D,E], 1, 3, Sub),
     Sub == [B,C,D].
 
 test(sub_full) :-
     a_obj(A), b_obj(B), c_obj(C),
-    ch_sub([A,B,C], 0, 2, Sub),
+    objchain_sub([A,B,C], 0, 2, Sub),
     Sub == [A,B,C].
 
 test(sub_single) :-
     a_obj(A), b_obj(B), c_obj(C),
-    ch_sub([A,B,C], 1, 1, Sub),
+    objchain_sub([A,B,C], 1, 1, Sub),
     Sub == [B].
 
-% ch_reverse tests.
+% objchain_reverse tests.
 
 test(reverse_hchain) :-
     a_obj(A), b_obj(B), c_obj(C),
-    ch_reverse([A,B,C], Rev),
+    objchain_reverse([A,B,C], Rev),
     Rev == [C,B,A].
 
 test(reverse_single) :-
-    a_obj(A), ch_reverse([A], Rev), Rev == [A].
+    a_obj(A), objchain_reverse([A], Rev), Rev == [A].
 
-% ch_length tests.
+% objchain_length tests.
 
 test(length_five) :-
-    h_chain(Objs), ch_length(Objs, N), N == 5.
+    h_chain(Objs), objchain_length(Objs, N), N == 5.
 
 test(length_one) :-
-    a_obj(A), ch_length([A], N), N == 1.
+    a_obj(A), objchain_length([A], N), N == 1.
 
 test(length_empty) :-
-    ch_length([], N), N == 0.
+    objchain_length([], N), N == 0.
 
-% ch_is_linear_path tests.
+% objchain_is_linear_path tests.
 
 test(is_linear_path_valid) :-
     a_obj(A), b_obj(B), c_obj(C), d_obj(D), e_obj(E),
-    ch_is_linear_path([A,B,C,D,E]).
+    objchain_is_linear_path([A,B,C,D,E]).
 
 test(not_linear_path_gap) :-
     a_obj(A), c_obj(C), b_obj(B),
-    \+ ch_is_linear_path([A,C,B]).
+    \+ objchain_is_linear_path([A,C,B]).
 
 test(is_linear_path_single) :-
-    a_obj(A), ch_is_linear_path([A]).
+    a_obj(A), objchain_is_linear_path([A]).
 
 test(is_linear_path_empty) :-
-    ch_is_linear_path([]).
+    objchain_is_linear_path([]).
 
-% ch_direction tests.
+% objchain_direction tests.
 
 test(direction_h) :-
-    h_chain(Objs), ch_linearize(Objs, Ord), ch_direction(Ord, Dir), Dir == h.
+    h_chain(Objs), objchain_linearize(Objs, Ord), objchain_direction(Ord, Dir), Dir == h.
 
 test(direction_v) :-
-    v_chain(Objs), ch_direction(Objs, Dir), Dir == v.
+    v_chain(Objs), objchain_direction(Objs, Dir), Dir == v.
 
 test(direction_other_lshape) :-
     p_obj(P), q_obj(Q), s_obj(S),
-    ch_direction([P,Q,S], Dir), Dir == other.
+    objchain_direction([P,Q,S], Dir), Dir == other.
 
 :- end_tests(objchain).

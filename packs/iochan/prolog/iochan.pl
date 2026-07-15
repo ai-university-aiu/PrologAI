@@ -1,32 +1,32 @@
 :- module(iochan, [
-    % ic_text_out/3: write text to a registered text-output channel.
-    ic_text_out/3,
-    % ic_text_in/2: read text from a registered text-input channel.
-    ic_text_in/2,
-    % ic_image_out/3: send an image (file path) to a registered image-output channel.
-    ic_image_out/3,
-    % ic_image_in/2: capture an image from a registered image-input channel into a file path.
-    ic_image_in/2,
-    % ic_speak/2: synthesize speech from text and play through the default audio-output channel.
-    ic_speak/2,
-    % ic_speak_to/3: synthesize speech and send to a named audio-output channel.
-    ic_speak_to/3,
-    % ic_listen/2: record audio for DurationSecs from the default mic and return a text transcript.
-    ic_listen/2,
-    % ic_listen_from/3: record audio from a named mic channel and return a text transcript.
-    ic_listen_from/3,
-    % ic_print_text/3: send text to a registered printer channel.
-    ic_print_text/3,
-    % ic_print_image/3: send an image (file path) to a registered printer channel.
-    ic_print_image/3,
-    % ic_register_channel/3: register a channel configuration under a type.
-    ic_register_channel/3,
-    % ic_channel_info/2: retrieve the configuration of a registered channel.
-    ic_channel_info/2,
-    % ic_list_channels/2: list all registered channels of a given type.
-    ic_list_channels/2,
-    % ic_channel_status/2: check whether a channel is available (ready or unavailable).
-    ic_channel_status/2
+    % iochan_text_out/3: write text to a registered text-output channel.
+    iochan_text_out/3,
+    % iochan_text_in/2: read text from a registered text-input channel.
+    iochan_text_in/2,
+    % iochan_image_out/3: send an image (file path) to a registered image-output channel.
+    iochan_image_out/3,
+    % iochan_image_in/2: capture an image from a registered image-input channel into a file path.
+    iochan_image_in/2,
+    % iochan_speak/2: synthesize speech from text and play through the default audio-output channel.
+    iochan_speak/2,
+    % iochan_speak_to/3: synthesize speech and send to a named audio-output channel.
+    iochan_speak_to/3,
+    % iochan_listen/2: record audio for DurationSecs from the default mic and return a text transcript.
+    iochan_listen/2,
+    % iochan_listen_from/3: record audio from a named mic channel and return a text transcript.
+    iochan_listen_from/3,
+    % iochan_print_text/3: send text to a registered printer channel.
+    iochan_print_text/3,
+    % iochan_print_image/3: send an image (file path) to a registered printer channel.
+    iochan_print_image/3,
+    % iochan_register_channel/3: register a channel configuration under a type.
+    iochan_register_channel/3,
+    % iochan_channel_info/2: retrieve the configuration of a registered channel.
+    iochan_channel_info/2,
+    % iochan_list_channels/2: list all registered channels of a given type.
+    iochan_list_channels/2,
+    % iochan_channel_status/2: check whether a channel is available (ready or unavailable).
+    iochan_channel_status/2
 ]).
 
 % iochan.pl - Layer 254: I/O Channel Integration (ic_* prefix).
@@ -52,52 +52,52 @@
 
 % --- CHANNEL REGISTRY ---
 
-% ic_channel/3: ChannelId, ChannelType, Config - runtime channel registry.
-:- dynamic ic_channel/3.
+% iochan_channel/3: ChannelId, ChannelType, Config - runtime channel registry.
+:- dynamic iochan_channel/3.
 
-% ic_chan_counter/1: monotonic counter for channel ID generation.
-:- dynamic ic_chan_counter/1.
+% iochan_chan_counter/1: monotonic counter for channel ID generation.
+:- dynamic iochan_chan_counter/1.
 % Seed the counter at 0.
-ic_chan_counter(0).
+iochan_chan_counter(0).
 
-% ic_next_id_/1: generate the next unique channel ID atom.
-ic_next_id_(Id) :-
+% iochan_next_id_/1: generate the next unique channel ID atom.
+iochan_next_id_(Id) :-
 %   Retrieve and retract the current counter value.
-    retract(ic_chan_counter(N)),
+    retract(iochan_chan_counter(N)),
 %   Increment the counter by one.
     N1 is N + 1,
 %   Assert the updated counter value.
-    assertz(ic_chan_counter(N1)),
+    assertz(iochan_chan_counter(N1)),
 %   Build a channel ID atom from the counter value.
     atomic_list_concat([chan, N1], '_', Id).
 
-% ic_register_channel/3: +ChannelType, +Config, -ChannelId
+% iochan_register_channel/3: +ChannelType, +Config, -ChannelId
 % Register a channel configuration under the given type and return its ID.
-ic_register_channel(Type, Config, ChannelId) :-
+iochan_register_channel(Type, Config, ChannelId) :-
 %   Generate a fresh unique ID for this channel.
-    ic_next_id_(ChannelId),
+    iochan_next_id_(ChannelId),
 %   Record the channel in the runtime registry.
-    assertz(ic_channel(ChannelId, Type, Config)).
+    assertz(iochan_channel(ChannelId, Type, Config)).
 
-% ic_channel_info/2: +ChannelId, -Info
+% iochan_channel_info/2: +ChannelId, -Info
 % Retrieve the stored configuration for a channel ID.
-ic_channel_info(ChannelId, info(ChannelId, Type, Config)) :-
+iochan_channel_info(ChannelId, info(ChannelId, Type, Config)) :-
 %   Look up the channel in the registry.
-    ic_channel(ChannelId, Type, Config).
+    iochan_channel(ChannelId, Type, Config).
 
-% ic_list_channels/2: +ChannelType, -Channels
+% iochan_list_channels/2: +ChannelType, -Channels
 % List all registered channels of the given type as [chan(Id, Config), ...].
-ic_list_channels(Type, Channels) :-
+iochan_list_channels(Type, Channels) :-
 %   Collect all channels whose type matches.
     findall(chan(Id, Config),
-            ic_channel(Id, Type, Config),
+            iochan_channel(Id, Type, Config),
             Channels).
 
-% ic_channel_status/2: +ChannelId, -Status
+% iochan_channel_status/2: +ChannelId, -Status
 % Return ready if the channel exists, unavailable otherwise.
-ic_channel_status(ChannelId, Status) :-
+iochan_channel_status(ChannelId, Status) :-
 %   Check existence; if found, status is ready.
-    ( ic_channel(ChannelId, _, _) ->
+    ( iochan_channel(ChannelId, _, _) ->
         Status = ready
     ;
         Status = unavailable
@@ -106,35 +106,35 @@ ic_channel_status(ChannelId, Status) :-
 % --- DEFAULT CHANNEL SEEDS ---
 
 % Register the console as the default text-output and text-input channel.
-:- ic_register_channel(text_out, console_config, _).
-:- ic_register_channel(text_in,  console_config, _).
+:- iochan_register_channel(text_out, console_config, _).
+:- iochan_register_channel(text_in,  console_config, _).
 
 % Register the console as the default image-output channel.
-:- ic_register_channel(image_out, console_config, _).
+:- iochan_register_channel(image_out, console_config, _).
 
 % Register default speaker and microphone channels.
-:- ic_register_channel(audio_out, speaker_config(''),  _).
-:- ic_register_channel(audio_in,  mic_config(''),      _).
+:- iochan_register_channel(audio_out, speaker_config(''),  _).
+:- iochan_register_channel(audio_in,  mic_config(''),      _).
 
 % --- TEXT OUTPUT ---
 
-% ic_text_out/3: +Channel, +Text, -Status
+% iochan_text_out/3: +Channel, +Text, -Status
 % Dispatch Text to the named channel.
 % Channel may be a registered ChannelId atom or a config term.
-ic_text_out(Channel, Text, Status) :-
+iochan_text_out(Channel, Text, Status) :-
 %   Resolve channel config from ID or direct config term.
-    ic_resolve_(text_out, Channel, Config),
+    iochan_resolve_(text_out, Channel, Config),
 %   Dispatch text to the resolved config.
-    ic_dispatch_text_out_(Config, Text, Status).
+    iochan_dispatch_text_out_(Config, Text, Status).
 
-% ic_dispatch_text_out_/3: +Config, +Text, -Status
+% iochan_dispatch_text_out_/3: +Config, +Text, -Status
 % Write text to the console.
-ic_dispatch_text_out_(console_config, Text, ok) :-
+iochan_dispatch_text_out_(console_config, Text, ok) :-
 %   Write text followed by a newline.
     writeln(Text).
 
 % Send text via sendmail subprocess.
-ic_dispatch_text_out_(email_config(Addr, Subject), Text, Status) :-
+iochan_dispatch_text_out_(email_config(Addr, Subject), Text, Status) :-
 %   Build a simple email message in a temporary file.
     tmp_file_name_(tmp_email, TmpPath),
 %   Write the message text to the temp file.
@@ -156,7 +156,7 @@ ic_dispatch_text_out_(email_config(Addr, Subject), Text, Status) :-
     ).
 
 % Send text to an X11 window using xdotool type.
-ic_dispatch_text_out_(screen_config(WinId), Text, Status) :-
+iochan_dispatch_text_out_(screen_config(WinId), Text, Status) :-
 %   Build the window ID argument as an atom.
     atom_string(WinId, WinStr),
 %   Use xdotool to type text into the target window.
@@ -172,7 +172,7 @@ ic_dispatch_text_out_(screen_config(WinId), Text, Status) :-
     ).
 
 % POST text to an application HTTP endpoint.
-ic_dispatch_text_out_(app_config(_AppId, Endpoint), Text, Status) :-
+iochan_dispatch_text_out_(app_config(_AppId, Endpoint), Text, Status) :-
 %   Use library(http/http_client) http_post to send text as a string body.
     catch(
         ( atom_string(Text, TextStr),
@@ -188,21 +188,21 @@ ic_dispatch_text_out_(app_config(_AppId, Endpoint), Text, Status) :-
 
 % --- TEXT INPUT ---
 
-% ic_text_in/2: +Channel, -Text
+% iochan_text_in/2: +Channel, -Text
 % Read text from the named channel.
-ic_text_in(Channel, Text) :-
+iochan_text_in(Channel, Text) :-
 %   Resolve channel config.
-    ic_resolve_(text_in, Channel, Config),
+    iochan_resolve_(text_in, Channel, Config),
 %   Dispatch text input from the resolved config.
-    ic_dispatch_text_in_(Config, Text).
+    iochan_dispatch_text_in_(Config, Text).
 
 % Read a line from the console.
-ic_dispatch_text_in_(console_config, Text) :-
+iochan_dispatch_text_in_(console_config, Text) :-
 %   Read a full line from standard input into Text.
     read_line_to_string(user_input, Text).
 
 % Fetch the most recent unread email via fetchmail shell script.
-ic_dispatch_text_in_(email_config(_Addr, _Subject), Text) :-
+iochan_dispatch_text_in_(email_config(_Addr, _Subject), Text) :-
 %   Write a shell snippet to fetch latest email body.
     tmp_file_name_(tmp_email_in, TmpPath),
 %   Call fetchmail in one-shot mode writing to tmp file.
@@ -218,12 +218,12 @@ ic_dispatch_text_in_(email_config(_Addr, _Subject), Text) :-
     ).
 
 % Read text typed into an X11 window via xdotool.
-ic_dispatch_text_in_(screen_config(_WinId), Text) :-
+iochan_dispatch_text_in_(screen_config(_WinId), Text) :-
 %   Fall back to console read: no generalized screen capture defined.
     read_line_to_string(user_input, Text).
 
 % Poll an application HTTP endpoint for text.
-ic_dispatch_text_in_(app_config(_AppId, Endpoint), Text) :-
+iochan_dispatch_text_in_(app_config(_AppId, Endpoint), Text) :-
 %   Perform an HTTP GET to retrieve text.
     catch(
         http_get(Endpoint, Text, []),
@@ -233,16 +233,16 @@ ic_dispatch_text_in_(app_config(_AppId, Endpoint), Text) :-
 
 % --- IMAGE OUTPUT ---
 
-% ic_image_out/3: +Channel, +ImagePath, -Status
+% iochan_image_out/3: +Channel, +ImagePath, -Status
 % Send the image at ImagePath to the named channel.
-ic_image_out(Channel, ImagePath, Status) :-
+iochan_image_out(Channel, ImagePath, Status) :-
 %   Resolve channel config.
-    ic_resolve_(image_out, Channel, Config),
+    iochan_resolve_(image_out, Channel, Config),
 %   Dispatch image output to the resolved config.
-    ic_dispatch_image_out_(Config, ImagePath, Status).
+    iochan_dispatch_image_out_(Config, ImagePath, Status).
 
 % Display an image in the console using img2txt or write the path.
-ic_dispatch_image_out_(console_config, ImagePath, ok) :-
+iochan_dispatch_image_out_(console_config, ImagePath, ok) :-
 %   Attempt img2txt for terminal rendering; fall back to printing the path.
     catch(
         ( process_create(path(img2txt),
@@ -255,7 +255,7 @@ ic_dispatch_image_out_(console_config, ImagePath, ok) :-
     ).
 
 % Email an image as an attachment.
-ic_dispatch_image_out_(email_config(Addr, Subject), ImagePath, Status) :-
+iochan_dispatch_image_out_(email_config(Addr, Subject), ImagePath, Status) :-
 %   Use mutt or mail -a for attachment.
     catch(
         ( process_create(path(mutt),
@@ -269,7 +269,7 @@ ic_dispatch_image_out_(email_config(Addr, Subject), ImagePath, Status) :-
     ).
 
 % Display an image on an X11 screen using eog or display.
-ic_dispatch_image_out_(screen_config(_WinId), ImagePath, Status) :-
+iochan_dispatch_image_out_(screen_config(_WinId), ImagePath, Status) :-
 %   Try display (ImageMagick) first, then eog.
     catch(
         ( process_create(path(display),
@@ -283,7 +283,7 @@ ic_dispatch_image_out_(screen_config(_WinId), ImagePath, Status) :-
     ).
 
 % POST an image to an application endpoint.
-ic_dispatch_image_out_(app_config(_AppId, Endpoint), ImagePath, Status) :-
+iochan_dispatch_image_out_(app_config(_AppId, Endpoint), ImagePath, Status) :-
 %   Read image bytes and POST as application/octet-stream.
     catch(
         ( read_file_to_codes(ImagePath, Codes, []),
@@ -300,21 +300,21 @@ ic_dispatch_image_out_(app_config(_AppId, Endpoint), ImagePath, Status) :-
 
 % --- IMAGE INPUT ---
 
-% ic_image_in/2: +Channel, -ImagePath
+% iochan_image_in/2: +Channel, -ImagePath
 % Capture an image from the named channel, returning the file path.
-ic_image_in(Channel, ImagePath) :-
+iochan_image_in(Channel, ImagePath) :-
 %   Resolve channel config.
-    ic_resolve_(image_in, Channel, Config),
+    iochan_resolve_(image_in, Channel, Config),
 %   Dispatch image capture to the resolved config.
-    ic_dispatch_image_in_(Config, ImagePath).
+    iochan_dispatch_image_in_(Config, ImagePath).
 
 % Read an image from a file path channel config.
-ic_dispatch_image_in_(file_config(Path), Path) :-
+iochan_dispatch_image_in_(file_config(Path), Path) :-
 %   Verify the image file exists.
     exists_file(Path).
 
 % Capture from a webcam using fswebcam.
-ic_dispatch_image_in_(webcam_config(DevId), ImagePath) :-
+iochan_dispatch_image_in_(webcam_config(DevId), ImagePath) :-
 %   Build a temporary image file path.
     tmp_file_name_(webcam_capture, ImagePath),
 %   Capture one frame from the device.
@@ -329,7 +329,7 @@ ic_dispatch_image_in_(webcam_config(DevId), ImagePath) :-
     ).
 
 % Download an image from a URL.
-ic_dispatch_image_in_(url_config(URL), ImagePath) :-
+iochan_dispatch_image_in_(url_config(URL), ImagePath) :-
 %   Build a temporary file path.
     tmp_file_name_(url_image, ImagePath),
 %   Use wget to download the image.
@@ -345,23 +345,23 @@ ic_dispatch_image_in_(url_config(URL), ImagePath) :-
 
 % --- SPEAKER OUTPUT ---
 
-% ic_speak/2: +Text, -Status
+% iochan_speak/2: +Text, -Status
 % Synthesize speech from Text and play through the default speaker channel.
-ic_speak(Text, Status) :-
+iochan_speak(Text, Status) :-
 %   Dispatch to default speaker config.
-    ic_dispatch_speak_(speaker_config(''), Text, Status).
+    iochan_dispatch_speak_(speaker_config(''), Text, Status).
 
-% ic_speak_to/3: +Channel, +Text, -Status
+% iochan_speak_to/3: +Channel, +Text, -Status
 % Synthesize speech and send to the named audio-output channel.
-ic_speak_to(Channel, Text, Status) :-
+iochan_speak_to(Channel, Text, Status) :-
 %   Resolve channel config.
-    ic_resolve_(audio_out, Channel, Config),
+    iochan_resolve_(audio_out, Channel, Config),
 %   Dispatch speech synthesis to the resolved config.
-    ic_dispatch_speak_(Config, Text, Status).
+    iochan_dispatch_speak_(Config, Text, Status).
 
-% ic_dispatch_speak_/3: +Config, +Text, -Status
+% iochan_dispatch_speak_/3: +Config, +Text, -Status
 % Use espeak-ng to synthesize speech; empty DevId uses the default device.
-ic_dispatch_speak_(speaker_config(DevId), Text, Status) :-
+iochan_dispatch_speak_(speaker_config(DevId), Text, Status) :-
 %   Build espeak-ng argument list with optional device flag.
     ( DevId = '' ->
         Args = [Text]
@@ -379,11 +379,11 @@ ic_dispatch_speak_(speaker_config(DevId), Text, Status) :-
       ) ->
         true
     ;
-        ic_dispatch_speak_festival_(Text, Status)
+        iochan_dispatch_speak_festival_(Text, Status)
     ).
 
-% ic_dispatch_speak_festival_/2: fall back to festival if espeak-ng is absent.
-ic_dispatch_speak_festival_(Text, Status) :-
+% iochan_dispatch_speak_festival_/2: fall back to festival if espeak-ng is absent.
+iochan_dispatch_speak_festival_(Text, Status) :-
 %   Write text to a temp file for festival.
     tmp_file_name_(festival_tts, TmpPath),
 %   Write the text content to the temp file.
@@ -406,23 +406,23 @@ ic_dispatch_speak_festival_(Text, Status) :-
 
 % --- MICROPHONE INPUT ---
 
-% ic_listen/2: +DurationSecs, -Transcript
+% iochan_listen/2: +DurationSecs, -Transcript
 % Record audio for DurationSecs from the default mic and transcribe via Whisper.
-ic_listen(DurationSecs, Transcript) :-
+iochan_listen(DurationSecs, Transcript) :-
 %   Dispatch to default mic config.
-    ic_dispatch_listen_(mic_config(''), DurationSecs, Transcript).
+    iochan_dispatch_listen_(mic_config(''), DurationSecs, Transcript).
 
-% ic_listen_from/3: +Channel, +DurationSecs, -Transcript
+% iochan_listen_from/3: +Channel, +DurationSecs, -Transcript
 % Record audio from the named mic channel and transcribe.
-ic_listen_from(Channel, DurationSecs, Transcript) :-
+iochan_listen_from(Channel, DurationSecs, Transcript) :-
 %   Resolve channel config.
-    ic_resolve_(audio_in, Channel, Config),
+    iochan_resolve_(audio_in, Channel, Config),
 %   Dispatch audio capture to the resolved config.
-    ic_dispatch_listen_(Config, DurationSecs, Transcript).
+    iochan_dispatch_listen_(Config, DurationSecs, Transcript).
 
-% ic_dispatch_listen_/3: +Config, +DurationSecs, -Transcript
+% iochan_dispatch_listen_/3: +Config, +DurationSecs, -Transcript
 % Record with arecord for DurationSecs, then transcribe with whisper-cli.
-ic_dispatch_listen_(mic_config(DevId), DurationSecs, Transcript) :-
+iochan_dispatch_listen_(mic_config(DevId), DurationSecs, Transcript) :-
 %   Return empty transcript immediately for zero-duration requests.
     ( DurationSecs =:= 0 ->
         Transcript = ''
@@ -463,17 +463,17 @@ ic_dispatch_listen_(mic_config(DevId), DurationSecs, Transcript) :-
 
 % --- PRINTER OUTPUT ---
 
-% ic_print_text/3: +Channel, +Text, -Status
+% iochan_print_text/3: +Channel, +Text, -Status
 % Send text to a registered printer channel.
-ic_print_text(Channel, Text, Status) :-
+iochan_print_text(Channel, Text, Status) :-
 %   Resolve channel config.
-    ic_resolve_(printer, Channel, Config),
+    iochan_resolve_(printer, Channel, Config),
 %   Dispatch to the resolved printer config.
-    ic_dispatch_print_text_(Config, Text, Status).
+    iochan_dispatch_print_text_(Config, Text, Status).
 
-% ic_dispatch_print_text_/3: +Config, +Text, -Status
+% iochan_dispatch_print_text_/3: +Config, +Text, -Status
 % Write text to a temp file and submit via lp.
-ic_dispatch_print_text_(printer_config(Name, Opts), Text, Status) :-
+iochan_dispatch_print_text_(printer_config(Name, Opts), Text, Status) :-
 %   Build a temporary text file for the print job.
     tmp_file_name_(print_job, TmpPath),
 %   Write the text content to the temp file.
@@ -483,7 +483,7 @@ ic_dispatch_print_text_(printer_config(Name, Opts), Text, Status) :-
         close(Stream)
     ),
 %   Build lp argument list; include printer name if not empty.
-    ic_lp_args_(Name, Opts, TmpPath, Args),
+    iochan_lp_args_(Name, Opts, TmpPath, Args),
 %   Submit the print job.
     catch(
         ( process_create(path(lp), Args, [process(Pid)]),
@@ -494,19 +494,19 @@ ic_dispatch_print_text_(printer_config(Name, Opts), Text, Status) :-
         Status = error(lp_unavailable)
     ).
 
-% ic_print_image/3: +Channel, +ImagePath, -Status
+% iochan_print_image/3: +Channel, +ImagePath, -Status
 % Send an image to a registered printer channel.
-ic_print_image(Channel, ImagePath, Status) :-
+iochan_print_image(Channel, ImagePath, Status) :-
 %   Resolve channel config.
-    ic_resolve_(printer, Channel, Config),
+    iochan_resolve_(printer, Channel, Config),
 %   Dispatch to the resolved printer config.
-    ic_dispatch_print_image_(Config, ImagePath, Status).
+    iochan_dispatch_print_image_(Config, ImagePath, Status).
 
-% ic_dispatch_print_image_/3: +Config, +ImagePath, -Status
+% iochan_dispatch_print_image_/3: +Config, +ImagePath, -Status
 % Submit image directly to lp.
-ic_dispatch_print_image_(printer_config(Name, Opts), ImagePath, Status) :-
+iochan_dispatch_print_image_(printer_config(Name, Opts), ImagePath, Status) :-
 %   Build lp argument list with the image file.
-    ic_lp_args_(Name, Opts, ImagePath, Args),
+    iochan_lp_args_(Name, Opts, ImagePath, Args),
 %   Submit the print job.
     catch(
         ( process_create(path(lp), Args, [process(Pid)]),
@@ -517,25 +517,25 @@ ic_dispatch_print_image_(printer_config(Name, Opts), ImagePath, Status) :-
         Status = error(lp_unavailable)
     ).
 
-% ic_lp_args_/4: +Name, +Opts, +FilePath, -Args
+% iochan_lp_args_/4: +Name, +Opts, +FilePath, -Args
 % Build the lp argument list. If Name is empty, use the default printer.
-ic_lp_args_('', _Opts, FilePath, [FilePath]) :- !.
-ic_lp_args_(Name, [], FilePath, ['-d', Name, FilePath]) :- !.
-ic_lp_args_(Name, [Opt|Opts], FilePath, ['-d', Name, '-o', Opt | Rest]) :-
+iochan_lp_args_('', _Opts, FilePath, [FilePath]) :- !.
+iochan_lp_args_(Name, [], FilePath, ['-d', Name, FilePath]) :- !.
+iochan_lp_args_(Name, [Opt|Opts], FilePath, ['-d', Name, '-o', Opt | Rest]) :-
 %   Recurse for additional options (simplified: only first opt is applied here).
-    ic_lp_args_(Name, Opts, FilePath, PartialArgs),
+    iochan_lp_args_(Name, Opts, FilePath, PartialArgs),
 %   Remove the duplication of name/file arguments from recursion.
     last(PartialArgs, _),
     Rest = [FilePath].
 
 % --- CHANNEL RESOLUTION HELPER ---
 
-% ic_resolve_/3: +ChannelType, +ChannelOrConfig, -Config
+% iochan_resolve_/3: +ChannelType, +ChannelOrConfig, -Config
 % If given a registered ChannelId atom, look up its config.
 % If given a config term directly, use it as-is.
-ic_resolve_(Type, Channel, Config) :-
+iochan_resolve_(Type, Channel, Config) :-
 %   If Channel is a registered ID, retrieve its config.
-    ( ic_channel(Channel, Type, Config) ->
+    ( iochan_channel(Channel, Type, Config) ->
         true
     ;
 %   Otherwise treat Channel as the config term directly.

@@ -58,58 +58,58 @@ FOURTEEN PUBLIC PREDICATES
 
 CHANNEL REGISTRY
 
-    ic_register_channel(+Type, +Config, -ChannelId)
+    iochan_register_channel(+Type, +Config, -ChannelId)
         Register a configuration under a type. Returns a unique channel ID atom (chan_N).
         Five default channels are pre-registered at load time.
 
-    ic_channel_info(+ChannelId, -Info)
+    iochan_channel_info(+ChannelId, -Info)
         Returns info(ChannelId, Type, Config) for a registered channel.
 
-    ic_list_channels(+Type, -Channels)
+    iochan_list_channels(+Type, -Channels)
         Returns [chan(Id, Config), ...] for all registered channels of the given type.
 
-    ic_channel_status(+ChannelId, -Status)
+    iochan_channel_status(+ChannelId, -Status)
         Returns ready if the channel exists, unavailable otherwise.
 
 TEXT I/O
 
-    ic_text_out(+Channel, +Text, -Status)
+    iochan_text_out(+Channel, +Text, -Status)
         Dispatch Text to the named channel. Channel may be a registered ChannelId or a
         config term directly.
 
-    ic_text_in(+Channel, -Text)
+    iochan_text_in(+Channel, -Text)
         Read text from the named channel into Text.
 
 IMAGE I/O
 
-    ic_image_out(+Channel, +ImagePath, -Status)
+    iochan_image_out(+Channel, +ImagePath, -Status)
         Send the image at ImagePath to the named channel.
 
-    ic_image_in(+Channel, -ImagePath)
+    iochan_image_in(+Channel, -ImagePath)
         Capture an image from the named channel; return the file path.
 
 AUDIO (SPEAKER AND MICROPHONE)
 
-    ic_speak(+Text, -Status)
+    iochan_speak(+Text, -Status)
         Synthesize speech from Text via espeak-ng (festival fallback) through the
         default speaker (speaker_config('')).
 
-    ic_speak_to(+Channel, +Text, -Status)
+    iochan_speak_to(+Channel, +Text, -Status)
         Synthesize speech and route to a named audio-output channel.
 
-    ic_listen(+DurationSecs, -Transcript)
+    iochan_listen(+DurationSecs, -Transcript)
         Record audio for DurationSecs from the default microphone (mic_config('')) and
         transcribe via whisper-cli. Returns '' if duration=0 or hardware is unavailable.
 
-    ic_listen_from(+Channel, +DurationSecs, -Transcript)
+    iochan_listen_from(+Channel, +DurationSecs, -Transcript)
         Record from a named audio-input channel and transcribe.
 
 PRINTER
 
-    ic_print_text(+Channel, +Text, -Status)
+    iochan_print_text(+Channel, +Text, -Status)
         Send text to a registered printer channel using the CUPS lp command.
 
-    ic_print_image(+Channel, +ImagePath, -Status)
+    iochan_print_image(+Channel, +ImagePath, -Status)
         Send an image file to a registered printer channel using the CUPS lp command.
 
 
@@ -120,55 +120,55 @@ EXAMPLES
     % --- Text output ---
 
     % Write to the pre-registered console channel.
-    ?- ic_text_out(console_config, 'Hello from PrologAI!', S).
+    ?- iochan_text_out(console_config, 'Hello from PrologAI!', S).
     Hello from PrologAI!
     S = ok.
 
     % Register and use an email channel.
-    ?- ic_register_channel(text_out, email_config('me@example.com','Alert'), Ch),
-       ic_text_out(Ch, 'Reasoning complete.', S).
+    ?- iochan_register_channel(text_out, email_config('me@example.com','Alert'), Ch),
+       iochan_text_out(Ch, 'Reasoning complete.', S).
     Ch = chan_6, S = ok.    % requires sendmail
 
     % --- Speaker ---
 
-    ?- ic_speak('PrologAI is listening.', Status).
+    ?- iochan_speak('PrologAI is listening.', Status).
     Status = ok.            % requires espeak-ng or festival
 
     % Register a specific audio device and speak to it.
-    ?- ic_register_channel(audio_out, speaker_config('hw:1,0'), SpkId),
-       ic_speak_to(SpkId, 'Custom device test.', Status).
+    ?- iochan_register_channel(audio_out, speaker_config('hw:1,0'), SpkId),
+       iochan_speak_to(SpkId, 'Custom device test.', Status).
 
     % --- Microphone ---
 
-    ?- ic_listen(5, Transcript).
+    ?- iochan_listen(5, Transcript).
     Transcript = "hello prolog ai".   % requires arecord + whisper-cli
 
     % --- Image output ---
 
-    ?- ic_image_out(console_config, '/home/user/diagram.png', Status).
+    ?- iochan_image_out(console_config, '/home/user/diagram.png', Status).
     % ASCII art of diagram printed to terminal (requires img2txt)
     Status = ok.
 
     % Email an image.
-    ?- ic_image_out(email_config('colleague@example.com','Result'), '/tmp/out.png', S).
+    ?- iochan_image_out(email_config('colleague@example.com','Result'), '/tmp/out.png', S).
 
     % --- Image input ---
 
-    ?- ic_register_channel(image_in, webcam_config('/dev/video0'), CamId),
-       ic_image_in(CamId, ImagePath).
+    ?- iochan_register_channel(image_in, webcam_config('/dev/video0'), CamId),
+       iochan_image_in(CamId, ImagePath).
     ImagePath = '/tmp/iochan_webcam_capture_123456'.
 
-    ?- ic_register_channel(image_in, url_config('https://example.com/img.jpg'), UrlId),
-       ic_image_in(UrlId, Path).
+    ?- iochan_register_channel(image_in, url_config('https://example.com/img.jpg'), UrlId),
+       iochan_image_in(UrlId, Path).
 
     % --- Printer ---
 
-    ?- ic_register_channel(printer, printer_config('', []), PrintId),
-       ic_print_text(PrintId, 'PrologAI report\n', Status).
+    ?- iochan_register_channel(printer, printer_config('', []), PrintId),
+       iochan_print_text(PrintId, 'PrologAI report\n', Status).
     % Prints to default CUPS printer (requires lp)
 
-    ?- ic_register_channel(printer, printer_config('HP_Color', ['fit-to-page']), PId),
-       ic_print_image(PId, '/tmp/diagram.pdf', Status).
+    ?- iochan_register_channel(printer, printer_config('HP_Color', ['fit-to-page']), PId),
+       iochan_print_image(PId, '/tmp/diagram.pdf', Status).
 
 
 GRACEFUL DEGRADATION
@@ -186,21 +186,21 @@ error terms rather than propagating exceptions to the caller:
 This means iochan predicates are safe to call in reasoning chains where the exact
 I/O environment is unknown. You can check Status and branch accordingly:
 
-    ?- ic_speak('Alert!', Status),
+    ?- iochan_speak('Alert!', Status),
        ( Status = ok -> true ; format("Speech unavailable: ~w~n", [Status]) ).
 
 
 EXERCISES
 
-1. Register a text-output channel of type app_config, then inspect it with ic_channel_info.
+1. Register a text-output channel of type app_config, then inspect it with iochan_channel_info.
 
-2. Write a Prolog loop that calls ic_speak/2 to announce each element of a list aloud.
+2. Write a Prolog loop that calls iochan_speak/2 to announce each element of a list aloud.
 
 3. Register two printer channels (one with an empty name for the default printer,
-   one for a named printer). List all printer channels with ic_list_channels.
+   one for a named printer). List all printer channels with iochan_list_channels.
 
-4. Use ic_listen/2 to record 3 seconds, then use ic_text_out to write the transcript
+4. Use iochan_listen/2 to record 3 seconds, then use iochan_text_out to write the transcript
    to the console channel.
 
 5. Set up an image input channel with file_config for a local file, then pass the
-   captured ImagePath to ic_image_out targeting the console channel.
+   captured ImagePath to iochan_image_out targeting the console channel.

@@ -14,20 +14,20 @@ Load the pack:
 
 1. Rotations
 
-gx_rotate90(+Grid, -Result)
+gridxform_rotate90(+Grid, -Result)
 
 Rotate Grid 90 degrees clockwise. An H x W input becomes a W x H result.
 result[R][C] = original[H-1-C][R].
 
 Example:
-gx_rotate90([[a,b,c],[d,e,f],[g,h,i]], R).
+gridxform_rotate90([[a,b,c],[d,e,f],[g,h,i]], R).
 % R = [[g,d,a],[h,e,b],[i,f,c]]
 
-gx_rotate180(+Grid, -Result)
+gridxform_rotate180(+Grid, -Result)
 
 Rotate Grid 180 degrees. Same dimensions as input.
 
-gx_rotate270(+Grid, -Result)
+gridxform_rotate270(+Grid, -Result)
 
 Rotate Grid 270 degrees clockwise (= 90 degrees counter-clockwise).
 An H x W input becomes W x H.
@@ -35,24 +35,24 @@ An H x W input becomes W x H.
 
 2. Reflections
 
-gx_flip_h(+Grid, -Result)
+gridxform_flip_h(+Grid, -Result)
 
 Flip horizontally (left-right mirror). result[R][C] = original[R][W-1-C].
 
-gx_flip_v(+Grid, -Result)
+gridxform_flip_v(+Grid, -Result)
 
 Flip vertically (top-bottom mirror). result[R][C] = original[H-1-R][C].
 
-gx_transpose(+Grid, -Result)
+gridxform_transpose(+Grid, -Result)
 
 Transpose along the main diagonal: result[R][C] = original[C][R].
 An H x W input becomes W x H.
 
 Example:
-gx_transpose([[a,b,c],[d,e,f]], R).
+gridxform_transpose([[a,b,c],[d,e,f]], R).
 % R = [[a,d],[b,e],[c,f]]
 
-gx_flip_d2(+Grid, -Result)
+gridxform_flip_d2(+Grid, -Result)
 
 Reflect along the anti-diagonal: result[R][C] = original[H-1-C][W-1-R].
 An H x W input becomes W x H.
@@ -60,96 +60,96 @@ An H x W input becomes W x H.
 
 3. Crop
 
-gx_crop(+Grid, +R0, +C0, +R1, +C1, -Result)
+gridxform_crop(+Grid, +R0, +C0, +R1, +C1, -Result)
 
 Extract rows [R0..R1] x columns [C0..C1] (both inclusive).
 Result has (R1-R0+1) rows and (C1-C0+1) columns.
 
 Example:
 G = [[a,b,c],[d,e,f],[g,h,i]].
-gx_crop(G, 1, 1, 2, 2, R).
+gridxform_crop(G, 1, 1, 2, 2, R).
 % R = [[e,f],[h,i]]
 
-gx_crop_content(+Grid, +BgColor, -Result)
+gridxform_crop_content(+Grid, +BgColor, -Result)
 
 Auto-crop Grid to the tightest bounding box enclosing all non-BgColor cells.
 If Grid contains no non-BgColor cells, Result = Grid unchanged.
 
 Example:
 G = [[x,x,x],[x,r,r],[x,r,r]].
-gx_crop_content(G, x, R).
+gridxform_crop_content(G, x, R).
 % R = [[r,r],[r,r]]
 
 
 4. Pad
 
-gx_pad(+Grid, +Top, +Bot, +Left, +Right, +BgColor, -Result)
+gridxform_pad(+Grid, +Top, +Bot, +Left, +Right, +BgColor, -Result)
 
 Surround Grid with BgColor padding on each side.
 
 Example:
 G = [[r]].
-gx_pad(G, 1, 1, 1, 1, x, R).
+gridxform_pad(G, 1, 1, 1, 1, x, R).
 % R = [[x,x,x],[x,r,x],[x,x,x]]
 
 
 5. Scale and Tile
 
-gx_scale(+Grid, +N, -Result)
+gridxform_scale(+Grid, +N, -Result)
 
 Upscale Grid by integer factor N. Each cell becomes an N x N block.
 An H x W input becomes (H*N) x (W*N).
 
 Example:
 G = [[r,x],[x,r]].
-gx_scale(G, 2, R).
+gridxform_scale(G, 2, R).
 % R = [[r,r,x,x],[r,r,x,x],[x,x,r,r],[x,x,r,r]]
 
-gx_tile(+Grid, +H, +W, -Result)
+gridxform_tile(+Grid, +H, +W, -Result)
 
 Tile Grid to fill an H x W output using modular indexing.
 result[R][C] = original[R mod TileH][C mod TileW].
 
 Example:
 G = [[r,x],[x,r]].
-gx_tile(G, 4, 4, R).
+gridxform_tile(G, 4, 4, R).
 % R = [[r,x,r,x],[x,r,x,r],[r,x,r,x],[x,r,x,r]]
 
 
 6. D4 Symmetry Group
 
-gx_d4_group(+Grid, -Transforms)
+gridxform_d4_group(+Grid, -Transforms)
 
 Returns a list of all 8 D4 isometries of Grid:
 [identity, rotate90, rotate180, rotate270, flip_h, flip_v, transpose, flip_d2].
 
 Example:
-gx_d4_group([[r,x],[x,r]], Ts), length(Ts, 8).
+gridxform_d4_group([[r,x],[x,r]], Ts), length(Ts, 8).
 
-gx_normalize(+Grid, -Canon)
+gridxform_normalize(+Grid, -Canon)
 
-Canonical form: the lexicographically smallest element of gx_d4_group(Grid)
+Canonical form: the lexicographically smallest element of gridxform_d4_group(Grid)
 under Prolog's standard term order. Two grids with the same canonical form are
 related by some D4 symmetry (rotation or reflection).
 
 Example:
-gx_normalize([[r,x],[x,x]], Canon).
+gridxform_normalize([[r,x],[x,x]], Canon).
 % Canon = [[r,x],[x,x]]  (or whichever rotation/flip is lexicographically first)
 
 
 7. Summary of Predicates
 
-gx_rotate90/2      - rotate 90 degrees clockwise; H x W -> W x H
-gx_rotate180/2     - rotate 180 degrees; same dimensions
-gx_rotate270/2     - rotate 270 degrees clockwise; H x W -> W x H
-gx_flip_h/2        - flip horizontal (left-right mirror); same dims
-gx_flip_v/2        - flip vertical (top-bottom mirror); same dims
-gx_transpose/2     - transpose main diagonal; H x W -> W x H
-gx_flip_d2/2       - anti-diagonal flip; H x W -> W x H
-gx_crop/6          - crop to explicit R0,C0,R1,C1 bounds
-gx_crop_content/3  - auto-crop to non-BgColor bounding box
-gx_pad/7           - pad with BgColor on all four sides
-gx_scale/3         - integer upscale; each cell becomes N x N block
-gx_tile/4          - tile Grid to fill H x W target
-gx_d4_group/2      - enumerate all 8 D4 isometries
-gx_normalize/2     - canonical D4 form (lexicographic minimum)
+gridxform_rotate90/2      - rotate 90 degrees clockwise; H x W -> W x H
+gridxform_rotate180/2     - rotate 180 degrees; same dimensions
+gridxform_rotate270/2     - rotate 270 degrees clockwise; H x W -> W x H
+gridxform_flip_h/2        - flip horizontal (left-right mirror); same dims
+gridxform_flip_v/2        - flip vertical (top-bottom mirror); same dims
+gridxform_transpose/2     - transpose main diagonal; H x W -> W x H
+gridxform_flip_d2/2       - anti-diagonal flip; H x W -> W x H
+gridxform_crop/6          - crop to explicit R0,C0,R1,C1 bounds
+gridxform_crop_content/3  - auto-crop to non-BgColor bounding box
+gridxform_pad/7           - pad with BgColor on all four sides
+gridxform_scale/3         - integer upscale; each cell becomes N x N block
+gridxform_tile/4          - tile Grid to fill H x W target
+gridxform_d4_group/2      - enumerate all 8 D4 isometries
+gridxform_normalize/2     - canonical D4 form (lexicographic minimum)

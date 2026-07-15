@@ -20,105 +20,105 @@ Every symmetry operation begins by computing the object's bounding box.
     :- use_module(library(objsym)).
 
     O = obj(a, [r(2,3), r(2,4), r(3,3), r(3,4)]),
-    os_bbox(O, MinR, MinC, MaxR, MaxC).
+    objsym_bbox(O, MinR, MinC, MaxR, MaxC).
     % MinR=2, MinC=3, MaxR=3, MaxC=4
 
-os_normalize/2 translates the object so MinR=0 and MinC=0:
+objsym_normalize/2 translates the object so MinR=0 and MinC=0:
 
-    os_normalize(O, obj(a, NormCells)).
+    objsym_normalize(O, obj(a, NormCells)).
     % NormCells contains r(0,0), r(0,1), r(1,0), r(1,1)
 
-os_translate/4 shifts all cells by an explicit (DR, DC) offset:
+objsym_translate/4 shifts all cells by an explicit (DR, DC) offset:
 
-    os_translate(O, -2, -3, obj(a, Shifted)).
+    objsym_translate(O, -2, -3, obj(a, Shifted)).
     % Same result as normalization for this 2x2 block
 
 3. Reflection and Rotation
 
-os_reflect_h/2: mirror left-right about the object's vertical center axis.
+objsym_reflect_h/2: mirror left-right about the object's vertical center axis.
 For each cell r(R,C), the new column is MinC + MaxC - C.
 
     H = obj(h, [r(0,0), r(0,1), r(0,2)]),
-    os_reflect_h(H, obj(h, Ref)).
+    objsym_reflect_h(H, obj(h, Ref)).
     % Ref: r(0,2), r(0,1), r(0,0)  -- same cell set (bar is h-symmetric)
 
-os_reflect_v/2: mirror top-bottom about the horizontal center axis.
+objsym_reflect_v/2: mirror top-bottom about the horizontal center axis.
 For each cell r(R,C), the new row is MinR + MaxR - R.
 
-os_rotate180/2: rotate 180 degrees about the bbox center (apply both flips).
+objsym_rotate180/2: rotate 180 degrees about the bbox center (apply both flips).
     L = obj(l, [r(0,0), r(1,0), r(1,1)]),
-    os_rotate180(L, obj(l, Rot)).
+    objsym_rotate180(L, obj(l, Rot)).
     % Rot: r(1,1), r(0,1), r(0,0)  -- the J-shape
 
-os_rotate90/2: rotate 90 degrees clockwise, result normalized to origin.
+objsym_rotate90/2: rotate 90 degrees clockwise, result normalized to origin.
 Formula: for cell r(R,C), new row = C - MinC, new col = MaxR - R.
 
     H = obj(h, [r(0,0), r(0,1), r(0,2)]),
-    os_rotate90(H, obj(h, RotCells)).
+    objsym_rotate90(H, obj(h, RotCells)).
     % RotCells: r(0,0), r(1,0), r(2,0)  -- a vertical bar
 
 4. Symmetry Tests
 
-os_is_hsymm/1: true when sorted cells equal sorted cells of reflect_h.
-os_is_vsymm/1: true when sorted cells equal sorted cells of reflect_v.
-os_is_rot180/1: true when sorted cells equal sorted cells of rotate180.
-os_is_rot90/1: true when normalized sorted cells equal normalized sorted cells after rotate90.
+objsym_is_hsymm/1: true when sorted cells equal sorted cells of reflect_h.
+objsym_is_vsymm/1: true when sorted cells equal sorted cells of reflect_v.
+objsym_is_rot180/1: true when sorted cells equal sorted cells of rotate180.
+objsym_is_rot90/1: true when normalized sorted cells equal normalized sorted cells after rotate90.
 
 Examples:
 
     Plus = obj(p, [r(0,1), r(1,0), r(1,1), r(1,2), r(2,1)]),
-    os_is_hsymm(Plus),   % true
-    os_is_vsymm(Plus),   % true
-    os_is_rot180(Plus),  % true
-    os_is_rot90(Plus).   % true
+    objsym_is_hsymm(Plus),   % true
+    objsym_is_vsymm(Plus),   % true
+    objsym_is_rot180(Plus),  % true
+    objsym_is_rot90(Plus).   % true
 
     Z = obj(z, [r(0,0), r(0,1), r(1,1), r(1,2)]),
-    \+ os_is_hsymm(Z),   % false
-    os_is_rot180(Z).     % true (point-symmetric)
+    \+ objsym_is_hsymm(Z),   % false
+    objsym_is_rot180(Z).     % true (point-symmetric)
 
 5. Symmetry Collection
 
-os_has_symmetry/1: true if any of the four tests passes (cut on first).
+objsym_has_symmetry/1: true if any of the four tests passes (cut on first).
 
-os_symmetries/2: returns the list of atoms from [h, v, rot180, rot90] that hold.
+objsym_symmetries/2: returns the list of atoms from [h, v, rot180, rot90] that hold.
 
     T = obj(t, [r(0,0), r(0,1), r(0,2), r(1,1)]),
-    os_symmetries(T, List).
+    objsym_symmetries(T, List).
     % List = [h]
 
     L = obj(l, [r(0,0), r(1,0), r(1,1)]),
-    os_symmetries(L, []).
+    objsym_symmetries(L, []).
     % L has no symmetry
 
 6. D4 Equivalence
 
-os_equivalent/2: true when the two objects have the same cell shape under any
+objsym_equivalent/2: true when the two objects have the same cell shape under any
 D4 orientation (four rotations times two reflections). Color is ignored; only
 cell positions are compared.
 
     H = obj(h, [r(0,0), r(0,1), r(0,2)]),   % horizontal bar
     V = obj(v, [r(0,0), r(1,0), r(2,0)]),   % vertical bar
-    os_equivalent(H, V).   % true: 90-degree rotation maps one to the other
+    objsym_equivalent(H, V).   % true: 90-degree rotation maps one to the other
 
     L  = obj(l,  [r(0,0), r(1,0), r(1,1)]),
     Z  = obj(z,  [r(0,0), r(0,1), r(1,1), r(1,2)]),
-    \+ os_equivalent(L, Z).   % different shapes
+    \+ objsym_equivalent(L, Z).   % different shapes
 
 7. Predicate Reference
 
-os_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC)
-os_normalize(+Obj, -NormObj)
-os_translate(+Obj, +DR, +DC, -Moved)
-os_reflect_h(+Obj, -Reflected)
-os_reflect_v(+Obj, -Reflected)
-os_rotate180(+Obj, -Rotated)
-os_rotate90(+Obj, -Rotated)
-os_is_hsymm(+Obj)
-os_is_vsymm(+Obj)
-os_is_rot180(+Obj)
-os_is_rot90(+Obj)
-os_has_symmetry(+Obj)
-os_symmetries(+Obj, -List)
-os_equivalent(+Obj1, +Obj2)
+objsym_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC)
+objsym_normalize(+Obj, -NormObj)
+objsym_translate(+Obj, +DR, +DC, -Moved)
+objsym_reflect_h(+Obj, -Reflected)
+objsym_reflect_v(+Obj, -Reflected)
+objsym_rotate180(+Obj, -Rotated)
+objsym_rotate90(+Obj, -Rotated)
+objsym_is_hsymm(+Obj)
+objsym_is_vsymm(+Obj)
+objsym_is_rot180(+Obj)
+objsym_is_rot90(+Obj)
+objsym_has_symmetry(+Obj)
+objsym_symmetries(+Obj, -List)
+objsym_equivalent(+Obj1, +Obj2)
 
 61 PLUnit tests cover all 14 predicates. This is WP 191, Layer 170.

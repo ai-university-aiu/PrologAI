@@ -4323,16 +4323,16 @@ Load the pack:
 
 GRAVITY ACROSS A WHOLE GRID
 
-mv_gravity_down(+Bg, +Grid, -Grid2)
-mv_gravity_up(+Bg, +Grid, -Grid2)
-mv_gravity_left(+Bg, +Grid, -Grid2)
-mv_gravity_right(+Bg, +Grid, -Grid2)
+motion_gravity_down(+Bg, +Grid, -Grid2)
+motion_gravity_up(+Bg, +Grid, -Grid2)
+motion_gravity_left(+Bg, +Grid, -Grid2)
+motion_gravity_right(+Bg, +Grid, -Grid2)
 
 Each predicate pulls all foreground cells (cells not equal to Bg) toward one
 edge. Columns are processed independently for up/down; rows for left/right.
 
 Example:
-  ?- mv_gravity_down(0, [[0,1,0],[0,0,2],[3,0,0]], G2).
+  ?- motion_gravity_down(0, [[0,1,0],[0,0,2],[3,0,0]], G2).
   G2 = [[0,0,0],[0,0,0],[3,1,2]].
 
 Each column's non-zero cells fall to the bottom; zeros rise to the top.
@@ -4340,24 +4340,24 @@ Each column's non-zero cells fall to the bottom; zeros rise to the top.
 
 SLIDING A WHOLE GRID (DIRECTION ATOM)
 
-mv_slide_col(+Bg, +Dir, +Grid, -Grid2)
-mv_slide_row(+Bg, +Dir, +Grid, -Grid2)
+motion_slide_col(+Bg, +Dir, +Grid, -Grid2)
+motion_slide_row(+Bg, +Dir, +Grid, -Grid2)
 
 Same behavior as the gravity predicates but accept an explicit direction atom:
   Dir = down, up, left, or right.
 
-  ?- mv_slide_col(0, down, [[0,1],[2,0]], G2).
+  ?- motion_slide_col(0, down, [[0,1],[2,0]], G2).
   G2 = [[0,0],[2,1]].
 
 
 TRANSLATING THE ENTIRE GRID
 
-mv_shift_grid(+Bg, +DR, +DC, +Grid, -Grid2)
+motion_shift_grid(+Bg, +DR, +DC, +Grid, -Grid2)
 
 Shifts every cell by row offset DR and column offset DC. Cells that fall
 outside the boundary are lost; incoming cells are filled with Bg.
 
-  ?- mv_shift_grid(0, 1, 0, [[1,2],[3,4]], G2).
+  ?- motion_shift_grid(0, 1, 0, [[1,2],[3,4]], G2).
   G2 = [[0,0],[1,2]].
 
 
@@ -4366,72 +4366,72 @@ WORKING WITH SCENE OBJECTS
 A scene has the form: scene(Rows, Cols, BgColor, Objects)
 An object has the form: obj(Color, Cells) where Cells is a sorted list of r(R,C) terms.
 
-mv_obj_translate(+DR, +DC, +Obj, -Obj2)
+motion_obj_translate(+DR, +DC, +Obj, -Obj2)
   Translates one object by (DR, DC), preserving its color.
 
-  ?- mv_obj_translate(1, 2, obj(5, [r(0,0), r(0,1)]), Obj2).
+  ?- motion_obj_translate(1, 2, obj(5, [r(0,0), r(0,1)]), Obj2).
   Obj2 = obj(5, [r(1,2), r(1,3)]).
 
-mv_scene_translate(+DR, +DC, +Scene, -Scene2)
+motion_scene_translate(+DR, +DC, +Scene, -Scene2)
   Translates all objects in a scene by (DR, DC).
 
-mv_scene_to_grid(+Scene, -Grid)
+motion_scene_to_grid(+Scene, -Grid)
   Renders a scene to a grid. Each object's cells are painted with their color.
 
-  ?- mv_scene_to_grid(scene(2,2,0,[obj(5,[r(0,0)]),obj(3,[r(1,1)])]), Grid).
+  ?- motion_scene_to_grid(scene(2,2,0,[obj(5,[r(0,0)]),obj(3,[r(1,1)])]), Grid).
   Grid = [[5,0],[0,3]].
 
-mv_scene_gravity(+Scene, -Scene2)
+motion_scene_gravity(+Scene, -Scene2)
   Applies downward gravity to a scene via a grid round-trip:
-  render -> mv_gravity_down -> sc_grid_to_scene.
+  render -> motion_gravity_down -> sc_grid_to_scene.
   Same-color objects that fall into contact may be merged.
 
-  ?- mv_scene_gravity(scene(3,1,0,[obj(2,[r(0,0)])]), Scene2).
+  ?- motion_scene_gravity(scene(3,1,0,[obj(2,[r(0,0)])]), Scene2).
   Scene2 = scene(3,1,0,[obj(2,[r(2,0)])]).
 
 
 DISTANCE AND PROXIMITY
 
-mv_distance(+CellA, +CellB, -D)
+motion_distance(+CellA, +CellB, -D)
   Manhattan distance (taxicab distance: sum of absolute coordinate differences)
   between two r(R,C) cell terms.
 
-  ?- mv_distance(r(0,0), r(3,4), D).
+  ?- motion_distance(r(0,0), r(3,4), D).
   D = 7.
 
-mv_closest_cell(+Cells, +Ref, -Closest)
+motion_closest_cell(+Cells, +Ref, -Closest)
   Returns the cell in Cells with the minimum Manhattan distance to Ref.
   On ties, the cell appearing earlier in the list wins.
 
-  ?- mv_closest_cell([r(5,5), r(1,1), r(0,1)], r(0,0), Closest).
+  ?- motion_closest_cell([r(5,5), r(1,1), r(0,1)], r(0,0), Closest).
   Closest = r(0,1).
 
 
 COMBINING MOTION WITH COMPOSE
 
-  ?- cp_apply(mv_gravity_down(0), [[0,1,0],[0,0,2]], G2).
+  ?- cp_apply(motion_gravity_down(0), [[0,1,0],[0,0,2]], G2).
   G2 = [[0,0,0],[0,1,2]].
 
-  ?- cp_pipe(mv_shift_grid(0,0,1), mv_gravity_down(0),
+  ?- cp_pipe(motion_shift_grid(0,0,1), motion_gravity_down(0),
              [[1,0,0],[0,0,0]], G2).
   G2 = [[0,0,0],[0,0,1]].
 
 
 PREDICATE SUMMARY
 
-  mv_gravity_down(+Bg, +Grid, -Grid2)
-  mv_gravity_up(+Bg, +Grid, -Grid2)
-  mv_gravity_left(+Bg, +Grid, -Grid2)
-  mv_gravity_right(+Bg, +Grid, -Grid2)
-  mv_slide_col(+Bg, +Dir, +Grid, -Grid2)
-  mv_slide_row(+Bg, +Dir, +Grid, -Grid2)
-  mv_shift_grid(+Bg, +DR, +DC, +Grid, -Grid2)
-  mv_obj_translate(+DR, +DC, +Obj, -Obj2)
-  mv_scene_translate(+DR, +DC, +Scene, -Scene2)
-  mv_scene_to_grid(+Scene, -Grid)
-  mv_scene_gravity(+Scene, -Scene2)
-  mv_distance(+CellA, +CellB, -D)
-  mv_closest_cell(+Cells, +Ref, -Closest)
+  motion_gravity_down(+Bg, +Grid, -Grid2)
+  motion_gravity_up(+Bg, +Grid, -Grid2)
+  motion_gravity_left(+Bg, +Grid, -Grid2)
+  motion_gravity_right(+Bg, +Grid, -Grid2)
+  motion_slide_col(+Bg, +Dir, +Grid, -Grid2)
+  motion_slide_row(+Bg, +Dir, +Grid, -Grid2)
+  motion_shift_grid(+Bg, +DR, +DC, +Grid, -Grid2)
+  motion_obj_translate(+DR, +DC, +Obj, -Obj2)
+  motion_scene_translate(+DR, +DC, +Scene, -Scene2)
+  motion_scene_to_grid(+Scene, -Grid)
+  motion_scene_gravity(+Scene, -Scene2)
+  motion_distance(+CellA, +CellB, -D)
+  motion_closest_cell(+Cells, +Ref, -Closest)
 
 
 WHAT COMES NEXT
@@ -5299,91 +5299,91 @@ the cell level. Layer 50, requires grid. Load with :- use_module(library(overlay
 
 TRANSPARENT OVERLAY
 
-ov_over(+A, +B, +BG, -Result)
+overlay_over(+A, +B, +BG, -Result)
   Result = B[r][c] if B[r][c]!=BG; A[r][c] otherwise (transparent).
 
-ov_blend(+A, +B, +BG, -Result)
-  Alias for ov_over.
+overlay_blend(+A, +B, +BG, -Result)
+  Alias for overlay_over.
 
-:- ov_over([[1,0],[0,1]], [[0,2],[2,0]], 0, R).
+:- overlay_over([[1,0],[0,1]], [[0,2],[2,0]], 0, R).
 % R = [[1,2],[2,1]].
 
 
 BITWISE OPERATIONS
 
-ov_or(+A, +B, -Result)   - pointwise bitwise OR.
-ov_and(+A, +B, -Result)  - pointwise bitwise AND.
+overlay_or(+A, +B, -Result)   - pointwise bitwise OR.
+overlay_and(+A, +B, -Result)  - pointwise bitwise AND.
 
-:- ov_or([[1,0],[0,1]], [[0,1],[1,0]], R).
+:- overlay_or([[1,0],[0,1]], [[0,1],[1,0]], R).
 % R = [[1,1],[1,1]].
 
 
 XOR WITH BACKGROUND
 
-ov_xor(+A, +B, +BG, -Result)
+overlay_xor(+A, +B, +BG, -Result)
   Non-BG value where exactly one grid is non-BG; BG where both or neither.
 
-:- ov_xor([[1,0],[0,2]], [[0,3],[3,0]], 0, R).
+:- overlay_xor([[1,0],[0,2]], [[0,3],[3,0]], 0, R).
 % R = [[1,3],[3,2]].
 
 
 DIFFERENCE AND INTERSECTION
 
-ov_diff(+A, +B, +BG, -Result)       - A's value where A!=B; BG where equal.
-ov_intersect(+A, +B, +BG, -Result)  - A's value where A=B; BG where differ.
+overlay_diff(+A, +B, +BG, -Result)       - A's value where A!=B; BG where equal.
+overlay_intersect(+A, +B, +BG, -Result)  - A's value where A=B; BG where differ.
 
-:- ov_diff([[1,2],[3,4]], [[1,0],[3,0]], 0, R). % R=[[0,2],[0,4]].
-:- ov_intersect([[1,2],[3,4]], [[1,0],[3,0]], 0, R). % R=[[1,0],[3,0]].
+:- overlay_diff([[1,2],[3,4]], [[1,0],[3,0]], 0, R). % R=[[0,2],[0,4]].
+:- overlay_intersect([[1,2],[3,4]], [[1,0],[3,0]], 0, R). % R=[[1,0],[3,0]].
 
 
 MASKING
 
-ov_mask(+Grid, +Mask, +BG, -Result)
+overlay_mask(+Grid, +Mask, +BG, -Result)
   Keep Grid's value where Mask is non-BG; BG elsewhere.
 
-ov_mask_inv(+Grid, +Mask, +BG, -Result)
-  Keep Grid's value where Mask equals BG; BG elsewhere. Complement of ov_mask.
+overlay_mask_inv(+Grid, +Mask, +BG, -Result)
+  Keep Grid's value where Mask equals BG; BG elsewhere. Complement of overlay_mask.
 
-:- ov_mask([[1,2,3]], [[0,1,0]], 0, R).     % R=[[0,2,0]].
-:- ov_mask_inv([[1,2,3]], [[0,1,0]], 0, R). % R=[[1,0,3]].
+:- overlay_mask([[1,2,3]], [[0,1,0]], 0, R).     % R=[[0,2,0]].
+:- overlay_mask_inv([[1,2,3]], [[0,1,0]], 0, R). % R=[[1,0,3]].
 
 
 PRIORITY MERGE
 
-ov_priority(+Grids, +BG, -Result)
+overlay_priority(+Grids, +BG, -Result)
   First non-BG value at each position scanning Grids in order.
 
-:- ov_priority([[[1,0],[0,1]], [[0,2],[2,0]]], 0, R).
+:- overlay_priority([[[1,0],[0,1]], [[0,2],[2,0]]], 0, R).
 % R = [[1,2],[2,1]].
 
 
 COLOR REPLACEMENT
 
-ov_replace(+Grid, +Old, +New, -Result)  - replace all Old cells with New.
-ov_fill_bg(+Grid, +BG, +Fill, -Result) - replace BG cells with Fill.
+overlay_replace(+Grid, +Old, +New, -Result)  - replace all Old cells with New.
+overlay_fill_bg(+Grid, +BG, +Fill, -Result) - replace BG cells with Fill.
 
-:- ov_replace([[1,2,1]], 1, 9, R). % R=[[9,2,9]].
-:- ov_fill_bg([[1,0,0]], 0, 5, R). % R=[[1,5,5]].
+:- overlay_replace([[1,2,1]], 1, 9, R). % R=[[9,2,9]].
+:- overlay_fill_bg([[1,0,0]], 0, 5, R). % R=[[1,5,5]].
 
 
 POINTWISE EXTREMA
 
-ov_max(+A, +B, -Result) - pointwise maximum.
-ov_min(+A, +B, -Result) - pointwise minimum.
+overlay_max(+A, +B, -Result) - pointwise maximum.
+overlay_min(+A, +B, -Result) - pointwise minimum.
 
-:- ov_max([[1,5],[3,2]], [[4,2],[1,6]], R). % R=[[4,5],[3,6]].
-:- ov_min([[1,5],[3,2]], [[4,2],[1,6]], R). % R=[[1,2],[1,2]].
+:- overlay_max([[1,5],[3,2]], [[4,2],[1,6]], R). % R=[[4,5],[3,6]].
+:- overlay_min([[1,5],[3,2]], [[4,2],[1,6]], R). % R=[[1,2],[1,2]].
 
 
 PREDICATE SUMMARY
 
-Layering: ov_over/4, ov_blend/4
-Logic:    ov_or/3, ov_and/3, ov_xor/4
-Analysis: ov_diff/4, ov_intersect/4
-Masking:  ov_mask/4, ov_mask_inv/4
-Merge:    ov_priority/3
-Color:    ov_replace/4, ov_fill_bg/4
-Extrema:  ov_max/3, ov_min/3
+Layering: overlay_over/4, overlay_blend/4
+Logic:    overlay_or/3, overlay_and/3, overlay_xor/4
+Analysis: overlay_diff/4, overlay_intersect/4
+Masking:  overlay_mask/4, overlay_mask_inv/4
+Merge:    overlay_priority/3
+Color:    overlay_replace/4, overlay_fill_bg/4
+Extrema:  overlay_max/3, overlay_min/3
 
 END OF CHAPTER 32
 
@@ -6378,28 +6378,28 @@ LOADING
 
 GRID DIMENSIONS
 
-  id_grid_dims(+Grid, -Rows, -Cols)
+  induction_grid_dims(+Grid, -Rows, -Cols)
 
   Returns the number of rows and columns in a grid.
 
   Example:
 
-    id_grid_dims([[0,1],[2,3],[4,5]], R, C).
+    induction_grid_dims([[0,1],[2,3],[4,5]], R, C).
     % R = 3, C = 2
 
 
 COLOR ANALYSIS
 
-  id_input_colors(+Input, -Colors)
-  id_output_colors(+Output, -Colors)
+  induction_input_colors(+Input, -Colors)
+  induction_output_colors(+Output, -Colors)
 
   Return sorted lists of distinct colors found in each grid.
 
-  id_new_colors(+Input, +Output, -New)
+  induction_new_colors(+Input, +Output, -New)
 
   Colors that appear in Output but not in Input.
 
-  id_lost_colors(+Input, +Output, -Lost)
+  induction_lost_colors(+Input, +Output, -Lost)
 
   Colors that appear in Input but not in Output.
 
@@ -6407,17 +6407,17 @@ COLOR ANALYSIS
 
     In  = [[0,1],[1,0]].
     Out = [[2,3],[3,2]].
-    id_new_colors(In, Out, New).    % New = [2, 3]
-    id_lost_colors(In, Out, Lost).  % Lost = [0, 1]
+    induction_new_colors(In, Out, New).    % New = [2, 3]
+    induction_lost_colors(In, Out, Lost).  % Lost = [0, 1]
 
 
 CHANGED AND UNCHANGED CELLS
 
-  id_changed_cells(+Input, +Output, -Changed)
+  induction_changed_cells(+Input, +Output, -Changed)
 
   List of r(R,C) cells where Input and Output differ.
 
-  id_unchanged_cells(+Input, +Output, -Unchanged)
+  induction_unchanged_cells(+Input, +Output, -Unchanged)
 
   List of r(R,C) cells where Input and Output have the same value.
 
@@ -6427,13 +6427,13 @@ CHANGED AND UNCHANGED CELLS
 
     G1 = [[0,0],[0,0]].
     G2 = [[0,0],[0,1]].
-    id_changed_cells(G1, G2, Changed).    % Changed = [r(1,1)]
-    id_unchanged_cells(G1, G2, Unch).     % Unch = [r(0,0), r(0,1), r(1,0)]
+    induction_changed_cells(G1, G2, Changed).    % Changed = [r(1,1)]
+    induction_unchanged_cells(G1, G2, Unch).     % Unch = [r(0,0), r(0,1), r(1,0)]
 
 
 COLOR MAP
 
-  id_color_map(+Input, +Output, -Map)
+  induction_color_map(+Input, +Output, -Map)
 
   Infers a sorted list of OldColor-NewColor pairs from all changed cells.
   If the same input color maps to two different output colors (inconsistent),
@@ -6443,13 +6443,13 @@ COLOR MAP
 
     In  = [[0,1],[1,0]].
     Out = [[5,3],[3,5]].
-    id_color_map(In, Out, Map).
+    induction_color_map(In, Out, Map).
     % Map = [0-5, 1-3]
 
 
 RECOLOR DETECTION
 
-  id_is_recolor(+Input, +Output)
+  induction_is_recolor(+Input, +Output)
 
   Succeeds when Output is a pure, consistent color substitution of Input:
   every cell with the same input color gets the same output color, and
@@ -6457,51 +6457,51 @@ RECOLOR DETECTION
 
   Example:
 
-    id_is_recolor([[0,1],[1,0]], [[5,3],[3,5]]).  % true
-    id_is_recolor([[0,1],[1,0]], [[0,1],[1,0]]).  % true (identity)
+    induction_is_recolor([[0,1],[1,0]], [[5,3],[3,5]]).  % true
+    induction_is_recolor([[0,1],[1,0]], [[0,1],[1,0]]).  % true (identity)
 
     % Inconsistent: cell (0,0) has color 0 mapped to 1,
     %               cell (0,1) has color 0 mapped to 2.
-    \+ id_is_recolor([[0,0]], [[1,2]]).
+    \+ induction_is_recolor([[0,0]], [[1,2]]).
 
 
 UNIFORM OUTPUT
 
-  id_uniform_output(+Output, ?Color)
+  induction_uniform_output(+Output, ?Color)
 
   Succeeds when every cell in Output has the same Color.
 
-  id_output_color(+Output, -Color)
+  induction_output_color(+Output, -Color)
 
   Returns the single uniform color; fails if Output is not uniform.
 
   Example:
 
-    id_uniform_output([[5,5],[5,5]], C).  % C = 5
-    \+ id_uniform_output([[5,6],[5,5]], _).
+    induction_uniform_output([[5,5],[5,5]], C).  % C = 5
+    \+ induction_uniform_output([[5,6],[5,5]], _).
 
 
 SIZE RATIO
 
-  id_size_ratio(+Input, +Output, -Ratio)
+  induction_size_ratio(+Input, +Output, -Ratio)
 
   Ratio = RR-RC where RR = OutRows / InRows, RC = OutCols / InCols.
   Returns integers when division is exact.
 
   Example:
 
-    id_size_ratio([[0,0],[0,0]], [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]], R).
+    induction_size_ratio([[0,0],[0,0]], [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]], R).
     % R = 2-2
 
 
 SCALE DETECTION
 
-  id_is_scale(+Input, +Output)
+  induction_is_scale(+Input, +Output)
 
   Succeeds when Output is an integer (uniform) scale of Input:
   both row ratio and column ratio are the same positive integer.
 
-  id_scale_factor(+Input, +Output, -K)
+  induction_scale_factor(+Input, +Output, -K)
 
   Returns the integer scale factor K.
 
@@ -6509,8 +6509,8 @@ SCALE DETECTION
 
     In  = [[0,1],[1,0]].
     Out = [[0,0,1,1],[0,0,1,1],[1,1,0,0],[1,1,0,0]].
-    id_is_scale(In, Out).           % true
-    id_scale_factor(In, Out, K).    % K = 2
+    induction_is_scale(In, Out).           % true
+    induction_scale_factor(In, Out, K).    % K = 2
 
 
 PUTTING IT TOGETHER
@@ -6518,16 +6518,16 @@ PUTTING IT TOGETHER
 The typical workflow when analyzing a grid pair:
 
   Step 1: check for recolor.
-    id_is_recolor(In, Out) -> it is a color substitution.
+    induction_is_recolor(In, Out) -> it is a color substitution.
 
   Step 2: check for scaling.
-    id_is_scale(In, Out) -> it is a zoom.
+    induction_is_scale(In, Out) -> it is a zoom.
 
   Step 3: look at color sets.
-    id_new_colors(In, Out, New), id_lost_colors(In, Out, Lost).
+    induction_new_colors(In, Out, New), induction_lost_colors(In, Out, Lost).
 
   Step 4: inspect changed cells.
-    id_changed_cells(In, Out, Changed).
+    induction_changed_cells(In, Out, Changed).
 
 These primitives are designed to be combined with the compare, spatial,
 fill, and transform packs for full ARC-style grid transformation analysis.
@@ -6712,7 +6712,7 @@ complete toolkit for physics-like grid transformations:
 
   % Check if output is just the input after falling.
   gravity_fall_down(Input, 0, R),
-  id_is_recolor(R, Output).  % Would fail; fall changes positions
+  induction_is_recolor(R, Output).  % Would fail; fall changes positions
 
 
 END OF CHAPTER 42
@@ -6740,7 +6740,7 @@ and a 0 means "not selected."
 
 Building a mask:
 
-  ns_mask_from_color(+Grid, +Color, -Mask)
+  noise_mask_from_color(+Grid, +Color, -Mask)
 
   Creates a mask where every cell with Color becomes 1, and all other
   cells become 0.
@@ -6748,12 +6748,12 @@ Building a mask:
   Example:
 
     G = [[1,2,1],[2,1,2]].
-    ns_mask_from_color(G, 2, M).
+    noise_mask_from_color(G, 2, M).
     % M = [[0,1,0],[1,0,1]]
 
 Applying a mask:
 
-  ns_mask_apply(+Grid, +Mask, +FillColor, -Result)
+  noise_mask_apply(+Grid, +Mask, +FillColor, -Result)
 
   Replaces all cells where Mask=1 with FillColor. Mask=0 cells are
   unchanged.
@@ -6762,28 +6762,28 @@ Applying a mask:
 
     G = [[1,2,3],[4,5,6]].
     M = [[1,0,1],[0,1,0]].
-    ns_mask_apply(G, M, 0, R).
+    noise_mask_apply(G, M, 0, R).
     % R = [[0,2,0],[4,0,6]]
 
 Inverting a mask:
 
-  ns_mask_invert(+Mask, +_Rows, -Inverted)
+  noise_mask_invert(+Mask, +_Rows, -Inverted)
 
   Flips every bit: 0 becomes 1 and 1 becomes 0.
 
   Example:
 
     M = [[1,0],[0,1]].
-    ns_mask_invert(M, 2, I).
+    noise_mask_invert(M, 2, I).
     % I = [[0,1],[1,0]]
 
 Combining masks:
 
-  ns_mask_and(+Mask1, +Mask2, -Result)
+  noise_mask_and(+Mask1, +Mask2, -Result)
 
   Pointwise AND: result is 1 only where both masks are 1.
 
-  ns_mask_or(+Mask1, +Mask2, -Result)
+  noise_mask_or(+Mask1, +Mask2, -Result)
 
   Pointwise OR: result is 1 where either mask is 1.
 
@@ -6791,49 +6791,49 @@ Combining masks:
 
     M1 = [[1,0],[0,1]].
     M2 = [[1,1],[0,0]].
-    ns_mask_and(M1, M2, A).  % A = [[1,0],[0,0]]
-    ns_mask_or(M1, M2, O).   % O = [[1,1],[0,1]]
+    noise_mask_and(M1, M2, A).  % A = [[1,0],[0,0]]
+    noise_mask_or(M1, M2, O).   % O = [[1,1],[0,1]]
 
 
 CONVERTING BETWEEN MASKS AND REGIONS
 
-  ns_mask_to_region(+Mask, -Region)
+  noise_mask_to_region(+Mask, -Region)
 
   Extracts all r(R,C) cells where the mask is 1.
 
   Example:
 
     M = [[1,0],[0,1]].
-    ns_mask_to_region(M, Region).
+    noise_mask_to_region(M, Region).
     % Region = [r(0,0), r(1,1)]
 
-  ns_region_to_mask(+Region, +Rows, +Cols, -Mask)
+  noise_region_to_mask(+Region, +Rows, +Cols, -Mask)
 
   Builds a binary mask from a list of r(R,C) cells.
 
   Example:
 
-    ns_region_to_mask([r(0,0), r(1,1)], 2, 2, M).
+    noise_region_to_mask([r(0,0), r(1,1)], 2, 2, M).
     % M = [[1,0],[0,1]]
 
 
 NOISE ANALYSIS
 
-  ns_majority_color(+Grid, -Color)
+  noise_majority_color(+Grid, -Color)
 
   Returns the most frequently occurring color value in the grid.
 
   Example:
 
     G = [[5,5,5],[5,3,5],[5,5,5]].
-    ns_majority_color(G, C).
+    noise_majority_color(G, C).
     % C = 5
 
-  ns_color_count(+Grid, +Color, -Count)
+  noise_color_count(+Grid, +Color, -Count)
 
   Counts the number of cells with the given Color.
 
-  ns_noise_cells(+Grid, +_BG, -Cells)
+  noise_noise_cells(+Grid, +_BG, -Cells)
 
   Returns the list of r(R,C) cells whose value differs from the
   majority color.
@@ -6841,10 +6841,10 @@ NOISE ANALYSIS
   Example:
 
     G = [[5,5,5],[5,3,5],[5,5,5]].
-    ns_noise_cells(G, 0, Cells).
+    noise_noise_cells(G, 0, Cells).
     % Cells = [r(1,1)]
 
-  ns_denoise(+Grid, +_BG, -Result)
+  noise_denoise(+Grid, +_BG, -Result)
 
   Replaces all non-majority cells with the majority color. Equivalent
   to removing noise and returning a clean version.
@@ -6852,13 +6852,13 @@ NOISE ANALYSIS
   Example:
 
     G = [[5,5,5],[5,3,5],[5,5,5]].
-    ns_denoise(G, 0, R).
+    noise_denoise(G, 0, R).
     % R = [[5,5,5],[5,5,5],[5,5,5]]
 
 
 SPARSE AND DENSE CELLS
 
-  ns_sparse_cells(+Grid, +N, -Cells)
+  noise_sparse_cells(+Grid, +N, -Cells)
 
   Returns cells whose color appears fewer than N times in the entire
   grid. These are the "rare" colors - likely noise or exceptions.
@@ -6866,10 +6866,10 @@ SPARSE AND DENSE CELLS
   Example:
 
     G = [[5,5,5],[5,3,5],[5,5,5]].
-    ns_sparse_cells(G, 2, Sparse).
+    noise_sparse_cells(G, 2, Sparse).
     % Sparse = [r(1,1)]  (color 3 appears only once)
 
-  ns_dense_cells(+Grid, +N, -Cells)
+  noise_dense_cells(+Grid, +N, -Cells)
 
   Returns cells whose color appears N or more times. These belong to
   the dominant or common colors.
@@ -6877,7 +6877,7 @@ SPARSE AND DENSE CELLS
 
 COLOR ISOLATION
 
-  ns_isolate_color(+Grid, +Color, -Result)
+  noise_isolate_color(+Grid, +Color, -Result)
 
   Keeps cells with Color and replaces all other cells with 0. Useful
   for pulling out one layer of a multi-color grid.
@@ -6885,7 +6885,7 @@ COLOR ISOLATION
   Example:
 
     G = [[1,2,1],[2,1,2]].
-    ns_isolate_color(G, 2, R).
+    noise_isolate_color(G, 2, R).
     % R = [[0,2,0],[2,0,2]]
 
 
@@ -6893,22 +6893,22 @@ TYPICAL WORKFLOWS
 
 Detect and remove noise:
 
-  ns_noise_cells(Grid, 0, Noise),
+  noise_noise_cells(Grid, 0, Noise),
   length(Noise, NCount),
   ( NCount < 3
-  -> ns_denoise(Grid, 0, Clean)
+  -> noise_denoise(Grid, 0, Clean)
   ;  Clean = Grid
   ).
 
 Build a mask from a region and apply it:
 
-  ns_region_to_mask(Region, Rows, Cols, Mask),
-  ns_mask_apply(Grid, Mask, 0, Cleared).
+  noise_region_to_mask(Region, Rows, Cols, Mask),
+  noise_mask_apply(Grid, Mask, 0, Cleared).
 
 Isolate and compare two colors:
 
-  ns_isolate_color(Grid, Color1, Layer1),
-  ns_isolate_color(Grid, Color2, Layer2),
+  noise_isolate_color(Grid, Color1, Layer1),
+  noise_isolate_color(Grid, Color2, Layer2),
   cp_grids_equal(Layer1, Layer2).
 
 
@@ -7090,7 +7090,7 @@ The generate pack works naturally with the compare and noise packs:
 
   % Generate a frame and apply it as a mask.
   ge_frame(Rows, Cols, 1, 0, FrameMask),
-  ns_mask_apply(Grid, FrameMask, FillColor, Result).
+  noise_mask_apply(Grid, FrameMask, FillColor, Result).
 
 
 END OF CHAPTER 44
@@ -7762,7 +7762,7 @@ The rewrite pack integrates naturally with the connect, morph, and induction pac
   rw_normalize(Cleaned, 0, Grid2).
 
   % Apply the inferred recolor map from the induction pack.
-  id_color_map(Pairs, ColorMap),
+  induction_color_map(Pairs, ColorMap),
   rw_map_color(Grid, ColorMap, Grid2).
 
   % Overlay a mask-selected fill onto a base grid.
@@ -8913,57 +8913,57 @@ In compositional reasoning, a rule is induced from training pairs. Each pair
 shows an Input grid and the correct Output grid. The induct pack extracts the
 evidence from those pairs:
 
-  What cells changed? (in_delta, in_changed_cells)
-  What color substitutions occurred? (in_color_map)
-  Did the grid size change? (in_size_change)
-  What is the background? (in_bg_color)
-  Are all pairs consistent? (in_consistent_delta, in_size_change_pairs)
+  What cells changed? (induct_delta, induct_changed_cells)
+  What color substitutions occurred? (induct_color_map)
+  Did the grid size change? (induct_size_change)
+  What is the background? (induct_bg_color)
+  Are all pairs consistent? (induct_consistent_delta, induct_size_change_pairs)
 
 These observations become the inputs to hypothesis generation.
 
 SECTION 55.2 - CELL-LEVEL CHANGE
 
-in_delta(+Input, +Output, -Delta)
+induct_delta(+Input, +Output, -Delta)
 
 Delta is a list of r(R,C)-OldColor-NewColor triples for cells that changed.
 
-  in_delta([[1,2],[3,4]], [[1,9],[3,9]], Delta).
+  induct_delta([[1,2],[3,4]], [[1,9],[3,9]], Delta).
   % Delta = [r(0,1)-2-9, r(1,1)-4-9]
 
-in_changed_cells/3 lists positions that changed. in_invariant_cells/3 lists
-positions that stayed the same. in_constant/2 tests identity.
+induct_changed_cells/3 lists positions that changed. induct_invariant_cells/3 lists
+positions that stayed the same. induct_constant/2 tests identity.
 
 SECTION 55.3 - COLOR MAPS
 
-in_color_map(+Input, +Output, -Map)
+induct_color_map(+Input, +Output, -Map)
 
 Map is a list of OldColor-NewColor pairs for all changed cells.
 Fails if a color maps to two different outputs.
 
-  in_color_map([[1,2],[1,2]], [[5,6],[5,6]], Map).
+  induct_color_map([[1,2],[1,2]], [[5,6],[5,6]], Map).
   % Map = [1-5, 2-6]
 
-in_color_map_pairs/2 intersects per-pair maps for cross-pair consistency.
-in_common_keys/3 extracts shared entries from two maps.
+induct_color_map_pairs/2 intersects per-pair maps for cross-pair consistency.
+induct_common_keys/3 extracts shared entries from two maps.
 
 SECTION 55.4 - SIZE AND BACKGROUND
 
-in_size_change/4: DRows and DCols for one pair (negative means shrinkage).
-in_size_change_pairs/3: consistent size delta across all pairs or fails.
-in_bg_color/2: most frequent color in one grid.
-in_bg_color_pairs/2: consistent background across all pairs or fails.
+induct_size_change/4: DRows and DCols for one pair (negative means shrinkage).
+induct_size_change_pairs/3: consistent size delta across all pairs or fails.
+induct_bg_color/2: most frequent color in one grid.
+induct_bg_color_pairs/2: consistent background across all pairs or fails.
 
 SECTION 55.5 - COLOR SETS AND CONSISTENCY
 
-in_color_palette/3: sorted union of all colors in one pair.
-in_palette_pairs/3: separate input and output color sets across all pairs.
-in_consistent_delta/2: all pairs share the same delta or fails.
+induct_color_palette/3: sorted union of all colors in one pair.
+induct_palette_pairs/3: separate input and output color sets across all pairs.
+induct_consistent_delta/2: all pairs share the same delta or fails.
 
 SECTION 55.6 - DESIGN NOTES
 
 All cell-iteration predicates use findall for determinism.
-in_color_map uses intersection/3 for set operations.
-in_bg_color uses max_member/2 from library(lists) for the argmax.
+induct_color_map uses intersection/3 for set operations.
+induct_bg_color uses max_member/2 from library(lists) for the argmax.
 In case of a tie, max_member picks the largest color value.
 
 SECTION 55.7 - ACCEPTANCE TESTS
@@ -8985,41 +8985,41 @@ The hyp pack requires: grid, induct.
 SECTION 56.1 - THE HYPOTHESIS AS A CALLABLE
 
 In PrologAI, a hypothesis is a Prolog callable of the form Goal(Input, Output).
-The simplest hypothesis is hy_identity/2. The most common is hy_color_sub(Map),
+The simplest hypothesis is hyp_identity/2. The most common is hyp_color_sub(Map),
 a partial application that substitutes colors according to a map.
 
 SECTION 56.2 - COLOR SUBSTITUTION
 
-hy_color_sub(+Map, +Grid, -Grid2)
+hyp_color_sub(+Map, +Grid, -Grid2)
 
 Applies a color substitution map (list of Old-New pairs) to every cell.
 Cells not in Map are left unchanged (identity fallback).
 
-  hy_color_sub([1-5, 2-6], [[1,2],[2,1]], Grid2).
+  hyp_color_sub([1-5, 2-6], [[1,2],[2,1]], Grid2).
   % Grid2 = [[5,6],[6,5]]
 
-hy_identity/2 returns grid unchanged. hy_from_map/3 and hy_apply_map/3
-are aliases for hy_color_sub.
+hyp_identity/2 returns grid unchanged. hyp_from_map/3 and hyp_apply_map/3
+are aliases for hyp_color_sub.
 
 SECTION 56.3 - TESTING AND SELECTION
 
-hy_test/4: pixel accuracy for one pair (float).
-hy_test_all/4: mean accuracy over all pairs.
-hy_verify/3: exact-match test for one pair.
-hy_verify_all/2: exact-match test for all pairs.
-hy_rank/3: rank hypothesis list by accuracy descending.
-hy_select/3: pick the best hypothesis.
+hyp_test/4: pixel accuracy for one pair (float).
+hyp_test_all/4: mean accuracy over all pairs.
+hyp_verify/3: exact-match test for one pair.
+hyp_verify_all/2: exact-match test for all pairs.
+hyp_rank/3: rank hypothesis list by accuracy descending.
+hyp_select/3: pick the best hypothesis.
 
 SECTION 56.4 - MAP UTILITIES
 
-hy_compose/4: sequential two-map substitution.
-hy_invert_map/2: swap keys and values.
-hy_map_lookup/3: lookup with identity fallback.
-hy_describe/2: human-readable atom.
+hyp_compose/4: sequential two-map substitution.
+hyp_invert_map/2: swap keys and values.
+hyp_map_lookup/3: lookup with identity fallback.
+hyp_describe/2: human-readable atom.
 
 SECTION 56.5 - DESIGN NOTES
 
-hy_select and hy_rank have no meta_predicate declarations because their
+hyp_select and hyp_rank have no meta_predicate declarations because their
 output argument is plain data, not a goal. Declaring the output as a goal
 arity would cause module qualification of the returned hypothesis functor,
 breaking unification in the caller.
@@ -9978,43 +9978,43 @@ region properties, filtering by size, recoloring components, and extracting
 individual regions from a grid.
 
 Core labeling:
-  lb_label(+Grid, +Bg, -LabelGrid)      assign labels to connected components
-  lb_components(+Grid, +Bg, -Comps)     list of cell lists per component
-  lb_count(+Grid, +Bg, -N)              count components
+  label_label(+Grid, +Bg, -LabelGrid)      assign labels to connected components
+  label_components(+Grid, +Bg, -Comps)     list of cell lists per component
+  label_count(+Grid, +Bg, -N)              count components
 
 Per-component queries:
-  lb_size_of(+LG, +Label, -Size)        cell count of a label
-  lb_sizes_all(+LG, +Bg, -Sizes)        sorted Label-Size pairs
-  lb_cells_of(+LG, +Label, -Cells)      cells carrying a label
-  lb_bbox_of(+LG, +Label, -TL, -BR)     bounding box as two R-C pairs
-  lb_neighbors_of(+LG, +L, +Bg, -Ns)   adjacent foreground labels
+  label_size_of(+LG, +Label, -Size)        cell count of a label
+  label_sizes_all(+LG, +Bg, -Sizes)        sorted Label-Size pairs
+  label_cells_of(+LG, +Label, -Cells)      cells carrying a label
+  label_bbox_of(+LG, +Label, -TL, -BR)     bounding box as two R-C pairs
+  label_neighbors_of(+LG, +L, +Bg, -Ns)   adjacent foreground labels
 
 Grid transformations:
-  lb_fill_label(+LG, +Label, +Val, -G)  replace a label with a value
-  lb_keep_largest(+Grid, +Bg, -Result)  keep only the largest component
-  lb_remove_small(+Grid, +Bg, +Min, -R) remove small components
-  lb_color_labels(+LG, +Bg, +Cols, -G)  color labels from a palette
-  lb_merge_two(+LG, +L1, +L2, -NewG)   merge two labels into one
-  lb_select_label(+Grid, +LG, +L, -R)  extract one component
+  label_fill_label(+LG, +Label, +Val, -G)  replace a label with a value
+  label_keep_largest(+Grid, +Bg, -Result)  keep only the largest component
+  label_remove_small(+Grid, +Bg, +Min, -R) remove small components
+  label_color_labels(+LG, +Bg, +Cols, -G)  color labels from a palette
+  label_merge_two(+LG, +L1, +L2, -NewG)   merge two labels into one
+  label_select_label(+Grid, +LG, +L, -R)  extract one component
 
 Example: label a grid with isolated corners:
-  lb_label([[1,0,1],[0,0,0],[1,0,1]], 0, LG).
+  label_label([[1,0,1],[0,0,0],[1,0,1]], 0, LG).
   % LG = [[1,0,2],[0,0,0],[3,0,4]]
 
 Example: count components:
-  lb_count([[1,0,1],[0,0,0],[1,0,1]], 0, N).
+  label_count([[1,0,1],[0,0,0],[1,0,1]], 0, N).
   % N = 4
 
 Example: find bounding box of label 1:
-  lb_bbox_of([[1,1,0],[0,0,0],[0,2,2]], 1, TL, BR).
+  label_bbox_of([[1,1,0],[0,0,0],[0,2,2]], 1, TL, BR).
   % TL = 0-0, BR = 0-1
 
 Example: keep only the largest component:
-  lb_keep_largest([[1,0,1],[1,1,0],[0,0,1]], 0, R).
+  label_keep_largest([[1,0,1],[1,1,0],[0,0,1]], 0, R).
   % R = [[1,0,0],[1,1,0],[0,0,0]]
 
 Example: color all components from a palette:
-  lb_color_labels([[1,0,2],[0,0,0],[3,0,4]], 0, [7,8,9], G).
+  label_color_labels([[1,0,2],[0,0,0],[3,0,4]], 0, [7,8,9], G).
   % G = [[7,0,8],[0,0,0],[9,0,7]]
 
 All 42 PLUnit acceptance tests are in packs/label/test/test_label.pl.
@@ -10036,83 +10036,83 @@ Load the pack with:
 
 Basic Dilation and Erosion
 
-mo_dilate/3 expands all non-background regions by one 4-connected step.
+morph_dilate/3 expands all non-background regions by one 4-connected step.
 Each background cell adjacent to a non-background cell receives the value
 of its first non-background 4-neighbor.
 
-    ?- mo_dilate([[0,0,0],[0,1,0],[0,0,0]], 0, R).
+    ?- morph_dilate([[0,0,0],[0,1,0],[0,0,0]], 0, R).
     R = [[0,1,0],[1,1,1],[0,1,0]].
 
-mo_erode/3 shrinks all non-background regions by one step. Each non-background
+morph_erode/3 shrinks all non-background regions by one step. Each non-background
 cell adjacent to a background cell becomes background.
 
-    ?- mo_erode([[0,1,0],[1,1,1],[0,1,0]], 0, R).
+    ?- morph_erode([[0,1,0],[1,1,1],[0,1,0]], 0, R).
     R = [[0,0,0],[0,1,0],[0,0,0]].
 
 Repeated Operations
 
-mo_dilate_n/4 and mo_erode_n/4 apply the operation N times. N=0 returns
+morph_dilate_n/4 and morph_erode_n/4 apply the operation N times. N=0 returns
 the input unchanged.
 
-    ?- mo_dilate_n([[0,0,0,0,0],[0,0,0,0,0],[0,0,1,0,0],
+    ?- morph_dilate_n([[0,0,0,0,0],[0,0,0,0,0],[0,0,1,0,0],
                     [0,0,0,0,0],[0,0,0,0,0]], 0, 2, R).
     R = [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]].
 
 Compound Operations
 
-mo_open/3 applies erosion then dilation (removes small protrusions).
-mo_close/3 applies dilation then erosion (fills small gaps).
-mo_smooth/3 applies open then close (combines both effects).
+morph_open/3 applies erosion then dilation (removes small protrusions).
+morph_close/3 applies dilation then erosion (fills small gaps).
+morph_smooth/3 applies open then close (combines both effects).
 
-    ?- mo_close([[1,0,1]], 0, R).
+    ?- morph_close([[1,0,1]], 0, R).
     R = [[1,1,1]].
 
-    ?- mo_smooth([[0,1,0],[1,1,1],[0,1,0]], 0, R).
+    ?- morph_smooth([[0,1,0],[1,1,1],[0,1,0]], 0, R).
     R = [[1,1,1],[1,1,1],[1,1,1]].
 
 Boundary and Interior
 
-mo_boundary/3 keeps only perimeter non-background cells.
-mo_interior/3 keeps only non-perimeter non-background cells.
+morph_boundary/3 keeps only perimeter non-background cells.
+morph_interior/3 keeps only non-perimeter non-background cells.
 
-    ?- mo_boundary([[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],
+    ?- morph_boundary([[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],
                     [0,1,1,1,0],[0,0,0,0,0]], 0, R).
     R = [[0,0,0,0,0],[0,1,1,1,0],[0,1,0,1,0],[0,1,1,1,0],[0,0,0,0,0]].
 
 Value-Fixed Dilation
 
-mo_dilate_val/4 dilates with a fixed fill value:
+morph_dilate_val/4 dilates with a fixed fill value:
 
-    ?- mo_dilate_val([[0,0,0],[0,1,0],[0,0,0]], 0, 9, R).
+    ?- morph_dilate_val([[0,0,0],[0,1,0],[0,0,0]], 0, 9, R).
     R = [[0,9,0],[9,1,9],[0,9,0]].
 
 Region Growing
 
-mo_grow_from/5 performs BFS from seed cells into adjacent background territory:
+morph_grow_from/5 performs BFS from seed cells into adjacent background territory:
 
-    ?- mo_grow_from([[0,1,0],[0,1,0],[0,1,0]], [0-0], 0, 5, R).
+    ?- morph_grow_from([[0,1,0],[0,1,0],[0,1,0]], [0-0], 0, 5, R).
     R = [[5,1,0],[5,1,0],[5,1,0]].
 
 Distance to Background
 
-mo_dist_to_bg/3 computes L1 Manhattan distance to nearest background cell:
+morph_dist_to_bg/3 computes L1 Manhattan distance to nearest background cell:
 
-    ?- mo_dist_to_bg([[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],
+    ?- morph_dist_to_bg([[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],
                       [0,1,1,1,0],[0,0,0,0,0]], 0, D).
     D = [[0,0,0,0,0],[0,1,1,1,0],[0,1,2,1,0],[0,1,1,1,0],[0,0,0,0,0]].
 
 Dilation Rings
 
-mo_ring/4 extracts cells added at exactly the Nth dilation step:
+morph_ring/4 extracts cells added at exactly the Nth dilation step:
 
-    ?- mo_ring([[0,0,0],[0,1,0],[0,0,0]], 0, 1, R).
+    ?- morph_ring([[0,0,0],[0,1,0],[0,0,0]], 0, 1, R).
     R = [[0,1,0],[1,0,1],[0,1,0]].
 
 Filling Enclosed Holes
 
-mo_fill_holes/4 fills background regions not reachable from the grid border:
+morph_fill_holes/4 fills background regions not reachable from the grid border:
 
-    ?- mo_fill_holes([[1,1,1],[1,0,1],[1,1,1]], 0, 5, R).
+    ?- morph_fill_holes([[1,1,1],[1,0,1],[1,1,1]], 0, 5, R).
     R = [[1,1,1],[1,5,1],[1,1,1]].
 
 All 42 PLUnit acceptance tests are in packs/morph/test/test_morph.pl.
@@ -11151,20 +11151,20 @@ cell's immediate neighborhood.
 
 75.2 Raw neighbor access
 
-nb_4neighbors/4 returns a list of nb(Row,Col,Val) terms for each valid
+neighbor_4neighbors/4 returns a list of nb(Row,Col,Val) terms for each valid
 4-connected neighbor. Out-of-bounds directions are omitted.
 
-?- nb_4neighbors([[0,0,0],[0,1,0],[0,0,0]], 1, 1, N).
+?- neighbor_4neighbors([[0,0,0],[0,1,0],[0,0,0]], 1, 1, N).
 N = [nb(0,1,0), nb(2,1,0), nb(1,0,0), nb(1,2,0)].
 
-?- nb_4neighbors([[1,2],[3,4]], 0, 0, N).
+?- neighbor_4neighbors([[1,2],[3,4]], 0, 0, N).
 N = [nb(1,0,3), nb(0,1,2)].
 
 A corner cell has 2 neighbors; an edge cell has 3; an interior cell has 4.
 
-nb_8neighbors/4 returns up to 8 neighbors including diagonals.
+neighbor_8neighbors/4 returns up to 8 neighbors including diagonals.
 
-?- nb_8neighbors([[1,2,3],[4,5,6],[7,8,9]], 0, 0, N).
+?- neighbor_8neighbors([[1,2,3],[4,5,6],[7,8,9]], 0, 0, N).
 N = [nb(0,1,2), nb(1,0,4), nb(1,1,5)].
 
 
@@ -11173,133 +11173,133 @@ N = [nb(0,1,2), nb(1,0,4), nb(1,1,5)].
 A cell is a boundary cell if it is non-Bg and at least one 4-neighbor is
 Bg or out of bounds.
 
-?- nb_is_boundary([[0,0,0],[0,1,0],[0,0,0]], 1, 1, 0).
+?- neighbor_is_boundary([[0,0,0],[0,1,0],[0,0,0]], 1, 1, 0).
 true.
 
-?- nb_is_boundary([[1,1],[1,1]], 0, 0, 0).
+?- neighbor_is_boundary([[1,1],[1,1]], 0, 0, 0).
 true.
 
-?- nb_is_boundary([[1,1,1],[1,1,1],[1,1,1]], 1, 1, 0).
+?- neighbor_is_boundary([[1,1,1],[1,1,1],[1,1,1]], 1, 1, 0).
 false.
 
 A cell is an interior cell if it is non-Bg and all 4-neighbors are within
 bounds and non-Bg.
 
-?- nb_is_interior([[1,1,1],[1,1,1],[1,1,1]], 1, 1, 0).
+?- neighbor_is_interior([[1,1,1],[1,1,1],[1,1,1]], 1, 1, 0).
 true.
 
-nb_boundary_cells/3 collects all boundary cells in a grid as sorted R-C pairs.
+neighbor_boundary_cells/3 collects all boundary cells in a grid as sorted R-C pairs.
 
-?- nb_boundary_cells([[1,1],[1,1]], 0, Cells).
+?- neighbor_boundary_cells([[1,1],[1,1]], 0, Cells).
 Cells = [0-0, 0-1, 1-0, 1-1].
 
-?- nb_boundary_cells([[0,0,0],[0,1,0],[0,0,0]], 0, Cells).
+?- neighbor_boundary_cells([[0,0,0],[0,1,0],[0,0,0]], 0, Cells).
 Cells = [1-1].
 
-nb_interior_cells/3 collects all interior cells.
+neighbor_interior_cells/3 collects all interior cells.
 
-?- nb_interior_cells([[1,1,1],[1,1,1],[1,1,1]], 0, Cells).
+?- neighbor_interior_cells([[1,1,1],[1,1,1],[1,1,1]], 0, Cells).
 Cells = [1-1].
 
-?- nb_interior_cells([[1,1,1,1],[1,1,1,1],[1,1,1,1],[1,1,1,1]], 0, Cells).
+?- neighbor_interior_cells([[1,1,1,1],[1,1,1,1],[1,1,1,1],[1,1,1,1]], 0, Cells).
 Cells = [1-1, 1-2, 2-1, 2-2].
 
 
 75.4 Neighbor value analysis
 
-nb_count_same/4 counts 4-neighbors with the same value as the cell.
+neighbor_count_same/4 counts 4-neighbors with the same value as the cell.
 
-?- nb_count_same([[1,1,1],[1,1,1],[1,1,1]], 1, 1, N).
+?- neighbor_count_same([[1,1,1],[1,1,1],[1,1,1]], 1, 1, N).
 N = 4.
 
-?- nb_count_same([[1,0,1],[0,1,0],[1,0,1]], 1, 1, N).
+?- neighbor_count_same([[1,0,1],[0,1,0],[1,0,1]], 1, 1, N).
 N = 0.
 
-nb_count_diff/4 counts 4-neighbors with a different value.
+neighbor_count_diff/4 counts 4-neighbors with a different value.
 
-?- nb_count_diff([[0,0,0],[0,1,0],[0,0,0]], 1, 1, N).
+?- neighbor_count_diff([[0,0,0],[0,1,0],[0,0,0]], 1, 1, N).
 N = 4.
 
-nb_adjacent_colors/4 returns the sorted set of distinct values found among
+neighbor_adjacent_colors/4 returns the sorted set of distinct values found among
 4-neighbors.
 
-?- nb_adjacent_colors([[1,2,3],[4,5,6],[7,8,9]], 1, 1, Colors).
+?- neighbor_adjacent_colors([[1,2,3],[4,5,6],[7,8,9]], 1, 1, Colors).
 Colors = [2, 4, 6, 8].
 
-?- nb_adjacent_colors([[0,0,0],[0,1,0],[0,0,0]], 1, 1, Colors).
+?- neighbor_adjacent_colors([[0,0,0],[0,1,0],[0,0,0]], 1, 1, Colors).
 Colors = [0].
 
 
 75.5 Contour of a color
 
-nb_contour/3 finds all cells of a specific Color that are adjacent to
+neighbor_contour/3 finds all cells of a specific Color that are adjacent to
 something different (a different color or the grid boundary).
 
-?- nb_contour([[0,0,0],[0,1,0],[0,0,0]], 1, Cells).
+?- neighbor_contour([[0,0,0],[0,1,0],[0,0,0]], 1, Cells).
 Cells = [1-1].
 
-?- nb_contour([[1,1,1],[1,1,1],[1,1,1]], 1, Cells).
+?- neighbor_contour([[1,1,1],[1,1,1],[1,1,1]], 1, Cells).
 Cells = [0-0, 0-1, 0-2, 1-0, 1-2, 2-0, 2-1, 2-2].
 
 The center cell (1,1) is not in the contour because all 4-neighbors have
 color 1.
 
-?- nb_contour([[1,1],[1,1]], 1, Cells).
+?- neighbor_contour([[1,1],[1,1]], 1, Cells).
 Cells = [0-0, 0-1, 1-0, 1-1].
 
 
 75.6 Color contact queries
 
-nb_color_touches/3 succeeds if any cell of ColorA is 4-adjacent to any
+neighbor_color_touches/3 succeeds if any cell of ColorA is 4-adjacent to any
 cell of ColorB.
 
-?- nb_color_touches([[1,2],[0,0]], 1, 2).
+?- neighbor_color_touches([[1,2],[0,0]], 1, 2).
 true.
 
-?- nb_color_touches([[1,0],[0,2]], 1, 2).
+?- neighbor_color_touches([[1,0],[0,2]], 1, 2).
 false.
 
-nb_touching_pairs/4 enumerates all such 4-adjacency pairs.
+neighbor_touching_pairs/4 enumerates all such 4-adjacency pairs.
 
-?- nb_touching_pairs([[1,2],[0,0]], 1, 2, Pairs).
+?- neighbor_touching_pairs([[1,2],[0,0]], 1, 2, Pairs).
 Pairs = [(0-0)-(0-1)].
 
-?- nb_touching_pairs([[1,0],[0,2]], 1, 2, Pairs).
+?- neighbor_touching_pairs([[1,0],[0,2]], 1, 2, Pairs).
 Pairs = [].
 
 
 75.7 Flood fill
 
-nb_flood_fill/5 replaces the 4-connected region containing seed cell (R, C)
+neighbor_flood_fill/5 replaces the 4-connected region containing seed cell (R, C)
 with FillVal. The modified grid is returned. If the seed cell already has
 value FillVal, the grid is returned unchanged.
 
-?- nb_flood_fill([[1,1],[1,1]], 0, 0, 9, R).
+?- neighbor_flood_fill([[1,1],[1,1]], 0, 0, 9, R).
 R = [[9,9],[9,9]].
 
-?- nb_flood_fill([[1,0,1],[1,0,1]], 0, 0, 2, R).
+?- neighbor_flood_fill([[1,0,1],[1,0,1]], 0, 0, 2, R).
 R = [[2,0,1],[2,0,1]].
 
 The right column is unreachable from (0,0) because column 1 is 0.
 
-?- nb_flood_fill([[1,1],[1,1]], 0, 0, 1, R).
+?- neighbor_flood_fill([[1,1],[1,1]], 0, 0, 1, R).
 R = [[1,1],[1,1]].
 
 
 75.8 Dilation
 
-nb_dilate/4 expands a Color region by one cell in all 4-connected directions.
+neighbor_dilate/4 expands a Color region by one cell in all 4-connected directions.
 Every Bg cell adjacent to any Color cell is set to Color.
 
-?- nb_dilate([[0,0,0],[0,1,0],[0,0,0]], 0, 1, R).
+?- neighbor_dilate([[0,0,0],[0,1,0],[0,0,0]], 0, 1, R).
 R = [[0,1,0],[1,1,1],[0,1,0]].
 
-?- nb_dilate([[0,0,0],[1,1,1],[0,0,0]], 0, 1, R).
+?- neighbor_dilate([[0,0,0],[1,1,1],[0,0,0]], 0, 1, R).
 R = [[1,1,1],[1,1,1],[1,1,1]].
 
 Non-Bg cells of other colors are not overwritten.
 
-?- nb_dilate([[0,2,0],[0,1,0],[0,0,0]], 0, 1, R),
+?- neighbor_dilate([[0,2,0],[0,1,0],[0,0,0]], 0, 1, R),
    nth0(0, R, Row0), nth0(1, Row0, V).
 V = 2.
 
@@ -11309,42 +11309,42 @@ V = 2.
 Determine whether a region has any interior cells (solid fill) or only
 boundary cells (hollow ring):
 
-?- nb_interior_cells(Grid, 0, Interior),
+?- neighbor_interior_cells(Grid, 0, Interior),
    (Interior = [] -> write(hollow) ; write(solid)).
 
 Find where two colors meet and highlight the contact zone:
 
-?- nb_touching_pairs(Grid, 1, 2, Pairs),
+?- neighbor_touching_pairs(Grid, 1, 2, Pairs),
    maplist([(R-_)-_]>>(write(R)), Pairs).
 
 Erode a region by removing its contour:
 
-?- nb_contour(Grid, 1, ContourCells),
-   foldl([R-C, G0, G1]>>(nb_set_cell_(G0,R,C,0,G1)), ContourCells, Grid, Eroded).
+?- neighbor_contour(Grid, 1, ContourCells),
+   foldl([R-C, G0, G1]>>(neighbor_set_cell_(G0,R,C,0,G1)), ContourCells, Grid, Eroded).
 
 Compute the outline of a color and then dilate back to recover the original:
 
-?- nb_contour(Grid, 1, Outline),
-   nb_dilate(OutlineGrid, 0, 1, Recovered).
+?- neighbor_contour(Grid, 1, Outline),
+   neighbor_dilate(OutlineGrid, 0, 1, Recovered).
 
 
 75.10 Summary
 
 Predicate             Arity  Purpose
-nb_4neighbors         4      nb(R,C,V) list of valid 4-neighbors
-nb_8neighbors         4      nb(R,C,V) list of valid 8-neighbors
-nb_is_boundary        4      test: non-Bg cell with Bg/OOB 4-neighbor
-nb_is_interior        4      test: non-Bg cell with all in-bounds non-Bg 4-neighbors
-nb_boundary_cells     3      sorted R-C pairs of all boundary cells
-nb_interior_cells     3      sorted R-C pairs of all interior cells
-nb_count_same         4      count of 4-neighbors with same color
-nb_count_diff         4      count of 4-neighbors with different color
-nb_adjacent_colors    4      sorted distinct colors among 4-neighbors
-nb_contour            3      sorted R-C pairs of Color cells touching non-Color
-nb_color_touches      3      succeed if ColorA 4-adjacent to ColorB anywhere
-nb_touching_pairs     4      sorted (R1-C1)-(R2-C2) pairs of color adjacencies
-nb_flood_fill         5      4-connected flood fill from seed; returns modified grid
-nb_dilate             4      expand Color region by one 4-connected layer
+neighbor_4neighbors         4      nb(R,C,V) list of valid 4-neighbors
+neighbor_8neighbors         4      nb(R,C,V) list of valid 8-neighbors
+neighbor_is_boundary        4      test: non-Bg cell with Bg/OOB 4-neighbor
+neighbor_is_interior        4      test: non-Bg cell with all in-bounds non-Bg 4-neighbors
+neighbor_boundary_cells     3      sorted R-C pairs of all boundary cells
+neighbor_interior_cells     3      sorted R-C pairs of all interior cells
+neighbor_count_same         4      count of 4-neighbors with same color
+neighbor_count_diff         4      count of 4-neighbors with different color
+neighbor_adjacent_colors    4      sorted distinct colors among 4-neighbors
+neighbor_contour            3      sorted R-C pairs of Color cells touching non-Color
+neighbor_color_touches      3      succeed if ColorA 4-adjacent to ColorB anywhere
+neighbor_touching_pairs     4      sorted (R1-C1)-(R2-C2) pairs of color adjacencies
+neighbor_flood_fill         5      4-connected flood fill from seed; returns modified grid
+neighbor_dilate             4      expand Color region by one 4-connected layer
 
 The neighbor pack lives at Layer 93, above the region pack (Layer 92).
 Chapter 76: Row and Column Permutation - The Permute Pack
@@ -12367,41 +12367,41 @@ draw a line segment onto it.
 
 The three enumeration predicates list every cell on a segment.
 
-li_hline(+R, +C1, +C2, -Cells) lists cells on the horizontal segment at row R
+line_hline(+R, +C1, +C2, -Cells) lists cells on the horizontal segment at row R
 from column C1 to column C2.
 
 Example:
 
-?- li_hline(1, 0, 3, Cells).
+?- line_hline(1, 0, 3, Cells).
 Cells = [1-0, 1-1, 1-2, 1-3]
 
-?- li_hline(0, 5, 2, Cells).
+?- line_hline(0, 5, 2, Cells).
 Cells = [0-2, 0-3, 0-4, 0-5]
 
 The columns are always returned in ascending order, regardless of whether C1 is
 smaller or larger than C2.
 
-li_vline(+C, +R1, +R2, -Cells) lists cells on the vertical segment at column C
+line_vline(+C, +R1, +R2, -Cells) lists cells on the vertical segment at column C
 from row R1 to row R2.
 
 Example:
 
-?- li_vline(2, 0, 3, Cells).
+?- line_vline(2, 0, 3, Cells).
 Cells = [0-2, 1-2, 2-2, 3-2]
 
 Rows are also returned in ascending order.
 
-li_diag_seg(+R1, +C1, +R2, +C2, -Cells) lists cells on the 45-degree diagonal
+line_diag_seg(+R1, +C1, +R2, +C2, -Cells) lists cells on the 45-degree diagonal
 from (R1,C1) to (R2,C2). The path length must equal the column span:
 abs(R2-R1) must equal abs(C2-C1). Cells are returned in walk order from the
 start to the end.
 
 Example:
 
-?- li_diag_seg(0, 0, 2, 2, Cells).
+?- line_diag_seg(0, 0, 2, 2, Cells).
 Cells = [0-0, 1-1, 2-2]
 
-?- li_diag_seg(2, 0, 0, 2, Cells).
+?- line_diag_seg(2, 0, 0, 2, Cells).
 Cells = [2-0, 1-1, 0-2]
 
 
@@ -12410,23 +12410,23 @@ Cells = [2-0, 1-1, 0-2]
 The drawing predicates return a modified grid with a line segment painted to a
 given color. All row and column indices are 0-based.
 
-li_draw_h(+Grid, +R, +C1, +C2, +Color, -Result) draws a horizontal line.
-li_draw_v(+Grid, +C, +R1, +R2, +Color, -Result) draws a vertical line.
-li_draw_diag(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) draws a 45-degree
+line_draw_h(+Grid, +R, +C1, +C2, +Color, -Result) draws a horizontal line.
+line_draw_v(+Grid, +C, +R1, +R2, +Color, -Result) draws a vertical line.
+line_draw_diag(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) draws a 45-degree
 diagonal line.
 
 Example:
 
 ?- Grid = [[0,0,0],[0,0,0],[0,0,0]],
-   li_draw_h(Grid, 1, 0, 2, 5, Result).
+   line_draw_h(Grid, 1, 0, 2, 5, Result).
 Result = [[0,0,0],[5,5,5],[0,0,0]]
 
 ?- Grid = [[0,0,0],[0,0,0],[0,0,0]],
-   li_draw_v(Grid, 1, 0, 2, 4, Result).
+   line_draw_v(Grid, 1, 0, 2, 4, Result).
 Result = [[0,4,0],[0,4,0],[0,4,0]]
 
 ?- Grid = [[0,0,0],[0,0,0],[0,0,0]],
-   li_draw_diag(Grid, 0, 0, 2, 2, 1, Result).
+   line_draw_diag(Grid, 0, 0, 2, 2, 1, Result).
 Result = [[1,0,0],[0,1,0],[0,0,1]]
 
 
@@ -12435,106 +12435,106 @@ Result = [[1,0,0],[0,1,0],[0,0,1]]
 The alignment predicates test whether two cells share a row, column, diagonal,
 or anti-diagonal. They succeed or fail; they produce no output terms.
 
-li_same_row(+R1, +C1, +R2, +C2) - cells share a row if R1 =:= R2.
-li_same_col(+R1, +C1, +R2, +C2) - cells share a column if C1 =:= C2.
-li_same_diag(+R1, +C1, +R2, +C2) - cells share a diagonal if C1 - R1 =:= C2 - R2.
-li_same_anti(+R1, +C1, +R2, +C2) - cells share an anti-diagonal if R1 + C1 =:= R2 + C2.
+line_same_row(+R1, +C1, +R2, +C2) - cells share a row if R1 =:= R2.
+line_same_col(+R1, +C1, +R2, +C2) - cells share a column if C1 =:= C2.
+line_same_diag(+R1, +C1, +R2, +C2) - cells share a diagonal if C1 - R1 =:= C2 - R2.
+line_same_anti(+R1, +C1, +R2, +C2) - cells share an anti-diagonal if R1 + C1 =:= R2 + C2.
 
 Example:
 
-?- li_same_diag(0, 0, 2, 2).
+?- line_same_diag(0, 0, 2, 2).
 true.
 
-?- li_same_anti(0, 4, 2, 2).
+?- line_same_anti(0, 4, 2, 2).
 true.
 
-?- li_same_row(1, 3, 2, 3).
+?- line_same_row(1, 3, 2, 3).
 false.
 
 
 82.5 Collinearity Test
 
-li_collinear(+R1, +C1, +R2, +C2, +R3, +C3) succeeds if three cells are
+line_collinear(+R1, +C1, +R2, +C2, +R3, +C3) succeeds if three cells are
 collinear: they all lie on the same row, the same column, the same diagonal
 (C - R constant), or the same anti-diagonal (R + C constant).
 
 Example:
 
-?- li_collinear(2, 0, 2, 3, 2, 7).
+?- line_collinear(2, 0, 2, 3, 2, 7).
 true.
 
-?- li_collinear(0, 0, 1, 1, 3, 3).
+?- line_collinear(0, 0, 1, 1, 3, 3).
 true.
 
-?- li_collinear(0, 0, 1, 2, 2, 2).
+?- line_collinear(0, 0, 1, 2, 2, 2).
 false.
 
 
 82.6 Endpoints
 
-li_endpoints(+Cells, -First, -Last) extracts the first and last R-C pair from
+line_endpoints(+Cells, -First, -Last) extracts the first and last R-C pair from
 a non-empty list of cells. This is useful when you have a segment computed by
-li_hline, li_vline, or li_diag_seg and need only the boundary cells.
+line_hline, line_vline, or line_diag_seg and need only the boundary cells.
 
 Example:
 
-?- li_endpoints([0-0, 1-1, 2-2], First, Last).
+?- line_endpoints([0-0, 1-1, 2-2], First, Last).
 First = 0-0, Last = 2-2.
 
-?- li_endpoints([3-5], First, Last).
+?- line_endpoints([3-5], First, Last).
 First = 3-5, Last = 3-5.
 
 
 82.7 Interior Gap
 
-li_gap(+R1, +C1, +R2, +C2, -Gap) returns the cells strictly between two
+line_gap(+R1, +C1, +R2, +C2, -Gap) returns the cells strictly between two
 aligned points, excluding both endpoints. The two input cells must be on the
 same row, column, diagonal, or anti-diagonal. If they are adjacent, Gap = [].
 
 Example:
 
-?- li_gap(1, 0, 1, 4, Gap).
+?- line_gap(1, 0, 1, 4, Gap).
 Gap = [1-1, 1-2, 1-3].
 
-?- li_gap(0, 2, 3, 2, Gap).
+?- line_gap(0, 2, 3, 2, Gap).
 Gap = [1-2, 2-2].
 
-?- li_gap(0, 0, 0, 1, Gap).
+?- line_gap(0, 0, 0, 1, Gap).
 Gap = [].
 
 
 82.8 Segment Type Classification
 
-li_line_type(+R1, +C1, +R2, +C2, -Type) classifies the segment from (R1,C1)
+line_line_type(+R1, +C1, +R2, +C2, -Type) classifies the segment from (R1,C1)
 to (R2,C2). Type is one of: point (same cell), horizontal, vertical, diagonal,
 anti_diagonal, or other.
 
 Example:
 
-?- li_line_type(2, 0, 2, 5, Type).
+?- line_line_type(2, 0, 2, 5, Type).
 Type = horizontal.
 
-?- li_line_type(0, 0, 3, 3, Type).
+?- line_line_type(0, 0, 3, 3, Type).
 Type = diagonal.
 
-?- li_line_type(4, 4, 4, 4, Type).
+?- line_line_type(4, 4, 4, 4, Type).
 Type = point.
 
 
 82.9 Implementation Notes
 
 Determinism is achieved through three strategies. Enumeration predicates
-(li_hline, li_vline) use maplist/3 with unification lambdas of the form
+(line_hline, line_vline) use maplist/3 with unification lambdas of the form
 [X, RC]>>(RC = R-X) rather than [X, R-X]>>true; the explicit unification in
 the lambda body commits the result without leaving a choicepoint.
 
-li_diag_walk_ and li_fill_cells_ use if-then-else instead of two-clause
+line_diag_walk_ and line_fill_cells_ use if-then-else instead of two-clause
 recursion, so Prolog does not retain a choicepoint after reaching the base case.
 
-li_collinear and li_line_type use if-then-else chains; the -> commit operator
+line_collinear and line_line_type use if-then-else chains; the -> commit operator
 prevents backtracking into later alternatives once a condition is satisfied.
 
-li_replace_nth_ and li_last_ carry cuts on their base cases for the same reason.
+line_replace_nth_ and line_last_ carry cuts on their base cases for the same reason.
 
 Built-ins used without import: length/2.
 Imported from library(lists): nth0/3, numlist/3, append/2.
@@ -14201,9 +14201,9 @@ right-to-left. The result is a list of hull vertices in clockwise order
 in screen coordinates (row increasing downward).
 
 
-89.1 Computing the Hull - hu_convex_hull/2
+89.1 Computing the Hull - hull_convex_hull/2
 
-hu_convex_hull(+Cells, -Hull)
+hull_convex_hull(+Cells, -Hull)
 
 Hull is a list of R-C vertex cells forming the convex hull of Cells.
 Vertices are in clockwise screen order (R increases downward). Collinear
@@ -14212,21 +14212,21 @@ points are excluded - only the corner vertices are kept.
 Examples:
 
 % Five cells: four corners plus center; only the corners are on the hull.
-hu_convex_hull([0-0, 0-2, 2-0, 2-2, 1-1], Hull).
+hull_convex_hull([0-0, 0-2, 2-0, 2-2, 1-1], Hull).
 % sort(Hull, S), S = [0-0, 0-2, 2-0, 2-2]
 
 % Three collinear cells: hull has only the two endpoints.
-hu_convex_hull([0-0, 0-1, 0-2], Hull).
+hull_convex_hull([0-0, 0-1, 0-2], Hull).
 % sort(Hull, S), S = [0-0, 0-2]
 
 % Single cell: hull is just that cell.
-hu_convex_hull([1-1], Hull).
+hull_convex_hull([1-1], Hull).
 % Hull = [1-1]
 
 
-89.2 Convexity Test - hu_is_convex/1
+89.2 Convexity Test - hull_is_convex/1
 
-hu_is_convex(+Cells)
+hull_is_convex(+Cells)
 
 Succeed if Cells is a convex discrete shape: the set of cells must equal
 the complete set of grid cells inside (or on) its convex hull.
@@ -14234,149 +14234,149 @@ the complete set of grid cells inside (or on) its convex hull.
 Examples:
 
 % A filled 3x3 grid is convex.
-hu_is_convex([0-0,0-1,0-2,1-0,1-1,1-2,2-0,2-1,2-2]).  % succeeds
+hull_is_convex([0-0,0-1,0-2,1-0,1-1,1-2,2-0,2-1,2-2]).  % succeeds
 
 % An L-shape has cell (1,1) inside its hull but not in the set.
-hu_is_convex([0-0, 1-0, 2-0, 2-1, 2-2]).  % fails
+hull_is_convex([0-0, 1-0, 2-0, 2-1, 2-2]).  % fails
 
 
 89.3 Hull Size and Area
 
-hu_hull_size(+Cells, -N) - count hull vertices
-hu_hull_area2(+Cells, -A2) - twice the hull area (integer shoelace, 0 for degenerate)
+hull_hull_size(+Cells, -N) - count hull vertices
+hull_hull_area2(+Cells, -A2) - twice the hull area (integer shoelace, 0 for degenerate)
 
 Examples:
 
 % Unit square: 4 vertices, twice area = 2.
-hu_hull_size([0-0, 0-1, 1-0, 1-1], N).   % N = 4
-hu_hull_area2([0-0, 0-1, 1-0, 1-1], A2). % A2 = 2
+hull_hull_size([0-0, 0-1, 1-0, 1-1], N).   % N = 4
+hull_hull_area2([0-0, 0-1, 1-0, 1-1], A2). % A2 = 2
 
 % 2-unit square: twice area = 8.
-hu_hull_area2([0-0, 0-2, 2-0, 2-2], A2). % A2 = 8
+hull_hull_area2([0-0, 0-2, 2-0, 2-2], A2). % A2 = 8
 
 
-89.4 Point-in-Hull Test - hu_in_hull/3
+89.4 Point-in-Hull Test - hull_in_hull/3
 
-hu_in_hull(+R, +C, +Hull)
+hull_in_hull(+R, +C, +Hull)
 
 Succeed if (R,C) lies inside or on the convex hull Hull. Handles 0, 1, and
 2-vertex degenerate cases. For 3+ vertices: all edge cross products Z =< 0.
 
 Examples:
 
-hu_convex_hull([0-0, 0-2, 2-0, 2-2], Hull).
-hu_in_hull(1, 1, Hull).  % succeeds (center)
-hu_in_hull(2, 1, Hull).  % succeeds (boundary)
-hu_in_hull(3, 3, Hull).  % fails (outside)
+hull_convex_hull([0-0, 0-2, 2-0, 2-2], Hull).
+hull_in_hull(1, 1, Hull).  % succeeds (center)
+hull_in_hull(2, 1, Hull).  % succeeds (boundary)
+hull_in_hull(3, 3, Hull).  % fails (outside)
 
 
-89.5 All Cells Inside the Hull - hu_cells_in_hull/3
+89.5 All Cells Inside the Hull - hull_cells_in_hull/3
 
-hu_cells_in_hull(+Grid, +Cells, -InHull)
+hull_cells_in_hull(+Grid, +Cells, -InHull)
 
 InHull is the sorted list of all grid cells inside or on the convex hull.
 
 Grid = [[0,0,0],[0,0,0],[0,0,0]].
-hu_cells_in_hull(Grid, [0-0, 0-2, 2-0, 2-2], InHull).
+hull_cells_in_hull(Grid, [0-0, 0-2, 2-0, 2-2], InHull).
 % length(InHull, 9)
 
 
-89.6 Filling the Hull Region - hu_fill_hull/4
+89.6 Filling the Hull Region - hull_fill_hull/4
 
-hu_fill_hull(+Grid, +Cells, +Color, -Out)
+hull_fill_hull(+Grid, +Cells, +Color, -Out)
 
 Out is Grid with every cell inside the hull set to Color.
 
-hu_fill_hull([[0,0,0],[0,0,0],[0,0,0]], [0-0, 0-2, 2-0], 3, Out).
+hull_fill_hull([[0,0,0],[0,0,0],[0,0,0]], [0-0, 0-2, 2-0], 3, Out).
 % Out = [[3,3,3],[3,3,0],[3,0,0]]
 
 
-89.7 Finding Concavities - hu_concavities/4
+89.7 Finding Concavities - hull_concavities/4
 
-hu_concavities(+Grid, +Cells, +Bg, -Missing)
+hull_concavities(+Grid, +Cells, +Bg, -Missing)
 
 Missing is the sorted list of Bg cells inside the hull but absent from Cells.
 
 Grid = [[0,0,0],[0,0,0],[0,0,0]].
-hu_concavities(Grid, [0-0,1-0,2-0,2-1,2-2], 0, Missing).
+hull_concavities(Grid, [0-0,1-0,2-0,2-1,2-2], 0, Missing).
 % Missing = [1-1]
 
 
-89.8 Diameter - hu_diameter/4
+89.8 Diameter - hull_diameter/4
 
-hu_diameter(+Cells, -P1, -P2, -D2)
+hull_diameter(+Cells, -P1, -P2, -D2)
 
 P1 and P2 are the farthest pair; D2 is their squared Euclidean distance.
 
-hu_diameter([0-0, 0-2, 2-0, 2-2], _P1, _P2, D2). % D2 = 8
+hull_diameter([0-0, 0-2, 2-0, 2-2], _P1, _P2, D2). % D2 = 8
 
 
-89.9 Hull Dimensions - hu_aspect/3
+89.9 Hull Dimensions - hull_aspect/3
 
-hu_aspect(+Cells, -H, -W)
+hull_aspect(+Cells, -H, -W)
 
 H = MaxR - MinR, W = MaxC - MinC of the hull bounding box.
 
-hu_aspect([0-0, 0-2, 2-0, 2-2], H, W). % H=2, W=2
+hull_aspect([0-0, 0-2, 2-0, 2-2], H, W). % H=2, W=2
 
 
-89.10 Rectangle Test - hu_is_rect/1
+89.10 Rectangle Test - hull_is_rect/1
 
-hu_is_rect(+Cells)
+hull_is_rect(+Cells)
 
 Succeed if the hull has 4 vertices and all angles are exactly 90 degrees.
 Works for axis-aligned and tilted rectangles.
 
-hu_is_rect([0-1, 1-2, 2-1, 1-0]).  % succeeds (tilted square)
+hull_is_rect([0-1, 1-2, 2-1, 1-0]).  % succeeds (tilted square)
 
 
-89.11 Hull Perimeter - hu_hull_perim2/2
+89.11 Hull Perimeter - hull_hull_perim2/2
 
-hu_hull_perim2(+Cells, -P2)
+hull_hull_perim2(+Cells, -P2)
 
 P2 is the sum of squared edge lengths (integer proxy, no floating-point).
 
-hu_hull_perim2([0-0, 0-1, 1-0, 1-1], P2). % P2=4
-hu_hull_perim2([0-0, 0-2, 2-0], P2).       % P2=16
+hull_hull_perim2([0-0, 0-1, 1-0, 1-1], P2). % P2=4
+hull_hull_perim2([0-0, 0-2, 2-0], P2).       % P2=16
 
 
-89.12 Centroid - hu_centroid/3
+89.12 Centroid - hull_centroid/3
 
-hu_centroid(+Cells, -AvgR, -AvgC)
+hull_centroid(+Cells, -AvgR, -AvgC)
 
 Integer floor of the average row and column of the hull vertices.
 
-hu_centroid([0-0, 0-2, 2-0, 2-2], AvgR, AvgC). % AvgR=1, AvgC=1
+hull_centroid([0-0, 0-2, 2-0, 2-2], AvgR, AvgC). % AvgR=1, AvgC=1
 
 
-89.13 Containment Test - hu_hull_contains/2
+89.13 Containment Test - hull_hull_contains/2
 
-hu_hull_contains(+Cells, +SubCells)
+hull_hull_contains(+Cells, +SubCells)
 
 Succeed if every cell in SubCells is inside or on the hull of Cells.
 
-hu_hull_contains([0-0, 0-2, 2-0, 2-2], [1-1]).  % succeeds
-hu_hull_contains([0-0, 0-2, 2-0, 2-2], [5-5]).  % fails
+hull_hull_contains([0-0, 0-2, 2-0, 2-2], [1-1]).  % succeeds
+hull_hull_contains([0-0, 0-2, 2-0, 2-2], [5-5]).  % fails
 
 
 89.14 Summary
 
 The hull pack provides convex hull computation and polygon geometry:
 
-- hu_convex_hull     - compute convex hull vertices (CW screen order)
-- hu_is_convex       - test if a cell set equals its hull interior
-- hu_hull_size       - count hull vertices
-- hu_hull_area2      - twice the hull area (integer shoelace)
-- hu_in_hull         - test if a point is inside/on the hull
-- hu_cells_in_hull   - all grid cells inside the hull
-- hu_fill_hull       - paint hull interior with a color
-- hu_concavities     - Bg cells inside hull but absent from shape
-- hu_diameter        - farthest pair of cells (max squared distance)
-- hu_aspect          - hull bounding box height and width
-- hu_is_rect         - test for rectangular hull (4 right angles)
-- hu_hull_perim2     - sum of squared hull edge lengths
-- hu_centroid        - floor of average hull vertex position
-- hu_hull_contains   - test containment of a cell set
+- hull_convex_hull     - compute convex hull vertices (CW screen order)
+- hull_is_convex       - test if a cell set equals its hull interior
+- hull_hull_size       - count hull vertices
+- hull_hull_area2      - twice the hull area (integer shoelace)
+- hull_in_hull         - test if a point is inside/on the hull
+- hull_cells_in_hull   - all grid cells inside the hull
+- hull_fill_hull       - paint hull interior with a color
+- hull_concavities     - Bg cells inside hull but absent from shape
+- hull_diameter        - farthest pair of cells (max squared distance)
+- hull_aspect          - hull bounding box height and width
+- hull_is_rect         - test for rectangular hull (4 right angles)
+- hull_hull_perim2     - sum of squared hull edge lengths
+- hull_centroid        - floor of average hull vertex position
+- hull_hull_contains   - test containment of a cell set
 
 All predicates are deterministic. No floating-point arithmetic is used.
 The cross product and shoelace formula work entirely in integers.
@@ -14399,137 +14399,137 @@ Loading the Pack
 :- use_module(library(prologai/patch)).
 
 
-90.1 Extracting a Patch - pa_extract/6
+90.1 Extracting a Patch - patch_extract/6
 
-pa_extract(+Grid, +R0, +C0, +H, +W, -Patch)
+patch_extract(+Grid, +R0, +C0, +H, +W, -Patch)
 
 Patch is the H x W sub-grid starting at (R0, C0). All indices 0-based.
 
 Grid = [[1,2,3],[4,5,6],[7,8,9]].
-pa_extract(Grid, 0, 0, 2, 2, P).  % P = [[1,2],[4,5]]
-pa_extract(Grid, 1, 1, 2, 2, P).  % P = [[5,6],[8,9]]
-pa_extract(Grid, 1, 1, 1, 1, P).  % P = [[5]]
+patch_extract(Grid, 0, 0, 2, 2, P).  % P = [[1,2],[4,5]]
+patch_extract(Grid, 1, 1, 2, 2, P).  % P = [[5,6],[8,9]]
+patch_extract(Grid, 1, 1, 1, 1, P).  % P = [[5]]
 
 
-90.2 Patch Dimensions - pa_dims/3
+90.2 Patch Dimensions - patch_dims/3
 
-pa_dims(+Patch, -H, -W)
+patch_dims(+Patch, -H, -W)
 
 H is the row count, W is the column count. Empty patch gives 0, 0.
 
-pa_dims([[1,2,3],[4,5,6]], H, W).  % H=2, W=3
-pa_dims([], H, W).                 % H=0, W=0
+patch_dims([[1,2,3],[4,5,6]], H, W).  % H=2, W=3
+patch_dims([], H, W).                 % H=0, W=0
 
 
-90.3 Template Matching - pa_match/4
+90.3 Template Matching - patch_match/4
 
-pa_match(+Grid, +Patch, -R0, -C0)
+patch_match(+Grid, +Patch, -R0, -C0)
 
 Non-deterministically find all positions where Patch occurs exactly in Grid.
 Use once/1 for first match, findall/3 to collect all.
 
 Grid = [[1,2,1],[1,2,3],[4,5,6]].
-once(pa_match(Grid, [[1,2]], R0, C0)).     % R0=0, C0=0
-pa_match(Grid, [[9,9]], _, _).             % fails
-findall(R-C, pa_match(Grid, [[5]], R, C), L). % L = [1-1]
+once(patch_match(Grid, [[1,2]], R0, C0)).     % R0=0, C0=0
+patch_match(Grid, [[9,9]], _, _).             % fails
+findall(R-C, patch_match(Grid, [[5]], R, C), L). % L = [1-1]
 
 
 90.4 All Matches and Count
 
-pa_match_all(+Grid, +Patch, -Positions) - list of R0-C0 pairs (or [])
-pa_match_count(+Grid, +Patch, -N) - count of matches (0 if none)
+patch_match_all(+Grid, +Patch, -Positions) - list of R0-C0 pairs (or [])
+patch_match_count(+Grid, +Patch, -N) - count of matches (0 if none)
 
-pa_match_all([[1,0,1],[0,0,0],[1,0,0]], [[1]], Pos).
+patch_match_all([[1,0,1],[0,0,0],[1,0,0]], [[1]], Pos).
 % sort(Pos, S), S = [0-0, 0-2, 2-0]
 
-pa_match_count([[0,0,0],[0,0,0],[0,0,0]], [[0,0],[0,0]], N).
+patch_match_count([[0,0,0],[0,0,0],[0,0,0]], [[0,0],[0,0]], N).
 % N = 4
 
 
-90.5 Wildcard Matching - pa_match_bg/4
+90.5 Wildcard Matching - patch_match_bg/4
 
-pa_match_bg(+Grid, +Patch, +Bg, -Positions)
+patch_match_bg(+Grid, +Patch, +Bg, -Positions)
 
 Bg cells in Patch match any grid cell; non-Bg must match exactly.
 
 Grid = [[1,2,3],[4,5,6],[7,8,9]].
-pa_match_bg(Grid, [[0,2],[0,5]], 0, Pos).
+patch_match_bg(Grid, [[0,2],[0,5]], 0, Pos).
 % Pos = [0-0]  (0 is wildcard; 2 and 5 must match exactly)
 
 
-90.6 Sliding Window - pa_slides/4
+90.6 Sliding Window - patch_slides/4
 
-pa_slides(+Grid, +H, +W, -Patches)
+patch_slides(+Grid, +H, +W, -Patches)
 
 All H x W sub-patches as R0-C0-Patch triples, row-major order.
 
-pa_slides([[1,2,3],[4,5,6],[7,8,9]], 2, 2, P).
+patch_slides([[1,2,3],[4,5,6],[7,8,9]], 2, 2, P).
 % length(P, 4)
 % P = [0-0-[[1,2],[4,5]], 0-1-[[2,3],[5,6]], 1-0-..., 1-1-...]
 
 
 90.7 Unique Patches and Most Common
 
-pa_unique_patches(+Grid, +H, +W, -Unique)
+patch_unique_patches(+Grid, +H, +W, -Unique)
 Sorted list of distinct H x W patches (no duplicates).
 
-pa_most_common_patch(+Grid, +H, +W, -Patch, -Count)
+patch_most_common_patch(+Grid, +H, +W, -Patch, -Count)
 Most frequent H x W patch and its count. Ties go to first in sort order.
 
-pa_unique_patches([[1,1,1],[1,1,1],[1,1,1]], 2, 2, U).
+patch_unique_patches([[1,1,1],[1,1,1],[1,1,1]], 2, 2, U).
 % length(U, 1)
 
-pa_most_common_patch([[1],[1],[2]], 1, 1, Patch, Count).
+patch_most_common_patch([[1],[1],[2]], 1, 1, Patch, Count).
 % Patch = [[1]], Count = 2
 
 
-90.8 Patch Comparison - pa_diff/3
+90.8 Patch Comparison - patch_diff/3
 
-pa_diff(+PatchA, +PatchB, -Cells)
+patch_diff(+PatchA, +PatchB, -Cells)
 
 Cells where PatchA and PatchB differ (sorted R-C list, [] if identical).
 
-pa_diff([[1,2],[3,4]], [[1,2],[3,9]], C).  % C = [1-1]
-pa_diff([[1,2],[3,4]], [[1,2],[3,4]], C).  % C = []
+patch_diff([[1,2],[3,4]], [[1,2],[3,9]], C).  % C = [1-1]
+patch_diff([[1,2],[3,4]], [[1,2],[3,4]], C).  % C = []
 
 
-90.9 Uniformity - pa_is_uniform/2
+90.9 Uniformity - patch_is_uniform/2
 
-pa_is_uniform(+Patch, -Color)
+patch_is_uniform(+Patch, -Color)
 
 Succeed if all cells are Color. Fails for mixed patches.
 
-pa_is_uniform([[1,1],[1,1]], Color).  % Color = 1
-pa_is_uniform([[1,2],[3,4]], _).      % fails
+patch_is_uniform([[1,1],[1,1]], Color).  % Color = 1
+patch_is_uniform([[1,2],[3,4]], _).      % fails
 
 
 90.10 Geometric Operations
 
-pa_flip_h(+Patch, -Flipped) - reverse each row (left-right mirror)
-pa_flip_v(+Patch, -Flipped) - reverse row order (top-bottom mirror)
-pa_rot90(+Patch, -Rotated)  - 90 degrees CW; H x W → W x H
+patch_flip_h(+Patch, -Flipped) - reverse each row (left-right mirror)
+patch_flip_v(+Patch, -Flipped) - reverse row order (top-bottom mirror)
+patch_rot90(+Patch, -Rotated)  - 90 degrees CW; H x W → W x H
 
-pa_flip_h([[1,2,3]], F).            % F = [[3,2,1]]
-pa_flip_v([[1,2],[3,4]], F).        % F = [[3,4],[1,2]]
-pa_rot90([[1,2,3],[4,5,6]], R).     % R = [[4,1],[5,2],[6,3]]
+patch_flip_h([[1,2,3]], F).            % F = [[3,2,1]]
+patch_flip_v([[1,2],[3,4]], F).        % F = [[3,4],[1,2]]
+patch_rot90([[1,2,3],[4,5,6]], R).     % R = [[4,1],[5,2],[6,3]]
 
 
 90.11 Summary
 
-- pa_extract         - extract H x W sub-patch
-- pa_dims            - patch dimensions
-- pa_match           - find matching positions (non-deterministic)
-- pa_match_all       - all matches as list
-- pa_match_count     - count of matches
-- pa_match_bg        - match with wildcard background
-- pa_slides          - all H x W sub-patches
-- pa_unique_patches  - distinct patches in a grid
-- pa_most_common_patch - most frequent patch
-- pa_diff            - cells where two patches differ
-- pa_is_uniform      - test uniform color
-- pa_flip_h          - horizontal flip
-- pa_flip_v          - vertical flip
-- pa_rot90           - 90-degree clockwise rotation
+- patch_extract         - extract H x W sub-patch
+- patch_dims            - patch dimensions
+- patch_match           - find matching positions (non-deterministic)
+- patch_match_all       - all matches as list
+- patch_match_count     - count of matches
+- patch_match_bg        - match with wildcard background
+- patch_slides          - all H x W sub-patches
+- patch_unique_patches  - distinct patches in a grid
+- patch_most_common_patch - most frequent patch
+- patch_diff            - cells where two patches differ
+- patch_is_uniform      - test uniform color
+- patch_flip_h          - horizontal flip
+- patch_flip_v          - vertical flip
+- patch_rot90           - 90-degree clockwise rotation
 
 Next chapter: Chapter 91 covers the Signal Pack (1D signal analysis of grid rows and columns).
 
@@ -14570,28 +14570,28 @@ Chapter 92: Value Frequency Analysis - The Histogram Pack (hi_* prefix)
 The histogram pack (Work Package 131, Layer 110) provides 14 predicates for
 value frequency analysis of integer lists and 2D grids.
 
-hi_count([1,2,1,3,1], 1, N).         % N = 3
-hi_freq([3,1,2,1,3,3], Pairs).       % Pairs = [1-2, 2-1, 3-3]
-hi_mode([1,2,2,3,3,3], V, N).        % V=3, N=3
-hi_rare([1,2,2,3,3,3], V, N).        % V=1, N=1
-hi_mode([1,1,2,2], V, N).            % V=1, N=2 (tie: smallest wins)
-hi_rare([1,1,2,2], V, N).            % V=2, N=2 (tie: largest wins)
-hi_unique_vals([3,1,2,1,3], Vals).   % Vals = [1,2,3]
-hi_unique_count([1,1,2,3,3], N).     % N = 3
-hi_sorted_by_freq([1,2,2,3,3,3], P). % P = [3-3, 2-2, 1-1]
-hi_top_n([1,2,2,3,3,3], 2, T).      % T = [3-3, 2-2]
-hi_has_value([1,2,3], 2).            % true
-hi_all_equal([3,3,3], V).            % V = 3
-hi_grid_freq([[1,2],[2,3]], Pairs).  % Pairs = [1-1, 2-2, 3-1]
-hi_grid_mode([[1,2],[2,2]], C, N).   % C=2, N=3
-hi_grid_rare([[1,2,2,2]], C, N).     % C=1, N=1
-hi_rank([1,2,2,3,3,3], 3, R).       % R=1 (most common = rank 1)
+histogram_count([1,2,1,3,1], 1, N).         % N = 3
+histogram_freq([3,1,2,1,3,3], Pairs).       % Pairs = [1-2, 2-1, 3-3]
+histogram_mode([1,2,2,3,3,3], V, N).        % V=3, N=3
+histogram_rare([1,2,2,3,3,3], V, N).        % V=1, N=1
+histogram_mode([1,1,2,2], V, N).            % V=1, N=2 (tie: smallest wins)
+histogram_rare([1,1,2,2], V, N).            % V=2, N=2 (tie: largest wins)
+histogram_unique_vals([3,1,2,1,3], Vals).   % Vals = [1,2,3]
+histogram_unique_count([1,1,2,3,3], N).     % N = 3
+histogram_sorted_by_freq([1,2,2,3,3,3], P). % P = [3-3, 2-2, 1-1]
+histogram_top_n([1,2,2,3,3,3], 2, T).      % T = [3-3, 2-2]
+histogram_has_value([1,2,3], 2).            % true
+histogram_all_equal([3,3,3], V).            % V = 3
+histogram_grid_freq([[1,2],[2,3]], Pairs).  % Pairs = [1-1, 2-2, 3-1]
+histogram_grid_mode([[1,2],[2,2]], C, N).   % C=2, N=3
+histogram_grid_rare([[1,2,2,2]], C, N).     % C=1, N=1
+histogram_rank([1,2,2,3,3,3], 3, R).       % R=1 (most common = rank 1)
 
-hi_sorted_by_freq negates counts, applies keysort (stable), then recovers
+histogram_sorted_by_freq negates counts, applies keysort (stable), then recovers
 the originals, achieving descending-count order with value-ascending tiebreak.
 
-hi_top_n uses length/2 + append/3 to extract the first N pairs as a prefix.
-hi_all_equal uses forall(member(X, T), X =:= H) for uniform integer grids.
+histogram_top_n uses length/2 + append/3 to extract the first N pairs as a prefix.
+histogram_all_equal uses forall(member(X, T), X =:= H) for uniform integer grids.
 
 Predicate count: 14 (hi_* prefix). Tests: 42/42. Layer: 110.
 
@@ -14662,24 +14662,24 @@ Chapter 95: Row and Column Interleaving - The Interleave Pack (il_* prefix)
 The interleave pack (Work Package 134, Layer 113) provides 14 predicates for
 row/column interleaving, weaving, stride selection, and block partitioning.
 
-il_rows([[1,2],[3,4]], [[5,6],[7,8]], R).       % R = [[1,2],[5,6],[3,4],[7,8]]
-il_cols([[1,2],[3,4]], [[5,6],[7,8]], R).       % R = [[1,5,2,6],[3,7,4,8]]
-il_derows([[a],[b],[c],[d]], E, O).            % E=[[a],[c]], O=[[b],[d]]
-il_decols([[1,2,3,4]], E, O).                  % E=[[1,3]], O=[[2,4]]
-il_weave_rows([[1,2],[3,4],[5,6]], 0, W).      % W=[[1,2],[0,0],[3,4],[0,0],[5,6]]
-il_weave_cols([[1,2,3]], 0, W).               % W=[[1,0,2,0,3]]
-il_unweave_rows([[1,2],[0,0],[3,4],[0,0],[5,6]], Core).  % Core=[[1,2],[3,4],[5,6]]
-il_stride_rows([[r0],[r1],[r2],[r3]], 2, 0, S). % S=[[r0],[r2]]
-il_stride_cols([[1,2,3,4]], 2, 1, S).          % S=[[2,4]]
-il_select_rows([[r0],[r1],[r2]], [0,2], S).    % S=[[r0],[r2]]
-il_select_cols([[1,2,3],[4,5,6]], [1], S).     % S=[[2],[5]]
-il_rows_n([[[a],[b]],[[c],[d]],[[e],[f]]], R). % R=[[a],[c],[e],[b],[d],[f]]
-il_block_rows([[r0],[r1],[r2],[r3],[r4],[r5]], 2, Bs). % Bs=[[[r0],[r1]],[[r2],[r3]],[[r4],[r5]]]
+interleave_rows([[1,2],[3,4]], [[5,6],[7,8]], R).       % R = [[1,2],[5,6],[3,4],[7,8]]
+interleave_cols([[1,2],[3,4]], [[5,6],[7,8]], R).       % R = [[1,5,2,6],[3,7,4,8]]
+interleave_derows([[a],[b],[c],[d]], E, O).            % E=[[a],[c]], O=[[b],[d]]
+interleave_decols([[1,2,3,4]], E, O).                  % E=[[1,3]], O=[[2,4]]
+interleave_weave_rows([[1,2],[3,4],[5,6]], 0, W).      % W=[[1,2],[0,0],[3,4],[0,0],[5,6]]
+interleave_weave_cols([[1,2,3]], 0, W).               % W=[[1,0,2,0,3]]
+interleave_unweave_rows([[1,2],[0,0],[3,4],[0,0],[5,6]], Core).  % Core=[[1,2],[3,4],[5,6]]
+interleave_stride_rows([[r0],[r1],[r2],[r3]], 2, 0, S). % S=[[r0],[r2]]
+interleave_stride_cols([[1,2,3,4]], 2, 1, S).          % S=[[2,4]]
+interleave_select_rows([[r0],[r1],[r2]], [0,2], S).    % S=[[r0],[r2]]
+interleave_select_cols([[1,2,3],[4,5,6]], [1], S).     % S=[[2],[5]]
+interleave_rows_n([[[a],[b]],[[c],[d]],[[e],[f]]], R). % R=[[a],[c],[e],[b],[d],[f]]
+interleave_block_rows([[r0],[r1],[r2],[r3],[r4],[r5]], 2, Bs). % Bs=[[[r0],[r1]],[[r2],[r3]],[[r4],[r5]]]
 
-il_rows and il_cols merge; il_derows and il_decols split. il_weave_rows inserts
-background rows as separators; il_unweave_rows removes them. il_stride_rows uses
-findall + between + mod arithmetic; il_rows_n uses between + member for round-robin.
-il_block_rows uses length + append with if-then-else for partial last blocks.
+interleave_rows and interleave_cols merge; interleave_derows and interleave_decols split. interleave_weave_rows inserts
+background rows as separators; interleave_unweave_rows removes them. interleave_stride_rows uses
+findall + between + mod arithmetic; interleave_rows_n uses between + member for round-robin.
+interleave_block_rows uses length + append with if-then-else for partial last blocks.
 
 Predicate count: 14 (il_* prefix). Tests: 42/42. Layer: 113.
 
@@ -14691,25 +14691,25 @@ Chapter 96: Grid Panel Detection and Splitting - The Panel Pack (pn_* prefix)
 The panel pack (Work Package 135, Layer 114) provides 14 predicates for
 detecting and splitting grids at all-background divider rows and columns.
 
-pn_is_divider_row([[1,2],[0,0],[3,4]], 1, 0).     % true: row 1 is all-0
-pn_is_divider_col([[1,0,2],[3,0,4]], 1, 0).       % true: column 1 is all-0
-pn_divider_rows([[1],[0],[2],[0],[3]], 0, Rows).   % Rows = [1,3]
-pn_divider_cols([[0,1,0],[0,2,0]], 0, Cols).       % Cols = [0,2]
-pn_auto_split_rows([[1,2],[3,4],[0,0],[5,6],[7,8]], 0, Parts).
+panel_is_divider_row([[1,2],[0,0],[3,4]], 1, 0).     % true: row 1 is all-0
+panel_is_divider_col([[1,0,2],[3,0,4]], 1, 0).       % true: column 1 is all-0
+panel_divider_rows([[1],[0],[2],[0],[3]], 0, Rows).   % Rows = [1,3]
+panel_divider_cols([[0,1,0],[0,2,0]], 0, Cols).       % Cols = [0,2]
+panel_auto_split_rows([[1,2],[3,4],[0,0],[5,6],[7,8]], 0, Parts).
   % Parts = [[[1,2],[3,4]], [[5,6],[7,8]]]
-pn_auto_split_cols([[1,0,2],[3,0,4]], 0, Parts).  % Parts = [[[1],[3]],[[2],[4]]]
-pn_strip_rows([[1,2],[0,0],[3,4],[0,0],[5,6]], 0, S). % S = [[1,2],[3,4],[5,6]]
-pn_strip_cols([[1,0,2],[3,0,4]], 0, S).            % S = [[1,2],[3,4]]
-pn_quadrants([[1,2,3,4],[5,6,7,8],[a,b,c,d],[e,f,g,h]], TL, TR, BL, BR).
+panel_auto_split_cols([[1,0,2],[3,0,4]], 0, Parts).  % Parts = [[[1],[3]],[[2],[4]]]
+panel_strip_rows([[1,2],[0,0],[3,4],[0,0],[5,6]], 0, S). % S = [[1,2],[3,4],[5,6]]
+panel_strip_cols([[1,0,2],[3,0,4]], 0, S).            % S = [[1,2],[3,4]]
+panel_quadrants([[1,2,3,4],[5,6,7,8],[a,b,c,d],[e,f,g,h]], TL, TR, BL, BR).
   % TL=[[1,2],[5,6]], TR=[[3,4],[7,8]], BL=[[a,b],[e,f]], BR=[[c,d],[g,h]]
-pn_n_col_parts([[1,2,3,4,5,6]], 3, Parts). % Parts = [[[1,2]],[[3,4]],[[5,6]]]
-pn_col_slices([[1,2,3,4,5,6]], [2,3,1], Parts). % Parts=[[[1,2]],[[3,4,5]],[[6]]]
-pn_has_dividers([[1,2],[0,0],[3,4]], 0).          % true
+panel_n_col_parts([[1,2,3,4,5,6]], 3, Parts). % Parts = [[[1,2]],[[3,4]],[[5,6]]]
+panel_col_slices([[1,2,3,4,5,6]], [2,3,1], Parts). % Parts=[[[1,2]],[[3,4,5]],[[6]]]
+panel_has_dividers([[1,2],[0,0],[3,4]], 0).          % true
 
-pn_split_rows uses a two-clause recursive helper with cut on the base case.
-pn_slice_row_ uses length/2 + append/3 for column range extraction.
-pn_quadrants computes midpoints with integer division.
-pn_col_slices uses pn_cumsum_ to compute running totals from width list.
+panel_split_rows uses a two-clause recursive helper with cut on the base case.
+panel_slice_row_ uses length/2 + append/3 for column range extraction.
+panel_quadrants computes midpoints with integer division.
+panel_col_slices uses panel_cumsum_ to compute running totals from width list.
 
 Predicate count: 14 (pn_* prefix). Tests: 42/42. Layer: 114.
 
@@ -14859,37 +14859,37 @@ The locate pack (Work Package 139, Layer 118) provides 14 predicates for
 finding sub-patterns, matching row/column sequences, and locating unique markers.
 
 Predicates:
-lc_subgrid_at(+Grid, +Sub, +R0, +C0).   % test if Sub appears at (R0,C0)
-lc_find_sub(+Grid, +Sub, -R0, -C0).     % first position where Sub matches
-lc_all_sub(+Grid, +Sub, -Positions).    % all R0-C0 where Sub matches
-lc_subgrid_count(+Grid, +Sub, -N).      % count of Sub occurrences
-lc_row_pattern(+Grid, +Pattern, -R).    % first row index matching Pattern
-lc_all_row_pattern(+Grid, +Pattern, -Rows). % all row indices matching Pattern
-lc_col_pattern(+Grid, +Pattern, -C).    % first column index matching Pattern
-lc_all_col_pattern(+Grid, +Pattern, -Cols). % all column indices matching Pattern
-lc_row_prefix(+Grid, +R, +Prefix, -Rest). % row R = Prefix ++ Rest
-lc_row_suffix(+Grid, +R, +Suffix).      % row R ends with Suffix
-lc_anchor(+Grid, +V, -R, -C).           % unique cell with value V (exactly 1)
-lc_row_count(+Grid, +V, -Counts).       % list of V counts per row
-lc_row_contains(+Grid, +V, -Rows).      % sorted rows containing V
-lc_col_contains(+Grid, +V, -Cols).      % sorted columns containing V
+locate_subgrid_at(+Grid, +Sub, +R0, +C0).   % test if Sub appears at (R0,C0)
+locate_find_sub(+Grid, +Sub, -R0, -C0).     % first position where Sub matches
+locate_all_sub(+Grid, +Sub, -Positions).    % all R0-C0 where Sub matches
+locate_subgrid_count(+Grid, +Sub, -N).      % count of Sub occurrences
+locate_row_pattern(+Grid, +Pattern, -R).    % first row index matching Pattern
+locate_all_row_pattern(+Grid, +Pattern, -Rows). % all row indices matching Pattern
+locate_col_pattern(+Grid, +Pattern, -C).    % first column index matching Pattern
+locate_all_col_pattern(+Grid, +Pattern, -Cols). % all column indices matching Pattern
+locate_row_prefix(+Grid, +R, +Prefix, -Rest). % row R = Prefix ++ Rest
+locate_row_suffix(+Grid, +R, +Suffix).      % row R ends with Suffix
+locate_anchor(+Grid, +V, -R, -C).           % unique cell with value V (exactly 1)
+locate_row_count(+Grid, +V, -Counts).       % list of V counts per row
+locate_row_contains(+Grid, +V, -Rows).      % sorted rows containing V
+locate_col_contains(+Grid, +V, -Cols).      % sorted columns containing V
 
 Examples:
-lc_subgrid_at([[1,2,3],[4,5,6],[7,8,9]], [[5,6],[8,9]], 1, 1). % true
-lc_find_sub([[0,0,0],[0,1,0],[0,0,0]], [[1]], R, C).  % R=1, C=1
-lc_all_sub([[1,0,1],[0,0,0],[1,0,1]], [[1]], P).      % P=[0-0,0-2,2-0,2-2]
-lc_row_pattern([[0,0],[1,2],[0,0]], [1,2], R).         % R=1
-lc_col_pattern([[1,0],[2,0],[3,0]], [1,2,3], C).       % C=0
-lc_anchor([[0,0,0],[0,9,0],[0,0,0]], 9, R, C).         % R=1, C=1
-lc_row_count([[1,0,1],[0,0,0],[1,1,0]], 1, Counts).    % Counts=[2,0,2]
-lc_col_contains([[1,0,1],[0,1,0]], 1, Cols).           % Cols=[0,1,2]
+locate_subgrid_at([[1,2,3],[4,5,6],[7,8,9]], [[5,6],[8,9]], 1, 1). % true
+locate_find_sub([[0,0,0],[0,1,0],[0,0,0]], [[1]], R, C).  % R=1, C=1
+locate_all_sub([[1,0,1],[0,0,0],[1,0,1]], [[1]], P).      % P=[0-0,0-2,2-0,2-2]
+locate_row_pattern([[0,0],[1,2],[0,0]], [1,2], R).         % R=1
+locate_col_pattern([[1,0],[2,0],[3,0]], [1,2,3], C).       % C=0
+locate_anchor([[0,0,0],[0,9,0],[0,0,0]], 9, R, C).         % R=1, C=1
+locate_row_count([[1,0,1],[0,0,0],[1,1,0]], 1, Counts).    % Counts=[2,0,2]
+locate_col_contains([[1,0,1],[0,1,0]], 1, Cols).           % Cols=[0,1,2]
 
-lc_subgrid_at: forall/2 over all Sub positions; each checks Grid offset cell.
-lc_find_sub: between/3 enumeration + lc_subgrid_at + cut.
-lc_col_pattern: inner findall extracts column values; unifies with Pattern; cut.
-lc_all_col_pattern: outer findall where inner findall unifies column with Pattern.
-lc_row_suffix: append(_, Suffix, Row) + cut for deterministic existence test.
-lc_anchor: findall of all V cells; single-element [R-C] pattern for uniqueness.
+locate_subgrid_at: forall/2 over all Sub positions; each checks Grid offset cell.
+locate_find_sub: between/3 enumeration + locate_subgrid_at + cut.
+locate_col_pattern: inner findall extracts column values; unifies with Pattern; cut.
+locate_all_col_pattern: outer findall where inner findall unifies column with Pattern.
+locate_row_suffix: append(_, Suffix, Row) + cut for deterministic existence test.
+locate_anchor: findall of all V cells; single-element [R-C] pattern for uniqueness.
 
 Predicate count: 14 (lc_* prefix). Tests: 42/42. Layer: 118.
 
@@ -15050,40 +15050,40 @@ A mask is a same-size grid where each cell is 0 (disabled) or 1 (enabled).
 Layer 122, Work Package 143.
 
 Public predicates:
-mk_from_val(+Grid, +V, -Mask).       % 1 where Grid=V, else 0
-mk_from_bg(+Grid, +Bg, -Mask).       % 0 where Grid=Bg, else 1
-mk_invert(+Mask, -Mask2).            % flip all bits
-mk_and(+MaskA, +MaskB, -MaskC).      % element-wise AND
-mk_or(+MaskA, +MaskB, -MaskC).       % element-wise OR
-mk_xor(+MaskA, +MaskB, -MaskC).      % element-wise XOR
-mk_apply(+Grid, +Mask, +Bg, -Grid2). % keep Grid at 1-cells, Bg at 0-cells
-mk_fill(+Grid, +Mask, +V, -Grid2).   % set V at 1-cells, keep Grid at 0-cells
-mk_overlay(+GA, +GB, +Mask, -Grid2). % GB at 1-cells, GA at 0-cells
-mk_where(+Mask, -Cells).             % sorted R-C pairs of 1-positions
-mk_count(+Mask, -N).                 % count of 1-cells
-mk_any(+Mask).                       % true iff any cell = 1
-mk_all(+Mask).                       % true iff all cells = 1
-mk_extract(+Grid, +Mask, -Vals).     % sorted unique values at 1-positions
+mask_from_val(+Grid, +V, -Mask).       % 1 where Grid=V, else 0
+mask_from_bg(+Grid, +Bg, -Mask).       % 0 where Grid=Bg, else 1
+mask_invert(+Mask, -Mask2).            % flip all bits
+mask_and(+MaskA, +MaskB, -MaskC).      % element-wise AND
+mask_or(+MaskA, +MaskB, -MaskC).       % element-wise OR
+mask_xor(+MaskA, +MaskB, -MaskC).      % element-wise XOR
+mask_apply(+Grid, +Mask, +Bg, -Grid2). % keep Grid at 1-cells, Bg at 0-cells
+mask_fill(+Grid, +Mask, +V, -Grid2).   % set V at 1-cells, keep Grid at 0-cells
+mask_overlay(+GA, +GB, +Mask, -Grid2). % GB at 1-cells, GA at 0-cells
+mask_where(+Mask, -Cells).             % sorted R-C pairs of 1-positions
+mask_count(+Mask, -N).                 % count of 1-cells
+mask_any(+Mask).                       % true iff any cell = 1
+mask_all(+Mask).                       % true iff all cells = 1
+mask_extract(+Grid, +Mask, -Vals).     % sorted unique values at 1-positions
 
 Examples:
-mk_from_val([[0,1,0],[1,0,1]], 1, M).      % M=[[0,1,0],[1,0,1]]
-mk_from_bg([[0,1,2],[0,3,0]], 0, M).       % M=[[0,1,1],[0,1,0]]
-mk_invert([[1,0],[0,1]], M).               % M=[[0,1],[1,0]]
-mk_and([[1,1],[0,1]], [[1,0],[1,1]], M).   % M=[[1,0],[0,1]]
-mk_apply([[1,2],[3,4]], [[1,0],[0,1]], 0, G). % G=[[1,0],[0,4]]
-mk_fill([[1,2],[3,4]], [[1,0],[0,1]], 9, G).  % G=[[9,2],[3,9]]
-mk_overlay([[1,1],[1,1]], [[2,2],[2,2]], [[1,0],[0,1]], G). % G=[[2,1],[1,2]]
-mk_where([[1,0,1],[0,1,0]], Cs).           % Cs=[0-0,0-2,1-1]
-mk_count([[1,0,1],[0,1,0]], N).            % N=3
-mk_extract([[1,2,3]], [[1,0,1]], Vals).    % Vals=[1,3]
+mask_from_val([[0,1,0],[1,0,1]], 1, M).      % M=[[0,1,0],[1,0,1]]
+mask_from_bg([[0,1,2],[0,3,0]], 0, M).       % M=[[0,1,1],[0,1,0]]
+mask_invert([[1,0],[0,1]], M).               % M=[[0,1],[1,0]]
+mask_and([[1,1],[0,1]], [[1,0],[1,1]], M).   % M=[[1,0],[0,1]]
+mask_apply([[1,2],[3,4]], [[1,0],[0,1]], 0, G). % G=[[1,0],[0,4]]
+mask_fill([[1,2],[3,4]], [[1,0],[0,1]], 9, G).  % G=[[9,2],[3,9]]
+mask_overlay([[1,1],[1,1]], [[2,2],[2,2]], [[1,0],[0,1]], G). % G=[[2,1],[1,2]]
+mask_where([[1,0,1],[0,1,0]], Cs).           % Cs=[0-0,0-2,1-1]
+mask_count([[1,0,1],[0,1,0]], N).            % N=3
+mask_extract([[1,2,3]], [[1,0,1]], Vals).    % Vals=[1,3]
 
-mk_from_val/mk_from_bg: nested maplist/3 with two-clause cut-on-match helpers.
-mk_and/mk_or: nested maplist/4 with two-clause helpers.
-mk_xor: (A+B) mod 2 per cell.
-mk_apply/mk_fill: nested maplist/4; strict duals of each other.
-mk_overlay: nested maplist/5 for four-way parallel iteration.
-mk_any: member/2 with cut on first 1 found.
-mk_all: forall/2 (built-in) over all rows and cells.
+mask_from_val/mask_from_bg: nested maplist/3 with two-clause cut-on-match helpers.
+mask_and/mask_or: nested maplist/4 with two-clause helpers.
+mask_xor: (A+B) mod 2 per cell.
+mask_apply/mask_fill: nested maplist/4; strict duals of each other.
+mask_overlay: nested maplist/5 for four-way parallel iteration.
+mask_any: member/2 with cut on first 1 found.
+mask_all: forall/2 (built-in) over all rows and cells.
 
 Predicate count: 14 (mk_* prefix). Tests: 42/42. Layer: 122.
 
@@ -15147,46 +15147,46 @@ numerical lists. It complements the cross pack (cx_*) which extracts rows,
 columns, and diagonals from grids; the numseq pack then processes those slices.
 
 Predicates:
-nr_diff(+List, -Diffs).                  % consecutive pairwise differences
-nr_cumsum(+List, -Sums).                 % prefix cumulative sums
-nr_running_max(+List, -Maxs).            % running maximum
-nr_running_min(+List, -Mins).            % running minimum
-nr_zip_add(+A, +B, -C).                  % element-wise A[I]+B[I]
-nr_zip_sub(+A, +B, -C).                  % element-wise A[I]-B[I]
-nr_zip_mul(+A, +B, -C).                  % element-wise A[I]*B[I]
-nr_zip_max(+A, +B, -C).                  % element-wise max(A[I],B[I])
-nr_zip_min(+A, +B, -C).                  % element-wise min(A[I],B[I])
-nr_scale(+List, +K, -Scaled).            % multiply every element by K
-nr_offset(+List, +D, -Shifted).          % add constant D to every element
-nr_is_sorted(+List).                     % succeeds iff non-decreasing
-nr_is_arith(+List).                      % succeeds iff constant pairwise diff
-nr_period(+List, +MaxP, -P).             % shortest repeating period in 1..MaxP
+numseq_diff(+List, -Diffs).                  % consecutive pairwise differences
+numseq_cumsum(+List, -Sums).                 % prefix cumulative sums
+numseq_running_max(+List, -Maxs).            % running maximum
+numseq_running_min(+List, -Mins).            % running minimum
+numseq_zip_add(+A, +B, -C).                  % element-wise A[I]+B[I]
+numseq_zip_sub(+A, +B, -C).                  % element-wise A[I]-B[I]
+numseq_zip_mul(+A, +B, -C).                  % element-wise A[I]*B[I]
+numseq_zip_max(+A, +B, -C).                  % element-wise max(A[I],B[I])
+numseq_zip_min(+A, +B, -C).                  % element-wise min(A[I],B[I])
+numseq_scale(+List, +K, -Scaled).            % multiply every element by K
+numseq_offset(+List, +D, -Shifted).          % add constant D to every element
+numseq_is_sorted(+List).                     % succeeds iff non-decreasing
+numseq_is_arith(+List).                      % succeeds iff constant pairwise diff
+numseq_period(+List, +MaxP, -P).             % shortest repeating period in 1..MaxP
 
 Examples:
-nr_diff([1,3,6,10], Diffs).              % Diffs=[2,3,4]
-nr_cumsum([1,2,3,4], Sums).              % Sums=[1,3,6,10]
-nr_running_max([3,1,4,1,5,9,2], Maxs).  % Maxs=[3,3,4,4,5,9,9]
-nr_running_min([5,3,4,1,2], Mins).      % Mins=[5,3,3,1,1]
-nr_zip_add([1,2,3],[4,5,6],C).           % C=[5,7,9]
-nr_zip_sub([5,6,7],[1,2,3],C).           % C=[4,4,4]
-nr_zip_mul([2,3,4],[5,6,7],C).           % C=[10,18,28]
-nr_zip_max([1,5,3],[4,2,6],C).           % C=[4,5,6]
-nr_zip_min([1,5,3],[4,2,6],C).           % C=[1,2,3]
-nr_scale([1,2,3,4], 2, S).              % S=[2,4,6,8]
-nr_offset([5,6,7], -3, S).              % S=[2,3,4]
-nr_is_sorted([1,2,3,4]).                 % true
-nr_is_arith([2,4,6,8]).                  % true (step=2)
-nr_period([1,2,1,2,1,2], 3, P).         % P=2
+numseq_diff([1,3,6,10], Diffs).              % Diffs=[2,3,4]
+numseq_cumsum([1,2,3,4], Sums).              % Sums=[1,3,6,10]
+numseq_running_max([3,1,4,1,5,9,2], Maxs).  % Maxs=[3,3,4,4,5,9,9]
+numseq_running_min([5,3,4,1,2], Mins).      % Mins=[5,3,3,1,1]
+numseq_zip_add([1,2,3],[4,5,6],C).           % C=[5,7,9]
+numseq_zip_sub([5,6,7],[1,2,3],C).           % C=[4,4,4]
+numseq_zip_mul([2,3,4],[5,6,7],C).           % C=[10,18,28]
+numseq_zip_max([1,5,3],[4,2,6],C).           % C=[4,5,6]
+numseq_zip_min([1,5,3],[4,2,6],C).           % C=[1,2,3]
+numseq_scale([1,2,3,4], 2, S).              % S=[2,4,6,8]
+numseq_offset([5,6,7], -3, S).              % S=[2,3,4]
+numseq_is_sorted([1,2,3,4]).                 % true
+numseq_is_arith([2,4,6,8]).                  % true (step=2)
+numseq_period([1,2,1,2,1,2], 3, P).         % P=2
 
 Key implementation patterns:
-nr_diff: two-clause recursion; D is B-A; recurse on [B|T].
-nr_cumsum: recursive helper accumulates S is Acc+H.
-nr_running_max/min: recursive helper updating Max1 is max(H,Max0).
-nr_zip_*: maplist/3 with named per-element helper (nr_add_, nr_sub_, etc.).
-nr_scale/offset: maplist/3 with helper capturing K or D from outer call.
-nr_is_sorted: A =< B recursive guard.
-nr_is_arith: compute D from first pair; recursive helper verifies D2=:=D.
-nr_period: between/3 + Len mod P =:= 0 + forall+nth0 element comparison.
+numseq_diff: two-clause recursion; D is B-A; recurse on [B|T].
+numseq_cumsum: recursive helper accumulates S is Acc+H.
+numseq_running_max/min: recursive helper updating Max1 is max(H,Max0).
+nr_zip_*: maplist/3 with named per-element helper (numseq_add_, numseq_sub_, etc.).
+numseq_scale/offset: maplist/3 with helper capturing K or D from outer call.
+numseq_is_sorted: A =< B recursive guard.
+numseq_is_arith: compute D from first pair; recursive helper verifies D2=:=D.
+numseq_period: between/3 + Len mod P =:= 0 + forall+nth0 element comparison.
 
 Library imports: library(apply): maplist/3.
   library(lists): nth0/3, numlist/3.
@@ -15600,37 +15600,37 @@ The naggr pack provides per-cell aggregate statistics over in-bounds 4-connected
 and 8-connected neighborhoods.  Complements the automaton pack (at_*, Layer 120)
 which provides count-based neighbor operations.
 
-Predicates: na_sum4/2, na_sum8/2, na_max4/2, na_max8/2, na_min4/2, na_min8/2,
-  na_mean4/2, na_mean8/2, na_range4/2, na_range8/2, na_spread4/2, na_spread8/2,
-  na_diff4/2, na_diff8/2.
+Predicates: naggr_sum4/2, naggr_sum8/2, naggr_max4/2, naggr_max8/2, naggr_min4/2, naggr_min8/2,
+  naggr_mean4/2, naggr_mean8/2, naggr_range4/2, naggr_range8/2, naggr_spread4/2, naggr_spread8/2,
+  naggr_diff4/2, naggr_diff8/2.
 
 Usage examples:
 
-na_sum4([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[6,9,8],[13,20,17],[12,21,14]]
-na_sum8([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[11,19,13],[23,40,27],[17,31,19]]
-na_max4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[4,5,6],[7,8,9],[8,9,8]]
-na_max8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[5,6,6],[8,9,9],[8,9,8]]
-na_min4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[2,1,2],[1,2,3],[4,5,6]]
-na_min8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[2,1,2],[1,1,2],[4,4,5]]
-na_mean4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[3,3,4],[4,5,5],[6,7,7]]
-na_mean8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[3,3,4],[4,5,5],[5,6,6]]
-na_range4([[1,2,3],[4,5,6],[7,8,9]],R). % R=[[2,4,4],[6,6,6],[4,4,2]]
-na_range8([[1,2,3],[4,5,6],[7,8,9]],R). % R=[[3,5,4],[7,8,7],[4,5,3]]
-na_spread4([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[2,3,2],[3,4,3],[2,3,2]]
-na_spread8([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[3,5,3],[5,8,5],[3,5,3]]
-na_diff4([[1,2,1],[2,1,2],[1,2,1]],D). % D=[[2,3,2],[3,4,3],[2,3,2]]
-na_diff8([[1,2,1],[2,1,2],[1,2,1]],D). % D=[[2,3,2],[3,4,3],[2,3,2]]
+naggr_sum4([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[6,9,8],[13,20,17],[12,21,14]]
+naggr_sum8([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[11,19,13],[23,40,27],[17,31,19]]
+naggr_max4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[4,5,6],[7,8,9],[8,9,8]]
+naggr_max8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[5,6,6],[8,9,9],[8,9,8]]
+naggr_min4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[2,1,2],[1,2,3],[4,5,6]]
+naggr_min8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[2,1,2],[1,1,2],[4,4,5]]
+naggr_mean4([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[3,3,4],[4,5,5],[6,7,7]]
+naggr_mean8([[1,2,3],[4,5,6],[7,8,9]],M). % M=[[3,3,4],[4,5,5],[5,6,6]]
+naggr_range4([[1,2,3],[4,5,6],[7,8,9]],R). % R=[[2,4,4],[6,6,6],[4,4,2]]
+naggr_range8([[1,2,3],[4,5,6],[7,8,9]],R). % R=[[3,5,4],[7,8,7],[4,5,3]]
+naggr_spread4([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[2,3,2],[3,4,3],[2,3,2]]
+naggr_spread8([[1,2,3],[4,5,6],[7,8,9]],S). % S=[[3,5,3],[5,8,5],[3,5,3]]
+naggr_diff4([[1,2,1],[2,1,2],[1,2,1]],D). % D=[[2,3,2],[3,4,3],[2,3,2]]
+naggr_diff8([[1,2,1],[2,1,2],[1,2,1]],D). % D=[[2,3,2],[3,4,3],[2,3,2]]
 
 Empty neighborhood sentinel:
-na_sum4([[5]],S). % S=[[0]] - 1x1 grid has no 4-neighbors
-na_max4([[5]],M). % M=[[0]]
+naggr_sum4([[5]],S). % S=[[0]] - 1x1 grid has no 4-neighbors
+naggr_max4([[5]],M). % M=[[0]]
 
 Key implementation patterns:
-na_nbr4_vals_/na_nbr8_vals_: findall over member(DR-DC, offsets) with
+naggr_nbr4_vals_/naggr_nbr8_vals_: findall over member(DR-DC, offsets) with
   bounds guards NR>=0, NR<H, NC>=0, NC<W.
 Nested findall: outer collects rows; inner collects per-cell aggregates.
-na_spread4/8: sort/2 removes duplicates; length measures distinct set.
-na_diff4/8: nested findall counts same-valued neighbors; D = Total - SC.
+naggr_spread4/8: sort/2 removes duplicates; length measures distinct set.
+naggr_diff4/8: nested findall counts same-valued neighbors; D = Total - SC.
 
 Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2,
   sum_list/2. Built-ins: sort/2, length/2, between/3.
@@ -15645,29 +15645,29 @@ The median pack provides the lower (floor) integer median for lists, rows, colum
 grid-wide, and per-cell 4/8-connected neighborhoods.  Uses msort/2 (built-in) to
 preserve duplicates.  Lower median index: MI = (N-1)//2 (0-based).
 
-Predicates: md_median/2, md_row/3, md_col/3, md_row_medians/2, md_col_medians/2,
-  md_grid/2, md_filter4/2, md_filter8/2, md_above/2, md_below/2,
-  md_row_above/3, md_row_below/3, md_col_above/3, md_col_below/3.
+Predicates: median_median/2, median_row/3, median_col/3, median_row_medians/2, median_col_medians/2,
+  median_grid/2, median_filter4/2, median_filter8/2, median_above/2, median_below/2,
+  median_row_above/3, median_row_below/3, median_col_above/3, median_col_below/3.
 
 Usage examples:
 
-md_median([1,2,3,4,5],M). % M=3
-md_median([1,2,3,4],M). % M=2 (lower of 2 and 3)
-md_median([1,1,1,2,3],M). % M=1 (duplicates preserved by msort)
-md_grid([[1,2,3],[4,5,6],[7,8,9]],M). % M=5
-md_row_medians([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[2,5,8]
-md_col_medians([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[4,5,6]
-md_filter4([[1,2,3],[4,5,6],[7,8,9]],F). % F=[[2,2,3],[4,5,5],[7,7,8]]
-md_filter8([[1,2,1],[2,4,2],[1,2,1]],F). % F=[[2,2,2],[2,2,2],[2,2,2]]
-md_above([[1,2,3],[4,5,6],[7,8,9]],C). % C=[1-2,2-0,2-1,2-2]
-md_below([[1,2],[3,4]],C). % C=[0-0]
-md_row_above([[1,2,3],[4,5,6],[7,8,9]],1,C). % C=[1-2]
-md_col_above([[1,2],[3,4]],0,C). % C=[1-0]
+median_median([1,2,3,4,5],M). % M=3
+median_median([1,2,3,4],M). % M=2 (lower of 2 and 3)
+median_median([1,1,1,2,3],M). % M=1 (duplicates preserved by msort)
+median_grid([[1,2,3],[4,5,6],[7,8,9]],M). % M=5
+median_row_medians([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[2,5,8]
+median_col_medians([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[4,5,6]
+median_filter4([[1,2,3],[4,5,6],[7,8,9]],F). % F=[[2,2,3],[4,5,5],[7,7,8]]
+median_filter8([[1,2,1],[2,4,2],[1,2,1]],F). % F=[[2,2,2],[2,2,2],[2,2,2]]
+median_above([[1,2,3],[4,5,6],[7,8,9]],C). % C=[1-2,2-0,2-1,2-2]
+median_below([[1,2],[3,4]],C). % C=[0-0]
+median_row_above([[1,2,3],[4,5,6],[7,8,9]],1,C). % C=[1-2]
+median_col_above([[1,2],[3,4]],0,C). % C=[1-0]
 
 Key implementation patterns:
-md_median: msort preserving duplicates; MI=(N-1)//2; nth0(MI,Sorted,M).
-md_filter4/8: triple-nested findall; neighbor collection via offset list+bounds guard.
-md_above/below: compute grid median first; findall+nth0 with V>Median or V<Median.
+median_median: msort preserving duplicates; MI=(N-1)//2; nth0(MI,Sorted,M).
+median_filter4/8: triple-nested findall; neighbor collection via offset list+bounds guard.
+median_above/below: compute grid median first; findall+nth0 with V>Median or V<Median.
 
 Library imports: library(lists): member/2, nth0/3. Built-ins: msort/2, length/2.
 
@@ -15681,31 +15681,31 @@ The nmode pack provides the mode (most frequent value, smallest-value tie-breaki
 for lists, grid rows, columns, the entire grid, and per-cell 4/8-connected
 neighborhood filters.  It also detects uniform and outlier cells.
 
-Predicates: nm_mode/2, nm_mode_all/2, nm_mode_count/3, nm_row/3, nm_col/3,
-  nm_row_modes/2, nm_col_modes/2, nm_grid/2, nm_filter4/2, nm_filter8/2,
-  nm_uniform4/2, nm_uniform8/2, nm_outlier4/2, nm_outlier8/2.
+Predicates: nmode_mode/2, nmode_mode_all/2, nmode_mode_count/3, nmode_row/3, nmode_col/3,
+  nmode_row_modes/2, nmode_col_modes/2, nmode_grid/2, nmode_filter4/2, nmode_filter8/2,
+  nmode_uniform4/2, nmode_uniform8/2, nmode_outlier4/2, nmode_outlier8/2.
 
 Usage examples:
 
-nm_mode([1,2,3],M). % M=1 (all distinct; smallest wins)
-nm_mode([1,1,2,2],M). % M=1 (tied; smallest wins)
-nm_mode_all([1,1,2,2],Ms). % Ms=[1,2]
-nm_mode_count([1,1,2,3],M,C). % M=1, C=2
-nm_row_modes([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[1,4,7]
-nm_col_modes([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[1,2,3]
-nm_grid([[1,2,3],[4,5,6],[7,8,9]],M). % M=1
-nm_filter4([[1,2,3],[4,5,6],[7,8,9]],F). % F=[[1,1,2],[1,2,3],[4,5,6]]
-nm_filter8([[1,2,1],[2,1,2],[1,2,1]],F). % F=[[1,1,1],[1,1,1],[1,1,1]]
-nm_uniform4([[1,1,1],[1,1,1],[1,1,1]],C). % C=[0-0,...,2-2] all 9 cells
-nm_uniform4([[1,2,3],[4,5,6],[7,8,9]],C). % C=[] (all neighbors distinct)
-nm_outlier4([[1,2,1],[2,1,2],[1,2,1]],C). % C=all 9 cells (checkerboard)
-nm_outlier8([[1,2,1],[2,1,2],[1,2,1]],C). % C=all except center 1-1
+nmode_mode([1,2,3],M). % M=1 (all distinct; smallest wins)
+nmode_mode([1,1,2,2],M). % M=1 (tied; smallest wins)
+nmode_mode_all([1,1,2,2],Ms). % Ms=[1,2]
+nmode_mode_count([1,1,2,3],M,C). % M=1, C=2
+nmode_row_modes([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[1,4,7]
+nmode_col_modes([[1,2,3],[4,5,6],[7,8,9]],Ms). % Ms=[1,2,3]
+nmode_grid([[1,2,3],[4,5,6],[7,8,9]],M). % M=1
+nmode_filter4([[1,2,3],[4,5,6],[7,8,9]],F). % F=[[1,1,2],[1,2,3],[4,5,6]]
+nmode_filter8([[1,2,1],[2,1,2],[1,2,1]],F). % F=[[1,1,1],[1,1,1],[1,1,1]]
+nmode_uniform4([[1,1,1],[1,1,1],[1,1,1]],C). % C=[0-0,...,2-2] all 9 cells
+nmode_uniform4([[1,2,3],[4,5,6],[7,8,9]],C). % C=[] (all neighbors distinct)
+nmode_outlier4([[1,2,1],[2,1,2],[1,2,1]],C). % C=all 9 cells (checkerboard)
+nmode_outlier8([[1,2,1],[2,1,2],[1,2,1]],C). % C=all except center 1-1
 
 Key implementation pattern:
-nm_mode builds Value-Count pairs from an msort-sorted list. nm_count_prefix_
+nmode_mode builds Value-Count pairs from an msort-sorted list. nmode_count_prefix_
 clause 1 (empty list) has a cut to prevent duplicate solutions in findall.
-nm_uniform4/8 uses sort(NbrVals,[_]) as a one-step uniformity test.
-nm_outlier4/8 computes the mode of NEIGHBORS ONLY (cell excluded).
+nmode_uniform4/8 uses sort(NbrVals,[_]) as a one-step uniformity test.
+nmode_outlier4/8 computes the mode of NEIGHBORS ONLY (cell excluded).
 
 Library imports: library(lists): member/2, nth0/3, max_list/2.
 Built-ins: msort/2, sort/2, length/2, between/3, findall/3.
@@ -16040,83 +16040,83 @@ analysis.
 
 Predicates:
 
-ix_row_grid(+H, +W, -Grid)
+index_row_grid(+H, +W, -Grid)
   Grid is H rows by W cols; cell(R,C) = R.
   Row 0 is all zeros; row H-1 is all H-1.
 
-ix_col_grid(+H, +W, -Grid)
+index_col_grid(+H, +W, -Grid)
   Grid is H rows by W cols; cell(R,C) = C.
   Every row is [0, 1, 2, ..., W-1].
 
-ix_sum_grid(+H, +W, -Grid)
+index_sum_grid(+H, +W, -Grid)
   Grid is H rows by W cols; cell(R,C) = R+C.
   Cells on the same top-left/bottom-right diagonal share a value.
 
-ix_diff_grid(+H, +W, -Grid)
+index_diff_grid(+H, +W, -Grid)
   Grid is H rows by W cols; cell(R,C) = R-C.
   Values may be negative. Anti-diagonal cells share a value.
 
-ix_prod_grid(+H, +W, -Grid)
+index_prod_grid(+H, +W, -Grid)
   Grid is H rows by W cols; cell(R,C) = R*C.
   Row 0 and column 0 are all zeros.
 
-ix_manhattan_grid(+H, +W, +R0, +C0, -Grid)
+index_manhattan_grid(+H, +W, +R0, +C0, -Grid)
   cell(R,C) = |R-R0| + |C-C0| (Manhattan/taxi-cab distance from R0,C0).
 
-ix_chebyshev_grid(+H, +W, +R0, +C0, -Grid)
+index_chebyshev_grid(+H, +W, +R0, +C0, -Grid)
   cell(R,C) = max(|R-R0|, |C-C0|) (Chebyshev/king-move distance).
   Cells at distance K form a hollow square ring (shell) around (R0,C0).
 
-ix_mod_grid(+H, +W, +N, -Grid)
+index_mod_grid(+H, +W, +N, -Grid)
   cell(R,C) = (R+C) mod N. Diagonal stripe pattern with period N.
 
-ix_row_mod_grid(+H, +W, +N, -Grid)
+index_row_mod_grid(+H, +W, +N, -Grid)
   cell(R,C) = R mod N. Horizontal stripe pattern; period N across rows.
 
-ix_col_mod_grid(+H, +W, +N, -Grid)
+index_col_mod_grid(+H, +W, +N, -Grid)
   cell(R,C) = C mod N. Vertical stripe pattern; period N across columns.
 
-ix_mask_rows(+Grid, +Is, +Bg, -Grid2)
+index_mask_rows(+Grid, +Is, +Bg, -Grid2)
   Grid2 is Grid with rows NOT in Is replaced by all-Bg rows.
 
-ix_mask_cols(+Grid, +Js, +Bg, -Grid2)
+index_mask_cols(+Grid, +Js, +Bg, -Grid2)
   Grid2 is Grid with columns NOT in Js replaced by Bg.
 
-ix_apply(+IxGrid, +Op, +Grid, -Out)
+index_apply(+IxGrid, +Op, +Grid, -Out)
   Out[R][C] = Grid[R][C] Op IxGrid[R][C].
   Op is one of: add, sub, mul, max_op, min_op.
 
-ix_from(+H, +W, +R0, +C0, -Grid)
+index_from(+H, +W, +R0, +C0, -Grid)
   cell(R,C) = (R-R0)*W + (C-C0). Signed linear row-major offset from
   reference point (R0,C0). Values may be negative.
 
 Usage examples:
 
-ix_row_grid(3, 3, G).    % G = [[0,0,0],[1,1,1],[2,2,2]]
-ix_col_grid(3, 3, G).    % G = [[0,1,2],[0,1,2],[0,1,2]]
-ix_sum_grid(3, 3, G).    % G = [[0,1,2],[1,2,3],[2,3,4]]
-ix_diff_grid(3, 3, G).   % G = [[0,-1,-2],[1,0,-1],[2,1,0]]
-ix_prod_grid(3, 3, G).   % G = [[0,0,0],[0,1,2],[0,2,4]]
+index_row_grid(3, 3, G).    % G = [[0,0,0],[1,1,1],[2,2,2]]
+index_col_grid(3, 3, G).    % G = [[0,1,2],[0,1,2],[0,1,2]]
+index_sum_grid(3, 3, G).    % G = [[0,1,2],[1,2,3],[2,3,4]]
+index_diff_grid(3, 3, G).   % G = [[0,-1,-2],[1,0,-1],[2,1,0]]
+index_prod_grid(3, 3, G).   % G = [[0,0,0],[0,1,2],[0,2,4]]
 
-ix_manhattan_grid(3, 3, 1, 1, G).
+index_manhattan_grid(3, 3, 1, 1, G).
 %   G = [[2,1,2],[1,0,1],[2,1,2]]
 
-ix_chebyshev_grid(5, 5, 2, 2, G).
+index_chebyshev_grid(5, 5, 2, 2, G).
 %   G = [[2,2,2,2,2],[2,1,1,1,2],[2,1,0,1,2],[2,1,1,1,2],[2,2,2,2,2]]
 
-ix_mod_grid(3, 3, 3, G).      % G = [[0,1,2],[1,2,0],[2,0,1]]
-ix_row_mod_grid(4, 3, 2, G).  % G = [[0,0,0],[1,1,1],[0,0,0],[1,1,1]]
-ix_col_mod_grid(3, 4, 2, G).  % G = [[0,1,0,1],[0,1,0,1],[0,1,0,1]]
+index_mod_grid(3, 3, 3, G).      % G = [[0,1,2],[1,2,0],[2,0,1]]
+index_row_mod_grid(4, 3, 2, G).  % G = [[0,0,0],[1,1,1],[0,0,0],[1,1,1]]
+index_col_mod_grid(3, 4, 2, G).  % G = [[0,1,0,1],[0,1,0,1],[0,1,0,1]]
 
-ix_mask_rows([[a,b],[c,d],[e,f]], [0,2], 9, G).  % G = [[a,b],[9,9],[e,f]]
-ix_mask_cols([[a,b,c],[d,e,f]], [1], 0, G).      % G = [[0,b,0],[0,e,0]]
+index_mask_rows([[a,b],[c,d],[e,f]], [0,2], 9, G).  % G = [[a,b],[9,9],[e,f]]
+index_mask_cols([[a,b,c],[d,e,f]], [1], 0, G).      % G = [[0,b,0],[0,e,0]]
 
-ix_row_grid(2, 3, IxG),
-ix_apply(IxG, add, [[10,10,10],[10,10,10]], Out).
+index_row_grid(2, 3, IxG),
+index_apply(IxG, add, [[10,10,10],[10,10,10]], Out).
 %   Out = [[10,10,10],[11,11,11]]
 
-ix_from(3, 3, 0, 0, G).   % G = [[0,1,2],[3,4,5],[6,7,8]]
-ix_from(3, 3, 1, 1, G).   % G = [[-4,-3,-2],[-1,0,1],[2,3,4]]
+index_from(3, 3, 0, 0, G).   % G = [[0,1,2],[3,4,5],[6,7,8]]
+index_from(3, 3, 1, 1, G).   % G = [[-4,-3,-2],[-1,0,1],[2,3,4]]
 
 Library imports: library(lists): member/2, nth0/3.
 Built-ins: length/2, between/3, findall/3.
@@ -16422,97 +16422,97 @@ sparse R-C position lists, objop accepts and returns complete grids, identifying
 objects by their color value automatically. This pack covers the workflow of "find
 the colored object and transform it."
 
-The central private helper oo_set_cells_ scans the full grid, replacing any cell
+The central private helper objop_set_cells_ scans the full grid, replacing any cell
 at a position in the Cells list with Val and keeping all others unchanged.
 
 
 Identifying Object Cells and Bounding Boxes
 
-oo_cells_of(+Grid, +V, -Cells): sorted list of R-C pairs where the grid holds V.
+objop_cells_of(+Grid, +V, -Cells): sorted list of R-C pairs where the grid holds V.
 
-    oo_cells_of([[1,0,1],[0,1,0],[1,0,0]], 1, Cells).
+    objop_cells_of([[1,0,1],[0,1,0],[1,0,0]], 1, Cells).
     % Cells = [0-0, 0-2, 1-1, 2-0]
 
-    oo_cells_of([[2,2],[2,2]], 2, Cells).
+    objop_cells_of([[2,2],[2,2]], 2, Cells).
     % Cells = [0-0, 0-1, 1-0, 1-1]
 
-    oo_cells_of([[0,0],[0,0]], 5, Cells).
+    objop_cells_of([[0,0],[0,0]], 5, Cells).
     % Cells = []  (color absent)
 
-oo_bbox(+Cells, -R0, -C0, -R1, -C1): bounding box of a cell list.
+objop_bbox(+Cells, -R0, -C0, -R1, -C1): bounding box of a cell list.
 
-    oo_bbox([0-0, 0-2, 1-1, 2-0], R0, C0, R1, C1).
+    objop_bbox([0-0, 0-2, 1-1, 2-0], R0, C0, R1, C1).
     % R0=0, C0=0, R1=2, C1=2
 
-    oo_bbox([2-3], R0, C0, R1, C1).
+    objop_bbox([2-3], R0, C0, R1, C1).
     % R0=2, C0=3, R1=2, C1=3  (single cell)
 
 
 Counting, Size, and Center
 
-oo_count(+Grid, +V, -N): number of cells with value V.
+objop_count(+Grid, +V, -N): number of cells with value V.
 
-    oo_count([[1,0],[1,0],[1,0]], 1, N).   % N = 3
-    oo_count([[0,0],[0,0]], 5, N).         % N = 0
+    objop_count([[1,0],[1,0],[1,0]], 1, N).   % N = 3
+    objop_count([[0,0],[0,0]], 5, N).         % N = 0
 
-oo_size(+Grid, +V, -H, -W): height H and width W of V cells' bounding box.
+objop_size(+Grid, +V, -H, -W): height H and width W of V cells' bounding box.
 
-    oo_size([[1,1,1],[1,1,1],[0,0,0]], 1, H, W).
+    objop_size([[1,1,1],[1,1,1],[0,0,0]], 1, H, W).
     % H=2, W=3
 
-    oo_size([[1],[1],[1]], 1, H, W).
+    objop_size([[1],[1],[1]], 1, H, W).
     % H=3, W=1
 
-oo_center(+Grid, +V, -R, -C): center of V cells' bounding box (integer division).
+objop_center(+Grid, +V, -R, -C): center of V cells' bounding box (integer division).
 
-    oo_center([[1,1,1],[1,1,1],[1,1,1]], 1, R, C).
+    objop_center([[1,1,1],[1,1,1],[1,1,1]], 1, R, C).
     % R=1, C=1
 
-    oo_center([[1,1,1]], 1, R, C).
+    objop_center([[1,1,1]], 1, R, C).
     % R=0, C=1
 
 
 Erasing, Repainting, and Swapping
 
-oo_erase(+Grid, +V, +Bg, -Out): replace all V cells with Bg.
+objop_erase(+Grid, +V, +Bg, -Out): replace all V cells with Bg.
 
-    oo_erase([[1,2,1],[2,1,2],[1,2,1]], 1, 0, Out).
+    objop_erase([[1,2,1],[2,1,2],[1,2,1]], 1, 0, Out).
     % Out = [[0,2,0],[2,0,2],[0,2,0]]
 
-oo_repaint(+Grid, +V, +NewV, -Out): replace all V cells with NewV.
+objop_repaint(+Grid, +V, +NewV, -Out): replace all V cells with NewV.
 
-    oo_repaint([[1,0,1],[0,1,0]], 1, 9, Out).
+    objop_repaint([[1,0,1],[0,1,0]], 1, 9, Out).
     % Out = [[9,0,9],[0,9,0]]
 
-oo_swap(+Grid, +V1, +V2, -Out): exchange all V1 and V2 cells (assumes no overlap).
+objop_swap(+Grid, +V1, +V2, -Out): exchange all V1 and V2 cells (assumes no overlap).
 
-    oo_swap([[1,2],[2,1]], 1, 2, Out).
+    objop_swap([[1,2],[2,1]], 1, 2, Out).
     % Out = [[2,1],[1,2]]
 
-    oo_swap([[1,1],[2,2]], 1, 2, Out).
+    objop_swap([[1,1],[2,2]], 1, 2, Out).
     % Out = [[2,2],[1,1]]
 
 
 Moving and Copying
 
-oo_move(+Grid, +V, +DR, +DC, +Bg, -Out): translate V cells by (DR, DC). Original
+objop_move(+Grid, +V, +DR, +DC, +Bg, -Out): translate V cells by (DR, DC). Original
 cells become Bg; cells translated outside the grid are clipped.
 
-    oo_move([[1,0,0],[0,0,0]], 1, 0, 2, 0, Out).
+    objop_move([[1,0,0],[0,0,0]], 1, 0, 2, 0, Out).
     % Out = [[0,0,1],[0,0,0]]  (moved right 2)
 
-    oo_move([[1,1],[0,0],[0,0]], 1, 2, 0, 0, Out).
+    objop_move([[1,1],[0,0],[0,0]], 1, 2, 0, 0, Out).
     % Out = [[0,0],[0,0],[1,1]]  (moved down 2)
 
-    oo_move([[0,1],[0,0]], 1, 0, 2, 0, Out).
+    objop_move([[0,1],[0,0]], 1, 0, 2, 0, Out).
     % Out = [[0,0],[0,0]]  (out of bounds, clipped)
 
-oo_copy(+Grid, +V, +DR, +DC, -Out): copy V cells to offset (DR, DC); originals stay.
+objop_copy(+Grid, +V, +DR, +DC, -Out): copy V cells to offset (DR, DC); originals stay.
 
-    oo_copy([[1,0,0],[0,0,0]], 1, 0, 1, Out).
+    objop_copy([[1,0,0],[0,0,0]], 1, 0, 1, Out).
     % Out = [[1,1,0],[0,0,0]]
 
-    oo_copy([[1,0],[0,0]], 1, 1, 1, Out).
+    objop_copy([[1,0],[0,0]], 1, 1, 1, Out).
     % Out = [[1,0],[0,1]]
 
 
@@ -16521,34 +16521,34 @@ In-Place Transformations
 All transformation predicates erase the original V cells, compute new positions
 based on the bounding box, and paint V at the new positions.
 
-oo_rotate90(+Grid, +V, +Bg, -Out): rotate V cells 90 CW around the bbox top-left.
+objop_rotate90(+Grid, +V, +Bg, -Out): rotate V cells 90 CW around the bbox top-left.
 Formula: normalized (r,c) maps to (c, H-1-r) where H is the bbox height.
 
-    oo_rotate90([[1,0],[1,0],[0,0]], 1, 0, Out).
+    objop_rotate90([[1,0],[1,0],[0,0]], 1, 0, Out).
     % Out = [[1,1],[0,0],[0,0]]  (2x1 column becomes 1x2 row)
 
-    oo_rotate90([[1,0],[1,1],[0,0]], 1, 0, Out).
+    objop_rotate90([[1,0],[1,1],[0,0]], 1, 0, Out).
     % Out = [[1,1],[1,0],[0,0]]  (L-shape rotated 90 CW)
 
-oo_rotate180(+Grid, +V, +Bg, -Out): rotate V cells 180 degrees within the bbox.
+objop_rotate180(+Grid, +V, +Bg, -Out): rotate V cells 180 degrees within the bbox.
 Formula: normalized (r,c) maps to (H-1-r, W-1-c).
 
-    oo_rotate180([[0,0,0,0],[1,1,0,1],[0,0,0,0]], 1, 0, Out).
+    objop_rotate180([[0,0,0,0],[1,1,0,1],[0,0,0,0]], 1, 0, Out).
     % Out = [[0,0,0,0],[1,0,1,1],[0,0,0,0]]
 
-oo_mirror_h(+Grid, +V, +Bg, -Out): flip V cells left-right within the bbox.
+objop_mirror_h(+Grid, +V, +Bg, -Out): flip V cells left-right within the bbox.
 Formula: normalized column c maps to W-1-c.
 
-    oo_mirror_h([[1,0],[1,1]], 1, 0, Out).
+    objop_mirror_h([[1,0],[1,1]], 1, 0, Out).
     % Out = [[0,1],[1,1]]
 
-    oo_mirror_h([[0,1,0,1,1],[0,0,0,0,0]], 1, 0, Out).
+    objop_mirror_h([[0,1,0,1,1],[0,0,0,0,0]], 1, 0, Out).
     % Out = [[0,1,1,0,1],[0,0,0,0,0]]
 
-oo_mirror_v(+Grid, +V, +Bg, -Out): flip V cells top-bottom within the bbox.
+objop_mirror_v(+Grid, +V, +Bg, -Out): flip V cells top-bottom within the bbox.
 Formula: normalized row r maps to H-1-r.
 
-    oo_mirror_v([[1,1],[0,1],[0,0]], 1, 0, Out).
+    objop_mirror_v([[1,1],[0,1],[0,0]], 1, 0, Out).
     % Out = [[0,1],[1,1],[0,0]]
 
 
@@ -16560,10 +16560,10 @@ Rotate the red (color 1) L-shape, then move it right by 3:
             [1,1,0,0,0,0],
             [0,0,0,0,0,0]].
 
-    oo_rotate90(Grid, 1, 0, G1).
+    objop_rotate90(Grid, 1, 0, G1).
     % G1: L rotated 90 CW
 
-    oo_move(G1, 1, 0, 3, 0, Out).
+    objop_move(G1, 1, 0, 3, 0, Out).
     % Out: rotated L moved 3 columns right
 
 Library imports: library(lists): member/2, memberchk/2, nth0/3, min_list/2, max_list/2.
@@ -16587,58 +16587,58 @@ normalizing each result, and taking the lexicographically smallest.
 
 Object Properties
 
-pr_obj_shape(+Obj, -Shape): D4-canonical shape of an obj term.
+pair_obj_shape(+Obj, -Shape): D4-canonical shape of an obj term.
 
-    pr_obj_shape(obj(1, [r(0,0), r(0,1)]), Shape).  % Shape = [r(0,0), r(0,1)]
-    pr_obj_shape(obj(2, [r(0,0), r(1,0)]), Shape).  % Shape = [r(0,0), r(0,1)]
+    pair_obj_shape(obj(1, [r(0,0), r(0,1)]), Shape).  % Shape = [r(0,0), r(0,1)]
+    pair_obj_shape(obj(2, [r(0,0), r(1,0)]), Shape).  % Shape = [r(0,0), r(0,1)]
     % Horizontal and vertical pairs have the same canonical shape.
 
-pr_obj_color(+Obj, -Color): extract color.
-pr_obj_size(+Obj, -N): number of cells.
+pair_obj_color(+Obj, -Color): extract color.
+pair_obj_size(+Obj, -N): number of cells.
 
-    pr_obj_color(obj(5, [r(0,0)]), 5).   % succeeds
-    pr_obj_size(obj(2, [r(0,0), r(0,1), r(0,2)]), 3).  % succeeds
+    pair_obj_color(obj(5, [r(0,0)]), 5).   % succeeds
+    pair_obj_size(obj(2, [r(0,0), r(0,1), r(0,2)]), 3).  % succeeds
 
 
 Equality Tests
 
-pr_shape_eq(+Obj1, +Obj2): same D4-canonical shape.
-pr_color_eq(+Obj1, +Obj2): same color.
-pr_size_eq(+Obj1, +Obj2): same cell count.
+pair_shape_eq(+Obj1, +Obj2): same D4-canonical shape.
+pair_color_eq(+Obj1, +Obj2): same color.
+pair_size_eq(+Obj1, +Obj2): same cell count.
 
-    pr_shape_eq(obj(1, [r(0,0),r(0,1)]), obj(2, [r(0,0),r(1,0)])).  % succeeds
-    pr_color_eq(obj(3, [r(0,0)]), obj(3, [r(1,2)])).   % succeeds
-    pr_size_eq(obj(1, [r(0,0)]), obj(2, [r(5,5)])).    % succeeds
+    pair_shape_eq(obj(1, [r(0,0),r(0,1)]), obj(2, [r(0,0),r(1,0)])).  % succeeds
+    pair_color_eq(obj(3, [r(0,0)]), obj(3, [r(1,2)])).   % succeeds
+    pair_size_eq(obj(1, [r(0,0)]), obj(2, [r(5,5)])).    % succeeds
 
 
 Grouping
 
-pr_group_color(+Objs, -Groups): Color-[Obj] pairs sorted by color.
-pr_group_size(+Objs, -Groups): N-[Obj] pairs sorted by cell count.
-pr_group_shape(+Objs, -Groups): Shape-[Obj] pairs sorted by canonical shape.
+pair_group_color(+Objs, -Groups): Color-[Obj] pairs sorted by color.
+pair_group_size(+Objs, -Groups): N-[Obj] pairs sorted by cell count.
+pair_group_shape(+Objs, -Groups): Shape-[Obj] pairs sorted by canonical shape.
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])].
-    pr_group_color(Objs, Groups).
+    pair_group_color(Objs, Groups).
     % Groups = [1-[obj(1,[r(0,0)]),obj(1,[r(1,0)])], 2-[obj(2,[r(0,1)])]]
 
 
 Finding the Unique Object
 
-pr_unique_color(+Objs, -Obj): the obj whose color appears exactly once.
-pr_unique_size(+Objs, -Obj): the obj whose size appears exactly once.
+pair_unique_color(+Objs, -Obj): the obj whose color appears exactly once.
+pair_unique_size(+Objs, -Obj): the obj whose size appears exactly once.
 Both fail if there is not exactly one such object.
 
     Objs = [obj(1,[r(0,0)]), obj(1,[r(1,0)]), obj(2,[r(0,1)])].
-    pr_unique_color(Objs, obj(2,[r(0,1)])).  % color 2 appears once
+    pair_unique_color(Objs, obj(2,[r(0,1)])).  % color 2 appears once
 
 
 Cross-Scene Matching
 
-pr_match_color(+Objs1, +Objs2, -Pairs): Color-O1-O2 triples.
-pr_match_size(+Objs1, +Objs2, -Pairs): N-O1-O2 triples.
-pr_match_shape(+Objs1, +Objs2, -Pairs): Shape-O1-O2 triples.
+pair_match_color(+Objs1, +Objs2, -Pairs): Color-O1-O2 triples.
+pair_match_size(+Objs1, +Objs2, -Pairs): N-O1-O2 triples.
+pair_match_shape(+Objs1, +Objs2, -Pairs): Shape-O1-O2 triples.
 
-    pr_match_shape([obj(1,[r(0,0),r(0,1)])], [obj(2,[r(0,0),r(1,0)])], Pairs).
+    pair_match_shape([obj(1,[r(0,0),r(0,1)])], [obj(2,[r(0,0),r(1,0)])], Pairs).
     % Pairs = [[r(0,0),r(0,1)]-obj(1,...)-obj(2,...)]
     % Horizontal and vertical pairs match under D4 equivalence.
 
@@ -17521,32 +17521,32 @@ The layout pack analyzes the collective spatial arrangement of a list of
 obj(Color, Cells) terms.
 
 1. Global Bounding Box
-lt_global_bbox(+Objs, -R1, -C1, -R2, -C2): bounding box over ALL cells of all objs.
-lt_bbox_area(+Objs, -Area): (R2-R1+1) * (C2-C1+1).
+layout_global_bbox(+Objs, -R1, -C1, -R2, -C2): bounding box over ALL cells of all objs.
+layout_bbox_area(+Objs, -Area): (R2-R1+1) * (C2-C1+1).
 
 2. Row and Column Range
-lt_row_range(+Objs, -MinR, -MaxR): range of topmost rows.
-lt_col_range(+Objs, -MinC, -MaxC): range of leftmost columns.
-lt_row_count(+Objs, -N): distinct topmost row count.
-lt_col_count(+Objs, -N): distinct leftmost col count.
+layout_row_range(+Objs, -MinR, -MaxR): range of topmost rows.
+layout_col_range(+Objs, -MinC, -MaxC): range of leftmost columns.
+layout_row_count(+Objs, -N): distinct topmost row count.
+layout_col_count(+Objs, -N): distinct leftmost col count.
 
 3. Line Detection
-lt_all_same_row(+Objs): succeed iff all share the same topmost row.
-lt_all_same_col(+Objs): succeed iff all share the same leftmost column.
+layout_all_same_row(+Objs): succeed iff all share the same topmost row.
+layout_all_same_col(+Objs): succeed iff all share the same leftmost column.
 
 4. Centroid of All
-lt_centroid_of_all(+Objs, -R, -C): integer-truncated centroid of all centroids.
+layout_centroid_of_all(+Objs, -R, -C): integer-truncated centroid of all centroids.
 
 5. Grid Detection
-lt_is_grid(+Objs, -Rows, -Cols): objects' centroids form an R x C grid.
+layout_is_grid(+Objs, -Rows, -Cols): objects' centroids form an R x C grid.
 
 6. Diagonal Detection
-lt_is_diagonal_dr(+Objs): R-C constant (downward-right diagonal).
-lt_is_diagonal_dl(+Objs): R+C constant (downward-left diagonal).
+layout_is_diagonal_dr(+Objs): R-C constant (downward-right diagonal).
+layout_is_diagonal_dl(+Objs): R+C constant (downward-left diagonal).
 
 7. Uniform Spacing
-lt_gap_h(+Objs, -Gap): uniform horizontal centroid gap (fails if non-uniform).
-lt_gap_v(+Objs, -Gap): uniform vertical centroid gap.
+layout_gap_h(+Objs, -Gap): uniform horizontal centroid gap (fails if non-uniform).
+layout_gap_v(+Objs, -Gap): uniform vertical centroid gap.
 
 Chapter 142: Object Symmetry Analysis (objsym pack, os_* prefix, Layer 170)
 
@@ -17555,26 +17555,26 @@ obj(Color, Cells) terms. All transforms are computed relative to the object's ow
 bounding box, so no prior normalization is required.
 
 1. Bounding Box
-os_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC): bounding box of the object's cell set.
-os_normalize(+Obj, -NormObj): translate so bbox top-left is at r(0,0).
-os_translate(+Obj, +DR, +DC, -Moved): shift all cells by (DR, DC).
+objsym_bbox(+Obj, -MinR, -MinC, -MaxR, -MaxC): bounding box of the object's cell set.
+objsym_normalize(+Obj, -NormObj): translate so bbox top-left is at r(0,0).
+objsym_translate(+Obj, +DR, +DC, -Moved): shift all cells by (DR, DC).
 
 2. Reflection and Rotation
-os_reflect_h(+Obj, -Reflected): mirror left-right about vertical center (new C = MinC+MaxC-C).
-os_reflect_v(+Obj, -Reflected): mirror top-bottom about horizontal center (new R = MinR+MaxR-R).
-os_rotate180(+Obj, -Rotated): rotate 180 degrees (apply both flips).
-os_rotate90(+Obj, -Rotated): rotate 90 degrees CW, normalized to origin (new NR=C-MinC, NC=MaxR-R).
+objsym_reflect_h(+Obj, -Reflected): mirror left-right about vertical center (new C = MinC+MaxC-C).
+objsym_reflect_v(+Obj, -Reflected): mirror top-bottom about horizontal center (new R = MinR+MaxR-R).
+objsym_rotate180(+Obj, -Rotated): rotate 180 degrees (apply both flips).
+objsym_rotate90(+Obj, -Rotated): rotate 90 degrees CW, normalized to origin (new NR=C-MinC, NC=MaxR-R).
 
 3. Symmetry Tests
-os_is_hsymm(+Obj): sorted cells == sorted cells of reflect_h.
-os_is_vsymm(+Obj): sorted cells == sorted cells of reflect_v.
-os_is_rot180(+Obj): sorted cells == sorted cells of rotate180.
-os_is_rot90(+Obj): sorted normalized cells == sorted normalized cells after rotate90.
-os_has_symmetry(+Obj): any symmetry test passes (cut on first).
-os_symmetries(+Obj, -List): list of symmetry atoms [h, v, rot180, rot90] that hold.
+objsym_is_hsymm(+Obj): sorted cells == sorted cells of reflect_h.
+objsym_is_vsymm(+Obj): sorted cells == sorted cells of reflect_v.
+objsym_is_rot180(+Obj): sorted cells == sorted cells of rotate180.
+objsym_is_rot90(+Obj): sorted normalized cells == sorted normalized cells after rotate90.
+objsym_has_symmetry(+Obj): any symmetry test passes (cut on first).
+objsym_symmetries(+Obj, -List): list of symmetry atoms [h, v, rot180, rot90] that hold.
 
 4. D4 Equivalence
-os_equivalent(+Obj1, +Obj2): same shape under any of 8 D4 orientations (color ignored).
+objsym_equivalent(+Obj1, +Obj2): same shape under any of 8 D4 orientations (color ignored).
 
 Chapter 143: Object Shape Classification (objbound pack, ob_* prefix, Layer 171)
 
@@ -17582,28 +17582,28 @@ The objbound pack classifies the shape of individual obj(Color, Cells) terms
 without requiring a grid argument.
 
 1. Bounding Box Dimensions
-ob_bbox_h(+Obj, -H): bounding box height (MaxR - MinR + 1).
-ob_bbox_w(+Obj, -W): bounding box width (MaxC - MinC + 1).
-ob_bbox_area(+Obj, -Area): H * W.
+objbound_bbox_h(+Obj, -H): bounding box height (MaxR - MinR + 1).
+objbound_bbox_w(+Obj, -W): bounding box width (MaxC - MinC + 1).
+objbound_bbox_area(+Obj, -Area): H * W.
 
 2. Shape Type Tests
-ob_is_rect(+Obj): cell count = bbox area (no holes).
-ob_is_hline(+Obj): H = 1.
-ob_is_vline(+Obj): W = 1.
-ob_is_single(+Obj): H = 1 and W = 1.
-ob_is_square_bbox(+Obj): H = W.
+objbound_is_rect(+Obj): cell count = bbox area (no holes).
+objbound_is_hline(+Obj): H = 1.
+objbound_is_vline(+Obj): W = 1.
+objbound_is_single(+Obj): H = 1 and W = 1.
+objbound_is_square_bbox(+Obj): H = W.
 
 3. Holes and Hollow Objects
-ob_holes(+Obj, -HoleCells): bbox cells not in the object.
-ob_n_holes(+Obj, -N): hole count.
-ob_is_hollow(+Obj): N > 0.
+objbound_holes(+Obj, -HoleCells): bbox cells not in the object.
+objbound_n_holes(+Obj, -N): hole count.
+objbound_is_hollow(+Obj): N > 0.
 
 4. Frame Detection
-ob_is_frame(+Obj): H>=3, W>=3, all border cells present, no interior cells.
+objbound_is_frame(+Obj): H>=3, W>=3, all border cells present, no interior cells.
 
 5. Perimeter and Hull
-ob_perimeter(+Obj, -P): total exposed cell edges.
-ob_dense_hull(+Obj, -HullObj): solid bbox rectangle with same color.
+objbound_perimeter(+Obj, -P): total exposed cell edges.
+objbound_dense_hull(+Obj, -HullObj): solid bbox rectangle with same color.
 
 Chapter 144: Object Pair Relations (objrel Pack, or_*, Layer 172)
 
@@ -17612,30 +17612,30 @@ obj(Color, Cells) terms. Colors are ignored; all reasoning uses
 cell positions only.
 
 1. Overlap
-or_overlap/2: share at least one cell.
-or_shared_cells/3: cells in both objects.
-or_n_shared/3: count of shared cells.
+objrel_overlap/2: share at least one cell.
+objrel_shared_cells/3: cells in both objects.
+objrel_n_shared/3: count of shared cells.
 
 2. Adjacency
-or_touch4/2: 4-adjacent (Manhattan 1), no overlap.
-or_touch8/2: 8-adjacent (Chebyshev 1, includes diagonal), no overlap.
+objrel_touch4/2: 4-adjacent (Manhattan 1), no overlap.
+objrel_touch8/2: 8-adjacent (Chebyshev 1, includes diagonal), no overlap.
 
 3. Containment and Union
-or_contains/2: every cell of Obj2 is in Obj1.
-or_union_cells/3: sorted union of both cell sets.
+objrel_contains/2: every cell of Obj2 is in Obj1.
+objrel_union_cells/3: sorted union of both cell sets.
 
 4. Distance
-or_dist/3: Euclidean distance between centroids (float).
-or_manhattan/3: Manhattan distance between centroids.
+objrel_dist/3: Euclidean distance between centroids (float).
+objrel_manhattan/3: Manhattan distance between centroids.
 
 5. Direction and Alignment
-or_direction/3: compass direction (n/s/e/w/ne/nw/se/sw/same).
-or_aligned_h/2: same centroid row.
-or_aligned_v/2: same centroid column.
+objrel_direction/3: compass direction (n/s/e/w/ne/nw/se/sw/same).
+objrel_aligned_h/2: same centroid row.
+objrel_aligned_v/2: same centroid column.
 
 6. Bounding Box Gaps
-or_gap_rows/3: empty rows between bounding boxes (0 if touching/overlap).
-or_gap_cols/3: empty columns between bounding boxes.
+objrel_gap_rows/3: empty rows between bounding boxes (0 if touching/overlap).
+objrel_gap_cols/3: empty columns between bounding boxes.
 
 Chapter 145: Object List Filtering (objfilter Pack, of_*, Layer 173)
 
@@ -17643,28 +17643,28 @@ The objfilter pack selects objects from a list of obj(Color, Cells) terms
 by color, size, or shape. No cross-pack dependencies.
 
 1. Color Filters
-of_by_color/3: objects of a given color.
-of_not_color/3: objects excluding a given color.
+objfilter_by_color/3: objects of a given color.
+objfilter_not_color/3: objects excluding a given color.
 
 2. Size Filters
-of_exact_size/3: objects with exactly N cells.
-of_min_size/3: objects with >= N cells.
-of_max_size/3: objects with <= N cells.
+objfilter_exact_size/3: objects with exactly N cells.
+objfilter_min_size/3: objects with >= N cells.
+objfilter_max_size/3: objects with <= N cells.
 
 3. Shape Filters
-of_is_rect/2: objects filling their bounding box (no holes).
-of_is_hline/2: objects spanning a single row (bbox height = 1).
-of_is_vline/2: objects spanning a single column (bbox width = 1).
-of_is_single/2: single-cell objects.
-of_is_hollow/2: objects with at least one hole in bbox (L-shapes, frames).
+objfilter_is_rect/2: objects filling their bounding box (no holes).
+objfilter_is_hline/2: objects spanning a single row (bbox height = 1).
+objfilter_is_vline/2: objects spanning a single column (bbox width = 1).
+objfilter_is_single/2: single-cell objects.
+objfilter_is_hollow/2: objects with at least one hole in bbox (L-shapes, frames).
 
 4. Aggregate Selection
-of_largest/2: object with the most cells (first on ties).
-of_smallest/2: object with the fewest cells (first on ties).
+objfilter_largest/2: object with the most cells (first on ties).
+objfilter_smallest/2: object with the fewest cells (first on ties).
 
 5. Generic Meta-Predicates
-of_filter/3: include(Goal, Objs, Filtered) — custom test per object.
-of_partition/4: partition(Goal, Objs, In, Out) — split by goal.
+objfilter_filter/3: include(Goal, Objs, Filtered) — custom test per object.
+objfilter_partition/4: partition(Goal, Objs, In, Out) — split by goal.
 
 Chapter 145: Grid Canvas and Object Rendering (canvas Pack, cv_*, Layer 174)
 
@@ -17698,57 +17698,57 @@ canvas_blit/5: paste a subgrid at a given position.
 Chapter 146: Object Sequence and Progression Analysis (objseq Pack, oq_*, Layer 175)
 
 1. Color and Size Sequences
-oq_color_seq/2: extract color list in list order.
-oq_size_seq/2: extract cell-count list in list order.
+objseq_color_seq/2: extract color list in list order.
+objseq_size_seq/2: extract cell-count list in list order.
 
 2. Centroid and Step Sequences
-oq_centroid_seq/2: centroid sequence as r(R,C) terms.
-oq_step_seq/2: consecutive centroid deltas as dr(DR,DC) terms.
+objseq_centroid_seq/2: centroid sequence as r(R,C) terms.
+objseq_step_seq/2: consecutive centroid deltas as dr(DR,DC) terms.
 
 3. Monotone Tests
-oq_is_growing/1: sizes strictly increasing.
-oq_is_shrinking/1: sizes strictly decreasing.
+objseq_is_growing/1: sizes strictly increasing.
+objseq_is_shrinking/1: sizes strictly decreasing.
 
 4. Constant Step Analysis
-oq_const_step/3: all centroid steps equal (DR, DC).
-oq_const_row_step/2: all row steps equal DR.
-oq_const_col_step/2: all col steps equal DC.
+objseq_const_step/3: all centroid steps equal (DR, DC).
+objseq_const_row_step/2: all row steps equal DR.
+objseq_const_col_step/2: all col steps equal DC.
 
 5. Periodic Sequences
-oq_color_period/3: minimal color-sequence period P and unit cycle.
-oq_size_period/3: minimal size-sequence period P and unit cycle.
+objseq_color_period/3: minimal color-sequence period P and unit cycle.
+objseq_size_period/3: minimal size-sequence period P and unit cycle.
 
 6. Collinearity and Prediction
-oq_collinear/1: all centroids on a straight line.
-oq_next_centroid/2: predict next position from constant step.
-oq_zip_colors/3: zip two obj lists into C1-C2 color pairs.
+objseq_collinear/1: all centroids on a straight line.
+objseq_next_centroid/2: predict next position from constant step.
+objseq_zip_colors/3: zip two obj lists into C1-C2 color pairs.
 
 
 Chapter 147: Object-Pair Change Analysis and Rule Application (objdelta Pack, dp_*, Layer 176)
 
 1. Single-Pair Deltas
-dp_color_delta/3: extract C1-C2 color change from one O1-O2 pair.
-dp_pos_delta/3: extract dr(DR,DC) centroid displacement from one pair.
-dp_size_delta/3: extract size change N2-N1 from one pair.
+objdelta_color_delta/3: extract C1-C2 color change from one O1-O2 pair.
+objdelta_pos_delta/3: extract dr(DR,DC) centroid displacement from one pair.
+objdelta_size_delta/3: extract size change N2-N1 from one pair.
 
 2. Pair Tests
-dp_same_color/2: O1 and O2 share the same color.
-dp_same_form/2: O1 and O2 share the same normalised shape.
-dp_same_pos/2: O1 and O2 share the same centroid.
+objdelta_same_color/2: O1 and O2 share the same color.
+objdelta_same_form/2: O1 and O2 share the same normalised shape.
+objdelta_same_pos/2: O1 and O2 share the same centroid.
 
 3. Color Map Operations
-dp_color_map/2: extract sorted distinct C1-C2 map from a list of pairs.
-dp_apply_color/3: apply single C1-C2 rule; fail if color does not match.
-dp_apply_color_map/3: apply first matching Map entry to one object.
-dp_apply_map_all/3: apply Map to a list; unmatched objects unchanged.
+objdelta_color_map/2: extract sorted distinct C1-C2 map from a list of pairs.
+objdelta_apply_color/3: apply single C1-C2 rule; fail if color does not match.
+objdelta_apply_color_map/3: apply first matching Map entry to one object.
+objdelta_apply_map_all/3: apply Map to a list; unmatched objects unchanged.
 
 4. Constant Displacement
-dp_const_dr/2: all pairs share the same row delta DR.
-dp_const_dc/2: all pairs share the same col delta DC.
+objdelta_const_dr/2: all pairs share the same row delta DR.
+objdelta_const_dc/2: all pairs share the same col delta DC.
 
 5. Cell-Level Analysis
-dp_common_cells/3: positions in both O1 and O2.
-dp_cell_diff/4: Added (in O2 not O1) and Removed (in O1 not O2).
+objdelta_common_cells/3: positions in both O1 and O2.
+objdelta_cell_diff/4: Added (in O2 not O1) and Removed (in O1 not O2).
 
 
 Chapter 148: Object Tiling and Multi-Copy Layout (objcopy Pack, tc_*, Layer 177)
@@ -17784,30 +17784,30 @@ The objmatch pack finds correspondences between two obj(Color, Cells) term
 lists using four matching strategies and provides delta analysis on pairs.
 
 1. Matching Strategies
-mx_by_color/3: match by same color.
-mx_by_size/3: match by same cell count.
-mx_by_form/3: match by same normalized shape (color and position ignored).
-mx_by_nearest/3: greedy nearest-centroid matching.
+objmatch_by_color/3: match by same color.
+objmatch_by_size/3: match by same cell count.
+objmatch_by_form/3: match by same normalized shape (color and position ignored).
+objmatch_by_nearest/3: greedy nearest-centroid matching.
 
 2. Unmatched Objects
-mx_unmatched/5: extract objects from each list not appearing in any pair.
+objmatch_unmatched/5: extract objects from each list not appearing in any pair.
 
 3. Pair Filtering
-mx_filter_changed_color/2: keep only pairs where color changed.
-mx_filter_same_color/2: keep only pairs where color is unchanged.
+objmatch_filter_changed_color/2: keep only pairs where color changed.
+objmatch_filter_same_color/2: keep only pairs where color is unchanged.
 
 4. Delta Extraction
-mx_color_deltas/2: c1-c2 color change per pair.
-mx_pos_deltas/2: dr(DR,DC) centroid displacement per pair.
-mx_size_deltas/2: N2-N1 size change per pair.
+objmatch_color_deltas/2: c1-c2 color change per pair.
+objmatch_pos_deltas/2: dr(DR,DC) centroid displacement per pair.
+objmatch_size_deltas/2: N2-N1 size change per pair.
 
 5. Uniformity Tests
-mx_all_same_color_delta/1: all pairs share the same color change.
-mx_all_same_pos_delta/1: all pairs share the same positional delta.
-mx_all_same_size_delta/1: all pairs share the same size change.
+objmatch_all_same_color_delta/1: all pairs share the same color change.
+objmatch_all_same_pos_delta/1: all pairs share the same positional delta.
+objmatch_all_same_size_delta/1: all pairs share the same size change.
 
 6. Positional Zip
-mx_zip/3: index-wise pairing of two equal-length lists.
+objmatch_zip/3: index-wise pairing of two equal-length lists.
 
 Chapter 150: Object Merging, Set Operations, and Component Splitting (objmerge Pack, mg_*, Layer 179)
 
@@ -17815,28 +17815,28 @@ The objmerge pack provides cell-set operations and structural operations on
 obj(Color, Cells) terms.
 
 1. Cell-Set Operations
-mg_union_cells/4: sorted union of two obj cell sets.
-mg_intersect_cells/4: sorted intersection.
-mg_diff_cells/4: O1 minus O2 cell set.
-mg_sym_diff_cells/4: symmetric difference.
+objmerge_union_cells/4: sorted union of two obj cell sets.
+objmerge_intersect_cells/4: sorted intersection.
+objmerge_diff_cells/4: O1 minus O2 cell set.
+objmerge_sym_diff_cells/4: symmetric difference.
 
 2. Concatenation
-mg_concat_h/4: place O2 right of O1 bbox with Gap.
-mg_concat_v/4: place O2 below O1 bbox with Gap.
+objmerge_concat_h/4: place O2 right of O1 bbox with Gap.
+objmerge_concat_v/4: place O2 below O1 bbox with Gap.
 
 3. List Operations
-mg_merge_list/3: union of all cells in a list of objs.
-mg_subtract_list/4: remove cells of any obj in list from base.
+objmerge_merge_list/3: union of all cells in a list of objs.
+objmerge_subtract_list/4: remove cells of any obj in list from base.
 
 4. Bounding-Box Operations
-mg_expand_bbox/2: fill bounding box with obj's color.
-mg_hollow_bbox/2: 1-cell-wide outer frame of bounding box.
-mg_pad/4: add P layers of border cells with new color.
+objmerge_expand_bbox/2: fill bounding box with obj's color.
+objmerge_hollow_bbox/2: 1-cell-wide outer frame of bounding box.
+objmerge_pad/4: add P layers of border cells with new color.
 
 5. Connected Components
-mg_split_cc4/2: split into 4-connected component objs.
-mg_split_cc8/2: split into 8-connected component objs.
-mg_n_components4/2: count 4-connected components.
+objmerge_split_cc4/2: split into 4-connected component objs.
+objmerge_split_cc8/2: split into 8-connected component objs.
+objmerge_n_components4/2: count 4-connected components.
 
 
 Chapter 151: Object-List Aggregate Attribute Analysis (objattr, oa_*, Layer 180)
@@ -17845,26 +17845,26 @@ The objattr pack provides aggregate statistics and rankings over a list of obj(C
 terms. It gives a reasoner a bird's-eye view of a scene without manual accumulation.
 
 1. Cell and Color Counts
-oa_total_cells/2: total cells across all objects.
-oa_color_counts/2: Color-Count pairs (number of objects per color).
-oa_cell_counts_by_color/2: Color-Total pairs (total cells per color).
-oa_n_colors/2: number of distinct colors.
-oa_n_objs_of_color/3: object count for a specific color.
+objattr_total_cells/2: total cells across all objects.
+objattr_color_counts/2: Color-Count pairs (number of objects per color).
+objattr_cell_counts_by_color/2: Color-Total pairs (total cells per color).
+objattr_n_colors/2: number of distinct colors.
+objattr_n_objs_of_color/3: object count for a specific color.
 
 2. Color Dominance
-oa_dominant_color/2: color with the most total cells.
-oa_rarest_color/2: color with the fewest total cells.
-oa_unique_color/2: backtrackable; each color appearing in exactly one object.
+objattr_dominant_color/2: color with the most total cells.
+objattr_rarest_color/2: color with the fewest total cells.
+objattr_unique_color/2: backtrackable; each color appearing in exactly one object.
 
 3. Rankings
-oa_size_rank/2: objects sorted by cell count descending.
-oa_pos_rank/2: objects sorted by top-left corner, row-major order.
-oa_majority_size/2: most frequently occurring cell count.
+objattr_size_rank/2: objects sorted by cell count descending.
+objattr_pos_rank/2: objects sorted by top-left corner, row-major order.
+objattr_majority_size/2: most frequently occurring cell count.
 
 4. Uniformity Tests
-oa_all_same_color/1: all objects share the same color.
-oa_all_same_size/1: all objects have the same cell count.
-oa_all_same_form/1: all objects have the same normalized shape (position and color ignored).
+objattr_all_same_color/1: all objects share the same color.
+objattr_all_same_size/1: all objects have the same cell count.
+objattr_all_same_form/1: all objects have the same normalized shape (position and color ignored).
 
 
 Chapter 152: Object-List Grouping by Shared Attribute (objgroup, og_*, Layer 181)
@@ -17874,24 +17874,24 @@ sharing a common attribute value. It fills the gap between objfilter (which sele
 individual objects) and objattr (which aggregates over all objects).
 
 1. Grouping Operations
-og_by_color/2: partition into Color-ObjList groups, sorted by Color.
-og_by_size/2: partition into Size-ObjList groups, sorted by Size ascending.
-og_by_form/2: partition by normalized shape (translate-to-origin, sort cells).
-og_by_row/2: partition by top-left row, sorted ascending.
-og_by_col/2: partition by top-left col, sorted ascending.
+objgroup_by_color/2: partition into Color-ObjList groups, sorted by Color.
+objgroup_by_size/2: partition into Size-ObjList groups, sorted by Size ascending.
+objgroup_by_form/2: partition by normalized shape (translate-to-origin, sort cells).
+objgroup_by_row/2: partition by top-left row, sorted ascending.
+objgroup_by_col/2: partition by top-left col, sorted ascending.
 
 2. Group Inspection
-og_n_groups/2: count of groups.
-og_n_members/3: filter groups to those with exactly N members.
-og_singletons/2: groups with exactly 1 member.
-og_largest/2: the group with the most members.
-og_smallest/2: the group with the fewest members.
+objgroup_n_groups/2: count of groups.
+objgroup_n_members/3: filter groups to those with exactly N members.
+objgroup_singletons/2: groups with exactly 1 member.
+objgroup_largest/2: the group with the most members.
+objgroup_smallest/2: the group with the fewest members.
 
 3. Group Analysis
-og_all_same_size/1: all groups have the same member count.
-og_sort_desc/2: sort groups by member count descending.
-og_flat/2: flatten groups back to a single obj list.
-og_filter_size/4: keep groups with member count in Min..Max inclusive.
+objgroup_all_same_size/1: all groups have the same member count.
+objgroup_sort_desc/2: sort groups by member count descending.
+objgroup_flat/2: flatten groups back to a single obj list.
+objgroup_filter_size/4: keep groups with member count in Min..Max inclusive.
 
 
 Chapter 153: Scene-Level Comparison of Two Object Lists (scenecmp, sm_*, Layer 182)
@@ -17926,26 +17926,26 @@ The objlocate pack queries a list of obj(Color, Cells) terms for those satisfyin
 spatial or attribute relationship to a given reference object.
 
 1. Directional Queries (by centroid)
-lq_above/3: centroid row strictly less than Ref.
-lq_below/3: centroid row strictly greater than Ref.
-lq_left_of/3: centroid col strictly less than Ref.
-lq_right_of/3: centroid col strictly greater than Ref.
+objlocate_above/3: centroid row strictly less than Ref.
+objlocate_below/3: centroid row strictly greater than Ref.
+objlocate_left_of/3: centroid col strictly less than Ref.
+objlocate_right_of/3: centroid col strictly greater than Ref.
 
 2. Adjacency Queries
-lq_touching4/3: 4-adjacent to Ref (Manhattan distance 1, no overlap).
-lq_touching8/3: 8-adjacent to Ref (Chebyshev distance 1, no overlap).
-lq_overlapping/3: sharing at least one cell with Ref.
+objlocate_touching4/3: 4-adjacent to Ref (Manhattan distance 1, no overlap).
+objlocate_touching8/3: 8-adjacent to Ref (Chebyshev distance 1, no overlap).
+objlocate_overlapping/3: sharing at least one cell with Ref.
 
 3. Attribute Queries
-lq_same_color/3: same color atom as Ref.
-lq_same_form/3: same normalized shape as Ref (translate-to-origin, sort).
-lq_aligned_h/3: same top-left row as Ref.
-lq_aligned_v/3: same top-left column as Ref.
+objlocate_same_color/3: same color atom as Ref.
+objlocate_same_form/3: same normalized shape as Ref (translate-to-origin, sort).
+objlocate_aligned_h/3: same top-left row as Ref.
+objlocate_aligned_v/3: same top-left column as Ref.
 
 4. Distance Queries
-lq_nearest/3: single object with smallest squared centroid distance to Ref.
-lq_farthest/3: single object with largest squared centroid distance to Ref.
-lq_n_touching4/3: count of 4-touching objects.
+objlocate_nearest/3: single object with smallest squared centroid distance to Ref.
+objlocate_farthest/3: single object with largest squared centroid distance to Ref.
+objlocate_n_touching4/3: count of 4-touching objects.
 
 
 Chapter 155: scenexf Pack - Scene-Level Uniform Transformation (sx_*, Layer 184)
@@ -18255,15 +18255,15 @@ color-indexed queries over obj(Color,Cells) scene lists.
 :- use_module(pack(multicolor/prolog/multicolor)).
 
 % Count objects per color
-mc_color_counts([obj(r,[r(0,0)]),obj(r,[r(1,0)]),obj(b,[r(0,1)])], Counts).
+multicolor_color_counts([obj(r,[r(0,0)]),obj(r,[r(1,0)]),obj(b,[r(0,1)])], Counts).
 % Counts = [b-1, r-2]
 
 % How many objects of a given color
-mc_count_of_color([obj(r,[r(0,0)])], r, N).
+multicolor_count_of_color([obj(r,[r(0,0)])], r, N).
 % N = 1
 
 % The color appearing most often
-mc_majority_color(Scene, Color).
+multicolor_majority_color(Scene, Color).
 
 14 mc_* predicates. 42 tests pass. Layer 193.
 All 42 tests pass. See docs/tutorial/Ch175_MultiColor.txt for the full chapter.
@@ -18363,15 +18363,15 @@ grid format, without converting to obj terms first.
 :- use_module(pack(gridtask/prolog/gridtask)).
 
 % Count differing cells
-gt_n_changed([[r,r],[r,r]], [[r,b],[r,r]], N).
+gridtask_n_changed([[r,r],[r,r]], [[r,b],[r,r]], N).
 % N = 1
 
 % Infer strategy and apply to test grid
-gt_solve([[[r,r]]-[[b,b]]], [[r,r]], Out, Rule).
+gridtask_solve([[[r,r]]-[[b,b]]], [[r,r]], Out, Rule).
 % Rule = color_map([r-b]), Out = [[b,b]]
 
 % Pixel accuracy of a rule on one pair
-gt_pair_score(identity, [[r,r]], [[r,r]], Score).
+gridtask_pair_score(identity, [[r,r]], [[r,r]], Score).
 % Score = 1.0
 
 14 gt_* predicates. 51 tests pass. Layer 198.
@@ -18637,23 +18637,23 @@ tile to target dimensions, D4 group enumeration, and canonical D4 form.
 :- use_module(pack(gridxform/prolog/gridxform)).
 
 % Rotate 90 CW:
-gx_rotate90([[a,b,c],[d,e,f],[g,h,i]], R).
+gridxform_rotate90([[a,b,c],[d,e,f],[g,h,i]], R).
 % R = [[g,d,a],[h,e,b],[i,f,c]]
 
 % Transpose a 2x3 grid to get 3x2:
-gx_transpose([[a,b,c],[d,e,f]], R).
+gridxform_transpose([[a,b,c],[d,e,f]], R).
 % R = [[a,d],[b,e],[c,f]]
 
 % Auto-crop to content bounding box:
-gx_crop_content([[x,x,x],[x,r,r],[x,r,r]], x, R).
+gridxform_crop_content([[x,x,x],[x,r,r],[x,r,r]], x, R).
 % R = [[r,r],[r,r]]
 
 % Tile a 2x2 checkerboard to 4x4:
-gx_tile([[r,x],[x,r]], 4, 4, R).
+gridxform_tile([[r,x],[x,r]], 4, 4, R).
 % R = [[r,x,r,x],[x,r,x,r],[r,x,r,x],[x,r,x,r]]
 
 % Scale up by 2:
-gx_scale([[r,x],[x,r]], 2, R).
+gridxform_scale([[r,x],[x,r]], 2, R).
 % R = [[r,r,x,x],[r,r,x,x],[x,x,r,r],[x,x,r,r]]
 
 14 gx_* predicates. 44 tests pass. Layer 207.
@@ -18670,23 +18670,23 @@ top-bottom (h), left-right (v), main diagonal (d1), anti-diagonal (d2),
 :- use_module(pack(gridsymm/prolog/gridsymm)).
 
 % Test top-bottom symmetry:
-gsm_sym_h([[r,x,r],[x,b,x],[r,x,r]]).
+gridsymm_sym_h([[r,x,r],[x,b,x],[r,x,r]]).
 % true
 
 % Enumerate all symmetries:
-gsm_symmetries([[r,x,r],[x,x,x],[r,x,r]], Syms).
+gridsymm_symmetries([[r,x,r],[x,x,x],[r,x,r]], Syms).
 % Syms = [h, v, d1, d2, rot90, rot180]
 
 % Complete grid to be horizontally symmetric:
-gsm_complete_h([[r,b],[x,x]], top, R).
+gridsymm_complete_h([[r,b],[x,x]], top, R).
 % R = [[r,b],[r,b]]
 
 % Find symmetry violations:
-gsm_violations_h([[r,x],[b,x]], Cells).
+gridsymm_violations_h([[r,x],[b,x]], Cells).
 % Cells = [0-0]  (row 0, col 0: r != b)
 
 % Compute symmetry score (fraction of matching pairs):
-gsm_score([[r,x,r],[r,x,b],[r,x,r]], v, S).
+gridsymm_score([[r,x,r],[r,x,b],[r,x,r]], v, S).
 % S = 0.666...
 
 14 gsm_* predicates. 44 tests pass. Layer 208.
@@ -18911,14 +18911,14 @@ at (0,0), moving right, down, left, up, then repeating for inner frames.
 
 :- use_module(pack(gridspiral/prolog/gridspiral)).
 
-gsp_spiral/2 returns R-C pairs in spiral order; gsp_read_spiral/2 reads values;
-gsp_write_spiral/3 and gsp_fill_spiral/3 write values into spiral positions.
-gsp_spiral_length/2 returns H*W; gsp_spiral_index/4 finds a cell's position;
-gsp_nth_spiral/4 finds the cell at position N. gsp_frame_spiral/3 returns the
-spiral for a single frame D; gsp_all_frame_spirals/2 lists all frames.
-gsp_spiral_uniform/2 tests uniformity; gsp_spiral_reversed/2 reverses order;
-gsp_spiral_count/3 counts a color. gsp_rotate_spiral/3 rotates values N steps
-along the spiral; gsp_spiral_slice/4 returns spiral cells from Start to End.
+gridspiral_spiral/2 returns R-C pairs in spiral order; gridspiral_read_spiral/2 reads values;
+gridspiral_write_spiral/3 and gridspiral_fill_spiral/3 write values into spiral positions.
+gridspiral_spiral_length/2 returns H*W; gridspiral_spiral_index/4 finds a cell's position;
+gridspiral_nth_spiral/4 finds the cell at position N. gridspiral_frame_spiral/3 returns the
+spiral for a single frame D; gridspiral_all_frame_spirals/2 lists all frames.
+gridspiral_spiral_uniform/2 tests uniformity; gridspiral_spiral_reversed/2 reverses order;
+gridspiral_spiral_count/3 counts a color. gridspiral_rotate_spiral/3 rotates values N steps
+along the spiral; gridspiral_spiral_slice/4 returns spiral cells from Start to End.
 
 14 gsp_* predicates. 44 tests pass. Layer 217.
 
@@ -19040,15 +19040,15 @@ Chapter 201: gridtile Pack - Grid Tiling Pattern Analysis (gti_*, Layer 224)
 The gridtile pack (Layer 224) provides fourteen predicates for detecting, extracting,
 verifying, and constructing tiling patterns in raw grids. A grid has vertical period
 P if H mod P = 0 and every row R equals row R mod P; horizontal period is defined
-similarly for columns. gti_h_period/2 and gti_w_period/2 find the smallest periods.
-gti_tile_size/3 returns both. gti_is_tiling/3 verifies a given (TH, TW) pair.
-gti_extract_tile/4 extracts the top-left TH x TW sub-grid as the canonical tile.
-gti_tile_to_grid/4 builds any H x W grid by repeating a tile (cell R,C = Tile[R mod
-TH][C mod TW]). gti_row_is_periodic/3 and gti_col_is_periodic/3 check periodicity
-of individual rows and columns. gti_tile_count_h/3 and gti_tile_count_w/3 count
-complete tile rows and columns. gti_matches_tile/4 checks if a specific sub-grid
-equals a tile. gti_tile_offset/5 finds the tile-relative position of a cell.
-gti_all_tiles/4 lists all tile sub-grids in row-major order. gti_crop_to_tile/2
+similarly for columns. gridtile_h_period/2 and gridtile_w_period/2 find the smallest periods.
+gridtile_tile_size/3 returns both. gridtile_is_tiling/3 verifies a given (TH, TW) pair.
+gridtile_extract_tile/4 extracts the top-left TH x TW sub-grid as the canonical tile.
+gridtile_tile_to_grid/4 builds any H x W grid by repeating a tile (cell R,C = Tile[R mod
+TH][C mod TW]). gridtile_row_is_periodic/3 and gridtile_col_is_periodic/3 check periodicity
+of individual rows and columns. gridtile_tile_count_h/3 and gridtile_tile_count_w/3 count
+complete tile rows and columns. gridtile_matches_tile/4 checks if a specific sub-grid
+equals a tile. gridtile_tile_offset/5 finds the tile-relative position of a cell.
+gridtile_all_tiles/4 lists all tile sub-grids in row-major order. gridtile_crop_to_tile/2
 extracts the minimal tile.
 
 :- use_module(pack(gridtile/prolog/gridtile)).
@@ -19136,20 +19136,20 @@ color; cells adjacent to two or more different colors remain background (conflic
 
 :- use_module(pack(gridwave/prolog/gridwave)).
 
-gwv_step/3       - one wave-expansion step (all colors, conflict = stays bg)
-gwv_fill/3       - expand to fixed point (multi-color Voronoi with conflict)
-gwv_fill_n/4     - exactly N wave-expansion steps
-gwv_frontier/3   - bg cells adjacent to any non-bg (R-C list)
-gwv_color_frontier/4   - bg cells adjacent to a specific color
-gwv_equidistant_front/3 - bg cells adjacent to two or more different colors
-gwv_color_expand/4     - expand one color one step
-gwv_color_expand_n/5   - expand one color N steps
-gwv_shadow_right/4     - cast shadow rightward from non-bg cells
-gwv_shadow_left/4      - cast shadow leftward
-gwv_shadow_down/4      - cast shadow downward
-gwv_shadow_up/4        - cast shadow upward
-gwv_contract/3   - remove non-bg cells touching in-bounds bg (interior erosion)
-gwv_contract_n/4 - N contraction steps
+gridwave_step/3       - one wave-expansion step (all colors, conflict = stays bg)
+gridwave_fill/3       - expand to fixed point (multi-color Voronoi with conflict)
+gridwave_fill_n/4     - exactly N wave-expansion steps
+gridwave_frontier/3   - bg cells adjacent to any non-bg (R-C list)
+gridwave_color_frontier/4   - bg cells adjacent to a specific color
+gridwave_equidistant_front/3 - bg cells adjacent to two or more different colors
+gridwave_color_expand/4     - expand one color one step
+gridwave_color_expand_n/5   - expand one color N steps
+gridwave_shadow_right/4     - cast shadow rightward from non-bg cells
+gridwave_shadow_left/4      - cast shadow leftward
+gridwave_shadow_down/4      - cast shadow downward
+gridwave_shadow_up/4        - cast shadow upward
+gridwave_contract/3   - remove non-bg cells touching in-bounds bg (interior erosion)
+gridwave_contract_n/4 - N contraction steps
 
 14 gwv_* predicates. 44 tests pass. Layer 229.
 
@@ -19531,14 +19531,14 @@ Chapter 227: gridtransform - Grid Transformation Detection and Application (gtr_
 The gridtransform pack adds fourteen predicates for detecting color mappings between
 two grids, computing differences, and applying transformations.
 
-Predicates: gtr_color_map/3, gtr_apply_color_map/3, gtr_diff_cells/3,
-gtr_diff_count/3, gtr_same_cells/3, gtr_changed_colors/3, gtr_invert_map/2,
-gtr_compose_maps/3, gtr_is_identity_map/1, gtr_apply_changes/3, gtr_delta_grid/4,
-gtr_overlay/4, gtr_common_grid/4, gtr_is_color_permutation/2.
+Predicates: gridtransform_color_map/3, gridtransform_apply_color_map/3, gridtransform_diff_cells/3,
+gridtransform_diff_count/3, gridtransform_same_cells/3, gridtransform_changed_colors/3, gridtransform_invert_map/2,
+gridtransform_compose_maps/3, gridtransform_is_identity_map/1, gridtransform_apply_changes/3, gridtransform_delta_grid/4,
+gridtransform_overlay/4, gridtransform_common_grid/4, gridtransform_is_color_permutation/2.
 
-Key design: color maps are cm(Old,New) sorted lists. gtr_color_map uses sort+
-consistency check. gtr_delta_grid and gtr_overlay compose: overlay(A,delta(A,B,Bg),Bg)=B.
-gtr_is_color_permutation requires both consistency (no ambiguous mapping) and
+Key design: color maps are cm(Old,New) sorted lists. gridtransform_color_map uses sort+
+consistency check. gridtransform_delta_grid and gridtransform_overlay compose: overlay(A,delta(A,B,Bg),Bg)=B.
+gridtransform_is_color_permutation requires both consistency (no ambiguous mapping) and
 injectivity (no two sources map to same target).
 
 See docs/tutorial/Ch227_GridTransform.txt for full details and examples.
@@ -19588,14 +19588,14 @@ The invariant pack (Work Package 269, Layer 248) provides fourteen predicates fo
 finding what stays constant across all training pairs. Invariants reduce the rule
 search space by eliminating entire rule classes before any search begins.
 
-Predicates: iv_grid_invariants/2, iv_output_invariants/2, iv_object_invariants/2,
-iv_variant_features/2, iv_consistent_delta/2, iv_all_grids/2, iv_no_grids/2,
-iv_color_set/3, iv_same_color_sets/2, iv_same_dims/1, iv_preserves_dims/1,
-iv_preserves_colors/1, iv_preserves_count/2, iv_stable_color_map/2.
+Predicates: invariant_grid_invariants/2, invariant_output_invariants/2, invariant_object_invariants/2,
+invariant_variant_features/2, invariant_consistent_delta/2, invariant_all_grids/2, invariant_no_grids/2,
+invariant_color_set/3, invariant_same_color_sets/2, invariant_same_dims/1, invariant_preserves_dims/1,
+invariant_preserves_colors/1, invariant_preserves_count/2, invariant_stable_color_map/2.
 
 Key design: invariants are inv(Property) terms; variant features are feature(Property)
-terms. Training pairs are pair(InputGrid, OutputGrid). iv_stable_color_map intersects
-per-pair cell change maps to find consistent color mappings. iv_all_grids/iv_no_grids
+terms. Training pairs are pair(InputGrid, OutputGrid). invariant_stable_color_map intersects
+per-pair cell change maps to find consistent color mappings. invariant_all_grids/invariant_no_grids
 are meta_predicate declarations for correct module-qualified dispatch.
 
 See docs/tutorial/Ch230_Invariant.txt for full details and examples.
@@ -19645,15 +19645,15 @@ The multipair pack (Work Package 272, Layer 251) provides fourteen predicates fo
 tracking object identity and correspondence across multiple training pairs. Objects
 are identified by color (bg=0). Training pairs are pair(InputGrid, OutputGrid) terms.
 
-Predicates: mp_track_objects/2, mp_invariant_objects/2, mp_role_objects/3,
-mp_cross_pair_match/2, mp_all_input_objects/2, mp_color_frequency/3,
-mp_universal_colors/2, mp_variable_colors/2, mp_disappeared_objects/2,
-mp_appeared_objects/2, mp_stable_color_objects/2, mp_modal_object_count/2,
-mp_consistent_count/1, mp_singleton_color/2.
+Predicates: multipair_track_objects/2, multipair_invariant_objects/2, multipair_role_objects/3,
+multipair_cross_pair_match/2, multipair_all_input_objects/2, multipair_color_frequency/3,
+multipair_universal_colors/2, multipair_variable_colors/2, multipair_disappeared_objects/2,
+multipair_appeared_objects/2, multipair_stable_color_objects/2, multipair_modal_object_count/2,
+multipair_consistent_count/1, multipair_singleton_color/2.
 
 Key design: tracked(Idx, Color, PairIdxList) identity terms; po(PairIdx, Color)
 input objects; match(I, J, CommonColors) correspondence terms.
-mp_universal_colors and mp_variable_colors are guaranteed disjoint.
+multipair_universal_colors and multipair_variable_colors are guaranteed disjoint.
 
 See docs/tutorial/Ch233_MultiPair.txt for full details and examples.
 
@@ -19693,15 +19693,15 @@ Chapter 236: hyp Enhancement - Spatial, Structural, Sequence Hypotheses (WP-275)
 
 Three new hypothesis types extend the hyp pack beyond color substitutions:
 
-hy_spatial_hyp(+Pairs, +Moves, -Hyp): find the first DR-DC shift that explains all pairs.
-    hy_spatial_hyp(Pairs, [0-1, 1-0, 0-(-1), (-1)-0], shift(DR, DC)).
+hyp_spatial_hyp(+Pairs, +Moves, -Hyp): find the first DR-DC shift that explains all pairs.
+    hyp_spatial_hyp(Pairs, [0-1, 1-0, 0-(-1), (-1)-0], shift(DR, DC)).
 
-hy_structural_hyp(+Pairs, +Patterns, -Hyp): find the first structural pattern consistent
+hyp_structural_hyp(+Pairs, +Patterns, -Hyp): find the first structural pattern consistent
 with all pairs.
-    hy_structural_hyp(Pairs, [dims_preserved, colors_preserved], structural(Pat)).
+    hyp_structural_hyp(Pairs, [dims_preserved, colors_preserved], structural(Pat)).
 
-hy_sequence_hyp(+Pairs, +Maps1, +Maps2, -Hyp): find a two-step color-map hypothesis.
-    hy_sequence_hyp(Pairs, [[1-2]], [[2-3]], seq([1-2], [2-3])).
+hyp_sequence_hyp(+Pairs, +Maps1, +Maps2, -Hyp): find a two-step color-map hypothesis.
+    hyp_sequence_hyp(Pairs, [[1-2]], [[2-3]], seq([1-2], [2-3])).
 
 
 Chapter 237: condxf Enhancement - Context Gate Inference (WP-276)
@@ -19720,13 +19720,13 @@ Chapter 238: induction Enhancement - Cross-Pair Property Aggregation (WP-277)
 
 Two new predicates aggregate grid-pair properties across a list of training pairs:
 
-id_cross_pair_invariants(+Pairs, -Invariants):
+induction_cross_pair_invariants(+Pairs, -Invariants):
     Returns properties that hold for every training pair (e.g. dims_preserved).
-    id_cross_pair_invariants(Pairs, Inv), member(dims_preserved, Inv).
+    induction_cross_pair_invariants(Pairs, Inv), member(dims_preserved, Inv).
 
-id_cross_pair_variants(+Pairs, -Variants):
+induction_cross_pair_variants(+Pairs, -Variants):
     Returns properties that hold for SOME but not ALL pairs.
-    id_cross_pair_variants(Pairs, Var), member(colors_preserved, Var).
+    induction_cross_pair_variants(Pairs, Var), member(colors_preserved, Var).
 
 Properties tested: dims_preserved, colors_preserved, total_nonzero_preserved,
 monotone_input, monotone_output, bg_preserved, scale_preserved.
@@ -19811,73 +19811,73 @@ REGISTERING CHANNELS
     :- use_module(library(iochan)).
 
     % Register a custom email channel.
-    ?- ic_register_channel(text_out, email_config('user@example.com', 'Alert'), ChanId).
+    ?- iochan_register_channel(text_out, email_config('user@example.com', 'Alert'), ChanId).
     ChanId = chan_6.
 
     % Check its status.
-    ?- ic_channel_status(chan_6, Status).
+    ?- iochan_channel_status(chan_6, Status).
     Status = ready.
 
     % List all text-output channels.
-    ?- ic_list_channels(text_out, Channels).
+    ?- iochan_list_channels(text_out, Channels).
     Channels = [chan(chan_1, console_config), chan(chan_6, email_config(...))].
 
 TEXT OUTPUT
 
     % Write to the console (pre-registered as chan_1).
-    ?- ic_text_out(console_config, 'Hello from PrologAI!', Status).
+    ?- iochan_text_out(console_config, 'Hello from PrologAI!', Status).
     Hello from PrologAI!
     Status = ok.
 
     % Write to an email channel.
-    ?- ic_text_out(chan_6, 'Alert: reasoning complete.', Status).
+    ?- iochan_text_out(chan_6, 'Alert: reasoning complete.', Status).
     Status = ok.    % (if sendmail is installed)
 
 TEXT INPUT
 
     % Read a line from the console.
-    ?- ic_text_in(console_config, Text).
+    ?- iochan_text_in(console_config, Text).
     |: Hello
     Text = "Hello".
 
 SPEAKER OUTPUT
 
     % Speak text aloud using espeak-ng (festival as fallback).
-    ?- ic_speak('PrologAI is now speaking.', Status).
+    ?- iochan_speak('PrologAI is now speaking.', Status).
     Status = ok.    % (if espeak-ng or festival is installed)
 
     % Speak to a named speaker channel.
-    ?- ic_register_channel(audio_out, speaker_config('hw:0,0'), SpkId),
-       ic_speak_to(SpkId, 'Channel test.', Status).
+    ?- iochan_register_channel(audio_out, speaker_config('hw:0,0'), SpkId),
+       iochan_speak_to(SpkId, 'Channel test.', Status).
 
 MICROPHONE INPUT
 
     % Record 5 seconds from the default mic and transcribe.
-    ?- ic_listen(5, Transcript).
+    ?- iochan_listen(5, Transcript).
     Transcript = "what I just said".    % (if arecord + whisper-cli installed)
 
 IMAGE OUTPUT
 
     % Display an image in the terminal (requires img2txt).
-    ?- ic_image_out(console_config, '/path/to/image.png', Status).
+    ?- iochan_image_out(console_config, '/path/to/image.png', Status).
 
     % Email an image attachment.
-    ?- ic_image_out(email_config('user@example.com', 'Photo'), '/path/to/photo.jpg', S).
+    ?- iochan_image_out(email_config('user@example.com', 'Photo'), '/path/to/photo.jpg', S).
 
 IMAGE INPUT
 
     % Capture from a webcam.
-    ?- ic_register_channel(image_in, webcam_config('/dev/video0'), CamId),
-       ic_image_in(CamId, ImagePath).
+    ?- iochan_register_channel(image_in, webcam_config('/dev/video0'), CamId),
+       iochan_image_in(CamId, ImagePath).
 
 PRINTER OUTPUT
 
     % Print text to the default CUPS printer.
-    ?- ic_register_channel(printer, printer_config('', []), PrintId),
-       ic_print_text(PrintId, 'PrologAI report.', Status).
+    ?- iochan_register_channel(printer, printer_config('', []), PrintId),
+       iochan_print_text(PrintId, 'PrologAI report.', Status).
 
     % Print an image.
-    ?- ic_print_image(PrintId, '/path/to/diagram.png', Status).
+    ?- iochan_print_image(PrintId, '/path/to/diagram.png', Status).
 
 All hardware-dependent predicates degrade gracefully: if the required external program
 (espeak-ng, festival, arecord, whisper-cli, sendmail, mutt, xdotool, img2txt,

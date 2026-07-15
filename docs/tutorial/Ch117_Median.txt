@@ -10,80 +10,80 @@ which is essential for correct median computation when values repeat.
 
 Predicates:
 
-md_median(+List, -M)
+median_median(+List, -M)
   Lower median of a non-empty integer list.
 
-md_row(+Grid, +R, -M)
+median_row(+Grid, +R, -M)
   Lower median of row R (0-based) of Grid.
 
-md_col(+Grid, +C, -M)
+median_col(+Grid, +C, -M)
   Lower median of column C (0-based) of Grid.
 
-md_row_medians(+Grid, -Ms)
+median_row_medians(+Grid, -Ms)
   List of per-row lower medians, one per row.
 
-md_col_medians(+Grid, -Ms)
+median_col_medians(+Grid, -Ms)
   List of per-column lower medians, one per column.
 
-md_grid(+Grid, -M)
+median_grid(+Grid, -M)
   Lower median of all cell values in Grid.
 
-md_filter4(+Grid, -OutGrid)
+median_filter4(+Grid, -OutGrid)
   4-connected median filter: each output cell is the median of the cell and its
   in-bounds 4-neighbors (3-5 values depending on border proximity).
 
-md_filter8(+Grid, -OutGrid)
+median_filter8(+Grid, -OutGrid)
   8-connected median filter: each output cell is the median of the cell and its
   in-bounds 8-neighbors (4-9 values).
 
-md_above(+Grid, -Cells)
+median_above(+Grid, -Cells)
   Sorted R-C positions with value strictly above the grid-wide lower median.
 
-md_below(+Grid, -Cells)
+median_below(+Grid, -Cells)
   Sorted R-C positions with value strictly below the grid-wide lower median.
 
-md_row_above(+Grid, +R, -Cells)
+median_row_above(+Grid, +R, -Cells)
   R-C positions in row R with value strictly above that row's lower median.
 
-md_row_below(+Grid, +R, -Cells)
+median_row_below(+Grid, +R, -Cells)
   R-C positions in row R with value strictly below that row's lower median.
 
-md_col_above(+Grid, +C, -Cells)
+median_col_above(+Grid, +C, -Cells)
   R-C positions in column C with value strictly above that column's lower median.
 
-md_col_below(+Grid, +C, -Cells)
+median_col_below(+Grid, +C, -Cells)
   R-C positions in column C with value strictly below that column's lower median.
 
 Example:
 
-?- md_median([1,2,3,4,5], M).
+?- median_median([1,2,3,4,5], M).
 M = 3.
 
-?- md_median([1,1,1,2,3], M).
+?- median_median([1,1,1,2,3], M).
 M = 1.
 
-?- md_grid([[1,2,3],[4,5,6],[7,8,9]], M).
+?- median_grid([[1,2,3],[4,5,6],[7,8,9]], M).
 M = 5.
 
-?- md_filter4([[1,2,3],[4,5,6],[7,8,9]], F).
+?- median_filter4([[1,2,3],[4,5,6],[7,8,9]], F).
 F = [[2,2,3],[4,5,5],[7,7,8]].
 
-?- md_filter8([[1,2,1],[2,4,2],[1,2,1]], F).
+?- median_filter8([[1,2,1],[2,4,2],[1,2,1]], F).
 F = [[2,2,2],[2,2,2],[2,2,2]].
 
-?- md_above([[1,2,3],[4,5,6],[7,8,9]], C).
+?- median_above([[1,2,3],[4,5,6],[7,8,9]], C).
 C = [1-2,2-0,2-1,2-2].
 
-?- md_row_above([[1,2,3],[4,5,6],[7,8,9]], 1, C).
+?- median_row_above([[1,2,3],[4,5,6],[7,8,9]], 1, C).
 C = [1-2].
 
 Implementation notes:
 
-md_median uses msort/2 (built-in, not in any library) which preserves duplicate
+median_median uses msort/2 (built-in, not in any library) which preserves duplicate
 values.  sort/2 would deduplicate and give wrong medians for repeated values.
 
-md_filter4 and md_filter8 use triple-nested findall: the outer findall collects
+median_filter4 and median_filter8 use triple-nested findall: the outer findall collects
 rows, the middle collects per-cell medians, and the innermost collects neighbor
-values.  md_median is then called on [CellValue|NeighborValues].
+values.  median_median is then called on [CellValue|NeighborValues].
 
 All 42 acceptance tests pass under SWI-Prolog.

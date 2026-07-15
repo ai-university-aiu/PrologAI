@@ -36,9 +36,9 @@ right-to-left. The result is a list of hull vertices in clockwise order
 in screen coordinates (row increasing downward).
 
 
-89.1 Computing the Hull - hu_convex_hull/2
+89.1 Computing the Hull - hull_convex_hull/2
 
-hu_convex_hull(+Cells, -Hull)
+hull_convex_hull(+Cells, -Hull)
 
 Hull is a list of R-C vertex cells forming the convex hull of Cells.
 Vertices are in clockwise screen order (R increases downward). Collinear
@@ -47,21 +47,21 @@ points are excluded - only the corner vertices are kept.
 Examples:
 
 % Five cells: four corners plus center; only the corners are on the hull.
-hu_convex_hull([0-0, 0-2, 2-0, 2-2, 1-1], Hull).
+hull_convex_hull([0-0, 0-2, 2-0, 2-2, 1-1], Hull).
 % sort(Hull, S), S = [0-0, 0-2, 2-0, 2-2]
 
 % Three collinear cells: hull has only the two endpoints.
-hu_convex_hull([0-0, 0-1, 0-2], Hull).
+hull_convex_hull([0-0, 0-1, 0-2], Hull).
 % sort(Hull, S), S = [0-0, 0-2]
 
 % Single cell: hull is just that cell.
-hu_convex_hull([1-1], Hull).
+hull_convex_hull([1-1], Hull).
 % Hull = [1-1]
 
 
-89.2 Convexity Test - hu_is_convex/1
+89.2 Convexity Test - hull_is_convex/1
 
-hu_is_convex(+Cells)
+hull_is_convex(+Cells)
 
 Succeed if Cells is a convex discrete shape: the set of cells must equal
 the complete set of grid cells inside (or on) its convex hull. A fully
@@ -70,23 +70,23 @@ filled square is convex; an L-shape is not.
 Examples:
 
 % A filled 3x3 grid equals the interior of its own hull - convex.
-hu_is_convex([0-0,0-1,0-2,1-0,1-1,1-2,2-0,2-1,2-2]).  % succeeds
+hull_is_convex([0-0,0-1,0-2,1-0,1-1,1-2,2-0,2-1,2-2]).  % succeeds
 
 % An L-shape has cell (1,1) inside its hull but not in the set.
-hu_is_convex([0-0, 1-0, 2-0, 2-1, 2-2]).  % fails
+hull_is_convex([0-0, 1-0, 2-0, 2-1, 2-2]).  % fails
 
 % A single cell is trivially convex.
-hu_is_convex([1-1]).  % succeeds
+hull_is_convex([1-1]).  % succeeds
 
 
 89.3 Hull Size and Area
 
-hu_hull_size(+Cells, -N)
+hull_hull_size(+Cells, -N)
 
 N is the number of vertices in the convex hull. Collinear middle points
 are not counted.
 
-hu_hull_area2(+Cells, -A2)
+hull_hull_area2(+Cells, -A2)
 
 A2 is twice the area of the convex hull, computed via the shoelace formula.
 Always an integer (no floating-point arithmetic). Returns 0 for degenerate
@@ -95,22 +95,22 @@ hulls with fewer than 3 vertices (points or line segments).
 Examples:
 
 % Unit square: 4 vertices, area 1, twice area = 2.
-hu_hull_size([0-0, 0-1, 1-0, 1-1], N).   % N = 4
-hu_hull_area2([0-0, 0-1, 1-0, 1-1], A2). % A2 = 2
+hull_hull_size([0-0, 0-1, 1-0, 1-1], N).   % N = 4
+hull_hull_area2([0-0, 0-1, 1-0, 1-1], A2). % A2 = 2
 
 % 2-unit square (3x3 corners): 4 vertices, area 4, twice area = 8.
-hu_hull_area2([0-0, 0-2, 2-0, 2-2], A2). % A2 = 8
+hull_hull_area2([0-0, 0-2, 2-0, 2-2], A2). % A2 = 8
 
 % Collinear cells: degenerate hull, area = 0.
-hu_hull_area2([0-0, 0-1, 0-2], A2). % A2 = 0
+hull_hull_area2([0-0, 0-1, 0-2], A2). % A2 = 0
 
 
-89.4 Point-in-Hull Test - hu_in_hull/3
+89.4 Point-in-Hull Test - hull_in_hull/3
 
-hu_in_hull(+R, +C, +Hull)
+hull_in_hull(+R, +C, +Hull)
 
 Succeed if cell (R,C) lies inside or on the convex hull Hull. Hull must
-be a list of vertices as returned by hu_convex_hull.
+be a list of vertices as returned by hull_convex_hull.
 
 For a hull with 3 or more vertices, the test checks that the cross product
 of (edge direction) and (point-minus-edge-start) is non-positive for every
@@ -120,21 +120,21 @@ that the point lies within the bounding box of the two endpoints.
 Examples:
 
 % First compute the hull.
-hu_convex_hull([0-0, 0-2, 2-0, 2-2], Hull).
+hull_convex_hull([0-0, 0-2, 2-0, 2-2], Hull).
 
 % Test center: inside.
-hu_in_hull(1, 1, Hull).  % succeeds
+hull_in_hull(1, 1, Hull).  % succeeds
 
 % Test a boundary point: on the edge.
-hu_in_hull(2, 1, Hull).  % succeeds (on the bottom edge)
+hull_in_hull(2, 1, Hull).  % succeeds (on the bottom edge)
 
 % Test outside: fails.
-hu_in_hull(3, 3, Hull).  % fails
+hull_in_hull(3, 3, Hull).  % fails
 
 
-89.5 All Cells Inside the Hull - hu_cells_in_hull/3
+89.5 All Cells Inside the Hull - hull_cells_in_hull/3
 
-hu_cells_in_hull(+Grid, +Cells, -InHull)
+hull_cells_in_hull(+Grid, +Cells, -InHull)
 
 InHull is the sorted list of all grid cells that lie inside or on the
 convex hull of Cells. The Grid is used only for its dimensions (row and
@@ -145,21 +145,21 @@ Examples:
 Grid = [[0,0,0],[0,0,0],[0,0,0]].  % 3x3 grid
 
 % Hull of four corners contains all 9 cells.
-hu_cells_in_hull(Grid, [0-0, 0-2, 2-0, 2-2], InHull).
+hull_cells_in_hull(Grid, [0-0, 0-2, 2-0, 2-2], InHull).
 % length(InHull, 9)
 
 % Hull of a single cell contains only that cell.
-hu_cells_in_hull(Grid, [1-1], InHull).
+hull_cells_in_hull(Grid, [1-1], InHull).
 % InHull = [1-1]
 
 % Hull of two cells on the same row: all cells on that row segment.
-hu_cells_in_hull(Grid, [0-0, 0-2], InHull).
+hull_cells_in_hull(Grid, [0-0, 0-2], InHull).
 % InHull = [0-0, 0-1, 0-2]
 
 
-89.6 Filling the Hull Region - hu_fill_hull/4
+89.6 Filling the Hull Region - hull_fill_hull/4
 
-hu_fill_hull(+Grid, +Cells, +Color, -Out)
+hull_fill_hull(+Grid, +Cells, +Color, -Out)
 
 Out is Grid with every cell inside the convex hull of Cells set to Color.
 Cells outside the hull retain their original values.
@@ -167,17 +167,17 @@ Cells outside the hull retain their original values.
 Examples:
 
 % Fill the entire 3x3 grid (hull of four corners covers all 9 cells).
-hu_fill_hull([[0,0,0],[0,0,0],[0,0,0]], [0-0, 0-2, 2-0, 2-2], 1, Out).
+hull_fill_hull([[0,0,0],[0,0,0],[0,0,0]], [0-0, 0-2, 2-0, 2-2], 1, Out).
 % Out = [[1,1,1],[1,1,1],[1,1,1]]
 
 % Fill only the triangle in the upper-left.
-hu_fill_hull([[0,0,0],[0,0,0],[0,0,0]], [0-0, 0-2, 2-0], 3, Out).
+hull_fill_hull([[0,0,0],[0,0,0],[0,0,0]], [0-0, 0-2, 2-0], 3, Out).
 % Out = [[3,3,3],[3,3,0],[3,0,0]]
 
 
-89.7 Finding Concavities - hu_concavities/4
+89.7 Finding Concavities - hull_concavities/4
 
-hu_concavities(+Grid, +Cells, +Bg, -Missing)
+hull_concavities(+Grid, +Cells, +Bg, -Missing)
 
 Missing is the sorted list of Bg-valued grid cells that are inside the
 convex hull of Cells but are absent from Cells themselves. These are the
@@ -188,21 +188,21 @@ Examples:
 Grid = [[0,0,0],[0,0,0],[0,0,0]].
 
 % L-shape: cell (1,1) is inside the hull but not in the L.
-hu_concavities(Grid, [0-0,1-0,2-0,2-1,2-2], 0, Missing).
+hull_concavities(Grid, [0-0,1-0,2-0,2-1,2-2], 0, Missing).
 % Missing = [1-1]
 
 % Full square: no missing cells.
-hu_concavities([[0,0],[0,0]], [0-0,0-1,1-0,1-1], 0, Missing).
+hull_concavities([[0,0],[0,0]], [0-0,0-1,1-0,1-1], 0, Missing).
 % Missing = []
 
 % Three triangle corners: three cells inside the hull not in the set.
-hu_concavities(Grid, [0-0, 0-2, 2-0], 0, Missing).
+hull_concavities(Grid, [0-0, 0-2, 2-0], 0, Missing).
 % sort(Missing, S), S = [0-1, 1-0, 1-1]
 
 
-89.8 Diameter - hu_diameter/4
+89.8 Diameter - hull_diameter/4
 
-hu_diameter(+Cells, -P1, -P2, -D2)
+hull_diameter(+Cells, -P1, -P2, -D2)
 
 P1 and P2 are the pair of cells in Cells with the greatest squared
 Euclidean distance; D2 is that squared distance. Fails if Cells has fewer
@@ -211,16 +211,16 @@ than two elements.
 Examples:
 
 % Diagonal of 3x3 square: squared distance 8.
-hu_diameter([0-0, 0-2, 2-0, 2-2], _P1, _P2, D2). % D2 = 8
+hull_diameter([0-0, 0-2, 2-0, 2-2], _P1, _P2, D2). % D2 = 8
 
 % Three points in a right triangle: hypotenuse is the diameter.
-hu_diameter([0-0, 0-2, 2-0], P1, P2, D2).
+hull_diameter([0-0, 0-2, 2-0], P1, P2, D2).
 % P1 = 0-2, P2 = 2-0, D2 = 8
 
 
-89.9 Hull Dimensions - hu_aspect/3
+89.9 Hull Dimensions - hull_aspect/3
 
-hu_aspect(+Cells, -H, -W)
+hull_aspect(+Cells, -H, -W)
 
 H is the row-span (MaxR - MinR) and W is the column-span (MaxC - MinC)
 of the convex hull bounding box. A horizontal segment has H=0; a vertical
@@ -228,14 +228,14 @@ segment has W=0.
 
 Examples:
 
-hu_aspect([0-0, 0-2, 2-0, 2-2], H, W). % H=2, W=2 (square)
-hu_aspect([0-0, 0-2], H, W).            % H=0, W=2 (horizontal segment)
-hu_aspect([0-0, 1-0, 2-0, 2-1, 2-2], H, W). % H=2, W=2 (L-shape hull)
+hull_aspect([0-0, 0-2, 2-0, 2-2], H, W). % H=2, W=2 (square)
+hull_aspect([0-0, 0-2], H, W).            % H=0, W=2 (horizontal segment)
+hull_aspect([0-0, 1-0, 2-0, 2-1, 2-2], H, W). % H=2, W=2 (L-shape hull)
 
 
-89.10 Rectangle Test - hu_is_rect/1
+89.10 Rectangle Test - hull_is_rect/1
 
-hu_is_rect(+Cells)
+hull_is_rect(+Cells)
 
 Succeed if the convex hull of Cells has exactly 4 vertices and all four
 interior angles are exactly 90 degrees. Works for both axis-aligned and
@@ -243,14 +243,14 @@ tilted rectangles.
 
 Examples:
 
-hu_is_rect([0-0, 0-3, 2-0, 2-3]).   % succeeds (axis-aligned rectangle)
-hu_is_rect([0-0, 0-2, 2-0]).          % fails (triangle, only 3 vertices)
-hu_is_rect([0-1, 1-2, 2-1, 1-0]).    % succeeds (tilted/rotated square)
+hull_is_rect([0-0, 0-3, 2-0, 2-3]).   % succeeds (axis-aligned rectangle)
+hull_is_rect([0-0, 0-2, 2-0]).          % fails (triangle, only 3 vertices)
+hull_is_rect([0-1, 1-2, 2-1, 1-0]).    % succeeds (tilted/rotated square)
 
 
-89.11 Hull Perimeter - hu_hull_perim2/2
+89.11 Hull Perimeter - hull_hull_perim2/2
 
-hu_hull_perim2(+Cells, -P2)
+hull_hull_perim2(+Cells, -P2)
 
 P2 is the sum of squared edge lengths around the closed hull. This avoids
 floating-point arithmetic (no square roots). Returns 0 for hulls with
@@ -261,14 +261,14 @@ squared edge lengths. P2 is a monotone proxy for the true perimeter.
 
 Examples:
 
-hu_hull_perim2([0-0, 0-1, 1-0, 1-1], P2). % P2=4 (four unit edges, L2=1 each)
-hu_hull_perim2([0-0, 0-2, 2-0, 2-2], P2). % P2=16 (four edges, L2=4 each)
-hu_hull_perim2([0-0, 0-2, 2-0], P2).       % P2=16 (legs L2=4, hyp L2=8)
+hull_hull_perim2([0-0, 0-1, 1-0, 1-1], P2). % P2=4 (four unit edges, L2=1 each)
+hull_hull_perim2([0-0, 0-2, 2-0, 2-2], P2). % P2=16 (four edges, L2=4 each)
+hull_hull_perim2([0-0, 0-2, 2-0], P2).       % P2=16 (legs L2=4, hyp L2=8)
 
 
-89.12 Centroid - hu_centroid/3
+89.12 Centroid - hull_centroid/3
 
-hu_centroid(+Cells, -AvgR, -AvgC)
+hull_centroid(+Cells, -AvgR, -AvgC)
 
 AvgR and AvgC are the integer floor of the average row and column of the
 hull vertices (not of all cells in Cells). The centroid of the hull gives
@@ -277,15 +277,15 @@ a reasonable center estimate for the shape. Fails if Cells is empty.
 Examples:
 
 % Four corners of 3x3 square: centroid = (1,1).
-hu_centroid([0-0, 0-2, 2-0, 2-2], AvgR, AvgC). % AvgR=1, AvgC=1
+hull_centroid([0-0, 0-2, 2-0, 2-2], AvgR, AvgC). % AvgR=1, AvgC=1
 
 % Tilted square: centroid = (1,1).
-hu_centroid([0-1, 1-2, 2-1, 1-0], AvgR, AvgC). % AvgR=1, AvgC=1
+hull_centroid([0-1, 1-2, 2-1, 1-0], AvgR, AvgC). % AvgR=1, AvgC=1
 
 
-89.13 Containment Test - hu_hull_contains/2
+89.13 Containment Test - hull_hull_contains/2
 
-hu_hull_contains(+Cells, +SubCells)
+hull_hull_contains(+Cells, +SubCells)
 
 Succeed if every cell in SubCells lies inside or on the convex hull of
 Cells. Fails if any cell in SubCells is outside the hull.
@@ -293,33 +293,33 @@ Cells. Fails if any cell in SubCells is outside the hull.
 Examples:
 
 % Center is inside the hull of four corners.
-hu_hull_contains([0-0, 0-2, 2-0, 2-2], [1-1]).  % succeeds
+hull_hull_contains([0-0, 0-2, 2-0, 2-2], [1-1]).  % succeeds
 
 % Cell (5,5) is outside.
-hu_hull_contains([0-0, 0-2, 2-0, 2-2], [5-5]).  % fails
+hull_hull_contains([0-0, 0-2, 2-0, 2-2], [5-5]).  % fails
 
 % Edge midpoints are on the boundary.
-hu_hull_contains([0-0, 0-2, 2-0, 2-2], [0-1, 1-0, 1-2, 2-1]).  % succeeds
+hull_hull_contains([0-0, 0-2, 2-0, 2-2], [0-1, 1-0, 1-2, 2-1]).  % succeeds
 
 
 89.14 Summary
 
 The hull pack provides convex hull computation and polygon geometry:
 
-- hu_convex_hull     - compute convex hull vertices (CW screen order)
-- hu_is_convex       - test if a cell set equals its hull interior
-- hu_hull_size       - count hull vertices
-- hu_hull_area2      - twice the hull area (integer shoelace)
-- hu_in_hull         - test if a point is inside/on the hull
-- hu_cells_in_hull   - all grid cells inside the hull
-- hu_fill_hull       - paint hull interior with a color
-- hu_concavities     - Bg cells inside hull but absent from shape
-- hu_diameter        - farthest pair of cells (max squared distance)
-- hu_aspect          - hull bounding box height and width
-- hu_is_rect         - test for rectangular hull (4 right angles)
-- hu_hull_perim2     - sum of squared hull edge lengths
-- hu_centroid        - floor of average hull vertex position
-- hu_hull_contains   - test containment of a cell set
+- hull_convex_hull     - compute convex hull vertices (CW screen order)
+- hull_is_convex       - test if a cell set equals its hull interior
+- hull_hull_size       - count hull vertices
+- hull_hull_area2      - twice the hull area (integer shoelace)
+- hull_in_hull         - test if a point is inside/on the hull
+- hull_cells_in_hull   - all grid cells inside the hull
+- hull_fill_hull       - paint hull interior with a color
+- hull_concavities     - Bg cells inside hull but absent from shape
+- hull_diameter        - farthest pair of cells (max squared distance)
+- hull_aspect          - hull bounding box height and width
+- hull_is_rect         - test for rectangular hull (4 right angles)
+- hull_hull_perim2     - sum of squared hull edge lengths
+- hull_centroid        - floor of average hull vertex position
+- hull_hull_contains   - test containment of a cell set
 
 All predicates are deterministic. No floating-point arithmetic is used.
 The cross product and shoelace formula work entirely in integers.

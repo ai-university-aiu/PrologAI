@@ -19,158 +19,158 @@ Layer: 175. No dependencies on other packs.
 
 157.2 Color and Size Sequences
 
-oq_color_seq(+Objs, -Colors)
+objseq_color_seq(+Objs, -Colors)
 
 Extract the color from each obj in list order.
 
     Objs = [obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(0,2)])],
-    oq_color_seq(Objs, Colors).
+    objseq_color_seq(Objs, Colors).
     % Colors = [r, b, g]
 
-oq_size_seq(+Objs, -Sizes)
+objseq_size_seq(+Objs, -Sizes)
 
 Extract the cell count from each obj in list order.
 
     bar2 = obj(b,[r(0,0),r(0,1)]),   % size 2
     bar3 = obj(g,[r(1,0),r(1,1),r(1,2)]),   % size 3
-    oq_size_seq([bar2, bar3], Sizes).
+    objseq_size_seq([bar2, bar3], Sizes).
     % Sizes = [2, 3]
 
 157.3 Centroid and Step Sequences
 
-oq_centroid_seq(+Objs, -Centroids)
+objseq_centroid_seq(+Objs, -Centroids)
 
 Extract the floor-average centroid of each obj as r(R,C).
 
-    oq_centroid_seq([obj(r,[r(0,0)]), obj(b,[r(2,0)])], Cs).
+    objseq_centroid_seq([obj(r,[r(0,0)]), obj(b,[r(2,0)])], Cs).
     % Cs = [r(0,0), r(2,0)]
 
-oq_step_seq(+Objs, -Steps)
+objseq_step_seq(+Objs, -Steps)
 
 Compute consecutive centroid deltas as dr(DR,DC) terms. The result has
 one fewer element than Objs.
 
     Objs = [obj(r,[r(0,0)]), obj(b,[r(2,0)]), obj(g,[r(4,0)])],
-    oq_step_seq(Objs, Steps).
+    objseq_step_seq(Objs, Steps).
     % Steps = [dr(2,0), dr(2,0)]
 
 157.4 Monotone Size Tests
 
-oq_is_growing(+Objs)
+objseq_is_growing(+Objs)
 
 Succeeds if cell counts are strictly increasing in list order.
 
-    oq_is_growing([obj(r,[_]), obj(b,[_,_]), obj(g,[_,_,_])]).   % succeeds
+    objseq_is_growing([obj(r,[_]), obj(b,[_,_]), obj(g,[_,_,_])]).   % succeeds
 
-oq_is_shrinking(+Objs)
+objseq_is_shrinking(+Objs)
 
 Succeeds if cell counts are strictly decreasing in list order.
 
-    oq_is_shrinking([obj(r,[_,_,_]), obj(b,[_,_]), obj(g,[_])]).   % succeeds
+    objseq_is_shrinking([obj(r,[_,_,_]), obj(b,[_,_]), obj(g,[_])]).   % succeeds
 
 Both trivially succeed for 0 or 1 objects.
 
 157.5 Constant Step Analysis
 
-oq_const_step(+Objs, -DR, -DC)
+objseq_const_step(+Objs, -DR, -DC)
 
 Succeeds and binds DR and DC if all consecutive centroid steps are the same.
 Requires at least 2 objects.
 
     Objs = [obj(r,[r(0,0)]), obj(b,[r(2,0)]), obj(g,[r(4,0)])],
-    oq_const_step(Objs, DR, DC).
+    objseq_const_step(Objs, DR, DC).
     % DR = 2, DC = 0
 
-oq_const_row_step(+Objs, -DR)
+objseq_const_row_step(+Objs, -DR)
 
 Verifies all row steps are DR, ignoring column steps.
 
-oq_const_col_step(+Objs, -DC)
+objseq_const_col_step(+Objs, -DC)
 
 Verifies all column steps are DC, ignoring row steps.
 
     Objs = [obj(r,[r(0,0)]), obj(b,[r(0,3)]), obj(g,[r(0,6)])],
-    oq_const_col_step(Objs, DC).
+    objseq_const_col_step(Objs, DC).
     % DC = 3
 
 157.6 Periodic Sequences
 
-oq_color_period(+Objs, -P, -Cycle)
+objseq_color_period(+Objs, -P, -Cycle)
 
 Find the smallest period P such that Cycle (a list of length P) tiles the
 color sequence exactly. N mod P must equal 0 where N is length(Objs).
 
     Objs = [obj(r,_), obj(b,_), obj(r,_), obj(b,_)],
-    oq_color_period(Objs, P, Cycle).
+    objseq_color_period(Objs, P, Cycle).
     % P = 2, Cycle = [r, b]
 
     % Period 1 (all same color):
-    oq_color_period([obj(r,_),obj(r,_),obj(r,_)], P, Cycle).
+    objseq_color_period([obj(r,_),obj(r,_),obj(r,_)], P, Cycle).
     % P = 1, Cycle = [r]
 
-oq_size_period(+Objs, -P, -Cycle)
+objseq_size_period(+Objs, -P, -Cycle)
 
-Same as oq_color_period but for the size (cell-count) sequence.
+Same as objseq_color_period but for the size (cell-count) sequence.
 
     Objs = [obj(r,[_]), obj(b,[_,_]), obj(g,[_]), obj(y,[_,_])],
-    oq_size_period(Objs, P, Cycle).
+    objseq_size_period(Objs, P, Cycle).
     % P = 2, Cycle = [1, 2]
 
 157.7 Collinearity and Position Prediction
 
-oq_collinear(+Objs)
+objseq_collinear(+Objs)
 
 Succeeds if all centroids lie on a single straight line. Uses the 2D cross
 product: P1, P2, P3 are collinear if (P2-P1) x (P3-P1) = 0.
 
     % Horizontal line:
-    oq_collinear([obj(r,[r(0,0)]), obj(b,[r(0,2)]), obj(g,[r(0,4)])]).
+    objseq_collinear([obj(r,[r(0,0)]), obj(b,[r(0,2)]), obj(g,[r(0,4)])]).
 
     % Diagonal line:
-    oq_collinear([obj(r,[r(0,0)]), obj(b,[r(1,1)]), obj(g,[r(2,2)])]).
+    objseq_collinear([obj(r,[r(0,0)]), obj(b,[r(1,1)]), obj(g,[r(2,2)])]).
 
     % Not collinear:
-    \+ oq_collinear([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])]).
+    \+ objseq_collinear([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])]).
 
-oq_next_centroid(+Objs, -r(NR,NC))
+objseq_next_centroid(+Objs, -r(NR,NC))
 
 Predicts the next centroid in a regular sequence by projecting the constant
 step one position beyond the last centroid.
 
     Objs = [obj(r,[r(0,0)]), obj(b,[r(2,0)]), obj(g,[r(4,0)])],
-    oq_next_centroid(Objs, r(NR, NC)).
+    objseq_next_centroid(Objs, r(NR, NC)).
     % NR = 6, NC = 0
 
-Fails if the step is not constant (oq_const_step would fail).
+Fails if the step is not constant (objseq_const_step would fail).
 
 157.8 Color Mapping
 
-oq_zip_colors(+Objs1, +Objs2, -Pairs)
+objseq_zip_colors(+Objs1, +Objs2, -Pairs)
 
 Zip two obj lists into C1-C2 color pairs. Useful for recording the color
 mapping between input and output objects after a transformation.
 
     In  = [obj(r,[r(0,0)]), obj(b,[r(1,0)])],
     Out = [obj(g,[r(0,0)]), obj(y,[r(1,0)])],
-    oq_zip_colors(In, Out, Pairs).
+    objseq_zip_colors(In, Out, Pairs).
     % Pairs = [r-g, b-y]
 
 157.9 Summary
 
 Predicate             Description
-oq_color_seq/2        color list in list order
-oq_size_seq/2         cell-count list in list order
-oq_centroid_seq/2     centroid sequence as r(R,C) list
-oq_step_seq/2         consecutive centroid deltas as dr(DR,DC) list
-oq_is_growing/1       sizes strictly increasing
-oq_is_shrinking/1     sizes strictly decreasing
-oq_const_step/3       all centroid steps equal (DR, DC)
-oq_const_row_step/2   all row steps equal DR
-oq_const_col_step/2   all col steps equal DC
-oq_color_period/3     minimal color-sequence period P and unit cycle
-oq_size_period/3      minimal size-sequence period P and unit cycle
-oq_collinear/1        all centroids on one line
-oq_next_centroid/2    predict next position from constant step
-oq_zip_colors/3       zip two obj lists into color pairs
+objseq_color_seq/2        color list in list order
+objseq_size_seq/2         cell-count list in list order
+objseq_centroid_seq/2     centroid sequence as r(R,C) list
+objseq_step_seq/2         consecutive centroid deltas as dr(DR,DC) list
+objseq_is_growing/1       sizes strictly increasing
+objseq_is_shrinking/1     sizes strictly decreasing
+objseq_const_step/3       all centroid steps equal (DR, DC)
+objseq_const_row_step/2   all row steps equal DR
+objseq_const_col_step/2   all col steps equal DC
+objseq_color_period/3     minimal color-sequence period P and unit cycle
+objseq_size_period/3      minimal size-sequence period P and unit cycle
+objseq_collinear/1        all centroids on one line
+objseq_next_centroid/2    predict next position from constant step
+objseq_zip_colors/3       zip two obj lists into color pairs
 
 This is WP 196, PrologAI Layer 175.

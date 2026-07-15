@@ -15,49 +15,49 @@ Layer 198. Pack prefix: gt_*. Work Package 219.
 Exported Predicates
 
 
-gt_diff_cells(+Before, +After, -Cells)
+gridtask_diff_cells(+Before, +After, -Cells)
 
 Cells is the list of r(R,C) positions where Before and After have different values.
 Both grids must have the same dimensions.
 
 Example:
 
-gt_diff_cells([[r,r],[r,r]], [[r,b],[r,r]], Diffs).
+gridtask_diff_cells([[r,r],[r,r]], [[r,b],[r,r]], Diffs).
 % Diffs = [r(0,1)]
 
 
-gt_n_changed(+Before, +After, -N)
+gridtask_n_changed(+Before, +After, -N)
 
 N is the count of cells that differ between Before and After.
 
 Example:
 
-gt_n_changed([[r,r],[r,r]], [[b,b],[b,b]], N).
+gridtask_n_changed([[r,r],[r,r]], [[b,b],[b,b]], N).
 % N = 4
 
 
-gt_unchanged_cells(+Before, +After, -Cells)
+gridtask_unchanged_cells(+Before, +After, -Cells)
 
 Cells is the list of r(R,C) positions where Before and After have the same value.
 
 Example:
 
-gt_unchanged_cells([[r,r],[r,r]], [[r,b],[r,r]], Cells).
+gridtask_unchanged_cells([[r,r],[r,r]], [[r,b],[r,r]], Cells).
 % length(Cells, 3)
 
 
-gt_bg_color(+Grid, -BgColor)
+gridtask_bg_color(+Grid, -BgColor)
 
 BgColor is the most frequent color in Grid (the background color). Ties broken
 by standard term order.
 
 Example:
 
-gt_bg_color([[r,r,r],[r,b,r],[r,r,r]], BgColor).
+gridtask_bg_color([[r,r,r],[r,b,r],[r,r,r]], BgColor).
 % BgColor = r
 
 
-gt_infer_color_map(+Before, +After, -Map)
+gridtask_infer_color_map(+Before, +After, -Map)
 
 Map is a list of From-To pairs where From is a color in Before and To is the
 corresponding color in After at the same position. Includes identity pairs (V-V)
@@ -66,39 +66,39 @@ target colors (inconsistent partial recoloring).
 
 Example:
 
-gt_infer_color_map([[b,b],[b,b]], [[g,g],[g,g]], Map).
+gridtask_infer_color_map([[b,b],[b,b]], [[g,g],[g,g]], Map).
 % Map = [b-g]
 
 % Partial recolor fails - r maps to both r and b:
-gt_infer_color_map([[r,r],[r,r]], [[r,b],[r,r]], _).
+gridtask_infer_color_map([[r,r],[r,r]], [[r,b],[r,r]], _).
 % fails
 
 
-gt_test_color_map(+Map, +Before, +After)
+gridtask_test_color_map(+Map, +Before, +After)
 
 Succeed iff applying Map to Before yields After exactly.
 
 Example:
 
-gt_test_color_map([b-g], [[b,b]], [[g,g]]).
+gridtask_test_color_map([b-g], [[b,b]], [[g,g]]).
 % succeeds
 
 
-gt_apply_color_map(+Map, +Grid, -NewGrid)
+gridtask_apply_color_map(+Map, +Grid, -NewGrid)
 
 NewGrid is Grid with each cell recolored via Map. Cells whose color is not in
 Map are left unchanged.
 
 Example:
 
-gt_apply_color_map([r-b], [[r,r],[r,r]], NewG).
+gridtask_apply_color_map([r-b], [[r,r],[r,r]], NewG).
 % NewG = [[b,b],[b,b]]
 
-gt_apply_color_map([b-g], [[r,b],[r,r]], NewG).
+gridtask_apply_color_map([b-g], [[r,b],[r,r]], NewG).
 % NewG = [[r,g],[r,r]]
 
 
-gt_color_map_pairs(+Pairs, -Map)
+gridtask_color_map_pairs(+Pairs, -Map)
 
 Map is the consistent color substitution table derived from all Before-After pairs
 in Pairs. Collects From-To evidence from every cell of every pair. Fails if any
@@ -106,33 +106,33 @@ source color maps to two different targets across any pair.
 
 Example:
 
-gt_color_map_pairs([[[r]]-[[b]], [[r,r]]-[[b,b]]], Map).
+gridtask_color_map_pairs([[[r]]-[[b]], [[r,r]]-[[b,b]]], Map).
 % memberchk(r-b, Map)
 
 
-gt_is_color_sub(+Pairs)
+gridtask_is_color_sub(+Pairs)
 
 Succeed if there exists a single consistent color substitution map that exactly
 explains every Before-After pair in Pairs.
 
 
-gt_is_identity(+Before, +After)
+gridtask_is_identity(+Before, +After)
 
 Succeed if Before and After are structurally identical (==).
 
 
-gt_is_scale(+Before, +After, -N)
+gridtask_is_scale(+Before, +After, -N)
 
 Succeed if After is obtained by repeating each cell of Before into an N x N block.
 N must be an integer >= 2; fails for same-size grids (N=1).
 
 Example:
 
-gt_is_scale([[b,r],[r,b]], [[b,b,r,r],[b,b,r,r],[r,r,b,b],[r,r,b,b]], N).
+gridtask_is_scale([[b,r],[r,b]], [[b,b,r,r],[b,b,r,r],[r,r,b,b],[r,r,b,b]], N).
 % N = 2
 
 
-gt_infer_shift(+Before, +After, +BgColor, -dr(DR,DC))
+gridtask_infer_shift(+Before, +After, +BgColor, -dr(DR,DC))
 
 DR and DC are the row and column translation offsets such that shifting Before
 by (DR,DC) with BgColor fill reproduces After exactly. Finds the shift by
@@ -141,25 +141,25 @@ Fails if no single shift explains the transformation.
 
 Example:
 
-gt_infer_shift([[r,r,r],[b,r,r],[r,r,r]], [[r,r,r],[r,b,r],[r,r,r]], r, dr(DR,DC)).
+gridtask_infer_shift([[r,r,r],[b,r,r],[r,r,r]], [[r,r,r],[r,b,r],[r,r,r]], r, dr(DR,DC)).
 % DR = 0, DC = 1
 
 
-gt_pair_score(+Rule, +Before, +After, -Score)
+gridtask_pair_score(+Rule, +Before, +After, -Score)
 
 Score is the pixel accuracy (float in [0.0, 1.0]) of applying Rule to Before
 and comparing with After. 1.0 means exact match.
 
 Example:
 
-gt_pair_score(identity, [[r,r]], [[r,r]], Score).
+gridtask_pair_score(identity, [[r,r]], [[r,r]], Score).
 % Score = 1.0
 
-gt_pair_score(identity, [[r,r]], [[b,b]], Score).
+gridtask_pair_score(identity, [[r,r]], [[b,b]], Score).
 % Score = 0.0
 
 
-gt_solve(+Pairs, +TestBefore, -TestAfter, -Rule)
+gridtask_solve(+Pairs, +TestBefore, -TestAfter, -Rule)
 
 Tries four strategies in order: identity, color substitution, integer scale, and
 constant translation. Applies the first strategy that explains all training pairs
@@ -169,19 +169,19 @@ strategy succeeds.
 Example:
 
 % Color substitution task:
-gt_solve([[[r,r]]-[[b,b]]], [[r,r]], Out, Rule).
+gridtask_solve([[[r,r]]-[[b,b]]], [[r,r]], Out, Rule).
 % Rule = color_map([r-b]), Out = [[b,b]]
 
 % Scale-2 task:
-gt_solve([[[b,r]]-[[b,b,r,r],[b,b,r,r],[r,r,b,b],[r,r,b,b]]], [[b]], Out, Rule).
+gridtask_solve([[[b,r]]-[[b,b,r,r],[b,b,r,r],[r,r,b,b],[r,r,b,b]]], [[b]], Out, Rule).
 % Rule = scale(2)
 
 % Unknown rule falls back to identity:
-gt_solve([[[r,r]]-[[b,g]]], [[r,r]], Out, Rule).
+gridtask_solve([[[r,r]]-[[b,g]]], [[r,r]], Out, Rule).
 % Rule = identity, Out = [[r,r]]
 
 
-Strategy Order in gt_solve
+Strategy Order in gridtask_solve
 
 1. Identity: all training pairs are input == output.
 2. Color substitution: a single consistent color map explains all pairs.

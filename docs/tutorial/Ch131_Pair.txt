@@ -18,118 +18,118 @@ vertical, and two diagonals).
 
 Object Properties
 
-pr_obj_shape(+Obj, -Shape): D4-canonical shape of an obj term.
+pair_obj_shape(+Obj, -Shape): D4-canonical shape of an obj term.
 
-    pr_obj_shape(obj(1, [r(0,0), r(0,1)]), Shape).
+    pair_obj_shape(obj(1, [r(0,0), r(0,1)]), Shape).
     % Shape = [r(0,0), r(0,1)]
 
-    pr_obj_shape(obj(2, [r(0,0), r(1,0)]), Shape).
+    pair_obj_shape(obj(2, [r(0,0), r(1,0)]), Shape).
     % Shape = [r(0,0), r(0,1)]  (same canonical as horizontal pair)
 
-    pr_obj_shape(obj(3, [r(0,0)]), Shape).
+    pair_obj_shape(obj(3, [r(0,0)]), Shape).
     % Shape = [r(0,0)]
 
-pr_obj_color(+Obj, -Color): extract the color from an obj term.
+pair_obj_color(+Obj, -Color): extract the color from an obj term.
 
-    pr_obj_color(obj(5, [r(0,0)]), Color).   % Color = 5
-    pr_obj_color(obj(0, [r(1,2)]), Color).   % Color = 0
+    pair_obj_color(obj(5, [r(0,0)]), Color).   % Color = 5
+    pair_obj_color(obj(0, [r(1,2)]), Color).   % Color = 0
 
-pr_obj_size(+Obj, -N): number of cells in an obj term.
+pair_obj_size(+Obj, -N): number of cells in an obj term.
 
-    pr_obj_size(obj(1, [r(0,0)]), N).                   % N = 1
-    pr_obj_size(obj(2, [r(0,0), r(0,1), r(0,2)]), N).  % N = 3
+    pair_obj_size(obj(1, [r(0,0)]), N).                   % N = 1
+    pair_obj_size(obj(2, [r(0,0), r(0,1), r(0,2)]), N).  % N = 3
 
 
 Equality Tests
 
-pr_shape_eq(+Obj1, +Obj2): succeed if both obj terms have the same D4-canonical
+pair_shape_eq(+Obj1, +Obj2): succeed if both obj terms have the same D4-canonical
 shape. A horizontal pair and a vertical pair are shape-equal.
 
-    pr_shape_eq(obj(1, [r(0,0), r(0,1)]), obj(2, [r(0,0), r(1,0)])).
+    pair_shape_eq(obj(1, [r(0,0), r(0,1)]), obj(2, [r(0,0), r(1,0)])).
     % succeeds (both are D4-equivalent pairs)
 
-    pr_shape_eq(obj(1, [r(0,0), r(1,0), r(1,1)]),
+    pair_shape_eq(obj(1, [r(0,0), r(1,0), r(1,1)]),
                 obj(2, [r(0,0), r(0,1), r(1,0)])).
     % succeeds (L-shape and its 90 CW rotation)
 
-pr_color_eq(+Obj1, +Obj2): succeed if both obj terms have the same color.
+pair_color_eq(+Obj1, +Obj2): succeed if both obj terms have the same color.
 
-    pr_color_eq(obj(3, [r(0,0)]), obj(3, [r(1,2)])).   % succeeds
-    pr_color_eq(obj(7, [r(0,0), r(0,1)]), obj(7, [r(0,0)])).  % succeeds
+    pair_color_eq(obj(3, [r(0,0)]), obj(3, [r(1,2)])).   % succeeds
+    pair_color_eq(obj(7, [r(0,0), r(0,1)]), obj(7, [r(0,0)])).  % succeeds
 
-pr_size_eq(+Obj1, +Obj2): succeed if both obj terms have the same cell count.
+pair_size_eq(+Obj1, +Obj2): succeed if both obj terms have the same cell count.
 
-    pr_size_eq(obj(1, [r(0,0)]), obj(2, [r(5,5)])).
+    pair_size_eq(obj(1, [r(0,0)]), obj(2, [r(5,5)])).
     % succeeds (both size 1)
 
 
 Grouping
 
-pr_group_color(+Objs, -Groups): group a list of obj terms by color.
+pair_group_color(+Objs, -Groups): group a list of obj terms by color.
 Result is a sorted list of Color-[Obj] pairs.
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(0,1)]), obj(1,[r(1,0)])].
-    pr_group_color(Objs, Groups).
+    pair_group_color(Objs, Groups).
     % Groups = [1-[obj(1,[r(0,0)]),obj(1,[r(1,0)])], 2-[obj(2,[r(0,1)])]]
 
-pr_group_size(+Objs, -Groups): group by cell count.
+pair_group_size(+Objs, -Groups): group by cell count.
 Result is a sorted list of N-[Obj] pairs.
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(0,0),r(0,1)]), obj(3,[r(1,1)])].
-    pr_group_size(Objs, Groups).
+    pair_group_size(Objs, Groups).
     % Groups = [1-[obj(1,[r(0,0)]),obj(3,[r(1,1)])], 2-[obj(2,[r(0,0),r(0,1)])]]
 
-pr_group_shape(+Objs, -Groups): group by D4-canonical shape.
+pair_group_shape(+Objs, -Groups): group by D4-canonical shape.
 Horizontal and vertical objects of the same length land in the same group.
 
     Objs = [obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(1,0)]),
             obj(3,[r(0,0),r(0,1),r(0,2)])].
-    pr_group_shape(Objs, Groups).
+    pair_group_shape(Objs, Groups).
     % Groups = [[r(0,0),r(0,1)]-[obj(1,...),obj(2,...)],
     %           [r(0,0),r(0,1),r(0,2)]-[obj(3,...)]]
 
 
 Finding the Unique Object
 
-pr_unique_color(+Objs, -Obj): find the unique obj whose color appears exactly
+pair_unique_color(+Objs, -Obj): find the unique obj whose color appears exactly
 once in the list. Fails if there is not exactly one such object.
 
     Objs = [obj(1,[r(0,0)]), obj(1,[r(1,0)]), obj(2,[r(0,1)])].
-    pr_unique_color(Objs, Obj).
+    pair_unique_color(Objs, Obj).
     % Obj = obj(2,[r(0,1)])  (color 2 appears only once)
 
-pr_unique_size(+Objs, -Obj): find the unique obj whose size appears exactly once.
+pair_unique_size(+Objs, -Obj): find the unique obj whose size appears exactly once.
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(0,0),r(0,1)]), obj(3,[r(1,1)])].
-    pr_unique_size(Objs, Obj).
+    pair_unique_size(Objs, Obj).
     % Obj = obj(2,[r(0,0),r(0,1)])  (size 2 appears only once)
 
 
 Cross-Scene Matching
 
-pr_match_color(+Objs1, +Objs2, -Pairs): find Color-Obj1-Obj2 triples where
+pair_match_color(+Objs1, +Objs2, -Pairs): find Color-Obj1-Obj2 triples where
 one object from each list shares the same color.
 
     Objs1 = [obj(1,[r(0,0)]), obj(2,[r(0,1)])].
     Objs2 = [obj(1,[r(1,0)]), obj(3,[r(1,1)])].
-    pr_match_color(Objs1, Objs2, Pairs).
+    pair_match_color(Objs1, Objs2, Pairs).
     % Pairs = [1-obj(1,[r(0,0)])-obj(1,[r(1,0)])]
 
-pr_match_size(+Objs1, +Objs2, -Pairs): N-Obj1-Obj2 triples for same-size pairs.
+pair_match_size(+Objs1, +Objs2, -Pairs): N-Obj1-Obj2 triples for same-size pairs.
 
     Objs1 = [obj(1,[r(0,0)]), obj(2,[r(0,0),r(0,1)])].
     Objs2 = [obj(3,[r(1,0)]), obj(4,[r(1,0),r(1,1)])].
-    pr_match_size(Objs1, Objs2, Pairs).
+    pair_match_size(Objs1, Objs2, Pairs).
     % Pairs = [1-obj(1,[r(0,0)])-obj(3,[r(1,0)]),
     %          2-obj(2,[r(0,0),r(0,1)])-obj(4,[r(1,0),r(1,1)])]
 
-pr_match_shape(+Objs1, +Objs2, -Pairs): Shape-Obj1-Obj2 triples for pairs with
+pair_match_shape(+Objs1, +Objs2, -Pairs): Shape-Obj1-Obj2 triples for pairs with
 the same D4-canonical shape. A horizontal pair in scene 1 matches a vertical
 pair in scene 2.
 
     Objs1 = [obj(1,[r(0,0),r(0,1)])].
     Objs2 = [obj(2,[r(0,0),r(1,0)])].
-    pr_match_shape(Objs1, Objs2, Pairs).
+    pair_match_shape(Objs1, Objs2, Pairs).
     % Pairs = [[r(0,0),r(0,1)]-obj(1,[r(0,0),r(0,1)])-obj(2,[r(0,0),r(1,0)])]
 
 

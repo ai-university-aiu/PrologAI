@@ -28,9 +28,9 @@ This is the foundation for detecting repeated motifs, finding where an object
 occurs in multiple places, and discovering structural regularities.
 
 
-90.1 Extracting a Patch - pa_extract/6
+90.1 Extracting a Patch - patch_extract/6
 
-pa_extract(+Grid, +R0, +C0, +H, +W, -Patch)
+patch_extract(+Grid, +R0, +C0, +H, +W, -Patch)
 
 Patch is the H x W sub-grid of Grid starting at row R0 and column C0
 (both 0-based). Takes H consecutive rows starting at R0 and W consecutive
@@ -41,35 +41,35 @@ Examples:
 Grid = [[1,2,3],[4,5,6],[7,8,9]].
 
 % Extract 2x2 from top-left corner.
-pa_extract(Grid, 0, 0, 2, 2, Patch).
+patch_extract(Grid, 0, 0, 2, 2, Patch).
 % Patch = [[1,2],[4,5]]
 
 % Extract 2x2 from bottom-right corner.
-pa_extract(Grid, 1, 1, 2, 2, Patch).
+patch_extract(Grid, 1, 1, 2, 2, Patch).
 % Patch = [[5,6],[8,9]]
 
 % Extract a single cell.
-pa_extract(Grid, 1, 1, 1, 1, Patch).
+patch_extract(Grid, 1, 1, 1, 1, Patch).
 % Patch = [[5]]
 
 
-90.2 Patch Dimensions - pa_dims/3
+90.2 Patch Dimensions - patch_dims/3
 
-pa_dims(+Patch, -H, -W)
+patch_dims(+Patch, -H, -W)
 
 H is the number of rows and W is the number of columns in Patch. An empty
 patch has H=0, W=0.
 
 Examples:
 
-pa_dims([[1,2,3],[4,5,6]], H, W).  % H=2, W=3
-pa_dims([[1,2,3,4]], H, W).        % H=1, W=4
-pa_dims([], H, W).                 % H=0, W=0
+patch_dims([[1,2,3],[4,5,6]], H, W).  % H=2, W=3
+patch_dims([[1,2,3,4]], H, W).        % H=1, W=4
+patch_dims([], H, W).                 % H=0, W=0
 
 
-90.3 Template Matching - pa_match/4
+90.3 Template Matching - patch_match/4
 
-pa_match(+Grid, +Patch, -R0, -C0)
+patch_match(+Grid, +Patch, -R0, -C0)
 
 Non-deterministically find all 0-based positions (R0, C0) where Patch occurs
 exactly in Grid. Backtracks over all matching positions in row-major order.
@@ -80,25 +80,25 @@ Examples:
 Grid = [[1,2,1],[1,2,3],[4,5,6]].
 
 % Find the first position of [[1,2]] in the first row.
-once(pa_match(Grid, [[1,2]], R0, C0)).
+once(patch_match(Grid, [[1,2]], R0, C0)).
 % R0=0, C0=0
 
 % Does [[9,9]] appear anywhere? Fails.
-pa_match(Grid, [[9,9]], _, _).  % fails
+patch_match(Grid, [[9,9]], _, _).  % fails
 
 % Find every position of [[5]].
-findall(R0-C0, pa_match(Grid, [[5]], R0, C0), Positions).
+findall(R0-C0, patch_match(Grid, [[5]], R0, C0), Positions).
 % Positions = [1-1]
 
 
 90.4 All Matches and Count
 
-pa_match_all(+Grid, +Patch, -Positions)
+patch_match_all(+Grid, +Patch, -Positions)
 
 Positions is the list of all R0-C0 pairs where Patch occurs exactly in Grid.
 Returns [] if no match exists.
 
-pa_match_count(+Grid, +Patch, -N)
+patch_match_count(+Grid, +Patch, -N)
 
 N is the count of matching positions.
 
@@ -107,21 +107,21 @@ Examples:
 Grid = [[1,0,1],[0,0,0],[1,0,0]].
 
 % Find all positions of [[1]] (the value 1 appears 3 times).
-pa_match_all(Grid, [[1]], Positions).
+patch_match_all(Grid, [[1]], Positions).
 % sort(Positions, S), S = [0-0, 0-2, 2-0]
 
 % Count positions of [[0,0],[0,0]] in an all-zero 3x3.
-pa_match_count([[0,0,0],[0,0,0],[0,0,0]], [[0,0],[0,0]], N).
+patch_match_count([[0,0,0],[0,0,0],[0,0,0]], [[0,0],[0,0]], N).
 % N = 4
 
 % Pattern not present: zero matches.
-pa_match_count([[1,2,3],[4,5,6]], [[7,8],[9,0]], N).
+patch_match_count([[1,2,3],[4,5,6]], [[7,8],[9,0]], N).
 % N = 0
 
 
-90.5 Wildcard Matching - pa_match_bg/4
+90.5 Wildcard Matching - patch_match_bg/4
 
-pa_match_bg(+Grid, +Patch, +Bg, -Positions)
+patch_match_bg(+Grid, +Patch, +Bg, -Positions)
 
 Match with Bg as a wildcard: a Bg cell in Patch matches any cell value in
 Grid. Non-Bg cells in Patch must match the corresponding grid cell exactly.
@@ -136,17 +136,17 @@ Grid = [[1,2,3],[4,5,6],[7,8,9]].
 
 % Pattern [[0,2],[0,5]] with Bg=0: the 0 cells are wildcards.
 % Matches at (0,0): grid has 2 at (0,1) and 5 at (1,1). ✓
-pa_match_bg(Grid, [[0,2],[0,5]], 0, Positions).
+patch_match_bg(Grid, [[0,2],[0,5]], 0, Positions).
 % Positions = [0-0]
 
 % All-Bg pattern matches every valid position.
-pa_match_bg([[1,2],[3,4]], [[0,0],[0,0]], 0, Positions).
+patch_match_bg([[1,2],[3,4]], [[0,0],[0,0]], 0, Positions).
 % length(Positions, 1)  (only one 2x2 position in a 2x2 grid)
 
 
-90.6 Sliding Window - pa_slides/4
+90.6 Sliding Window - patch_slides/4
 
-pa_slides(+Grid, +H, +W, -Patches)
+patch_slides(+Grid, +H, +W, -Patches)
 
 Patches is the list of all overlapping H x W sub-patches in row-major order.
 Each element is R0-C0-Patch. The total count is (NR-H+1)*(NC-W+1).
@@ -156,18 +156,18 @@ Examples:
 Grid = [[1,2,3],[4,5,6],[7,8,9]].
 
 % 4 patches of size 2x2.
-pa_slides(Grid, 2, 2, Patches).
+patch_slides(Grid, 2, 2, Patches).
 % length(Patches, 4)
 % Patches = [0-0-[[1,2],[4,5]], 0-1-[[2,3],[5,6]], 1-0-[[4,5],[7,8]], 1-1-[[5,6],[8,9]]]
 
 % 6 patches of size 1x1.
-pa_slides([[1,2,3],[4,5,6]], 1, 1, Patches).
+patch_slides([[1,2,3],[4,5,6]], 1, 1, Patches).
 % length(Patches, 6)
 
 
-90.7 Unique Patches - pa_unique_patches/4
+90.7 Unique Patches - patch_unique_patches/4
 
-pa_unique_patches(+Grid, +H, +W, -Unique)
+patch_unique_patches(+Grid, +H, +W, -Unique)
 
 Unique is the sorted list of all distinct H x W patches. Sort order is
 standard Prolog term order (equal patches appear only once).
@@ -175,21 +175,21 @@ standard Prolog term order (equal patches appear only once).
 Examples:
 
 % Uniform grid: all 2x2 patches are identical.
-pa_unique_patches([[1,1,1],[1,1,1],[1,1,1]], 2, 2, Unique).
+patch_unique_patches([[1,1,1],[1,1,1],[1,1,1]], 2, 2, Unique).
 % length(Unique, 1), Unique = [[[1,1],[1,1]]]
 
 % All-distinct 1x1 patches.
-pa_unique_patches([[1,2],[3,4]], 1, 1, Unique).
+patch_unique_patches([[1,2],[3,4]], 1, 1, Unique).
 % length(Unique, 4)
 
 % Alternating grid has two distinct 1x1 patches.
-pa_unique_patches([[0,1,0],[1,0,1],[0,1,0]], 1, 1, Unique).
+patch_unique_patches([[0,1,0],[1,0,1],[0,1,0]], 1, 1, Unique).
 % length(Unique, 2)
 
 
-90.8 Most Common Patch - pa_most_common_patch/5
+90.8 Most Common Patch - patch_most_common_patch/5
 
-pa_most_common_patch(+Grid, +H, +W, -Patch, -Count)
+patch_most_common_patch(+Grid, +H, +W, -Patch, -Count)
 
 Patch is the H x W sub-patch with the highest occurrence count in Grid.
 Count is that count. On ties, the patch first in term sort order wins.
@@ -198,17 +198,17 @@ Fails if no H x W patches fit in Grid (grid too small).
 Examples:
 
 % Uniform 3x3 grid: the single 2x2 patch occurs 4 times.
-pa_most_common_patch([[1,1,1],[1,1,1],[1,1,1]], 2, 2, Patch, Count).
+patch_most_common_patch([[1,1,1],[1,1,1],[1,1,1]], 2, 2, Patch, Count).
 % Patch = [[1,1],[1,1]], Count = 4
 
 % [[1]] appears twice, [[2]] once.
-pa_most_common_patch([[1],[1],[2]], 1, 1, Patch, Count).
+patch_most_common_patch([[1],[1],[2]], 1, 1, Patch, Count).
 % Patch = [[1]], Count = 2
 
 
-90.9 Patch Comparison - pa_diff/3
+90.9 Patch Comparison - patch_diff/3
 
-pa_diff(+PatchA, +PatchB, -Cells)
+patch_diff(+PatchA, +PatchB, -Cells)
 
 Cells is the sorted list of R-C pairs where PatchA and PatchB have different
 cell values. Both patches must have the same dimensions. Returns [] if the
@@ -216,74 +216,74 @@ patches are identical.
 
 Examples:
 
-pa_diff([[1,2],[3,4]], [[1,2],[3,4]], Cells).
+patch_diff([[1,2],[3,4]], [[1,2],[3,4]], Cells).
 % Cells = []
 
-pa_diff([[1,2],[3,4]], [[1,2],[3,9]], Cells).
+patch_diff([[1,2],[3,4]], [[1,2],[3,9]], Cells).
 % Cells = [1-1]
 
-pa_diff([[1,1],[1,1]], [[2,2],[2,2]], Cells).
+patch_diff([[1,1],[1,1]], [[2,2],[2,2]], Cells).
 % sort(Cells, S), S = [0-0, 0-1, 1-0, 1-1]
 
 
-90.10 Uniformity Test - pa_is_uniform/2
+90.10 Uniformity Test - patch_is_uniform/2
 
-pa_is_uniform(+Patch, -Color)
+patch_is_uniform(+Patch, -Color)
 
 Succeed if every cell in Patch has the same value Color. Fails if the patch
 contains more than one distinct value.
 
 Examples:
 
-pa_is_uniform([[1,1],[1,1]], Color).  % Color = 1 (succeeds)
-pa_is_uniform([[1,2],[3,4]], _).      % fails (multiple colors)
-pa_is_uniform([[7]], Color).          % Color = 7 (trivially uniform)
+patch_is_uniform([[1,1],[1,1]], Color).  % Color = 1 (succeeds)
+patch_is_uniform([[1,2],[3,4]], _).      % fails (multiple colors)
+patch_is_uniform([[7]], Color).          % Color = 7 (trivially uniform)
 
 
-90.11 Geometric Operations - pa_flip_h/2, pa_flip_v/2, pa_rot90/2
+90.11 Geometric Operations - patch_flip_h/2, patch_flip_v/2, patch_rot90/2
 
-pa_flip_h(+Patch, -Flipped)
+patch_flip_h(+Patch, -Flipped)
 Horizontal flip: reverses each row independently.
 
-pa_flip_v(+Patch, -Flipped)
+patch_flip_v(+Patch, -Flipped)
 Vertical flip: reverses the order of rows.
 
-pa_rot90(+Patch, -Rotated)
+patch_rot90(+Patch, -Rotated)
 90-degree clockwise rotation. For an H x W input, the output is W x H.
 Formula: Rotated(r', c') = Patch(H-1-c', r').
 
 Examples:
 
-pa_flip_h([[1,2,3]], Flipped).         % [[3,2,1]]
-pa_flip_h([[1,2],[3,4]], Flipped).     % [[2,1],[4,3]]
+patch_flip_h([[1,2,3]], Flipped).         % [[3,2,1]]
+patch_flip_h([[1,2],[3,4]], Flipped).     % [[2,1],[4,3]]
 
-pa_flip_v([[1,2],[3,4]], Flipped).     % [[3,4],[1,2]]
-pa_flip_v([[1,2],[3,4],[5,6]], F).     % [[5,6],[3,4],[1,2]]
+patch_flip_v([[1,2],[3,4]], Flipped).     % [[3,4],[1,2]]
+patch_flip_v([[1,2],[3,4],[5,6]], F).     % [[5,6],[3,4],[1,2]]
 
-pa_rot90([[1,2,3],[4,5,6]], R).   % [[4,1],[5,2],[6,3]]  (2x3 → 3x2)
-pa_rot90([[1,2],[3,4]], R).       % [[3,1],[4,2]]         (2x2 → 2x2)
+patch_rot90([[1,2,3],[4,5,6]], R).   % [[4,1],[5,2],[6,3]]  (2x3 → 3x2)
+patch_rot90([[1,2],[3,4]], R).       % [[3,1],[4,2]]         (2x2 → 2x2)
 
 
 90.12 Summary
 
 The patch pack provides sub-grid extraction and template matching:
 
-- pa_extract         - extract H x W sub-patch from a grid
-- pa_dims            - get patch dimensions (H, W)
-- pa_match           - non-deterministically find all matching positions
-- pa_match_all       - all matching positions as a list
-- pa_match_count     - count of matching positions
-- pa_match_bg        - match with background wildcard cells
-- pa_slides          - enumerate all H x W sub-patches with positions
-- pa_unique_patches  - sorted list of distinct patches in a grid
-- pa_most_common_patch - most frequent patch and its count
-- pa_diff            - cells where two patches differ
-- pa_is_uniform      - test if patch is all one color
-- pa_flip_h          - horizontal (left-right) flip
-- pa_flip_v          - vertical (top-bottom) flip
-- pa_rot90           - 90-degree clockwise rotation
+- patch_extract         - extract H x W sub-patch from a grid
+- patch_dims            - get patch dimensions (H, W)
+- patch_match           - non-deterministically find all matching positions
+- patch_match_all       - all matching positions as a list
+- patch_match_count     - count of matching positions
+- patch_match_bg        - match with background wildcard cells
+- patch_slides          - enumerate all H x W sub-patches with positions
+- patch_unique_patches  - sorted list of distinct patches in a grid
+- patch_most_common_patch - most frequent patch and its count
+- patch_diff            - cells where two patches differ
+- patch_is_uniform      - test if patch is all one color
+- patch_flip_h          - horizontal (left-right) flip
+- patch_flip_v          - vertical (top-bottom) flip
+- patch_rot90           - 90-degree clockwise rotation
 
-All predicates except pa_match are deterministic. pa_match is intentionally
+All predicates except patch_match are deterministic. patch_match is intentionally
 non-deterministic and backtracks over all matching positions.
 
 Next chapter: Chapter 91 covers the next perceptual or structural pack.

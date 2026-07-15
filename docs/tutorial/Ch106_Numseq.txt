@@ -11,63 +11,63 @@ All predicates use the nr_* prefix.
 
 1. Pairwise Differences
 
-nr_diff(+List, -Diffs) computes consecutive pairwise differences.
+numseq_diff(+List, -Diffs) computes consecutive pairwise differences.
 Diffs[I] = List[I+1] - List[I].
 
 Examples:
 
-?- nr_diff([1,3,6,10], Diffs).
+?- numseq_diff([1,3,6,10], Diffs).
 Diffs = [2,3,4].
 
-?- nr_diff([5,3], Diffs).
+?- numseq_diff([5,3], Diffs).
 Diffs = [-2].
 
-?- nr_diff([7], Diffs).
+?- numseq_diff([7], Diffs).
 Diffs = [].
 
 
 2. Cumulative Sum
 
-nr_cumsum(+List, -Sums) computes prefix cumulative sums. Sums[I] is the
+numseq_cumsum(+List, -Sums) computes prefix cumulative sums. Sums[I] is the
 sum of List[0..I].
 
 Examples:
 
-?- nr_cumsum([1,2,3,4], Sums).
+?- numseq_cumsum([1,2,3,4], Sums).
 Sums = [1,3,6,10].
 
-?- nr_cumsum([5], Sums).
+?- numseq_cumsum([5], Sums).
 Sums = [5].
 
-?- nr_cumsum([0,0,0], Sums).
+?- numseq_cumsum([0,0,0], Sums).
 Sums = [0,0,0].
 
 
 3. Running Maximum
 
-nr_running_max(+List, -Maxs) computes the running maximum. Maxs[I] is the
+numseq_running_max(+List, -Maxs) computes the running maximum. Maxs[I] is the
 maximum of List[0..I].
 
 Examples:
 
-?- nr_running_max([3,1,4,1,5,9,2], Maxs).
+?- numseq_running_max([3,1,4,1,5,9,2], Maxs).
 Maxs = [3,3,4,4,5,9,9].
 
-?- nr_running_max([1,2,3], Maxs).
+?- numseq_running_max([1,2,3], Maxs).
 Maxs = [1,2,3].
 
 
 4. Running Minimum
 
-nr_running_min(+List, -Mins) computes the running minimum. Mins[I] is the
+numseq_running_min(+List, -Mins) computes the running minimum. Mins[I] is the
 minimum of List[0..I].
 
 Examples:
 
-?- nr_running_min([5,3,4,1,2], Mins).
+?- numseq_running_min([5,3,4,1,2], Mins).
 Mins = [5,3,3,1,1].
 
-?- nr_running_min([3,2,1], Mins).
+?- numseq_running_min([3,2,1], Mins).
 Mins = [3,2,1].
 
 
@@ -75,92 +75,92 @@ Mins = [3,2,1].
 
 Five predicates perform element-wise operations on two lists of equal length:
 
-nr_zip_add(+A, +B, -C)  C[I] = A[I] + B[I]
-nr_zip_sub(+A, +B, -C)  C[I] = A[I] - B[I]
-nr_zip_mul(+A, +B, -C)  C[I] = A[I] * B[I]
-nr_zip_max(+A, +B, -C)  C[I] = max(A[I], B[I])
-nr_zip_min(+A, +B, -C)  C[I] = min(A[I], B[I])
+numseq_zip_add(+A, +B, -C)  C[I] = A[I] + B[I]
+numseq_zip_sub(+A, +B, -C)  C[I] = A[I] - B[I]
+numseq_zip_mul(+A, +B, -C)  C[I] = A[I] * B[I]
+numseq_zip_max(+A, +B, -C)  C[I] = max(A[I], B[I])
+numseq_zip_min(+A, +B, -C)  C[I] = min(A[I], B[I])
 
 Examples:
 
-?- nr_zip_add([1,2,3], [4,5,6], C).
+?- numseq_zip_add([1,2,3], [4,5,6], C).
 C = [5,7,9].
 
-?- nr_zip_sub([5,6,7], [1,2,3], C).
+?- numseq_zip_sub([5,6,7], [1,2,3], C).
 C = [4,4,4].
 
-?- nr_zip_mul([2,3,4], [5,6,7], C).
+?- numseq_zip_mul([2,3,4], [5,6,7], C).
 C = [10,18,28].
 
-?- nr_zip_max([1,5,3], [4,2,6], C).
+?- numseq_zip_max([1,5,3], [4,2,6], C).
 C = [4,5,6].
 
-?- nr_zip_min([1,5,3], [4,2,6], C).
+?- numseq_zip_min([1,5,3], [4,2,6], C).
 C = [1,2,3].
 
 
 6. Scalar Operations
 
-nr_scale(+List, +K, -Scaled) multiplies every element by scalar K.
-nr_offset(+List, +D, -Shifted) adds constant D to every element.
+numseq_scale(+List, +K, -Scaled) multiplies every element by scalar K.
+numseq_offset(+List, +D, -Shifted) adds constant D to every element.
 
 Examples:
 
-?- nr_scale([1,2,3,4], 2, Scaled).
+?- numseq_scale([1,2,3,4], 2, Scaled).
 Scaled = [2,4,6,8].
 
-?- nr_scale([5,6,7], 0, Scaled).
+?- numseq_scale([5,6,7], 0, Scaled).
 Scaled = [0,0,0].
 
-?- nr_offset([1,2,3], 10, Shifted).
+?- numseq_offset([1,2,3], 10, Shifted).
 Shifted = [11,12,13].
 
-?- nr_offset([5,6,7], -3, Shifted).
+?- numseq_offset([5,6,7], -3, Shifted).
 Shifted = [2,3,4].
 
 
 7. Sorted and Arithmetic Sequence Tests
 
-nr_is_sorted(+List) succeeds iff List is non-decreasing.
-nr_is_arith(+List) succeeds iff List is an arithmetic sequence (constant
+numseq_is_sorted(+List) succeeds iff List is non-decreasing.
+numseq_is_arith(+List) succeeds iff List is an arithmetic sequence (constant
 pairwise difference).
 
 Examples:
 
-?- nr_is_sorted([1,2,3,4]).
+?- numseq_is_sorted([1,2,3,4]).
 true.
 
-?- nr_is_sorted([1,1,2,2]).
+?- numseq_is_sorted([1,1,2,2]).
 true.
 
-?- nr_is_sorted([1,3,2]).
+?- numseq_is_sorted([1,3,2]).
 false.
 
-?- nr_is_arith([2,4,6,8]).
+?- numseq_is_arith([2,4,6,8]).
 true.
 
-?- nr_is_arith([5,5,5,5]).
+?- numseq_is_arith([5,5,5,5]).
 true.
 
-?- nr_is_arith([1,2,4,8]).
+?- numseq_is_arith([1,2,4,8]).
 false.
 
 
 8. Period Detection
 
-nr_period(+List, +MaxP, -P) finds the shortest repeating period P of List
+numseq_period(+List, +MaxP, -P) finds the shortest repeating period P of List
 within the range 1..MaxP. The list length must be divisible by P, and every
 element at position I must equal the element at position I+P.
 
 Examples:
 
-?- nr_period([1,2,1,2,1,2], 3, P).
+?- numseq_period([1,2,1,2,1,2], 3, P).
 P = 2.
 
-?- nr_period([1,2,3,1,2,3], 3, P).
+?- numseq_period([1,2,3,1,2,3], 3, P).
 P = 3.
 
-?- nr_period([5,5,5,5], 4, P).
+?- numseq_period([5,5,5,5], 4, P).
 P = 1.
 
 
@@ -171,8 +171,8 @@ predicates to analyze individual rows:
 
 ?- Grid = [[3,1,4],[1,5,9],[2,6,5]],
    cross_row(Grid, 1, Row),
-   nr_diff(Row, Diffs),
-   nr_running_max(Row, Maxs).
+   numseq_diff(Row, Diffs),
+   numseq_running_max(Row, Maxs).
 Row = [1,5,9], Diffs = [4,4], Maxs = [1,5,9].
 
 

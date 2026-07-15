@@ -14,60 +14,60 @@ ranks values by frequency, and computes modal colors from grids.
 
 2. Counting and Frequency Tables
 
-hi_count(+List, +V, -N) counts how many times V appears in List. Returns 0
+histogram_count(+List, +V, -N) counts how many times V appears in List. Returns 0
 when V is not present.
 
-hi_freq(+List, -Pairs) computes a V-Count pair list, sorted by value ascending.
+histogram_freq(+List, -Pairs) computes a V-Count pair list, sorted by value ascending.
 
-?- hi_count([1,2,1,3,1], 1, N).
+?- histogram_count([1,2,1,3,1], 1, N).
 N = 3.
 
-?- hi_freq([3,1,2,1,3,3], Pairs).
+?- histogram_freq([3,1,2,1,3,3], Pairs).
 Pairs = [1-2, 2-1, 3-3].
 
-?- hi_freq([], Pairs).
+?- histogram_freq([], Pairs).
 Pairs = [].
 
 
 3. Most and Least Common Values
 
-hi_mode(+List, -V, -N) finds the most frequent value and its count. Ties are
+histogram_mode(+List, -V, -N) finds the most frequent value and its count. Ties are
 broken by smallest value.
 
-hi_rare(+List, -V, -N) finds the least frequent value. Ties are broken by
+histogram_rare(+List, -V, -N) finds the least frequent value. Ties are broken by
 largest value.
 
-?- hi_mode([1,2,2,3,3,3], V, N).
+?- histogram_mode([1,2,2,3,3,3], V, N).
 V = 3, N = 3.
 
-?- hi_rare([1,2,2,3,3,3], V, N).
+?- histogram_rare([1,2,2,3,3,3], V, N).
 V = 1, N = 1.
 
-?- hi_mode([1,1,2,2], V, N).
+?- histogram_mode([1,1,2,2], V, N).
 V = 1, N = 2.   % tie: smallest wins
 
 
 4. Distinct Values
 
-hi_unique_vals(+List, -Vals) returns the sorted list of distinct values.
-hi_unique_count(+List, -N) returns the count of distinct values.
+histogram_unique_vals(+List, -Vals) returns the sorted list of distinct values.
+histogram_unique_count(+List, -N) returns the count of distinct values.
 
-?- hi_unique_vals([3,1,2,1,3], Vals).
+?- histogram_unique_vals([3,1,2,1,3], Vals).
 Vals = [1,2,3].
 
-?- hi_unique_count([1,1,2,3,3], N).
+?- histogram_unique_count([1,1,2,3,3], N).
 N = 3.
 
 
 5. Sorting by Frequency
 
-hi_sorted_by_freq(+List, -Pairs) returns V-Count pairs sorted by count
+histogram_sorted_by_freq(+List, -Pairs) returns V-Count pairs sorted by count
 descending. Ties in count are broken by value ascending.
 
-?- hi_sorted_by_freq([1,2,2,3,3,3], Pairs).
+?- histogram_sorted_by_freq([1,2,2,3,3,3], Pairs).
 Pairs = [3-3, 2-2, 1-1].
 
-?- hi_sorted_by_freq([1,1,2,2], Pairs).
+?- histogram_sorted_by_freq([1,1,2,2], Pairs).
 Pairs = [1-2, 2-2].   % tie: both count 2, smaller V first
 
 The implementation negates counts and uses keysort (stable) to produce
@@ -76,60 +76,60 @@ descending-count order while preserving value-ascending order for ties.
 
 6. Top-N Values
 
-hi_top_n(+List, +N, -TopN) returns the N most frequent V-Count pairs.
+histogram_top_n(+List, +N, -TopN) returns the N most frequent V-Count pairs.
 
-?- hi_top_n([1,2,2,3,3,3], 2, TopN).
+?- histogram_top_n([1,2,2,3,3,3], 2, TopN).
 TopN = [3-3, 2-2].
 
-?- hi_top_n([1,2,3], 1, TopN).
+?- histogram_top_n([1,2,3], 1, TopN).
 TopN = [1-1].   % all equal frequency; smallest value first
 
 
 7. Presence and Uniformity
 
-hi_has_value(+List, +V) succeeds if V appears at least once. Uses memberchk
+histogram_has_value(+List, +V) succeeds if V appears at least once. Uses memberchk
 for a single deterministic check.
 
-hi_all_equal(+List, -V) succeeds if every element equals V; binds V to the
+histogram_all_equal(+List, -V) succeeds if every element equals V; binds V to the
 first element. Fails for the empty list.
 
-?- hi_has_value([1,2,3], 2).
+?- histogram_has_value([1,2,3], 2).
 true.
 
-?- hi_all_equal([3,3,3], V).
+?- histogram_all_equal([3,3,3], V).
 V = 3.
 
-?- hi_all_equal([3,3,4], _).
+?- histogram_all_equal([3,3,4], _).
 false.
 
 
 8. Grid-Level Predicates
 
-hi_grid_freq(+Grid, -Pairs) computes the frequency table of all cell values
-in a 2D grid. Flattens the grid with append/2, then calls hi_freq.
+histogram_grid_freq(+Grid, -Pairs) computes the frequency table of all cell values
+in a 2D grid. Flattens the grid with append/2, then calls histogram_freq.
 
-hi_grid_mode(+Grid, -Color, -Count) finds the most frequent cell color.
-hi_grid_rare(+Grid, -Color, -Count) finds the least frequent cell color.
+histogram_grid_mode(+Grid, -Color, -Count) finds the most frequent cell color.
+histogram_grid_rare(+Grid, -Color, -Count) finds the least frequent cell color.
 
-?- hi_grid_freq([[1,2],[2,3]], Pairs).
+?- histogram_grid_freq([[1,2],[2,3]], Pairs).
 Pairs = [1-1, 2-2, 3-1].
 
-?- hi_grid_mode([[1,2],[2,2]], Color, Count).
+?- histogram_grid_mode([[1,2],[2,2]], Color, Count).
 Color = 2, Count = 3.
 
-?- hi_grid_rare([[1,2,2,2]], Color, Count).
+?- histogram_grid_rare([[1,2,2,2]], Color, Count).
 Color = 1, Count = 1.
 
 
 9. Ranking
 
-hi_rank(+List, +V, -Rank) gives the 1-based rank of value V by frequency.
+histogram_rank(+List, +V, -Rank) gives the 1-based rank of value V by frequency.
 Rank 1 is the most frequent. Fails if V does not appear in List.
 
-?- hi_rank([1,2,2,3,3,3], 3, R).
+?- histogram_rank([1,2,2,3,3,3], 3, R).
 R = 1.   % most common
 
-?- hi_rank([1,2,2,3,3,3], 1, R).
+?- histogram_rank([1,2,2,3,3,3], 1, R).
 R = 3.   % least common
 
 

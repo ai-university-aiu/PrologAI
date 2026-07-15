@@ -16,12 +16,12 @@ Layer: 178. No dependencies on other packs.
 
 160.2 Matching by Color
 
-mx_by_color(+List1, +List2, -Pairs)
+objmatch_by_color(+List1, +List2, -Pairs)
 
 Each Obj1 in List1 is paired with every Obj2 in List2 that shares the same
 color. All matches are returned (multiple matches per object are possible).
 
-    mx_by_color(
+    objmatch_by_color(
         [obj(r,[r(0,0)]), obj(b,[r(1,0)])],
         [obj(r,[r(5,5)]), obj(b,[r(6,6)])],
         Pairs).
@@ -30,12 +30,12 @@ color. All matches are returned (multiple matches per object are possible).
 
 160.3 Matching by Size
 
-mx_by_size(+List1, +List2, -Pairs)
+objmatch_by_size(+List1, +List2, -Pairs)
 
 Each Obj1 is paired with each Obj2 that has the same cell count (size). Color
 is ignored.
 
-    mx_by_size(
+    objmatch_by_size(
         [obj(r,[r(0,0)])],
         [obj(b,[r(0,0)]), obj(g,[r(1,1)])],
         Pairs).
@@ -44,7 +44,7 @@ is ignored.
 
 160.4 Matching by Form
 
-mx_by_form(+List1, +List2, -Pairs)
+objmatch_by_form(+List1, +List2, -Pairs)
 
 Each Obj1 is paired with each Obj2 whose normalized shape equals Obj1's. The
 normalized shape is the sorted cell list after translating the bounding box
@@ -52,12 +52,12 @@ top-left to r(0,0). Color and position are both ignored.
 
     Lshape = obj(p, [r(0,0),r(1,0),r(1,1)]),
     LshapeFar = obj(y, [r(3,4),r(4,4),r(4,5)]),
-    mx_by_form([Lshape], [LshapeFar], Pairs).
+    objmatch_by_form([Lshape], [LshapeFar], Pairs).
     % Pairs = [Lshape-LshapeFar]
 
 160.5 Matching by Nearest Centroid (Greedy)
 
-mx_by_nearest(+List1, +List2, -Pairs)
+objmatch_by_nearest(+List1, +List2, -Pairs)
 
 Greedy nearest-centroid matching. Each Obj1 in List1 claims the nearest
 remaining Obj2 by squared Euclidean centroid distance.
@@ -66,76 +66,76 @@ remaining Obj2 by squared Euclidean centroid distance.
     B = obj(b,[r(2,2)]),   % centroid r(2,2)
     C = obj(g,[r(5,5)]),   % centroid r(5,5)
     D = obj(y,[r(1,1)]),   % centroid r(1,1)
-    mx_by_nearest([A, C], [B, D], Pairs).
+    objmatch_by_nearest([A, C], [B, D], Pairs).
     % A (at 0,0) nearest to D (at 1,1, dist^2=2) vs B (at 2,2, dist^2=8)
     % C (at 5,5) nearest to B (at 2,2, remaining)
     % Pairs = [A-D, C-B]
 
 160.6 Extracting Unmatched Objects
 
-mx_unmatched(+Pairs, +List1, +List2, -Unmatched1, -Unmatched2)
+objmatch_unmatched(+Pairs, +List1, +List2, -Unmatched1, -Unmatched2)
 
 Returns the objects from each list that do not appear in any pair.
 
     R = obj(r,[r(0,0)]), B = obj(b,[r(0,0)]), G = obj(g,[r(0,0)]),
-    mx_unmatched([R-B], [R, G], [B, G], Um1, Um2).
+    objmatch_unmatched([R-B], [R, G], [B, G], Um1, Um2).
     % Um1 = [G], Um2 = [G]
 
 160.7 Filtering Pairs by Color Change
 
-mx_filter_changed_color(+Pairs, -Changed)
+objmatch_filter_changed_color(+Pairs, -Changed)
 
 Keeps only pairs where the two colors differ.
 
-mx_filter_same_color(+Pairs, -Same)
+objmatch_filter_same_color(+Pairs, -Same)
 
 Keeps only pairs where the two colors are identical.
 
 160.8 Computing Deltas
 
-mx_color_deltas(+Pairs, -Deltas)
+objmatch_color_deltas(+Pairs, -Deltas)
 
 Maps each O1-O2 pair to a c1-c2 atom pair showing the color change.
 
-    mx_color_deltas([obj(r,[r(0,0)])-obj(b,[r(0,0)])], D).
+    objmatch_color_deltas([obj(r,[r(0,0)])-obj(b,[r(0,0)])], D).
     % D = [r-b]
 
-mx_pos_deltas(+Pairs, -Deltas)
+objmatch_pos_deltas(+Pairs, -Deltas)
 
 Maps each pair to a dr(DR,DC) term showing the centroid displacement.
 
-    mx_pos_deltas([obj(r,[r(0,0)])-obj(b,[r(3,4)])], D).
+    objmatch_pos_deltas([obj(r,[r(0,0)])-obj(b,[r(3,4)])], D).
     % D = [dr(3,4)]
 
-mx_size_deltas(+Pairs, -Deltas)
+objmatch_size_deltas(+Pairs, -Deltas)
 
 Maps each pair to an integer N2-N1 showing the size change.
 
-    mx_size_deltas([obj(r,[r(0,0)])-obj(b,[r(0,0),r(0,1)])], D).
+    objmatch_size_deltas([obj(r,[r(0,0)])-obj(b,[r(0,0),r(0,1)])], D).
     % D = [1]
 
 160.9 Testing Uniformity of Deltas
 
-mx_all_same_color_delta(+Pairs)
+objmatch_all_same_color_delta(+Pairs)
 
 Succeeds iff all pairs share the same c1-c2 color change (trivially true for
 the empty list).
 
-mx_all_same_pos_delta(+Pairs)
+objmatch_all_same_pos_delta(+Pairs)
 
 Succeeds iff all pairs share the same dr(DR,DC) positional delta.
 
-mx_all_same_size_delta(+Pairs)
+objmatch_all_same_size_delta(+Pairs)
 
 Succeeds iff all pairs share the same integer size delta.
 
 160.10 Positional Zip
 
-mx_zip(+List1, +List2, -Pairs)
+objmatch_zip(+List1, +List2, -Pairs)
 
 Index-wise pairing: element I of List1 with element I of List2.
 
-    mx_zip([A, B, C], [X, Y, Z], Pairs).
+    objmatch_zip([A, B, C], [X, Y, Z], Pairs).
     % Pairs = [A-X, B-Y, C-Z]
 
 The lists must have equal length; the predicate fails if they differ.
@@ -143,19 +143,19 @@ The lists must have equal length; the predicate fails if they differ.
 160.11 Summary
 
 Predicate                    Description
-mx_by_color/3               match objects with same color
-mx_by_size/3                match objects with same cell count
-mx_by_form/3                match objects with same normalized shape
-mx_by_nearest/3             greedy nearest-centroid matching
-mx_unmatched/5              extract unmatched objects from both lists
-mx_filter_changed_color/2   keep only pairs where color changed
-mx_filter_same_color/2      keep only pairs where color is unchanged
-mx_color_deltas/2           list of c1-c2 color changes per pair
-mx_pos_deltas/2             list of dr(DR,DC) position changes per pair
-mx_size_deltas/2            list of N2-N1 size changes per pair
-mx_all_same_color_delta/1   test all pairs have same color change
-mx_all_same_pos_delta/1     test all pairs have same positional delta
-mx_all_same_size_delta/1    test all pairs have same size change
-mx_zip/3                    index-wise pairing of two equal-length lists
+objmatch_by_color/3               match objects with same color
+objmatch_by_size/3                match objects with same cell count
+objmatch_by_form/3                match objects with same normalized shape
+objmatch_by_nearest/3             greedy nearest-centroid matching
+objmatch_unmatched/5              extract unmatched objects from both lists
+objmatch_filter_changed_color/2   keep only pairs where color changed
+objmatch_filter_same_color/2      keep only pairs where color is unchanged
+objmatch_color_deltas/2           list of c1-c2 color changes per pair
+objmatch_pos_deltas/2             list of dr(DR,DC) position changes per pair
+objmatch_size_deltas/2            list of N2-N1 size changes per pair
+objmatch_all_same_color_delta/1   test all pairs have same color change
+objmatch_all_same_pos_delta/1     test all pairs have same positional delta
+objmatch_all_same_size_delta/1    test all pairs have same size change
+objmatch_zip/3                    index-wise pairing of two equal-length lists
 
 This is WP 199, PrologAI Layer 178.

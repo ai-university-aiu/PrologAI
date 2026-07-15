@@ -8,108 +8,108 @@ analysis.
 
 Predicates:
 
-ix_row_grid(+H, +W, -Grid)
+index_row_grid(+H, +W, -Grid)
   Grid is H rows by W cols; cell(R,C) = R.
   Row 0 is all zeros; row H-1 is all H-1.
 
-ix_col_grid(+H, +W, -Grid)
+index_col_grid(+H, +W, -Grid)
   Grid is H rows by W cols; cell(R,C) = C.
   Every row is [0, 1, 2, ..., W-1].
 
-ix_sum_grid(+H, +W, -Grid)
+index_sum_grid(+H, +W, -Grid)
   Grid is H rows by W cols; cell(R,C) = R+C.
   Cells on the same top-left/bottom-right diagonal share a value.
 
-ix_diff_grid(+H, +W, -Grid)
+index_diff_grid(+H, +W, -Grid)
   Grid is H rows by W cols; cell(R,C) = R-C.
   Values may be negative. Anti-diagonal cells share a value.
 
-ix_prod_grid(+H, +W, -Grid)
+index_prod_grid(+H, +W, -Grid)
   Grid is H rows by W cols; cell(R,C) = R*C.
   Row 0 and column 0 are all zeros.
 
-ix_manhattan_grid(+H, +W, +R0, +C0, -Grid)
+index_manhattan_grid(+H, +W, +R0, +C0, -Grid)
   cell(R,C) = |R-R0| + |C-C0| (Manhattan/taxi-cab distance from R0,C0).
   Minimum value 0 at (R0,C0). Values increase by 1 per step away.
 
-ix_chebyshev_grid(+H, +W, +R0, +C0, -Grid)
+index_chebyshev_grid(+H, +W, +R0, +C0, -Grid)
   cell(R,C) = max(|R-R0|, |C-C0|) (Chebyshev/king-move distance).
   Cells at distance K form a hollow square ring (shell) around (R0,C0).
 
-ix_mod_grid(+H, +W, +N, -Grid)
+index_mod_grid(+H, +W, +N, -Grid)
   cell(R,C) = (R+C) mod N. Diagonal stripe pattern with period N.
 
-ix_row_mod_grid(+H, +W, +N, -Grid)
+index_row_mod_grid(+H, +W, +N, -Grid)
   cell(R,C) = R mod N. Horizontal stripe pattern; all cells in row R have
   the same value. Period N across rows.
 
-ix_col_mod_grid(+H, +W, +N, -Grid)
+index_col_mod_grid(+H, +W, +N, -Grid)
   cell(R,C) = C mod N. Vertical stripe pattern; all cells in column C have
   the same value. Period N across columns.
 
-ix_mask_rows(+Grid, +Is, +Bg, -Grid2)
+index_mask_rows(+Grid, +Is, +Bg, -Grid2)
   Grid2 is Grid with rows whose 0-based index is NOT in Is replaced by
   all-Bg rows. Rows in Is are kept unchanged.
 
-ix_mask_cols(+Grid, +Js, +Bg, -Grid2)
+index_mask_cols(+Grid, +Js, +Bg, -Grid2)
   Grid2 is Grid with columns whose 0-based index is NOT in Js replaced by
   Bg. Columns in Js are kept unchanged.
 
-ix_apply(+IxGrid, +Op, +Grid, -Out)
+index_apply(+IxGrid, +Op, +Grid, -Out)
   Out[R][C] = Grid[R][C] Op IxGrid[R][C].
   Op is one of: add, sub, mul, max_op, min_op.
 
-ix_from(+H, +W, +R0, +C0, -Grid)
+index_from(+H, +W, +R0, +C0, -Grid)
   cell(R,C) = (R-R0)*W + (C-C0). Signed linear row-major offset from
   reference point (R0,C0). Values may be negative.
 
 Usage examples:
 
-ix_row_grid(3, 3, G).
+index_row_grid(3, 3, G).
 %   G = [[0,0,0],[1,1,1],[2,2,2]]
 
-ix_col_grid(3, 3, G).
+index_col_grid(3, 3, G).
 %   G = [[0,1,2],[0,1,2],[0,1,2]]
 
-ix_sum_grid(3, 3, G).
+index_sum_grid(3, 3, G).
 %   G = [[0,1,2],[1,2,3],[2,3,4]]
 
-ix_diff_grid(3, 3, G).
+index_diff_grid(3, 3, G).
 %   G = [[0,-1,-2],[1,0,-1],[2,1,0]]
 
-ix_prod_grid(3, 3, G).
+index_prod_grid(3, 3, G).
 %   G = [[0,0,0],[0,1,2],[0,2,4]]
 
-ix_manhattan_grid(3, 3, 1, 1, G).
+index_manhattan_grid(3, 3, 1, 1, G).
 %   G = [[2,1,2],[1,0,1],[2,1,2]]  (diamond pattern from center)
 
-ix_chebyshev_grid(5, 5, 2, 2, G).
+index_chebyshev_grid(5, 5, 2, 2, G).
 %   G = [[2,2,2,2,2],[2,1,1,1,2],[2,1,0,1,2],[2,1,1,1,2],[2,2,2,2,2]]
 %   Concentric square shells around (2,2).
 
-ix_mod_grid(3, 3, 3, G).
+index_mod_grid(3, 3, 3, G).
 %   G = [[0,1,2],[1,2,0],[2,0,1]]
 
-ix_row_mod_grid(4, 3, 2, G).
+index_row_mod_grid(4, 3, 2, G).
 %   G = [[0,0,0],[1,1,1],[0,0,0],[1,1,1]]  (alternating row stripes)
 
-ix_col_mod_grid(3, 4, 2, G).
+index_col_mod_grid(3, 4, 2, G).
 %   G = [[0,1,0,1],[0,1,0,1],[0,1,0,1]]  (alternating col stripes)
 
-ix_mask_rows([[a,b],[c,d],[e,f]], [0,2], 9, G).
+index_mask_rows([[a,b],[c,d],[e,f]], [0,2], 9, G).
 %   G = [[a,b],[9,9],[e,f]]  (row 1 replaced with background)
 
-ix_mask_cols([[a,b,c],[d,e,f]], [1], 0, G).
+index_mask_cols([[a,b,c],[d,e,f]], [1], 0, G).
 %   G = [[0,b,0],[0,e,0]]  (only column 1 kept)
 
-ix_row_grid(2, 3, IxG),
-ix_apply(IxG, add, [[10,10,10],[10,10,10]], Out).
+index_row_grid(2, 3, IxG),
+index_apply(IxG, add, [[10,10,10],[10,10,10]], Out).
 %   Out = [[10,10,10],[11,11,11]]  (add row index to constant grid)
 
-ix_from(3, 3, 0, 0, G).
+index_from(3, 3, 0, 0, G).
 %   G = [[0,1,2],[3,4,5],[6,7,8]]  (linear scan from top-left)
 
-ix_from(3, 3, 1, 1, G).
+index_from(3, 3, 1, 1, G).
 %   G = [[-4,-3,-2],[-1,0,1],[2,3,4]]  (signed offsets from center)
 
 Key implementation notes:
@@ -117,27 +117,27 @@ Key implementation notes:
 All coordinate grids are built using nested findall with between/3 (built-in).
 No recursive predicates are used; all grids are constructed declaratively.
 
-ix_row_grid uses findall(R, between(1,W,_), Row) to collect R once per
+index_row_grid uses findall(R, between(1,W,_), Row) to collect R once per
   column (the anonymous variable drives W iterations).
 
-ix_chebyshev_grid produces concentric square rings. The value at each cell
+index_chebyshev_grid produces concentric square rings. The value at each cell
   is the Chebyshev distance (max of absolute row and column offsets from
   the reference point). This is equivalent to the L-infinity norm.
 
-ix_mod_grid with N=2 on a square grid produces a checkerboard-like diagonal
+index_mod_grid with N=2 on a square grid produces a checkerboard-like diagonal
   stripe: cells where R+C is even have value 0, cells where R+C is odd
   have value 1. This is different from a true checkerboard (which alternates
   by R+C parity).
 
-ix_mask_rows uses findall(Bg, member(_, OrigRow), Row) to create an all-Bg
+index_mask_rows uses findall(Bg, member(_, OrigRow), Row) to create an all-Bg
   row with the same length as OrigRow without needing to know W explicitly.
 
-ix_apply supports five binary operations between index and value grids:
+index_apply supports five binary operations between index and value grids:
   add (Grid+Ix), sub (Grid-Ix), mul (Grid*Ix), max_op, min_op.
-  Combine ix_row_grid with add to add a row-offset to each row's values.
-  Combine ix_col_grid with mul to scale values by column position.
+  Combine index_row_grid with add to add a row-offset to each row's values.
+  Combine index_col_grid with mul to scale values by column position.
 
-ix_from with (R0,C0)=(0,0) gives the standard row-major linear index: each
+index_from with (R0,C0)=(0,0) gives the standard row-major linear index: each
   cell's value equals its 0-based position in a flattened array.
 
 Library imports: library(lists): member/2, nth0/3.

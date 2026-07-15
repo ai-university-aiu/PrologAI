@@ -16,91 +16,91 @@ Layer: 173. No dependencies on other packs.
 
 155.2 Color Filters
 
-of_by_color(+Objs, +Color, -Filtered)
+objfilter_by_color(+Objs, +Color, -Filtered)
 
 Keeps objects whose color equals Color.
 
-    of_by_color(Scene, red, Reds).   % only red objects
+    objfilter_by_color(Scene, red, Reds).   % only red objects
 
-of_not_color(+Objs, +Color, -Filtered)
+objfilter_not_color(+Objs, +Color, -Filtered)
 
 Keeps objects whose color is NOT Color.
 
-    of_not_color(Scene, black, Rest).  % everything except black
+    objfilter_not_color(Scene, black, Rest).  % everything except black
 
 155.3 Size Filters
 
-of_exact_size(+Objs, +N, -Filtered)
+objfilter_exact_size(+Objs, +N, -Filtered)
 
 Keeps objects with exactly N cells.
 
-    of_exact_size(Scene, 1, Singles).  % single-cell objects
+    objfilter_exact_size(Scene, 1, Singles).  % single-cell objects
 
-of_min_size(+Objs, +N, -Filtered)
+objfilter_min_size(+Objs, +N, -Filtered)
 
 Keeps objects with at least N cells.
 
-    of_min_size(Scene, 4, Big).  % objects with 4 or more cells
+    objfilter_min_size(Scene, 4, Big).  % objects with 4 or more cells
 
-of_max_size(+Objs, +N, -Filtered)
+objfilter_max_size(+Objs, +N, -Filtered)
 
 Keeps objects with at most N cells.
 
-    of_max_size(Scene, 3, Small).  % objects with 3 or fewer cells
+    objfilter_max_size(Scene, 3, Small).  % objects with 3 or fewer cells
 
 155.4 Shape Filters
 
-of_is_rect(+Objs, -Filtered)
+objfilter_is_rect(+Objs, -Filtered)
 
 Keeps objects that fill their bounding box (no holes). Solid rectangles,
 horizontal bars, vertical bars, and single cells all qualify.
 
-    of_is_rect(Scene, Rects).
+    objfilter_is_rect(Scene, Rects).
 
-of_is_hline(+Objs, -Filtered)
+objfilter_is_hline(+Objs, -Filtered)
 
 Keeps objects where all cells lie in a single row (bounding box height = 1).
 
-    of_is_hline(Scene, Hlines).
+    objfilter_is_hline(Scene, Hlines).
 
-of_is_vline(+Objs, -Filtered)
+objfilter_is_vline(+Objs, -Filtered)
 
 Keeps objects where all cells lie in a single column (bounding box width = 1).
 
-    of_is_vline(Scene, Vlines).
+    objfilter_is_vline(Scene, Vlines).
 
-of_is_single(+Objs, -Filtered)
+objfilter_is_single(+Objs, -Filtered)
 
 Keeps single-cell objects (exactly 1 cell).
 
-    of_is_single(Scene, Dots).
+    objfilter_is_single(Scene, Dots).
 
-of_is_hollow(+Objs, -Filtered)
+objfilter_is_hollow(+Objs, -Filtered)
 
 Keeps objects with at least one hole inside their bounding box (cell count
 is less than the bounding box area). L-shapes and frames are hollow.
 
-    of_is_hollow(Scene, Hollow).
+    objfilter_is_hollow(Scene, Hollow).
 
 155.5 Aggregate Selection
 
-of_largest(+Objs, -Obj)
+objfilter_largest(+Objs, -Obj)
 
 Returns the object with the most cells. On ties, returns the first in the
 list. Fails when Objs is empty.
 
-    of_largest(Scene, Biggest).
+    objfilter_largest(Scene, Biggest).
 
-of_smallest(+Objs, -Obj)
+objfilter_smallest(+Objs, -Obj)
 
 Returns the object with the fewest cells. On ties, returns the first in
 the list. Fails when Objs is empty.
 
-    of_smallest(Scene, Smallest).
+    objfilter_smallest(Scene, Smallest).
 
 155.6 Generic Meta-Predicates
 
-of_filter(+Objs, :Goal, -Filtered)
+objfilter_filter(+Objs, :Goal, -Filtered)
 
 Keeps objects where call(Goal, Obj) succeeds. Wraps include/3.
 
@@ -111,31 +111,31 @@ Keeps objects where call(Goal, Obj) succeeds. Wraps include/3.
         min_list(Cs, MinC), max_list(Cs, MaxC),
         MaxR - MinR =:= MaxC - MinC.
 
-    of_filter(Scene, is_square_bbox, Squares).
+    objfilter_filter(Scene, is_square_bbox, Squares).
 
-of_partition(+Objs, :Goal, -In, -Out)
+objfilter_partition(+Objs, :Goal, -In, -Out)
 
 Splits Objs into two lists: In (where Goal succeeds) and Out (where Goal
 fails). Wraps partition/4.
 
-    of_partition(Scene, is_square_bbox, Squares, NonSquares).
+    objfilter_partition(Scene, is_square_bbox, Squares, NonSquares).
 
 155.7 Summary
 
 Predicate            Description
-of_by_color/3        include objects of Color
-of_not_color/3       exclude objects of Color
-of_exact_size/3      objects with exactly N cells
-of_min_size/3        objects with >= N cells
-of_max_size/3        objects with <= N cells
-of_is_rect/2         objects filling their bounding box
-of_is_hline/2        objects spanning a single row
-of_is_vline/2        objects spanning a single column
-of_is_single/2       single-cell objects
-of_is_hollow/2       objects with holes in bounding box
-of_largest/2         object with most cells (first on tie)
-of_smallest/2        object with fewest cells (first on tie)
-of_filter/3          generic inclusion filter (meta)
-of_partition/4       split by goal into matching / non-matching (meta)
+objfilter_by_color/3        include objects of Color
+objfilter_not_color/3       exclude objects of Color
+objfilter_exact_size/3      objects with exactly N cells
+objfilter_min_size/3        objects with >= N cells
+objfilter_max_size/3        objects with <= N cells
+objfilter_is_rect/2         objects filling their bounding box
+objfilter_is_hline/2        objects spanning a single row
+objfilter_is_vline/2        objects spanning a single column
+objfilter_is_single/2       single-cell objects
+objfilter_is_hollow/2       objects with holes in bounding box
+objfilter_largest/2         object with most cells (first on tie)
+objfilter_smallest/2        object with fewest cells (first on tie)
+objfilter_filter/3          generic inclusion filter (meta)
+objfilter_partition/4       split by goal into matching / non-matching (meta)
 
 This is WP 194, PrologAI Layer 173.
