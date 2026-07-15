@@ -8,93 +8,93 @@ frequency tables; and finding the most frequently co-adjacent value.
 
 Predicates:
 
-cooccur_h_pairs(+Grid, -Pairs)
+cooccurrence_h_pairs(+Grid, -Pairs)
   Ordered horizontal adjacent value pairs A-B: A immediately left of B.
 
-cooccur_v_pairs(+Grid, -Pairs)
+cooccurrence_v_pairs(+Grid, -Pairs)
   Ordered vertical adjacent value pairs A-B: A immediately above B.
   Column-major order (all pairs for column 0 first, then column 1, etc.).
 
-cooccur_d_pairs_dr(+Grid, -Pairs)
+cooccurrence_d_pairs_dr(+Grid, -Pairs)
   Down-right diagonal pairs A-B: A at (R,C), B at (R+1,C+1).
 
-cooccur_d_pairs_dl(+Grid, -Pairs)
+cooccurrence_d_pairs_dl(+Grid, -Pairs)
   Down-left diagonal pairs A-B: A at (R,C), B at (R+1,C-1).
 
-cooccur_count_h(+Grid, +V1, +V2, -N)
+cooccurrence_count_h(+Grid, +V1, +V2, -N)
   N is the count of directed horizontal V1-V2 adjacent pairs.
 
-cooccur_count_v(+Grid, +V1, +V2, -N)
+cooccurrence_count_v(+Grid, +V1, +V2, -N)
   N is the count of directed vertical V1-V2 adjacent pairs.
 
-cooccur_count_adj4(+Grid, +V1, +V2, -N)
+cooccurrence_count_adj4(+Grid, +V1, +V2, -N)
   N is the total undirected 4-adjacent {V1,V2} pair count.
   When V1==V2: counts V1-V1 directed pairs. When V1\=V2: adds V1-V2 and V2-V1.
 
-cooccur_always_adj4(+Grid, +V1, +V2)
+cooccurrence_always_adj4(+Grid, +V1, +V2)
   Succeeds if every V1 cell has at least one 4-adjacent V2 cell.
 
-cooccur_never_adj4(+Grid, +V1, +V2)
+cooccurrence_never_adj4(+Grid, +V1, +V2)
   Succeeds if no V1 cell is 4-adjacent to any V2 cell.
 
-cooccur_isolated4(+Grid, +V, -Cells)
+cooccurrence_isolated4(+Grid, +V, -Cells)
   Sorted R-C positions of V cells with no 4-adjacent V-neighbor.
 
-cooccur_border_vals(+Grid, +V, -Vals)
+cooccurrence_border_vals(+Grid, +V, -Vals)
   Sorted distinct values W (W \= V) that 4-neighbor at least one V cell.
 
-cooccur_shared_border(+Grid, +V1, +V2)
+cooccurrence_shared_border(+Grid, +V1, +V2)
   Succeeds if some V1 cell is 4-adjacent to some V2 cell.
 
-cooccur_row_transitions(+Grid, -Triples)
+cooccurrence_row_transitions(+Grid, -Triples)
   A-B-N frequency triples for horizontal V1-V2 pairs, sorted by N descending.
 
-cooccur_most_common_adj4(+Grid, +V, -W)
+cooccurrence_most_common_adj4(+Grid, +V, -W)
   W is the value most frequently 4-adjacent to V cells.
   Ties: largest value wins. Fails if no other value borders V.
 
 Usage examples:
 
 G = [[1,1,1],[1,2,1],[1,1,1]].
-cooccur_h_pairs(G, P).        % P=[1-1,1-1,1-2,2-1,1-1,1-1]
-cooccur_v_pairs(G, P).        % P=[1-1,1-1,1-2,2-1,1-1,1-1]
-cooccur_count_h(G, 1, 2, N). % N=1 (one left-of-2 horizontal edge)
-cooccur_count_adj4(G, 1, 2, N). % N=4 (four undirected 1-2 edges)
-cooccur_count_adj4(G, 1, 1, N). % N=8 (eight undirected 1-1 edges)
-cooccur_always_adj4(G, 2, 1). % succeeds: center 2 is surrounded by 1s
-cooccur_never_adj4(G, 2, 2).  % succeeds: only one 2 cell, no 2-2 edge
-cooccur_isolated4(G, 2, C).   % C=[1-1]: center 2 has no 2-neighbor
-cooccur_isolated4(G, 1, C).   % C=[]: all 1 cells have 1-neighbors
-cooccur_border_vals(G, 2, V). % V=[1]: 2 only borders 1
-cooccur_shared_border(G, 1, 2). % succeeds
-cooccur_row_transitions(G, T).  % T=[1-1-4,2-1-1,1-2-1]
-cooccur_most_common_adj4(G, 1, W). % W=2 (only adjacent value)
+cooccurrence_h_pairs(G, P).        % P=[1-1,1-1,1-2,2-1,1-1,1-1]
+cooccurrence_v_pairs(G, P).        % P=[1-1,1-1,1-2,2-1,1-1,1-1]
+cooccurrence_count_h(G, 1, 2, N). % N=1 (one left-of-2 horizontal edge)
+cooccurrence_count_adj4(G, 1, 2, N). % N=4 (four undirected 1-2 edges)
+cooccurrence_count_adj4(G, 1, 1, N). % N=8 (eight undirected 1-1 edges)
+cooccurrence_always_adj4(G, 2, 1). % succeeds: center 2 is surrounded by 1s
+cooccurrence_never_adj4(G, 2, 2).  % succeeds: only one 2 cell, no 2-2 edge
+cooccurrence_isolated4(G, 2, C).   % C=[1-1]: center 2 has no 2-neighbor
+cooccurrence_isolated4(G, 1, C).   % C=[]: all 1 cells have 1-neighbors
+cooccurrence_border_vals(G, 2, V). % V=[1]: 2 only borders 1
+cooccurrence_shared_border(G, 1, 2). % succeeds
+cooccurrence_row_transitions(G, T).  % T=[1-1-4,2-1-1,1-2-1]
+cooccurrence_most_common_adj4(G, 1, W). % W=2 (only adjacent value)
 
 For G3 = [[1,2,3],[4,5,6],[7,8,9]]:
-cooccur_h_pairs(G3, P). % P=[1-2,2-3,4-5,5-6,7-8,8-9]
-cooccur_v_pairs(G3, P). % P=[1-4,4-7,2-5,5-8,3-6,6-9] (column-major)
-cooccur_d_pairs_dr(G3, P). % P=[1-5,2-6,4-8,5-9]
-cooccur_d_pairs_dl(G3, P). % P=[2-4,3-5,5-7,6-8]
-cooccur_border_vals(G3, 5, V). % V=[2,4,6,8] (4 neighbors of center)
-cooccur_most_common_adj4(G3, 5, W). % W=8 (all tied at 1; largest wins)
-cooccur_never_adj4(G3, 1, 9). % succeeds: opposite corners
+cooccurrence_h_pairs(G3, P). % P=[1-2,2-3,4-5,5-6,7-8,8-9]
+cooccurrence_v_pairs(G3, P). % P=[1-4,4-7,2-5,5-8,3-6,6-9] (column-major)
+cooccurrence_d_pairs_dr(G3, P). % P=[1-5,2-6,4-8,5-9]
+cooccurrence_d_pairs_dl(G3, P). % P=[2-4,3-5,5-7,6-8]
+cooccurrence_border_vals(G3, 5, V). % V=[2,4,6,8] (4 neighbors of center)
+cooccurrence_most_common_adj4(G3, 5, W). % W=8 (all tied at 1; largest wins)
+cooccurrence_never_adj4(G3, 1, 9). % succeeds: opposite corners
 
 Key implementation notes:
 
-cooccur_v_pairs generates in column-major order. When using the result, note that
+cooccurrence_v_pairs generates in column-major order. When using the result, note that
   pairs for column C all appear before pairs for column C+1.
 
-cooccur_count_adj4 uses directed pair counts: for V1 \= V2, adds count(V1-V2) +
+cooccurrence_count_adj4 uses directed pair counts: for V1 \= V2, adds count(V1-V2) +
   count(V2-V1) from the horizontal+vertical pair lists. This gives the total
   number of undirected edges between V1 and V2 cells.
 
-cooccur_shared_border uses cut after finding the first matching pair for
+cooccurrence_shared_border uses cut after finding the first matching pair for
   determinism. It does not count all matches.
 
-cooccur_row_transitions sorts by count descending. Ties within the same count
+cooccurrence_row_transitions sorts by count descending. Ties within the same count
   are ordered by msort on N-A-B triples (A then B after N tie), reversed.
 
-cooccur_most_common_adj4 uses msort on N-X pairs and takes the last element,
+cooccurrence_most_common_adj4 uses msort on N-X pairs and takes the last element,
   giving the highest-N entry. On ties, the largest X wins.
 
 Library imports: library(lists): member/2, nth0/3, last/2, append/3.

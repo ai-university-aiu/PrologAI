@@ -86,8 +86,8 @@
 :- use_module(library(lists),     [numlist/3]).
 
 % Soft dependency on sona — load only if the library is available.
-:- ignore(catch(use_module(library(sona),
-                            [sona_retrieve/3, sona_absorb/1]),
+:- ignore(catch(use_module(library(synaptic_ontological_neural_aggregator),
+                            [synaptic_ontological_neural_aggregator_retrieve/3, synaptic_ontological_neural_aggregator_absorb/1]),
                 _,
                 true)).
 
@@ -162,7 +162,7 @@ dreaming_journal(MindId, Journal) :-
 % Define a clause for 'pai dream generative replay': replay SONA trajectories with noise.
 dreaming_generative_replay(MindId, Count, Replayed) :-
     % Attempt to retrieve Count trajectories from SONA; fall back to empty list.
-    (   catch(sona_retrieve(traj(_), Count, Trajectories), _, fail)
+    (   catch(synaptic_ontological_neural_aggregator_retrieve(traj(_), Count, Trajectories), _, fail)
     ->  % Map the perturb-and-absorb operation over every retrieved trajectory.
         maplist(dreaming_perturb_and_absorb(MindId), Trajectories, Replayed)
     ;   % SONA is not loaded or has no entries; return an empty replay list.
@@ -178,7 +178,7 @@ dreaming_perturb_and_absorb(MindId, Traj, replayed(MindId, PerturbedTraj)) :-
     % Reconstruct the perturbed trajectory term.
     PerturbedTraj =.. [F | PerturbedArgs],
     % Re-absorb the perturbed trajectory into SONA; ignore errors if SONA absent.
-    catch(sona_absorb(PerturbedTraj), _, true).
+    catch(synaptic_ontological_neural_aggregator_absorb(PerturbedTraj), _, true).
 
 % Define a clause for 'dream perturb arg': prepend a replay-noise marker to event lists.
 dreaming_perturb_arg(events(Evs), events([replay_noise(dreaming) | Evs])) :- !.

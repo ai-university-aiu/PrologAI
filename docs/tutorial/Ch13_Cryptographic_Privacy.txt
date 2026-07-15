@@ -143,29 +143,29 @@ The cryptographic privacy layer lives in pack lattice_crypto, work package PR 49
 
 To load it:
 
-    ?- use_module(library(lattice_crypto)).
+    ?- use_module(library(lattice_cryptography)).
 
 You should see:
 
     true.
 
-If that fails, make sure your library path includes packs/lattice_crypto/prolog. In a fresh session from the PrologAI repository root:
+If that fails, make sure your library path includes packs/lattice_cryptography/prolog. In a fresh session from the PrologAI repository root:
 
-    ?- assertz(file_search_path(library, 'packs/lattice_crypto/prolog')).
-    ?- use_module(library(lattice_crypto)).
+    ?- assertz(file_search_path(library, 'packs/lattice_cryptography/prolog')).
+    ?- use_module(library(lattice_cryptography)).
 
 
 CHECKING WHAT IS AVAILABLE
 
 Before encrypting, you can ask PrologAI which algorithms are ready to use:
 
-    ?- lattice_crypto_crypto_available(pai_algo_rsa).
+    ?- lattice_cryptography_crypto_available(lattice_cryptography_algo_rsa).
     true.
 
-    ?- lattice_crypto_crypto_available(pai_algo_ecdh).
+    ?- lattice_cryptography_crypto_available(lattice_cryptography_algo_ecdh).
     true.
 
-    ?- lattice_crypto_crypto_available(pai_algo_pqc).
+    ?- lattice_cryptography_crypto_available(lattice_cryptography_algo_pqc).
     false.
 
 The first two should succeed on any standard installation. The third only succeeds if the OQS Provider is installed.
@@ -179,9 +179,9 @@ Step 1: Generate a key pair.
 
 The key pair is written to temporary PEM files (PEM is a standard format for storing cryptographic keys as text).
 
-    ?- lattice_crypto_keygen_rsa(2048, PrivFile, PubFile).
-    PrivFile = '/tmp/swipl_pai_rsa_priv_1234',
-    PubFile = '/tmp/swipl_pai_rsa_pub_5678'.
+    ?- lattice_cryptography_keygen_rsa(2048, PrivFile, PubFile).
+    PrivFile = '/tmp/swipl_prologai_rsa_priv_1234',
+    PubFile = '/tmp/swipl_prologai_rsa_pub_5678'.
 
 The variable PrivFile now holds the path to your private key file.
 The variable PubFile holds the path to your public key file.
@@ -190,8 +190,8 @@ Keep the private key secret. Distribute the public key freely.
 
 Step 2: Load the keys into Prolog.
 
-    ?- lattice_crypto_pem_load_private(PrivFile, PrivKey),
-       lattice_crypto_pem_load_public(PubFile, PubKey).
+    ?- lattice_cryptography_pem_load_private(PrivFile, PrivKey),
+       lattice_cryptography_pem_load_public(PubFile, PubKey).
     PrivKey = <ssl_key>(0x...),
     PubKey = <ssl_key>(0x...).
 
@@ -199,7 +199,7 @@ PrivKey and PubKey are now Prolog terms representing the loaded keys.
 
 Step 3: Encrypt the password.
 
-    ?- lattice_crypto_encrypt_rsa(PubKey, 'hunter2_my_bank_password', Bundle, Tag).
+    ?- lattice_cryptography_encrypt_rsa(PubKey, 'hunter2_my_bank_password', Bundle, Tag).
     Bundle = rsa_bundle('7f3a...', '2b9c...', 'a1d4...'),
     Tag = '8e2f...'.
 
@@ -212,7 +212,7 @@ Note: the actual hex strings will be much longer than shown above (they are abbr
 
 Step 4: Decrypt the password.
 
-    ?- lattice_crypto_decrypt_rsa(PrivKey, Bundle, Tag, Plain).
+    ?- lattice_cryptography_decrypt_rsa(PrivKey, Bundle, Tag, Plain).
     Plain = 'hunter2_my_bank_password'.
 
 The original password is recovered.
@@ -228,7 +228,7 @@ ECDH does not use PEM files for the recipient key. The recipient's key is stored
 
 Step 1: Generate a key pair for the recipient.
 
-    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub).
+    ?- lattice_cryptography_keygen_ecdh(prime256v1, RecipPriv, RecipPub).
     RecipPriv = 73849201...,
     RecipPub = point(114492..., 98234...).
 
@@ -237,7 +237,7 @@ RecipPub is a point on the P-256 curve, represented as point(X, Y) where X and Y
 
 Step 2: Encrypt the SSN using only the public key.
 
-    ?- lattice_crypto_encrypt_ecdh(RecipPub, 'SSN:123-45-6789', Bundle, Tag).
+    ?- lattice_cryptography_encrypt_ecdh(RecipPub, 'SSN:123-45-6789', Bundle, Tag).
     Bundle = ecdh_bundle(114492..., 98234..., '3f7a...', 'b2c1...'),
     Tag = 'a9e4...'.
 
@@ -248,7 +248,7 @@ The ECDH bundle contains:
 
 Step 3: Decrypt using only the private scalar.
 
-    ?- lattice_crypto_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
+    ?- lattice_cryptography_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
     Plain = 'SSN:123-45-6789'.
 
 The SSN is recovered.
@@ -260,14 +260,14 @@ EXAMPLE 3: THE GENERIC INTERFACE
 
 The generic interface lets you write code that works with any algorithm.
 
-    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       lattice_crypto_encrypt(pai_algo_ecdh, RecipPub, 'CreditCard:4111111111111111', Bundle, Tag),
-       lattice_crypto_decrypt(pai_algo_ecdh, RecipPriv, Bundle, Tag, Plain).
+    ?- lattice_cryptography_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       lattice_cryptography_encrypt(lattice_cryptography_algo_ecdh, RecipPub, 'CreditCard:4111111111111111', Bundle, Tag),
+       lattice_cryptography_decrypt(lattice_cryptography_algo_ecdh, RecipPriv, Bundle, Tag, Plain).
     Plain = 'CreditCard:4111111111111111'.
 
-To switch to RSA, change pai_algo_ecdh to pai_algo_rsa and supply RSA keys instead.
+To switch to RSA, change lattice_cryptography_algo_ecdh to lattice_cryptography_algo_rsa and supply RSA keys instead.
 
-To switch to PQC (when available), change to pai_algo_pqc and supply a PEM file path.
+To switch to PQC (when available), change to lattice_cryptography_algo_pqc and supply a PEM file path.
 
 
 WHAT HAPPENS WHEN THE TAG IS TAMPERED?
@@ -276,10 +276,10 @@ AES-256-GCM protects against tampering. If the ciphertext or the tag is changed 
 
 To demonstrate:
 
-    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       lattice_crypto_encrypt_ecdh(RecipPub, 'secret value', Bundle, _RealTag),
+    ?- lattice_cryptography_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       lattice_cryptography_encrypt_ecdh(RecipPub, 'secret value', Bundle, _RealTag),
        FakeTag = '00000000000000000000000000000000',
-       lattice_crypto_decrypt_ecdh(RecipPriv, Bundle, FakeTag, Plain, prime256v1).
+       lattice_cryptography_decrypt_ecdh(RecipPriv, Bundle, FakeTag, Plain, prime256v1).
     ERROR: SSL(00000000) : ...
 
 The decryption fails and raises an error. It does not silently return wrong data.
@@ -291,8 +291,8 @@ STORING AN ENCRYPTED VALUE IN THE LATTICE
 
 Encrypted bundles are ordinary Prolog compound terms. They can be stored in the Lattice exactly like any other value.
 
-    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       lattice_crypto_encrypt_ecdh(RecipPub, 'my_bank_password', Bundle, Tag),
+    ?- lattice_cryptography_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       lattice_cryptography_encrypt_ecdh(RecipPub, 'my_bank_password', Bundle, Tag),
        anchor_node(private_credential, bank_password, Bundle-Tag, []).
 
 The Lattice now contains a node_fact with relation type private_credential, key bank_password, and value Bundle-Tag.
@@ -306,7 +306,7 @@ To retrieve and decrypt:
 
     ?- live_node_facts(private_credential-bank_password, [node_fact(_,_,BundleTag,_)]),
        BundleTag = Bundle-Tag,
-       lattice_crypto_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
+       lattice_cryptography_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
     Plain = 'my_bank_password'.
 
 
@@ -337,7 +337,7 @@ REAL-WORLD APPLICATIONS OF THESE TECHNIQUES
 
 The mathematics behind PrologAI's crypto pack powers the entire digital economy.
 
-When you log in to your bank's website, RSA or ECDH establishes a shared secret and AES encrypts your session. That is exactly what lattice_crypto_encrypt/5 does.
+When you log in to your bank's website, RSA or ECDH establishes a shared secret and AES encrypts your session. That is exactly what lattice_cryptography_encrypt/5 does.
 
 When your phone stores a fingerprint or face ID template, it encrypts it with a key that never leaves the secure hardware chip. That is the same asymmetric-key-wraps-symmetric-key pattern.
 
@@ -370,12 +370,12 @@ All three use hybrid encryption: the asymmetric algorithm wraps a 256-bit AES se
 AES-256-GCM also provides authenticated integrity: any tampering with the ciphertext or tag causes decryption to fail with an error.
 
 The main predicates are:
-    lattice_crypto_keygen_rsa/3, lattice_crypto_keygen_ecdh/3, lattice_crypto_keygen_pqc/2  - key generation.
-    lattice_crypto_encrypt/5, lattice_crypto_decrypt/5                            - generic dispatch.
-    lattice_crypto_encrypt_rsa/4, lattice_crypto_decrypt_rsa/4                    - RSA convenience.
-    lattice_crypto_encrypt_ecdh/4, lattice_crypto_decrypt_ecdh/5                  - ECDH convenience.
-    lattice_crypto_encrypt_pqc/4, lattice_crypto_decrypt_pqc/4                    - PQC convenience.
-    lattice_crypto_crypto_available/1                                  - availability probe.
+    lattice_cryptography_keygen_rsa/3, lattice_cryptography_keygen_ecdh/3, lattice_cryptography_keygen_pqc/2  - key generation.
+    lattice_cryptography_encrypt/5, lattice_cryptography_decrypt/5                            - generic dispatch.
+    lattice_cryptography_encrypt_rsa/4, lattice_cryptography_decrypt_rsa/4                    - RSA convenience.
+    lattice_cryptography_encrypt_ecdh/4, lattice_cryptography_decrypt_ecdh/5                  - ECDH convenience.
+    lattice_cryptography_encrypt_pqc/4, lattice_cryptography_decrypt_pqc/4                    - PQC convenience.
+    lattice_cryptography_crypto_available/1                                  - availability probe.
 
 
 WHAT COMES NEXT

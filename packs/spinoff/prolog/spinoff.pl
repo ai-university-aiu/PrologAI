@@ -10,7 +10,7 @@
     is forged.  For each unreliable spinoff, the miner searches contexts that
     lift reliability past a threshold and forges context-spinoff plans.
 
-    Spinoffs never overwrite parents (pai_accommodate semantics).
+    Spinoffs never overwrite parents (spinoff_accommodate semantics).
 
     Predicates:
       spinoff_spinoff_mine/2    — +Command, -SpinoffList
@@ -371,7 +371,7 @@ maybe_forge_spinoff(Command, Context, Result, Reliability) :-
     % Execute: ( spinoff_plan(_, Command, Context, Result, _).
     ( spinoff_plan(_, Command, Context, Result, _)
     % If the condition above succeeded, perform the following action.
-    ->  true   % already exists (pai_accommodate semantics)
+    ->  true   % already exists (spinoff_accommodate semantics)
     % Otherwise (else branch), perform the following action.
     ;   next_spinoff_id(SpId),
         % Continue the multi-line expression started above.

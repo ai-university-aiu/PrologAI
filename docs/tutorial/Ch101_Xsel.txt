@@ -12,24 +12,24 @@ All predicates use the xs_* prefix.
 
 1. Threshold Cell Selectors
 
-xsel_cells_lt(+Grid, +V, -Cells) returns the sorted list of R-C pairs for cells
+extended_selection_cells_lt(+Grid, +V, -Cells) returns the sorted list of R-C pairs for cells
 with value strictly less than V.
 
-xsel_cells_gt(+Grid, +V, -Cells) returns the sorted list for cells with value
+extended_selection_cells_gt(+Grid, +V, -Cells) returns the sorted list for cells with value
 strictly greater than V.
 
-xsel_cells_le(+Grid, +V, -Cells) returns the sorted list for cells with value
+extended_selection_cells_le(+Grid, +V, -Cells) returns the sorted list for cells with value
 less than or equal to V.
 
-xsel_cells_ge(+Grid, +V, -Cells) returns the sorted list for cells with value
+extended_selection_cells_ge(+Grid, +V, -Cells) returns the sorted list for cells with value
 greater than or equal to V.
 
 Example:
 
-:- xsel_cells_lt([[1,2],[3,4]], 3, Cs).
+:- extended_selection_cells_lt([[1,2],[3,4]], 3, Cs).
 % Cs = [0-0, 0-1]    (values 1 and 2 are < 3)
 
-:- xsel_cells_ge([[1,2],[3,4]], 3, Cs).
+:- extended_selection_cells_ge([[1,2],[3,4]], 3, Cs).
 % Cs = [1-0, 1-1]    (values 3 and 4 are >= 3)
 
 All four predicates use findall with an arithmetic guard followed by sort/2
@@ -38,36 +38,36 @@ to produce a canonical list.
 
 2. Range and Inequality Selectors
 
-xsel_cells_between(+Grid, +Lo, +Hi, -Cells) returns cells with Lo =< value =< Hi.
+extended_selection_cells_between(+Grid, +Lo, +Hi, -Cells) returns cells with Lo =< value =< Hi.
 
-xsel_cells_ne(+Grid, +V, -Cells) returns cells with value not equal to V.
+extended_selection_cells_ne(+Grid, +V, -Cells) returns cells with value not equal to V.
 
 Example:
 
-:- xsel_cells_between([[0,1],[2,3]], 1, 2, Cs).
+:- extended_selection_cells_between([[0,1],[2,3]], 1, 2, Cs).
 % Cs = [0-1, 1-0]    (values 1 and 2 are in [1,2])
 
-:- xsel_cells_ne([[0,1],[1,0]], 0, Cs).
+:- extended_selection_cells_ne([[0,1],[1,0]], 0, Cs).
 % Cs = [0-1, 1-0]    (cells where value != 0)
 
 
 3. Extremum Locators
 
-xsel_max_cells(+Grid, -Cells) returns the sorted list of R-C pairs of cells
+extended_selection_max_cells(+Grid, -Cells) returns the sorted list of R-C pairs of cells
 containing the maximum value in Grid.
 
-xsel_min_cells(+Grid, -Cells) returns the sorted list of R-C pairs of cells
+extended_selection_min_cells(+Grid, -Cells) returns the sorted list of R-C pairs of cells
 containing the minimum value.
 
 Example:
 
-:- xsel_max_cells([[1,2],[3,4]], Cs).
+:- extended_selection_max_cells([[1,2],[3,4]], Cs).
 % Cs = [1-1]          (4 is the unique maximum)
 
-:- xsel_max_cells([[5,0],[0,5]], Cs).
+:- extended_selection_max_cells([[5,0],[0,5]], Cs).
 % Cs = [0-0, 1-1]    (both 5s are the maximum)
 
-:- xsel_min_cells([[3,3],[3,3]], Cs).
+:- extended_selection_min_cells([[3,3],[3,3]], Cs).
 % Cs = [0-0, 0-1, 1-0, 1-1]  (all cells share the minimum)
 
 Implementation: two-pass approach. First pass collects all cell values and
@@ -77,24 +77,24 @@ positions equal to that extremum.
 
 4. Conditional Replacement
 
-xsel_threshold(+Grid, +T, +OnV, +OffV, -Grid2) replaces each cell with OnV
+extended_selection_threshold(+Grid, +T, +OnV, +OffV, -Grid2) replaces each cell with OnV
 if its value is >= T, otherwise with OffV. This is a binary threshold.
 
-xsel_replace_lt(+Grid, +V, +New, -Grid2) replaces every cell with value < V
+extended_selection_replace_lt(+Grid, +V, +New, -Grid2) replaces every cell with value < V
 with New, leaving all other cells unchanged.
 
-xsel_replace_gt(+Grid, +V, +New, -Grid2) replaces every cell with value > V
+extended_selection_replace_gt(+Grid, +V, +New, -Grid2) replaces every cell with value > V
 with New.
 
 Example:
 
-:- xsel_threshold([[1,3],[5,2]], 3, 1, 0, G).
+:- extended_selection_threshold([[1,3],[5,2]], 3, 1, 0, G).
 % G = [[0,1],[1,0]]  (3 and 5 >= 3 become 1; 1 and 2 become 0)
 
-:- xsel_replace_lt([[1,3],[2,4]], 3, 0, G).
+:- extended_selection_replace_lt([[1,3],[2,4]], 3, 0, G).
 % G = [[0,3],[0,4]]  (1 and 2 are < 3, replaced with 0)
 
-:- xsel_replace_gt([[1,3],[5,2]], 3, 0, G).
+:- extended_selection_replace_gt([[1,3],[5,2]], 3, 0, G).
 % G = [[1,3],[0,2]]  (5 is > 3, replaced with 0)
 
 All three use nested maplist (one level per row, one level per cell) with
@@ -103,49 +103,49 @@ an if-then-else inside a private helper predicate.
 
 5. Value Ranking
 
-xsel_rank_vals(+Grid, -Vals) returns the sorted list of unique values appearing
+extended_selection_rank_vals(+Grid, -Vals) returns the sorted list of unique values appearing
 in Grid. The index of each value in this list is its ordinal rank (0 = smallest).
 
-xsel_val_rank(+Grid, +V, -Rank) returns the 0-based ordinal rank of value V.
+extended_selection_val_rank(+Grid, +V, -Rank) returns the 0-based ordinal rank of value V.
 Fails if V does not appear in Grid.
 
-xsel_rank_grid(+Grid, -RankGrid) produces a new grid where each cell contains
+extended_selection_rank_grid(+Grid, -RankGrid) produces a new grid where each cell contains
 its original value's ordinal rank.
 
 Example:
 
-:- xsel_rank_vals([[3,1],[2,1]], Vs).
+:- extended_selection_rank_vals([[3,1],[2,1]], Vs).
 % Vs = [1, 2, 3]       (1 is rank 0, 2 is rank 1, 3 is rank 2)
 
-:- xsel_val_rank([[3,1],[2,1]], 3, R).
+:- extended_selection_val_rank([[3,1],[2,1]], 3, R).
 % R = 2
 
-:- xsel_rank_grid([[3,1],[2,1]], G).
+:- extended_selection_rank_grid([[3,1],[2,1]], G).
 % G = [[2,0],[1,0]]    (3->2, 1->0, 2->1)
 
-:- xsel_rank_grid([[5,3],[1,7]], G).
+:- extended_selection_rank_grid([[5,3],[1,7]], G).
 % G = [[2,1],[0,3]]    (1->0, 3->1, 5->2, 7->3)
 
-xsel_rank_vals uses findall with nested member/2 to collect all values, then
-sort/2 which simultaneously removes duplicates and orders ascending. xsel_val_rank
-uses nth0 with a cut to find the unique position. xsel_rank_grid calls xsel_rank_vals
-once and then applies xsel_rank_val_ (nth0 + cut) to every cell via nested maplist.
+extended_selection_rank_vals uses findall with nested member/2 to collect all values, then
+sort/2 which simultaneously removes duplicates and orders ascending. extended_selection_val_rank
+uses nth0 with a cut to find the unique position. extended_selection_rank_grid calls extended_selection_rank_vals
+once and then applies extended_selection_rank_val_ (nth0 + cut) to every cell via nested maplist.
 
 
 6. Design Notes
 
-The xsel_rank_val_ private helper adds a cut after nth0(Rank, Vals, V) because
+The extended_selection_rank_val_ private helper adds a cut after nth0(Rank, Vals, V) because
 the sorted unique list contains each value exactly once; without the cut, nth0
 would leave a choicepoint that produces PLUnit warnings. The cut is safe here
 because uniqueness is guaranteed by the sort/2 that built Vals.
 
-The six threshold selectors (xsel_cells_lt, xsel_cells_gt, xsel_cells_le,
-xsel_cells_ge, xsel_cells_between, xsel_cells_ne) all follow the same findall +
+The six threshold selectors (extended_selection_cells_lt, extended_selection_cells_gt, extended_selection_cells_le,
+extended_selection_cells_ge, extended_selection_cells_between, extended_selection_cells_ne) all follow the same findall +
 sort pattern with different arithmetic guards. This uniformity makes them
-easy to combine: for example, calling xsel_cells_ge and then xsel_cells_le on the
-same grid and intersecting the results is equivalent to xsel_cells_between.
+easy to combine: for example, calling extended_selection_cells_ge and then extended_selection_cells_le on the
+same grid and intersecting the results is equivalent to extended_selection_cells_between.
 
 Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2.
 library(apply): maplist/3.
 
-Test file: packs/xsel/test/test_xsel.pl. All 42 tests pass.
+Test file: packs/extended_selection/test/test_extended_selection.pl. All 42 tests pass.

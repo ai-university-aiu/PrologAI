@@ -4,24 +4,24 @@
 
 % recur_arith/4 tests
 
-test(arith_basic) :-
+test(arithmetic_basic) :-
     recur_arith(1, 2, 3, [1,3,5]).
 
-test(arith_zero_step) :-
+test(arithmetic_zero_step) :-
     recur_arith(7, 0, 4, [7,7,7,7]).
 
-test(arith_negative_step) :-
+test(arithmetic_negative_step) :-
     recur_arith(10, -3, 4, [10,7,4,1]).
 
 % recur_arith_step/2 tests
 
-test(arith_step_positive) :-
+test(arithmetic_step_positive) :-
     recur_arith_step([1,3,5,7], 2).
 
-test(arith_step_negative) :-
+test(arithmetic_step_negative) :-
     recur_arith_step([10,7,4,1], -3).
 
-test(arith_step_zero) :-
+test(arithmetic_step_zero) :-
     recur_arith_step([5,5,5], 0).
 
 % recur_is_arith/2 tests
@@ -136,13 +136,13 @@ test(zip_with_single) :-
 
 % recur_diff_list/2 tests
 
-test(diff_list_variable) :-
+test(difference_list_variable) :-
     recur_diff_list([1,3,6,10], [2,3,4]).
 
-test(diff_list_negative) :-
+test(difference_list_negative) :-
     recur_diff_list([5,3,1], [-2,-2]).
 
-test(diff_list_zero) :-
+test(difference_list_zero) :-
     recur_diff_list([7,7], [0]).
 
 % recur_const_diffs/2 tests

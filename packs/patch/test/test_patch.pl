@@ -186,17 +186,17 @@ test(most_common_single) :-
 % patch_diff/3 tests
 
 % Two identical patches give an empty diff list.
-test(diff_identical) :-
+test(difference_identical) :-
     patch_diff([[1,2],[3,4]], [[1,2],[3,4]], Cells),
     Cells = [].
 
 % Patches differing in one cell give a one-element diff list.
-test(diff_one_cell) :-
+test(difference_one_cell) :-
     patch_diff([[1,2],[3,4]], [[1,2],[3,9]], Cells),
     Cells = [1-1].
 
 % Patches differing in all cells give a full diff list.
-test(diff_all_cells) :-
+test(difference_all_cells) :-
     patch_diff([[1,1],[1,1]], [[2,2],[2,2]], Cells),
     sort(Cells, S),
     S = [0-0, 0-1, 1-0, 1-1].

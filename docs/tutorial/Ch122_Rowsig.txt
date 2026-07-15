@@ -7,114 +7,114 @@ by index, and testing palindrome and anagram structure.
 
 Predicates:
 
-rowsig_col_at(+Grid, +C, -Col)
+row_signature_col_at(+Grid, +C, -Col)
   Col is the ordered list of values in column C, top-to-bottom (row 0 first).
 
-rowsig_all_cols(+Grid, -Cols)
+row_signature_all_cols(+Grid, -Cols)
   Cols is the list of all column lists in column order (column 0 first).
 
-rowsig_row_freq(+Grid, -Freqs)
+row_signature_row_freq(+Grid, -Freqs)
   Freqs is Row-N pairs where N is how often Row appears. Sorted by N desc;
   equal-count rows ordered by reverse standard order (largest last in msort,
   first after reverse).
 
-rowsig_col_freq(+Grid, -Freqs)
+row_signature_col_freq(+Grid, -Freqs)
   Freqs is Col-N pairs where N is how often column list Col appears. Sorted
   by N descending.
 
-rowsig_modal_row(+Grid, -Row)
+row_signature_modal_row(+Grid, -Row)
   Row is the most frequently appearing row. On tie, the largest row in
   standard order wins (msort + last). Fails if Grid is empty.
 
-rowsig_modal_col(+Grid, -Col)
+row_signature_modal_col(+Grid, -Col)
   Col is the most frequently appearing column list. Ties resolved by largest
   column (msort + last). Fails if Grid has no columns.
 
-rowsig_uniq_rows(+Grid, -Pairs)
+row_signature_uniq_rows(+Grid, -Pairs)
   Pairs is the list of R-Row terms for rows appearing exactly once, ordered
   by row index ascending.
 
-rowsig_uniq_cols(+Grid, -Pairs)
+row_signature_uniq_cols(+Grid, -Pairs)
   Pairs is the list of C-Col terms for columns appearing exactly once,
   ordered by column index ascending.
 
-rowsig_dup_row_pairs(+Grid, -Pairs)
+row_signature_dup_row_pairs(+Grid, -Pairs)
   Pairs is the list of R1-R2 index pairs where row R1 equals row R2 and
   R1 < R2. Ordered by R1 then R2.
 
-rowsig_dup_col_pairs(+Grid, -Pairs)
+row_signature_dup_col_pairs(+Grid, -Pairs)
   Pairs is the list of C1-C2 index pairs where column C1 equals column C2
   and C1 < C2. Ordered by C1 then C2.
 
-rowsig_row_palindrome(+Grid, +R)
+row_signature_row_palindrome(+Grid, +R)
   Succeeds if row R reads the same left-to-right and right-to-left.
 
-rowsig_col_palindrome(+Grid, +C)
+row_signature_col_palindrome(+Grid, +C)
   Succeeds if column C reads the same top-to-bottom and bottom-to-top.
 
-rowsig_rows_anagram(+Grid, +R1, +R2)
+row_signature_rows_anagram(+Grid, +R1, +R2)
   Succeeds if rows R1 and R2 have the same multiset of values
   (msort of both rows produces the same list).
 
-rowsig_cols_anagram(+Grid, +C1, +C2)
+row_signature_cols_anagram(+Grid, +C1, +C2)
   Succeeds if columns C1 and C2 have the same multiset of values
   (msort of both columns produces the same list).
 
 Usage examples:
 
 G = [[1,2,3],[4,5,6],[7,8,9]].
-rowsig_col_at(G, 0, Col).     % Col=[1,4,7]
-rowsig_col_at(G, 1, Col).     % Col=[2,5,8]
-rowsig_all_cols(G, Cols).     % Cols=[[1,4,7],[2,5,8],[3,6,9]]
-rowsig_modal_row(G, Row).     % Row=[7,8,9] (all freq=1; largest wins)
-rowsig_modal_col(G, Col).     % Col=[3,6,9] (all freq=1; largest wins)
-rowsig_uniq_rows(G, Pairs).   % Pairs=[0-[1,2,3],1-[4,5,6],2-[7,8,9]]
-rowsig_dup_row_pairs(G, P).   % P=[]
-rowsig_dup_col_pairs(G, P).   % P=[]
+row_signature_col_at(G, 0, Col).     % Col=[1,4,7]
+row_signature_col_at(G, 1, Col).     % Col=[2,5,8]
+row_signature_all_cols(G, Cols).     % Cols=[[1,4,7],[2,5,8],[3,6,9]]
+row_signature_modal_row(G, Row).     % Row=[7,8,9] (all freq=1; largest wins)
+row_signature_modal_col(G, Col).     % Col=[3,6,9] (all freq=1; largest wins)
+row_signature_uniq_rows(G, Pairs).   % Pairs=[0-[1,2,3],1-[4,5,6],2-[7,8,9]]
+row_signature_dup_row_pairs(G, P).   % P=[]
+row_signature_dup_col_pairs(G, P).   % P=[]
 
 G2 = [[1,2],[3,4],[1,2]].
-rowsig_row_freq(G2, Freqs).   % Freqs=[[1,2]-2,[3,4]-1]
-rowsig_modal_row(G2, Row).    % Row=[1,2]
-rowsig_uniq_rows(G2, Pairs).  % Pairs=[1-[3,4]]
-rowsig_dup_row_pairs(G2, P).  % P=[0-2]
+row_signature_row_freq(G2, Freqs).   % Freqs=[[1,2]-2,[3,4]-1]
+row_signature_modal_row(G2, Row).    % Row=[1,2]
+row_signature_uniq_rows(G2, Pairs).  % Pairs=[1-[3,4]]
+row_signature_dup_row_pairs(G2, P).  % P=[0-2]
 
 G3 = [[1,2,1],[3,4,5],[6,7,6]].
-rowsig_row_palindrome(G3, 0). % succeeds: [1,2,1] is palindrome
-rowsig_row_palindrome(G3, 2). % succeeds: [6,7,6] is palindrome
-rowsig_row_palindrome(G3, 1). % fails: [3,4,5] is not palindrome
+row_signature_row_palindrome(G3, 0). % succeeds: [1,2,1] is palindrome
+row_signature_row_palindrome(G3, 2). % succeeds: [6,7,6] is palindrome
+row_signature_row_palindrome(G3, 1). % fails: [3,4,5] is not palindrome
 
 G4 = [[1,2],[3,3],[1,5]].
-rowsig_col_palindrome(G4, 0). % succeeds: col0=[1,3,1] is palindrome
-rowsig_col_palindrome(G4, 1). % fails: col1=[2,3,5] is not palindrome
+row_signature_col_palindrome(G4, 0). % succeeds: col0=[1,3,1] is palindrome
+row_signature_col_palindrome(G4, 1). % fails: col1=[2,3,5] is not palindrome
 
 G5 = [[1,2,3],[3,1,2],[4,5,6]].
-rowsig_rows_anagram(G5, 0, 1). % succeeds: [1,2,3] and [3,1,2] same multiset
-rowsig_rows_anagram(G5, 0, 2). % fails: [1,2,3] and [4,5,6] different multisets
+row_signature_rows_anagram(G5, 0, 1). % succeeds: [1,2,3] and [3,1,2] same multiset
+row_signature_rows_anagram(G5, 0, 2). % fails: [1,2,3] and [4,5,6] different multisets
 
 G6 = [[1,2],[3,1],[2,3]].
-rowsig_cols_anagram(G6, 0, 1). % succeeds: [1,3,2] and [2,1,3] same multiset
+row_signature_cols_anagram(G6, 0, 1). % succeeds: [1,3,2] and [2,1,3] same multiset
 
 Key implementation notes:
 
-rowsig_col_at uses findall over member(Row, Grid) with nth0(C, Row, V). The column
+row_signature_col_at uses findall over member(Row, Grid) with nth0(C, Row, V). The column
   order follows the row order of Grid (top to bottom).
 
-rowsig_row_freq and rowsig_col_freq use sort to get unique elements, then include to
+row_signature_row_freq and row_signature_col_freq use sort to get unique elements, then include to
   count each, then msort + reverse for descending order. Output format is
   Element-Count (not Count-Element).
 
-rowsig_modal_row and rowsig_modal_col use msort + last on Count-Element pairs.
+row_signature_modal_row and row_signature_modal_col use msort + last on Count-Element pairs.
   When all counts are equal, msort sorts by Element ascending, so last gives
   the largest Element — a deterministic tie-breaking rule.
 
-rowsig_dup_row_pairs uses a double between loop with R1 < R2. The findall
+row_signature_dup_row_pairs uses a double between loop with R1 < R2. The findall
   enumeration in between order (0,1,2,...) guarantees pairs are in R1 then
   R2 ascending order.
 
-rowsig_row_palindrome and rowsig_col_palindrome test reverse(X) = X. This is the
+row_signature_row_palindrome and row_signature_col_palindrome test reverse(X) = X. This is the
   clean Prolog idiom for palindrome: unify the list with its own reverse.
 
-rowsig_rows_anagram and rowsig_cols_anagram use msort (not sort) so duplicate values
+row_signature_rows_anagram and row_signature_cols_anagram use msort (not sort) so duplicate values
   are preserved. Two rows with [1,1,2] and [2,1,1] are anagrams; sort would
   give [1,2] for both and miss the count of 1s.
 

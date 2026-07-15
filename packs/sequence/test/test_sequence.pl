@@ -44,22 +44,22 @@ test(delta_two) :-
 
 :- begin_tests(sequence_is_arithmetic).
 
-test(arith_yes) :-
+test(arithmetic_yes) :-
     sequence_is_arithmetic([2,4,6,8,10]).
 
-test(arith_constant) :-
+test(arithmetic_constant) :-
     sequence_is_arithmetic([5,5,5,5]).
 
-test(arith_single) :-
+test(arithmetic_single) :-
     sequence_is_arithmetic([7]).
 
-test(arith_empty) :-
+test(arithmetic_empty) :-
     sequence_is_arithmetic([]).
 
-test(arith_no, [fail]) :-
+test(arithmetic_no, [fail]) :-
     sequence_is_arithmetic([1,3,6,10]).
 
-test(arith_two) :-
+test(arithmetic_two) :-
     sequence_is_arithmetic([3,7]).
 
 :- end_tests(sequence_is_arithmetic).

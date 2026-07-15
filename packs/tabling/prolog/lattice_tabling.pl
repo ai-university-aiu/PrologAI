@@ -12,9 +12,9 @@
     declare_derived/1      — declare Relation as an incrementally tabled
                              predicate over the dynamic Lattice node_fact store.
                              Creates a tabling wrapper accessible via
-                             pai_derived/3.
+                             tabling_derived/3.
 
-    pai_derived/3          — pai_derived(+Relation, ?Args, ?Referents)
+    tabling_derived/3          — tabling_derived(+Relation, ?Args, ?Referents)
                              Query derived Lattice facts via the tabled
                              interface.  Automatically recomputes when
                              underlying node_facts change.
@@ -24,11 +24,11 @@
                               and inscribe them as contradiction node_facts
                               for compensation and coping.
 
-    pai_tabling_stats/1    — return statistics about the current tabling state
+    tabling_stats/1    — return statistics about the current tabling state
                              (number of tabled calls, recomputations, answers).
 
     Tabling configuration:
-    pai_declare_tabling_fallback/1 — toggle fallback to plain computation
+    tabling_declare_tabling_fallback/1 — toggle fallback to plain computation
                                      (for debugging comparison).
 
     Implementation note:
@@ -45,11 +45,11 @@
     % Continue the multi-line expression started above.
     declare_derived/1,        % +Relation
     % Continue the multi-line expression started above.
-    pai_derived/3,            % +Relation, ?Args, ?Referents
+    tabling_derived/3,            % +Relation, ?Args, ?Referents
     % Supply 'surface_contradictions/0' as the next argument to the expression above.
     surface_contradictions/0,
     % Continue the multi-line expression started above.
-    pai_tabling_stats/1,      % -Stats
+    tabling_stats/1,      % -Stats
     % Continue the multi-line expression started above.
     taxonomy_closure/2        % ?Instance, ?Class
 % Close the expression opened above.
@@ -92,7 +92,7 @@ declare_derived(Relation) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_derived/3
+% tabling_derived/3
 %
 %   Tabled query interface over the Lattice node_fact store.
 %   Returns any node_fact matching (Relation, Args, Referents) from the
@@ -102,14 +102,14 @@ declare_derived(Relation) :-
 %   The predicate itself is tabled with the incremental attribute; because
 %   lattice_node_fact/5 is also incremental, a change via anchor_node or
 %   prune_node automatically retriggers recomputation the next time
-%   pai_derived is called.
+%   tabling_derived is called.
 % ---------------------------------------------------------------------------
 
-% Execute the compile-time directive: table pai_derived/3 as incremental.
-:- table pai_derived/3 as incremental.
+% Execute the compile-time directive: table tabling_derived/3 as incremental.
+:- table tabling_derived/3 as incremental.
 
 % Define a clause for 'pai derived': succeed when the following conditions hold.
-pai_derived(Relation, Args, Referents) :-
+tabling_derived(Relation, Args, Referents) :-
     % Execute: ( default_nexus(Nexus), nexus_is_open(Nexus).
     ( default_nexus(Nexus), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
@@ -196,17 +196,17 @@ surface_contradictions :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_tabling_stats/1
+% tabling_stats/1
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai tabling stats': succeed when the following conditions hold.
-pai_tabling_stats(Stats) :-
+tabling_stats(Stats) :-
     % Aggregate solutions using 'count' and bind the result to a single value.
     aggregate_all(count, derived_relation_registered(_), DCount),
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
-        ( predicate_property(pai_derived(_, _, _), tabled)
+        ( predicate_property(tabling_derived(_, _, _), tabled)
         % If the condition above succeeded, perform the following action.
         ->  Tabled = true
         % Otherwise (else branch), perform the following action.
@@ -235,8 +235,8 @@ pai_tabling_stats(Stats) :-
     Stats = tabling_stats{
         % Execute: declared_relations:      DCount,.
         declared_relations:      DCount,
-        % Execute: pai_derived_tabled:      Tabled,.
-        pai_derived_tabled:      Tabled,
+        % Execute: tabling_derived_tabled:      Tabled,.
+        tabling_derived_tabled:      Tabled,
         % Execute: taxonomy_closure_tabled: TaxTabled.
         taxonomy_closure_tabled: TaxTabled
     % Execute: }..

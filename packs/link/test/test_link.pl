@@ -116,7 +116,7 @@ test(same_form_diff_color) :-
     red1(R), red2(R2),
     link_by_form([R], [R2], [R-R2]).
 
-test(diff_form) :-
+test(difference_form) :-
     % green1 (single cell) vs red1 (2-cell horizontal): different forms.
     green1(G), red1(R),
     link_by_form([G], [R], []).

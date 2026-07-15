@@ -34,84 +34,84 @@ L-shape:    obj(p, [r(0,0),r(1,0),r(1,1)])        3 cells
 Predicate Reference
 
 
-objattr_total_cells(+Objs, -N)
+object_attribute_total_cells(+Objs, -N)
 
 Unifies N with the total number of cells across all objects in Objs.
 
-  ?- objattr_total_cells([obj(r,[r(0,0)]), obj(b,[r(0,1),r(0,2),r(0,3)])], N).
+  ?- object_attribute_total_cells([obj(r,[r(0,0)]), obj(b,[r(0,1),r(0,2),r(0,3)])], N).
   N = 4.
 
-  ?- objattr_total_cells([], N).
+  ?- object_attribute_total_cells([], N).
   N = 0.
 
 
-objattr_color_counts(+Objs, -Pairs)
+object_attribute_color_counts(+Objs, -Pairs)
 
 Unifies Pairs with a sorted list of Color-Count terms giving the number of objects per
 distinct color.
 
-  ?- objattr_color_counts([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], P).
+  ?- object_attribute_color_counts([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], P).
   P = [b-1, r-2].
 
 
-objattr_cell_counts_by_color(+Objs, -Pairs)
+object_attribute_cell_counts_by_color(+Objs, -Pairs)
 
 Unifies Pairs with a sorted list of Color-Total terms giving the total number of cells
 per distinct color (summed across all objects of that color).
 
-  ?- objattr_cell_counts_by_color([obj(r,[r(0,0)]), obj(r,[r(0,0),r(0,1),r(0,2)]),
+  ?- object_attribute_cell_counts_by_color([obj(r,[r(0,0)]), obj(r,[r(0,0),r(0,1),r(0,2)]),
                                obj(b,[r(0,0)])], P).
   P = [b-1, r-4].
 
 
-objattr_n_colors(+Objs, -N)
+object_attribute_n_colors(+Objs, -N)
 
 Unifies N with the number of distinct colors in the list.
 
-  ?- objattr_n_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])], N).
+  ?- object_attribute_n_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])], N).
   N = 3.
 
 
-objattr_n_objs_of_color(+Objs, +Color, -N)
+object_attribute_n_objs_of_color(+Objs, +Color, -N)
 
 Unifies N with the count of objects whose color matches Color.
 
-  ?- objattr_n_objs_of_color([obj(r,[r(0,0)]), obj(r,[r(1,0)]), obj(b,[r(0,1)])], r, N).
+  ?- object_attribute_n_objs_of_color([obj(r,[r(0,0)]), obj(r,[r(1,0)]), obj(b,[r(0,1)])], r, N).
   N = 2.
 
 
-objattr_dominant_color(+Objs, -Color)
+object_attribute_dominant_color(+Objs, -Color)
 
 Unifies Color with the color that has the most total cells across the list. If two
 colors tie, the one that appears first in alphabetical order wins.
 
-  ?- objattr_dominant_color([obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)]),
+  ?- object_attribute_dominant_color([obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)]),
                          obj(b,[r(0,0)]), obj(g,[r(0,1)])], C).
   C = r.
 
 
-objattr_rarest_color(+Objs, -Color)
+object_attribute_rarest_color(+Objs, -Color)
 
 Unifies Color with the color that has the fewest total cells.
 
-  ?- objattr_rarest_color([obj(r,[r(0,0),r(0,1),r(0,2)]), obj(b,[r(0,0)])], C).
+  ?- object_attribute_rarest_color([obj(r,[r(0,0),r(0,1),r(0,2)]), obj(b,[r(0,0)])], C).
   C = b.
 
 
-objattr_unique_color(+Objs, -Color)
+object_attribute_unique_color(+Objs, -Color)
 
 Succeeds for each color that appears in exactly one object. Fails if no such color
 exists. Backtrackable.
 
-  ?- objattr_unique_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], C).
+  ?- object_attribute_unique_color([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], C).
   C = b.
 
 
-objattr_size_rank(+Objs, -Ranked)
+object_attribute_size_rank(+Objs, -Ranked)
 
 Unifies Ranked with Objs sorted by cell count descending (largest object first).
 
-  ?- objattr_size_rank([obj(r,[r(0,0)]),
+  ?- object_attribute_size_rank([obj(r,[r(0,0)]),
                    obj(r,[r(0,0),r(0,1),r(0,2)]),
                    obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)])], Ranked).
   Ranked = [obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)]),
@@ -119,52 +119,52 @@ Unifies Ranked with Objs sorted by cell count descending (largest object first).
             obj(r,[r(0,0)])].
 
 
-objattr_pos_rank(+Objs, -Ranked)
+object_attribute_pos_rank(+Objs, -Ranked)
 
 Unifies Ranked with Objs sorted by top-left corner position in row-major order
 (topmost row first, leftmost column first within a row).
 
-  ?- objattr_pos_rank([obj(g,[r(1,0)]), obj(b,[r(0,1)]), obj(r,[r(0,0)])], Ranked).
+  ?- object_attribute_pos_rank([obj(g,[r(1,0)]), obj(b,[r(0,1)]), obj(r,[r(0,0)])], Ranked).
   Ranked = [obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])].
 
 
-objattr_majority_size(+Objs, -N)
+object_attribute_majority_size(+Objs, -N)
 
 Unifies N with the most frequently occurring cell count in Objs.
 
-  ?- objattr_majority_size([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)]),
+  ?- object_attribute_majority_size([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)]),
                         obj(r,[r(0,0),r(0,1),r(0,2)])], N).
   N = 1.
 
 The mode is found using a run-length accumulator over a sorted list of counts.
 
 
-objattr_all_same_color(+Objs)
+object_attribute_all_same_color(+Objs)
 
 Succeeds iff all objects in Objs share the same color. Succeeds vacuously for empty
 list.
 
-  ?- objattr_all_same_color([obj(r,[r(0,0)]), obj(r,[r(0,1)]), obj(r,[r(1,0)])]).
+  ?- object_attribute_all_same_color([obj(r,[r(0,0)]), obj(r,[r(0,1)]), obj(r,[r(1,0)])]).
   true.
 
-  ?- objattr_all_same_color([obj(r,[r(0,0)]), obj(b,[r(0,1)])]).
+  ?- object_attribute_all_same_color([obj(r,[r(0,0)]), obj(b,[r(0,1)])]).
   false.
 
 
-objattr_all_same_size(+Objs)
+object_attribute_all_same_size(+Objs)
 
 Succeeds iff all objects have the same cell count.
 
-  ?- objattr_all_same_size([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])]).
+  ?- object_attribute_all_same_size([obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(g,[r(1,0)])]).
   true.   % all have 1 cell
 
 
-objattr_all_same_form(+Objs)
+object_attribute_all_same_form(+Objs)
 
 Succeeds iff all objects have the same normalized shape (translated to the origin and
 sorted). Color and position are ignored; only the relative arrangement of cells matters.
 
-  ?- objattr_all_same_form([obj(p,[r(0,0),r(1,0),r(1,1)]),
+  ?- object_attribute_all_same_form([obj(p,[r(0,0),r(1,0),r(1,1)]),
                         obj(b,[r(3,4),r(4,4),r(4,5)])]).
   true.   % both are the same L-shape, just at different positions
 
@@ -181,10 +181,10 @@ Find the dominant color, check uniformity, and rank by size:
 
   ?- Objs = [obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)]),
              obj(b,[r(3,0)]), obj(b,[r(3,2)])],
-     objattr_dominant_color(Objs, Dom),
-     objattr_n_colors(Objs, NC),
-     objattr_all_same_color(Objs),
-     objattr_size_rank(Objs, Ranked).
+     object_attribute_dominant_color(Objs, Dom),
+     object_attribute_n_colors(Objs, NC),
+     object_attribute_all_same_color(Objs),
+     object_attribute_size_rank(Objs, Ranked).
 
   Dom = r,
   NC = 2,
@@ -192,8 +192,8 @@ Find the dominant color, check uniformity, and rank by size:
 
   ?- Objs = [obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)]),
              obj(b,[r(3,0)]), obj(b,[r(3,2)])],
-     objattr_dominant_color(Objs, Dom),
-     objattr_size_rank(Objs, [Biggest|_]).
+     object_attribute_dominant_color(Objs, Dom),
+     object_attribute_size_rank(Objs, [Biggest|_]).
 
   Dom = r,
   Biggest = obj(r,[r(0,0),r(0,1),r(1,0),r(1,1)]).
@@ -202,14 +202,14 @@ Find the dominant color, check uniformity, and rank by size:
 Test Coverage
 
 All 41 acceptance criteria (AC-OA-001 through AC-OA-041) defined in
-Refinement v214 Part 191 are exercised in packs/objattr/test/test_objattr.pl.
+Refinement v214 Part 191 are exercised in packs/object_attribute/test/test_object_attribute.pl.
 All 41 tests pass.
 
 
 Summary
 
 The objattr pack gives a reasoner a statistical and comparative view of a scene's object
-list. With objattr_dominant_color, objattr_size_rank, objattr_all_same_form, and related predicates,
+list. With object_attribute_dominant_color, object_attribute_size_rank, object_attribute_all_same_form, and related predicates,
 a symbolic agent can quickly characterize what is in a scene and how the objects relate
 to one another in aggregate - without looping or accumulating manually in calling code.
 

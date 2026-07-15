@@ -19,42 +19,42 @@ Layer: 176. No dependencies on other packs.
 
 158.2 Extracting Deltas from a Single Pair
 
-objdelta_color_delta(+O1, +O2, -C1-C2)
+object_delta_color_delta(+O1, +O2, -C1-C2)
 
 Extract the color change. C1 is O1's color; C2 is O2's color. Equal if
 the color did not change.
 
-    objdelta_color_delta(obj(r,[r(0,0)]), obj(b,[r(0,0)]), Delta).
+    object_delta_color_delta(obj(r,[r(0,0)]), obj(b,[r(0,0)]), Delta).
     % Delta = r-b
 
-objdelta_pos_delta(+O1, +O2, -dr(DR,DC))
+object_delta_pos_delta(+O1, +O2, -dr(DR,DC))
 
 Extract the centroid displacement from O1 to O2.
 
-    objdelta_pos_delta(obj(r,[r(0,0)]), obj(r,[r(2,3)]), Delta).
+    object_delta_pos_delta(obj(r,[r(0,0)]), obj(r,[r(2,3)]), Delta).
     % Delta = dr(2,3)
 
-objdelta_size_delta(+O1, +O2, -D)
+object_delta_size_delta(+O1, +O2, -D)
 
 Extract the size change: D = |Cells2| - |Cells1|. Negative means smaller.
 
-    objdelta_size_delta(obj(r,[r(0,0)]), obj(r,[r(0,0),r(0,1)]), D).
+    object_delta_size_delta(obj(r,[r(0,0)]), obj(r,[r(0,0),r(0,1)]), D).
     % D = 1
 
 158.3 Testing Pair Properties
 
-objdelta_same_color(+O1, +O2)
+object_delta_same_color(+O1, +O2)
 
 Succeeds if O1 and O2 have the same color atom.
 
-objdelta_same_form(+O1, +O2)
+object_delta_same_form(+O1, +O2)
 
 Succeeds if O1 and O2 have the same origin-normalised shape (color ignored).
 
-    objdelta_same_form(obj(r,[r(0,0),r(0,1)]), obj(b,[r(0,0),r(0,1)])).  % succeeds
-    \+ objdelta_same_form(obj(r,[r(0,0)]), obj(b,[r(0,0),r(0,1)])).       % fails
+    object_delta_same_form(obj(r,[r(0,0),r(0,1)]), obj(b,[r(0,0),r(0,1)])).  % succeeds
+    \+ object_delta_same_form(obj(r,[r(0,0)]), obj(b,[r(0,0),r(0,1)])).       % fails
 
-objdelta_same_pos(+O1, +O2)
+object_delta_same_pos(+O1, +O2)
 
 Succeeds if O1 and O2 share the same floor-average centroid.
 
@@ -63,91 +63,91 @@ Succeeds if O1 and O2 share the same floor-average centroid.
 A color map is a sorted list of C1-C2 terms (one per distinct color
 transformation).
 
-objdelta_color_map(+Pairs, -Map)
+object_delta_color_map(+Pairs, -Map)
 
 Extract a sorted distinct color map from a list of O1-O2 pairs.
 
     Pairs = [obj(r,[r(0,0)])-obj(b,[r(0,0)]),
              obj(g,[r(1,0)])-obj(y,[r(1,0)])],
-    objdelta_color_map(Pairs, Map).
+    object_delta_color_map(Pairs, Map).
     % Map = [g-y, r-b]
 
-objdelta_apply_color(+C1-C2, +Obj, -Obj2)
+object_delta_apply_color(+C1-C2, +Obj, -Obj2)
 
 Apply a single color rule: if Obj's color is C1, recolor to C2. Fails if
 Obj's color is not C1.
 
-    objdelta_apply_color(r-b, obj(r,[r(0,0)]), Obj2).
+    object_delta_apply_color(r-b, obj(r,[r(0,0)]), Obj2).
     % Obj2 = obj(b, [r(0,0)])
 
-objdelta_apply_color_map(+Map, +Obj, -Obj2)
+object_delta_apply_color_map(+Map, +Obj, -Obj2)
 
 Apply the first matching rule in Map. Fails if no rule matches.
 
-    objdelta_apply_color_map([g-y, r-b], obj(r,[r(0,0)]), Obj2).
+    object_delta_apply_color_map([g-y, r-b], obj(r,[r(0,0)]), Obj2).
     % Obj2 = obj(b, [r(0,0)])
 
-objdelta_apply_map_all(+Map, +Objs, -Objs2)
+object_delta_apply_map_all(+Map, +Objs, -Objs2)
 
 Apply Map to every object in Objs. Objects not in the Map are left unchanged.
 
     Map = [r-b],
     Objs = [obj(r,[r(0,0)]), obj(g,[r(1,0)])],
-    objdelta_apply_map_all(Map, Objs, Objs2).
+    object_delta_apply_map_all(Map, Objs, Objs2).
     % Objs2 = [obj(b,[r(0,0)]), obj(g,[r(1,0)])]   % g unchanged
 
 158.5 Constant Displacement Analysis
 
-objdelta_const_dr(+Pairs, -DR)
+object_delta_const_dr(+Pairs, -DR)
 
 Verify all pairs share the same row displacement and bind DR. Fails if
 any row delta differs.
 
     Pairs = [obj(r,[r(0,0)])-obj(r,[r(2,0)]),
              obj(g,[r(1,0)])-obj(g,[r(3,0)])],
-    objdelta_const_dr(Pairs, DR).
+    object_delta_const_dr(Pairs, DR).
     % DR = 2
 
-objdelta_const_dc(+Pairs, -DC)
+object_delta_const_dc(+Pairs, -DC)
 
 Verify all pairs share the same column displacement and bind DC.
 
 158.6 Cell-Level Analysis
 
-objdelta_common_cells(+O1, +O2, -Cells)
+object_delta_common_cells(+O1, +O2, -Cells)
 
 Find cell positions (r(R,C)) present in both O1 and O2.
 
     A = obj(r,[r(0,0),r(0,1),r(1,0)]),
     B = obj(b,[r(0,0),r(1,0),r(1,1)]),
-    objdelta_common_cells(A, B, Cells).
+    object_delta_common_cells(A, B, Cells).
     % Cells = [r(0,0), r(1,0)]
 
-objdelta_cell_diff(+O1, +O2, -Added, -Removed)
+object_delta_cell_diff(+O1, +O2, -Added, -Removed)
 
 Added: positions in O2 not in O1. Removed: positions in O1 not in O2.
 
     A = obj(r,[r(0,0),r(0,1)]),
     B = obj(b,[r(0,1),r(0,2)]),
-    objdelta_cell_diff(A, B, Added, Removed).
+    object_delta_cell_diff(A, B, Added, Removed).
     % Added = [r(0,2)], Removed = [r(0,0)]
 
 158.7 Summary
 
 Predicate             Description
-objdelta_color_delta/3      extract C1-C2 color change from a pair
-objdelta_pos_delta/3        extract dr(DR,DC) centroid displacement
-objdelta_size_delta/3       extract size change N2-N1
-objdelta_same_color/2       same color test
-objdelta_same_form/2        same normalized shape test
-objdelta_same_pos/2         same centroid test
-objdelta_color_map/2        extract sorted color map from pairs
-objdelta_apply_color/3      apply single C1-C2 color rule
-objdelta_apply_color_map/3  apply first matching rule from a Map
-objdelta_apply_map_all/3    apply Map to all objects in a list
-objdelta_const_dr/2         constant row displacement across pairs
-objdelta_const_dc/2         constant col displacement across pairs
-objdelta_common_cells/3     cell positions in both objects
-objdelta_cell_diff/4        added and removed cell positions
+object_delta_color_delta/3      extract C1-C2 color change from a pair
+object_delta_pos_delta/3        extract dr(DR,DC) centroid displacement
+object_delta_size_delta/3       extract size change N2-N1
+object_delta_same_color/2       same color test
+object_delta_same_form/2        same normalized shape test
+object_delta_same_pos/2         same centroid test
+object_delta_color_map/2        extract sorted color map from pairs
+object_delta_apply_color/3      apply single C1-C2 color rule
+object_delta_apply_color_map/3  apply first matching rule from a Map
+object_delta_apply_map_all/3    apply Map to all objects in a list
+object_delta_const_dr/2         constant row displacement across pairs
+object_delta_const_dc/2         constant col displacement across pairs
+object_delta_common_cells/3     cell positions in both objects
+object_delta_cell_diff/4        added and removed cell positions
 
 This is WP 197, PrologAI Layer 176.

@@ -9,115 +9,115 @@ and comparison/inference predicates (testing or discovering what changed between
 
 Applied Transformations
 
-xform_recolor(+Obj, +Color, -Out): create a new obj with a different color, same cells.
+isometry_recolor(+Obj, +Color, -Out): create a new obj with a different color, same cells.
 
-    xform_recolor(obj(1, [r(0,0), r(0,1)]), 5, Out).
+    isometry_recolor(obj(1, [r(0,0), r(0,1)]), 5, Out).
     % Out = obj(5, [r(0,0), r(0,1)])
 
-xform_translate(+Obj, +r(DR,DC), -Out): shift every cell by the given row-column offset.
+isometry_translate(+Obj, +r(DR,DC), -Out): shift every cell by the given row-column offset.
 
-    xform_translate(obj(1, [r(0,0), r(0,1)]), r(0,3), Out).
+    isometry_translate(obj(1, [r(0,0), r(0,1)]), r(0,3), Out).
     % Out = obj(1, [r(0,3), r(0,4)])
 
-xform_normalize(+Obj, -Out): translate an obj so that its minimum row = 0 and minimum
+isometry_normalize(+Obj, -Out): translate an obj so that its minimum row = 0 and minimum
 column = 0 (i.e., the top-left cell of the bounding box is at the origin).
 
-    xform_normalize(obj(2, [r(3,4), r(3,5), r(4,4)]), Out).
+    isometry_normalize(obj(2, [r(3,4), r(3,5), r(4,4)]), Out).
     % Out = obj(2, [r(0,0), r(0,1), r(1,0)])
 
-xform_d4(+Obj, +Op, -Out): apply a named D4 symmetry operation to an obj. The result is
+isometry_d4(+Obj, +Op, -Out): apply a named D4 symmetry operation to an obj. The result is
 placed at the same top-left corner as the input. Op must be one of:
 id, r90, r180, r270, fh, fv, fd1, fd2.
 
-    xform_d4(obj(1, [r(0,0), r(0,1)]), r90, Out).
+    isometry_d4(obj(1, [r(0,0), r(0,1)]), r90, Out).
     % r90 rotates a horizontal pair to vertical
     % Out = obj(1, [r(0,0), r(1,0)])
 
-    xform_d4(obj(2, [r(0,0), r(1,0), r(1,1)]), fh, Out).
+    isometry_d4(obj(2, [r(0,0), r(1,0), r(1,1)]), fh, Out).
     % fh flips the L-shape horizontally
     % Out = obj(2, [r(0,1), r(1,0), r(1,1)])
 
 
 Cell Identity and Offset
 
-xform_same_cells(+Obj1, +Obj2): succeed if both obj terms have the same sorted cell set
+isometry_same_cells(+Obj1, +Obj2): succeed if both obj terms have the same sorted cell set
 (ignoring color). Implemented via Prolog unification on the Cells argument.
 
-    xform_same_cells(obj(1, [r(0,0), r(0,1)]), obj(5, [r(0,0), r(0,1)])).
+    isometry_same_cells(obj(1, [r(0,0), r(0,1)]), obj(5, [r(0,0), r(0,1)])).
     % succeeds (same cells, different colors)
 
-xform_cell_offset(+Obj1, +Obj2, -r(DR,DC)): find the translation vector from Obj1 to Obj2.
+isometry_cell_offset(+Obj1, +Obj2, -r(DR,DC)): find the translation vector from Obj1 to Obj2.
 Succeeds only when both objs have the same normalized shape (pure translation). Returns
 DR = min_row(Obj2) - min_row(Obj1), DC = min_col(Obj2) - min_col(Obj1).
 
-    xform_cell_offset(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,3),r(0,4)]), Off).
+    isometry_cell_offset(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,3),r(0,4)]), Off).
     % Off = r(0,3)
 
-    xform_cell_offset(obj(1,[r(0,0),r(1,0)]), obj(1,[r(2,3),r(3,3)]), Off).
+    isometry_cell_offset(obj(1,[r(0,0),r(1,0)]), obj(1,[r(2,3),r(3,3)]), Off).
     % Off = r(2,3)
 
-xform_is_recolor(+Obj1, +Obj2): succeed when Obj1 and Obj2 have the same cells but
+isometry_is_recolor(+Obj1, +Obj2): succeed when Obj1 and Obj2 have the same cells but
 different colors.
 
-    xform_is_recolor(obj(1, [r(0,0), r(0,1)]), obj(5, [r(0,0), r(0,1)])).
+    isometry_is_recolor(obj(1, [r(0,0), r(0,1)]), obj(5, [r(0,0), r(0,1)])).
     % succeeds
 
 
 Cell Set Arithmetic
 
-xform_cells_added(+Obj1, +Obj2, -Added): cells in Obj2 not present in Obj1.
+isometry_cells_added(+Obj1, +Obj2, -Added): cells in Obj2 not present in Obj1.
 Uses subtract/3 from library(lists).
 
-    xform_cells_added(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,0),r(0,1),r(0,2)]), Added).
+    isometry_cells_added(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,0),r(0,1),r(0,2)]), Added).
     % Added = [r(0,2)]
 
-xform_cells_removed(+Obj1, +Obj2, -Removed): cells in Obj1 not present in Obj2.
+isometry_cells_removed(+Obj1, +Obj2, -Removed): cells in Obj1 not present in Obj2.
 
-    xform_cells_removed(obj(1,[r(0,0),r(0,1),r(0,2)]), obj(1,[r(0,0),r(0,1)]), Rem).
+    isometry_cells_removed(obj(1,[r(0,0),r(0,1),r(0,2)]), obj(1,[r(0,0),r(0,1)]), Rem).
     % Rem = [r(0,2)]
 
-xform_cells_kept(+Obj1, +Obj2, -Kept): cells present in both Obj1 and Obj2.
+isometry_cells_kept(+Obj1, +Obj2, -Kept): cells present in both Obj1 and Obj2.
 
-    xform_cells_kept(obj(1,[r(0,0),r(0,1),r(0,2)]),
+    isometry_cells_kept(obj(1,[r(0,0),r(0,1),r(0,2)]),
                   obj(2,[r(0,1),r(0,2),r(0,3)]), Kept).
     % Kept = [r(0,1), r(0,2)]
 
-xform_overlap_count(+Obj1, +Obj2, -N): number of cells shared by both obj terms.
+isometry_overlap_count(+Obj1, +Obj2, -N): number of cells shared by both obj terms.
 
-    xform_overlap_count(obj(1,[r(0,0),r(0,1),r(0,2)]),
+    isometry_overlap_count(obj(1,[r(0,0),r(0,1),r(0,2)]),
                      obj(2,[r(0,1),r(0,2),r(0,3)]), N).
     % N = 2
 
 
 Transformation Inference
 
-xform_any_d4(+Obj1, +Obj2, -Op): find the first D4 operation Op such that applying Op
+isometry_any_d4(+Obj1, +Obj2, -Op): find the first D4 operation Op such that applying Op
 to the normalized form of Obj1 gives the normalized form of Obj2. Tries ops in order:
 id, r90, r180, r270, fh, fv, fd1, fd2. Cuts after the first match.
 
-    xform_any_d4(obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(0,1)]), Op).
+    isometry_any_d4(obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(0,1)]), Op).
     % Op = id
 
-    xform_any_d4(obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(1,0)]), Op).
+    isometry_any_d4(obj(1,[r(0,0),r(0,1)]), obj(2,[r(0,0),r(1,0)]), Op).
     % Op = r90  (horizontal pair and vertical pair are r90-related)
 
-xform_scale_factor(+Obj1, +Obj2, -N): find integer N >= 1 such that Obj2 has N times
+isometry_scale_factor(+Obj1, +Obj2, -N): find integer N >= 1 such that Obj2 has N times
 as many cells as Obj1. Fails if the ratio is not a positive integer.
 
-    xform_scale_factor(obj(1,[r(0,0),r(0,1)]),
+    isometry_scale_factor(obj(1,[r(0,0),r(0,1)]),
                     obj(1,[r(0,0),r(0,1),r(0,2),r(0,3)]), N).
     % N = 2  (4 cells = 2 * 2 cells)
 
-    % xform_scale_factor(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,0),r(0,1),r(0,2)]), _).
+    % isometry_scale_factor(obj(1,[r(0,0),r(0,1)]), obj(1,[r(0,0),r(0,1),r(0,2)]), _).
     % fails (3 cells is not a multiple of 2)
 
-xform_merge(+Obj1, +Obj2, -Out): merge two same-color obj terms into one with the union
+isometry_merge(+Obj1, +Obj2, -Out): merge two same-color obj terms into one with the union
 cell set. Colors must be identical. Duplicates are removed by sort/2.
 
-    xform_merge(obj(3,[r(0,0),r(0,1)]), obj(3,[r(1,0),r(1,1)]), Out).
+    isometry_merge(obj(3,[r(0,0),r(0,1)]), obj(3,[r(1,0),r(1,1)]), Out).
     % Out = obj(3, [r(0,0), r(0,1), r(1,0), r(1,1)])
 
-    xform_merge(obj(2,[r(0,0),r(0,1)]), obj(2,[r(0,1),r(0,2)]), Out).
+    isometry_merge(obj(2,[r(0,0),r(0,1)]), obj(2,[r(0,1),r(0,2)]), Out).
     % Out = obj(2, [r(0,0), r(0,1), r(0,2)])  (r(0,1) deduplicated)
 
 

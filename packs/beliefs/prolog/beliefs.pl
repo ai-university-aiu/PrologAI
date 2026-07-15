@@ -9,28 +9,28 @@
     first-attempt ratios never divide by zero.
 
     Predicates:
-      pai_belief/3         — +NodeId, +Field, -Value  OR  set +NodeId, +Field, +Value
-      pai_belief_update/3  — +NodeId, +Field, +Delta
-      pai_propagate/2      — +NodeId, +Propagator
-      pai_belief_record/2  — +NodeId, -BeliefRecord
-      pai_add_neighbor/2   — +NodeId, +NeighborId
-      pai_attempt/2        — +NodeId, +Outcome (success|failure)
+      beliefs_belief/3         — +NodeId, +Field, -Value  OR  set +NodeId, +Field, +Value
+      beliefs_belief_update/3  — +NodeId, +Field, +Delta
+      beliefs_propagate/2      — +NodeId, +Propagator
+      beliefs_belief_record/2  — +NodeId, -BeliefRecord
+      beliefs_add_neighbor/2   — +NodeId, +NeighborId
+      beliefs_attempt/2        — +NodeId, +Outcome (success|failure)
 */
 
 % Declare this file as the 'beliefs' module and list its exported predicates.
 :- module(beliefs, [
-    % Supply 'pai_belief/3' as the next argument to the expression above.
-    pai_belief/3,
-    % Supply 'pai_belief_update/3' as the next argument to the expression above.
-    pai_belief_update/3,
-    % Supply 'pai_propagate/2' as the next argument to the expression above.
-    pai_propagate/2,
-    % Supply 'pai_belief_record/2' as the next argument to the expression above.
-    pai_belief_record/2,
-    % Supply 'pai_add_neighbor/2' as the next argument to the expression above.
-    pai_add_neighbor/2,
-    % Supply 'pai_attempt/2' as the next argument to the expression above.
-    pai_attempt/2
+    % Supply 'beliefs_belief/3' as the next argument to the expression above.
+    beliefs_belief/3,
+    % Supply 'beliefs_belief_update/3' as the next argument to the expression above.
+    beliefs_belief_update/3,
+    % Supply 'beliefs_propagate/2' as the next argument to the expression above.
+    beliefs_propagate/2,
+    % Supply 'beliefs_belief_record/2' as the next argument to the expression above.
+    beliefs_belief_record/2,
+    % Supply 'beliefs_add_neighbor/2' as the next argument to the expression above.
+    beliefs_add_neighbor/2,
+    % Supply 'beliefs_attempt/2' as the next argument to the expression above.
+    beliefs_attempt/2
 % Close the expression opened above.
 ]).
 
@@ -132,11 +132,11 @@ set_field(NodeId, Field, NewV) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_belief/3
+% beliefs_belief/3
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai belief': succeed when the following conditions hold.
-pai_belief(NodeId, Field, Value) :-
+beliefs_belief(NodeId, Field, Value) :-
     % State a fact for 'ensure record' with the arguments listed below.
     ensure_record(NodeId),
     % Execute: ( number(Value).
@@ -151,11 +151,11 @@ pai_belief(NodeId, Field, Value) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_belief_update/3
+% beliefs_belief_update/3
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai belief update': succeed when the following conditions hold.
-pai_belief_update(NodeId, Field, Delta) :-
+beliefs_belief_update(NodeId, Field, Delta) :-
     % State a fact for 'ensure record' with the arguments listed below.
     ensure_record(NodeId),
     % State a fact for 'get field' with the arguments listed below.
@@ -172,7 +172,7 @@ pai_belief_update(NodeId, Field, Delta) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai propagate': succeed when the following conditions hold.
-pai_propagate(NodeId, Propagator) :-
+beliefs_propagate(NodeId, Propagator) :-
     % State a fact for 'ensure record' with the arguments listed below.
     ensure_record(NodeId),
     % Check that '( Propagator' is unifiable with 'arousal'.
@@ -215,7 +215,7 @@ propagate_blend(NodeId, Field, Vals) :-
         % Continue the multi-line expression started above.
         New is Cur + 0.3 * (Avg - Cur),
         % Continue the multi-line expression started above.
-        pai_belief(NodeId, Field, New)
+        beliefs_belief(NodeId, Field, New)
     % Close the expression opened above.
     ).
 
@@ -256,7 +256,7 @@ propagate_coherence(NodeId) :-
         % Continue the multi-line expression started above.
         NormAgreement is (Agreement + 1.0) / 2.0,
         % Continue the multi-line expression started above.
-        pai_belief(NodeId, coherence, NormAgreement)
+        beliefs_belief(NodeId, coherence, NormAgreement)
     % Close the expression opened above.
     ).
 
@@ -273,14 +273,14 @@ propagate_likelihood(NodeId) :-
     % Evaluate the arithmetic expression 'PriorSu / PriorAt' and bind the result to 'L'.
     L is PriorSu / PriorAt,
     % State the fact: pai belief(NodeId, likelihood, L).
-    pai_belief(NodeId, likelihood, L).
+    beliefs_belief(NodeId, likelihood, L).
 
 % ---------------------------------------------------------------------------
-% pai_belief_record/2
+% beliefs_belief_record/2
 % ---------------------------------------------------------------------------
 
 % State a fact for 'pai belief record' with the arguments listed below.
-pai_belief_record(NodeId, record(NodeId,
+beliefs_belief_record(NodeId, record(NodeId,
     % Continue the multi-line expression started above.
     certainty(Ce), coherence(Co), likelihood(L),
     % Continue the multi-line expression started above.
@@ -295,11 +295,11 @@ pai_belief_record(NodeId, record(NodeId,
     !.
 
 % ---------------------------------------------------------------------------
-% pai_add_neighbor/2
+% beliefs_add_neighbor/2
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai add neighbor': succeed when the following conditions hold.
-pai_add_neighbor(NodeId, NeighborId) :-
+beliefs_add_neighbor(NodeId, NeighborId) :-
     % Execute: ( neighbor_edge(NodeId, NeighborId) -> true.
     ( neighbor_edge(NodeId, NeighborId) -> true
     % Otherwise (else branch), perform the following action.
@@ -308,19 +308,19 @@ pai_add_neighbor(NodeId, NeighborId) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_attempt/2
+% beliefs_attempt/2
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai attempt': succeed when the following conditions hold.
-pai_attempt(NodeId, Outcome) :-
+beliefs_attempt(NodeId, Outcome) :-
     % State a fact for 'ensure record' with the arguments listed below.
     ensure_record(NodeId),
     % State a fact for 'pai belief update' with the arguments listed below.
-    pai_belief_update(NodeId, attempts, 1),
-    % Check that '( Outcome' is unifiable with 'success -> pai_belief_update(NodeId, successes, 1) ; true )'.
-    ( Outcome = success -> pai_belief_update(NodeId, successes, 1) ; true ),
+    beliefs_belief_update(NodeId, attempts, 1),
+    % Check that '( Outcome' is unifiable with 'success -> beliefs_belief_update(NodeId, successes, 1) ; true )'.
+    ( Outcome = success -> beliefs_belief_update(NodeId, successes, 1) ; true ),
     % State the fact: pai propagate(NodeId, likelihood).
-    pai_propagate(NodeId, likelihood).
+    beliefs_propagate(NodeId, likelihood).
 
 % ---------------------------------------------------------------------------
 % Helpers

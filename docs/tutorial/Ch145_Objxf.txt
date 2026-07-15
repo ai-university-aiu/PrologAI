@@ -11,7 +11,7 @@ This chapter explains all 14 predicates with examples.
 Section 145.1: What objxf Operates On
 
 All predicates operate on obj(Color, Cells) terms where Cells is a list of r(Row, Col)
-coordinate pairs. The Color field is preserved by all transformations except objxf_recolor.
+coordinate pairs. The Color field is preserved by all transformations except object_transform_recolor.
 
 Example object: obj(red, [r(0,0), r(0,1), r(1,0)])
 This is an L-shaped object at rows 0-1, cols 0-1, with three cells.
@@ -19,43 +19,43 @@ This is an L-shaped object at rows 0-1, cols 0-1, with three cells.
 
 Section 145.2: Bounding Box and Size
 
-objxf_bbox(+Obj, -R0, -C0, -R1, -C1)
+object_transform_bbox(+Obj, -R0, -C0, -R1, -C1)
 
 R0 = min row, C0 = min col, R1 = max row, C1 = max col across all cells.
 
-    ?- objxf_bbox(obj(red,[r(2,3),r(2,4),r(3,3)]), R0, C0, R1, C1).
+    ?- object_transform_bbox(obj(red,[r(2,3),r(2,4),r(3,3)]), R0, C0, R1, C1).
     R0=2, C0=3, R1=3, C1=4.
 
-objxf_size(+Obj, -H, -W)
+object_transform_size(+Obj, -H, -W)
 
 H = height (R1-R0+1), W = width (C1-C0+1) of the bounding box.
 
-    ?- objxf_size(obj(red,[r(2,3),r(2,4),r(3,3)]), H, W).
+    ?- object_transform_size(obj(red,[r(2,3),r(2,4),r(3,3)]), H, W).
     H=2, W=2.
 
 
 Section 145.3: Translation and Normalization
 
-objxf_translate(+Obj, +DR, +DC, -Result)
+object_transform_translate(+Obj, +DR, +DC, -Result)
 
 Shifts every cell by (DR, DC). DR and DC may be negative.
 
-    ?- objxf_translate(obj(blue,[r(2,3)]), -2, -3, R).
+    ?- object_transform_translate(obj(blue,[r(2,3)]), -2, -3, R).
     R = obj(blue, [r(0,0)]).
 
-objxf_to_origin(+Obj, -Result)
+object_transform_to_origin(+Obj, -Result)
 
 Moves the object so its topmost row = 0 and leftmost col = 0. Equivalent to
-objxf_translate with the negated bounding box anchor.
+object_transform_translate with the negated bounding box anchor.
 
-    ?- objxf_to_origin(obj(red,[r(2,3),r(2,4),r(3,3)]), R).
+    ?- object_transform_to_origin(obj(red,[r(2,3),r(2,4),r(3,3)]), R).
     R = obj(red, [r(0,0),r(0,1),r(1,0)]).
 
-objxf_recolor(+Obj, +NewColor, -Result)
+object_transform_recolor(+Obj, +NewColor, -Result)
 
 Replaces the color field. Cells are not changed.
 
-    ?- objxf_recolor(obj(red,[r(0,0)]), blue, R).
+    ?- object_transform_recolor(obj(red,[r(0,0)]), blue, R).
     R = obj(blue, [r(0,0)]).
 
 
@@ -65,68 +65,68 @@ All three rotation predicates rotate within the bounding box. The bounding box a
 (minimum row, minimum column) remains the same. After rotation, the object's bounding
 box dimensions swap (H becomes W and W becomes H) for 90 and 270 degree rotations.
 
-objxf_rot90(+Obj, -Result) - Rotate 90 degrees clockwise.
+object_transform_rot90(+Obj, -Result) - Rotate 90 degrees clockwise.
 
 The formula: each cell r(R,C) maps to r(R0 + Lc, C0 + (H-1) - Lr) where:
 - Lr = R - R0 (local row)
 - Lc = C - C0 (local col)
 - H = bounding box height
 
-    ?- objxf_rot90(obj(blue,[r(0,0),r(0,1)]), R).
+    ?- object_transform_rot90(obj(blue,[r(0,0),r(0,1)]), R).
     % hline -> vline: [r(0,0),r(1,0)].
 
-objxf_rot180(+Obj, -Result) - Rotate 180 degrees.
+object_transform_rot180(+Obj, -Result) - Rotate 180 degrees.
 
 Formula: r(R,C) -> r(R0+R1-R, C0+C1-C). Same as reflecting both axes.
 
-objxf_rot270(+Obj, -Result) - Rotate 270 degrees clockwise (= 90 CCW).
+object_transform_rot270(+Obj, -Result) - Rotate 270 degrees clockwise (= 90 CCW).
 
 Formula: r(R,C) -> r(R0+(W-1)-Lc, C0+Lr).
 
-Composing rotations: objxf_rot90 applied twice = objxf_rot180; three times = objxf_rot270.
+Composing rotations: object_transform_rot90 applied twice = object_transform_rot180; three times = object_transform_rot270.
 
 
 Section 145.5: Reflections
 
-objxf_reflect_h(+Obj, -Result) - Flip upside-down within the bounding box.
+object_transform_reflect_h(+Obj, -Result) - Flip upside-down within the bounding box.
 
 Formula: r(R,C) -> r(R0+R1-R, C). Columns unchanged; rows mirrored about the
 horizontal midpoint.
 
-    ?- objxf_reflect_h(obj(yellow,[r(0,0),r(0,1),r(1,0)]), R).
+    ?- object_transform_reflect_h(obj(yellow,[r(0,0),r(0,1),r(1,0)]), R).
     % corner -> [r(0,0), r(1,0), r(1,1)] (bottom-left L).
 
-objxf_reflect_v(+Obj, -Result) - Flip left-right within the bounding box.
+object_transform_reflect_v(+Obj, -Result) - Flip left-right within the bounding box.
 
 Formula: r(R,C) -> r(R, C0+C1-C). Rows unchanged; columns mirrored about the
 vertical midpoint.
 
-    ?- objxf_reflect_v(obj(yellow,[r(0,0),r(0,1),r(1,0)]), R).
+    ?- object_transform_reflect_v(obj(yellow,[r(0,0),r(0,1),r(1,0)]), R).
     % corner -> [r(0,0), r(0,1), r(1,1)] (top-right L).
 
 
 Section 145.6: Cell-Set Algebra
 
-objxf_merge(+Obj1, +Obj2, -Result)
+object_transform_merge(+Obj1, +Obj2, -Result)
 
 Produces the union of cells from both objects. Result has Obj1's color.
 Shared cells appear only once (sort/2 deduplicates).
 
-    ?- objxf_merge(obj(a,[r(0,0),r(0,1)]), obj(b,[r(0,1),r(0,2)]), R).
+    ?- object_transform_merge(obj(a,[r(0,0),r(0,1)]), obj(b,[r(0,1),r(0,2)]), R).
     R = obj(a, [r(0,0),r(0,1),r(0,2)]).
 
-objxf_diff(+Obj1, +Obj2, -Result)
+object_transform_diff(+Obj1, +Obj2, -Result)
 
 Cells in Obj1 that are NOT in Obj2. Result has Obj1's color.
 
-    ?- objxf_diff(obj(a,[r(0,0),r(0,1)]), obj(b,[r(0,1),r(0,2)]), R).
+    ?- object_transform_diff(obj(a,[r(0,0),r(0,1)]), obj(b,[r(0,1),r(0,2)]), R).
     R = obj(a, [r(0,0)]).
 
-objxf_intersect(+Obj1, +Obj2, -Result)
+object_transform_intersect(+Obj1, +Obj2, -Result)
 
 Cells present in both Obj1 and Obj2. Result has Obj1's color.
 
-    ?- objxf_intersect(obj(a,[r(0,0),r(0,1)]), obj(b,[r(0,1),r(0,2)]), R).
+    ?- object_transform_intersect(obj(a,[r(0,0),r(0,1)]), obj(b,[r(0,1),r(0,2)]), R).
     R = obj(a, [r(0,1)]).
 
 These three predicates satisfy inclusion-exclusion:
@@ -135,14 +135,14 @@ These three predicates satisfy inclusion-exclusion:
 
 Section 145.7: Scale Up
 
-objxf_scale_up(+Obj, +Factor, -Result)
+object_transform_scale_up(+Obj, +Factor, -Result)
 
 Each cell r(R,C) expands to a Factor x Factor block. Factor must be a positive integer.
 
-    ?- objxf_scale_up(obj(red,[r(0,0)]), 2, R).
+    ?- object_transform_scale_up(obj(red,[r(0,0)]), 2, R).
     R = obj(red, [r(0,0),r(0,1),r(1,0),r(1,1)]).
 
-    ?- objxf_scale_up(obj(red,[r(0,0),r(0,1)]), 3, R).
+    ?- object_transform_scale_up(obj(red,[r(0,0),r(0,1)]), 3, R).
     % 2 cells * 3*3 = 18 cells total.
 
 Scale by 1 is identity. Scale by 2 quadruples the cell count. Scale by N multiplies
@@ -178,9 +178,9 @@ Use objxf when you want to transform an object in-place (keeping its position)
 or when the Color matters for the result.
 
 A typical pattern:
-1. objxf_to_origin: normalize to origin for comparison or canonical form
+1. object_transform_to_origin: normalize to origin for comparison or canonical form
 2. Comparison via sort
-3. objxf_translate back to the desired position
+3. object_transform_translate back to the desired position
 
 The scene pack (sc_*) extracts obj terms from grids. objxf transforms them.
 Together they support a full object-centric pipeline:
@@ -190,27 +190,27 @@ grid -> scene_grid_to_scene -> obj terms -> ox_* transforms -> scene -> grid.
 Section 145.10: Quick Reference
 
 Bounding box:
-- objxf_bbox/5    min/max row and col of Obj's cells
-- objxf_size/3    height and width of bounding box
+- object_transform_bbox/5    min/max row and col of Obj's cells
+- object_transform_size/3    height and width of bounding box
 
 Translation and normalization:
-- objxf_translate/4  shift all cells by (DR, DC)
-- objxf_to_origin/2  move so top-left = r(0,0)
-- objxf_recolor/3    replace color field
+- object_transform_translate/4  shift all cells by (DR, DC)
+- object_transform_to_origin/2  move so top-left = r(0,0)
+- object_transform_recolor/3    replace color field
 
 Rotations:
-- objxf_rot90/2   90 degrees clockwise
-- objxf_rot180/2  180 degrees
-- objxf_rot270/2  270 degrees clockwise
+- object_transform_rot90/2   90 degrees clockwise
+- object_transform_rot180/2  180 degrees
+- object_transform_rot270/2  270 degrees clockwise
 
 Reflections:
-- objxf_reflect_h/2  flip upside-down
-- objxf_reflect_v/2  flip left-right
+- object_transform_reflect_h/2  flip upside-down
+- object_transform_reflect_v/2  flip left-right
 
 Set algebra:
-- objxf_merge/3      union of cells (first object's color)
-- objxf_diff/3       cells in Obj1 not in Obj2
-- objxf_intersect/3  cells in both Obj1 and Obj2
+- object_transform_merge/3      union of cells (first object's color)
+- object_transform_diff/3       cells in Obj1 not in Obj2
+- object_transform_intersect/3  cells in both Obj1 and Obj2
 
 Scaling:
-- objxf_scale_up/3   expand each cell to Factor x Factor block
+- object_transform_scale_up/3   expand each cell to Factor x Factor block

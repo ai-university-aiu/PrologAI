@@ -24,22 +24,22 @@ Cell-count invariants: does the total number of cells stay the same?
 Exported Predicates
 
 
-sceneinv_n_before(+Pair, -N)
+scene_invariant_n_before(+Pair, -N)
 
 N is the number of objects in the Before scene of Pair.
 
 Example:
 
-sceneinv_n_before([obj(r,[r(0,0)]),obj(b,[r(0,1)])]-[obj(r,[r(0,0)])], N).
+scene_invariant_n_before([obj(r,[r(0,0)]),obj(b,[r(0,1)])]-[obj(r,[r(0,0)])], N).
 % N = 2
 
 
-sceneinv_n_after(+Pair, -N)
+scene_invariant_n_after(+Pair, -N)
 
 N is the number of objects in the After scene of Pair.
 
 
-sceneinv_all_n_before(+Pairs, -Ns)
+scene_invariant_all_n_before(+Pairs, -Ns)
 
 Ns is the list of Before object counts, one per pair.
 
@@ -47,69 +47,69 @@ Example:
 
 Pairs = [[obj(r,[r(0,0)])]-[obj(b,[r(0,0)])],
          [obj(r,[r(0,0)])]-[obj(b,[r(0,0)])]],
-sceneinv_all_n_before(Pairs, Ns).
+scene_invariant_all_n_before(Pairs, Ns).
 % Ns = [1, 1]
 
 
-sceneinv_all_n_after(+Pairs, -Ns)
+scene_invariant_all_n_after(+Pairs, -Ns)
 
 Ns is the list of After object counts, one per pair.
 
 
-sceneinv_const_n_before(+Pairs, -N)
+scene_invariant_const_n_before(+Pairs, -N)
 
 N is constant across all Before scenes. Fails if counts differ or Pairs is empty.
 
 Example:
 
-sceneinv_const_n_before(Pairs, N).
+scene_invariant_const_n_before(Pairs, N).
 % N = 1  (if every Before has exactly 1 object)
 
 
-sceneinv_const_n_after(+Pairs, -N)
+scene_invariant_const_n_after(+Pairs, -N)
 
 N is constant across all After scenes. Fails if counts differ or Pairs is empty.
 
 
-sceneinv_n_preserved(+Pairs)
+scene_invariant_n_preserved(+Pairs)
 
 Succeeds if Before and After have the same object count in EVERY pair.
 Succeeds vacuously for empty Pairs.
 
 Example:
 
-sceneinv_n_preserved([B1-A1, B2-A2]).
+scene_invariant_n_preserved([B1-A1, B2-A2]).
 % succeeds if length(B1)==length(A1) and length(B2)==length(A2)
 
 
-sceneinv_colors_before(+Pair, -Colors)
+scene_invariant_colors_before(+Pair, -Colors)
 
 Sorted distinct colors in the Before scene. Uses sort/2 so duplicates are removed.
 
 Example:
 
-sceneinv_colors_before([obj(r,[r(0,0)]),obj(b,[r(0,1)])]-_, Colors).
+scene_invariant_colors_before([obj(r,[r(0,0)]),obj(b,[r(0,1)])]-_, Colors).
 % Colors = [b, r]
 
 
-sceneinv_colors_after(+Pair, -Colors)
+scene_invariant_colors_after(+Pair, -Colors)
 
 Sorted distinct colors in the After scene.
 
 
-sceneinv_const_colors_before(+Pairs, -Colors)
+scene_invariant_const_colors_before(+Pairs, -Colors)
 
 Colors is the Before color set, constant across all pairs.
 Fails if sets differ or Pairs is empty.
 
 
-sceneinv_const_colors_after(+Pairs, -Colors)
+scene_invariant_const_colors_after(+Pairs, -Colors)
 
 Colors is the After color set, constant across all pairs.
 Fails if sets differ or Pairs is empty.
 
 
-sceneinv_colors_preserved(+Pairs)
+scene_invariant_colors_preserved(+Pairs)
 
 Succeeds if Before and After have the same sorted color set in EVERY pair.
 Succeeds vacuously for empty Pairs.
@@ -118,21 +118,21 @@ Example:
 
 % Color-swap pair: {r,b} -> {r,b}  -- preserved
 Pair = [obj(r,[r(0,0)]),obj(b,[r(0,1)])] - [obj(b,[r(0,0)]),obj(r,[r(0,1)])],
-sceneinv_colors_preserved([Pair]).  % succeeds
+scene_invariant_colors_preserved([Pair]).  % succeeds
 
 
-sceneinv_total_cells_before(+Pair, -N)
+scene_invariant_total_cells_before(+Pair, -N)
 
 Total cell count across all objects in the Before scene.
 N = sum of length(Cells) for each obj(_, Cells) in Before.
 
 Example:
 
-sceneinv_total_cells_before([obj(r,[r(0,0),r(0,1)])]-_, N).
+scene_invariant_total_cells_before([obj(r,[r(0,0),r(0,1)])]-_, N).
 % N = 2
 
 
-sceneinv_cells_preserved(+Pairs)
+scene_invariant_cells_preserved(+Pairs)
 
 Succeeds if the total cell count is the same in Before and After for EVERY pair.
 Succeeds vacuously for empty Pairs.
@@ -143,7 +143,7 @@ Typical Use
 Given a list of training pairs, check invariants before searching for a rule:
 
 solve(Pairs, Test, Output) :-
-    ( sceneinv_n_preserved(Pairs) ->
+    ( scene_invariant_n_preserved(Pairs) ->
         % output must have same object count as Test
         length(Test, N), length(Output, N)
     ; true ),
@@ -158,7 +158,7 @@ None. Uses library(lists) and library(apply).
 Test Coverage
 
 All 46 acceptance criteria (AC-SI-001 through AC-SI-046) defined in
-Refinement v228 Part 205 are exercised in packs/sceneinv/test/test_sceneinv.pl.
+Refinement v228 Part 205 are exercised in packs/scene_invariant/test/test_scene_invariant.pl.
 All 46 tests pass.
 
 

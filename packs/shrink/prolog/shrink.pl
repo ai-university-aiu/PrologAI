@@ -1,7 +1,7 @@
 % shrink.pl - Layer 164: Grid Downscaling and Block Decomposition (dn_* prefix).
 % Provides predicates for partitioning a 2D grid into equal-sized NxN blocks,
 % testing and exploiting blocky structure (every block is a uniform color),
-% shrinking a blocky grid by factor N (the inverse of objxf_scale_up in objxf),
+% shrinking a blocky grid by factor N (the inverse of object_transform_scale_up in objxf),
 % finding the scale factor of a scaled-up grid, and downscaling obj(Color, Cells)
 % terms. All predicates use 0-indexed row-column coordinates.
 :- module(shrink, [

@@ -10,7 +10,7 @@
       exploration_actor (30 000 ms) — low-density regions → explore_objectives
       imitation_actor   (5 000 ms) — matches observed agent_actions to causal_plans
       play_actor        (60 000 ms, idle only) — random capability variation
-      meta_control_actor(5 000 ms) — actor health; triggers sona_crystallize
+      meta_control_actor(5 000 ms) — actor health; triggers synaptic_ontological_neural_aggregator_crystallize
       gating_actor      (5 000 ms) — unified gating: filters objectives by readiness
       impasse_actor     (2 000 ms) — converts dead-ends into subgoal node_facts
 
@@ -513,7 +513,7 @@ reflection_meta_control_cycle :-
         % Continue the multi-line expression started above.
         ( TotalFacts > 1000000
         % If the condition above succeeded, perform the following action.
-        ->  catch(sona:sona_crystallize([]), _, true)
+        ->  catch(sona:synaptic_ontological_neural_aggregator_crystallize([]), _, true)
         % Otherwise (else branch), perform the following action.
         ;   true
         % Close the expression opened above.

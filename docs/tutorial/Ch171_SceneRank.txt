@@ -24,12 +24,12 @@ produces a result order-insensitively equal to the After scene.
 Exported Predicates
 
 
-scenerank_n_pairs(+Pairs, -N)
+scene_rank_n_pairs(+Pairs, -N)
 
 Number of pairs in the pair list.
 
 
-scenerank_coverage_pairs(+Rule, +Pairs, -Covered)
+scene_rank_coverage_pairs(+Rule, +Pairs, -Covered)
 
 List of pairs that the rule correctly explains.
 
@@ -37,131 +37,131 @@ Example:
 
 Pairs = [ [obj(r,[r(0,0)])]-[obj(g,[r(0,0)])],
           [obj(r,[r(1,0)])]-[obj(g,[r(1,0)])] ],
-scenerank_coverage_pairs(recolor(r,g), Pairs, Covered).
+scene_rank_coverage_pairs(recolor(r,g), Pairs, Covered).
 % Covered = [ ... both pairs ... ]
 
 
-scenerank_coverage(+Rule, +Pairs, -N)
+scene_rank_coverage(+Rule, +Pairs, -N)
 
 Count of pairs the rule correctly explains.
 
 Example:
 
-scenerank_coverage(recolor(r,g), Pairs, N).
+scene_rank_coverage(recolor(r,g), Pairs, N).
 % N = 2  (if both pairs are r->g)
 
 
-scenerank_consistent(+Rule, +Pairs)
+scene_rank_consistent(+Rule, +Pairs)
 
 Succeed if the rule correctly transforms every pair.
 
 Example:
 
-scenerank_consistent(recolor(r,g), Pairs).   % true if all pairs are r->g
+scene_rank_consistent(recolor(r,g), Pairs).   % true if all pairs are r->g
 
 
-scenerank_inconsistent_pairs(+Rule, +Pairs, -Bad)
+scene_rank_inconsistent_pairs(+Rule, +Pairs, -Bad)
 
 List of pairs the rule does NOT explain.
 
 Example:
 
-scenerank_inconsistent_pairs(recolor(r,g), [GoodPair, BadPair], Bad).
+scene_rank_inconsistent_pairs(recolor(r,g), [GoodPair, BadPair], Bad).
 % Bad = [BadPair]
 
 
-scenerank_rule_score(+Rule, +Pairs, -N)
+scene_rank_rule_score(+Rule, +Pairs, -N)
 
-Alias for scenerank_coverage.
+Alias for scene_rank_coverage.
 
 
-scenerank_rank_rules(+Rules, +Pairs, -Ranked)
+scene_rank_rank_rules(+Rules, +Pairs, -Ranked)
 
 Sort Rules by coverage descending. Ties are broken by standard Prolog term
 order, giving a stable deterministic ordering.
 
 Example:
 
-scenerank_rank_rules([recolor(r,b), recolor(r,g)], Pairs, Ranked).
+scene_rank_rank_rules([recolor(r,b), recolor(r,g)], Pairs, Ranked).
 % Ranked = [recolor(r,g), recolor(r,b)]  (assuming r->g has higher coverage)
 
 
-scenerank_rank_candidates(+Rules, +Pairs, -CovRulePairs)
+scene_rank_rank_candidates(+Rules, +Pairs, -CovRulePairs)
 
-Like scenerank_rank_rules but returns Coverage-Rule pairs so the coverage count is
+Like scene_rank_rank_rules but returns Coverage-Rule pairs so the coverage count is
 available alongside the rule term.
 
 Example:
 
-scenerank_rank_candidates([recolor(r,g), recolor(r,b)], Pairs, CovRules).
+scene_rank_rank_candidates([recolor(r,g), recolor(r,b)], Pairs, CovRules).
 % CovRules = [2-recolor(r,g), 0-recolor(r,b)]
 
 
-scenerank_best_rule(+Rules, +Pairs, -Best)
+scene_rank_best_rule(+Rules, +Pairs, -Best)
 
 The rule with the highest coverage. Fails if Rules is empty.
 
 Example:
 
-scenerank_best_rule([recolor(r,b), recolor(r,g)], Pairs, Best).
+scene_rank_best_rule([recolor(r,b), recolor(r,g)], Pairs, Best).
 % Best = recolor(r,g)
 
 
-scenerank_all_consistent(+Rules, +Pairs, -Consistent)
+scene_rank_all_consistent(+Rules, +Pairs, -Consistent)
 
 The subset of Rules that are fully consistent with every pair.
 
 Example:
 
-scenerank_all_consistent([recolor(r,g), recolor(r,b)], Pairs, Consistent).
+scene_rank_all_consistent([recolor(r,g), recolor(r,b)], Pairs, Consistent).
 % Consistent = [recolor(r,g)]  (if only that rule covers all pairs)
 
 
-scenerank_filter_min_coverage(+Rules, +Pairs, +MinN, -Filtered)
+scene_rank_filter_min_coverage(+Rules, +Pairs, +MinN, -Filtered)
 
 Keep only rules whose coverage is >= MinN.
 
 Example:
 
-scenerank_filter_min_coverage([recolor(r,g), recolor(r,b)], Pairs, 2, Filtered).
+scene_rank_filter_min_coverage([recolor(r,g), recolor(r,b)], Pairs, 2, Filtered).
 % Filtered = [recolor(r,g)]  (if recolor(r,g) has coverage 2 >= 2)
 
 
-scenerank_perfect_rules(+Rules, +Pairs, -Perfect)
+scene_rank_perfect_rules(+Rules, +Pairs, -Perfect)
 
 Rules whose coverage equals the total pair count (perfect coverage).
 
 Example:
 
-scenerank_perfect_rules([recolor(r,g), recolor(r,b)], Pairs, Perfect).
+scene_rank_perfect_rules([recolor(r,g), recolor(r,b)], Pairs, Perfect).
 % Perfect = [recolor(r,g)]  (if recolor(r,g) covers all pairs)
 
 
-scenerank_coverage_ratio(+Rule, +Pairs, -Num/Den)
+scene_rank_coverage_ratio(+Rule, +Pairs, -Num/Den)
 
 Coverage as an integer fraction. Num is the coverage count; Den is the
 total pair count.
 
 Example:
 
-scenerank_coverage_ratio(recolor(r,g), Pairs, Num/Den).
+scene_rank_coverage_ratio(recolor(r,g), Pairs, Num/Den).
 % Num/Den = 2/3  (if recolor(r,g) covers 2 of 3 pairs)
 
 
-scenerank_top_n_rules(+Rules, +Pairs, +N, -TopN)
+scene_rank_top_n_rules(+Rules, +Pairs, +N, -TopN)
 
 The top N rules as Coverage-Rule pairs in descending coverage order.
 If fewer than N candidates exist, returns all.
 
 Example:
 
-scenerank_top_n_rules([recolor(r,g), shift(1,0), recolor(r,b)], Pairs, 2, TopN).
+scene_rank_top_n_rules([recolor(r,g), shift(1,0), recolor(r,b)], Pairs, 2, TopN).
 % TopN = [2-recolor(r,g), 1-shift(1,0)]
 
 
 Internal Rule Engine
 
-scenerank implements its own rule application engine (scenerank_apply_) with the same
+scenerank implements its own rule application engine (scene_rank_apply_) with the same
 dispatch vocabulary as sceneapply: recolor(Old,New), recolor_all(New),
 color_map(Map), shift(DR,DC), to_origin, reflect_h(Width), reflect_v(Height),
 remove_color(Color), keep_color(Color), sort_size_desc, sort_size_asc, top_n(N).
@@ -177,8 +177,8 @@ manual enumeration, use scenerank to select the best rule:
 solve(TrainingPairs, TestInput, Output) :-
     Candidates = [recolor(r,g), recolor(b,r), shift(1,0), shift(-1,0),
                   to_origin, recolor_all(g)],
-    scenerank_best_rule(Candidates, TrainingPairs, BestRule),
-    scenerank_apply_(BestRule, TestInput, Output).
+    scene_rank_best_rule(Candidates, TrainingPairs, BestRule),
+    scene_rank_apply_(BestRule, TestInput, Output).
 
 
 Dependencies
@@ -189,7 +189,7 @@ None. Uses library(lists) and library(apply).
 Test Coverage
 
 All 41 acceptance criteria (AC-RK-001 through AC-RK-041) defined in
-Refinement v223 Part 200 are exercised in packs/scenerank/test/test_scenerank.pl.
+Refinement v223 Part 200 are exercised in packs/scene_rank/test/test_scene_rank.pl.
 All 41 tests pass.
 
 

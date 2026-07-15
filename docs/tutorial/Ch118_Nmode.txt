@@ -9,87 +9,87 @@ Ties in frequency are broken by returning the smallest tied value.
 
 Predicates:
 
-nmode_mode(+List, -M)
+neighborhood_mode_mode(+List, -M)
   Mode of a non-empty integer list; ties broken by smallest value.
 
-nmode_mode_all(+List, -Ms)
+neighborhood_mode_mode_all(+List, -Ms)
   Sorted list of ALL values tied for the highest frequency.
 
-nmode_mode_count(+List, -M, -Count)
+neighborhood_mode_mode_count(+List, -M, -Count)
   Mode M and its frequency Count.
 
-nmode_row(+Grid, +R, -M)
+neighborhood_mode_row(+Grid, +R, -M)
   Mode of row R (0-based) of Grid.
 
-nmode_col(+Grid, +C, -M)
+neighborhood_mode_col(+Grid, +C, -M)
   Mode of column C (0-based) of Grid.
 
-nmode_row_modes(+Grid, -Ms)
+neighborhood_mode_row_modes(+Grid, -Ms)
   List of per-row modes, one per row.
 
-nmode_col_modes(+Grid, -Ms)
+neighborhood_mode_col_modes(+Grid, -Ms)
   List of per-column modes, one per column.
 
-nmode_grid(+Grid, -M)
+neighborhood_mode_grid(+Grid, -M)
   Mode of all cell values in Grid.
 
-nmode_filter4(+Grid, -OutGrid)
+neighborhood_mode_filter4(+Grid, -OutGrid)
   4-connected mode filter: each output cell is the mode of the cell and
   its in-bounds 4-neighbors.  Useful for denoising and pattern completion.
 
-nmode_filter8(+Grid, -OutGrid)
+neighborhood_mode_filter8(+Grid, -OutGrid)
   8-connected mode filter: each output cell is the mode of the cell and
   its in-bounds 8-neighbors.
 
-nmode_uniform4(+Grid, -Cells)
+neighborhood_mode_uniform4(+Grid, -Cells)
   Sorted R-C positions whose in-bounds 4-neighbors all share one value.
 
-nmode_uniform8(+Grid, -Cells)
+neighborhood_mode_uniform8(+Grid, -Cells)
   Sorted R-C positions whose in-bounds 8-neighbors all share one value.
 
-nmode_outlier4(+Grid, -Cells)
+neighborhood_mode_outlier4(+Grid, -Cells)
   Sorted R-C positions whose value differs from their 4-neighbor mode
   (cell excluded from the mode computation).
 
-nmode_outlier8(+Grid, -Cells)
+neighborhood_mode_outlier8(+Grid, -Cells)
   Sorted R-C positions whose value differs from their 8-neighbor mode
   (cell excluded from the mode computation).
 
 Usage examples:
 
-nmode_mode([1,2,3], M). % M=1 (all tied; smallest wins)
-nmode_mode([1,1,2,3], M). % M=1 (highest frequency)
-nmode_mode([1,1,2,2], M). % M=1 (tied at 2; smallest wins)
-nmode_mode_all([1,1,2,2], Ms). % Ms=[1,2]
-nmode_mode_count([1,1,2,3], M, C). % M=1, C=2
-nmode_grid([[1,2,3],[4,5,6],[7,8,9]], M). % M=1 (all distinct; smallest)
-nmode_row_modes([[1,2,3],[4,5,6],[7,8,9]], Ms). % Ms=[1,4,7]
-nmode_col_modes([[1,2,3],[4,5,6],[7,8,9]], Ms). % Ms=[1,2,3]
-nmode_filter4([[1,2,3],[4,5,6],[7,8,9]], F).
+neighborhood_mode_mode([1,2,3], M). % M=1 (all tied; smallest wins)
+neighborhood_mode_mode([1,1,2,3], M). % M=1 (highest frequency)
+neighborhood_mode_mode([1,1,2,2], M). % M=1 (tied at 2; smallest wins)
+neighborhood_mode_mode_all([1,1,2,2], Ms). % Ms=[1,2]
+neighborhood_mode_mode_count([1,1,2,3], M, C). % M=1, C=2
+neighborhood_mode_grid([[1,2,3],[4,5,6],[7,8,9]], M). % M=1 (all distinct; smallest)
+neighborhood_mode_row_modes([[1,2,3],[4,5,6],[7,8,9]], Ms). % Ms=[1,4,7]
+neighborhood_mode_col_modes([[1,2,3],[4,5,6],[7,8,9]], Ms). % Ms=[1,2,3]
+neighborhood_mode_filter4([[1,2,3],[4,5,6],[7,8,9]], F).
   % F=[[1,1,2],[1,2,3],[4,5,6]]
-nmode_filter8([[1,2,1],[2,1,2],[1,2,1]], F).
+neighborhood_mode_filter8([[1,2,1],[2,1,2],[1,2,1]], F).
   % F=[[1,1,1],[1,1,1],[1,1,1]] (checkerboard collapses to uniform)
-nmode_uniform4([[1,1,1],[1,1,1],[1,1,1]], C).
+neighborhood_mode_uniform4([[1,1,1],[1,1,1],[1,1,1]], C).
   % C=[0-0,0-1,...,2-2] (all 9 cells)
-nmode_uniform4([[1,2,3],[4,5,6],[7,8,9]], C).
+neighborhood_mode_uniform4([[1,2,3],[4,5,6],[7,8,9]], C).
   % C=[] (all neighbors differ in a sequential grid)
-nmode_outlier4([[1,2,1],[2,1,2],[1,2,1]], C).
+neighborhood_mode_outlier4([[1,2,1],[2,1,2],[1,2,1]], C).
   % C=[0-0,0-1,...,2-2] (checkerboard: every cell disagrees with neighbors)
-nmode_outlier8([[1,2,1],[2,1,2],[1,2,1]], C).
+neighborhood_mode_outlier8([[1,2,1],[2,1,2],[1,2,1]], C).
   % C=[0-0,0-1,0-2,1-0,1-2,2-0,2-1,2-2] (center 1-1 agrees with 8-nbr mode)
 
 Key implementation notes:
 
-Mode computation uses nmode_freq_pairs_/2, which converts an msort-sorted list
+Mode computation uses neighborhood_mode_freq_pairs_/2, which converts an msort-sorted list
 (duplicates preserved) into Value-Count pairs by grouping consecutive equal
-elements.  The private helper nmode_count_prefix_/4 has a cut in its empty-list
+elements.  The private helper neighborhood_mode_count_prefix_/4 has a cut in its empty-list
 base case to prevent the catch-all clause from also matching, which would
 cause duplicate solutions inside findall.
 
-nmode_uniform4/8 uses sort(NbrVals, [_]) as a one-step test: sort/2 removes
+neighborhood_mode_uniform4/8 uses sort(NbrVals, [_]) as a one-step test: sort/2 removes
 duplicates, so [_] matches iff all neighbor values are identical.
 
-nmode_outlier4/8 computes the mode of NEIGHBORS ONLY (not including the cell
+neighborhood_mode_outlier4/8 computes the mode of NEIGHBORS ONLY (not including the cell
 itself), then checks if the cell's own value differs numerically (=\=/2).
 
 Library imports: library(lists): member/2, nth0/3, max_list/2.
