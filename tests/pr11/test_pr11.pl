@@ -62,23 +62,23 @@ pr11_setup :-
     set_default_nexus(N),
     % Clear SONA state between test runs
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)),
+    retractall(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:synaptic_ontological_neural_aggregator_importance(_, _)),
+    retractall(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_importance(_, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:synaptic_ontological_neural_aggregator_retrieval_count(_, _)),
+    retractall(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_retrieval_count(_, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:synaptic_ontological_neural_aggregator_trajectory_id_counter(_)),
+    retractall(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_id_counter(_)),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(sona:synaptic_ontological_neural_aggregator_trajectory_id_counter(0)),
+    assertz(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_id_counter(0)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:synaptic_ontological_neural_aggregator_consolidation_cycle(_)),
+    retractall(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_consolidation_cycle(_)),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(sona:synaptic_ontological_neural_aggregator_consolidation_cycle(0)),
+    assertz(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_consolidation_cycle(0)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:synaptic_ontological_neural_aggregator_last_crystallize_time(_)),
+    retractall(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_last_crystallize_time(_)),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(sona:synaptic_ontological_neural_aggregator_last_crystallize_time(0.0)).
+    assertz(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_last_crystallize_time(0.0)).
 
 % Execute: pr11_cleanup :-.
 pr11_cleanup :-
@@ -220,7 +220,7 @@ test(duplicate_not_stored) :-
     % Aggregate solutions using 'count' and bind the result to a single value.
     aggregate_all(count,
                   % Continue the multi-line expression started above.
-                  sona:synaptic_ontological_neural_aggregator_trajectory_entry(_, sit_dup, [do(x)], success, _, _),
+                  synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_entry(_, sit_dup, [do(x)], success, _, _),
                   % Supply 'N' as the next argument to the expression above.
                   N),
     % Check that 'N' is numerically equal to '1'.
@@ -268,7 +268,7 @@ test(crystallize_skips_when_too_few) :-
 test(retrieve_empty_bank) :-
     % Temporarily clear bank state, retrieve, then restore doesn't matter
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)),
+    retractall(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)),
     % State a fact for 'sona retrieve' with the arguments listed below.
     synaptic_ontological_neural_aggregator_retrieve(no_such_situation, Results),
     % Check that 'Results' is unifiable with '[]'.

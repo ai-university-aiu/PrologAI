@@ -46,19 +46,19 @@
 % Execute: pr43_setup :-.
 pr43_setup :-
     % Remove all matching facts from the runtime knowledge base.
-    retractall(a2a:agent_to_agent_agent_capability(_, _)),
+    retractall(agent_to_agent:agent_to_agent_agent_capability(_, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(a2a:agent_to_agent_agent_identity(_, _)),
+    retractall(agent_to_agent:agent_to_agent_agent_identity(_, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(a2a:agent_to_agent_task_record(_, _, _, _)),
+    retractall(agent_to_agent:agent_to_agent_task_record(_, _, _, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(a2a:agent_to_agent_agent_mail(_, _, _, _, _)),
+    retractall(agent_to_agent:agent_to_agent_agent_mail(_, _, _, _, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(a2a:agent_to_agent_delivered_mail(_)),
+    retractall(agent_to_agent:agent_to_agent_delivered_mail(_)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(a2a:agent_to_agent_mail_counter(_)),
+    retractall(agent_to_agent:agent_to_agent_mail_counter(_)),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(a2a:agent_to_agent_mail_counter(0)).
+    assertz(agent_to_agent:agent_to_agent_mail_counter(0)).
 
 % Execute: pr43_cleanup :- pr43_setup..
 pr43_cleanup :- pr43_setup.
@@ -66,12 +66,12 @@ pr43_cleanup :- pr43_setup.
 %  AC-PR43-001: agent card generated; includes capabilities
 % Define a clause for 'test': succeed when the following conditions hold.
 test(agent_card_generated, [setup(pr43_setup)]) :-
-    % Execute: a2a:agent_to_agent_register_identity(mind_a43, pai_mind_a43),.
-    a2a:agent_to_agent_register_identity(mind_a43, pai_mind_a43),
-    % Execute: a2a:agent_to_agent_register_capability(mind_a43, weather_forecast),.
-    a2a:agent_to_agent_register_capability(mind_a43, weather_forecast),
-    % Execute: a2a:agent_to_agent_register_capability(mind_a43, document_search),.
-    a2a:agent_to_agent_register_capability(mind_a43, document_search),
+    % Execute: agent_to_agent:agent_to_agent_register_identity(mind_a43, pai_mind_a43),.
+    agent_to_agent:agent_to_agent_register_identity(mind_a43, pai_mind_a43),
+    % Execute: agent_to_agent:agent_to_agent_register_capability(mind_a43, weather_forecast),.
+    agent_to_agent:agent_to_agent_register_capability(mind_a43, weather_forecast),
+    % Execute: agent_to_agent:agent_to_agent_register_capability(mind_a43, document_search),.
+    agent_to_agent:agent_to_agent_register_capability(mind_a43, document_search),
     % State a fact for 'pai agent card' with the arguments listed below.
     agent_to_agent_agent_card(Card),
     % Check that 'Card' is unifiable with 'card(identity(_), capabilities(Caps), endpoint(_))'.
@@ -94,10 +94,10 @@ test(mail_arrives_on_fetch, [setup(pr43_setup)]) :-
 %  AC-PR43-003: capabilities reflected in card
 % Define a clause for 'test': succeed when the following conditions hold.
 test(capabilities_in_card, [setup(pr43_setup)]) :-
-    % Execute: a2a:agent_to_agent_register_capability(mind43, skill_alpha),.
-    a2a:agent_to_agent_register_capability(mind43, skill_alpha),
-    % Execute: a2a:agent_to_agent_register_capability(mind43, skill_beta),.
-    a2a:agent_to_agent_register_capability(mind43, skill_beta),
+    % Execute: agent_to_agent:agent_to_agent_register_capability(mind43, skill_alpha),.
+    agent_to_agent:agent_to_agent_register_capability(mind43, skill_alpha),
+    % Execute: agent_to_agent:agent_to_agent_register_capability(mind43, skill_beta),.
+    agent_to_agent:agent_to_agent_register_capability(mind43, skill_beta),
     % State a fact for 'pai agent card' with the arguments listed below.
     agent_to_agent_agent_card(card(_, capabilities(Caps), _)),
     % State a fact for 'once' with the arguments listed below.
@@ -108,8 +108,8 @@ test(capabilities_in_card, [setup(pr43_setup)]) :-
 %  AC-PR43-004: task with registered skill → completed
 % Define a clause for 'test': succeed when the following conditions hold.
 test(task_completed, [setup(pr43_setup)]) :-
-    % Execute: a2a:agent_to_agent_register_capability(mind43, forecast_skill43),.
-    a2a:agent_to_agent_register_capability(mind43, forecast_skill43),
+    % Execute: agent_to_agent:agent_to_agent_register_capability(mind43, forecast_skill43),.
+    agent_to_agent:agent_to_agent_register_capability(mind43, forecast_skill43),
     % State a fact for 'pai a2a task' with the arguments listed below.
     agent_to_agent_task(task_001_43, forecast_skill43, input(location, london43), Status),
     % Check that 'Status' is unifiable with 'completed(_)'.
@@ -128,8 +128,8 @@ test(task_unknown_skill, [setup(pr43_setup)]) :-
 test(mail_stored, [setup(pr43_setup)]) :-
     % State a fact for 'pai peer mail send' with the arguments listed below.
     agent_to_agent_peer_mail_send(bob43, subject43, body43),
-    % Execute: a2a:agent_to_agent_agent_mail(_, bob43, _, _, body43)..
-    a2a:agent_to_agent_agent_mail(_, bob43, _, _, body43).
+    % Execute: agent_to_agent:agent_to_agent_agent_mail(_, bob43, _, _, body43)..
+    agent_to_agent:agent_to_agent_agent_mail(_, bob43, _, _, body43).
 
 %  AC-PR43-007: fetch only returns mail for the correct recipient
 % Define a clause for 'test': succeed when the following conditions hold.

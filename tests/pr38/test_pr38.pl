@@ -59,25 +59,25 @@
 
 % Execute: pr38_setup :-.
 pr38_setup :-
-    % Execute: vsa:retractall(vsa:vector_symbolic_architecture_active_algebra(_)),.
-    vsa:retractall(vsa:vector_symbolic_architecture_active_algebra(_)),
-    % Execute: vsa:retractall(vsa:vector_symbolic_architecture_dim(_)),.
-    vsa:retractall(vsa:vector_symbolic_architecture_dim(_)),
-    % Execute: vsa:assertz(vsa:vector_symbolic_architecture_active_algebra(map)),.
-    vsa:assertz(vsa:vector_symbolic_architecture_active_algebra(map)),
-    % Execute: vsa:assertz(vsa:vector_symbolic_architecture_dim(64))..
-    vsa:assertz(vsa:vector_symbolic_architecture_dim(64)).
+    % Execute: vector_symbolic_architecture:retractall(vector_symbolic_architecture:vector_symbolic_architecture_active_algebra(_)),.
+    vector_symbolic_architecture:retractall(vector_symbolic_architecture:vector_symbolic_architecture_active_algebra(_)),
+    % Execute: vector_symbolic_architecture:retractall(vector_symbolic_architecture:vector_symbolic_architecture_dim(_)),.
+    vector_symbolic_architecture:retractall(vector_symbolic_architecture:vector_symbolic_architecture_dim(_)),
+    % Execute: vector_symbolic_architecture:assertz(vector_symbolic_architecture:vector_symbolic_architecture_active_algebra(map)),.
+    vector_symbolic_architecture:assertz(vector_symbolic_architecture:vector_symbolic_architecture_active_algebra(map)),
+    % Execute: vector_symbolic_architecture:assertz(vector_symbolic_architecture:vector_symbolic_architecture_dim(64))..
+    vector_symbolic_architecture:assertz(vector_symbolic_architecture:vector_symbolic_architecture_dim(64)).
 
 % Execute: pr38_cleanup :-.
 pr38_cleanup :-
-    % Execute: vsa:retractall(vsa:vector_symbolic_architecture_active_algebra(_)),.
-    vsa:retractall(vsa:vector_symbolic_architecture_active_algebra(_)),
-    % Execute: vsa:retractall(vsa:vector_symbolic_architecture_dim(_)),.
-    vsa:retractall(vsa:vector_symbolic_architecture_dim(_)),
-    % Execute: vsa:assertz(vsa:vector_symbolic_architecture_active_algebra(map)),.
-    vsa:assertz(vsa:vector_symbolic_architecture_active_algebra(map)),
-    % Execute: vsa:assertz(vsa:vector_symbolic_architecture_dim(64))..
-    vsa:assertz(vsa:vector_symbolic_architecture_dim(64)).
+    % Execute: vector_symbolic_architecture:retractall(vector_symbolic_architecture:vector_symbolic_architecture_active_algebra(_)),.
+    vector_symbolic_architecture:retractall(vector_symbolic_architecture:vector_symbolic_architecture_active_algebra(_)),
+    % Execute: vector_symbolic_architecture:retractall(vector_symbolic_architecture:vector_symbolic_architecture_dim(_)),.
+    vector_symbolic_architecture:retractall(vector_symbolic_architecture:vector_symbolic_architecture_dim(_)),
+    % Execute: vector_symbolic_architecture:assertz(vector_symbolic_architecture:vector_symbolic_architecture_active_algebra(map)),.
+    vector_symbolic_architecture:assertz(vector_symbolic_architecture:vector_symbolic_architecture_active_algebra(map)),
+    % Execute: vector_symbolic_architecture:assertz(vector_symbolic_architecture:vector_symbolic_architecture_dim(64))..
+    vector_symbolic_architecture:assertz(vector_symbolic_architecture:vector_symbolic_architecture_dim(64)).
 
 %  AC-PR38-001: whole-structure vectors differ; unbinding OBJECT returns book
 % Define a clause for 'test': succeed when the following conditions hold.
@@ -205,8 +205,8 @@ test(compound_dimension, [setup(pr38_setup)]) :-
     vector_symbolic_architecture_embed_compound(foo38(x38, y38), Vec),
     % Unify 'Dim' with the number of elements in list 'Vec'.
     length(Vec, Dim),
-    % Execute: vsa:vector_symbolic_architecture_dim(Dim)..
-    vsa:vector_symbolic_architecture_dim(Dim).
+    % Execute: vector_symbolic_architecture:vector_symbolic_architecture_dim(Dim)..
+    vector_symbolic_architecture:vector_symbolic_architecture_dim(Dim).
 
 %  AC-PR38-008: switching algebra changes bind behavior
 % Define a clause for 'test': succeed when the following conditions hold.
