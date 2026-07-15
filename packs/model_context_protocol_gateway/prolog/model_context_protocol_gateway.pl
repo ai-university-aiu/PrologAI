@@ -306,7 +306,7 @@ model_context_protocol_gateway_tool(body_enroll, Params, ok) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
-        mindbody:manifest_body(Address, Needs, Caps),
+        mind_body:manifest_body(Address, Needs, Caps),
         % Continue the multi-line expression started above.
         _, true
     % Close the expression opened above.
@@ -323,7 +323,7 @@ model_context_protocol_gateway_tool(body_signal, Params, ok) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
-        mindbody:relay_percept(Address, Signal),
+        mind_body:relay_percept(Address, Signal),
         % Continue the multi-line expression started above.
         _, true
     % Close the expression opened above.
@@ -340,7 +340,7 @@ model_context_protocol_gateway_tool(body_command, Params, ok) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
-        mindbody:mind_body_dispatch_command(Address, Cmd),
+        mind_body:mind_body_dispatch_command(Address, Cmd),
         % Continue the multi-line expression started above.
         _, true
     % Close the expression opened above.
@@ -352,8 +352,8 @@ model_context_protocol_gateway_tool(sona_learn, Params, ok) :-
     TrajAtom = Params.get(trajectory, 'none'),
     % State a fact for 'term to atom' with the arguments listed below.
     term_to_atom(Traj, TrajAtom),
-    % State the fact: catch(sona:synaptic_ontological_neural_aggregator_absorb(Traj), _, true).
-    catch(sona:synaptic_ontological_neural_aggregator_absorb(Traj), _, true).
+    % State the fact: catch(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_absorb(Traj), _, true).
+    catch(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_absorb(Traj), _, true).
 
 % Define a clause for 'dispatch tool': succeed when the following conditions hold.
 model_context_protocol_gateway_tool(sona_recall, Params, Results) :-
@@ -366,7 +366,7 @@ model_context_protocol_gateway_tool(sona_recall, Params, Results) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
-        ( sona:synaptic_ontological_neural_aggregator_retrieve(Pat, K, Trajs),
+        ( synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_retrieve(Pat, K, Trajs),
           % Continue the multi-line expression started above.
           maplist([T, A]>>(term_to_atom(T, A)), Trajs, Results)
         % Close the expression opened above.

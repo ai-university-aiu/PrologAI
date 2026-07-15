@@ -4055,7 +4055,7 @@ when the cell list is empty it returns the grid unchanged; otherwise it calls
 dg_replace_cell_ on the first cell and recurses.
 
 Group 4 - Cell index membership (DG-DG-011 through DG-DG-012):
-dg_cell_diag and dg_cell_anti_diag are single-step arithmetic: N is C-R
+dg_cell_diag and dg_cell_anti_diag are single-step grid_arithmetic: N is C-R
 and N is R+C respectively.
 
 Group 5 - Uniformity tests (DG-DG-013 through DG-DG-014):
@@ -4264,7 +4264,7 @@ value. rt_is_frame/6 is identical but uses rt_border for the cell list.
 Group 6 - Overlap and scaling (RT-RT-013 through RT-RT-014):
 rt_overlap/8 is a pure arithmetic test: row intervals overlap iff R1a =< R2b
 and R2a >= R1b; column intervals overlap iff C1a =< C2b and C2a >= C1b.
-rt_scale/7 computes the new bottom-right corner with arithmetic:
+rt_scale/7 computes the new bottom-right corner with grid_arithmetic:
 R2New = R1 + (R2-R1)*Factor and C2New = C1 + (C2-C1)*Factor.
 
 Dependencies: none. The rect pack imports nth0/3, numlist/3, append/2, append/3,
@@ -6252,7 +6252,7 @@ Modular stripe patterns:
   ix_row_mod_grid: R mod N; horizontal stripes
   ix_col_mod_grid: C mod N; vertical stripes
 
-Index-based selection and arithmetic:
+Index-based selection and grid_arithmetic:
   ix_mask_rows: zero out rows not in an index list
   ix_mask_cols: zero out columns not in an index list
   ix_apply: elementwise binary Op between an index grid and a value grid
@@ -6732,7 +6732,7 @@ with different shapes.
 xf_is_recolor: Similar one-clause design with shared Cells. Adds C1 \= C2 to require
 different colors.
 
-Cell arithmetic: xf_cells_added, xf_cells_removed, xf_cells_kept use subtract/3 (from
+Cell grid_arithmetic: xf_cells_added, xf_cells_removed, xf_cells_kept use subtract/3 (from
 library(lists)) and findall+memberchk for the intersection. xf_overlap_count wraps
 xf_cells_kept with length.
 

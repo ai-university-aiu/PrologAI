@@ -445,13 +445,13 @@ compute_r3(Score) :-
         % Continue the multi-line expression started above.
         ( aggregate_all(count,
                         % Continue the multi-line expression started above.
-                        sona:sona_trajectory_entry(_, _, _, _, _, _),
+                        synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _),
                         % Supply 'Total' as the next argument to the expression above.
                         Total),
           % Continue the multi-line expression started above.
           aggregate_all(count,
                         % Continue the multi-line expression started above.
-                        sona:sona_trajectory_entry(_, _, _, success, _, _),
+                        synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, success, _, _),
                         % Supply 'Successes' as the next argument to the expression above.
                         Successes),
           % Continue the multi-line expression started above.
@@ -575,7 +575,7 @@ diagnose_one(repeated_plan_failure(Plan, Count)) :-
     % Aggregate solutions using 'bag' and bind the result to a single value.
     aggregate_all(bag(Plan1), (
         % Continue the multi-line expression started above.
-        sona:sona_trajectory_entry(_, _, [Plan1|_], failure, _, _)
+        synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, [Plan1|_], failure, _, _)
     % Continue the multi-line expression started above.
     ), FailedPlans),
     % Sort list 'FailedPlans' into 'UniqPlans', removing duplicates.
@@ -585,7 +585,7 @@ diagnose_one(repeated_plan_failure(Plan, Count)) :-
     % Aggregate solutions using 'count' and bind the result to a single value.
     aggregate_all(count,
                   % Continue the multi-line expression started above.
-                  sona:sona_trajectory_entry(_, _, [Plan|_], failure, _, _),
+                  synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, [Plan|_], failure, _, _),
                   % Supply 'Count' as the next argument to the expression above.
                   Count),
     % Check that 'Count' is greater than or equal to '5'.

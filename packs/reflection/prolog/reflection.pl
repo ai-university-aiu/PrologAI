@@ -187,7 +187,7 @@ reflection_motivation_cycle :-
             % Continue the multi-line expression started above.
             catch(
                 % Continue the multi-line expression started above.
-                ( mindbody:body_vitals(Addr, vitals(_, Needs, _))
+                ( mind_body:body_vitals(Addr, vitals(_, Needs, _))
                 % If the condition above succeeded, perform the following action.
                 ->  forall(
                         % Continue the multi-line expression started above.
@@ -513,7 +513,7 @@ reflection_meta_control_cycle :-
         % Continue the multi-line expression started above.
         ( TotalFacts > 1000000
         % If the condition above succeeded, perform the following action.
-        ->  catch(sona:synaptic_ontological_neural_aggregator_crystallize([]), _, true)
+        ->  catch(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_crystallize([]), _, true)
         % Otherwise (else branch), perform the following action.
         ;   true
         % Close the expression opened above.

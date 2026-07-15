@@ -503,7 +503,7 @@ attach_learning(CId, Relation, Ids) :-
           % Continue the multi-line expression started above.
           get_time(T),
           % Continue the multi-line expression started above.
-          sona:synaptic_ontological_neural_aggregator_absorb(trajectory(CId, [broadcast, Relation, Ids],
+          synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_absorb(trajectory(CId, [broadcast, Relation, Ids],
                                        % Continue the multi-line expression started above.
                                        broadcast_cycle, 0.5, T))
         % Close the expression opened above.
