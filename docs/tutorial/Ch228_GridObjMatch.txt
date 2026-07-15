@@ -12,7 +12,7 @@ object terms between two lists and detecting what changed. It answers the questi
 what changed color, what appeared, and what disappeared?"
 
 Objects have the form ob(Color, Cells, BBox) where BBox = r0(R0,C0,R1,C1).
-Objects are produced by gob_all_objects/3 from the gridobj pack.
+Objects are produced by gridobj_all_objects/3 from the gridobj pack.
 
 Match pairs use the term match(O1, O2).
 Movement vectors use mv(DR, DC) where positive DR is down and positive DC is right.
@@ -145,8 +145,8 @@ two object lists (typical in grid puzzle analysis).
 :- use_module(packs/gridobjmatch/prolog/gridobjmatch).
 
 analyze_transformation(GridIn, GridOut, BgColor, Analysis) :-
-    gob_all_objects(GridIn,  BgColor, ObjsIn),
-    gob_all_objects(GridOut, BgColor, ObjsOut),
+    gridobj_all_objects(GridIn,  BgColor, ObjsIn),
+    gridobj_all_objects(GridOut, BgColor, ObjsOut),
     gridobjmatch_match_color(ObjsIn, ObjsOut, Pairs),
     gridobjmatch_color_diff(Pairs, Same, Diff),
     gridobjmatch_constant_move(Pairs, MoveVec),

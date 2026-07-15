@@ -83,8 +83,8 @@
 % Close the module declaration.
 ]).
 
-% Import ep_eval and ep_shell from the ephemera pack for code execution.
-:- use_module(library(ephemera), [ep_eval/3, ep_shell/3]).
+% Import ephemera_eval and ephemera_shell from the ephemera pack for code execution.
+:- use_module(library(ephemera), [ephemera_eval/3, ephemera_shell/3]).
 % Import lists predicates.
 :- use_module(library(lists),    [member/2, last/2]).
 
@@ -181,12 +181,12 @@ ag_loop_step(LoopId, ReasonGoal, step_ok(Thought, Action, Observation)) :-
 % Define ag_act for action_eval(GoalTerm): call a Prolog goal via ephemera.
 ag_act(_LoopId, action_eval(GoalTerm), obs_eval(EvalResult)) :-
     % Evaluate the goal term with a 30-second default timeout.
-    ep_eval(GoalTerm, 30, EvalResult).
+    ephemera_eval(GoalTerm, 30, EvalResult).
 
 % Define ag_act for action_shell(Argv, Timeout): run a shell command.
 ag_act(_LoopId, action_shell(Argv, Timeout), obs_shell(ShellResult)) :-
-    % Execute the shell command via ep_shell.
-    ep_shell(Argv, Timeout, ShellResult).
+    % Execute the shell command via ephemera_shell.
+    ephemera_shell(Argv, Timeout, ShellResult).
 
 % Define ag_act for action_push_goal(Subgoal): push one subgoal.
 ag_act(LoopId, action_push_goal(Subgoal), obs_pushed(Subgoal)) :-

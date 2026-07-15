@@ -51,7 +51,7 @@
 % Import grid measurement and reading.
 :- use_module(library(grid), [gd_size/3, gd_cell/4, gd_colors/2, gd_color_count/3]).
 % Import connected-component object detection.
-:- use_module(library(gridobj), [gob_all_objects/3]).
+:- use_module(library(gridobj), [gridobj_all_objects/3]).
 % Import list helpers.
 :- use_module(library(lists), [member/2, max_list/2, min_list/2, sum_list/2]).
 % Import aggregation.
@@ -142,7 +142,7 @@ grid_perception_objects_compute(Frame, Objects) :-
     % The background to segment against.
     ( grid_perception_background(Frame, Bg) -> true ; Bg = 0 ),
     % Connected components over every non-background colour.
-    catch(gob_all_objects(Frame, Bg, Raw), _, Raw = []),
+    catch(gridobj_all_objects(Frame, Bg, Raw), _, Raw = []),
     % Summarise each component: colour, size, centroid, and bounding box.
     findall(NegSize - obj(Colour, Size, cell(CR, CC), bbox(R0, C0, R1, C1)),
         ( member(ob(Colour, Cells, _), Raw),

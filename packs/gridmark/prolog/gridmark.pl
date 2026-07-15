@@ -188,7 +188,7 @@ gridmark_mark_checkerboard(Grid, MarkColor, Marked) :-
 
 % gridmark_erase(+Grid, +MarkColor, +BgColor, -Erased)
 % Erased is Grid with every cell of color MarkColor replaced by BgColor.
-% Equivalent to gc_recolor but framed as "erase the mark."
+% Equivalent to gridcolor_recolor but framed as "erase the mark."
 gridmark_erase(Grid, MarkColor, BgColor, Erased) :-
     gridmark_dims_(Grid, H, W),
     H1 is H - 1, W1 is W - 1,

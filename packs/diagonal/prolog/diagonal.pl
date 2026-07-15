@@ -36,7 +36,7 @@ diagonal_cell_at_(Grid, R, C, V) :-
     nth0(C, Row, V).
 
 % diagonal_replace_cell_: return Grid with cell (R,C) replaced by V.
-% Uses the deterministic sr_replace_nth_ pattern: cut on base case.
+% Uses the deterministic stripe_replace_nth_ pattern: cut on base case.
 diagonal_replace_nth_list_(0, [_|T], V, [V|T]) :- !.
 diagonal_replace_nth_list_(N, [H|T], V, [H|T2]) :-
 % Decrement and recurse.

@@ -2,7 +2,7 @@ Chapter 225: gridgroupby - Grid Group-By Operations (ggb_*, Layer 243)
 
 Work Package 264. Module: gridgroupby. Prefix: ggb_. Layer: 243.
 Dependencies: library(lists) [member/2, append/3].
-Input format: ob(Color,Cells,BBox) terms as produced by gob_all_objects/3.
+Input format: ob(Color,Cells,BBox) terms as produced by gridobj_all_objects/3.
 
 
 Overview
@@ -11,7 +11,7 @@ The gridgroupby pack provides fourteen predicates for grouping, filtering,
 sorting, pairing, and counting objects in a symbolic grid's object list.
 
 It operates on ob(Color,Cells,BBox) terms - the format returned by
-gob_all_objects/3 from the gridobj pack. It does not access grids directly;
+gridobj_all_objects/3 from the gridobj pack. It does not access grids directly;
 all operations are list transformations over object lists.
 
 
@@ -87,7 +87,7 @@ Example session
 
 % Get all objects then group by color.
 Grid = [[r,b,r],[b,r,b]],
-gob_all_objects(Grid, b, Objects),
+gridobj_all_objects(Grid, b, Objects),
 gridgroupby_group_by_color(Objects, Groups).
 % Objects has r-colored objects; Groups = [grp(r, [ob(r,[r(0,0)],_), ob(r,[r(0,2)],_), ob(r,[r(1,1)],_)])].
 

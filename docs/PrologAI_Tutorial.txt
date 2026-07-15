@@ -3331,9 +3331,9 @@ LOADING THE EPHEMERA PACK
 
 EVALUATING A PROLOG GOAL WITH A TIMEOUT
 
-ep_eval(+GoalTerm, +TimeoutSecs, -EvalResult)
+ephemera_eval(+GoalTerm, +TimeoutSecs, -EvalResult)
 
-    ?- ep_eval((X is 3 * 7), 5, R).
+    ?- ephemera_eval((X is 3 * 7), 5, R).
     X = 21, R = success.
 
 Results: success, fail, timeout, or error(E).
@@ -3343,17 +3343,17 @@ Variable bindings in GoalTerm are preserved on success.
 
 EVALUATING PROLOG CODE WRITTEN AS AN ATOM
 
-ep_scratch(+CodeAtom, +VarBindings, +TimeoutSecs, -EvalResult)
+ephemera_scratch(+CodeAtom, +VarBindings, +TimeoutSecs, -EvalResult)
 
-    ?- ep_scratch('Y is 10 + 5', ['Y'=Y], 5, R).
+    ?- ephemera_scratch('Y is 10 + 5', ['Y'=Y], 5, R).
     Y = 15, R = success(['Y'=15]).
 
 
 RUNNING A SHELL COMMAND
 
-ep_shell(+Argv, +TimeoutSecs, -ShellResult)
+ephemera_shell(+Argv, +TimeoutSecs, -ShellResult)
 
-    ?- ep_shell(['echo', 'hello world'], 10, R).
+    ?- ephemera_shell(['echo', 'hello world'], 10, R).
     R = shell_result(0, 'hello world\n', '').
 
 Result: shell_result(ExitCode, Stdout, Stderr).
@@ -3361,11 +3361,11 @@ Result: shell_result(ExitCode, Stdout, Stderr).
 
 RUNNING A SCRIPT IN ANOTHER LANGUAGE
 
-ep_ephemeral(+Language, +Code, +TimeoutSecs, -ShellResult)
+ephemera_ephemeral(+Language, +Code, +TimeoutSecs, -ShellResult)
 
 Language: prolog, python, or bash.
 
-    ?- ep_ephemeral(python, 'import math\nprint(math.sqrt(144))', 10, R).
+    ?- ephemera_ephemeral(python, 'import math\nprint(math.sqrt(144))', 10, R).
     R = shell_result(0, '12.0\n', '').
 
 The temporary file is always deleted after the subprocess exits.
@@ -3373,7 +3373,7 @@ The temporary file is always deleted after the subprocess exits.
 
 ITERATION CYCLES: SYNTHESIZE, EXECUTE, CHECK
 
-ep_iterate(:SynthGoal, :ExecGoal, :CheckGoal, +MaxIter, -IterResult)
+ephemera_iterate(:SynthGoal, :ExecGoal, :CheckGoal, +MaxIter, -IterResult)
 
 Calls SynthGoal to produce Code, ExecGoal to run it, CheckGoal to verify the result.
 
@@ -3382,9 +3382,9 @@ Returns ok(Code, Result) or exhausted(Code, Result).
 
 TRACING EXECUTION SEQUENCES
 
-    ?- ep_next_trace_id(TId).
-    ?- ep_trace_record(TId, 1, 'X is 1', success).
-    ?- ep_trace_get(TId, Entries).
+    ?- ephemera_next_trace_id(TId).
+    ?- ephemera_trace_record(TId, 1, 'X is 1', success).
+    ?- ephemera_trace_get(TId, Entries).
 
 
 SKILL PERSISTENCE: NAMING AND REUSING USEFUL EPHEMERA
@@ -3393,49 +3393,49 @@ An ephemeron that proves useful during execution does not have to stay ephemeral
 
 If the same computation is likely to be needed again, it can be saved as a named skill and retrieved later without re-synthesis.
 
-ep_skill_save/4 saves a named skill with a description.
+ephemera_skill_save/4 saves a named skill with a description.
 
 % Save a Python greeting skill.
-ep_skill_save(greet, python, 'print("Hello from Mentova")',
+ephemera_skill_save(greet, python, 'print("Hello from Mentova")',
               'Print a greeting from Mentova').
 
-ep_skill_lookup/3 retrieves the language and code for a named skill.
+ephemera_skill_lookup/3 retrieves the language and code for a named skill.
 
-ep_skill_lookup(greet, Lang, Code).
+ephemera_skill_lookup(greet, Lang, Code).
 % Lang = python, Code = 'print("Hello from Mentova")'
 
-ep_skill_run/3 retrieves and executes a skill by name.
+ephemera_skill_run/3 retrieves and executes a skill by name.
 
-ep_skill_run(greet, 10, shell_result(0, Out, _)).
+ephemera_skill_run(greet, 10, shell_result(0, Out, _)).
 % Out = 'Hello from Mentova\n'
 
-ep_skill_list/1 returns all saved skills as skill(Name, Language, Description) terms.
+ephemera_skill_list/1 returns all saved skills as skill(Name, Language, Description) terms.
 
-ep_skill_list(Skills).
+ephemera_skill_list(Skills).
 % Skills = [skill(greet, python, 'Print a greeting from Mentova')]
 
-ep_skill_forget/1 removes a saved skill by name.
+ephemera_skill_forget/1 removes a saved skill by name.
 
-ep_skill_forget(greet).
+ephemera_skill_forget(greet).
 
-Skills persist for the lifetime of the session in the dynamic fact ep_skill_db/4.
+Skills persist for the lifetime of the session in the dynamic fact ephemera_skill_db/4.
 
 
 SUMMARY
 
-ep_eval/3             Evaluate a Prolog goal term with timeout.
-ep_scratch/4          Evaluate Prolog source written as an atom.
-ep_shell/3            Run any shell command and capture output.
-ep_ephemeral/4        Write a script to a temp file, run it, delete it.
-ep_iterate/5          Synthesize-execute-check loop with step budget.
-ep_trace_record/4     Record one step to a trace log.
-ep_trace_get/2        Retrieve all entries for a trace.
-ep_next_trace_id/1    Allocate a fresh unique trace identifier.
-ep_skill_save/4       Save a useful ephemeron as a named, reusable skill.
-ep_skill_lookup/3     Retrieve a saved skill's language and code by name.
-ep_skill_run/3        Execute a saved skill by name.
-ep_skill_list/1       List all saved skills.
-ep_skill_forget/1     Remove a saved skill by name.
+ephemera_eval/3             Evaluate a Prolog goal term with timeout.
+ephemera_scratch/4          Evaluate Prolog source written as an atom.
+ephemera_shell/3            Run any shell command and capture output.
+ephemera_ephemeral/4        Write a script to a temp file, run it, delete it.
+ephemera_iterate/5          Synthesize-execute-check loop with step budget.
+ephemera_trace_record/4     Record one step to a trace log.
+ephemera_trace_get/2        Retrieve all entries for a trace.
+ephemera_next_trace_id/1    Allocate a fresh unique trace identifier.
+ephemera_skill_save/4       Save a useful ephemeron as a named, reusable skill.
+ephemera_skill_lookup/3     Retrieve a saved skill's language and code by name.
+ephemera_skill_run/3        Execute a saved skill by name.
+ephemera_skill_list/1       List all saved skills.
+ephemera_skill_forget/1     Remove a saved skill by name.
 
 
 WHAT COMES NEXT
@@ -5397,78 +5397,78 @@ requires grid. Load with :- use_module(library(measure)).
 
 AREA AND BOUNDING BOX
 
-ms_area(+Region, -N)              - number of cells.
-ms_bbox(+Region, -bbox(R1,C1,R2,C2)) - tight bounding box.
-ms_bbox_size(+Region, -W, -H)    - bbox width and height.
+measure_area(+Region, -N)              - number of cells.
+measure_bbox(+Region, -bbox(R1,C1,R2,C2)) - tight bounding box.
+measure_bbox_size(+Region, -W, -H)    - bbox width and height.
 
-:- ms_area([r(0,0),r(0,1),r(1,0),r(1,1)], N). % N=4.
-:- ms_bbox([r(1,0),r(1,2)], B). % B=bbox(1,0,1,2).
+:- measure_area([r(0,0),r(0,1),r(1,0),r(1,1)], N). % N=4.
+:- measure_bbox([r(1,0),r(1,2)], B). % B=bbox(1,0,1,2).
 
 
 PERIMETER AND DIAMETER
 
-ms_perimeter(+Region, -P) - total exposed 4-connected edge faces.
-ms_diameter(+Region, -D)  - max Manhattan distance between any two cells.
+measure_perimeter(+Region, -P) - total exposed 4-connected edge faces.
+measure_diameter(+Region, -D)  - max Manhattan distance between any two cells.
 
-:- ms_perimeter([r(0,0)], P). % P=4 (single cell, 4 exposed faces).
-:- ms_diameter([r(0,0),r(0,3)], D). % D=3.
+:- measure_perimeter([r(0,0)], P). % P=4 (single cell, 4 exposed faces).
+:- measure_diameter([r(0,0),r(0,3)], D). % D=3.
 
 
 EXTENT AND ASPECT
 
-ms_extent(+Region, -N, -D) - N=area, D=bbox_area. Fill ratio = N/D.
-ms_aspect(+Region, -N, -D) - N=max(W,H), D=min(W,H). Square has N=D.
+measure_extent(+Region, -N, -D) - N=area, D=bbox_area. Fill ratio = N/D.
+measure_aspect(+Region, -N, -D) - N=max(W,H), D=min(W,H). Square has N=D.
 
-:- ms_extent([r(0,0),r(1,0),r(1,1)], N, D). % N=3, D=4 (L-shape).
-:- ms_aspect([r(1,0),r(1,1),r(1,2)], N, D). % N=3, D=1 (hline).
+:- measure_extent([r(0,0),r(1,0),r(1,1)], N, D). % N=3, D=4 (L-shape).
+:- measure_aspect([r(1,0),r(1,1),r(1,2)], N, D). % N=3, D=1 (hline).
 
 
 SPANS AND CENTROID
 
-ms_row_span(+Region, -S) - distinct row count.
-ms_col_span(+Region, -S) - distinct column count.
-ms_centroid(+Region, -AR, -AC) - integer floor average row and column.
+measure_row_span(+Region, -S) - distinct row count.
+measure_col_span(+Region, -S) - distinct column count.
+measure_centroid(+Region, -AR, -AC) - integer floor average row and column.
 
-:- ms_row_span([r(0,0),r(1,0),r(2,0)], S). % S=3 (vline).
-:- ms_centroid([r(0,0),r(2,2)], AR, AC). % AR=1, AC=1.
+:- measure_row_span([r(0,0),r(1,0),r(2,0)], S). % S=3 (vline).
+:- measure_centroid([r(0,0),r(2,2)], AR, AC). % AR=1, AC=1.
 
 
 RADIUS
 
-ms_radius(+Region, -Rad)
+measure_radius(+Region, -Rad)
   Max Chebyshev distance from centroid to any cell.
   Chebyshev(r(R1,C1), r(R2,C2)) = max(|R1-R2|, |C1-C2|).
 
-:- ms_radius([r(0,0),r(0,1),r(0,2)], R). % R=1.
+:- measure_radius([r(0,0),r(0,1),r(0,2)], R). % R=1.
 
 
 INTERIOR AND BORDER
 
-ms_interior_count(+Region, -N) - cells with all 4 neighbors inside region.
-ms_border_count(+Region, -N)   - cells with at least one neighbor outside.
+measure_interior_count(+Region, -N) - cells with all 4 neighbors inside region.
+measure_border_count(+Region, -N)   - cells with at least one neighbor outside.
 Invariant: interior + border = area.
 
 Sq3 = [r(0,0)..r(2,2)] (3x3 square).
-:- ms_interior_count(Sq3, N). % N=1 (center only).
-:- ms_border_count(Sq3, N).   % N=8.
+:- measure_interior_count(Sq3, N). % N=1 (center only).
+:- measure_border_count(Sq3, N).   % N=8.
 
 
 COLOR COUNT
 
-ms_color_count(+Grid, -N) - distinct integer values in the grid.
+measure_color_count(+Grid, -N) - distinct integer values in the grid.
 
-:- ms_color_count([[0,1,2],[0,1,2]], N). % N=3.
+:- measure_color_count([[0,1,2],[0,1,2]], N). % N=3.
 
 
 PREDICATE SUMMARY
 
-Shape:    ms_area/2, ms_bbox/2, ms_bbox_size/3
-Edge:     ms_perimeter/2, ms_diameter/2
-Fill:     ms_extent/3, ms_aspect/3
-Layout:   ms_row_span/2, ms_col_span/2
-Center:   ms_centroid/3, ms_radius/2
-Topology: ms_interior_count/2, ms_border_count/2
-Grid:     ms_color_count/2
+Shape:    measure_area/2, measure_bbox/2, measure_bbox_size/3
+Edge:     measure_perimeter/2, measure_diameter/2
+Fill:     measure_extent/3, measure_aspect/3
+Layout:   measure_row_span/2, measure_col_span/2
+Center:   measure_centroid/3, measure_radius/2
+Topology: measure_interior_count/2, measure_border_count/2
+Grid:     measure_color_count/2
 
 END OF CHAPTER 33
 END OF CHAPTER 33 AND END OF THE PROLOGAI TUTORIAL
@@ -7305,7 +7305,7 @@ LOADING
 
 FLOOD FILL
 
-  cc_flood4(+Grid, +r(R0,C0), +Color, -Region)
+  connect_flood4(+Grid, +r(R0,C0), +Color, -Region)
 
   Find all cells with Color reachable from r(R0,C0) through
   4-connected (up/down/left/right) steps.
@@ -7313,25 +7313,25 @@ FLOOD FILL
   Example:
 
     G = [[1,1,0],[1,0,0],[0,0,1]].
-    cc_flood4(G, r(0,0), 1, R).
+    connect_flood4(G, r(0,0), 1, R).
     % R = [r(1,0), r(0,1), r(0,0)]  (order depends on DFS)
 
   If the seed cell does not have Color, Region = [].
 
-  cc_flood8(+Grid, +r(R0,C0), +Color, -Region)
+  connect_flood8(+Grid, +r(R0,C0), +Color, -Region)
 
-  Same as cc_flood4 but allows diagonal steps (8-connected).
+  Same as connect_flood4 but allows diagonal steps (8-connected).
 
   Example:
 
     G = [[1,0,0],[0,1,0],[0,0,1]].
-    cc_flood8(G, r(0,0), 1, R).
+    connect_flood8(G, r(0,0), 1, R).
     % R contains r(0,0), r(1,1), r(2,2) -- diagonal chain connected.
 
 
 CONNECTED COMPONENTS
 
-  cc_components4(+Grid, +Color, -Components)
+  connect_components4(+Grid, +Color, -Components)
 
   Components is the list of all 4-connected regions of Color.
   Each element is a list of r(R,C) cells.
@@ -7339,63 +7339,63 @@ CONNECTED COMPONENTS
   Example:
 
     G = [[1,0,1],[0,0,0],[1,0,1]].
-    cc_components4(G, 1, Comps).
+    connect_components4(G, 1, Comps).
     % Comps = [[r(0,0)], [r(0,2)], [r(2,0)], [r(2,2)]]
     % (order may vary)
 
-  cc_components8(+Grid, +Color, -Components)
+  connect_components8(+Grid, +Color, -Components)
 
   Same using 8-connected adjacency.
 
-  cc_count4(+Grid, +Color, -N)
-  cc_count8(+Grid, +Color, -N)
+  connect_count4(+Grid, +Color, -N)
+  connect_count8(+Grid, +Color, -N)
 
   N is the number of connected components.
 
   Example:
 
     G = [[1,0,1],[0,0,0],[1,0,1]].
-    cc_count4(G, 1, N).  % N = 4
-    cc_count8(G, 1, N).  % N = 4 (no diagonal links between corners)
+    connect_count4(G, 1, N).  % N = 4
+    connect_count8(G, 1, N).  % N = 4 (no diagonal links between corners)
 
-  cc_sizes4(+Grid, +Color, -Sizes)
-  cc_sizes8(+Grid, +Color, -Sizes)
+  connect_sizes4(+Grid, +Color, -Sizes)
+  connect_sizes8(+Grid, +Color, -Sizes)
 
   Sizes is the msort-ascending list of component sizes.
 
   Example:
 
     G = [[1,1,0],[1,0,0],[0,0,1]].
-    cc_sizes4(G, 1, S).  % S = [1, 3]
+    connect_sizes4(G, 1, S).  % S = [1, 3]
 
 
 FINDING LARGEST AND SMALLEST COMPONENTS
 
-  cc_largest4(+Grid, +Color, -Largest)
-  cc_largest8(+Grid, +Color, -Largest)
+  connect_largest4(+Grid, +Color, -Largest)
+  connect_largest8(+Grid, +Color, -Largest)
 
   Largest is the biggest connected component. Fails if no cells
   of Color exist.
 
-  cc_smallest4(+Grid, +Color, -Smallest)
+  connect_smallest4(+Grid, +Color, -Smallest)
 
   Smallest is the smallest non-empty component.
 
   Example:
 
     G = [[1,1,0],[1,0,0],[0,0,1]].
-    cc_largest4(G, 1, L).   % L = [r(0,0), r(0,1), r(1,0)]
-    cc_smallest4(G, 1, S).  % S = [r(2,2)]
+    connect_largest4(G, 1, L).   % L = [r(0,0), r(0,1), r(1,0)]
+    connect_smallest4(G, 1, S).  % S = [r(2,2)]
 
 
 REGION TOPOLOGY
 
-  cc_border_cells(+Grid, +Region, -Border)
+  connect_border_cells(+Grid, +Region, -Border)
 
   Border is the subset of Region where at least one 4-neighbor
   is either out of the grid bounds or not in Region.
 
-  cc_interior_cells(+Grid, +Region, -Interior)
+  connect_interior_cells(+Grid, +Region, -Interior)
 
   Interior is the subset of Region where all 4-neighbors are
   in bounds AND in Region. Grid-edge cells are never interior.
@@ -7403,14 +7403,14 @@ REGION TOPOLOGY
   Example:
 
     G = [[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]].
-    cc_components4(G, 1, [All]).
-    cc_border_cells(G, All, Border).    % 16 cells (outer ring)
-    cc_interior_cells(G, All, Interior). % 9 cells (inner 3x3)
+    connect_components4(G, 1, [All]).
+    connect_border_cells(G, All, Border).    % 16 cells (outer ring)
+    connect_interior_cells(G, All, Interior). % 9 cells (inner 3x3)
 
 
 ENCLOSED CELLS
 
-  cc_enclosed(+Grid, +BG, -Enclosed)
+  connect_enclosed(+Grid, +BG, -Enclosed)
 
   Enclosed is the list of BG-colored cells that are completely
   surrounded by non-BG cells -- they cannot be reached from any
@@ -7421,11 +7421,11 @@ ENCLOSED CELLS
   Example:
 
     G = [[1,1,1],[1,0,1],[1,1,1]].  % ring of 1s
-    cc_enclosed(G, 0, Enclosed).
+    connect_enclosed(G, 0, Enclosed).
     % Enclosed = [r(1,1)]   -- the center 0 is trapped inside.
 
     G = [[1,0,1],[0,0,0],[1,0,1]].  % isolated 1s
-    cc_enclosed(G, 0, Enclosed).
+    connect_enclosed(G, 0, Enclosed).
     % Enclosed = []          -- all 0s reach the border.
 
 
@@ -7434,15 +7434,15 @@ COMBINING WITH OTHER PACKS
 The connect pack integrates with spatial, lookup, and fill packs:
 
   % Find the largest blob and fill it with color 3.
-  cc_largest4(Grid, 1, Blob),
+  connect_largest4(Grid, 1, Blob),
   fill_fill_region(Grid, Blob, 3, NewGrid).
 
   % Find enclosed holes and index their positions.
-  cc_enclosed(Grid, 0, Holes),
+  connect_enclosed(Grid, 0, Holes),
   lk_position_color(Grid, 0, PosMap).
 
   % Count isolated cells (components of size 1).
-  cc_sizes4(Grid, 1, Sizes),
+  connect_sizes4(Grid, 1, Sizes),
   include(==(1), Sizes, SingleCells),
   length(SingleCells, IsolatedCount).
 
@@ -7600,7 +7600,7 @@ COMBINING WITH OTHER PACKS
 The morph pack integrates naturally with the connect and fill packs:
 
   % Find the outline (boundary) of the largest connected region.
-  cc_largest4(Grid, 1, Blob),
+  connect_largest4(Grid, 1, Blob),
   fill_fill_region(Grid, Blob, 1, BlobGrid),
   mo_boundary4(BlobGrid, 1, Outline).
 
@@ -7754,7 +7754,7 @@ COMBINING WITH OTHER PACKS
 The rewrite pack integrates naturally with the connect, morph, and induction packs:
 
   % Recolor all cells belonging to the largest connected blob.
-  cc_largest4(Grid, 1, BlobRegion),
+  connect_largest4(Grid, 1, BlobRegion),
   rewrite_set_region(Grid, BlobRegion, 2, Grid2).
 
   % Normalize colors after a morphological transformation.
@@ -8287,7 +8287,7 @@ Grid Inventory
 obj_inventory(+Grid, +Color, -Objects)
 
   Objects is the list of all 4-connected objects of Color in Grid.
-  Uses the connect pack's cc_components4/3 internally.
+  Uses the connect pack's connect_components4/3 internally.
 
   Grid = [[1,1,0],[1,0,1]],
   obj_inventory(Grid, 1, Objs).
@@ -11785,18 +11785,18 @@ identical. The predicates use the sr_* prefix. Load the pack with:
 
 79.1 Testing Single Rows and Columns
 
-sr_uniform_row(+Grid, +R, -Color) succeeds if row R (0-based) has all cells
+stripe_uniform_row(+Grid, +R, -Color) succeeds if row R (0-based) has all cells
 equal to Color:
 
-  ?- sr_uniform_row([[5,5,5],[1,2,3]], 0, C).
+  ?- stripe_uniform_row([[5,5,5],[1,2,3]], 0, C).
   C = 5.
 
-  ?- sr_uniform_row([[5,5,5],[1,2,3]], 1, C).
+  ?- stripe_uniform_row([[5,5,5],[1,2,3]], 1, C).
   false.
 
-sr_uniform_col(+Grid, +C, -Color) tests a column:
+stripe_uniform_col(+Grid, +C, -Color) tests a column:
 
-  ?- sr_uniform_col([[5,0,0],[5,1,2],[5,2,3]], 0, C).
+  ?- stripe_uniform_col([[5,0,0],[5,1,2],[5,2,3]], 0, C).
   C = 5.
 
 Both predicates fail immediately when the target row or column contains two or
@@ -11805,15 +11805,15 @@ more distinct values.
 
 79.2 Finding All Uniform Rows or Columns of a Color
 
-sr_uniform_rows(+Grid, +Color, -Rows) returns the sorted list of row indices
+stripe_uniform_rows(+Grid, +Color, -Rows) returns the sorted list of row indices
 where every cell equals Color:
 
-  ?- sr_uniform_rows([[0,0],[1,2],[0,0]], 0, Rs).
+  ?- stripe_uniform_rows([[0,0],[1,2],[0,0]], 0, Rs).
   Rs = [0, 2].
 
-sr_uniform_cols(+Grid, +Color, -Cols) does the same for columns:
+stripe_uniform_cols(+Grid, +Color, -Cols) does the same for columns:
 
-  ?- sr_uniform_cols([[0,1,0],[0,2,0],[0,3,0]], 0, Cs).
+  ?- stripe_uniform_cols([[0,1,0],[0,2,0],[0,3,0]], 0, Cs).
   Cs = [0, 2].
 
 If no row or column matches, the result is the empty list.
@@ -11821,17 +11821,17 @@ If no row or column matches, the result is the empty list.
 
 79.3 Finding All Stripes (Any Color)
 
-sr_all_stripe_rows(+Grid, -Pairs) returns R-Color pairs for all uniform rows:
+stripe_all_stripe_rows(+Grid, -Pairs) returns R-Color pairs for all uniform rows:
 
-  ?- sr_all_stripe_rows([[5,5],[1,2],[3,3]], Pairs).
+  ?- stripe_all_stripe_rows([[5,5],[1,2],[3,3]], Pairs).
   Pairs = [0-5, 2-3].
 
 Only rows 0 and 2 are uniform; row 1 contains two distinct values and is
 omitted. The pairs are in ascending row-index order.
 
-sr_all_stripe_cols(+Grid, -Pairs) does the same for columns:
+stripe_all_stripe_cols(+Grid, -Pairs) does the same for columns:
 
-  ?- sr_all_stripe_cols([[0,1],[0,2],[0,3]], Pairs).
+  ?- stripe_all_stripe_cols([[0,1],[0,2],[0,3]], Pairs).
   Pairs = [0-0].
 
 Only column 0 is uniform; columns 1 and 2 are not.
@@ -11839,16 +11839,16 @@ Only column 0 is uniform; columns 1 and 2 are not.
 
 79.4 Finding Non-Uniform Rows and Columns
 
-sr_mixed_rows(+Grid, -Rows) returns row indices that are NOT uniform:
+stripe_mixed_rows(+Grid, -Rows) returns row indices that are NOT uniform:
 
-  ?- sr_mixed_rows([[0,0],[1,2],[3,3]], Rs).
+  ?- stripe_mixed_rows([[0,0],[1,2],[3,3]], Rs).
   Rs = [1].
 
 Only row 1 has two distinct values; rows 0 and 2 are uniform and excluded.
 
-sr_mixed_cols(+Grid, -Cols) does the same for columns:
+stripe_mixed_cols(+Grid, -Cols) does the same for columns:
 
-  ?- sr_mixed_cols([[0,1],[0,2]], Cs).
+  ?- stripe_mixed_cols([[0,1],[0,2]], Cs).
   Cs = [1].
 
 The mixed rows and mixed columns always complement the uniform ones:
@@ -11857,15 +11857,15 @@ every index appears in exactly one of the two result lists.
 
 79.5 Filling a Single Row or Column
 
-sr_fill_row(+Grid, +R, +Color, -Result) returns Grid with row R replaced by
+stripe_fill_row(+Grid, +R, +Color, -Result) returns Grid with row R replaced by
 an all-Color row:
 
-  ?- sr_fill_row([[1,2,3],[4,5,6]], 0, 0, R).
+  ?- stripe_fill_row([[1,2,3],[4,5,6]], 0, 0, R).
   R = [[0,0,0],[4,5,6]].
 
-sr_fill_col(+Grid, +C, +Color, -Result) fills a column:
+stripe_fill_col(+Grid, +C, +Color, -Result) fills a column:
 
-  ?- sr_fill_col([[1,2],[3,4]], 1, 9, R).
+  ?- stripe_fill_col([[1,2],[3,4]], 1, 9, R).
   R = [[1,9],[3,9]].
 
 Both predicates leave all other cells unchanged.
@@ -11873,14 +11873,14 @@ Both predicates leave all other cells unchanged.
 
 79.6 Filling Multiple Rows or Columns
 
-sr_fill_rows(+Grid, +Rows, +Color, -Result) fills every row index in Rows:
+stripe_fill_rows(+Grid, +Rows, +Color, -Result) fills every row index in Rows:
 
-  ?- sr_fill_rows([[1,2],[3,4],[5,6]], [0,2], 0, R).
+  ?- stripe_fill_rows([[1,2],[3,4],[5,6]], [0,2], 0, R).
   R = [[0,0],[3,4],[0,0]].
 
-sr_fill_cols(+Grid, +Cols, +Color, -Result) fills multiple columns:
+stripe_fill_cols(+Grid, +Cols, +Color, -Result) fills multiple columns:
 
-  ?- sr_fill_cols([[1,2,3],[4,5,6]], [0,2], 9, R).
+  ?- stripe_fill_cols([[1,2,3],[4,5,6]], [0,2], 9, R).
   R = [[9,2,9],[9,5,9]].
 
 Passing an empty list leaves the grid unchanged.
@@ -11888,24 +11888,24 @@ Passing an empty list leaves the grid unchanged.
 
 79.7 Row-Column Intersections
 
-sr_cross_cells(+Grid, +Rows, +Cols, -Cells) returns r(R,C) terms for every
+stripe_cross_cells(+Grid, +Rows, +Cols, -Cells) returns r(R,C) terms for every
 pair in the Cartesian product of Rows x Cols:
 
-  ?- sr_cross_cells([[0,1,2],[3,4,5],[6,7,8]], [0,2], [1,2], Cells).
+  ?- stripe_cross_cells([[0,1,2],[3,4,5],[6,7,8]], [0,2], [1,2], Cells).
   Cells = [r(0,1), r(0,2), r(2,1), r(2,2)].
 
 Cells are in row-major order (all columns for the first row, then all columns
 for the second row, and so on). The grid argument is accepted for API
 consistency but is not used; the result depends only on Rows and Cols.
 
-sr_cross_fill(+Grid, +Rows, +Cols, +Color, -Result) fills all cells at the
+stripe_cross_fill(+Grid, +Rows, +Cols, +Color, -Result) fills all cells at the
 Rows x Cols intersections, as well as the rest of each listed row and column:
 
-  ?- sr_cross_fill([[1,2,3],[4,5,6],[7,8,9]], [1], [1], 0, R).
+  ?- stripe_cross_fill([[1,2,3],[4,5,6],[7,8,9]], [1], [1], 0, R).
   R = [[1,0,3],[0,0,0],[7,0,9]].
 
 Row 1 and column 1 are both filled with 0. The intersection r(1,1) is also 0.
-This is because sr_cross_fill first fills the listed rows, then fills the
+This is because stripe_cross_fill first fills the listed rows, then fills the
 listed columns.
 
 
@@ -11915,9 +11915,9 @@ This example finds all rows and columns that are a specific "separator" color
 and marks them, then identifies the remaining mixed rows:
 
   mark_separators(Grid, SepColor, Marked) :-
-      sr_uniform_rows(Grid, SepColor, SepRows),
-      sr_uniform_cols(Grid, SepColor, SepCols),
-      sr_cross_fill(Grid, SepRows, SepCols, SepColor, Marked).
+      stripe_uniform_rows(Grid, SepColor, SepRows),
+      stripe_uniform_cols(Grid, SepColor, SepCols),
+      stripe_cross_fill(Grid, SepRows, SepCols, SepColor, Marked).
 
   ?- mark_separators([[0,1,0],[0,0,0],[0,2,0]], 0, Marked).
   Marked = [[0,0,0],[0,0,0],[0,0,0]].
@@ -11931,20 +11931,20 @@ After filling those, the entire grid becomes 0.
 The stripe pack provides the basic vocabulary for row and column stripe
 analysis:
 
-  sr_uniform_row/3     - row R is all Color (test)
-  sr_uniform_col/3     - column C is all Color (test)
-  sr_uniform_rows/3    - sorted row indices uniformly Color
-  sr_uniform_cols/3    - sorted column indices uniformly Color
-  sr_all_stripe_rows/2 - R-Color pairs for all uniform rows
-  sr_all_stripe_cols/2 - C-Color pairs for all uniform columns
-  sr_mixed_rows/2      - sorted row indices NOT uniform
-  sr_mixed_cols/2      - sorted column indices NOT uniform
-  sr_fill_row/4        - fill row R with Color
-  sr_fill_col/4        - fill column C with Color
-  sr_fill_rows/4       - fill multiple rows with Color
-  sr_fill_cols/4       - fill multiple columns with Color
-  sr_cross_cells/4     - r(R,C) at Rows x Cols Cartesian product
-  sr_cross_fill/5      - fill all Rows x Cols intersections with Color
+  stripe_uniform_row/3     - row R is all Color (test)
+  stripe_uniform_col/3     - column C is all Color (test)
+  stripe_uniform_rows/3    - sorted row indices uniformly Color
+  stripe_uniform_cols/3    - sorted column indices uniformly Color
+  stripe_all_stripe_rows/2 - R-Color pairs for all uniform rows
+  stripe_all_stripe_cols/2 - C-Color pairs for all uniform columns
+  stripe_mixed_rows/2      - sorted row indices NOT uniform
+  stripe_mixed_cols/2      - sorted column indices NOT uniform
+  stripe_fill_row/4        - fill row R with Color
+  stripe_fill_col/4        - fill column C with Color
+  stripe_fill_rows/4       - fill multiple rows with Color
+  stripe_fill_cols/4       - fill multiple columns with Color
+  stripe_cross_cells/4     - r(R,C) at Rows x Cols Cartesian product
+  stripe_cross_fill/5      - fill all Rows x Cols intersections with Color
 
 END OF CHAPTER 79
 Chapter 80: Diagonal Line Extraction and Filling - The Diagonal Pack
@@ -16135,82 +16135,82 @@ fold.
 
 Predicates:
 
-fd_split_h(+Grid, +R, -Top, -Bottom)
+fold_split_h(+Grid, +R, -Top, -Bottom)
   Top = rows 0..R (length R+1). Bottom = rows R+1..H-1.
 
-fd_split_v(+Grid, +C, -Left, -Right)
+fold_split_v(+Grid, +C, -Left, -Right)
   Left = cols 0..C per row. Right = cols C+1..W-1 per row.
 
-fd_overlay(+A, +B, +Bg, -Out)
+fold_overlay(+A, +B, +Bg, -Out)
   Out[R][C] = A[R][C] when A[R][C] != Bg; else Out[R][C] = B[R][C].
 
-fd_fold_h(+Grid, +R, +Bg, -Out)
+fold_fold_h(+Grid, +R, +Bg, -Out)
   Fold bottom half upward; crease after row R.
   Out[I] = overlay(Top[I], Bottom[R-I], Bg) when R-I < len(Bottom).
 
-fd_fold_v(+Grid, +C, +Bg, -Out)
+fold_fold_v(+Grid, +C, +Bg, -Out)
   Fold right half leftward; crease after col C.
   Out[row][I] = overlay(Left[row][I], Right[row][C-I], Bg) when C-I < len(Right_row).
 
-fd_unfold_h(+Half, -Grid)
+fold_unfold_h(+Half, -Grid)
   Grid = append(Half, reverse_rows(Half)). Height = 2 * height(Half).
 
-fd_unfold_v(+Half, -Grid)
+fold_unfold_v(+Half, -Grid)
   Grid[R] = append(Half[R], reverse(Half[R])). Width = 2 * width(Half).
 
-fd_sym_h(+Grid, +R)
+fold_sym_h(+Grid, +R)
   Succeed if Grid is symmetric under horizontal fold with crease after row R.
-  Mirror formula: row I maps to row (2R+1-I). Consistent with fd_fold_h.
+  Mirror formula: row I maps to row (2R+1-I). Consistent with fold_fold_h.
 
-fd_sym_v(+Grid, +C)
+fold_sym_v(+Grid, +C)
   Succeed if Grid is symmetric under vertical fold with crease after col C.
-  Mirror formula: col J maps to col (2C+1-J). Consistent with fd_fold_v.
+  Mirror formula: col J maps to col (2C+1-J). Consistent with fold_fold_v.
 
-fd_find_fold_h(+Grid, -R)
-  First R in [0,H-1] such that fd_sym_h(Grid, R) succeeds.
+fold_find_fold_h(+Grid, -R)
+  First R in [0,H-1] such that fold_sym_h(Grid, R) succeeds.
 
-fd_find_fold_v(+Grid, -C)
-  First C in [0,W-1] such that fd_sym_v(Grid, C) succeeds.
+fold_find_fold_v(+Grid, -C)
+  First C in [0,W-1] such that fold_sym_v(Grid, C) succeeds.
 
-fd_mark_row(+Grid, +V, -R)
+fold_mark_row(+Grid, +V, -R)
   R = first row index where every cell equals V.
 
-fd_mark_col(+Grid, +V, -C)
+fold_mark_col(+Grid, +V, -C)
   C = first column index where every cell equals V.
 
-fd_fold_both(+Grid, +R, +C, +Bg, -Out)
-  fd_fold_h at R, then fd_fold_v at C. Output: height R+1, width C+1.
+fold_fold_both(+Grid, +R, +C, +Bg, -Out)
+  fold_fold_h at R, then fold_fold_v at C. Output: height R+1, width C+1.
 
 Usage examples:
 
-fd_split_h([[a,b],[c,d],[e,f],[g,h]], 1, Top, Bottom).
+fold_split_h([[a,b],[c,d],[e,f],[g,h]], 1, Top, Bottom).
 %  Top = [[a,b],[c,d]], Bottom = [[e,f],[g,h]]
 
-fd_overlay([[0,1],[2,0]], [[9,9],[9,9]], 0, Out).
+fold_overlay([[0,1],[2,0]], [[9,9],[9,9]], 0, Out).
 %  Out = [[9,1],[2,9]]
 
-fd_fold_h([[0,0],[0,7],[5,0]], 1, 0, Out).
+fold_fold_h([[0,0],[0,7],[5,0]], 1, 0, Out).
 %  Out = [[0,0],[5,7]]
 
-fd_fold_v([[0,0,3],[0,5,0]], 1, 0, Out).
+fold_fold_v([[0,0,3],[0,5,0]], 1, 0, Out).
 %  Out = [[0,3],[0,5]]
 
-fd_unfold_h([[1,2],[3,4]], Grid).
+fold_unfold_h([[1,2],[3,4]], Grid).
 %  Grid = [[1,2],[3,4],[3,4],[1,2]]
 
-fd_unfold_v([[1,2],[3,4]], Grid).
+fold_unfold_v([[1,2],[3,4]], Grid).
 %  Grid = [[1,2,2,1],[3,4,4,3]]
 
-fd_sym_h([[1,2],[3,4],[3,4],[1,2]], 1).   % succeeds
-fd_sym_v([[1,2,2,1],[3,4,4,3]], 1).       % succeeds
+fold_sym_h([[1,2],[3,4],[3,4],[1,2]], 1).   % succeeds
+fold_sym_v([[1,2,2,1],[3,4,4,3]], 1).       % succeeds
 
-fd_find_fold_h([[a,b],[c,d],[c,d],[a,b]], R).  % R = 1
-fd_find_fold_v([[1,2,2,1],[3,4,4,3]], C).      % C = 1
+fold_find_fold_h([[a,b],[c,d],[c,d],[a,b]], R).  % R = 1
+fold_find_fold_v([[1,2,2,1],[3,4,4,3]], C).      % C = 1
 
-fd_mark_row([[1,2],[9,9],[3,4]], 9, R).  % R = 1
-fd_mark_col([[1,0,2],[3,0,4]], 0, C).    % C = 1
+fold_mark_row([[1,2],[9,9],[3,4]], 9, R).  % R = 1
+fold_mark_col([[1,0,2],[3,0,4]], 0, C).    % C = 1
 
-fd_fold_both([[1,2,3],[4,5,6],[7,8,9]], 0, 0, 0, Out).  % Out = [[1]]
+fold_fold_both([[1,2,3],[4,5,6],[7,8,9]], 0, 0, 0, Out).  % Out = [[1]]
 
 Library imports: library(lists): member/2, nth0/3, append/2, append/3, reverse/2.
 Library imports: library(apply): maplist/3, maplist/4.
@@ -18702,23 +18702,23 @@ recoloring, color mapping, binary thresholding, and dominant color detection.
 :- use_module(pack(gridcolor/prolog/gridcolor)).
 
 % Count red cells:
-gc_count([[r,r,x],[r,x,b],[x,x,r]], r, N). % N = 4
+gridcolor_count([[r,r,x],[r,x,b],[x,x,r]], r, N). % N = 4
 
 % Histogram:
-gc_histogram([[r,x],[r,r]], Pairs). % Pairs = [r-3, x-1]
+gridcolor_histogram([[r,x],[r,r]], Pairs). % Pairs = [r-3, x-1]
 
 % Recolor x to background:
-gc_recolor([[r,x],[x,r]], x, bg, R). % R = [[r,bg],[bg,r]]
+gridcolor_recolor([[r,x],[x,r]], x, bg, R). % R = [[r,bg],[bg,r]]
 
 % Color map (swap colors):
-gc_color_map([[r,g],[g,r]], [r-b, g-r], R). % R = [[b,r],[r,b]]
+gridcolor_color_map([[r,g],[g,r]], [r-b, g-r], R). % R = [[b,r],[r,b]]
 
 % Threshold: only red cells selected:
-gc_threshold([[r,x,b],[r,r,x]], [r], sel, bg, R).
+gridcolor_threshold([[r,x,b],[r,r,x]], [r], sel, bg, R).
 % R = [[sel,bg,bg],[sel,sel,bg]]
 
 % Most frequent non-background:
-gc_dominant([[x,r,x],[x,r,r]], x, Color). % Color = r
+gridcolor_dominant([[x,r,x],[x,r,r]], x, Color). % Color = r
 
 14 gc_* predicates. 44 tests pass. Layer 209.
 All 44 tests pass. See docs/tutorial/Ch191_GridColor.txt for the full chapter.
@@ -19480,21 +19480,21 @@ and manipulation: BFS cell enumeration, color/size/bbox query, binary mask,
 bounding-box extraction, full object inventory, count, largest/smallest
 selection, flood fill, enclosed-region fill, object removal, and movement.
 
-Predicates: gob_object_cells/4, gob_object_color/4, gob_object_size/4,
-gob_object_bbox/4, gob_object_mask/5, gob_extract_object/5, gob_all_objects/3,
-gob_object_count/3, gob_largest_object/3, gob_smallest_object/3,
-gob_flood_fill/5, gob_fill_enclosed/4, gob_remove_object/5, gob_move_object/7.
+Predicates: gridobj_object_cells/4, gridobj_object_color/4, gridobj_object_size/4,
+gridobj_object_bbox/4, gridobj_object_mask/5, gridobj_extract_object/5, gridobj_all_objects/3,
+gridobj_object_count/3, gridobj_largest_object/3, gridobj_smallest_object/3,
+gridobj_flood_fill/5, gridobj_fill_enclosed/4, gridobj_remove_object/5, gridobj_move_object/7.
 
-Key design: gob_bfs_ checks both Visited and the frontier tail (Rest) to prevent
-double-enqueueing. gob_fill_enclosed BFS-floods from all border Bg cells;
-unreachable Bg cells are enclosed. gob_move_object clips out-of-bounds cells.
+Key design: gridobj_bfs_ checks both Visited and the frontier tail (Rest) to prevent
+double-enqueueing. gridobj_fill_enclosed BFS-floods from all border Bg cells;
+unreachable Bg cells are enclosed. gridobj_move_object clips out-of-bounds cells.
 
 See docs/tutorial/Ch224_GridObj.txt for full details and examples.
 
 Chapter 225: gridgroupby - Grid Group-By Operations (ggb_*, Layer 243)
 
 The gridgroupby pack adds fourteen predicates for grouping, filtering, sorting,
-pairing, and counting ob(Color,Cells,BBox) object terms produced by gob_all_objects.
+pairing, and counting ob(Color,Cells,BBox) object terms produced by gridobj_all_objects.
 
 Predicates: gridgroupby_group_by_color/2, gridgroupby_group_by_size/2, gridgroupby_group_by_row/2,
 gridgroupby_group_by_col/2, gridgroupby_filter_by_color/3, gridgroupby_filter_by_size/3,
@@ -19512,7 +19512,7 @@ See docs/tutorial/Ch225_GridGroupBy.txt for full details and examples.
 Chapter 226: gridrelation - Grid Object Spatial Relations (grl_*, Layer 244)
 
 The gridrelation pack adds fourteen predicates for computing spatial relations
-between ob(Color,Cells,BBox) object terms from gob_all_objects.
+between ob(Color,Cells,BBox) object terms from gridobj_all_objects.
 
 Predicates: grl_touching/2, grl_adjacent/3, grl_min_distance/3, grl_above/2,
 grl_below/2, grl_left_of/2, grl_right_of/2, grl_bbox_contains/2,
@@ -19547,7 +19547,7 @@ Chapter 228: gridobjmatch - Object Matching and Change Detection (gom_*, Layer 2
 
 The gridobjmatch pack (Work Package 267, Layer 246) provides fourteen predicates for
 matching ob(Color,Cells,BBox) object terms between two lists and detecting what
-changed from one list to the other. Objects are produced by gob_all_objects/3 from
+changed from one list to the other. Objects are produced by gridobj_all_objects/3 from
 the gridobj pack.
 
 Predicates: gridobjmatch_match_color/3, gridobjmatch_match_nearest/3, gridobjmatch_match_size/3,
@@ -22670,7 +22670,7 @@ Key predicates:
   ms_motif_/2          - parse one motif rectangle with its anchor
   ms_lesson_/7         - one marker's offset-color-polarity lesson
   ms_ray_/6            - the ray cells cast by one motif
-  ms_row_/5            - rebuild one output row under the rays
+  measure_row_/5            - rebuild one output row under the rays
   arc2_transform(motif_shadow, +Grid, -Out)
   arc2_induce_rule(+Pairs, motif_shadow)
 

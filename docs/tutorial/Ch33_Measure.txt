@@ -11,134 +11,134 @@ Load the pack:
 
 Area
 
-ms_area/2 returns the number of cells in a region.
+measure_area/2 returns the number of cells in a region.
 
-    ?- ms_area([r(0,0), r(0,1), r(1,0), r(1,1)], N).
+    ?- measure_area([r(0,0), r(0,1), r(1,0), r(1,1)], N).
     N = 4.
 
 
 Bounding Box
 
-ms_bbox/2 returns the tight bounding box of a region as bbox(R1,C1,R2,C2)
+measure_bbox/2 returns the tight bounding box of a region as bbox(R1,C1,R2,C2)
 with inclusive row/col bounds.
 
-    ?- ms_bbox([r(1,0), r(1,1), r(1,2)], Box).
+    ?- measure_bbox([r(1,0), r(1,1), r(1,2)], Box).
     Box = bbox(1,0,1,2).
 
-ms_bbox_size/3 returns the width and height of the bounding box.
+measure_bbox_size/3 returns the width and height of the bounding box.
 
-    ?- ms_bbox_size([r(0,0), r(2,3)], W, H).
+    ?- measure_bbox_size([r(0,0), r(2,3)], W, H).
     W = 4, H = 3.
 
 
 Perimeter
 
-ms_perimeter/2 counts the total exposed 4-connected edge faces. Each cell
+measure_perimeter/2 counts the total exposed 4-connected edge faces. Each cell
 can contribute 0 to 4 exposed edges depending on how many of its 4 neighbors
 are outside the region.
 
-    ?- ms_perimeter([r(0,0)], P).
+    ?- measure_perimeter([r(0,0)], P).
     P = 4.          % single cell: all 4 faces exposed.
 
-    ?- ms_perimeter([r(0,0),r(0,1),r(1,0),r(1,1)], P).
+    ?- measure_perimeter([r(0,0),r(0,1),r(1,0),r(1,1)], P).
     P = 8.          % 2x2 square: each cell has 2 exposed faces.
 
 
 Diameter
 
-ms_diameter/2 returns the maximum Manhattan distance between any two cells
+measure_diameter/2 returns the maximum Manhattan distance between any two cells
 in the region.
 
-    ?- ms_diameter([r(0,0), r(0,3)], D).
+    ?- measure_diameter([r(0,0), r(0,3)], D).
     D = 3.
 
-    ?- ms_diameter([r(0,0)], D).
+    ?- measure_diameter([r(0,0)], D).
     D = 0.
 
 
 Extent and Aspect
 
-ms_extent/3 returns the area-to-bounding-box ratio as two integers N and D,
+measure_extent/3 returns the area-to-bounding-box ratio as two integers N and D,
 where N is the area and D is the bounding box area. A perfectly filled
 rectangle has N = D.
 
-    ?- ms_extent([r(0,0), r(1,0), r(1,1)], N, D).
+    ?- measure_extent([r(0,0), r(1,0), r(1,1)], N, D).
     N = 3, D = 4.   % L-shape: 3 cells in a 2x2 bounding box.
 
-ms_aspect/3 returns the aspect ratio as N/D where N = max(W,H) and
+measure_aspect/3 returns the aspect ratio as N/D where N = max(W,H) and
 D = min(W,H). A square has N = D.
 
-    ?- ms_aspect([r(1,0), r(1,1), r(1,2)], N, D).
+    ?- measure_aspect([r(1,0), r(1,1), r(1,2)], N, D).
     N = 3, D = 1.   % hline: 3 wide, 1 tall.
 
 
 Row and Column Spans
 
-ms_row_span/2 and ms_col_span/2 count the number of distinct rows and columns
+measure_row_span/2 and measure_col_span/2 count the number of distinct rows and columns
 occupied by the region.
 
-    ?- ms_row_span([r(0,1), r(1,1), r(2,1)], S).
+    ?- measure_row_span([r(0,1), r(1,1), r(2,1)], S).
     S = 3.          % vline occupies 3 distinct rows.
 
-    ?- ms_col_span([r(0,1), r(1,1), r(2,1)], S).
+    ?- measure_col_span([r(0,1), r(1,1), r(2,1)], S).
     S = 1.          % vline occupies 1 distinct column.
 
 
 Centroid and Radius
 
-ms_centroid/3 returns the integer floor centroid (average row and column).
+measure_centroid/3 returns the integer floor centroid (average row and column).
 
-    ?- ms_centroid([r(0,0), r(0,2), r(2,0), r(2,2)], R, C).
+    ?- measure_centroid([r(0,0), r(0,2), r(2,0), r(2,2)], R, C).
     R = 1, C = 1.
 
-ms_radius/2 returns the maximum Chebyshev distance from the centroid to any
+measure_radius/2 returns the maximum Chebyshev distance from the centroid to any
 cell in the region. The Chebyshev distance is max(|dR|, |dC|).
 
-    ?- ms_radius([r(0,0), r(0,1), r(0,2)], Rad).
+    ?- measure_radius([r(0,0), r(0,1), r(0,2)], Rad).
     Rad = 1.
 
 
 Interior and Border
 
-ms_interior_count/2 counts cells whose 4 neighbors are all inside the region.
-ms_border_count/2 counts cells with at least one 4-neighbor outside. These
+measure_interior_count/2 counts cells whose 4 neighbors are all inside the region.
+measure_border_count/2 counts cells with at least one 4-neighbor outside. These
 two counts always sum to the area.
 
     Sq3 = [r(0,0),r(0,1),r(0,2),r(1,0),r(1,1),r(1,2),r(2,0),r(2,1),r(2,2)].
-    ?- ms_interior_count(Sq3, N).
+    ?- measure_interior_count(Sq3, N).
     N = 1.     % only the center cell (1,1) has all 4 neighbors in the region.
 
-    ?- ms_border_count(Sq3, N).
+    ?- measure_border_count(Sq3, N).
     N = 8.     % the 8 surrounding cells are border cells.
 
 
 Color Count
 
-ms_color_count/2 counts the number of distinct integer values present in a
+measure_color_count/2 counts the number of distinct integer values present in a
 grid (list-of-lists).
 
-    ?- ms_color_count([[0,1,2],[0,1,2]], N).
+    ?- measure_color_count([[0,1,2],[0,1,2]], N).
     N = 3.
 
-    ?- ms_color_count([[0,0],[0,0]], N).
+    ?- measure_color_count([[0,0],[0,0]], N).
     N = 1.
 
 
 Exported Predicates
 
-ms_area/2          - cell count
-ms_bbox/2          - tight bounding box
-ms_bbox_size/3     - bounding box width and height
-ms_perimeter/2     - exposed 4-edge face count
-ms_diameter/2      - maximum Manhattan distance between any two cells
-ms_extent/3        - area/bbox_area as N/D
-ms_aspect/3        - max(W,H)/min(W,H) as N/D
-ms_row_span/2      - distinct row count
-ms_col_span/2      - distinct column count
-ms_centroid/3      - integer floor centroid
-ms_radius/2        - maximum Chebyshev distance from centroid
-ms_interior_count/2 - cells with all 4 neighbors inside region
-ms_border_count/2  - cells with at least one neighbor outside region
-ms_color_count/2   - distinct color values in a grid
+measure_area/2          - cell count
+measure_bbox/2          - tight bounding box
+measure_bbox_size/3     - bounding box width and height
+measure_perimeter/2     - exposed 4-edge face count
+measure_diameter/2      - maximum Manhattan distance between any two cells
+measure_extent/3        - area/bbox_area as N/D
+measure_aspect/3        - max(W,H)/min(W,H) as N/D
+measure_row_span/2      - distinct row count
+measure_col_span/2      - distinct column count
+measure_centroid/3      - integer floor centroid
+measure_radius/2        - maximum Chebyshev distance from centroid
+measure_interior_count/2 - cells with all 4 neighbors inside region
+measure_border_count/2  - cells with at least one neighbor outside region
+measure_color_count/2   - distinct color values in a grid
 
 END OF CHAPTER 33

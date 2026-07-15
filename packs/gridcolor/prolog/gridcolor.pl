@@ -1,18 +1,18 @@
 :- module(gridcolor, [
-    gc_count/3,
-    gc_histogram/2,
-    gc_most_frequent/2,
-    gc_least_frequent/2,
-    gc_unique_colors/2,
-    gc_color_cells/3,
-    gc_contains/2,
-    gc_recolor/4,
-    gc_color_map/3,
-    gc_threshold/5,
-    gc_dominant/3,
-    gc_fraction/3,
-    gc_count_colors/2,
-    gc_sorted_by_freq/2
+    gridcolor_count/3,
+    gridcolor_histogram/2,
+    gridcolor_most_frequent/2,
+    gridcolor_least_frequent/2,
+    gridcolor_unique_colors/2,
+    gridcolor_color_cells/3,
+    gridcolor_contains/2,
+    gridcolor_recolor/4,
+    gridcolor_color_map/3,
+    gridcolor_threshold/5,
+    gridcolor_dominant/3,
+    gridcolor_fraction/3,
+    gridcolor_count_colors/2,
+    gridcolor_sorted_by_freq/2
 ]).
 % gridcolor.pl - Layer 209: Grid Color Analysis - count, histogram, frequency,
 % recolor, color mapping, threshold, dominant color, and frequency sorting (gc_* prefix).
@@ -24,32 +24,32 @@
 % --- PRIVATE HELPERS ---
 
 % Grid dimensions: H rows, W columns.
-gc_dims_(Grid, H, W) :-
+gridcolor_dims_(Grid, H, W) :-
 % Count rows.
     length(Grid, H),
 % Count columns from first row.
     (H > 0 -> Grid = [FR|_], length(FR, W) ; W = 0).
 
 % Cell value at row R, column C (0-indexed).
-gc_cell_(Grid, R, C, V) :-
+gridcolor_cell_(Grid, R, C, V) :-
 % Select row R.
     nth0(R, Grid, Row),
 % Select column C.
     nth0(C, Row, V).
 
 % Collect all cell values from Grid as a flat list in row-major order.
-gc_all_cells_(Grid, Cells) :-
+gridcolor_all_cells_(Grid, Cells) :-
 % Get dimensions.
-    gc_dims_(Grid, H, W),
+    gridcolor_dims_(Grid, H, W),
 % Compute last row and column indices.
     H1 is H - 1,
 % Compute last column index.
     W1 is W - 1,
 % Collect all values.
-    findall(V, (between(0, H1, R), between(0, W1, C), gc_cell_(Grid, R, C, V)), Cells).
+    findall(V, (between(0, H1, R), between(0, W1, C), gridcolor_cell_(Grid, R, C, V)), Cells).
 
 % Build a new H x W grid using a lambda Goal(R, C, V).
-gc_build_(H, W, Goal, Grid) :-
+gridcolor_build_(H, W, Goal, Grid) :-
 % Compute last row and column indices.
     H1 is H - 1,
 % Compute last column index.
@@ -62,22 +62,22 @@ gc_build_(H, W, Goal, Grid) :-
 
 % --- COLOR COUNTING AND ANALYSIS ---
 
-% gc_count(+Grid, +Color, -N)
+% gridcolor_count(+Grid, +Color, -N)
 % N is the number of cells in Grid whose value equals Color.
-gc_count(Grid, Color, N) :-
+gridcolor_count(Grid, Color, N) :-
 % Collect all cells with the matching color.
-    gc_all_cells_(Grid, All),
+    gridcolor_all_cells_(Grid, All),
 % Count cells equal to Color by collecting matching ones.
     findall(1, member(Color, All), Ones),
 % The count is the length of the ones list.
     length(Ones, N).
 
-% gc_histogram(+Grid, -Pairs)
+% gridcolor_histogram(+Grid, -Pairs)
 % Pairs is a list of Color-Count pairs for every distinct color in Grid,
 % sorted alphabetically by Color name.
-gc_histogram(Grid, Pairs) :-
+gridcolor_histogram(Grid, Pairs) :-
 % Get all cell values.
-    gc_all_cells_(Grid, All),
+    gridcolor_all_cells_(Grid, All),
 % Find sorted list of distinct colors.
     sort(All, Colors),
 % For each distinct color, count its occurrences.
@@ -87,12 +87,12 @@ gc_histogram(Grid, Pairs) :-
          length(Ones, N)),
         Pairs).
 
-% gc_most_frequent(+Grid, -Color)
+% gridcolor_most_frequent(+Grid, -Color)
 % Color is the most frequently occurring color in Grid.
 % If multiple colors share the maximum count, returns one of them.
-gc_most_frequent(Grid, Color) :-
+gridcolor_most_frequent(Grid, Color) :-
 % Build histogram.
-    gc_histogram(Grid, Pairs),
+    gridcolor_histogram(Grid, Pairs),
 % Require at least one color.
     Pairs = [_|_],
 % Rearrange to N-C for numerical sort.
@@ -102,12 +102,12 @@ gc_most_frequent(Grid, Color) :-
 % Take the last element (maximum count).
     last(Sorted, _-Color).
 
-% gc_least_frequent(+Grid, -Color)
+% gridcolor_least_frequent(+Grid, -Color)
 % Color is the least frequently occurring color in Grid.
 % If multiple colors share the minimum count, returns one of them.
-gc_least_frequent(Grid, Color) :-
+gridcolor_least_frequent(Grid, Color) :-
 % Build histogram.
-    gc_histogram(Grid, Pairs),
+    gridcolor_histogram(Grid, Pairs),
 % Require at least one color.
     Pairs = [_|_],
 % Rearrange to N-C for numerical sort.
@@ -115,19 +115,19 @@ gc_least_frequent(Grid, Color) :-
 % Sort by count ascending; the minimum is first.
     msort(NCPairs, [_-Color|_]).
 
-% gc_unique_colors(+Grid, -Colors)
+% gridcolor_unique_colors(+Grid, -Colors)
 % Colors is the sorted list of distinct color atoms present in Grid.
-gc_unique_colors(Grid, Colors) :-
+gridcolor_unique_colors(Grid, Colors) :-
 % Get all cells.
-    gc_all_cells_(Grid, All),
+    gridcolor_all_cells_(Grid, All),
 % sort/2 removes duplicates and gives sorted result.
     sort(All, Colors).
 
-% gc_color_cells(+Grid, +Color, -Cells)
+% gridcolor_color_cells(+Grid, +Color, -Cells)
 % Cells is the list of R-C positions (in row-major order) where Grid[R][C] = Color.
-gc_color_cells(Grid, Color, Cells) :-
+gridcolor_color_cells(Grid, Color, Cells) :-
 % Get dimensions.
-    gc_dims_(Grid, H, W),
+    gridcolor_dims_(Grid, H, W),
 % Compute last indices.
     H1 is H - 1,
 % Compute last column index.
@@ -136,62 +136,62 @@ gc_color_cells(Grid, Color, Cells) :-
     findall(R-C,
         (between(0, H1, R),
          between(0, W1, C),
-         gc_cell_(Grid, R, C, Color)),
+         gridcolor_cell_(Grid, R, C, Color)),
         Cells).
 
-% gc_contains(+Grid, +Color)
+% gridcolor_contains(+Grid, +Color)
 % Succeed if Grid contains at least one cell with value Color.
-gc_contains(Grid, Color) :-
+gridcolor_contains(Grid, Color) :-
 % Get all cells; check if Color is among them.
-    gc_all_cells_(Grid, All),
+    gridcolor_all_cells_(Grid, All),
 % memberchk avoids choice points and searches efficiently.
     memberchk(Color, All).
 
 % --- COLOR TRANSFORMATION ---
 
-% gc_recolor(+Grid, +OldColor, +NewColor, -Result)
+% gridcolor_recolor(+Grid, +OldColor, +NewColor, -Result)
 % Result is Grid with every occurrence of OldColor replaced by NewColor.
-gc_recolor(Grid, OldColor, NewColor, Result) :-
+gridcolor_recolor(Grid, OldColor, NewColor, Result) :-
 % Get dimensions.
-    gc_dims_(Grid, H, W),
+    gridcolor_dims_(Grid, H, W),
 % Build result: substitute OldColor with NewColor, keep others unchanged.
-    gc_build_(H, W,
-        [R, C, V]>>(gc_cell_(Grid, R, C, GV),
+    gridcolor_build_(H, W,
+        [R, C, V]>>(gridcolor_cell_(Grid, R, C, GV),
                     (GV = OldColor -> V = NewColor ; V = GV)),
         Result).
 
-% gc_color_map(+Grid, +Map, -Result)
+% gridcolor_color_map(+Grid, +Map, -Result)
 % Result applies the color mapping Map (list of OldColor-NewColor pairs) to Grid.
 % Colors not present in Map are left unchanged.
-gc_color_map(Grid, Map, Result) :-
+gridcolor_color_map(Grid, Map, Result) :-
 % Get dimensions.
-    gc_dims_(Grid, H, W),
+    gridcolor_dims_(Grid, H, W),
 % For each cell, look up its color in Map; use mapped color or keep original.
-    gc_build_(H, W,
-        [R, C, V]>>(gc_cell_(Grid, R, C, GV),
+    gridcolor_build_(H, W,
+        [R, C, V]>>(gridcolor_cell_(Grid, R, C, GV),
                     (member(GV-NV, Map) -> V = NV ; V = GV)),
         Result).
 
-% gc_threshold(+Grid, +Colors, +FgColor, +BgColor, -Result)
+% gridcolor_threshold(+Grid, +Colors, +FgColor, +BgColor, -Result)
 % Result is a binary grid: cells whose color is in Colors become FgColor;
 % all other cells become BgColor.
-gc_threshold(Grid, Colors, FgColor, BgColor, Result) :-
+gridcolor_threshold(Grid, Colors, FgColor, BgColor, Result) :-
 % Get dimensions.
-    gc_dims_(Grid, H, W),
+    gridcolor_dims_(Grid, H, W),
 % Build binary result using membership test.
-    gc_build_(H, W,
-        [R, C, V]>>(gc_cell_(Grid, R, C, GV),
+    gridcolor_build_(H, W,
+        [R, C, V]>>(gridcolor_cell_(Grid, R, C, GV),
                     (memberchk(GV, Colors) -> V = FgColor ; V = BgColor)),
         Result).
 
 % --- DERIVED STATISTICS ---
 
-% gc_dominant(+Grid, +BgColor, -Color)
+% gridcolor_dominant(+Grid, +BgColor, -Color)
 % Color is the most frequent non-BgColor color in Grid.
 % Fails if Grid contains no non-BgColor cells.
-gc_dominant(Grid, BgColor, Color) :-
+gridcolor_dominant(Grid, BgColor, Color) :-
 % Build histogram.
-    gc_histogram(Grid, Pairs),
+    gridcolor_histogram(Grid, Pairs),
 % Filter out the background color.
     findall(C-N, (member(C-N, Pairs), C \= BgColor), NonBgPairs),
 % Require at least one non-background color.
@@ -203,32 +203,32 @@ gc_dominant(Grid, BgColor, Color) :-
 % Take the color with the highest count.
     last(Sorted, _-Color).
 
-% gc_fraction(+Grid, +Color, -Frac)
+% gridcolor_fraction(+Grid, +Color, -Frac)
 % Frac is the fraction [0.0..1.0] of Grid cells whose value equals Color.
-gc_fraction(Grid, Color, Frac) :-
+gridcolor_fraction(Grid, Color, Frac) :-
 % Get total cell count.
-    gc_dims_(Grid, H, W),
+    gridcolor_dims_(Grid, H, W),
 % Total = H * W.
     Total is H * W,
 % Count matching cells.
-    gc_count(Grid, Color, N),
+    gridcolor_count(Grid, Color, N),
 % Compute floating-point fraction.
     (Total =:= 0 -> Frac = 0.0 ; Frac is float(N) / Total).
 
-% gc_count_colors(+Grid, -N)
+% gridcolor_count_colors(+Grid, -N)
 % N is the number of distinct colors present in Grid.
-gc_count_colors(Grid, N) :-
+gridcolor_count_colors(Grid, N) :-
 % Get unique colors.
-    gc_unique_colors(Grid, Colors),
+    gridcolor_unique_colors(Grid, Colors),
 % Count them.
     length(Colors, N).
 
-% gc_sorted_by_freq(+Grid, -Colors)
+% gridcolor_sorted_by_freq(+Grid, -Colors)
 % Colors is the list of distinct colors in Grid sorted by frequency,
 % most frequent first. Ties are broken by alphabetical order.
-gc_sorted_by_freq(Grid, Colors) :-
+gridcolor_sorted_by_freq(Grid, Colors) :-
 % Build histogram.
-    gc_histogram(Grid, Pairs),
+    gridcolor_histogram(Grid, Pairs),
 % Negate counts so msort gives descending frequency order.
     findall(NegN-C, (member(C-N, Pairs), NegN is -N), NegNCPairs),
 % Sort ascending on NegN: largest count (most negative NegN) comes first.

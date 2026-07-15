@@ -3,228 +3,228 @@
 
 :- begin_tests(gridobj).
 
-% AC-GOB-001: gob_object_cells for single cell.
+% AC-GOB-001: gridobj_object_cells for single cell.
 test('AC-GOB-001: object_cells single') :-
-    gob_object_cells([[r,b],[b,b]], 0, 0, Cells),
+    gridobj_object_cells([[r,b],[b,b]], 0, 0, Cells),
     Cells = [r(0,0)].
 
-% AC-GOB-002: gob_object_cells for 2-cell horizontal component.
+% AC-GOB-002: gridobj_object_cells for 2-cell horizontal component.
 test('AC-GOB-002: object_cells horizontal') :-
-    gob_object_cells([[r,r,b],[b,b,b]], 0, 0, Cells),
+    gridobj_object_cells([[r,r,b],[b,b,b]], 0, 0, Cells),
     msort(Cells, [r(0,0),r(0,1)]).
 
-% AC-GOB-003: gob_object_cells L-shape component (4-connected).
+% AC-GOB-003: gridobj_object_cells L-shape component (4-connected).
 test('AC-GOB-003: object_cells L-shape') :-
     Grid = [[r,r,b],[r,b,b]],
-    gob_object_cells(Grid, 0, 0, Cells),
+    gridobj_object_cells(Grid, 0, 0, Cells),
     msort(Cells, [r(0,0),r(0,1),r(1,0)]).
 
-% AC-GOB-004: gob_object_color returns correct color.
+% AC-GOB-004: gridobj_object_color returns correct color.
 test('AC-GOB-004: object_color basic') :-
-    gob_object_color([[r,b],[b,b]], 0, 0, r).
+    gridobj_object_color([[r,b],[b,b]], 0, 0, r).
 
-% AC-GOB-005: gob_object_color on non-first cell.
+% AC-GOB-005: gridobj_object_color on non-first cell.
 test('AC-GOB-005: object_color position') :-
-    gob_object_color([[r,g],[b,b]], 0, 1, g).
+    gridobj_object_color([[r,g],[b,b]], 0, 1, g).
 
-% AC-GOB-006: gob_object_size single cell = 1.
+% AC-GOB-006: gridobj_object_size single cell = 1.
 test('AC-GOB-006: object_size single') :-
-    gob_object_size([[r,b],[b,b]], 0, 0, 1).
+    gridobj_object_size([[r,b],[b,b]], 0, 0, 1).
 
-% AC-GOB-007: gob_object_size 3-cell component.
+% AC-GOB-007: gridobj_object_size 3-cell component.
 test('AC-GOB-007: object_size three') :-
-    gob_object_size([[r,r,r],[b,b,b]], 0, 0, 3).
+    gridobj_object_size([[r,r,r],[b,b,b]], 0, 0, 3).
 
-% AC-GOB-008: gob_object_bbox single cell.
+% AC-GOB-008: gridobj_object_bbox single cell.
 test('AC-GOB-008: object_bbox single') :-
-    gob_object_bbox([[r,b],[b,b]], 0, 0, r0(0,0,0,0)).
+    gridobj_object_bbox([[r,b],[b,b]], 0, 0, r0(0,0,0,0)).
 
-% AC-GOB-009: gob_object_bbox 2x2 block.
+% AC-GOB-009: gridobj_object_bbox 2x2 block.
 test('AC-GOB-009: object_bbox 2x2 block') :-
     Grid = [[r,r],[r,r]],
-    gob_object_bbox(Grid, 0, 0, r0(0,0,1,1)).
+    gridobj_object_bbox(Grid, 0, 0, r0(0,0,1,1)).
 
-% AC-GOB-010: gob_object_bbox L-shape.
+% AC-GOB-010: gridobj_object_bbox L-shape.
 test('AC-GOB-010: object_bbox L-shape') :-
     Grid = [[r,r,b],[r,b,b]],
-    gob_object_bbox(Grid, 0, 0, r0(0,0,1,1)).
+    gridobj_object_bbox(Grid, 0, 0, r0(0,0,1,1)).
 
-% AC-GOB-011: gob_object_mask single cell.
+% AC-GOB-011: gridobj_object_mask single cell.
 test('AC-GOB-011: object_mask single') :-
-    gob_object_mask([[r,b],[b,b]], 0, 0, b, [[r,b],[b,b]]).
+    gridobj_object_mask([[r,b],[b,b]], 0, 0, b, [[r,b],[b,b]]).
 
-% AC-GOB-012: gob_object_mask isolates one of two components.
+% AC-GOB-012: gridobj_object_mask isolates one of two components.
 test('AC-GOB-012: object_mask isolates') :-
     Grid = [[r,b,g],[b,b,b]],
-    gob_object_mask(Grid, 0, 0, b, [[r,b,b],[b,b,b]]).
+    gridobj_object_mask(Grid, 0, 0, b, [[r,b,b],[b,b,b]]).
 
-% AC-GOB-013: gob_object_mask full-row component.
+% AC-GOB-013: gridobj_object_mask full-row component.
 test('AC-GOB-013: object_mask full row') :-
     Grid = [[r,r,r],[b,b,b]],
-    gob_object_mask(Grid, 0, 0, b, [[r,r,r],[b,b,b]]).
+    gridobj_object_mask(Grid, 0, 0, b, [[r,r,r],[b,b,b]]).
 
-% AC-GOB-014: gob_extract_object single cell.
+% AC-GOB-014: gridobj_extract_object single cell.
 test('AC-GOB-014: extract_object single') :-
-    gob_extract_object([[r,b],[b,b]], 0, 0, b, [[r]]).
+    gridobj_extract_object([[r,b],[b,b]], 0, 0, b, [[r]]).
 
-% AC-GOB-015: gob_extract_object 2-cell horizontal.
+% AC-GOB-015: gridobj_extract_object 2-cell horizontal.
 test('AC-GOB-015: extract_object horizontal') :-
     Grid = [[b,r,r,b],[b,b,b,b]],
-    gob_extract_object(Grid, 0, 1, b, [[r,r]]).
+    gridobj_extract_object(Grid, 0, 1, b, [[r,r]]).
 
-% AC-GOB-016: gob_extract_object L-shape with bg fill in bbox.
+% AC-GOB-016: gridobj_extract_object L-shape with bg fill in bbox.
 test('AC-GOB-016: extract_object L-shape') :-
     Grid = [[r,r,b],[r,b,b],[b,b,b]],
-    gob_extract_object(Grid, 0, 0, b, [[r,r],[r,b]]).
+    gridobj_extract_object(Grid, 0, 0, b, [[r,r],[r,b]]).
 
-% AC-GOB-017: gob_all_objects on grid with two objects.
+% AC-GOB-017: gridobj_all_objects on grid with two objects.
 test('AC-GOB-017: all_objects two') :-
     Grid = [[r,b,g],[b,b,b]],
-    gob_all_objects(Grid, b, Objects),
+    gridobj_all_objects(Grid, b, Objects),
     length(Objects, 2),
     member(ob(r,[r(0,0)],r0(0,0,0,0)), Objects),
     member(ob(g,[r(0,2)],r0(0,2,0,2)), Objects).
 
-% AC-GOB-018: gob_all_objects on all-bg grid returns empty.
+% AC-GOB-018: gridobj_all_objects on all-bg grid returns empty.
 test('AC-GOB-018: all_objects all bg') :-
-    gob_all_objects([[b,b],[b,b]], b, []).
+    gridobj_all_objects([[b,b],[b,b]], b, []).
 
-% AC-GOB-019: gob_all_objects single object.
+% AC-GOB-019: gridobj_all_objects single object.
 test('AC-GOB-019: all_objects single') :-
     Grid = [[r,r],[r,r]],
-    gob_all_objects(Grid, b, [ob(r,_,r0(0,0,1,1))]).
+    gridobj_all_objects(Grid, b, [ob(r,_,r0(0,0,1,1))]).
 
-% AC-GOB-020: gob_object_count two objects.
+% AC-GOB-020: gridobj_object_count two objects.
 test('AC-GOB-020: object_count two') :-
-    gob_object_count([[r,b,g],[b,b,b]], b, 2).
+    gridobj_object_count([[r,b,g],[b,b,b]], b, 2).
 
-% AC-GOB-021: gob_object_count zero for all-bg.
+% AC-GOB-021: gridobj_object_count zero for all-bg.
 test('AC-GOB-021: object_count zero') :-
-    gob_object_count([[b,b],[b,b]], b, 0).
+    gridobj_object_count([[b,b],[b,b]], b, 0).
 
-% AC-GOB-022: gob_object_count one for single-color grid.
+% AC-GOB-022: gridobj_object_count one for single-color grid.
 test('AC-GOB-022: object_count one') :-
-    gob_object_count([[r,r],[r,r]], b, 1).
+    gridobj_object_count([[r,r],[r,r]], b, 1).
 
-% AC-GOB-023: gob_largest_object returns larger component.
+% AC-GOB-023: gridobj_largest_object returns larger component.
 test('AC-GOB-023: largest_object basic') :-
     Grid = [[r,r,b],[b,b,g]],
-    gob_largest_object(Grid, b, Cells),
+    gridobj_largest_object(Grid, b, Cells),
     length(Cells, 2),
     msort(Cells, [r(0,0),r(0,1)]).
 
-% AC-GOB-024: gob_largest_object single object.
+% AC-GOB-024: gridobj_largest_object single object.
 test('AC-GOB-024: largest_object single') :-
-    gob_largest_object([[r,r],[r,r]], b, Cells),
+    gridobj_largest_object([[r,r],[r,r]], b, Cells),
     length(Cells, 4).
 
-% AC-GOB-025: gob_largest_object three objects returns largest.
+% AC-GOB-025: gridobj_largest_object three objects returns largest.
 test('AC-GOB-025: largest_object three') :-
     Grid = [[r,r,r],[g,b,y]],
-    gob_largest_object(Grid, b, Cells),
+    gridobj_largest_object(Grid, b, Cells),
     length(Cells, 3).
 
-% AC-GOB-026: gob_smallest_object returns smaller component.
+% AC-GOB-026: gridobj_smallest_object returns smaller component.
 test('AC-GOB-026: smallest_object basic') :-
     Grid = [[r,r,b],[b,b,g]],
-    gob_smallest_object(Grid, b, Cells),
+    gridobj_smallest_object(Grid, b, Cells),
     length(Cells, 1),
     Cells = [r(1,2)].
 
-% AC-GOB-027: gob_smallest_object single object.
+% AC-GOB-027: gridobj_smallest_object single object.
 test('AC-GOB-027: smallest_object single') :-
-    gob_smallest_object([[r,r],[r,r]], b, Cells),
+    gridobj_smallest_object([[r,r],[r,r]], b, Cells),
     length(Cells, 4).
 
-% AC-GOB-028: gob_smallest_object three objects returns smallest.
+% AC-GOB-028: gridobj_smallest_object three objects returns smallest.
 test('AC-GOB-028: smallest_object three') :-
     Grid = [[r,r,r],[g,b,y]],
-    gob_smallest_object(Grid, b, Cells),
+    gridobj_smallest_object(Grid, b, Cells),
     length(Cells, 1).
 
-% AC-GOB-029: gob_flood_fill on single cell.
+% AC-GOB-029: gridobj_flood_fill on single cell.
 test('AC-GOB-029: flood_fill single') :-
-    gob_flood_fill([[r,b],[b,b]], 0, 0, x, [[x,b],[b,b]]).
+    gridobj_flood_fill([[r,b],[b,b]], 0, 0, x, [[x,b],[b,b]]).
 
-% AC-GOB-030: gob_flood_fill entire same-color region.
+% AC-GOB-030: gridobj_flood_fill entire same-color region.
 test('AC-GOB-030: flood_fill region') :-
-    gob_flood_fill([[r,r],[r,b]], 0, 0, g, [[g,g],[g,b]]).
+    gridobj_flood_fill([[r,r],[r,b]], 0, 0, g, [[g,g],[g,b]]).
 
-% AC-GOB-031: gob_flood_fill does not cross Bg.
+% AC-GOB-031: gridobj_flood_fill does not cross Bg.
 test('AC-GOB-031: flood_fill no bg cross') :-
     Grid = [[r,b,r],[r,b,r]],
-    gob_flood_fill(Grid, 0, 0, x, [[x,b,r],[x,b,r]]).
+    gridobj_flood_fill(Grid, 0, 0, x, [[x,b,r],[x,b,r]]).
 
-% AC-GOB-032: gob_fill_enclosed fills inner Bg.
+% AC-GOB-032: gridobj_fill_enclosed fills inner Bg.
 test('AC-GOB-032: fill_enclosed basic') :-
     Grid = [[r,r,r],[r,b,r],[r,r,r]],
-    gob_fill_enclosed(Grid, b, x, [[r,r,r],[r,x,r],[r,r,r]]).
+    gridobj_fill_enclosed(Grid, b, x, [[r,r,r],[r,x,r],[r,r,r]]).
 
-% AC-GOB-033: gob_fill_enclosed does not fill border-reachable Bg.
+% AC-GOB-033: gridobj_fill_enclosed does not fill border-reachable Bg.
 test('AC-GOB-033: fill_enclosed border open') :-
     Grid = [[b,b,b],[b,r,b],[b,b,b]],
-    gob_fill_enclosed(Grid, b, x, Grid).
+    gridobj_fill_enclosed(Grid, b, x, Grid).
 
-% AC-GOB-034: gob_fill_enclosed multiple enclosed regions.
+% AC-GOB-034: gridobj_fill_enclosed multiple enclosed regions.
 test('AC-GOB-034: fill_enclosed multiple') :-
     Grid = [[r,r,r,r,r],[r,b,r,b,r],[r,r,r,r,r]],
-    gob_fill_enclosed(Grid, b, x, Result),
+    gridobj_fill_enclosed(Grid, b, x, Result),
     Result = [[r,r,r,r,r],[r,x,r,x,r],[r,r,r,r,r]].
 
-% AC-GOB-035: gob_remove_object removes single cell.
+% AC-GOB-035: gridobj_remove_object removes single cell.
 test('AC-GOB-035: remove_object single') :-
-    gob_remove_object([[r,b],[b,b]], 0, 0, b, [[b,b],[b,b]]).
+    gridobj_remove_object([[r,b],[b,b]], 0, 0, b, [[b,b],[b,b]]).
 
-% AC-GOB-036: gob_remove_object removes only its component.
+% AC-GOB-036: gridobj_remove_object removes only its component.
 test('AC-GOB-036: remove_object partial') :-
     Grid = [[r,r,b],[b,b,g]],
-    gob_remove_object(Grid, 0, 0, b, [[b,b,b],[b,b,g]]).
+    gridobj_remove_object(Grid, 0, 0, b, [[b,b,b],[b,b,g]]).
 
-% AC-GOB-037: gob_remove_object on fully-filled grid.
+% AC-GOB-037: gridobj_remove_object on fully-filled grid.
 test('AC-GOB-037: remove_object all') :-
-    gob_remove_object([[r,r],[r,r]], 0, 0, b, [[b,b],[b,b]]).
+    gridobj_remove_object([[r,r],[r,r]], 0, 0, b, [[b,b],[b,b]]).
 
-% AC-GOB-038: gob_move_object moves single cell.
+% AC-GOB-038: gridobj_move_object moves single cell.
 test('AC-GOB-038: move_object single') :-
-    gob_move_object([[r,b,b],[b,b,b]], 0, 0, 0, 2, b, [[b,b,r],[b,b,b]]).
+    gridobj_move_object([[r,b,b],[b,b,b]], 0, 0, 0, 2, b, [[b,b,r],[b,b,b]]).
 
-% AC-GOB-039: gob_move_object moves 2-cell component.
+% AC-GOB-039: gridobj_move_object moves 2-cell component.
 test('AC-GOB-039: move_object two cells') :-
     Grid = [[r,r,b],[b,b,b],[b,b,b]],
-    gob_move_object(Grid, 0, 0, 1, 0, b, [[b,b,b],[r,r,b],[b,b,b]]).
+    gridobj_move_object(Grid, 0, 0, 1, 0, b, [[b,b,b],[r,r,b],[b,b,b]]).
 
-% AC-GOB-040: gob_move_object keeps other objects.
+% AC-GOB-040: gridobj_move_object keeps other objects.
 test('AC-GOB-040: move_object preserves others') :-
     Grid = [[r,b,g],[b,b,b]],
-    gob_move_object(Grid, 0, 0, 1, 0, b, Result),
-    gob_object_cells(Result, 0, 2, [r(0,2)]).
+    gridobj_move_object(Grid, 0, 0, 1, 0, b, Result),
+    gridobj_object_cells(Result, 0, 2, [r(0,2)]).
 
 % AC-GOB-041: integration - extract then flood fill.
 test('AC-GOB-041: integration extract and fill') :-
     Grid = [[r,r,b],[r,b,b]],
-    gob_extract_object(Grid, 0, 0, b, Extracted),
-    gob_flood_fill(Extracted, 0, 0, g, Filled),
+    gridobj_extract_object(Grid, 0, 0, b, Extracted),
+    gridobj_flood_fill(Extracted, 0, 0, g, Filled),
     Filled = [[g,g],[g,b]].
 
 % AC-GOB-042: integration - count objects after remove.
 test('AC-GOB-042: integration remove reduces count') :-
     Grid = [[r,b,g],[b,b,b]],
-    gob_remove_object(Grid, 0, 0, b, Cleaned),
-    gob_object_count(Cleaned, b, 1).
+    gridobj_remove_object(Grid, 0, 0, b, Cleaned),
+    gridobj_object_count(Cleaned, b, 1).
 
 % AC-GOB-043: integration - all_objects counts match object_count.
 test('AC-GOB-043: integration all_objects count') :-
     Grid = [[r,b,g],[b,y,b]],
-    gob_all_objects(Grid, b, Objects),
+    gridobj_all_objects(Grid, b, Objects),
     length(Objects, Count),
-    gob_object_count(Grid, b, Count).
+    gridobj_object_count(Grid, b, Count).
 
 % AC-GOB-044: integration - largest then extract.
 test('AC-GOB-044: integration largest extract') :-
     Grid = [[r,r,r],[g,b,b]],
-    gob_largest_object(Grid, b, LargeCells),
+    gridobj_largest_object(Grid, b, LargeCells),
     length(LargeCells, 3),
-    gob_extract_object(Grid, 0, 0, b, Ext),
+    gridobj_extract_object(Grid, 0, 0, b, Ext),
     Ext = [[r,r,r]].
 
 :- end_tests(gridobj).

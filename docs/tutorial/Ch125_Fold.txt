@@ -10,28 +10,28 @@ fold (horizontal then vertical).
 
 Splitting a Grid in Half
 
-fd_split_h(+Grid, +R, -Top, -Bottom) splits Grid horizontally at crease row R.
+fold_split_h(+Grid, +R, -Top, -Bottom) splits Grid horizontally at crease row R.
 Top receives rows 0 through R inclusive; Bottom receives the remaining rows.
 
-    fd_split_h([[a,b],[c,d],[e,f],[g,h]], 1, Top, Bottom).
+    fold_split_h([[a,b],[c,d],[e,f],[g,h]], 1, Top, Bottom).
     Top    = [[a,b],[c,d]]
     Bottom = [[e,f],[g,h]]
 
-fd_split_v(+Grid, +C, -Left, -Right) splits Grid vertically at crease column C.
+fold_split_v(+Grid, +C, -Left, -Right) splits Grid vertically at crease column C.
 Each row is split independently.
 
-    fd_split_v([[1,2,3,4],[5,6,7,8]], 1, Left, Right).
+    fold_split_v([[1,2,3,4],[5,6,7,8]], 1, Left, Right).
     Left  = [[1,2],[5,6]]
     Right = [[3,4],[7,8]]
 
 
 Overlaying Two Grids
 
-fd_overlay(+A, +B, +Bg, -Out) combines two same-size grids cell by cell.
+fold_overlay(+A, +B, +Bg, -Out) combines two same-size grids cell by cell.
 The output cell equals A's cell when A's cell is not the background value Bg;
 otherwise the output cell equals B's cell. Grid A takes priority.
 
-    fd_overlay([[0,1],[2,0]], [[9,9],[9,9]], 0, Out).
+    fold_overlay([[0,1],[2,0]], [[9,9],[9,9]], 0, Out).
     Out = [[9,1],[2,9]]
 
 When A is all background, the result is B. When A has no background cells, the
@@ -40,96 +40,96 @@ result is A unchanged.
 
 Folding
 
-fd_fold_h(+Grid, +R, +Bg, -Out) folds the bottom half of Grid upward. The crease
+fold_fold_h(+Grid, +R, +Bg, -Out) folds the bottom half of Grid upward. The crease
 falls between row R and row R+1. Row I of the output overlays Top[I] with
 Bottom[R-I] using Bg as the background. The output has R+1 rows.
 
-    fd_fold_h([[0,0],[0,7],[5,0]], 1, 0, Out).
+    fold_fold_h([[0,0],[0,7],[5,0]], 1, 0, Out).
     Out = [[0,0],[5,7]]
 
 Explanation: Top = [[0,0],[0,7]]; Bottom = [[5,0]].
 Row 0 of output: K = 1-0 = 1; K >= length(Bottom) = 1, so keep Top[0] = [0,0].
 Row 1 of output: K = 1-1 = 0; overlay([0,7],[5,0],0): 0==bg->5; 7!=bg->7.
 
-fd_fold_v(+Grid, +C, +Bg, -Out) folds the right half leftward. The crease falls
+fold_fold_v(+Grid, +C, +Bg, -Out) folds the right half leftward. The crease falls
 between column C and column C+1. Column I of the output overlays Left[row][I] with
 Right[row][C-I]. The output has C+1 columns.
 
-    fd_fold_v([[0,0,3],[0,5,0]], 1, 0, Out).
+    fold_fold_v([[0,0,3],[0,5,0]], 1, 0, Out).
     Out = [[0,3],[0,5]]
 
 
 Unfolding
 
-fd_unfold_h(+Half, -Grid) creates a symmetric full grid by stacking Half above its
+fold_unfold_h(+Half, -Grid) creates a symmetric full grid by stacking Half above its
 row-reversed copy. The result has twice as many rows as Half.
 
-    fd_unfold_h([[1,2],[3,4]], Grid).
+    fold_unfold_h([[1,2],[3,4]], Grid).
     Grid = [[1,2],[3,4],[3,4],[1,2]]
 
-fd_unfold_v(+Half, -Grid) creates a symmetric full grid by joining each row with
+fold_unfold_v(+Half, -Grid) creates a symmetric full grid by joining each row with
 its own reverse. The result has twice as many columns as Half.
 
-    fd_unfold_v([[1,2],[3,4]], Grid).
+    fold_unfold_v([[1,2],[3,4]], Grid).
     Grid = [[1,2,2,1],[3,4,4,3]]
 
 
 Testing and Finding Fold Symmetry
 
-fd_sym_h(+Grid, +R) succeeds if Grid is symmetric under a horizontal fold with
+fold_sym_h(+Grid, +R) succeeds if Grid is symmetric under a horizontal fold with
 crease after row R. The mirror formula is row I corresponds to row (2R+1-I). This
-is consistent with fd_fold_h: the crease sits between rows R and R+1, so row 0 of
+is consistent with fold_fold_h: the crease sits between rows R and R+1, so row 0 of
 Top maps to row 0 of Bottom (= overall row R+1), etc.
 
-    fd_sym_h([[1,2],[3,4],[3,4],[1,2]], 1).  % succeeds
-    fd_sym_h([[1,2],[3,4],[5,6]], 1).         % fails
+    fold_sym_h([[1,2],[3,4],[3,4],[1,2]], 1).  % succeeds
+    fold_sym_h([[1,2],[3,4],[5,6]], 1).         % fails
 
-fd_sym_v(+Grid, +C) succeeds if Grid is symmetric under a vertical fold with
+fold_sym_v(+Grid, +C) succeeds if Grid is symmetric under a vertical fold with
 crease after column C. Mirror formula: column J corresponds to column (2C+1-J).
 
-    fd_sym_v([[1,2,2,1],[3,4,4,3]], 1).      % succeeds
+    fold_sym_v([[1,2,2,1],[3,4,4,3]], 1).      % succeeds
 
-fd_find_fold_h(+Grid, -R) finds the first row R (starting from 0) around which
+fold_find_fold_h(+Grid, -R) finds the first row R (starting from 0) around which
 Grid is fold-symmetric. Fails if no such R exists.
 
-    fd_find_fold_h([[a,b],[c,d],[c,d],[a,b]], R).
+    fold_find_fold_h([[a,b],[c,d],[c,d],[a,b]], R).
     R = 1
 
-fd_find_fold_v(+Grid, -C) finds the first column C around which Grid is
+fold_find_fold_v(+Grid, -C) finds the first column C around which Grid is
 fold-symmetric.
 
-    fd_find_fold_v([[1,2,2,1],[3,4,4,3]], C).
+    fold_find_fold_v([[1,2,2,1],[3,4,4,3]], C).
     C = 1
 
 Roundtrip: unfolding then finding fold always returns the expected crease.
 
-    fd_unfold_h([[1,2],[3,4]], Grid),
-    fd_find_fold_h(Grid, R).
+    fold_unfold_h([[1,2],[3,4]], Grid),
+    fold_find_fold_h(Grid, R).
     Grid = [[1,2],[3,4],[3,4],[1,2]], R = 1
 
 
 Detecting Marker Rows and Columns
 
-fd_mark_row(+Grid, +V, -R) returns the index of the first row where every cell
+fold_mark_row(+Grid, +V, -R) returns the index of the first row where every cell
 equals V. Useful for identifying fold-indicator rows (a row of separators or zeros).
 
-    fd_mark_row([[1,2],[9,9],[3,4]], 9, R).
+    fold_mark_row([[1,2],[9,9],[3,4]], 9, R).
     R = 1
 
-fd_mark_col(+Grid, +V, -C) returns the index of the first column where every cell
+fold_mark_col(+Grid, +V, -C) returns the index of the first column where every cell
 equals V.
 
-    fd_mark_col([[1,0,2],[3,0,4],[5,0,6]], 0, C).
+    fold_mark_col([[1,0,2],[3,0,4],[5,0,6]], 0, C).
     C = 1
 
 
 Double Fold
 
-fd_fold_both(+Grid, +R, +C, +Bg, -Out) applies fd_fold_h at row R then fd_fold_v
+fold_fold_both(+Grid, +R, +C, +Bg, -Out) applies fold_fold_h at row R then fold_fold_v
 at column C on the result. The output has height R+1 and width C+1: the top-left
 quadrant of the original after two orthogonal folds.
 
-    fd_fold_both([[1,2,3],[4,5,6],[7,8,9]], 0, 0, 0, Out).
+    fold_fold_both([[1,2,3],[4,5,6],[7,8,9]], 0, 0, 0, Out).
     Out = [[1]]
 
 
