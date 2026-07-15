@@ -110,7 +110,7 @@ reflex_actors_actor_names([
 
 %  AC-PR13-001
 % Define a clause for 'test': succeed when the following conditions hold.
-test(install_starts_all_cyclic_actors, [blocked('live reflex-actor Lattice concurrency deadlock on uninstall; cyclic-actor lifecycle is covered by packs/actors/test/test_actors.pl')]) :-
+test(install_starts_all_cyclic_actors) :-
     % Call the goal 'reflex_actors_install_actors'.
     reflex_actors_install_actors,
     % State a fact for 'cyclic actor list' with the arguments listed below.
@@ -128,7 +128,7 @@ test(install_starts_all_cyclic_actors, [blocked('live reflex-actor Lattice concu
 
 %  AC-PR13-002
 % Define a clause for 'test': succeed when the following conditions hold.
-test(uninstall_stops_all_cyclic_actors, [blocked('live reflex-actor Lattice concurrency deadlock on uninstall; cyclic-actor lifecycle is covered by packs/actors/test/test_actors.pl')]) :-
+test(uninstall_stops_all_cyclic_actors) :-
     % Call the goal 'reflex_actors_install_actors'.
     reflex_actors_install_actors,
     % Call the goal 'reflex_actors_uninstall_actors'.
@@ -148,7 +148,7 @@ test(uninstall_stops_all_cyclic_actors, [blocked('live reflex-actor Lattice conc
 
 %  AC-PR13-003
 % Define a clause for 'test': succeed when the following conditions hold.
-test(motivation_cycle_inscribes_objective, [blocked('live reflex-actor Lattice concurrency deadlock on uninstall; cyclic-actor lifecycle is covered by packs/actors/test/test_actors.pl')]) :-
+test(motivation_cycle_inscribes_objective) :-
     % Enroll a body with a need and provide an interoceptive signal
     % State a fact for 'manifest body' with the arguments listed below.
     manifest_body('herald://test-body', [need(battery, 80.0, percent)], []),
@@ -174,7 +174,7 @@ test(motivation_cycle_inscribes_objective, [blocked('live reflex-actor Lattice c
 
 %  AC-PR13-004
 % Define a clause for 'test': succeed when the following conditions hold.
-test(exploration_cycle_inscribes_explore_objective, [blocked('live reflex-actor Lattice concurrency deadlock on uninstall; cyclic-actor lifecycle is covered by packs/actors/test/test_actors.pl')]) :-
+test(exploration_cycle_inscribes_explore_objective) :-
     % Call the goal 'reflex_actors_exploration_cycle'.
     reflex_actors_exploration_cycle,
     % State a fact for 'default nexus' with the arguments listed below.
@@ -184,13 +184,13 @@ test(exploration_cycle_inscribes_explore_objective, [blocked('live reflex-actor 
 
 %  AC-PR13-005
 % Define a clause for 'test': succeed when the following conditions hold.
-test(meta_control_cycle_runs, [blocked('live reflex-actor Lattice concurrency deadlock on uninstall; cyclic-actor lifecycle is covered by packs/actors/test/test_actors.pl')]) :-
+test(meta_control_cycle_runs) :-
     % State the zero-argument fact 'reflex_actors_meta_control_cycle'.
     reflex_actors_meta_control_cycle.
 
 %  AC-PR13-006
 % Define a clause for 'test': succeed when the following conditions hold.
-test(regulation_cycle_classifies_outcome, [blocked('live reflex-actor Lattice concurrency deadlock on uninstall; cyclic-actor lifecycle is covered by packs/actors/test/test_actors.pl')]) :-
+test(regulation_cycle_classifies_outcome) :-
     % State a fact for 'default nexus' with the arguments listed below.
     default_nexus(Nx),
     % Inscribe a body_command and a matching proprioceptive result
@@ -215,7 +215,7 @@ test(regulation_cycle_classifies_outcome, [blocked('live reflex-actor Lattice co
 
 %  AC-PR13-007
 % Define a clause for 'test': succeed when the following conditions hold.
-test(compensation_sentinel_registered, [blocked('live reflex-actor Lattice concurrency deadlock on uninstall; cyclic-actor lifecycle is covered by packs/actors/test/test_actors.pl')]) :-
+test(compensation_sentinel_registered) :-
     % Call the goal 'reflex_actors_install_actors'.
     reflex_actors_install_actors,
     % State a fact for 'sentinel list' with the arguments listed below.
@@ -225,7 +225,7 @@ test(compensation_sentinel_registered, [blocked('live reflex-actor Lattice concu
 
 %  AC-PR13-008
 % Define a clause for 'test': succeed when the following conditions hold.
-test(discovery_sentinel_registered, [blocked('live reflex-actor Lattice concurrency deadlock on uninstall; cyclic-actor lifecycle is covered by packs/actors/test/test_actors.pl')]) :-
+test(discovery_sentinel_registered) :-
     % Call the goal 'reflex_actors_install_actors'.
     reflex_actors_install_actors,
     % State a fact for 'sentinel list' with the arguments listed below.
@@ -235,7 +235,7 @@ test(discovery_sentinel_registered, [blocked('live reflex-actor Lattice concurre
 
 %  AC-PR13-009
 % Define a clause for 'test': succeed when the following conditions hold.
-test(impasse_cycle_inscribes_subgoal, [blocked('live reflex-actor Lattice concurrency deadlock on uninstall; cyclic-actor lifecycle is covered by packs/actors/test/test_actors.pl')]) :-
+test(impasse_cycle_inscribes_subgoal) :-
     % State a fact for 'default nexus' with the arguments listed below.
     default_nexus(Nx),
     % State a fact for 'anchor node' with the arguments listed below.
