@@ -2,13 +2,13 @@
 
     AC-PR30-001: Given two percepts of the same scene from slightly different
                  positions, when the locator runs, both attach to one venue.
-    AC-PR30-002: pai_detect returns a trait_set for each requested detector.
+    AC-PR30-002: perception_detect returns a trait_set for each requested detector.
     AC-PR30-003: Traits from all detectors are stored; disagreements preserved.
     AC-PR30-004: Scene detector produces four hash traits + foveal blackout.
     AC-PR30-005: Two very different percepts produce different venues.
-    AC-PR30-006: pai_map_update attaches a venue to a locale.
-    AC-PR30-007: pai_venue_of queries correctly by scene ID.
-    AC-PR30-008: pai_locale_of returns unassigned for unmapped venues.
+    AC-PR30-006: perception_map_update attaches a venue to a locale.
+    AC-PR30-007: perception_venue_of queries correctly by scene ID.
+    AC-PR30-008: perception_locale_of returns unassigned for unmapped venues.
     AC-PR30-009: Detectors begin tabula rasa (idempotent on repeated calls).
 */
 
@@ -27,16 +27,16 @@
 :- use_module(library(plunit)).
 % Load the built-in 'perception' library so its predicates are available here.
 :- use_module(library(perception), [
-    % Supply 'pai_detect/3' as the next argument to the expression above.
-    pai_detect/3,
-    % Supply 'pai_locate/2' as the next argument to the expression above.
-    pai_locate/2,
-    % Supply 'pai_map_update/2' as the next argument to the expression above.
-    pai_map_update/2,
-    % Supply 'pai_venue_of/2' as the next argument to the expression above.
-    pai_venue_of/2,
-    % Supply 'pai_locale_of/2' as the next argument to the expression above.
-    pai_locale_of/2
+    % Supply 'perception_detect/3' as the next argument to the expression above.
+    perception_detect/3,
+    % Supply 'perception_locate/2' as the next argument to the expression above.
+    perception_locate/2,
+    % Supply 'perception_map_update/2' as the next argument to the expression above.
+    perception_map_update/2,
+    % Supply 'perception_venue_of/2' as the next argument to the expression above.
+    perception_venue_of/2,
+    % Supply 'perception_locale_of/2' as the next argument to the expression above.
+    perception_locale_of/2
 % Close the expression opened above.
 ]).
 
@@ -86,25 +86,25 @@ pr30_cleanup :-
 test(same_scene_same_venue) :-
     % Same scene, slightly different percept refs → same traits from scene detector
     % State a fact for 'once' with the arguments listed below.
-    once(pai_detect(garden_clip_001, [scene], TraitSets1)),
+    once(perception_detect(garden_clip_001, [scene], TraitSets1)),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_detect(garden_clip_001, [scene], TraitSets2)),  % same ref → same traits
+    once(perception_detect(garden_clip_001, [scene], TraitSets2)),  % same ref → same traits
     % State a fact for 'once' with the arguments listed below.
     once(member(trait_set(scene, Traits1), TraitSets1)),
     % State a fact for 'once' with the arguments listed below.
     once(member(trait_set(scene, Traits2), TraitSets2)),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_locate(Traits1, V1)),
+    once(perception_locate(Traits1, V1)),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_locate(Traits2, V2)),
+    once(perception_locate(Traits2, V2)),
     % Check that 'V1' is unifiable with 'V2.   % same scene hash → same venue'.
     V1 = V2.   % same scene hash → same venue
 
-%  AC-PR30-002: pai_detect returns trait_sets for requested detectors
+%  AC-PR30-002: perception_detect returns trait_sets for requested detectors
 % Define a clause for 'test': succeed when the following conditions hold.
 test(detect_returns_trait_sets) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_detect(office_clip, [icon, shape], TraitSets)),
+    once(perception_detect(office_clip, [icon, shape], TraitSets)),
     % Unify '2' with the number of elements in list 'TraitSets'.
     length(TraitSets, 2),
     % State a fact for 'memberchk' with the arguments listed below.
@@ -116,7 +116,7 @@ test(detect_returns_trait_sets) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(all_detector_traits_stored) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_detect(lab_clip, [geon, object], _)),
+    once(perception_detect(lab_clip, [geon, object], _)),
     % State a fact for 'once' with the arguments listed below.
     once(perception:percept_traits(lab_clip, geon, _)),
     % State the fact: once(perception:percept_traits(lab_clip, object, _)).
@@ -126,7 +126,7 @@ test(all_detector_traits_stored) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(scene_detector_four_hashes) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_detect(hall_clip, [scene], TraitSets)),
+    once(perception_detect(hall_clip, [scene], TraitSets)),
     % State a fact for 'memberchk' with the arguments listed below.
     memberchk(trait_set(scene, Traits), TraitSets),
     % State a fact for 'memberchk' with the arguments listed below.
@@ -144,9 +144,9 @@ test(scene_detector_four_hashes) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(different_scenes_different_venues) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_detect(scene_aaa, [scene], TS1)),
+    once(perception_detect(scene_aaa, [scene], TS1)),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_detect(scene_zzz, [scene], TS2)),
+    once(perception_detect(scene_zzz, [scene], TS2)),
     % State a fact for 'memberchk' with the arguments listed below.
     memberchk(trait_set(scene, T1), TS1),
     % State a fact for 'memberchk' with the arguments listed below.
@@ -155,9 +155,9 @@ test(different_scenes_different_venues) :-
     % Check that '( T1' is not unifiable with 'T2'.
     ( T1 \= T2
     % If the condition above succeeded, perform the following action.
-    ->  once(pai_locate(T1, V1)),
+    ->  once(perception_locate(T1, V1)),
         % Continue the multi-line expression started above.
-        once(pai_locate(T2, V2)),
+        once(perception_locate(T2, V2)),
         % They might be same or different depending on similarity
         % Continue the multi-line expression started above.
         ( V1 = V2 -> true ; V1 \= V2 )  % either is valid; just no error
@@ -166,46 +166,46 @@ test(different_scenes_different_venues) :-
     % Close the expression opened above.
     ).
 
-%  AC-PR30-006: pai_map_update attaches venue to locale
+%  AC-PR30-006: perception_map_update attaches venue to locale
 % Define a clause for 'test': succeed when the following conditions hold.
 test(map_update_attaches_locale) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_locate([edge, corner], VenueId)),
+    once(perception_locate([edge, corner], VenueId)),
     % State a fact for 'pai map update' with the arguments listed below.
-    pai_map_update(VenueId, locale(test_locale_1)),
+    perception_map_update(VenueId, locale(test_locale_1)),
     % State the fact: once(perception:venue_locale(VenueId, test_locale_1)).
     once(perception:venue_locale(VenueId, test_locale_1)).
 
-%  AC-PR30-007: pai_venue_of queries by scene ID
+%  AC-PR30-007: perception_venue_of queries by scene ID
 % Define a clause for 'test': succeed when the following conditions hold.
 test(venue_of_by_scene_id) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_locate([bright, large], V)),
+    once(perception_locate([bright, large], V)),
     % Find the scene ID that was just created
     % State a fact for 'once' with the arguments listed below.
     once(perception:venue_record(V, _, [SId|_])),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_venue_of(SId, V2)),
+    once(perception_venue_of(SId, V2)),
     % Check that 'V2' is unifiable with 'V'.
     V2 = V.
 
-%  AC-PR30-008: pai_locale_of returns unassigned for unmapped venue
+%  AC-PR30-008: perception_locale_of returns unassigned for unmapped venue
 % Define a clause for 'test': succeed when the following conditions hold.
 test(locale_of_unassigned) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_locate([smooth, dark], V)),
+    once(perception_locate([smooth, dark], V)),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_locale_of(V, L)),
+    once(perception_locale_of(V, L)),
     % Check that 'L' is unifiable with 'unassigned'.
     L = unassigned.
 
-%  AC-PR30-009: repeated pai_detect calls are idempotent (same traits returned)
+%  AC-PR30-009: repeated perception_detect calls are idempotent (same traits returned)
 % Define a clause for 'test': succeed when the following conditions hold.
 test(detect_idempotent) :-
     % State a fact for 'once' with the arguments listed below.
-    once(pai_detect(repeat_clip, [shape], TS1)),
+    once(perception_detect(repeat_clip, [shape], TS1)),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_detect(repeat_clip, [shape], TS2)),
+    once(perception_detect(repeat_clip, [shape], TS2)),
     % State a fact for 'memberchk' with the arguments listed below.
     memberchk(trait_set(shape, T1), TS1),
     % State a fact for 'memberchk' with the arguments listed below.

@@ -6,7 +6,7 @@
     AC-PR49-004: ECDH hybrid encrypt/decrypt recovers original plaintext.
     AC-PR49-005: ECDH decryption with wrong private key fails.
     AC-PR49-006: lattice_crypto_keygen_ecdh/3 returns distinct public points on each call.
-    AC-PR49-007: lattice_crypto_crypto_available/1 succeeds for pai_algo_rsa and pai_algo_ecdh.
+    AC-PR49-007: lattice_crypto_crypto_available/1 succeeds for lattice_cryptography_algo_rsa and lattice_cryptography_algo_ecdh.
     AC-PR49-008: lattice_crypto_encrypt/5 and lattice_crypto_decrypt/5 dispatch correctly for RSA.
     AC-PR49-009: lattice_crypto_encrypt/5 and lattice_crypto_decrypt/5 dispatch correctly for ECDH.
     AC-PR49-010: Tampered tag causes authentication error on decrypt.
@@ -19,7 +19,7 @@
    % State a fact for 'file directory name' with the arguments listed below.
    file_directory_name(TestsDir, ProjectRoot),
    % State a fact for 'atomic list concat' with the arguments listed below.
-   atomic_list_concat([ProjectRoot, '/packs/lattice_crypto/prolog'], CryptoPath),
+   atomic_list_concat([ProjectRoot, '/packs/lattice_cryptography/prolog'], CryptoPath),
    % Add a new fact or rule to the runtime knowledge base.
    assertz(file_search_path(library, CryptoPath)).
 
@@ -28,7 +28,7 @@
 % Load the built-in 'crypto' library so its predicates are available here.
 :- use_module(library(crypto)).
 % Load the lattice_crypto module under test.
-:- use_module(library(lattice_crypto)).
+:- use_module(library(lattice_cryptography)).
 
 % Execute the compile-time directive: begin_tests(pr49).
 :- begin_tests(pr49).
@@ -156,12 +156,12 @@ test(ecdh_keygen_distinct) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(crypto_available_rsa) :-
     % Assert RSA availability.
-    lattice_crypto_crypto_available(pai_algo_rsa).
+    lattice_crypto_crypto_available(lattice_cryptography_algo_rsa).
 
 % Define a clause for 'test': succeed when the following conditions hold.
 test(crypto_available_ecdh) :-
     % Assert ECDH availability.
-    lattice_crypto_crypto_available(pai_algo_ecdh).
+    lattice_crypto_crypto_available(lattice_cryptography_algo_ecdh).
 
 % ---------------------------------------------------------------------------
 % AC-PR49-008 — Generic dispatch for RSA via lattice_crypto_encrypt/5
@@ -172,9 +172,9 @@ test(generic_dispatch_rsa) :-
     % Generate RSA keys.
     rsa_test_keys(PrivKey, PubKey),
     % Encrypt through the generic interface.
-    lattice_crypto_encrypt(pai_algo_rsa, PubKey, 'generic-rsa-secret', Bundle, Tag),
+    lattice_crypto_encrypt(lattice_cryptography_algo_rsa, PubKey, 'generic-rsa-secret', Bundle, Tag),
     % Decrypt through the generic interface.
-    lattice_crypto_decrypt(pai_algo_rsa, PrivKey, Bundle, Tag, Plain),
+    lattice_crypto_decrypt(lattice_cryptography_algo_rsa, PrivKey, Bundle, Tag, Plain),
     % Assert the plaintext.
     Plain = 'generic-rsa-secret'.
 
@@ -187,9 +187,9 @@ test(generic_dispatch_ecdh) :-
     % Generate ECDH key pair.
     lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
     % Encrypt through the generic interface.
-    lattice_crypto_encrypt(pai_algo_ecdh, RecipPub, 'generic-ecdh-secret', Bundle, Tag),
+    lattice_crypto_encrypt(lattice_cryptography_algo_ecdh, RecipPub, 'generic-ecdh-secret', Bundle, Tag),
     % Decrypt through the generic interface.
-    lattice_crypto_decrypt(pai_algo_ecdh, RecipPriv, Bundle, Tag, Plain),
+    lattice_crypto_decrypt(lattice_cryptography_algo_ecdh, RecipPriv, Bundle, Tag, Plain),
     % Assert the plaintext.
     Plain = 'generic-ecdh-secret'.
 

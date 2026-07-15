@@ -1,10 +1,10 @@
 /*  PrologAI — PR 41 Distribution Semantics Probabilistic Layer Acceptance Tests
 
     AC-PR41-001: Given probabilistic facts rain(0.3) and sprinkler(0.5) with
-                 the standard wet-grass rules, when pai_prob_query computes
+                 the standard wet-grass rules, when probabilistic_query computes
                  wet_grass, the probability matches the analytically correct
                  value within tolerance, with an explanation set.
-    AC-PR41-002: pai_prob_fact declares a fact with its probability.
+    AC-PR41-002: probabilistic_fact declares a fact with its probability.
     AC-PR41-003: Certain fact (P=1.0) gives query probability 1.0.
     AC-PR41-004: Impossible fact (P=0.0) gives query probability 0.0.
     AC-PR41-005: Explanation set is non-empty for provable query.
@@ -13,7 +13,7 @@
     AC-PR41-007: Two mutually exclusive paths to same conclusion:
                  P = P(path1) + P(path2) (inclusion-exclusion).
     AC-PR41-008: Sampling budget gives result within statistical tolerance.
-    AC-PR41-009: pai_prob_fact is idempotent (re-declaring updates probability).
+    AC-PR41-009: probabilistic_fact is idempotent (re-declaring updates probability).
 */
 
 % Execute the compile-time directive: prolog_load_context(directory, TestDir),.
@@ -29,8 +29,8 @@
 
 % Load the built-in 'plunit' library so its predicates are available here.
 :- use_module(library(plunit)).
-% Import [pai_prob_fact/2, pai_prob_rule/2, pai_prob_query/3] from the built-in 'probabilistic' library.
-:- use_module(library(probabilistic), [pai_prob_fact/2, pai_prob_rule/2, pai_prob_query/3]).
+% Import [probabilistic_fact/2, probabilistic_rule/2, probabilistic_query/3] from the built-in 'probabilistic' library.
+:- use_module(library(probabilistic), [probabilistic_fact/2, probabilistic_rule/2, probabilistic_query/3]).
 
 % Execute the compile-time directive: begin_tests(pr41, [setup(pr41_setup), cleanup(pr41_cleanup)]).
 :- begin_tests(pr41, [setup(pr41_setup), cleanup(pr41_cleanup)]).
@@ -54,23 +54,23 @@ pr41_cleanup :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(wet_grass_probability, [setup(pr41_setup)]) :-
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(rain41,      0.3),
+    probabilistic_fact(rain41,      0.3),
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(sprinkler41, 0.5),
+    probabilistic_fact(sprinkler41, 0.5),
     % State a fact for 'pai prob rule' with the arguments listed below.
-    pai_prob_rule(wet_grass41, rain41),
+    probabilistic_rule(wet_grass41, rain41),
     % State a fact for 'pai prob rule' with the arguments listed below.
-    pai_prob_rule(wet_grass41, sprinkler41),
+    probabilistic_rule(wet_grass41, sprinkler41),
     % State a fact for 'pai prob query' with the arguments listed below.
-    pai_prob_query(wet_grass41, budget(100), result(P, _Expls)),
+    probabilistic_query(wet_grass41, budget(100), result(P, _Expls)),
     % Check that 'abs(P - 0.65)' is less than '0.01'.
     abs(P - 0.65) < 0.01.
 
-%  AC-PR41-002: pai_prob_fact stores the probability
+%  AC-PR41-002: probabilistic_fact stores the probability
 % Define a clause for 'test': succeed when the following conditions hold.
 test(prob_fact_stored, [setup(pr41_setup)]) :-
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(smoke41, 0.4),
+    probabilistic_fact(smoke41, 0.4),
     % Execute: probabilistic:prob_fact(smoke41, 0.4)..
     probabilistic:prob_fact(smoke41, 0.4).
 
@@ -78,9 +78,9 @@ test(prob_fact_stored, [setup(pr41_setup)]) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(certain_fact, [setup(pr41_setup)]) :-
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(certain41, 1.0),
+    probabilistic_fact(certain41, 1.0),
     % State a fact for 'pai prob query' with the arguments listed below.
-    pai_prob_query(certain41, budget(10), result(P, _)),
+    probabilistic_query(certain41, budget(10), result(P, _)),
     % Check that 'abs(P - 1.0)' is less than '1.0e-9'.
     abs(P - 1.0) < 1.0e-9.
 
@@ -88,9 +88,9 @@ test(certain_fact, [setup(pr41_setup)]) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(impossible_fact, [setup(pr41_setup)]) :-
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(impossible41, 0.0),
+    probabilistic_fact(impossible41, 0.0),
     % State a fact for 'pai prob query' with the arguments listed below.
-    pai_prob_query(impossible41, budget(10), result(P, _)),
+    probabilistic_query(impossible41, budget(10), result(P, _)),
     % Check that 'abs(P - 0.0)' is less than '1.0e-9'.
     abs(P - 0.0) < 1.0e-9.
 
@@ -98,9 +98,9 @@ test(impossible_fact, [setup(pr41_setup)]) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(explanations_non_empty, [setup(pr41_setup)]) :-
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(event41, 0.7),
+    probabilistic_fact(event41, 0.7),
     % State a fact for 'pai prob query' with the arguments listed below.
-    pai_prob_query(event41, budget(10), result(_, Expls)),
+    probabilistic_query(event41, budget(10), result(_, Expls)),
     % Check that 'Expls' is not unifiable with '[]'.
     Expls \= [],
     % Check that 'Expls' is not unifiable with 'sampled(_, _)'.
@@ -111,13 +111,13 @@ test(explanations_non_empty, [setup(pr41_setup)]) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(conjunction_product_rule, [setup(pr41_setup)]) :-
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(rain41b, 0.4),
+    probabilistic_fact(rain41b, 0.4),
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(cold41b, 0.6),
+    probabilistic_fact(cold41b, 0.6),
     % State a fact for 'pai prob rule' with the arguments listed below.
-    pai_prob_rule(rainy_cold41, (rain41b, cold41b)),
+    probabilistic_rule(rainy_cold41, (rain41b, cold41b)),
     % State a fact for 'pai prob query' with the arguments listed below.
-    pai_prob_query(rainy_cold41, budget(10), result(P, _)),
+    probabilistic_query(rainy_cold41, budget(10), result(P, _)),
     % Check that 'abs(P - 0.24)' is less than '0.01.   % 0.4 * 0.6 = 0.24'.
     abs(P - 0.24) < 0.01.   % 0.4 * 0.6 = 0.24
 
@@ -125,15 +125,15 @@ test(conjunction_product_rule, [setup(pr41_setup)]) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(disjunction_two_paths, [setup(pr41_setup)]) :-
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(path1_41, 0.3),
+    probabilistic_fact(path1_41, 0.3),
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(path2_41, 0.4),
+    probabilistic_fact(path2_41, 0.4),
     % State a fact for 'pai prob rule' with the arguments listed below.
-    pai_prob_rule(goal41, path1_41),
+    probabilistic_rule(goal41, path1_41),
     % State a fact for 'pai prob rule' with the arguments listed below.
-    pai_prob_rule(goal41, path2_41),
+    probabilistic_rule(goal41, path2_41),
     % State a fact for 'pai prob query' with the arguments listed below.
-    pai_prob_query(goal41, budget(10), result(P, _)),
+    probabilistic_query(goal41, budget(10), result(P, _)),
     % Check that 'abs(P - 0.58)' is less than '0.01'.
     abs(P - 0.58) < 0.01.
 
@@ -141,19 +141,19 @@ test(disjunction_two_paths, [setup(pr41_setup)]) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(sampling_tolerance, [setup(pr41_setup)]) :-
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(coin41, 0.5),
+    probabilistic_fact(coin41, 0.5),
     % State a fact for 'pai prob query' with the arguments listed below.
-    pai_prob_query(coin41, budget(200), result(P, _)),
+    probabilistic_query(coin41, budget(200), result(P, _)),
     % Check that 'abs(P - 0.5)' is less than '0.15.    % wide tolerance for stochastic test'.
     abs(P - 0.5) < 0.15.    % wide tolerance for stochastic test
 
-%  AC-PR41-009: pai_prob_fact idempotent (re-declare updates)
+%  AC-PR41-009: probabilistic_fact idempotent (re-declare updates)
 % Define a clause for 'test': succeed when the following conditions hold.
 test(prob_fact_idempotent, [setup(pr41_setup)]) :-
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(event41b, 0.3),
+    probabilistic_fact(event41b, 0.3),
     % State a fact for 'pai prob fact' with the arguments listed below.
-    pai_prob_fact(event41b, 0.7),
+    probabilistic_fact(event41b, 0.7),
     % Aggregate solutions using 'count' and bind the result to a single value.
     aggregate_all(count, probabilistic:prob_fact(event41b, _), Count),
     % Check that 'Count' is numerically equal to '1'.

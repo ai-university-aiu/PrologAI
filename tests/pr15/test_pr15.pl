@@ -5,10 +5,10 @@
                  reflects the removal without manual cache invalidation.
     AC-PR15-002: Minimal recomputation: only the affected derivation changes.
     AC-PR15-003: declare_derived/1 is idempotent.
-    AC-PR15-004: pai_derived/3 returns results consistent with current Lattice.
-    AC-PR15-005: pai_derived/3 updates automatically after anchor_node.
-    AC-PR15-006: pai_derived/3 updates automatically after prune_node.
-    AC-PR15-007: pai_tabling_stats/1 reports pai_derived as tabled.
+    AC-PR15-004: tabling_derived/3 returns results consistent with current Lattice.
+    AC-PR15-005: tabling_derived/3 updates automatically after anchor_node.
+    AC-PR15-006: tabling_derived/3 updates automatically after prune_node.
+    AC-PR15-007: tabling_stats/1 reports tabling_derived as tabled.
     AC-PR15-008: surface_contradictions/0 inscribes contradiction node_facts.
     AC-PR15-009: taxonomy_closure/2 computes transitive closure correctly.
 */
@@ -43,11 +43,11 @@
                                     % Continue the multi-line expression started above.
                                     prune_node/1]).
 % Load the built-in 'lattice_tabling' library so its predicates are available here.
-:- use_module(library(lattice_tabling), [declare_derived/1, pai_derived/3,
+:- use_module(library(lattice_tabling), [declare_derived/1, tabling_derived/3,
                                          % Supply 'surface_contradictions/0' as the next argument to the expression above.
                                          surface_contradictions/0,
-                                         % Supply 'pai_tabling_stats/1' as the next argument to the expression above.
-                                         pai_tabling_stats/1,
+                                         % Supply 'tabling_stats/1' as the next argument to the expression above.
+                                         tabling_stats/1,
                                          % Continue the multi-line expression started above.
                                          taxonomy_closure/2]).
 
@@ -129,49 +129,49 @@ test(declare_derived_idempotent) :-
     % Check that 'N' is numerically equal to '1'.
     N =:= 1.
 
-%  AC-PR15-004: pai_derived returns Lattice facts
+%  AC-PR15-004: tabling_derived returns Lattice facts
 % Define a clause for 'test': succeed when the following conditions hold.
 test(pai_derived_returns_lattice_facts) :-
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(taxonomy_test, [value_a], [ref_b], _),
-    % State the fact: once(pai_derived(taxonomy_test, [value_a], [ref_b])).
-    once(pai_derived(taxonomy_test, [value_a], [ref_b])).
+    % State the fact: once(tabling_derived(taxonomy_test, [value_a], [ref_b])).
+    once(tabling_derived(taxonomy_test, [value_a], [ref_b])).
 
-%  AC-PR15-005: pai_derived updates after anchor_node
+%  AC-PR15-005: tabling_derived updates after anchor_node
 % Define a clause for 'test': succeed when the following conditions hold.
 test(pai_derived_updates_after_anchor) :-
     % Before anchor
-    % Succeed only if 'pai_derived(new_rel, [new_val], []' cannot be proved (negation as failure).
-    \+ pai_derived(new_rel, [new_val], []),
+    % Succeed only if 'tabling_derived(new_rel, [new_val], []' cannot be proved (negation as failure).
+    \+ tabling_derived(new_rel, [new_val], []),
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(new_rel, [new_val], [], _),
     % After anchor — tabled result should now hold
-    % State the fact: once(pai_derived(new_rel, [new_val], [])).
-    once(pai_derived(new_rel, [new_val], [])).
+    % State the fact: once(tabling_derived(new_rel, [new_val], [])).
+    once(tabling_derived(new_rel, [new_val], [])).
 
-%  AC-PR15-006: pai_derived updates after prune_node
+%  AC-PR15-006: tabling_derived updates after prune_node
 % Define a clause for 'test': succeed when the following conditions hold.
 test(pai_derived_updates_after_prune) :-
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(prunable_rel, [px], [], _),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_derived(prunable_rel, [px], [])),
+    once(tabling_derived(prunable_rel, [px], [])),
     % Prune
     % Execute: lattice:lattice_node_fact(_, PId, prunable_rel, [px], []),.
     lattice:lattice_node_fact(_, PId, prunable_rel, [px], []),
     % State a fact for 'prune node' with the arguments listed below.
     prune_node(PId),
-    % After pruning, pai_derived should no longer hold
-    % Succeed only if 'pai_derived(prunable_rel, [px], []' cannot be proved (negation as failure).
-    \+ pai_derived(prunable_rel, [px], []).
+    % After pruning, tabling_derived should no longer hold
+    % Succeed only if 'tabling_derived(prunable_rel, [px], []' cannot be proved (negation as failure).
+    \+ tabling_derived(prunable_rel, [px], []).
 
 %  AC-PR15-007: tabling stats
 % Define a clause for 'test': succeed when the following conditions hold.
 test(tabling_stats_pai_derived_tabled) :-
     % State a fact for 'pai tabling stats' with the arguments listed below.
-    pai_tabling_stats(Stats),
+    tabling_stats(Stats),
     % State a fact for 'get dict' with the arguments listed below.
-    get_dict(pai_derived_tabled, Stats, Tabled),
+    get_dict(tabling_derived_tabled, Stats, Tabled),
     % Check that 'Tabled' is structurally identical to 'true'.
     Tabled == true.
 

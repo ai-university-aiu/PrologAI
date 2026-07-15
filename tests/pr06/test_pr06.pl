@@ -8,7 +8,7 @@
     AC-PR06-006: cyclic_actor_status/2 returns a dict with cycle_count and error_count.
     AC-PR06-007: Stopped actor removed from cyclic_actor_list.
     AC-PR06-008: Actor survives goal failure (nondet goal that fails).
-    AC-PR06-009: pai_declare_actor/3 starts a cyclic actor.
+    AC-PR06-009: actors_declare_actor/3 starts a cyclic actor.
 */
 
 % Execute the compile-time directive: prolog_load_context(directory, TestDir),.
@@ -147,7 +147,7 @@ test(goal_failure_survives) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(pai_declare_actor_starts) :-
     % State a fact for 'pai declare actor' with the arguments listed below.
-    pai_declare_actor(pai_test_actor, true, 100),
+    actors_declare_actor(pai_test_actor, true, 100),
     % State a fact for 'cyclic actor list' with the arguments listed below.
     cyclic_actor_list(Ls),
     % State a fact for 'memberchk' with the arguments listed below.

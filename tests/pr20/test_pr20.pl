@@ -7,7 +7,7 @@
     AC-PR20-002: record_trial/4 stores trial records.
     AC-PR20-003: spinoff_spinoff_stats/2 returns correct trial counts.
     AC-PR20-004: spinoff_spinoff_mine/2 finds result-spinoffs for reliable commands.
-    AC-PR20-005: Spinoffs never overwrite parents (pai_accommodate semantics).
+    AC-PR20-005: Spinoffs never overwrite parents (spinoff_accommodate semantics).
     AC-PR20-006: Context-spinoff has higher reliability than unconditional.
     AC-PR20-007: compute_marginal correctly estimates P(result|command).
     AC-PR20-008: find_context_conditions finds the best discriminating context.

@@ -27,7 +27,7 @@
    % State a fact for 'atomic list concat' with the arguments listed below.
    atomic_list_concat([ProjectRoot, '/packs/sentinels/prolog'],      SentinelPath),
    % State a fact for 'atomic list concat' with the arguments listed below.
-   atomic_list_concat([ProjectRoot, '/packs/mindbody/prolog'],       MindBodyPath),
+   atomic_list_concat([ProjectRoot, '/packs/mind_body/prolog'],       MindBodyPath),
    % State a fact for 'atomic list concat' with the arguments listed below.
    atomic_list_concat([ProjectRoot, '/packs/sona/prolog'],           SonaPath),
    % State a fact for 'atomic list concat' with the arguments listed below.
@@ -64,7 +64,7 @@
 % Import [sentinels_list/2] from the built-in 'sentinels' library.
 :- use_module(library(sentinels),   [sentinels_list/2]).
 % Import [manifest_body/3] from the built-in 'mindbody' library.
-:- use_module(library(mindbody),    [manifest_body/3]).
+:- use_module(library(mind_body),    [manifest_body/3]).
 % Load the built-in reflex_actors library so its predicates are available here.
 :- use_module(library(reflex_actors),  [reflex_actors_install_actors/0,
                                      % Supply 'reflex_actors_uninstall_actors/0' as the next argument to the expression above.

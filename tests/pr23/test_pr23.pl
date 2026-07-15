@@ -3,17 +3,17 @@
     AC-PR23-001: Given region A (shrinking error) and region B (stationary
                  random error), when curiosity urges are computed, region A
                  receives the higher urge.
-    AC-PR23-002: Given an idle interval, when pai_self_propose_task runs,
+    AC-PR23-002: Given an idle interval, when curiosity_self_propose_task runs,
                  at least one curiosity_task node_fact exists with its
                  proposal rationale, goal, and learning-progress score.
-    AC-PR23-003: pai_learning_progress returns 0.0 with only one data point.
-    AC-PR23-004: pai_learning_progress is positive for a strictly decreasing
+    AC-PR23-003: curiosity_learning_progress returns 0.0 with only one data point.
+    AC-PR23-004: curiosity_learning_progress is positive for a strictly decreasing
                  error series.
     AC-PR23-005: Noisy-TV guard: a region with constant high error (no
                  change) receives a lower urge than one with shrinking error.
     AC-PR23-006: Habituation grows after a visit and bounds the urge.
-    AC-PR23-007: pai_curiosity_frontier returns the region with highest urge.
-    AC-PR23-008: pai_curiosity_update ticks without error and caches urges.
+    AC-PR23-007: curiosity_frontier returns the region with highest urge.
+    AC-PR23-008: curiosity_update ticks without error and caches urges.
     AC-PR23-009: Error window is capped: only the last N=10 errors are kept.
 */
 
@@ -48,18 +48,18 @@
 :- use_module(library(node_facts),[set_default_nexus/1]).
 % Load the built-in 'curiosity' library so its predicates are available here.
 :- use_module(library(curiosity), [
-    % Supply 'pai_observe_error/3' as the next argument to the expression above.
-    pai_observe_error/3,
-    % Supply 'pai_learning_progress/2' as the next argument to the expression above.
-    pai_learning_progress/2,
-    % Supply 'pai_curiosity_urge/2' as the next argument to the expression above.
-    pai_curiosity_urge/2,
-    % Supply 'pai_curiosity_frontier/1' as the next argument to the expression above.
-    pai_curiosity_frontier/1,
-    % Supply 'pai_self_propose_task/3' as the next argument to the expression above.
-    pai_self_propose_task/3,
-    % Supply 'pai_curiosity_update/0' as the next argument to the expression above.
-    pai_curiosity_update/0
+    % Supply 'curiosity_observe_error/3' as the next argument to the expression above.
+    curiosity_observe_error/3,
+    % Supply 'curiosity_learning_progress/2' as the next argument to the expression above.
+    curiosity_learning_progress/2,
+    % Supply 'curiosity_urge/2' as the next argument to the expression above.
+    curiosity_urge/2,
+    % Supply 'curiosity_frontier/1' as the next argument to the expression above.
+    curiosity_frontier/1,
+    % Supply 'curiosity_self_propose_task/3' as the next argument to the expression above.
+    curiosity_self_propose_task/3,
+    % Supply 'curiosity_update/0' as the next argument to the expression above.
+    curiosity_update/0
 % Close the expression opened above.
 ]).
 
@@ -103,7 +103,7 @@ test(shrinking_beats_noisy) :-
         % Continue the multi-line expression started above.
         member(E-T, [1.0-1, 0.5-2, 0.25-3, 0.1-4, 0.05-5]),
         % Continue the multi-line expression started above.
-        pai_observe_error(region_a, E, T)
+        curiosity_observe_error(region_a, E, T)
     % Close the expression opened above.
     ),
     % Region B: stationary noise around 0.8
@@ -112,17 +112,17 @@ test(shrinking_beats_noisy) :-
         % Continue the multi-line expression started above.
         member(E-T, [0.8-1, 0.9-2, 0.75-3, 0.85-4, 0.8-5]),
         % Continue the multi-line expression started above.
-        pai_observe_error(region_b, E, T)
+        curiosity_observe_error(region_b, E, T)
     % Close the expression opened above.
     ),
     % State a fact for 'pai curiosity urge' with the arguments listed below.
-    pai_curiosity_urge(region_a, UrgeA),
+    curiosity_urge(region_a, UrgeA),
     % State a fact for 'pai curiosity urge' with the arguments listed below.
-    pai_curiosity_urge(region_b, UrgeB),
+    curiosity_urge(region_b, UrgeB),
     % Check that 'UrgeA' is greater than 'UrgeB'.
     UrgeA > UrgeB.
 
-%  AC-PR23-002: pai_self_propose_task inscribes a curiosity_task node_fact
+%  AC-PR23-002: curiosity_self_propose_task inscribes a curiosity_task node_fact
 % Define a clause for 'test': succeed when the following conditions hold.
 test(self_propose_task_inscribes_node) :-
     % Verify that for every solution of the Condition, the Action also holds.
@@ -130,11 +130,11 @@ test(self_propose_task_inscribes_node) :-
         % Continue the multi-line expression started above.
         member(E-T, [1.0-1, 0.6-2, 0.3-3, 0.1-4, 0.05-5]),
         % Continue the multi-line expression started above.
-        pai_observe_error(region_propose, E, T)
+        curiosity_observe_error(region_propose, E, T)
     % Close the expression opened above.
     ),
     % State a fact for 'pai self propose task' with the arguments listed below.
-    pai_self_propose_task(region_propose, GoalNodeId, LP),
+    curiosity_self_propose_task(region_propose, GoalNodeId, LP),
     % State a fact for 'nonvar' with the arguments listed below.
     nonvar(GoalNodeId),
     % Check that 'LP' is greater than '0.0'.
@@ -144,9 +144,9 @@ test(self_propose_task_inscribes_node) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(single_error_progress_zero) :-
     % State a fact for 'pai observe error' with the arguments listed below.
-    pai_observe_error(region_single, 0.5, 1),
+    curiosity_observe_error(region_single, 0.5, 1),
     % State a fact for 'pai learning progress' with the arguments listed below.
-    pai_learning_progress(region_single, LP),
+    curiosity_learning_progress(region_single, LP),
     % Check that 'LP' is numerically equal to '0.0'.
     LP =:= 0.0.
 
@@ -158,11 +158,11 @@ test(decreasing_errors_positive_progress) :-
         % Continue the multi-line expression started above.
         member(E-T, [1.0-1, 0.8-2, 0.6-3, 0.4-4, 0.2-5, 0.1-6]),
         % Continue the multi-line expression started above.
-        pai_observe_error(region_decreasing, E, T)
+        curiosity_observe_error(region_decreasing, E, T)
     % Close the expression opened above.
     ),
     % State a fact for 'pai learning progress' with the arguments listed below.
-    pai_learning_progress(region_decreasing, LP),
+    curiosity_learning_progress(region_decreasing, LP),
     % Check that 'LP' is greater than '0.0'.
     LP > 0.0.
 
@@ -175,7 +175,7 @@ test(constant_high_error_low_urge) :-
         % Continue the multi-line expression started above.
         member(E-T, [1.0-1, 0.5-2, 0.25-3, 0.1-4, 0.05-5]),
         % Continue the multi-line expression started above.
-        pai_observe_error(region_shrink2, E, T)
+        curiosity_observe_error(region_shrink2, E, T)
     % Close the expression opened above.
     ),
     % Constant region
@@ -184,13 +184,13 @@ test(constant_high_error_low_urge) :-
         % Continue the multi-line expression started above.
         member(E-T, [0.9-1, 0.9-2, 0.9-3, 0.9-4, 0.9-5]),
         % Continue the multi-line expression started above.
-        pai_observe_error(region_const, E, T)
+        curiosity_observe_error(region_const, E, T)
     % Close the expression opened above.
     ),
     % State a fact for 'pai curiosity urge' with the arguments listed below.
-    pai_curiosity_urge(region_shrink2, UShrink),
+    curiosity_urge(region_shrink2, UShrink),
     % State a fact for 'pai curiosity urge' with the arguments listed below.
-    pai_curiosity_urge(region_const,   UConst),
+    curiosity_urge(region_const,   UConst),
     % Check that 'UShrink' is greater than 'UConst'.
     UShrink > UConst.
 
@@ -202,20 +202,20 @@ test(habituation_reduces_urge) :-
         % Continue the multi-line expression started above.
         member(E-T, [1.0-1, 0.5-2, 0.2-3, 0.1-4, 0.05-5]),
         % Continue the multi-line expression started above.
-        pai_observe_error(region_hab, E, T)
+        curiosity_observe_error(region_hab, E, T)
     % Close the expression opened above.
     ),
     % State a fact for 'pai curiosity urge' with the arguments listed below.
-    pai_curiosity_urge(region_hab, UrgeBase),
+    curiosity_urge(region_hab, UrgeBase),
     % Simulate a visit (increases habituation)
     % State a fact for 'pai self propose task' with the arguments listed below.
-    pai_self_propose_task(region_hab, _, _),
+    curiosity_self_propose_task(region_hab, _, _),
     % State a fact for 'pai curiosity urge' with the arguments listed below.
-    pai_curiosity_urge(region_hab, UrgeAfter),
+    curiosity_urge(region_hab, UrgeAfter),
     % Check that 'UrgeAfter' is less than or equal to 'UrgeBase'.
     UrgeAfter =< UrgeBase.
 
-%  AC-PR23-007: pai_curiosity_frontier returns the region with highest urge
+%  AC-PR23-007: curiosity_frontier returns the region with highest urge
 % Define a clause for 'test': succeed when the following conditions hold.
 test(curiosity_frontier_correct) :-
     % region_f1: big shrink → high urge
@@ -224,7 +224,7 @@ test(curiosity_frontier_correct) :-
         % Continue the multi-line expression started above.
         member(E-T, [1.0-1, 0.5-2, 0.2-3, 0.05-4, 0.01-5]),
         % Continue the multi-line expression started above.
-        pai_observe_error(region_f1, E, T)
+        curiosity_observe_error(region_f1, E, T)
     % Close the expression opened above.
     ),
     % region_f2: small shrink → lower urge
@@ -233,21 +233,21 @@ test(curiosity_frontier_correct) :-
         % Continue the multi-line expression started above.
         member(E-T, [0.6-1, 0.55-2, 0.5-3, 0.48-4, 0.46-5]),
         % Continue the multi-line expression started above.
-        pai_observe_error(region_f2, E, T)
+        curiosity_observe_error(region_f2, E, T)
     % Close the expression opened above.
     ),
     % State a fact for 'pai curiosity urge' with the arguments listed below.
-    pai_curiosity_urge(region_f1, U1),
+    curiosity_urge(region_f1, U1),
     % State a fact for 'pai curiosity urge' with the arguments listed below.
-    pai_curiosity_urge(region_f2, U2),
+    curiosity_urge(region_f2, U2),
     % Check that 'U1' is greater than 'U2'.
     U1 > U2,
     % State a fact for 'pai curiosity frontier' with the arguments listed below.
-    pai_curiosity_frontier(Frontier),
+    curiosity_frontier(Frontier),
     % Check that 'Frontier' is unifiable with 'region_f1'.
     Frontier = region_f1.
 
-%  AC-PR23-008: pai_curiosity_update ticks without error
+%  AC-PR23-008: curiosity_update ticks without error
 % Define a clause for 'test': succeed when the following conditions hold.
 test(curiosity_update_runs) :-
     % Verify that for every solution of the Condition, the Action also holds.
@@ -255,11 +255,11 @@ test(curiosity_update_runs) :-
         % Continue the multi-line expression started above.
         member(E-T, [1.0-1, 0.5-2, 0.2-3]),
         % Continue the multi-line expression started above.
-        pai_observe_error(region_upd, E, T)
+        curiosity_observe_error(region_upd, E, T)
     % Close the expression opened above.
     ),
-    % State the zero-argument fact 'pai_curiosity_update'.
-    pai_curiosity_update.
+    % State the zero-argument fact 'curiosity_update'.
+    curiosity_update.
 
 %  AC-PR23-009: error window is capped at 10 entries
 % Define a clause for 'test': succeed when the following conditions hold.
@@ -269,7 +269,7 @@ test(error_window_capped) :-
         % Continue the multi-line expression started above.
         between(1, 15, I),
         % Continue the multi-line expression started above.
-        pai_observe_error(region_cap, 0.5, I)
+        curiosity_observe_error(region_cap, 0.5, I)
     % Close the expression opened above.
     ),
     % Aggregate solutions using 'count' and bind the result to a single value.
