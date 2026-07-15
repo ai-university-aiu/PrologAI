@@ -54,6 +54,14 @@ is_banned_name() { # $1 = pack name -> 0 if the NAME is an abbreviation/concaten
 }
 
 for p in "${targets[@]}"; do
+  # (5) TEST PRESENCE — every pack must ship an in-pack PLUnit test, or it never
+  # enters the per-pack regression and can rot invisibly (six self-recursive
+  # crypto stubs overflowed the stack undetected in lattice_cryptography for
+  # exactly this reason). Checked for every pack, including multi-file ones.
+  if [ ! -f "packs/$p/test/test_$p.pl" ]; then
+    violations=$((violations+1))
+    echo "VIOLATION [NO-TEST]  pack '$p' has no test/test_$p.pl (not in the per-pack regression; can rot invisibly)"
+  fi
   f="packs/$p/prolog/$p.pl"
   [ -f "$f" ] || continue
   scanned=$((scanned+1))
