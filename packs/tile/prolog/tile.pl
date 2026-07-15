@@ -1,20 +1,20 @@
 % tile.pl - Layer 81: Tiling, Stamping, and Period Detection (ti_* prefix).
 % ARC-AGI-2 visual reasoning: tile patterns, stamp motifs, detect periodicity.
 :- module(tile, [
-    ti_tile_h/3,
-    ti_tile_v/3,
-    ti_tile/4,
-    ti_split_rows/3,
-    ti_split_cols/3,
-    ti_split/4,
-    ti_flatten_tiles/2,
-    ti_stamp/5,
-    ti_stamp_all/4,
-    ti_extract_tile/6,
-    ti_is_tiling/3,
-    ti_find_period_h/2,
-    ti_find_period_v/2,
-    ti_checkerboard/5
+    tile_tile_h/3,
+    tile_tile_v/3,
+    tile_tile/4,
+    tile_split_rows/3,
+    tile_split_cols/3,
+    tile_split/4,
+    tile_flatten_tiles/2,
+    tile_stamp/5,
+    tile_stamp_all/4,
+    tile_extract_tile/6,
+    tile_is_tiling/3,
+    tile_find_period_h/2,
+    tile_find_period_v/2,
+    tile_checkerboard/5
 ]).
 
 % Import list operations used throughout this module.
@@ -22,34 +22,34 @@
 % Import higher-order operations used throughout this module.
 :- use_module(library(apply), [maplist/2, maplist/3, maplist/4, foldl/4]).
 
-% ti_tile_h(+Tile, +N, -Grid): Grid is Tile repeated N times side-by-side.
-ti_tile_h(Tile, N, Grid) :-
+% tile_tile_h(+Tile, +N, -Grid): Grid is Tile repeated N times side-by-side.
+tile_tile_h(Tile, N, Grid) :-
     % Repeat each row of Tile N times by appending copies.
-    maplist(ti_repeat_row_(N), Tile, Grid).
+    maplist(tile_repeat_row_(N), Tile, Grid).
 
-% ti_repeat_row_(+N, +Row, -Rep): Rep is Row concatenated N times.
-ti_repeat_row_(N, Row, Rep) :-
+% tile_repeat_row_(+N, +Row, -Rep): Rep is Row concatenated N times.
+tile_repeat_row_(N, Row, Rep) :-
     % Drive N fold steps using index list 1..N.
     numlist(1, N, Ns),
     % Start from [] and append Row once per fold step.
     foldl([_, Acc, NAcc]>>(append(Acc, Row, NAcc)), Ns, [], Rep).
 
-% ti_tile_v(+Tile, +N, -Grid): Grid is Tile stacked N times vertically.
-ti_tile_v(Tile, N, Grid) :-
+% tile_tile_v(+Tile, +N, -Grid): Grid is Tile stacked N times vertically.
+tile_tile_v(Tile, N, Grid) :-
     % Drive N fold steps using index list 1..N.
     numlist(1, N, Ns),
     % Start from [] and append all Tile rows once per fold step.
     foldl([_, Acc, NAcc]>>(append(Acc, Tile, NAcc)), Ns, [], Grid).
 
-% ti_tile(+Tile, +NR, +NC, -Grid): Grid is Tile tiled NR rows by NC columns of copies.
-ti_tile(Tile, NR, NC, Grid) :-
+% tile_tile(+Tile, +NR, +NC, -Grid): Grid is Tile tiled NR rows by NC columns of copies.
+tile_tile(Tile, NR, NC, Grid) :-
     % First tile Tile horizontally NC times.
-    ti_tile_h(Tile, NC, HGrid),
+    tile_tile_h(Tile, NC, HGrid),
     % Then tile that horizontally-extended grid NR times vertically.
-    ti_tile_v(HGrid, NR, Grid).
+    tile_tile_v(HGrid, NR, Grid).
 
-% ti_split_rows(+Grid, +TH, -Bands): split Grid into horizontal bands of TH rows each.
-ti_split_rows(Grid, TH, Bands) :-
+% tile_split_rows(+Grid, +TH, -Bands): split Grid into horizontal bands of TH rows each.
+tile_split_rows(Grid, TH, Bands) :-
     % Compute number of bands from total row count and band height.
     length(Grid, NRows),
     NTiles is NRows // TH,
@@ -63,8 +63,8 @@ ti_split_rows(Grid, TH, Bands) :-
         maplist([RI, Row]>>(nth0(RI, Grid, Row)), RowIdxs, Band)
     ), TIs, Bands).
 
-% ti_split_cols(+Grid, +TW, -Stripes): split Grid into vertical stripes of TW cols each.
-ti_split_cols(Grid, TW, Stripes) :-
+% tile_split_cols(+Grid, +TW, -Stripes): split Grid into vertical stripes of TW cols each.
+tile_split_cols(Grid, TW, Stripes) :-
     % Get column count from the first row.
     Grid = [FirstRow|_], length(FirstRow, NCols),
     NTiles is NCols // TW,
@@ -80,15 +80,15 @@ ti_split_cols(Grid, TW, Stripes) :-
         ), Grid, Stripe)
     ), TIs, Stripes).
 
-% ti_split(+Grid, +TH, +TW, -TileGrid): split Grid into list-of-tile-rows of TH x TW tiles.
-ti_split(Grid, TH, TW, TileGrid) :-
+% tile_split(+Grid, +TH, +TW, -TileGrid): split Grid into list-of-tile-rows of TH x TW tiles.
+tile_split(Grid, TH, TW, TileGrid) :-
     % First partition rows into horizontal bands.
-    ti_split_rows(Grid, TH, Bands),
+    tile_split_rows(Grid, TH, Bands),
     % Then partition each band into TW-wide vertical stripes.
-    maplist([Band, TileRow]>>(ti_split_cols(Band, TW, TileRow)), Bands, TileGrid).
+    maplist([Band, TileRow]>>(tile_split_cols(Band, TW, TileRow)), Bands, TileGrid).
 
-% ti_join_tile_row_(+TileRow, -Band): horizontally join a list of tiles into one sub-grid.
-ti_join_tile_row_(TileRow, Band) :-
+% tile_join_tile_row_(+TileRow, -Band): horizontally join a list of tiles into one sub-grid.
+tile_join_tile_row_(TileRow, Band) :-
     % Read tile height from the first tile in the row.
     TileRow = [FirstTile|_], length(FirstTile, TH), TH1 is TH - 1,
     % Iterate over each row index within the tile height.
@@ -99,15 +99,15 @@ ti_join_tile_row_(TileRow, Band) :-
         append(RowParts, Row)
     ), RowIdxs, Band).
 
-% ti_flatten_tiles(+TileGrid, -Grid): reassemble list-of-tile-rows back into one Grid.
-ti_flatten_tiles(TileGrid, Grid) :-
+% tile_flatten_tiles(+TileGrid, -Grid): reassemble list-of-tile-rows back into one Grid.
+tile_flatten_tiles(TileGrid, Grid) :-
     % Horizontally join each tile-row into a band.
-    maplist(ti_join_tile_row_, TileGrid, Bands),
+    maplist(tile_join_tile_row_, TileGrid, Bands),
     % Vertically stack all bands.
     append(Bands, Grid).
 
-% ti_stamp(+Base, +Motif, +R, +C, -Result): overlay Motif onto Base with top-left at (R,C).
-ti_stamp(Base, Motif, R, C, Result) :-
+% tile_stamp(+Base, +Motif, +R, +C, -Result): overlay Motif onto Base with top-left at (R,C).
+tile_stamp(Base, Motif, R, C, Result) :-
     % Read grid dimensions for full iteration.
     length(Base, NRows), NRowsM1 is NRows - 1,
     Base = [FirstRow|_], length(FirstRow, NCols), NColsM1 is NCols - 1,
@@ -127,13 +127,13 @@ ti_stamp(Base, Motif, R, C, Result) :-
         )
     ), RowIdxs, Base, Result).
 
-% ti_stamp_all(+Base, +Motif, +Positions, -Result): stamp Motif at each R-C in Positions.
-ti_stamp_all(Base, Motif, Positions, Result) :-
+% tile_stamp_all(+Base, +Motif, +Positions, -Result): stamp Motif at each R-C in Positions.
+tile_stamp_all(Base, Motif, Positions, Result) :-
     % Fold over R-C pairs, accumulating the grid after each stamp.
-    foldl([R-C, Acc, NAcc]>>(ti_stamp(Acc, Motif, R, C, NAcc)), Positions, Base, Result).
+    foldl([R-C, Acc, NAcc]>>(tile_stamp(Acc, Motif, R, C, NAcc)), Positions, Base, Result).
 
-% ti_extract_tile(+Grid, +TH, +TW, +TR, +TC, -Tile): extract TH x TW tile at tile-pos (TR,TC).
-ti_extract_tile(Grid, TH, TW, TR, TC, Tile) :-
+% tile_extract_tile(+Grid, +TH, +TW, +TR, +TC, -Tile): extract TH x TW tile at tile-pos (TR,TC).
+tile_extract_tile(Grid, TH, TW, TR, TC, Tile) :-
     % Compute the row and column ranges for this tile in the full grid.
     R0 is TR * TH, R1 is R0 + TH - 1,
     C0 is TC * TW, C1 is C0 + TW - 1,
@@ -145,13 +145,13 @@ ti_extract_tile(Grid, TH, TW, TR, TC, Tile) :-
         maplist([CI, Cell]>>(nth0(CI, Row, Cell)), ColIdxs, TRow)
     ), RowIdxs, Tile).
 
-% ti_is_tiling(+Grid, +TH, +TW): true if Grid is an exact tiling by a TH x TW tile.
-ti_is_tiling(Grid, TH, TW) :-
+% tile_is_tiling(+Grid, +TH, +TW): true if Grid is an exact tiling by a TH x TW tile.
+tile_is_tiling(Grid, TH, TW) :-
     % Check that dimensions are exact multiples of the tile size.
     length(Grid, NRows), Grid = [FirstRow|_], length(FirstRow, NCols),
     NRows mod TH =:= 0, NCols mod TW =:= 0,
     % Extract the reference tile at position (0,0).
-    ti_extract_tile(Grid, TH, TW, 0, 0, RefTile),
+    tile_extract_tile(Grid, TH, TW, 0, 0, RefTile),
     % Compute tile-grid dimensions.
     NRTiles is NRows // TH, NRTilesM1 is NRTiles - 1,
     NCTiles is NCols // TW, NCTilesM1 is NCTiles - 1,
@@ -160,10 +160,10 @@ ti_is_tiling(Grid, TH, TW) :-
     % Every tile must be structurally identical to the reference tile.
     forall(member(TR, TRIdxs),
         forall(member(TC, TCIdxs),
-            (ti_extract_tile(Grid, TH, TW, TR, TC, Tile), Tile == RefTile))).
+            (tile_extract_tile(Grid, TH, TW, TR, TC, Tile), Tile == RefTile))).
 
-% ti_row_period_(+Row, +P): Row has horizontal period P (repeats every P cells).
-ti_row_period_(Row, P) :-
+% tile_row_period_(+Row, +P): Row has horizontal period P (repeats every P cells).
+tile_row_period_(Row, P) :-
     % Build index list for all cell positions.
     length(Row, N), NM1 is N - 1,
     numlist(0, NM1, Idxs),
@@ -172,19 +172,19 @@ ti_row_period_(Row, P) :-
         nth0(I, Row, V), I2 is I mod P, nth0(I2, Row, V)
     )).
 
-% ti_find_period_h(+Grid, -PH): smallest horizontal period (in columns) of Grid.
-ti_find_period_h(Grid, PH) :-
+% tile_find_period_h(+Grid, -PH): smallest horizontal period (in columns) of Grid.
+tile_find_period_h(Grid, PH) :-
     % Try candidate periods 1..NCols in ascending order.
     Grid = [FirstRow|_], length(FirstRow, NCols),
     between(1, NCols, PH),
     NCols mod PH =:= 0,
     % All rows must have period PH.
-    forall(member(Row, Grid), ti_row_period_(Row, PH)),
+    forall(member(Row, Grid), tile_row_period_(Row, PH)),
     % Cut after the first (smallest) match.
     !.
 
-% ti_col_period_(+Grid, +P): Grid has vertical period P (rows repeat every P rows).
-ti_col_period_(Grid, P) :-
+% tile_col_period_(+Grid, +P): Grid has vertical period P (rows repeat every P rows).
+tile_col_period_(Grid, P) :-
     % Build index list for all row positions.
     length(Grid, N), NM1 is N - 1,
     numlist(0, NM1, Idxs),
@@ -194,19 +194,19 @@ ti_col_period_(Grid, P) :-
         Row == Row2
     )).
 
-% ti_find_period_v(+Grid, -PV): smallest vertical period (in rows) of Grid.
-ti_find_period_v(Grid, PV) :-
+% tile_find_period_v(+Grid, -PV): smallest vertical period (in rows) of Grid.
+tile_find_period_v(Grid, PV) :-
     % Try candidate periods 1..NRows in ascending order.
     length(Grid, NRows),
     between(1, NRows, PV),
     NRows mod PV =:= 0,
     % Grid must have vertical period PV.
-    ti_col_period_(Grid, PV),
+    tile_col_period_(Grid, PV),
     % Cut after the first (smallest) match.
     !.
 
-% ti_checkerboard(+H, +W, +V1, +V2, -Grid): H x W grid with V1 at even (R+C), V2 at odd.
-ti_checkerboard(H, W, V1, V2, Grid) :-
+% tile_checkerboard(+H, +W, +V1, +V2, -Grid): H x W grid with V1 at even (R+C), V2 at odd.
+tile_checkerboard(H, W, V1, V2, Grid) :-
     % Build row and column index lists.
     HM1 is H - 1, WM1 is W - 1,
     numlist(0, HM1, RowIdxs),

@@ -5,15 +5,15 @@
 :- begin_tests(remap_replace).
 
 test(replace_basic) :-
-    rm_replace([[1,0],[0,1]], 0, 9, G),
+    remap_replace([[1,0],[0,1]], 0, 9, G),
     G = [[1,9],[9,1]].
 
 test(replace_none) :-
-    rm_replace([[1,2],[3,4]], 0, 9, G),
+    remap_replace([[1,2],[3,4]], 0, 9, G),
     G = [[1,2],[3,4]].
 
 test(replace_all) :-
-    rm_replace([[0,0],[0,0]], 0, 5, G),
+    remap_replace([[0,0],[0,0]], 0, 5, G),
     G = [[5,5],[5,5]].
 
 :- end_tests(remap_replace).
@@ -21,17 +21,17 @@ test(replace_all) :-
 :- begin_tests(remap_swap).
 
 test(swap_basic) :-
-    rm_swap([[1,2],[2,1]], 1, 2, G),
+    remap_swap([[1,2],[2,1]], 1, 2, G),
     G = [[2,1],[1,2]].
 
 test(swap_no_b) :-
-    rm_swap([[1,3],[3,1]], 1, 2, G),
+    remap_swap([[1,3],[3,1]], 1, 2, G),
     G = [[2,3],[3,2]].
 
 test(swap_symmetric) :-
     G = [[1,2],[3,4]],
-    rm_swap(G, 1, 2, G2),
-    rm_swap(G2, 1, 2, G).
+    remap_swap(G, 1, 2, G2),
+    remap_swap(G2, 1, 2, G).
 
 :- end_tests(remap_swap).
 
@@ -39,16 +39,16 @@ test(swap_symmetric) :-
 
 test(apply_map_basic) :-
     Map = [1-9, 2-8],
-    rm_apply_map(Map, [[1,2],[3,4]], G),
+    remap_apply_map(Map, [[1,2],[3,4]], G),
     G = [[9,8],[3,4]].
 
 test(apply_map_identity) :-
-    rm_apply_map([], [[1,2],[3,4]], G),
+    remap_apply_map([], [[1,2],[3,4]], G),
     G = [[1,2],[3,4]].
 
 test(apply_map_full) :-
     Map = [0-1, 1-0],
-    rm_apply_map(Map, [[0,1],[1,0]], G),
+    remap_apply_map(Map, [[0,1],[1,0]], G),
     G = [[1,0],[0,1]].
 
 :- end_tests(remap_apply_map).
@@ -57,12 +57,12 @@ test(apply_map_full) :-
 
 test(apply_map_to_basic) :-
     Map = [1-9],
-    rm_apply_map_to(Map, 1, [[1,2],[1,3]], G),
+    remap_apply_map_to(Map, 1, [[1,2],[1,3]], G),
     G = [[9,2],[9,3]].
 
 test(apply_map_to_no_match) :-
     Map = [5-9],
-    rm_apply_map_to(Map, 5, [[1,2],[3,4]], G),
+    remap_apply_map_to(Map, 5, [[1,2],[3,4]], G),
     G = [[1,2],[3,4]].
 
 :- end_tests(remap_apply_map_to).
@@ -70,11 +70,11 @@ test(apply_map_to_no_match) :-
 :- begin_tests(remap_invert_map).
 
 test(invert_basic) :-
-    rm_invert_map([1-9, 2-8], Inv),
+    remap_invert_map([1-9, 2-8], Inv),
     Inv = [9-1, 8-2].
 
 test(invert_identity) :-
-    rm_invert_map([1-1, 2-2], Inv),
+    remap_invert_map([1-1, 2-2], Inv),
     Inv = [1-1, 2-2].
 
 :- end_tests(remap_invert_map).
@@ -84,18 +84,18 @@ test(invert_identity) :-
 test(compose_basic) :-
     Map1 = [1-2, 3-4],
     Map2 = [2-9, 4-8],
-    rm_compose_maps(Map1, Map2, Composed),
+    remap_compose_maps(Map1, Map2, Composed),
     Composed = [1-9, 3-8].
 
 test(compose_identity_second) :-
     Map1 = [1-2, 3-4],
-    rm_compose_maps(Map1, [], Composed),
+    remap_compose_maps(Map1, [], Composed),
     Composed = [1-2, 3-4].
 
 test(compose_partial) :-
     Map1 = [1-2, 3-4],
     Map2 = [2-9],
-    rm_compose_maps(Map1, Map2, Composed),
+    remap_compose_maps(Map1, Map2, Composed),
     Composed = [1-9, 3-4].
 
 :- end_tests(remap_compose_maps).
@@ -103,15 +103,15 @@ test(compose_partial) :-
 :- begin_tests(remap_normalize).
 
 test(normalize_basic) :-
-    rm_normalize([[3,1],[5,3]], G),
+    remap_normalize([[3,1],[5,3]], G),
     G = [[2,1],[3,2]].
 
 test(normalize_already) :-
-    rm_normalize([[1,2],[3,4]], G),
+    remap_normalize([[1,2],[3,4]], G),
     G = [[1,2],[3,4]].
 
 test(normalize_single_val) :-
-    rm_normalize([[5,5],[5,5]], G),
+    remap_normalize([[5,5],[5,5]], G),
     G = [[1,1],[1,1]].
 
 :- end_tests(remap_normalize).
@@ -119,15 +119,15 @@ test(normalize_single_val) :-
 :- begin_tests(remap_shift).
 
 test(shift_positive) :-
-    rm_shift([[1,2],[3,4]], 10, G),
+    remap_shift([[1,2],[3,4]], 10, G),
     G = [[11,12],[13,14]].
 
 test(shift_zero) :-
-    rm_shift([[1,2],[3,4]], 0, G),
+    remap_shift([[1,2],[3,4]], 0, G),
     G = [[1,2],[3,4]].
 
 test(shift_negative) :-
-    rm_shift([[5,6],[7,8]], -3, G),
+    remap_shift([[5,6],[7,8]], -3, G),
     G = [[2,3],[4,5]].
 
 :- end_tests(remap_shift).
@@ -135,15 +135,15 @@ test(shift_negative) :-
 :- begin_tests(remap_clamp).
 
 test(clamp_basic) :-
-    rm_clamp([[0,5],[10,3]], 1, 8, G),
+    remap_clamp([[0,5],[10,3]], 1, 8, G),
     G = [[1,5],[8,3]].
 
 test(clamp_no_change) :-
-    rm_clamp([[2,3],[4,5]], 1, 8, G),
+    remap_clamp([[2,3],[4,5]], 1, 8, G),
     G = [[2,3],[4,5]].
 
 test(clamp_all_low) :-
-    rm_clamp([[0,0],[0,0]], 1, 9, G),
+    remap_clamp([[0,0],[0,0]], 1, 9, G),
     G = [[1,1],[1,1]].
 
 :- end_tests(remap_clamp).
@@ -151,11 +151,11 @@ test(clamp_all_low) :-
 :- begin_tests(remap_conditional).
 
 test(conditional_basic) :-
-    rm_conditional([X]>>(X =:= 0), [[1,0],[0,1]], 9, G),
+    remap_conditional([X]>>(X =:= 0), [[1,0],[0,1]], 9, G),
     G = [[1,9],[9,1]].
 
 test(conditional_none) :-
-    rm_conditional([X]>>(X =:= 5), [[1,2],[3,4]], 9, G),
+    remap_conditional([X]>>(X =:= 5), [[1,2],[3,4]], 9, G),
     G = [[1,2],[3,4]].
 
 :- end_tests(remap_conditional).
@@ -163,15 +163,15 @@ test(conditional_none) :-
 :- begin_tests(remap_binarize).
 
 test(binarize_basic) :-
-    rm_binarize([[0,1],[2,0]], 0, 1, G),
+    remap_binarize([[0,1],[2,0]], 0, 1, G),
     G = [[0,1],[1,0]].
 
 test(binarize_all_fg) :-
-    rm_binarize([[1,2],[3,4]], 0, 9, G),
+    remap_binarize([[1,2],[3,4]], 0, 9, G),
     G = [[9,9],[9,9]].
 
 test(binarize_all_bg) :-
-    rm_binarize([[0,0],[0,0]], 0, 9, G),
+    remap_binarize([[0,0],[0,0]], 0, 9, G),
     G = [[0,0],[0,0]].
 
 :- end_tests(remap_binarize).
@@ -179,11 +179,11 @@ test(binarize_all_bg) :-
 :- begin_tests(remap_remap_bg).
 
 test(remap_bg_basic) :-
-    rm_remap_bg([[0,1],[0,2]], 0, 9, G),
+    remap_remap_bg([[0,1],[0,2]], 0, 9, G),
     G = [[9,1],[9,2]].
 
 test(remap_bg_no_match) :-
-    rm_remap_bg([[1,2],[3,4]], 0, 9, G),
+    remap_remap_bg([[1,2],[3,4]], 0, 9, G),
     G = [[1,2],[3,4]].
 
 :- end_tests(remap_remap_bg).
@@ -191,15 +191,15 @@ test(remap_bg_no_match) :-
 :- begin_tests(remap_palette).
 
 test(palette_basic) :-
-    rm_palette([[1,0],[2,1]], Pal),
+    remap_palette([[1,0],[2,1]], Pal),
     Pal = [0,1,2].
 
 test(palette_single) :-
-    rm_palette([[5,5],[5,5]], Pal),
+    remap_palette([[5,5],[5,5]], Pal),
     Pal = [5].
 
 test(palette_sorted) :-
-    rm_palette([[3,1,2],[2,3,1]], Pal),
+    remap_palette([[3,1,2],[2,3,1]], Pal),
     Pal = [1,2,3].
 
 :- end_tests(remap_palette).
@@ -207,15 +207,15 @@ test(palette_sorted) :-
 :- begin_tests(remap_reindex).
 
 test(reindex_basic) :-
-    rm_reindex([[3,1],[5,3]], [1,3,5], G),
+    remap_reindex([[3,1],[5,3]], [1,3,5], G),
     G = [[2,1],[3,2]].
 
 test(reindex_single) :-
-    rm_reindex([[9,9],[9,9]], [9], G),
+    remap_reindex([[9,9],[9,9]], [9], G),
     G = [[1,1],[1,1]].
 
 test(reindex_identity) :-
-    rm_reindex([[1,2],[3,4]], [1,2,3,4], G),
+    remap_reindex([[1,2],[3,4]], [1,2,3,4], G),
     G = [[1,2],[3,4]].
 
 :- end_tests(remap_reindex).

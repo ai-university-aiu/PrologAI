@@ -18,37 +18,37 @@ An arithmetic sequence is a list where each element differs from the previous
 by a fixed amount called the "step" (or "common difference"). For example,
 [1, 3, 5, 7] has step 2, and [10, 7, 4, 1] has step -3.
 
-rc_arith(+Start, +Step, +N, -Seq) generates N terms starting at Start:
+recur_arith(+Start, +Step, +N, -Seq) generates N terms starting at Start:
 
-  ?- rc_arith(1, 2, 5, Seq).
+  ?- recur_arith(1, 2, 5, Seq).
   Seq = [1, 3, 5, 7, 9].
 
-  ?- rc_arith(10, -3, 4, Seq).
+  ?- recur_arith(10, -3, 4, Seq).
   Seq = [10, 7, 4, 1].
 
-  ?- rc_arith(5, 0, 3, Seq).
+  ?- recur_arith(5, 0, 3, Seq).
   Seq = [5, 5, 5].    % step 0 produces a constant sequence
 
-rc_arith_step(+Seq, -Step) extracts the common difference from an existing list:
+recur_arith_step(+Seq, -Step) extracts the common difference from an existing list:
 
-  ?- rc_arith_step([2, 5, 8, 11], Step).
+  ?- recur_arith_step([2, 5, 8, 11], Step).
   Step = 3.
 
-  ?- rc_arith_step([4, 4, 4], Step).
+  ?- recur_arith_step([4, 4, 4], Step).
   Step = 0.
 
 It fails if the differences are not all equal:
 
-  ?- rc_arith_step([1, 2, 4, 8], Step).
+  ?- recur_arith_step([1, 2, 4, 8], Step).
   false.
 
-rc_is_arith(+Seq, -Step) is a named alias for rc_arith_step that reads as a
+recur_is_arith(+Seq, -Step) is a named alias for recur_arith_step that reads as a
 test predicate:
 
-  ?- rc_is_arith([3, 6, 9, 12], Step).
+  ?- recur_is_arith([3, 6, 9, 12], Step).
   Step = 3.
 
-  ?- rc_is_arith([1, 2, 4, 8], _).
+  ?- recur_is_arith([1, 2, 4, 8], _).
   false.
 
 
@@ -58,48 +58,48 @@ A periodic sequence is a list formed by repeating a shorter unit one or more
 times. For example, [a, b, a, b, a, b] repeats the unit [a, b] three times,
 and [7, 7, 7, 7] repeats the unit [7] four times.
 
-rc_repeat(+Unit, +N, -Seq) generates Seq by repeating Unit exactly N times:
+recur_repeat(+Unit, +N, -Seq) generates Seq by repeating Unit exactly N times:
 
-  ?- rc_repeat([a, b], 3, Seq).
+  ?- recur_repeat([a, b], 3, Seq).
   Seq = [a, b, a, b, a, b].
 
-  ?- rc_repeat([1, 2, 3], 2, Seq).
+  ?- recur_repeat([1, 2, 3], 2, Seq).
   Seq = [1, 2, 3, 1, 2, 3].
 
-rc_period(+Seq, -Unit) finds the minimal repeating unit:
+recur_period(+Seq, -Unit) finds the minimal repeating unit:
 
-  ?- rc_period([1, 2, 1, 2, 1, 2], Unit).
+  ?- recur_period([1, 2, 1, 2, 1, 2], Unit).
   Unit = [1, 2].
 
-  ?- rc_period([a, b, c, a, b, c], Unit).
+  ?- recur_period([a, b, c, a, b, c], Unit).
   Unit = [a, b, c].
 
-  ?- rc_period([7, 7, 7, 7], Unit).
+  ?- recur_period([7, 7, 7, 7], Unit).
   Unit = [7].    % constant sequences have period 1
 
 The unit length must evenly divide the sequence length:
 
-  ?- rc_period([1, 2, 3], Unit).
+  ?- recur_period([1, 2, 3], Unit).
   Unit = [1, 2, 3].    % [1,2,3] is itself - no shorter divisor
 
-rc_is_periodic(+Seq, -Unit) is equivalent to rc_period; it reads as a test:
+recur_is_periodic(+Seq, -Unit) is equivalent to recur_period; it reads as a test:
 
-  ?- rc_is_periodic([x, y, z, x, y, z], Unit).
+  ?- recur_is_periodic([x, y, z, x, y, z], Unit).
   Unit = [x, y, z].
 
 
 81.3 Cycling Through an Infinite Repetition
 
-rc_cycle_nth(+Unit, +N, -V) returns the N-th element (1-based) of the infinite
+recur_cycle_nth(+Unit, +N, -V) returns the N-th element (1-based) of the infinite
 cyclic repetition of Unit, using modular arithmetic:
 
-  ?- rc_cycle_nth([a, b, c], 1, V).
+  ?- recur_cycle_nth([a, b, c], 1, V).
   V = a.
 
-  ?- rc_cycle_nth([a, b, c], 4, V).
+  ?- recur_cycle_nth([a, b, c], 4, V).
   V = a.    % position 4 wraps around: (4-1) mod 3 = 0
 
-  ?- rc_cycle_nth([1, 2], 7, V).
+  ?- recur_cycle_nth([1, 2], 7, V).
   V = 1.    % position 7: (7-1) mod 2 = 0
 
 
@@ -108,82 +108,82 @@ cyclic repetition of Unit, using modular arithmetic:
 Given an existing arithmetic or periodic sequence, these predicates predict the
 next N terms.
 
-rc_next_arith(+Seq, +N, -Next) continues an arithmetic sequence:
+recur_next_arith(+Seq, +N, -Next) continues an arithmetic sequence:
 
-  ?- rc_next_arith([1, 3, 5], 3, Next).
+  ?- recur_next_arith([1, 3, 5], 3, Next).
   Next = [7, 9, 11].
 
-  ?- rc_next_arith([10, 7, 4], 2, Next).
+  ?- recur_next_arith([10, 7, 4], 2, Next).
   Next = [1, -2].
 
-rc_next_repeat(+Seq, +N, -Next) continues a periodic sequence from where it left
+recur_next_repeat(+Seq, +N, -Next) continues a periodic sequence from where it left
 off:
 
-  ?- rc_next_repeat([1, 2, 3, 1, 2, 3], 4, Next).
+  ?- recur_next_repeat([1, 2, 3, 1, 2, 3], 4, Next).
   Next = [1, 2, 3, 1].
 
-  ?- rc_next_repeat([a, b, a, b], 3, Next).
+  ?- recur_next_repeat([a, b, a, b], 3, Next).
   Next = [a, b, a].
 
 
 81.5 Extending a Sequence
 
-rc_extend_arith(+Seq, +N, -Extended, -Step) extends an arithmetic sequence and
+recur_extend_arith(+Seq, +N, -Extended, -Step) extends an arithmetic sequence and
 also returns the detected step:
 
-  ?- rc_extend_arith([2, 4, 6], 3, Extended, Step).
+  ?- recur_extend_arith([2, 4, 6], 3, Extended, Step).
   Extended = [2, 4, 6, 8, 10, 12], Step = 2.
 
-  ?- rc_extend_arith([9, 6, 3], 2, Extended, Step).
+  ?- recur_extend_arith([9, 6, 3], 2, Extended, Step).
   Extended = [9, 6, 3, 0, -3], Step = -3.
 
-rc_extend_repeat(+Seq, +N, -Extended, -Unit) extends a periodic sequence and also
+recur_extend_repeat(+Seq, +N, -Extended, -Unit) extends a periodic sequence and also
 returns the minimal period unit:
 
-  ?- rc_extend_repeat([1, 2, 1, 2], 4, Extended, Unit).
+  ?- recur_extend_repeat([1, 2, 1, 2], 4, Extended, Unit).
   Extended = [1, 2, 1, 2, 1, 2, 1, 2], Unit = [1, 2].
 
-  ?- rc_extend_repeat([a, b, c], 6, Extended, Unit).
+  ?- recur_extend_repeat([a, b, c], 6, Extended, Unit).
   Extended = [a, b, c, a, b, c, a, b, c], Unit = [a, b, c].
 
 
-81.6 Pair-wise Combination: rc_zip_with
+81.6 Pair-wise Combination: recur_zip_with
 
-rc_zip_with(+List1, +List2, :Goal, -Result) applies a 3-argument goal to each
+recur_zip_with(+List1, +List2, :Goal, -Result) applies a 3-argument goal to each
 pair of elements from two same-length lists. Goal(A, B, C) produces C for each
 pair (A, B):
 
-  ?- rc_zip_with([1, 2, 3], [10, 20, 30], [A,B,C]>>(C is A + B), Result).
+  ?- recur_zip_with([1, 2, 3], [10, 20, 30], [A,B,C]>>(C is A + B), Result).
   Result = [11, 22, 33].
 
-  ?- rc_zip_with([5, 6, 7], [1, 2, 3], [A,B,C]>>(C is A - B), Result).
+  ?- recur_zip_with([5, 6, 7], [1, 2, 3], [A,B,C]>>(C is A - B), Result).
   Result = [4, 4, 4].
 
-  ?- rc_zip_with([], [], _, Result).
+  ?- recur_zip_with([], [], _, Result).
   Result = [].
 
 
 81.7 Difference Lists
 
-rc_diff_list(+Seq, -Diffs) computes the consecutive differences of a numeric list.
+recur_diff_list(+Seq, -Diffs) computes the consecutive differences of a numeric list.
 Diffs has one fewer element than Seq:
 
-  ?- rc_diff_list([1, 3, 6, 10], Diffs).
+  ?- recur_diff_list([1, 3, 6, 10], Diffs).
   Diffs = [2, 3, 4].    % differences are not constant
 
-  ?- rc_diff_list([5, 3, 1], Diffs).
+  ?- recur_diff_list([5, 3, 1], Diffs).
   Diffs = [-2, -2].
 
-rc_const_diffs(+Seq, -Step) succeeds if all consecutive differences are equal,
+recur_const_diffs(+Seq, -Step) succeeds if all consecutive differences are equal,
 and returns that common difference:
 
-  ?- rc_const_diffs([2, 5, 8, 11], Step).
+  ?- recur_const_diffs([2, 5, 8, 11], Step).
   Step = 3.
 
-  ?- rc_const_diffs([1, 2, 4, 8], _).
+  ?- recur_const_diffs([1, 2, 4, 8], _).
   false.    % differences [1, 2, 4] are not all equal
 
-rc_const_diffs is equivalent to rc_is_arith but is named for use in contexts
+recur_const_diffs is equivalent to recur_is_arith but is named for use in contexts
 where you are explicitly working with difference lists.
 
 
@@ -192,14 +192,14 @@ where you are explicitly working with difference lists.
 The most powerful use of the recur pack is to first test whether a sequence
 is arithmetic or periodic, then extend or query it:
 
-  sequence_type(Seq, arithmetic(Step)) :- rc_is_arith(Seq, Step).
-  sequence_type(Seq, periodic(Unit))   :- rc_is_periodic(Seq, Unit).
+  sequence_type(Seq, arithmetic(Step)) :- recur_is_arith(Seq, Step).
+  sequence_type(Seq, periodic(Unit))   :- recur_is_periodic(Seq, Unit).
 
   extend_any(Seq, N, Extended) :-
-      (rc_is_arith(Seq, _) ->
-          rc_extend_arith(Seq, N, Extended, _)
+      (recur_is_arith(Seq, _) ->
+          recur_extend_arith(Seq, N, Extended, _)
       ;
-          rc_extend_repeat(Seq, N, Extended, _)
+          recur_extend_repeat(Seq, N, Extended, _)
       ).
 
   ?- extend_any([1, 3, 5], 3, E).
@@ -211,17 +211,17 @@ is arithmetic or periodic, then extend or query it:
 
 81.9 Summary of Predicates
 
-rc_arith/4           - generate N-term arithmetic sequence from Start with Step
-rc_arith_step/2      - extract common difference of an arithmetic sequence
-rc_is_arith/2        - test if a sequence is arithmetic; return Step
-rc_repeat/3          - repeat a unit N times end-to-end
-rc_period/2          - find the minimal repeating unit of a sequence
-rc_is_periodic/2     - test if a sequence is an exact integer repetition
-rc_next_arith/3      - next N terms of an arithmetic sequence
-rc_next_repeat/3     - next N terms of a periodic sequence
-rc_extend_arith/4    - extend arithmetic sequence by N terms; return Step
-rc_extend_repeat/4   - extend periodic sequence by N terms; return Unit
-rc_cycle_nth/3       - N-th element (1-based) of an infinite cyclic repetition
-rc_zip_with/4        - pair-wise application of a goal over two lists
-rc_diff_list/2       - consecutive element-wise differences
-rc_const_diffs/2     - test if all consecutive differences are equal; return Step
+recur_arith/4           - generate N-term arithmetic sequence from Start with Step
+recur_arith_step/2      - extract common difference of an arithmetic sequence
+recur_is_arith/2        - test if a sequence is arithmetic; return Step
+recur_repeat/3          - repeat a unit N times end-to-end
+recur_period/2          - find the minimal repeating unit of a sequence
+recur_is_periodic/2     - test if a sequence is an exact integer repetition
+recur_next_arith/3      - next N terms of an arithmetic sequence
+recur_next_repeat/3     - next N terms of a periodic sequence
+recur_extend_arith/4    - extend arithmetic sequence by N terms; return Step
+recur_extend_repeat/4   - extend periodic sequence by N terms; return Unit
+recur_cycle_nth/3       - N-th element (1-based) of an infinite cyclic repetition
+recur_zip_with/4        - pair-wise application of a goal over two lists
+recur_diff_list/2       - consecutive element-wise differences
+recur_const_diffs/2     - test if all consecutive differences are equal; return Step

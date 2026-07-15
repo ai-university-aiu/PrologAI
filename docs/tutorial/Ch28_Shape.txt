@@ -45,177 +45,177 @@ LOADING THE SHAPE PACK
 
 CREATING SHAPES
 
-sh_from_cells(+Cells, -Shape)
+shape_from_cells(+Cells, -Shape)
 
 Build a normalized shape from a raw list of r(R,C) cells.
 
 % Normalize an L-shape starting at row 2, col 3.
-:- sh_from_cells([r(2,3), r(3,3), r(4,3), r(4,4)], Shape).
+:- shape_from_cells([r(2,3), r(3,3), r(4,3), r(4,4)], Shape).
 % Shape = [r(0,0), r(1,0), r(2,0), r(2,1)].
 
 % A single cell normalizes to [r(0,0)].
-:- sh_from_cells([r(5,7)], Shape).
+:- shape_from_cells([r(5,7)], Shape).
 % Shape = [r(0,0)].
 
-sh_from_grid(+Grid, +Color, -Shape)
+shape_from_grid(+Grid, +Color, -Shape)
 
 Extract all cells of a given color from a grid and normalize to a shape.
 
 % Extract the L-shape from a grid.
 Grid = [[1,0,0],[1,0,0],[1,1,0]].
-:- sh_from_grid(Grid, 1, Shape).
+:- shape_from_grid(Grid, 1, Shape).
 % Shape = [r(0,0), r(1,0), r(2,0), r(2,1)].
 
 % Fails if the color is not present.
-:- sh_from_grid(Grid, 9, _Shape).
+:- shape_from_grid(Grid, 9, _Shape).
 % Fails.
 
 
 SHAPE PROPERTIES
 
-sh_area(+Shape, -N)
+shape_area(+Shape, -N)
 
 N is the number of cells in Shape.
 
-:- sh_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
-   sh_area(S, N).
+:- shape_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
+   shape_area(S, N).
 % N = 4.
 
-sh_bounding_size(+Shape, -Rows, -Cols)
+shape_bounding_size(+Shape, -Rows, -Cols)
 
 Rows x Cols is the minimal bounding box.
 
-:- sh_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
-   sh_bounding_size(S, Rows, Cols).
+:- shape_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
+   shape_bounding_size(S, Rows, Cols).
 % Rows = 3, Cols = 2.
 
-sh_contains_cell(+Shape, +Cell)
+shape_contains_cell(+Shape, +Cell)
 
 Succeed if cell r(R,C) is a member of Shape.
 
-:- sh_contains_cell([r(0,0), r(1,0), r(2,0), r(2,1)], r(2,1)).
+:- shape_contains_cell([r(0,0), r(1,0), r(2,0), r(2,1)], r(2,1)).
 % Succeeds.
 
-:- sh_contains_cell([r(0,0), r(1,0)], r(0,1)).
+:- shape_contains_cell([r(0,0), r(1,0)], r(0,1)).
 % Fails.
 
-sh_equal(+Shape1, +Shape2)
+shape_equal(+Shape1, +Shape2)
 
 Succeed if Shape1 and Shape2 are identical normalized shapes.
 Two copies of the same pattern at different grid positions are equal after
-normalization via sh_from_cells.
+normalization via shape_from_cells.
 
 % Two bars at different positions are equal after normalization.
-:- sh_from_cells([r(0,0), r(0,1)], S1),
-   sh_from_cells([r(3,5), r(3,6)], S2),
-   sh_equal(S1, S2).
+:- shape_from_cells([r(0,0), r(0,1)], S1),
+   shape_from_cells([r(3,5), r(3,6)], S2),
+   shape_equal(S1, S2).
 % Succeeds.
 
 
 SPATIAL TRANSFORMATIONS
 
-sh_translate(+Shape, +DR, +DC, -Shape2)
+shape_translate(+Shape, +DR, +DC, -Shape2)
 
-Add (DR, DC) offset to all cells. Does NOT renormalize; use sh_from_cells
+Add (DR, DC) offset to all cells. Does NOT renormalize; use shape_from_cells
 on the result if you need the shape back at the origin.
 
 % Translate a bar from origin to row 2, col 3.
-:- sh_from_cells([r(0,0), r(0,1)], S),
-   sh_translate(S, 2, 3, S2).
+:- shape_from_cells([r(0,0), r(0,1)], S),
+   shape_translate(S, 2, 3, S2).
 % S2 = [r(2,3), r(2,4)].
 
-sh_rotate90(+Shape, -Shape2)
+shape_rotate90(+Shape, -Shape2)
 
 Rotate 90 degrees clockwise, then renormalize. The transformation is:
 r(R,C) -> r(C, MaxR-R) where MaxR = max row in Shape.
 
 % Rotate the L-shape 90 degrees CW.
-:- sh_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
-   sh_rotate90(S, S2).
+:- shape_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
+   shape_rotate90(S, S2).
 % S2 = [r(0,0), r(0,1), r(0,2), r(1,0)].
 
 % Four rotations return the original shape.
-:- sh_rotate90(S, R1), sh_rotate90(R1, R2),
-   sh_rotate90(R2, R3), sh_rotate90(R3, R4),
-   sh_equal(S, R4).
+:- shape_rotate90(S, R1), shape_rotate90(R1, R2),
+   shape_rotate90(R2, R3), shape_rotate90(R3, R4),
+   shape_equal(S, R4).
 
-sh_reflect_h(+Shape, -Shape2)
+shape_reflect_h(+Shape, -Shape2)
 
 Reflect horizontally (flip columns), then renormalize.
 Transformation: r(R,C) -> r(R, MaxC-C).
 
 % A horizontal bar is unchanged by horizontal reflection.
-:- sh_from_cells([r(0,0), r(0,1), r(0,2)], S),
-   sh_reflect_h(S, S2),
-   sh_equal(S, S2).
+:- shape_from_cells([r(0,0), r(0,1), r(0,2)], S),
+   shape_reflect_h(S, S2),
+   shape_equal(S, S2).
 
-sh_reflect_v(+Shape, -Shape2)
+shape_reflect_v(+Shape, -Shape2)
 
 Reflect vertically (flip rows), then renormalize.
 Transformation: r(R,C) -> r(MaxR-R, C).
 
 % A vertical bar is unchanged by vertical reflection.
-:- sh_from_cells([r(0,0), r(1,0), r(2,0)], S),
-   sh_reflect_v(S, S2),
-   sh_equal(S, S2).
+:- shape_from_cells([r(0,0), r(1,0), r(2,0)], S),
+   shape_reflect_v(S, S2),
+   shape_equal(S, S2).
 
 
 D4 ORBIT AND CANONICAL FORM
 
-sh_orbit(+Shape, -Orbit)
+shape_orbit(+Shape, -Orbit)
 
 Orbit is the list of all distinct D4 orientations of Shape (1 to 8 elements).
 An asymmetric shape has 8 distinct orientations; a square has 1.
 
 % An asymmetric L-shape has 8 distinct orientations.
-:- sh_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
-   sh_orbit(S, Orbit),
+:- shape_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
+   shape_orbit(S, Orbit),
    length(Orbit, 8).
 
 % A 1x3 bar has 2 distinct orientations (horizontal and vertical).
-:- sh_from_cells([r(0,0), r(0,1), r(0,2)], S),
-   sh_orbit(S, Orbit),
+:- shape_from_cells([r(0,0), r(0,1), r(0,2)], S),
+   shape_orbit(S, Orbit),
    length(Orbit, 2).
 
-sh_canonical(+Shape, -Canon)
+shape_canonical(+Shape, -Canon)
 
 Canon is the lexicographically smallest element of the D4 orbit.
 Two shapes have the same canonical form if and only if they are D4-equivalent.
 
-:- sh_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
-   sh_rotate90(S, R90),
-   sh_canonical(S, C1),
-   sh_canonical(R90, C2),
-   sh_equal(C1, C2).
+:- shape_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
+   shape_rotate90(S, R90),
+   shape_canonical(S, C1),
+   shape_canonical(R90, C2),
+   shape_equal(C1, C2).
 % Succeeds: same canonical form.
 
-sh_equivalent(+Shape1, +Shape2)
+shape_equivalent(+Shape1, +Shape2)
 
 Succeed if Shape1 and Shape2 have the same D4 canonical form.
 
 % An L-shape and its 90-degree rotation are equivalent.
-:- sh_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
-   sh_rotate90(S, R90),
-   sh_equivalent(S, R90).
+:- shape_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
+   shape_rotate90(S, R90),
+   shape_equivalent(S, R90).
 % Succeeds.
 
 % A bar and an L-shape are not equivalent.
-:- sh_from_cells([r(0,0), r(0,1), r(0,2)], Bar),
-   sh_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], L),
-   sh_equivalent(Bar, L).
+:- shape_from_cells([r(0,0), r(0,1), r(0,2)], Bar),
+   shape_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], L),
+   shape_equivalent(Bar, L).
 % Fails.
 
 
 PLACING SHAPES ON GRIDS
 
-sh_to_grid(+Shape, +DR, +DC, +Color, +Grid, -Grid2)
+shape_to_grid(+Shape, +DR, +DC, +Color, +Grid, -Grid2)
 
 Place each cell of Shape on Grid at offset (DR, DC) with Color.
 
 % Place an L-shape starting at row 1, col 2.
 Grid = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]].
-:- sh_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
-   sh_to_grid(S, 1, 2, 5, Grid, Grid2).
+:- shape_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], S),
+   shape_to_grid(S, 1, 2, 5, Grid, Grid2).
 % Grid2 has 5 at positions (1,2), (2,2), (3,2), (3,3).
 
 
@@ -225,52 +225,52 @@ Checking if two colors have the same shape (up to position):
 
 % Test if color 1 and color 2 in a grid have the same normalized shape.
 same_shape_colors(Grid, C1, C2) :-
-    sh_from_grid(Grid, C1, S1),
-    sh_from_grid(Grid, C2, S2),
-    sh_equal(S1, S2).
+    shape_from_grid(Grid, C1, S1),
+    shape_from_grid(Grid, C2, S2),
+    shape_equal(S1, S2).
 
 Finding if two grids contain the same shape type (up to rotation):
 
 % Test if color 1 in G1 and color 1 in G2 are D4-equivalent shapes.
 same_shape_type(G1, G2) :-
-    sh_from_grid(G1, 1, S1),
-    sh_from_grid(G2, 1, S2),
-    sh_equivalent(S1, S2).
+    shape_from_grid(G1, 1, S1),
+    shape_from_grid(G2, 1, S2),
+    shape_equivalent(S1, S2).
 
 Placing all rotations of a shape to find which one fits:
 
 % Find which rotation of Shape fits at position (DR, DC) with color Color.
 find_fitting_rotation(Shape, DR, DC, Color, Grid, Rotation) :-
-    sh_orbit(Shape, Orbit),
+    shape_orbit(Shape, Orbit),
     member(Rotation, Orbit),
-    sh_to_grid(Rotation, DR, DC, Color, Grid, _Grid2).
+    shape_to_grid(Rotation, DR, DC, Color, Grid, _Grid2).
 
 
 PREDICATE SUMMARY
 
 Creation:
-  sh_from_cells/2     - normalize raw cells to a shape
-  sh_from_grid/3      - extract and normalize color cells from a grid
+  shape_from_cells/2     - normalize raw cells to a shape
+  shape_from_grid/3      - extract and normalize color cells from a grid
 
 Properties:
-  sh_area/2           - cell count
-  sh_bounding_size/3  - bounding box dimensions
-  sh_contains_cell/2  - membership test (deterministic)
-  sh_equal/2          - identity test
+  shape_area/2           - cell count
+  shape_bounding_size/3  - bounding box dimensions
+  shape_contains_cell/2  - membership test (deterministic)
+  shape_equal/2          - identity test
 
 Transformation:
-  sh_translate/4      - shift cells by offset (no renormalize)
-  sh_rotate90/2       - 90-degree CW rotation, renormalize
-  sh_reflect_h/2      - horizontal flip (columns), renormalize
-  sh_reflect_v/2      - vertical flip (rows), renormalize
+  shape_translate/4      - shift cells by offset (no renormalize)
+  shape_rotate90/2       - 90-degree CW rotation, renormalize
+  shape_reflect_h/2      - horizontal flip (columns), renormalize
+  shape_reflect_v/2      - vertical flip (rows), renormalize
 
 D4 orbit:
-  sh_orbit/2          - all distinct D4 orientations
-  sh_canonical/2      - lex-min D4 orientation
-  sh_equivalent/2     - D4 orbit equivalence
+  shape_orbit/2          - all distinct D4 orientations
+  shape_canonical/2      - lex-min D4 orientation
+  shape_equivalent/2     - D4 orbit equivalence
 
 Placement:
-  sh_to_grid/6        - place shape on grid at offset
+  shape_to_grid/6        - place shape on grid at offset
 
 
 WHAT COMES NEXT

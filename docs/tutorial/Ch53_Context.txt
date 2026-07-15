@@ -177,12 +177,12 @@ The context pack integrates naturally with the pipeline, obj, and rewrite packs:
 
   % Look up what operation to apply for color 2.
   context_get(SymbolTable, 2, StepName),
-  pl_run([StepName], InputGrid, OutputGrid).
+  pipeline_run([StepName], InputGrid, OutputGrid).
 
   % Pass a context map through a pipeline via a step that reads from it.
-  pl_register(apply_ctx_op, [ctx_op(Map), G, G2]>>(
+  pipeline_register(apply_ctx_op, [ctx_op(Map), G, G2]>>(
       context_select(Map, [operation], noop, Op),
-      pl_run([Op], G, G2)
+      pipeline_run([Op], G, G2)
   )).
 
   % Merge two partial symbol tables from two training pairs.

@@ -6,72 +6,72 @@ Cells list in an obj term.
 
 1. Getting the Size
 
-sz_of(+Obj, -N): N is the cell count of Obj.
+sizeop_of(+Obj, -N): N is the cell count of Obj.
 
-  ?- sz_of(obj(red, [r(0,0), r(0,1), r(1,0)]), N).
+  ?- sizeop_of(obj(red, [r(0,0), r(0,1), r(1,0)]), N).
   N = 3.
 
 2. Sorting by Size
 
-sz_sort_asc(+Objs, -Sorted): sort by cell count ascending (stable).
-sz_sort_desc(+Objs, -Sorted): sort by cell count descending (stable).
+sizeop_sort_asc(+Objs, -Sorted): sort by cell count ascending (stable).
+sizeop_sort_desc(+Objs, -Sorted): sort by cell count descending (stable).
 
   ?- Objs = [obj(a,[r(0,0),r(0,1),r(0,2)]),
              obj(b,[r(0,0)]),
              obj(c,[r(0,0),r(0,1)])],
-     sz_sort_asc(Objs, S).
+     sizeop_sort_asc(Objs, S).
   S = [obj(b,...), obj(c,...), obj(a,...)].   % 1, 2, 3
 
 3. Selecting Extremes
 
-sz_smallest(+Objs, -Obj): first object with fewest cells (input order on ties).
-sz_largest(+Objs, -Obj): first object with most cells (input order on ties).
+sizeop_smallest(+Objs, -Obj): first object with fewest cells (input order on ties).
+sizeop_largest(+Objs, -Obj): first object with most cells (input order on ties).
 
-  ?- sz_largest([obj(a,[r(0,0)]), obj(b,[r(0,0),r(0,1)])], O).
+  ?- sizeop_largest([obj(a,[r(0,0)]), obj(b,[r(0,0),r(0,1)])], O).
   O = obj(b, [r(0,0),r(0,1)]).
 
 4. Rank-Indexed Access
 
-sz_nth_smallest(+Objs, +N, -Obj): Nth smallest (1-based).
-sz_nth_largest(+Objs, +N, -Obj): Nth largest (1-based).
+sizeop_nth_smallest(+Objs, +N, -Obj): Nth smallest (1-based).
+sizeop_nth_largest(+Objs, +N, -Obj): Nth largest (1-based).
 
-  ?- sz_nth_smallest([obj(a,[r(0,0)]), obj(b,[r(0,0),r(0,1)])], 2, O).
+  ?- sizeop_nth_smallest([obj(a,[r(0,0)]), obj(b,[r(0,0),r(0,1)])], 2, O).
   O = obj(b, [r(0,0),r(0,1)]).
 
 5. Rank Query
 
-sz_rank_of(+Objs, +Obj, -Rank): 1-based size rank (ascending) of Obj in Objs.
+sizeop_rank_of(+Objs, +Obj, -Rank): 1-based size rank (ascending) of Obj in Objs.
 
-  ?- sz_rank_of([obj(a,[r(0,0)]), obj(b,[r(0,0),r(0,1)])], obj(a,[r(0,0)]), R).
+  ?- sizeop_rank_of([obj(a,[r(0,0)]), obj(b,[r(0,0),r(0,1)])], obj(a,[r(0,0)]), R).
   R = 1.
 
 6. Color Assignment in Size Order
 
-sz_assign_colors(+Objs, +Colors, -Result): sort Objs by size ascending, zip
+sizeop_assign_colors(+Objs, +Colors, -Result): sort Objs by size ascending, zip
 with Colors, recolor. Truncates at the shorter list.
 
   ?- Objs = [obj(x,[r(0,0),r(0,1)]), obj(y,[r(0,0)])],
-     sz_assign_colors(Objs, [red, blue], Result).
+     sizeop_assign_colors(Objs, [red, blue], Result).
   Result = [obj(red,[r(0,0)]), obj(blue,[r(0,0),r(0,1)])].
   % obj(y) is smallest (size 1) -> red; obj(x) is size 2 -> blue.
 
 7. Size Filtering
 
-sz_by_size(+Objs, +N, -Filtered): objects with exactly N cells.
-sz_above(+Objs, +N, -Filtered): objects with > N cells.
-sz_below(+Objs, +N, -Filtered): objects with < N cells.
+sizeop_by_size(+Objs, +N, -Filtered): objects with exactly N cells.
+sizeop_above(+Objs, +N, -Filtered): objects with > N cells.
+sizeop_below(+Objs, +N, -Filtered): objects with < N cells.
 
   ?- Objs = [obj(a,[r(0,0)]), obj(b,[r(0,0),r(0,1)]), obj(c,[r(0,0),r(0,1),r(1,0)])],
-     sz_above(Objs, 1, F).
+     sizeop_above(Objs, 1, F).
   F = [obj(b,...), obj(c,...)].
 
 8. Size Statistics
 
-sz_unique_sizes(+Objs, -Sizes): sorted list of distinct cell counts.
-sz_total_cells(+Objs, -N): sum of all cell counts.
+sizeop_unique_sizes(+Objs, -Sizes): sorted list of distinct cell counts.
+sizeop_total_cells(+Objs, -N): sum of all cell counts.
 
-  ?- sz_unique_sizes([obj(a,[r(0,0)]), obj(b,[r(0,0),r(0,1)]), obj(c,[r(0,0)])], S).
+  ?- sizeop_unique_sizes([obj(a,[r(0,0)]), obj(b,[r(0,0),r(0,1)]), obj(c,[r(0,0)])], S).
   S = [1, 2].   % two sizes: 1 (appears twice) and 2
 
-  ?- sz_total_cells([obj(a,[r(0,0)]), obj(b,[r(0,0),r(0,1)])], N).
+  ?- sizeop_total_cells([obj(a,[r(0,0)]), obj(b,[r(0,0),r(0,1)])], N).
   N = 3.

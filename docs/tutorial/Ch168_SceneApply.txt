@@ -42,85 +42,85 @@ Loading the Pack
 
 Core Predicates
 
-sa_apply(+Rule, +Scene, -Scene2)
+sceneapply_apply(+Rule, +Scene, -Scene2)
 
 Apply one rule term to the scene. Dispatches internally to the appropriate
 scene manipulation helper based on the rule term structure.
 
-  :- sa_apply(recolor(r,g), [obj(r,[r(0,0)]), obj(b,[r(0,1)])], Out).
+  :- sceneapply_apply(recolor(r,g), [obj(r,[r(0,0)]), obj(b,[r(0,1)])], Out).
   Out = [obj(g,[r(0,0)]), obj(b,[r(0,1)])].
 
-  :- sa_apply(shift(2,3), [obj(r,[r(0,0)])], Out).
+  :- sceneapply_apply(shift(2,3), [obj(r,[r(0,0)])], Out).
   Out = [obj(r,[r(2,3)])].
 
-  :- sa_apply(keep_color(r), [obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], Out).
+  :- sceneapply_apply(keep_color(r), [obj(r,[r(0,0)]), obj(b,[r(0,1)]), obj(r,[r(0,2)])], Out).
   Out = [obj(r,[r(0,0)]), obj(r,[r(0,2)])].
 
-sa_apply_seq(+Rules, +Scene, -Scene2)
+sceneapply_apply_seq(+Rules, +Scene, -Scene2)
 
 Apply a sequence of rule terms in order. The first rule transforms the scene,
 the second transforms the result, and so on.
 
-  :- sa_apply_seq([recolor(r,g), shift(1,1)], [obj(r,[r(0,0)])], Out).
+  :- sceneapply_apply_seq([recolor(r,g), shift(1,1)], [obj(r,[r(0,0)])], Out).
   Out = [obj(g,[r(1,1)])].
 
-  :- sa_apply_seq([], Scene, Out).
+  :- sceneapply_apply_seq([], Scene, Out).
   Out = Scene.  % empty sequence is identity
 
-sa_verify(+Rule, +Before, +After)
+sceneapply_verify(+Rule, +Before, +After)
 
 Succeed if applying Rule to Before produces After. Comparison is
 order-insensitive (uses msort internally).
 
-  :- sa_verify(recolor(r,g), [obj(r,[r(0,0)])], [obj(g,[r(0,0)])]).
+  :- sceneapply_verify(recolor(r,g), [obj(r,[r(0,0)])], [obj(g,[r(0,0)])]).
   true.
 
-sa_verify_seq(+Rules, +Before, +After)
+sceneapply_verify_seq(+Rules, +Before, +After)
 
 Succeed if applying the rule sequence to Before produces After.
 
-sa_verify_all(+Rule, +Pairs)
+sceneapply_verify_all(+Rule, +Pairs)
 
 Succeed if Rule works on every Before-After pair. Pairs is a list of
 Before-After terms.
 
   :- P1 = [obj(r,[r(0,0)])] - [obj(g,[r(0,0)])],
      P2 = [obj(r,[r(1,1)])] - [obj(g,[r(1,1)])],
-     sa_verify_all(recolor(r,g), [P1, P2]).
+     sceneapply_verify_all(recolor(r,g), [P1, P2]).
   true.
 
-sa_verify_seq_all(+Rules, +Pairs)
+sceneapply_verify_seq_all(+Rules, +Pairs)
 
 Succeed if the rule sequence works on every Before-After pair.
 
 
 Classification Predicates
 
-sa_rule_type(+Rule, -Type)
+sceneapply_rule_type(+Rule, -Type)
 
 Classify a rule term. Returns one of: color, spatial, filter, order, dedup.
 
-  :- sa_rule_type(recolor(r,g), T).   T = color.
-  :- sa_rule_type(shift(1,2), T).     T = spatial.
-  :- sa_rule_type(keep_color(r), T).  T = filter.
-  :- sa_rule_type(sort_size_desc, T). T = order.
-  :- sa_rule_type(dedup_form, T).     T = dedup.
+  :- sceneapply_rule_type(recolor(r,g), T).   T = color.
+  :- sceneapply_rule_type(shift(1,2), T).     T = spatial.
+  :- sceneapply_rule_type(keep_color(r), T).  T = filter.
+  :- sceneapply_rule_type(sort_size_desc, T). T = order.
+  :- sceneapply_rule_type(dedup_form, T).     T = dedup.
 
-sa_is_color_rule(+Rule)
-sa_is_spatial_rule(+Rule)
-sa_is_filter_rule(+Rule)
+sceneapply_is_color_rule(+Rule)
+sceneapply_is_spatial_rule(+Rule)
+sceneapply_is_filter_rule(+Rule)
 
-Type-check predicates that delegate to sa_rule_type.
+Type-check predicates that delegate to sceneapply_rule_type.
 
-sa_colors_affected(+Rule, -Colors)
+sceneapply_colors_affected(+Rule, -Colors)
 
 List the color atoms referenced by the rule. Spatial, ordering, and dedup rules
 return []. Color rules return the colors they operate on.
 
-  :- sa_colors_affected(recolor(r,g), Colors).   Colors = [r,g].
-  :- sa_colors_affected(shift(2,3), Colors).     Colors = [].
+  :- sceneapply_colors_affected(recolor(r,g), Colors).   Colors = [r,g].
+  :- sceneapply_colors_affected(shift(2,3), Colors).     Colors = [].
 
-sa_rule_invertible(+Rule)
+sceneapply_rule_invertible(+Rule)
 
 Succeed if the rule has a trivially constructible inverse:
 - recolor(Old, New) is invertible via recolor(New, Old)
@@ -134,18 +134,18 @@ trivially invertible.
 
 Composition Utilities
 
-sa_compose(+Rule1, +Rule2, -Seq)
+sceneapply_compose(+Rule1, +Rule2, -Seq)
 
 Make a two-step sequence from two rules.
 
-  :- sa_compose(recolor(r,g), shift(1,1), Seq).
+  :- sceneapply_compose(recolor(r,g), shift(1,1), Seq).
   Seq = [recolor(r,g), shift(1,1)].
 
-sa_seq_len(+Seq, -N)
+sceneapply_seq_len(+Seq, -N)
 
 Count the number of steps in a rule sequence.
 
-  :- sa_seq_len([recolor(r,g), shift(1,1)], N).
+  :- sceneapply_seq_len([recolor(r,g), shift(1,1)], N).
   N = 2.
 
 
@@ -157,21 +157,21 @@ The complete pattern induction workflow using ruleinfer + sceneapply:
       % Infer from first pair
       TrainingPairs = [Before-After | _],
       % Try single-step rules
-      (   ri_infer_recolor(Before, After, Old, New),
+      (   ruleinfer_infer_recolor(Before, After, Old, New),
           Rule = recolor(Old, New)
-      ;   ri_infer_shift(Before, After, DR, DC),
+      ;   ruleinfer_infer_shift(Before, After, DR, DC),
           Rule = shift(DR, DC)
-      ;   ri_infer_keep_color(Before, After, Color),
+      ;   ruleinfer_infer_keep_color(Before, After, Color),
           Rule = keep_color(Color)
-      ;   ri_infer_remove_color(Before, After, Color),
+      ;   ruleinfer_infer_remove_color(Before, After, Color),
           Rule = remove_color(Color)
-      ;   ri_infer_to_origin(Before, After),
+      ;   ruleinfer_infer_to_origin(Before, After),
           Rule = to_origin
       ),
       % Verify rule across all training pairs
-      sa_verify_all(Rule, TrainingPairs),
+      sceneapply_verify_all(Rule, TrainingPairs),
       % Apply rule to test input
-      sa_apply(Rule, TestInput, Output).
+      sceneapply_apply(Rule, TestInput, Output).
 
 
 Test Coverage

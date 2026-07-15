@@ -28,150 +28,150 @@ LOADING THE RELATION PACK
 
 POSITIONAL ORDERING
 
-rl_above(+A, +B)
+relation_above(+A, +B)
 
 Succeed if every row of A is strictly less than every row of B.
 (In grid coordinates, row 0 is at the top, so smaller row = higher up.)
 
 % A 2-row block at rows 0-1 is above a 2-row block at rows 3-4.
-:- rl_above([r(0,0),r(1,0)], [r(3,0),r(4,0)]).
+:- relation_above([r(0,0),r(1,0)], [r(3,0),r(4,0)]).
 % Succeeds.
 
-:- rl_above([r(3,0)], [r(0,0)]).
+:- relation_above([r(3,0)], [r(0,0)]).
 % Fails.
 
-rl_below(+A, +B)
+relation_below(+A, +B)
 
 Succeed if every row of A is strictly greater than every row of B.
 
-:- rl_below([r(3,0),r(4,0)], [r(0,0),r(1,0)]).
+:- relation_below([r(3,0),r(4,0)], [r(0,0),r(1,0)]).
 % Succeeds.
 
-rl_left_of(+A, +B)
+relation_left_of(+A, +B)
 
 Succeed if every column of A is strictly less than every column of B.
 
-:- rl_left_of([r(0,0),r(0,1)], [r(0,3),r(0,4)]).
+:- relation_left_of([r(0,0),r(0,1)], [r(0,3),r(0,4)]).
 % Succeeds.
 
-rl_right_of(+A, +B)
+relation_right_of(+A, +B)
 
 Succeed if every column of A is strictly greater than every column of B.
 
-:- rl_right_of([r(0,3),r(0,4)], [r(0,0),r(0,1)]).
+:- relation_right_of([r(0,3),r(0,4)], [r(0,0),r(0,1)]).
 % Succeeds.
 
 
 ADJACENCY AND DISTANCE
 
-rl_adjacent(+A, +B)
+relation_adjacent(+A, +B)
 
 Succeed if any cell of A has a 4-connected neighbor in B.
 
 % Two regions touching at a border.
-:- rl_adjacent([r(0,0),r(1,0)], [r(2,0)]).
+:- relation_adjacent([r(0,0),r(1,0)], [r(2,0)]).
 % Succeeds.
 
 % Two regions separated by a gap.
-:- rl_adjacent([r(0,0)], [r(2,0)]).
+:- relation_adjacent([r(0,0)], [r(2,0)]).
 % Fails.
 
-rl_distance(+A, +B, -D)
+relation_distance(+A, +B, -D)
 
 D is the minimum Manhattan distance between any cell of A and any cell of B.
 Returns 0 if A and B share a cell.
 
 % Adjacent single cells.
-:- rl_distance([r(0,0)], [r(0,1)], D).
+:- relation_distance([r(0,0)], [r(0,1)], D).
 % D = 1.
 
 % Overlapping regions.
-:- rl_distance([r(1,1),r(1,2)], [r(1,2),r(1,3)], D).
+:- relation_distance([r(1,1),r(1,2)], [r(1,2),r(1,3)], D).
 % D = 0.
 
 
 CONTAINMENT AND SET RELATIONS
 
-rl_contained_bbox(+A, +B)
+relation_contained_bbox(+A, +B)
 
 Succeed if the bounding box of A is contained within the bounding box of B.
 
 % A single inner cell inside a surrounding ring.
-:- rl_contained_bbox([r(1,1)],
+:- relation_contained_bbox([r(1,1)],
                       [r(0,0),r(0,1),r(0,2),r(1,0),r(1,2),r(2,0),r(2,1),r(2,2)]).
 % Succeeds.
 
-rl_overlap(+A, +B)
+relation_overlap(+A, +B)
 
 Succeed if A and B share at least one cell.
 
-:- rl_overlap([r(0,0),r(0,1)], [r(0,1),r(0,2)]).
+:- relation_overlap([r(0,0),r(0,1)], [r(0,1),r(0,2)]).
 % Succeeds.
 
-:- rl_overlap([r(0,0)], [r(1,0)]).
+:- relation_overlap([r(0,0)], [r(1,0)]).
 % Fails.
 
-rl_disjoint(+A, +B)
+relation_disjoint(+A, +B)
 
 Succeed if A and B share no cells.
 
-:- rl_disjoint([r(0,0)], [r(1,0)]).
+:- relation_disjoint([r(0,0)], [r(1,0)]).
 % Succeeds.
 
 
 ROW AND COLUMN ALIGNMENT
 
-rl_same_row(+A, +B)
+relation_same_row(+A, +B)
 
 Succeed if A and B have at least one row index in common.
 
 % Two regions sharing row 2.
-:- rl_same_row([r(2,0),r(2,1)], [r(2,5)]).
+:- relation_same_row([r(2,0),r(2,1)], [r(2,5)]).
 % Succeeds.
 
-rl_same_col(+A, +B)
+relation_same_col(+A, +B)
 
 Succeed if A and B have at least one column index in common.
 
 % Two regions sharing column 3.
-:- rl_same_col([r(0,3),r(1,3)], [r(5,3)]).
+:- relation_same_col([r(0,3),r(1,3)], [r(5,3)]).
 % Succeeds.
 
 
 CENTROID, OFFSET, AND DIRECTION
 
-rl_centroid(+Region, -AvgR, -AvgC)
+relation_centroid(+Region, -AvgR, -AvgC)
 
 AvgR and AvgC are the integer (floor division) centroid of Region.
 
 % Centroid of a 3-cell vertical bar at rows 0,1,2; col 2.
-:- rl_centroid([r(0,2),r(1,2),r(2,2)], R, C).
+:- relation_centroid([r(0,2),r(1,2),r(2,2)], R, C).
 % R = 1, C = 2.
 
-rl_offset(+A, +B, -DR, -DC)
+relation_offset(+A, +B, -DR, -DC)
 
 DR = centroid_row(B) - centroid_row(A).
 DC = centroid_col(B) - centroid_col(A).
 
 % B is 3 rows below and 4 cols to the right of A.
-:- rl_offset([r(0,0)], [r(3,4)], DR, DC).
+:- relation_offset([r(0,0)], [r(3,4)], DR, DC).
 % DR = 3, DC = 4.
 
-rl_direction(+A, +B, -Dir)
+relation_direction(+A, +B, -Dir)
 
 Dir is the cardinal direction from A toward B: above, below, left, or right.
 The dominant axis of the centroid offset determines the direction.
 
 % B is above A.
-:- rl_direction([r(5,5)], [r(2,5)], Dir).
+:- relation_direction([r(5,5)], [r(2,5)], Dir).
 % Dir = above.
 
 % B is to the right of A.
-:- rl_direction([r(2,1)], [r(2,5)], Dir).
+:- relation_direction([r(2,1)], [r(2,5)], Dir).
 % Dir = right.
 
 % Diagonal: row-dominant becomes above.
-:- rl_direction([r(5,0)], [r(2,1)], Dir).
+:- relation_direction([r(5,0)], [r(2,1)], Dir).
 % Dir = above (DR = -3, DC = 1; |DR| >= |DC|).
 
 
@@ -180,27 +180,27 @@ TYPICAL USAGE PATTERNS
 Testing if a small object fits inside a larger frame:
 
 contains_region(Outer, Inner) :-
-    rl_contained_bbox(Inner, Outer),
-    rl_disjoint(Inner, Outer).
+    relation_contained_bbox(Inner, Outer),
+    relation_disjoint(Inner, Outer).
 
 Finding which region is nearest to a target:
 
 nearest_region(Target, Regions, Nearest) :-
     findall(D-R,
         (member(R, Regions),
-         rl_distance(Target, R, D)),
+         relation_distance(Target, R, D)),
         Pairs),
     min_member(_-Nearest, Pairs).
 
 Building a spatial layout description:
 
 describe_layout(A, B, Desc) :-
-    (rl_above(A, B) -> Desc = a_above_b
-    ;rl_below(A, B) -> Desc = a_below_b
-    ;rl_left_of(A, B) -> Desc = a_left_of_b
-    ;rl_right_of(A, B) -> Desc = a_right_of_b
-    ;rl_adjacent(A, B) -> Desc = a_adjacent_b
-    ;rl_overlap(A, B) -> Desc = a_overlaps_b
+    (relation_above(A, B) -> Desc = a_above_b
+    ;relation_below(A, B) -> Desc = a_below_b
+    ;relation_left_of(A, B) -> Desc = a_left_of_b
+    ;relation_right_of(A, B) -> Desc = a_right_of_b
+    ;relation_adjacent(A, B) -> Desc = a_adjacent_b
+    ;relation_overlap(A, B) -> Desc = a_overlaps_b
     ;Desc = a_disjoint_b
     ).
 
@@ -208,28 +208,28 @@ describe_layout(A, B, Desc) :-
 PREDICATE SUMMARY
 
 Positional ordering:
-  rl_above/2      - A entirely above B
-  rl_below/2      - A entirely below B
-  rl_left_of/2    - A entirely left of B
-  rl_right_of/2   - A entirely right of B
+  relation_above/2      - A entirely above B
+  relation_below/2      - A entirely below B
+  relation_left_of/2    - A entirely left of B
+  relation_right_of/2   - A entirely right of B
 
 Adjacency and distance:
-  rl_adjacent/2   - 4-connected adjacency
-  rl_distance/3   - minimum Manhattan distance
+  relation_adjacent/2   - 4-connected adjacency
+  relation_distance/3   - minimum Manhattan distance
 
 Containment and set relations:
-  rl_contained_bbox/2 - bounding box containment
-  rl_overlap/2        - shared cell existence
-  rl_disjoint/2       - no shared cells
+  relation_contained_bbox/2 - bounding box containment
+  relation_overlap/2        - shared cell existence
+  relation_disjoint/2       - no shared cells
 
 Row and column alignment:
-  rl_same_row/2   - shared row index
-  rl_same_col/2   - shared column index
+  relation_same_row/2   - shared row index
+  relation_same_col/2   - shared column index
 
 Centroid and direction:
-  rl_centroid/3   - integer centroid
-  rl_offset/4     - integer centroid offset (DR, DC)
-  rl_direction/3  - cardinal direction
+  relation_centroid/3   - integer centroid
+  relation_offset/4     - integer centroid offset (DR, DC)
+  relation_direction/3  - cardinal direction
 
 
 WHAT COMES NEXT

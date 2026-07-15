@@ -10,43 +10,43 @@ LOADING
 
 HISTOGRAM AND FREQUENCY
 
-qn_histogram/2 returns a Color-Count list.
+quant_histogram/2 returns a Color-Count list.
 
-    ?- qn_histogram([obj(1,[r(0,0)]),obj(1,[r(1,0)]),obj(2,[r(2,0)])], H).
+    ?- quant_histogram([obj(1,[r(0,0)]),obj(1,[r(1,0)]),obj(2,[r(2,0)])], H).
     H = [1-2, 2-1].
 
-qn_most_frequent_color/2 and qn_least_frequent_color/2 identify extremes.
-qn_max_color_count/2 and qn_min_color_count/2 return the count values.
+quant_most_frequent_color/2 and quant_least_frequent_color/2 identify extremes.
+quant_max_color_count/2 and quant_min_color_count/2 return the count values.
 
 GROUPING
 
-qn_group_by_color/2, qn_group_by_size/2, qn_group_by_shape/2 partition
+quant_group_by_color/2, quant_group_by_size/2, quant_group_by_shape/2 partition
 an object list into Color-[Objs] (or Size-[Objs] or Shape-[Objs]) pairs.
 
-    ?- sc_objects(G, Objs), qn_group_by_color(Objs, Groups).
+    ?- sc_objects(G, Objs), quant_group_by_color(Objs, Groups).
 
 UNIQUE SHAPES
 
-qn_unique_shapes/2 returns a sorted list of distinct normalized shapes.
+quant_unique_shapes/2 returns a sorted list of distinct normalized shapes.
 
-    ?- qn_unique_shapes(Objs, Shapes), length(Shapes, N).
+    ?- quant_unique_shapes(Objs, Shapes), length(Shapes, N).
 
 CONDITIONAL COUNTING
 
-qn_count_where/3 counts objects satisfying a named goal.
+quant_count_where/3 counts objects satisfying a named goal.
 
-    ?- qn_count_where(Objs, has_color_1, Count).
+    ?- quant_count_where(Objs, has_color_1, Count).
 
-qn_exactly_n/3 and qn_at_least_n/3 assert count thresholds.
+quant_exactly_n/3 and quant_at_least_n/3 assert count thresholds.
 
 UNIFORMITY TESTS
 
-qn_all_same_color/1, qn_all_same_size/1, qn_all_same_shape/1 check
+quant_all_same_color/1, quant_all_same_size/1, quant_all_same_shape/1 check
 if all objects in a list share the same attribute value.
 
 MULTISET MATCHING
 
-qn_colors_match/2, qn_shapes_match/2, qn_sizes_match/2 compare two
+quant_colors_match/2, quant_shapes_match/2, quant_sizes_match/2 compare two
 object lists for attribute multiset equality (order-independent).
 
 WHAT COMES NEXT

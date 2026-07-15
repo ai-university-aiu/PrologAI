@@ -13,137 +13,137 @@ and for reading, writing, mapping, and filtering individual grid cells.
 
 2. Basic Cell Enumeration
 
-sn_row_major(+Grid, -Cells) returns all R-C-V triples in row-major order:
+scan_row_major(+Grid, -Cells) returns all R-C-V triples in row-major order:
 row 0 left-to-right, then row 1 left-to-right, and so on.
 
-?- sn_row_major([[1,2],[3,4]], Cells).
+?- scan_row_major([[1,2],[3,4]], Cells).
 Cells = [0-0-1, 0-1-2, 1-0-3, 1-1-4].
 
-?- sn_row_major([], Cells).
+?- scan_row_major([], Cells).
 Cells = [].
 
-sn_col_major(+Grid, -Cells) traverses column 0 top-to-bottom, then column 1, etc.
+scan_col_major(+Grid, -Cells) traverses column 0 top-to-bottom, then column 1, etc.
 
-?- sn_col_major([[1,2],[3,4]], Cells).
+?- scan_col_major([[1,2],[3,4]], Cells).
 Cells = [0-0-1, 1-0-3, 0-1-2, 1-1-4].
 
-sn_cells_of(+Grid, +V, -Cells) lists all R-C positions where the cell equals V.
+scan_cells_of(+Grid, +V, -Cells) lists all R-C positions where the cell equals V.
 
-?- sn_cells_of([[1,0,1],[0,1,0]], 1, Cells).
+?- scan_cells_of([[1,0,1],[0,1,0]], 1, Cells).
 Cells = [0-0, 0-2, 1-1].
 
-?- sn_cells_of([[a,b],[c,d]], z, Cells).
+?- scan_cells_of([[a,b],[c,d]], z, Cells).
 Cells = [].
 
-sn_index_of(+Grid, +V, -R, -C) finds the first occurrence of V in row-major order.
+scan_index_of(+Grid, +V, -R, -C) finds the first occurrence of V in row-major order.
 
-?- sn_index_of([[1,2],[3,1]], 1, R, C).
+?- scan_index_of([[1,2],[3,1]], 1, R, C).
 R = 0, C = 0.
 
-?- sn_index_of([[1,2],[3,4]], 4, R, C).
+?- scan_index_of([[1,2],[3,4]], 4, R, C).
 R = 1, C = 1.
 
 
 3. Reading and Writing Cells
 
-sn_set_cell(+Grid, +R, +C, +V, -New) returns a new grid with one cell changed.
+scan_set_cell(+Grid, +R, +C, +V, -New) returns a new grid with one cell changed.
 All other cells are unchanged. R and C are 0-based.
 
-?- sn_set_cell([[1,2],[3,4]], 0, 1, 9, New).
+?- scan_set_cell([[1,2],[3,4]], 0, 1, 9, New).
 New = [[1,9],[3,4]].
 
-?- sn_set_cell([[0]], 0, 0, 5, New).
+?- scan_set_cell([[0]], 0, 0, 5, New).
 New = [[5]].
 
-sn_update_cells(+Grid, +Updates, -New) applies a list of R-C-V updates at once.
+scan_update_cells(+Grid, +Updates, -New) applies a list of R-C-V updates at once.
 Each R-C-V triple in Updates sets cell (R,C) to V. Cells not listed are unchanged.
 
-?- sn_update_cells([[1,2],[3,4]], [0-1-9, 1-0-7], New).
+?- scan_update_cells([[1,2],[3,4]], [0-1-9, 1-0-7], New).
 New = [[1,9],[7,4]].
 
-?- sn_update_cells([[1,2],[3,4]], [], New).
+?- scan_update_cells([[1,2],[3,4]], [], New).
 New = [[1,2],[3,4]].
 
 
 4. Mapping and Filtering
 
-sn_map_cells(+Grid, :Goal, -New) applies Goal(R, C, OldV, NewV) to every cell.
+scan_map_cells(+Grid, :Goal, -New) applies Goal(R, C, OldV, NewV) to every cell.
 The result is a grid where each cell holds the NewV from Goal.
 
 Example: define add_one(_, _, V, NV) :- NV is V + 1.
 
-?- sn_map_cells([[1,2],[3,4]], add_one, New).
+?- scan_map_cells([[1,2],[3,4]], add_one, New).
 New = [[2,3],[4,5]].
 
-sn_filter_cells(+Grid, :Pred, -Cells) collects R-C-V triples where Pred(R,C,V)
+scan_filter_cells(+Grid, :Pred, -Cells) collects R-C-V triples where Pred(R,C,V)
 succeeds.
 
 Example: define gt2(_, _, V) :- V > 2.
 
-?- sn_filter_cells([[1,2],[3,4]], gt2, Cells).
+?- scan_filter_cells([[1,2],[3,4]], gt2, Cells).
 Cells = [1-0-3, 1-1-4].
 
 
 5. Traversal Orders
 
-sn_zigzag(+Grid, -Cells) visits even rows left-to-right and odd rows right-to-left.
+scan_zigzag(+Grid, -Cells) visits even rows left-to-right and odd rows right-to-left.
 
-?- sn_zigzag([[1,2,3],[4,5,6]], Cells).
+?- scan_zigzag([[1,2,3],[4,5,6]], Cells).
 Cells = [0-0-1, 0-1-2, 0-2-3, 1-2-6, 1-1-5, 1-0-4].
 
-sn_spiral_in(+Grid, -Cells) visits cells clockwise from the outer ring inward.
+scan_spiral_in(+Grid, -Cells) visits cells clockwise from the outer ring inward.
 
-?- sn_spiral_in([[1,2,3],[4,5,6],[7,8,9]], Cells).
+?- scan_spiral_in([[1,2,3],[4,5,6],[7,8,9]], Cells).
 Cells = [0-0-1, 0-1-2, 0-2-3, 1-2-6, 2-2-9, 2-1-8, 2-0-7, 1-0-4, 1-1-5].
 
-?- sn_spiral_in([[1,2,3]], Cells).
+?- scan_spiral_in([[1,2,3]], Cells).
 Cells = [0-0-1, 0-1-2, 0-2-3].
 
-sn_border_traversal(+Grid, -Cells) visits only the outer border cells clockwise.
+scan_border_traversal(+Grid, -Cells) visits only the outer border cells clockwise.
 
-?- sn_border_traversal([[1,2,3],[4,5,6],[7,8,9]], Cells).
+?- scan_border_traversal([[1,2,3],[4,5,6],[7,8,9]], Cells).
 Cells = [0-0-1, 0-1-2, 0-2-3, 1-2-6, 2-2-9, 2-1-8, 2-0-7, 1-0-4].
 
-?- sn_border_traversal([[1,2],[3,4]], Cells).
+?- scan_border_traversal([[1,2],[3,4]], Cells).
 Cells = [0-0-1, 0-1-2, 1-1-4, 1-0-3].
 
 
 6. Diagonal Traversal
 
-sn_diag_traversal_ne(+Grid, -Cells) visits cells along NE-going diagonals where
+scan_diag_traversal_ne(+Grid, -Cells) visits cells along NE-going diagonals where
 R+C is constant. Diagonal 0 is (0,0); diagonal 1 is (0,1) then (1,0); etc.
 
-?- sn_diag_traversal_ne([[1,2],[3,4]], Cells).
+?- scan_diag_traversal_ne([[1,2],[3,4]], Cells).
 Cells = [0-0-1, 0-1-2, 1-0-3, 1-1-4].
 
-sn_diag_traversal_se(+Grid, -Cells) visits cells along SE-going diagonals where
+scan_diag_traversal_se(+Grid, -Cells) visits cells along SE-going diagonals where
 C-R is constant. Both row and column increase along each diagonal.
 
-?- sn_diag_traversal_se([[1,2],[3,4]], Cells).
+?- scan_diag_traversal_se([[1,2],[3,4]], Cells).
 Cells = [1-0-3, 0-0-1, 1-1-4, 0-1-2].
 
 
 7. Building Grids from Cell Lists
 
-sn_grid_from_cells(+H, +W, +Cells, +Bg, -Grid) builds an H-by-W grid from a
+scan_grid_from_cells(+H, +W, +Cells, +Bg, -Grid) builds an H-by-W grid from a
 sparse list of R-C-V triples. Every cell not mentioned gets the background Bg.
 
-?- sn_grid_from_cells(2, 2, [0-0-1, 1-1-4], 0, Grid).
+?- scan_grid_from_cells(2, 2, [0-0-1, 1-1-4], 0, Grid).
 Grid = [[1,0],[0,4]].
 
-?- sn_grid_from_cells(2, 2, [], 7, Grid).
+?- scan_grid_from_cells(2, 2, [], 7, Grid).
 Grid = [[7,7],[7,7]].
 
-?- sn_grid_from_cells(1, 3, [0-1-9], 0, Grid).
+?- scan_grid_from_cells(1, 3, [0-1-9], 0, Grid).
 Grid = [[0,9,0]].
 
 
 8. Summary
 
 The 14 sn_* predicates cover six traversal orders (row-major, column-major,
-zigzag, spiral, border, two diagonals), cell read/write operations (sn_set_cell,
-sn_update_cells), higher-order operations (sn_map_cells, sn_filter_cells), value
-lookup (sn_cells_of, sn_index_of), and grid construction (sn_grid_from_cells).
+zigzag, spiral, border, two diagonals), cell read/write operations (scan_set_cell,
+scan_update_cells), higher-order operations (scan_map_cells, scan_filter_cells), value
+lookup (scan_cells_of, scan_index_of), and grid construction (scan_grid_from_cells).
 These building blocks support constructing ARC-AGI-2 solution rules that need
 to inspect or transform specific cells across a grid without enumerating
 transformations explicitly.
