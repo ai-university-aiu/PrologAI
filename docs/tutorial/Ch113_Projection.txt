@@ -22,130 +22,130 @@ gradients, imbalances, repeated values, and directional structure.
 
 Sums
 
-pj_row_sums(+Grid, -Sums) returns a list of row sums.
+projection_row_sums(+Grid, -Sums) returns a list of row sums.
 
-?- pj_row_sums([[1,2,3],[4,5,6],[7,8,9]], Sums).
+?- projection_row_sums([[1,2,3],[4,5,6],[7,8,9]], Sums).
 Sums = [6, 15, 24].
 
-pj_col_sums(+Grid, -Sums) returns a list of column sums.
+projection_col_sums(+Grid, -Sums) returns a list of column sums.
 
-?- pj_col_sums([[1,2,3],[4,5,6],[7,8,9]], Sums).
+?- projection_col_sums([[1,2,3],[4,5,6],[7,8,9]], Sums).
 Sums = [12, 15, 18].
 
 
 Counts
 
-pj_row_counts(+Grid, +Val, -Counts) counts how many times Val appears
+project_row_counts(+Grid, +Val, -Counts) counts how many times Val appears
 in each row.
 
-?- pj_row_counts([[0,1,2],[0,1,2],[0,1,2]], 0, Counts).
+?- project_row_counts([[0,1,2],[0,1,2],[0,1,2]], 0, Counts).
 Counts = [1, 1, 1].
 
-pj_col_counts(+Grid, +Val, -Counts) counts how many times Val appears
+project_col_counts(+Grid, +Val, -Counts) counts how many times Val appears
 in each column.
 
-?- pj_col_counts([[0,1,2],[0,1,2],[0,1,2]], 2, Counts).
+?- project_col_counts([[0,1,2],[0,1,2],[0,1,2]], 2, Counts).
 Counts = [0, 0, 3].
 
 
 Maxima
 
-pj_row_maxes(+Grid, -Maxes) returns the maximum value in each row.
+projection_row_maxes(+Grid, -Maxes) returns the maximum value in each row.
 
-?- pj_row_maxes([[1,2,3],[4,5,6],[7,8,9]], Maxes).
+?- projection_row_maxes([[1,2,3],[4,5,6],[7,8,9]], Maxes).
 Maxes = [3, 6, 9].
 
-pj_col_maxes(+Grid, -Maxes) returns the maximum value in each column.
+projection_col_maxes(+Grid, -Maxes) returns the maximum value in each column.
 
-?- pj_col_maxes([[1,2,3],[4,5,6],[7,8,9]], Maxes).
+?- projection_col_maxes([[1,2,3],[4,5,6],[7,8,9]], Maxes).
 Maxes = [7, 8, 9].
 
 
 Unique Values
 
-pj_row_uniq(+Grid, -ValLists) returns the sorted unique values in each row.
+projection_row_uniq(+Grid, -ValLists) returns the sorted unique values in each row.
 
-?- pj_row_uniq([[1,1,2],[1,2,2]], ValLists).
+?- projection_row_uniq([[1,1,2],[1,2,2]], ValLists).
 ValLists = [[1, 2], [1, 2]].
 
-pj_col_uniq(+Grid, -ValLists) returns the sorted unique values in each column.
+projection_col_uniq(+Grid, -ValLists) returns the sorted unique values in each column.
 
-?- pj_col_uniq([[0,1,2],[0,1,2],[0,1,2]], ValLists).
+?- projection_col_uniq([[0,1,2],[0,1,2],[0,1,2]], ValLists).
 ValLists = [[0], [1], [2]].
 
 
 Shadow Projections
 
-pj_shadow_h(+Grid, +Val, -ColIndices) returns the sorted list of 0-based
+projection_shadow_h(+Grid, +Val, -ColIndices) returns the sorted list of 0-based
 column indices where Val appears in at least one row. This is the horizontal
 shadow of Val projected onto the column axis.
 
-?- pj_shadow_h([[0,1,2],[0,1,2],[0,1,2]], 0, ColIndices).
+?- projection_shadow_h([[0,1,2],[0,1,2],[0,1,2]], 0, ColIndices).
 ColIndices = [0].
 
-?- pj_shadow_h([[1,1,1],[1,1,1],[1,1,1]], 1, ColIndices).
+?- projection_shadow_h([[1,1,1],[1,1,1],[1,1,1]], 1, ColIndices).
 ColIndices = [0, 1, 2].
 
-pj_shadow_v(+Grid, +Val, -RowIndices) returns the sorted list of 0-based
+projection_shadow_v(+Grid, +Val, -RowIndices) returns the sorted list of 0-based
 row indices where Val appears in at least one column.
 
-?- pj_shadow_v([[0,1,2],[0,1,2],[0,1,2]], 0, RowIndices).
+?- projection_shadow_v([[0,1,2],[0,1,2],[0,1,2]], 0, RowIndices).
 RowIndices = [0, 1, 2].
 
 
 Run-Length Profiles
 
-pj_h_profile(+Grid, +Val, -Profile) returns, for each row, the length of
+projection_h_profile(+Grid, +Val, -Profile) returns, for each row, the length of
 the longest contiguous run of Val in that row.
 
-?- pj_h_profile([[1,1,0],[1,0,0],[1,1,1]], 1, Profile).
+?- projection_h_profile([[1,1,0],[1,0,0],[1,1,1]], 1, Profile).
 Profile = [2, 1, 3].
 
-pj_v_profile(+Grid, +Val, -Profile) returns, for each column, the length
+projection_v_profile(+Grid, +Val, -Profile) returns, for each column, the length
 of the longest contiguous run of Val in that column.
 
-?- pj_v_profile([[1,1,0],[1,0,0],[1,1,1]], 1, Profile).
+?- projection_v_profile([[1,1,0],[1,0,0],[1,1,1]], 1, Profile).
 Profile = [3, 1, 1].
 
 When Val does not appear in a row or column, the run length is 0.
 
-?- pj_h_profile([[1,1,1],[1,1,1],[1,1,1]], 9, Profile).
+?- projection_h_profile([[1,1,1],[1,1,1],[1,1,1]], 9, Profile).
 Profile = [0, 0, 0].
 
 
 Modal Values
 
-pj_row_modes(+Grid, -Modes) returns, for each row, the most frequently
+projection_row_modes(+Grid, -Modes) returns, for each row, the most frequently
 occurring value. On ties, the smallest value wins.
 
-?- pj_row_modes([[1,1,2],[1,2,2]], Modes).
+?- projection_row_modes([[1,1,2],[1,2,2]], Modes).
 Modes = [1, 2].
 
-?- pj_row_modes([[0,1,2],[0,1,2],[0,1,2]], Modes).
+?- projection_row_modes([[0,1,2],[0,1,2],[0,1,2]], Modes).
 Modes = [0, 0, 0].
 
-pj_col_modes(+Grid, -Modes) returns the modal value for each column.
+projection_col_modes(+Grid, -Modes) returns the modal value for each column.
 
-?- pj_col_modes([[1,1,2],[1,2,2]], Modes).
+?- projection_col_modes([[1,1,2],[1,2,2]], Modes).
 Modes = [1, 1, 2].
 
 
 Summary of pj_* Predicates
 
-pj_row_sums/2 - sum of values in each row
-pj_col_sums/2 - sum of values in each column
-pj_row_counts/3 - count of Val in each row
-pj_col_counts/3 - count of Val in each column
-pj_row_maxes/2 - maximum value in each row
-pj_col_maxes/2 - maximum value in each column
-pj_row_uniq/2 - sorted unique values in each row
-pj_col_uniq/2 - sorted unique values in each column
-pj_shadow_h/3 - column indices where Val appears (horizontal shadow)
-pj_shadow_v/3 - row indices where Val appears (vertical shadow)
-pj_h_profile/3 - longest Val run per row
-pj_v_profile/3 - longest Val run per column
-pj_row_modes/2 - modal value per row (smallest on tie)
-pj_col_modes/2 - modal value per column (smallest on tie)
+projection_row_sums/2 - sum of values in each row
+projection_col_sums/2 - sum of values in each column
+project_row_counts/3 - count of Val in each row
+project_col_counts/3 - count of Val in each column
+projection_row_maxes/2 - maximum value in each row
+projection_col_maxes/2 - maximum value in each column
+projection_row_uniq/2 - sorted unique values in each row
+projection_col_uniq/2 - sorted unique values in each column
+projection_shadow_h/3 - column indices where Val appears (horizontal shadow)
+projection_shadow_v/3 - row indices where Val appears (vertical shadow)
+projection_h_profile/3 - longest Val run per row
+projection_v_profile/3 - longest Val run per column
+projection_row_modes/2 - modal value per row (smallest on tie)
+projection_col_modes/2 - modal value per column (smallest on tie)
 
 
 END OF CHAPTER 113

@@ -14,137 +14,137 @@ All predicates use the gm_* prefix.
 
 Five predicates operate on two same-sized grids and produce a result grid.
 
-gm_add(+GridA, +GridB, -GridC)  GridC[R][C] = GridA[R][C] + GridB[R][C]
-gm_sub(+GridA, +GridB, -GridC)  GridC[R][C] = GridA[R][C] - GridB[R][C]
-gm_mul(+GridA, +GridB, -GridC)  GridC[R][C] = GridA[R][C] * GridB[R][C]
-gm_max(+GridA, +GridB, -GridC)  GridC[R][C] = max(GridA[R][C], GridB[R][C])
-gm_min(+GridA, +GridB, -GridC)  GridC[R][C] = min(GridA[R][C], GridB[R][C])
+gridmath_add(+GridA, +GridB, -GridC)  GridC[R][C] = GridA[R][C] + GridB[R][C]
+gridmask_sub(+GridA, +GridB, -GridC)  GridC[R][C] = GridA[R][C] - GridB[R][C]
+gridmath_mul(+GridA, +GridB, -GridC)  GridC[R][C] = GridA[R][C] * GridB[R][C]
+gridmath_max(+GridA, +GridB, -GridC)  GridC[R][C] = max(GridA[R][C], GridB[R][C])
+gridmath_min(+GridA, +GridB, -GridC)  GridC[R][C] = min(GridA[R][C], GridB[R][C])
 
 Examples:
 
-?- gm_add([[1,2],[3,4]], [[5,6],[7,8]], C).
+?- gridmath_add([[1,2],[3,4]], [[5,6],[7,8]], C).
 C = [[6,8],[10,12]].
 
-?- gm_sub([[5,6],[7,8]], [[1,2],[3,4]], C).
+?- gridmask_sub([[5,6],[7,8]], [[1,2],[3,4]], C).
 C = [[4,4],[4,4]].
 
-?- gm_mul([[1,2],[3,4]], [[5,6],[7,8]], C).
+?- gridmath_mul([[1,2],[3,4]], [[5,6],[7,8]], C).
 C = [[5,12],[21,32]].
 
-?- gm_max([[1,5],[3,2]], [[4,2],[1,6]], C).
+?- gridmath_max([[1,5],[3,2]], [[4,2],[1,6]], C).
 C = [[4,5],[3,6]].
 
-?- gm_min([[1,5],[3,2]], [[4,2],[1,6]], C).
+?- gridmath_min([[1,5],[3,2]], [[4,2],[1,6]], C).
 C = [[1,2],[1,2]].
 
 
 2. Scalar Operations
 
-gm_scale(+Grid, +K, -Grid2) multiplies every cell by scalar K.
-gm_offset(+Grid, +D, -Grid2) adds constant D to every cell.
+gridmath_scale(+Grid, +K, -Grid2) multiplies every cell by scalar K.
+gridmath_offset(+Grid, +D, -Grid2) adds constant D to every cell.
 
 Examples:
 
-?- gm_scale([[1,2],[3,4]], 2, G).
+?- gridmath_scale([[1,2],[3,4]], 2, G).
 G = [[2,4],[6,8]].
 
-?- gm_scale([[5,6],[7,8]], 0, G).
+?- gridmath_scale([[5,6],[7,8]], 0, G).
 G = [[0,0],[0,0]].
 
-?- gm_offset([[1,2],[3,4]], 10, G).
+?- gridmath_offset([[1,2],[3,4]], 10, G).
 G = [[11,12],[13,14]].
 
-?- gm_offset([[5,6],[7,8]], -3, G).
+?- gridmath_offset([[5,6],[7,8]], -3, G).
 G = [[2,3],[4,5]].
 
 
 3. Absolute Value
 
-gm_abs(+Grid, -Grid2) replaces every cell with its absolute value.
+gridmath_abs(+Grid, -Grid2) replaces every cell with its absolute value.
 
 Examples:
 
-?- gm_abs([[-1,2],[-3,4]], G).
+?- gridmath_abs([[-1,2],[-3,4]], G).
 G = [[1,2],[3,4]].
 
-?- gm_abs([[-5,-6],[-7,-8]], G).
+?- gridmath_abs([[-5,-6],[-7,-8]], G).
 G = [[5,6],[7,8]].
 
 
 4. Comparison Masks
 
-gm_eq_mask(+GridA, +GridB, -Mask) produces a 1/0 mask where 1 means cells
+gridmath_eq_mask(+GridA, +GridB, -Mask) produces a 1/0 mask where 1 means cells
 are equal and 0 means they differ.
 
-gm_diff_mask(+GridA, +GridB, -Mask) is the complement: 1 where cells differ,
+gridmath_diff_mask(+GridA, +GridB, -Mask) is the complement: 1 where cells differ,
 0 where they are equal.
 
 Examples:
 
-?- gm_eq_mask([[1,2],[3,4]], [[1,5],[3,6]], M).
+?- gridmath_eq_mask([[1,2],[3,4]], [[1,5],[3,6]], M).
 M = [[1,0],[1,0]].
 
-?- gm_diff_mask([[1,2],[3,4]], [[1,5],[3,6]], M).
+?- gridmath_diff_mask([[1,2],[3,4]], [[1,5],[3,6]], M).
 M = [[0,1],[0,1]].
 
-?- gm_eq_mask([[2,2],[2,2]], [[2,2],[2,2]], M).
+?- gridmath_eq_mask([[2,2],[2,2]], [[2,2],[2,2]], M).
 M = [[1,1],[1,1]].
 
 
 5. Clamping and Modulo
 
-gm_clamp(+Grid, +Lo, +Hi, -Grid2) clamps each cell to the inclusive
+gridmath_clamp(+Grid, +Lo, +Hi, -Grid2) clamps each cell to the inclusive
 range [Lo, Hi].
 
-gm_modulo(+Grid, +M, -Grid2) applies modulo M to every cell.
+gridmath_modulo(+Grid, +M, -Grid2) applies modulo M to every cell.
 
 Examples:
 
-?- gm_clamp([[0,-1],[2,3]], 1, 5, G).
+?- gridmath_clamp([[0,-1],[2,3]], 1, 5, G).
 G = [[1,1],[2,3]].
 
-?- gm_clamp([[3,6],[8,2]], 1, 5, G).
+?- gridmath_clamp([[3,6],[8,2]], 1, 5, G).
 G = [[3,5],[5,2]].
 
-?- gm_modulo([[1,2],[3,4]], 2, G).
+?- gridmath_modulo([[1,2],[3,4]], 2, G).
 G = [[1,0],[1,0]].
 
-?- gm_modulo([[11,22],[33,44]], 10, G).
+?- gridmath_modulo([[11,22],[33,44]], 10, G).
 G = [[1,2],[3,4]].
 
 
 6. Aggregate Statistics
 
-gm_sum(+Grid, -Sum) computes the sum of all cell values.
-gm_product(+Grid, -Prod) computes the product of all cell values.
+gridmath_sum(+Grid, -Sum) computes the sum of all cell values.
+gridmath_product(+Grid, -Prod) computes the product of all cell values.
 
 Examples:
 
-?- gm_sum([[1,2],[3,4]], S).
+?- gridmath_sum([[1,2],[3,4]], S).
 S = 10.
 
-?- gm_sum([[0,0],[0,0]], S).
+?- gridmath_sum([[0,0],[0,0]], S).
 S = 0.
 
-?- gm_product([[1,2],[3,4]], P).
+?- gridmath_product([[1,2],[3,4]], P).
 P = 24.
 
-?- gm_product([[2,3],[0,4]], P).
+?- gridmath_product([[2,3],[0,4]], P).
 P = 0.
 
 
 7. Common Patterns
 
-Combining gm_sub with gm_abs gives absolute difference between grids:
+Combining gridmask_sub with gridmath_abs gives absolute difference between grids:
 
-?- gm_sub([[5,3],[1,4]], [[2,7],[3,2]], D),
-   gm_abs(D, AbsDiff).
+?- gridmask_sub([[5,3],[1,4]], [[2,7],[3,2]], D),
+   gridmath_abs(D, AbsDiff).
 D = [[3,-4],[-2,2]], AbsDiff = [[3,4],[2,2]].
 
-Combining gm_eq_mask with gm_sum counts matching cells:
+Combining gridmath_eq_mask with gridmath_sum counts matching cells:
 
-?- gm_eq_mask([[1,2],[3,4]], [[1,5],[3,6]], M),
-   gm_sum(M, Count).
+?- gridmath_eq_mask([[1,2],[3,4]], [[1,5],[3,6]], M),
+   gridmath_sum(M, Count).
 M = [[1,0],[1,0]], Count = 2.
 
 
