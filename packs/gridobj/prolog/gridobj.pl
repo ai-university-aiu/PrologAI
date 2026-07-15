@@ -1,33 +1,33 @@
 % Module declaration with all fourteen public predicates.
 :- module(gridobj, [
 % List of r(R,C) cells in the 4-connected component at (R,C).
-    gob_object_cells/4,
+    gridobj_object_cells/4,
 % Color of the connected component at (R,C).
-    gob_object_color/4,
+    gridobj_object_color/4,
 % Number of cells in the connected component at (R,C).
-    gob_object_size/4,
+    gridobj_object_size/4,
 % Bounding box r0(R0,C0,R1,C1) of the connected component at (R,C).
-    gob_object_bbox/4,
+    gridobj_object_bbox/4,
 % Binary grid mask: component color where object, Bg elsewhere.
-    gob_object_mask/5,
+    gridobj_object_mask/5,
 % Extract bounding-box subgrid of the connected component at (R,C).
-    gob_extract_object/5,
+    gridobj_extract_object/5,
 % List of ob(Color,Cells,BBox) for all non-bg connected components.
-    gob_all_objects/3,
+    gridobj_all_objects/3,
 % Count of distinct non-bg connected components.
-    gob_object_count/3,
+    gridobj_object_count/3,
 % Cells of the largest (most cells) non-bg connected component.
-    gob_largest_object/3,
+    gridobj_largest_object/3,
 % Cells of the smallest (fewest cells) non-bg connected component.
-    gob_smallest_object/3,
+    gridobj_smallest_object/3,
 % Replace the connected component at (R,C) with NewColor.
-    gob_flood_fill/5,
+    gridobj_flood_fill/5,
 % Fill all Bg regions fully enclosed by non-Bg cells with FgColor.
-    gob_fill_enclosed/4,
+    gridobj_fill_enclosed/4,
 % Replace all cells of the connected component at (R,C) with Bg.
-    gob_remove_object/5,
+    gridobj_remove_object/5,
 % Move the connected component at (R,C) so its bbox top-left is (NewR,NewC).
-    gob_move_object/7
+    gridobj_move_object/7
 ]).
 % gridobj.pl - Layer 242: Grid Object Operations (gob_* prefix).
 % Fourteen predicates for flood-fill-based connected component analysis,
@@ -38,103 +38,103 @@
 
 % --- PRIVATE HELPERS ---
 
-% gob_dims_/3: (H, W) of a grid.
-gob_dims_(Grid, H, W) :-
+% gridobj_dims_/3: (H, W) of a grid.
+gridobj_dims_(Grid, H, W) :-
     length(Grid, H),
     ( H > 0 -> Grid = [Row0|_], length(Row0, W) ; W = 0 ).
 
-% gob_cell_/4: value at (R, C) in Grid.
-gob_cell_(Grid, R, C, V) :-
+% gridobj_cell_/4: value at (R, C) in Grid.
+gridobj_cell_(Grid, R, C, V) :-
     nth0(R, Grid, Row), nth0(C, Row, V).
 
-% gob_cells_bbox_/2: bounding box of a non-empty list of r(R,C) cells.
-gob_cells_bbox_(Cells, r0(R0,C0,R1,C1)) :-
+% gridobj_cells_bbox_/2: bounding box of a non-empty list of r(R,C) cells.
+gridobj_cells_bbox_(Cells, r0(R0,C0,R1,C1)) :-
     findall(R, member(r(R,_), Cells), Rs),
     findall(C, member(r(_,C), Cells), Cs),
     min_list(Rs, R0), max_list(Rs, R1),
     min_list(Cs, C0), max_list(Cs, C1).
 
-% gob_bfs_/7: BFS from Frontier; return all visited cells of same Color.
+% gridobj_bfs_/7: BFS from Frontier; return all visited cells of same Color.
 % Frontier: list of r(R,C) to expand next.
 % Visited: all cells already collected (includes Frontier starting cells).
-gob_bfs_([], Visited, _, _, _, _, Visited).
-gob_bfs_([r(R,C)|Rest], Visited, Color, H, W, Grid, Result) :-
+gridobj_bfs_([], Visited, _, _, _, _, Visited).
+gridobj_bfs_([r(R,C)|Rest], Visited, Color, H, W, Grid, Result) :-
     R0 is R - 1, R1 is R + 1, C0 is C - 1, C1 is C + 1,
     findall(r(NR,NC),
         ( member(r(NR,NC), [r(R0,C),r(R1,C),r(R,C0),r(R,C1)]),
           NR >= 0, NR < H, NC >= 0, NC < W,
           \+ member(r(NR,NC), Visited),
           \+ member(r(NR,NC), Rest),
-          gob_cell_(Grid, NR, NC, Color) ),
+          gridobj_cell_(Grid, NR, NC, Color) ),
         NewCells),
     append(Rest, NewCells, NewFrontier),
     append(Visited, NewCells, NewVisited),
-    gob_bfs_(NewFrontier, NewVisited, Color, H, W, Grid, Result).
+    gridobj_bfs_(NewFrontier, NewVisited, Color, H, W, Grid, Result).
 
-% gob_bg_bfs_/7: BFS from Frontier through Bg-colored cells only.
-gob_bg_bfs_([], Visited, _, _, _, _, Visited).
-gob_bg_bfs_([r(R,C)|Rest], Visited, Bg, H, W, Grid, Result) :-
+% gridobj_bg_bfs_/7: BFS from Frontier through Bg-colored cells only.
+gridobj_bg_bfs_([], Visited, _, _, _, _, Visited).
+gridobj_bg_bfs_([r(R,C)|Rest], Visited, Bg, H, W, Grid, Result) :-
     R0 is R - 1, R1 is R + 1, C0 is C - 1, C1 is C + 1,
     findall(r(NR,NC),
         ( member(r(NR,NC), [r(R0,C),r(R1,C),r(R,C0),r(R,C1)]),
           NR >= 0, NR < H, NC >= 0, NC < W,
           \+ member(r(NR,NC), Visited),
           \+ member(r(NR,NC), Rest),
-          gob_cell_(Grid, NR, NC, Bg) ),
+          gridobj_cell_(Grid, NR, NC, Bg) ),
         NewCells),
     append(Rest, NewCells, NewFrontier),
     append(Visited, NewCells, NewVisited),
-    gob_bg_bfs_(NewFrontier, NewVisited, Bg, H, W, Grid, Result).
+    gridobj_bg_bfs_(NewFrontier, NewVisited, Bg, H, W, Grid, Result).
 
-% gob_collect_objects_/7: collect all non-bg connected components.
+% gridobj_collect_objects_/7: collect all non-bg connected components.
 % Scans NonBgCells in order; skips cells already in Seen.
-gob_collect_objects_([], _, _, _, _, _, []).
-gob_collect_objects_([r(R,C)|Rest], Grid, H, W, Bg, Seen, Objects) :-
+gridobj_collect_objects_([], _, _, _, _, _, []).
+gridobj_collect_objects_([r(R,C)|Rest], Grid, H, W, Bg, Seen, Objects) :-
     ( member(r(R,C), Seen) ->
-        gob_collect_objects_(Rest, Grid, H, W, Bg, Seen, Objects)
+        gridobj_collect_objects_(Rest, Grid, H, W, Bg, Seen, Objects)
     ;
-        gob_cell_(Grid, R, C, Color),
-        gob_bfs_([r(R,C)], [r(R,C)], Color, H, W, Grid, Cells),
-        gob_cells_bbox_(Cells, BBox),
+        gridobj_cell_(Grid, R, C, Color),
+        gridobj_bfs_([r(R,C)], [r(R,C)], Color, H, W, Grid, Cells),
+        gridobj_cells_bbox_(Cells, BBox),
         append(Seen, Cells, NewSeen),
-        gob_collect_objects_(Rest, Grid, H, W, Bg, NewSeen, RestObjs),
+        gridobj_collect_objects_(Rest, Grid, H, W, Bg, NewSeen, RestObjs),
         Objects = [ob(Color,Cells,BBox)|RestObjs]
     ).
 
 % --- PUBLIC PREDICATES ---
 
-% gob_object_cells(+Grid, +R, +C, -Cells)
+% gridobj_object_cells(+Grid, +R, +C, -Cells)
 % Cells is the list of r(R,C) positions in the 4-connected component at (R,C).
 % The component includes (R,C) itself.
-gob_object_cells(Grid, R, C, Cells) :-
-    gob_dims_(Grid, H, W),
-    gob_cell_(Grid, R, C, Color),
-    gob_bfs_([r(R,C)], [r(R,C)], Color, H, W, Grid, Cells).
+gridobj_object_cells(Grid, R, C, Cells) :-
+    gridobj_dims_(Grid, H, W),
+    gridobj_cell_(Grid, R, C, Color),
+    gridobj_bfs_([r(R,C)], [r(R,C)], Color, H, W, Grid, Cells).
 
-% gob_object_color(+Grid, +R, +C, -Color)
+% gridobj_object_color(+Grid, +R, +C, -Color)
 % Color is the value at (R,C) = the color of the connected component.
-gob_object_color(Grid, R, C, Color) :-
-    gob_cell_(Grid, R, C, Color).
+gridobj_object_color(Grid, R, C, Color) :-
+    gridobj_cell_(Grid, R, C, Color).
 
-% gob_object_size(+Grid, +R, +C, -Size)
+% gridobj_object_size(+Grid, +R, +C, -Size)
 % Size is the number of cells in the 4-connected component at (R,C).
-gob_object_size(Grid, R, C, Size) :-
-    gob_object_cells(Grid, R, C, Cells),
+gridobj_object_size(Grid, R, C, Size) :-
+    gridobj_object_cells(Grid, R, C, Cells),
     length(Cells, Size).
 
-% gob_object_bbox(+Grid, +R, +C, -BBox)
+% gridobj_object_bbox(+Grid, +R, +C, -BBox)
 % BBox is r0(R0,C0,R1,C1): the tight bounding box of the component at (R,C).
-gob_object_bbox(Grid, R, C, BBox) :-
-    gob_object_cells(Grid, R, C, Cells),
-    gob_cells_bbox_(Cells, BBox).
+gridobj_object_bbox(Grid, R, C, BBox) :-
+    gridobj_object_cells(Grid, R, C, Cells),
+    gridobj_cells_bbox_(Cells, BBox).
 
-% gob_object_mask(+Grid, +R, +C, +Bg, -Mask)
+% gridobj_object_mask(+Grid, +R, +C, +Bg, -Mask)
 % Mask is a grid with component cells shown in their Color and all other cells Bg.
 % Same dimensions as Grid.
-gob_object_mask(Grid, R, C, Bg, Mask) :-
-    gob_object_cells(Grid, R, C, Cells),
-    gob_cell_(Grid, R, C, Color),
-    gob_dims_(Grid, H, W),
+gridobj_object_mask(Grid, R, C, Bg, Mask) :-
+    gridobj_object_cells(Grid, R, C, Cells),
+    gridobj_cell_(Grid, R, C, Color),
+    gridobj_dims_(Grid, H, W),
     H1 is H - 1, W1 is W - 1,
     findall(Row,
         (between(0, H1, GR),
@@ -144,13 +144,13 @@ gob_object_mask(Grid, R, C, Bg, Mask) :-
              Row)),
         Mask).
 
-% gob_extract_object(+Grid, +R, +C, +Bg, -Extracted)
+% gridobj_extract_object(+Grid, +R, +C, +Bg, -Extracted)
 % Extracted is the bounding-box subgrid of the component at (R,C).
 % Non-component cells within the bounding box are filled with Bg.
-gob_extract_object(Grid, R, C, Bg, Extracted) :-
-    gob_object_cells(Grid, R, C, Cells),
-    gob_cell_(Grid, R, C, Color),
-    gob_cells_bbox_(Cells, r0(R0,C0,R1,C1)),
+gridobj_extract_object(Grid, R, C, Bg, Extracted) :-
+    gridobj_object_cells(Grid, R, C, Cells),
+    gridobj_cell_(Grid, R, C, Color),
+    gridobj_cells_bbox_(Cells, r0(R0,C0,R1,C1)),
     H0 is R1 - R0 + 1, W0 is C1 - C0 + 1,
     H1 is H0 - 1, W1 is W0 - 1,
     findall(Row,
@@ -163,79 +163,79 @@ gob_extract_object(Grid, R, C, Bg, Extracted) :-
              Row)),
         Extracted).
 
-% gob_all_objects(+Grid, +Bg, -Objects)
+% gridobj_all_objects(+Grid, +Bg, -Objects)
 % Objects is a list of ob(Color,Cells,BBox) for every non-Bg connected component.
 % Components are returned in scan order (top-to-bottom, left-to-right by seed).
-gob_all_objects(Grid, Bg, Objects) :-
-    gob_dims_(Grid, H, W),
+gridobj_all_objects(Grid, Bg, Objects) :-
+    gridobj_dims_(Grid, H, W),
     H1 is H - 1, W1 is W - 1,
     findall(r(R,C),
         ( between(0, H1, R), between(0, W1, C),
-          gob_cell_(Grid, R, C, V), V \= Bg ),
+          gridobj_cell_(Grid, R, C, V), V \= Bg ),
         NonBgCells),
-    gob_collect_objects_(NonBgCells, Grid, H, W, Bg, [], Objects).
+    gridobj_collect_objects_(NonBgCells, Grid, H, W, Bg, [], Objects).
 
-% gob_object_count(+Grid, +Bg, -Count)
+% gridobj_object_count(+Grid, +Bg, -Count)
 % Count is the number of distinct non-Bg connected components.
-gob_object_count(Grid, Bg, Count) :-
-    gob_all_objects(Grid, Bg, Objects),
+gridobj_object_count(Grid, Bg, Count) :-
+    gridobj_all_objects(Grid, Bg, Objects),
     length(Objects, Count).
 
-% gob_largest_object(+Grid, +Bg, -Cells)
+% gridobj_largest_object(+Grid, +Bg, -Cells)
 % Cells is the cell list of the largest non-Bg connected component.
 % Fails if Grid has no non-Bg cells.
-gob_largest_object(Grid, Bg, Cells) :-
-    gob_all_objects(Grid, Bg, Objects),
+gridobj_largest_object(Grid, Bg, Cells) :-
+    gridobj_all_objects(Grid, Bg, Objects),
     Objects \= [],
     findall(neg(Neg, Cs),
         (member(ob(_,Cs,_), Objects), length(Cs, Len), Neg is -Len),
         Keyed),
     msort(Keyed, [neg(_,Cells)|_]).
 
-% gob_smallest_object(+Grid, +Bg, -Cells)
+% gridobj_smallest_object(+Grid, +Bg, -Cells)
 % Cells is the cell list of the smallest non-Bg connected component.
 % Fails if Grid has no non-Bg cells.
-gob_smallest_object(Grid, Bg, Cells) :-
-    gob_all_objects(Grid, Bg, Objects),
+gridobj_smallest_object(Grid, Bg, Cells) :-
+    gridobj_all_objects(Grid, Bg, Objects),
     Objects \= [],
     findall(pos(Len, Cs),
         (member(ob(_,Cs,_), Objects), length(Cs, Len)),
         Keyed),
     msort(Keyed, [pos(_,Cells)|_]).
 
-% gob_flood_fill(+Grid, +R, +C, +NewColor, -Result)
+% gridobj_flood_fill(+Grid, +R, +C, +NewColor, -Result)
 % Replace all cells of the connected component at (R,C) with NewColor.
-gob_flood_fill(Grid, R, C, NewColor, Result) :-
-    gob_object_cells(Grid, R, C, Cells),
-    gob_dims_(Grid, H, W),
+gridobj_flood_fill(Grid, R, C, NewColor, Result) :-
+    gridobj_object_cells(Grid, R, C, Cells),
+    gridobj_dims_(Grid, H, W),
     H1 is H - 1, W1 is W - 1,
     findall(Row,
         (between(0, H1, GR),
          findall(V,
              (between(0, W1, GC),
               ( member(r(GR,GC), Cells) -> V = NewColor
-              ; gob_cell_(Grid, GR, GC, V) )),
+              ; gridobj_cell_(Grid, GR, GC, V) )),
              Row)),
         Result).
 
-% gob_fill_enclosed(+Grid, +Bg, +FgColor, -Result)
+% gridobj_fill_enclosed(+Grid, +Bg, +FgColor, -Result)
 % Fill all Bg regions that are fully enclosed by non-Bg cells with FgColor.
 % A Bg region is enclosed if it has no 4-connected path to the grid border.
-gob_fill_enclosed(Grid, Bg, FgColor, Result) :-
-    gob_dims_(Grid, H, W),
+gridobj_fill_enclosed(Grid, Bg, FgColor, Result) :-
+    gridobj_dims_(Grid, H, W),
     H1 is H - 1, W1 is W - 1,
     findall(r(R,C),
         ( between(0, H1, R), between(0, W1, C),
           ( R =:= 0 ; R =:= H1 ; C =:= 0 ; C =:= W1 ),
-          gob_cell_(Grid, R, C, Bg) ),
+          gridobj_cell_(Grid, R, C, Bg) ),
         BorderBg0),
     list_to_set(BorderBg0, BorderBg),
-    gob_bg_bfs_(BorderBg, BorderBg, Bg, H, W, Grid, ReachableBg),
+    gridobj_bg_bfs_(BorderBg, BorderBg, Bg, H, W, Grid, ReachableBg),
     findall(Row,
         (between(0, H1, GR),
          findall(V,
              (between(0, W1, GC),
-              gob_cell_(Grid, GR, GC, OV),
+              gridobj_cell_(Grid, GR, GC, OV),
               ( OV = Bg ->
                   ( member(r(GR,GC), ReachableBg) -> V = Bg ; V = FgColor )
               ;
@@ -244,32 +244,32 @@ gob_fill_enclosed(Grid, Bg, FgColor, Result) :-
              Row)),
         Result).
 
-% gob_remove_object(+Grid, +R, +C, +Bg, -Result)
+% gridobj_remove_object(+Grid, +R, +C, +Bg, -Result)
 % Replace all cells of the connected component at (R,C) with Bg.
-gob_remove_object(Grid, R, C, Bg, Result) :-
-    gob_object_cells(Grid, R, C, Cells),
-    gob_dims_(Grid, H, W),
+gridobj_remove_object(Grid, R, C, Bg, Result) :-
+    gridobj_object_cells(Grid, R, C, Cells),
+    gridobj_dims_(Grid, H, W),
     H1 is H - 1, W1 is W - 1,
     findall(Row,
         (between(0, H1, GR),
          findall(V,
              (between(0, W1, GC),
               ( member(r(GR,GC), Cells) -> V = Bg
-              ; gob_cell_(Grid, GR, GC, V) )),
+              ; gridobj_cell_(Grid, GR, GC, V) )),
              Row)),
         Result).
 
-% gob_move_object(+Grid, +R, +C, +NewR, +NewC, +Bg, -Result)
+% gridobj_move_object(+Grid, +R, +C, +NewR, +NewC, +Bg, -Result)
 % Move the connected component at (R,C) so its bounding-box top-left is at (NewR,NewC).
 % Removes original cells and places component at new position.
 % Cells that would move outside the grid bounds are clipped (not placed).
-gob_move_object(Grid, R, C, NewR, NewC, Bg, Result) :-
-    gob_object_cells(Grid, R, C, Cells),
-    gob_cell_(Grid, R, C, Color),
-    gob_cells_bbox_(Cells, r0(OldR0,OldC0,_,_)),
+gridobj_move_object(Grid, R, C, NewR, NewC, Bg, Result) :-
+    gridobj_object_cells(Grid, R, C, Cells),
+    gridobj_cell_(Grid, R, C, Color),
+    gridobj_cells_bbox_(Cells, r0(OldR0,OldC0,_,_)),
     DR is NewR - OldR0, DC is NewC - OldC0,
-    gob_remove_object(Grid, R, C, Bg, Base),
-    gob_dims_(Base, H, W),
+    gridobj_remove_object(Grid, R, C, Bg, Base),
+    gridobj_dims_(Base, H, W),
     H1 is H - 1, W1 is W - 1,
     findall(r(GR,GC,Color),
         ( member(r(OR,OC), Cells),
@@ -281,6 +281,6 @@ gob_move_object(Grid, R, C, NewR, NewC, Bg, Result) :-
          findall(V,
              (between(0, W1, GC),
               ( member(r(GR,GC,Color), MovedCells) -> V = Color
-              ; gob_cell_(Base, GR, GC, V) )),
+              ; gridobj_cell_(Base, GR, GC, V) )),
              Row)),
         Result).

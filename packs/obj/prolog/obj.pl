@@ -36,7 +36,7 @@
 % Import higher-order apply utilities.
 :- use_module(library(apply), [maplist/2, maplist/3]).
 % Import the connect pack for flood-fill component analysis.
-:- use_module(library(connect), [cc_components4/3]).
+:- use_module(library(connect), [connect_components4/3]).
 
 % obj_from_cells(+Color, +Cells, -Obj).
 % Construct an object term obj(Color, SortedCells).
@@ -126,7 +126,7 @@ obj_normalize_cell_(MinR, MinC, r(R, C), r(DR, DC)) :-
 % Each element is an obj(Color, SortedCells) term.
 obj_inventory(Grid, Color, Objects) :-
     % Get all 4-connected components of this color from the connect pack.
-    cc_components4(Grid, Color, Components),
+    connect_components4(Grid, Color, Components),
     % Wrap each component in an obj term.
     maplist(obj_wrap_(Color), Components, Objects).
 
@@ -137,7 +137,7 @@ obj_wrap_(Color, Cells, Obj) :-
 
 % obj_all(+Grid, -Objects).
 % Objects is the list of all obj(Color, Cells) terms for every non-zero color in Grid.
-% Objects from lower colors appear first; within a color, order follows cc_components4.
+% Objects from lower colors appear first; within a color, order follows connect_components4.
 obj_all(Grid, Objects) :-
     % Collect all cell values via findall to avoid choicepoints.
     findall(V, (member(Row, Grid), member(V, Row)), AllVals),

@@ -203,7 +203,7 @@ rotation_apply_cell_(3, R, C, _, W1, NR, R) :-
 
 % rotation_overlay_bg_(+Bg, +VA, +VB, -V): overlay two cell values with background priority.
 % If VA is not background then VA wins; otherwise VB is used.
-% This is the same semantics as fd_overlay_cell_ in the fold pack, implemented locally.
+% This is the same semantics as fold_overlay_cell_ in the fold pack, implemented locally.
 rotation_overlay_bg_(Bg, VA, _VB, VA) :-
     % Non-background A value takes priority.
     VA \= Bg,

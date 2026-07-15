@@ -22,7 +22,7 @@ Lattice Cryptographic Privacy Layer
 ephemera
 Ephemeral Code Synthesis, Execution, and Skill Persistence (PR 53)
 
-    compose short-lived programs in Prolog, Python, or Bash, run them with a wall-clock timeout, capture stdout and stderr, and log execution traces. Useful ephemera can be named, saved, indexed, retrieved by name, and re-run as skills without re-synthesis. Key predicates: `ep_eval/3` (Prolog goal with timeout), `ep_shell/3` (shell command), `ep_ephemeral/4` (language-specific script), `ep_iterate/5` (synthesize-execute-check loop), `ep_skill_save/4`, `ep_skill_run/3`, `ep_skill_list/1`.
+    compose short-lived programs in Prolog, Python, or Bash, run them with a wall-clock timeout, capture stdout and stderr, and log execution traces. Useful ephemera can be named, saved, indexed, retrieved by name, and re-run as skills without re-synthesis. Key predicates: `ephemera_eval/3` (Prolog goal with timeout), `ephemera_shell/3` (shell command), `ephemera_ephemeral/4` (language-specific script), `ephemera_iterate/5` (synthesize-execute-check loop), `ephemera_skill_save/4`, `ephemera_skill_run/3`, `ephemera_skill_list/1`.
 
 agency
 Agentic Execution Loop (PR 54)
@@ -128,7 +128,7 @@ Grid Combination by Layering, Logic, Masking, and Priority Merge (PR 71)
 measure
 Geometric Measurement of Cell Regions and Grids (PR 72)
 
-    area (`ms_area/2`), bounding box (`ms_bbox/2`, `ms_bbox_size/3`), perimeter (`ms_perimeter/2`), diameter (`ms_diameter/2`), extent fraction (`ms_extent/3`), aspect ratio (`ms_aspect/3`), row/column spans (`ms_row_span/2`, `ms_col_span/2`), integer centroid (`ms_centroid/3`), Chebyshev radius (`ms_radius/2`), interior and border counts (`ms_interior_count/2`, `ms_border_count/2`), and distinct color count (`ms_color_count/2`). 14 ms_* predicates, Layer 51.
+    area (`measure_area/2`), bounding box (`measure_bbox/2`, `measure_bbox_size/3`), perimeter (`measure_perimeter/2`), diameter (`measure_diameter/2`), extent fraction (`measure_extent/3`), aspect ratio (`measure_aspect/3`), row/column spans (`measure_row_span/2`, `measure_col_span/2`), integer centroid (`measure_centroid/3`), Chebyshev radius (`measure_radius/2`), interior and border counts (`measure_interior_count/2`, `measure_border_count/2`), and distinct color count (`measure_color_count/2`). 14 ms_* predicates, Layer 51.
 
 transform
 Grid-Level Spatial and Color Transformations (PR 73)
@@ -193,7 +193,7 @@ Association List Operations and Grid Index Maps (PR 84)
 connect
 Flood Fill and Connected Component Analysis (PR 85)
 
-    4-connected flood fill (`cc_flood4/4`), 8-connected flood fill (`cc_flood8/4`), all 4-connected components (`cc_components4/3`), all 8-connected components (`cc_components8/3`), component counts (`cc_count4/3`, `cc_count8/3`), sorted size lists (`cc_sizes4/3`, `cc_sizes8/3`), largest component (`cc_largest4/3`, `cc_largest8/3`), smallest component (`cc_smallest4/3`), border cells of a region (`cc_border_cells/3`), interior cells of a region (`cc_interior_cells/3`), and background cells enclosed inside a closed shape (`cc_enclosed/3`). 14 cc_* predicates, Layer 64.
+    4-connected flood fill (`connect_flood4/4`), 8-connected flood fill (`connect_flood8/4`), all 4-connected components (`connect_components4/3`), all 8-connected components (`connect_components8/3`), component counts (`connect_count4/3`, `connect_count8/3`), sorted size lists (`connect_sizes4/3`, `connect_sizes8/3`), largest component (`connect_largest4/3`, `connect_largest8/3`), smallest component (`connect_smallest4/3`), border cells of a region (`connect_border_cells/3`), interior cells of a region (`connect_interior_cells/3`), and background cells enclosed inside a closed shape (`connect_enclosed/3`). 14 cc_* predicates, Layer 64.
 
 morph
 Morphological Grid Operations (PR 105)
@@ -493,7 +493,7 @@ Arithmetic Progression and Periodic Recurrence Detection (PR 120)
 stripe
 Uniform Row and Column Stripe Detection and Filling (PR 118)
 
-    testing whether row R is all one value (`sr_uniform_row/3`), testing whether column C is all one value (`sr_uniform_col/3`), returning sorted row indices uniformly equal to Color (`sr_uniform_rows/3`), returning sorted column indices uniformly equal to Color (`sr_uniform_cols/3`), R-Color pairs for all uniform rows in row-index order (`sr_all_stripe_rows/2`), C-Color pairs for all uniform columns in column-index order (`sr_all_stripe_cols/2`), sorted row indices that are NOT uniform (`sr_mixed_rows/2`), sorted column indices that are NOT uniform (`sr_mixed_cols/2`), filling row R with Color (`sr_fill_row/4`), filling column C with Color (`sr_fill_col/4`), filling multiple row indices with Color (`sr_fill_rows/4`), filling multiple column indices with Color (`sr_fill_cols/4`), returning r(R,C) terms for the Cartesian product of two index lists (`sr_cross_cells/4`), and filling all cells at row-column intersections with Color (`sr_cross_fill/5`). 14 sr_* predicates, Layer 97.
+    testing whether row R is all one value (`stripe_uniform_row/3`), testing whether column C is all one value (`stripe_uniform_col/3`), returning sorted row indices uniformly equal to Color (`stripe_uniform_rows/3`), returning sorted column indices uniformly equal to Color (`stripe_uniform_cols/3`), R-Color pairs for all uniform rows in row-index order (`stripe_all_stripe_rows/2`), C-Color pairs for all uniform columns in column-index order (`stripe_all_stripe_cols/2`), sorted row indices that are NOT uniform (`stripe_mixed_rows/2`), sorted column indices that are NOT uniform (`stripe_mixed_cols/2`), filling row R with Color (`stripe_fill_row/4`), filling column C with Color (`stripe_fill_col/4`), filling multiple row indices with Color (`stripe_fill_rows/4`), filling multiple column indices with Color (`stripe_fill_cols/4`), returning r(R,C) terms for the Cartesian product of two index lists (`stripe_cross_cells/4`), and filling all cells at row-column intersections with Color (`stripe_cross_fill/5`). 14 sr_* predicates, Layer 97.
 
 permute
 Row and Column Permutation Operations (PR 115)
@@ -668,12 +668,12 @@ Position-Based Sorting, Filtering, and Assignment for Object Collections (PR 268
 objxf
 Spatial and Color Transformations for obj(Color, Cells) Terms (PR 269)
 
-    treats obj terms as first-class geometric objects; bounding box query (ox_bbox: min/max row/col via findall+min_list/max_list; ox_size: H=R1-R0+1, W=C1-C0+1); translation (ox_translate: shift by DR,DC; ox_to_origin: shift by -R0,-C0); color replacement (ox_recolor: replace Color field only); rotations use bounding-box-local coords Lr=R-R0, Lc=C-C0 (ox_rot90: r->r(R0+Lc,C0+(H-1)-Lr) swaps H/W; ox_rot180: r->r(R0+R1-R,C0+C1-C); ox_rot270: r->r(R0+(W-1)-Lc,C0+Lr) swaps W/H); reflections (ox_reflect_h: r->r(R0+R1-R,C) mirrors rows; ox_reflect_v: r->r(R,C0+C1-C) mirrors cols); set algebra (ox_merge: append+sort dedup union; ox_diff: findall with \\+ member; ox_intersect: findall with member; all result in first object's color); scale-up (ox_scale_up: each r(R,C)->Factor x Factor block via between/3; cell count = original * Factor * Factor). 14 ox_* predicates, Layer 163.
+    treats obj terms as first-class geometric objects; bounding box query (objxf_bbox: min/max row/col via findall+min_list/max_list; objxf_size: H=R1-R0+1, W=C1-C0+1); translation (objxf_translate: shift by DR,DC; objxf_to_origin: shift by -R0,-C0); color replacement (objxf_recolor: replace Color field only); rotations use bounding-box-local coords Lr=R-R0, Lc=C-C0 (objxf_rot90: r->r(R0+Lc,C0+(H-1)-Lr) swaps H/W; objxf_rot180: r->r(R0+R1-R,C0+C1-C); objxf_rot270: r->r(R0+(W-1)-Lc,C0+Lr) swaps W/H); reflections (objxf_reflect_h: r->r(R0+R1-R,C) mirrors rows; objxf_reflect_v: r->r(R,C0+C1-C) mirrors cols); set algebra (objxf_merge: append+sort dedup union; objxf_diff: findall with \\+ member; objxf_intersect: findall with member; all result in first object's color); scale-up (objxf_scale_up: each r(R,C)->Factor x Factor block via between/3; cell count = original * Factor * Factor). 14 ox_* predicates, Layer 163.
 
 shrink
 Grid Downscaling and Block Decomposition (PR 270)
 
-    the inverse of ox_scale_up; partitions a 2D grid into equal-sized NxN blocks and tests or exploits blocky structure where every block is a uniform color; block dimensions (shrink_block_dims: H//N rows of blocks, W//N cols); block cell coordinates (shrink_block_cells: r(R,C) pairs for block I,J without needing the grid); block color inspection (shrink_block_color: unique color via sort+[Color] pattern, fails if mixed; shrink_block_majority: most frequent color via msort+last on Count-V pairs); blocky test (shrink_is_blocky: forall over all block indices); grid shrinking (shrink_shrink: majority vote per block; shrink_shrink_strict: unique color per block, fails if any mixed); scale search (shrink_find_scale: smallest N>=2 such that all blocks are uniform, cut on first match); object downscaling (shrink_obj_shrink: R//N, C//N integer division per cell, sort removes duplicates; shrink_scale_factor: try N=2..30, shrink Obj2 and compare normalized cell sets to Obj1); block classification (shrink_uniform_blocks: I-J pairs where block is uniform; shrink_mixed_blocks: I-J pairs where not uniform); block extraction (shrink_block_grid: NxN sub-grid; shrink_block_val: flat value list in row-major order). 14 dn_* predicates, Layer 164.
+    the inverse of objxf_scale_up; partitions a 2D grid into equal-sized NxN blocks and tests or exploits blocky structure where every block is a uniform color; block dimensions (shrink_block_dims: H//N rows of blocks, W//N cols); block cell coordinates (shrink_block_cells: r(R,C) pairs for block I,J without needing the grid); block color inspection (shrink_block_color: unique color via sort+[Color] pattern, fails if mixed; shrink_block_majority: most frequent color via msort+last on Count-V pairs); blocky test (shrink_is_blocky: forall over all block indices); grid shrinking (shrink_shrink: majority vote per block; shrink_shrink_strict: unique color per block, fails if any mixed); scale search (shrink_find_scale: smallest N>=2 such that all blocks are uniform, cut on first match); object downscaling (shrink_obj_shrink: R//N, C//N integer division per cell, sort removes duplicates; shrink_scale_factor: try N=2..30, shrink Obj2 and compare normalized cell sets to Obj1); block classification (shrink_uniform_blocks: I-J pairs where block is uniform; shrink_mixed_blocks: I-J pairs where not uniform); block extraction (shrink_block_grid: NxN sub-grid; shrink_block_val: flat value list in row-major order). 14 dn_* predicates, Layer 164.
 
 objmorph
 Morphological Operations on obj(Color, Cells) Terms (PR 271)
@@ -693,7 +693,7 @@ Object Connectivity and Component Analysis (PR 273)
 wavefront
 Wavefront BFS Propagation Through Passable Cells (PR 274)
 
-    BFS wavefront from seed cells through 4-adjacent cells matching a passable color; seeds always enter at distance 0 regardless of their own color; wf_bfs_ maintains an Enqueued set (not Visited) to prevent duplicate queue insertions while still collecting each dequeued cell into the result; wf_passable (collect all PassColor cells); wf_bfs (BFS from seeds; returns sorted D-r(R,C) DistPairs list); wf_reachable (all cells in DistPairs); wf_unreachable (PassColor cells absent from DistPairs); distance queries: wf_at_dist (cells at exact distance D), wf_within_dist (cells at distance <= MaxD), wf_dist_of (distance of specific cell), wf_max_dist (maximum distance), wf_all_dists (sorted list of distinct distance values); wf_path_exists (memberchk on BFS result; no choicepoints); wf_paint_bg (replace each passable cell with min(BFS_distance, MaxD); unreachable cells unchanged); multi-source: wf_multi_wave (pre-compute one BFS per color; each passable cell gets color of nearest seed; ties by term order), wf_collision (passable cells where min distance is achieved by 2+ colors: sort D-Color pairs, check [MinD-_|Rest] contains MinD again); wf_enclosed (seed BFS from all PassColor border cells; return PassColor cells absent from exterior BFS). 14 wf_* predicates, Layer 168.
+    BFS wavefront from seed cells through 4-adjacent cells matching a passable color; seeds always enter at distance 0 regardless of their own color; wavefront_bfs_ maintains an Enqueued set (not Visited) to prevent duplicate queue insertions while still collecting each dequeued cell into the result; wavefront_passable (collect all PassColor cells); wavefront_bfs (BFS from seeds; returns sorted D-r(R,C) DistPairs list); wavefront_reachable (all cells in DistPairs); wavefront_unreachable (PassColor cells absent from DistPairs); distance queries: wavefront_at_dist (cells at exact distance D), wavefront_within_dist (cells at distance <= MaxD), wavefront_dist_of (distance of specific cell), wavefront_max_dist (maximum distance), wavefront_all_dists (sorted list of distinct distance values); wavefront_path_exists (memberchk on BFS result; no choicepoints); wavefront_paint_bg (replace each passable cell with min(BFS_distance, MaxD); unreachable cells unchanged); multi-source: wavefront_multi_wave (pre-compute one BFS per color; each passable cell gets color of nearest seed; ties by term order), wavefront_collision (passable cells where min distance is achieved by 2+ colors: sort D-Color pairs, check [MinD-_|Rest] contains MinD again); wavefront_enclosed (seed BFS from all PassColor border cells; return PassColor cells absent from exterior BFS). 14 wf_* predicates, Layer 168.
 
 objfilter
 Object List Filtering and Selection for obj(Color, Cells) Terms (PR 281)
@@ -743,7 +743,7 @@ Grid Rotation and Rotational Symmetry Detection (PR 250)
 fold
 Grid Folding, Unfolding, and Fold-Symmetry Detection (PR 249)
 
-    splitting a grid into top/bottom halves at a horizontal crease row (`fd_split_h/4`), splitting into left/right halves at a vertical crease column (`fd_split_v/4`), overlaying two same-size grids with background-priority semantics where non-background cells of grid A overwrite grid B (`fd_overlay/4`), folding the bottom half upward with the crease after row R so that output row I overlays Top[I] with Bottom[R-I] (`fd_fold_h/4`), folding the right half leftward with the crease after column C so that output column I overlays Left[col][I] with Right[col][C-I] (`fd_fold_v/4`), creating a symmetric full grid from a top half by stacking with its row-reversed copy (`fd_unfold_h/2`), creating a symmetric full grid from a left half by joining each row with its column-reverse (`fd_unfold_v/2`), testing horizontal fold symmetry using between-rows mirror formula row I maps to row 2R+1-I consistent with fd_fold_h (`fd_sym_h/2`), testing vertical fold symmetry using mirror formula column J maps to column 2C+1-J (`fd_sym_v/2`), finding the first valid horizontal fold crease (`fd_find_fold_h/2`), finding the first valid vertical fold crease (`fd_find_fold_v/2`), finding the first row where every cell equals a marker value (`fd_mark_row/3`), finding the first column where every cell equals a marker value (`fd_mark_col/3`), and composing a horizontal fold then vertical fold to reduce a grid to its top-left quadrant (`fd_fold_both/5`). 14 fd_* predicates, Layer 143.
+    splitting a grid into top/bottom halves at a horizontal crease row (`fold_split_h/4`), splitting into left/right halves at a vertical crease column (`fold_split_v/4`), overlaying two same-size grids with background-priority semantics where non-background cells of grid A overwrite grid B (`fold_overlay/4`), folding the bottom half upward with the crease after row R so that output row I overlays Top[I] with Bottom[R-I] (`fold_fold_h/4`), folding the right half leftward with the crease after column C so that output column I overlays Left[col][I] with Right[col][C-I] (`fold_fold_v/4`), creating a symmetric full grid from a top half by stacking with its row-reversed copy (`fold_unfold_h/2`), creating a symmetric full grid from a left half by joining each row with its column-reverse (`fold_unfold_v/2`), testing horizontal fold symmetry using between-rows mirror formula row I maps to row 2R+1-I consistent with fold_fold_h (`fold_sym_h/2`), testing vertical fold symmetry using mirror formula column J maps to column 2C+1-J (`fold_sym_v/2`), finding the first valid horizontal fold crease (`fold_find_fold_h/2`), finding the first valid vertical fold crease (`fold_find_fold_v/2`), finding the first row where every cell equals a marker value (`fold_mark_row/3`), finding the first column where every cell equals a marker value (`fold_mark_col/3`), and composing a horizontal fold then vertical fold to reduce a grid to its top-left quadrant (`fold_fold_both/5`). 14 fd_* predicates, Layer 143.
 
 interop
 Hyperon Interoperability Bridge
@@ -1109,20 +1109,20 @@ Grid Symmetry: Detection, Completion, Violations, and Score (gsm_*, Layer 208)
 
 gridcolor
 Grid Color Analysis: Count, Histogram, Recolor, Color Map, Threshold, Dominant, Fraction (gc_*, Layer 209)
-    gc_count/3: count cells matching Color; N = total matches in the flat cell list
-    gc_histogram/2: Color-Count pairs for every distinct color, sorted alphabetically by color name
-    gc_most_frequent/2: most frequently occurring color; ties resolved by alphabetical order (last in sort)
-    gc_least_frequent/2: least frequently occurring color; ties resolved alphabetically (first in sort)
-    gc_unique_colors/2: sorted list of distinct color atoms using sort/2
-    gc_color_cells/3: R-C positions (row-major) of all cells matching Color
-    gc_contains/2: succeed if at least one cell equals Color; uses memberchk
-    gc_recolor/4: replace all OldColor cells with NewColor; other cells unchanged
-    gc_color_map/3: apply list of OldColor-NewColor pair mappings; unmapped colors pass through unchanged
-    gc_threshold/5: binary grid where Colors-list cells become FgColor and all other cells become BgColor
-    gc_dominant/3: most frequent non-BgColor; fails if only BgColor present
-    gc_fraction/3: float fraction of cells matching Color in [0.0..1.0]
-    gc_count_colors/2: number of distinct colors present (integer)
-    gc_sorted_by_freq/2: colors sorted most-frequent-first; ties broken by sort order
+    gridcolor_count/3: count cells matching Color; N = total matches in the flat cell list
+    gridcolor_histogram/2: Color-Count pairs for every distinct color, sorted alphabetically by color name
+    gridcolor_most_frequent/2: most frequently occurring color; ties resolved by alphabetical order (last in sort)
+    gridcolor_least_frequent/2: least frequently occurring color; ties resolved alphabetically (first in sort)
+    gridcolor_unique_colors/2: sorted list of distinct color atoms using sort/2
+    gridcolor_color_cells/3: R-C positions (row-major) of all cells matching Color
+    gridcolor_contains/2: succeed if at least one cell equals Color; uses memberchk
+    gridcolor_recolor/4: replace all OldColor cells with NewColor; other cells unchanged
+    gridcolor_color_map/3: apply list of OldColor-NewColor pair mappings; unmapped colors pass through unchanged
+    gridcolor_threshold/5: binary grid where Colors-list cells become FgColor and all other cells become BgColor
+    gridcolor_dominant/3: most frequent non-BgColor; fails if only BgColor present
+    gridcolor_fraction/3: float fraction of cells matching Color in [0.0..1.0]
+    gridcolor_count_colors/2: number of distinct colors present (integer)
+    gridcolor_sorted_by_freq/2: colors sorted most-frequent-first; ties broken by sort order
 
 gridstitch
     Grid Assembly: Concatenation, Splitting, Tiling, Border, and Repetition (gst_*, Layer 210)
@@ -1666,20 +1666,20 @@ Grid Resize and Scale Operations: Integer Scale Up/Down, Mode Downsample, Double
 
 gridobj
 Grid Object Operations: Connected Component Cells, Color, Size, Bbox, Mask, Extract, All Objects, Count, Largest, Smallest, Flood Fill, Fill Enclosed, Remove, and Move (gob_*, Layer 242)
-    gob_object_cells(+Grid,+R,+C,-Cells): r(R,C) list for 4-connected component at (R,C) by BFS.
-    gob_object_color(+Grid,+R,+C,-Color): color of the connected component at (R,C).
-    gob_object_size(+Grid,+R,+C,-Size): cell count of the connected component at (R,C).
-    gob_object_bbox(+Grid,+R,+C,-BBox): tight bounding box r0(R0,C0,R1,C1) of the component.
-    gob_object_mask(+Grid,+R,+C,+Bg,-Mask): full-grid mask: component color where object, Bg elsewhere.
-    gob_extract_object(+Grid,+R,+C,+Bg,-Extracted): bbox subgrid of the component; non-component cells = Bg.
-    gob_all_objects(+Grid,+Bg,-Objects): ob(Color,Cells,BBox) list for all non-Bg connected components.
-    gob_object_count(+Grid,+Bg,-Count): count of distinct non-Bg connected components.
-    gob_largest_object(+Grid,+Bg,-Cells): cells of the component with the most cells.
-    gob_smallest_object(+Grid,+Bg,-Cells): cells of the component with the fewest cells.
-    gob_flood_fill(+Grid,+R,+C,+NewColor,-Result): replace connected component at (R,C) with NewColor.
-    gob_fill_enclosed(+Grid,+Bg,+FgColor,-Result): fill Bg regions with no path to the border with FgColor.
-    gob_remove_object(+Grid,+R,+C,+Bg,-Result): replace connected component at (R,C) with Bg.
-    gob_move_object(+Grid,+R,+C,+NewR,+NewC,+Bg,-Result): move component bbox top-left to (NewR,NewC).
+    gridobj_object_cells(+Grid,+R,+C,-Cells): r(R,C) list for 4-connected component at (R,C) by BFS.
+    gridobj_object_color(+Grid,+R,+C,-Color): color of the connected component at (R,C).
+    gridobj_object_size(+Grid,+R,+C,-Size): cell count of the connected component at (R,C).
+    gridobj_object_bbox(+Grid,+R,+C,-BBox): tight bounding box r0(R0,C0,R1,C1) of the component.
+    gridobj_object_mask(+Grid,+R,+C,+Bg,-Mask): full-grid mask: component color where object, Bg elsewhere.
+    gridobj_extract_object(+Grid,+R,+C,+Bg,-Extracted): bbox subgrid of the component; non-component cells = Bg.
+    gridobj_all_objects(+Grid,+Bg,-Objects): ob(Color,Cells,BBox) list for all non-Bg connected components.
+    gridobj_object_count(+Grid,+Bg,-Count): count of distinct non-Bg connected components.
+    gridobj_largest_object(+Grid,+Bg,-Cells): cells of the component with the most cells.
+    gridobj_smallest_object(+Grid,+Bg,-Cells): cells of the component with the fewest cells.
+    gridobj_flood_fill(+Grid,+R,+C,+NewColor,-Result): replace connected component at (R,C) with NewColor.
+    gridobj_fill_enclosed(+Grid,+Bg,+FgColor,-Result): fill Bg regions with no path to the border with FgColor.
+    gridobj_remove_object(+Grid,+R,+C,+Bg,-Result): replace connected component at (R,C) with Bg.
+    gridobj_move_object(+Grid,+R,+C,+NewR,+NewC,+Bg,-Result): move component bbox top-left to (NewR,NewC).
 
 gridgroupby
 Grid Group-By Operations: Group, Filter, Sort, Pair, and Count Objects by Attribute (ggb_*, Layer 243)

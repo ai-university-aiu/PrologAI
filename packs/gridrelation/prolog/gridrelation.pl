@@ -31,7 +31,7 @@
 ]).
 % gridrelation.pl - Layer 244: Grid Object Spatial Relations (grl_* prefix).
 % Fourteen predicates for computing spatial relations between ob(Color,Cells,BBox)
-% object terms as produced by gob_all_objects/3.
+% object terms as produced by gridobj_all_objects/3.
 :- use_module(library(lists), [member/2]).
 
 % --- PRIVATE HELPERS ---

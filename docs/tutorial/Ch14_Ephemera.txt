@@ -39,11 +39,11 @@ EVALUATING A PROLOG GOAL WITH A TIMEOUT
 
 The simplest ephemeron is a Prolog goal evaluated with a time limit.
 
-ep_eval(+GoalTerm, +TimeoutSecs, -EvalResult)
+ephemera_eval(+GoalTerm, +TimeoutSecs, -EvalResult)
 
 Example:
 
-    ?- ep_eval((X is 3 * 7), 5, R).
+    ?- ephemera_eval((X is 3 * 7), 5, R).
     X = 21,
     R = success.
 
@@ -57,14 +57,14 @@ The result can be one of four values:
 
     error(E)    The goal threw the exception E.
 
-The variable bindings in GoalTerm are preserved after a success result, so you can extract computed values from the original goal term directly after ep_eval/3 returns.
+The variable bindings in GoalTerm are preserved after a success result, so you can extract computed values from the original goal term directly after ephemera_eval/3 returns.
 
 
 EVALUATING PROLOG CODE WRITTEN AS AN ATOM
 
 Sometimes the code to evaluate is built up as a text atom - for example, when it is constructed from parts at runtime.
 
-ep_scratch(+CodeAtom, +VarBindings, +TimeoutSecs, -EvalResult)
+ephemera_scratch(+CodeAtom, +VarBindings, +TimeoutSecs, -EvalResult)
 
 CodeAtom is a Prolog goal written as a text atom, for example 'X is 2 + 2'.
 
@@ -72,7 +72,7 @@ VarBindings is a list of pairs 'VarName'=Variable, where VarName is the name as 
 
 Example:
 
-    ?- ep_scratch('Y is 10 + 5', ['Y'=Y], 5, R).
+    ?- ephemera_scratch('Y is 10 + 5', ['Y'=Y], 5, R).
     Y = 15,
     R = success(['Y'=15]).
 
@@ -81,7 +81,7 @@ The result on success is success(UpdatedBindings), where UpdatedBindings is the 
 
 RUNNING A SHELL COMMAND
 
-ep_shell(+Argv, +TimeoutSecs, -ShellResult)
+ephemera_shell(+Argv, +TimeoutSecs, -ShellResult)
 
 Argv is a list of atoms.
 
@@ -91,7 +91,7 @@ The remaining atoms are its arguments.
 
 Example:
 
-    ?- ep_shell(['echo', 'hello world'], 10, R).
+    ?- ephemera_shell(['echo', 'hello world'], 10, R).
     R = shell_result(0, 'hello world\n', '').
 
 The result is always a shell_result/3 term:
@@ -104,17 +104,17 @@ Stdout and Stderr are atoms containing the captured output from each stream.
 
 You can run any command your operating system supports:
 
-    ?- ep_shell(['date'], 5, shell_result(_, Out, _)).
+    ?- ephemera_shell(['date'], 5, shell_result(_, Out, _)).
     Out = 'Tue Jun 24 12:00:00 UTC 2026\n'.
 
-    ?- ep_shell(['python3', '--version'], 5, shell_result(_, Out, Err)).
+    ?- ephemera_shell(['python3', '--version'], 5, shell_result(_, Out, Err)).
     Out = '',
     Err = 'Python 3.12.0\n'.
 
 
 RUNNING A SCRIPT IN ANOTHER LANGUAGE
 
-ep_ephemeral(+Language, +Code, +TimeoutSecs, -ShellResult)
+ephemera_ephemeral(+Language, +Code, +TimeoutSecs, -ShellResult)
 
 Language is one of: prolog, python, or bash.
 
@@ -124,20 +124,20 @@ The pack writes the code to a temporary file, runs it, captures output, then del
 
 Example - run a Python snippet:
 
-    ?- ep_ephemeral(python,
+    ?- ephemera_ephemeral(python,
            'import math\nprint(math.sqrt(144))',
            10, R).
     R = shell_result(0, '12.0\n', '').
 
 Example - run a Bash snippet:
 
-    ?- ep_ephemeral(bash,
+    ?- ephemera_ephemeral(bash,
            'echo "files: $(ls | wc -l)"',
            10, shell_result(0, Out, _)).
 
 Example - run Prolog source code as a script:
 
-    ?- ep_ephemeral(prolog,
+    ?- ephemera_ephemeral(prolog,
            ':- write(hello_from_script), nl, halt.',
            10, shell_result(0, Out, _)).
     Out = 'hello_from_script\n'.
@@ -147,7 +147,7 @@ The temporary file is always deleted, even if the script fails or times out.
 
 ITERATION CYCLES: SYNTHESIZE, EXECUTE, CHECK
 
-ep_iterate(:SynthGoal, :ExecGoal, :CheckGoal, +MaxIter, -IterResult)
+ephemera_iterate(:SynthGoal, :ExecGoal, :CheckGoal, +MaxIter, -IterResult)
 
 This predicate implements a closed loop:
 
@@ -163,10 +163,10 @@ This is the building block for code-generation loops: the synthesizer proposes c
 Example pattern:
 
     synth([C]>>(C = 'print(42)')).
-    run([C, R]>>(ep_ephemeral(python, C, 5, R))).
+    run([C, R]>>(ephemera_ephemeral(python, C, 5, R))).
     check([R]>>(R = shell_result(0, _, _))).
 
-    ?- ep_iterate(synth, run, check, 5, Result).
+    ?- ephemera_iterate(synth, run, check, 5, Result).
     Result = ok('print(42)', shell_result(0, '42\n', '')).
 
 
@@ -176,17 +176,17 @@ When you want to review a sequence of ephemeron executions later, use the trace 
 
 Allocate a trace identifier:
 
-    ?- ep_next_trace_id(TId).
+    ?- ephemera_next_trace_id(TId).
     TId = ep_trace_1.
 
 Record each step:
 
-    ?- ep_trace_record(TId, 1, 'X is 1', success).
-    ?- ep_trace_record(TId, 2, 'Y is 2', success).
+    ?- ephemera_trace_record(TId, 1, 'X is 1', success).
+    ?- ephemera_trace_record(TId, 2, 'Y is 2', success).
 
 Retrieve the full trace:
 
-    ?- ep_trace_get(TId, Entries).
+    ?- ephemera_trace_get(TId, Entries).
     Entries = [trace(TId, 1, 'X is 1', success),
                trace(TId, 2, 'Y is 2', success)].
 
@@ -201,7 +201,7 @@ Every subprocess execution is bounded by the caller-supplied TimeoutSecs.
 
 If a subprocess does not finish in time, it is terminated and a shell_result with exit code -1 is returned.
 
-Temporary files created by ep_ephemeral/4 are deleted before the predicate returns, on both success and failure.
+Temporary files created by ephemera_ephemeral/4 are deleted before the predicate returns, on both success and failure.
 
 The ephemera pack does not modify any global state except its own trace log and counter.
 
@@ -216,10 +216,10 @@ If the same computation is likely to be needed again, it can be saved as a named
 
 SAVING A SKILL
 
-ep_skill_save/4 takes four arguments: a name atom, a language atom, the source code atom, and a human-readable description.
+ephemera_skill_save/4 takes four arguments: a name atom, a language atom, the source code atom, and a human-readable description.
 
 % Save a greeting skill in Python with a description.
-ep_skill_save(greet, python, 'print("Hello from Mentova")',
+ephemera_skill_save(greet, python, 'print("Hello from Mentova")',
               'Print a greeting from Mentova').
 
 If a skill with the same name already exists it is replaced.
@@ -227,10 +227,10 @@ If a skill with the same name already exists it is replaced.
 
 RETRIEVING A SKILL
 
-ep_skill_lookup/3 retrieves the language and code for a named skill.
+ephemera_skill_lookup/3 retrieves the language and code for a named skill.
 
 % Look up the greeting skill.
-ep_skill_lookup(greet, Lang, Code).
+ephemera_skill_lookup(greet, Lang, Code).
 % Lang = python
 % Code = 'print("Hello from Mentova")'
 
@@ -239,24 +239,24 @@ It fails silently if no skill with that name exists.
 
 RUNNING A SAVED SKILL
 
-ep_skill_run/3 retrieves a skill by name and executes it immediately.
+ephemera_skill_run/3 retrieves a skill by name and executes it immediately.
 
 % Run the greeting skill with a 10-second timeout.
-ep_skill_run(greet, 10, shell_result(Code, Out, _)).
+ephemera_skill_run(greet, 10, shell_result(Code, Out, _)).
 % Code = 0
 % Out  = 'Hello from Mentova\n'
 
-This is exactly equivalent to ep_skill_lookup/3 followed by ep_ephemeral/4 - ep_skill_run/3 is a thin named-dispatch convenience.
+This is exactly equivalent to ephemera_skill_lookup/3 followed by ephemera_ephemeral/4 - ephemera_skill_run/3 is a thin named-dispatch convenience.
 
 
 LISTING ALL SAVED SKILLS
 
-ep_skill_list/1 returns all saved skills as a list of skill(Name, Language, Description) terms.
+ephemera_skill_list/1 returns all saved skills as a list of skill(Name, Language, Description) terms.
 
 The code body is not included in the listing - this keeps the list compact and readable.
 
 % List all saved skills.
-ep_skill_list(Skills).
+ephemera_skill_list(Skills).
 % Skills = [skill(greet, python, 'Print a greeting from Mentova')]
 
 An empty list is returned when no skills have been saved.
@@ -264,10 +264,10 @@ An empty list is returned when no skills have been saved.
 
 FORGETTING A SKILL
 
-ep_skill_forget/1 removes a saved skill by name.
+ephemera_skill_forget/1 removes a saved skill by name.
 
 % Remove the greeting skill.
-ep_skill_forget(greet).
+ephemera_skill_forget(greet).
 
 It succeeds silently even if no skill with that name exists.
 
@@ -279,7 +279,7 @@ Save an ephemeron as a skill when:
 - A synthesized ephemeron has been verified correct and should not be re-synthesized each time.
 - You want to build an index of reusable utility code that grows with the session.
 
-Skills persist for the lifetime of the SWI-Prolog session. They are stored in the dynamic fact ep_skill_db/4, which is not written to disk. To persist skills across sessions, export ep_skill_db/4 facts to a file and reload them at startup.
+Skills persist for the lifetime of the SWI-Prolog session. They are stored in the dynamic fact ephemera_skill_db/4, which is not written to disk. To persist skills across sessions, export ephemera_skill_db/4 facts to a file and reload them at startup.
 
 
 SAFETY PROPERTIES
@@ -288,7 +288,7 @@ Every subprocess execution is bounded by the caller-supplied TimeoutSecs.
 
 If a subprocess does not finish in time, it is terminated and a shell_result with exit code -1 is returned.
 
-Temporary files created by ep_ephemeral/4 are deleted before the predicate returns, on both success and failure.
+Temporary files created by ephemera_ephemeral/4 are deleted before the predicate returns, on both success and failure.
 
 The ephemera pack does not modify any global state except its own trace log, counter, and skill database.
 
@@ -297,19 +297,19 @@ All external code (Python, Bash, external Prolog) runs in a subprocess isolated 
 
 SUMMARY
 
-ep_eval/3             Evaluate a Prolog goal term with timeout.
-ep_scratch/4          Evaluate Prolog source written as an atom.
-ep_shell/3            Run any shell command and capture output.
-ep_ephemeral/4        Write a script to a temp file, run it, delete it.
-ep_iterate/5          Synthesize-execute-check loop with step budget.
-ep_trace_record/4     Record one step to a trace log.
-ep_trace_get/2        Retrieve all entries for a trace.
-ep_next_trace_id/1    Allocate a fresh unique trace identifier.
-ep_skill_save/4       Save a useful ephemeron as a named, reusable skill.
-ep_skill_lookup/3     Retrieve a saved skill's language and code by name.
-ep_skill_run/3        Execute a saved skill by name.
-ep_skill_list/1       List all saved skills.
-ep_skill_forget/1     Remove a saved skill by name.
+ephemera_eval/3             Evaluate a Prolog goal term with timeout.
+ephemera_scratch/4          Evaluate Prolog source written as an atom.
+ephemera_shell/3            Run any shell command and capture output.
+ephemera_ephemeral/4        Write a script to a temp file, run it, delete it.
+ephemera_iterate/5          Synthesize-execute-check loop with step budget.
+ephemera_trace_record/4     Record one step to a trace log.
+ephemera_trace_get/2        Retrieve all entries for a trace.
+ephemera_next_trace_id/1    Allocate a fresh unique trace identifier.
+ephemera_skill_save/4       Save a useful ephemeron as a named, reusable skill.
+ephemera_skill_lookup/3     Retrieve a saved skill's language and code by name.
+ephemera_skill_run/3        Execute a saved skill by name.
+ephemera_skill_list/1       List all saved skills.
+ephemera_skill_forget/1     Remove a saved skill by name.
 
 
 WHAT COMES NEXT

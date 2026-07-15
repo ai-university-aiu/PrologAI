@@ -31,7 +31,7 @@
 ]).
 % gridgroupby.pl - Layer 243: Grid Group-By Operations (ggb_* prefix).
 % Fourteen predicates for grouping, filtering, sorting, pairing, and counting
-% ob(Color,Cells,BBox) object terms produced by gob_all_objects/3.
+% ob(Color,Cells,BBox) object terms produced by gridobj_all_objects/3.
 :- use_module(library(lists), [member/2, append/3]).
 
 % --- PRIVATE HELPERS ---

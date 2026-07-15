@@ -1,6 +1,6 @@
 % PLUnit tests for the obj pack (obj_* predicates).
 :- use_module(library(plunit)).
-% Load the connect pack so obj_inventory can find cc_components4.
+% Load the connect pack so obj_inventory can find connect_components4.
 :- use_module('../../connect/prolog/connect').
 :- use_module('../prolog/obj').
 
