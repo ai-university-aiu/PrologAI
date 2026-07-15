@@ -43,6 +43,11 @@
 % Declare 'actor_entry/2.          % Name, ThreadId' as dynamic — its facts may be added or removed at runtime.
 :- dynamic actor_entry/2.          % Name, ThreadId
 
+% Declare 'actor_stop_requested/1' as dynamic — a per-actor stop flag set by
+% cyclic_actor_stop so the loop exits at the next cycle boundary even if the
+% thread_signal interrupt is missed while a cycle goal is wedged on a lock.
+:- dynamic actor_stop_requested/1.
+
 % Register the following goal to run automatically at load time.
 :- initialization(mutex_create(actor_registry_mutex), now).
 
@@ -120,8 +125,9 @@ cyclic_actor(Name, Goal, DelayMs) :-
         actor_loop(Name, Goal, DelayMs),
         % Supply 'Tid' as the next argument to the expression above.
         Tid,
-        % Continue the multi-line expression started above.
-        [alias(Name), detached(false)]
+        % Detached so a wedged actor can never block halt or thread_join; stop is
+        % driven by the stop flag + signal + a bounded wait in cyclic_actor_stop.
+        [alias(Name), detached(true)]
     % Close the expression opened above.
     ),
     % State the fact: register actor(Name, Tid).
@@ -146,6 +152,9 @@ actor_loop(Name, Goal, DelayMs) :-
 
 % Define a clause for 'actor loop body': succeed when the following conditions hold.
 actor_loop_body(Name, Goal, DelayMs) :-
+    % If a stop was requested, exit cleanly at this cycle boundary (a deterministic
+    % exit point that does not depend on the thread_signal interrupt landing).
+    ( actor_stop_requested(Name) -> throw(actor_stop(Name)) ; true ),
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.
@@ -208,35 +217,40 @@ log_actor_warn(Name, Msg) :-
 
 % Define a clause for 'cyclic actor stop': succeed when the following conditions hold.
 cyclic_actor_stop(Name) :-
-    % Execute: ( once(registry_lock(actor_entry(Name, Tid))).
+    % Look up the actor's thread id under the registry mutex (released at once).
     ( once(registry_lock(actor_entry(Name, Tid)))
-    % If the condition above succeeded, perform the following action.
-    ->  catch(
-            % Continue the multi-line expression started above.
-            thread_signal(Tid, throw(actor_stop(Name))),
-            % Supply '_' as the next argument to the expression above.
-            _,
-            % Supply 'true' as the next argument to the expression above.
-            true
-        % Close the expression opened above.
+    % If the actor exists, ask it to stop and wait, bounded, for it to exit.
+    ->  % Set the stop flag so the loop exits at its next cycle boundary.
+        ( actor_stop_requested(Name) -> true ; assertz(actor_stop_requested(Name)) ),
+        % Signal the thread to interrupt a current sleep with the stop exception.
+        catch(thread_signal(Tid, throw(actor_stop(Name))), _, true),
+        % Poll for the thread to exit, up to about three seconds.
+        wait_for_actor_exit(Tid, 30),
+        % If it is still running (a wedged cycle goal), force an abort and wait more.
+        ( catch(thread_property(Tid, status(running)), _, fail)
+        ->  catch(thread_signal(Tid, abort), _, true),
+            wait_for_actor_exit(Tid, 20)
+        ;   true
         ),
-        % Continue the multi-line expression started above.
-        catch(
-            % Continue the multi-line expression started above.
-            thread_join(Tid, _),
-            % Supply '_' as the next argument to the expression above.
-            _,
-            % Supply 'true' as the next argument to the expression above.
-            true
-        % Close the expression opened above.
-        ),
-        % Continue the multi-line expression started above.
+        % Reap the thread if joinable (a no-op for a detached or already-gone thread).
+        catch(thread_join(Tid, _), _, true),
+        % Remove the registry entry, clear the stop flag, and reset the counters.
         deregister_actor(Name),
-        % Continue the multi-line expression started above.
+        retractall(actor_stop_requested(Name)),
         clear_actor_counts(Name)
-    % Otherwise (else branch), perform the following action.
+    % Otherwise there is no such actor; stopping is a no-op.
     ;   true
-    % Close the expression opened above.
+    ).
+
+% Poll a thread's status until it is no longer running or the budget is spent.
+% Budget N is in units of 100 ms; returns as soon as the thread has exited.
+wait_for_actor_exit(_, 0) :- !.
+wait_for_actor_exit(Tid, N) :-
+    % Still running: sleep 100 ms and poll again with one less unit of budget.
+    ( catch(thread_property(Tid, status(running)), _, fail)
+    ->  sleep(0.1), N1 is N - 1, wait_for_actor_exit(Tid, N1)
+    % Not running (exited or gone): done.
+    ;   true
     ).
 
 % ---------------------------------------------------------------------------

@@ -4,7 +4,7 @@ Winner: **prolog**
 
 | Backend | Score |
 |---------|-------|
-| prolog | 0.0677 |
+| prolog | 0.0622 |
 
 ## Notes
 
