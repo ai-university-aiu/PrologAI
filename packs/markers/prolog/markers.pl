@@ -15,25 +15,25 @@
     Markers decay each cycle toward neutral (0.0) at a configurable rate.
 
     Predicates:
-        pai_marker_stamp/2      — +Plan, +episode(Valence,Arousal)
-        pai_marker_of/2         — +Plan, -marker(MeanV,MeanA,Count)
-        pai_marker_filter/3     — +Candidates, +Opts, -Filtered
-        pai_marker_decay/0      — tick: decay all markers toward neutral
-        pai_marker_override/2   — +Plan, +ExplicitEvidence (inhibit marker)
+        markers_marker_stamp/2      — +Plan, +episode(Valence,Arousal)
+        markers_marker_of/2         — +Plan, -marker(MeanV,MeanA,Count)
+        markers_marker_filter/3     — +Candidates, +Opts, -Filtered
+        markers_marker_decay/0      — tick: decay all markers toward neutral
+        markers_marker_override/2   — +Plan, +ExplicitEvidence (inhibit marker)
 */
 
 % Declare this file as the 'markers' module and list its exported predicates.
 :- module(markers, [
     % Continue the multi-line expression started above.
-    pai_marker_stamp/2,      % +Plan, +episode(Valence, Arousal)
+    markers_marker_stamp/2,      % +Plan, +episode(Valence, Arousal)
     % Continue the multi-line expression started above.
-    pai_marker_of/2,         % +Plan, -marker(MeanV, MeanA, Count)
+    markers_marker_of/2,         % +Plan, -marker(MeanV, MeanA, Count)
     % Continue the multi-line expression started above.
-    pai_marker_filter/3,     % +Candidates, +Opts, -Filtered
-    % Supply 'pai_marker_decay/0' as the next argument to the expression above.
-    pai_marker_decay/0,
+    markers_marker_filter/3,     % +Candidates, +Opts, -Filtered
+    % Supply 'markers_marker_decay/0' as the next argument to the expression above.
+    markers_marker_decay/0,
     % Continue the multi-line expression started above.
-    pai_marker_override/2    % +Plan, +ExplicitEvidence
+    markers_marker_override/2    % +Plan, +ExplicitEvidence
 % Close the expression opened above.
 ]).
 
@@ -57,11 +57,11 @@ prune_threshold(-0.5).
 boost_threshold(0.5).           % used as sort key (higher = earlier in result)
 
 % ---------------------------------------------------------------------------
-% pai_marker_stamp/2
+% markers_marker_stamp/2
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai marker stamp': succeed when the following conditions hold.
-pai_marker_stamp(Plan, episode(Valence, Arousal)) :-
+markers_marker_stamp(Plan, episode(Valence, Arousal)) :-
     % Execute: ( retract(plan_marker(Plan, OldV, OldA, N)).
     ( retract(plan_marker(Plan, OldV, OldA, N))
     % If the condition above succeeded, perform the following action.
@@ -84,11 +84,11 @@ pai_marker_stamp(Plan, episode(Valence, Arousal)) :-
     assertz(plan_marker(Plan, NewV, NewA, N1)).
 
 % ---------------------------------------------------------------------------
-% pai_marker_of/2
+% markers_marker_of/2
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai marker of': succeed when the following conditions hold.
-pai_marker_of(Plan, marker(MeanV, MeanA, Count)) :-
+markers_marker_of(Plan, marker(MeanV, MeanA, Count)) :-
     % Execute: ( plan_marker(Plan, MeanV, MeanA, Count).
     ( plan_marker(Plan, MeanV, MeanA, Count)
     % If the condition above succeeded, perform the following action.
@@ -99,7 +99,7 @@ pai_marker_of(Plan, marker(MeanV, MeanA, Count)) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_marker_filter/3
+% markers_marker_filter/3
 %
 %   Opts:
 %     override(Plan) — ignore marker for this specific plan
@@ -107,7 +107,7 @@ pai_marker_of(Plan, marker(MeanV, MeanA, Count)) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai marker filter': succeed when the following conditions hold.
-pai_marker_filter(Candidates, Opts, Filtered) :-
+markers_marker_filter(Candidates, Opts, Filtered) :-
     % State a fact for 'min count opt' with the arguments listed below.
     min_count_opt(Opts, MinCount),
     % State a fact for 'prune threshold' with the arguments listed below.
@@ -200,11 +200,11 @@ min_count_opt(Opts, N) :-
     ( memberchk(min_count(N), Opts) -> true ; N = 1 ).
 
 % ---------------------------------------------------------------------------
-% pai_marker_decay/0
+% markers_marker_decay/0
 % ---------------------------------------------------------------------------
 
-% Execute: pai_marker_decay :-.
-pai_marker_decay :-
+% Execute: markers_marker_decay :-.
+markers_marker_decay :-
     % State a fact for 'marker decay rate' with the arguments listed below.
     marker_decay_rate(Rate),
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
@@ -227,11 +227,11 @@ pai_marker_decay :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_marker_override/2
+% markers_marker_override/2
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai marker override': succeed when the following conditions hold.
-pai_marker_override(Plan, ExplicitEvidence) :-
+markers_marker_override(Plan, ExplicitEvidence) :-
     % Remove all matching facts from the runtime knowledge base.
     retractall(marker_override(Plan, _)),
     % Add a new fact or rule to the runtime knowledge base.

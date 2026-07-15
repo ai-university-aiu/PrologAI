@@ -2443,9 +2443,9 @@ All ANP messages are signed with HMAC-SHA256. Incoming messages are verified bef
 
 ANP supports meta-protocol negotiation: when two agents meet, they announce which protocols they support, so they can choose the best one.
 
-    ?- use_module(library(anp), [pai_anp_did/1, pai_anp_negotiate/2]).
-    ?- pai_anp_did(DID).       % Get Mentova's DID.
-    ?- pai_anp_negotiate(peer_endpoint, Protocols).  % Negotiate protocols with a peer.
+    ?- use_module(library(anp), [anp_anp_did/1, anp_anp_negotiate/2]).
+    ?- anp_anp_did(DID).       % Get Mentova's DID.
+    ?- anp_anp_negotiate(peer_endpoint, Protocols).  % Negotiate protocols with a peer.
 
 
 THE ROBOT BODY (PR 46 - ROS BRIDGE)
@@ -2542,11 +2542,11 @@ SITUATIONAL AWARENESS (PR 51)
 Awareness is engineered as a ladder of regards (viewpoints): ambient_regard (general awareness, the default), selfward_regard (self-interest), otherward_regard(Agent) (the view of another mind, for theory of mind), avowed_regard (what the mind owns), and disavowed_regard (what the mind disowns). A proposition is held under a regard, so the mind can believe something from one standpoint and deny it from another.
 
     ?- use_module(library(awareness)).
-    ?- pai_regard_hold(selfward_regard, location(ball, box)).
-    ?- pai_tom_attribute(alice, not(location(ball, box))).
-    ?- pai_tom_divergence(alice, Divs).
+    ?- awareness_regard_hold(selfward_regard, location(ball, box)).
+    ?- awareness_tom_attribute(alice, not(location(ball, box))).
+    ?- awareness_tom_divergence(alice, Divs).
 
-The divergence list reports that alice holds a false belief relative to the mind's own view - the computational core of theory of mind. pai_regard_reconcile/1 then integrates the owned and disowned regards into a single coherent self-account.
+The divergence list reports that alice holds a false belief relative to the mind's own view - the computational core of theory of mind. awareness_regard_reconcile/1 then integrates the owned and disowned regards into a single coherent self-account.
 
 
 DREAMING ENGINE (PR 52)
@@ -3080,13 +3080,13 @@ CHECKING WHAT IS AVAILABLE
 
 Before encrypting, you can ask PrologAI which algorithms are ready to use:
 
-    ?- pai_crypto_available(pai_algo_rsa).
+    ?- lattice_crypto_crypto_available(pai_algo_rsa).
     true.
 
-    ?- pai_crypto_available(pai_algo_ecdh).
+    ?- lattice_crypto_crypto_available(pai_algo_ecdh).
     true.
 
-    ?- pai_crypto_available(pai_algo_pqc).
+    ?- lattice_crypto_crypto_available(pai_algo_pqc).
     false.
 
 The first two should succeed on any standard installation. The third only succeeds if the OQS Provider is installed.
@@ -3100,7 +3100,7 @@ Step 1: Generate a key pair.
 
 The key pair is written to temporary PEM files (PEM is a standard format for storing cryptographic keys as text).
 
-    ?- pai_keygen_rsa(2048, PrivFile, PubFile).
+    ?- lattice_crypto_keygen_rsa(2048, PrivFile, PubFile).
     PrivFile = '/tmp/swipl_pai_rsa_priv_1234',
     PubFile = '/tmp/swipl_pai_rsa_pub_5678'.
 
@@ -3111,8 +3111,8 @@ Keep the private key secret. Distribute the public key freely.
 
 Step 2: Load the keys into Prolog.
 
-    ?- pai_pem_load_private(PrivFile, PrivKey),
-       pai_pem_load_public(PubFile, PubKey).
+    ?- lattice_crypto_pem_load_private(PrivFile, PrivKey),
+       lattice_crypto_pem_load_public(PubFile, PubKey).
     PrivKey = <ssl_key>(0x...),
     PubKey = <ssl_key>(0x...).
 
@@ -3120,7 +3120,7 @@ PrivKey and PubKey are now Prolog terms representing the loaded keys.
 
 Step 3: Encrypt the password.
 
-    ?- pai_encrypt_rsa(PubKey, 'hunter2_my_bank_password', Bundle, Tag).
+    ?- lattice_crypto_encrypt_rsa(PubKey, 'hunter2_my_bank_password', Bundle, Tag).
     Bundle = rsa_bundle('7f3a...', '2b9c...', 'a1d4...'),
     Tag = '8e2f...'.
 
@@ -3133,7 +3133,7 @@ Note: the actual hex strings will be much longer than shown above (they are abbr
 
 Step 4: Decrypt the password.
 
-    ?- pai_decrypt_rsa(PrivKey, Bundle, Tag, Plain).
+    ?- lattice_crypto_decrypt_rsa(PrivKey, Bundle, Tag, Plain).
     Plain = 'hunter2_my_bank_password'.
 
 The original password is recovered.
@@ -3149,7 +3149,7 @@ ECDH does not use PEM files for the recipient key. The recipient's key is stored
 
 Step 1: Generate a key pair for the recipient.
 
-    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub).
+    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub).
     RecipPriv = 73849201...,
     RecipPub = point(114492..., 98234...).
 
@@ -3158,7 +3158,7 @@ RecipPub is a point on the P-256 curve, represented as point(X, Y) where X and Y
 
 Step 2: Encrypt the SSN using only the public key.
 
-    ?- pai_encrypt_ecdh(RecipPub, 'SSN:123-45-6789', Bundle, Tag).
+    ?- lattice_crypto_encrypt_ecdh(RecipPub, 'SSN:123-45-6789', Bundle, Tag).
     Bundle = ecdh_bundle(114492..., 98234..., '3f7a...', 'b2c1...'),
     Tag = 'a9e4...'.
 
@@ -3169,7 +3169,7 @@ The ECDH bundle contains:
 
 Step 3: Decrypt using only the private scalar.
 
-    ?- pai_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
+    ?- lattice_crypto_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
     Plain = 'SSN:123-45-6789'.
 
 The SSN is recovered.
@@ -3181,9 +3181,9 @@ EXAMPLE 3: THE GENERIC INTERFACE
 
 The generic interface lets you write code that works with any algorithm.
 
-    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       pai_encrypt(pai_algo_ecdh, RecipPub, 'CreditCard:4111111111111111', Bundle, Tag),
-       pai_decrypt(pai_algo_ecdh, RecipPriv, Bundle, Tag, Plain).
+    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       lattice_crypto_encrypt(pai_algo_ecdh, RecipPub, 'CreditCard:4111111111111111', Bundle, Tag),
+       lattice_crypto_decrypt(pai_algo_ecdh, RecipPriv, Bundle, Tag, Plain).
     Plain = 'CreditCard:4111111111111111'.
 
 To switch to RSA, change pai_algo_ecdh to pai_algo_rsa and supply RSA keys instead.
@@ -3197,10 +3197,10 @@ AES-256-GCM protects against tampering. If the ciphertext or the tag is changed 
 
 To demonstrate:
 
-    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       pai_encrypt_ecdh(RecipPub, 'secret value', Bundle, _RealTag),
+    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       lattice_crypto_encrypt_ecdh(RecipPub, 'secret value', Bundle, _RealTag),
        FakeTag = '00000000000000000000000000000000',
-       pai_decrypt_ecdh(RecipPriv, Bundle, FakeTag, Plain, prime256v1).
+       lattice_crypto_decrypt_ecdh(RecipPriv, Bundle, FakeTag, Plain, prime256v1).
     ERROR: SSL(00000000) : ...
 
 The decryption fails and raises an error. It does not silently return wrong data.
@@ -3212,8 +3212,8 @@ STORING AN ENCRYPTED VALUE IN THE LATTICE
 
 Encrypted bundles are ordinary Prolog compound terms. They can be stored in the Lattice exactly like any other value.
 
-    ?- pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
-       pai_encrypt_ecdh(RecipPub, 'my_bank_password', Bundle, Tag),
+    ?- lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+       lattice_crypto_encrypt_ecdh(RecipPub, 'my_bank_password', Bundle, Tag),
        anchor_node(private_credential, bank_password, Bundle-Tag, []).
 
 The Lattice now contains a node_fact with relation type private_credential, key bank_password, and value Bundle-Tag.
@@ -3227,7 +3227,7 @@ To retrieve and decrypt:
 
     ?- live_node_facts(private_credential-bank_password, [node_fact(_,_,BundleTag,_)]),
        BundleTag = Bundle-Tag,
-       pai_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
+       lattice_crypto_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1).
     Plain = 'my_bank_password'.
 
 
@@ -3258,7 +3258,7 @@ REAL-WORLD APPLICATIONS OF THESE TECHNIQUES
 
 The mathematics behind PrologAI's crypto pack powers the entire digital economy.
 
-When you log in to your bank's website, RSA or ECDH establishes a shared secret and AES encrypts your session. That is exactly what pai_encrypt/5 does.
+When you log in to your bank's website, RSA or ECDH establishes a shared secret and AES encrypts your session. That is exactly what lattice_crypto_encrypt/5 does.
 
 When your phone stores a fingerprint or face ID template, it encrypts it with a key that never leaves the secure hardware chip. That is the same asymmetric-key-wraps-symmetric-key pattern.
 
@@ -3291,12 +3291,12 @@ All three use hybrid encryption: the asymmetric algorithm wraps a 256-bit AES se
 AES-256-GCM also provides authenticated integrity: any tampering with the ciphertext or tag causes decryption to fail with an error.
 
 The main predicates are:
-    pai_keygen_rsa/3, pai_keygen_ecdh/3, pai_keygen_pqc/2  - key generation.
-    pai_encrypt/5, pai_decrypt/5                            - generic dispatch.
-    pai_encrypt_rsa/4, pai_decrypt_rsa/4                    - RSA convenience.
-    pai_encrypt_ecdh/4, pai_decrypt_ecdh/5                  - ECDH convenience.
-    pai_encrypt_pqc/4, pai_decrypt_pqc/4                    - PQC convenience.
-    pai_crypto_available/1                                  - availability probe.
+    lattice_crypto_keygen_rsa/3, lattice_crypto_keygen_ecdh/3, lattice_crypto_keygen_pqc/2  - key generation.
+    lattice_crypto_encrypt/5, lattice_crypto_decrypt/5                            - generic dispatch.
+    lattice_crypto_encrypt_rsa/4, lattice_crypto_decrypt_rsa/4                    - RSA convenience.
+    lattice_crypto_encrypt_ecdh/4, lattice_crypto_decrypt_ecdh/5                  - ECDH convenience.
+    lattice_crypto_encrypt_pqc/4, lattice_crypto_decrypt_pqc/4                    - PQC convenience.
+    lattice_crypto_crypto_available/1                                  - availability probe.
 
 
 WHAT COMES NEXT

@@ -10,28 +10,28 @@
                      a2a(Skill) | body(CapName)
 
     Predicates:
-        pai_tool_card/2     — +Identity, -Card: describe a registered tool
-        pai_tool_register/2 — +Card, -ToolId: enrol a tool in the registry
-        pai_tool_discover/2 — +Affordance, -Candidates: search by affordance
-        pai_tool_select/3   — +Objective, +Budget, -Tool: score and choose
-        pai_tool_invoke/4   — +Tool, +Args, +QuarantineScope, -Result
-        pai_build_tool/3    — +Goal, +Components, -ToolId
+        tooling_tool_card/2     — +Identity, -Card: describe a registered tool
+        tooling_tool_register/2 — +Card, -ToolId: enrol a tool in the registry
+        tooling_tool_discover/2 — +Affordance, -Candidates: search by affordance
+        tooling_tool_select/3   — +Objective, +Budget, -Tool: score and choose
+        tooling_tool_invoke/4   — +Tool, +Args, +QuarantineScope, -Result
+        tooling_build_tool/3    — +Goal, +Components, -ToolId
 */
 
 % Declare this file as the 'tooling' module and list its exported predicates.
 :- module(tooling, [
-    % Supply 'pai_tool_card/2' as the next argument to the expression above.
-    pai_tool_card/2,
-    % Supply 'pai_tool_register/2' as the next argument to the expression above.
-    pai_tool_register/2,
-    % Supply 'pai_tool_discover/2' as the next argument to the expression above.
-    pai_tool_discover/2,
-    % Supply 'pai_tool_select/3' as the next argument to the expression above.
-    pai_tool_select/3,
-    % Supply 'pai_tool_invoke/4' as the next argument to the expression above.
-    pai_tool_invoke/4,
-    % Supply 'pai_build_tool/3' as the next argument to the expression above.
-    pai_build_tool/3
+    % Supply 'tooling_tool_card/2' as the next argument to the expression above.
+    tooling_tool_card/2,
+    % Supply 'tooling_tool_register/2' as the next argument to the expression above.
+    tooling_tool_register/2,
+    % Supply 'tooling_tool_discover/2' as the next argument to the expression above.
+    tooling_tool_discover/2,
+    % Supply 'tooling_tool_select/3' as the next argument to the expression above.
+    tooling_tool_select/3,
+    % Supply 'tooling_tool_invoke/4' as the next argument to the expression above.
+    tooling_tool_invoke/4,
+    % Supply 'tooling_build_tool/3' as the next argument to the expression above.
+    tooling_build_tool/3
 % Close the expression opened above.
 ]).
 
@@ -66,7 +66,7 @@ next_tool_id(Id) :-
     Id = tool(N1).
 
 % ---------------------------------------------------------------------------
-% pai_tool_register/2 — enrol a tool card in the registry
+% tooling_tool_register/2 — enrol a tool card in the registry
 %
 %   Card = tool_card(Identity, Description, InputSchema, OutputSchema,
 %                    RiskClass, Authorization, Binding)
@@ -74,7 +74,7 @@ next_tool_id(Id) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai tool register': succeed when the following conditions hold.
-pai_tool_register(tool_card(Id, Desc, In, Out, Risk, Auth, Binding), ToolId) :-
+tooling_tool_register(tool_card(Id, Desc, In, Out, Risk, Auth, Binding), ToolId) :-
     % Execute: ( tool_record(Id, _, _, _, _, _, _).
     ( tool_record(Id, _, _, _, _, _, _)
     % If the condition above succeeded, perform the following action.
@@ -91,16 +91,16 @@ pai_tool_register(tool_card(Id, Desc, In, Out, Risk, Auth, Binding), ToolId) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_tool_card/2 — retrieve a registered tool card
+% tooling_tool_card/2 — retrieve a registered tool card
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai tool card': succeed when the following conditions hold.
-pai_tool_card(Identity, tool_card(Identity, Desc, In, Out, Risk, Auth, Binding)) :-
+tooling_tool_card(Identity, tool_card(Identity, Desc, In, Out, Risk, Auth, Binding)) :-
     % State the fact: tool record(Identity, Desc, In, Out, Risk, Auth, Binding).
     tool_record(Identity, Desc, In, Out, Risk, Auth, Binding).
 
 % ---------------------------------------------------------------------------
-% pai_tool_discover/2 — find tools matching an affordance
+% tooling_tool_discover/2 — find tools matching an affordance
 %
 %   Affordance is an atom or term describing what is needed.
 %   Returns a list of tool identities whose description or InputSchema
@@ -108,7 +108,7 @@ pai_tool_card(Identity, tool_card(Identity, Desc, In, Out, Risk, Auth, Binding))
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai tool discover': succeed when the following conditions hold.
-pai_tool_discover(Affordance, Candidates) :-
+tooling_tool_discover(Affordance, Candidates) :-
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(Id, matching_tool(Affordance, Id), Raw),
     % Sort list 'Raw' into 'Candidates', removing duplicates.
@@ -139,7 +139,7 @@ affordance_match(Affordance, Field) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_tool_select/3 — score candidates and choose the best
+% tooling_tool_select/3 — score candidates and choose the best
 %
 %   Objective is an atom/term describing what must be accomplished.
 %   Budget is max_failures(N) — tools with >= N recent failures are excluded.
@@ -153,9 +153,9 @@ affordance_match(Affordance, Field) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai tool select': succeed when the following conditions hold.
-pai_tool_select(Objective, Budget, Tool) :-
+tooling_tool_select(Objective, Budget, Tool) :-
     % State a fact for 'pai tool discover' with the arguments listed below.
-    pai_tool_discover(Objective, Candidates),
+    tooling_tool_discover(Objective, Candidates),
     % Check that 'Candidates' is not unifiable with '[]'.
     Candidates \= [],
     % State a fact for 'budget filter' with the arguments listed below.
@@ -205,7 +205,7 @@ risk_penalty(high,     0.5).
 risk_penalty(_,        0.0).
 
 % ---------------------------------------------------------------------------
-% pai_tool_invoke/4 — gated invocation with quarantine and reliability update
+% tooling_tool_invoke/4 — gated invocation with quarantine and reliability update
 %
 %   Tool is the tool identity.
 %   Args is the input term.
@@ -219,7 +219,7 @@ risk_penalty(_,        0.0).
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai tool invoke': succeed when the following conditions hold.
-pai_tool_invoke(Tool, Args, QuarantineScope, Result) :-
+tooling_tool_invoke(Tool, Args, QuarantineScope, Result) :-
     % Execute: ( tool_record(Tool, _Desc, _In, _Out, Risk, Auth, Binding).
     ( tool_record(Tool, _Desc, _In, _Out, Risk, Auth, Binding)
     % If the condition above succeeded, perform the following action.
@@ -308,7 +308,7 @@ update_reliability(Tool, failure) :-
     assertz(tool_reliability(Tool, S, F1)).
 
 % ---------------------------------------------------------------------------
-% pai_build_tool/3 — synthesize a new tool from a goal and component tools
+% tooling_build_tool/3 — synthesize a new tool from a goal and component tools
 %
 %   Goal is an atom describing what the new tool should accomplish.
 %   Components is a list of existing tool identities to compose.
@@ -319,7 +319,7 @@ update_reliability(Tool, failure) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai build tool': succeed when the following conditions hold.
-pai_build_tool(Goal, Components, ToolId) :-
+tooling_build_tool(Goal, Components, ToolId) :-
     % State a fact for 'maplist' with the arguments listed below.
     maplist([C]>>(tool_record(C, _, _, _, _, _, _)), Components),
     % State a fact for 'atomic list concat' with the arguments listed below.
@@ -335,6 +335,6 @@ pai_build_tool(Goal, Components, ToolId) :-
         % Continue the multi-line expression started above.
         Card = tool_card(ToolId, Desc, input(Goal), output(Goal), low, open, mock(composed_result(ToolId))),
         % Continue the multi-line expression started above.
-        pai_tool_register(Card, _)
+        tooling_tool_register(Card, _)
     % Close the expression opened above.
     ).

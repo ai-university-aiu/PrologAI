@@ -17,34 +17,34 @@
     append-only (sediment): word_traces are never retracted or edited.
 
     Three modes:
-      Hearer — pai_hear/2: builds word_traces as words arrive; sets
+      Hearer — language_hear/2: builds word_traces as words arrive; sets
                grammatical pointers between them; admits unknown words;
                leaves missing referents unbound.
-      Thinker— pai_think_path/3: navigates from a seed word_trace along
+      Thinker— language_think_path/3: navigates from a seed word_trace along
                semantic and grammatical pointers to derive content;
                resolves indexicals against current context.
-      Speaker— pai_speak/2: traverses a think-path and emits surfaces.
+      Speaker— language_speak/2: traverses a think-path and emits surfaces.
 
     Predicates:
-      pai_hear/2         — +Words, -TraceIds
-      pai_think_path/3   — +FromCore, +Opts, -Path
-      pai_speak/2        — +Path, -Surface
-      pai_word_trace/3   — +Core, -Id, -Pointers  (query)
-      pai_set_context/2  — +Indexical, +Value  (I, you, here, now)
+      language_hear/2         — +Words, -TraceIds
+      language_think_path/3   — +FromCore, +Opts, -Path
+      language_speak/2        — +Path, -Surface
+      language_word_trace/3   — +Core, -Id, -Pointers  (query)
+      language_set_context/2  — +Indexical, +Value  (I, you, here, now)
 */
 
 % Declare this file as the 'language' module and list its exported predicates.
 :- module(language, [
-    % Supply 'pai_hear/2' as the next argument to the expression above.
-    pai_hear/2,
-    % Supply 'pai_think_path/3' as the next argument to the expression above.
-    pai_think_path/3,
-    % Supply 'pai_speak/2' as the next argument to the expression above.
-    pai_speak/2,
-    % Supply 'pai_word_trace/3' as the next argument to the expression above.
-    pai_word_trace/3,
-    % Supply 'pai_set_context/2' as the next argument to the expression above.
-    pai_set_context/2
+    % Supply 'language_hear/2' as the next argument to the expression above.
+    language_hear/2,
+    % Supply 'language_think_path/3' as the next argument to the expression above.
+    language_think_path/3,
+    % Supply 'language_speak/2' as the next argument to the expression above.
+    language_speak/2,
+    % Supply 'language_word_trace/3' as the next argument to the expression above.
+    language_word_trace/3,
+    % Supply 'language_set_context/2' as the next argument to the expression above.
+    language_set_context/2
 % Close the expression opened above.
 ]).
 
@@ -76,16 +76,16 @@ next_trace_id(Id) :-
     Id = N1.
 
 % ---------------------------------------------------------------------------
-% pai_word_trace/3 — query word_traces by Core
+% language_word_trace/3 — query word_traces by Core
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai word trace': succeed when the following conditions hold.
-pai_word_trace(Core, Id, Pointers) :-
+language_word_trace(Core, Id, Pointers) :-
     % State the fact: word trace(Id, Core, Pointers, _).
     word_trace(Id, Core, Pointers, _).
 
 % ---------------------------------------------------------------------------
-% pai_hear/2
+% language_hear/2
 %
 %   Hear a list of Words (atoms), build word_traces, set inter-trace
 %   pointers for simple subject-verb-object patterns.
@@ -103,7 +103,7 @@ pai_word_trace(Core, Id, Pointers) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai hear': succeed when the following conditions hold.
-pai_hear(Words, TraceIds) :-
+language_hear(Words, TraceIds) :-
     % State a fact for 'get time' with the arguments listed below.
     get_time(T0),
     % State a fact for 'hear words' with the arguments listed below.
@@ -111,7 +111,7 @@ pai_hear(Words, TraceIds) :-
     % State a fact for 'reverse' with the arguments listed below.
     reverse(TraceIds0, TraceIds),
     % State the fact: link grammar(TraceIds).
-    link_grammar(TraceIds).
+    language_grammar(TraceIds).
 
 % State the fact: hear words([], _, _, Acc, Acc).
 hear_words([], _, _, Acc, Acc).
@@ -126,7 +126,7 @@ hear_words([W|Rest], T0, Pos, Acc, Result) :-
     Timestamp is T0 + Pos,
     % Append to same-core token line
     % State a fact for 'link same core' with the arguments listed below.
-    link_same_core(Core, Id),
+    language_same_core(Core, Id),
     % Add a new fact or rule to the runtime knowledge base.
     assertz(word_trace(Id, Core, [], Timestamp)),
     % Evaluate the arithmetic expression 'Pos + 1' and bind the result to 'Pos1'.
@@ -144,7 +144,7 @@ resolve_indexical(I, Value) :-
 resolve_indexical(W, W).
 
 % Define a clause for 'link same core': succeed when the following conditions hold.
-link_same_core(Core, NewId) :-
+language_same_core(Core, NewId) :-
     % Execute: ( word_trace(PrevId, Core, PrevPtrs, PrevT),.
     ( word_trace(PrevId, Core, PrevPtrs, PrevT),
       % Continue the multi-line expression started above.
@@ -164,10 +164,10 @@ link_same_core(Core, NewId) :-
 
 % Set grammatical pointers based on position (simple SVO heuristic)
 % Define a clause for 'link grammar': succeed when the following conditions hold.
-link_grammar(TraceIds) :-
+language_grammar(TraceIds) :-
     % Set next pointers along the stream
     % State a fact for 'link next' with the arguments listed below.
-    link_next(TraceIds),
+    language_next(TraceIds),
     % SVO: [Subj, Verb, Compl…]
     % Check that '( TraceIds' is unifiable with '[SId, VId | CompIds]'.
     ( TraceIds = [SId, VId | CompIds]
@@ -189,15 +189,15 @@ link_grammar(TraceIds) :-
     ).
 
 % State the fact: link next([]).
-link_next([]).
+language_next([]).
 % State the fact: link next([_]).
-link_next([_]).
+language_next([_]).
 % Define a clause for 'link next': succeed when the following conditions hold.
-link_next([A, B | Rest]) :-
+language_next([A, B | Rest]) :-
     % State a fact for 'set pointer' with the arguments listed below.
     set_pointer(A, pointer(next, B)),
     % State the fact: link next([B|Rest]).
-    link_next([B|Rest]).
+    language_next([B|Rest]).
 
 % Define a clause for 'set pointer': succeed when the following conditions hold.
 set_pointer(TraceId, NewPtr) :-
@@ -211,7 +211,7 @@ set_pointer(TraceId, NewPtr) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_think_path/3
+% language_think_path/3
 %
 %   Navigate from the most recent word_trace for FromCore along semantic
 %   and grammatical pointers.  Returns a path (list of trace IDs) reaching
@@ -222,7 +222,7 @@ set_pointer(TraceId, NewPtr) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai think path': succeed when the following conditions hold.
-pai_think_path(FromCore, Opts, Path) :-
+language_think_path(FromCore, Opts, Path) :-
     % Find most recent trace for FromCore
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(Id-T, word_trace(Id, FromCore, _, T), Candidates),
@@ -295,14 +295,14 @@ bfs([H|Queue], Visited, MaxD, RelFilter, Path) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_speak/2
+% language_speak/2
 %
-%   Given a Path (list of trace IDs from pai_think_path), emit a surface
+%   Given a Path (list of trace IDs from language_think_path), emit a surface
 %   representation by reading the Core value of each trace in natural order.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai speak': succeed when the following conditions hold.
-pai_speak(Path, Surface) :-
+language_speak(Path, Surface) :-
     % Sort path by timestamp to get natural word order
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(T-Core, (
@@ -320,11 +320,11 @@ pai_speak(Path, Surface) :-
     atomic_list_concat(Words, ' ', Surface).
 
 % ---------------------------------------------------------------------------
-% pai_set_context/2 — set an indexical binding
+% language_set_context/2 — set an indexical binding
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai set context': succeed when the following conditions hold.
-pai_set_context(Indexical, Value) :-
+language_set_context(Indexical, Value) :-
     % Remove all matching facts from the runtime knowledge base.
     retractall(context_param(Indexical, _)),
     % Add a new fact or rule to the runtime knowledge base.

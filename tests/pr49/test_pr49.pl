@@ -5,10 +5,10 @@
     AC-PR49-003: RSA decryption with wrong key fails with an error.
     AC-PR49-004: ECDH hybrid encrypt/decrypt recovers original plaintext.
     AC-PR49-005: ECDH decryption with wrong private key fails.
-    AC-PR49-006: pai_keygen_ecdh/3 returns distinct public points on each call.
-    AC-PR49-007: pai_crypto_available/1 succeeds for pai_algo_rsa and pai_algo_ecdh.
-    AC-PR49-008: pai_encrypt/5 and pai_decrypt/5 dispatch correctly for RSA.
-    AC-PR49-009: pai_encrypt/5 and pai_decrypt/5 dispatch correctly for ECDH.
+    AC-PR49-006: lattice_crypto_keygen_ecdh/3 returns distinct public points on each call.
+    AC-PR49-007: lattice_crypto_crypto_available/1 succeeds for pai_algo_rsa and pai_algo_ecdh.
+    AC-PR49-008: lattice_crypto_encrypt/5 and lattice_crypto_decrypt/5 dispatch correctly for RSA.
+    AC-PR49-009: lattice_crypto_encrypt/5 and lattice_crypto_decrypt/5 dispatch correctly for ECDH.
     AC-PR49-010: Tampered tag causes authentication error on decrypt.
 */
 
@@ -40,11 +40,11 @@
 % Define a clause for 'rsa_test_keys': succeed when the following conditions hold.
 rsa_test_keys(PrivKey, PubKey) :-
     % Generate the key pair into temporary PEM files.
-    pai_keygen_rsa(2048, PrivFile, PubFile),
+    lattice_crypto_keygen_rsa(2048, PrivFile, PubFile),
     % Load the private key blob from the PEM file.
-    pai_pem_load_private(PrivFile, PrivKey),
+    lattice_crypto_pem_load_private(PrivFile, PrivKey),
     % Load the public key blob from the PEM file.
-    pai_pem_load_public(PubFile, PubKey),
+    lattice_crypto_pem_load_public(PubFile, PubKey),
     % Clean up temporary files.
     catch(delete_file(PrivFile), _, true),
     % Clean up the public key file.
@@ -85,9 +85,9 @@ test(rsa_hybrid_roundtrip) :-
     % Generate a fresh RSA key pair.
     rsa_test_keys(PrivKey, PubKey),
     % Encrypt a sensitive password.
-    pai_encrypt_rsa(PubKey, 'CreditCard:4111111111111111', Bundle, Tag),
+    lattice_crypto_encrypt_rsa(PubKey, 'CreditCard:4111111111111111', Bundle, Tag),
     % Decrypt the bundle.
-    pai_decrypt_rsa(PrivKey, Bundle, Tag, Plain),
+    lattice_crypto_decrypt_rsa(PrivKey, Bundle, Tag, Plain),
     % Assert the plaintext was recovered.
     Plain = 'CreditCard:4111111111111111'.
 
@@ -102,9 +102,9 @@ test(rsa_wrong_key_fails, [throws(_)]) :-
     % Generate key pair B.
     rsa_test_keys(PrivB, _PubB),
     % Encrypt with public key A.
-    pai_encrypt_rsa(PubA, 'secret', Bundle, Tag),
+    lattice_crypto_encrypt_rsa(PubA, 'secret', Bundle, Tag),
     % Attempt to decrypt with private key B — must throw.
-    pai_decrypt_rsa(PrivB, Bundle, Tag, _Plain).
+    lattice_crypto_decrypt_rsa(PrivB, Bundle, Tag, _Plain).
 
 % ---------------------------------------------------------------------------
 % AC-PR49-004 — ECDH hybrid round-trip
@@ -113,11 +113,11 @@ test(rsa_wrong_key_fails, [throws(_)]) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(ecdh_hybrid_roundtrip) :-
     % Generate a recipient ECDH key pair on prime256v1.
-    pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+    lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
     % Encrypt a secret value.
-    pai_encrypt_ecdh(RecipPub, 'Password:hunter2', Bundle, Tag),
+    lattice_crypto_encrypt_ecdh(RecipPub, 'Password:hunter2', Bundle, Tag),
     % Decrypt the bundle using the recipient's private scalar.
-    pai_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1),
+    lattice_crypto_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1),
     % Assert the plaintext was recovered.
     Plain = 'Password:hunter2'.
 
@@ -128,43 +128,43 @@ test(ecdh_hybrid_roundtrip) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(ecdh_wrong_key_fails, [throws(_)]) :-
     % Generate recipient key pair.
-    pai_keygen_ecdh(prime256v1, _RecipPriv, RecipPub),
+    lattice_crypto_keygen_ecdh(prime256v1, _RecipPriv, RecipPub),
     % Generate a different private scalar (wrong key).
-    pai_keygen_ecdh(prime256v1, WrongPriv, _),
+    lattice_crypto_keygen_ecdh(prime256v1, WrongPriv, _),
     % Encrypt a secret.
-    pai_encrypt_ecdh(RecipPub, 'secret', Bundle, Tag),
+    lattice_crypto_encrypt_ecdh(RecipPub, 'secret', Bundle, Tag),
     % Decrypt with wrong key — AES-GCM authentication must fail.
-    pai_decrypt_ecdh(WrongPriv, Bundle, Tag, _Plain, prime256v1).
+    lattice_crypto_decrypt_ecdh(WrongPriv, Bundle, Tag, _Plain, prime256v1).
 
 % ---------------------------------------------------------------------------
-% AC-PR49-006 — pai_keygen_ecdh produces distinct public points
+% AC-PR49-006 — lattice_crypto_keygen_ecdh produces distinct public points
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'test': succeed when the following conditions hold.
 test(ecdh_keygen_distinct) :-
     % Generate the first key pair.
-    pai_keygen_ecdh(prime256v1, _Priv1, Pub1),
+    lattice_crypto_keygen_ecdh(prime256v1, _Priv1, Pub1),
     % Generate the second key pair.
-    pai_keygen_ecdh(prime256v1, _Priv2, Pub2),
+    lattice_crypto_keygen_ecdh(prime256v1, _Priv2, Pub2),
     % Assert the two public keys are not equal.
     Pub1 \= Pub2.
 
 % ---------------------------------------------------------------------------
-% AC-PR49-007 — pai_crypto_available/1 succeeds for RSA and ECDH
+% AC-PR49-007 — lattice_crypto_crypto_available/1 succeeds for RSA and ECDH
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'test': succeed when the following conditions hold.
 test(crypto_available_rsa) :-
     % Assert RSA availability.
-    pai_crypto_available(pai_algo_rsa).
+    lattice_crypto_crypto_available(pai_algo_rsa).
 
 % Define a clause for 'test': succeed when the following conditions hold.
 test(crypto_available_ecdh) :-
     % Assert ECDH availability.
-    pai_crypto_available(pai_algo_ecdh).
+    lattice_crypto_crypto_available(pai_algo_ecdh).
 
 % ---------------------------------------------------------------------------
-% AC-PR49-008 — Generic dispatch for RSA via pai_encrypt/5
+% AC-PR49-008 — Generic dispatch for RSA via lattice_crypto_encrypt/5
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'test': succeed when the following conditions hold.
@@ -172,24 +172,24 @@ test(generic_dispatch_rsa) :-
     % Generate RSA keys.
     rsa_test_keys(PrivKey, PubKey),
     % Encrypt through the generic interface.
-    pai_encrypt(pai_algo_rsa, PubKey, 'generic-rsa-secret', Bundle, Tag),
+    lattice_crypto_encrypt(pai_algo_rsa, PubKey, 'generic-rsa-secret', Bundle, Tag),
     % Decrypt through the generic interface.
-    pai_decrypt(pai_algo_rsa, PrivKey, Bundle, Tag, Plain),
+    lattice_crypto_decrypt(pai_algo_rsa, PrivKey, Bundle, Tag, Plain),
     % Assert the plaintext.
     Plain = 'generic-rsa-secret'.
 
 % ---------------------------------------------------------------------------
-% AC-PR49-009 — Generic dispatch for ECDH via pai_encrypt/5
+% AC-PR49-009 — Generic dispatch for ECDH via lattice_crypto_encrypt/5
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'test': succeed when the following conditions hold.
 test(generic_dispatch_ecdh) :-
     % Generate ECDH key pair.
-    pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+    lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
     % Encrypt through the generic interface.
-    pai_encrypt(pai_algo_ecdh, RecipPub, 'generic-ecdh-secret', Bundle, Tag),
+    lattice_crypto_encrypt(pai_algo_ecdh, RecipPub, 'generic-ecdh-secret', Bundle, Tag),
     % Decrypt through the generic interface.
-    pai_decrypt(pai_algo_ecdh, RecipPriv, Bundle, Tag, Plain),
+    lattice_crypto_decrypt(pai_algo_ecdh, RecipPriv, Bundle, Tag, Plain),
     % Assert the plaintext.
     Plain = 'generic-ecdh-secret'.
 
@@ -200,13 +200,13 @@ test(generic_dispatch_ecdh) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(tampered_tag_fails, [throws(_)]) :-
     % Generate ECDH key pair.
-    pai_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
+    lattice_crypto_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
     % Encrypt a value.
-    pai_encrypt_ecdh(RecipPub, 'tamper-test', Bundle, _Tag),
+    lattice_crypto_encrypt_ecdh(RecipPub, 'tamper-test', Bundle, _Tag),
     % Forge a bogus tag (all zeros, 32 hex chars = 16 bytes).
     FakeTag = '00000000000000000000000000000000',
     % Attempt decryption with the forged tag — must throw.
-    pai_decrypt_ecdh(RecipPriv, Bundle, FakeTag, _Plain, prime256v1).
+    lattice_crypto_decrypt_ecdh(RecipPriv, Bundle, FakeTag, _Plain, prime256v1).
 
 % Execute the compile-time directive: end_tests(pr49).
 :- end_tests(pr49).

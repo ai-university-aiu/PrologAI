@@ -2,7 +2,7 @@
 
     Implements the EMA (Emotion and Adaptation) cognitive appraisal model:
 
-    Stage 1 — Causal interpretation: a pai_causal_model/1 is maintained over
+    Stage 1 — Causal interpretation: a appraisal_causal_model/1 is maintained over
     events recording past/future events, causal links, agenda, and likelihoods.
 
     Stage 2 — Appraisal: per event, four variables are computed:
@@ -20,25 +20,25 @@
                                desirability; NEVER denies safety-critical facts)
 
     Predicates:
-        pai_causal_model/1      — +Event  (assert into causal interpretation)
-        pai_appraise/3          — +Event, +Goals, -Appraisal
-        pai_cope_select/3       — +Appraisal, +Opts, -CopingStrategy
-        pai_emotion_from_appraisal/2  — +Appraisal, -Emotion(intensity)
-        pai_appraisal_decay/0   — tick: decay emotion intensities
+        appraisal_causal_model/1      — +Event  (assert into causal interpretation)
+        appraisal_appraise/3          — +Event, +Goals, -Appraisal
+        appraisal_cope_select/3       — +Appraisal, +Opts, -CopingStrategy
+        appraisal_emotion_from_appraisal/2  — +Appraisal, -Emotion(intensity)
+        appraisal_appraisal_decay/0   — tick: decay emotion intensities
 */
 
 % Declare this file as the 'appraisal' module and list its exported predicates.
 :- module(appraisal, [
-    % Supply 'pai_causal_model/1' as the next argument to the expression above.
-    pai_causal_model/1,
-    % Supply 'pai_appraise/3' as the next argument to the expression above.
-    pai_appraise/3,
-    % Supply 'pai_cope_select/3' as the next argument to the expression above.
-    pai_cope_select/3,
-    % Supply 'pai_emotion_from_appraisal/2' as the next argument to the expression above.
-    pai_emotion_from_appraisal/2,
-    % Supply 'pai_appraisal_decay/0' as the next argument to the expression above.
-    pai_appraisal_decay/0
+    % Supply 'appraisal_causal_model/1' as the next argument to the expression above.
+    appraisal_causal_model/1,
+    % Supply 'appraisal_appraise/3' as the next argument to the expression above.
+    appraisal_appraise/3,
+    % Supply 'appraisal_cope_select/3' as the next argument to the expression above.
+    appraisal_cope_select/3,
+    % Supply 'appraisal_emotion_from_appraisal/2' as the next argument to the expression above.
+    appraisal_emotion_from_appraisal/2,
+    % Supply 'appraisal_appraisal_decay/0' as the next argument to the expression above.
+    appraisal_appraisal_decay/0
 % Close the expression opened above.
 ]).
 
@@ -79,21 +79,21 @@ next_event_id(Id) :-
     Id = N1.
 
 % ---------------------------------------------------------------------------
-% pai_causal_model/1
+% appraisal_causal_model/1
 %
 %   Assert an event into the causal interpretation.
 %   Event = event(Type, Desc, Likelihood) | causal_link(CauseDesc, EffectDesc)
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai causal model': succeed when the following conditions hold.
-pai_causal_model(event(Type, Desc, Likelihood)) :-
+appraisal_causal_model(event(Type, Desc, Likelihood)) :-
     % State a fact for 'next event id' with the arguments listed below.
     next_event_id(Id),
     % Add a new fact or rule to the runtime knowledge base.
     assertz(causal_event(Id, Type, Desc, Likelihood)).
 
 % Define a clause for 'pai causal model': succeed when the following conditions hold.
-pai_causal_model(causal_link(CauseDesc, EffectDesc)) :-
+appraisal_causal_model(causal_link(CauseDesc, EffectDesc)) :-
     % Check that '( causal_event(CId, _, CauseDesc, _) -> true ; CId' is unifiable with 'unknown )'.
     ( causal_event(CId, _, CauseDesc, _) -> true ; CId = unknown ),
     % Check that '( causal_event(EId, _, EffectDesc, _) -> true ; EId' is unifiable with 'unknown )'.
@@ -102,7 +102,7 @@ pai_causal_model(causal_link(CauseDesc, EffectDesc)) :-
     assertz(causal_link(CId, EId)).
 
 % ---------------------------------------------------------------------------
-% pai_appraise/3
+% appraisal_appraise/3
 %
 %   Appraise an event against a list of active Goals.
 %   Goals: list of goal(Desc, Polarity) where Polarity = positive | negative.
@@ -118,7 +118,7 @@ pai_causal_model(causal_link(CauseDesc, EffectDesc)) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai appraise': succeed when the following conditions hold.
-pai_appraise(Event, Goals, Appraisal) :-
+appraisal_appraise(Event, Goals, Appraisal) :-
     % State a fact for 'event desirability' with the arguments listed below.
     event_desirability(Event, Goals, Desirability),
     % State a fact for 'event likelihood' with the arguments listed below.
@@ -204,7 +204,7 @@ event_controllability(Event, Attribution, Controllability) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_cope_select/3
+% appraisal_cope_select/3
 %
 %   Opts: [safety_critical(Event)] → emotion-focused coping may not deny that event
 %
@@ -215,7 +215,7 @@ event_controllability(Event, Attribution, Controllability) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai cope select': succeed when the following conditions hold.
-pai_cope_select(Appraisal, Opts, CopingStrategy) :-
+appraisal_cope_select(Appraisal, Opts, CopingStrategy) :-
     % Check that 'Appraisal' is unifiable with 'appraisal(Event, Desirability, _Likelihood'.
     Appraisal = appraisal(Event, Desirability, _Likelihood,
                            % Continue the multi-line expression started above.
@@ -244,7 +244,7 @@ pai_cope_select(Appraisal, Opts, CopingStrategy) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_emotion_from_appraisal/2
+% appraisal_emotion_from_appraisal/2
 %
 %   Map appraisal to an emotion label and intensity.
 %   Simplified OCC-style mapping:
@@ -256,7 +256,7 @@ pai_cope_select(Appraisal, Opts, CopingStrategy) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai emotion from appraisal': succeed when the following conditions hold.
-pai_emotion_from_appraisal(Appraisal, Emotion) :-
+appraisal_emotion_from_appraisal(Appraisal, Emotion) :-
     % Check that 'Appraisal' is unifiable with 'appraisal(_, Desirability, _, Attribution, _, Intensity)'.
     Appraisal = appraisal(_, Desirability, _, Attribution, _, Intensity),
     % Check that '( Desirability' is greater than '0.0, Attribution = self   -> Emotion = pride(Intensity)'.
@@ -273,11 +273,11 @@ pai_emotion_from_appraisal(Appraisal, Emotion) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_appraisal_decay/0 — decay all recorded emotion intensities
+% appraisal_appraisal_decay/0 — decay all recorded emotion intensities
 % ---------------------------------------------------------------------------
 
-% Execute: pai_appraisal_decay :-.
-pai_appraisal_decay :-
+% Execute: appraisal_appraisal_decay :-.
+appraisal_appraisal_decay :-
     % State a fact for 'emotion decay rate' with the arguments listed below.
     emotion_decay_rate(Rate),
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).

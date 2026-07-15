@@ -5,7 +5,7 @@
     precision-weighted so noisy channels do not dominate salience.
 
     Three explicit loops:
-      perception — state inference from situation (pai_infer_state/2)
+      perception — state inference from situation (prediction_infer_state/2)
       learning   — delegated to PR 22 generative model
       planning   — policy selection by expected utility
 
@@ -14,28 +14,28 @@
 
     Predicates:
 
-    pai_generate_prediction/3  — generate downward prediction for a situation
-    pai_prediction_residual/3  — compute precision-weighted residual (error)
-    pai_precision/2            — query or update channel precision weight
-    pai_minimize_free_energy/1 — run one free-energy minimization step
-    pai_infer_state/2          — perceive: infer abstract state from node_facts
-    pai_route_disturbance/1    — route unresolved error to regulation/compensation
+    prediction_generate_prediction/3  — generate downward prediction for a situation
+    prediction_prediction_residual/3  — compute precision-weighted residual (error)
+    prediction_precision/2            — query or update channel precision weight
+    prediction_minimize_free_energy/1 — run one free-energy minimization step
+    prediction_infer_state/2          — perceive: infer abstract state from node_facts
+    prediction_route_disturbance/1    — route unresolved error to regulation/compensation
 */
 
 % Declare this file as the 'prediction' module and list its exported predicates.
 :- module(prediction, [
     % Continue the multi-line expression started above.
-    pai_generate_prediction/3,   % +Channel, +Situation, -PredictedState
+    prediction_generate_prediction/3,   % +Channel, +Situation, -PredictedState
     % Continue the multi-line expression started above.
-    pai_prediction_residual/3,   % +Channel, +Observed, -WeightedResidual
+    prediction_prediction_residual/3,   % +Channel, +Observed, -WeightedResidual
     % Continue the multi-line expression started above.
-    pai_precision/2,             % +Channel, -Precision  (or update with +Precision)
+    prediction_precision/2,             % +Channel, -Precision  (or update with +Precision)
     % Continue the multi-line expression started above.
-    pai_minimize_free_energy/1,  % +Situation
+    prediction_minimize_free_energy/1,  % +Situation
     % Continue the multi-line expression started above.
-    pai_infer_state/2,           % +Nexus, -InferredState
+    prediction_infer_state/2,           % +Nexus, -InferredState
     % Continue the multi-line expression started above.
-    pai_route_disturbance/1      % +Residual
+    prediction_route_disturbance/1      % +Residual
 % Close the expression opened above.
 ]).
 
@@ -69,7 +69,7 @@
 default_precision(0.8).
 
 % Define a clause for 'pai precision': succeed when the following conditions hold.
-pai_precision(Channel, Precision) :-
+prediction_precision(Channel, Precision) :-
     % Execute: ( channel_precision(Channel, Precision).
     ( channel_precision(Channel, Precision)
     % If the condition above succeeded, perform the following action.
@@ -100,14 +100,14 @@ update_precision(Channel, NewPrecision) :-
 :- dynamic prediction_model/4.     % Channel, Situation, Relation, Args
 
 % ---------------------------------------------------------------------------
-% pai_generate_prediction/3
+% prediction_generate_prediction/3
 %
 %   Generate a downward prediction for a given situation on a channel.
 %   Falls back to a "no change" prior if no model entry exists.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai generate prediction': succeed when the following conditions hold.
-pai_generate_prediction(Channel, Situation, PredictedState) :-
+prediction_generate_prediction(Channel, Situation, PredictedState) :-
     % Execute: ( prediction_model(Channel, Situation, Relation, Args).
     ( prediction_model(Channel, Situation, Relation, Args)
     % If the condition above succeeded, perform the following action.
@@ -130,7 +130,7 @@ pai_generate_prediction(Channel, Situation, PredictedState) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_prediction_residual/3
+% prediction_prediction_residual/3
 %
 %   Compute the precision-weighted prediction error for a channel:
 %     residual = precision * |observed - predicted|
@@ -141,11 +141,11 @@ pai_generate_prediction(Channel, Situation, PredictedState) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai prediction residual': succeed when the following conditions hold.
-pai_prediction_residual(Channel, Observed, WeightedResidual) :-
+prediction_prediction_residual(Channel, Observed, WeightedResidual) :-
     % State a fact for 'pai precision' with the arguments listed below.
-    pai_precision(Channel, Precision),
+    prediction_precision(Channel, Precision),
     % State a fact for 'pai generate prediction' with the arguments listed below.
-    pai_generate_prediction(Channel, unknown, Predicted),
+    prediction_generate_prediction(Channel, unknown, Predicted),
     % State a fact for 'raw error' with the arguments listed below.
     raw_error(Predicted, Observed, RawError),
     % Evaluate the arithmetic expression 'Precision * RawError' and bind the result to 'WeightedResidual'.
@@ -207,13 +207,13 @@ adapt_precision(Channel) :-
         % Continue the multi-line expression started above.
         ( Variance > 0.1
         % If the condition above succeeded, perform the following action.
-        ->  pai_precision(Channel, CurrentP),
+        ->  prediction_precision(Channel, CurrentP),
             % Continue the multi-line expression started above.
             NewP is CurrentP * 0.95,
             % Continue the multi-line expression started above.
             update_precision(Channel, NewP)
         % Otherwise (else branch), perform the following action.
-        ;   pai_precision(Channel, CurrentP),
+        ;   prediction_precision(Channel, CurrentP),
             % Continue the multi-line expression started above.
             NewP is min(1.0, CurrentP * 1.01),
             % Continue the multi-line expression started above.
@@ -242,7 +242,7 @@ sumlist_sq([H|T], SqSum, Mean) :-
     SqSum is S1 + Diff * Diff.
 
 % ---------------------------------------------------------------------------
-% pai_minimize_free_energy/1
+% prediction_minimize_free_energy/1
 %
 %   One step of free-energy minimization for a Situation.
 %   Runs the three loops in order: perception, then disturbance routing.
@@ -250,22 +250,22 @@ sumlist_sq([H|T], SqSum, Mean) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai minimize free energy': succeed when the following conditions hold.
-pai_minimize_free_energy(Situation) :-
+prediction_minimize_free_energy(Situation) :-
     % Perception loop: infer state
     % Execute: ( catch(default_nexus(Nexus), _, fail), nexus_is_open(Nexus).
     ( catch(default_nexus(Nexus), _, fail), nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
-    ->  pai_infer_state(Nexus, _InferredState),
+    ->  prediction_infer_state(Nexus, _InferredState),
         % Compute residual for this situation
         % Continue the multi-line expression started above.
-        pai_prediction_residual(perception, [node_fact(situation, [Situation], [])],
+        prediction_prediction_residual(perception, [node_fact(situation, [Situation], [])],
                                 % Supply 'Residual' as the next argument to the expression above.
                                 Residual),
         % Route disturbance if error is large
         % Continue the multi-line expression started above.
         ( Residual > 0.5
         % If the condition above succeeded, perform the following action.
-        ->  pai_route_disturbance(disturbance(perception, Situation, Residual))
+        ->  prediction_route_disturbance(disturbance(perception, Situation, Residual))
         % Otherwise (else branch), perform the following action.
         ;   true
         % Close the expression opened above.
@@ -279,13 +279,13 @@ pai_minimize_free_energy(Situation) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_infer_state/2 — perception loop
+% prediction_infer_state/2 — perception loop
 %
 %   Infer the current abstract state from the most active node_facts.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai infer state': succeed when the following conditions hold.
-pai_infer_state(Nexus, InferredState) :-
+prediction_infer_state(Nexus, InferredState) :-
     % State a fact for 'nexus is open' with the arguments listed below.
     nexus_is_open(Nexus),
     % Execute: ( catch(traverse_nexus(Nexus, node_fact(_, _, _), 5, TopResults), _, fail),.
@@ -323,14 +323,14 @@ record_curiosity_prior(Nexus) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_route_disturbance/1
+% prediction_route_disturbance/1
 %
 %   Route a large unresolved prediction error to the regulation and
 %   compensation actors as a disturbance node_fact.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai route disturbance': succeed when the following conditions hold.
-pai_route_disturbance(Disturbance) :-
+prediction_route_disturbance(Disturbance) :-
     % State a fact for 'catch' with the arguments listed below.
     catch(
         % Continue the multi-line expression started above.

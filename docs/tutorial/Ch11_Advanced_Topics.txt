@@ -159,9 +159,9 @@ All ANP messages are signed with HMAC-SHA256. Incoming messages are verified bef
 
 ANP supports meta-protocol negotiation: when two agents meet, they announce which protocols they support, so they can choose the best one.
 
-    ?- use_module(library(anp), [pai_anp_did/1, pai_anp_negotiate/2]).
-    ?- pai_anp_did(DID).       % Get Mentova's DID.
-    ?- pai_anp_negotiate(peer_endpoint, Protocols).  % Negotiate protocols with a peer.
+    ?- use_module(library(anp), [anp_anp_did/1, anp_anp_negotiate/2]).
+    ?- anp_anp_did(DID).       % Get Mentova's DID.
+    ?- anp_anp_negotiate(peer_endpoint, Protocols).  % Negotiate protocols with a peer.
 
 
 THE ROBOT BODY (PR 46 - ROS BRIDGE)
@@ -257,11 +257,11 @@ SITUATIONAL AWARENESS (PR 51)
 Awareness is engineered as a ladder of regards (viewpoints): ambient_regard (general awareness, the default), selfward_regard (self-interest), otherward_regard(Agent) (the view of another mind, for theory of mind), avowed_regard (what the mind owns), and disavowed_regard (what the mind disowns). A proposition is held under a regard, so the mind can believe something from one standpoint and deny it from another.
 
     ?- use_module(library(awareness)).
-    ?- pai_regard_hold(selfward_regard, location(ball, box)).
-    ?- pai_tom_attribute(alice, not(location(ball, box))).
-    ?- pai_tom_divergence(alice, Divs).
+    ?- awareness_regard_hold(selfward_regard, location(ball, box)).
+    ?- awareness_tom_attribute(alice, not(location(ball, box))).
+    ?- awareness_tom_divergence(alice, Divs).
 
-The divergence list reports that alice holds a false belief relative to the mind's own view - the computational core of theory of mind. pai_regard_reconcile/1 then integrates the owned and disowned regards into a single coherent self-account.
+The divergence list reports that alice holds a false belief relative to the mind's own view - the computational core of theory of mind. awareness_regard_reconcile/1 then integrates the owned and disowned regards into a single coherent self-account.
 
 
 DREAMING ENGINE (PR 52)

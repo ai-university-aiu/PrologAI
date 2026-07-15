@@ -18,28 +18,28 @@
     constitutional gate.
 
     Predicates:
-        pai_anp_did/1               — -DID: the mind's did:web DID
-        pai_anp_agent_description/1 — -Desc: the ANP agent description term
-        pai_anp_send/3              — +PeerDID, +Payload, -Envelope
-        pai_anp_receive/3           — +Envelope, +Scope, -Payload
-        pai_anp_verify/2            — +Envelope, -Result (verified|failed)
-        pai_anp_negotiate/2         — +PeerDID, -ProtocolSet
+        anp_anp_did/1               — -DID: the mind's did:web DID
+        anp_anp_agent_description/1 — -Desc: the ANP agent description term
+        anp_anp_send/3              — +PeerDID, +Payload, -Envelope
+        anp_anp_receive/3           — +Envelope, +Scope, -Payload
+        anp_anp_verify/2            — +Envelope, -Result (verified|failed)
+        anp_anp_negotiate/2         — +PeerDID, -ProtocolSet
 */
 
 % Declare this file as the 'anp' module and list its exported predicates.
 :- module(anp, [
-    % Supply 'pai_anp_did/1' as the next argument to the expression above.
-    pai_anp_did/1,
-    % Supply 'pai_anp_agent_description/1' as the next argument to the expression above.
-    pai_anp_agent_description/1,
-    % Supply 'pai_anp_send/3' as the next argument to the expression above.
-    pai_anp_send/3,
-    % Supply 'pai_anp_receive/3' as the next argument to the expression above.
-    pai_anp_receive/3,
-    % Supply 'pai_anp_verify/2' as the next argument to the expression above.
-    pai_anp_verify/2,
-    % Supply 'pai_anp_negotiate/2' as the next argument to the expression above.
-    pai_anp_negotiate/2
+    % Supply 'anp_anp_did/1' as the next argument to the expression above.
+    anp_anp_did/1,
+    % Supply 'anp_anp_agent_description/1' as the next argument to the expression above.
+    anp_anp_agent_description/1,
+    % Supply 'anp_anp_send/3' as the next argument to the expression above.
+    anp_anp_send/3,
+    % Supply 'anp_anp_receive/3' as the next argument to the expression above.
+    anp_anp_receive/3,
+    % Supply 'anp_anp_verify/2' as the next argument to the expression above.
+    anp_anp_verify/2,
+    % Supply 'anp_anp_negotiate/2' as the next argument to the expression above.
+    anp_anp_negotiate/2
 % Close the expression opened above.
 ]).
 
@@ -70,7 +70,7 @@
 :- dynamic anp_active_port/1.
 
 % ---------------------------------------------------------------------------
-% pai_anp_did/1 — return or generate the mind's DID
+% anp_anp_did/1 — return or generate the mind's DID
 %
 %   The DID is derived from the Mind Server hostname (default: localhost).
 %   It is stored as a dynamic fact and survives within a session.
@@ -78,7 +78,7 @@
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai anp did': return the stored DID, or generate one.
-pai_anp_did(DID) :-
+anp_anp_did(DID) :-
     % Check if a DID is already stored.
     ( anp_did(DID)
     % If yes, return it directly.
@@ -121,11 +121,11 @@ anp_ensure_signing_key :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_anp_agent_description/1 — the ANP agent description as a Prolog term
+% anp_anp_agent_description/1 — the ANP agent description as a Prolog term
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai anp agent description': build the description from state.
-pai_anp_agent_description(description(
+anp_anp_agent_description(description(
         % The mind's DID.
         did(DID),
         % The list of supported protocols with their endpoints.
@@ -145,7 +145,7 @@ pai_anp_agent_description(description(
         description_url('http://localhost:7477/.well-known/agent-descriptions')
     )) :-
     % Get the mind's DID (generate if needed).
-    pai_anp_did(DID),
+    anp_anp_did(DID),
     % Ensure the signing key is present.
     anp_ensure_signing_key,
     % Retrieve the signing key.
@@ -156,20 +156,20 @@ pai_anp_agent_description(description(
     sub_atom(Full, 0, 16, _, Fingerprint).
 
 % ---------------------------------------------------------------------------
-% pai_anp_send/3 — compose, sign, and send a message to a peer
+% anp_anp_send/3 — compose, sign, and send a message to a peer
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai anp send': sign a payload and build an ANP envelope.
-pai_anp_send(PeerDID, Payload, Envelope) :-
+anp_anp_send(PeerDID, Payload, Envelope) :-
     % Gate the outbound message through the constitutional check.
     ( anp_constitutional_check(send(PeerDID, Payload))
     % If permitted, compose and sign the envelope.
     ->  true
     % If vetoed, throw an error so the caller knows the message was blocked.
-    ;   throw(error(constitutional_veto(anp_send), pai_anp_send/3))
+    ;   throw(error(constitutional_veto(anp_send), anp_anp_send/3))
     ),
     % Get the sender's DID.
-    pai_anp_did(SenderDID),
+    anp_anp_did(SenderDID),
     % Get the current timestamp.
     get_time(Timestamp),
     % Compute the HMAC signature over the payload and timestamp.
@@ -195,13 +195,13 @@ anp_sign(Payload, Timestamp, Signature) :-
     crypto_data_hash(SigningData, Signature, [algorithm(sha256)]).
 
 % ---------------------------------------------------------------------------
-% pai_anp_receive/3 — verify and admit an inbound ANP envelope
+% anp_anp_receive/3 — verify and admit an inbound ANP envelope
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai anp receive': verify the envelope and return the payload.
-pai_anp_receive(Envelope, _Scope, Payload) :-
+anp_anp_receive(Envelope, _Scope, Payload) :-
     % Verify the envelope's signature.
-    pai_anp_verify(Envelope, Result),
+    anp_anp_verify(Envelope, Result),
     % Check the verification result.
     ( Result = verified
     % If verified, extract the payload from the envelope.
@@ -213,11 +213,11 @@ pai_anp_receive(Envelope, _Scope, Payload) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_anp_verify/2 — verify the cryptographic signature of an ANP envelope
+% anp_anp_verify/2 — verify the cryptographic signature of an ANP envelope
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai anp verify': check the signature against the sender's key.
-pai_anp_verify(Envelope, Result) :-
+anp_anp_verify(Envelope, Result) :-
     % Extract the components from the envelope.
     ( Envelope = envelope(from(SenderDID), _, timestamp(Timestamp),
                           signature(Signature), payload(Payload))
@@ -257,11 +257,11 @@ anp_verify_signature(SenderDID, Payload, Timestamp, Signature) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_anp_negotiate/2 — meta-protocol negotiation
+% anp_anp_negotiate/2 — meta-protocol negotiation
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai anp negotiate': return the set of supported protocols.
-pai_anp_negotiate(_PeerDID, ProtocolSet) :-
+anp_anp_negotiate(_PeerDID, ProtocolSet) :-
     % Return the fixed set of four supported protocols with their local endpoints.
     ProtocolSet = [
         % MCP protocol endpoint.
@@ -304,13 +304,13 @@ anp_constitutional_check(Action) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai anp start': start the ANP HTTP gateway on the given port.
-pai_anp_start(Port) :-
+anp_anp_start(Port) :-
     % Check whether the server is already running.
     ( anp_active_port(Port)
     % If already running, do nothing.
     ->  true
     % Otherwise, stop any previous server and start a new one.
-    ;   pai_anp_stop,
+    ;   anp_anp_stop,
         % Register the well-known agent descriptions endpoint.
         http_handler(root('.well-known'('agent-descriptions')),
                      anp_handle_agent_descriptions, []),
@@ -323,7 +323,7 @@ pai_anp_start(Port) :-
     ).
 
 % Define a clause for 'pai anp stop': stop the ANP gateway if running.
-pai_anp_stop :-
+anp_anp_stop :-
     % Check if a server is active.
     ( anp_active_port(Port)
     % If yes, stop it.
@@ -337,11 +337,11 @@ pai_anp_stop :-
 % Define a clause for 'anp handle agent descriptions': serve the ANP agent description.
 anp_handle_agent_descriptions(_Request) :-
     % Build the agent description.
-    pai_anp_agent_description(Desc),
+    anp_anp_agent_description(Desc),
     % Convert the description to a JSON-serializable atom.
     term_to_atom(Desc, DescAtom),
     % Get the DID.
-    pai_anp_did(DID),
+    anp_anp_did(DID),
     % Serve the agent description as JSON.
     reply_json_dict(json{
         did: DID,

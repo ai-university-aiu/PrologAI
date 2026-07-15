@@ -1,8 +1,8 @@
 /*  PrologAI — PR 35 Lattice-Resident Rewrite Rules / Minimal Kernel Acceptance Tests
 
     AC-PR35-001: Given a rewrite rule set defining factorial in the Lattice,
-                 when pai_interpret evaluates factorial(5), then 120 is returned
-                 and pai_kernel_trace yields a derivation using only kernel
+                 when kernel_interpret evaluates factorial(5), then 120 is returned
+                 and kernel_kernel_trace yields a derivation using only kernel
                  transition rules.
     AC-PR35-002: Two independent runs of the same factorial rule set agree on
                  all results from factorial(0) to factorial(5).
@@ -11,7 +11,7 @@
     AC-PR35-005: Arithmetic is evaluated once sub-terms are reduced to numbers.
     AC-PR35-006: An unrecognized expression is returned unchanged (gradual).
     AC-PR35-007: Multiple rule bases can coexist; each is queried correctly.
-    AC-PR35-008: pai_kernel_trace returns a non-empty list of step/3 terms.
+    AC-PR35-008: kernel_kernel_trace returns a non-empty list of step/3 terms.
     AC-PR35-009: Guard failure causes the rule to be skipped.
 */
 
@@ -50,12 +50,12 @@
 :- use_module(library(node_facts), [set_default_nexus/1]).
 % Load the built-in 'kernel' library so its predicates are available here.
 :- use_module(library(kernel), [
-    % Supply 'pai_rewrite_rule/4' as the next argument to the expression above.
-    pai_rewrite_rule/4,
-    % Supply 'pai_interpret/3' as the next argument to the expression above.
-    pai_interpret/3,
-    % Supply 'pai_kernel_trace/2' as the next argument to the expression above.
-    pai_kernel_trace/2
+    % Supply 'kernel_rewrite_rule/4' as the next argument to the expression above.
+    kernel_rewrite_rule/4,
+    % Supply 'kernel_interpret/3' as the next argument to the expression above.
+    kernel_interpret/3,
+    % Supply 'kernel_kernel_trace/2' as the next argument to the expression above.
+    kernel_kernel_trace/2
 % Close the expression opened above.
 ]).
 
@@ -83,17 +83,17 @@ pr35_cleanup :-
 test(factorial_five) :-
     % Declare factorial rule base
     % State a fact for 'pai rewrite rule' with the arguments listed below.
-    pai_rewrite_rule(factorial(0), 1, true, _),
+    kernel_rewrite_rule(factorial(0), 1, true, _),
     % State a fact for 'pai rewrite rule' with the arguments listed below.
-    pai_rewrite_rule(factorial(N), N * factorial(N1),
+    kernel_rewrite_rule(factorial(N), N * factorial(N1),
                      % Continue the multi-line expression started above.
                      (integer(N), N > 0, N1 is N - 1), _),
     % Evaluate
     % State a fact for 'pai interpret' with the arguments listed below.
-    pai_interpret(factorial(5), 120, []),
+    kernel_interpret(factorial(5), 120, []),
     % Trace
     % State a fact for 'pai kernel trace' with the arguments listed below.
-    pai_kernel_trace(factorial(5), Trace),
+    kernel_kernel_trace(factorial(5), Trace),
     % Check that 'Trace' is not unifiable with '[]'.
     Trace \= [],
     % State the fact: maplist(is_kernel_step, Trace).
@@ -110,31 +110,31 @@ is_kernel_step(step(recurse, _, _)).
 % Define a clause for 'test': succeed when the following conditions hold.
 test(factorial_consistency) :-
     % State a fact for 'pai interpret' with the arguments listed below.
-    pai_interpret(factorial(0), 1,   []),
+    kernel_interpret(factorial(0), 1,   []),
     % State a fact for 'pai interpret' with the arguments listed below.
-    pai_interpret(factorial(1), 1,   []),
+    kernel_interpret(factorial(1), 1,   []),
     % State a fact for 'pai interpret' with the arguments listed below.
-    pai_interpret(factorial(2), 2,   []),
+    kernel_interpret(factorial(2), 2,   []),
     % State a fact for 'pai interpret' with the arguments listed below.
-    pai_interpret(factorial(3), 6,   []),
+    kernel_interpret(factorial(3), 6,   []),
     % State a fact for 'pai interpret' with the arguments listed below.
-    pai_interpret(factorial(4), 24,  []),
+    kernel_interpret(factorial(4), 24,  []),
     % State the fact: pai interpret(factorial(5), 120, []).
-    pai_interpret(factorial(5), 120, []).
+    kernel_interpret(factorial(5), 120, []).
 
 % AC-PR35-003: rule with guard `true` applies unconditionally
 % Define a clause for 'test': succeed when the following conditions hold.
 test(unconditional_rule) :-
     % State a fact for 'pai rewrite rule' with the arguments listed below.
-    pai_rewrite_rule(meaning_of_life, 42, true, _),
+    kernel_rewrite_rule(meaning_of_life, 42, true, _),
     % State the fact: pai interpret(meaning_of_life, 42, []).
-    pai_interpret(meaning_of_life, 42, []).
+    kernel_interpret(meaning_of_life, 42, []).
 
 % AC-PR35-004: recursive rule terminates at base case
 % Define a clause for 'test': succeed when the following conditions hold.
 test(recursive_terminates_at_base) :-
     % State a fact for 'pai interpret' with the arguments listed below.
-    pai_interpret(factorial(0), R0, []),
+    kernel_interpret(factorial(0), R0, []),
     % Check that 'R0' is numerically equal to '1'.
     R0 =:= 1.
 
@@ -142,31 +142,31 @@ test(recursive_terminates_at_base) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(arithmetic_evaluation) :-
     % State a fact for 'pai interpret' with the arguments listed below.
-    pai_interpret(3 + 4, 7, []),
+    kernel_interpret(3 + 4, 7, []),
     % State the fact: pai interpret(6 * 7, 42, []).
-    pai_interpret(6 * 7, 42, []).
+    kernel_interpret(6 * 7, 42, []).
 
 % AC-PR35-006: unrecognized expression returned as-is (gradual)
 % Define a clause for 'test': succeed when the following conditions hold.
 test(unknown_expression_unchanged) :-
     % State the fact: pai interpret(unknown_atom35, unknown_atom35, []).
-    pai_interpret(unknown_atom35, unknown_atom35, []).
+    kernel_interpret(unknown_atom35, unknown_atom35, []).
 
-% AC-PR35-007: pai_rewrite_rule stores rule retrievable via lattice
+% AC-PR35-007: kernel_rewrite_rule stores rule retrievable via lattice
 % Define a clause for 'test': succeed when the following conditions hold.
 test(rule_stored_in_lattice) :-
     % State a fact for 'pai rewrite rule' with the arguments listed below.
-    pai_rewrite_rule(double(X), X + X, (number(X)), RuleId),
+    kernel_rewrite_rule(double(X), X + X, (number(X)), RuleId),
     % State a fact for 'nonvar' with the arguments listed below.
     nonvar(RuleId),
     % State the fact: pai interpret(double(5), 10, []).
-    pai_interpret(double(5), 10, []).
+    kernel_interpret(double(5), 10, []).
 
-% AC-PR35-008: pai_kernel_trace returns non-empty list of step/3 terms
+% AC-PR35-008: kernel_kernel_trace returns non-empty list of step/3 terms
 % Define a clause for 'test': succeed when the following conditions hold.
 test(trace_non_empty) :-
     % State a fact for 'pai kernel trace' with the arguments listed below.
-    pai_kernel_trace(factorial(3), Trace),
+    kernel_kernel_trace(factorial(3), Trace),
     % Check that 'Trace' is not unifiable with '[]'.
     Trace \= [],
     % Check that 'Trace' is unifiable with '[step(_, _, _)|_]'.
@@ -176,13 +176,13 @@ test(trace_non_empty) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(guard_failure_skips_rule) :-
     % Rule: only applies for N > 10 (will not fire for our input)
-    % Check that 'pai_rewrite_rule(guarded_fn(N), big, (number(N), N' is greater than '10), _)'.
-    pai_rewrite_rule(guarded_fn(N), big, (number(N), N > 10), _),
+    % Check that 'kernel_rewrite_rule(guarded_fn(N), big, (number(N), N' is greater than '10), _)'.
+    kernel_rewrite_rule(guarded_fn(N), big, (number(N), N > 10), _),
     % Rule: applies for any number
     % State a fact for 'pai rewrite rule' with the arguments listed below.
-    pai_rewrite_rule(guarded_fn(_), small, true, _),
+    kernel_rewrite_rule(guarded_fn(_), small, true, _),
     % State the fact: pai interpret(guarded_fn(5), small, []).
-    pai_interpret(guarded_fn(5), small, []).
+    kernel_interpret(guarded_fn(5), small, []).
 
 % Execute the compile-time directive: end_tests(pr35).
 :- end_tests(pr35).

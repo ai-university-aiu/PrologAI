@@ -6,10 +6,10 @@
 
     Key predicates:
 
-    pai_coalition_form/3   — build coalitions from live node_facts with salience
-    pai_salience/2         — compute salience for a coalition
-    pai_pin_item/2         — top-down pin an item into candidacy
-    pai_broadcast_subscribe/1 — subscribe an actor to the broadcast channel
+    workspace_coalition_form/3   — build coalitions from live node_facts with salience
+    workspace_salience/2         — compute salience for a coalition
+    workspace_pin_item/2         — top-down pin an item into candidacy
+    workspace_broadcast_subscribe/1 — subscribe an actor to the broadcast channel
     workspace_cycle/0      — run one cognitive cycle (200 ms cadence by default)
     install_workspace_actor/0  — start the attention_arbiter_actor
     uninstall_workspace_actor/0
@@ -26,13 +26,13 @@
 % Declare this file as the 'workspace' module and list its exported predicates.
 :- module(workspace, [
     % Continue the multi-line expression started above.
-    pai_coalition_form/3,         % +Nexus, +K, -Coalitions (list of coalition terms)
+    workspace_coalition_form/3,         % +Nexus, +K, -Coalitions (list of coalition terms)
     % Continue the multi-line expression started above.
-    pai_salience/2,               % +CoalitionId, -Score
+    workspace_salience/2,               % +CoalitionId, -Score
     % Continue the multi-line expression started above.
-    pai_pin_item/2,               % +CoalitionId, +Priority
+    workspace_pin_item/2,               % +CoalitionId, +Priority
     % Continue the multi-line expression started above.
-    pai_broadcast_subscribe/1,    % +ActorGoal  (called each cycle with broadcast content)
+    workspace_broadcast_subscribe/1,    % +ActorGoal  (called each cycle with broadcast content)
     % Supply 'workspace_cycle/0' as the next argument to the expression above.
     workspace_cycle/0,
     % Supply 'install_workspace_actor/0' as the next argument to the expression above.
@@ -119,7 +119,7 @@ ensure_experience_scopes :-
 :- initialization(ensure_experience_scopes, now).
 
 % ---------------------------------------------------------------------------
-% pai_coalition_form/3
+% workspace_coalition_form/3
 %
 %   Build coalitions from the current live node_facts in Nexus.
 %   Each coalition is a group of thematically related live facts.
@@ -130,7 +130,7 @@ ensure_experience_scopes :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai coalition form': succeed when the following conditions hold.
-pai_coalition_form(Nexus, K, Coalitions) :-
+workspace_coalition_form(Nexus, K, Coalitions) :-
     % State a fact for 'nexus is open' with the arguments listed below.
     nexus_is_open(Nexus),
     % State a fact for 'live node facts' with the arguments listed below.
@@ -337,11 +337,11 @@ take_k(K, List, Result) :-
     append(Result, _, List).
 
 % ---------------------------------------------------------------------------
-% pai_salience/2 — query the salience of a coalition by Id
+% workspace_salience/2 — query the salience of a coalition by Id
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai salience': succeed when the following conditions hold.
-pai_salience(CoalitionId, Score) :-
+workspace_salience(CoalitionId, Score) :-
     % Execute: ( coalition_salience(CoalitionId, Score).
     ( coalition_salience(CoalitionId, Score)
     % If the condition above succeeded, perform the following action.
@@ -352,22 +352,22 @@ pai_salience(CoalitionId, Score) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_pin_item/2 — top-down pin a coalition into candidacy
+% workspace_pin_item/2 — top-down pin a coalition into candidacy
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai pin item': succeed when the following conditions hold.
-pai_pin_item(CoalitionId, Priority) :-
+workspace_pin_item(CoalitionId, Priority) :-
     % Remove all matching facts from the runtime knowledge base.
     retractall(pinned_item(CoalitionId, _)),
     % Add a new fact or rule to the runtime knowledge base.
     assertz(pinned_item(CoalitionId, Priority)).
 
 % ---------------------------------------------------------------------------
-% pai_broadcast_subscribe/1 — subscribe a goal to receive broadcast content
+% workspace_broadcast_subscribe/1 — subscribe a goal to receive broadcast content
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai broadcast subscribe': succeed when the following conditions hold.
-pai_broadcast_subscribe(Goal) :-
+workspace_broadcast_subscribe(Goal) :-
     % Execute: ( broadcast_subscriber(Goal).
     ( broadcast_subscriber(Goal)
     % If the condition above succeeded, perform the following action.
@@ -396,7 +396,7 @@ workspace_cycle :-
       % Continue the multi-line expression started above.
       nexus_is_open(Nexus)
     % If the condition above succeeded, perform the following action.
-    ->  pai_coalition_form(Nexus, 10, Coalitions),
+    ->  workspace_coalition_form(Nexus, 10, Coalitions),
         % Continue the multi-line expression started above.
         ( Coalitions = []
         % If the condition above succeeded, perform the following action.

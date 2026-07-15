@@ -13,8 +13,8 @@
     Spinoffs never overwrite parents (pai_accommodate semantics).
 
     Predicates:
-      pai_spinoff_mine/2    — +Command, -SpinoffList
-      pai_spinoff_stats/2   — +Command, -Stats
+      spinoff_spinoff_mine/2    — +Command, -SpinoffList
+      spinoff_spinoff_stats/2   — +Command, -Stats
       record_trial/4        — log before/after for one command attempt
       install_attribution_miner/0
       uninstall_attribution_miner/0
@@ -23,9 +23,9 @@
 % Declare this file as the 'spinoff' module and list its exported predicates.
 :- module(spinoff, [
     % Continue the multi-line expression started above.
-    pai_spinoff_mine/2,         % +Command, -Spinoffs
+    spinoff_spinoff_mine/2,         % +Command, -Spinoffs
     % Continue the multi-line expression started above.
-    pai_spinoff_stats/2,        % +Command, -Stats
+    spinoff_spinoff_stats/2,        % +Command, -Stats
     % Continue the multi-line expression started above.
     record_trial/4,             % +Command, +ContextBefore, +ContextAfter, +Outcome
     % Supply 'install_attribution_miner/0' as the next argument to the expression above.
@@ -117,11 +117,11 @@ record_trial(Command, ContextBefore, ContextAfter, Outcome) :-
     assertz(trial_record(Id, Command, ContextBefore, ContextAfter, Outcome, Ts)).
 
 % ---------------------------------------------------------------------------
-% pai_spinoff_stats/2 — statistics for a command
+% spinoff_spinoff_stats/2 — statistics for a command
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai spinoff stats': succeed when the following conditions hold.
-pai_spinoff_stats(Command, Stats) :-
+spinoff_spinoff_stats(Command, Stats) :-
     % Total trials with this command
     % Aggregate solutions using 'count' and bind the result to a single value.
     aggregate_all(count,
@@ -167,7 +167,7 @@ pai_spinoff_stats(Command, Stats) :-
     }.
 
 % ---------------------------------------------------------------------------
-% pai_spinoff_mine/2 — run marginal attribution for a command
+% spinoff_spinoff_mine/2 — run marginal attribution for a command
 %
 %   Returns a list of spinoff terms:
 %     result_spinoff(Command, Result, Reliability)   — unconditional
@@ -175,7 +175,7 @@ pai_spinoff_stats(Command, Stats) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai spinoff mine': succeed when the following conditions hold.
-pai_spinoff_mine(Command, Spinoffs) :-
+spinoff_spinoff_mine(Command, Spinoffs) :-
     % Gather all result patterns from trials
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(Change, (
@@ -420,7 +420,7 @@ attribution_miner_cycle :-
                 % Continue the multi-line expression started above.
                 ( N >= 5
                 % If the condition above succeeded, perform the following action.
-                ->  catch(pai_spinoff_mine(Cmd, _), _, true)
+                ->  catch(spinoff_spinoff_mine(Cmd, _), _, true)
                 % Otherwise (else branch), perform the following action.
                 ;   true
                 % Close the expression opened above.

@@ -4,11 +4,11 @@
                  cycle runs, exactly the 0.9 coalition's content is broadcast.
     AC-PR18-002: Given the same coalition winning 5 consecutive cycles, its
                  salience on the 5th cycle is lower than on the first (habituation).
-    AC-PR18-003: pai_coalition_form/3 returns coalitions grouped from live node_facts.
-    AC-PR18-004: pai_pin_item/2 boosts a coalition's candidacy (pin raises salience).
-    AC-PR18-005: pai_broadcast_subscribe/1 delivers content to subscribed goals.
+    AC-PR18-003: workspace_coalition_form/3 returns coalitions grouped from live node_facts.
+    AC-PR18-004: workspace_pin_item/2 boosts a coalition's candidacy (pin raises salience).
+    AC-PR18-005: workspace_broadcast_subscribe/1 delivers content to subscribed goals.
     AC-PR18-006: salience floor decays when no coalition clears it.
-    AC-PR18-007: pai_salience/2 returns the recorded salience of a coalition.
+    AC-PR18-007: workspace_salience/2 returns the recorded salience of a coalition.
     AC-PR18-008: bottom-up urgent percept wins over any other coalition.
     AC-PR18-009: internal_experience and overall_experience scopes exist.
 */
@@ -45,13 +45,13 @@
                                     % Continue the multi-line expression started above.
                                     live_node_facts/2]).
 % Load the built-in 'workspace' library so its predicates are available here.
-:- use_module(library(workspace),  [pai_coalition_form/3,
-                                    % Supply 'pai_salience/2' as the next argument to the expression above.
-                                    pai_salience/2,
-                                    % Supply 'pai_pin_item/2' as the next argument to the expression above.
-                                    pai_pin_item/2,
-                                    % Supply 'pai_broadcast_subscribe/1' as the next argument to the expression above.
-                                    pai_broadcast_subscribe/1,
+:- use_module(library(workspace),  [workspace_coalition_form/3,
+                                    % Supply 'workspace_salience/2' as the next argument to the expression above.
+                                    workspace_salience/2,
+                                    % Supply 'workspace_pin_item/2' as the next argument to the expression above.
+                                    workspace_pin_item/2,
+                                    % Supply 'workspace_broadcast_subscribe/1' as the next argument to the expression above.
+                                    workspace_broadcast_subscribe/1,
                                     % Continue the multi-line expression started above.
                                     workspace_cycle/0]).
 
@@ -110,7 +110,7 @@ test(highest_salience_wins_broadcast) :-
     % State a fact for 'nb setval' with the arguments listed below.
     nb_setval(pr18_broadcast_result, none),
     % State a fact for 'pai broadcast subscribe' with the arguments listed below.
-    pai_broadcast_subscribe(
+    workspace_broadcast_subscribe(
         % Continue the multi-line expression started above.
         [Content]>>(
             % Continue the multi-line expression started above.
@@ -174,7 +174,7 @@ test(habituation_reduces_salience) :-
     % Close the expression opened above.
     ).
 
-%  AC-PR18-003: pai_coalition_form groups live node_facts by relation
+%  AC-PR18-003: workspace_coalition_form groups live node_facts by relation
 % Define a clause for 'test': succeed when the following conditions hold.
 test(coalition_form_groups_live_facts) :-
     % State a fact for 'nb getval' with the arguments listed below.
@@ -186,7 +186,7 @@ test(coalition_form_groups_live_facts) :-
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(beta_rel,  [b1], [], _),
     % State a fact for 'pai coalition form' with the arguments listed below.
-    pai_coalition_form(Nexus, 10, Coalitions),
+    workspace_coalition_form(Nexus, 10, Coalitions),
     % Check that 'Coalitions' is not unifiable with '[]'.
     Coalitions \= [],
     % Check that alpha_rel facts are grouped together
@@ -197,15 +197,15 @@ test(coalition_form_groups_live_facts) :-
     % Check that 'N' is greater than or equal to '1'.
     N >= 1.
 
-%  AC-PR18-004: pai_pin_item raises salience for a coalition
+%  AC-PR18-004: workspace_pin_item raises salience for a coalition
 % Define a clause for 'test': succeed when the following conditions hold.
 test(pin_item_raises_salience) :-
     % Record salience before pin
     % State a fact for 'pai salience' with the arguments listed below.
-    pai_salience(pin_test_coal, Before),
+    workspace_salience(pin_test_coal, Before),
     % Pin it at high priority
     % State a fact for 'pai pin item' with the arguments listed below.
-    pai_pin_item(pin_test_coal, 100),
+    workspace_pin_item(pin_test_coal, 100),
     % Add a new fact or rule to the runtime knowledge base.
     assertz(workspace:coalition_content(pin_test_coal, [99])),
     % Compute salience with pin boost
@@ -232,7 +232,7 @@ test(broadcast_subscribe_delivers_content) :-
     % State a fact for 'nb setval' with the arguments listed below.
     nb_setval(pr18_subscribe_count, 0),
     % State a fact for 'pai broadcast subscribe' with the arguments listed below.
-    pai_broadcast_subscribe(
+    workspace_broadcast_subscribe(
         % Continue the multi-line expression started above.
         [_Content]>>(
             % Continue the multi-line expression started above.
@@ -270,13 +270,13 @@ test(salience_floor_decays) :-
     % Check that 'NewFloor' is less than '0.99'.
     NewFloor < 0.99.
 
-%  AC-PR18-007: pai_salience returns stored salience
+%  AC-PR18-007: workspace_salience returns stored salience
 % Define a clause for 'test': succeed when the following conditions hold.
 test(pai_salience_returns_score) :-
     % Add a new fact or rule to the runtime knowledge base.
     assertz(workspace:coalition_salience(query_test_c, 0.75)),
     % State a fact for 'pai salience' with the arguments listed below.
-    pai_salience(query_test_c, Score),
+    workspace_salience(query_test_c, Score),
     % Check that 'Score' is numerically equal to '0.75'.
     Score =:= 0.75.
 
@@ -290,7 +290,7 @@ test(urgent_percept_bottom_up_capture) :-
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(low_priority, [normal_item], [], _),
     % State a fact for 'pai coalition form' with the arguments listed below.
-    pai_coalition_form(Nexus, 10, Coalitions),
+    workspace_coalition_form(Nexus, 10, Coalitions),
     % Execute: ( member(_Score1-coalition(_, percept_urgent, _), Coalitions).
     ( member(_Score1-coalition(_, percept_urgent, _), Coalitions)
     % If the condition above succeeded, perform the following action.

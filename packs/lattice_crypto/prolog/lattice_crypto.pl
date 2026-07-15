@@ -39,58 +39,58 @@
     Exported predicates:
 
     Key generation:
-        pai_keygen_rsa/3     +Bits, -PrivPEMFile, -PubPEMFile
-        pai_keygen_ecdh/3    +Curve, -PrivInt, -PubPoint
-        pai_keygen_pqc/2     +Algorithm, -KeyPair
+        lattice_crypto_keygen_rsa/3     +Bits, -PrivPEMFile, -PubPEMFile
+        lattice_crypto_keygen_ecdh/3    +Curve, -PrivInt, -PubPoint
+        lattice_crypto_keygen_pqc/2     +Algorithm, -KeyPair
 
     Encryption / decryption:
-        pai_encrypt/5        +Algo, +PublicKey, +Plaintext, -Bundle, -Tag
-        pai_decrypt/5        +Algo, +PrivateKey, +Bundle, +Tag, -Plaintext
+        lattice_crypto_encrypt/5        +Algo, +PublicKey, +Plaintext, -Bundle, -Tag
+        lattice_crypto_decrypt/5        +Algo, +PrivateKey, +Bundle, +Tag, -Plaintext
 
     Convenience wrappers:
-        pai_encrypt_rsa/4    +PubKey, +Plain, -Bundle, -Tag
-        pai_decrypt_rsa/4    +PrivKey, +Bundle, +Tag, -Plain
-        pai_encrypt_ecdh/4   +RecipPubPoint, +Plain, -Bundle, -Tag
-        pai_decrypt_ecdh/5   +RecipPrivInt, +Bundle, +Tag, -Plain, +Curve
-        pai_encrypt_pqc/4    +RecipPubKeyFile, +Plain, -Bundle, -Tag
-        pai_decrypt_pqc/4    +RecipPrivKeyFile, +Bundle, +Tag, -Plain
+        lattice_crypto_encrypt_rsa/4    +PubKey, +Plain, -Bundle, -Tag
+        lattice_crypto_decrypt_rsa/4    +PrivKey, +Bundle, +Tag, -Plain
+        lattice_crypto_encrypt_ecdh/4   +RecipPubPoint, +Plain, -Bundle, -Tag
+        lattice_crypto_decrypt_ecdh/5   +RecipPrivInt, +Bundle, +Tag, -Plain, +Curve
+        lattice_crypto_encrypt_pqc/4    +RecipPubKeyFile, +Plain, -Bundle, -Tag
+        lattice_crypto_decrypt_pqc/4    +RecipPrivKeyFile, +Bundle, +Tag, -Plain
 
     Utility:
-        pai_crypto_available/1   ?Algorithm
-        pai_pem_load_private/2   +PEMFile, -Key
-        pai_pem_load_public/2    +PEMFile, -Key
+        lattice_crypto_crypto_available/1   ?Algorithm
+        lattice_crypto_pem_load_private/2   +PEMFile, -Key
+        lattice_crypto_pem_load_public/2    +PEMFile, -Key
 */
 
 % Declare this file as the 'lattice_crypto' module and list its exported predicates.
 :- module(lattice_crypto, [
     % Continue the multi-line expression started above.
-    pai_keygen_rsa/3,
+    lattice_crypto_keygen_rsa/3,
     % Continue the multi-line expression started above.
-    pai_keygen_ecdh/3,
+    lattice_crypto_keygen_ecdh/3,
     % Continue the multi-line expression started above.
-    pai_keygen_pqc/2,
+    lattice_crypto_keygen_pqc/2,
     % Continue the multi-line expression started above.
-    pai_encrypt/5,
+    lattice_crypto_encrypt/5,
     % Continue the multi-line expression started above.
-    pai_decrypt/5,
+    lattice_crypto_decrypt/5,
     % Continue the multi-line expression started above.
-    pai_encrypt_rsa/4,
+    lattice_crypto_encrypt_rsa/4,
     % Continue the multi-line expression started above.
-    pai_decrypt_rsa/4,
+    lattice_crypto_decrypt_rsa/4,
     % Continue the multi-line expression started above.
-    pai_encrypt_ecdh/4,
+    lattice_crypto_encrypt_ecdh/4,
     % Continue the multi-line expression started above.
-    pai_decrypt_ecdh/5,
+    lattice_crypto_decrypt_ecdh/5,
     % Continue the multi-line expression started above.
-    pai_encrypt_pqc/4,
+    lattice_crypto_encrypt_pqc/4,
     % Continue the multi-line expression started above.
-    pai_decrypt_pqc/4,
+    lattice_crypto_decrypt_pqc/4,
     % Continue the multi-line expression started above.
-    pai_crypto_available/1,
+    lattice_crypto_crypto_available/1,
     % Continue the multi-line expression started above.
-    pai_pem_load_private/2,
+    lattice_crypto_pem_load_private/2,
     % Continue the multi-line expression started above.
-    pai_pem_load_public/2
+    lattice_crypto_pem_load_public/2
 % Close the expression opened above.
 ]).
 
@@ -108,10 +108,10 @@
 % ---------------------------------------------------------------------------
 
 % ERC
-% pai_crypto_available(?Algorithm)
+% lattice_crypto_crypto_available(?Algorithm)
 % Succeeds if Algorithm is supported and ready to use.
 % ERC
-pai_crypto_available(pai_algo_rsa) :-
+lattice_crypto_crypto_available(pai_algo_rsa) :-
 % ERC
     catch(process_create(path(openssl), [version],
 % ERC
@@ -119,11 +119,11 @@ pai_crypto_available(pai_algo_rsa) :-
 % ERC
           _, fail).
 % ERC
-pai_crypto_available(pai_algo_ecdh) :-
+lattice_crypto_crypto_available(pai_algo_ecdh) :-
 % ERC
     catch(crypto_name_curve(prime256v1, _), _, fail).
 % ERC
-pai_crypto_available(pai_algo_pqc) :-
+lattice_crypto_crypto_available(pai_algo_pqc) :-
 % ERC
     lc_pqc_provider_present.
 
@@ -152,10 +152,10 @@ lc_pqc_provider_present :-
 % ---------------------------------------------------------------------------
 
 % ERC
-% pai_pem_load_private(+PEMFile, -Key)
+% lattice_crypto_pem_load_private(+PEMFile, -Key)
 % Load an RSA private key from a PEM file path.
 % ERC
-pai_pem_load_private(PEMFile, Key) :-
+lattice_crypto_pem_load_private(PEMFile, Key) :-
 % ERC
     setup_call_cleanup(
 % ERC
@@ -166,10 +166,10 @@ pai_pem_load_private(PEMFile, Key) :-
         close(Stream)).
 
 % ERC
-% pai_pem_load_public(+PEMFile, -Key)
+% lattice_crypto_pem_load_public(+PEMFile, -Key)
 % Load an RSA public key from a PEM file path.
 % ERC
-pai_pem_load_public(PEMFile, Key) :-
+lattice_crypto_pem_load_public(PEMFile, Key) :-
 % ERC
     setup_call_cleanup(
 % ERC
@@ -184,11 +184,11 @@ pai_pem_load_public(PEMFile, Key) :-
 % ---------------------------------------------------------------------------
 
 % ERC
-% pai_keygen_rsa(+Bits, -PrivPEMFile, -PubPEMFile)
+% lattice_crypto_keygen_rsa(+Bits, -PrivPEMFile, -PubPEMFile)
 % Generate an RSA key pair; write PEM files; unify their paths.
 % The caller is responsible for deleting the files when done.
 % ERC
-pai_keygen_rsa(Bits, PrivPEMFile, PubPEMFile) :-
+lattice_crypto_keygen_rsa(Bits, PrivPEMFile, PubPEMFile) :-
 % ERC
     integer(Bits), Bits >= 2048,
 % ERC
@@ -211,11 +211,11 @@ pai_keygen_rsa(Bits, PrivPEMFile, PubPEMFile) :-
                    [stdout(null), stderr(null)]).
 
 % ERC
-% pai_keygen_ecdh(+Curve, -PrivInt, -PubPoint)
+% lattice_crypto_keygen_ecdh(+Curve, -PrivInt, -PubPoint)
 % Generate an ephemeral ECDH key pair on the named curve.
 % PrivInt is the private scalar (integer); PubPoint = point(X,Y).
 % ERC
-pai_keygen_ecdh(Curve, PrivInt, PubPoint) :-
+lattice_crypto_keygen_ecdh(Curve, PrivInt, PubPoint) :-
 % ERC
     crypto_name_curve(Curve, CurveHandle),
 % ERC
@@ -226,11 +226,11 @@ pai_keygen_ecdh(Curve, PrivInt, PubPoint) :-
     crypto_curve_scalar_mult(CurveHandle, PrivInt, Gen, PubPoint).
 
 % ERC
-% pai_keygen_pqc(+Algorithm, -KeyPair)
+% lattice_crypto_keygen_pqc(+Algorithm, -KeyPair)
 % Generate a PQC key pair via the OQS provider.
 % Algorithm is e.g. 'ML-KEM-768'.
 % ERC
-pai_keygen_pqc(Algorithm, pqc_keypair(PrivPEMFile, PubPEMFile)) :-
+lattice_crypto_keygen_pqc(Algorithm, pqc_keypair(PrivPEMFile, PubPEMFile)) :-
 % ERC
     (   lc_pqc_provider_present
 % ERC
@@ -242,7 +242,7 @@ pai_keygen_pqc(Algorithm, pqc_keypair(PrivPEMFile, PubPEMFile)) :-
 % ERC
                 'Install openssl-oqs-provider (liboqs) for PQC support.'),
 % ERC
-            pai_keygen_pqc/2))
+            lattice_crypto_keygen_pqc/2))
 % ERC
     ),
 % ERC
@@ -269,34 +269,34 @@ pai_keygen_pqc(Algorithm, pqc_keypair(PrivPEMFile, PubPEMFile)) :-
 % ---------------------------------------------------------------------------
 
 % ERC
-% pai_encrypt(+Algo, +PublicKey, +Plaintext, -Bundle, -Tag)
+% lattice_crypto_encrypt(+Algo, +PublicKey, +Plaintext, -Bundle, -Tag)
 % Encrypt Plaintext using the given algorithm and public key.
 % ERC
-pai_encrypt(pai_algo_rsa, PubKey, Plaintext, Bundle, Tag) :-
+lattice_crypto_encrypt(pai_algo_rsa, PubKey, Plaintext, Bundle, Tag) :-
 % ERC
     lc_encrypt_rsa(PubKey, Plaintext, Bundle, Tag).
 % ERC
-pai_encrypt(pai_algo_ecdh, PubPoint, Plaintext, Bundle, Tag) :-
+lattice_crypto_encrypt(pai_algo_ecdh, PubPoint, Plaintext, Bundle, Tag) :-
 % ERC
     lc_encrypt_ecdh(prime256v1, PubPoint, Plaintext, Bundle, Tag).
 % ERC
-pai_encrypt(pai_algo_pqc, PubKeyFile, Plaintext, Bundle, Tag) :-
+lattice_crypto_encrypt(pai_algo_pqc, PubKeyFile, Plaintext, Bundle, Tag) :-
 % ERC
     lc_encrypt_pqc('ML-KEM-768', PubKeyFile, Plaintext, Bundle, Tag).
 
 % ERC
-% pai_decrypt(+Algo, +PrivateKey, +Bundle, +Tag, -Plaintext)
+% lattice_crypto_decrypt(+Algo, +PrivateKey, +Bundle, +Tag, -Plaintext)
 % Decrypt Bundle using the given algorithm and private key.
 % ERC
-pai_decrypt(pai_algo_rsa, PrivKey, Bundle, Tag, Plaintext) :-
+lattice_crypto_decrypt(pai_algo_rsa, PrivKey, Bundle, Tag, Plaintext) :-
 % ERC
     lc_decrypt_rsa(PrivKey, Bundle, Tag, Plaintext).
 % ERC
-pai_decrypt(pai_algo_ecdh, PrivInt, Bundle, Tag, Plaintext) :-
+lattice_crypto_decrypt(pai_algo_ecdh, PrivInt, Bundle, Tag, Plaintext) :-
 % ERC
     lc_decrypt_ecdh(prime256v1, PrivInt, Bundle, Tag, Plaintext).
 % ERC
-pai_decrypt(pai_algo_pqc, PrivKeyFile, Bundle, Tag, Plaintext) :-
+lattice_crypto_decrypt(pai_algo_pqc, PrivKeyFile, Bundle, Tag, Plaintext) :-
 % ERC
     lc_decrypt_pqc(PrivKeyFile, Bundle, Tag, Plaintext).
 
@@ -305,16 +305,16 @@ pai_decrypt(pai_algo_pqc, PrivKeyFile, Bundle, Tag, Plaintext) :-
 % ---------------------------------------------------------------------------
 
 % ERC
-% pai_encrypt_rsa(+PubKey, +Plaintext, -Bundle, -Tag)
+% lattice_crypto_encrypt_rsa(+PubKey, +Plaintext, -Bundle, -Tag)
 % ERC
-pai_encrypt_rsa(PubKey, Plaintext, Bundle, Tag) :-
+lattice_crypto_encrypt_rsa(PubKey, Plaintext, Bundle, Tag) :-
 % ERC
     lc_encrypt_rsa(PubKey, Plaintext, Bundle, Tag).
 
 % ERC
-% pai_decrypt_rsa(+PrivKey, +Bundle, +Tag, -Plaintext)
+% lattice_crypto_decrypt_rsa(+PrivKey, +Bundle, +Tag, -Plaintext)
 % ERC
-pai_decrypt_rsa(PrivKey, Bundle, Tag, Plaintext) :-
+lattice_crypto_decrypt_rsa(PrivKey, Bundle, Tag, Plaintext) :-
 % ERC
     lc_decrypt_rsa(PrivKey, Bundle, Tag, Plaintext).
 
@@ -380,16 +380,16 @@ lc_decrypt_rsa(PrivKey,
 % ---------------------------------------------------------------------------
 
 % ERC
-% pai_encrypt_ecdh(+RecipPubPoint, +Plaintext, -Bundle, -Tag)
+% lattice_crypto_encrypt_ecdh(+RecipPubPoint, +Plaintext, -Bundle, -Tag)
 % ERC
-pai_encrypt_ecdh(RecipPubPoint, Plaintext, Bundle, Tag) :-
+lattice_crypto_encrypt_ecdh(RecipPubPoint, Plaintext, Bundle, Tag) :-
 % ERC
     lc_encrypt_ecdh(prime256v1, RecipPubPoint, Plaintext, Bundle, Tag).
 
 % ERC
-% pai_decrypt_ecdh(+RecipPrivInt, +Bundle, +Tag, -Plaintext, +Curve)
+% lattice_crypto_decrypt_ecdh(+RecipPrivInt, +Bundle, +Tag, -Plaintext, +Curve)
 % ERC
-pai_decrypt_ecdh(RecipPrivInt, Bundle, Tag, Plaintext, Curve) :-
+lattice_crypto_decrypt_ecdh(RecipPrivInt, Bundle, Tag, Plaintext, Curve) :-
 % ERC
     lc_decrypt_ecdh(Curve, RecipPrivInt, Bundle, Tag, Plaintext).
 
@@ -472,16 +472,16 @@ lc_decrypt_ecdh(Curve, RecipPriv,
 % ---------------------------------------------------------------------------
 
 % ERC
-% pai_encrypt_pqc(+RecipPubKeyFile, +Plaintext, -Bundle, -Tag)
+% lattice_crypto_encrypt_pqc(+RecipPubKeyFile, +Plaintext, -Bundle, -Tag)
 % ERC
-pai_encrypt_pqc(RecipPubKeyFile, Plaintext, Bundle, Tag) :-
+lattice_crypto_encrypt_pqc(RecipPubKeyFile, Plaintext, Bundle, Tag) :-
 % ERC
     lc_encrypt_pqc('ML-KEM-768', RecipPubKeyFile, Plaintext, Bundle, Tag).
 
 % ERC
-% pai_decrypt_pqc(+RecipPrivKeyFile, +Bundle, +Tag, -Plaintext)
+% lattice_crypto_decrypt_pqc(+RecipPrivKeyFile, +Bundle, +Tag, -Plaintext)
 % ERC
-pai_decrypt_pqc(RecipPrivKeyFile, Bundle, Tag, Plaintext) :-
+lattice_crypto_decrypt_pqc(RecipPrivKeyFile, Bundle, Tag, Plaintext) :-
 % ERC
     lc_decrypt_pqc(RecipPrivKeyFile, Bundle, Tag, Plaintext).
 
@@ -492,7 +492,7 @@ pai_decrypt_pqc(RecipPrivKeyFile, Bundle, Tag, Plaintext) :-
 % ERC
 lc_encrypt_pqc(Algorithm, RecipPubKeyFile, Plaintext, Bundle, TagHex) :-
 % ERC
-    lc_require_pqc_provider(pai_encrypt_pqc/4),
+    lc_require_pqc_provider(lattice_crypto_encrypt_pqc/4),
 % ERC
     tmp_file(pai_pqc_encap, EncapFile),
 % ERC
@@ -553,7 +553,7 @@ lc_decrypt_pqc(RecipPrivKeyFile,
 % ERC
                TagHex, Plaintext) :-
 % ERC
-    lc_require_pqc_provider(pai_decrypt_pqc/4),
+    lc_require_pqc_provider(lattice_crypto_decrypt_pqc/4),
 % ERC
     hex_bytes(EncapHex, EncapBytes),
 % ERC

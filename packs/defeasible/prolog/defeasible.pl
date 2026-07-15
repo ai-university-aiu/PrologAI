@@ -27,22 +27,22 @@
                                         to evidence E
         just(no, no_rule)            — no applicable default rule found
 
-    pai_justify/2 renders any just/_ term as a readable atom.
+    defeasible_justify/2 renders any just/_ term as a readable atom.
 
     Predicates:
-        pai_defeasible_rule/3   — +RuleBase, +Type(default|exception), +Rule
-        pai_defeasible_query/4  — +RuleBase, +Goal, +Background, -Answer
-        pai_justify/2           — +ProofTree, -Text
+        defeasible_defeasible_rule/3   — +RuleBase, +Type(default|exception), +Rule
+        defeasible_defeasible_query/4  — +RuleBase, +Goal, +Background, -Answer
+        defeasible_justify/2           — +ProofTree, -Text
 */
 
 % Declare this file as the 'defeasible' module and list its exported predicates.
 :- module(defeasible, [
-    % Supply 'pai_defeasible_rule/3' as the next argument to the expression above.
-    pai_defeasible_rule/3,
-    % Supply 'pai_defeasible_query/4' as the next argument to the expression above.
-    pai_defeasible_query/4,
-    % Supply 'pai_justify/2' as the next argument to the expression above.
-    pai_justify/2
+    % Supply 'defeasible_defeasible_rule/3' as the next argument to the expression above.
+    defeasible_defeasible_rule/3,
+    % Supply 'defeasible_defeasible_query/4' as the next argument to the expression above.
+    defeasible_defeasible_query/4,
+    % Supply 'defeasible_justify/2' as the next argument to the expression above.
+    defeasible_justify/2
 % Close the expression opened above.
 ]).
 
@@ -56,7 +56,7 @@
 :- use_module(library(apply),      [maplist/3]).
 
 % ---------------------------------------------------------------------------
-% pai_defeasible_rule/3
+% defeasible_defeasible_rule/3
 %
 %   Type = default   → Rule = (Head :- Cond)
 %   Type = exception → Rule = exc(Head, ExcCond)
@@ -66,24 +66,24 @@
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai defeasible rule': succeed when the following conditions hold.
-pai_defeasible_rule(RuleBase, default, (Head :- Cond)) :-
+defeasible_defeasible_rule(RuleBase, default, (Head :- Cond)) :-
     % State the fact: anchor node(defeasible_rule, [RuleBase, Head, Cond], [], _).
     anchor_node(defeasible_rule, [RuleBase, Head, Cond], [], _).
 
 % Define a clause for 'pai defeasible rule': succeed when the following conditions hold.
-pai_defeasible_rule(RuleBase, exception, exc(Head, ExcCond)) :-
+defeasible_defeasible_rule(RuleBase, exception, exc(Head, ExcCond)) :-
     % State the fact: anchor node(exception_rule, [RuleBase, Head, ExcCond], [], _).
     anchor_node(exception_rule, [RuleBase, Head, ExcCond], [], _).
 
 % ---------------------------------------------------------------------------
-% pai_defeasible_query/4
+% defeasible_defeasible_query/4
 %
 %   Evaluates Goal against RuleBase with Background ground facts.
 %   Returns answer(yes, ProofTree) or answer(no, ProofTree).
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai defeasible query': succeed when the following conditions hold.
-pai_defeasible_query(RuleBase, Goal, Background, Answer) :-
+defeasible_defeasible_query(RuleBase, Goal, Background, Answer) :-
     % Execute: ( try_exception(RuleBase, Goal, Background, ExcJust).
     ( try_exception(RuleBase, Goal, Background, ExcJust)
     % If the condition above succeeded, perform the following action.
@@ -142,32 +142,32 @@ prove_bg(Goal, BG, just(yes, bg_fact(Goal))) :-
     memberchk(Goal, BG).
 
 % ---------------------------------------------------------------------------
-% pai_justify/2 — render a proof tree as a human-readable atom
+% defeasible_justify/2 — render a proof tree as a human-readable atom
 % ---------------------------------------------------------------------------
 
 % State the fact: pai justify(just(yes, trivial), "trivially true").
-pai_justify(just(yes, trivial), "trivially true").
+defeasible_justify(just(yes, trivial), "trivially true").
 % Define a clause for 'pai justify': succeed when the following conditions hold.
-pai_justify(just(yes, bg_fact(F)), Text) :-
+defeasible_justify(just(yes, bg_fact(F)), Text) :-
     % Write formatted output to the current output stream.
     format(atom(Text), "background fact: ~w", [F]).
 % Define a clause for 'pai justify': succeed when the following conditions hold.
-pai_justify(just(yes, via_rule(H :- B), SubJust), Text) :-
+defeasible_justify(just(yes, via_rule(H :- B), SubJust), Text) :-
     % State a fact for 'pai justify' with the arguments listed below.
-    pai_justify(SubJust, Sub),
+    defeasible_justify(SubJust, Sub),
     % Write formatted output to the current output stream.
     format(atom(Text), "default rule (~w :- ~w) because ~w", [H, B, Sub]).
 % Define a clause for 'pai justify': succeed when the following conditions hold.
-pai_justify(just(yes, and(JA, JB)), Text) :-
+defeasible_justify(just(yes, and(JA, JB)), Text) :-
     % State a fact for 'pai justify' with the arguments listed below.
-    pai_justify(JA, TA),
+    defeasible_justify(JA, TA),
     % State a fact for 'pai justify' with the arguments listed below.
-    pai_justify(JB, TB),
+    defeasible_justify(JB, TB),
     % Write formatted output to the current output stream.
     format(atom(Text), "~w; and ~w", [TA, TB]).
 % State the fact: pai justify(just(no, no_rule), "no applicable rule found").
-pai_justify(just(no, no_rule), "no applicable rule found").
+defeasible_justify(just(no, no_rule), "no applicable rule found").
 % Define a clause for 'pai justify': succeed when the following conditions hold.
-pai_justify(just(no, defeated_by(Exc, Goal), _SubJust), Text) :-
+defeasible_justify(just(no, defeated_by(Exc, Goal), _SubJust), Text) :-
     % Write formatted output to the current output stream.
     format(atom(Text), "conclusion ~w defeated: exception condition ~w applies", [Goal, Exc]).

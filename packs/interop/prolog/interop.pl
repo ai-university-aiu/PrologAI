@@ -10,7 +10,7 @@
         Hyperon value        →  node_fact tagged hyperon_value(Value)
 
     Import:
-        pai_atomese_import(+Exprs, +Scope, -Ids)
+        interop_atomese_import(+Exprs, +Scope, -Ids)
           Exprs: a list of metta_expr(Head, Args) terms  OR  a MeTTa source
           atom where each line is `(Head Arg1 Arg2 ...)`.
           Each expression is inscribed as a node_fact; Referents = [atomese_scope(Scope)]
@@ -18,12 +18,12 @@
           Knowledge lands in a quarantine scope until coordination promotes it.
 
     Export:
-        pai_atomese_export(+Scope, +_Target, -MettaLines)
+        interop_atomese_export(+Scope, +_Target, -MettaLines)
           Finds all node_facts tagged atomese_scope(Scope) in the active nexus
           and serializes each as a MeTTa source line `(Head Arg1 Arg2 ...)`.
 
     Space mount:
-        pai_space_mount(+SpaceId, +Nexus, +Opts)
+        interop_space_mount(+SpaceId, +Nexus, +Opts)
           Records a named MeTTa space as a foreign nexus binding.
           Access mode: read (query only), write (read-through and write-through).
 
@@ -32,19 +32,19 @@
         up to variable renaming.
 
     Predicates:
-        pai_atomese_import/3  — +Exprs, +Scope, -ImportedIds
-        pai_atomese_export/3  — +Scope, +Target, -MettaLines
-        pai_space_mount/3     — +SpaceId, +Nexus, +Opts
+        interop_atomese_import/3  — +Exprs, +Scope, -ImportedIds
+        interop_atomese_export/3  — +Scope, +Target, -MettaLines
+        interop_space_mount/3     — +SpaceId, +Nexus, +Opts
 */
 
 % Declare this file as the 'interop' module and list its exported predicates.
 :- module(interop, [
-    % Supply 'pai_atomese_import/3' as the next argument to the expression above.
-    pai_atomese_import/3,
-    % Supply 'pai_atomese_export/3' as the next argument to the expression above.
-    pai_atomese_export/3,
-    % Supply 'pai_space_mount/3' as the next argument to the expression above.
-    pai_space_mount/3
+    % Supply 'interop_atomese_import/3' as the next argument to the expression above.
+    interop_atomese_import/3,
+    % Supply 'interop_atomese_export/3' as the next argument to the expression above.
+    interop_atomese_export/3,
+    % Supply 'interop_space_mount/3' as the next argument to the expression above.
+    interop_space_mount/3
 % Close the expression opened above.
 ]).
 
@@ -61,11 +61,11 @@
 :- dynamic mounted_space/3.   % SpaceId, Nexus, Opts
 
 % ---------------------------------------------------------------------------
-% pai_atomese_import/3
+% interop_atomese_import/3
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai atomese import': succeed when the following conditions hold.
-pai_atomese_import(Expressions, Scope, ImportedIds) :-
+interop_atomese_import(Expressions, Scope, ImportedIds) :-
     % Execute: ( is_list(Expressions).
     ( is_list(Expressions)
     % If the condition above succeeded, perform the following action.
@@ -84,11 +84,11 @@ pai_atomese_import(Expressions, Scope, ImportedIds) :-
     ), ImportedIds).
 
 % ---------------------------------------------------------------------------
-% pai_atomese_export/3
+% interop_atomese_export/3
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai atomese export': succeed when the following conditions hold.
-pai_atomese_export(Scope, _Target, MettaLines) :-
+interop_atomese_export(Scope, _Target, MettaLines) :-
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
     findall(Line, (
         % Continue the multi-line expression started above.
@@ -127,11 +127,11 @@ arg_to_atom(Arg, Atom) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_space_mount/3
+% interop_space_mount/3
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai space mount': succeed when the following conditions hold.
-pai_space_mount(SpaceId, Nexus, Opts) :-
+interop_space_mount(SpaceId, Nexus, Opts) :-
     % Execute: ( mounted_space(SpaceId, _, _).
     ( mounted_space(SpaceId, _, _)
     % If the condition above succeeded, perform the following action.

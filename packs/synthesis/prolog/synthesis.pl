@@ -12,31 +12,31 @@
       feature  → subtask → option → model → plan
 
     Predicates:
-      pai_observe_event/2    — log an observation (pattern + timestamp)
-      pai_model_synthesize/3 — generate candidate models from event pairs
-      pai_model_score/2      — score a model against observed outcomes
-      pai_model_compose/3    — chain models from current situation to goal
-      pai_model_gc/0         — garbage-collect persistently mispredicting models
-      pai_lifecycle_advance/2— advance a competence to the next stage
-      pai_symbolic_regress/3 — find a human-readable formula for data points
+      synthesis_observe_event/2    — log an observation (pattern + timestamp)
+      synthesis_model_synthesize/3 — generate candidate models from event pairs
+      synthesis_model_score/2      — score a model against observed outcomes
+      synthesis_model_compose/3    — chain models from current situation to goal
+      synthesis_model_gc/0         — garbage-collect persistently mispredicting models
+      synthesis_lifecycle_advance/2— advance a competence to the next stage
+      synthesis_symbolic_regress/3 — find a human-readable formula for data points
 */
 
 % Declare this file as the 'synthesis' module and list its exported predicates.
 :- module(synthesis, [
     % Continue the multi-line expression started above.
-    pai_observe_event/2,      % +Pattern, +Timestamp
+    synthesis_observe_event/2,      % +Pattern, +Timestamp
     % Continue the multi-line expression started above.
-    pai_model_synthesize/3,   % +EventPairs, +Opts, -Models
+    synthesis_model_synthesize/3,   % +EventPairs, +Opts, -Models
     % Continue the multi-line expression started above.
-    pai_model_score/2,        % +ModelId, -Score
+    synthesis_model_score/2,        % +ModelId, -Score
     % Continue the multi-line expression started above.
-    pai_model_compose/3,      % +GoalPattern, +CurrentSituation, -Plan
-    % Supply 'pai_model_gc/0' as the next argument to the expression above.
-    pai_model_gc/0,
+    synthesis_model_compose/3,      % +GoalPattern, +CurrentSituation, -Plan
+    % Supply 'synthesis_model_gc/0' as the next argument to the expression above.
+    synthesis_model_gc/0,
     % Continue the multi-line expression started above.
-    pai_lifecycle_advance/2,  % +ModelId, -NewStage
+    synthesis_lifecycle_advance/2,  % +ModelId, -NewStage
     % Continue the multi-line expression started above.
-    pai_symbolic_regress/3    % +DataPoints, +Opts, -Formula
+    synthesis_symbolic_regress/3    % +DataPoints, +Opts, -Formula
 % Close the expression opened above.
 ]).
 
@@ -116,18 +116,18 @@ score_threshold_gc(0.2).           % delete models below this score
 score_threshold_advance(0.7).      % advance lifecycle above this score
 
 % ---------------------------------------------------------------------------
-% pai_observe_event/2 — log an observation for later synthesis
+% synthesis_observe_event/2 — log an observation for later synthesis
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai observe event': succeed when the following conditions hold.
-pai_observe_event(Pattern, Timestamp) :-
+synthesis_observe_event(Pattern, Timestamp) :-
     % State a fact for 'next obs id' with the arguments listed below.
     next_obs_id(Id),
     % Add a new fact or rule to the runtime knowledge base.
     assertz(observed_event(Id, Pattern, Timestamp)).
 
 % ---------------------------------------------------------------------------
-% pai_model_synthesize/3
+% synthesis_model_synthesize/3
 %
 %   Generate candidate models from event pairs in the observation log.
 %   For each pair (A at T1, B at T2 > T1) within a 10-second window,
@@ -139,7 +139,7 @@ pai_observe_event(Pattern, Timestamp) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai model synthesize': succeed when the following conditions hold.
-pai_model_synthesize(EventPairs, _Opts, Models) :-
+synthesis_model_synthesize(EventPairs, _Opts, Models) :-
     % Check that '( EventPairs' is unifiable with '[]'.
     ( EventPairs = []
     % If the condition above succeeded, perform the following action.
@@ -209,14 +209,14 @@ synthesize_one_model(APattern, BPattern, DeltaMs, Guards, MId) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_model_score/2
+% synthesis_model_score/2
 %
 %   Score = hits / (hits + misses), or 0.5 if no predictions yet.
 %   Updates the stored score.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai model score': succeed when the following conditions hold.
-pai_model_score(ModelId, Score) :-
+synthesis_model_score(ModelId, Score) :-
     % Aggregate solutions using 'count' and bind the result to a single value.
     aggregate_all(count, model_prediction(ModelId, _, _, hit),  Hits),
     % Aggregate solutions using 'count' and bind the result to a single value.
@@ -241,14 +241,14 @@ pai_model_score(ModelId, Score) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_model_compose/3
+% synthesis_model_compose/3
 %
 %   Chain models backward from GoalPattern to CurrentSituation.
 %   Plan = [model_step(MId, APattern, BPattern, Delta) | …]
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai model compose': succeed when the following conditions hold.
-pai_model_compose(GoalPattern, CurrentSituation, Plan) :-
+synthesis_model_compose(GoalPattern, CurrentSituation, Plan) :-
     % Execute: ( synthesized_model(MId, APattern, GoalPattern, Delta, _G, Score, Stage),.
     ( synthesized_model(MId, APattern, GoalPattern, Delta, _G, Score, Stage),
       % Continue the multi-line expression started above.
@@ -260,7 +260,7 @@ pai_model_compose(GoalPattern, CurrentSituation, Plan) :-
         % If the condition above succeeded, perform the following action.
         ->  Plan = [model_step(MId, APattern, GoalPattern, Delta)]
         % Otherwise (else branch), perform the following action.
-        ;   ( pai_model_compose(APattern, CurrentSituation, SubPlan)
+        ;   ( synthesis_model_compose(APattern, CurrentSituation, SubPlan)
             % If the condition above succeeded, perform the following action.
             ->  Plan = [model_step(MId, APattern, GoalPattern, Delta)|SubPlan]
             % Otherwise (else branch), perform the following action.
@@ -275,11 +275,11 @@ pai_model_compose(GoalPattern, CurrentSituation, Plan) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_model_gc/0 — garbage collect persistently mispredicting models
+% synthesis_model_gc/0 — garbage collect persistently mispredicting models
 % ---------------------------------------------------------------------------
 
-% Execute: pai_model_gc :-.
-pai_model_gc :-
+% Execute: synthesis_model_gc :-.
+synthesis_model_gc :-
     % State a fact for 'score threshold gc' with the arguments listed below.
     score_threshold_gc(Threshold),
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
@@ -308,13 +308,13 @@ pai_model_gc :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_lifecycle_advance/2
+% synthesis_lifecycle_advance/2
 %
 %   Advance ModelId to its next stage when its score >= threshold.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai lifecycle advance': succeed when the following conditions hold.
-pai_lifecycle_advance(ModelId, NewStage) :-
+synthesis_lifecycle_advance(ModelId, NewStage) :-
     % Execute: ( synthesized_model(ModelId, A, B, D, G, Score, Stage).
     ( synthesized_model(ModelId, A, B, D, G, Score, Stage)
     % If the condition above succeeded, perform the following action.
@@ -341,7 +341,7 @@ pai_lifecycle_advance(ModelId, NewStage) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_symbolic_regress/3
+% synthesis_symbolic_regress/3
 %
 %   Find a human-readable formula fitting DataPoints.
 %   DataPoints: list of x-y(X,Y) terms.
@@ -353,7 +353,7 @@ pai_lifecycle_advance(ModelId, NewStage) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai symbolic regress': succeed when the following conditions hold.
-pai_symbolic_regress(DataPoints, _Opts, Formula) :-
+synthesis_symbolic_regress(DataPoints, _Opts, Formula) :-
     % Check that 'DataPoints' is not unifiable with '[]'.
     DataPoints \= [],
     % Unify 'N' with the number of elements in list 'DataPoints'.

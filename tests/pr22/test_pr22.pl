@@ -1,18 +1,18 @@
 /*  PrologAI — PR 22 Self-Programming Seed: Model Synthesis Acceptance Tests
 
     AC-PR22-001: After 20 switch_press → light_on observations (~1 second apart),
-                 pai_model_synthesize produces a model with APattern=switch_press
+                 synthesis_model_synthesize produces a model with APattern=switch_press
                  and DeltaMs <= 1500.
-    AC-PR22-002: pai_symbolic_regress on linear garden sensor data produces a
+    AC-PR22-002: synthesis_symbolic_regress on linear garden sensor data produces a
                  linear/3 formula with R² >= 0.99.
-    AC-PR22-003: pai_model_score returns 0.5 for a model with no predictions.
-    AC-PR22-004: After 8 hits and 2 misses, pai_model_score returns 0.8.
-    AC-PR22-005: pai_lifecycle_advance promotes a model with score >= 0.7.
-    AC-PR22-006: pai_lifecycle_advance does NOT promote a model with score < 0.7.
-    AC-PR22-007: pai_model_gc deletes a model with score < 0.2 that has >= 5 predictions.
-    AC-PR22-008: pai_model_compose returns a non-empty plan when a subtask model
+    AC-PR22-003: synthesis_model_score returns 0.5 for a model with no predictions.
+    AC-PR22-004: After 8 hits and 2 misses, synthesis_model_score returns 0.8.
+    AC-PR22-005: synthesis_lifecycle_advance promotes a model with score >= 0.7.
+    AC-PR22-006: synthesis_lifecycle_advance does NOT promote a model with score < 0.7.
+    AC-PR22-007: synthesis_model_gc deletes a model with score < 0.2 that has >= 5 predictions.
+    AC-PR22-008: synthesis_model_compose returns a non-empty plan when a subtask model
                  links current situation to goal.
-    AC-PR22-009: pai_symbolic_regress on a constant dataset returns constant/1.
+    AC-PR22-009: synthesis_symbolic_regress on a constant dataset returns constant/1.
 */
 
 % Execute the compile-time directive: prolog_load_context(directory, TestDir),.
@@ -46,20 +46,20 @@
 :- use_module(library(node_facts),[set_default_nexus/1]).
 % Load the built-in 'synthesis' library so its predicates are available here.
 :- use_module(library(synthesis), [
-    % Supply 'pai_observe_event/2' as the next argument to the expression above.
-    pai_observe_event/2,
-    % Supply 'pai_model_synthesize/3' as the next argument to the expression above.
-    pai_model_synthesize/3,
-    % Supply 'pai_model_score/2' as the next argument to the expression above.
-    pai_model_score/2,
-    % Supply 'pai_model_compose/3' as the next argument to the expression above.
-    pai_model_compose/3,
-    % Supply 'pai_model_gc/0' as the next argument to the expression above.
-    pai_model_gc/0,
-    % Supply 'pai_lifecycle_advance/2' as the next argument to the expression above.
-    pai_lifecycle_advance/2,
-    % Supply 'pai_symbolic_regress/3' as the next argument to the expression above.
-    pai_symbolic_regress/3
+    % Supply 'synthesis_observe_event/2' as the next argument to the expression above.
+    synthesis_observe_event/2,
+    % Supply 'synthesis_model_synthesize/3' as the next argument to the expression above.
+    synthesis_model_synthesize/3,
+    % Supply 'synthesis_model_score/2' as the next argument to the expression above.
+    synthesis_model_score/2,
+    % Supply 'synthesis_model_compose/3' as the next argument to the expression above.
+    synthesis_model_compose/3,
+    % Supply 'synthesis_model_gc/0' as the next argument to the expression above.
+    synthesis_model_gc/0,
+    % Supply 'synthesis_lifecycle_advance/2' as the next argument to the expression above.
+    synthesis_lifecycle_advance/2,
+    % Supply 'synthesis_symbolic_regress/3' as the next argument to the expression above.
+    synthesis_symbolic_regress/3
 % Close the expression opened above.
 ]).
 
@@ -115,15 +115,15 @@ test(model_synthesize_light_switch) :-
           % Continue the multi-line expression started above.
           T2 is T1 + 1.0,
           % Continue the multi-line expression started above.
-          pai_observe_event(switch_press, T1),
+          synthesis_observe_event(switch_press, T1),
           % Continue the multi-line expression started above.
-          pai_observe_event(light_on,     T2)
+          synthesis_observe_event(light_on,     T2)
         % Close the expression opened above.
         )
     % Close the expression opened above.
     ),
     % State a fact for 'pai model synthesize' with the arguments listed below.
-    pai_model_synthesize([], [], Models),
+    synthesis_model_synthesize([], [], Models),
     % Check that 'Models' is not unifiable with '[]'.
     Models \= [],
     % State a fact for 'once' with the arguments listed below.
@@ -145,7 +145,7 @@ test(symbolic_regress_linear) :-
     % State a fact for 'maplist' with the arguments listed below.
     maplist([X, x_y(X, Y)]>>(Y is 3.0 * X + 7.0), Xs, Points),
     % State a fact for 'pai symbolic regress' with the arguments listed below.
-    pai_symbolic_regress(Points, [], Formula),
+    synthesis_symbolic_regress(Points, [], Formula),
     % Check that 'Formula' is unifiable with 'linear(Slope, Intercept, r_squared(R2))'.
     Formula = linear(Slope, Intercept, r_squared(R2)),
     % Check that 'abs(Slope     - 3.0)' is less than '0.01'.
@@ -163,7 +163,7 @@ test(model_score_no_predictions) :-
             % Continue the multi-line expression started above.
             pattern_a, pattern_b, 500, [], 0.5, feature)),
     % State a fact for 'pai model score' with the arguments listed below.
-    pai_model_score(test_model_003, Score),
+    synthesis_model_score(test_model_003, Score),
     % Check that 'Score' is numerically equal to '0.5'.
     Score =:= 0.5.
 
@@ -183,7 +183,7 @@ test(model_score_from_predictions) :-
            % Continue the multi-line expression started above.
            assertz(synthesis:model_prediction(test_model_004, 0, p_d, miss))),
     % State a fact for 'pai model score' with the arguments listed below.
-    pai_model_score(test_model_004, Score),
+    synthesis_model_score(test_model_004, Score),
     % Check that 'abs(Score - 0.8)' is less than '0.001'.
     abs(Score - 0.8) < 0.001.
 
@@ -195,7 +195,7 @@ test(lifecycle_advance_succeeds) :-
             % Continue the multi-line expression started above.
             pat_e, pat_f, 300, [], 0.75, feature)),
     % State a fact for 'pai lifecycle advance' with the arguments listed below.
-    pai_lifecycle_advance(test_model_005, NewStage),
+    synthesis_lifecycle_advance(test_model_005, NewStage),
     % Check that 'NewStage' is unifiable with 'subtask'.
     NewStage = subtask.
 
@@ -207,7 +207,7 @@ test(lifecycle_advance_blocked_low_score) :-
             % Continue the multi-line expression started above.
             pat_g, pat_h, 300, [], 0.5, feature)),
     % State a fact for 'pai lifecycle advance' with the arguments listed below.
-    pai_lifecycle_advance(test_model_006, NewStage),
+    synthesis_lifecycle_advance(test_model_006, NewStage),
     % Check that 'NewStage' is unifiable with 'feature'.
     NewStage = feature.
 
@@ -222,8 +222,8 @@ test(model_gc_removes_low_score) :-
     forall(between(1, 5, _),
            % Continue the multi-line expression started above.
            assertz(synthesis:model_prediction(test_model_007, 0, p_j, miss))),
-    % Call the goal 'pai_model_gc'.
-    pai_model_gc,
+    % Call the goal 'synthesis_model_gc'.
+    synthesis_model_gc,
     % Succeed only if 'synthesis:synthesized_model(test_model_007, _, _, _, _, _, _' cannot be proved (negation as failure).
     \+ synthesis:synthesized_model(test_model_007, _, _, _, _, _, _).
 
@@ -235,7 +235,7 @@ test(model_compose_returns_plan) :-
             % Continue the multi-line expression started above.
             situation_dark, situation_lit, 1000, [], 0.8, subtask)),
     % State a fact for 'pai model compose' with the arguments listed below.
-    pai_model_compose(situation_lit, situation_dark, Plan),
+    synthesis_model_compose(situation_lit, situation_dark, Plan),
     % Check that 'Plan' is unifiable with '[model_step(test_model_008, situation_dark, situation_lit, 1000)]'.
     Plan = [model_step(test_model_008, situation_dark, situation_lit, 1000)].
 
@@ -247,7 +247,7 @@ test(symbolic_regress_constant) :-
     % Check that 'Points' is unifiable with '[x_y(0,5.0), x_y(0,5.0), x_y(0,5.0), x_y(0,5.0)]'.
     Points = [x_y(0,5.0), x_y(0,5.0), x_y(0,5.0), x_y(0,5.0)],
     % State a fact for 'pai symbolic regress' with the arguments listed below.
-    pai_symbolic_regress(Points, [], Formula),
+    synthesis_symbolic_regress(Points, [], Formula),
     % Check that 'Formula' is unifiable with 'constant(Mean)'.
     Formula = constant(Mean),
     % Check that 'abs(Mean - 5.0)' is less than '0.001'.

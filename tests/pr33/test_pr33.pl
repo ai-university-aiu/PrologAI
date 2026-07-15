@@ -5,11 +5,11 @@
                  then an ill_typed node_fact exists naming the violation, and the
                  system continues running.
     AC-PR33-002: Untyped node_facts are always legal (gradual typing).
-    AC-PR33-003: pai_type_declare is idempotent — declaring twice stores once.
-    AC-PR33-004: pai_type_of/2 is backtrackable and queryable.
+    AC-PR33-003: types_type_declare is idempotent — declaring twice stores once.
+    AC-PR33-004: types_type_of/2 is backtrackable and queryable.
     AC-PR33-005: Valid value against correct type succeeds with no ill_typed.
     AC-PR33-006: After a violation, the offending node_fact stays in the Lattice.
-    AC-PR33-007: pai_type_check recognises atom type correctly.
+    AC-PR33-007: types_type_check recognises atom type correctly.
     AC-PR33-008: Types themselves can be typed (types-as-atoms in the Lattice).
     AC-PR33-009: Multiple distinct violations each produce a separate ill_typed.
 */
@@ -49,12 +49,12 @@
 :- use_module(library(node_facts),[set_default_nexus/1, anchor_node/4]).
 % Load the built-in 'types' library so its predicates are available here.
 :- use_module(library(types), [
-    % Supply 'pai_type_declare/2' as the next argument to the expression above.
-    pai_type_declare/2,
-    % Supply 'pai_type_of/2' as the next argument to the expression above.
-    pai_type_of/2,
-    % Supply 'pai_type_check/2' as the next argument to the expression above.
-    pai_type_check/2
+    % Supply 'types_type_declare/2' as the next argument to the expression above.
+    types_type_declare/2,
+    % Supply 'types_type_of/2' as the next argument to the expression above.
+    types_type_of/2,
+    % Supply 'types_type_check/2' as the next argument to the expression above.
+    types_type_check/2
 % Close the expression opened above.
 ]).
 
@@ -81,12 +81,12 @@ pr33_cleanup :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(ill_typed_on_type_mismatch) :-
     % State a fact for 'pai type declare' with the arguments listed below.
-    pai_type_declare(battery_level, number),
+    types_type_declare(battery_level, number),
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(battery_level, [low_battery_text], [], _),
     % Checker runs on the text argument against declared type
     % State a fact for 'pai type check' with the arguments listed below.
-    pai_type_check(low_battery_text, number),
+    types_type_check(low_battery_text, number),
     % ill_typed node_fact must now exist
     % State a fact for 'once' with the arguments listed below.
     once(lattice_node_fact(_, _, ill_typed, [low_battery_text, number], _)),
@@ -105,13 +105,13 @@ test(untyped_node_facts_always_legal) :-
     % Succeed only if 'lattice_node_fact(_, _, ill_typed, [foo, _], _' cannot be proved (negation as failure).
     \+ lattice_node_fact(_, _, ill_typed, [foo, _], _).
 
-%  AC-PR33-003: pai_type_declare is idempotent
+%  AC-PR33-003: types_type_declare is idempotent
 % Define a clause for 'test': succeed when the following conditions hold.
 test(type_declare_idempotent) :-
     % State a fact for 'pai type declare' with the arguments listed below.
-    pai_type_declare(temperature33, number),
+    types_type_declare(temperature33, number),
     % State a fact for 'pai type declare' with the arguments listed below.
-    pai_type_declare(temperature33, number),
+    types_type_declare(temperature33, number),
     % Aggregate solutions using 'count' and bind the result to a single value.
     aggregate_all(count,
         % Continue the multi-line expression started above.
@@ -121,25 +121,25 @@ test(type_declare_idempotent) :-
     % Check that 'Count' is numerically equal to '1'.
     Count =:= 1.
 
-%  AC-PR33-004: pai_type_of/2 queries declared types
+%  AC-PR33-004: types_type_of/2 queries declared types
 % Define a clause for 'test': succeed when the following conditions hold.
 test(type_of_queryable) :-
     % State a fact for 'pai type declare' with the arguments listed below.
-    pai_type_declare(pressure33, float),
+    types_type_declare(pressure33, float),
     % State a fact for 'pai type declare' with the arguments listed below.
-    pai_type_declare(label33, atom),
+    types_type_declare(label33, atom),
     % State a fact for 'once' with the arguments listed below.
-    once(pai_type_of(pressure33, float)),
-    % State the fact: once(pai_type_of(label33, atom)).
-    once(pai_type_of(label33, atom)).
+    once(types_type_of(pressure33, float)),
+    % State the fact: once(types_type_of(label33, atom)).
+    once(types_type_of(label33, atom)).
 
 %  AC-PR33-005: valid value passes type check with no ill_typed for that value
 % Define a clause for 'test': succeed when the following conditions hold.
 test(valid_value_no_ill_typed) :-
     % State a fact for 'pai type declare' with the arguments listed below.
-    pai_type_declare(count33, integer),
+    types_type_declare(count33, integer),
     % State a fact for 'pai type check' with the arguments listed below.
-    pai_type_check(42, integer),
+    types_type_check(42, integer),
     % Succeed only if 'lattice_node_fact(_, _, ill_typed, [42, integer], _' cannot be proved (negation as failure).
     \+ lattice_node_fact(_, _, ill_typed, [42, integer], _).
 
@@ -147,11 +147,11 @@ test(valid_value_no_ill_typed) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(offending_node_fact_stays) :-
     % State a fact for 'pai type declare' with the arguments listed below.
-    pai_type_declare(speed33, number),
+    types_type_declare(speed33, number),
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(speed33, [fast_text], [], NodeId),
     % State a fact for 'pai type check' with the arguments listed below.
-    pai_type_check(fast_text, number),
+    types_type_check(fast_text, number),
     % ill_typed inscribed
     % State a fact for 'once' with the arguments listed below.
     once(lattice_node_fact(_, _, ill_typed, [fast_text, number], _)),
@@ -159,11 +159,11 @@ test(offending_node_fact_stays) :-
     % State the fact: lattice node fact(_, NodeId, speed33, [fast_text], _).
     lattice_node_fact(_, NodeId, speed33, [fast_text], _).
 
-%  AC-PR33-007: pai_type_check recognises atom type correctly
+%  AC-PR33-007: types_type_check recognises atom type correctly
 % Define a clause for 'test': succeed when the following conditions hold.
 test(type_check_atom_type) :-
     % State a fact for 'pai type check' with the arguments listed below.
-    pai_type_check(hello, atom),
+    types_type_check(hello, atom),
     % Succeed only if 'lattice_node_fact(_, _, ill_typed, [hello, atom], _' cannot be proved (negation as failure).
     \+ lattice_node_fact(_, _, ill_typed, [hello, atom], _).
 
@@ -172,25 +172,25 @@ test(type_check_atom_type) :-
 test(types_are_typed) :-
     % Declare that the values of 'sensor_type33' are atoms
     % State a fact for 'pai type declare' with the arguments listed below.
-    pai_type_declare(sensor_type33, atom),
+    types_type_declare(sensor_type33, atom),
     % Declare the type declaration itself as a node_fact
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(type_of, [sensor_type33, atom], [], MetaId),
     % State a fact for 'nonvar' with the arguments listed below.
     nonvar(MetaId),
     % Query it back
-    % State the fact: once(pai_type_of(sensor_type33, atom)).
-    once(pai_type_of(sensor_type33, atom)).
+    % State the fact: once(types_type_of(sensor_type33, atom)).
+    once(types_type_of(sensor_type33, atom)).
 
 %  AC-PR33-009: multiple violations produce multiple ill_typed node_facts
 % Define a clause for 'test': succeed when the following conditions hold.
 test(multiple_violations_separate_ill_typed) :-
     % State a fact for 'pai type declare' with the arguments listed below.
-    pai_type_declare(voltage33, number),
+    types_type_declare(voltage33, number),
     % State a fact for 'pai type check' with the arguments listed below.
-    pai_type_check(high_text, number),
+    types_type_check(high_text, number),
     % State a fact for 'pai type check' with the arguments listed below.
-    pai_type_check(low_text, number),
+    types_type_check(low_text, number),
     % State a fact for 'once' with the arguments listed below.
     once(lattice_node_fact(_, _, ill_typed, [high_text, number], _)),
     % State the fact: once(lattice_node_fact(_, _, ill_typed, [low_text, number], _)).

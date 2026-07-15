@@ -13,19 +13,19 @@
     - SWI-Prolog's must_be/2 is the primitive type-checking layer.
 
     Predicates:
-        pai_type_declare/2  — +Subject, +Type  : declare Subject :: Type
-        pai_type_of/2       — ?Subject, ?Type  : query declared types
-        pai_type_check/2    — +Value, +Type    : check; inscribe ill_typed on mismatch
+        types_type_declare/2  — +Subject, +Type  : declare Subject :: Type
+        types_type_of/2       — ?Subject, ?Type  : query declared types
+        types_type_check/2    — +Value, +Type    : check; inscribe ill_typed on mismatch
 */
 
 % Declare this file as the 'types' module and list its exported predicates.
 :- module(types, [
-    % Supply 'pai_type_declare/2' as the next argument to the expression above.
-    pai_type_declare/2,
-    % Supply 'pai_type_of/2' as the next argument to the expression above.
-    pai_type_of/2,
-    % Supply 'pai_type_check/2' as the next argument to the expression above.
-    pai_type_check/2
+    % Supply 'types_type_declare/2' as the next argument to the expression above.
+    types_type_declare/2,
+    % Supply 'types_type_of/2' as the next argument to the expression above.
+    types_type_of/2,
+    % Supply 'types_type_check/2' as the next argument to the expression above.
+    types_type_check/2
 % Close the expression opened above.
 ]).
 
@@ -35,14 +35,14 @@
 :- use_module(library(lattice),    [lattice_node_fact/5]).
 
 % ---------------------------------------------------------------------------
-% pai_type_declare/2
+% types_type_declare/2
 %
 %   Inscribe a type_of(Subject, Type) node_fact in the default nexus.
 %   Idempotent: if an identical declaration already exists, skip.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai type declare': succeed when the following conditions hold.
-pai_type_declare(Subject, Type) :-
+types_type_declare(Subject, Type) :-
     % Execute: ( lattice_node_fact(_, _, type_of, [Subject, Type], _).
     ( lattice_node_fact(_, _, type_of, [Subject, Type], _)
     % If the condition above succeeded, perform the following action.
@@ -53,18 +53,18 @@ pai_type_declare(Subject, Type) :-
     ).
 
 % ---------------------------------------------------------------------------
-% pai_type_of/2
+% types_type_of/2
 %
 %   Query all declared types.  Backtrackable.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai type of': succeed when the following conditions hold.
-pai_type_of(Subject, Type) :-
+types_type_of(Subject, Type) :-
     % State the fact: lattice node fact(_, _, type_of, [Subject, Type], _).
     lattice_node_fact(_, _, type_of, [Subject, Type], _).
 
 % ---------------------------------------------------------------------------
-% pai_type_check/2
+% types_type_check/2
 %
 %   Validate Value against Type using SWI-Prolog's must_be/2.
 %   On type mismatch: inscribe an ill_typed node_fact naming the violation
@@ -73,7 +73,7 @@ pai_type_of(Subject, Type) :-
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'pai type check': succeed when the following conditions hold.
-pai_type_check(Value, Type) :-
+types_type_check(Value, Type) :-
     % Execute: ( catch(must_be(Type, Value), _, fail).
     ( catch(must_be(Type, Value), _, fail)
     % If the condition above succeeded, perform the following action.

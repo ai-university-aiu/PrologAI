@@ -32,40 +32,40 @@
     Negation convention: a proposition P and the term not(P) are contradictories.
 
     Predicates:
-        pai_regard_kinds/1       — -Kinds            (ladder order)
-        pai_regard_open/1        — +Regard
-        pai_regard_hold/2        — +Regard, +Prop
-        pai_regard_held/2        — +Regard, -Prop
-        pai_regard_shift/1       — +Regard
-        pai_regard_active/1      — -Regard
-        pai_regard_level/2       — +Regard, -Level
-        pai_tom_attribute/2      — +Agent, +Prop
-        pai_tom_divergence/2     — +Agent, -Divergences
-        pai_regard_reconcile/1   — -Integrated
+        awareness_regard_kinds/1       — -Kinds            (ladder order)
+        awareness_regard_open/1        — +Regard
+        awareness_regard_hold/2        — +Regard, +Prop
+        awareness_regard_held/2        — +Regard, -Prop
+        awareness_regard_shift/1       — +Regard
+        awareness_regard_active/1      — -Regard
+        awareness_regard_level/2       — +Regard, -Level
+        awareness_tom_attribute/2      — +Agent, +Prop
+        awareness_tom_divergence/2     — +Agent, -Divergences
+        awareness_regard_reconcile/1   — -Integrated
 */
 
 % Declare this file as the 'awareness' module and list its exported predicates.
 :- module(awareness, [
     % Continue the multi-line expression started above.
-    pai_regard_kinds/1,         % -Kinds (ladder order)
+    awareness_regard_kinds/1,         % -Kinds (ladder order)
     % Continue the multi-line expression started above.
-    pai_regard_open/1,          % +Regard
+    awareness_regard_open/1,          % +Regard
     % Continue the multi-line expression started above.
-    pai_regard_hold/2,          % +Regard, +Prop
+    awareness_regard_hold/2,          % +Regard, +Prop
     % Continue the multi-line expression started above.
-    pai_regard_held/2,          % +Regard, -Prop
+    awareness_regard_held/2,          % +Regard, -Prop
     % Continue the multi-line expression started above.
-    pai_regard_shift/1,         % +Regard
+    awareness_regard_shift/1,         % +Regard
     % Continue the multi-line expression started above.
-    pai_regard_active/1,        % -Regard
+    awareness_regard_active/1,        % -Regard
     % Continue the multi-line expression started above.
-    pai_regard_level/2,         % +Regard, -Level
+    awareness_regard_level/2,         % +Regard, -Level
     % Continue the multi-line expression started above.
-    pai_tom_attribute/2,        % +Agent, +Prop
+    awareness_tom_attribute/2,        % +Agent, +Prop
     % Continue the multi-line expression started above.
-    pai_tom_divergence/2,       % +Agent, -Divergences
-    % Supply 'pai_regard_reconcile/1' as the next argument to the expression above.
-    pai_regard_reconcile/1      % -Integrated
+    awareness_tom_divergence/2,       % +Agent, -Divergences
+    % Supply 'awareness_regard_reconcile/1' as the next argument to the expression above.
+    awareness_regard_reconcile/1      % -Integrated
 % Close the expression opened above.
 ]).
 
@@ -124,19 +124,19 @@ ensure_regard(Regard) :-
     ( regard(Regard) -> true ; assertz(regard(Regard)) ).
 
 % ---------------------------------------------------------------------------
-% pai_regard_kinds/1 — the ladder of standing kinds, in developmental order
+% awareness_regard_kinds/1 — the ladder of standing kinds, in developmental order
 % ---------------------------------------------------------------------------
 
-% Define 'pai_regard_kinds': return the standing regard kinds in ladder order.
-pai_regard_kinds([ambient_regard, selfward_regard, otherward_regard,
+% Define 'awareness_regard_kinds': return the standing regard kinds in ladder order.
+awareness_regard_kinds([ambient_regard, selfward_regard, otherward_regard,
                   avowed_regard, disavowed_regard]).
 
 % ---------------------------------------------------------------------------
-% pai_regard_open/1 — ensure a regard (standing or otherward(Agent)) exists
+% awareness_regard_open/1 — ensure a regard (standing or otherward(Agent)) exists
 % ---------------------------------------------------------------------------
 
-% Define 'pai_regard_open': open the given regard, validating its kind.
-pai_regard_open(Regard) :-
+% Define 'awareness_regard_open': open the given regard, validating its kind.
+awareness_regard_open(Regard) :-
     % Confirm the regard is a recognised viewpoint before opening it.
     valid_regard(Regard),
     % Open it (idempotent).
@@ -156,35 +156,35 @@ valid_regard(Regard) :-
     regard_kind_level(Regard, _Level).
 
 % ---------------------------------------------------------------------------
-% pai_regard_hold/2 — hold a proposition under a regard
+% awareness_regard_hold/2 — hold a proposition under a regard
 % ---------------------------------------------------------------------------
 
-% Define 'pai_regard_hold': record Prop as held under Regard.
-pai_regard_hold(Regard, Prop) :-
+% Define 'awareness_regard_hold': record Prop as held under Regard.
+awareness_regard_hold(Regard, Prop) :-
     % Open the regard if necessary (validates the kind too).
-    pai_regard_open(Regard),
+    awareness_regard_open(Regard),
     % Avoid storing a duplicate of the same held proposition.
     ( held(Regard, Prop) -> true ; assertz(held(Regard, Prop)) ),
     % Commit deterministically.
     !.
 
 % ---------------------------------------------------------------------------
-% pai_regard_held/2 — query propositions held under a regard
+% awareness_regard_held/2 — query propositions held under a regard
 % ---------------------------------------------------------------------------
 
-% Define 'pai_regard_held': enumerate the propositions held under Regard.
-pai_regard_held(Regard, Prop) :-
+% Define 'awareness_regard_held': enumerate the propositions held under Regard.
+awareness_regard_held(Regard, Prop) :-
     % Retrieve a stored held proposition for this regard.
     held(Regard, Prop).
 
 % ---------------------------------------------------------------------------
-% pai_regard_shift/1 — set the active standpoint
+% awareness_regard_shift/1 — set the active standpoint
 % ---------------------------------------------------------------------------
 
-% Define 'pai_regard_shift': make Regard the active standpoint.
-pai_regard_shift(Regard) :-
+% Define 'awareness_regard_shift': make Regard the active standpoint.
+awareness_regard_shift(Regard) :-
     % Open the regard if necessary (validates the kind too).
-    pai_regard_open(Regard),
+    awareness_regard_open(Regard),
     % Remove any previous active standpoint.
     retractall(active_regard(_)),
     % Install the new active standpoint.
@@ -193,50 +193,50 @@ pai_regard_shift(Regard) :-
     !.
 
 % ---------------------------------------------------------------------------
-% pai_regard_active/1 — query the active standpoint
+% awareness_regard_active/1 — query the active standpoint
 % ---------------------------------------------------------------------------
 
-% Define 'pai_regard_active': read the current standpoint, defaulting to ambient.
-pai_regard_active(Regard) :-
+% Define 'awareness_regard_active': read the current standpoint, defaulting to ambient.
+awareness_regard_active(Regard) :-
     % If an active standpoint is set, return it; otherwise default to ambient.
     ( active_regard(R) -> Regard = R ; Regard = ambient_regard ),
     % Commit deterministically.
     !.
 
 % ---------------------------------------------------------------------------
-% pai_regard_level/2 — the developmental level index of a regard
+% awareness_regard_level/2 — the developmental level index of a regard
 % ---------------------------------------------------------------------------
 
-% Define 'pai_regard_level' for otherward_regard(Agent) — level of the others tier.
-pai_regard_level(otherward_regard(_Agent), Level) :-
+% Define 'awareness_regard_level' for otherward_regard(Agent) — level of the others tier.
+awareness_regard_level(otherward_regard(_Agent), Level) :-
     % Look up the level for the otherward tier.
     regard_kind_level(otherward_regard, Level),
     % Commit deterministically.
     !.
-% Define 'pai_regard_level' for a standing regard — its tabled level.
-pai_regard_level(Regard, Level) :-
+% Define 'awareness_regard_level' for a standing regard — its tabled level.
+awareness_regard_level(Regard, Level) :-
     % Look up the level directly for the standing kind.
     regard_kind_level(Regard, Level),
     % Commit deterministically.
     !.
 
 % ---------------------------------------------------------------------------
-% pai_tom_attribute/2 — attribute a proposition to another mind (theory of mind)
+% awareness_tom_attribute/2 — attribute a proposition to another mind (theory of mind)
 % ---------------------------------------------------------------------------
 
-% Define 'pai_tom_attribute': hold Prop under Agent's otherward regard.
-pai_tom_attribute(Agent, Prop) :-
+% Define 'awareness_tom_attribute': hold Prop under Agent's otherward regard.
+awareness_tom_attribute(Agent, Prop) :-
     % Hold the attributed proposition under the agent's own viewpoint.
-    pai_regard_hold(otherward_regard(Agent), Prop),
+    awareness_regard_hold(otherward_regard(Agent), Prop),
     % Commit deterministically.
     !.
 
 % ---------------------------------------------------------------------------
-% pai_tom_divergence/2 — propositions where self and other contradict each other
+% awareness_tom_divergence/2 — propositions where self and other contradict each other
 % ---------------------------------------------------------------------------
 
-% Define 'pai_tom_divergence': collect contradictions between self and Agent.
-pai_tom_divergence(Agent, Divergences) :-
+% Define 'awareness_tom_divergence': collect contradictions between self and Agent.
+awareness_tom_divergence(Agent, Divergences) :-
     % Find every self-held / other-held pair that contradict one another.
     findall(divergence(SelfProp, OtherProp),
             % The self holds SelfProp from its self-interested view.
@@ -263,11 +263,11 @@ contradicts(not(P), P) :-
     !.
 
 % ---------------------------------------------------------------------------
-% pai_regard_reconcile/1 — integrate the avowed and disavowed views
+% awareness_regard_reconcile/1 — integrate the avowed and disavowed views
 % ---------------------------------------------------------------------------
 
-% Define 'pai_regard_reconcile': merge owned and disowned views into one account.
-pai_regard_reconcile(Integrated) :-
+% Define 'awareness_regard_reconcile': merge owned and disowned views into one account.
+awareness_regard_reconcile(Integrated) :-
     % Collect every proposition held under the owned (avowed) regard.
     findall(avowed(P), held(avowed_regard, P), Avowed),
     % Collect every proposition held under the disowned (disavowed) regard.

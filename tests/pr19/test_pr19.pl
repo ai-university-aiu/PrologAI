@@ -4,11 +4,11 @@
                  cycles run, then that channel's precision weight decreases.
     AC-PR19-002: Prediction errors reference abstract representations (not raw
                  payloads).
-    AC-PR19-003: pai_generate_prediction/3 returns a prediction for a situation.
-    AC-PR19-004: pai_prediction_residual/3 returns a weighted residual.
-    AC-PR19-005: pai_precision/2 returns the default precision for a new channel.
+    AC-PR19-003: prediction_generate_prediction/3 returns a prediction for a situation.
+    AC-PR19-004: prediction_prediction_residual/3 returns a weighted residual.
+    AC-PR19-005: prediction_precision/2 returns the default precision for a new channel.
     AC-PR19-006: Updating precision clamps to [0.05, 1.0].
-    AC-PR19-007: pai_minimize_free_energy/1 runs without error.
+    AC-PR19-007: prediction_minimize_free_energy/1 runs without error.
     AC-PR19-008: Routes disturbances when residual exceeds threshold.
     AC-PR19-009: Dark-room guard records curiosity_prior node_fact.
 */
@@ -45,17 +45,17 @@
 % Import [set_default_nexus/1, anchor_node/4] from the built-in 'node_facts' library.
 :- use_module(library(node_facts), [set_default_nexus/1, anchor_node/4]).
 % Load the built-in 'prediction' library so its predicates are available here.
-:- use_module(library(prediction), [pai_generate_prediction/3,
-                                    % Supply 'pai_prediction_residual/3' as the next argument to the expression above.
-                                    pai_prediction_residual/3,
-                                    % Supply 'pai_precision/2' as the next argument to the expression above.
-                                    pai_precision/2,
-                                    % Supply 'pai_minimize_free_energy/1' as the next argument to the expression above.
-                                    pai_minimize_free_energy/1,
-                                    % Supply 'pai_infer_state/2' as the next argument to the expression above.
-                                    pai_infer_state/2,
+:- use_module(library(prediction), [prediction_generate_prediction/3,
+                                    % Supply 'prediction_prediction_residual/3' as the next argument to the expression above.
+                                    prediction_prediction_residual/3,
+                                    % Supply 'prediction_precision/2' as the next argument to the expression above.
+                                    prediction_precision/2,
+                                    % Supply 'prediction_minimize_free_energy/1' as the next argument to the expression above.
+                                    prediction_minimize_free_energy/1,
+                                    % Supply 'prediction_infer_state/2' as the next argument to the expression above.
+                                    prediction_infer_state/2,
                                     % Continue the multi-line expression started above.
-                                    pai_route_disturbance/1]).
+                                    prediction_route_disturbance/1]).
 
 % Execute the compile-time directive: begin_tests(pr19, [setup(pr19_setup), cleanup(pr19_cleanup)]).
 :- begin_tests(pr19, [setup(pr19_setup), cleanup(pr19_cleanup)]).
@@ -91,7 +91,7 @@ pr19_cleanup :-
 test(noisy_channel_precision_decreases) :-
     % Record the initial precision
     % State a fact for 'pai precision' with the arguments listed below.
-    pai_precision(noisy_channel, P0),
+    prediction_precision(noisy_channel, P0),
     % Inject 100 cycles of high-variance error on the channel
     % State a fact for 'get time' with the arguments listed below.
     get_time(T0),
@@ -115,7 +115,7 @@ test(noisy_channel_precision_decreases) :-
     prediction:adapt_precision(noisy_channel),
     % Final precision should be less than or equal to initial
     % State a fact for 'pai precision' with the arguments listed below.
-    pai_precision(noisy_channel, P1),
+    prediction_precision(noisy_channel, P1),
     % Check that 'P1' is less than or equal to 'P0'.
     P1 =< P0.
 
@@ -127,7 +127,7 @@ test(prediction_errors_reference_abstract_representations) :-
     anchor_node(visual_object, [stable_object_1], [], _),
     % Generate a prediction for it
     % State a fact for 'pai generate prediction' with the arguments listed below.
-    pai_generate_prediction(visual_channel, stable_object_1, Prediction),
+    prediction_generate_prediction(visual_channel, stable_object_1, Prediction),
     % The prediction should reference abstract terms, not raw bytes
     % Execute: Prediction =.. [prediction | Args],.
     Prediction =.. [prediction | Args],
@@ -137,23 +137,23 @@ test(prediction_errors_reference_abstract_representations) :-
     % Succeed only if 'member(raw_bytes(_), Args' cannot be proved (negation as failure).
     \+ member(raw_bytes(_), Args).
 
-%  AC-PR19-003: pai_generate_prediction returns a prediction term
+%  AC-PR19-003: prediction_generate_prediction returns a prediction term
 % Define a clause for 'test': succeed when the following conditions hold.
 test(generate_prediction_returns_term) :-
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(context_rel, [test_situation], [], _),
     % State a fact for 'pai generate prediction' with the arguments listed below.
-    pai_generate_prediction(test_channel, test_situation, Pred),
+    prediction_generate_prediction(test_channel, test_situation, Pred),
     % Execute: Pred =.. [prediction | _Args]..
     Pred =.. [prediction | _Args].
 
-%  AC-PR19-004: pai_prediction_residual returns a numeric weighted residual
+%  AC-PR19-004: prediction_prediction_residual returns a numeric weighted residual
 % Define a clause for 'test': succeed when the following conditions hold.
 test(prediction_residual_is_numeric) :-
     % Check that 'Observed' is unifiable with '[node_fact(state_a, [x], [])]'.
     Observed = [node_fact(state_a, [x], [])],
     % State a fact for 'pai prediction residual' with the arguments listed below.
-    pai_prediction_residual(residual_channel, Observed, Residual),
+    prediction_prediction_residual(residual_channel, Observed, Residual),
     % State a fact for 'number' with the arguments listed below.
     number(Residual),
     % Check that 'Residual' is greater than or equal to '0.0'.
@@ -165,7 +165,7 @@ test(prediction_residual_is_numeric) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(default_precision_for_new_channel) :-
     % State a fact for 'pai precision' with the arguments listed below.
-    pai_precision(brand_new_channel_xyz, P),
+    prediction_precision(brand_new_channel_xyz, P),
     % Check that 'P' is greater than '0.0'.
     P > 0.0,
     % Check that 'P' is less than or equal to '1.0'.
@@ -177,23 +177,23 @@ test(precision_clamped) :-
     % Execute: prediction:update_precision(clamp_test, -1.0),.
     prediction:update_precision(clamp_test, -1.0),
     % State a fact for 'pai precision' with the arguments listed below.
-    pai_precision(clamp_test, P1),
+    prediction_precision(clamp_test, P1),
     % Check that 'P1' is greater than or equal to '0.05'.
     P1 >= 0.05,
     % Execute: prediction:update_precision(clamp_test, 99.0),.
     prediction:update_precision(clamp_test, 99.0),
     % State a fact for 'pai precision' with the arguments listed below.
-    pai_precision(clamp_test, P2),
+    prediction_precision(clamp_test, P2),
     % Check that 'P2' is less than or equal to '1.0'.
     P2 =< 1.0.
 
-%  AC-PR19-007: pai_minimize_free_energy runs without error
+%  AC-PR19-007: prediction_minimize_free_energy runs without error
 % Define a clause for 'test': succeed when the following conditions hold.
 test(minimize_free_energy_runs) :-
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(test_situation_node, [sit_a], [], _),
     % State the fact: pai minimize free energy(sit_a).
-    pai_minimize_free_energy(sit_a).
+    prediction_minimize_free_energy(sit_a).
 
 %  AC-PR19-008: routes disturbances when residual is high
 % Define a clause for 'test': succeed when the following conditions hold.
@@ -216,7 +216,7 @@ test(routes_disturbance_on_high_residual) :-
     % Execute: prediction:adapt_precision(disturbance_channel),.
     prediction:adapt_precision(disturbance_channel),
     % State a fact for 'pai route disturbance' with the arguments listed below.
-    pai_route_disturbance(disturbance(test, situation_d, 0.8)),
+    prediction_route_disturbance(disturbance(test, situation_d, 0.8)),
     % State the fact: once(lattice:lattice_node_fact(Nexus, _, prediction_disturbance, _, _)).
     once(lattice:lattice_node_fact(Nexus, _, prediction_disturbance, _, _)).
 
@@ -226,7 +226,7 @@ test(dark_room_guard_curiosity_prior) :-
     % State a fact for 'nb getval' with the arguments listed below.
     nb_getval(pr19_nexus_ref, Nexus),
     % State a fact for 'pai minimize free energy' with the arguments listed below.
-    pai_minimize_free_energy(any_situation),
+    prediction_minimize_free_energy(any_situation),
     % State the fact: once(lattice:lattice_node_fact(Nexus, _, curiosity_prior, [active], _)).
     once(lattice:lattice_node_fact(Nexus, _, curiosity_prior, [active], _)).
 
