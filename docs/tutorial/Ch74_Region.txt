@@ -151,8 +151,8 @@ modified sub-grids back together:
 
 ?- rg_sections(Grid, 0, M),
    maplist(maplist([Sub, Result]>>(process(Sub, Result))), M, Processed),
-   maplist(as_hcat, Processed, HRows),
-   as_vcat(HRows, Output).
+   maplist(assemble_hcat, Processed, HRows),
+   assemble_vcat(HRows, Output).
 
 Use rg_region to identify the content region around a specific cell, then use
 the scene pack to analyze objects within that region:

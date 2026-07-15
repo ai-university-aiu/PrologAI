@@ -30,44 +30,44 @@ left unchanged (identity behavior).
 Exported Predicates
 
 
-ct_infer_from_pair(+Before, +After, -Map)
+colortable_infer_from_pair(+Before, +After, -Map)
 
 Derive the color-to-color mapping from one Before-After pair.
 
 Example:
 
-ct_infer_from_pair([obj(r,[r(0,0)]),obj(b,[r(0,1)])],
+colortable_infer_from_pair([obj(r,[r(0,0)]),obj(b,[r(0,1)])],
                    [obj(g,[r(0,0)]),obj(y,[r(0,1)])],
                    Map).
 % Map = [r-g, b-y]
 
 
-ct_consistent_map(+Map)
+colortable_consistent_map(+Map)
 
 Succeed if no source color appears with two different target colors.
 
 Example:
 
-ct_consistent_map([r-g, b-y]).   % true
-\+ ct_consistent_map([r-g, r-b]). % true (r maps to two targets -- fails)
+colortable_consistent_map([r-g, b-y]).   % true
+\+ colortable_consistent_map([r-g, r-b]). % true (r maps to two targets -- fails)
 
 
-ct_merge_maps(+Map1, +Map2, -Merged)
+colortable_merge_maps(+Map1, +Map2, -Merged)
 
 Combine two maps. Fails if merging would create a conflict.
 
 Example:
 
-ct_merge_maps([r-g], [b-y], Merged).
+colortable_merge_maps([r-g], [b-y], Merged).
 % Merged = [r-g, b-y]
 
 
-ct_extend_map(+Base, +Extra, -Extended)
+colortable_extend_map(+Base, +Extra, -Extended)
 
-Add new entries from Extra to Base. Alias for ct_merge_maps.
+Add new entries from Extra to Base. Alias for colortable_merge_maps.
 
 
-ct_learn_map(+Pairs, -Map, -Inconsistent)
+colortable_learn_map(+Pairs, -Map, -Inconsistent)
 
 Learn a color map from a list of Before-After training pairs. Processes pairs
 one by one, accumulating a consistent map. Pairs that conflict with the
@@ -79,99 +79,99 @@ Pairs = [
     [obj(r,[r(0,0)])]-[obj(g,[r(0,0)])],
     [obj(b,[r(0,1)])]-[obj(y,[r(0,1)])]
 ],
-ct_learn_map(Pairs, Map, Bad).
+colortable_learn_map(Pairs, Map, Bad).
 % Map = [r-g, b-y], Bad = []
 
 
-ct_mapped_color(+Map, +Color, -Mapped)
+colortable_mapped_color(+Map, +Color, -Mapped)
 
 Look up one color. Returns the mapped target, or the color itself if not found.
 
 Example:
 
-ct_mapped_color([r-g, b-y], r, g).  % g
-ct_mapped_color([r-g, b-y], p, p).  % p (not in map, identity)
+colortable_mapped_color([r-g, b-y], r, g).  % g
+colortable_mapped_color([r-g, b-y], p, p).  % p (not in map, identity)
 
 
-ct_apply_map(+Map, +Obj, -MappedObj)
+colortable_apply_map(+Map, +Obj, -MappedObj)
 
 Apply a color map to one obj(Color, Cells) term.
 
 Example:
 
-ct_apply_map([r-g], obj(r,[r(0,0)]), Result).
+colortable_apply_map([r-g], obj(r,[r(0,0)]), Result).
 % Result = obj(g,[r(0,0)])
 
 
-ct_apply_to_scene(+Map, +Scene, -MappedScene)
+colortable_apply_to_scene(+Map, +Scene, -MappedScene)
 
 Apply a color map to every object in a scene list.
 
 Example:
 
-ct_apply_to_scene([r-g, b-y],
+colortable_apply_to_scene([r-g, b-y],
                   [obj(r,[r(0,0)]), obj(b,[r(0,1)])],
                   MappedScene).
 % MappedScene = [obj(g,[r(0,0)]), obj(y,[r(0,1)])]
 
 
-ct_map_covers(+Map, +Scene)
+colortable_map_covers(+Map, +Scene)
 
 Succeed if Map has an explicit entry for every color in Scene.
 
 Example:
 
-ct_map_covers([r-g, b-y], [obj(r,[r(0,0)]), obj(b,[r(0,1)])]).  % true
-\+ ct_map_covers([r-g], [obj(r,[r(0,0)]), obj(b,[r(0,1)])]).    % true (b not covered)
+colortable_map_covers([r-g, b-y], [obj(r,[r(0,0)]), obj(b,[r(0,1)])]).  % true
+\+ colortable_map_covers([r-g], [obj(r,[r(0,0)]), obj(b,[r(0,1)])]).    % true (b not covered)
 
 
-ct_complete_map(+Map, +Scene, -Complete)
+colortable_complete_map(+Map, +Scene, -Complete)
 
 Extend Map with identity entries for any colors in Scene not already covered.
 
 Example:
 
-ct_complete_map([r-g], [obj(b,[r(0,1)])], Complete).
+colortable_complete_map([r-g], [obj(b,[r(0,1)])], Complete).
 % Complete = [r-g, b-b]  (b mapped to itself)
 
 
-ct_invert_map(+Map, -Inverted)
+colortable_invert_map(+Map, -Inverted)
 
 Swap From and To in each entry. Fails if the result would be inconsistent.
 
 Example:
 
-ct_invert_map([r-g, b-y], Inverted).
+colortable_invert_map([r-g, b-y], Inverted).
 % Inverted = [g-r, y-b]
 
 
-ct_identity_map(+Colors, -Map)
+colortable_identity_map(+Colors, -Map)
 
 Build a map where every color maps to itself.
 
 Example:
 
-ct_identity_map([r, b, g], Map).
+colortable_identity_map([r, b, g], Map).
 % Map = [r-r, b-b, g-g]
 
 
-ct_restrict_map(+Map, +Colors, -Restricted)
+colortable_restrict_map(+Map, +Colors, -Restricted)
 
 Keep only map entries whose source color appears in Colors.
 
 Example:
 
-ct_restrict_map([r-g, b-y, p-w], [r, p], Restricted).
+colortable_restrict_map([r-g, b-y, p-w], [r, p], Restricted).
 % Restricted = [r-g, p-w]
 
 
-ct_map_colors(+Map, -Colors)
+colortable_map_colors(+Map, -Colors)
 
 List all source (From) colors in the map.
 
 Example:
 
-ct_map_colors([r-g, b-y, p-w], Colors).
+colortable_map_colors([r-g, b-y, p-w], Colors).
 % Colors = [r, b, p]
 
 
@@ -180,8 +180,8 @@ Typical Workflow
 Given a set of training pairs, learn the color table and apply it:
 
 solve_color_puzzle(TrainingPairs, TestScene, Output) :-
-    ct_learn_map(TrainingPairs, Map, []),  % [] = no inconsistencies
-    ct_apply_to_scene(Map, TestScene, Output).
+    colortable_learn_map(TrainingPairs, Map, []),  % [] = no inconsistencies
+    colortable_apply_to_scene(Map, TestScene, Output).
 
 
 Dependencies

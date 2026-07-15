@@ -14,155 +14,155 @@ translation, normalization, shape equality testing, and geometric transformation
 
 2. Converting Between Grids and Cell Sets
 
-cs_from_grid(+Grid, +Color, -Cells) extracts all positions of Color as a
+cellset_from_grid(+Grid, +Color, -Cells) extracts all positions of Color as a
 sorted list of R-C pairs (0-based). Returns [] if Color is absent.
 
-?- cs_from_grid([[0,1,0],[1,0,1]], 1, Cells).
+?- cellset_from_grid([[0,1,0],[1,0,1]], 1, Cells).
 Cells = [0-1, 1-0, 1-2].
 
-?- cs_from_grid([[1,1],[1,0]], 1, Cells).
+?- cellset_from_grid([[1,1],[1,0]], 1, Cells).
 Cells = [0-0, 0-1, 1-0].
 
-?- cs_from_grid([[0,0],[0,0]], 9, Cells).
+?- cellset_from_grid([[0,0],[0,0]], 9, Cells).
 Cells = [].
 
-cs_to_grid(+Cells, +H, +W, +Color, +Bg, -Grid) paints a cell set onto an
+cellset_to_grid(+Cells, +H, +W, +Color, +Bg, -Grid) paints a cell set onto an
 H x W canvas. Cells in the set become Color; all others become Bg.
 
-?- cs_to_grid([0-0, 1-1], 2, 2, 1, 0, Grid).
+?- cellset_to_grid([0-0, 1-1], 2, 2, 1, 0, Grid).
 Grid = [[1,0],[0,1]].
 
-?- cs_to_grid([0-1], 2, 3, 9, 0, Grid).
+?- cellset_to_grid([0-1], 2, 3, 9, 0, Grid).
 Grid = [[0,9,0],[0,0,0]].
 
-?- cs_to_grid([], 2, 2, 1, 0, Grid).
+?- cellset_to_grid([], 2, 2, 1, 0, Grid).
 Grid = [[0,0],[0,0]].
 
 
 3. Set Operations
 
-cs_union(+A, +B, -Union) returns the sorted union of two cell sets.
+cellset_union(+A, +B, -Union) returns the sorted union of two cell sets.
 Duplicates are removed.
 
-?- cs_union([0-0, 0-1], [1-0], Union).
+?- cellset_union([0-0, 0-1], [1-0], Union).
 Union = [0-0, 0-1, 1-0].
 
-?- cs_union([0-0, 0-1], [0-0, 1-1], Union).
+?- cellset_union([0-0, 0-1], [0-0, 1-1], Union).
 Union = [0-0, 0-1, 1-1].
 
-?- cs_union([], [1-2, 3-4], Union).
+?- cellset_union([], [1-2, 3-4], Union).
 Union = [1-2, 3-4].
 
-cs_intersect(+A, +B, -Inter) returns the sorted intersection.
+cellset_intersect(+A, +B, -Inter) returns the sorted intersection.
 
-?- cs_intersect([0-0, 0-1, 1-0], [0-1, 1-0, 2-2], Inter).
+?- cellset_intersect([0-0, 0-1, 1-0], [0-1, 1-0, 2-2], Inter).
 Inter = [0-1, 1-0].
 
-?- cs_intersect([0-0], [1-1], Inter).
+?- cellset_intersect([0-0], [1-1], Inter).
 Inter = [].
 
-cs_subtract(+A, +B, -Diff) returns members of A not in B.
+cellset_subtract(+A, +B, -Diff) returns members of A not in B.
 
-?- cs_subtract([0-0, 0-1, 1-0], [0-1], Diff).
+?- cellset_subtract([0-0, 0-1, 1-0], [0-1], Diff).
 Diff = [0-0, 1-0].
 
-?- cs_subtract([0-0, 1-1], [0-0, 1-1], Diff).
+?- cellset_subtract([0-0, 1-1], [0-0, 1-1], Diff).
 Diff = [].
 
 
 4. Translation and Normalization
 
-cs_translate(+Cells, +DR, +DC, -Shifted) shifts every cell by (DR, DC).
+cellset_translate(+Cells, +DR, +DC, -Shifted) shifts every cell by (DR, DC).
 Negative offsets are allowed.
 
-?- cs_translate([0-0, 0-1, 1-0], 2, 3, S).
+?- cellset_translate([0-0, 0-1, 1-0], 2, 3, S).
 S = [2-3, 2-4, 3-3].
 
-?- cs_translate([2-3], -1, -2, S).
+?- cellset_translate([2-3], -1, -2, S).
 S = [1-1].
 
-cs_normalize(+Cells, -Norm, -DR, -DC) translates so the minimum row becomes
+cellset_normalize(+Cells, -Norm, -DR, -DC) translates so the minimum row becomes
 0 and the minimum column becomes 0. Returns the negative offsets used.
 
-?- cs_normalize([2-3, 2-4, 3-3], Norm, DR, DC).
+?- cellset_normalize([2-3, 2-4, 3-3], Norm, DR, DC).
 Norm = [0-0, 0-1, 1-0], DR = -2, DC = -3.
 
-?- cs_normalize([], Norm, DR, DC).
+?- cellset_normalize([], Norm, DR, DC).
 Norm = [], DR = 0, DC = 0.
 
 
 5. Queries
 
-cs_bbox(+Cells, -R0, -C0, -R1, -C1) gives the bounding box of a non-empty
+cellset_bbox(+Cells, -R0, -C0, -R1, -C1) gives the bounding box of a non-empty
 cell set. Fails on [].
 
-?- cs_bbox([0-1, 1-0, 1-2], R0, C0, R1, C1).
+?- cellset_bbox([0-1, 1-0, 1-2], R0, C0, R1, C1).
 R0 = 0, C0 = 0, R1 = 1, C1 = 2.
 
-?- cs_bbox([3-5], R0, C0, R1, C1).
+?- cellset_bbox([3-5], R0, C0, R1, C1).
 R0 = 3, C0 = 5, R1 = 3, C1 = 5.
 
-cs_size(+Cells, -N) counts the cells.
+cellset_size(+Cells, -N) counts the cells.
 
-?- cs_size([0-0, 1-1, 2-2], N). N = 3.
-?- cs_size([], N). N = 0.
+?- cellset_size([0-0, 1-1, 2-2], N). N = 3.
+?- cellset_size([], N). N = 0.
 
-cs_contains(+Cells, +R, +C) succeeds if (R,C) is in the set.
+cellset_contains(+Cells, +R, +C) succeeds if (R,C) is in the set.
 
-?- cs_contains([0-0, 1-1, 2-2], 1, 1). true.
-?- cs_contains([0-0, 1-1], 2, 2). false.
+?- cellset_contains([0-0, 1-1, 2-2], 1, 1). true.
+?- cellset_contains([0-0, 1-1], 2, 2). false.
 
 
 6. Background Neighbors
 
-cs_adjacent_bg(+Cells, -Adjacent) returns the sorted list of all 4-connected
+cellset_adjacent_bg(+Cells, -Adjacent) returns the sorted list of all 4-connected
 neighbors not in the set. May include positions with negative coordinates for
 cells at row 0 or column 0.
 
-?- cs_adjacent_bg([2-2], Adj).
+?- cellset_adjacent_bg([2-2], Adj).
 Adj = [1-2, 2-1, 2-3, 3-2].
 
-?- cs_adjacent_bg([1-1, 1-2], Adj).
+?- cellset_adjacent_bg([1-1, 1-2], Adj).
 Adj = [0-1, 0-2, 1-0, 1-3, 2-1, 2-2].
 
 
 7. Shape Equality
 
-cs_same_shape(+A, +B) succeeds if A and B have the same shape when normalized
+cellset_same_shape(+A, +B) succeeds if A and B have the same shape when normalized
 to the origin. Position in the grid does not matter.
 
-?- cs_same_shape([0-0, 0-1, 1-0], [2-3, 2-4, 3-3]). true.
-?- cs_same_shape([0-0, 0-1], [0-0, 1-0]). false.
-?- cs_same_shape([], []). true.
+?- cellset_same_shape([0-0, 0-1, 1-0], [2-3, 2-4, 3-3]). true.
+?- cellset_same_shape([0-0, 0-1], [0-0, 1-0]). false.
+?- cellset_same_shape([], []). true.
 
 
 8. Geometric Transformations
 
-cs_rotate_90(+Cells, +H, -Rotated) rotates 90 degrees clockwise within a
+cellset_rotate_90(+Cells, +H, -Rotated) rotates 90 degrees clockwise within a
 grid of H rows. Formula: new_R = old_C, new_C = H-1-old_R.
 
-?- cs_rotate_90([0-0, 0-1, 0-2], 3, Rot).
+?- cellset_rotate_90([0-0, 0-1, 0-2], 3, Rot).
 Rot = [0-2, 1-2, 2-2].    % top row becomes right column
 
-?- cs_rotate_90([0-0, 1-0, 2-0], 3, Rot).
+?- cellset_rotate_90([0-0, 1-0, 2-0], 3, Rot).
 Rot = [0-0, 0-1, 0-2].    % left column becomes top row
 
-cs_mirror_h(+Cells, +W, -Mirrored) mirrors horizontally within a grid of W
+cellset_mirror_h(+Cells, +W, -Mirrored) mirrors horizontally within a grid of W
 columns. Formula: new_R = old_R, new_C = W-1-old_C.
 
-?- cs_mirror_h([0-0, 0-1, 1-2], 3, Mirrored).
+?- cellset_mirror_h([0-0, 0-1, 1-2], 3, Mirrored).
 Mirrored = [0-1, 0-2, 1-0].
 
-?- cs_mirror_h([0-1, 1-1], 3, Mirrored).
+?- cellset_mirror_h([0-1, 1-1], 3, Mirrored).
 Mirrored = [0-1, 1-1].    % center column stays in center
 
 
 9. Summary
 
 The 14 cs_* predicates convert between dense grids and sparse R-C sets
-(cs_from_grid, cs_to_grid), perform set algebra (cs_union, cs_intersect,
-cs_subtract), translate and normalize positions (cs_translate, cs_normalize),
-query size, membership, and bounding box (cs_size, cs_contains, cs_bbox),
-find background neighbors (cs_adjacent_bg), test shape equality (cs_same_shape),
-and apply geometric transformations (cs_rotate_90, cs_mirror_h). All sets are
+(cellset_from_grid, cellset_to_grid), perform set algebra (cellset_union, cellset_intersect,
+cellset_subtract), translate and normalize positions (cellset_translate, cellset_normalize),
+query size, membership, and bounding box (cellset_size, cellset_contains, cellset_bbox),
+find background neighbors (cellset_adjacent_bg), test shape equality (cellset_same_shape),
+and apply geometric transformations (cellset_rotate_90, cellset_mirror_h). All sets are
 represented as sorted lists of R-C pairs for canonical ordering.

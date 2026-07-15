@@ -7958,189 +7958,189 @@ PREDICATE REFERENCE
 
 Cell-Wise Binary Grid Operations
 
-ar_cell_add(+Grid1, +Grid2, -Grid3)
+arith_cell_add(+Grid1, +Grid2, -Grid3)
 
   Grid3[R][C] = Grid1[R][C] + Grid2[R][C] for every cell.
   Grid1 and Grid2 must have identical dimensions.
 
   % Add two 2x2 grids.
-  ar_cell_add([[1,2],[3,4]], [[5,6],[7,8]], G3).
+  arith_cell_add([[1,2],[3,4]], [[5,6],[7,8]], G3).
   % G3 = [[6,8],[10,12]]
 
   % Adding a zero grid leaves the grid unchanged.
-  ar_cell_add([[1,2],[3,4]], [[0,0],[0,0]], G3).
+  arith_cell_add([[1,2],[3,4]], [[0,0],[0,0]], G3).
   % G3 = [[1,2],[3,4]]
 
-ar_cell_sub(+Grid1, +Grid2, -Grid3)
+arith_cell_sub(+Grid1, +Grid2, -Grid3)
 
   Grid3[R][C] = Grid1[R][C] - Grid2[R][C] for every cell.
   Subtraction can produce negative values.
 
   % Subtract two grids.
-  ar_cell_sub([[5,6],[7,8]], [[1,2],[3,4]], G3).
+  arith_cell_sub([[5,6],[7,8]], [[1,2],[3,4]], G3).
   % G3 = [[4,4],[4,4]]
 
   % A grid minus itself gives all zeros.
-  ar_cell_sub([[3,4],[5,6]], [[3,4],[5,6]], G3).
+  arith_cell_sub([[3,4],[5,6]], [[3,4],[5,6]], G3).
   % G3 = [[0,0],[0,0]]
 
-ar_cell_mul(+Grid1, +Grid2, -Grid3)
+arith_cell_mul(+Grid1, +Grid2, -Grid3)
 
   Grid3[R][C] = Grid1[R][C] * Grid2[R][C] for every cell.
 
   % Multiply two grids.
-  ar_cell_mul([[1,2],[3,4]], [[2,3],[4,5]], G3).
+  arith_cell_mul([[1,2],[3,4]], [[2,3],[4,5]], G3).
   % G3 = [[2,6],[12,20]]
 
   % Multiplying by a grid of ones is the identity.
-  ar_cell_mul([[3,4],[5,6]], [[1,1],[1,1]], G3).
+  arith_cell_mul([[3,4],[5,6]], [[1,1],[1,1]], G3).
   % G3 = [[3,4],[5,6]]
 
-ar_cell_abs_diff(+Grid1, +Grid2, -Grid3)
+arith_cell_abs_diff(+Grid1, +Grid2, -Grid3)
 
   Grid3[R][C] = |Grid1[R][C] - Grid2[R][C]| for every cell.
   The result is always non-negative.
 
   % Absolute difference is symmetric.
-  ar_cell_abs_diff([[1,5],[3,2]], [[4,2],[1,7]], G3).
+  arith_cell_abs_diff([[1,5],[3,2]], [[4,2],[1,7]], G3).
   % G3 = [[3,3],[2,5]]
 
   % A grid minus itself gives all zeros.
-  ar_cell_abs_diff([[3,4],[5,6]], [[3,4],[5,6]], G3).
+  arith_cell_abs_diff([[3,4],[5,6]], [[3,4],[5,6]], G3).
   % G3 = [[0,0],[0,0]]
 
 
 Scalar Operations
 
-ar_cell_mod(+Grid, +N, -Grid2)
+arith_cell_mod(+Grid, +N, -Grid2)
 
   Grid2[R][C] = Grid[R][C] mod N for every cell.
 
   % Modulo 3.
-  ar_cell_mod([[5,6],[7,8]], 3, G2).
+  arith_cell_mod([[5,6],[7,8]], 3, G2).
   % G2 = [[2,0],[1,2]]
 
   % Modulo larger than all values: unchanged.
-  ar_cell_mod([[1,2],[3,4]], 10, G2).
+  arith_cell_mod([[1,2],[3,4]], 10, G2).
   % G2 = [[1,2],[3,4]]
 
-ar_scalar_add(+Grid, +N, -Grid2)
+arith_scalar_add(+Grid, +N, -Grid2)
 
   Grid2[R][C] = Grid[R][C] + N for every cell.
 
   % Add 5 to every cell.
-  ar_scalar_add([[1,2],[3,4]], 5, G2).
+  arith_scalar_add([[1,2],[3,4]], 5, G2).
   % G2 = [[6,7],[8,9]]
 
   % Negative N subtracts.
-  ar_scalar_add([[5,6],[7,8]], -3, G2).
+  arith_scalar_add([[5,6],[7,8]], -3, G2).
   % G2 = [[2,3],[4,5]]
 
-ar_scalar_mul(+Grid, +N, -Grid2)
+arith_scalar_mul(+Grid, +N, -Grid2)
 
   Grid2[R][C] = Grid[R][C] * N for every cell.
 
   % Multiply every cell by 3.
-  ar_scalar_mul([[1,2],[3,4]], 3, G2).
+  arith_scalar_mul([[1,2],[3,4]], 3, G2).
   % G2 = [[3,6],[9,12]]
 
   % Multiply by 0 zeroes out the grid.
-  ar_scalar_mul([[5,6],[7,8]], 0, G2).
+  arith_scalar_mul([[5,6],[7,8]], 0, G2).
   % G2 = [[0,0],[0,0]]
 
-ar_cell_clamp(+Grid, +Lo, +Hi, -Grid2)
+arith_cell_clamp(+Grid, +Lo, +Hi, -Grid2)
 
   Grid2[R][C] = max(Lo, min(Hi, Grid[R][C])) for every cell.
   Values below Lo become Lo; values above Hi become Hi.
   Values already within [Lo, Hi] are unchanged.
 
   % Clamp a row to the range [2, 8].
-  ar_cell_clamp([[0,3,7,10]], 2, 8, G2).
+  arith_cell_clamp([[0,3,7,10]], 2, 8, G2).
   % G2 = [[2,3,7,8]]
 
   % Clamp all values that are too high.
-  ar_cell_clamp([[7,8],[9,10]], 1, 5, G2).
+  arith_cell_clamp([[7,8],[9,10]], 1, 5, G2).
   % G2 = [[5,5],[5,5]]
 
 
 Row and Column Sums
 
-ar_row_sum(+Grid, +R, -Sum)
+arith_row_sum(+Grid, +R, -Sum)
 
   Sum is the arithmetic total of all cell values in row R (0-indexed).
 
   % Row 1 sums to 4+5+6 = 15.
-  ar_row_sum([[1,2,3],[4,5,6],[7,8,9]], 1, Sum).
+  arith_row_sum([[1,2,3],[4,5,6],[7,8,9]], 1, Sum).
   % Sum = 15
 
   % Row of zeros sums to 0.
-  ar_row_sum([[0,0,0],[1,2,3]], 0, Sum).
+  arith_row_sum([[0,0,0],[1,2,3]], 0, Sum).
   % Sum = 0
 
-ar_col_sum(+Grid, +C, -Sum)
+arith_col_sum(+Grid, +C, -Sum)
 
   Sum is the arithmetic total of all cell values in column C (0-indexed).
 
   % Column 2 sums to 3+6+9 = 18.
-  ar_col_sum([[1,2,3],[4,5,6],[7,8,9]], 2, Sum).
+  arith_col_sum([[1,2,3],[4,5,6],[7,8,9]], 2, Sum).
   % Sum = 18
 
-ar_row_sums(+Grid, -Sums)
+arith_row_sums(+Grid, -Sums)
 
   Sums is a list where Sums[i] is the sum of all values in row i.
 
   % Sum every row.
-  ar_row_sums([[1,2],[3,4],[5,6]], Sums).
+  arith_row_sums([[1,2],[3,4],[5,6]], Sums).
   % Sums = [3, 7, 11]
 
-ar_col_sums(+Grid, -Sums)
+arith_col_sums(+Grid, -Sums)
 
   Sums is a list where Sums[j] is the sum of all values in column j.
 
   % Sum every column.
-  ar_col_sums([[1,2,3],[4,5,6]], Sums).
+  arith_col_sums([[1,2,3],[4,5,6]], Sums).
   % Sums = [5, 7, 9]
 
 
 Grid-Wide Extremes
 
-ar_cell_max(+Grid, -Max)
+arith_cell_max(+Grid, -Max)
 
   Max is the largest cell value anywhere in Grid.
 
   % Maximum of [[1,5],[3,2]] is 5.
-  ar_cell_max([[1,5],[3,2]], Max).
+  arith_cell_max([[1,5],[3,2]], Max).
   % Max = 5
 
   % Maximum of negative values.
-  ar_cell_max([[-3,-1],[-5,-2]], Max).
+  arith_cell_max([[-3,-1],[-5,-2]], Max).
   % Max = -1
 
-ar_cell_min(+Grid, -Min)
+arith_cell_min(+Grid, -Min)
 
   Min is the smallest cell value anywhere in Grid.
 
   % Minimum of [[4,1],[3,2]] is 1.
-  ar_cell_min([[4,1],[3,2]], Min).
+  arith_cell_min([[4,1],[3,2]], Min).
   % Min = 1
 
 
 IMPLEMENTATION NOTES
 
-Binary grid operations (ar_cell_add, ar_cell_sub, ar_cell_mul, ar_cell_abs_diff)
+Binary grid operations (arith_cell_add, arith_cell_sub, arith_cell_mul, arith_cell_abs_diff)
 use maplist/4 over row pairs, then maplist/4 over cell pairs. This avoids
 explicit indexing.
 
-Scalar operations (ar_cell_mod, ar_scalar_add, ar_scalar_mul, ar_cell_clamp) use
+Scalar operations (arith_cell_mod, arith_scalar_add, arith_scalar_mul, arith_cell_clamp) use
 maplist(maplist(F)), threading the scalar via partial application.
 
-ar_col_sums builds a column-index list via numlist/3 and maps ar_col_sum/3 over
-it. ar_col_sum extracts a column via maplist(nth0(C), Grid, Col).
+arith_col_sums builds a column-index list via numlist/3 and maps arith_col_sum/3 over
+it. arith_col_sum extracts a column via maplist(nth0(C), Grid, Col).
 
-ar_cell_max and ar_cell_min flatten the grid with append/2 and delegate to
+arith_cell_max and arith_cell_min flatten the grid with append/2 and delegate to
 max_list/2 and min_list/2.
 
-ar_cell_clamp uses a three-way if-then-else for determinism (no choicepoints).
+arith_cell_clamp uses a three-way if-then-else for determinism (no choicepoints).
 
 
 COMBINING WITH OTHER PACKS
@@ -8148,27 +8148,27 @@ COMBINING WITH OTHER PACKS
 The arith pack integrates naturally with the grid, compare, and rewrite packs:
 
   % Find how many cells exceed a threshold after scaling.
-  ar_scalar_mul(Grid, 2, Scaled),
-  ar_cell_max(Scaled, Max),
-  ar_cell_clamp(Scaled, 0, Max, Clamped),
-  ar_cell_max(Clamped, _).
+  arith_scalar_mul(Grid, 2, Scaled),
+  arith_cell_max(Scaled, Max),
+  arith_cell_clamp(Scaled, 0, Max, Clamped),
+  arith_cell_max(Clamped, _).
 
   % Compute absolute difference between input and output grids.
-  ar_cell_abs_diff(InputGrid, OutputGrid, Diff),
-  ar_cell_max(Diff, MaxChange).
+  arith_cell_abs_diff(InputGrid, OutputGrid, Diff),
+  arith_cell_max(Diff, MaxChange).
 
   % Scale a grid and then replace background with a different value.
-  ar_scalar_add(Grid, 1, Shifted),
-  ar_cell_clamp(Shifted, 0, 9, Final).
+  arith_scalar_add(Grid, 1, Shifted),
+  arith_cell_clamp(Shifted, 0, 9, Final).
 
   % Check whether all rows have equal sums (a balanced grid).
-  ar_row_sums(Grid, Sums),
+  arith_row_sums(Grid, Sums),
   sort(Sums, Sorted),
   Sorted = [_].   % single unique sum => all rows equal
 
   % Column sums as a signature for comparing two grids structurally.
-  ar_col_sums(Grid1, Sig1),
-  ar_col_sums(Grid2, Sig2),
+  arith_col_sums(Grid1, Sig1),
+  arith_col_sums(Grid2, Sig2),
   Sig1 = Sig2.    % same column sums => structural match
 
 
@@ -8569,14 +8569,14 @@ predicates into named steps:
   pl_register(bg_to_one, [_, G, G2]>>(rw_replace_color(G, 0, 1, G2))).
 
   % Register a step that scales all values by 2.
-  pl_register(scale2, [_, G, G2]>>(ar_scalar_mul(G, 2, G2))).
+  pl_register(scale2, [_, G, G2]>>(arith_scalar_mul(G, 2, G2))).
 
   % Apply both steps in sequence.
   pl_run([bg_to_one, scale2], InputGrid, OutputGrid).
 
   % Pipeline with a context-dependent step.
   % The step handler reads a color from the step term.
-  pl_register(fill_color, [fill_color(C), G, G2]>>(ar_scalar_add(G, C, G2))).
+  pl_register(fill_color, [fill_color(C), G, G2]>>(arith_scalar_add(G, C, G2))).
   pl_run([fill_color(3)], [[0,0],[0,0]], Out).
   % Out = [[3,3],[3,3]]
 
@@ -10804,152 +10804,152 @@ larger grids from multiple pieces.
 
 73.2 Horizontal and vertical concatenation
 
-as_hcat/2 joins a list of same-height grids side by side.
+assemble_hcat/2 joins a list of same-height grids side by side.
 
-?- as_hcat([[[1,2],[3,4]], [[5,6],[7,8]]], R).
+?- assemble_hcat([[[1,2],[3,4]], [[5,6],[7,8]]], R).
 R = [[1,2,5,6],[3,4,7,8]].
 
-?- as_hcat([[[1],[2]], [[3],[4]], [[5],[6]]], R).
+?- assemble_hcat([[[1],[2]], [[3],[4]], [[5],[6]]], R).
 R = [[1,3,5],[2,4,6]].
 
-as_vcat/2 stacks a list of same-width grids top to bottom.
+assemble_vcat/2 stacks a list of same-width grids top to bottom.
 
-?- as_vcat([[[1,2],[3,4]], [[5,6],[7,8]]], R).
+?- assemble_vcat([[[1,2],[3,4]], [[5,6],[7,8]]], R).
 R = [[1,2],[3,4],[5,6],[7,8]].
 
-as_grid_of/2 assembles a 2D matrix of grids: each inner list is a row of
+assemble_grid_of/2 assembles a 2D matrix of grids: each inner list is a row of
 same-height grids; the outer list is a column of such rows.
 
-?- as_grid_of([[[[1]],[[2]]],[[[3]],[[4]]]], R).
+?- assemble_grid_of([[[[1]],[[2]]],[[[3]],[[4]]]], R).
 R = [[1,2],[3,4]].
 
 
 73.3 Downscaling
 
-as_downscale/3 reduces each K x K non-overlapping block to one cell using
+assemble_downscale/3 reduces each K x K non-overlapping block to one cell using
 majority vote. This is the inverse of the sk_upscale predicate in the seek
 pack.
 
-?- as_downscale([[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, R).
+?- assemble_downscale([[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]], 2, R).
 R = [[1,2],[3,4]].
 
-?- as_downscale([[5,5],[5,5]], 2, R).
+?- assemble_downscale([[5,5],[5,5]], 2, R).
 R = [[5]].
 
 
 73.4 Border and centering
 
-as_border/4 surrounds a grid with a W-cell wide frame of a chosen color.
+assemble_border/4 surrounds a grid with a W-cell wide frame of a chosen color.
 
-?- as_border([[5]], 1, 0, R).
+?- assemble_border([[5]], 1, 0, R).
 R = [[0,0,0],[0,5,0],[0,0,0]].
 
-?- as_border([[1,2],[3,4]], 1, 9, R).
+?- assemble_border([[1,2],[3,4]], 1, 9, R).
 R = [[9,9,9,9],[9,1,2,9],[9,3,4,9],[9,9,9,9]].
 
-as_center_in/5 embeds a smaller grid at the integer floor center of a canvas
+assemble_center_in/5 embeds a smaller grid at the integer floor center of a canvas
 filled with a background color.
 
-?- as_center_in([[5]], 3, 3, 0, R).
+?- assemble_center_in([[5]], 3, 3, 0, R).
 R = [[0,0,0],[0,5,0],[0,0,0]].
 
-?- as_center_in([[7]], 5, 5, 0, R).
+?- assemble_center_in([[7]], 5, 5, 0, R).
 R = [[0,0,0,0,0],[0,0,0,0,0],[0,0,7,0,0],[0,0,0,0,0],[0,0,0,0,0]].
 
 
 73.5 Quadrant extraction
 
-as_quarter/3 extracts one of four named quadrants from a grid. Q is one of
+assemble_quarter/3 extracts one of four named quadrants from a grid. Q is one of
 the atoms tl, tr, bl, br (top-left, top-right, bottom-left, bottom-right).
 The split is at the floor midpoint of each dimension.
 
-?- as_quarter([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]], tl, R).
+?- assemble_quarter([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]], tl, R).
 R = [[1,2],[5,6]].
 
-?- as_quarter([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]], br, R).
+?- assemble_quarter([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]], br, R).
 R = [[11,12],[15,16]].
 
 
 73.6 Mirror concatenation
 
-as_flip_h_cat/2 concatenates a grid with its own left-right mirror.
+assemble_flip_h_cat/2 concatenates a grid with its own left-right mirror.
 The result has twice the column count.
 
-?- as_flip_h_cat([[1,2],[3,4]], R).
+?- assemble_flip_h_cat([[1,2],[3,4]], R).
 R = [[1,2,2,1],[3,4,4,3]].
 
-?- as_flip_h_cat([[1,2,3]], R).
+?- assemble_flip_h_cat([[1,2,3]], R).
 R = [[1,2,3,3,2,1]].
 
-as_flip_v_cat/2 stacks a grid with its own top-bottom mirror.
+assemble_flip_v_cat/2 stacks a grid with its own top-bottom mirror.
 The result has twice the row count.
 
-?- as_flip_v_cat([[1,2],[3,4]], R).
+?- assemble_flip_v_cat([[1,2],[3,4]], R).
 R = [[1,2],[3,4],[3,4],[1,2]].
 
-?- as_flip_v_cat([[1],[2],[3]], R).
+?- assemble_flip_v_cat([[1],[2],[3]], R).
 R = [[1],[2],[3],[3],[2],[1]].
 
 
 73.7 Interleaving
 
-as_zip_h/3 interleaves columns from two same-size grids. Column 0 from G1,
+assemble_zip_h/3 interleaves columns from two same-size grids. Column 0 from G1,
 column 0 from G2, column 1 from G1, column 1 from G2, and so on.
 
-?- as_zip_h([[1,2],[3,4]], [[5,6],[7,8]], R).
+?- assemble_zip_h([[1,2],[3,4]], [[5,6],[7,8]], R).
 R = [[1,5,2,6],[3,7,4,8]].
 
-as_zip_v/3 interleaves rows from two same-size grids.
+assemble_zip_v/3 interleaves rows from two same-size grids.
 
-?- as_zip_v([[1,2],[3,4]], [[5,6],[7,8]], R).
+?- assemble_zip_v([[1,2],[3,4]], [[5,6],[7,8]], R).
 R = [[1,2],[5,6],[3,4],[7,8]].
 
 
 73.8 Paste and mask
 
-as_paste/5 unconditionally pastes a sub-grid into a base grid at a given
-row and column offset. Unlike gd_overlay in the grid pack, as_paste always
+assemble_paste/5 unconditionally pastes a sub-grid into a base grid at a given
+row and column offset. Unlike gd_overlay in the grid pack, assemble_paste always
 overwrites regardless of cell value.
 
-?- as_paste([[0,0,0],[0,0,0],[0,0,0]], [[5]], 1, 1, R).
+?- assemble_paste([[0,0,0],[0,0,0],[0,0,0]], [[5]], 1, 1, R).
 R = [[0,0,0],[0,5,0],[0,0,0]].
 
-?- as_paste([[0,0,0],[0,0,0],[0,0,0]], [[1,2],[3,4]], 0, 0, R).
+?- assemble_paste([[0,0,0],[0,0,0],[0,0,0]], [[1,2],[3,4]], 0, 0, R).
 R = [[1,2,0],[3,4,0],[0,0,0]].
 
-as_mask_fill/4 replaces cells with Fill wherever the corresponding mask cell
+assemble_mask_fill/4 replaces cells with Fill wherever the corresponding mask cell
 is non-zero.
 
-?- as_mask_fill([[1,2],[3,4]], [[0,1],[1,0]], 9, R).
+?- assemble_mask_fill([[1,2],[3,4]], [[0,1],[1,0]], 9, R).
 R = [[1,9],[9,4]].
 
 
 73.9 Crop or pad to size
 
-as_crop_to/5 produces a grid of exactly NR rows and NC columns. If the input
+assemble_crop_to/5 produces a grid of exactly NR rows and NC columns. If the input
 is smaller, cells beyond its bounds are filled with Bg. If the input is larger,
 cells beyond NR rows or NC columns are discarded.
 
-?- as_crop_to([[1,2,3,4],[5,6,7,8]], 2, 2, 0, R).
+?- assemble_crop_to([[1,2,3,4],[5,6,7,8]], 2, 2, 0, R).
 R = [[1,2],[5,6]].
 
-?- as_crop_to([[1,2],[3,4]], 4, 4, 0, R).
+?- assemble_crop_to([[1,2],[3,4]], 4, 4, 0, R).
 R = [[1,2,0,0],[3,4,0,0],[0,0,0,0],[0,0,0,0]].
 
 
 73.10 Common patterns
 
 Build a bordered pattern from a motif and its mirror:
-?- as_flip_h_cat(Motif, Wide), as_border(Wide, 1, 0, Framed).
+?- assemble_flip_h_cat(Motif, Wide), assemble_border(Wide, 1, 0, Framed).
 
 Assemble four different grids into a 2x2 layout:
-?- as_grid_of([[TL, TR], [BL, BR]], Combined).
+?- assemble_grid_of([[TL, TR], [BL, BR]], Combined).
 
 Center a small decoded symbol in a fixed-size output canvas:
-?- as_center_in(Symbol, 10, 10, 0, Output).
+?- assemble_center_in(Symbol, 10, 10, 0, Output).
 
 Downscale a large grid to reveal the underlying pattern:
-?- as_downscale(LargeGrid, 3, SmallGrid).
+?- assemble_downscale(LargeGrid, 3, SmallGrid).
 Chapter 74: Grid Region Extraction by Separator Lines - The Region Pack
 
 The region pack (rg_* predicate family, Layer 92) provides 14 predicates for
@@ -11103,8 +11103,8 @@ modified sub-grids back together:
 
 ?- rg_sections(Grid, 0, M),
    maplist(maplist([Sub, Result]>>(process(Sub, Result))), M, Processed),
-   maplist(as_hcat, Processed, HRows),
-   as_vcat(HRows, Output).
+   maplist(assemble_hcat, Processed, HRows),
+   assemble_vcat(HRows, Output).
 
 Use rg_region to identify the content region around a specific cell, then use
 the scene pack to analyze objects within that region:
@@ -14768,38 +14768,38 @@ computation, cropping, trimming, padding, placement, filling, and box algebra.
 
 :- use_module(packs/bound/prolog/bound).
 
-bd_bbox(Grid, Color, R0, C0, R1, C1). % tight inclusive bbox of Color
-bd_bbox_h(R0, R1, H).                 % height = R1 - R0 + 1
-bd_bbox_w(C0, C1, W).                 % width  = C1 - C0 + 1
-bd_center(Grid, Color, CR, CC).       % integer center (floor division)
+bound_bbox(Grid, Color, R0, C0, R1, C1). % tight inclusive bbox of Color
+bound_bbox_h(R0, R1, H).                 % height = R1 - R0 + 1
+bound_bbox_w(C0, C1, W).                 % width  = C1 - C0 + 1
+bound_center(Grid, Color, CR, CC).       % integer center (floor division)
 
-bd_crop_bbox(Grid, R0, C0, R1, C1, Sub). % crop to inclusive rectangle
-bd_crop_color(Grid, Color, Sub).          % crop to tight bbox of Color
-bd_trim(Grid, Bg, Trimmed).               % remove all-Bg border rows/cols
-bd_pad(Grid, N, Bg, Padded).             % add N Bg cells on all four sides
-bd_place(Canvas, Patch, R0, C0, Bg, New). % place Patch at (R0,C0)
-bd_fill_bbox(Grid, R0, C0, R1, C1, Color, New). % fill rectangle with Color
+bound_crop_bbox(Grid, R0, C0, R1, C1, Sub). % crop to inclusive rectangle
+bound_crop_color(Grid, Color, Sub).          % crop to tight bbox of Color
+bound_trim(Grid, Bg, Trimmed).               % remove all-Bg border rows/cols
+bound_pad(Grid, N, Bg, Padded).             % add N Bg cells on all four sides
+bound_place(Canvas, Patch, R0, C0, Bg, New). % place Patch at (R0,C0)
+bound_fill_bbox(Grid, R0, C0, R1, C1, Color, New). % fill rectangle with Color
 
-bd_bbox_contains(R0, C0, R1, C1, R, C).     % test cell in box
-bd_bbox_overlap(R0A,C0A,R1A,C1A,R0B,C0B,R1B,C1B). % boxes overlap?
-bd_bbox_union(R0A,C0A,R1A,C1A,R0B,C0B,R1B,C1B,R0,C0,R1,C1). % union
-bd_expand(R0, C0, R1, C1, N, ER0, EC0, ER1, EC1). % expand by N
+bound_bbox_contains(R0, C0, R1, C1, R, C).     % test cell in box
+bound_bbox_overlap(R0A,C0A,R1A,C1A,R0B,C0B,R1B,C1B). % boxes overlap?
+bound_bbox_union(R0A,C0A,R1A,C1A,R0B,C0B,R1B,C1B,R0,C0,R1,C1). % union
+bound_expand(R0, C0, R1, C1, N, ER0, EC0, ER1, EC1). % expand by N
 
 Examples:
-bd_bbox([[0,1,0],[0,1,0],[0,0,0]], 1, R0,C0,R1,C1). % R0=0,C0=1,R1=1,C1=1
-bd_crop_color([[0,0,0],[0,1,1],[0,1,0]], 1, Sub).    % Sub=[[1,1],[1,0]]
-bd_trim([[0,0,0],[0,1,0],[0,0,0]], 0, T).             % T=[[1]]
-bd_pad([[1,2],[3,4]], 1, 0, P).                       % 4x4 padded grid
-bd_place([[0,0,0],[0,0,0],[0,0,0]], [[7]], 1, 2, 0, New). % place 7 at (1,2)
-bd_fill_bbox([[0,0,0],[0,0,0],[0,0,0]], 1, 0, 1, 2, 9, New). % fill row 1
-bd_bbox_overlap(0,0,2,2, 1,1,3,3). % true (overlapping rectangles)
-bd_bbox_union(0,0,2,2, 1,1,3,3, R0,C0,R1,C1). % R0=0,C0=0,R1=3,C1=3
+bound_bbox([[0,1,0],[0,1,0],[0,0,0]], 1, R0,C0,R1,C1). % R0=0,C0=1,R1=1,C1=1
+bound_crop_color([[0,0,0],[0,1,1],[0,1,0]], 1, Sub).    % Sub=[[1,1],[1,0]]
+bound_trim([[0,0,0],[0,1,0],[0,0,0]], 0, T).             % T=[[1]]
+bound_pad([[1,2],[3,4]], 1, 0, P).                       % 4x4 padded grid
+bound_place([[0,0,0],[0,0,0],[0,0,0]], [[7]], 1, 2, 0, New). % place 7 at (1,2)
+bound_fill_bbox([[0,0,0],[0,0,0],[0,0,0]], 1, 0, 1, 2, 9, New). % fill row 1
+bound_bbox_overlap(0,0,2,2, 1,1,3,3). % true (overlapping rectangles)
+bound_bbox_union(0,0,2,2, 1,1,3,3, R0,C0,R1,C1). % R0=0,C0=0,R1=3,C1=3
 
-bd_bbox uses findall + min_list/max_list; fails for absent color.
-bd_trim uses findall of non-Bg cells; returns [[]] for all-Bg grid.
-bd_pad reuses the same Padding list for both top and bottom rows.
-bd_place uses nested findall with if-then-else on Patch row/col bounds.
-bd_slice_row_ uses length/2 + append/3 for inclusive [C0,C1] column extraction.
+bound_bbox uses findall + min_list/max_list; fails for absent color.
+bound_trim uses findall of non-Bg cells; returns [[]] for all-Bg grid.
+bound_pad reuses the same Padding list for both top and bottom rows.
+bound_place uses nested findall with if-then-else on Patch row/col bounds.
+bound_slice_row_ uses length/2 + append/3 for inclusive [C0,C1] column extraction.
 
 Predicate count: 14 (bd_* prefix). Tests: 42/42. Layer: 116.
 
@@ -14812,41 +14812,41 @@ The cellset pack (Work Package 138, Layer 117) provides 14 predicates for
 treating grid objects as sorted lists of R-C position pairs.
 
 Predicates:
-cs_from_grid(+Grid, +Color, -Cells).   % sorted R-C positions of Color
-cs_to_grid(+Cells, +H, +W, +Color, +Bg, -Grid). % paint cell set onto canvas
-cs_union(+A, +B, -Union).              % sorted set union
-cs_intersect(+A, +B, -Inter).          % sorted set intersection
-cs_subtract(+A, +B, -Diff).            % set difference A minus B
-cs_translate(+Cells, +DR, +DC, -Shifted). % shift all cells by (DR,DC)
-cs_bbox(+Cells, -R0, -C0, -R1, -C1).  % bounding box; fails if empty
-cs_normalize(+Cells, -Norm, -DR, -DC). % translate top-left to (0,0)
-cs_size(+Cells, -N).                   % count of cells
-cs_contains(+Cells, +R, +C).           % deterministic membership test
-cs_adjacent_bg(+Cells, -Adjacent).     % sorted 4-connected background neighbors
-cs_same_shape(+A, +B).                 % shape equality after normalization
-cs_rotate_90(+Cells, +H, -Rotated).    % 90-degree CW rotation; H = grid height
-cs_mirror_h(+Cells, +W, -Mirrored).    % horizontal mirror; W = grid width
+cellset_from_grid(+Grid, +Color, -Cells).   % sorted R-C positions of Color
+cellset_to_grid(+Cells, +H, +W, +Color, +Bg, -Grid). % paint cell set onto canvas
+cellset_union(+A, +B, -Union).              % sorted set union
+cellset_intersect(+A, +B, -Inter).          % sorted set intersection
+cellset_subtract(+A, +B, -Diff).            % set difference A minus B
+cellset_translate(+Cells, +DR, +DC, -Shifted). % shift all cells by (DR,DC)
+cellset_bbox(+Cells, -R0, -C0, -R1, -C1).  % bounding box; fails if empty
+cellset_normalize(+Cells, -Norm, -DR, -DC). % translate top-left to (0,0)
+cellset_size(+Cells, -N).                   % count of cells
+cellset_contains(+Cells, +R, +C).           % deterministic membership test
+cellset_adjacent_bg(+Cells, -Adjacent).     % sorted 4-connected background neighbors
+cellset_same_shape(+A, +B).                 % shape equality after normalization
+cellset_rotate_90(+Cells, +H, -Rotated).    % 90-degree CW rotation; H = grid height
+cellset_mirror_h(+Cells, +W, -Mirrored).    % horizontal mirror; W = grid width
 
 Examples:
-cs_from_grid([[0,1,0],[1,0,1]], 1, Cells). % Cells=[0-1,1-0,1-2]
-cs_to_grid([0-0,1-1], 2, 2, 1, 0, Grid).  % Grid=[[1,0],[0,1]]
-cs_union([0-0,0-1], [0-0,1-1], U).        % U=[0-0,0-1,1-1]
-cs_intersect([0-0,0-1,1-0], [0-1,1-0,2-2], I). % I=[0-1,1-0]
-cs_subtract([0-0,0-1,1-0], [0-1], D).     % D=[0-0,1-0]
-cs_translate([0-0,0-1,1-0], 2, 3, S).     % S=[2-3,2-4,3-3]
-cs_normalize([2-3,2-4,3-3], N, DR, DC).   % N=[0-0,0-1,1-0],DR=-2,DC=-3
-cs_same_shape([0-0,0-1,1-0], [3-5,3-6,4-5]). % same L-shape, different origin
-cs_rotate_90([0-0,0-1,0-2], 3, Rot).      % Rot=[0-2,1-2,2-2] (top row -> right col)
-cs_mirror_h([0-0,0-1,1-2], 3, M).         % M=[0-1,0-2,1-0]
+cellset_from_grid([[0,1,0],[1,0,1]], 1, Cells). % Cells=[0-1,1-0,1-2]
+cellset_to_grid([0-0,1-1], 2, 2, 1, 0, Grid).  % Grid=[[1,0],[0,1]]
+cellset_union([0-0,0-1], [0-0,1-1], U).        % U=[0-0,0-1,1-1]
+cellset_intersect([0-0,0-1,1-0], [0-1,1-0,2-2], I). % I=[0-1,1-0]
+cellset_subtract([0-0,0-1,1-0], [0-1], D).     % D=[0-0,1-0]
+cellset_translate([0-0,0-1,1-0], 2, 3, S).     % S=[2-3,2-4,3-3]
+cellset_normalize([2-3,2-4,3-3], N, DR, DC).   % N=[0-0,0-1,1-0],DR=-2,DC=-3
+cellset_same_shape([0-0,0-1,1-0], [3-5,3-6,4-5]). % same L-shape, different origin
+cellset_rotate_90([0-0,0-1,0-2], 3, Rot).      % Rot=[0-2,1-2,2-2] (top row -> right col)
+cellset_mirror_h([0-0,0-1,1-2], 3, M).         % M=[0-1,0-2,1-0]
 
-cs_from_grid: findall + sort/2 for canonical R-C order.
-cs_to_grid: nested findall with memberchk to select Color or Bg.
-cs_union: append + sort removes duplicates.
-cs_subtract: delegates to subtract/3 from library(lists).
-cs_normalize: two clauses; empty returns ([], 0, 0); non-empty uses cs_bbox + cs_translate.
-cs_adjacent_bg: four fixed offsets per cell; \+memberchk filter; sort removes shared-neighbor dups.
-cs_rotate_90: maplist with cs_rot90_ (new_R=C, new_C=H1-R), then sort.
-cs_mirror_h: maplist with cs_mirh_ (new_C=W1-C), then sort.
+cellset_from_grid: findall + sort/2 for canonical R-C order.
+cellset_to_grid: nested findall with memberchk to select Color or Bg.
+cellset_union: append + sort removes duplicates.
+cellset_subtract: delegates to subtract/3 from library(lists).
+cellset_normalize: two clauses; empty returns ([], 0, 0); non-empty uses cellset_bbox + cellset_translate.
+cellset_adjacent_bg: four fixed offsets per cell; \+memberchk filter; sort removes shared-neighbor dups.
+cellset_rotate_90: maplist with cellset_rot90_ (new_R=C, new_C=H1-R), then sort.
+cellset_mirror_h: maplist with cellset_mirh_ (new_C=W1-C), then sort.
 
 Predicate count: 14 (cs_* prefix). Tests: 42/42. Layer: 117.
 
@@ -14950,45 +14950,45 @@ The autom pack applies neighborhood aggregation rules across an entire grid
 in a single call, producing transformed grids based on cell neighborhoods.
 
 Neighborhood count grids (produce integer grid from same-sized grid):
-at_count_nbrs_4(+Grid, +V, -CGrid).  % each cell = count of V 4-neighbors
-at_count_nbrs_8(+Grid, +V, -CGrid).  % each cell = count of V 8-neighbors
-at_count_same_4(+Grid, -CGrid).       % each cell = count of same-val 4-nbrs
-at_count_same_8(+Grid, -CGrid).       % each cell = count of same-val 8-nbrs
+autom_count_nbrs_4(+Grid, +V, -CGrid).  % each cell = count of V 4-neighbors
+autom_count_nbrs_8(+Grid, +V, -CGrid).  % each cell = count of V 8-neighbors
+autom_count_same_4(+Grid, -CGrid).       % each cell = count of same-val 4-nbrs
+autom_count_same_8(+Grid, -CGrid).       % each cell = count of same-val 8-nbrs
 
 Boolean neighbor grids (produce 1/0 grid):
-at_any_nbr_4(+Grid, +V, -BGrid).     % 1 if any 4-neighbor = V; else 0
-at_all_nbrs_4(+Grid, +V, -BGrid).    % 1 if all in-bounds 4-nbrs = V; else 0
-at_any_nbr_8(+Grid, +V, -BGrid).     % 1 if any 8-neighbor = V; else 0
-at_all_nbrs_8(+Grid, +V, -BGrid).    % 1 if all in-bounds 8-nbrs = V; else 0
+autom_any_nbr_4(+Grid, +V, -BGrid).     % 1 if any 4-neighbor = V; else 0
+autom_all_nbrs_4(+Grid, +V, -BGrid).    % 1 if all in-bounds 4-nbrs = V; else 0
+autom_any_nbr_8(+Grid, +V, -BGrid).     % 1 if any 8-neighbor = V; else 0
+autom_all_nbrs_8(+Grid, +V, -BGrid).    % 1 if all in-bounds 8-nbrs = V; else 0
 
 Isolated cell detection:
-at_isolated_4(+Grid, +V, -Cells).    % V cells with no V 4-neighbor
-at_isolated_8(+Grid, +V, -Cells).    % V cells with no V 8-neighbor
+autom_isolated_4(+Grid, +V, -Cells).    % V cells with no V 4-neighbor
+autom_isolated_8(+Grid, +V, -Cells).    % V cells with no V 8-neighbor
 
 Birth rules:
-at_birth_4(+Grid, +Dead, +Live, +N, -Grid2). % Dead + N Live 4-nbrs -> Live
-at_birth_8(+Grid, +Dead, +Live, +N, -Grid2). % Dead + N Live 8-nbrs -> Live
+autom_birth_4(+Grid, +Dead, +Live, +N, -Grid2). % Dead + N Live 4-nbrs -> Live
+autom_birth_8(+Grid, +Dead, +Live, +N, -Grid2). % Dead + N Live 8-nbrs -> Live
 
 Aggregation:
-at_majority_4(+Grid, +Bg, -Grid2).   % each cell takes majority of self+4-nbrs
-at_step_gol(+Grid, -Grid2).          % one step of Conway's Game of Life B3/S23
+autom_majority_4(+Grid, +Bg, -Grid2).   % each cell takes majority of self+4-nbrs
+autom_step_gol(+Grid, -Grid2).          % one step of Conway's Game of Life B3/S23
 
 Examples:
-at_count_nbrs_4([[0,0,0],[0,1,0],[0,0,0]], 0, CG). % CG=[[2,2,2],[2,4,2],[2,2,2]]
-at_count_nbrs_8([[0,0,0],[0,1,0],[0,0,0]], 1, CG). % CG=[[1,1,1],[1,0,1],[1,1,1]]
-at_any_nbr_4([[0,0,0],[0,1,0],[0,0,0]], 1, BG).    % BG=[[0,1,0],[1,0,1],[0,1,0]]
-at_all_nbrs_4([[1,1,1],[1,0,1],[1,1,1]], 1, BG).   % BG=[[1,0,1],[0,1,0],[1,0,1]]
-at_isolated_4([[1,0,1],[0,0,0]], 1, Cs).            % Cs=[0-0, 0-2]
-at_birth_4([[0,1,0],[1,0,1],[0,1,0]], 0, 1, 4, G). % G=[[0,1,0],[1,1,1],[0,1,0]]
-at_majority_4([[1,1],[1,0]], 0, G).                  % G=[[1,1],[1,1]]
-at_step_gol([[0,0,0],[1,1,1],[0,0,0]], G).           % G=[[0,1,0],[0,1,0],[0,1,0]]
+autom_count_nbrs_4([[0,0,0],[0,1,0],[0,0,0]], 0, CG). % CG=[[2,2,2],[2,4,2],[2,2,2]]
+autom_count_nbrs_8([[0,0,0],[0,1,0],[0,0,0]], 1, CG). % CG=[[1,1,1],[1,0,1],[1,1,1]]
+autom_any_nbr_4([[0,0,0],[0,1,0],[0,0,0]], 1, BG).    % BG=[[0,1,0],[1,0,1],[0,1,0]]
+autom_all_nbrs_4([[1,1,1],[1,0,1],[1,1,1]], 1, BG).   % BG=[[1,0,1],[0,1,0],[1,0,1]]
+autom_isolated_4([[1,0,1],[0,0,0]], 1, Cs).            % Cs=[0-0, 0-2]
+autom_birth_4([[0,1,0],[1,0,1],[0,1,0]], 0, 1, 4, G). % G=[[0,1,0],[1,1,1],[0,1,0]]
+autom_majority_4([[1,1],[1,0]], 0, G).                  % G=[[1,1],[1,1]]
+autom_step_gol([[0,0,0],[1,1,1],[0,0,0]], G).           % G=[[0,1,0],[0,1,0],[0,1,0]]
 
-at_count_nbrs_4/8: triple-nested findall (rows, cells, directions).
-at_any_nbr_4/8: private helper with cut on first V-neighbor; if-then-else->1/0.
-at_all_nbrs_4/8: forall/2 over in-bounds directions; vacuously true if no nbrs.
-at_birth_4/8: (V==Dead, N==Count -> Live ; V) per cell.
-at_majority_4: at_mode_ uses findall+max_list+unique-winner-or-Bg.
-at_step_gol: count alive 8-nbrs + at_gol_next_ (survive S23, birth B3, die).
+autom_count_nbrs_4/8: triple-nested findall (rows, cells, directions).
+autom_any_nbr_4/8: private helper with cut on first V-neighbor; if-then-else->1/0.
+autom_all_nbrs_4/8: forall/2 over in-bounds directions; vacuously true if no nbrs.
+autom_birth_4/8: (V==Dead, N==Count -> Live ; V) per cell.
+autom_majority_4: autom_mode_ uses findall+max_list+unique-winner-or-Bg.
+autom_step_gol: count alive 8-nbrs + autom_gol_next_ (survive S23, birth B3, die).
 
 Predicate count: 14 (at_* prefix). Tests: 42/42. Layer: 120.
 
@@ -15255,45 +15255,45 @@ analyzing color (value) labels in grids and lists. A "map" is a list of
 Old-New pairs.
 
 Predicates:
-cm_apply(+Map, +Grid, -Grid2).           % substitute cells; preserve unmatched
-cm_apply_default(+Map, +Bg, +Grid, -G2). % substitute cells; replace unmatched with Bg
-cm_invert(+Map, +Grid, -Grid2).          % apply inverse map (swap Old-New)
-cm_compose(+MapA, +MapB, -MapAB).        % compose: MapAB[k] = MapB[MapA[k]]
-cm_from_grids(+GridA, +GridB, -Map).     % derive map from cell correspondences
-cm_identity(+Palette, -Map).             % identity map V-V for each palette value
-cm_remap(+OldVals, +NewVals, -Map).      % build map from parallel lists
-cm_remap_list(+Map, +List, -List2).      % apply map to 1D list
-cm_palette(+Map, -Palette).              % sorted keys of Map
-cm_used(+Grid, -UsedVals).              % sorted distinct values in Grid
-cm_has_key(+Map, +K).                   % succeeds iff K is a key in Map
-cm_lookup(+Map, +K, -V).               % look up value for key K; fails if absent
-cm_restrict(+Map, +Keys, -Map2).        % keep only entries with key in Keys
-cm_expand(+Map, +Bg, +Palette, -Map2).  % add K-Bg for missing palette keys
+colormap_apply(+Map, +Grid, -Grid2).           % substitute cells; preserve unmatched
+colormap_apply_default(+Map, +Bg, +Grid, -G2). % substitute cells; replace unmatched with Bg
+colormap_invert(+Map, +Grid, -Grid2).          % apply inverse map (swap Old-New)
+colormap_compose(+MapA, +MapB, -MapAB).        % compose: MapAB[k] = MapB[MapA[k]]
+colormap_from_grids(+GridA, +GridB, -Map).     % derive map from cell correspondences
+colormap_identity(+Palette, -Map).             % identity map V-V for each palette value
+colormap_remap(+OldVals, +NewVals, -Map).      % build map from parallel lists
+colormap_remap_list(+Map, +List, -List2).      % apply map to 1D list
+colormap_palette(+Map, -Palette).              % sorted keys of Map
+colormap_used(+Grid, -UsedVals).              % sorted distinct values in Grid
+colormap_has_key(+Map, +K).                   % succeeds iff K is a key in Map
+colormap_lookup(+Map, +K, -V).               % look up value for key K; fails if absent
+colormap_restrict(+Map, +Keys, -Map2).        % keep only entries with key in Keys
+colormap_expand(+Map, +Bg, +Palette, -Map2).  % add K-Bg for missing palette keys
 
 Examples:
-cm_apply([1-9,2-8],[[1,2],[3,1]],G).    % G=[[9,8],[3,9]]
-cm_apply_default([1-9],0,[[1,3]],G).    % G=[[9,0]]
-cm_invert([1-9,2-8],[[9,8]],G).         % G=[[1,2]]
-cm_compose([1-2,3-4],[2-9,4-7],M).      % M=[1-9,3-7]
-cm_from_grids([[1,2]],[[5,6]],M).       % M=[1-5,2-6]
-cm_identity([0,1,2],M).                 % M=[0-0,1-1,2-2]
-cm_remap([1,2,3],[9,8,7],M).            % M=[1-9,2-8,3-7]
-cm_remap_list([1-9,2-8],[1,2,3,1],L).   % L=[9,8,3,9]
-cm_palette([3-0,1-0,2-0],P).            % P=[1,2,3]
-cm_used([[3,1],[2,1]],U).               % U=[1,2,3]
-cm_has_key([1-9,2-8],1).                % true
-cm_lookup([1-9,2-8],2,V).              % V=8
-cm_restrict([1-9,2-8,3-7],[1,3],M).    % M=[1-9,3-7]
-cm_expand([1-9],0,[1,2,3],M).           % M=[1-9,2-0,3-0]
+colormap_apply([1-9,2-8],[[1,2],[3,1]],G).    % G=[[9,8],[3,9]]
+colormap_apply_default([1-9],0,[[1,3]],G).    % G=[[9,0]]
+colormap_invert([1-9,2-8],[[9,8]],G).         % G=[[1,2]]
+colormap_compose([1-2,3-4],[2-9,4-7],M).      % M=[1-9,3-7]
+colormap_from_grids([[1,2]],[[5,6]],M).       % M=[1-5,2-6]
+colormap_identity([0,1,2],M).                 % M=[0-0,1-1,2-2]
+colormap_remap([1,2,3],[9,8,7],M).            % M=[1-9,2-8,3-7]
+colormap_remap_list([1-9,2-8],[1,2,3,1],L).   % L=[9,8,3,9]
+colormap_palette([3-0,1-0,2-0],P).            % P=[1,2,3]
+colormap_used([[3,1],[2,1]],U).               % U=[1,2,3]
+colormap_has_key([1-9,2-8],1).                % true
+colormap_lookup([1-9,2-8],2,V).              % V=8
+colormap_restrict([1-9,2-8,3-7],[1,3],M).    % M=[1-9,3-7]
+colormap_expand([1-9],0,[1,2,3],M).           % M=[1-9,2-0,3-0]
 
 Key implementation patterns:
-cm_apply/apply_default/remap_list: nested maplist/3 + cm_apply_cell_ helper
+colormap_apply/apply_default/remap_list: nested maplist/3 + colormap_apply_cell_ helper
   using if-then-else with memberchk for deterministic lookup.
-cm_invert: findall swaps O-N to N-O then delegates to cm_apply.
-cm_compose: findall iterates MapA; for each K-V1 looks up V1 in MapB.
-cm_from_grids: nth0 aligned collection + sort/2 deduplication.
-cm_palette/used: findall collects keys/values + sort/2.
-cm_expand: findall + \+ memberchk finds missing keys + append/3.
+colormap_invert: findall swaps O-N to N-O then delegates to colormap_apply.
+colormap_compose: findall iterates MapA; for each K-V1 looks up V1 in MapB.
+colormap_from_grids: nth0 aligned collection + sort/2 deduplication.
+colormap_palette/used: findall collects keys/values + sort/2.
+colormap_expand: findall + \+ memberchk finds missing keys + append/3.
 
 Library imports: library(lists): member/2, memberchk/2, nth0/3, append/3.
   library(apply): maplist/3. Built-in: sort/2.
@@ -15308,45 +15308,45 @@ The block pack provides 14 predicates for splitting grids into uniform
 rectangular blocks and performing block-level operations.
 
 Predicates:
-bk_extract(+Grid,+R0,+C0,+R1,+C1,-Block). % extract rectangular sub-grid
-bk_dims(+Grid,+BH,+BW,-NR,-NC).           % block grid dimensions
-bk_split_h(+Grid,+BH,-Strips).             % horizontal strips of height BH
-bk_split_v(+Grid,+BW,-Strips).             % vertical strips of width BW
-bk_tile_h(+Grid,+N,-Tiled).               % stack N copies vertically
-bk_tile_v(+Grid,+N,-Tiled).               % extend each row N times
-bk_count_h(+Grid,+BH,-N).                 % number of horizontal strips
-bk_count_v(+Grid,+BW,-N).                 % number of vertical strips
-bk_map(+Blocks,+Goal,-Blocks2).            % apply Goal to each block
-bk_uniform(+Grid,+R,+C,-V).              % value at cell (R,C)
-bk_mode_color(+Grid,+R0,+C0,-V).         % most frequent in 2x2 block
-bk_border_color(+Grid,+R0,+C0,-Bg).      % most frequent border in 3x3 nbr
-bk_is_solid(+Grid,+Color,-Bool).          % 1 iff all cells equal Color
-bk_is_border(+Grid,+R,+C,-Bool).         % 1 iff (R,C) is on outer border
+block_extract(+Grid,+R0,+C0,+R1,+C1,-Block). % extract rectangular sub-grid
+block_dims(+Grid,+BH,+BW,-NR,-NC).           % block grid dimensions
+block_split_h(+Grid,+BH,-Strips).             % horizontal strips of height BH
+block_split_v(+Grid,+BW,-Strips).             % vertical strips of width BW
+block_tile_h(+Grid,+N,-Tiled).               % stack N copies vertically
+block_tile_v(+Grid,+N,-Tiled).               % extend each row N times
+block_count_h(+Grid,+BH,-N).                 % number of horizontal strips
+block_count_v(+Grid,+BW,-N).                 % number of vertical strips
+block_map(+Blocks,+Goal,-Blocks2).            % apply Goal to each block
+block_uniform(+Grid,+R,+C,-V).              % value at cell (R,C)
+block_mode_color(+Grid,+R0,+C0,-V).         % most frequent in 2x2 block
+block_border_color(+Grid,+R0,+C0,-Bg).      % most frequent border in 3x3 nbr
+block_is_solid(+Grid,+Color,-Bool).          % 1 iff all cells equal Color
+block_is_border(+Grid,+R,+C,-Bool).         % 1 iff (R,C) is on outer border
 
 Examples:
-bk_extract([[1,2,3],[4,5,6],[7,8,9]],0,0,1,1,B). % B=[[1,2],[4,5]]
-bk_dims([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]],2,2,NR,NC). % NR=2,NC=2
-bk_split_h([[1,2],[3,4],[5,6],[7,8]],2,S). % S=[[[1,2],[3,4]],[[5,6],[7,8]]]
-bk_split_v([[1,2,3,4],[5,6,7,8]],2,S).    % S=[[[1,2],[5,6]],[[3,4],[7,8]]]
-bk_tile_h([[1,2],[3,4]],2,T).              % T=[[1,2],[3,4],[1,2],[3,4]]
-bk_tile_v([[1,2],[3,4]],2,T).              % T=[[1,2,1,2],[3,4,3,4]]
-bk_count_h([[1],[2],[3],[4]],2,N).         % N=2
-bk_count_v([[1,2,3,4,5,6]],2,N).          % N=3
-bk_map([[[1,2],[3,4]],[[5,6],[7,8]]],length,Ns). % Ns=[2,2]
-bk_uniform([[1,2],[3,9]],1,1,V).           % V=9
-bk_mode_color([[1,1],[1,2]],0,0,V).        % V=1
-bk_border_color([[0,0,0],[0,1,0],[0,0,0]],1,1,Bg). % Bg=0
-bk_is_solid([[3,3],[3,3]],3,Bool).         % Bool=1
-bk_is_border([[1,2,3],[4,5,6],[7,8,9]],0,0,Bool). % Bool=1
+block_extract([[1,2,3],[4,5,6],[7,8,9]],0,0,1,1,B). % B=[[1,2],[4,5]]
+block_dims([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]],2,2,NR,NC). % NR=2,NC=2
+block_split_h([[1,2],[3,4],[5,6],[7,8]],2,S). % S=[[[1,2],[3,4]],[[5,6],[7,8]]]
+block_split_v([[1,2,3,4],[5,6,7,8]],2,S).    % S=[[[1,2],[5,6]],[[3,4],[7,8]]]
+block_tile_h([[1,2],[3,4]],2,T).              % T=[[1,2],[3,4],[1,2],[3,4]]
+block_tile_v([[1,2],[3,4]],2,T).              % T=[[1,2,1,2],[3,4,3,4]]
+block_count_h([[1],[2],[3],[4]],2,N).         % N=2
+block_count_v([[1,2,3,4,5,6]],2,N).          % N=3
+block_map([[[1,2],[3,4]],[[5,6],[7,8]]],length,Ns). % Ns=[2,2]
+block_uniform([[1,2],[3,9]],1,1,V).           % V=9
+block_mode_color([[1,1],[1,2]],0,0,V).        % V=1
+block_border_color([[0,0,0],[0,1,0],[0,0,0]],1,1,Bg). % Bg=0
+block_is_solid([[3,3],[3,3]],3,Bool).         % Bool=1
+block_is_border([[1,2,3],[4,5,6],[7,8,9]],0,0,Bool). % Bool=1
 
 Key implementation patterns:
-bk_extract: nested findall+between+nth0 (row sweep then col sweep).
-bk_split_h/v: findall over strip index Si; inner findall slices rows/cols.
-bk_tile_h: findall over between(1,N,_) + member replicates rows.
-bk_tile_v: maplist+helper capturing N; findall over between+member in row.
-bk_mode_color/border_color: bk_mode_ helper uses include+length+max_list+sort.
-bk_is_solid: forall+member+member checks all cells.
-bk_is_border: if-then-else with four border conditions.
+block_extract: nested findall+between+nth0 (row sweep then col sweep).
+block_split_h/v: findall over strip index Si; inner findall slices rows/cols.
+block_tile_h: findall over between(1,N,_) + member replicates rows.
+block_tile_v: maplist+helper capturing N; findall over between+member in row.
+block_mode_color/border_color: block_mode_ helper uses include+length+max_list+sort.
+block_is_solid: forall+member+member checks all cells.
+block_is_border: if-then-else with four border conditions.
 
 Library imports: library(lists): member/2, nth0/3, numlist/3, append/3, max_list/2.
   library(apply): maplist/3, include/3. Built-ins: length/2, between/3, forall/2.
@@ -16340,28 +16340,28 @@ The ring depth of cell (R,C) in an H x W grid is min(R, H-1-R, C, W-1-C).
 Ring 0 is the outermost border. Ring N is N steps inward. The max ring index is
 (min(H,W)-1)//2.
 
-br_ring_cells(+Grid, +N, -Cells): list of R-C pairs in ring N, row-major order.
-br_ring_vals(+Grid, +N, -Vals): values at ring N in row-major order.
-br_ring_color(+Grid, +N, -Color): uniform color of ring N; fails if non-uniform.
-br_is_uniform_ring(+Grid, +N): succeed if ring N is uniform.
-br_add_border(+Grid, +V, -Out): add one V-layer around Grid; Out is (H+2)x(W+2).
-br_strip_border(+Grid, -Inner): remove outermost ring; Inner is (H-2)x(W-2) or [].
-br_inner_n(+Grid, +N, -Inner): strip N rings (N=0 is identity).
-br_outer_color(+Grid, -V): uniform color of ring 0.
-br_is_uniform_outer(+Grid): succeed if ring 0 is uniform.
-br_ring_colors(+Grid, -Colors): list of uniform ring colors from outside in.
-br_max_ring(+Grid, -N): index of innermost ring = (min(H,W)-1)//2.
-br_is_nested(+Grid): succeed if every ring is uniform (bullseye pattern).
-br_depth_map(+Grid, -DepthGrid): grid where each cell holds its ring index.
-br_fill_ring(+Grid, +N, +V, -Out): replace all cells in ring N with V.
+border_ring_cells(+Grid, +N, -Cells): list of R-C pairs in ring N, row-major order.
+border_ring_vals(+Grid, +N, -Vals): values at ring N in row-major order.
+border_ring_color(+Grid, +N, -Color): uniform color of ring N; fails if non-uniform.
+border_is_uniform_ring(+Grid, +N): succeed if ring N is uniform.
+border_add_border(+Grid, +V, -Out): add one V-layer around Grid; Out is (H+2)x(W+2).
+border_strip_border(+Grid, -Inner): remove outermost ring; Inner is (H-2)x(W-2) or [].
+border_inner_n(+Grid, +N, -Inner): strip N rings (N=0 is identity).
+border_outer_color(+Grid, -V): uniform color of ring 0.
+border_is_uniform_outer(+Grid): succeed if ring 0 is uniform.
+border_ring_colors(+Grid, -Colors): list of uniform ring colors from outside in.
+border_max_ring(+Grid, -N): index of innermost ring = (min(H,W)-1)//2.
+border_is_nested(+Grid): succeed if every ring is uniform (bullseye pattern).
+border_depth_map(+Grid, -DepthGrid): grid where each cell holds its ring index.
+border_fill_ring(+Grid, +N, +V, -Out): replace all cells in ring N with V.
 
-Example: br_add_border([[1,2],[3,4]], 0, Out).
+Example: border_add_border([[1,2],[3,4]], 0, Out).
          Out = [[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]].
 
-Example: br_depth_map([[0,0,0],[0,0,0],[0,0,0]], DM).
+Example: border_depth_map([[0,0,0],[0,0,0],[0,0,0]], DM).
          DM = [[0,0,0],[0,1,0],[0,0,0]].
 
-Example: br_ring_colors([[1,1,1,1,1],[1,2,2,2,1],[1,2,3,2,1],[1,2,2,2,1],[1,1,1,1,1]], C).
+Example: border_ring_colors([[1,1,1,1,1],[1,2,2,2,1],[1,2,3,2,1],[1,2,2,2,1],[1,1,1,1,1]], C).
          C = [1, 2, 3].
 
 Library imports: library(lists): member/2, nth0/3, numlist/3, append/2, append/3.
@@ -17672,28 +17672,28 @@ This is WP 195. The canvas pack bridges the obj(Color, Cells) world and the
 2D grid world with 14 predicates.
 
 1. Canvas Creation
-cv_blank/4: create H x W grid filled with Bg.
-cv_size/3: get grid height and width.
+canvas_blank/4: create H x W grid filled with Bg.
+canvas_size/3: get grid height and width.
 
 2. Painting Objects
-cv_paint/3: paint one obj term onto a grid.
-cv_paint_all/3: paint a list of obj terms in order.
-cv_paint_at/5: translate by (DR,DC) then paint.
-cv_paint_clip/3: paint with out-of-bounds cells silently skipped.
-cv_paint_bg/4: paint only onto background-valued cells.
+canvas_paint/3: paint one obj term onto a grid.
+canvas_paint_all/3: paint a list of obj terms in order.
+canvas_paint_at/5: translate by (DR,DC) then paint.
+canvas_paint_clip/3: paint with out-of-bounds cells silently skipped.
+canvas_paint_bg/4: paint only onto background-valued cells.
 
 3. Erasing Objects
-cv_erase/4: fill obj cells with background value.
+canvas_erase/4: fill obj cells with background value.
 
 4. Extracting Objects
-cv_extract/3: extract obj(Color, Cells) for all Color cells.
-cv_extract_all/3: extract all non-bg objects from a grid.
+canvas_extract/3: extract obj(Color, Cells) for all Color cells.
+canvas_extract_all/3: extract all non-bg objects from a grid.
 
 5. Convenience
-cv_render/5: create blank canvas and paint all objects.
-cv_move/6: erase obj at current position, repaint at offset.
-cv_stamp/3: extract obj as minimal bounding-box grid.
-cv_blit/5: paste a subgrid at a given position.
+canvas_render/5: create blank canvas and paint all objects.
+canvas_move/6: erase obj at current position, repaint at offset.
+canvas_stamp/3: extract obj as minimal bounding-box grid.
+canvas_blit/5: paste a subgrid at a given position.
 
 Chapter 146: Object Sequence and Progression Analysis (objseq Pack, oq_*, Layer 175)
 
@@ -18191,14 +18191,14 @@ Cells) scene pairs. A table is a list of From-To color pairs.
 :- use_module(pack(colortable/prolog/colortable)).
 
 % Infer a color map from one Before-After scene pair
-ct_infer_from_pair([obj(r,[r(0,0)])], [obj(b,[r(0,0)])], Map).
+colortable_infer_from_pair([obj(r,[r(0,0)])], [obj(b,[r(0,0)])], Map).
 % Map contains r-b
 
 % Learn a consistent map from multiple pairs
-ct_learn_map(Pairs, Map, Stats).
+colortable_learn_map(Pairs, Map, Stats).
 
 % Apply a learned map to a new scene
-ct_apply_map(Map, [obj(r,[r(0,0)])], Out).
+colortable_apply_map(Map, [obj(r,[r(0,0)])], Out).
 % Out = [obj(b,[r(0,0)])]
 
 14 ct_* predicates. 44 tests pass. Layer 190.
