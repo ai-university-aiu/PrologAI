@@ -27,7 +27,7 @@ This allows targeted operations such as:
 Exported Predicates
 
 
-xc_split_color(+Scene, +Color, -Match, -NoMatch)
+condxf_split_color(+Scene, +Color, -Match, -NoMatch)
 
 Partition Scene into two lists: Match contains all objects whose color is Color;
 NoMatch contains all others. Order within each list is preserved.
@@ -35,55 +35,55 @@ NoMatch contains all others. Order within each list is preserved.
 Example:
 
 % R = obj(r,[r(0,0)]), B = obj(b,[r(0,1)]), RB = obj(r,[r(0,0),r(0,1),r(0,2)])
-xc_split_color([R, B, RB], r, Match, NoMatch).
+condxf_split_color([R, B, RB], r, Match, NoMatch).
 % Match   = [R, RB]
 % NoMatch = [B]
 
 
-xc_merge(+Group1, +Group2, -Scene2)
+condxf_merge(+Group1, +Group2, -Scene2)
 
 Concatenate two object groups into one scene list (simple append). Useful
-after xc_split_color to recombine the groups after modifying one of them.
+after condxf_split_color to recombine the groups after modifying one of them.
 
 Example:
 
-xc_merge([obj(r,[r(0,0)])], [obj(b,[r(0,1)])], Scene2).
+condxf_merge([obj(r,[r(0,0)])], [obj(b,[r(0,1)])], Scene2).
 % Scene2 = [obj(r,[r(0,0)]), obj(b,[r(0,1)])]
 
 
-xc_recolor_matching(+Scene, +MatchColor, +NewColor, -Scene2)
+condxf_recolor_matching(+Scene, +MatchColor, +NewColor, -Scene2)
 
 Recolor all objects whose color is MatchColor to NewColor. Other objects
 are unchanged.
 
 Example:
 
-xc_recolor_matching([R, B, RB], r, g, Out).
+condxf_recolor_matching([R, B, RB], r, g, Out).
 % Out = [obj(g,[r(0,0)]), B, obj(g,[r(0,0),r(0,1),r(0,2)])]
 
 
-xc_shift_color(+Scene, +Color, +DR, +DC, -Scene2)
+condxf_shift_color(+Scene, +Color, +DR, +DC, -Scene2)
 
 Translate all objects of Color by (DR, DC). Other objects are unchanged.
 
 Example:
 
-xc_shift_color([R, B], r, 2, 3, Out).
+condxf_shift_color([R, B], r, 2, 3, Out).
 % Out = [obj(r,[r(2,3)]), B]
 
 
-xc_swap_colors(+Scene, +C1, +C2, -Scene2)
+condxf_swap_colors(+Scene, +C1, +C2, -Scene2)
 
 Swap colors C1 and C2 throughout the scene. Objects of C1 become C2, objects
 of C2 become C1, and objects of any other color are unchanged.
 
 Example:
 
-xc_swap_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)])], r, b, Out).
+condxf_swap_colors([obj(r,[r(0,0)]), obj(b,[r(0,1)])], r, b, Out).
 % Out = [obj(b,[r(0,0)]), obj(r,[r(0,1)])]
 
 
-xc_recolor_by_size(+Scene, +N, +Cmp, +NewColor, -Scene2)
+condxf_recolor_by_size(+Scene, +N, +Cmp, +NewColor, -Scene2)
 
 Recolor each object whose cell count satisfies the comparison Cmp against
 threshold N to NewColor. Cmp is one of: gt (>), lt (<), eq (=:=), ge (>=),
@@ -92,52 +92,52 @@ le (=<). Objects not satisfying the comparison are unchanged.
 Example:
 
 % RB has 3 cells, R has 1 cell
-xc_recolor_by_size([R, RB], 1, gt, y, Out).
+condxf_recolor_by_size([R, RB], 1, gt, y, Out).
 % Only RB satisfies size > 1
 % Out = [R, obj(y,[r(0,0),r(0,1),r(0,2)])]
 
 
-xc_move_color(+Scene, +Color, +DR, +DC, -Scene2)
+condxf_move_color(+Scene, +Color, +DR, +DC, -Scene2)
 
-Alias for xc_shift_color. Provided for readability in contexts where "move"
+Alias for condxf_shift_color. Provided for readability in contexts where "move"
 is more natural than "shift".
 
 
-xc_largest(+Scene, -Obj)
+condxf_largest(+Scene, -Obj)
 
 The single largest object by cell count. On ties, the object that sorts first
 under standard Prolog term order is returned, giving deterministic behavior.
 
 Example:
 
-xc_largest([obj(r,[r(0,0)]), obj(r,[r(0,0),r(0,1),r(0,2)])], Obj).
+condxf_largest([obj(r,[r(0,0)]), obj(r,[r(0,0),r(0,1),r(0,2)])], Obj).
 % Obj = obj(r,[r(0,0),r(0,1),r(0,2)])  (3 cells > 1 cell)
 
 
-xc_smallest(+Scene, -Obj)
+condxf_smallest(+Scene, -Obj)
 
 The single smallest object by cell count. On ties, standard term order
 determines which object is returned.
 
 
-xc_recolor_largest(+Scene, +NewColor, -Scene2)
+condxf_recolor_largest(+Scene, +NewColor, -Scene2)
 
-Recolor the largest object (as found by xc_largest) to NewColor. Other
+Recolor the largest object (as found by condxf_largest) to NewColor. Other
 objects are unchanged.
 
 Example:
 
-xc_recolor_largest([R, RB], g, Out).
+condxf_recolor_largest([R, RB], g, Out).
 % Out = [R, obj(g,[r(0,0),r(0,1),r(0,2)])]
 
 
-xc_recolor_smallest(+Scene, +NewColor, -Scene2)
+condxf_recolor_smallest(+Scene, +NewColor, -Scene2)
 
-Recolor the smallest object (as found by xc_smallest) to NewColor. Other
+Recolor the smallest object (as found by condxf_smallest) to NewColor. Other
 objects are unchanged.
 
 
-xc_unique_size(+Scene, -Obj)
+condxf_unique_size(+Scene, -Obj)
 
 Backtrackable. Succeeds for each object whose cell count appears exactly once
 in the scene. If every size appears more than once, the predicate fails.
@@ -145,28 +145,28 @@ in the scene. If every size appears more than once, the predicate fails.
 Example:
 
 % R and B both have 1 cell; L has 3 cells (unique)
-xc_unique_size([R, B, L], L).
+condxf_unique_size([R, B, L], L).
 
 
-xc_recolor_unique_size(+Scene, +NewColor, -Scene2)
+condxf_recolor_unique_size(+Scene, +NewColor, -Scene2)
 
 Recolor the unique-size object to NewColor. Fails if no unique-size object
-exists (because xc_unique_size fails).
+exists (because condxf_unique_size fails).
 
 Example:
 
-xc_recolor_unique_size([R, B, L], g, Out).
+condxf_recolor_unique_size([R, B, L], g, Out).
 % Out = [R, B, obj(g,[r(0,0),r(1,0),r(1,1)])]
 
 
-xc_split_size(+Scene, +N, +Cmp, -Match, -NoMatch)
+condxf_split_size(+Scene, +N, +Cmp, -Match, -NoMatch)
 
-Partition Scene by a size comparison (same Cmp atoms as xc_recolor_by_size).
+Partition Scene by a size comparison (same Cmp atoms as condxf_recolor_by_size).
 Match contains objects satisfying size Cmp N; NoMatch contains the rest.
 
 Example:
 
-xc_split_size([R, RB], 1, gt, Match, NoMatch).
+condxf_split_size([R, RB], 1, gt, Match, NoMatch).
 % Match   = [RB]  (3 > 1)
 % NoMatch = [R]   (1 is not > 1)
 
@@ -176,25 +176,25 @@ Typical Workflow
 A common use is to isolate one group, transform it, and recombine:
 
 % Isolate the red objects, shift them down by 1 row, recombine.
-xc_split_color(Scene, r, Reds, Others),
-xc_shift_color(Reds, r, 1, 0, ShiftedReds),
-xc_merge(ShiftedReds, Others, Scene2).
+condxf_split_color(Scene, r, Reds, Others),
+condxf_shift_color(Reds, r, 1, 0, ShiftedReds),
+condxf_merge(ShiftedReds, Others, Scene2).
 
 Or, more directly:
 
-xc_shift_color(Scene, r, 1, 0, Scene2).
+condxf_shift_color(Scene, r, 1, 0, Scene2).
 
 
 Private Helpers
 
-xc_color_/2       - extract color from obj
-xc_size_/2        - cell count of obj
-xc_size_cmp_/3    - compare size with threshold using Cmp atom
-xc_recolor_if_match_/4  - recolor one obj if color matches
-xc_shift_if_color_/5    - shift one obj if color matches
-xc_swap_one_/4    - swap C1<->C2 in one obj using if-then-else
-xc_recolor_if_size_/5   - recolor one obj if size satisfies Cmp
-xc_recolor_if_obj_/4    - recolor one obj if it is the target identity
+condxf_color_/2       - extract color from obj
+condxf_size_/2        - cell count of obj
+condxf_size_cmp_/3    - compare size with threshold using Cmp atom
+condxf_recolor_if_match_/4  - recolor one obj if color matches
+condxf_shift_if_color_/5    - shift one obj if color matches
+condxf_swap_one_/4    - swap C1<->C2 in one obj using if-then-else
+condxf_recolor_if_size_/5   - recolor one obj if size satisfies Cmp
+condxf_recolor_if_obj_/4    - recolor one obj if it is the target identity
 
 
 Dependencies

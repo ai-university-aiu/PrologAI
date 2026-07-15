@@ -13,17 +13,17 @@ All grids use the standard format: a list of rows, each a list of color atoms,
 
 1. Halves
 
-gps_top_half/2 returns the sub-grid of rows [0, H//2). For even H the two halves
+gridpos_top_half/2 returns the sub-grid of rows [0, H//2). For even H the two halves
 have equal height; for odd H the top half is smaller.
 
   G = [[a,b,c,d],[e,f,g,h],[i,j,k,l],[m,n,o,p]].
-  gps_top_half(G, T).     % T = [[a,b,c,d],[e,f,g,h]]
-  gps_bottom_half(G, B).  % B = [[i,j,k,l],[m,n,o,p]]
+  gridpos_top_half(G, T).     % T = [[a,b,c,d],[e,f,g,h]]
+  gridpos_bottom_half(G, B).  % B = [[i,j,k,l],[m,n,o,p]]
 
-gps_left_half/2 and gps_right_half/2 do the same for columns:
+gridpos_left_half/2 and gridpos_right_half/2 do the same for columns:
 
-  gps_left_half(G, L).    % L = [[a,b],[e,f],[i,j],[m,n]]
-  gps_right_half(G, R).   % R = [[c,d],[g,h],[k,l],[o,p]]
+  gridpos_left_half(G, L).    % L = [[a,b],[e,f],[i,j],[m,n]]
+  gridpos_right_half(G, R).   % R = [[c,d],[g,h],[k,l],[o,p]]
 
 For a 1-column grid the left half contains one empty row per row; the right half
 contains the single column.
@@ -31,76 +31,76 @@ contains the single column.
 
 2. Quadrants
 
-gps_quadrant/3 extracts one rectangular quadrant. The second argument must be
+gridpos_quadrant/3 extracts one rectangular quadrant. The second argument must be
 one of the atoms tl (top-left), tr (top-right), bl (bottom-left), or br
 (bottom-right).
 
-  gps_quadrant(G, tl, Q).  % Q = [[a,b],[e,f]]
-  gps_quadrant(G, br, Q).  % Q = [[k,l],[o,p]]
+  gridpos_quadrant(G, tl, Q).  % Q = [[a,b],[e,f]]
+  gridpos_quadrant(G, br, Q).  % Q = [[k,l],[o,p]]
 
 
 3. Even and Odd Rows and Columns
 
-gps_even_rows/2 keeps rows at indices 0, 2, 4, ... gps_odd_rows/2 keeps rows
+gridpos_even_rows/2 keeps rows at indices 0, 2, 4, ... gridpos_odd_rows/2 keeps rows
 at indices 1, 3, 5, ...
 
-  gps_even_rows(G, E).  % E = [[a,b,c,d],[i,j,k,l]]
-  gps_odd_rows(G, O).   % O = [[e,f,g,h],[m,n,o,p]]
+  gridpos_even_rows(G, E).  % E = [[a,b,c,d],[i,j,k,l]]
+  gridpos_odd_rows(G, O).   % O = [[e,f,g,h],[m,n,o,p]]
 
-gps_even_cols/2 and gps_odd_cols/2 apply the same filter to column indices:
+gridpos_even_cols/2 and gridpos_odd_cols/2 apply the same filter to column indices:
 
-  gps_even_cols(G, E).  % E = [[a,c],[e,g],[i,k],[m,o]]
-  gps_odd_cols(G, O).   % O = [[b,d],[f,h],[j,l],[n,p]]
+  gridpos_even_cols(G, E).  % E = [[a,c],[e,g],[i,k],[m,o]]
+  gridpos_odd_cols(G, O).   % O = [[b,d],[f,h],[j,l],[n,p]]
 
 
 4. Checkerboard Pattern
 
-gps_checkerboard/3 returns all R-C pairs where (R+C) mod 2 = Parity. Parity
+gridpos_checkerboard/3 returns all R-C pairs where (R+C) mod 2 = Parity. Parity
 must be bound to 0 or 1.
 
-  gps_checkerboard(G, 0, Cs).  % Cs = [0-0,0-2,1-1,1-3,2-0,2-2,3-1,3-3]
-  gps_checkerboard(G, 1, Cs).  % Cs = [0-1,0-3,1-0,1-2,2-1,2-3,3-0,3-2]
+  gridpos_checkerboard(G, 0, Cs).  % Cs = [0-0,0-2,1-1,1-3,2-0,2-2,3-1,3-3]
+  gridpos_checkerboard(G, 1, Cs).  % Cs = [0-1,0-3,1-0,1-2,2-1,2-3,3-0,3-2]
 
 
 5. Center Cell
 
-gps_center_cell/3 returns the row R and column C of the center cell.
+gridpos_center_cell/3 returns the row R and column C of the center cell.
 R = H//2, C = W//2.
 
   G33 = [[a,b,c],[d,e,f],[g,h,i]].
-  gps_center_cell(G33, R, C).  % R = 1, C = 1
+  gridpos_center_cell(G33, R, C).  % R = 1, C = 1
 
 
 6. Corner Cells
 
-gps_corners/2 returns a list of four R-C-Value terms for the top-left, top-right,
+gridpos_corners/2 returns a list of four R-C-Value terms for the top-left, top-right,
 bottom-left, and bottom-right corners.
 
-  gps_corners(G, Cs).  % Cs = [0-0-a, 0-3-d, 3-0-m, 3-3-p]
+  gridpos_corners(G, Cs).  % Cs = [0-0-a, 0-3-d, 3-0-m, 3-3-p]
 
 
 7. Center Cross
 
-gps_cross_h/3 returns the center row index R (H//2) and its content.
-gps_cross_v/3 returns the center column index C (W//2) and its content as a list.
+gridpos_cross_h/3 returns the center row index R (H//2) and its content.
+gridpos_cross_v/3 returns the center column index C (W//2) and its content as a list.
 
-  gps_cross_h(G33, R, Row).  % R = 1, Row = [d,e,f]
-  gps_cross_v(G33, C, Col).  % C = 1, Col = [b,e,h]
+  gridpos_cross_h(G33, R, Row).  % R = 1, Row = [d,e,f]
+  gridpos_cross_v(G33, C, Col).  % C = 1, Col = [b,e,h]
 
 
 8. Predicate Reference
 
-  gps_top_half/2      - rows [0, H//2)
-  gps_bottom_half/2   - rows [H//2, H)
-  gps_left_half/2     - cols [0, W//2)
-  gps_right_half/2    - cols [W//2, W)
-  gps_quadrant/3      - quadrant by atom (tl/tr/bl/br)
-  gps_even_rows/2     - rows at even indices
-  gps_odd_rows/2      - rows at odd indices
-  gps_even_cols/2     - cols at even indices
-  gps_odd_cols/2      - cols at odd indices
-  gps_checkerboard/3  - R-C pairs for parity (R+C) mod 2
-  gps_center_cell/3   - center cell (H//2, W//2)
-  gps_corners/2       - four corner cells as R-C-Value terms
-  gps_cross_h/3       - center row index and content
-  gps_cross_v/3       - center column index and content
+  gridpos_top_half/2      - rows [0, H//2)
+  gridpos_bottom_half/2   - rows [H//2, H)
+  gridpos_left_half/2     - cols [0, W//2)
+  gridpos_right_half/2    - cols [W//2, W)
+  gridpos_quadrant/3      - quadrant by atom (tl/tr/bl/br)
+  gridpos_even_rows/2     - rows at even indices
+  gridpos_odd_rows/2      - rows at odd indices
+  gridpos_even_cols/2     - cols at even indices
+  gridpos_odd_cols/2      - cols at odd indices
+  gridpos_checkerboard/3  - R-C pairs for parity (R+C) mod 2
+  gridpos_center_cell/3   - center cell (H//2, W//2)
+  gridpos_corners/2       - four corner cells as R-C-Value terms
+  gridpos_cross_h/3       - center row index and content
+  gridpos_cross_v/3       - center column index and content

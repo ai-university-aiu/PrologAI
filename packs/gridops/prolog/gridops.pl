@@ -5,58 +5,58 @@
 % value per cell; finding stable and unstable cells; testing grid equality; and
 % performing elementwise arithmetic (add, subtract, max, min, overlay, intersect).
 :- module(gridops, [
-    go_always/3,
-    go_never/3,
-    go_sometimes/3,
-    go_count_v/3,
-    go_modal/2,
-    go_stable/2,
-    go_unstable/2,
-    go_eq/2,
-    go_add/3,
-    go_sub/3,
-    go_emax/3,
-    go_emin/3,
-    go_overlay/3,
-    go_intersect/3
+    gridops_always/3,
+    gridops_never/3,
+    gridops_sometimes/3,
+    gridops_count_v/3,
+    gridops_modal/2,
+    gridops_stable/2,
+    gridops_unstable/2,
+    gridops_eq/2,
+    gridops_add/3,
+    gridops_sub/3,
+    gridops_emax/3,
+    gridops_emin/3,
+    gridops_overlay/3,
+    gridops_intersect/3
 ]).
 % Import list utilities; sort/2, msort/2, length/2, between/3, forall/2, findall/3 are built-ins.
 :- use_module(library(lists), [member/2, nth0/3, last/2]).
 % Import maplist/3, maplist/4, include/3 for elementwise grid operations.
 :- use_module(library(apply), [maplist/3, maplist/4, include/3]).
 
-% go_dims_(+Grids, -NR, -NC): extract row and column counts from the first grid.
-go_dims_(Grids, NR, NC) :-
+% gridops_dims_(+Grids, -NR, -NC): extract row and column counts from the first grid.
+gridops_dims_(Grids, NR, NC) :-
 % Use the first grid in the collection for dimension extraction.
     (Grids = [G1|_], G1 = [Fr|_] -> length(G1, NR), length(Fr, NC) ; NR=0, NC=0).
 
-% go_always(+Grids, +V, -Cells): Cells is the sorted list of R-C positions at which
+% gridops_always(+Grids, +V, -Cells): Cells is the sorted list of R-C positions at which
 % EVERY grid in Grids contains value V. Empty if Grids is empty or V absent in all.
-go_always(Grids, V, Cells) :-
+gridops_always(Grids, V, Cells) :-
 % Determine grid dimensions from the first grid.
-    go_dims_(Grids, NR, NC),
+    gridops_dims_(Grids, NR, NC),
     NR1 is NR - 1, NC1 is NC - 1,
 % Collect positions where every grid has value V using forall.
     findall(R-C, (between(0, NR1, R), between(0, NC1, C),
         forall(member(Grid, Grids),
             (nth0(R, Grid, Row), nth0(C, Row, V)))), Cells).
 
-% go_never(+Grids, +V, -Cells): Cells is the sorted list of R-C positions at which
+% gridops_never(+Grids, +V, -Cells): Cells is the sorted list of R-C positions at which
 % NO grid in Grids contains value V.
-go_never(Grids, V, Cells) :-
+gridops_never(Grids, V, Cells) :-
 % Determine grid dimensions.
-    go_dims_(Grids, NR, NC),
+    gridops_dims_(Grids, NR, NC),
     NR1 is NR - 1, NC1 is NC - 1,
 % Collect positions where no grid has value V.
     findall(R-C, (between(0, NR1, R), between(0, NC1, C),
         \+ (member(Grid, Grids),
             nth0(R, Grid, Row), nth0(C, Row, V))), Cells).
 
-% go_sometimes(+Grids, +V, -Cells): Cells is the sorted list of R-C positions at which
+% gridops_sometimes(+Grids, +V, -Cells): Cells is the sorted list of R-C positions at which
 % SOME (at least one) grid has value V but NOT every grid does. Deduplicated by sort.
-go_sometimes(Grids, V, Cells) :-
+gridops_sometimes(Grids, V, Cells) :-
 % Determine grid dimensions.
-    go_dims_(Grids, NR, NC),
+    gridops_dims_(Grids, NR, NC),
     NR1 is NR - 1, NC1 is NC - 1,
 % Collect positions where at least one grid has V but not all grids do.
     findall(R-C, (between(0, NR1, R), between(0, NC1, C),
@@ -66,11 +66,11 @@ go_sometimes(Grids, V, Cells) :-
 % Remove duplicates arising from multiple grids having V at the same position.
     sort(Raw, Cells).
 
-% go_count_v(+Grids, +V, -CountGrid): CountGrid is a grid of integers where each
+% gridops_count_v(+Grids, +V, -CountGrid): CountGrid is a grid of integers where each
 % cell (R,C) holds the count of how many grids in Grids have value V at (R,C).
-go_count_v(Grids, V, CountGrid) :-
+gridops_count_v(Grids, V, CountGrid) :-
 % Determine grid dimensions.
-    go_dims_(Grids, NR, NC),
+    gridops_dims_(Grids, NR, NC),
     NR1 is NR - 1, NC1 is NC - 1,
 % Build a count row for each row index, then collect all rows.
     findall(CountRow,
@@ -84,12 +84,12 @@ go_count_v(Grids, V, CountGrid) :-
              CountRow)),
         CountGrid).
 
-% go_modal(+Grids, -ModalGrid): ModalGrid is a grid where each cell (R,C) holds
+% gridops_modal(+Grids, -ModalGrid): ModalGrid is a grid where each cell (R,C) holds
 % the value that appears most often across all grids at that position. When counts
 % tie, the smallest value wins.
-go_modal(Grids, ModalGrid) :-
+gridops_modal(Grids, ModalGrid) :-
 % Determine grid dimensions.
-    go_dims_(Grids, NR, NC),
+    gridops_dims_(Grids, NR, NC),
     NR1 is NR - 1, NC1 is NC - 1,
 % Build a modal row for each row, then collect all rows.
     findall(ModalRow,
@@ -98,15 +98,15 @@ go_modal(Grids, ModalGrid) :-
              (between(0, NC1, C),
 % Collect all values at (R,C) from all grids.
               findall(V, (member(Grid, Grids), nth0(R, Grid, GRow), nth0(C, GRow, V)), Vs),
-              go_mode_(Vs, MV)),
+              gridops_mode_(Vs, MV)),
              ModalRow)),
         ModalGrid).
 
-% go_stable(+Grids, -Triples): Triples is the list of R-C-V terms for positions
+% gridops_stable(+Grids, -Triples): Triples is the list of R-C-V terms for positions
 % where ALL grids in Grids agree on value V. The value V comes from the first grid.
-go_stable(Grids, Triples) :-
+gridops_stable(Grids, Triples) :-
 % Determine grid dimensions.
-    go_dims_(Grids, NR, NC),
+    gridops_dims_(Grids, NR, NC),
     NR1 is NR - 1, NC1 is NC - 1,
 % A cell is stable if the first grid's value matches all other grids' values.
     findall(R-C-V, (between(0, NR1, R), between(0, NC1, C),
@@ -115,78 +115,78 @@ go_stable(Grids, Triples) :-
         forall(member(Grid, RestGs),
             (nth0(R, Grid, GRow), nth0(C, GRow, V)))), Triples).
 
-% go_unstable(+Grids, -Cells): Cells is the sorted list of R-C positions where
+% gridops_unstable(+Grids, -Cells): Cells is the sorted list of R-C positions where
 % the grids in Grids do NOT all agree on the same value.
-go_unstable(Grids, Cells) :-
+gridops_unstable(Grids, Cells) :-
 % Determine grid dimensions.
-    go_dims_(Grids, NR, NC),
+    gridops_dims_(Grids, NR, NC),
     NR1 is NR - 1, NC1 is NC - 1,
 % First collect stable positions so we can exclude them.
-    go_stable(Grids, Stable),
+    gridops_stable(Grids, Stable),
 % Collect all positions not in the stable set.
     findall(R-C, (between(0, NR1, R), between(0, NC1, C),
         \+ member(R-C-_, Stable)), Cells).
 
-% go_eq(+G1, +G2): succeeds if G1 and G2 are cell-for-cell identical grids.
-go_eq(G1, G2) :-
+% gridops_eq(+G1, +G2): succeeds if G1 and G2 are cell-for-cell identical grids.
+gridops_eq(G1, G2) :-
 % Unification of two lists of lists tests all elements.
     G1 = G2.
 
-% go_add(+G1, +G2, -G): G is the elementwise integer sum of G1 and G2.
+% gridops_add(+G1, +G2, -G): G is the elementwise integer sum of G1 and G2.
 % G[R][C] = G1[R][C] + G2[R][C]. Grids must have identical dimensions.
-go_add(G1, G2, G) :-
+gridops_add(G1, G2, G) :-
 % Apply row-wise addition using maplist/4.
-    maplist(go_add_row_, G1, G2, G).
+    maplist(gridops_add_row_, G1, G2, G).
 
-% go_sub(+G1, +G2, -G): G is the elementwise integer difference G1 minus G2.
+% gridops_sub(+G1, +G2, -G): G is the elementwise integer difference G1 minus G2.
 % G[R][C] = G1[R][C] - G2[R][C]. Grids must have identical dimensions.
-go_sub(G1, G2, G) :-
+gridops_sub(G1, G2, G) :-
 % Apply row-wise subtraction using maplist/4.
-    maplist(go_sub_row_, G1, G2, G).
+    maplist(gridops_sub_row_, G1, G2, G).
 
-% go_emax(+G1, +G2, -G): G is the elementwise integer maximum of G1 and G2.
+% gridops_emax(+G1, +G2, -G): G is the elementwise integer maximum of G1 and G2.
 % G[R][C] = max(G1[R][C], G2[R][C]).
-go_emax(G1, G2, G) :-
+gridops_emax(G1, G2, G) :-
 % Apply row-wise max using maplist/4.
-    maplist(go_emax_row_, G1, G2, G).
+    maplist(gridops_emax_row_, G1, G2, G).
 
-% go_emin(+G1, +G2, -G): G is the elementwise integer minimum of G1 and G2.
+% gridops_emin(+G1, +G2, -G): G is the elementwise integer minimum of G1 and G2.
 % G[R][C] = min(G1[R][C], G2[R][C]).
-go_emin(G1, G2, G) :-
+gridops_emin(G1, G2, G) :-
 % Apply row-wise min using maplist/4.
-    maplist(go_emin_row_, G1, G2, G).
+    maplist(gridops_emin_row_, G1, G2, G).
 
-% go_overlay(+Grids, +Bg, -G): G is the overlay of all grids. At each (R,C), the
+% gridops_overlay(+Grids, +Bg, -G): G is the overlay of all grids. At each (R,C), the
 % result is the first non-Bg value found scanning Grids in order; Bg if all are Bg.
-go_overlay(Grids, Bg, G) :-
+gridops_overlay(Grids, Bg, G) :-
 % Determine grid dimensions.
-    go_dims_(Grids, NR, NC),
+    gridops_dims_(Grids, NR, NC),
     NR1 is NR - 1, NC1 is NC - 1,
 % Build each row by scanning grids for the first non-Bg value per cell.
     findall(Row,
         (between(0, NR1, R),
          findall(V,
-             (between(0, NC1, C), go_overlay_cell_(Grids, Bg, R, C, V)),
+             (between(0, NC1, C), gridops_overlay_cell_(Grids, Bg, R, C, V)),
              Row)),
         G).
 
-% go_intersect(+Grids, +Bg, -G): G is the intersection of all grids. At each (R,C),
+% gridops_intersect(+Grids, +Bg, -G): G is the intersection of all grids. At each (R,C),
 % if ALL grids have the same non-Bg value V, the result is V. Otherwise it is Bg.
-go_intersect(Grids, Bg, G) :-
+gridops_intersect(Grids, Bg, G) :-
 % Determine grid dimensions.
-    go_dims_(Grids, NR, NC),
+    gridops_dims_(Grids, NR, NC),
     NR1 is NR - 1, NC1 is NC - 1,
 % Build each row by checking full agreement among grids.
     findall(Row,
         (between(0, NR1, R),
          findall(V,
-             (between(0, NC1, C), go_intersect_cell_(Grids, Bg, R, C, V)),
+             (between(0, NC1, C), gridops_intersect_cell_(Grids, Bg, R, C, V)),
              Row)),
         G).
 
-% go_mode_(+Vals, -Mode): Mode is the value appearing most often in Vals.
+% gridops_mode_(+Vals, -Mode): Mode is the value appearing most often in Vals.
 % When multiple values tie for the highest count, the smallest value wins.
-go_mode_(Vals, Mode) :-
+gridops_mode_(Vals, Mode) :-
 % Deduplicate to find candidates.
     sort(Vals, Uniq),
 % Count each unique value.
@@ -200,49 +200,49 @@ go_mode_(Vals, Mode) :-
 % Take the first (smallest) candidate as Mode.
     Candidates = [Mode|_].
 
-% go_add_row_(+Row1, +Row2, -Row): Row is the elementwise sum of Row1 and Row2.
-go_add_row_(Row1, Row2, Row) :-
-    maplist(go_add_cell_, Row1, Row2, Row).
+% gridops_add_row_(+Row1, +Row2, -Row): Row is the elementwise sum of Row1 and Row2.
+gridops_add_row_(Row1, Row2, Row) :-
+    maplist(gridops_add_cell_, Row1, Row2, Row).
 
-% go_add_cell_(+A, +B, -C): C is A + B.
-go_add_cell_(A, B, C) :-
+% gridops_add_cell_(+A, +B, -C): C is A + B.
+gridops_add_cell_(A, B, C) :-
     C is A + B.
 
-% go_sub_row_(+Row1, +Row2, -Row): Row is the elementwise difference Row1 minus Row2.
-go_sub_row_(Row1, Row2, Row) :-
-    maplist(go_sub_cell_, Row1, Row2, Row).
+% gridops_sub_row_(+Row1, +Row2, -Row): Row is the elementwise difference Row1 minus Row2.
+gridops_sub_row_(Row1, Row2, Row) :-
+    maplist(gridops_sub_cell_, Row1, Row2, Row).
 
-% go_sub_cell_(+A, +B, -C): C is A - B.
-go_sub_cell_(A, B, C) :-
+% gridops_sub_cell_(+A, +B, -C): C is A - B.
+gridops_sub_cell_(A, B, C) :-
     C is A - B.
 
-% go_emax_row_(+Row1, +Row2, -Row): Row is the elementwise maximum of Row1 and Row2.
-go_emax_row_(Row1, Row2, Row) :-
-    maplist(go_emax_cell_, Row1, Row2, Row).
+% gridops_emax_row_(+Row1, +Row2, -Row): Row is the elementwise maximum of Row1 and Row2.
+gridops_emax_row_(Row1, Row2, Row) :-
+    maplist(gridops_emax_cell_, Row1, Row2, Row).
 
-% go_emax_cell_(+A, +B, -C): C is max(A, B).
-go_emax_cell_(A, B, C) :-
+% gridops_emax_cell_(+A, +B, -C): C is max(A, B).
+gridops_emax_cell_(A, B, C) :-
     C is max(A, B).
 
-% go_emin_row_(+Row1, +Row2, -Row): Row is the elementwise minimum of Row1 and Row2.
-go_emin_row_(Row1, Row2, Row) :-
-    maplist(go_emin_cell_, Row1, Row2, Row).
+% gridops_emin_row_(+Row1, +Row2, -Row): Row is the elementwise minimum of Row1 and Row2.
+gridops_emin_row_(Row1, Row2, Row) :-
+    maplist(gridops_emin_cell_, Row1, Row2, Row).
 
-% go_emin_cell_(+A, +B, -C): C is min(A, B).
-go_emin_cell_(A, B, C) :-
+% gridops_emin_cell_(+A, +B, -C): C is min(A, B).
+gridops_emin_cell_(A, B, C) :-
     C is min(A, B).
 
-% go_overlay_cell_(+Grids, +Bg, +R, +C, -V): V is the first non-Bg value at (R,C)
+% gridops_overlay_cell_(+Grids, +Bg, +R, +C, -V): V is the first non-Bg value at (R,C)
 % across Grids in order, or Bg if all grids have Bg at (R,C).
-go_overlay_cell_(Grids, Bg, R, C, V) :-
+gridops_overlay_cell_(Grids, Bg, R, C, V) :-
 % Soft-cut: use first non-Bg value found; fall through to Bg if none found.
     (member(Grid, Grids), nth0(R, Grid, GRow), nth0(C, GRow, GV), GV \= Bg
     -> V = GV
     ;  V = Bg).
 
-% go_intersect_cell_(+Grids, +Bg, +R, +C, -V): V is the common non-Bg value
+% gridops_intersect_cell_(+Grids, +Bg, +R, +C, -V): V is the common non-Bg value
 % at (R,C) if ALL grids have the same non-Bg value there; otherwise V is Bg.
-go_intersect_cell_(Grids, Bg, R, C, V) :-
+gridops_intersect_cell_(Grids, Bg, R, C, V) :-
 % Check the first grid: if it has non-Bg, verify all others match.
     (Grids = [FG|RestGs],
      nth0(R, FG, FR), nth0(C, FR, FV), FV \= Bg,

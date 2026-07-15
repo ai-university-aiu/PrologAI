@@ -9,110 +9,110 @@ reorder a grid by its row or column content.
 
 1. Basic Extraction
 
-grc_row/3 and grc_col/3 retrieve a single row or column as a flat list.
+gridrowcol_row/3 and gridrowcol_col/3 retrieve a single row or column as a flat list.
 
   :- use_module(pack(gridrowcol/prolog/gridrowcol)).
 
   G = [[a,b,c],[d,e,f],[g,h,i]].
 
-  grc_row(G, 0, Row).   % Row = [a,b,c]
-  grc_row(G, 2, Row).   % Row = [g,h,i]
+  gridrowcol_row(G, 0, Row).   % Row = [a,b,c]
+  gridrowcol_row(G, 2, Row).   % Row = [g,h,i]
 
-  grc_col(G, 0, Col).   % Col = [a,d,g]
-  grc_col(G, 2, Col).   % Col = [c,f,i]
+  gridrowcol_col(G, 0, Col).   % Col = [a,d,g]
+  gridrowcol_col(G, 2, Col).   % Col = [c,f,i]
 
 
 2. Uniformity Testing
 
-grc_row_uniform/3 and grc_col_uniform/3 check whether every cell in a row or
+gridrowcol_row_uniform/3 and gridrowcol_col_uniform/3 check whether every cell in a row or
 column has the same color, and bind that color.
 
   G = [[r,r,r],[r,r,r],[r,r,r]].
 
-  grc_row_uniform(G, 0, C).  % C = r
-  grc_col_uniform(G, 1, C).  % C = r
+  gridrowcol_row_uniform(G, 0, C).  % C = r
+  gridrowcol_col_uniform(G, 1, C).  % C = r
 
   G2 = [[a,b,c],[d,e,f],[g,h,i]].
-  grc_row_uniform(G2, 0, _). % fails - row 0 has a, b, c
+  gridrowcol_row_uniform(G2, 0, _). % fails - row 0 has a, b, c
 
 
 3. Row and Column Equality
 
-grc_equal_rows/3 succeeds if two rows of the grid are identical. A row always
+gridrowcol_equal_rows/3 succeeds if two rows of the grid are identical. A row always
 equals itself.
 
   G = [[r,r,r],[x,x,x],[r,r,r]].
-  grc_equal_rows(G, 0, 2).  % succeeds (both are [r,r,r])
-  grc_equal_rows(G, 1, 1).  % succeeds (self-comparison)
-  grc_equal_rows(G, 0, 1).  % fails
+  gridrowcol_equal_rows(G, 0, 2).  % succeeds (both are [r,r,r])
+  gridrowcol_equal_rows(G, 1, 1).  % succeeds (self-comparison)
+  gridrowcol_equal_rows(G, 0, 1).  % fails
 
-grc_equal_cols/3 works the same way for columns.
+gridrowcol_equal_cols/3 works the same way for columns.
 
 
 4. Finding Positions
 
-grc_row_positions/3 finds all row indices whose content equals a given pattern.
-grc_col_positions/3 does the same for columns.
+gridrowcol_row_positions/3 finds all row indices whose content equals a given pattern.
+gridrowcol_col_positions/3 does the same for columns.
 
   G = [[r,r,r],[x,x,x],[r,r,r]].
-  grc_row_positions(G, [r,r,r], Pos).  % Pos = [0,2]
-  grc_row_positions(G, [z,z,z], Pos).  % Pos = []
+  gridrowcol_row_positions(G, [r,r,r], Pos).  % Pos = [0,2]
+  gridrowcol_row_positions(G, [z,z,z], Pos).  % Pos = []
 
 
 5. Finding Matching Pairs
 
-grc_matching_rows/2 returns all ordered pairs (R1, R2) with R1 < R2 where
-rows R1 and R2 are identical. grc_matching_cols/2 does the same for columns.
+gridrowcol_matching_rows/2 returns all ordered pairs (R1, R2) with R1 < R2 where
+rows R1 and R2 are identical. gridrowcol_matching_cols/2 does the same for columns.
 
   G = [[r,r,r],[r,r,r],[r,r,r]].
-  grc_matching_rows(G, Pairs).  % Pairs = [0-1, 0-2, 1-2]
+  gridrowcol_matching_rows(G, Pairs).  % Pairs = [0-1, 0-2, 1-2]
 
   G2 = [[a,b,a],[c,d,c],[e,f,e]].
-  grc_matching_cols(G2, Pairs).  % Pairs = [0-2]
+  gridrowcol_matching_cols(G2, Pairs).  % Pairs = [0-2]
 
 
 6. Unique Rows and Columns
 
-grc_unique_rows/2 and grc_unique_cols/2 return the indices of rows (or
+gridrowcol_unique_rows/2 and gridrowcol_unique_cols/2 return the indices of rows (or
 columns) that appear exactly once in the grid. If a row appears two or more
 times, none of its copies are considered unique.
 
   G = [[r,r,r],[x,x,x],[r,r,r]].
-  grc_unique_rows(G, Rows).   % Rows = [1]  (only the x row is unique)
+  gridrowcol_unique_rows(G, Rows).   % Rows = [1]  (only the x row is unique)
 
   G2 = [[r,r,r],[r,r,r],[r,r,r]].
-  grc_unique_rows(G2, Rows).  % Rows = []   (no row is unique)
+  gridrowcol_unique_rows(G2, Rows).  % Rows = []   (no row is unique)
 
 
 7. Sorting Rows and Columns
 
-grc_row_sort/2 sorts the rows of a grid in standard Prolog term order
+gridrowcol_row_sort/2 sorts the rows of a grid in standard Prolog term order
 (using msort, so duplicate rows are preserved).
 
   G = [[c,c,c],[a,a,a],[b,b,b]].
-  grc_row_sort(G, S).  % S = [[a,a,a],[b,b,b],[c,c,c]]
+  gridrowcol_row_sort(G, S).  % S = [[a,a,a],[b,b,b],[c,c,c]]
 
-grc_col_sort/2 reorders the columns of the grid by the lexicographic order
+gridrowcol_col_sort/2 reorders the columns of the grid by the lexicographic order
 of their content. Each column is extracted as a top-to-bottom list, the lists
 are sorted, and the grid is rebuilt from the sorted column order.
 
   G = [[c,a,b],[c,a,b],[c,a,b],[c,a,b]].
-  grc_col_sort(G, S).  % S = [[a,b,c],[a,b,c],[a,b,c],[a,b,c]]
+  gridrowcol_col_sort(G, S).  % S = [[a,b,c],[a,b,c],[a,b,c],[a,b,c]]
 
 
 8. Predicate Reference
 
-  grc_row/3             - row R as a list
-  grc_col/3             - column C as a top-to-bottom list
-  grc_row_uniform/3     - is row R all one color? binds that color
-  grc_col_uniform/3     - is column C all one color? binds that color
-  grc_equal_rows/3      - rows R1 and R2 identical?
-  grc_equal_cols/3      - columns C1 and C2 identical?
-  grc_row_positions/3   - row indices matching a pattern
-  grc_col_positions/3   - column indices matching a pattern
-  grc_matching_rows/2   - R1-R2 pairs of identical rows (R1 < R2)
-  grc_matching_cols/2   - C1-C2 pairs of identical columns (C1 < C2)
-  grc_unique_rows/2     - row indices appearing exactly once
-  grc_unique_cols/2     - column indices appearing exactly once
-  grc_row_sort/2        - sort rows lexicographically
-  grc_col_sort/2        - sort columns lexicographically
+  gridrowcol_row/3             - row R as a list
+  gridrowcol_col/3             - column C as a top-to-bottom list
+  gridrowcol_row_uniform/3     - is row R all one color? binds that color
+  gridrowcol_col_uniform/3     - is column C all one color? binds that color
+  gridrowcol_equal_rows/3      - rows R1 and R2 identical?
+  gridrowcol_equal_cols/3      - columns C1 and C2 identical?
+  gridrowcol_row_positions/3   - row indices matching a pattern
+  gridrowcol_col_positions/3   - column indices matching a pattern
+  gridrowcol_matching_rows/2   - R1-R2 pairs of identical rows (R1 < R2)
+  gridrowcol_matching_cols/2   - C1-C2 pairs of identical columns (C1 < C2)
+  gridrowcol_unique_rows/2     - row indices appearing exactly once
+  gridrowcol_unique_cols/2     - column indices appearing exactly once
+  gridrowcol_row_sort/2        - sort rows lexicographically
+  gridrowcol_col_sort/2        - sort columns lexicographically

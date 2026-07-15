@@ -14,127 +14,127 @@ To use this pack, add to your Prolog source:
 
 Global Maximum and Minimum
 
-ex_max_val(+Grid, -Val) returns the maximum value across all cells.
+extrema_max_val(+Grid, -Val) returns the maximum value across all cells.
 
-?- ex_max_val([[1,2,3],[4,5,6],[7,8,9]], V).
+?- extrema_max_val([[1,2,3],[4,5,6],[7,8,9]], V).
 V = 9.
 
-ex_min_val(+Grid, -Val) returns the minimum value.
+extrema_min_val(+Grid, -Val) returns the minimum value.
 
-?- ex_min_val([[0,1],[1,0]], V).
+?- extrema_min_val([[0,1],[1,0]], V).
 V = 0.
 
 
 Positions of Maximum and Minimum
 
-ex_max_cells(+Grid, -Cells) returns the sorted list of R-C positions whose
+extrema_max_cells(+Grid, -Cells) returns the sorted list of R-C positions whose
 value equals the grid maximum.
 
-?- ex_max_cells([[1,2,3],[4,5,6],[7,8,9]], C).
+?- extrema_max_cells([[1,2,3],[4,5,6],[7,8,9]], C).
 C = [2-2].
 
-?- ex_max_cells([[1,1,1],[1,1,1],[1,1,1]], C), length(C, N).
+?- extrema_max_cells([[1,1,1],[1,1,1],[1,1,1]], C), length(C, N).
 N = 9.
 
-ex_min_cells(+Grid, -Cells) returns positions of the minimum value.
+extrema_min_cells(+Grid, -Cells) returns positions of the minimum value.
 
-?- ex_min_cells([[0,1],[1,0]], C).
+?- extrema_min_cells([[0,1],[1,0]], C).
 C = [0-0, 1-1].
 
 
 Row and Column Argmax/Argmin
 
-ex_row_argmax(+Grid, -R) returns the 0-based index of the row with the
+extrema_row_argmax(+Grid, -R) returns the 0-based index of the row with the
 maximum row sum. First row wins on ties.
 
-?- ex_row_argmax([[1,2,3],[4,5,6],[7,8,9]], R).
+?- extrema_row_argmax([[1,2,3],[4,5,6],[7,8,9]], R).
 R = 2.
 
-ex_col_argmax(+Grid, -C) returns the column index with the maximum column sum.
+extrema_col_argmax(+Grid, -C) returns the column index with the maximum column sum.
 
-?- ex_col_argmax([[1,2,3],[4,5,6],[7,8,9]], C).
+?- extrema_col_argmax([[1,2,3],[4,5,6],[7,8,9]], C).
 C = 2.
 
-ex_row_argmin(+Grid, -R) and ex_col_argmin(+Grid, -C) return the row and
+extrema_row_argmin(+Grid, -R) and extrema_col_argmin(+Grid, -C) return the row and
 column indices with minimum sums.
 
-?- ex_row_argmin([[1,2,3],[4,5,6],[7,8,9]], R).
+?- extrema_row_argmin([[1,2,3],[4,5,6],[7,8,9]], R).
 R = 0.
 
-?- ex_col_argmin([[1,2,3],[4,5,6],[7,8,9]], C).
+?- extrema_col_argmin([[1,2,3],[4,5,6],[7,8,9]], C).
 C = 0.
 
 
 Local Maxima and Minima
 
-ex_local_max4(+Grid, -Cells) returns cells that are strictly greater than
+extrema_local_max4(+Grid, -Cells) returns cells that are strictly greater than
 every in-bounds 4-connected neighbor. Out-of-bounds directions are ignored,
 so border cells can qualify.
 
-?- ex_local_max4([[1,2,1],[2,4,2],[1,2,1]], C).
+?- extrema_local_max4([[1,2,1],[2,4,2],[1,2,1]], C).
 C = [1-1].
 
-?- ex_local_max4([[1,1,1],[1,1,1],[1,1,1]], C).
+?- extrema_local_max4([[1,1,1],[1,1,1],[1,1,1]], C).
 C = [].
 
-ex_local_min4(+Grid, -Cells) returns cells strictly less than all in-bounds
+extrema_local_min4(+Grid, -Cells) returns cells strictly less than all in-bounds
 4-neighbors.
 
-?- ex_local_min4([[1,2,1],[2,4,2],[1,2,1]], C), length(C, N).
+?- extrema_local_min4([[1,2,1],[2,4,2],[1,2,1]], C), length(C, N).
 N = 4.
 
 
 Threshold Filtering
 
-ex_above(+Grid, +Thresh, -Cells) returns cells with value strictly greater
+extrema_above(+Grid, +Thresh, -Cells) returns cells with value strictly greater
 than Thresh.
 
-?- ex_above([[1,2,3],[4,5,6],[7,8,9]], 5, C), length(C, N).
+?- extrema_above([[1,2,3],[4,5,6],[7,8,9]], 5, C), length(C, N).
 N = 4.
 
-ex_below(+Grid, +Thresh, -Cells) returns cells with value strictly less
+extrema_below(+Grid, +Thresh, -Cells) returns cells with value strictly less
 than Thresh.
 
-?- ex_below([[0,1],[1,0]], 1, C), length(C, N).
+?- extrema_below([[0,1],[1,0]], 1, C), length(C, N).
 N = 2.
 
 
 Range and Non-Zero Cells
 
-ex_range(+Grid, -Range) returns the maximum minus minimum of all cell values.
+extrema_range(+Grid, -Range) returns the maximum minus minimum of all cell values.
 
-?- ex_range([[1,2,3],[4,5,6],[7,8,9]], R).
+?- extrema_range([[1,2,3],[4,5,6],[7,8,9]], R).
 R = 8.
 
-?- ex_range([[1,1,1],[1,1,1],[1,1,1]], R).
+?- extrema_range([[1,1,1],[1,1,1],[1,1,1]], R).
 R = 0.
 
-ex_nonzero(+Grid, -Cells) returns all positions with value not equal to 0.
+extrema_nonzero(+Grid, -Cells) returns all positions with value not equal to 0.
 Useful for enumerating non-background cells in sparse grids.
 
-?- ex_nonzero([[0,1],[1,0]], C).
+?- extrema_nonzero([[0,1],[1,0]], C).
 C = [0-1, 1-0].
 
-?- ex_nonzero([[0,0],[0,0]], C).
+?- extrema_nonzero([[0,0],[0,0]], C).
 C = [].
 
 
 Summary of ex_* Predicates
 
-ex_max_val/2 - maximum value in the grid
-ex_min_val/2 - minimum value in the grid
-ex_max_cells/2 - positions of cells with maximum value
-ex_min_cells/2 - positions of cells with minimum value
-ex_row_argmax/2 - row index with maximum sum (first on tie)
-ex_col_argmax/2 - column index with maximum sum (first on tie)
-ex_row_argmin/2 - row index with minimum sum (first on tie)
-ex_col_argmin/2 - column index with minimum sum (first on tie)
-ex_local_max4/2 - cells strictly greater than all in-bounds 4-neighbors
-ex_local_min4/2 - cells strictly less than all in-bounds 4-neighbors
-ex_above/3 - cells with value strictly above threshold
-ex_below/3 - cells with value strictly below threshold
-ex_range/2 - max minus min value (scalar)
-ex_nonzero/2 - positions of non-zero cells
+extrema_max_val/2 - maximum value in the grid
+extrema_min_val/2 - minimum value in the grid
+extrema_max_cells/2 - positions of cells with maximum value
+extrema_min_cells/2 - positions of cells with minimum value
+extrema_row_argmax/2 - row index with maximum sum (first on tie)
+extrema_col_argmax/2 - column index with maximum sum (first on tie)
+extrema_row_argmin/2 - row index with minimum sum (first on tie)
+extrema_col_argmin/2 - column index with minimum sum (first on tie)
+extrema_local_max4/2 - cells strictly greater than all in-bounds 4-neighbors
+extrema_local_min4/2 - cells strictly less than all in-bounds 4-neighbors
+extrema_above/3 - cells with value strictly above threshold
+extrema_below/3 - cells with value strictly below threshold
+extrema_range/2 - max minus min value (scalar)
+extrema_nonzero/2 - positions of non-zero cells
 
 
 END OF CHAPTER 115

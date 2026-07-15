@@ -16,18 +16,18 @@ Layer 202. Pack prefix: gsc_*. Work Package 223.
 Exported Predicates
 
 
-gsc_upsample(+Grid, +N, -Scaled)
+gridscale_upsample(+Grid, +N, -Scaled)
 
 Each cell in Grid becomes an NxN block of the same color in Scaled.
 Scaled has dimensions (H*N) x (W*N). N=1 is a no-op.
 
 Example:
 
-gsc_upsample([[r,b],[b,r]], 2, S).
+gridscale_upsample([[r,b],[b,r]], 2, S).
 % S = [[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]]
 
 
-gsc_downsample(+Grid, +N, -Small)
+gridscale_downsample(+Grid, +N, -Small)
 
 Each NxN block in Grid must be uniform (all cells the same color). That
 color becomes one cell in Small. Small has dimensions (H//N) x (W//N).
@@ -35,74 +35,74 @@ Fails if any block is not uniform.
 
 Example:
 
-gsc_downsample([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2, S).
+gridscale_downsample([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2, S).
 % S = [[r,b],[b,r]]
 
 
-gsc_block_majority(+Grid, +N, -Small)
+gridscale_block_majority(+Grid, +N, -Small)
 
 Each NxN block is reduced to its most frequent color (majority vote, ties
 broken by term order). Never fails. Small has dimensions (H//N) x (W//N).
 
 Example:
 
-gsc_block_majority([[r,b,r,r],[b,r,r,r],[r,r,b,b],[r,r,b,b]], 2, S).
+gridscale_block_majority([[r,b,r,r],[b,r,r,r],[r,r,b,b],[r,r,b,b]], 2, S).
 % S = [[b,r],[r,b]]  (top-left block is r,b,b,r: tie -> b wins by term order)
 
 
-gsc_scale_factor(+GridA, +GridB, -N)
+gridscale_scale_factor(+GridA, +GridB, -N)
 
-N is the integer scale factor such that GridB = gsc_upsample(GridA, N).
+N is the integer scale factor such that GridB = gridscale_upsample(GridA, N).
 Requires H_B = H_A * N and W_B = W_A * N. Fails if no exact N exists.
 
 Example:
 
-gsc_scale_factor([[r,b],[b,r]], 6x6_upscale, N).  % N = 3
+gridscale_scale_factor([[r,b],[b,r]], 6x6_upscale, N).  % N = 3
 
 
-gsc_is_scale_of(+GridA, +GridB, +N)
+gridscale_is_scale_of(+GridA, +GridB, +N)
 
 Succeed if GridB is exactly GridA upsampled by integer factor N.
 Uses negation-as-failure across all (R,C) pairs for efficiency.
 
 Example:
 
-gsc_is_scale_of([[r,b],[b,r]], [[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2).  % succeeds
+gridscale_is_scale_of([[r,b],[b,r]], [[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2).  % succeeds
 
 
-gsc_block_at(+Grid, +N, +BR, +BC, -Block)
+gridscale_block_at(+Grid, +N, +BR, +BC, -Block)
 
 Block is the NxN sub-grid at block position (BR, BC): raw rows BR*N..BR*N+N-1
 and columns BC*N..BC*N+N-1.
 
 Example:
 
-gsc_block_at([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2, 0, 1, B).
+gridscale_block_at([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2, 0, 1, B).
 % B = [[b,b],[b,b]]
 
 
-gsc_block_uniform(+Grid, +N, +BR, +BC, -Color)
+gridscale_block_uniform(+Grid, +N, +BR, +BC, -Color)
 
 Succeed if the NxN block at block position (BR, BC) is all one Color.
 Fails if any cell differs from the first cell.
 
 Example:
 
-gsc_block_uniform([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2, 0, 0, C).
+gridscale_block_uniform([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2, 0, 0, C).
 % C = r
 
 
-gsc_all_uniform(+Grid, +N)
+gridscale_all_uniform(+Grid, +N)
 
 Succeed if every NxN block in Grid is uniform. This is the necessary and
 sufficient condition for Grid being a valid N-upsampling of a smaller grid.
 
 Example:
 
-gsc_all_uniform([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2).  % succeeds
+gridscale_all_uniform([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2).  % succeeds
 
 
-gsc_infer_tile(+Grid, -Tile)
+gridscale_infer_tile(+Grid, -Tile)
 
 Tile is the smallest grid whose N-upsampling equals Grid. Searches for the
 largest valid block size (divisor of H and W, >= 2, all blocks uniform) and
@@ -110,22 +110,22 @@ downsamples. Fails if no valid N >= 2 exists.
 
 Example:
 
-gsc_infer_tile([[r,r,r,b,b,b],[r,r,r,b,b,b],[r,r,r,b,b,b],[b,b,b,r,r,r],[b,b,b,r,r,r],[b,b,b,r,r,r]], T).
+gridscale_infer_tile([[r,r,r,b,b,b],[r,r,r,b,b,b],[r,r,r,b,b,b],[b,b,b,r,r,r],[b,b,b,r,r,r],[b,b,b,r,r,r]], T).
 % T = [[r,b],[b,r]]  (block size 3 is largest valid divisor)
 
 
-gsc_factors(+Grid, -Factors)
+gridscale_factors(+Grid, -Factors)
 
 Factors is the ascending list of positive integers that divide both H and W.
 Always includes 1; includes min(H,W) when H = W.
 
 Example:
 
-gsc_factors([[r,r,r,r,r,r],[r,r,r,r,r,r],[r,r,r,r,r,r],[r,r,r,r,r,r],[r,r,r,r,r,r],[r,r,r,r,r,r]], F).
+gridscale_factors([[r,r,r,r,r,r],[r,r,r,r,r,r],[r,r,r,r,r,r],[r,r,r,r,r,r],[r,r,r,r,r,r],[r,r,r,r,r,r]], F).
 % F = [1,2,3,6]
 
 
-gsc_resize(+Grid, +TargetH, +TargetW, -Resized)
+gridscale_resize(+Grid, +TargetH, +TargetW, -Resized)
 
 Nearest-neighbor resize to (TargetH, TargetW): Resized[r][c] =
 Grid[(r*H)//TargetH][(c*W)//TargetW]. Works for both upsampling and
@@ -133,33 +133,33 @@ downsampling to arbitrary target sizes.
 
 Example:
 
-gsc_resize([[r,b],[b,r]], 4, 4, S).
+gridscale_resize([[r,b],[b,r]], 4, 4, S).
 % S = [[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]]
 
 
-gsc_subsample(+Grid, +N, -Sub)
+gridscale_subsample(+Grid, +N, -Sub)
 
 Stride-N sampling: Sub[BR][BC] = Grid[BR*N][BC*N]. Output has
 (H//N) x (W//N) cells. Takes every N-th row and every N-th column.
 
 Example:
 
-gsc_subsample([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2, S).
+gridscale_subsample([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2, S).
 % S = [[r,b],[b,r]]  (rows 0,2 and cols 0,2)
 
 
-gsc_pad(+Grid, +N, +Color, -Padded)
+gridscale_pad(+Grid, +N, +Color, -Padded)
 
 Surrounds Grid with an N-cell wide border of Color. Padded has dimensions
 (H+2N) x (W+2N). N=0 is a no-op.
 
 Example:
 
-gsc_pad([[r,b],[b,r]], 1, g, P).
+gridscale_pad([[r,b],[b,r]], 1, g, P).
 % P = [[g,g,g,g],[g,r,b,g],[g,b,r,g],[g,g,g,g]]
 
 
-gsc_crop_to_factor(+Grid, +N, -Cropped)
+gridscale_crop_to_factor(+Grid, +N, -Cropped)
 
 Crops Grid to the largest dimensions divisible by N: CH = (H//N)*N rows,
 CW = (W//N)*N columns, taking the top-left region. If H and W are already
@@ -167,33 +167,33 @@ divisible by N, the full grid is returned.
 
 Example:
 
-gsc_crop_to_factor([[r,r,r],[b,b,b],[g,g,g]], 2, C).
+gridscale_crop_to_factor([[r,r,r],[b,b,b],[g,g,g]], 2, C).
 % C = [[r,r],[b,b]]  (CH = 2, CW = 2)
 
 
 Typical Use Cases
 
 Detect and recover a repeated tile:
-  gsc_infer_tile(Grid, Tile)
+  gridscale_infer_tile(Grid, Tile)
 
 Check whether one grid is an upsampling of another:
-  gsc_scale_factor(GridA, GridB, N)
-  gsc_is_scale_of(GridA, GridB, N)
+  gridscale_scale_factor(GridA, GridB, N)
+  gridscale_is_scale_of(GridA, GridB, N)
 
 Extend a small pattern to fill a larger canvas:
-  gsc_upsample(Tile, N, Large)
+  gridscale_upsample(Tile, N, Large)
 
 Majority-vote downscaling (robust to noise in blocks):
-  gsc_block_majority(Grid, N, Small)
+  gridscale_block_majority(Grid, N, Small)
 
 Resize to an arbitrary target size:
-  gsc_resize(Grid, TargetH, TargetW, Resized)
+  gridscale_resize(Grid, TargetH, TargetW, Resized)
 
 Add a uniform border before further processing:
-  gsc_pad(Grid, 2, black, Padded)
+  gridscale_pad(Grid, 2, black, Padded)
 
 Crop so block operations have aligned boundaries:
-  gsc_crop_to_factor(Grid, BlockSize, Aligned)
+  gridscale_crop_to_factor(Grid, BlockSize, Aligned)
 
 
 Dependencies

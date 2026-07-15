@@ -50,7 +50,7 @@ COLUMN UTILITIES
 
 FALLING DOWN AND UP
 
-  gv_fall_down(+Grid, +BG, -Result)
+  gravity_fall_down(+Grid, +BG, -Result)
   gv_compact_col(+Grid, +BG, -Result)
 
   Non-BG cells fall to the bottom of their column. BG fills the top.
@@ -58,18 +58,18 @@ FALLING DOWN AND UP
 
   Example:
 
-    gv_fall_down([[0,1],[2,0],[0,3]], 0, R).
+    gravity_fall_down([[0,1],[2,0],[0,3]], 0, R).
     % Column 0: [0,2,0] -> [0,0,2]
     % Column 1: [1,0,3] -> [0,1,3]
     % R = [[0,0],[0,1],[2,3]]
 
-  gv_fall_up(+Grid, +BG, -Result)
+  gravity_fall_up(+Grid, +BG, -Result)
 
   Non-BG cells rise to the top of their column. BG sinks to the bottom.
 
   Example:
 
-    gv_fall_up([[0,0],[2,0],[0,3]], 0, R).
+    gravity_fall_up([[0,0],[2,0],[0,3]], 0, R).
     % Column 0: [0,2,0] -> [2,0,0]
     % Column 1: [0,0,3] -> [3,0,0]
     % R = [[2,3],[0,0],[0,0]]
@@ -77,7 +77,7 @@ FALLING DOWN AND UP
 
 FALLING LEFT AND RIGHT
 
-  gv_fall_left(+Grid, +BG, -Result)
+  gravity_fall_left(+Grid, +BG, -Result)
   gv_compact_row(+Grid, +BG, -Result)
 
   Non-BG cells shift to the left of their row. BG fills the right.
@@ -85,16 +85,16 @@ FALLING LEFT AND RIGHT
 
   Example:
 
-    gv_fall_left([[0,1,0,2]], 0, R).
+    gravity_fall_left([[0,1,0,2]], 0, R).
     % R = [[1,2,0,0]]
 
-  gv_fall_right(+Grid, +BG, -Result)
+  gravity_fall_right(+Grid, +BG, -Result)
 
   Non-BG cells shift to the right of their row.
 
   Example:
 
-    gv_fall_right([[0,1,0,2]], 0, R).
+    gravity_fall_right([[0,1,0,2]], 0, R).
     % R = [[0,0,1,2]]
 
 
@@ -153,7 +153,7 @@ CUSTOM TRANSFORMS
   Example using built-in compact_bottom:
 
     gv_apply_col(Grid, 0, gv_compact_list_bottom_, Result).
-    % Equivalent to gv_fall_down(Grid, 0, Result).
+    % Equivalent to gravity_fall_down(Grid, 0, Result).
 
   gv_apply_row(+Grid, +BG, :Pred, -Result)
 
@@ -162,7 +162,7 @@ CUSTOM TRANSFORMS
   Example using built-in compact_top:
 
     gv_apply_row(Grid, 0, gv_compact_list_top_, Result).
-    % Equivalent to gv_fall_left(Grid, 0, Result).
+    % Equivalent to gravity_fall_left(Grid, 0, Result).
 
 
 PUTTING IT TOGETHER
@@ -171,11 +171,11 @@ Combining the gravity pack with the fill and compare packs gives a
 complete toolkit for physics-like grid transformations:
 
   % Apply gravity then compare with expected output.
-  gv_fall_down(Input, 0, Settled),
+  gravity_fall_down(Input, 0, Settled),
   cp_grids_equal(Settled, ExpectedOutput).
 
   % Check if output is just the input after falling.
-  gv_fall_down(Input, 0, R),
+  gravity_fall_down(Input, 0, R),
   id_is_recolor(R, Output).  % Would fail; fall changes positions
 
 

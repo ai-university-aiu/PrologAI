@@ -83,7 +83,7 @@ Spatial Movement, Gravity, and Distance for Grid-Based Reasoning (PR 62)
 frame
 Rectangular Border Detection, Interior Extraction, and Frame Generation (PR 63)
 
-    detect uniform outer rings (`fr_border_color/2`, `fr_has_border/2`, `fr_border_cells/2`), extract interiors (`fr_inner/2`, `fr_interior_uniform/1`, `fr_interior_color/2`), generate framed grids (`fr_make_framed/5`, `fr_add_border/4`), test sub-region borders (`fr_region_has_border/6`, `fr_region_border_color/6`), find bounding boxes (`fr_bounding_box/6`), and analyze concentric nesting (`fr_is_nested/3`, `fr_ring_count/2`). 14 fr_* predicates, Layer 42.
+    detect uniform outer rings (`frame_border_color/2`, `frame_has_border/2`, `frame_border_cells/2`), extract interiors (`frame_inner/2`, `frame_interior_uniform/1`, `frame_interior_color/2`), generate framed grids (`frame_make_framed/5`, `frame_add_border/4`), test sub-region borders (`frame_region_has_border/6`, `frame_region_border_color/6`), find bounding boxes (`frame_bounding_box/6`), and analyze concentric nesting (`frame_is_nested/3`, `frame_ring_count/2`). 14 fr_* predicates, Layer 42.
 
 path
 Path-Finding, Flood Fill, Connectivity, and Reachability (PR 64)
@@ -118,7 +118,7 @@ Arithmetic Sequence Analysis, List Structure, and Period Detection (PR 69)
 crop
 Subgrid Extraction, Padding, Splitting, Joining, and Embedding (PR 70)
 
-    bounding box detection (`cr_bbox/3`), rectangular extraction (`cr_crop_bbox/6`), content-aware cropping (`cr_crop_content/3`), uniform padding (`cr_pad/4`), border removal (`cr_strip_border/3`), horizontal/vertical splitting (`cr_split_h/4`, `cr_split_v/4`), row/column bands (`cr_rows/4`, `cr_cols/4`), stitching (`cr_stitch_h/3`, `cr_stitch_v/3`), subgrid embedding (`cr_embed/5`), center extraction (`cr_center/4`), and quadrant split (`cr_quadrants/5`). 14 cr_* predicates, Layer 49.
+    bounding box detection (`crop_bbox/3`), rectangular extraction (`crop_crop_bbox/6`), content-aware cropping (`crop_crop_content/3`), uniform padding (`crop_pad/4`), border removal (`crop_strip_border/3`), horizontal/vertical splitting (`crop_split_h/4`, `crop_split_v/4`), row/column bands (`crop_rows/4`, `crop_cols/4`), stitching (`crop_stitch_h/3`, `crop_stitch_v/3`), subgrid embedding (`crop_embed/5`), center extraction (`crop_center/4`), and quadrant split (`crop_quadrants/5`). 14 cr_* predicates, Layer 49.
 
 overlay
 Grid Combination by Layering, Logic, Masking, and Priority Merge (PR 71)
@@ -143,12 +143,12 @@ Selection and Filtering of Cell Regions by Spatial and Size Properties (PR 74)
 count
 Counting Cells, Colors, and Regions in Grids (PR 75)
 
-    color cell count (`cn_color_count/3`), color histogram (`cn_histogram/3`), most/least frequent colors (`cn_max_color/2`, `cn_min_color/2`), rows/columns containing a color (`cn_color_rows/3`, `cn_color_cols/3`), row/column value diversity (`cn_row_distinct/3`, `cn_col_distinct/3`), total cells (`cn_grid_total/2`), grid comparison counts (`cn_equal_cells/3`, `cn_diff_cells/3`), region color lookup (`cn_region_color/3`), per-color region tally (`cn_regions_per_color/3`), and flat-list value count (`cn_by_value/3`). 14 cn_* predicates, Layer 54.
+    color cell count (`count_color_count/3`), color histogram (`count_histogram/3`), most/least frequent colors (`count_max_color/2`, `count_min_color/2`), rows/columns containing a color (`count_color_rows/3`, `count_color_cols/3`), row/column value diversity (`count_row_distinct/3`, `count_col_distinct/3`), total cells (`count_grid_total/2`), grid comparison counts (`count_equal_cells/3`, `count_diff_cells/3`), region color lookup (`count_region_color/3`), per-color region tally (`count_regions_per_color/3`), and flat-list value count (`count_by_value/3`). 14 cn_* predicates, Layer 54.
 
 fill
 Pattern-Based Region and Grid Filling (PR 76)
 
-    fill a region list (`fl_fill_region/4`), fill a bounding box (`fl_fill_bbox/4`), fill entire rows or columns (`fl_fill_row/4`, `fl_fill_col/4`), fill explicit cell lists (`fl_fill_cells/4`), fill the outermost grid ring (`fl_fill_border/3`), fill only boundary cells of a region (`fl_outline_region/4`), fill only interior cells (`fl_fill_interior/4`), create uniform-color grids (`fl_solid_rect/4`), create checkerboard grids (`fl_checkerboard/5`), draw horizontal and vertical line segments (`fl_draw_hline/6`, `fl_draw_vline/6`), fill the main diagonal (`fl_fill_main_diag/3`), and overlay a subgrid with transparency (`fl_stamp/6`). 14 fl_* predicates, Layer 55.
+    fill a region list (`fill_fill_region/4`), fill a bounding box (`fill_fill_bbox/4`), fill entire rows or columns (`fill_fill_row/4`, `fill_fill_col/4`), fill explicit cell lists (`fill_fill_cells/4`), fill the outermost grid ring (`fill_fill_border/3`), fill only boundary cells of a region (`fill_outline_region/4`), fill only interior cells (`fill_fill_interior/4`), create uniform-color grids (`fill_solid_rect/4`), create checkerboard grids (`fill_checkerboard/5`), draw horizontal and vertical line segments (`fill_draw_hline/6`, `fill_draw_vline/6`), fill the main diagonal (`fill_fill_main_diag/3`), and overlay a subgrid with transparency (`fill_stamp/6`). 14 fl_* predicates, Layer 55.
 
 pattern
 Pattern Detection, Tiling Period, and Motif Extraction (PR 77)
@@ -173,7 +173,7 @@ Grid-Pair Inductive Analysis: Color Maps, Recolor Detection, Scale Inference, an
 gravity
 Directional Gravity and Settling Operations (PR 81)
 
-    column value extraction (`gv_col_values/3`), column replacement (`gv_set_col/4`), compacting all non-background cells to column bottoms (`gv_compact_col/3`, `gv_fall_down/3`), column tops (`gv_fall_up/3`), row lefts (`gv_compact_row/3`, `gv_fall_left/3`), row rights (`gv_fall_right/3`), settling a specific color to the column bottom past background with other cells as obstacles (`gv_settle_color/4`, `gv_stack_down/4`), floating a color to the column top (`gv_float_color/4`, `gv_stack_up/4`), and custom column or row transforms (`gv_apply_col/4`, `gv_apply_row/4`). 14 gv_* predicates, Layer 60.
+    column value extraction (`gv_col_values/3`), column replacement (`gv_set_col/4`), compacting all non-background cells to column bottoms (`gv_compact_col/3`, `gravity_fall_down/3`), column tops (`gravity_fall_up/3`), row lefts (`gv_compact_row/3`, `gravity_fall_left/3`), row rights (`gravity_fall_right/3`), settling a specific color to the column bottom past background with other cells as obstacles (`gv_settle_color/4`, `gv_stack_down/4`), floating a color to the column top (`gv_float_color/4`, `gv_stack_up/4`), and custom column or row transforms (`gv_apply_col/4`, `gv_apply_row/4`). 14 gv_* predicates, Layer 60.
 
 noise
 Binary Mask Operations and Grid Noise Analysis (PR 82)
@@ -223,7 +223,7 @@ Cell-Wise Arithmetic on Grids (PR 89)
 context
 Context Map Operations (PR 92)
 
-    storing key-value bindings (`ctx_put/4`), retrieving values (`ctx_get/3`), testing presence (`ctx_has/2`), removing entries (`ctx_delete/3`), extracting keys (`ctx_keys/2`) and values (`ctx_values/2`), building from pairs (`ctx_from_pairs/2`), converting to pairs (`ctx_to_pairs/2`), merging two maps with override semantics (`ctx_merge/3`), dispatching a goal by key with a default (`ctx_dispatch/4`), selecting the value for the first present key in a priority list (`ctx_select/4`), transforming all values (`ctx_map_values/3`), filtering entries by key predicate (`ctx_filter_keys/3`), and counting entries (`ctx_size/2`). 14 ctx_* predicates, Layer 71.
+    storing key-value bindings (`context_put/4`), retrieving values (`context_get/3`), testing presence (`context_has/2`), removing entries (`context_delete/3`), extracting keys (`context_keys/2`) and values (`context_values/2`), building from pairs (`context_from_pairs/2`), converting to pairs (`context_to_pairs/2`), merging two maps with override semantics (`context_merge/3`), dispatching a goal by key with a default (`context_dispatch/4`), selecting the value for the first present key in a priority list (`context_select/4`), transforming all values (`context_map_values/3`), filtering entries by key predicate (`context_filter_keys/3`), and counting entries (`context_size/2`). 14 ctx_* predicates, Layer 71.
 
 score
 Candidate Grid Scoring and Hypothesis Selection (PR 93)
@@ -318,17 +318,17 @@ Cell Neighborhood Analysis (PR 114)
 gravity
 Directional Cell-Sliding and Gravity Operations (PR 116)
 
-    compacting all non-Bg values to the left end of a row (`gv_pack_row_left/3`), right end (`gv_pack_row_right/3`), top of a column list (`gv_pack_col_up/3`), bottom of a column list (`gv_pack_col_down/3`), sliding all non-Bg cells left within their row (`gv_fall_left/3`), right (`gv_fall_right/3`), downward within their column (`gv_fall_down/3`), upward (`gv_fall_up/3`), dispatching gravity by direction atom (`gv_fall_dir/4`), sliding only a specific Color left while other non-Bg cells act as immovable walls (`gv_fall_color_left/4`), right (`gv_fall_color_right/4`), downward (`gv_fall_color_down/4`), upward (`gv_fall_color_up/4`), and dispatching color-specific gravity by direction atom (`gv_fall_color_dir/5`). 14 gv_* predicates, Layer 95.
+    compacting all non-Bg values to the left end of a row (`gravity_pack_row_left/3`), right end (`gravity_pack_row_right/3`), top of a column list (`gravity_pack_col_up/3`), bottom of a column list (`gravity_pack_col_down/3`), sliding all non-Bg cells left within their row (`gravity_fall_left/3`), right (`gravity_fall_right/3`), downward within their column (`gravity_fall_down/3`), upward (`gravity_fall_up/3`), dispatching gravity by direction atom (`gravity_fall_dir/4`), sliding only a specific Color left while other non-Bg cells act as immovable walls (`gravity_fall_color_left/4`), right (`gravity_fall_color_right/4`), downward (`gravity_fall_color_down/4`), upward (`gravity_fall_color_up/4`), and dispatching color-specific gravity by direction atom (`gravity_fall_color_dir/5`). 14 gv_* predicates, Layer 95.
 
 count
 Value Counting and Frequency Analysis (PR 117)
 
-    counting occurrences of a value in a flat list (`cn_by_value/3`), counting a value across all cells of a 2D grid (`cn_color_count/3`), building a frequency histogram as parallel sorted Colors and Counts lists (`cn_histogram/3`), returning the most frequently occurring value (`cn_max_color/2`), the least frequently occurring value (`cn_min_color/2`), counting rows containing a given value (`cn_color_rows/3`), counting columns containing a given value (`cn_color_cols/3`), counting distinct values in a single row (`cn_row_distinct/3`), counting distinct values in a single column (`cn_col_distinct/3`), returning the total number of cells as rows times columns (`cn_grid_total/2`), counting cells where two grids agree (`cn_equal_cells/3`), counting cells where two grids differ (`cn_diff_cells/3`), looking up the grid value at the first cell of a region expressed as r(R,C) terms (`cn_region_color/3`), and building a Color-Count tally for a list of regions (`cn_regions_per_color/3`). 14 cn_* predicates, Layer 96.
+    counting occurrences of a value in a flat list (`count_by_value/3`), counting a value across all cells of a 2D grid (`count_color_count/3`), building a frequency histogram as parallel sorted Colors and Counts lists (`count_histogram/3`), returning the most frequently occurring value (`count_max_color/2`), the least frequently occurring value (`count_min_color/2`), counting rows containing a given value (`count_color_rows/3`), counting columns containing a given value (`count_color_cols/3`), counting distinct values in a single row (`count_row_distinct/3`), counting distinct values in a single column (`count_col_distinct/3`), returning the total number of cells as rows times columns (`count_grid_total/2`), counting cells where two grids agree (`count_equal_cells/3`), counting cells where two grids differ (`count_diff_cells/3`), looking up the grid value at the first cell of a region expressed as r(R,C) terms (`count_region_color/3`), and building a Color-Count tally for a list of regions (`count_regions_per_color/3`). 14 cn_* predicates, Layer 96.
 
 diagonal
 Diagonal Line Extraction and Filling (PR 119)
 
-    extracting values on the main diagonal where C equals R (`dg_main_diag/2`), main anti-diagonal where R+C equals NC-1 (`dg_anti_diag/2`), the N-th diagonal where C-R equals N (`dg_nth_diag/3`), the N-th anti-diagonal where R+C equals N (`dg_nth_anti_diag/3`), all diagonals sorted by offset (`dg_all_diags/2`), all anti-diagonals sorted by sum (`dg_all_anti_diags/2`), filling the main diagonal with Color (`dg_fill_main/3`), filling the main anti-diagonal (`dg_fill_anti/3`), filling the N-th diagonal (`dg_fill_nth_diag/4`), filling the N-th anti-diagonal (`dg_fill_nth_anti_diag/4`), computing the diagonal index N=C-R for any cell (`dg_cell_diag/3`), computing the anti-diagonal index N=R+C (`dg_cell_anti_diag/3`), testing whether the N-th diagonal is all Color (`dg_uniform_diag/3`), and testing whether the N-th anti-diagonal is all Color (`dg_uniform_anti_diag/3`). 14 dg_* predicates, Layer 98.
+    extracting values on the main diagonal where C equals R (`diagonal_main_diag/2`), main anti-diagonal where R+C equals NC-1 (`diagonal_anti_diag/2`), the N-th diagonal where C-R equals N (`diagonal_nth_diag/3`), the N-th anti-diagonal where R+C equals N (`diagonal_nth_anti_diag/3`), all diagonals sorted by offset (`diagonal_all_diags/2`), all anti-diagonals sorted by sum (`diagonal_all_anti_diags/2`), filling the main diagonal with Color (`diagonal_fill_main/3`), filling the main anti-diagonal (`diagonal_fill_anti/3`), filling the N-th diagonal (`diagonal_fill_nth_diag/4`), filling the N-th anti-diagonal (`diagonal_fill_nth_anti_diag/4`), computing the diagonal index N=C-R for any cell (`diagonal_cell_diag/3`), computing the anti-diagonal index N=R+C (`diagonal_cell_anti_diag/3`), testing whether the N-th diagonal is all Color (`diagonal_uniform_diag/3`), and testing whether the N-th anti-diagonal is all Color (`diagonal_uniform_anti_diag/3`). 14 dg_* predicates, Layer 98.
 
 cluster
 Spatial Proximity and Grouping (PR 123)
@@ -368,7 +368,7 @@ Cellular Automaton Neighborhood Aggregation (PR 141)
 cross
 1D Cross-Section Extraction from 2D Grids (PR 142)
 
-    extracting a single row by 0-based index using nth0/3 (`cx_row/3`), extracting a single column as a list by collecting the C-th element from each row using member+nth0 inside findall (`cx_col/3`), extracting the main diagonal where each element is Grid[R][R] (`cx_diag/2`), extracting the anti-diagonal where each element is Grid[R][W-1-R] with a guard C>=0 for non-square grids (`cx_antidiag/2`), computing the arithmetic sum of a row using sum_list/2 from library(lists) (`cx_row_sum/3`), computing the sum of a column (`cx_col_sum/3`), counting occurrences of a value in a row using findall+member+length (`cx_row_count/4`), counting occurrences of a value in a column (`cx_col_count/4`), returning sorted row indices that contain at least one occurrence of a value using between+nth0+member then sort/2 to deduplicate (`cx_rows_with/3`), returning sorted column indices that contain a value (`cx_cols_with/3`), returning the sorted unique value set of a row using sort/2 (`cx_row_uniq/3`), returning the sorted unique value set of a column (`cx_col_uniq/3`), returning the most frequently occurring value in a row with tie-breaking to a background value via the findall+max_list+unique-winner-or-Bg pattern (`cx_row_mode/4`), and doing the same for a column (`cx_col_mode/4`). 14 cx_* predicates, Layer 121.
+    extracting a single row by 0-based index using nth0/3 (`cross_row/3`), extracting a single column as a list by collecting the C-th element from each row using member+nth0 inside findall (`cross_col/3`), extracting the main diagonal where each element is Grid[R][R] (`cross_diag/2`), extracting the anti-diagonal where each element is Grid[R][W-1-R] with a guard C>=0 for non-square grids (`cross_antidiag/2`), computing the arithmetic sum of a row using sum_list/2 from library(lists) (`cross_row_sum/3`), computing the sum of a column (`cross_col_sum/3`), counting occurrences of a value in a row using findall+member+length (`cross_row_count/4`), counting occurrences of a value in a column (`cross_col_count/4`), returning sorted row indices that contain at least one occurrence of a value using between+nth0+member then sort/2 to deduplicate (`cross_rows_with/3`), returning sorted column indices that contain a value (`cross_cols_with/3`), returning the sorted unique value set of a row using sort/2 (`cross_row_uniq/3`), returning the sorted unique value set of a column (`cross_col_uniq/3`), returning the most frequently occurring value in a row with tie-breaking to a background value via the findall+max_list+unique-winner-or-Bg pattern (`cross_row_mode/4`), and doing the same for a column (`cross_col_mode/4`). 14 cx_* predicates, Layer 121.
 
 mask
 Boolean Mask Operations on 2D Grids (PR 143)
@@ -403,12 +403,12 @@ Grid Topology and Connected Component Analysis (PR 151)
 distance
 Cell Distance and Proximity Computation (PR 150)
 
-    computing Manhattan (L1) distance as the sum of absolute row and column differences (`dt_manhattan/5`); computing Chebyshev (L-infinity, king-move) distance as the maximum of absolute row and column differences (`dt_chebyshev/5`); computing squared Euclidean distance as an integer to avoid square roots (`dt_euclidean_sq/5`); finding the nearest cell of a given value to a query position by collecting all D-R-C triples and selecting the minimum (`dt_nearest/4`); finding the farthest cell of a given value (`dt_farthest/4`); finding all cells of a given value at exactly a specified Manhattan distance (`dt_all_at/5`); collecting all in-bounds positions within a Manhattan radius (`dt_within_manhattan/5`); collecting all in-bounds positions within a Chebyshev radius (`dt_within_chebyshev/5`); building a same-size Manhattan distance transform grid where each cell holds its distance to the nearest target-value cell (`dt_map_manhattan/3`); building the Chebyshev distance transform grid (`dt_map_chebyshev/3`); collecting positions at exactly a specified Manhattan distance forming a ring (`dt_ring_manhattan/5`); computing the integer floor centroid of all cells with a given value (`dt_centroid/3`); computing the maximum pairwise Manhattan distance (diameter) of a set of R-C pairs and returning the two farthest cells (`dt_diameter_manhattan/3`); and computing the diameter under Chebyshev distance (`dt_diameter_chebyshev/3`). 14 dt_* predicates, Layer 129.
+    computing Manhattan (L1) distance as the sum of absolute row and column differences (`distance_manhattan/5`); computing Chebyshev (L-infinity, king-move) distance as the maximum of absolute row and column differences (`distance_chebyshev/5`); computing squared Euclidean distance as an integer to avoid square roots (`distance_euclidean_sq/5`); finding the nearest cell of a given value to a query position by collecting all D-R-C triples and selecting the minimum (`distance_nearest/4`); finding the farthest cell of a given value (`distance_farthest/4`); finding all cells of a given value at exactly a specified Manhattan distance (`distance_all_at/5`); collecting all in-bounds positions within a Manhattan radius (`distance_within_manhattan/5`); collecting all in-bounds positions within a Chebyshev radius (`distance_within_chebyshev/5`); building a same-size Manhattan distance transform grid where each cell holds its distance to the nearest target-value cell (`distance_map_manhattan/3`); building the Chebyshev distance transform grid (`distance_map_chebyshev/3`); collecting positions at exactly a specified Manhattan distance forming a ring (`distance_ring_manhattan/5`); computing the integer floor centroid of all cells with a given value (`distance_centroid/3`); computing the maximum pairwise Manhattan distance (diameter) of a set of R-C pairs and returning the two farthest cells (`distance_diameter_manhattan/3`); and computing the diameter under Chebyshev distance (`distance_diameter_chebyshev/3`). 14 dt_* predicates, Layer 129.
 
 edge
 Grid Edge Detection and Boundary Analysis (PR 149)
 
-    collecting all horizontal edge R-C positions where adjacent rows differ using findall with between and nth0 (`ed_h_edges/2`); collecting all vertical edge R-C positions where adjacent columns differ (`ed_v_edges/2`); testing whether a single horizontal edge exists at a specific row-column position returning Bool=1 or 0 (`ed_h_edge/4`); testing for a single vertical edge (`ed_v_edge/4`); combining horizontal and vertical edges into a sorted list of h-R-C and v-R-C direction-tagged terms (`ed_all_edges/2`); finding all cells of a given value that have at least one 4-connected neighbor with a different value using disjunctive findall (`ed_boundary_cells/3`); finding all cells on the outer grid perimeter using row and column index comparison (`ed_outer_boundary/2`); finding cells of a given value that are NOT boundary cells using negation-as-failure (`ed_inner_cells/3`); counting total edges as sum of horizontal and vertical edge list lengths (`ed_edge_count/2`); testing whether a grid has zero edges (`ed_is_smooth/1`); producing a same-size mask grid where each cell is 1 if it is a boundary cell and Bg otherwise using nested findall and a private four-direction helper (`ed_label_edges/3`); testing whether a single cell is a boundary cell returning Bool=1 or 0 (`ed_has_edge/4`); finding all 2x2 top-left corner positions where the four cells are not all equal using findall with negation-as-failure (`ed_corners/2`); and counting corner positions (`ed_corner_count/2`). 14 ed_* predicates, Layer 128.
+    collecting all horizontal edge R-C positions where adjacent rows differ using findall with between and nth0 (`edge_h_edges/2`); collecting all vertical edge R-C positions where adjacent columns differ (`edge_v_edges/2`); testing whether a single horizontal edge exists at a specific row-column position returning Bool=1 or 0 (`edge_h_edge/4`); testing for a single vertical edge (`edge_v_edge/4`); combining horizontal and vertical edges into a sorted list of h-R-C and v-R-C direction-tagged terms (`edge_all_edges/2`); finding all cells of a given value that have at least one 4-connected neighbor with a different value using disjunctive findall (`edge_boundary_cells/3`); finding all cells on the outer grid perimeter using row and column index comparison (`edge_outer_boundary/2`); finding cells of a given value that are NOT boundary cells using negation-as-failure (`edge_inner_cells/3`); counting total edges as sum of horizontal and vertical edge list lengths (`edge_edge_count/2`); testing whether a grid has zero edges (`edge_is_smooth/1`); producing a same-size mask grid where each cell is 1 if it is a boundary cell and Bg otherwise using nested findall and a private four-direction helper (`edge_label_edges/3`); testing whether a single cell is a boundary cell returning Bool=1 or 0 (`edge_has_edge/4`); finding all 2x2 top-left corner positions where the four cells are not all equal using findall with negation-as-failure (`edge_corners/2`); and counting corner positions (`edge_corner_count/2`). 14 ed_* predicates, Layer 128.
 
 colormap
 Color Lookup Table and Palette Substitution (PR 147)
@@ -458,7 +458,7 @@ Convex Hull and Polygon Geometry (PR 128)
 enclosure
 Interior and Exterior Classification (PR 127)
 
-    collecting all cells on the four grid edges in sorted order (`en_border_cells/2`), finding all background cells reachable from the grid border by 4-connected background steps returning the exterior region (`en_outer_cells/3`), finding all background cells not reachable from the border returning the enclosed interior region (`en_inner_cells/3`), testing if a specific cell is enclosed (`en_is_inner/4`), testing if a specific cell is exterior (`en_is_outer/4`), painting all enclosed background cells with a given color (`en_fill_inner/4`), counting enclosed background cells (`en_inner_count/3`), testing for any enclosed background cell (`en_has_inner/2`), partitioning enclosed background cells into 4-connected components (`en_inner_components/3`), partitioning exterior background cells into 4-connected components (`en_outer_components/3`), filling the enclosed component at a given cell with a color (`en_fill_hole/6`), finding all Color cells on the boundary of a color region (`en_boundary_cells/3`), finding all Color cells strictly interior to a color region (`en_interior_cells/3`), and testing whether all orthogonal neighbors of a cell are a given wall color (`en_is_surrounded/4`). 14 en_* predicates, Layer 106.
+    collecting all cells on the four grid edges in sorted order (`enclosure_border_cells/2`), finding all background cells reachable from the grid border by 4-connected background steps returning the exterior region (`enclosure_outer_cells/3`), finding all background cells not reachable from the border returning the enclosed interior region (`enclosure_inner_cells/3`), testing if a specific cell is enclosed (`enclosure_is_inner/4`), testing if a specific cell is exterior (`enclosure_is_outer/4`), painting all enclosed background cells with a given color (`enclosure_fill_inner/4`), counting enclosed background cells (`enclosure_inner_count/3`), testing for any enclosed background cell (`enclosure_has_inner/2`), partitioning enclosed background cells into 4-connected components (`enclosure_inner_components/3`), partitioning exterior background cells into 4-connected components (`enclosure_outer_components/3`), filling the enclosed component at a given cell with a color (`enclosure_fill_hole/6`), finding all Color cells on the boundary of a color region (`enclosure_boundary_cells/3`), finding all Color cells strictly interior to a color region (`enclosure_interior_cells/3`), and testing whether all orthogonal neighbors of a cell are a given wall color (`enclosure_is_surrounded/4`). 14 en_* predicates, Layer 106.
 
 spread
 BFS Spreading, Distance Maps, and Reachability (PR 126)
@@ -518,7 +518,7 @@ Object Spatial Ordering and Ranking (PR 111)
 diff
 Multi-Pair Grid Difference Analysis (PR 110)
 
-    all changed cells as diff(R,C,OldV,NewV) terms (`df_cell_diff/3`), cells that went from background to non-background (`df_added/4`), cells that went from non-background to background (`df_removed/4`), cells that stayed non-background but changed color (`df_recolored/4`), cells whose value did not change (`df_stable/3`), colors added to or lost from the palette (`df_palette_change/4`), cells that changed in every In-Out pair in a list (`df_common_diffs/2`), cells that were stable in every pair (`df_common_stable/2`), cells added in every pair (`df_always_added/3`), cells removed in every pair (`df_always_removed/3`), total count of changed cells (`df_total_changes/3`), applying a diff list to a grid (`df_apply_diffs/3`), inverting a diff list to reverse direction of each change (`df_invert_diffs/2`), and filtering diffs by a goal predicate (`df_filter_diffs/3`). 14 df_* predicates, Layer 89.
+    all changed cells as diff(R,C,OldV,NewV) terms (`diff_cell_diff/3`), cells that went from background to non-background (`diff_added/4`), cells that went from non-background to background (`diff_removed/4`), cells that stayed non-background but changed color (`diff_recolored/4`), cells whose value did not change (`diff_stable/3`), colors added to or lost from the palette (`diff_palette_change/4`), cells that changed in every In-Out pair in a list (`diff_common_diffs/2`), cells that were stable in every pair (`diff_common_stable/2`), cells added in every pair (`diff_always_added/3`), cells removed in every pair (`diff_always_removed/3`), total count of changed cells (`diff_total_changes/3`), applying a diff list to a grid (`diff_apply_diffs/3`), inverting a diff list to reverse direction of each change (`diff_invert_diffs/2`), and filtering diffs by a goal predicate (`diff_filter_diffs/3`). 14 df_* predicates, Layer 89.
 
 pipeline
 Sequential Step Dispatch and List Utilities (PR 91)
@@ -538,12 +538,12 @@ Row and Column Projection and Profile Analysis (PR 237)
 gradient
 Row and Column Gradient and Progression Analysis (PR 238)
 
-    adjacent pairwise differences per row (`gr_h_diffs/2`) and column (`gr_v_diffs/2`), monotonicity classification per row and column as 1/-1/0 (`gr_h_mono/2`, `gr_v_mono/2`), max-minus-min range per row and column (`gr_h_range/2`, `gr_v_range/2`), last-minus-first net slope per row and column (`gr_h_slope/2`, `gr_v_slope/2`), constancy tests (`gr_h_const/2`, `gr_v_const/2`), running cumulative sums per row and column (`gr_h_cum/2`, `gr_v_cum/2`), and second-order differences per row and column (`gr_h_second/2`, `gr_v_second/2`). 14 gr_* predicates, Layer 132.
+    adjacent pairwise differences per row (`gradient_h_diffs/2`) and column (`gradient_v_diffs/2`), monotonicity classification per row and column as 1/-1/0 (`gradient_h_mono/2`, `gradient_v_mono/2`), max-minus-min range per row and column (`gradient_h_range/2`, `gradient_v_range/2`), last-minus-first net slope per row and column (`gradient_h_slope/2`, `gradient_v_slope/2`), constancy tests (`gradient_h_const/2`, `gradient_v_const/2`), running cumulative sums per row and column (`gradient_h_cum/2`, `gradient_v_cum/2`), and second-order differences per row and column (`gradient_h_second/2`, `gradient_v_second/2`). 14 gr_* predicates, Layer 132.
 
 extrema
 2D Grid Extrema, Local Peaks, and Threshold Filtering (PR 239)
 
-    global maximum and minimum values (`ex_max_val/2`, `ex_min_val/2`), all cell positions holding the maximum or minimum (`ex_max_cells/2`, `ex_min_cells/2`), 0-based row and column argmax and argmin with first-occurrence tie-breaking (`ex_row_argmax/2`, `ex_col_argmax/2`, `ex_row_argmin/2`, `ex_col_argmin/2`), local maxima and minima among in-bounds 4-neighbors (`ex_local_max4/2`, `ex_local_min4/2`), threshold filter cells above and below a value (`ex_above/3`, `ex_below/3`), max-minus-min range (`ex_range/2`), and non-zero cell positions (`ex_nonzero/2`). 14 ex_* predicates, Layer 133.
+    global maximum and minimum values (`extrema_max_val/2`, `extrema_min_val/2`), all cell positions holding the maximum or minimum (`extrema_max_cells/2`, `extrema_min_cells/2`), 0-based row and column argmax and argmin with first-occurrence tie-breaking (`extrema_row_argmax/2`, `extrema_col_argmax/2`, `extrema_row_argmin/2`, `extrema_col_argmin/2`), local maxima and minima among in-bounds 4-neighbors (`extrema_local_max4/2`, `extrema_local_min4/2`), threshold filter cells above and below a value (`extrema_above/3`, `extrema_below/3`), max-minus-min range (`extrema_range/2`), and non-zero cell positions (`extrema_nonzero/2`). 14 ex_* predicates, Layer 133.
 
 naggr
 Per-Cell Neighborhood Value Aggregation (PR 240)
@@ -573,7 +573,7 @@ Mean, Sum, and Deviation Statistics for Integer Lists and 2D Grids (PR 244)
 cooccur
 Value Co-Occurrence and Adjacency Analysis in 2D Grids (PR 245)
 
-    ordered horizontal adjacent pairs (`co_h_pairs/2`), vertical adjacent pairs in column-major order (`co_v_pairs/2`), down-right and down-left diagonal pairs (`co_d_pairs_dr/2`, `co_d_pairs_dl/2`), directed horizontal and vertical pair counts (`co_count_h/4`, `co_count_v/4`), undirected 4-adjacent pair count (`co_count_adj4/4`), universal adjacency testing (`co_always_adj4/3`), empty adjacency testing (`co_never_adj4/3`), isolated cell detection (`co_isolated4/3`), border-value enumeration (`co_border_vals/3`), shared-border testing (`co_shared_border/3`), horizontal transition frequency triples sorted by count (`co_row_transitions/2`), and most-frequently-adjacent value (`co_most_common_adj4/3`). 14 co_* predicates, Layer 139.
+    ordered horizontal adjacent pairs (`cooccur_h_pairs/2`), vertical adjacent pairs in column-major order (`cooccur_v_pairs/2`), down-right and down-left diagonal pairs (`cooccur_d_pairs_dr/2`, `cooccur_d_pairs_dl/2`), directed horizontal and vertical pair counts (`cooccur_count_h/4`, `cooccur_count_v/4`), undirected 4-adjacent pair count (`cooccur_count_adj4/4`), universal adjacency testing (`cooccur_always_adj4/3`), empty adjacency testing (`cooccur_never_adj4/3`), isolated cell detection (`cooccur_isolated4/3`), border-value enumeration (`cooccur_border_vals/3`), shared-border testing (`cooccur_shared_border/3`), horizontal transition frequency triples sorted by count (`cooccur_row_transitions/2`), and most-frequently-adjacent value (`cooccur_most_common_adj4/3`). 14 co_* predicates, Layer 139.
 
 rowsig
 Row and Column Signature Analysis for 2D Grids (PR 246)
@@ -583,7 +583,7 @@ Row and Column Signature Analysis for 2D Grids (PR 246)
 gridops
 Grid Collection Operations for Multi-Grid Analysis (PR 247)
 
-    positions where every grid has a value (`go_always/3`), no grid has a value (`go_never/3`), some but not all grids have a value (`go_sometimes/3`), per-cell count of grids having a value (`go_count_v/3`), modal value per cell with smallest-value tie-breaking (`go_modal/2`), cells where all grids agree (`go_stable/2`), cells where grids disagree (`go_unstable/2`), cell-for-cell equality test via unification (`go_eq/2`), elementwise addition (`go_add/3`), elementwise subtraction (`go_sub/3`), elementwise maximum (`go_emax/3`), elementwise minimum (`go_emin/3`), overlay taking first non-background value per cell (`go_overlay/3`), and intersection keeping only unanimously non-background values (`go_intersect/3`). 14 go_* predicates, Layer 141.
+    positions where every grid has a value (`gridops_always/3`), no grid has a value (`gridops_never/3`), some but not all grids have a value (`gridops_sometimes/3`), per-cell count of grids having a value (`gridops_count_v/3`), modal value per cell with smallest-value tie-breaking (`gridops_modal/2`), cells where all grids agree (`gridops_stable/2`), cells where grids disagree (`gridops_unstable/2`), cell-for-cell equality test via unification (`gridops_eq/2`), elementwise addition (`gridops_add/3`), elementwise subtraction (`gridops_sub/3`), elementwise maximum (`gridops_emax/3`), elementwise minimum (`gridops_emin/3`), overlay taking first non-background value per cell (`gridops_overlay/3`), and intersection keeping only unanimously non-background values (`gridops_intersect/3`). 14 go_* predicates, Layer 141.
 
 index
 Coordinate-Valued Grid Generation and Index Masking (PR 248)
@@ -633,7 +633,7 @@ Bulk Color Operations on Object Scenes (PR 260)
 delta
 Scene-Level Delta Analysis (PR 261)
 
-    comparing two object scenes (lists of obj(Color, Cells) terms) using exact cell-set equality for matching where two objects match iff they have identical Cells lists under Prolog unification; collecting objects in S2 whose cell set does not appear in S1 at any color via findall+negation-as-failure (`dl_added/3`); collecting objects in S1 absent from S2 (`dl_removed/3`); collecting O1-O2 pairs sharing identical cell sets across scenes with sort deduplication (`dl_matched/3`); collecting From-To color change pairs for matched objects where C1 \= C2 (`dl_recolored/3`); collecting objects with verbatim identity (same color and same cells) in both scenes via member/2 term unification (`dl_unchanged/3`); computing colors in S2 not in S1 by set difference on sorted palettes (`dl_color_gain/3`); computing colors in S1 not in S2 (`dl_color_loss/3`); computing object count change N = length(S2) - length(S1) (`dl_count_diff/3`); computing total cell count change N = total_cells(S2) - total_cells(S1) via findall+length+sum_list (`dl_size_diff/3`); testing that only additions occurred by checking removed=[] and recolored=[] (`dl_is_added_only/2`); testing that only removals occurred (`dl_is_removed_only/2`); testing that no additions or removals occurred so only color changes are possible (`dl_is_recolor_only/2`); testing that both scenes are identical (`dl_is_stable/2`); and computing all four components as a single delta(Added, Removed, Recolored, Unchanged) compound term (`dl_scene_diff/3`). 14 dl_* predicates, Layer 155.
+    comparing two object scenes (lists of obj(Color, Cells) terms) using exact cell-set equality for matching where two objects match iff they have identical Cells lists under Prolog unification; collecting objects in S2 whose cell set does not appear in S1 at any color via findall+negation-as-failure (`delta_added/3`); collecting objects in S1 absent from S2 (`delta_removed/3`); collecting O1-O2 pairs sharing identical cell sets across scenes with sort deduplication (`delta_matched/3`); collecting From-To color change pairs for matched objects where C1 \= C2 (`delta_recolored/3`); collecting objects with verbatim identity (same color and same cells) in both scenes via member/2 term unification (`delta_unchanged/3`); computing colors in S2 not in S1 by set difference on sorted palettes (`delta_color_gain/3`); computing colors in S1 not in S2 (`delta_color_loss/3`); computing object count change N = length(S2) - length(S1) (`delta_count_diff/3`); computing total cell count change N = total_cells(S2) - total_cells(S1) via findall+length+sum_list (`delta_size_diff/3`); testing that only additions occurred by checking removed=[] and recolored=[] (`delta_is_added_only/2`); testing that only removals occurred (`delta_is_removed_only/2`); testing that no additions or removals occurred so only color changes are possible (`delta_is_recolor_only/2`); testing that both scenes are identical (`delta_is_stable/2`); and computing all four components as a single delta(Added, Removed, Recolored, Unchanged) compound term (`delta_scene_diff/3`). 14 dl_* predicates, Layer 155.
 
 group
 Object Grouping and Partition (PR 262)
@@ -819,7 +819,7 @@ Scene-Level Rule Term Evaluation Engine (PR 295)
 condxf
 Conditional and Selective Scene Transformation with Context Gate Inference (PR 296, WP-276)
 
-    Applies transformations to a subset of objects in an obj(Color, Cells) scene list - those satisfying a condition - while leaving the remaining objects unchanged. Complements scenexf (sx_*, Layer 184), which applies transformations uniformly to all objects. xc_split_color partitions a scene into objects of a given color and all others (findall with atom equality check). xc_merge concatenates two object groups (append). xc_recolor_matching recolors all objects of a given color using maplist with an if-cut helper. xc_shift_color translates only Color objects by (DR, DC) using maplist with a findall cell-shift helper. xc_swap_colors swaps C1 and C2 throughout using maplist with an if-then-else helper (avoids fragile clause-head matching). xc_recolor_by_size recolors objects satisfying a size comparison (gt/lt/eq/ge/le against a threshold N) using maplist with a size-cmp helper. xc_move_color is an alias for xc_shift_color. xc_largest selects the largest object via negated-count msort on keyed pairs; xc_smallest uses count msort; ties are broken by standard term order. xc_recolor_largest and xc_recolor_smallest recolor the extreme object using identity-match maplist. xc_unique_size backtracks over objects whose cell count appears exactly once (findall+length==1 check). xc_recolor_unique_size recolors the unique-size object; fails when no such object exists. xc_split_size partitions by size comparison using findall (both satisfying and not-satisfying branches). xc_infer_gate infers the gate_color(Color) that separates training pairs into groups with distinct change signatures (lost/gained color sets), enabling context-gated transformation search. 15 xc_* predicates, 45 tests, Layer 187.
+    Applies transformations to a subset of objects in an obj(Color, Cells) scene list - those satisfying a condition - while leaving the remaining objects unchanged. Complements scenexf (sx_*, Layer 184), which applies transformations uniformly to all objects. condxf_split_color partitions a scene into objects of a given color and all others (findall with atom equality check). condxf_merge concatenates two object groups (append). condxf_recolor_matching recolors all objects of a given color using maplist with an if-cut helper. condxf_shift_color translates only Color objects by (DR, DC) using maplist with a findall cell-shift helper. condxf_swap_colors swaps C1 and C2 throughout using maplist with an if-then-else helper (avoids fragile clause-head matching). condxf_recolor_by_size recolors objects satisfying a size comparison (gt/lt/eq/ge/le against a threshold N) using maplist with a size-cmp helper. condxf_move_color is an alias for condxf_shift_color. condxf_largest selects the largest object via negated-count msort on keyed pairs; condxf_smallest uses count msort; ties are broken by standard term order. condxf_recolor_largest and condxf_recolor_smallest recolor the extreme object using identity-match maplist. condxf_unique_size backtracks over objects whose cell count appears exactly once (findall+length==1 check). condxf_recolor_unique_size recolors the unique-size object; fails when no such object exists. condxf_split_size partitions by size comparison using findall (both satisfying and not-satisfying branches). condxf_infer_gate infers the gate_color(Color) that separates training pairs into groups with distinct change signatures (lost/gained color sets), enabling context-gated transformation search. 15 xc_* predicates, 45 tests, Layer 187.
 
 scenepair
 Holistic Before-After Scene Pair Analysis (PR 297)
@@ -839,7 +839,7 @@ Color Substitution Table Learning and Application (PR 299)
 gridsolve
 End-to-End Scene Puzzle Solver (PR 300)
 
-    Integrates rule inference, candidate ranking, and rule application into a single end-to-end solve/3 predicate. gs_apply: self-contained dispatch engine (recolor, recolor_all, color_map, shift, to_origin, reflect_h, reflect_v, remove_color, keep_color, sort_size_desc, sort_size_asc, top_n, identity). gs_coverage: include(gs_pair_ok_) + length. gs_consistent: maplist(gs_pair_ok_). gs_rank_rules: findall -N-Rule keyed msort + extract values. gs_best_rule: rank head. gs_consistent_rules: include(gs_consistent_check_). gs_valid_rules: include(gs_has_coverage_). gs_infer_candidates: findall over gs_infer_one_ backtracking patterns (recolor from single-color set difference, recolor_all if After has one color, color_map from positional pairs, shift from first-object topleft match, to_origin, remove_color). gs_default_candidates: static broad enumeration. gs_solve: infer + defaults -> union -> best_rule -> apply. gs_solve_n: rank all; take top N; return Coverage-Rule pairs. gs_explain: best_rule + coverage count. gs_all_same_output: maplist gs_apply. gs_n_pairs: length. No cross-pack dependencies; uses library(lists) and library(apply). 14 gs_* predicates, 41 tests, Layer 191.
+    Integrates rule inference, candidate ranking, and rule application into a single end-to-end solve/3 predicate. gridsolve_apply: self-contained dispatch engine (recolor, recolor_all, color_map, shift, to_origin, reflect_h, reflect_v, remove_color, keep_color, sort_size_desc, sort_size_asc, top_n, identity). gridsolve_coverage: include(gridsolve_pair_ok_) + length. gridsolve_consistent: maplist(gridsolve_pair_ok_). gridsolve_rank_rules: findall -N-Rule keyed msort + extract values. gridsolve_best_rule: rank head. gridsolve_consistent_rules: include(gridsolve_consistent_check_). gridsolve_valid_rules: include(gridsolve_has_coverage_). gridsolve_infer_candidates: findall over gridsolve_infer_one_ backtracking patterns (recolor from single-color set difference, recolor_all if After has one color, color_map from positional pairs, shift from first-object topleft match, to_origin, remove_color). gridsolve_default_candidates: static broad enumeration. gridsolve_solve: infer + defaults -> union -> best_rule -> apply. gridsolve_solve_n: rank all; take top N; return Coverage-Rule pairs. gridsolve_explain: best_rule + coverage count. gridsolve_all_same_output: maplist gridsolve_apply. gridsolve_n_pairs: length. No cross-pack dependencies; uses library(lists) and library(apply). 14 gs_* predicates, 41 tests, Layer 191.
 
 transformgen
 Systematic Generation of Scene Transformation Rule Candidates (PR 301)
@@ -888,20 +888,20 @@ Sequential Rule Inference: Multi-Step Scene Transformation Search with ARC-AGI-2
 
 gridquery
 Grid Query and Manipulation: Size, Color, Region, Diff, and Structural Ops (gq_*, Layer 196)
-    gq_size/3: height and width of a grid
-    gq_at/4: color at position (R,C) in the grid
-    gq_row/3: extract row R as a list
-    gq_col/3: extract column C as a list
-    gq_colors/2: sorted list of distinct colors in the grid
-    gq_n_cells/3: count of cells matching a given color
-    gq_most_freq_color/2: most frequent color (background by frequency)
-    gq_region/6: rectangular sub-grid bounded by (R0,C0)-(R1,C1)
-    gq_diff/3: r(R,C) cells where two grids differ
-    gq_n_diff/3: count of differing cells
-    gq_same_size/2: succeed if two grids have the same dimensions
-    gq_transpose/2: transpose the grid (rows become columns)
-    gq_replace/5: replace one cell and return the new grid
-    gq_fill_region/7: fill a rectangular region with a given color
+    gridquery_size/3: height and width of a grid
+    gridquery_at/4: color at position (R,C) in the grid
+    gridquery_row/3: extract row R as a list
+    gridquery_col/3: extract column C as a list
+    gridquery_colors/2: sorted list of distinct colors in the grid
+    gridquery_n_cells/3: count of cells matching a given color
+    gridquery_most_freq_color/2: most frequent color (background by frequency)
+    gridquery_region/6: rectangular sub-grid bounded by (R0,C0)-(R1,C1)
+    gridquery_diff/3: r(R,C) cells where two grids differ
+    gridquery_n_diff/3: count of differing cells
+    gridquery_same_size/2: succeed if two grids have the same dimensions
+    gridquery_transpose/2: transpose the grid (rows become columns)
+    gridquery_replace/5: replace one cell and return the new grid
+    gridquery_fill_region/7: fill a rectangular region with a given color
 
 gridparse
 Grid Parse: Conversion between Raw Grid Format and obj(Color,Cells) Scenes (gp_*, Layer 197)
@@ -939,20 +939,20 @@ Grid Task: End-to-End Raw Grid Task Solver (gt_*, Layer 198)
 
 gridnbr
 Grid Neighbor Analysis: Cell Adjacency, Morphological Ops, and Neighbor Counts (gn_*, Layer 199)
-    gn_nbr4/4: list of values at 4-connected neighbors of (R,C), omitting out-of-bounds
-    gn_nbr8/4: list of values at 8-connected neighbors of (R,C), omitting out-of-bounds
-    gn_count4/5: count of Color among 4-connected neighbors of (R,C)
-    gn_count8/5: count of Color among 8-connected neighbors of (R,C)
-    gn_count4_grid/3: grid of 4-neighbor Color counts for every cell
-    gn_count8_grid/3: grid of 8-neighbor Color counts for every cell
-    gn_any4/4: succeed (deterministic) if any 4-neighbor has given Color
-    gn_all4/4: succeed if every 4-neighbor has given Color (fails for no-neighbor cells)
-    gn_mark_border/3: replace non-background cells touching background with atom border
-    gn_mark_isolated/3: replace non-background cells with no same-color 4-neighbor with atom isolated
-    gn_expand_color/3: morphological dilation — add one layer of Color to all neighboring background cells
-    gn_shrink_color/3: morphological erosion — remove Color cells touching any non-Color 4-neighbor
-    gn_majority_nbr4/4: most frequent color among 4-connected neighbors; fails for no-neighbor cells
-    gn_conway_step/4: one cellular automaton step — kill Color cells with exactly N Color 4-neighbors
+    gridnbr_nbr4/4: list of values at 4-connected neighbors of (R,C), omitting out-of-bounds
+    gridnbr_nbr8/4: list of values at 8-connected neighbors of (R,C), omitting out-of-bounds
+    gridnbr_count4/5: count of Color among 4-connected neighbors of (R,C)
+    gridnbr_count8/5: count of Color among 8-connected neighbors of (R,C)
+    gridnbr_count4_grid/3: grid of 4-neighbor Color counts for every cell
+    gridnbr_count8_grid/3: grid of 8-neighbor Color counts for every cell
+    gridnbr_any4/4: succeed (deterministic) if any 4-neighbor has given Color
+    gridnbr_all4/4: succeed if every 4-neighbor has given Color (fails for no-neighbor cells)
+    gridnbr_mark_border/3: replace non-background cells touching background with atom border
+    gridnbr_mark_isolated/3: replace non-background cells with no same-color 4-neighbor with atom isolated
+    gridnbr_expand_color/3: morphological dilation — add one layer of Color to all neighboring background cells
+    gridnbr_shrink_color/3: morphological erosion — remove Color cells touching any non-Color 4-neighbor
+    gridnbr_majority_nbr4/4: most frequent color among 4-connected neighbors; fails for no-neighbor cells
+    gridnbr_conway_step/4: one cellular automaton step — kill Color cells with exactly N Color 4-neighbors
 
 griddist
 Grid Distance Transform: Cell-to-Color Distances, BFS Flood, Voronoi, and Morphological N-Step Ops (gd_*, Layer 200)
@@ -990,20 +990,20 @@ Grid Periodic Pattern Detection and Extension: Row/Column Period, Tiling, Autoco
 
 gridscale
 Grid Block-Pixel Scaling: Upsample, Downsample, Scale Factor, Tile Inference, Pad, and Resize (gsc_*, Layer 202)
-    gsc_upsample/3: each cell becomes NxN block of same color; output is (H*N) x (W*N)
-    gsc_downsample/3: each NxN block must be uniform; that color becomes one cell; fails if any block is not uniform
-    gsc_block_majority/3: downsample by N using majority-vote per NxN block; never fails
-    gsc_scale_factor/3: find integer N such that GridB = gsc_upsample(GridA, N); fails if none exists
-    gsc_is_scale_of/3: succeed if GridB equals GridA upsampled by N (negation-as-failure check)
-    gsc_block_at/5: extract NxN sub-grid at block position (BR, BC) = raw cells (BR*N..BR*N+N-1) x (BC*N..BC*N+N-1)
-    gsc_block_uniform/5: succeed if NxN block at (BR, BC) is all one Color; returns that Color
-    gsc_all_uniform/2: succeed if every NxN block in Grid is uniform (necessary condition for exact upsampling)
-    gsc_infer_tile/2: find smallest Tile whose N-upsampling equals Grid (largest valid block size); fails if no N>=2 works
-    gsc_factors/2: ascending list of all positive integers that divide both H and W
-    gsc_resize/4: nearest-neighbor resize to (TargetH, TargetW); Resized[r][c] = Grid[(r*H)//TargetH][(c*W)//TargetW]
-    gsc_subsample/3: stride-N sampling; Sub[BR][BC] = Grid[BR*N][BC*N]; output is (H//N) x (W//N)
-    gsc_pad/4: surround Grid with N-cell wide border of Color; output is (H+2N) x (W+2N); N=0 is no-op
-    gsc_crop_to_factor/3: crop to largest dimensions divisible by N; CH=(H//N)*N, CW=(W//N)*N, top-left region
+    gridscale_upsample/3: each cell becomes NxN block of same color; output is (H*N) x (W*N)
+    gridscale_downsample/3: each NxN block must be uniform; that color becomes one cell; fails if any block is not uniform
+    gridscale_block_majority/3: downsample by N using majority-vote per NxN block; never fails
+    gridscale_scale_factor/3: find integer N such that GridB = gridscale_upsample(GridA, N); fails if none exists
+    gridscale_is_scale_of/3: succeed if GridB equals GridA upsampled by N (negation-as-failure check)
+    gridscale_block_at/5: extract NxN sub-grid at block position (BR, BC) = raw cells (BR*N..BR*N+N-1) x (BC*N..BC*N+N-1)
+    gridscale_block_uniform/5: succeed if NxN block at (BR, BC) is all one Color; returns that Color
+    gridscale_all_uniform/2: succeed if every NxN block in Grid is uniform (necessary condition for exact upsampling)
+    gridscale_infer_tile/2: find smallest Tile whose N-upsampling equals Grid (largest valid block size); fails if no N>=2 works
+    gridscale_factors/2: ascending list of all positive integers that divide both H and W
+    gridscale_resize/4: nearest-neighbor resize to (TargetH, TargetW); Resized[r][c] = Grid[(r*H)//TargetH][(c*W)//TargetW]
+    gridscale_subsample/3: stride-N sampling; Sub[BR][BC] = Grid[BR*N][BC*N]; output is (H//N) x (W//N)
+    gridscale_pad/4: surround Grid with N-cell wide border of Color; output is (H+2N) x (W+2N); N=0 is no-op
+    gridscale_crop_to_factor/3: crop to largest dimensions divisible by N; CH=(H//N)*N, CW=(W//N)*N, top-left region
 
 gridrun
 Grid Run-Length Encoding and Stripe Analysis: Row/Column Runs, Uniformity, Striped Grids, and Alternating Patterns (grl_*, Layer 203)
@@ -1024,37 +1024,37 @@ Grid Run-Length Encoding and Stripe Analysis: Row/Column Runs, Uniformity, Strip
 
 gridflood
 Grid Flood-Fill, Region Analysis, Hole Filling, and Connected Components (gf_*, Layer 204)
-    gf_fill/5: 4-connected flood-fill from seed (R,C); replaces same-color region with NewColor; no-op if already NewColor
-    gf_fill8/5: 8-connected flood-fill from seed (R,C); diagonally adjacent cells of same color are included
-    gf_recolor/4: global palette swap; every OldColor cell becomes NewColor regardless of connectivity
-    gf_isolate/5: keep 4-connected region at (R,C); set all other cells to BgColor
-    gf_region_cells/4: list of R-C coordinates of 4-connected same-color region at (R,C) in BFS order
-    gf_region_size/4: cell count of 4-connected same-color region at (R,C)
-    gf_region_bbox/7: bounding box (MinR, MinC, MaxR, MaxC) of 4-connected region at (R,C)
-    gf_enclosed_cells/3: list of BgColor cells not reachable from grid border via 4-connected BgColor paths (holes)
-    gf_fill_enclosed/4: replace all enclosed BgColor cells with FillColor; border-reachable BgColor cells unchanged
-    gf_components/3: list of cell-lists, one per 4-connected Color region, in top-left seed order
-    gf_n_components/3: count of 4-connected Color regions; 0 if Color absent
-    gf_largest/3: cell-list of largest 4-connected Color region; ties favor first encountered; fails if Color absent
-    gf_is_connected/3: succeed if all Color cells form at most one connected region (Connectivity = 4 or 8); vacuously true if none
-    gf_boundary_fill/6: 4-connected flood-fill from (R,C) stopping at BoundaryColor walls; fills only SeedColor cells
+    gridflood_fill/5: 4-connected flood-fill from seed (R,C); replaces same-color region with NewColor; no-op if already NewColor
+    gridflood_fill8/5: 8-connected flood-fill from seed (R,C); diagonally adjacent cells of same color are included
+    gridflood_recolor/4: global palette swap; every OldColor cell becomes NewColor regardless of connectivity
+    gridflood_isolate/5: keep 4-connected region at (R,C); set all other cells to BgColor
+    gridflood_region_cells/4: list of R-C coordinates of 4-connected same-color region at (R,C) in BFS order
+    gridflood_region_size/4: cell count of 4-connected same-color region at (R,C)
+    gridflood_region_bbox/7: bounding box (MinR, MinC, MaxR, MaxC) of 4-connected region at (R,C)
+    gridflood_enclosed_cells/3: list of BgColor cells not reachable from grid border via 4-connected BgColor paths (holes)
+    gridflood_fill_enclosed/4: replace all enclosed BgColor cells with FillColor; border-reachable BgColor cells unchanged
+    gridflood_components/3: list of cell-lists, one per 4-connected Color region, in top-left seed order
+    gridflood_n_components/3: count of 4-connected Color regions; 0 if Color absent
+    gridflood_largest/3: cell-list of largest 4-connected Color region; ties favor first encountered; fails if Color absent
+    gridflood_is_connected/3: succeed if all Color cells form at most one connected region (Connectivity = 4 or 8); vacuously true if none
+    gridflood_boundary_fill/6: 4-connected flood-fill from (R,C) stopping at BoundaryColor walls; fills only SeedColor cells
 
 gridpath
 Grid Pathfinding: BFS Shortest Path, Distance Maps, Flood-N, Wavefront, Line-of-Sight, and Region Path (gpa_*, Layer 205)
-    gpa_shortest_path/7: shortest 4-connected path from (R1,C1) to (R2,C2) avoiding ObsColor; returns R-C list including both endpoints; fails if either endpoint is obstacle or no path exists
-    gpa_path_length/7: step count of shortest 4-path (length of path list minus 1); fails if no path
-    gpa_reachable/6: succeed if (R2,C2) is 4-connected reachable from (R1,C1) avoiding ObsColor
-    gpa_all_reachable/5: list of all cells reachable from seed via 4-connected non-ObsColor paths; includes seed itself
-    gpa_distance_map/5: list of NR-NC-Dist triples for all cells reachable from seed; seed has Dist=0; unreachable cells omitted
-    gpa_nearest/6: nearest reachable cell of TargetColor to seed; tie-break by BFS order; returns NR-NC; fails if none reachable
-    gpa_flood_n/6: all cells reachable within N 4-connected steps from seed avoiding ObsColor; N=0 returns just seed
-    gpa_wavefront/6: cells at exactly BFS distance N from seed; returns [] if no cells at that distance
-    gpa_straight_h/4: cells on horizontal segment row R, columns C1..C2 inclusive; order follows C1-to-C2 direction
-    gpa_straight_v/4: cells on vertical segment column C, rows R1..R2 inclusive; order follows R1-to-R2 direction
-    gpa_line_of_sight/6: succeed if (R1,C1) and (R2,C2) share row or column with no ObsColor strictly between; fail for diagonals
-    gpa_between_h/4: cells strictly interior to horizontal segment (endpoints excluded) in ascending column order
-    gpa_between_v/4: cells strictly interior to vertical segment (endpoints excluded) in ascending row order
-    gpa_region_path/5: shortest 4-path from any Color1 cell to any Color2 cell avoiding ObsColor; fails if no cells or no path
+    gridpath_shortest_path/7: shortest 4-connected path from (R1,C1) to (R2,C2) avoiding ObsColor; returns R-C list including both endpoints; fails if either endpoint is obstacle or no path exists
+    gridpath_path_length/7: step count of shortest 4-path (length of path list minus 1); fails if no path
+    gridpath_reachable/6: succeed if (R2,C2) is 4-connected reachable from (R1,C1) avoiding ObsColor
+    gridpath_all_reachable/5: list of all cells reachable from seed via 4-connected non-ObsColor paths; includes seed itself
+    gridpath_distance_map/5: list of NR-NC-Dist triples for all cells reachable from seed; seed has Dist=0; unreachable cells omitted
+    gridpath_nearest/6: nearest reachable cell of TargetColor to seed; tie-break by BFS order; returns NR-NC; fails if none reachable
+    gridpath_flood_n/6: all cells reachable within N 4-connected steps from seed avoiding ObsColor; N=0 returns just seed
+    gridpath_wavefront/6: cells at exactly BFS distance N from seed; returns [] if no cells at that distance
+    gridpath_straight_h/4: cells on horizontal segment row R, columns C1..C2 inclusive; order follows C1-to-C2 direction
+    gridpath_straight_v/4: cells on vertical segment column C, rows R1..R2 inclusive; order follows R1-to-R2 direction
+    gridpath_line_of_sight/6: succeed if (R1,C1) and (R2,C2) share row or column with no ObsColor strictly between; fail for diagonals
+    gridpath_between_h/4: cells strictly interior to horizontal segment (endpoints excluded) in ascending column order
+    gridpath_between_v/4: cells strictly interior to vertical segment (endpoints excluded) in ascending row order
+    gridpath_region_path/5: shortest 4-path from any Color1 cell to any Color2 cell avoiding ObsColor; fails if no cells or no path
 
 gridmask
 Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206)
@@ -1160,88 +1160,88 @@ gridedge
 
 gridmorph
     Grid Morphological Operations: Dilation, Erosion, Opening, Closing, Fill, and Gradient (gmo_*, Layer 212)
-    gmo_dilate/4: expand FgColor region by N layers (each non-FgColor cell adjacent to FgColor becomes FgColor)
-    gmo_erode/4: shrink FgColor region by N layers (each FgColor cell adjacent to non-FgColor becomes background)
-    gmo_open/4: morphological opening - N erosions then N dilations; removes small FgColor protrusions
-    gmo_close/4: morphological closing - N dilations then N erosions; fills small gaps and holes in FgColor
-    gmo_dilate1/3: single dilation step
-    gmo_erode1/3: single erosion step (background color discovered automatically)
-    gmo_boundary_inner/3: FgColor cells with at least one non-FgColor 4-connected in-bounds neighbor (inner border)
-    gmo_boundary_outer/3: non-FgColor cells with at least one FgColor 4-connected in-bounds neighbor (outer border)
-    gmo_gradient_cells/3: union of inner and outer boundaries (all cells in the border region)
-    gmo_top_hat/4: FgColor cells present in input but absent after opening (highlights small bright structures)
-    gmo_bottom_hat/4: cells added by closing that were not FgColor in input (highlights small dark holes)
-    gmo_fill_holes/4: replace enclosed BgColor regions (unreachable from grid border) with FgColor
-    gmo_connected_border/4: BFS from border TargetColor cells through TargetColor region; returns all reachable cells
-    gmo_remove_small/5: remove FgColor connected components with fewer than MinSize cells
+    gridmorph_dilate/4: expand FgColor region by N layers (each non-FgColor cell adjacent to FgColor becomes FgColor)
+    gridmorph_erode/4: shrink FgColor region by N layers (each FgColor cell adjacent to non-FgColor becomes background)
+    gridmorph_open/4: morphological opening - N erosions then N dilations; removes small FgColor protrusions
+    gridmorph_close/4: morphological closing - N dilations then N erosions; fills small gaps and holes in FgColor
+    gridmorph_dilate1/3: single dilation step
+    gridmorph_erode1/3: single erosion step (background color discovered automatically)
+    gridmorph_boundary_inner/3: FgColor cells with at least one non-FgColor 4-connected in-bounds neighbor (inner border)
+    gridmorph_boundary_outer/3: non-FgColor cells with at least one FgColor 4-connected in-bounds neighbor (outer border)
+    gridmorph_gradient_cells/3: union of inner and outer boundaries (all cells in the border region)
+    gridmorph_top_hat/4: FgColor cells present in input but absent after opening (highlights small bright structures)
+    gridmorph_bottom_hat/4: cells added by closing that were not FgColor in input (highlights small dark holes)
+    gridmorph_fill_holes/4: replace enclosed BgColor regions (unreachable from grid border) with FgColor
+    gridmorph_connected_border/4: BFS from border TargetColor cells through TargetColor region; returns all reachable cells
+    gridmorph_remove_small/5: remove FgColor connected components with fewer than MinSize cells
 
 gridconv
     Grid Convolution: Sliding Window, Pattern Matching, Density Maps, and Square Morphology (gcv_*, Layer 213)
-    gcv_window/6: extract (2N+1)x(2N+1) subgrid centered at (R,C); fill out-of-bounds with Fill color
-    gcv_count_in/6: count cells of Color in in-bounds portion of (2N+1)x(2N+1) window
-    gcv_density_map/4: grid where each cell holds Color count from its (2N+1)x(2N+1) window
-    gcv_majority/5: most frequent color among in-bounds window cells (ties by term order)
-    gcv_majority_map/3: each cell replaced by its local majority color (radius N)
-    gcv_uniform_at/5: yes/no - all in-bounds window cells are the same color
-    gcv_uniform_cells/3: list of (R,C) where in-bounds window is uniform
-    gcv_find_pattern/3: list of (R,C) where Pattern exactly matches as a subgrid; (R,C) is top-left corner
-    gcv_count_pattern/3: count positions where Pattern matches in Grid
-    gcv_has_pattern/2: succeeds if Pattern occurs at least once in Grid
-    gcv_hot_spots/5: cells where Color count in window >= Threshold
-    gcv_dilate_sq/4: square SE dilation radius N - cell becomes FgColor if any window cell is FgColor
-    gcv_erode_sq/4: square SE erosion radius N - FgColor cell loses color if any in-bounds window cell is not FgColor
-    gcv_replace_pattern/4: replace first (row-major) Pattern occurrence with Replacement; unchanged if no match
+    gridconv_window/6: extract (2N+1)x(2N+1) subgrid centered at (R,C); fill out-of-bounds with Fill color
+    gridconv_count_in/6: count cells of Color in in-bounds portion of (2N+1)x(2N+1) window
+    gridconv_density_map/4: grid where each cell holds Color count from its (2N+1)x(2N+1) window
+    gridconv_majority/5: most frequent color among in-bounds window cells (ties by term order)
+    gridconv_majority_map/3: each cell replaced by its local majority color (radius N)
+    gridconv_uniform_at/5: yes/no - all in-bounds window cells are the same color
+    gridconv_uniform_cells/3: list of (R,C) where in-bounds window is uniform
+    gridconv_find_pattern/3: list of (R,C) where Pattern exactly matches as a subgrid; (R,C) is top-left corner
+    gridconv_count_pattern/3: count positions where Pattern matches in Grid
+    gridconv_has_pattern/2: succeeds if Pattern occurs at least once in Grid
+    gridconv_hot_spots/5: cells where Color count in window >= Threshold
+    gridconv_dilate_sq/4: square SE dilation radius N - cell becomes FgColor if any window cell is FgColor
+    gridconv_erode_sq/4: square SE erosion radius N - FgColor cell loses color if any in-bounds window cell is not FgColor
+    gridconv_replace_pattern/4: replace first (row-major) Pattern occurrence with Replacement; unchanged if no match
 
 gridgraph
     Grid Region Adjacency Graph: Color Adjacency, Borders, Enclosure, Spanning, and Component Analysis (ggr_*, Layer 214)
-    ggr_adj_colors/2: sorted list of color pairs (C1-C2, C1 @< C2) where the two color regions share a 4-connected boundary
-    ggr_adj_of/3: sorted list of distinct colors 4-adjacent to Color
-    ggr_adj_graph/2: full adjacency list as list of (Color, Neighbors) for every distinct color
-    ggr_are_adj/3: test if two distinct colors share at least one 4-connected boundary
-    ggr_color_degree/3: count distinct colors adjacent to Color
-    ggr_shared_border/4: C1 cells that have at least one C2 4-neighbor (directional border)
-    ggr_border_length/4: count of C1 cells touching C2 (directional; may differ from C2->C1 count)
-    ggr_isolated_colors/2: colors with no differently-colored in-bounds 4-neighbor (degree 0)
-    ggr_enclosed_colors/3: colors with no border cells AND every non-self 4-neighbor is OuterColor
-    ggr_spanning_h/2: colors with at least one cell in column 0 AND at least one cell in last column
-    ggr_spanning_v/2: colors with at least one cell in row 0 AND at least one cell in last row
-    ggr_merge_colors/4: replace FromColor with ToColor everywhere in Grid
-    ggr_color_components/3: count 4-connected components of Color
-    ggr_component_cells/3: list of cell-lists; each is one 4-connected component of Color
+    gridgraph_adj_colors/2: sorted list of color pairs (C1-C2, C1 @< C2) where the two color regions share a 4-connected boundary
+    gridgraph_adj_of/3: sorted list of distinct colors 4-adjacent to Color
+    gridgraph_adj_graph/2: full adjacency list as list of (Color, Neighbors) for every distinct color
+    gridgraph_are_adj/3: test if two distinct colors share at least one 4-connected boundary
+    gridgraph_color_degree/3: count distinct colors adjacent to Color
+    gridgraph_shared_border/4: C1 cells that have at least one C2 4-neighbor (directional border)
+    gridgraph_border_length/4: count of C1 cells touching C2 (directional; may differ from C2->C1 count)
+    gridgraph_isolated_colors/2: colors with no differently-colored in-bounds 4-neighbor (degree 0)
+    gridgraph_enclosed_colors/3: colors with no border cells AND every non-self 4-neighbor is OuterColor
+    gridgraph_spanning_h/2: colors with at least one cell in column 0 AND at least one cell in last column
+    gridgraph_spanning_v/2: colors with at least one cell in row 0 AND at least one cell in last row
+    gridgraph_merge_colors/4: replace FromColor with ToColor everywhere in Grid
+    gridgraph_color_components/3: count 4-connected components of Color
+    gridgraph_component_cells/3: list of cell-lists; each is one 4-connected component of Color
 
 griddiag
     Grid Diagonal Analysis: Main and Anti-Diagonal Extraction, Counting, Uniformity, and Modification (gdi_*, Layer 215)
-    gdi_main_diag/3: values on K-th main diagonal (C-R=K), in ascending R order; K=0 is principal diagonal
-    gdi_anti_diag/3: values on K-th anti-diagonal (R+C=K), in ascending C order; K=0 is top-left corner
-    gdi_trace/2: principal diagonal (K=0); length = min(H,W)
-    gdi_all_main_diags/2: all H+W-1 main diagonals ordered from K=-(H-1) to K=W-1
-    gdi_all_anti_diags/2: all H+W-1 anti-diagonals ordered from K=0 to K=H+W-2
-    gdi_main_count/4: count of Color occurrences on K-th main diagonal
-    gdi_anti_count/4: count of Color occurrences on K-th anti-diagonal
-    gdi_main_uniform/3: yes/no - all cells on K-th main diagonal are the same color
-    gdi_anti_uniform/3: yes/no - all cells on K-th anti-diagonal are the same color
-    gdi_set_main_diag/4: grid with all cells on main diagonal K replaced by Color
-    gdi_set_anti_diag/4: grid with all cells on anti-diagonal K replaced by Color
-    gdi_uniform_main_diags/2: list of K values for which the main diagonal is uniform
-    gdi_uniform_anti_diags/2: list of K values for which the anti-diagonal is uniform
-    gdi_diag_length/3: number of cells on the K-th main diagonal
+    griddiag_main_diag/3: values on K-th main diagonal (C-R=K), in ascending R order; K=0 is principal diagonal
+    griddiag_anti_diag/3: values on K-th anti-diagonal (R+C=K), in ascending C order; K=0 is top-left corner
+    griddiag_trace/2: principal diagonal (K=0); length = min(H,W)
+    griddiag_all_main_diags/2: all H+W-1 main diagonals ordered from K=-(H-1) to K=W-1
+    griddiag_all_anti_diags/2: all H+W-1 anti-diagonals ordered from K=0 to K=H+W-2
+    griddiag_main_count/4: count of Color occurrences on K-th main diagonal
+    griddiag_anti_count/4: count of Color occurrences on K-th anti-diagonal
+    griddiag_main_uniform/3: yes/no - all cells on K-th main diagonal are the same color
+    griddiag_anti_uniform/3: yes/no - all cells on K-th anti-diagonal are the same color
+    griddiag_set_main_diag/4: grid with all cells on main diagonal K replaced by Color
+    griddiag_set_anti_diag/4: grid with all cells on anti-diagonal K replaced by Color
+    griddiag_uniform_main_diags/2: list of K values for which the main diagonal is uniform
+    griddiag_uniform_anti_diags/2: list of K values for which the anti-diagonal is uniform
+    griddiag_diag_length/3: number of cells on the K-th main diagonal
 
 gridframe
     Grid Frame Analysis: Concentric Ring Depth, Frame Extraction, Uniformity, Fill, and Peel (gfr_*, Layer 216)
-    gfr_cell_depth/4: frame depth of cell (R,C): min(R,H-1-R,C,W-1-C); 0 = outermost border
-    gfr_frame/3: list of R-C pairs at frame depth D, in row-major order
-    gfr_max_depth/2: maximum frame depth = floor((min(H,W)-1)/2)
-    gfr_frame_count/2: number of distinct depths (max_depth + 1)
-    gfr_peel/2: inner (H-2)x(W-2) subgrid after removing the outermost frame; fails if H<3 or W<3
-    gfr_all_frames/2: list of frame cell-lists ordered from depth 0 to max_depth
-    gfr_frame_uniform/3: yes/no - all cells at depth D are the same color
-    gfr_frame_colors/3: deduplicated list of colors present at frame depth D
-    gfr_set_frame/4: grid with all cells at depth D replaced by Color
-    gfr_count_in_frame/4: count of Color occurrences at frame depth D
-    gfr_uniform_frames/2: list of depths for which the frame is uniform, ascending order
-    gfr_fill_frames/3: fill each frame D with Colors[D]; extra frames unchanged
-    gfr_innermost/2: R-C pairs at the maximum frame depth
-    gfr_onion_layers/2: list of D-Color pairs for uniform frames (onion/target pattern)
+    gridframe_cell_depth/4: frame depth of cell (R,C): min(R,H-1-R,C,W-1-C); 0 = outermost border
+    gridframe_frame/3: list of R-C pairs at frame depth D, in row-major order
+    gridframe_max_depth/2: maximum frame depth = floor((min(H,W)-1)/2)
+    gridframe_frame_count/2: number of distinct depths (max_depth + 1)
+    gridframe_peel/2: inner (H-2)x(W-2) subgrid after removing the outermost frame; fails if H<3 or W<3
+    gridframe_all_frames/2: list of frame cell-lists ordered from depth 0 to max_depth
+    gridframe_frame_uniform/3: yes/no - all cells at depth D are the same color
+    gridframe_frame_colors/3: deduplicated list of colors present at frame depth D
+    gridframe_set_frame/4: grid with all cells at depth D replaced by Color
+    gridframe_count_in_frame/4: count of Color occurrences at frame depth D
+    gridframe_uniform_frames/2: list of depths for which the frame is uniform, ascending order
+    gridframe_fill_frames/3: fill each frame D with Colors[D]; extra frames unchanged
+    gridframe_innermost/2: R-C pairs at the maximum frame depth
+    gridframe_onion_layers/2: list of D-Color pairs for uniform frames (onion/target pattern)
 
 gridspiral
     Grid Spiral Traversal: Clockwise Spiral Ordering, Read, Write, Rotate, and Frame Spirals (gsp_*, Layer 217)
@@ -1262,54 +1262,54 @@ gridspiral
 
 griddelta
     Grid Delta Analysis: Difference Detection, Change Maps, Color Transitions, and Grid Comparison (gdt_*, Layer 218)
-    gdt_compatible/2: succeeds if two grids have the same number of rows and columns
-    gdt_diff_cells/3: R-C pairs where G1 and G2 have different values, in row-major order
-    gdt_diff_count/3: count of cells where G1 and G2 differ
-    gdt_same_cells/3: R-C pairs where G1 and G2 have equal values
-    gdt_changed_pairs/3: R-C-(Old->New) terms for each cell that changed from G1 to G2
-    gdt_color_changes/4: count cells where G1 has From color and G2 has a different color
-    gdt_changed_colors/3: distinct new colors introduced by the G1→G2 delta
-    gdt_apply_delta/4: apply G1→G2 changes to G3; cell gets G2 value if G3 matches G1 at that cell
-    gdt_diff_rows/3: sorted row indices containing at least one changed cell
-    gdt_diff_cols/3: sorted column indices containing at least one changed cell
-    gdt_agree_region/6: succeeds if G1 and G2 agree on every cell in [RowMin..RowMax] x [ColMin..ColMax]
-    gdt_overlay/4: G2 overlaid onto G1; Marker color in G2 is transparent (shows G1)
-    gdt_invert_delta/3: reverse delta applied to G2 — changed cells revert to G1's values
-    gdt_is_identity/2: succeeds if two grids are identical (zero differences)
+    griddelta_compatible/2: succeeds if two grids have the same number of rows and columns
+    griddelta_diff_cells/3: R-C pairs where G1 and G2 have different values, in row-major order
+    griddelta_diff_count/3: count of cells where G1 and G2 differ
+    griddelta_same_cells/3: R-C pairs where G1 and G2 have equal values
+    griddelta_changed_pairs/3: R-C-(Old->New) terms for each cell that changed from G1 to G2
+    griddelta_color_changes/4: count cells where G1 has From color and G2 has a different color
+    griddelta_changed_colors/3: distinct new colors introduced by the G1→G2 delta
+    griddelta_apply_delta/4: apply G1→G2 changes to G3; cell gets G2 value if G3 matches G1 at that cell
+    griddelta_diff_rows/3: sorted row indices containing at least one changed cell
+    griddelta_diff_cols/3: sorted column indices containing at least one changed cell
+    griddelta_agree_region/6: succeeds if G1 and G2 agree on every cell in [RowMin..RowMax] x [ColMin..ColMax]
+    griddelta_overlay/4: G2 overlaid onto G1; Marker color in G2 is transparent (shows G1)
+    griddelta_invert_delta/3: reverse delta applied to G2 — changed cells revert to G1's values
+    griddelta_is_identity/2: succeeds if two grids are identical (zero differences)
 
 gridrowcol
 Grid Row and Column Comparative Analysis (grc_*, Layer 219)
-    grc_row/3: extract row R (0-indexed) as a flat list
-    grc_col/3: extract column C (0-indexed) as a top-to-bottom list
-    grc_row_uniform/3: succeeds if all cells in row R share the same color; binds that color
-    grc_col_uniform/3: succeeds if all cells in column C share the same color; binds that color
-    grc_equal_rows/3: succeeds if rows R1 and R2 of Grid have identical content
-    grc_equal_cols/3: succeeds if columns C1 and C2 of Grid have identical content
-    grc_row_positions/3: sorted list of row indices whose content equals Pattern
-    grc_col_positions/3: sorted list of column indices whose content equals Pattern
-    grc_matching_rows/2: all R1-R2 pairs (R1<R2) of row indices with identical content
-    grc_matching_cols/2: all C1-C2 pairs (C1<C2) of column indices with identical content
-    grc_unique_rows/2: row indices whose content appears exactly once in the grid
-    grc_unique_cols/2: column indices whose content appears exactly once in the grid
-    grc_row_sort/2: grid with rows sorted in standard order (duplicates preserved)
-    grc_col_sort/2: grid with columns reordered by lexicographic order of their content
+    gridrowcol_row/3: extract row R (0-indexed) as a flat list
+    gridrowcol_col/3: extract column C (0-indexed) as a top-to-bottom list
+    gridrowcol_row_uniform/3: succeeds if all cells in row R share the same color; binds that color
+    gridrowcol_col_uniform/3: succeeds if all cells in column C share the same color; binds that color
+    gridrowcol_equal_rows/3: succeeds if rows R1 and R2 of Grid have identical content
+    gridrowcol_equal_cols/3: succeeds if columns C1 and C2 of Grid have identical content
+    gridrowcol_row_positions/3: sorted list of row indices whose content equals Pattern
+    gridrowcol_col_positions/3: sorted list of column indices whose content equals Pattern
+    gridrowcol_matching_rows/2: all R1-R2 pairs (R1<R2) of row indices with identical content
+    gridrowcol_matching_cols/2: all C1-C2 pairs (C1<C2) of column indices with identical content
+    gridrowcol_unique_rows/2: row indices whose content appears exactly once in the grid
+    gridrowcol_unique_cols/2: column indices whose content appears exactly once in the grid
+    gridrowcol_row_sort/2: grid with rows sorted in standard order (duplicates preserved)
+    gridrowcol_col_sort/2: grid with columns reordered by lexicographic order of their content
 
 gridseg
 Grid Segmentation by Separator Rows and Columns (gsg_*, Layer 220)
-    gsg_is_sep_row/3: succeeds if row R is entirely one color; binds that color
-    gsg_is_sep_col/3: succeeds if column C is entirely one color; binds that color
-    gsg_sep_rows/3: sorted list of row indices that are entirely Color
-    gsg_sep_cols/3: sorted list of column indices that are entirely Color
-    gsg_split_h/3: split Grid at separator rows of Color into non-empty sub-grids
-    gsg_split_v/3: split Grid at separator columns of Color into non-empty sub-grids
-    gsg_segment_count_h/3: number of horizontal segments after splitting
-    gsg_segment_count_v/3: number of vertical segments after splitting
-    gsg_panels/3: flat row-major list of all panels after splitting by separator rows and cols
-    gsg_panel_count/3: total number of panels
-    gsg_trim_h/3: remove leading and trailing separator rows (top and bottom)
-    gsg_trim_v/3: remove leading and trailing separator columns (left and right)
-    gsg_trim/3: remove all border separator rows and columns
-    gsg_sep_color/2: succeeds if exactly one color is used as separator; binds it
+    gridseg_is_sep_row/3: succeeds if row R is entirely one color; binds that color
+    gridseg_is_sep_col/3: succeeds if column C is entirely one color; binds that color
+    gridseg_sep_rows/3: sorted list of row indices that are entirely Color
+    gridseg_sep_cols/3: sorted list of column indices that are entirely Color
+    gridseg_split_h/3: split Grid at separator rows of Color into non-empty sub-grids
+    gridseg_split_v/3: split Grid at separator columns of Color into non-empty sub-grids
+    gridseg_segment_count_h/3: number of horizontal segments after splitting
+    gridseg_segment_count_v/3: number of vertical segments after splitting
+    gridseg_panels/3: flat row-major list of all panels after splitting by separator rows and cols
+    gridseg_panel_count/3: total number of panels
+    gridseg_trim_h/3: remove leading and trailing separator rows (top and bottom)
+    gridseg_trim_v/3: remove leading and trailing separator columns (left and right)
+    gridseg_trim/3: remove all border separator rows and columns
+    gridseg_sep_color/2: succeeds if exactly one color is used as separator; binds it
 
 gridhist
 Grid Histogram Analysis: Per-Row and Per-Column Color Frequency (ghst_*, Layer 221)
@@ -1330,27 +1330,27 @@ Grid Histogram Analysis: Per-Row and Per-Column Color Frequency (ghst_*, Layer 2
 
 gridpos
 Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222)
-    gps_top_half/2: sub-grid of the top half of rows [0, H//2)
-    gps_bottom_half/2: sub-grid of the bottom half of rows [H//2, H)
-    gps_left_half/2: sub-grid of the left half of columns [0, W//2)
-    gps_right_half/2: sub-grid of the right half of columns [W//2, W)
-    gps_quadrant/3: rectangular quadrant sub-grid by atom (tl/tr/bl/br)
-    gps_even_rows/2: sub-grid of rows at even 0-indexed positions (0, 2, 4, ...)
-    gps_odd_rows/2: sub-grid of rows at odd 0-indexed positions (1, 3, 5, ...)
-    gps_even_cols/2: sub-grid of columns at even 0-indexed positions
-    gps_odd_cols/2: sub-grid of columns at odd 0-indexed positions
-    gps_checkerboard/3: list of R-C pairs where (R+C) mod 2 = Parity (Parity bound to 0 or 1)
-    gps_center_cell/3: center cell row and column indices (H//2, W//2)
-    gps_corners/2: four corner cells as R-C-Value terms (tl, tr, bl, br order)
-    gps_cross_h/3: center row index and row content
-    gps_cross_v/3: center column index and column content as a list
+    gridpos_top_half/2: sub-grid of the top half of rows [0, H//2)
+    gridpos_bottom_half/2: sub-grid of the bottom half of rows [H//2, H)
+    gridpos_left_half/2: sub-grid of the left half of columns [0, W//2)
+    gridpos_right_half/2: sub-grid of the right half of columns [W//2, W)
+    gridpos_quadrant/3: rectangular quadrant sub-grid by atom (tl/tr/bl/br)
+    gridpos_even_rows/2: sub-grid of rows at even 0-indexed positions (0, 2, 4, ...)
+    gridpos_odd_rows/2: sub-grid of rows at odd 0-indexed positions (1, 3, 5, ...)
+    gridpos_even_cols/2: sub-grid of columns at even 0-indexed positions
+    gridpos_odd_cols/2: sub-grid of columns at odd 0-indexed positions
+    gridpos_checkerboard/3: list of R-C pairs where (R+C) mod 2 = Parity (Parity bound to 0 or 1)
+    gridpos_center_cell/3: center cell row and column indices (H//2, W//2)
+    gridpos_corners/2: four corner cells as R-C-Value terms (tl, tr, bl, br order)
+    gridpos_cross_h/3: center row index and row content
+    gridpos_cross_v/3: center column index and column content as a list
 
 gridgrav
 Grid Gravity Simulation: Settlement in Four Directions, Pile Analysis, and Floating Cell Detection (gv_*, Layer 223)
-    gv_fall_down/3: settle non-bg cells to the bottom of each column; bg fills top vacancies
-    gv_fall_up/3: settle non-bg cells to the top of each column; bg fills bottom vacancies
-    gv_fall_left/3: settle non-bg cells to the left of each row; bg fills right vacancies
-    gv_fall_right/3: settle non-bg cells to the right of each row; bg fills left vacancies
+    gravity_fall_down/3: settle non-bg cells to the bottom of each column; bg fills top vacancies
+    gravity_fall_up/3: settle non-bg cells to the top of each column; bg fills bottom vacancies
+    gravity_fall_left/3: settle non-bg cells to the left of each row; bg fills right vacancies
+    gravity_fall_right/3: settle non-bg cells to the right of each row; bg fills left vacancies
     gv_col_pile_h/4: count of non-bg cells in column C (pile height under down gravity)
     gv_row_pile_w/4: count of non-bg cells in row R (pile width under left gravity)
     gv_all_col_piles/3: list of pile heights for all columns in column-index order
@@ -1381,71 +1381,71 @@ Grid Tiling Pattern Analysis: Period Detection, Tile Extraction, Tiling Verifica
 
 gridmark
 Grid Marking and Annotation: Mark Cells, Rows, Columns, Borders, Diagonals, Rectangles, and Checkerboards (gmk_*, Layer 225)
-    gmk_mark_cell/5: overwrite one cell (R,C) with MarkColor
-    gmk_mark_cells/4: overwrite a list of R-C pairs with MarkColor
-    gmk_mark_row/4: overwrite all cells in row R with MarkColor
-    gmk_mark_col/4: overwrite all cells in column C with MarkColor
-    gmk_mark_rect/7: overwrite cells in rectangle rows [R0..R1], cols [C0..C1]
-    gmk_mark_border/3: overwrite all outer-ring cells with MarkColor
-    gmk_mark_diagonal/3: overwrite main diagonal cells (R=C, both in range)
-    gmk_mark_anti_diagonal/3: overwrite anti-diagonal cells where R+C = W-1
-    gmk_mark_corners/3: overwrite the four corner cells with MarkColor
-    gmk_mark_cross/3: overwrite the center row (H//2) and center column (W//2)
-    gmk_marked_cells/3: list of R-C pairs for all cells with MarkColor in row-major order
-    gmk_is_marked/4: check if cell (R,C) has MarkColor
-    gmk_mark_checkerboard/3: overwrite all cells where (R+C) mod 2 = 0
-    gmk_erase/4: replace all cells of MarkColor with BgColor
+    gridmark_mark_cell/5: overwrite one cell (R,C) with MarkColor
+    gridmark_mark_cells/4: overwrite a list of R-C pairs with MarkColor
+    gridmark_mark_row/4: overwrite all cells in row R with MarkColor
+    gridmark_mark_col/4: overwrite all cells in column C with MarkColor
+    gridmark_mark_rect/7: overwrite cells in rectangle rows [R0..R1], cols [C0..C1]
+    gridmark_mark_border/3: overwrite all outer-ring cells with MarkColor
+    gridmark_mark_diagonal/3: overwrite main diagonal cells (R=C, both in range)
+    gridmark_mark_anti_diagonal/3: overwrite anti-diagonal cells where R+C = W-1
+    gridmark_mark_corners/3: overwrite the four corner cells with MarkColor
+    gridmark_mark_cross/3: overwrite the center row (H//2) and center column (W//2)
+    gridmark_marked_cells/3: list of R-C pairs for all cells with MarkColor in row-major order
+    gridmark_is_marked/4: check if cell (R,C) has MarkColor
+    gridmark_mark_checkerboard/3: overwrite all cells where (R+C) mod 2 = 0
+    gridmark_erase/4: replace all cells of MarkColor with BgColor
 
 gridcrop
 Grid Cropping and Padding: Bounding Box, Trim, Crop, Pad, Center, Border, and Expand (gcr_*, Layer 226)
-    gcr_bbox/3: bounding box R0-C0-R1-C1 of all non-BgColor cells; fails if all cells are BgColor
-    gcr_crop_bbox/3: crop grid to the non-BgColor bounding box
-    gcr_trim/3: remove all outer uniform-BgColor rows and columns (equivalent to gcr_crop_bbox)
-    gcr_trim_rows/3: remove leading and trailing uniform-BgColor rows; columns unchanged
-    gcr_trim_cols/3: remove leading and trailing uniform-BgColor columns; rows unchanged
-    gcr_crop/6: extract sub-grid at rows R0..R1 and columns C0..C1 (0-indexed, inclusive)
-    gcr_pad_to/5: extend grid with BgColor to at least TargetH rows and TargetW columns
-    gcr_center_in/5: place grid in the center of a TargetH x TargetW BgColor frame
-    gcr_add_border/4: add N rows and N columns of Color on all four sides
-    gcr_remove_border/4: remove N rows and columns from all four sides
-    gcr_expand_down/4: append N new rows of Color at the bottom
-    gcr_expand_right/4: append N new columns of Color at the right
-    gcr_content_h/3: height of the non-BgColor bounding box (MaxR - MinR + 1)
-    gcr_content_w/3: width of the non-BgColor bounding box (MaxC - MinC + 1)
+    gridcrop_bbox/3: bounding box R0-C0-R1-C1 of all non-BgColor cells; fails if all cells are BgColor
+    gridcrop_crop_bbox/3: crop grid to the non-BgColor bounding box
+    gridcrop_trim/3: remove all outer uniform-BgColor rows and columns (equivalent to gridcrop_crop_bbox)
+    gridcrop_trim_rows/3: remove leading and trailing uniform-BgColor rows; columns unchanged
+    gridcrop_trim_cols/3: remove leading and trailing uniform-BgColor columns; rows unchanged
+    gridcrop_crop/6: extract sub-grid at rows R0..R1 and columns C0..C1 (0-indexed, inclusive)
+    gridcrop_pad_to/5: extend grid with BgColor to at least TargetH rows and TargetW columns
+    gridcrop_center_in/5: place grid in the center of a TargetH x TargetW BgColor frame
+    gridcrop_add_border/4: add N rows and N columns of Color on all four sides
+    gridcrop_remove_border/4: remove N rows and columns from all four sides
+    gridcrop_expand_down/4: append N new rows of Color at the bottom
+    gridcrop_expand_right/4: append N new columns of Color at the right
+    gridcrop_content_h/3: height of the non-BgColor bounding box (MaxR - MinR + 1)
+    gridcrop_content_w/3: width of the non-BgColor bounding box (MaxC - MinC + 1)
 
 gridpatch
 Grid Patch Operations: Extract, Place, Overlay, Find, Tile, Scatter, and Inpaint (gpt_*, Layer 227)
-    gpt_extract/6: extract sub-grid at rows R0..R1 and columns C0..C1
-    gpt_place/5: paste Patch at (R0,C0) overwriting cells in Grid
-    gpt_overlay/6: paste Patch with transparency (TranspColor cells kept from Grid)
-    gpt_match_at/4: check if Patch exactly matches Grid at position (R0,C0)
-    gpt_find_all/3: all R0-C0 positions where Patch matches in Grid (row-major)
-    gpt_count/3: count positions where Patch matches in Grid
-    gpt_scatter/4: place Patch at every position in a list, left-to-right
-    gpt_tile_fill/4: build H x W grid by tiling Patch (cell (R,C) = Patch[R mod PH][C mod PW])
-    gpt_h/2: number of rows in Patch
-    gpt_w/2: number of columns in Patch
-    gpt_size/3: row and column count of Patch
-    gpt_eq/2: check if two patches are identical
-    gpt_inpaint/7: fill rectangle [R0..R1] x [C0..C1] in Grid with Color
-    gpt_replace_first/4: replace first (top-left) matching OldPatch occurrence with NewPatch
+    gridpatch_extract/6: extract sub-grid at rows R0..R1 and columns C0..C1
+    gridpatch_place/5: paste Patch at (R0,C0) overwriting cells in Grid
+    gridpatch_overlay/6: paste Patch with transparency (TranspColor cells kept from Grid)
+    gridpatch_match_at/4: check if Patch exactly matches Grid at position (R0,C0)
+    gridpatch_find_all/3: all R0-C0 positions where Patch matches in Grid (row-major)
+    gridpatch_count/3: count positions where Patch matches in Grid
+    gridpatch_scatter/4: place Patch at every position in a list, left-to-right
+    gridpatch_tile_fill/4: build H x W grid by tiling Patch (cell (R,C) = Patch[R mod PH][C mod PW])
+    gridpatch_h/2: number of rows in Patch
+    gridpatch_w/2: number of columns in Patch
+    gridpatch_size/3: row and column count of Patch
+    gridpatch_eq/2: check if two patches are identical
+    gridpatch_inpaint/7: fill rectangle [R0..R1] x [C0..C1] in Grid with Color
+    gridpatch_replace_first/4: replace first (top-left) matching OldPatch occurrence with NewPatch
 
 gridscan
 Grid Ray Scanning: First Hit, Distance, Row/Column Content, and Blocking Detection in Four Directions (gsn_*, Layer 228)
-    gsn_scan_row/4: non-BgColor cells in row R as C-V pairs ordered by column
-    gsn_scan_col/4: non-BgColor cells in column C as R-V pairs ordered by row
-    gsn_first_right/5: first non-BgColor cell to the right of column C0 in row R as C-V
-    gsn_first_left/5: nearest non-BgColor cell to the left of column C0 in row R as C-V
-    gsn_first_down/5: first non-BgColor cell below row R0 in column C as R-V
-    gsn_first_up/5: nearest non-BgColor cell above row R0 in column C as R-V
-    gsn_dist_right/5: D = C_hit - C0 to first non-BgColor going right; fails if none
-    gsn_dist_left/5: D = C0 - C_hit to nearest non-BgColor going left; fails if none
-    gsn_dist_down/5: D = R_hit - R0 to first non-BgColor going down; fails if none
-    gsn_dist_up/5: D = R0 - R_hit to nearest non-BgColor going up; fails if none
-    gsn_blocked_right/4: succeeds if any non-BgColor cell exists to the right of C0
-    gsn_blocked_left/4: succeeds if any non-BgColor cell exists to the left of C0
-    gsn_blocked_down/4: succeeds if any non-BgColor cell exists below R0
-    gsn_blocked_up/4: succeeds if any non-BgColor cell exists above R0
+    gridscan_scan_row/4: non-BgColor cells in row R as C-V pairs ordered by column
+    gridscan_scan_col/4: non-BgColor cells in column C as R-V pairs ordered by row
+    gridscan_first_right/5: first non-BgColor cell to the right of column C0 in row R as C-V
+    gridscan_first_left/5: nearest non-BgColor cell to the left of column C0 in row R as C-V
+    gridscan_first_down/5: first non-BgColor cell below row R0 in column C as R-V
+    gridscan_first_up/5: nearest non-BgColor cell above row R0 in column C as R-V
+    gridscan_dist_right/5: D = C_hit - C0 to first non-BgColor going right; fails if none
+    gridscan_dist_left/5: D = C0 - C_hit to nearest non-BgColor going left; fails if none
+    gridscan_dist_down/5: D = R_hit - R0 to first non-BgColor going down; fails if none
+    gridscan_dist_up/5: D = R0 - R_hit to nearest non-BgColor going up; fails if none
+    gridscan_blocked_right/4: succeeds if any non-BgColor cell exists to the right of C0
+    gridscan_blocked_left/4: succeeds if any non-BgColor cell exists to the left of C0
+    gridscan_blocked_down/4: succeeds if any non-BgColor cell exists below R0
+    gridscan_blocked_up/4: succeeds if any non-BgColor cell exists above R0
 
 gridwave
 Grid Wave Propagation: Color Expansion, Contraction, Frontier Detection, and Directional Shadows (gwv_*, Layer 229)
@@ -1466,88 +1466,88 @@ Grid Wave Propagation: Color Expansion, Contraction, Frontier Detection, and Dir
 
 gridshift
 Grid Shifting and Cyclic Rolling: Linear Shifts, Toroidal Rolls, Per-Row/Column Rolls, Color Shift, and Offset (gsh_*, Layer 230)
-    gsh_shift_right/4: shift each row right by N; left cells become BgColor
-    gsh_shift_left/4: shift each row left by N; right cells become BgColor
-    gsh_shift_down/4: shift all rows down by N; N new BgColor rows at top
-    gsh_shift_up/4: shift all rows up by N; N new BgColor rows at bottom
-    gsh_roll_right/3: cyclically roll each row right by N (toroidal)
-    gsh_roll_left/3: cyclically roll each row left by N (toroidal)
-    gsh_roll_down/3: cyclically roll entire grid down by N rows (toroidal)
-    gsh_roll_up/3: cyclically roll entire grid up by N rows (toroidal)
-    gsh_roll_row/4: cyclically roll a single named row right by N positions
-    gsh_roll_col/4: cyclically roll a single named column down by N positions (via transpose)
-    gsh_shift_color/6: shift all cells of Color by (DR, DC); OOB cells disappear; vacated become BgColor
-    gsh_offset/5: shift entire grid by (DR, DC); Result[R][C] = Grid[R-DR][C-DC] or BgColor
-    gsh_shift_row/5: shift single row by N (positive=right, negative=left) with bg fill
-    gsh_shift_col/5: shift single column by N (positive=down, negative=up; via transpose)
+    gridshift_shift_right/4: shift each row right by N; left cells become BgColor
+    gridshift_shift_left/4: shift each row left by N; right cells become BgColor
+    gridshift_shift_down/4: shift all rows down by N; N new BgColor rows at top
+    gridshift_shift_up/4: shift all rows up by N; N new BgColor rows at bottom
+    gridshift_roll_right/3: cyclically roll each row right by N (toroidal)
+    gridshift_roll_left/3: cyclically roll each row left by N (toroidal)
+    gridshift_roll_down/3: cyclically roll entire grid down by N rows (toroidal)
+    gridshift_roll_up/3: cyclically roll entire grid up by N rows (toroidal)
+    gridshift_roll_row/4: cyclically roll a single named row right by N positions
+    gridshift_roll_col/4: cyclically roll a single named column down by N positions (via transpose)
+    gridshift_shift_color/6: shift all cells of Color by (DR, DC); OOB cells disappear; vacated become BgColor
+    gridshift_offset/5: shift entire grid by (DR, DC); Result[R][C] = Grid[R-DR][C-DC] or BgColor
+    gridshift_shift_row/5: shift single row by N (positive=right, negative=left) with bg fill
+    gridshift_shift_col/5: shift single column by N (positive=down, negative=up; via transpose)
 
 gridmap
 Grid Color Mapping: Remap, Swap, Replace, Merge, Normalize, Palette, Mask, Invert, Cycle, and Map Composition (gmp_*, Layer 231)
-    gmp_remap/3: apply a list of From-To color pairs to all cells; unmapped cells keep their color
-    gmp_swap/4: swap two specific colors throughout the grid (bidirectional remap)
-    gmp_replace/4: replace one specific color with another throughout the grid
-    gmp_merge/4: replace a list of colors with a single target color
-    gmp_normalize/3: assign integer rank labels (1, 2, 3, ...) to non-bg colors in first-occurrence row-major order
-    gmp_palette/3: return ordered list of distinct non-bg colors in first-occurrence row-major order
-    gmp_recolor_fg/4: replace all non-bg cells with a single foreground color
-    gmp_mask_color/4: keep cells of one color; replace all others with bg
-    gmp_invert/3: reverse palette assignments given explicit Palette list (c_i -> c_(n+1-i))
-    gmp_cycle/4: cyclically advance each cell's palette index by N positions mod palette length
-    gmp_build_map/4: derive From-To mapping from two aligned grids (non-bg positions that differ)
-    gmp_invert_map/2: reverse all From-To pairs to To-From
-    gmp_compose_maps/3: chain two maps - From-Mid in Map1, Mid-To in Map2 yields From-To
-    gmp_map_count/3: count cells whose color appears as a From key in a mapping
+    gridmap_remap/3: apply a list of From-To color pairs to all cells; unmapped cells keep their color
+    gridmap_swap/4: swap two specific colors throughout the grid (bidirectional remap)
+    gridmap_replace/4: replace one specific color with another throughout the grid
+    gridmap_merge/4: replace a list of colors with a single target color
+    gridmap_normalize/3: assign integer rank labels (1, 2, 3, ...) to non-bg colors in first-occurrence row-major order
+    gridmap_palette/3: return ordered list of distinct non-bg colors in first-occurrence row-major order
+    gridmap_recolor_fg/4: replace all non-bg cells with a single foreground color
+    gridmap_mask_color/4: keep cells of one color; replace all others with bg
+    gridmap_invert/3: reverse palette assignments given explicit Palette list (c_i -> c_(n+1-i))
+    gridmap_cycle/4: cyclically advance each cell's palette index by N positions mod palette length
+    gridmap_build_map/4: derive From-To mapping from two aligned grids (non-bg positions that differ)
+    gridmap_invert_map/2: reverse all From-To pairs to To-From
+    gridmap_compose_maps/3: chain two maps - From-Mid in Map1, Mid-To in Map2 yields From-To
+    gridmap_map_count/3: count cells whose color appears as a From key in a mapping
 
 gridrefl
 Grid Reflection and Rotation: Flip, Rotate, Transpose, Anti-Diagonal, Symmetry Detection, and Symmetry Completion (grf_*, Layer 232)
-    grf_flip_h/2: reverse each row (left-right mirror of the grid)
-    grf_flip_v/2: reverse list of rows (top-bottom mirror of the grid)
-    grf_rot90/2: rotate 90 degrees clockwise (transpose then flip_h)
-    grf_rot180/2: rotate 180 degrees (flip_v then flip_h)
-    grf_rot270/2: rotate 270 degrees clockwise / 90 degrees counter-clockwise (flip_h then transpose)
-    grf_transpose/2: swap rows and columns (main-diagonal reflection)
-    grf_antidiag/2: reflect across anti-diagonal (rot180 then transpose; AntiDiag[R][C] = Grid[N-1-C][N-1-R])
-    grf_is_sym_h/1: succeed if grid equals its horizontal flip
-    grf_is_sym_v/1: succeed if grid equals its vertical flip
-    grf_is_sym_d/1: succeed if grid equals its own transpose (diagonal symmetry)
-    grf_is_sym_a/1: succeed if grid equals its own anti-diagonal reflection
-    grf_sym_axes/2: return the subset of [h,v,d,a] for which the grid is symmetric
-    grf_make_sym_h/3: make horizontally symmetric by merging each row with its reverse
-    grf_make_sym_v/3: make vertically symmetric by merging row R with row (H-1-R)
+    gridrefl_flip_h/2: reverse each row (left-right mirror of the grid)
+    gridrefl_flip_v/2: reverse list of rows (top-bottom mirror of the grid)
+    gridrefl_rot90/2: rotate 90 degrees clockwise (transpose then flip_h)
+    gridrefl_rot180/2: rotate 180 degrees (flip_v then flip_h)
+    gridrefl_rot270/2: rotate 270 degrees clockwise / 90 degrees counter-clockwise (flip_h then transpose)
+    gridrefl_transpose/2: swap rows and columns (main-diagonal reflection)
+    gridrefl_antidiag/2: reflect across anti-diagonal (rot180 then transpose; AntiDiag[R][C] = Grid[N-1-C][N-1-R])
+    gridrefl_is_sym_h/1: succeed if grid equals its horizontal flip
+    gridrefl_is_sym_v/1: succeed if grid equals its vertical flip
+    gridrefl_is_sym_d/1: succeed if grid equals its own transpose (diagonal symmetry)
+    gridrefl_is_sym_a/1: succeed if grid equals its own anti-diagonal reflection
+    gridrefl_sym_axes/2: return the subset of [h,v,d,a] for which the grid is symmetric
+    gridrefl_make_sym_h/3: make horizontally symmetric by merging each row with its reverse
+    gridrefl_make_sym_v/3: make vertically symmetric by merging row R with row (H-1-R)
 
 gridlogic
 Grid Logical Operations: Cell-Wise AND, OR, XOR, NOT, Subtract, Common, Differ, Any, All, Majority, Unanimous, Mask, If-Then-Else, and Filter (ggl_*, Layer 233)
-    ggl_and/4: cell-wise AND - both non-bg → Grid1's value; else bg
-    ggl_or/4: cell-wise OR - first non-bg wins (Grid1 over Grid2); else bg
-    ggl_xor/4: cell-wise XOR - exactly one non-bg → that value; else bg
-    ggl_not/4: logical NOT - bg → FgColor; non-bg → bg
-    ggl_subtract/4: set difference - Grid1 non-bg AND Grid2 bg → Grid1 value; else bg
-    ggl_common/4: agreement - both grids agree on same non-bg value → that value; else bg
-    ggl_differ/4: disagreement - both non-bg but different → Grid1 value; else bg
-    ggl_any/3: list-wise OR over a list of grids - first non-bg across grids wins
-    ggl_all/3: list-wise AND over a list - unanimous non-bg agreement → value; else bg
-    ggl_majority/3: plurality vote - most frequent non-bg if count > N/2; else bg
-    ggl_unanimous/3: strict all-grids agreement (including bg) → value; else bg
-    ggl_mask/5: masking - keep Grid cell where MaskGrid = MaskColor; else bg
-    ggl_if/5: conditional selection - CondGrid = CondColor → ThenGrid; else → ElseGrid
-    ggl_filter/4: color filtering - keep cells in Colors list; else bg
+    gridlogic_and/4: cell-wise AND - both non-bg → Grid1's value; else bg
+    gridlogic_or/4: cell-wise OR - first non-bg wins (Grid1 over Grid2); else bg
+    gridlogic_xor/4: cell-wise XOR - exactly one non-bg → that value; else bg
+    gridlogic_not/4: logical NOT - bg → FgColor; non-bg → bg
+    gridlogic_subtract/4: set difference - Grid1 non-bg AND Grid2 bg → Grid1 value; else bg
+    gridlogic_common/4: agreement - both grids agree on same non-bg value → that value; else bg
+    gridlogic_differ/4: disagreement - both non-bg but different → Grid1 value; else bg
+    gridlogic_any/3: list-wise OR over a list of grids - first non-bg across grids wins
+    gridlogic_all/3: list-wise AND over a list - unanimous non-bg agreement → value; else bg
+    gridlogic_majority/3: plurality vote - most frequent non-bg if count > N/2; else bg
+    gridlogic_unanimous/3: strict all-grids agreement (including bg) → value; else bg
+    gridlogic_mask/5: masking - keep Grid cell where MaskGrid = MaskColor; else bg
+    gridlogic_if/5: conditional selection - CondGrid = CondColor → ThenGrid; else → ElseGrid
+    gridlogic_filter/4: color filtering - keep cells in Colors list; else bg
 
 gridchain
 Grid Sequence Utilities: Consecutive Pairs, Sliding Windows, Zip, Take, Drop, Cycle, Interleave, Split, Dedup, Diff Counts, and Change Mask (gch_*, Layer 234)
-    gch_pairs/2: consecutive two-element sublists from a sequence: [[G1,G2],[G2,G3],...]
-    gch_window/3: all consecutive overlapping windows of width W
-    gch_zip/3: element-wise zip of two sequences into two-element sublists
-    gch_take/3: first N grids from a sequence (clamps to actual length)
-    gch_drop/3: drop the first N grids (clamps to actual length, returns [])
-    gch_nth/3: 0-indexed element access into a sequence
-    gch_all_same/1: succeed if all grids in the sequence are identical
-    gch_dedup/2: remove duplicate grids preserving first-occurrence order
-    gch_cycle/3: build a sequence of N copies of a single grid
-    gch_interleave/3: interleave two sequences element by element
-    gch_split_at/4: split a sequence at index N into Before and After sublists
-    gch_reverse/2: reverse the sequence of grids
-    gch_diff_counts/3: per-consecutive-pair count of differing cell positions
-    gch_changes_mask/4: mark cells that differ between the first and last grid
+    gridchain_pairs/2: consecutive two-element sublists from a sequence: [[G1,G2],[G2,G3],...]
+    gridchain_window/3: all consecutive overlapping windows of width W
+    gridchain_zip/3: element-wise zip of two sequences into two-element sublists
+    gridchain_take/3: first N grids from a sequence (clamps to actual length)
+    gridchain_drop/3: drop the first N grids (clamps to actual length, returns [])
+    gridchain_nth/3: 0-indexed element access into a sequence
+    gridchain_all_same/1: succeed if all grids in the sequence are identical
+    gridchain_dedup/2: remove duplicate grids preserving first-occurrence order
+    gridchain_cycle/3: build a sequence of N copies of a single grid
+    gridchain_interleave/3: interleave two sequences element by element
+    gridchain_split_at/4: split a sequence at index N into Before and After sublists
+    gridchain_reverse/2: reverse the sequence of grids
+    gridchain_diff_counts/3: per-consecutive-pair count of differing cell positions
+    gridchain_changes_mask/4: mark cells that differ between the first and last grid
 
 gridblend
 Grid Blending and Layered Composition: Overlay, Underlay, Stencil, Priority Stack, Checkerboard Blend, Stripe Blend, Threshold Replace, Merge Many, Dominant Color, and Composite (gbld_*, Layer 235)
@@ -1564,37 +1564,37 @@ Grid Blending and Layered Composition: Overlay, Underlay, Stencil, Priority Stac
 
 gridextract
 Grid Object Extraction: Bounding Box Crops, Non-BG Object Isolation, Color-Region Extraction, Cell Collection, Largest/Smallest Object, Centered Crop, Region Count, and Object Registry (gxt_*, Layer 236)
-    gxt_nonbg_cells/3: collect all non-bg cells as r(R,C,V) triples in row-major order
-    gxt_color_cells/3: collect all cells of a specific color as r(R,C,Color) triples
-    gxt_bbox/4: compute tight bounding box bb(MinR,MinC,MaxR,MaxC) of all non-bg cells; fails if all-bg
-    gxt_crop_bbox/5: extract sub-grid for bounding box; returns crop and off(R1,C1) offset
-    gxt_object_at/5: BFS flood fill bounding box of 4-connected same-color region from (R,C)
-    gxt_all_colors/3: sorted unique list of all non-bg colors present in the grid
-    gxt_color_count/4: count all occurrences of a specific color
-    gxt_largest_color/3: non-bg color with the most cells (msort tie-breaking)
-    gxt_smallest_color/3: non-bg color with the fewest cells (msort tie-breaking)
-    gxt_centered_crop/5: crop of given height/width centered on centroid of non-bg cells (clamped)
-    gxt_row_cells/4: non-bg cells in a specific 0-indexed row as r(R,C,V) triples
-    gxt_col_cells/4: non-bg cells in a specific 0-indexed column as r(R,C,V) triples
-    gxt_region_count/4: count distinct 4-connected regions of a given color
-    gxt_registry/3: obj(Color,Count,BBox) records for each unique non-bg color, sorted by color
+    gridextract_nonbg_cells/3: collect all non-bg cells as r(R,C,V) triples in row-major order
+    gridextract_color_cells/3: collect all cells of a specific color as r(R,C,Color) triples
+    gridextract_bbox/4: compute tight bounding box bb(MinR,MinC,MaxR,MaxC) of all non-bg cells; fails if all-bg
+    gridextract_crop_bbox/5: extract sub-grid for bounding box; returns crop and off(R1,C1) offset
+    gridextract_object_at/5: BFS flood fill bounding box of 4-connected same-color region from (R,C)
+    gridextract_all_colors/3: sorted unique list of all non-bg colors present in the grid
+    gridextract_color_count/4: count all occurrences of a specific color
+    gridextract_largest_color/3: non-bg color with the most cells (msort tie-breaking)
+    gridextract_smallest_color/3: non-bg color with the fewest cells (msort tie-breaking)
+    gridextract_centered_crop/5: crop of given height/width centered on centroid of non-bg cells (clamped)
+    gridextract_row_cells/4: non-bg cells in a specific 0-indexed row as r(R,C,V) triples
+    gridextract_col_cells/4: non-bg cells in a specific 0-indexed column as r(R,C,V) triples
+    gridextract_region_count/4: count distinct 4-connected regions of a given color
+    gridextract_registry/3: obj(Color,Count,BBox) records for each unique non-bg color, sorted by color
 
 gridgrav
 Grid Gravity and Sliding: Fall Down, Up, Left, Right, Blocked Fall, Column and Row Setters, Settled Test, and Gravity Score (gra_*, Layer 237)
-    gra_fall_down/3: each column - non-bg values sink to the bottom; bg fills above
-    gra_fall_up/3: each column - non-bg values rise to the top; bg fills below
-    gra_fall_left/3: each row - non-bg values slide to the left; bg fills to the right
-    gra_fall_right/3: each row - non-bg values slide to the right; bg fills to the left
-    gra_fall/4: dispatch gravity by direction atom: down | up | left | right
-    gra_col_nonbg/4: collect non-bg values from a 0-indexed column, top to bottom
-    gra_row_nonbg/4: collect non-bg values from a 0-indexed row, left to right
-    gra_set_col_bottom/5: replace column with values packed to bottom; remaining cells become bg
-    gra_set_col_top/5: replace column with values packed to top; remaining cells become bg
-    gra_set_row_left/5: replace row with values packed to left; remaining cells become bg
-    gra_set_row_right/5: replace row with values packed to right; remaining cells become bg
-    gra_blocked_fall/5: gravity in a named direction with BlockColor cells as immovable walls
-    gra_is_settled/2: succeeds if gra_fall_down leaves the grid unchanged
-    gra_gravity_score/3: count of cell positions that differ between grid and its fall_down result
+    gridgrav_fall_down/3: each column - non-bg values sink to the bottom; bg fills above
+    gridgrav_fall_up/3: each column - non-bg values rise to the top; bg fills below
+    gridgrav_fall_left/3: each row - non-bg values slide to the left; bg fills to the right
+    gridgrav_fall_right/3: each row - non-bg values slide to the right; bg fills to the left
+    gridgrav_fall/4: dispatch gravity by direction atom: down | up | left | right
+    gridgrav_col_nonbg/4: collect non-bg values from a 0-indexed column, top to bottom
+    gridgrav_row_nonbg/4: collect non-bg values from a 0-indexed row, left to right
+    gridgrav_set_col_bottom/5: replace column with values packed to bottom; remaining cells become bg
+    gridgrav_set_col_top/5: replace column with values packed to top; remaining cells become bg
+    gridgrav_set_row_left/5: replace row with values packed to left; remaining cells become bg
+    gridgrav_set_row_right/5: replace row with values packed to right; remaining cells become bg
+    gridgrav_blocked_fall/5: gravity in a named direction with BlockColor cells as immovable walls
+    gridgrav_is_settled/2: succeeds if gridgrav_fall_down leaves the grid unchanged
+    gridgrav_gravity_score/3: count of cell positions that differ between grid and its fall_down result
 
 gridstamp
 Grid Stamping and Canvas Operations: Stamp, Scatter, Match Finding, Pad, Unpad, Replicate, Border, Center, Extract, Replace, and Canvas (gst_*, Layer 238)
@@ -1615,54 +1615,54 @@ Grid Stamping and Canvas Operations: Stamp, Scatter, Match Finding, Pad, Unpad, 
 
 gridalign
 Grid Alignment and Shift Matching: Center of Mass, Translation, Offset Search, Overlap Scoring, Bounding Box Alignment, and Anchor Placement (gal_*, Layer 239)
-    gal_center_of_mass(+Grid,+Bg,-r(R,C)): floor-average centroid of non-bg cells.
-    gal_nonbg_bbox(+Grid,+Bg,-BBox): tight bounding box r0(R0,C0,R1,C1) or none.
-    gal_bbox_center(+Grid,+Bg,-Center): floor center of bbox, or none.
-    gal_translate(+Grid,+DR,+DC,+Bg,-Result): shift content by (DR,DC), same size.
-    gal_overlap_count(+Grid1,+Grid2,+Bg,-Count): positions where both are non-bg.
-    gal_overlap_score(+Grid1,+Grid2,+Bg,-Score): overlap / Grid1 non-bg count.
-    gal_iou(+Grid1,+Grid2,+Bg,-IoU): intersection over union of non-bg regions.
-    gal_find_offset(+Grid1,+Grid2,+Bg,+SearchR,-o(DR,DC)): best alignment offset.
-    gal_align_centers(+Grid1,+Grid2,+Bg,-Aligned): translate Grid2 to match Grid1 centroid.
-    gal_align_bbox_centers(+Grid1,+Grid2,+Bg,-Aligned): translate Grid2 to match Grid1 bbox center.
-    gal_nonbg_offset(+Grid1,+Grid2,+Bg,-o(DR,DC)): centroid-to-centroid vector.
-    gal_place_at(+Canvas,+Grid2,+R0,+C0,+Bg,-Result): transparent paste at (R0,C0).
-    gal_anchor_to(+Canvas,+Grid2,+PR,+PC,+QR,+QC,+Bg,-Result): cell-to-cell alignment paste.
-    gal_match_any_offset(+Grid1,+Grid2,+Bg,-Offsets): all offsets with at least one overlap.
+    gridalign_center_of_mass(+Grid,+Bg,-r(R,C)): floor-average centroid of non-bg cells.
+    gridalign_nonbg_bbox(+Grid,+Bg,-BBox): tight bounding box r0(R0,C0,R1,C1) or none.
+    gridalign_bbox_center(+Grid,+Bg,-Center): floor center of bbox, or none.
+    gridalign_translate(+Grid,+DR,+DC,+Bg,-Result): shift content by (DR,DC), same size.
+    gridalign_overlap_count(+Grid1,+Grid2,+Bg,-Count): positions where both are non-bg.
+    gridalign_overlap_score(+Grid1,+Grid2,+Bg,-Score): overlap / Grid1 non-bg count.
+    gridalign_iou(+Grid1,+Grid2,+Bg,-IoU): intersection over union of non-bg regions.
+    gridalign_find_offset(+Grid1,+Grid2,+Bg,+SearchR,-o(DR,DC)): best alignment offset.
+    gridalign_align_centers(+Grid1,+Grid2,+Bg,-Aligned): translate Grid2 to match Grid1 centroid.
+    gridalign_align_bbox_centers(+Grid1,+Grid2,+Bg,-Aligned): translate Grid2 to match Grid1 bbox center.
+    gridalign_nonbg_offset(+Grid1,+Grid2,+Bg,-o(DR,DC)): centroid-to-centroid vector.
+    gridalign_place_at(+Canvas,+Grid2,+R0,+C0,+Bg,-Result): transparent paste at (R0,C0).
+    gridalign_anchor_to(+Canvas,+Grid2,+PR,+PC,+QR,+QC,+Bg,-Result): cell-to-cell alignment paste.
+    gridalign_match_any_offset(+Grid1,+Grid2,+Bg,-Offsets): all offsets with at least one overlap.
 
 gridcolorop
 Grid Color Operations: Count, Swap, Replace, Mask, Cycle, Rank, Palette Apply, and Invert (gco_*, Layer 240)
-    gco_color_counts(+Grid,+Bg,-Counts): cc(Color,Count) pairs for all non-bg colors, sorted by count descending.
-    gco_distinct_colors(+Grid,+Bg,-Colors): distinct non-bg colors sorted by count descending.
-    gco_nth_color(+Grid,+Bg,+N,-Color): Nth most frequent non-bg color (0-indexed).
-    gco_count_distinct(+Grid,+Bg,-Count): count of distinct non-bg colors.
-    gco_swap(+Grid,+Color1,+Color2,+Bg,-Result): exchange Color1 and Color2 throughout grid.
-    gco_replace(+Grid,+Old,+New,+Bg,-Result): replace every Old cell with New.
-    gco_apply_map(+Grid,+Map,+Bg,-Result): apply list of Old-New substitution pairs.
-    gco_keep_only(+Grid,+Color,+Bg,-Result): keep Color cells; bg-ify all others.
-    gco_remove_color(+Grid,+Color,+Bg,-Result): replace Color cells with Bg.
-    gco_cycle(+Grid,+Palette,+N,+Bg,-Result): advance each palette-member cell N steps (wrapping).
-    gco_rank_grid(+Grid,+Bg,-Result): replace non-bg cells with 0-indexed frequency rank integer.
-    gco_apply_palette(+Grid,+Bg,+Palette,-Result): replace Kth most frequent color with Kth palette entry.
-    gco_most_least(+Grid,+Bg,-Most,-Least): most and least frequent non-bg colors.
-    gco_invert(+Grid,+Bg,+FgColor,-Result): binary invert: non-bg->Bg, Bg->FgColor.
+    gridcolorop_color_counts(+Grid,+Bg,-Counts): cc(Color,Count) pairs for all non-bg colors, sorted by count descending.
+    gridcolorop_distinct_colors(+Grid,+Bg,-Colors): distinct non-bg colors sorted by count descending.
+    gridcolorop_nth_color(+Grid,+Bg,+N,-Color): Nth most frequent non-bg color (0-indexed).
+    gridcolorop_count_distinct(+Grid,+Bg,-Count): count of distinct non-bg colors.
+    gridcolorop_swap(+Grid,+Color1,+Color2,+Bg,-Result): exchange Color1 and Color2 throughout grid.
+    gridcolorop_replace(+Grid,+Old,+New,+Bg,-Result): replace every Old cell with New.
+    gridcolorop_apply_map(+Grid,+Map,+Bg,-Result): apply list of Old-New substitution pairs.
+    gridcolorop_keep_only(+Grid,+Color,+Bg,-Result): keep Color cells; bg-ify all others.
+    gridcolorop_remove_color(+Grid,+Color,+Bg,-Result): replace Color cells with Bg.
+    gridcolorop_cycle(+Grid,+Palette,+N,+Bg,-Result): advance each palette-member cell N steps (wrapping).
+    gridcolorop_rank_grid(+Grid,+Bg,-Result): replace non-bg cells with 0-indexed frequency rank integer.
+    gridcolorop_apply_palette(+Grid,+Bg,+Palette,-Result): replace Kth most frequent color with Kth palette entry.
+    gridcolorop_most_least(+Grid,+Bg,-Most,-Least): most and least frequent non-bg colors.
+    gridcolorop_invert(+Grid,+Bg,+FgColor,-Result): binary invert: non-bg->Bg, Bg->FgColor.
 
 gridresize
 Grid Resize and Scale Operations: Integer Scale Up/Down, Mode Downsample, Double, Halve, Nearest-Neighbor Resize, Tile, Crop, Border Crop, Fit, Embed, Size, Aspect Ratio, and Square Test (grs_*, Layer 241)
-    grs_scale_up(+Grid,+F,-Result): expand each cell into F x F block; output is (H*F) x (W*F).
-    grs_scale_down(+Grid,+F,+Bg,-Result): sample top-left of each F x F block; output is floor(H/F) x floor(W/F).
-    grs_scale_down_mode(+Grid,+F,+Bg,-Result): take mode of each F x F block (ties: msort-first).
-    grs_double(+Grid,-Result): scale up by 2 (shorthand).
-    grs_halve(+Grid,+Bg,-Result): scale down by 2 sampling top-left (shorthand).
-    grs_resize(+Grid,+NewH,+NewW,+Bg,-Result): nearest-neighbor resize to arbitrary dimensions.
-    grs_tile_to(+Grid,+H,+W,-Result): tile by modular repetition to fill exactly H x W.
-    grs_crop(+Grid,+R0,+C0,+R1,+C1,-Result): extract rows [R0,R1] x cols [C0,C1] (clamped).
-    grs_border_crop(+Grid,+N,+Bg,-Result): remove N rows/columns from all four borders.
-    grs_fit_in(+Grid,+H,+W,+Bg,-Result): scale to fit in H x W preserving aspect ratio, then center.
-    grs_embed_in(+Grid,+H,+W,+Bg,-Result): center grid in H x W Bg canvas without scaling.
-    grs_grid_size(+Grid,-H,-W): return row and column counts.
-    grs_aspect_ratio(+Grid,-H,-W,-Ratio): H, W, and float W/H ratio.
-    grs_is_square(+Grid): succeed if H = W.
+    gridresize_scale_up(+Grid,+F,-Result): expand each cell into F x F block; output is (H*F) x (W*F).
+    gridresize_scale_down(+Grid,+F,+Bg,-Result): sample top-left of each F x F block; output is floor(H/F) x floor(W/F).
+    gridresize_scale_down_mode(+Grid,+F,+Bg,-Result): take mode of each F x F block (ties: msort-first).
+    gridresize_double(+Grid,-Result): scale up by 2 (shorthand).
+    gridresize_halve(+Grid,+Bg,-Result): scale down by 2 sampling top-left (shorthand).
+    gridresize_resize(+Grid,+NewH,+NewW,+Bg,-Result): nearest-neighbor resize to arbitrary dimensions.
+    gridresize_tile_to(+Grid,+H,+W,-Result): tile by modular repetition to fill exactly H x W.
+    gridresize_crop(+Grid,+R0,+C0,+R1,+C1,-Result): extract rows [R0,R1] x cols [C0,C1] (clamped).
+    gridresize_border_crop(+Grid,+N,+Bg,-Result): remove N rows/columns from all four borders.
+    gridresize_fit_in(+Grid,+H,+W,+Bg,-Result): scale to fit in H x W preserving aspect ratio, then center.
+    gridresize_embed_in(+Grid,+H,+W,+Bg,-Result): center grid in H x W Bg canvas without scaling.
+    gridresize_grid_size(+Grid,-H,-W): return row and column counts.
+    gridresize_aspect_ratio(+Grid,-H,-W,-Ratio): H, W, and float W/H ratio.
+    gridresize_is_square(+Grid): succeed if H = W.
 
 gridobj
 Grid Object Operations: Connected Component Cells, Color, Size, Bbox, Mask, Extract, All Objects, Count, Largest, Smallest, Flood Fill, Fill Enclosed, Remove, and Move (gob_*, Layer 242)
@@ -1683,20 +1683,20 @@ Grid Object Operations: Connected Component Cells, Color, Size, Bbox, Mask, Extr
 
 gridgroupby
 Grid Group-By Operations: Group, Filter, Sort, Pair, and Count Objects by Attribute (ggb_*, Layer 243)
-    ggb_group_by_color(+Objects,-Groups): grp(Color,ObjList) list for each distinct color, ascending.
-    ggb_group_by_size(+Objects,-Groups): grp(Size,ObjList) list for each distinct cell count, ascending.
-    ggb_group_by_row(+Objects,-Groups): grp(Row0,ObjList) list for each distinct top row, ascending.
-    ggb_group_by_col(+Objects,-Groups): grp(Col0,ObjList) list for each distinct left col, ascending.
-    ggb_filter_by_color(+Objects,+Color,-Filtered): keep only objects whose color equals Color.
-    ggb_filter_by_size(+Objects,+Size,-Filtered): keep only objects whose cell count equals Size.
-    ggb_filter_larger(+Objects,+N,-Filtered): keep only objects whose cell count is > N.
-    ggb_filter_smaller(+Objects,+N,-Filtered): keep only objects whose cell count is < N.
-    ggb_sort_by_size_asc(+Objects,-Sorted): sort objects by cell count, smallest first.
-    ggb_sort_by_size_desc(+Objects,-Sorted): sort objects by cell count, largest first.
-    ggb_sort_by_row(+Objects,-Sorted): sort objects by top row of bbox, smallest first.
-    ggb_sort_by_col(+Objects,-Sorted): sort objects by left col of bbox, smallest first.
-    ggb_pair_by_color(+Objects,-Pairs): pair(Color,Obj1,Obj2) for each color with exactly two objects.
-    ggb_count_per_color(+Objects,-Counts): cnt(Color,N) list, most frequent color first.
+    gridgroupby_group_by_color(+Objects,-Groups): grp(Color,ObjList) list for each distinct color, ascending.
+    gridgroupby_group_by_size(+Objects,-Groups): grp(Size,ObjList) list for each distinct cell count, ascending.
+    gridgroupby_group_by_row(+Objects,-Groups): grp(Row0,ObjList) list for each distinct top row, ascending.
+    gridgroupby_group_by_col(+Objects,-Groups): grp(Col0,ObjList) list for each distinct left col, ascending.
+    gridgroupby_filter_by_color(+Objects,+Color,-Filtered): keep only objects whose color equals Color.
+    gridgroupby_filter_by_size(+Objects,+Size,-Filtered): keep only objects whose cell count equals Size.
+    gridgroupby_filter_larger(+Objects,+N,-Filtered): keep only objects whose cell count is > N.
+    gridgroupby_filter_smaller(+Objects,+N,-Filtered): keep only objects whose cell count is < N.
+    gridgroupby_sort_by_size_asc(+Objects,-Sorted): sort objects by cell count, smallest first.
+    gridgroupby_sort_by_size_desc(+Objects,-Sorted): sort objects by cell count, largest first.
+    gridgroupby_sort_by_row(+Objects,-Sorted): sort objects by top row of bbox, smallest first.
+    gridgroupby_sort_by_col(+Objects,-Sorted): sort objects by left col of bbox, smallest first.
+    gridgroupby_pair_by_color(+Objects,-Pairs): pair(Color,Obj1,Obj2) for each color with exactly two objects.
+    gridgroupby_count_per_color(+Objects,-Counts): cnt(Color,N) list, most frequent color first.
 
 gridrelation
 Grid Object Spatial Relations: Touching, Adjacent, Distance, Above, Below, Left-Of, Right-Of, Bbox Contains, Bbox Overlap, Cells Overlap, Same Rows, Same Cols, Direction, and All Relations (grl_*, Layer 244)
@@ -1734,20 +1734,20 @@ Grid Transformation Detection and Application: Color Map, Apply Map, Diff Cells,
 
 gridobjmatch
 Object Matching and Change Detection Between Object Lists (gom_*, Layer 246)
-    gom_match_color(+Objs1,+Objs2,-Pairs): match ob/3 terms by shared color; unmatched dropped.
-    gom_match_nearest(+Objs1,+Objs2,-Pairs): match by nearest doubled-centroid Manhattan distance; greedy.
-    gom_match_size(+Objs1,+Objs2,-Pairs): match by shared cell count; unmatched dropped.
-    gom_unmatched_a(+Pairs,+Objs1,-Unmatched): objects in Objs1 absent from any match/2 first element.
-    gom_unmatched_b(+Pairs,+Objs2,-Unmatched): objects in Objs2 absent from any match/2 second element.
-    gom_color_diff(+Pairs,-Same,-Diff): partition into same-color and different-color sub-lists.
-    gom_move_vector(+match(O1,O2),-mv(DR,DC)): displacement from top-left bbox of O1 to O2.
-    gom_move_vectors(+Pairs,-Vectors): list of mv/2 terms for each match pair.
-    gom_constant_move(+Pairs,-mv(DR,DC)): succeed if every pair shares the same move vector; fails for [].
-    gom_infer_color_map(+Pairs,-Map): sorted deduplicated cm(Old,New) list from color-changing pairs.
-    gom_appeared(+Objs1,+Objs2,-Appeared): objects in Objs2 with a color not present in Objs1.
-    gom_disappeared(+Objs1,+Objs2,-Disappeared): objects in Objs1 with a color not present in Objs2.
-    gom_same_structure(+Objs1,+Objs2): succeed if both lists have the same multiset of object colors.
-    gom_count_change(+Objs1,+Objs2,-N): N = length(Objs2) - length(Objs1).
+    gridobjmatch_match_color(+Objs1,+Objs2,-Pairs): match ob/3 terms by shared color; unmatched dropped.
+    gridobjmatch_match_nearest(+Objs1,+Objs2,-Pairs): match by nearest doubled-centroid Manhattan distance; greedy.
+    gridobjmatch_match_size(+Objs1,+Objs2,-Pairs): match by shared cell count; unmatched dropped.
+    gridobjmatch_unmatched_a(+Pairs,+Objs1,-Unmatched): objects in Objs1 absent from any match/2 first element.
+    gridobjmatch_unmatched_b(+Pairs,+Objs2,-Unmatched): objects in Objs2 absent from any match/2 second element.
+    gridobjmatch_color_diff(+Pairs,-Same,-Diff): partition into same-color and different-color sub-lists.
+    gridobjmatch_move_vector(+match(O1,O2),-mv(DR,DC)): displacement from top-left bbox of O1 to O2.
+    gridobjmatch_move_vectors(+Pairs,-Vectors): list of mv/2 terms for each match pair.
+    gridobjmatch_constant_move(+Pairs,-mv(DR,DC)): succeed if every pair shares the same move vector; fails for [].
+    gridobjmatch_infer_color_map(+Pairs,-Map): sorted deduplicated cm(Old,New) list from color-changing pairs.
+    gridobjmatch_appeared(+Objs1,+Objs2,-Appeared): objects in Objs2 with a color not present in Objs1.
+    gridobjmatch_disappeared(+Objs1,+Objs2,-Disappeared): objects in Objs1 with a color not present in Objs2.
+    gridobjmatch_same_structure(+Objs1,+Objs2): succeed if both lists have the same multiset of object colors.
+    gridobjmatch_count_change(+Objs1,+Objs2,-N): N = length(Objs2) - length(Objs1).
 
 symtab
 Symbol Table Learning from Input-Output Pairs (st_*, Layer 247)
@@ -1785,20 +1785,20 @@ Cross-Pair Invariant Extraction from Training Pairs (iv_*, Layer 248)
 
 contrast
 Contrastive Pair Analysis Across Training Pairs (ca_*, Layer 249)
-    ca_pairwise_delta(+Pairs,-Deltas): list of delta(I,Changes) with chg(R,C,OldV,NewV) for each changed cell.
-    ca_covarying_features(+Pairs,-Features): feat/2 terms present in all changing pairs but absent from stable pairs.
-    ca_context_gate(+Pairs,-Gate): top-ranked co-varying feature or feat(none,none).
-    ca_discriminating_pair(+Pairs,+Hyp1,+Hyp2,-Pair): first pair where Hyp1 and Hyp2 give different outcomes.
-    ca_correlated_features(+Pairs,+OutputChange,-Features): input features common to pairs containing OutputChange.
-    ca_change_count(+Pairs,+Feature,-N): count of changing pairs that contain Feature in their input profile.
-    ca_common_context(+Pairs,+OutputChange,-Context): alias for ca_correlated_features.
-    ca_separates(+Pairs,+Feature,+PositivePairs,-Score): precision of Feature as a separator (0.0-1.0).
-    ca_minimal_features(+Pairs,-Features): greedy feature selection ordered by correlation score.
-    ca_feature_profile(+Grid,-Profile): [feat(dims,R-C), feat(color_count,N), feat(dominant_color,C)].
-    ca_profile_diff(+Profile1,+Profile2,-Changed): features in Profile1 not matching same name in Profile2.
-    ca_stable_features(+Pairs,-Features): feat/2 terms whose value is the same in every training input.
-    ca_unstable_features(+Pairs,-Features): feat/2 terms whose value varies across at least two training inputs.
-    ca_rank_features(+Pairs,-RankedFeatures): features sorted by change_count/total_changing descending.
+    contrast_pairwise_delta(+Pairs,-Deltas): list of delta(I,Changes) with chg(R,C,OldV,NewV) for each changed cell.
+    contrast_covarying_features(+Pairs,-Features): feat/2 terms present in all changing pairs but absent from stable pairs.
+    contrast_context_gate(+Pairs,-Gate): top-ranked co-varying feature or feat(none,none).
+    contrast_discriminating_pair(+Pairs,+Hyp1,+Hyp2,-Pair): first pair where Hyp1 and Hyp2 give different outcomes.
+    contrast_correlated_features(+Pairs,+OutputChange,-Features): input features common to pairs containing OutputChange.
+    contrast_change_count(+Pairs,+Feature,-N): count of changing pairs that contain Feature in their input profile.
+    contrast_common_context(+Pairs,+OutputChange,-Context): alias for contrast_correlated_features.
+    contrast_separates(+Pairs,+Feature,+PositivePairs,-Score): precision of Feature as a separator (0.0-1.0).
+    contrast_minimal_features(+Pairs,-Features): greedy feature selection ordered by correlation score.
+    contrast_feature_profile(+Grid,-Profile): [feat(dims,R-C), feat(color_count,N), feat(dominant_color,C)].
+    contrast_profile_diff(+Profile1,+Profile2,-Changed): features in Profile1 not matching same name in Profile2.
+    contrast_stable_features(+Pairs,-Features): feat/2 terms whose value is the same in every training input.
+    contrast_unstable_features(+Pairs,-Features): feat/2 terms whose value varies across at least two training inputs.
+    contrast_rank_features(+Pairs,-RankedFeatures): features sorted by change_count/total_changing descending.
 
 legend
 Legend and Key Region Detection from Grid Training Pairs (lg_*, Layer 250)

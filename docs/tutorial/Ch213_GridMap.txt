@@ -17,118 +17,118 @@ Dependencies: library(lists)
 
 Atomic Substitutions
 
-gmp_remap(+Grid, +Mapping, -Result)
+gridmap_remap(+Grid, +Mapping, -Result)
 Apply a list of From-To color pairs. Unmapped cells keep their color.
 
     G = [[r,g,r],[g,b,g],[r,g,r]].
-    gmp_remap(G, [r-x, g-y], R).
+    gridmap_remap(G, [r-x, g-y], R).
     % R = [[x,y,x],[y,b,y],[x,y,x]]
 
-gmp_swap(+Grid, +C1, +C2, -Result)
+gridmap_swap(+Grid, +C1, +C2, -Result)
 Swap two colors throughout the grid. Equivalent to remap([C1-C2, C2-C1]).
 
-    gmp_swap(G, r, g, R).
+    gridmap_swap(G, r, g, R).
     % R = [[g,r,g],[r,b,r],[g,r,g]]
 
-gmp_replace(+Grid, +From, +To, -Result)
+gridmap_replace(+Grid, +From, +To, -Result)
 Replace one color with another. Equivalent to remap([From-To]).
 
-gmp_merge(+Grid, +Colors, +To, -Result)
+gridmap_merge(+Grid, +Colors, +To, -Result)
 Replace all colors in the Colors list with a single target color.
 
-    gmp_merge(G, [r,g], x, R).
+    gridmap_merge(G, [r,g], x, R).
     % R = [[x,x,x],[x,b,x],[x,x,x]]
 
 
 Canonical Labeling
 
-gmp_normalize(+Grid, +BgColor, -Normalized)
+gridmap_normalize(+Grid, +BgColor, -Normalized)
 Assign integer rank labels (1, 2, 3, ...) to non-bg colors in first-occurrence
 row-major order. BgColor cells remain unchanged.
 
-    gmp_normalize(G, b, N).
+    gridmap_normalize(G, b, N).
     % N = [[1,2,1],[2,b,2],[1,2,1]]  (r->1, g->2)
 
-gmp_palette(+Grid, +BgColor, -Palette)
+gridmap_palette(+Grid, +BgColor, -Palette)
 Return the ordered list of distinct non-bg colors in first-occurrence order.
 
-    gmp_palette(G, b, P).
+    gridmap_palette(G, b, P).
     % P = [r, g]
 
 
 Foreground and Masking
 
-gmp_recolor_fg(+Grid, +BgColor, +FgColor, -Result)
+gridmap_recolor_fg(+Grid, +BgColor, +FgColor, -Result)
 Replace all non-bg cells with FgColor. BgColor cells unchanged.
 
-    gmp_recolor_fg(G, b, x, R).
+    gridmap_recolor_fg(G, b, x, R).
     % R = [[x,x,x],[x,b,x],[x,x,x]]
 
-gmp_mask_color(+Grid, +Color, +BgColor, -Result)
+gridmap_mask_color(+Grid, +Color, +BgColor, -Result)
 Keep cells of Color; replace all others with BgColor.
 
-    gmp_mask_color(G, r, b, R).
+    gridmap_mask_color(G, r, b, R).
     % R = [[r,b,r],[b,b,b],[r,b,r]]
 
 
 Palette Permutations
 
-gmp_invert(+Grid, +Palette, -Result)
+gridmap_invert(+Grid, +Palette, -Result)
 Given Palette = [c1, c2, ..., cn], replace c_i with c_(n+1-i).
 This reverses palette order. Cells not in Palette are unchanged.
 
-    gmp_invert(G, [r,g], R).
+    gridmap_invert(G, [r,g], R).
     % R = [[g,r,g],[r,b,r],[g,r,g]]  (r<->g since n=2)
 
-gmp_cycle(+Grid, +Palette, +N, -Result)
+gridmap_cycle(+Grid, +Palette, +N, -Result)
 Cyclically advance each cell's palette index by N (mod palette length).
 
-    gmp_cycle([[r,b,r],[b,r,b]], [r,b], 1, R).
+    gridmap_cycle([[r,b,r],[b,r,b]], [r,b], 1, R).
     % R = [[b,r,b],[r,b,r]]  (r->b, b->r)
-    gmp_cycle([[a,b,c]], [a,b,c], 3, R).
+    gridmap_cycle([[a,b,c]], [a,b,c], 3, R).
     % R = [[a,b,c]]  (full rotation = identity)
 
 
 Mapping Utilities
 
-gmp_build_map(+Grid1, +Grid2, +BgColor, -Mapping)
+gridmap_build_map(+Grid1, +Grid2, +BgColor, -Mapping)
 Derive a From-To mapping from two aligned grids. For each position where both
 grids have non-bg values that differ, record From-To. Duplicates are removed
 preserving first-occurrence order.
 
-    gmp_build_map([[r,g],[b,r]], [[x,y],[z,x]], q, M).
+    gridmap_build_map([[r,g],[b,r]], [[x,y],[z,x]], q, M).
     % M = [r-x, g-y, b-z]
 
-gmp_invert_map(+Map, -InvMap)
+gridmap_invert_map(+Map, -InvMap)
 Reverse all From-To pairs to To-From.
 
-    gmp_invert_map([r-x, g-y], InvM).
+    gridmap_invert_map([r-x, g-y], InvM).
     % InvM = [x-r, y-g]
 
-gmp_compose_maps(+Map1, +Map2, -Composed)
+gridmap_compose_maps(+Map1, +Map2, -Composed)
 Chain two maps: find all From-Mid in Map1 and Mid-To in Map2; yield From-To.
 
-    gmp_compose_maps([r-g, g-b], [g-x, b-y], C).
+    gridmap_compose_maps([r-g, g-b], [g-x, b-y], C).
     % C = [r-x, g-y]
 
-gmp_map_count(+Grid, +Mapping, -Count)
+gridmap_map_count(+Grid, +Mapping, -Count)
 Count cells whose color appears as a From key in Mapping.
 
-    gmp_map_count(G, [r-x], Count).
+    gridmap_map_count(G, [r-x], Count).
     % Count = 4  (four r cells in G)
 
 
 Typical Workflows
 
 % Normalize a grid then build an inverse to recover original labels:
-gmp_normalize(G, b, N), gmp_palette(G, b, P),
-gmp_build_map(N, G, b, M), gmp_remap(N, M, G).
+gridmap_normalize(G, b, N), gridmap_palette(G, b, P),
+gridmap_build_map(N, G, b, M), gridmap_remap(N, M, G).
 
 % Compose: apply one renaming then a second:
-gmp_compose_maps([a-b, b-c], [b-x, c-y], Chained),
-gmp_remap(Grid, Chained, Result).
+gridmap_compose_maps([a-b, b-c], [b-x, c-y], Chained),
+gridmap_remap(Grid, Chained, Result).
 
 % Round-trip via invert_map:
-gmp_remap(G, Map, Mapped),
-gmp_invert_map(Map, InvMap),
-gmp_remap(Mapped, InvMap, G).  % recovers G
+gridmap_remap(G, Map, Mapped),
+gridmap_invert_map(Map, InvMap),
+gridmap_remap(Mapped, InvMap, G).  % recovers G

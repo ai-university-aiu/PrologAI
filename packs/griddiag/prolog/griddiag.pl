@@ -1,18 +1,18 @@
 :- module(griddiag, [
-    gdi_main_diag/3,
-    gdi_anti_diag/3,
-    gdi_trace/2,
-    gdi_all_main_diags/2,
-    gdi_all_anti_diags/2,
-    gdi_main_count/4,
-    gdi_anti_count/4,
-    gdi_main_uniform/3,
-    gdi_anti_uniform/3,
-    gdi_set_main_diag/4,
-    gdi_set_anti_diag/4,
-    gdi_uniform_main_diags/2,
-    gdi_uniform_anti_diags/2,
-    gdi_diag_length/3
+    griddiag_main_diag/3,
+    griddiag_anti_diag/3,
+    griddiag_trace/2,
+    griddiag_all_main_diags/2,
+    griddiag_all_anti_diags/2,
+    griddiag_main_count/4,
+    griddiag_anti_count/4,
+    griddiag_main_uniform/3,
+    griddiag_anti_uniform/3,
+    griddiag_set_main_diag/4,
+    griddiag_set_anti_diag/4,
+    griddiag_uniform_main_diags/2,
+    griddiag_uniform_anti_diags/2,
+    griddiag_diag_length/3
 ]).
 % griddiag.pl - Layer 215: Grid Diagonal Analysis (gdi_* prefix).
 % Extracts, analyzes, and modifies main and anti-diagonals of symbolic grids.
@@ -26,21 +26,21 @@
 % --- PRIVATE HELPERS ---
 
 % Grid dimensions: H rows, W columns.
-gdi_dims_(Grid, H, W) :-
+griddiag_dims_(Grid, H, W) :-
 % Count rows.
     length(Grid, H),
 % Count columns from first row.
     (H > 0 -> Grid = [FR|_], length(FR, W) ; W = 0).
 
 % Cell value at row R, column C (0-indexed); fails if out of bounds.
-gdi_cell_(Grid, R, C, V) :-
+griddiag_cell_(Grid, R, C, V) :-
 % Select row R.
     nth0(R, Grid, Row),
 % Select column C.
     nth0(C, Row, V).
 
 % Build a new H x W grid using a lambda Goal(R, C, V).
-gdi_build_(H, W, Goal, Grid) :-
+griddiag_build_(H, W, Goal, Grid) :-
 % Compute last indices.
     H1 is H - 1, W1 is W - 1,
 % Collect rows.
@@ -51,7 +51,7 @@ gdi_build_(H, W, Goal, Grid) :-
 
 % Valid (R, C) coordinates for main diagonal k in an H x W grid.
 % C - R = K → R in [max(0,-K), min(H-1,W-1-K)], C = R+K.
-gdi_main_rc_(H, W, K, R, C) :-
+griddiag_main_rc_(H, W, K, R, C) :-
     RMin is max(0, -K),
     RMax is min(H - 1, W - 1 - K),
     RMin =< RMax,
@@ -60,7 +60,7 @@ gdi_main_rc_(H, W, K, R, C) :-
 
 % Valid (R, C) coordinates for anti-diagonal k in an H x W grid.
 % R + C = K → C in [max(0,K-H+1), min(W-1,K)], R = K-C.
-gdi_anti_rc_(H, W, K, R, C) :-
+griddiag_anti_rc_(H, W, K, R, C) :-
     CMin is max(0, K - H + 1),
     CMax is min(W - 1, K),
     CMin =< CMax,
@@ -68,167 +68,167 @@ gdi_anti_rc_(H, W, K, R, C) :-
     R is K - C.
 
 % Test if all elements of a non-empty list are equal.
-gdi_all_eq_([]).
-gdi_all_eq_([_]).
-gdi_all_eq_([A, A | Rest]) :- gdi_all_eq_([A | Rest]).
+griddiag_all_eq_([]).
+griddiag_all_eq_([_]).
+griddiag_all_eq_([A, A | Rest]) :- griddiag_all_eq_([A | Rest]).
 
 % --- PUBLIC PREDICATES ---
 
-% gdi_main_diag(+Grid, +K, -Vals)
+% griddiag_main_diag(+Grid, +K, -Vals)
 % Vals is the list of color values on the K-th main diagonal.
 % Main diagonal K: cells (R,C) where C - R = K, in ascending R order.
 % K = 0: principal diagonal from (0,0). K > 0: above. K < 0: below.
-gdi_main_diag(Grid, K, Vals) :-
+griddiag_main_diag(Grid, K, Vals) :-
 % Get dimensions.
-    gdi_dims_(Grid, H, W),
+    griddiag_dims_(Grid, H, W),
 % Collect values along the diagonal.
     findall(V,
-        (gdi_main_rc_(H, W, K, R, C),
-         gdi_cell_(Grid, R, C, V)),
+        (griddiag_main_rc_(H, W, K, R, C),
+         griddiag_cell_(Grid, R, C, V)),
         Vals).
 
-% gdi_anti_diag(+Grid, +K, -Vals)
+% griddiag_anti_diag(+Grid, +K, -Vals)
 % Vals is the list of color values on the K-th anti-diagonal.
 % Anti-diagonal K: cells (R,C) where R + C = K, in ascending C order.
 % K = 0: only cell (0,0). K = H+W-2: bottom-right corner.
-gdi_anti_diag(Grid, K, Vals) :-
+griddiag_anti_diag(Grid, K, Vals) :-
 % Get dimensions.
-    gdi_dims_(Grid, H, W),
+    griddiag_dims_(Grid, H, W),
 % Collect values along the anti-diagonal.
     findall(V,
-        (gdi_anti_rc_(H, W, K, R, C),
-         gdi_cell_(Grid, R, C, V)),
+        (griddiag_anti_rc_(H, W, K, R, C),
+         griddiag_cell_(Grid, R, C, V)),
         Vals).
 
-% gdi_trace(+Grid, -Vals)
+% griddiag_trace(+Grid, -Vals)
 % Vals is the list of values on the principal diagonal: (0,0),(1,1),...
 % Length is min(H, W).
-gdi_trace(Grid, Vals) :-
+griddiag_trace(Grid, Vals) :-
 % The principal diagonal is main diagonal 0.
-    gdi_main_diag(Grid, 0, Vals).
+    griddiag_main_diag(Grid, 0, Vals).
 
-% gdi_all_main_diags(+Grid, -Diags)
+% griddiag_all_main_diags(+Grid, -Diags)
 % Diags is the list of all main diagonals, ordered from K = -(H-1) to K = W-1.
 % Each element is the Vals list for that diagonal.
-gdi_all_main_diags(Grid, Diags) :-
+griddiag_all_main_diags(Grid, Diags) :-
 % Get dimensions.
-    gdi_dims_(Grid, H, W),
+    griddiag_dims_(Grid, H, W),
     KMin is -(H - 1),
     KMax is W - 1,
 % Collect all diagonals in order.
     findall(Vals,
         (between(KMin, KMax, K),
-         gdi_main_diag(Grid, K, Vals)),
+         griddiag_main_diag(Grid, K, Vals)),
         Diags).
 
-% gdi_all_anti_diags(+Grid, -Diags)
+% griddiag_all_anti_diags(+Grid, -Diags)
 % Diags is the list of all anti-diagonals, ordered from K = 0 to K = H+W-2.
 % Each element is the Vals list for that anti-diagonal.
-gdi_all_anti_diags(Grid, Diags) :-
+griddiag_all_anti_diags(Grid, Diags) :-
 % Get dimensions.
-    gdi_dims_(Grid, H, W),
+    griddiag_dims_(Grid, H, W),
     KMax is H + W - 2,
 % Collect all anti-diagonals in order.
     findall(Vals,
         (between(0, KMax, K),
-         gdi_anti_diag(Grid, K, Vals)),
+         griddiag_anti_diag(Grid, K, Vals)),
         Diags).
 
-% gdi_main_count(+Grid, +K, +Color, -Count)
+% griddiag_main_count(+Grid, +K, +Color, -Count)
 % Count is the number of cells of Color on the K-th main diagonal.
-gdi_main_count(Grid, K, Color, Count) :-
+griddiag_main_count(Grid, K, Color, Count) :-
 % Get the diagonal values.
-    gdi_main_diag(Grid, K, Vals),
+    griddiag_main_diag(Grid, K, Vals),
 % Count Color occurrences.
     findall(1, member(Color, Vals), Ones),
     length(Ones, Count).
 
-% gdi_anti_count(+Grid, +K, +Color, -Count)
+% griddiag_anti_count(+Grid, +K, +Color, -Count)
 % Count is the number of cells of Color on the K-th anti-diagonal.
-gdi_anti_count(Grid, K, Color, Count) :-
+griddiag_anti_count(Grid, K, Color, Count) :-
 % Get the anti-diagonal values.
-    gdi_anti_diag(Grid, K, Vals),
+    griddiag_anti_diag(Grid, K, Vals),
 % Count Color occurrences.
     findall(1, member(Color, Vals), Ones),
     length(Ones, Count).
 
-% gdi_main_uniform(+Grid, +K, -Bool)
+% griddiag_main_uniform(+Grid, +K, -Bool)
 % Bool is yes if all cells on main diagonal K are the same color; no otherwise.
 % Fails if the diagonal is empty.
-gdi_main_uniform(Grid, K, Bool) :-
+griddiag_main_uniform(Grid, K, Bool) :-
 % Get diagonal values.
-    gdi_main_diag(Grid, K, Vals),
+    griddiag_main_diag(Grid, K, Vals),
 % Diagonal must be non-empty.
     Vals \= [],
 % Check uniformity.
-    (gdi_all_eq_(Vals) -> Bool = yes ; Bool = no).
+    (griddiag_all_eq_(Vals) -> Bool = yes ; Bool = no).
 
-% gdi_anti_uniform(+Grid, +K, -Bool)
+% griddiag_anti_uniform(+Grid, +K, -Bool)
 % Bool is yes if all cells on anti-diagonal K are the same color; no otherwise.
-gdi_anti_uniform(Grid, K, Bool) :-
+griddiag_anti_uniform(Grid, K, Bool) :-
 % Get anti-diagonal values.
-    gdi_anti_diag(Grid, K, Vals),
+    griddiag_anti_diag(Grid, K, Vals),
 % Diagonal must be non-empty.
     Vals \= [],
 % Check uniformity.
-    (gdi_all_eq_(Vals) -> Bool = yes ; Bool = no).
+    (griddiag_all_eq_(Vals) -> Bool = yes ; Bool = no).
 
-% gdi_set_main_diag(+Grid, +K, +Color, -Result)
+% griddiag_set_main_diag(+Grid, +K, +Color, -Result)
 % Result is Grid with all cells on main diagonal K set to Color.
-gdi_set_main_diag(Grid, K, Color, Result) :-
+griddiag_set_main_diag(Grid, K, Color, Result) :-
 % Get dimensions.
-    gdi_dims_(Grid, H, W),
+    griddiag_dims_(Grid, H, W),
 % Collect cells on diagonal K.
-    findall(R-C, gdi_main_rc_(H, W, K, R, C), DiagCells),
+    findall(R-C, griddiag_main_rc_(H, W, K, R, C), DiagCells),
 % Build result: replace diagonal cells with Color.
-    gdi_build_(H, W,
-        [R, C, V]>>(gdi_cell_(Grid, R, C, Orig),
+    griddiag_build_(H, W,
+        [R, C, V]>>(griddiag_cell_(Grid, R, C, Orig),
                     (memberchk(R-C, DiagCells) -> V = Color ; V = Orig)),
         Result).
 
-% gdi_set_anti_diag(+Grid, +K, +Color, -Result)
+% griddiag_set_anti_diag(+Grid, +K, +Color, -Result)
 % Result is Grid with all cells on anti-diagonal K set to Color.
-gdi_set_anti_diag(Grid, K, Color, Result) :-
+griddiag_set_anti_diag(Grid, K, Color, Result) :-
 % Get dimensions.
-    gdi_dims_(Grid, H, W),
+    griddiag_dims_(Grid, H, W),
 % Collect cells on anti-diagonal K.
-    findall(R-C, gdi_anti_rc_(H, W, K, R, C), DiagCells),
+    findall(R-C, griddiag_anti_rc_(H, W, K, R, C), DiagCells),
 % Build result: replace anti-diagonal cells with Color.
-    gdi_build_(H, W,
-        [R, C, V]>>(gdi_cell_(Grid, R, C, Orig),
+    griddiag_build_(H, W,
+        [R, C, V]>>(griddiag_cell_(Grid, R, C, Orig),
                     (memberchk(R-C, DiagCells) -> V = Color ; V = Orig)),
         Result).
 
-% gdi_uniform_main_diags(+Grid, -Ks)
+% griddiag_uniform_main_diags(+Grid, -Ks)
 % Ks is the list of K values (from -(H-1) to W-1) for which the K-th main
 % diagonal is uniform (all the same color).
-gdi_uniform_main_diags(Grid, Ks) :-
+griddiag_uniform_main_diags(Grid, Ks) :-
 % Get dimensions.
-    gdi_dims_(Grid, H, W),
+    griddiag_dims_(Grid, H, W),
     KMin is -(H - 1),
     KMax is W - 1,
 % Collect K values of uniform diagonals.
     findall(K,
         (between(KMin, KMax, K),
-         gdi_main_uniform(Grid, K, yes)),
+         griddiag_main_uniform(Grid, K, yes)),
         Ks).
 
-% gdi_uniform_anti_diags(+Grid, -Ks)
+% griddiag_uniform_anti_diags(+Grid, -Ks)
 % Ks is the list of K values (from 0 to H+W-2) for which the K-th anti-diagonal
 % is uniform (all the same color).
-gdi_uniform_anti_diags(Grid, Ks) :-
+griddiag_uniform_anti_diags(Grid, Ks) :-
 % Get dimensions.
-    gdi_dims_(Grid, H, W),
+    griddiag_dims_(Grid, H, W),
     KMax is H + W - 2,
 % Collect K values of uniform anti-diagonals.
     findall(K,
         (between(0, KMax, K),
-         gdi_anti_uniform(Grid, K, yes)),
+         griddiag_anti_uniform(Grid, K, yes)),
         Ks).
 
-% gdi_diag_length(+Grid, +K, -Len)
+% griddiag_diag_length(+Grid, +K, -Len)
 % Len is the number of cells on the K-th main diagonal of Grid.
-gdi_diag_length(Grid, K, Len) :-
+griddiag_diag_length(Grid, K, Len) :-
 % Get the diagonal and count its cells.
-    gdi_main_diag(Grid, K, Vals),
+    griddiag_main_diag(Grid, K, Vals),
     length(Vals, Len).

@@ -397,7 +397,7 @@ Everything is inspectable.
 | `iochan` | I/O Channel Integration: Speaker output (espeak-ng / festival TTS), microphone input (arecord + whisper-cli STT), text channels (console / email / screen / app), image channels (console / email / screen / app / webcam / URL), and printer output (CUPS lp) (ic_*, Layer 254) (WP-279) |
 | `seqinfer` (enhanced) | Sequential Rule Inference + ARC-AGI-2 Candidates: sq_arc2_candidates/1 adds 66-entry integer-color candidate list for multi-step search (sq_*, Layer 195) (WP-274, PR 363) |
 | `hyp` (enhanced) | Hypothesis Generation + Spatial/Structural/Sequence: hy_spatial_hyp/3, hy_structural_hyp/3, hy_sequence_hyp/4 extend hypothesis search to grid-level shifts, structural patterns, and two-step color maps (hy_*, Layer 74) (WP-275, PR 363) |
-| `condxf` (enhanced) | Conditional Scene Transform + Gate Inference: xc_infer_gate/3 infers the gate_color that separates training pairs by change signature (xc_*, Layer 187) (WP-276, PR 363) |
+| `condxf` (enhanced) | Conditional Scene Transform + Gate Inference: condxf_infer_gate/3 infers the gate_color that separates training pairs by change signature (xc_*, Layer 187) (WP-276, PR 363) |
 | `induction` (enhanced) | Grid-Pair Induction + Cross-Pair Aggregation: id_cross_pair_invariants/2, id_cross_pair_variants/2 aggregate properties across all training pairs (id_*, Layer 59) (WP-277, PR 363) |
 | `gridpos` | Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222) (PR 332) |
 | `gridhist` | Grid Histogram Analysis: Per-Row and Per-Column Color Frequency, Modal, and Entropy (ghst_*, Layer 221) (PR 331) |

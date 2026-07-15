@@ -11,20 +11,20 @@ is already settled.
 
 1. Gravity Directions
 
-gv_fall_down/3 settles non-bg cells to the bottom of each column, packing them
+gravity_fall_down/3 settles non-bg cells to the bottom of each column, packing them
 as low as possible while preserving their relative order. BgColor fills the
 vacated top positions.
 
   G = [[b,x,b],[x,b,b],[b,b,x],[b,b,b]].
-  gv_fall_down(G, b, F).
+  gravity_fall_down(G, b, F).
   % F = [[b,b,b],[b,b,b],[b,b,b],[x,x,x]]
 
-gv_fall_up/3, gv_fall_left/3, and gv_fall_right/3 work the same way in the
+gravity_fall_up/3, gravity_fall_left/3, and gravity_fall_right/3 work the same way in the
 named direction:
 
-  gv_fall_up(G, b, F).    % x cells rise to the top of each column
-  gv_fall_left(G, b, F).  % x cells pack left in each row
-  gv_fall_right(G, b, F). % x cells pack right in each row
+  gravity_fall_up(G, b, F).    % x cells rise to the top of each column
+  gravity_fall_left(G, b, F).  % x cells pack left in each row
+  gravity_fall_right(G, b, F). % x cells pack right in each row
 
 All four operations preserve the count and relative order of non-bg cells within
 each row or column.
@@ -57,7 +57,7 @@ downward gravity.
 gv_settled/2 succeeds if the grid is already settled (no floating cells):
 
   gv_settled(G, b).  % fails for G above
-  gv_fall_down(G, b, F), gv_settled(F, b).  % succeeds after falling
+  gravity_fall_down(G, b, F), gv_settled(F, b).  % succeeds after falling
 
 
 4. Column Gap and Pile Extremes
@@ -86,10 +86,10 @@ This count is invariant under any gravity operation.
 
 6. Predicate Reference
 
-  gv_fall_down/3      - settle non-bg cells to bottom
-  gv_fall_up/3        - settle non-bg cells to top
-  gv_fall_left/3      - settle non-bg cells to left of each row
-  gv_fall_right/3     - settle non-bg cells to right of each row
+  gravity_fall_down/3      - settle non-bg cells to bottom
+  gravity_fall_up/3        - settle non-bg cells to top
+  gravity_fall_left/3      - settle non-bg cells to left of each row
+  gravity_fall_right/3     - settle non-bg cells to right of each row
   gv_col_pile_h/4     - non-bg count in column C
   gv_row_pile_w/4     - non-bg count in row R
   gv_all_col_piles/3  - pile heights for all columns

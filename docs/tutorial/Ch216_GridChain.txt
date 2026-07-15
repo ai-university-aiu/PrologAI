@@ -17,106 +17,106 @@ Dependencies: library(lists)
 
 Pairing and Windowing
 
-gch_pairs(+Grids, -Pairs)
+gridchain_pairs(+Grids, -Pairs)
 Consecutive pairs: [[G1,G2],[G2,G3],...]. Empty or single-element input yields [].
 
-    gch_pairs([G1,G2,G3], [[G1,G2],[G2,G3]]).
+    gridchain_pairs([G1,G2,G3], [[G1,G2],[G2,G3]]).
 
-gch_window(+Grids, +W, -Windows)
+gridchain_window(+Grids, +W, -Windows)
 All consecutive sublists of length W (sliding window).
 
-    gch_window([G1,G2,G3,G4], 2, [[G1,G2],[G2,G3],[G3,G4]]).
-    gch_window([G1,G2], 5, []).   % W exceeds length → []
+    gridchain_window([G1,G2,G3,G4], 2, [[G1,G2],[G2,G3],[G3,G4]]).
+    gridchain_window([G1,G2], 5, []).   % W exceeds length → []
 
 
 Zip, Take, Drop, Index
 
-gch_zip(+Grids1, +Grids2, -ZippedPairs)
+gridchain_zip(+Grids1, +Grids2, -ZippedPairs)
 Element-wise zip into two-element sublists. Stops at the shorter sequence.
 
-    gch_zip([G1,G2], [G3,G4], [[G1,G3],[G2,G4]]).
+    gridchain_zip([G1,G2], [G3,G4], [[G1,G3],[G2,G4]]).
 
-gch_take(+Grids, +N, -Taken)
+gridchain_take(+Grids, +N, -Taken)
 First N grids. Clamps to full list if N exceeds length.
 
-    gch_take([G1,G2,G3], 2, [G1,G2]).
+    gridchain_take([G1,G2,G3], 2, [G1,G2]).
 
-gch_drop(+Grids, +N, -Rest)
+gridchain_drop(+Grids, +N, -Rest)
 Drop the first N grids. Returns [] if N exceeds length.
 
-    gch_drop([G1,G2,G3], 1, [G2,G3]).
+    gridchain_drop([G1,G2,G3], 1, [G2,G3]).
 
-gch_nth(+Grids, +N, -Grid)
+gridchain_nth(+Grids, +N, -Grid)
 0-indexed element access.
 
-    gch_nth([G1,G2,G3], 1, G2).
+    gridchain_nth([G1,G2,G3], 1, G2).
 
 
 Sameness, Deduplication, Repetition
 
-gch_all_same(+Grids)
+gridchain_all_same(+Grids)
 Succeeds if every grid in the sequence is identical. Empty and singleton succeed.
 
     G = [[r,b],[b,r]],
-    gch_all_same([G,G,G]).
+    gridchain_all_same([G,G,G]).
 
-gch_dedup(+Grids, -Unique)
+gridchain_dedup(+Grids, -Unique)
 Remove duplicate grids, preserving first-occurrence order.
 
     G1=[[r]], G2=[[g]],
-    gch_dedup([G1,G2,G1], [G1,G2]).
+    gridchain_dedup([G1,G2,G1], [G1,G2]).
 
-gch_cycle(+Grid, +N, -Sequence)
+gridchain_cycle(+Grid, +N, -Sequence)
 Build a sequence of N copies of Grid.
 
-    gch_cycle([[r,b]], 3, [[[r,b]],[[r,b]],[[r,b]]]).
+    gridchain_cycle([[r,b]], 3, [[[r,b]],[[r,b]],[[r,b]]]).
 
 
 Interleave, Split, Reverse
 
-gch_interleave(+Grids1, +Grids2, -Interleaved)
+gridchain_interleave(+Grids1, +Grids2, -Interleaved)
 Interleave element by element: [G1a,G1b,G2a,G2b,...]. Stops at shorter sequence.
 
-    gch_interleave([G1,G2], [G3,G4], [G1,G3,G2,G4]).
+    gridchain_interleave([G1,G2], [G3,G4], [G1,G3,G2,G4]).
 
-gch_split_at(+Grids, +N, -Before, -After)
+gridchain_split_at(+Grids, +N, -Before, -After)
 Split at index N: Before has the first N grids; After has the rest.
 
-    gch_split_at([G1,G2,G3,G4], 2, [G1,G2], [G3,G4]).
+    gridchain_split_at([G1,G2,G3,G4], 2, [G1,G2], [G3,G4]).
 
-gch_reverse(+Grids, -Reversed)
+gridchain_reverse(+Grids, -Reversed)
 Reverse the sequence.
 
-    gch_reverse([G1,G2,G3], [G3,G2,G1]).
+    gridchain_reverse([G1,G2,G3], [G3,G2,G1]).
 
 
 Change Analysis
 
-gch_diff_counts(+Grids, +BgColor, -Counts)
+gridchain_diff_counts(+Grids, +BgColor, -Counts)
 For each consecutive pair, count positions where the two grids differ.
 BgColor is accepted for API consistency but does not affect counting.
 
     G1=[[r,b]], G2=[[b,b]], G3=[[b,r]],
-    gch_diff_counts([G1,G2,G3], b, [1,1]).
+    gridchain_diff_counts([G1,G2,G3], b, [1,1]).
 
-gch_changes_mask(+Grids, +BgColor, +MarkColor, -Mask)
+gridchain_changes_mask(+Grids, +BgColor, +MarkColor, -Mask)
 Compare the first and last grids in the sequence. Mask has MarkColor at positions
 that changed; BgColor at unchanged positions. Single-element input returns an
 all-BgColor mask of the same dimensions.
 
     G1=[[r,b],[b,b]], Gn=[[r,b],[b,r]],
-    gch_changes_mask([G1,G2,Gn], b, m, [[b,b],[b,m]]).
+    gridchain_changes_mask([G1,G2,Gn], b, m, [[b,b],[b,m]]).
 
 
 Typical Workflows
 
 % Track how much a grid changes step by step:
-gch_diff_counts(Sequence, Bg, Counts).
+gridchain_diff_counts(Sequence, Bg, Counts).
 
 % Find sliding-window pairs and compare each:
-gch_window(Sequence, 2, Windows),
-findall(N, (member([Ga,Gb], Windows), gch_diff_counts([Ga,Gb], Bg, [N])), StepCounts).
+gridchain_window(Sequence, 2, Windows),
+findall(N, (member([Ga,Gb], Windows), gridchain_diff_counts([Ga,Gb], Bg, [N])), StepCounts).
 
 % Verify a transformation sequence ends at the target:
-gch_changes_mask(Sequence, Bg, mark, Mask),
-gch_all_same([Mask, AllBgMask]).   % no changes → all bg
+gridchain_changes_mask(Sequence, Bg, mark, Mask),
+gridchain_all_same([Mask, AllBgMask]).   % no changes → all bg
