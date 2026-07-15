@@ -57,8 +57,8 @@
 :- use_module(library(node_facts), [set_default_nexus/1]).
 % Import [sentinels_register/6] from the built-in 'sentinels' library.
 :- use_module(library(sentinels),  [sentinels_register/6]).
-% Import [sona_absorb/1] from the built-in 'sona' library.
-:- use_module(library(sona),       [sona_absorb/1]).
+% Import [synaptic_ontological_neural_aggregator_absorb/1] from the built-in 'sona' library.
+:- use_module(library(synaptic_ontological_neural_aggregator),       [synaptic_ontological_neural_aggregator_absorb/1]).
 % Load the built-in 'refinement' library so its predicates are available here.
 :- use_module(library(refinement), [refinement_propose_modification/3,
                                     % Supply 'refinement_sandbox_evaluate/3' as the next argument to the expression above.
@@ -102,7 +102,7 @@ pr17_setup :-
     % Add a new fact or rule to the runtime knowledge base.
     assertz(refinement:modification_id_counter(0)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:sona_trajectory_entry(_, _, _, _, _, _)).
+    retractall(sona:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)).
 
 % Execute: pr17_cleanup :-.
 pr17_cleanup :-
@@ -111,7 +111,7 @@ pr17_cleanup :-
     % Remove all matching facts from the runtime knowledge base.
     retractall(refinement:modification_proposal(_, _, _, _, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:sona_trajectory_entry(_, _, _, _, _, _)),
+    retractall(sona:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)),
     % State the fact: lattice close(N).
     lattice_close(N).
 
@@ -119,7 +119,7 @@ pr17_cleanup :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(repeated_failure_generates_proposal) :-
     % Directly assert 5 trajectory entries to bypass SONA deduplication.
-    % sona_trajectory_entry/6: Id, SitId, ActionSeq, Outcome, Reward, Timestamp
+    % synaptic_ontological_neural_aggregator_trajectory_entry/6: Id, SitId, ActionSeq, Outcome, Reward, Timestamp
     % State a fact for 'get time' with the arguments listed below.
     get_time(T0),
     % Verify that for every solution of the Condition, the Action also holds.
@@ -129,7 +129,7 @@ test(repeated_failure_generates_proposal) :-
         % Continue the multi-line expression started above.
         ( Ti is T0 - (105 - I) * 100,
           % Continue the multi-line expression started above.
-          assertz(sona:sona_trajectory_entry(I, situation_garden,
+          assertz(sona:synaptic_ontological_neural_aggregator_trajectory_entry(I, situation_garden,
                                              % Continue the multi-line expression started above.
                                              [garden_watering, irrigate],
                                              % Continue the multi-line expression started above.
@@ -190,7 +190,7 @@ test(r3_nondegradation_over_cycles) :-
         % Continue the multi-line expression started above.
         ( Ti is T0 - I * 10,
           % Continue the multi-line expression started above.
-          sona_absorb(trajectory(garden_task, [good_action], success, 1.0, Ti))
+          synaptic_ontological_neural_aggregator_absorb(trajectory(garden_task, [good_action], success, 1.0, Ti))
         % Close the expression opened above.
         )
     % Close the expression opened above.
@@ -202,7 +202,7 @@ test(r3_nondegradation_over_cycles) :-
         % Continue the multi-line expression started above.
         ( Tj is T0 - J * 10,
           % Continue the multi-line expression started above.
-          sona_absorb(trajectory(garden_task, [bad_action], failure, -1.0, Tj))
+          synaptic_ontological_neural_aggregator_absorb(trajectory(garden_task, [bad_action], failure, -1.0, Tj))
         % Close the expression opened above.
         )
     % Close the expression opened above.

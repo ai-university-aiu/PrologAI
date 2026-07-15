@@ -1,9 +1,9 @@
 /*  PrologAI — PR 14 MCP Gateway Acceptance Tests
 
-    AC-PR14-001: mcp_gateway_start(Port) starts; HTTP POST to
+    AC-PR14-001: model_context_protocol_gateway_start(Port) starts; HTTP POST to
                  /tools/lattice_query with valid API key returns MCP response.
     AC-PR14-002: Request with invalid API key returns HTTP 401.
-    AC-PR14-003: mcp_gateway_stop/0 stops the server.
+    AC-PR14-003: model_context_protocol_gateway_stop/0 stops the server.
     AC-PR14-004: /tools/lattice_inscribe stores a node_fact.
     AC-PR14-005: /tools/actor_list returns a list.
     AC-PR14-006: /tools/sona_learn accepts a trajectory.
@@ -27,7 +27,7 @@
    % State a fact for 'atomic list concat' with the arguments listed below.
    atomic_list_concat([ProjectRoot, '/packs/sentinels/prolog'],      SentinelPath),
    % State a fact for 'atomic list concat' with the arguments listed below.
-   atomic_list_concat([ProjectRoot, '/packs/mindbody/prolog'],       MindBodyPath),
+   atomic_list_concat([ProjectRoot, '/packs/mind_body/prolog'],       MindBodyPath),
    % State a fact for 'atomic list concat' with the arguments listed below.
    atomic_list_concat([ProjectRoot, '/packs/sona/prolog'],           SonaPath),
    % State a fact for 'atomic list concat' with the arguments listed below.
@@ -64,9 +64,9 @@
 % Import [set_default_nexus/1] from the built-in 'node_facts' library.
 :- use_module(library(node_facts), [set_default_nexus/1]).
 % Load the built-in 'mcp_gateway' library so its predicates are available here.
-:- use_module(library(mcp_gateway),[mcp_gateway_start/1, mcp_gateway_stop/0,
+:- use_module(library(model_context_protocol_gateway),[model_context_protocol_gateway_start/1, model_context_protocol_gateway_stop/0,
                                     % Continue the multi-line expression started above.
-                                    mcp_set_api_key/1]).
+                                    model_context_protocol_gateway_set_api_key/1]).
 
 % Execute the compile-time directive: nb_setval(pr14_test_port, 7477).
 :- nb_setval(pr14_test_port, 7477).
@@ -128,16 +128,16 @@ pr14_setup :-
     % State a fact for 'set default nexus' with the arguments listed below.
     set_default_nexus(N),
     % State a fact for 'mcp set api key' with the arguments listed below.
-    mcp_set_api_key('test-api-key-pr14'),
+    model_context_protocol_gateway_set_api_key('test-api-key-pr14'),
     % State a fact for 'nb getval' with the arguments listed below.
     nb_getval(pr14_test_port, Port),
     % State the fact: mcp gateway start(Port).
-    mcp_gateway_start(Port).
+    model_context_protocol_gateway_start(Port).
 
 % Execute: pr14_cleanup :-.
 pr14_cleanup :-
     % State a fact for 'catch' with the arguments listed below.
-    catch(mcp_gateway_stop, _, true),
+    catch(model_context_protocol_gateway_stop, _, true),
     % State a fact for 'nb getval' with the arguments listed below.
     nb_getval(pr14_nexus_ref, N),
     % State the fact: lattice close(N).
@@ -185,7 +185,7 @@ test(gateway_is_running_after_start) :-
     % State a fact for 'nb getval' with the arguments listed below.
     nb_getval(pr14_test_port, Port),
     % State a fact for 'mcp gateway start' with the arguments listed below.
-    mcp_gateway_start(Port),   % idempotent: already started
+    model_context_protocol_gateway_start(Port),   % idempotent: already started
     % State a fact for 'valid auth' with the arguments listed below.
     valid_auth(Auth),
     % State a fact for 'post mcp' with the arguments listed below.

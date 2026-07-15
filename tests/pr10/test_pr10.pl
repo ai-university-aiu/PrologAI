@@ -7,7 +7,7 @@
     AC-PR10-004: relay_percept with perception_signal stores percept node_fact.
     AC-PR10-005: relay_percept with interoceptive_signal stores percept node_fact.
     AC-PR10-006: relay_percept with proprioceptive_signal stores percept node_fact.
-    AC-PR10-007: dispatch_command records command as Lattice node_fact.
+    AC-PR10-007: mind_body_dispatch_command records command as Lattice node_fact.
     AC-PR10-008: Re-enrolling the same address updates the registration.
     AC-PR10-009: body_enrolled/1 succeeds for enrolled body, fails for unknown.
 */
@@ -25,7 +25,7 @@
    % State a fact for 'atomic list concat' with the arguments listed below.
    atomic_list_concat([ProjectRoot, '/packs/actors/prolog'],         ActorsPath),
    % State a fact for 'atomic list concat' with the arguments listed below.
-   atomic_list_concat([ProjectRoot, '/packs/mindbody/prolog'],       MindBodyPath),
+   atomic_list_concat([ProjectRoot, '/packs/mind_body/prolog'],       MindBodyPath),
    % Add a new fact or rule to the runtime knowledge base.
    assertz(file_search_path(library, LatticePath)),
    % Add a new fact or rule to the runtime knowledge base.
@@ -44,9 +44,9 @@
                                    % Continue the multi-line expression started above.
                                    traverse_nexus/4]).
 % Load the built-in 'mindbody' library so its predicates are available here.
-:- use_module(library(mindbody),  [manifest_body/3, body_vitals/2,
+:- use_module(library(mind_body),  [manifest_body/3, body_vitals/2,
                                    % Continue the multi-line expression started above.
-                                   relay_percept/2, dispatch_command/2,
+                                   relay_percept/2, mind_body_dispatch_command/2,
                                    % Continue the multi-line expression started above.
                                    body_enrolled/1]).
 
@@ -177,7 +177,7 @@ test(dispatch_command_records_node_fact) :-
     % State a fact for 'manifest body' with the arguments listed below.
     manifest_body('herald://robot-05', [], [capability(move_forward, [])]),
     % State a fact for 'dispatch command' with the arguments listed below.
-    dispatch_command('herald://robot-05', move_forward(1.0)),
+    mind_body_dispatch_command('herald://robot-05', move_forward(1.0)),
     % State a fact for 'default nexus' with the arguments listed below.
     default_nexus(Nx),
     % State a fact for 'traverse nexus' with the arguments listed below.

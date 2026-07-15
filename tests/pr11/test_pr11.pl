@@ -1,18 +1,18 @@
 /*  PrologAI — PR 11 SONA Continuous Learning Acceptance Tests
 
-    AC-PR11-001: sona_absorb accepts a trajectory; sona_retrieve returns it.
-    AC-PR11-002: sona_metrics returns expected fields after absorption.
+    AC-PR11-001: synaptic_ontological_neural_aggregator_absorb accepts a trajectory; synaptic_ontological_neural_aggregator_retrieve returns it.
+    AC-PR11-002: synaptic_ontological_neural_aggregator_metrics returns expected fields after absorption.
     AC-PR11-003: EWC++ — learning 5 harvesting trajectories does NOT degrade
                  recall of 5 watering trajectories absorbed earlier.
-    AC-PR11-004: Two trajectories identical except for outcome → sona_retrieve
+    AC-PR11-004: Two trajectories identical except for outcome → synaptic_ontological_neural_aggregator_retrieve
                  returns BOTH, never one merged hybrid.
-    AC-PR11-005: sona_crystallize writes crystallized_pattern node_facts.
+    AC-PR11-005: synaptic_ontological_neural_aggregator_crystallize writes crystallized_pattern node_facts.
     AC-PR11-006: Exact-duplicate trajectory (same SituationId, actions,
                  outcome) is NOT added a second time.
-    AC-PR11-007: sona_retrieve/3 respects the K limit.
-    AC-PR11-008: sona_crystallize with min_trajectory_count(N) skips when
+    AC-PR11-007: synaptic_ontological_neural_aggregator_retrieve/3 respects the K limit.
+    AC-PR11-008: synaptic_ontological_neural_aggregator_crystallize with min_trajectory_count(N) skips when
                  bank is too small.
-    AC-PR11-009: sona_retrieve with no entries returns empty list.
+    AC-PR11-009: synaptic_ontological_neural_aggregator_retrieve with no entries returns empty list.
 */
 
 % Execute the compile-time directive: prolog_load_context(directory, TestDir),.
@@ -43,11 +43,11 @@
                                     % Continue the multi-line expression started above.
                                     default_nexus/1]).
 % Load the built-in 'sona' library so its predicates are available here.
-:- use_module(library(sona),       [sona_absorb/1, sona_retrieve/2,
+:- use_module(library(synaptic_ontological_neural_aggregator),       [synaptic_ontological_neural_aggregator_absorb/1, synaptic_ontological_neural_aggregator_retrieve/2,
                                     % Continue the multi-line expression started above.
-                                    sona_retrieve/3, sona_metrics/1,
+                                    synaptic_ontological_neural_aggregator_retrieve/3, synaptic_ontological_neural_aggregator_metrics/1,
                                     % Continue the multi-line expression started above.
-                                    sona_crystallize/1]).
+                                    synaptic_ontological_neural_aggregator_crystallize/1]).
 
 % Execute the compile-time directive: begin_tests(pr11, [setup(pr11_setup), cleanup(pr11_cleanup)]).
 :- begin_tests(pr11, [setup(pr11_setup), cleanup(pr11_cleanup)]).
@@ -62,23 +62,23 @@ pr11_setup :-
     set_default_nexus(N),
     % Clear SONA state between test runs
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:sona_trajectory_entry(_, _, _, _, _, _)),
+    retractall(sona:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:sona_importance(_, _)),
+    retractall(sona:synaptic_ontological_neural_aggregator_importance(_, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:sona_retrieval_count(_, _)),
+    retractall(sona:synaptic_ontological_neural_aggregator_retrieval_count(_, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:sona_trajectory_id_counter(_)),
+    retractall(sona:synaptic_ontological_neural_aggregator_trajectory_id_counter(_)),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(sona:sona_trajectory_id_counter(0)),
+    assertz(sona:synaptic_ontological_neural_aggregator_trajectory_id_counter(0)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:sona_consolidation_cycle(_)),
+    retractall(sona:synaptic_ontological_neural_aggregator_consolidation_cycle(_)),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(sona:sona_consolidation_cycle(0)),
+    assertz(sona:synaptic_ontological_neural_aggregator_consolidation_cycle(0)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:sona_last_crystallize_time(_)),
+    retractall(sona:synaptic_ontological_neural_aggregator_last_crystallize_time(_)),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(sona:sona_last_crystallize_time(0.0)).
+    assertz(sona:synaptic_ontological_neural_aggregator_last_crystallize_time(0.0)).
 
 % Execute: pr11_cleanup :-.
 pr11_cleanup :-
@@ -93,9 +93,9 @@ test(absorb_and_retrieve) :-
     % State a fact for 'get time' with the arguments listed below.
     get_time(T),
     % State a fact for 'sona absorb' with the arguments listed below.
-    sona_absorb(trajectory(sit_001, [pick(apple)], success, 1.0, T)),
+    synaptic_ontological_neural_aggregator_absorb(trajectory(sit_001, [pick(apple)], success, 1.0, T)),
     % State a fact for 'sona retrieve' with the arguments listed below.
-    sona_retrieve(sit_001, Results),
+    synaptic_ontological_neural_aggregator_retrieve(sit_001, Results),
     % Check that 'Results' is not unifiable with '[]'.
     Results \= [],
     % Check that 'Results' is unifiable with '[trajectory(sit_001, _, success, _, _)|_]'.
@@ -107,9 +107,9 @@ test(metrics_after_absorption) :-
     % State a fact for 'get time' with the arguments listed below.
     get_time(T),
     % State a fact for 'sona absorb' with the arguments listed below.
-    sona_absorb(trajectory(sit_002, [move(north)], success, 0.8, T)),
+    synaptic_ontological_neural_aggregator_absorb(trajectory(sit_002, [move(north)], success, 0.8, T)),
     % State a fact for 'sona metrics' with the arguments listed below.
-    sona_metrics(M),
+    synaptic_ontological_neural_aggregator_metrics(M),
     % State a fact for 'get dict' with the arguments listed below.
     get_dict(trajectory_count, M, Count),
     % Check that 'Count' is greater than or equal to '1'.
@@ -134,12 +134,12 @@ test(ewcpp_non_degradation) :-
         % Continue the multi-line expression started above.
         SitId =.. [water_sit, I],
         % Continue the multi-line expression started above.
-        sona_absorb(trajectory(SitId, [water(plant, I)], success, 1.0, T))
+        synaptic_ontological_neural_aggregator_absorb(trajectory(SitId, [water(plant, I)], success, 1.0, T))
     % Close the expression opened above.
     )),
     % Retrieve watering before adding harvesting (baseline)
     % State a fact for 'sona retrieve' with the arguments listed below.
-    sona_retrieve(water_sit(1), 5, Before),
+    synaptic_ontological_neural_aggregator_retrieve(water_sit(1), 5, Before),
     % Unify 'N_Before' with the number of elements in list 'Before'.
     length(Before, N_Before),
     % Absorb 5 harvesting trajectories
@@ -148,15 +148,15 @@ test(ewcpp_non_degradation) :-
         % Continue the multi-line expression started above.
         SitId2 =.. [harvest_sit, J],
         % Continue the multi-line expression started above.
-        sona_absorb(trajectory(SitId2, [harvest(crop, J)], success, 1.0, T))
+        synaptic_ontological_neural_aggregator_absorb(trajectory(SitId2, [harvest(crop, J)], success, 1.0, T))
     % Close the expression opened above.
     )),
     % Absorb one more watering trajectory
     % State a fact for 'sona absorb' with the arguments listed below.
-    sona_absorb(trajectory(water_sit(6), [water(plant, 6)], success, 1.0, T)),
+    synaptic_ontological_neural_aggregator_absorb(trajectory(water_sit(6), [water(plant, 6)], success, 1.0, T)),
     % Recall of watering should not be degraded
     % State a fact for 'sona retrieve' with the arguments listed below.
-    sona_retrieve(water_sit(1), 5, After),
+    synaptic_ontological_neural_aggregator_retrieve(water_sit(1), 5, After),
     % Unify 'N_After' with the number of elements in list 'After'.
     length(After, N_After),
     % Check that 'N_After' is greater than or equal to 'N_Before'.
@@ -168,11 +168,11 @@ test(pattern_separation_dual_recall) :-
     % State a fact for 'get time' with the arguments listed below.
     get_time(T),
     % State a fact for 'sona absorb' with the arguments listed below.
-    sona_absorb(trajectory(sit_fork, [push(button)], success, 1.0, T)),
+    synaptic_ontological_neural_aggregator_absorb(trajectory(sit_fork, [push(button)], success, 1.0, T)),
     % State a fact for 'sona absorb' with the arguments listed below.
-    sona_absorb(trajectory(sit_fork, [push(button)], failure, -1.0, T)),
+    synaptic_ontological_neural_aggregator_absorb(trajectory(sit_fork, [push(button)], failure, -1.0, T)),
     % State a fact for 'sona retrieve' with the arguments listed below.
-    sona_retrieve(sit_fork, Results),
+    synaptic_ontological_neural_aggregator_retrieve(sit_fork, Results),
     % Unify 'N' with the number of elements in list 'Results'.
     length(Results, N),
     % Check that 'N' is greater than or equal to '2'.
@@ -192,11 +192,11 @@ test(crystallize_inscribes_node_facts) :-
         % Continue the multi-line expression started above.
         SA =.. [crystal_sit, I],
         % Continue the multi-line expression started above.
-        sona_absorb(trajectory(SA, [step(I)], success, 0.5, T))
+        synaptic_ontological_neural_aggregator_absorb(trajectory(SA, [step(I)], success, 0.5, T))
     % Close the expression opened above.
     )),
     % State a fact for 'sona crystallize' with the arguments listed below.
-    sona_crystallize([]),
+    synaptic_ontological_neural_aggregator_crystallize([]),
     % State a fact for 'default nexus' with the arguments listed below.
     default_nexus(Nx),
     % State a fact for 'traverse nexus' with the arguments listed below.
@@ -214,19 +214,19 @@ test(duplicate_not_stored) :-
     % State a fact for 'get time' with the arguments listed below.
     get_time(T),
     % State a fact for 'sona absorb' with the arguments listed below.
-    sona_absorb(trajectory(sit_dup, [do(x)], success, 1.0, T)),
+    synaptic_ontological_neural_aggregator_absorb(trajectory(sit_dup, [do(x)], success, 1.0, T)),
     % State a fact for 'sona absorb' with the arguments listed below.
-    sona_absorb(trajectory(sit_dup, [do(x)], success, 1.0, T)),
+    synaptic_ontological_neural_aggregator_absorb(trajectory(sit_dup, [do(x)], success, 1.0, T)),
     % Aggregate solutions using 'count' and bind the result to a single value.
     aggregate_all(count,
                   % Continue the multi-line expression started above.
-                  sona:sona_trajectory_entry(_, sit_dup, [do(x)], success, _, _),
+                  sona:synaptic_ontological_neural_aggregator_trajectory_entry(_, sit_dup, [do(x)], success, _, _),
                   % Supply 'N' as the next argument to the expression above.
                   N),
     % Check that 'N' is numerically equal to '1'.
     N =:= 1.
 
-%  AC-PR11-007: sona_retrieve/3 respects K limit
+%  AC-PR11-007: synaptic_ontological_neural_aggregator_retrieve/3 respects K limit
 % Define a clause for 'test': succeed when the following conditions hold.
 test(retrieve_respects_k) :-
     % State a fact for 'get time' with the arguments listed below.
@@ -236,11 +236,11 @@ test(retrieve_respects_k) :-
         % Continue the multi-line expression started above.
         SA =.. [batch_sit, I],
         % Continue the multi-line expression started above.
-        sona_absorb(trajectory(SA, [act(I)], success, 0.5, T))
+        synaptic_ontological_neural_aggregator_absorb(trajectory(SA, [act(I)], success, 0.5, T))
     % Close the expression opened above.
     )),
     % State a fact for 'sona retrieve' with the arguments listed below.
-    sona_retrieve(batch_sit(1), 3, Results),
+    synaptic_ontological_neural_aggregator_retrieve(batch_sit(1), 3, Results),
     % Unify 'N' with the number of elements in list 'Results'.
     length(Results, N),
     % Check that 'N' is less than or equal to '3'.
@@ -250,14 +250,14 @@ test(retrieve_respects_k) :-
 % Define a clause for 'test': succeed when the following conditions hold.
 test(crystallize_skips_when_too_few) :-
     % State a fact for 'sona metrics' with the arguments listed below.
-    sona_metrics(M0),
+    synaptic_ontological_neural_aggregator_metrics(M0),
     % State a fact for 'get dict' with the arguments listed below.
     get_dict(consolidation_cycle, M0, CC0),
     % Require more trajectories than exist in the bank
     % State a fact for 'sona crystallize' with the arguments listed below.
-    sona_crystallize([min_trajectory_count(9999)]),
+    synaptic_ontological_neural_aggregator_crystallize([min_trajectory_count(9999)]),
     % State a fact for 'sona metrics' with the arguments listed below.
-    sona_metrics(M1),
+    synaptic_ontological_neural_aggregator_metrics(M1),
     % State a fact for 'get dict' with the arguments listed below.
     get_dict(consolidation_cycle, M1, CC1),
     % Check that 'CC1' is numerically equal to 'CC0.   % cycle unchanged because threshold not met'.
@@ -268,9 +268,9 @@ test(crystallize_skips_when_too_few) :-
 test(retrieve_empty_bank) :-
     % Temporarily clear bank state, retrieve, then restore doesn't matter
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:sona_trajectory_entry(_, _, _, _, _, _)),
+    retractall(sona:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)),
     % State a fact for 'sona retrieve' with the arguments listed below.
-    sona_retrieve(no_such_situation, Results),
+    synaptic_ontological_neural_aggregator_retrieve(no_such_situation, Results),
     % Check that 'Results' is unifiable with '[]'.
     Results = [].
 
