@@ -510,6 +510,8 @@ No guessing.
 
 The [ARC-AGI-1](https://arcprize.org) benchmark is a set of 400 grid-transformation puzzles designed by Francois Chollet to measure fluid reasoning — the kind of intelligence that cannot be faked by memorizing training data.
 
+> **Re-verified 2026-07-15.** A full runnable re-run of the benchmark exposed a pre-existing recording overcount of two: tasks `234bbc79` and `4290ef0e` had rules that fit their training pairs but not their held-out test grids, so the benchmark had actually been scoring 398/400. Both rules were genuinely generalized (an N-piece joint-assembly rule, and a concentric-rings rule that sizes each ring from the edge-midpoint-gap centre-line invariant), and the full benchmark now truly scores **400/400 = 100.00%** — confirmed by both a booted run and an isolated `arc_benchmark_run/3`, each reporting 400 with an empty fail list.
+
 No large language model (LLM).
 
 No neural weights.
