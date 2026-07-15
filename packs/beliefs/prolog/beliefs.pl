@@ -50,21 +50,21 @@
 :- dynamic neighbor_edge/2.
 
 % Define a clause for 'clamp field': succeed when the following conditions hold.
-clamp_field(certainty,    Raw, C) :- C is max(0.0, min(1.0, Raw)).
+beliefs_field(certainty,    Raw, C) :- C is max(0.0, min(1.0, Raw)).
 % Define a clause for 'clamp field': succeed when the following conditions hold.
-clamp_field(coherence,    Raw, C) :- C is max(0.0, min(1.0, Raw)).
+beliefs_field(coherence,    Raw, C) :- C is max(0.0, min(1.0, Raw)).
 % Define a clause for 'clamp field': succeed when the following conditions hold.
-clamp_field(likelihood,   Raw, C) :- C is max(0.0, min(1.0, Raw)).
+beliefs_field(likelihood,   Raw, C) :- C is max(0.0, min(1.0, Raw)).
 % Define a clause for 'clamp field': succeed when the following conditions hold.
-clamp_field(desirability, Raw, C) :- C is max(-1.0, min(1.0, Raw)).
+beliefs_field(desirability, Raw, C) :- C is max(-1.0, min(1.0, Raw)).
 % Define a clause for 'clamp field': succeed when the following conditions hold.
-clamp_field(valence,      Raw, C) :- C is max(-1.0, min(1.0, Raw)).
+beliefs_field(valence,      Raw, C) :- C is max(-1.0, min(1.0, Raw)).
 % Define a clause for 'clamp field': succeed when the following conditions hold.
-clamp_field(arousal,      Raw, C) :- C is max(0.0, min(1.0, Raw)).
+beliefs_field(arousal,      Raw, C) :- C is max(0.0, min(1.0, Raw)).
 % Define a clause for 'clamp field': succeed when the following conditions hold.
-clamp_field(attempts,     Raw, C) :- C is max(0, Raw).
+beliefs_field(attempts,     Raw, C) :- C is max(0, Raw).
 % Define a clause for 'clamp field': succeed when the following conditions hold.
-clamp_field(successes,    Raw, C) :- C is max(0, Raw).
+beliefs_field(successes,    Raw, C) :- C is max(0, Raw).
 
 % Define a clause for 'ensure record': succeed when the following conditions hold.
 ensure_record(NodeId) :-
@@ -142,7 +142,7 @@ pai_belief(NodeId, Field, Value) :-
     % Execute: ( number(Value).
     ( number(Value)
     % If the condition above succeeded, perform the following action.
-    ->  clamp_field(Field, Value, Clamped),
+    ->  beliefs_field(Field, Value, Clamped),
         % Continue the multi-line expression started above.
         set_field(NodeId, Field, Clamped)
     % Otherwise (else branch), perform the following action.
@@ -163,7 +163,7 @@ pai_belief_update(NodeId, Field, Delta) :-
     % Evaluate the arithmetic expression 'Current + Delta' and bind the result to 'New'.
     New is Current + Delta,
     % State a fact for 'clamp field' with the arguments listed below.
-    clamp_field(Field, New, Clamped),
+    beliefs_field(Field, New, Clamped),
     % State the fact: set field(NodeId, Field, Clamped).
     set_field(NodeId, Field, Clamped).
 

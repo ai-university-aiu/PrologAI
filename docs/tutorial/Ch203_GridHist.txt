@@ -8,83 +8,83 @@ ascending color order. This is distinct from global grid color analysis
 
 1. Row and Column Histograms
 
-ghst_row_hist/3 returns the sorted Color-Count histogram for a specific row.
-ghst_col_hist/3 does the same for a specific column.
+gridhist_row_hist/3 returns the sorted Color-Count histogram for a specific row.
+gridhist_col_hist/3 does the same for a specific column.
 
   :- use_module(pack(gridhist/prolog/gridhist)).
 
   G = [[a,b,a],[b,a,b],[a,b,a]].
-  ghst_row_hist(G, 0, H).    % H = [a-2, b-1]
-  ghst_col_hist(G, 1, H).    % H = [a-1, b-2]
+  gridhist_row_hist(G, 0, H).    % H = [a-2, b-1]
+  gridhist_col_hist(G, 1, H).    % H = [a-1, b-2]
 
-ghst_all_row_hists/2 and ghst_all_col_hists/2 return histograms for all rows
+gridhist_all_row_hists/2 and gridhist_all_col_hists/2 return histograms for all rows
 or columns as a list (row 0 first, column 0 first).
 
-  ghst_all_row_hists(G, Hs).  % Hs = [[a-2,b-1],[a-1,b-2],[a-2,b-1]]
+  gridhist_all_row_hists(G, Hs).  % Hs = [[a-2,b-1],[a-1,b-2],[a-2,b-1]]
 
 
 2. Modal Color
 
-ghst_modal_row/3 and ghst_modal_col/3 return the most frequent color in a
+gridhist_modal_row/3 and gridhist_modal_col/3 return the most frequent color in a
 row or column. Ties are resolved by taking the color that is last in
 alphabetical sort order (the "highest" tied value).
 
-  ghst_modal_row(G, 0, C).   % C = a (a appears 2 times > b's 1)
-  ghst_modal_col(G, 1, C).   % C = b (b appears 2 times > a's 1)
+  gridhist_modal_row(G, 0, C).   % C = a (a appears 2 times > b's 1)
+  gridhist_modal_col(G, 1, C).   % C = b (b appears 2 times > a's 1)
 
 
 3. Color Counts
 
-ghst_row_count/4 and ghst_col_count/4 count specific color occurrences. They
+gridhist_row_count/4 and gridhist_col_count/4 count specific color occurrences. They
 return 0 if the color is absent.
 
-  ghst_row_count(G, 0, a, N).   % N = 2
-  ghst_row_count(G, 0, x, N).   % N = 0
+  gridhist_row_count(G, 0, a, N).   % N = 2
+  gridhist_row_count(G, 0, x, N).   % N = 0
 
 
 4. Color Entropy (Diversity)
 
-ghst_row_entropy/3 and ghst_col_entropy/3 return the number of distinct colors.
+gridhist_row_entropy/3 and gridhist_col_entropy/3 return the number of distinct colors.
 This equals the length of the corresponding histogram.
 
-  ghst_row_entropy(G, 0, N).   % N = 2  (a and b)
+  gridhist_row_entropy(G, 0, N).   % N = 2  (a and b)
 
 
 5. Max and Min Row
 
-ghst_max_row/3 returns the row with the highest count of a given color.
+gridhist_max_row/3 returns the row with the highest count of a given color.
 If multiple rows tie, the one with the highest index is returned.
 
-  ghst_max_row(G, a, Row).    % Row = 2 (rows 0 and 2 tie at 2; highest = 2)
+  gridhist_max_row(G, a, Row).    % Row = 2 (rows 0 and 2 tie at 2; highest = 2)
 
-ghst_min_row/3 returns the row with the lowest non-zero count. Fails if the
+gridhist_min_row/3 returns the row with the lowest non-zero count. Fails if the
 color does not appear in any row. Ties give the lowest index.
 
-  ghst_min_row(G, b, Row).    % Row = 0 (rows 0 and 2 tie at 1; lowest = 0)
+  gridhist_min_row(G, b, Row).    % Row = 0 (rows 0 and 2 tie at 1; lowest = 0)
 
 
 6. Row and Column Selection by Threshold
 
-ghst_rows_with/4 returns all row indices where a color appears at least N times.
-ghst_cols_with/4 does the same for columns.
+gridhist_rows_with/4 returns all row indices where a color appears at least N times.
+gridhist_cols_with/4 does the same for columns.
 
-  ghst_rows_with(G, a, 2, Rs).   % Rs = [0, 2]
-  ghst_cols_with(G, b, 2, Cs).   % Cs = [1]
+  gridhist_rows_with(G, a, 2, Rs).   % Rs = [0, 2]
+  gridhist_cols_with(G, b, 2, Cs).   % Cs = [1]
 
 
 7. Predicate Reference
 
-  ghst_row_hist/3       - histogram for row R
-  ghst_col_hist/3       - histogram for column C
-  ghst_all_row_hists/2  - histograms for all rows
-  ghst_all_col_hists/2  - histograms for all columns
-  ghst_modal_row/3      - most frequent color in row R
-  ghst_modal_col/3      - most frequent color in column C
-  ghst_row_count/4      - count of Color in row R
-  ghst_col_count/4      - count of Color in column C
-  ghst_row_entropy/3    - number of distinct colors in row R
-  ghst_col_entropy/3    - number of distinct colors in column C
-  ghst_max_row/3        - row with most occurrences of Color
-  ghst_min_row/3        - row with fewest (>0) occurrences of Color
-  ghst_rows_with/4      - rows where Color appears at least N times
-  ghst_cols_with/4      - columns where Color appears at least N times
+  gridhist_row_hist/3       - histogram for row R
+  gridhist_col_hist/3       - histogram for column C
+  gridhist_all_row_hists/2  - histograms for all rows
+  gridhist_all_col_hists/2  - histograms for all columns
+  gridhist_modal_row/3      - most frequent color in row R
+  gridhist_modal_col/3      - most frequent color in column C
+  gridhist_row_count/4      - count of Color in row R
+  gridhist_col_count/4      - count of Color in column C
+  gridhist_row_entropy/3    - number of distinct colors in row R
+  gridhist_col_entropy/3    - number of distinct colors in column C
+  gridhist_max_row/3        - row with most occurrences of Color
+  gridhist_min_row/3        - row with fewest (>0) occurrences of Color
+  gridhist_rows_with/4      - rows where Color appears at least N times
+  gridhist_cols_with/4      - columns where Color appears at least N times

@@ -90,7 +90,7 @@ pai_prob_query(Query, Budget, result(TotalProb, Explanations)) :-
     % Check that 'Budget' is unifiable with 'budget(MaxIter)'.
     Budget = budget(MaxIter),
     % Collect all matching Template values into a list (findall — never fails, returns empty list if none).
-    findall(Expl, prove_with_expl(Query, Expl), AllExpls),
+    findall(Expl, probabilistic_with_expl(Query, Expl), AllExpls),
     % Unify 'NE' with the number of elements in list 'AllExpls'.
     length(AllExpls, NE),
     % Check that '( NE' is less than or equal to 'MaxIter'.
@@ -113,34 +113,34 @@ pai_prob_query(Query, Budget, result(TotalProb, Explanations)) :-
     ).
 
 % ---------------------------------------------------------------------------
-% prove_with_expl/2 — meta-interpreter that collects proof explanations
+% probabilistic_with_expl/2 — meta-interpreter that collects proof explanations
 %
 %   An explanation is a list of ground probabilistic facts used in the proof.
 %   Deterministic (non-probabilistic) facts are included with implicit P=1.
 % ---------------------------------------------------------------------------
 
 % Define a clause for 'prove with expl': succeed when the following conditions hold.
-prove_with_expl(true, []) :- !.
+probabilistic_with_expl(true, []) :- !.
 % Define a clause for 'prove with expl': succeed when the following conditions hold.
-prove_with_expl((A, B), Expl) :- !,
+probabilistic_with_expl((A, B), Expl) :- !,
     % State a fact for 'prove with expl' with the arguments listed below.
-    prove_with_expl(A, EA),
+    probabilistic_with_expl(A, EA),
     % State a fact for 'prove with expl' with the arguments listed below.
-    prove_with_expl(B, EB),
+    probabilistic_with_expl(B, EB),
     % Unify the third argument with the concatenation of the first two lists.
     append(EA, EB, Expl).
 % Define a clause for 'prove with expl': succeed when the following conditions hold.
-prove_with_expl(Goal, [expl_fact(Goal, P)]) :-
+probabilistic_with_expl(Goal, [expl_fact(Goal, P)]) :-
     % State a fact for 'prob fact' with the arguments listed below.
     prob_fact(Goal, P), !.
 % Define a clause for 'prove with expl': succeed when the following conditions hold.
-prove_with_expl(Goal, Expl) :-
+probabilistic_with_expl(Goal, Expl) :-
     % Succeed only if 'prob_fact(Goal, _' cannot be proved (negation as failure).
     \+ prob_fact(Goal, _),
     % State a fact for 'prob rule' with the arguments listed below.
     prob_rule(Goal, Body),
     % State the fact: prove with expl(Body, Expl).
-    prove_with_expl(Body, Expl).
+    probabilistic_with_expl(Body, Expl).
 
 % ---------------------------------------------------------------------------
 % expl_prob/2 — compute the probability of one explanation
@@ -198,19 +198,19 @@ sample_loop(Query, N, Acc, Hits) :-
 
 % Define a clause for 'sample world': succeed when the following conditions hold.
 sample_world(Query) :-
-    % State the fact: catch(prove_sampled(Query), _, fail).
-    catch(prove_sampled(Query), _, fail).
+    % State the fact: catch(probabilistic_sampled(Query), _, fail).
+    catch(probabilistic_sampled(Query), _, fail).
 
 % Define a clause for 'prove sampled': succeed when the following conditions hold.
-prove_sampled(true) :- !.
+probabilistic_sampled(true) :- !.
 % Define a clause for 'prove sampled': succeed when the following conditions hold.
-prove_sampled((A, B)) :- !,
+probabilistic_sampled((A, B)) :- !,
     % State a fact for 'prove sampled' with the arguments listed below.
-    prove_sampled(A),
+    probabilistic_sampled(A),
     % State the fact: prove sampled(B).
-    prove_sampled(B).
+    probabilistic_sampled(B).
 % Define a clause for 'prove sampled': succeed when the following conditions hold.
-prove_sampled(Goal) :-
+probabilistic_sampled(Goal) :-
     % State a fact for 'prob fact' with the arguments listed below.
     prob_fact(Goal, P), !,
     % Evaluate the arithmetic expression 'random_float' and bind the result to 'X'.
@@ -218,10 +218,10 @@ prove_sampled(Goal) :-
     % Check that 'X' is less than or equal to 'P'.
     X =< P.
 % Define a clause for 'prove sampled': succeed when the following conditions hold.
-prove_sampled(Goal) :-
+probabilistic_sampled(Goal) :-
     % Succeed only if 'prob_fact(Goal, _' cannot be proved (negation as failure).
     \+ prob_fact(Goal, _),
     % State a fact for 'prob rule' with the arguments listed below.
     prob_rule(Goal, Body),
     % State the fact: prove sampled(Body).
-    prove_sampled(Body).
+    probabilistic_sampled(Body).

@@ -18464,25 +18464,25 @@ target sizes, measures autocorrelation, and applies wrap-around shifts.
 :- use_module(pack(gridperiod/prolog/gridperiod)).
 
 % Detect tile dimensions of a 4x4 repeating pattern:
-gper_tile_dims([[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]], PH, PW).
+gridperiod_tile_dims([[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]], PH, PW).
 % PH = 2, PW = 2
 
 % Extract the tile and reconstruct:
-gper_extract_tile([[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]], 2, 2, Tile).
+gridperiod_extract_tile([[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]], 2, 2, Tile).
 % Tile = [[r,b],[b,r]]
-gper_tile_grid([[r,b],[b,r]], 4, 4, G).
+gridperiod_tile_grid([[r,b],[b,r]], 4, 4, G).
 % G = [[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]]
 
 % Extend a small grid to a larger target size:
-gper_extend([[r,b],[b,r]], 4, 4, E).
+gridperiod_extend([[r,b],[b,r]], 4, 4, E).
 % E = [[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]]
 
 % Measure autocorrelation at lag 2 (score 1.0 = perfect period):
-gper_autocorr_row([[r,b],[b,r],[r,b],[b,r]], 2, S).
+gridperiod_autocorr_row([[r,b],[b,r],[r,b],[b,r]], 2, S).
 % S = 1.0
 
 % Shift rows down by 1 with wrap-around:
-gper_shift_wrap_rows([[r,r,r],[b,b,b],[g,g,g]], 1, S).
+gridperiod_shift_wrap_rows([[r,r,r],[b,b,b],[g,g,g]], 1, S).
 % S = [[g,g,g],[r,r,r],[b,b,b]]
 
 14 gper_* predicates. 51 tests pass. Layer 201.
@@ -18982,15 +18982,15 @@ Chapter 198: gridhist Pack - Grid Histogram Analysis (ghst_*, Layer 221)
 
 The gridhist pack (Layer 221) provides per-row and per-column color frequency
 histograms, modal color lookup, count queries, diversity measurement, and
-row/column selection by frequency threshold. ghst_row_hist/3 returns the sorted
-Color-Count histogram for row R. ghst_col_hist/3 does the same for column C.
-ghst_all_row_hists/2 and ghst_all_col_hists/2 return histograms for all rows
-or columns. ghst_modal_row/3 and ghst_modal_col/3 find the most frequent color.
-ghst_row_count/4 and ghst_col_count/4 count a specific color. ghst_row_entropy/3
-and ghst_col_entropy/3 return the number of distinct colors. ghst_max_row/3 finds
-the row with the highest count of a color (ties: highest index). ghst_min_row/3
-finds the row with the lowest non-zero count (ties: lowest index). ghst_rows_with/4
-and ghst_cols_with/4 return indices where a color appears >= N times.
+row/column selection by frequency threshold. gridhist_row_hist/3 returns the sorted
+Color-Count histogram for row R. gridhist_col_hist/3 does the same for column C.
+gridhist_all_row_hists/2 and gridhist_all_col_hists/2 return histograms for all rows
+or columns. gridhist_modal_row/3 and gridhist_modal_col/3 find the most frequent color.
+gridhist_row_count/4 and gridhist_col_count/4 count a specific color. gridhist_row_entropy/3
+and gridhist_col_entropy/3 return the number of distinct colors. gridhist_max_row/3 finds
+the row with the highest count of a color (ties: highest index). gridhist_min_row/3
+finds the row with the lowest non-zero count (ties: lowest index). gridhist_rows_with/4
+and gridhist_cols_with/4 return indices where a color appears >= N times.
 
 :- use_module(pack(gridhist/prolog/gridhist)).
 
@@ -19337,16 +19337,16 @@ All operations treat one designated BgColor as transparent.
 
 :- use_module(pack(gridblend/prolog/gridblend)).
 
-gbld_overlay/4           - Top over Bottom: non-bg in Top wins; bg reveals Bottom
-gbld_underlay/4          - Bottom over Top: non-bg in Bottom wins; bg reveals Top
-gbld_stencil/4           - keep Source only at StencilColor positions; else SC
-gbld_priority/3          - reduce list: first grid topmost (first non-bg wins)
-gbld_checker_blend/5     - blend by checkerboard parity (R+C) mod 2
-gbld_stripe_blend/5      - blend by horizontal row stripes of width StripeW
-gbld_threshold_replace/5 - replace non-bg cells in rows meeting a count threshold
-gbld_merge_many/3        - reduce list: last grid topmost (accumulate from bottom)
-gbld_dominant/3          - per-cell plurality vote across grid list
-gbld_composite/4         - mode-dispatched composite: overlay | underlay | dominant
+gridblend_overlay/4           - Top over Bottom: non-bg in Top wins; bg reveals Bottom
+gridblend_underlay/4          - Bottom over Top: non-bg in Bottom wins; bg reveals Top
+gridblend_stencil/4           - keep Source only at StencilColor positions; else SC
+gridblend_priority/3          - reduce list: first grid topmost (first non-bg wins)
+gridblend_checker_blend/5     - blend by checkerboard parity (R+C) mod 2
+gridblend_stripe_blend/5      - blend by horizontal row stripes of width StripeW
+gridblend_threshold_replace/5 - replace non-bg cells in rows meeting a count threshold
+gridblend_merge_many/3        - reduce list: last grid topmost (accumulate from bottom)
+gridblend_dominant/3          - per-cell plurality vote across grid list
+gridblend_composite/4         - mode-dispatched composite: overlay | underlay | dominant
 
 10 gbld_* predicates. 44 tests pass. Layer 235.
 

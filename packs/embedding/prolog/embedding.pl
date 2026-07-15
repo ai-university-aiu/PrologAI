@@ -226,8 +226,8 @@ external_embed_term(TermAtom, Vector) :-
 %    17–32: character 4-gram features
 % ---------------------------------------------------------------------------
 
-% Declare 'word_category_cache/2' as dynamic — its facts may be added or removed at runtime.
-:- dynamic word_category_cache/2.
+% Declare 'embedding_category_cache/2' as dynamic — its facts may be added or removed at runtime.
+:- dynamic embedding_category_cache/2.
 
 % Define a clause for 'local model embed': succeed when the following conditions hold.
 local_model_embed(TermAtom, _Dim, Vector) :-
@@ -237,21 +237,21 @@ local_model_embed(TermAtom, _Dim, Vector) :-
     string_lower(Str, Lower),
     % State a fact for 'atom string' with the arguments listed below.
     atom_string(LowerAtom, Lower),
-    % Execute: ( word_category_cache(LowerAtom, Vector).
-    ( word_category_cache(LowerAtom, Vector)
+    % Execute: ( embedding_category_cache(LowerAtom, Vector).
+    ( embedding_category_cache(LowerAtom, Vector)
     % If the condition above succeeded, perform the following action.
     ->  true
     % Otherwise (else branch), perform the following action.
     ;   compute_local_embedding(LowerAtom, Vector),
         % Continue the multi-line expression started above.
-        assertz(word_category_cache(LowerAtom, Vector))
+        assertz(embedding_category_cache(LowerAtom, Vector))
     % Close the expression opened above.
     ).
 
 % Define a clause for 'compute local embedding': succeed when the following conditions hold.
 compute_local_embedding(Word, Vector) :-
-    % Execute: ( word_semantic_features(Word, CatFeatures).
-    ( word_semantic_features(Word, CatFeatures)
+    % Execute: ( embedding_semantic_features(Word, CatFeatures).
+    ( embedding_semantic_features(Word, CatFeatures)
     % If the condition above succeeded, perform the following action.
     ->  char_ngram_features(Word, 16, NgFeatures),
         % Continue the multi-line expression started above.
@@ -264,105 +264,105 @@ compute_local_embedding(Word, Vector) :-
     normalize_vector(RawVec, Vector).
 
 % Define a clause for 'word semantic features': succeed when the following conditions hold.
-word_semantic_features(Word, Features) :-
+embedding_semantic_features(Word, Features) :-
     % State a fact for 'word category' with the arguments listed below.
-    word_category(Word, Category),
+    embedding_category(Word, Category),
     % State the fact: category features(Category, Features).
     category_features(Category, Features).
 
 % Word → category mappings
 % State the fact: word category(apple,      fruit).
-word_category(apple,      fruit).
+embedding_category(apple,      fruit).
 % State the fact: word category(pear,       fruit).
-word_category(pear,       fruit).
+embedding_category(pear,       fruit).
 % State the fact: word category(banana,     fruit).
-word_category(banana,     fruit).
+embedding_category(banana,     fruit).
 % State the fact: word category(orange,     fruit).
-word_category(orange,     fruit).
+embedding_category(orange,     fruit).
 % State the fact: word category(grape,      fruit).
-word_category(grape,      fruit).
+embedding_category(grape,      fruit).
 % State the fact: word category(strawberry, fruit).
-word_category(strawberry, fruit).
+embedding_category(strawberry, fruit).
 % State the fact: word category(cherry,     fruit).
-word_category(cherry,     fruit).
+embedding_category(cherry,     fruit).
 % State the fact: word category(mango,      fruit).
-word_category(mango,      fruit).
+embedding_category(mango,      fruit).
 % State the fact: word category(peach,      fruit).
-word_category(peach,      fruit).
+embedding_category(peach,      fruit).
 % State the fact: word category(plum,       fruit).
-word_category(plum,       fruit).
+embedding_category(plum,       fruit).
 % State the fact: word category(carrot,     vegetable).
-word_category(carrot,     vegetable).
+embedding_category(carrot,     vegetable).
 % State the fact: word category(potato,     vegetable).
-word_category(potato,     vegetable).
+embedding_category(potato,     vegetable).
 % State the fact: word category(tomato,     vegetable).
-word_category(tomato,     vegetable).
+embedding_category(tomato,     vegetable).
 % State the fact: word category(onion,      vegetable).
-word_category(onion,      vegetable).
+embedding_category(onion,      vegetable).
 % State the fact: word category(broccoli,   vegetable).
-word_category(broccoli,   vegetable).
+embedding_category(broccoli,   vegetable).
 % State the fact: word category(spinach,    vegetable).
-word_category(spinach,    vegetable).
+embedding_category(spinach,    vegetable).
 % State the fact: word category(lettuce,    vegetable).
-word_category(lettuce,    vegetable).
+embedding_category(lettuce,    vegetable).
 % State the fact: word category(cucumber,   vegetable).
-word_category(cucumber,   vegetable).
+embedding_category(cucumber,   vegetable).
 % State the fact: word category(carburetor, mechanical).
-word_category(carburetor, mechanical).
+embedding_category(carburetor, mechanical).
 % State the fact: word category(engine,     mechanical).
-word_category(engine,     mechanical).
+embedding_category(engine,     mechanical).
 % State the fact: word category(piston,     mechanical).
-word_category(piston,     mechanical).
+embedding_category(piston,     mechanical).
 % State the fact: word category(wrench,     mechanical).
-word_category(wrench,     mechanical).
+embedding_category(wrench,     mechanical).
 % State the fact: word category(gear,       mechanical).
-word_category(gear,       mechanical).
+embedding_category(gear,       mechanical).
 % State the fact: word category(bolt,       mechanical).
-word_category(bolt,       mechanical).
+embedding_category(bolt,       mechanical).
 % State the fact: word category(nut,        mechanical).
-word_category(nut,        mechanical).
+embedding_category(nut,        mechanical).
 % State the fact: word category(valve,      mechanical).
-word_category(valve,      mechanical).
+embedding_category(valve,      mechanical).
 % State the fact: word category(pump,       mechanical).
-word_category(pump,       mechanical).
+embedding_category(pump,       mechanical).
 % State the fact: word category(compressor, mechanical).
-word_category(compressor, mechanical).
+embedding_category(compressor, mechanical).
 % State the fact: word category(dog,        animal).
-word_category(dog,        animal).
+embedding_category(dog,        animal).
 % State the fact: word category(cat,        animal).
-word_category(cat,        animal).
+embedding_category(cat,        animal).
 % State the fact: word category(wolf,       animal).
-word_category(wolf,       animal).
+embedding_category(wolf,       animal).
 % State the fact: word category(bird,       animal).
-word_category(bird,       animal).
+embedding_category(bird,       animal).
 % State the fact: word category(fish,       animal).
-word_category(fish,       animal).
+embedding_category(fish,       animal).
 % State the fact: word category(horse,      animal).
-word_category(horse,      animal).
+embedding_category(horse,      animal).
 % State the fact: word category(cow,        animal).
-word_category(cow,        animal).
+embedding_category(cow,        animal).
 % State the fact: word category(elephant,   animal).
-word_category(elephant,   animal).
+embedding_category(elephant,   animal).
 % State the fact: word category(rose,       plant).
-word_category(rose,       plant).
+embedding_category(rose,       plant).
 % State the fact: word category(oak,        plant).
-word_category(oak,        plant).
+embedding_category(oak,        plant).
 % State the fact: word category(pine,       plant).
-word_category(pine,       plant).
+embedding_category(pine,       plant).
 % State the fact: word category(fern,       plant).
-word_category(fern,       plant).
+embedding_category(fern,       plant).
 % State the fact: word category(moss,       plant).
-word_category(moss,       plant).
+embedding_category(moss,       plant).
 % State the fact: word category(idea,       abstract).
-word_category(idea,       abstract).
+embedding_category(idea,       abstract).
 % State the fact: word category(concept,    abstract).
-word_category(concept,    abstract).
+embedding_category(concept,    abstract).
 % State the fact: word category(thought,    abstract).
-word_category(thought,    abstract).
+embedding_category(thought,    abstract).
 % State the fact: word category(belief,     abstract).
-word_category(belief,     abstract).
+embedding_category(belief,     abstract).
 % State the fact: word category(knowledge,  abstract).
-word_category(knowledge,  abstract).
+embedding_category(knowledge,  abstract).
 
 % category_features/2 — 16-dim feature vector per category
 % [dom_food, dom_mech, dom_biol, dom_abst,

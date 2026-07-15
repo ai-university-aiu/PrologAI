@@ -973,20 +973,20 @@ Grid Distance Transform: Cell-to-Color Distances, BFS Flood, Voronoi, and Morpho
 
 gridperiod
 Grid Periodic Pattern Detection and Extension: Row/Column Period, Tiling, Autocorrelation, and Wrap-Shift (gper_*, Layer 201)
-    gper_is_row_periodic/2: succeed if every pair of rows separated by P are identical (vacuously true for P >= H)
-    gper_is_col_periodic/2: succeed if every pair of columns separated by P are identical (vacuously true for P >= W)
-    gper_row_period/2: smallest positive P for which gper_is_row_periodic holds; always succeeds (P=H is upper bound)
-    gper_col_period/2: smallest positive P for which gper_is_col_periodic holds; always succeeds (P=W is upper bound)
-    gper_tile_dims/3: PH and PW — the smallest tile dimensions whose tiling reconstructs the grid
-    gper_extract_tile/4: top-left TH x TW sub-grid of Grid
-    gper_tile_grid/4: H x W grid formed by repeating Tile via wrap-around indexing Grid[r][c] = Tile[r mod TH][c mod TW]
-    gper_extend_rows/3: extend Grid to TargetH rows by wrapping row index (row R = row R mod H)
-    gper_extend_cols/3: extend Grid to TargetW columns per row by wrapping column index
-    gper_extend/4: extend Grid to TargetH x TargetW by tiling in both dimensions
-    gper_autocorr_row/3: fraction of row pairs (r, r+P) that are identical; 1.0 when no pairs exist
-    gper_autocorr_col/3: fraction of column pairs (c, c+P) that are identical; 1.0 when no pairs exist
-    gper_shift_wrap_rows/3: shift rows down by N with wrap-around; row R of result = row (R-N) mod H of input
-    gper_shift_wrap_cols/3: shift each row's columns right by N with wrap-around; cell (R,C) = (R,(C-N) mod W)
+    gridperiod_is_row_periodic/2: succeed if every pair of rows separated by P are identical (vacuously true for P >= H)
+    gridperiod_is_col_periodic/2: succeed if every pair of columns separated by P are identical (vacuously true for P >= W)
+    gridperiod_row_period/2: smallest positive P for which gridperiod_is_row_periodic holds; always succeeds (P=H is upper bound)
+    gridperiod_col_period/2: smallest positive P for which gridperiod_is_col_periodic holds; always succeeds (P=W is upper bound)
+    gridperiod_tile_dims/3: PH and PW — the smallest tile dimensions whose tiling reconstructs the grid
+    gridperiod_extract_tile/4: top-left TH x TW sub-grid of Grid
+    gridperiod_tile_grid/4: H x W grid formed by repeating Tile via wrap-around indexing Grid[r][c] = Tile[r mod TH][c mod TW]
+    gridperiod_extend_rows/3: extend Grid to TargetH rows by wrapping row index (row R = row R mod H)
+    gridperiod_extend_cols/3: extend Grid to TargetW columns per row by wrapping column index
+    gridperiod_extend/4: extend Grid to TargetH x TargetW by tiling in both dimensions
+    gridperiod_autocorr_row/3: fraction of row pairs (r, r+P) that are identical; 1.0 when no pairs exist
+    gridperiod_autocorr_col/3: fraction of column pairs (c, c+P) that are identical; 1.0 when no pairs exist
+    gridperiod_shift_wrap_rows/3: shift rows down by N with wrap-around; row R of result = row (R-N) mod H of input
+    gridperiod_shift_wrap_cols/3: shift each row's columns right by N with wrap-around; cell (R,C) = (R,(C-N) mod W)
 
 gridscale
 Grid Block-Pixel Scaling: Upsample, Downsample, Scale Factor, Tile Inference, Pad, and Resize (gsc_*, Layer 202)
@@ -1313,20 +1313,20 @@ Grid Segmentation by Separator Rows and Columns (gsg_*, Layer 220)
 
 gridhist
 Grid Histogram Analysis: Per-Row and Per-Column Color Frequency (ghst_*, Layer 221)
-    ghst_row_hist/3: color frequency histogram for row R (sorted Color-Count pairs)
-    ghst_col_hist/3: color frequency histogram for column C
-    ghst_all_row_hists/2: list of histograms for all rows in row-index order
-    ghst_all_col_hists/2: list of histograms for all columns
-    ghst_modal_row/3: most frequent color in row R
-    ghst_modal_col/3: most frequent color in column C
-    ghst_row_count/4: count of a given color in row R
-    ghst_col_count/4: count of a given color in column C
-    ghst_row_entropy/3: number of distinct colors in row R (diversity measure)
-    ghst_col_entropy/3: number of distinct colors in column C
-    ghst_max_row/3: row index with highest count of Color (tie: highest index)
-    ghst_min_row/3: row index with lowest non-zero count of Color (tie: lowest index)
-    ghst_rows_with/4: row indices where Color appears at least N times
-    ghst_cols_with/4: column indices where Color appears at least N times
+    gridhist_row_hist/3: color frequency histogram for row R (sorted Color-Count pairs)
+    gridhist_col_hist/3: color frequency histogram for column C
+    gridhist_all_row_hists/2: list of histograms for all rows in row-index order
+    gridhist_all_col_hists/2: list of histograms for all columns
+    gridhist_modal_row/3: most frequent color in row R
+    gridhist_modal_col/3: most frequent color in column C
+    gridhist_row_count/4: count of a given color in row R
+    gridhist_col_count/4: count of a given color in column C
+    gridhist_row_entropy/3: number of distinct colors in row R (diversity measure)
+    gridhist_col_entropy/3: number of distinct colors in column C
+    gridhist_max_row/3: row index with highest count of Color (tie: highest index)
+    gridhist_min_row/3: row index with lowest non-zero count of Color (tie: lowest index)
+    gridhist_rows_with/4: row indices where Color appears at least N times
+    gridhist_cols_with/4: column indices where Color appears at least N times
 
 gridpos
 Grid Positional Analysis: Halves, Quadrants, Even/Odd Rows and Columns, Checkerboard, Center, Corners, and Cross (gps_*, Layer 222)
@@ -1551,16 +1551,16 @@ Grid Sequence Utilities: Consecutive Pairs, Sliding Windows, Zip, Take, Drop, Cy
 
 gridblend
 Grid Blending and Layered Composition: Overlay, Underlay, Stencil, Priority Stack, Checkerboard Blend, Stripe Blend, Threshold Replace, Merge Many, Dominant Color, and Composite (gbld_*, Layer 235)
-    gbld_overlay/4: overlay Top on Bottom - non-bg cells in Top win; bg cells reveal Bottom
-    gbld_underlay/4: underlay Top beneath Bottom - non-bg cells in Bottom win; bg cells reveal Top
-    gbld_stencil/4: keep Source only at positions where Stencil = StencilColor; else output SC
-    gbld_priority/3: reduce a list of grids with first grid as topmost layer
-    gbld_checker_blend/5: blend two grids by checkerboard position parity (R+C) mod 2
-    gbld_stripe_blend/5: blend two grids by horizontal row stripes of given width
-    gbld_threshold_replace/5: replace non-bg cells in rows where non-bg count >= threshold
-    gbld_merge_many/3: reduce a list of grids with last grid as topmost layer
-    gbld_dominant/3: per-cell plurality vote - most frequent non-bg value across a grid list
-    gbld_composite/4: mode-dispatched composite reduction: overlay | underlay | dominant
+    gridblend_overlay/4: overlay Top on Bottom - non-bg cells in Top win; bg cells reveal Bottom
+    gridblend_underlay/4: underlay Top beneath Bottom - non-bg cells in Bottom win; bg cells reveal Top
+    gridblend_stencil/4: keep Source only at positions where Stencil = StencilColor; else output SC
+    gridblend_priority/3: reduce a list of grids with first grid as topmost layer
+    gridblend_checker_blend/5: blend two grids by checkerboard position parity (R+C) mod 2
+    gridblend_stripe_blend/5: blend two grids by horizontal row stripes of given width
+    gridblend_threshold_replace/5: replace non-bg cells in rows where non-bg count >= threshold
+    gridblend_merge_many/3: reduce a list of grids with last grid as topmost layer
+    gridblend_dominant/3: per-cell plurality vote - most frequent non-bg value across a grid list
+    gridblend_composite/4: mode-dispatched composite reduction: overlay | underlay | dominant
 
 gridextract
 Grid Object Extraction: Bounding Box Crops, Non-BG Object Isolation, Color-Region Extraction, Cell Collection, Largest/Smallest Object, Centered Crop, Region Count, and Object Registry (gxt_*, Layer 236)

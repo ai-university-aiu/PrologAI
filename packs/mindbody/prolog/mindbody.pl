@@ -121,7 +121,7 @@ body_vitals(Address, vitals(Address, Needs, Capabilities)) :-
 % Define a clause for 'relay percept': succeed when the following conditions hold.
 relay_percept(Address, Signal) :-
     % State a fact for 'percept channel' with the arguments listed below.
-    percept_channel(Signal, Channel),
+    mindbody_channel(Signal, Channel),
     % Store the percept in the Lattice
     % State a fact for 'anchor node' with the arguments listed below.
     anchor_node(percept_signal, [Address, Signal], [Channel], _),
@@ -138,11 +138,11 @@ relay_percept(Address, Signal) :-
     ).
 
 % State the fact: percept channel(perception_signal(_, _, _),    'channel://perceiver').
-percept_channel(perception_signal(_, _, _),    'channel://perceiver').
+mindbody_channel(perception_signal(_, _, _),    'channel://perceiver').
 % State the fact: percept channel(interoceptive_signal(_, _, _), 'channel://motivation').
-percept_channel(interoceptive_signal(_, _, _), 'channel://motivation').
+mindbody_channel(interoceptive_signal(_, _, _), 'channel://motivation').
 % State the fact: percept channel(proprioceptive_signal(_, _, _, _), 'channel://regulation').
-percept_channel(proprioceptive_signal(_, _, _, _), 'channel://regulation').
+mindbody_channel(proprioceptive_signal(_, _, _, _), 'channel://regulation').
 
 % ---------------------------------------------------------------------------
 % dispatch_command/2
