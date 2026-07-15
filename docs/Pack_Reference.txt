@@ -133,7 +133,7 @@ Geometric Measurement of Cell Regions and Grids (PR 72)
 transform
 Grid-Level Spatial and Color Transformations (PR 73)
 
-    spatial scaling (`tr_scale_up/3`, `tr_scale_down/3`), horizontal/vertical tiling (`tr_tile_h/3`, `tr_tile_v/3`, `tr_tile/3`), transposition (`tr_transpose/2`), reflections (`tr_flip_h/2`, `tr_flip_v/2`), rotations (`tr_rot90/2`, `tr_rot180/2`), content shifting with fill (`tr_shift/5`), color-map application (`tr_apply_map/3`), single-color replacement (`tr_replace_color/4`), and mask-based selection (`tr_mask_grid/4`). 14 tr_* predicates, Layer 52.
+    spatial scaling (`transform_scale_up/3`, `transform_scale_down/3`), horizontal/vertical tiling (`transform_tile_h/3`, `transform_tile_v/3`, `transform_tile/3`), transposition (`transform_transpose/2`), reflections (`transform_flip_h/2`, `transform_flip_v/2`), rotations (`transform_rot90/2`, `transform_rot180/2`), content shifting with fill (`transform_shift/5`), color-map application (`transform_apply_map/3`), single-color replacement (`transform_replace_color/4`), and mask-based selection (`transform_mask_grid/4`). 14 tr_* predicates, Layer 52.
 
 select
 Selection and Filtering of Cell Regions by Spatial and Size Properties (PR 74)
@@ -188,7 +188,7 @@ Grid Construction from Visual Patterns (PR 83)
 lookup
 Association List Operations and Grid Index Maps (PR 84)
 
-    key lookup (`lk_get/3`), add or replace pair (`lk_put/4`), extract keys and values (`lk_keys/2`, `lk_values/2`), membership test (`lk_has_key/2`), removal (`lk_delete/3`), value transformation (`lk_map_values/3`), pair building (`lk_from_pairs/2`), grid row/column/cell access (`lk_grid_row/3`, `lk_grid_col/3`, `lk_grid_cell/4`), Color-to-positions index map (`lk_color_positions/3`), position-to-Color index map (`lk_position_color/3`), and association list inversion (`lk_invert/2`). 14 lk_* predicates, Layer 63.
+    key lookup (`lookup_get/3`), add or replace pair (`lookup_put/4`), extract keys and values (`lookup_keys/2`, `lookup_values/2`), membership test (`lookup_has_key/2`), removal (`lookup_delete/3`), value transformation (`lookup_map_values/3`), pair building (`lookup_from_pairs/2`), grid row/column/cell access (`lookup_grid_row/3`, `lookup_grid_col/3`, `lookup_grid_cell/4`), Color-to-positions index map (`lookup_color_positions/3`), position-to-Color index map (`lookup_position_color/3`), and association list inversion (`link_invert/2`). 14 lk_* predicates, Layer 63.
 
 connect
 Flood Fill and Connected Component Analysis (PR 85)
@@ -278,7 +278,7 @@ Tiling, Stamping, and Period Detection (PR 102)
 trace
 Path Tracing, Rays, and Grid Boundaries (PR 103)
 
-    finding maximal contiguous non-Bg runs in a row (`tr_runs_row/3`), per-row run lists (`tr_spans_h/3`), per-column run lists (`tr_spans_v/3`), casting a horizontal ray to the first non-Bg cell (`tr_ray_h/6`), casting a vertical ray (`tr_ray_v/6`), listing cells in a horizontal line (`tr_line_h/4`), listing cells in a vertical line (`tr_line_v/4`), extracting values along a path (`tr_path_vals/3`), painting a value along a path (`tr_draw_path/4`), listing the border cells of a bounding rectangle (`tr_bbox_border/5`), non-Bg cells touching Bg or on the grid edge (`tr_perimeter/3`), Bg cells adjacent to non-Bg cells (`tr_outline/3`), all cells on the grid boundary (`tr_edge_cells/2`), and floor midpoint of two positions (`tr_midpoint/3`). 14 tr_* predicates, Layer 82.
+    finding maximal contiguous non-Bg runs in a row (`trace_runs_row/3`), per-row run lists (`trace_spans_h/3`), per-column run lists (`trace_spans_v/3`), casting a horizontal ray to the first non-Bg cell (`trace_ray_h/6`), casting a vertical ray (`trace_ray_v/6`), listing cells in a horizontal line (`trace_line_h/4`), listing cells in a vertical line (`trace_line_v/4`), extracting values along a path (`trace_path_vals/3`), painting a value along a path (`trace_draw_path/4`), listing the border cells of a bounding rectangle (`trace_bbox_border/5`), non-Bg cells touching Bg or on the grid edge (`trace_perimeter/3`), Bg cells adjacent to non-Bg cells (`trace_outline/3`), all cells on the grid boundary (`trace_edge_cells/2`), and floor midpoint of two positions (`trace_midpoint/3`). 14 tr_* predicates, Layer 82.
 
 label
 Connected Component Labeling and Region Queries (PR 104)
@@ -308,7 +308,7 @@ Pivot-Relative Cell Transformations (PR 108)
 project
 Axis Projection and Shadow Casting (PR 109)
 
-    propagating non-BG values downward through BG cells per column (`pj_shadow_down/3`), upward (`pj_shadow_up/3`), leftward (`pj_shadow_left/3`), rightward (`pj_shadow_right/3`), dispatching by direction atom (`pj_shadow_dir/4`), sorted row indices containing non-BG cells (`pj_nonbg_rows/3`), sorted column indices containing non-BG cells (`pj_nonbg_cols/3`), non-BG cell count per row (`pj_row_counts/3`), non-BG cell count per column (`pj_col_counts/3`), collapsing all rows to one row by first-non-BG per column (`pj_collapse_rows/3`), collapsing all columns to one column by first-non-BG per row (`pj_collapse_cols/3`), row index of topmost non-BG in a column (`pj_col_first/4`), row index of bottommost non-BG in a column (`pj_col_last/4`), and column index of leftmost non-BG in a row (`pj_row_first/4`). 14 pj_* predicates, Layer 88.
+    propagating non-BG values downward through BG cells per column (`project_shadow_down/3`), upward (`project_shadow_up/3`), leftward (`project_shadow_left/3`), rightward (`project_shadow_right/3`), dispatching by direction atom (`project_shadow_dir/4`), sorted row indices containing non-BG cells (`project_nonbg_rows/3`), sorted column indices containing non-BG cells (`project_nonbg_cols/3`), non-BG cell count per row (`project_row_counts/3`), non-BG cell count per column (`project_col_counts/3`), collapsing all rows to one row by first-non-BG per column (`project_collapse_rows/3`), collapsing all columns to one column by first-non-BG per row (`project_collapse_cols/3`), row index of topmost non-BG in a column (`project_col_first/4`), row index of bottommost non-BG in a column (`project_col_last/4`), and column index of leftmost non-BG in a row (`project_row_first/4`). 14 pj_* predicates, Layer 88.
 
 neighbor
 Cell Neighborhood Analysis (PR 114)
@@ -388,7 +388,7 @@ Numerical Sequence Operations on 1D Lists (PR 145)
 gridmath
 Cell-Wise Arithmetic on 2D Grids (PR 146)
 
-    computing cell-wise sum of two grids using nested maplist/4 with named row helper gm_add_row_ and cell helper gm_add_ (`gm_add/3`); cell-wise difference (`gm_sub/3`); cell-wise product (`gm_mul/3`); cell-wise maximum using max/2 (`gm_max/3`); cell-wise minimum (`gm_min/3`); multiplying every cell by a scalar K using nested maplist/3 with row helper gm_scale_row_(K) capturing K and cell helper gm_scale_(K) (`gm_scale/3`); adding a constant D to every cell (`gm_offset/3`); replacing every cell with its absolute value using abs/1 (`gm_abs/2`); producing a 1/0 mask where 1 marks positions where two grids agree using a two-clause cut helper gm_eq_(X,X,1):-!. gm_eq_(_,_,0) (`gm_eq_mask/3`); producing the complement mask where 1 marks positions where grids differ (`gm_diff_mask/3`); clamping each cell to an inclusive range [Lo,Hi] using max(Lo,min(Hi,V)) (`gm_clamp/4`); applying modulo M to every cell using V mod M (`gm_modulo/3`); summing all cell values by flattening with findall+member and a recursive accumulator (`gm_sum/2`); and computing the product of all cell values similarly (`gm_product/2`). 14 gm_* predicates, Layer 125.
+    computing cell-wise sum of two grids using nested maplist/4 with named row helper gridmath_add_row_ and cell helper gridmath_add_ (`gridmath_add/3`); cell-wise difference (`gridmask_sub/3`); cell-wise product (`gridmath_mul/3`); cell-wise maximum using max/2 (`gridmath_max/3`); cell-wise minimum (`gridmath_min/3`); multiplying every cell by a scalar K using nested maplist/3 with row helper gridmath_scale_row_(K) capturing K and cell helper gridmath_scale_(K) (`gridmath_scale/3`); adding a constant D to every cell (`gridmath_offset/3`); replacing every cell with its absolute value using abs/1 (`gridmath_abs/2`); producing a 1/0 mask where 1 marks positions where two grids agree using a two-clause cut helper gridmath_eq_(X,X,1):-!. gridmath_eq_(_,_,0) (`gridmath_eq_mask/3`); producing the complement mask where 1 marks positions where grids differ (`gridmath_diff_mask/3`); clamping each cell to an inclusive range [Lo,Hi] using max(Lo,min(Hi,V)) (`gridmath_clamp/4`); applying modulo M to every cell using V mod M (`gridmath_modulo/3`); summing all cell values by flattening with findall+member and a recursive accumulator (`gridmath_sum/2`); and computing the product of all cell values similarly (`gridmath_product/2`). 14 gm_* predicates, Layer 125.
 
 block
 Rectangular Sub-Grid Block Decomposition (PR 148)
@@ -533,7 +533,7 @@ Object Inventory and Reasoning (PR 90)
 projection
 Row and Column Projection and Profile Analysis (PR 237)
 
-    per-row sums (`pj_row_sums/2`), per-column sums (`pj_col_sums/2`), value occurrence counts per row and column (`pj_row_counts/3`, `pj_col_counts/3`), per-row and per-column maxima (`pj_row_maxes/2`, `pj_col_maxes/2`), sorted unique value sets per row and column (`pj_row_uniq/2`, `pj_col_uniq/2`), column and row shadow indices (`pj_shadow_h/3`, `pj_shadow_v/3`), longest contiguous value run per row and column via cumulative accumulator (`pj_h_profile/3`, `pj_v_profile/3`), and modal value per row and column (`pj_row_modes/2`, `pj_col_modes/2`). 14 pj_* predicates, Layer 131.
+    per-row sums (`projection_row_sums/2`), per-column sums (`projection_col_sums/2`), value occurrence counts per row and column (`project_row_counts/3`, `project_col_counts/3`), per-row and per-column maxima (`projection_row_maxes/2`, `projection_col_maxes/2`), sorted unique value sets per row and column (`projection_row_uniq/2`, `projection_col_uniq/2`), column and row shadow indices (`projection_shadow_h/3`, `projection_shadow_v/3`), longest contiguous value run per row and column via cumulative accumulator (`projection_h_profile/3`, `projection_v_profile/3`), and modal value per row and column (`projection_row_modes/2`, `projection_col_modes/2`). 14 pj_* predicates, Layer 131.
 
 gradient
 Row and Column Gradient and Progression Analysis (PR 238)
@@ -648,7 +648,7 @@ Object-Level Proximity and Distance (PR 263)
 link
 Object-to-Object Correspondence Linking (PR 264)
 
-    builds and manipulates O1-O2 link pairs between two obj(Color, Cells) lists; lk_by_position/3 (zip element-wise: three-clause recursive predicate with cuts on both empty base cases, then pair heads and recurse on tails); lk_by_nearest/3 (private lk_nearest_ helper: findall D-O pairs from centroid distances, min_list + member+cut for nearest with tie-break by list order); lk_by_color/3 (findall Cartesian product with color atom equality O=obj(C,_) pattern, then sort); lk_by_size/3 (findall with length equality, then sort); lk_by_form/3 (private lk_norm_ normalizes cells to origin and sorts, then findall pairs with equal norm, then sort); lk_source/2 and lk_target/2 (findall member(O1-_, Links) and member(_-O2, Links)); lk_invert/2 (findall O2-O1 from O1-O2); lk_count/2 (length/2); lk_apply_color/2 (findall obj(C2,Cells1) from member(obj(_,Cells1)-obj(C2,_), Links)); lk_apply_cells/2 (findall obj(C1,Cells2) from member(obj(C1,_)-obj(_,Cells2), Links)); lk_filter_same_color/2 (findall with O1=obj(C,_), O2=obj(C,_) pattern); lk_filter_diff_color/2 (C1 \= C2); lk_unlinked/3 (findall with \+ member(O-_, Links)). 14 lk_* predicates, Layer 158.
+    builds and manipulates O1-O2 link pairs between two obj(Color, Cells) lists; link_by_position/3 (zip element-wise: three-clause recursive predicate with cuts on both empty base cases, then pair heads and recurse on tails); link_by_nearest/3 (private link_nearest_ helper: findall D-O pairs from centroid distances, min_list + member+cut for nearest with tie-break by list order); link_by_color/3 (findall Cartesian product with color atom equality O=obj(C,_) pattern, then sort); link_by_size/3 (findall with length equality, then sort); link_by_form/3 (private link_norm_ normalizes cells to origin and sorts, then findall pairs with equal norm, then sort); link_source/2 and link_target/2 (findall member(O1-_, Links) and member(_-O2, Links)); link_invert/2 (findall O2-O1 from O1-O2); link_count/2 (length/2); link_apply_color/2 (findall obj(C2,Cells1) from member(obj(_,Cells1)-obj(C2,_), Links)); link_apply_cells/2 (findall obj(C1,Cells2) from member(obj(C1,_)-obj(_,Cells2), Links)); link_filter_same_color/2 (findall with O1=obj(C,_), O2=obj(C,_) pattern); link_filter_diff_color/2 (C1 \= C2); link_unlinked/3 (findall with \+ member(O-_, Links)). 14 lk_* predicates, Layer 158.
 
 layout
 Multi-Object Layout Analysis (PR 265)
@@ -1058,20 +1058,20 @@ Grid Pathfinding: BFS Shortest Path, Distance Maps, Flood-N, Wavefront, Line-of-
 
 gridmask
 Grid Mask Operations: Boolean Overlay, Union, Intersection, Difference, Invert, and Color Mask (gm_*, Layer 206)
-    gm_overlay/5: overlay GridB (transparent where BgColor) onto GridA; non-BgColor cells of GridB replace GridA
-    gm_union/4: union of non-background regions; GridA color wins where both non-BgColor; else GridB color; else BgColor
-    gm_intersect/5: intersection: Result = FgColor where both grids non-BgColor; else BgColor (boolean AND)
-    gm_difference/5: A minus B: keep GridA cell where GridB is BgColor; else replace with BgOut (set subtraction)
-    gm_invert/4: swap foreground and background; non-BgColor -> BgColor; BgColor -> FgColor
-    gm_mask_apply/5: gate Grid through Mask; where Mask non-BgColor Grid value shows; where BgColor result is FillColor
-    gm_extract/4: keep only named R-C cells from Grid; all other cells become BgColor
-    gm_stamp/5: paste Stamp at (OriginR, OriginC); all Stamp cells overwrite Grid; out-of-bounds cells silently skipped
-    gm_compare/4: list of R-C positions where two same-dimension grids differ; empty list if identical
-    gm_equal/2: succeed if two grids are structurally identical (unification)
-    gm_sub/6: extract Height x Width sub-grid at (R0,C0); fails if sub-grid extends outside bounds
-    gm_paste/6: transparent paste; only non-BgColor Patch cells overwrite Grid; BgColor Patch cells are invisible
-    gm_border_mask/3: binary mask marking N-layer border cells as border and all other cells as interior
-    gm_color_mask/4: binary mask where target Color cells become FgColor and all other cells become bg
+    gridmask_overlay/5: overlay GridB (transparent where BgColor) onto GridA; non-BgColor cells of GridB replace GridA
+    gridmask_union/4: union of non-background regions; GridA color wins where both non-BgColor; else GridB color; else BgColor
+    gridmask_intersect/5: intersection: Result = FgColor where both grids non-BgColor; else BgColor (boolean AND)
+    gridmask_difference/5: A minus B: keep GridA cell where GridB is BgColor; else replace with BgOut (set subtraction)
+    gridmask_invert/4: swap foreground and background; non-BgColor -> BgColor; BgColor -> FgColor
+    gridmask_mask_apply/5: gate Grid through Mask; where Mask non-BgColor Grid value shows; where BgColor result is FillColor
+    gridmask_extract/4: keep only named R-C cells from Grid; all other cells become BgColor
+    gridmask_stamp/5: paste Stamp at (OriginR, OriginC); all Stamp cells overwrite Grid; out-of-bounds cells silently skipped
+    gridmask_compare/4: list of R-C positions where two same-dimension grids differ; empty list if identical
+    gridmask_equal/2: succeed if two grids are structurally identical (unification)
+    gridmask_sub/6: extract Height x Width sub-grid at (R0,C0); fails if sub-grid extends outside bounds
+    gridmask_paste/6: transparent paste; only non-BgColor Patch cells overwrite Grid; BgColor Patch cells are invisible
+    gridmask_border_mask/3: binary mask marking N-layer border cells as border and all other cells as interior
+    gridmask_color_mask/4: binary mask where target Color cells become FgColor and all other cells become bg
 
 gridxform
 Grid Transformations: Rotate, Flip, Transpose, Crop, Pad, Scale, Tile, Canonicalize (gx_*, Layer 207)

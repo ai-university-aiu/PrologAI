@@ -15,7 +15,7 @@ Load the pack:
 
 1. Boolean Set Operations
 
-gm_overlay(+GridA, +GridB, +BgColor, +FgColor, -Result)
+gridmask_overlay(+GridA, +GridB, +BgColor, +FgColor, -Result)
 
 Overlays GridB on top of GridA. Non-BgColor cells of GridB replace the
 corresponding cell in GridA; BgColor cells of GridB are transparent.
@@ -24,21 +24,21 @@ Example:
 
 GA = [[r,r,x],[r,r,x],[x,x,x]].
 GB = [[x,x,x],[x,b,b],[x,b,b]].
-gm_overlay(GA, GB, x, r, R).
+gridmask_overlay(GA, GB, x, r, R).
 % R = [[r,r,x],[r,b,b],[x,b,b]]
 
-gm_union(+GridA, +GridB, +BgColor, -Result)
+gridmask_union(+GridA, +GridB, +BgColor, -Result)
 
 Union of two grids: where GridA is non-BgColor its color is kept; where GridA
 is BgColor and GridB is non-BgColor, GridB's color is used; both-background
 cells stay BgColor.
 
-gm_intersect(+GridA, +GridB, +BgColor, +FgColor, -Result)
+gridmask_intersect(+GridA, +GridB, +BgColor, +FgColor, -Result)
 
 Intersection: Result[r][c] = FgColor if both grids are non-BgColor there;
 otherwise BgColor. Produces a binary "both-active" mask.
 
-gm_difference(+GridA, +GridB, +BgColor, +BgOut, -Result)
+gridmask_difference(+GridA, +GridB, +BgColor, +BgOut, -Result)
 
 Set difference: Result keeps GridA cells where GridB is BgColor; masked cells
 (where GridB is non-BgColor) become BgOut.
@@ -47,10 +47,10 @@ Example:
 
 GA = [[r,r,x],[r,r,x],[x,x,x]].  % tl region
 GB = [[x,x,x],[x,b,b],[x,b,b]].  % br region
-gm_difference(GA, GB, x, x, R).
+gridmask_difference(GA, GB, x, x, R).
 % R = [[r,r,x],[r,x,x],[x,x,x]]  (r cells where GB was bg)
 
-gm_invert(+Grid, +BgColor, +FgColor, -Result)
+gridmask_invert(+Grid, +BgColor, +FgColor, -Result)
 
 Swaps foreground and background: non-BgColor cells become BgColor; BgColor
 cells become FgColor.
@@ -58,12 +58,12 @@ cells become FgColor.
 
 2. Mask-Based Operations
 
-gm_mask_apply(+Grid, +Mask, +BgColor, +FillColor, -Result)
+gridmask_mask_apply(+Grid, +Mask, +BgColor, +FillColor, -Result)
 
 Uses a Mask grid as a gate: where Mask is non-BgColor, Grid's cell value
 passes through to Result; where Mask is BgColor, the Result cell is FillColor.
 
-gm_extract(+Grid, +Cells, +BgColor, -Result)
+gridmask_extract(+Grid, +Cells, +BgColor, -Result)
 
 Keeps only the named cells (list of R-C coordinates); all other cells become
 BgColor. Useful for extracting a specific region found by gridflood_region_cells.
@@ -71,19 +71,19 @@ BgColor. Useful for extracting a specific region found by gridflood_region_cells
 Example:
 
 G = [[r,r,r],[r,r,r],[r,r,r]].
-gm_extract(G, [0-0,0-1,1-0], x, R).
+gridmask_extract(G, [0-0,0-1,1-0], x, R).
 % R = [[r,r,x],[r,x,x],[x,x,x]]
 
 
 3. Stamp and Paste
 
-gm_stamp(+Grid, +Stamp, +OriginR, +OriginC, -Result)
+gridmask_stamp(+Grid, +Stamp, +OriginR, +OriginC, -Result)
 
 Pastes Stamp onto Grid with the Stamp's top-left at (OriginR, OriginC). All
 Stamp cells overwrite the corresponding Grid cells. Stamp cells that fall
 outside the Grid bounds are silently ignored.
 
-gm_paste(+Grid, +Patch, +R0, +C0, +BgColor, -Result)
+gridmask_paste(+Grid, +Patch, +R0, +C0, +BgColor, -Result)
 
 Transparent paste: only Patch cells whose color differs from BgColor overwrite
 the corresponding Grid cell. BgColor Patch cells are transparent. Patch cells
@@ -93,22 +93,22 @@ Example:
 
 G = [[x,x,x],[x,x,x],[x,x,x]].
 P = [[r,r],[r,r]].
-gm_paste(G, P, 1, 1, x, R).
+gridmask_paste(G, P, 1, 1, x, R).
 % R = [[x,x,x],[x,r,r],[x,r,r]]
 
 
 4. Comparison and Equality
 
-gm_compare(+GridA, +GridB, +BgColor, -Diff)
+gridmask_compare(+GridA, +GridB, +BgColor, -Diff)
 
 Diff is the list of R-C positions where the two grids differ. Empty list means
 the grids are identical.
 
-gm_equal(+GridA, +GridB)
+gridmask_equal(+GridA, +GridB)
 
 Succeeds if both grids are identical (structurally equal).
 
-gm_sub(+Grid, +R0, +C0, +Height, +Width, -Sub)
+gridmask_sub(+Grid, +R0, +C0, +Height, +Width, -Sub)
 
 Extracts a Height x Width sub-grid starting at (R0, C0). Fails if the
 sub-grid extends outside the Grid bounds.
@@ -116,7 +116,7 @@ sub-grid extends outside the Grid bounds.
 
 5. Mask Generation
 
-gm_border_mask(+Grid, +N, -Mask)
+gridmask_border_mask(+Grid, +N, -Mask)
 
 Produces a binary grid where cells within N layers from any edge are marked
 'border'; all interior cells (more than N away from every edge) are 'interior'.
@@ -124,10 +124,10 @@ N=0 marks all cells as 'interior'.
 
 Example (3x3, N=1):
 
-gm_border_mask([[r,r,r],[r,r,r],[r,r,r]], 1, Mask).
+gridmask_border_mask([[r,r,r],[r,r,r],[r,r,r]], 1, Mask).
 % Mask = [[border,border,border],[border,interior,border],[border,border,border]]
 
-gm_color_mask(+Grid, +Color, +FgColor, -Mask)
+gridmask_color_mask(+Grid, +Color, +FgColor, -Mask)
 
 Produces a binary mask where cells matching Color become FgColor; all other
 cells become the atom 'bg'. Useful for creating selection masks for specific
@@ -136,23 +136,23 @@ colors before further processing.
 Example:
 
 G = [[r,r,r],[r,r,r],[b,b,b]].
-gm_color_mask(G, r, sel, Mask).
+gridmask_color_mask(G, r, sel, Mask).
 % Mask = [[sel,sel,sel],[sel,sel,sel],[bg,bg,bg]]
 
 
 6. Summary of Predicates
 
-gm_overlay/5    - overlay GridB (transparent BgColor) onto GridA
-gm_union/4      - union: GridA color wins, else GridB color, else BgColor
-gm_intersect/5  - intersection: FgColor where both non-BgColor
-gm_difference/5 - A minus B: keep A where B is BgColor, else BgOut
-gm_invert/4     - swap foreground and background
-gm_mask_apply/5 - gate Grid through Mask (non-Bg passes, Bg -> FillColor)
-gm_extract/4    - keep named R-C cells; all others become BgColor
-gm_stamp/5      - paste Stamp at (OR,OC); all Stamp cells overwrite
-gm_compare/4    - list of differing R-C positions between two grids
-gm_equal/2      - succeed if two grids are identical
-gm_sub/6        - extract Height x Width sub-grid at (R0,C0)
-gm_paste/6      - transparent paste (BgColor cells of Patch are invisible)
-gm_border_mask/3 - binary N-layer border vs interior mask
-gm_color_mask/4  - binary mask: Color cells -> FgColor, others -> bg
+gridmask_overlay/5    - overlay GridB (transparent BgColor) onto GridA
+gridmask_union/4      - union: GridA color wins, else GridB color, else BgColor
+gridmask_intersect/5  - intersection: FgColor where both non-BgColor
+gridmask_difference/5 - A minus B: keep A where B is BgColor, else BgOut
+gridmask_invert/4     - swap foreground and background
+gridmask_mask_apply/5 - gate Grid through Mask (non-Bg passes, Bg -> FillColor)
+gridmask_extract/4    - keep named R-C cells; all others become BgColor
+gridmask_stamp/5      - paste Stamp at (OR,OC); all Stamp cells overwrite
+gridmask_compare/4    - list of differing R-C positions between two grids
+gridmask_equal/2      - succeed if two grids are identical
+gridmask_sub/6        - extract Height x Width sub-grid at (R0,C0)
+gridmask_paste/6      - transparent paste (BgColor cells of Patch are invisible)
+gridmask_border_mask/3 - binary N-layer border vs interior mask
+gridmask_color_mask/4  - binary mask: Color cells -> FgColor, others -> bg

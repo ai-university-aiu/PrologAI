@@ -5485,68 +5485,68 @@ Load the pack:
 
 Scaling Up
 
-tr_scale_up/3 expands each cell into a Factor x Factor block.
+transform_scale_up/3 expands each cell into a Factor x Factor block.
 
-    ?- tr_scale_up([[1,2],[3,4]], 2, S).
+    ?- transform_scale_up([[1,2],[3,4]], 2, S).
     S = [[1,1,2,2],[1,1,2,2],[3,3,4,4],[3,3,4,4]].
 
-    ?- tr_scale_up([[7]], 3, S).
+    ?- transform_scale_up([[7]], 3, S).
     S = [[7,7,7],[7,7,7],[7,7,7]].
 
 
 Scaling Down
 
-tr_scale_down/3 keeps every Factor-th row and column (0-indexed).
+transform_scale_down/3 keeps every Factor-th row and column (0-indexed).
 
-    ?- tr_scale_down([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]], 2, S).
+    ?- transform_scale_down([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]], 2, S).
     S = [[1,3],[9,11]].   % rows 0,2 and cols 0,2 kept.
 
 
 Tiling
 
-tr_tile_h/3 repeats each row N times horizontally (widens the grid).
-tr_tile_v/3 repeats the grid N times vertically (heightens the grid).
-tr_tile/3 tiles in both directions.
+transform_tile_h/3 repeats each row N times horizontally (widens the grid).
+transform_tile_v/3 repeats the grid N times vertically (heightens the grid).
+transform_tile/3 tiles in both directions.
 
-    ?- tr_tile_h([[1,2],[3,4]], 2, T).
+    ?- transform_tile_h([[1,2],[3,4]], 2, T).
     T = [[1,2,1,2],[3,4,3,4]].
 
-    ?- tr_tile_v([[1,2],[3,4]], 2, T).
+    ?- transform_tile_v([[1,2],[3,4]], 2, T).
     T = [[1,2],[3,4],[1,2],[3,4]].
 
-    ?- tr_tile([[1,2],[3,4]], 2, T).
+    ?- transform_tile([[1,2],[3,4]], 2, T).
     T = [[1,2,1,2],[3,4,3,4],[1,2,1,2],[3,4,3,4]].
 
 
 Transposition
 
-tr_transpose/2 swaps rows and columns. The result has dimensions Cols x Rows.
+transform_transpose/2 swaps rows and columns. The result has dimensions Cols x Rows.
 
-    ?- tr_transpose([[1,2,3],[4,5,6]], T).
+    ?- transform_transpose([[1,2,3],[4,5,6]], T).
     T = [[1,4],[2,5],[3,6]].
 
 
 Reflections
 
-tr_flip_h/2 reverses each row (left-right mirror).
-tr_flip_v/2 reverses the row list (top-bottom mirror).
+transform_flip_h/2 reverses each row (left-right mirror).
+transform_flip_v/2 reverses the row list (top-bottom mirror).
 
-    ?- tr_flip_h([[1,2,3],[4,5,6]], F).
+    ?- transform_flip_h([[1,2,3],[4,5,6]], F).
     F = [[3,2,1],[6,5,4]].
 
-    ?- tr_flip_v([[1,2],[3,4],[5,6]], F).
+    ?- transform_flip_v([[1,2],[3,4],[5,6]], F).
     F = [[5,6],[3,4],[1,2]].
 
 
 Rotations
 
-tr_rot90/2 rotates 90 degrees clockwise (implemented as transpose + flip_h).
-tr_rot180/2 rotates 180 degrees (flip_v + flip_h).
+transform_rot90/2 rotates 90 degrees clockwise (implemented as transpose + flip_h).
+transform_rot180/2 rotates 180 degrees (flip_v + flip_h).
 
-    ?- tr_rot90([[1,2],[3,4]], R).
+    ?- transform_rot90([[1,2],[3,4]], R).
     R = [[3,1],[4,2]].
 
-    ?- tr_rot180([[1,2,3],[4,5,6],[7,8,9]], R).
+    ?- transform_rot180([[1,2,3],[4,5,6],[7,8,9]], R).
     R = [[9,8,7],[6,5,4],[3,2,1]].
 
 Four 90-degree rotations return to the original grid.
@@ -5554,61 +5554,61 @@ Four 90-degree rotations return to the original grid.
 
 Shifting
 
-tr_shift/5 translates grid content by DR rows and DC columns, filling vacated
+transform_shift/5 translates grid content by DR rows and DC columns, filling vacated
 cells with Fill. DR/DC may be negative (shift up/left).
 
-    ?- tr_shift([[1,2],[3,4]], 1, 0, 0, S).
+    ?- transform_shift([[1,2],[3,4]], 1, 0, 0, S).
     S = [[0,0],[1,2]].   % shifted down 1; top row filled with 0.
 
-    ?- tr_shift([[1,2],[3,4]], 0, -1, 9, S).
+    ?- transform_shift([[1,2],[3,4]], 0, -1, 9, S).
     S = [[2,9],[4,9]].   % shifted left 1; right col filled with 9.
 
 
 Color Mapping
 
-tr_apply_map/3 applies a list of From-To pairs to every cell. Values absent
+transform_apply_map/3 applies a list of From-To pairs to every cell. Values absent
 from the map are left unchanged.
 
-    ?- tr_apply_map([[0,1,0],[1,0,1]], [0-9], R).
+    ?- transform_apply_map([[0,1,0],[1,0,1]], [0-9], R).
     R = [[9,1,9],[1,9,1]].
 
-    ?- tr_apply_map([[0,1],[1,0]], [0-1, 1-0], R).
+    ?- transform_apply_map([[0,1],[1,0]], [0-1, 1-0], R).
     R = [[1,0],[0,1]].   % colors 0 and 1 swapped.
 
-tr_replace_color/4 is a convenience predicate for single-color substitution.
+transform_replace_color/4 is a convenience predicate for single-color substitution.
 
-    ?- tr_replace_color([[0,1,0],[0,0,1]], 0, 5, R).
+    ?- transform_replace_color([[0,1,0],[0,0,1]], 0, 5, R).
     R = [[5,1,5],[5,5,1]].
 
 
 Masking
 
-tr_mask_grid/4 uses a same-size Mask grid to select values. Where Mask=0, the
+transform_mask_grid/4 uses a same-size Mask grid to select values. Where Mask=0, the
 result cell is Fill. Where Mask is non-zero, the result is the Grid cell value.
 
-    ?- tr_mask_grid([[1,2],[3,4]], [[1,0],[0,1]], 0, R).
+    ?- transform_mask_grid([[1,2],[3,4]], [[1,0],[0,1]], 0, R).
     R = [[1,0],[0,4]].
 
-    ?- tr_mask_grid([[1,2],[3,4]], [[0,0],[0,0]], 9, R).
+    ?- transform_mask_grid([[1,2],[3,4]], [[0,0],[0,0]], 9, R).
     R = [[9,9],[9,9]].   % all transparent mask = all Fill.
 
 
 Exported Predicates
 
-tr_scale_up/3        - expand each cell to Factor x Factor block
-tr_scale_down/3      - subsample every Factor-th row and column
-tr_tile_h/3          - tile horizontally N times
-tr_tile_v/3          - tile vertically N times
-tr_tile/3            - tile in both directions N times
-tr_transpose/2       - swap rows and columns
-tr_flip_h/2          - left-right mirror
-tr_flip_v/2          - top-bottom mirror
-tr_rot90/2           - 90-degree clockwise rotation
-tr_rot180/2          - 180-degree rotation
-tr_shift/5           - translate content with fill
-tr_apply_map/3       - apply From-To color substitution map
-tr_replace_color/4   - single-color substitution
-tr_mask_grid/4       - mask-based cell selection
+transform_scale_up/3        - expand each cell to Factor x Factor block
+transform_scale_down/3      - subsample every Factor-th row and column
+transform_tile_h/3          - tile horizontally N times
+transform_tile_v/3          - tile vertically N times
+transform_tile/3            - tile in both directions N times
+transform_transpose/2       - swap rows and columns
+transform_flip_h/2          - left-right mirror
+transform_flip_v/2          - top-bottom mirror
+transform_rot90/2           - 90-degree clockwise rotation
+transform_rot180/2          - 180-degree rotation
+transform_shift/5           - translate content with fill
+transform_apply_map/3       - apply From-To color substitution map
+transform_replace_color/4   - single-color substitution
+transform_mask_grid/4       - mask-based cell selection
 
 END OF CHAPTER 34
 Chapter 35: Select Pack
@@ -7113,75 +7113,75 @@ LOADING
 
 ASSOCIATION LIST BASICS
 
-  lk_get(+Key, +Map, -Value)
+  lookup_get(+Key, +Map, -Value)
 
   Look up the first value associated with Key in a Key-Value list.
 
   Example:
 
-    lk_get(b, [a-1, b-2, c-3], V).
+    lookup_get(b, [a-1, b-2, c-3], V).
     % V = 2
 
-  lk_has_key(+Key, +Map)
+  lookup_has_key(+Key, +Map)
 
   Succeeds if Key is present in Map.
 
   Example:
 
-    lk_has_key(a, [a-1, b-2]).  % succeeds
-    lk_has_key(z, [a-1, b-2]).  % fails
+    lookup_has_key(a, [a-1, b-2]).  % succeeds
+    lookup_has_key(z, [a-1, b-2]).  % fails
 
-  lk_keys(+Map, -Keys)
-  lk_values(+Map, -Values)
+  lookup_keys(+Map, -Keys)
+  lookup_values(+Map, -Values)
 
   Extract all keys or all values from a map, preserving order.
 
   Example:
 
-    lk_keys([a-1, b-2, c-3], Ks).
+    lookup_keys([a-1, b-2, c-3], Ks).
     % Ks = [a, b, c]
 
-    lk_values([a-1, b-2, c-3], Vs).
+    lookup_values([a-1, b-2, c-3], Vs).
     % Vs = [1, 2, 3]
 
 
 ADDING AND REMOVING ENTRIES
 
-  lk_put(+Key, +Value, +MapIn, -MapOut)
+  lookup_put(+Key, +Value, +MapIn, -MapOut)
 
   Add a new key-value pair or replace the value for an existing key.
 
   Example:
 
-    lk_put(b, 99, [a-1, b-2, c-3], M).
+    lookup_put(b, 99, [a-1, b-2, c-3], M).
     % M = [a-1, b-99, c-3]
 
-    lk_put(d, 4, [a-1, b-2, c-3], M).
+    lookup_put(d, 4, [a-1, b-2, c-3], M).
     % M = [a-1, b-2, c-3, d-4]
 
-  lk_delete(+Key, +MapIn, -MapOut)
+  lookup_delete(+Key, +MapIn, -MapOut)
 
   Remove the first occurrence of Key from Map. No-op if Key is absent.
 
   Example:
 
-    lk_delete(b, [a-1, b-2, c-3], M).
+    lookup_delete(b, [a-1, b-2, c-3], M).
     % M = [a-1, c-3]
 
-  lk_from_pairs(+Pairs, -Map)
+  lookup_from_pairs(+Pairs, -Map)
 
   Identity predicate: a list of Key-Value pairs is already a map.
   Provided for explicit documentation of intent.
 
   Example:
 
-    lk_from_pairs([x-1, y-2], Map).
+    lookup_from_pairs([x-1, y-2], Map).
     % Map = [x-1, y-2]
 
 
 TRANSFORMING VALUES
 
-  lk_map_values(+Map, :Pred, -NewMap)
+  lookup_map_values(+Map, :Pred, -NewMap)
 
   Apply Pred(+V, -NewV) to every value in Map, keeping keys unchanged.
   Pred must be a 2-arity callable.
@@ -7189,52 +7189,52 @@ TRANSFORMING VALUES
   Example:
 
     double(V, D) :- D is V * 2.
-    lk_map_values([a-1, b-2, c-3], double, NewM).
+    lookup_map_values([a-1, b-2, c-3], double, NewM).
     % NewM = [a-2, b-4, c-6]
 
-  lk_invert(+Map, -Inverted)
+  link_invert(+Map, -Inverted)
 
   Swap all Key-Value pairs to Value-Key.
 
   Example:
 
-    lk_invert([a-1, b-2, c-3], Inv).
+    link_invert([a-1, b-2, c-3], Inv).
     % Inv = [1-a, 2-b, 3-c]
 
 
 GRID RANDOM ACCESS
 
-  lk_grid_row(+Grid, +R, -Row)
+  lookup_grid_row(+Grid, +R, -Row)
 
   Return row R of a grid (0-indexed).
 
   Example:
 
-    lk_grid_row([[1,2],[3,4],[5,6]], 1, Row).
+    lookup_grid_row([[1,2],[3,4],[5,6]], 1, Row).
     % Row = [3, 4]
 
-  lk_grid_col(+Grid, +C, -Col)
+  lookup_grid_col(+Grid, +C, -Col)
 
   Return column C of a grid as a list (0-indexed).
 
   Example:
 
-    lk_grid_col([[1,2,3],[4,5,6]], 1, Col).
+    lookup_grid_col([[1,2,3],[4,5,6]], 1, Col).
     % Col = [2, 5]
 
-  lk_grid_cell(+Grid, +R, +C, -Value)
+  lookup_grid_cell(+Grid, +R, +C, -Value)
 
   Return the value at row R, column C of a grid.
 
   Example:
 
-    lk_grid_cell([[0,1,0],[2,0,1],[0,2,0]], 1, 2, V).
+    lookup_grid_cell([[0,1,0],[2,0,1],[0,2,0]], 1, 2, V).
     % V = 1
 
 
 COLOR AND POSITION INDEX MAPS
 
-  lk_color_positions(+Grid, +BG, -Map)
+  lookup_color_positions(+Grid, +BG, -Map)
 
   Build a Color->[r(R,C)...] map for all non-background cells.
   Each key is a color; each value is the list of positions that color
@@ -7243,10 +7243,10 @@ COLOR AND POSITION INDEX MAPS
   Example:
 
     G = [[0,1,0],[2,0,1],[0,2,0]].
-    lk_color_positions(G, 0, Map).
+    lookup_color_positions(G, 0, Map).
     % Map = [1-[r(0,1),r(1,2)], 2-[r(1,0),r(2,1)]]
 
-  lk_position_color(+Grid, +BG, -Map)
+  lookup_position_color(+Grid, +BG, -Map)
 
   Build a r(R,C)->Color map for all non-background cells.
   Each key is a position; each value is the color at that position.
@@ -7254,7 +7254,7 @@ COLOR AND POSITION INDEX MAPS
   Example:
 
     G = [[0,1,0],[2,0,1],[0,2,0]].
-    lk_position_color(G, 0, Map).
+    lookup_position_color(G, 0, Map).
     % Map = [r(0,1)-1, r(1,0)-2, r(1,2)-1, r(2,1)-2]
 
 
@@ -7263,16 +7263,16 @@ COMBINING WITH OTHER PACKS
 The lookup pack integrates with the grid, spatial, and induction packs:
 
   % Find where color 3 appears, then use spatial reasoning.
-  lk_color_positions(Grid, 0, ColorMap),
-  lk_get(3, ColorMap, Positions),
+  lookup_color_positions(Grid, 0, ColorMap),
+  lookup_get(3, ColorMap, Positions),
   sp_bounding_box(Positions, BBox).
 
   % Build a position-to-color index for fast lookup.
-  lk_position_color(Grid, 0, PosMap),
-  lk_get(r(2, 3), PosMap, Color).
+  lookup_position_color(Grid, 0, PosMap),
+  lookup_get(r(2, 3), PosMap, Color).
 
   % Transform a frequency map to doubled values.
-  lk_map_values(FreqMap, double, DoubledFreqs).
+  lookup_map_values(FreqMap, double, DoubledFreqs).
 
 
 END OF CHAPTER 45
@@ -7439,7 +7439,7 @@ The connect pack integrates with spatial, lookup, and fill packs:
 
   % Find enclosed holes and index their positions.
   connect_enclosed(Grid, 0, Holes),
-  lk_position_color(Grid, 0, PosMap).
+  lookup_position_color(Grid, 0, PosMap).
 
   % Count isolated cells (components of size 1).
   connect_sizes4(Grid, 1, Sizes),
@@ -9923,45 +9923,45 @@ tr_* prefix for run detection, ray casting, line enumeration, path operations,
 boundary identification, and position arithmetic.
 
 Run detection:
-  tr_runs_row(+Row, +Bg, -Runs)      contiguous non-Bg runs in a row
-  tr_spans_h(+Grid, +Bg, -Spans)     per-row run lists
-  tr_spans_v(+Grid, +Bg, -Spans)     per-column run lists
+  trace_runs_row(+Row, +Bg, -Runs)      contiguous non-Bg runs in a row
+  trace_spans_h(+Grid, +Bg, -Spans)     per-row run lists
+  trace_spans_v(+Grid, +Bg, -Spans)     per-column run lists
 
 Ray casting:
-  tr_ray_h(+Grid, +R, +C, +Dir, +Bg, -HR-HC)  horizontal ray
-  tr_ray_v(+Grid, +R, +C, +Dir, +Bg, -HR-HC)  vertical ray
+  trace_ray_h(+Grid, +R, +C, +Dir, +Bg, -HR-HC)  horizontal ray
+  trace_ray_v(+Grid, +R, +C, +Dir, +Bg, -HR-HC)  vertical ray
 
 Line enumeration:
-  tr_line_h(+R, +C0, +C1, -Cells)   cells in a horizontal line
-  tr_line_v(+C, +R0, +R1, -Cells)   cells in a vertical line
+  trace_line_h(+R, +C0, +C1, -Cells)   cells in a horizontal line
+  trace_line_v(+C, +R0, +R1, -Cells)   cells in a vertical line
 
 Path operations:
-  tr_path_vals(+Grid, +Cells, -Vals)       extract values along a path
-  tr_draw_path(+Grid, +Cells, +Val, -Result)  paint a value along a path
+  trace_path_vals(+Grid, +Cells, -Vals)       extract values along a path
+  trace_draw_path(+Grid, +Cells, +Val, -Result)  paint a value along a path
 
 Boundary operations:
-  tr_bbox_border(+R0,+C0,+R1,+C1,-Cells)  border of a bounding rectangle
-  tr_perimeter(+Grid, +Bg, -Cells)         non-Bg cells on object perimeter
-  tr_outline(+Grid, +Bg, -Cells)           Bg cells adjacent to objects
-  tr_edge_cells(+Grid, -Cells)             grid boundary cells
+  trace_bbox_border(+R0,+C0,+R1,+C1,-Cells)  border of a bounding rectangle
+  trace_perimeter(+Grid, +Bg, -Cells)         non-Bg cells on object perimeter
+  trace_outline(+Grid, +Bg, -Cells)           Bg cells adjacent to objects
+  trace_edge_cells(+Grid, -Cells)             grid boundary cells
 
 Position arithmetic:
-  tr_midpoint(+R1-C1, +R2-C2, -RM-CM)     floor midpoint
+  trace_midpoint(+R1-C1, +R2-C2, -RM-CM)     floor midpoint
 
 Example: find runs in a row:
-  tr_runs_row([1,0,1,1,0], 0, Runs).
+  trace_runs_row([1,0,1,1,0], 0, Runs).
   % Runs = [0-0, 2-3]
 
 Example: cast a horizontal ray right:
-  tr_ray_h([[0,0,1,0]], 0, 1, 1, 0, H).
+  trace_ray_h([[0,0,1,0]], 0, 1, 1, 0, H).
   % H = 0-2
 
 Example: draw along a path:
-  tr_draw_path([[0,0,0],[0,0,0]], [0-0, 0-2, 1-1], 1, R).
+  trace_draw_path([[0,0,0],[0,0,0]], [0-0, 0-2, 1-1], 1, R).
   % R = [[1,0,1],[0,1,0]]
 
 Example: find perimeter of a 2x2 inner block:
-  tr_perimeter([[0,0,0,0],[0,1,1,0],[0,1,1,0],[0,0,0,0]], 0, Cells).
+  trace_perimeter([[0,0,0,0],[0,1,1,0],[0,1,1,0],[0,0,0,0]], 0, Cells).
   % Cells = [1-1, 1-2, 2-1, 2-2]
 
 All 42 PLUnit acceptance tests are in packs/trace/test/test_trace.pl.
@@ -10347,144 +10347,144 @@ or identifies which rows and columns are occupied by non-BG cells.
 
 70.2 Shadow casting
 
-pj_shadow_down/3 propagates each non-BG cell's value downward through BG cells.
+project_shadow_down/3 propagates each non-BG cell's value downward through BG cells.
 The shadow stops when it hits another non-BG cell.
 
-?- pj_shadow_down([[1,0],[0,0],[0,0]], 0, R).
+?- project_shadow_down([[1,0],[0,0],[0,0]], 0, R).
 R = [[1,0],[1,0],[1,0]].
 
-?- pj_shadow_down([[0,2],[0,0],[0,3]], 0, R).
+?- project_shadow_down([[0,2],[0,0],[0,3]], 0, R).
 R = [[0,2],[0,2],[0,3]].  % 2 casts to row 1; 3 starts at row 2
 
-?- pj_shadow_down([[0,0],[0,0]], 0, R).
+?- project_shadow_down([[0,0],[0,0]], 0, R).
 R = [[0,0],[0,0]].  % all BG: no shadow
 
-pj_shadow_up/3 propagates each non-BG cell's value upward through BG cells.
+project_shadow_up/3 propagates each non-BG cell's value upward through BG cells.
 
-?- pj_shadow_up([[0,0],[0,0],[1,0]], 0, R).
+?- project_shadow_up([[0,0],[0,0],[1,0]], 0, R).
 R = [[1,0],[1,0],[1,0]].
 
-pj_shadow_left/3 propagates each non-BG cell's value to the LEFT (into lower
+project_shadow_left/3 propagates each non-BG cell's value to the LEFT (into lower
 column indices) through BG cells.
 
-?- pj_shadow_left([[0,0,2]], 0, R).
+?- project_shadow_left([[0,0,2]], 0, R).
 R = [[2,2,2]].
 
-?- pj_shadow_left([[1,0,2]], 0, R).
+?- project_shadow_left([[1,0,2]], 0, R).
 R = [[1,2,2]].  % 2 fills col 1; stops at 1 in col 0
 
-pj_shadow_right/3 propagates each non-BG cell's value to the RIGHT through BG cells.
+project_shadow_right/3 propagates each non-BG cell's value to the RIGHT through BG cells.
 
-?- pj_shadow_right([[1,0,0]], 0, R).
+?- project_shadow_right([[1,0,0]], 0, R).
 R = [[1,1,1]].
 
-?- pj_shadow_right([[1,0,2]], 0, R).
+?- project_shadow_right([[1,0,2]], 0, R).
 R = [[1,1,2]].  % 1 fills col 1; stops at 2 in col 2
 
-pj_shadow_dir/4 dispatches to any of the four directions by atom name.
+project_shadow_dir/4 dispatches to any of the four directions by atom name.
 
-?- pj_shadow_dir([[2,0],[0,0]], 0, down, R).
+?- project_shadow_dir([[2,0],[0,0]], 0, down, R).
 R = [[2,0],[2,0]].
 
-?- pj_shadow_dir([[4,0,0]], 0, right, R).
+?- project_shadow_dir([[4,0,0]], 0, right, R).
 R = [[4,4,4]].
 
 
 70.3 Occupied axis detection
 
-pj_nonbg_rows/3 returns sorted row indices containing at least one non-BG cell.
+project_nonbg_rows/3 returns sorted row indices containing at least one non-BG cell.
 
-?- pj_nonbg_rows([[0,0],[1,0],[0,0]], 0, Rows).
+?- project_nonbg_rows([[0,0],[1,0],[0,0]], 0, Rows).
 Rows = [1].
 
-?- pj_nonbg_rows([[0,0],[0,0]], 0, Rows).
+?- project_nonbg_rows([[0,0],[0,0]], 0, Rows).
 Rows = [].
 
-pj_nonbg_cols/3 returns sorted column indices containing at least one non-BG cell.
+project_nonbg_cols/3 returns sorted column indices containing at least one non-BG cell.
 
-?- pj_nonbg_cols([[0,1,0],[0,0,0]], 0, Cols).
+?- project_nonbg_cols([[0,1,0],[0,0,0]], 0, Cols).
 Cols = [1].
 
-?- pj_nonbg_cols([[1,0,1],[0,2,0]], 0, Cols).
+?- project_nonbg_cols([[1,0,1],[0,2,0]], 0, Cols).
 Cols = [0,1,2].
 
 
 70.4 Cell counting
 
-pj_row_counts/3 returns a list of non-BG cell counts, one per row.
+project_row_counts/3 returns a list of non-BG cell counts, one per row.
 
-?- pj_row_counts([[1,0,1],[0,0,0],[0,2,0]], 0, Counts).
+?- project_row_counts([[1,0,1],[0,0,0],[0,2,0]], 0, Counts).
 Counts = [2,0,1].
 
-pj_col_counts/3 returns a list of non-BG cell counts, one per column.
+project_col_counts/3 returns a list of non-BG cell counts, one per column.
 
-?- pj_col_counts([[1,0],[0,2],[0,0]], 0, Counts).
+?- project_col_counts([[1,0],[0,2],[0,0]], 0, Counts).
 Counts = [1,1].
 
 
 70.5 Collapse to one dimension
 
-pj_collapse_rows/3 flattens all rows to a single row.
+project_collapse_rows/3 flattens all rows to a single row.
 For each column position, the result is the first (topmost) non-BG value.
 
-?- pj_collapse_rows([[1,0],[0,2]], 0, Row).
+?- project_collapse_rows([[1,0],[0,2]], 0, Row).
 Row = [1,2].
 
-?- pj_collapse_rows([[0,3],[1,0]], 0, Row).
+?- project_collapse_rows([[0,3],[1,0]], 0, Row).
 Row = [1,3].  % col 0: first nonbg scanning down is 1; col 1 is 3
 
-pj_collapse_cols/3 flattens all columns to a single column.
+project_collapse_cols/3 flattens all columns to a single column.
 For each row, the result is the first (leftmost) non-BG value.
 
-?- pj_collapse_cols([[1,0],[0,2]], 0, Col).
+?- project_collapse_cols([[1,0],[0,2]], 0, Col).
 Col = [1,2].
 
-?- pj_collapse_cols([[0,3],[1,0]], 0, Col).
+?- project_collapse_cols([[0,3],[1,0]], 0, Col).
 Col = [3,1].  % row 0: first nonbg scanning right is 3; row 1 is 1
 
 
 70.6 Boundary finding
 
-pj_col_first/4 returns the row index of the topmost non-BG cell in a column.
+project_col_first/4 returns the row index of the topmost non-BG cell in a column.
 
-?- pj_col_first([[0,0],[1,0],[0,0]], 0, 0, R).
+?- project_col_first([[0,0],[1,0],[0,0]], 0, 0, R).
 R = 1.
 
-?- pj_col_first([[1,0],[0,0]], 0, 0, R).
+?- project_col_first([[1,0],[0,0]], 0, 0, R).
 R = 0.
 
-pj_col_last/4 returns the row index of the bottommost non-BG cell in a column.
+project_col_last/4 returns the row index of the bottommost non-BG cell in a column.
 
-?- pj_col_last([[1,0],[1,0],[0,0]], 0, 0, R).
+?- project_col_last([[1,0],[1,0],[0,0]], 0, 0, R).
 R = 1.
 
-?- pj_col_last([[0,0],[0,0],[1,0]], 0, 0, R).
+?- project_col_last([[0,0],[0,0],[1,0]], 0, 0, R).
 R = 2.
 
-pj_row_first/4 returns the column index of the leftmost non-BG cell in a row.
+project_row_first/4 returns the column index of the leftmost non-BG cell in a row.
 
-?- pj_row_first([[0,0,1,0]], 0, 0, C).
+?- project_row_first([[0,0,1,0]], 0, 0, C).
 C = 2.
 
-?- pj_row_first([[1,0,0]], 0, 0, C).
+?- project_row_first([[1,0,0]], 0, 0, C).
 C = 0.
 
 
 70.7 Combining project with other packs
 
-Use pj_shadow_down after extracting objects with the scene pack to determine
+Use project_shadow_down after extracting objects with the scene pack to determine
 which grid cells each object "covers" when viewed from above.
 
-Use pj_nonbg_rows and pj_nonbg_cols together to identify the bounding row and
+Use project_nonbg_rows and project_nonbg_cols together to identify the bounding row and
 column bands of non-BG content without computing the full bounding box.
 
-Use pj_col_counts and pj_row_counts to build a count-based profile of the grid
+Use project_col_counts and project_row_counts to build a count-based profile of the grid
 that can be compared across training examples to detect regular structure.
 
-Use pj_collapse_rows followed by pj_shadow_right to fill an entire row with the
+Use project_collapse_rows followed by project_shadow_right to fill an entire row with the
 dominant value seen in each column - useful for "flood the row" transformations.
 
-Use pj_col_first and pj_col_last together to compute the height of each column's
+Use project_col_first and project_col_last together to compute the height of each column's
 non-BG stack, which is equivalent to gv_pile_height from the gravity pack but
 without modifying the grid.
 Chapter 71: Multi-Pair Grid Difference Analysis - The Diff Pack
@@ -15202,44 +15202,44 @@ The gridmath pack provides 14 predicates for applying arithmetic operations
 to 2D grids cell by cell. It extends numseq (nr_*) into two dimensions.
 
 Predicates:
-gm_add(+GridA, +GridB, -GridC).          % cell-wise A+B
-gm_sub(+GridA, +GridB, -GridC).          % cell-wise A-B
-gm_mul(+GridA, +GridB, -GridC).          % cell-wise A*B
-gm_max(+GridA, +GridB, -GridC).          % cell-wise max(A,B)
-gm_min(+GridA, +GridB, -GridC).          % cell-wise min(A,B)
-gm_scale(+Grid, +K, -Grid2).             % every cell * K
-gm_offset(+Grid, +D, -Grid2).            % every cell + D
-gm_abs(+Grid, -Grid2).                   % abs of every cell
-gm_eq_mask(+GridA, +GridB, -Mask).       % 1 where cells equal
-gm_diff_mask(+GridA, +GridB, -Mask).     % 1 where cells differ
-gm_clamp(+Grid, +Lo, +Hi, -Grid2).       % clamp to [Lo,Hi]
-gm_modulo(+Grid, +M, -Grid2).            % every cell mod M
-gm_sum(+Grid, -Sum).                     % sum of all cells
-gm_product(+Grid, -Prod).                % product of all cells
+gridmath_add(+GridA, +GridB, -GridC).          % cell-wise A+B
+gridmask_sub(+GridA, +GridB, -GridC).          % cell-wise A-B
+gridmath_mul(+GridA, +GridB, -GridC).          % cell-wise A*B
+gridmath_max(+GridA, +GridB, -GridC).          % cell-wise max(A,B)
+gridmath_min(+GridA, +GridB, -GridC).          % cell-wise min(A,B)
+gridmath_scale(+Grid, +K, -Grid2).             % every cell * K
+gridmath_offset(+Grid, +D, -Grid2).            % every cell + D
+gridmath_abs(+Grid, -Grid2).                   % abs of every cell
+gridmath_eq_mask(+GridA, +GridB, -Mask).       % 1 where cells equal
+gridmath_diff_mask(+GridA, +GridB, -Mask).     % 1 where cells differ
+gridmath_clamp(+Grid, +Lo, +Hi, -Grid2).       % clamp to [Lo,Hi]
+gridmath_modulo(+Grid, +M, -Grid2).            % every cell mod M
+gridmath_sum(+Grid, -Sum).                     % sum of all cells
+gridmath_product(+Grid, -Prod).                % product of all cells
 
 Examples:
-gm_add([[1,2],[3,4]], [[5,6],[7,8]], C). % C=[[6,8],[10,12]]
-gm_sub([[5,6],[7,8]], [[1,2],[3,4]], C). % C=[[4,4],[4,4]]
-gm_mul([[1,2],[3,4]], [[5,6],[7,8]], C). % C=[[5,12],[21,32]]
-gm_max([[1,5],[3,2]], [[4,2],[1,6]], C). % C=[[4,5],[3,6]]
-gm_min([[1,5],[3,2]], [[4,2],[1,6]], C). % C=[[1,2],[1,2]]
-gm_scale([[1,2],[3,4]], 2, G).           % G=[[2,4],[6,8]]
-gm_offset([[1,2],[3,4]], 10, G).         % G=[[11,12],[13,14]]
-gm_abs([[-1,2],[-3,4]], G).              % G=[[1,2],[3,4]]
-gm_eq_mask([[1,2],[3,4]],[[1,5],[3,6]],M). % M=[[1,0],[1,0]]
-gm_diff_mask([[1,2]],[[1,5]],M).         % M=[[0,1]]
-gm_clamp([[0,-1],[8,3]],1,5,G).          % G=[[1,1],[5,3]]
-gm_modulo([[11,22],[33,44]],10,G).       % G=[[1,2],[3,4]]
-gm_sum([[1,2],[3,4]], S).                % S=10
-gm_product([[1,2],[3,4]], P).            % P=24
+gridmath_add([[1,2],[3,4]], [[5,6],[7,8]], C). % C=[[6,8],[10,12]]
+gridmask_sub([[5,6],[7,8]], [[1,2],[3,4]], C). % C=[[4,4],[4,4]]
+gridmath_mul([[1,2],[3,4]], [[5,6],[7,8]], C). % C=[[5,12],[21,32]]
+gridmath_max([[1,5],[3,2]], [[4,2],[1,6]], C). % C=[[4,5],[3,6]]
+gridmath_min([[1,5],[3,2]], [[4,2],[1,6]], C). % C=[[1,2],[1,2]]
+gridmath_scale([[1,2],[3,4]], 2, G).           % G=[[2,4],[6,8]]
+gridmath_offset([[1,2],[3,4]], 10, G).         % G=[[11,12],[13,14]]
+gridmath_abs([[-1,2],[-3,4]], G).              % G=[[1,2],[3,4]]
+gridmath_eq_mask([[1,2],[3,4]],[[1,5],[3,6]],M). % M=[[1,0],[1,0]]
+gridmath_diff_mask([[1,2]],[[1,5]],M).         % M=[[0,1]]
+gridmath_clamp([[0,-1],[8,3]],1,5,G).          % G=[[1,1],[5,3]]
+gridmath_modulo([[11,22],[33,44]],10,G).       % G=[[1,2],[3,4]]
+gridmath_sum([[1,2],[3,4]], S).                % S=10
+gridmath_product([[1,2],[3,4]], P).            % P=24
 
 Key implementation patterns:
-gm_add/sub/mul/max/min/eq_mask/diff_mask: outer maplist/4 pairs rows;
+gridmath_add/sub/mul/max/min/eq_mask/diff_mask: outer maplist/4 pairs rows;
   inner maplist/4 pairs cells; named helpers ensure compatibility.
-gm_scale/offset/abs/clamp/modulo: outer maplist/3 pairs grid rows;
+gridmath_scale/offset/abs/clamp/modulo: outer maplist/3 pairs grid rows;
   row-level helper captures scalar; inner maplist/3 pairs cells.
-gm_eq_: two-clause cut pattern (X,X,1):-!. (_,_,0). for determinism.
-gm_sum/product: findall+member+member flattens all cells; recursive acc.
+gridmath_eq_: two-clause cut pattern (X,X,1):-!. (_,_,0). for determinism.
+gridmath_sum/product: findall+member+member flattens all cells; recursive acc.
 
 Library imports: library(apply): maplist/3, maplist/4.
   library(lists): member/2, append/2.
@@ -15483,28 +15483,28 @@ projections, run-length profiles, and modal values.
 Load: :- use_module('packs/projection/prolog/projection.pl').
 
 Example queries:
-pj_row_sums([[1,2,3],[4,5,6],[7,8,9]],S). % S=[6,15,24]
-pj_col_sums([[1,2,3],[4,5,6],[7,8,9]],S). % S=[12,15,18]
-pj_row_counts([[0,1,2],[0,1,2],[0,1,2]],0,C). % C=[1,1,1]
-pj_col_counts([[0,1,2],[0,1,2],[0,1,2]],2,C). % C=[0,0,3]
-pj_row_maxes([[1,2,3],[4,5,6],[7,8,9]],M). % M=[3,6,9]
-pj_col_maxes([[1,2,3],[4,5,6],[7,8,9]],M). % M=[7,8,9]
-pj_row_uniq([[1,1,2],[1,2,2]],U). % U=[[1,2],[1,2]]
-pj_col_uniq([[0,1,2],[0,1,2],[0,1,2]],U). % U=[[0],[1],[2]]
-pj_shadow_h([[0,1,2],[0,1,2],[0,1,2]],0,C). % C=[0]
-pj_shadow_v([[1,1,1],[1,1,1],[1,1,1]],1,R). % R=[0,1,2]
-pj_h_profile([[1,1,0],[1,0,0],[1,1,1]],1,P). % P=[2,1,3]
-pj_v_profile([[1,1,0],[1,0,0],[1,1,1]],1,P). % P=[3,1,1]
-pj_row_modes([[1,1,2],[1,2,2]],M). % M=[1,2]
-pj_col_modes([[1,1,2],[1,2,2]],M). % M=[1,1,2]
+projection_row_sums([[1,2,3],[4,5,6],[7,8,9]],S). % S=[6,15,24]
+projection_col_sums([[1,2,3],[4,5,6],[7,8,9]],S). % S=[12,15,18]
+project_row_counts([[0,1,2],[0,1,2],[0,1,2]],0,C). % C=[1,1,1]
+project_col_counts([[0,1,2],[0,1,2],[0,1,2]],2,C). % C=[0,0,3]
+projection_row_maxes([[1,2,3],[4,5,6],[7,8,9]],M). % M=[3,6,9]
+projection_col_maxes([[1,2,3],[4,5,6],[7,8,9]],M). % M=[7,8,9]
+projection_row_uniq([[1,1,2],[1,2,2]],U). % U=[[1,2],[1,2]]
+projection_col_uniq([[0,1,2],[0,1,2],[0,1,2]],U). % U=[[0],[1],[2]]
+projection_shadow_h([[0,1,2],[0,1,2],[0,1,2]],0,C). % C=[0]
+projection_shadow_v([[1,1,1],[1,1,1],[1,1,1]],1,R). % R=[0,1,2]
+projection_h_profile([[1,1,0],[1,0,0],[1,1,1]],1,P). % P=[2,1,3]
+projection_v_profile([[1,1,0],[1,0,0],[1,1,1]],1,P). % P=[3,1,1]
+projection_row_modes([[1,1,2],[1,2,2]],M). % M=[1,2]
+projection_col_modes([[1,1,2],[1,2,2]],M). % M=[1,1,2]
 
 Key implementation patterns:
-pj_col_: private helper extracts column C via findall(V, (member(Row,Grid),
+projection_col_: private helper extracts column C via findall(V, (member(Row,Grid),
   nth0(C,Row,V)), Col); used by all column predicates.
-pj_run_acc_: tail-recursive accumulator with Cur (current run) and Max
+projection_run_acc_: tail-recursive accumulator with Cur (current run) and Max
   (maximum seen); on match Cur1=Cur+1, Max1=max(Cur1,Max); on mismatch
   reset Cur to 0, update Max; final N=Max at empty list.
-pj_mode_/pj_max_pair_: sort for unique vals, findall N-V count pairs,
+projection_mode_/projection_max_pair_: sort for unique vals, findall N-V count pairs,
   recurse picking higher count; on tie prefer smaller V.
 include(=(Val), List, Occ): partial-application unification acts as integer
   equality filter for ground values.
@@ -17483,37 +17483,37 @@ of obj(Color, Cells) terms. A link is an O1-O2 pair.
 
 1. Building Links
 
-lk_by_position(+Objs1, +Objs2, -Links): zip two lists element-wise.
+link_by_position(+Objs1, +Objs2, -Links): zip two lists element-wise.
 
-  ?- lk_by_position(
+  ?- link_by_position(
        [obj(red,[r(0,0)]), obj(blue,[r(1,0)])],
        [obj(green,[r(0,0)]), obj(yellow,[r(1,0)])],
        Links).
   Links = [obj(red,[r(0,0)])-obj(green,[r(0,0)]),
            obj(blue,[r(1,0)])-obj(yellow,[r(1,0)])].
 
-lk_by_nearest(+Objs1, +Objs2, -Links): each O1 linked to its centroid-nearest O2.
-lk_by_color(+Objs1, +Objs2, -Links): all pairs sharing the same color atom.
-lk_by_size(+Objs1, +Objs2, -Links): all pairs with the same cell count.
-lk_by_form(+Objs1, +Objs2, -Links): all pairs with the same normalized shape.
+link_by_nearest(+Objs1, +Objs2, -Links): each O1 linked to its centroid-nearest O2.
+link_by_color(+Objs1, +Objs2, -Links): all pairs sharing the same color atom.
+link_by_size(+Objs1, +Objs2, -Links): all pairs with the same cell count.
+link_by_form(+Objs1, +Objs2, -Links): all pairs with the same normalized shape.
 
 2. Extracting and Manipulating
 
-lk_source(+Links, -Sources): O1 from each link.
-lk_target(+Links, -Targets): O2 from each link.
-lk_invert(+Links, -Inverted): swap O1 and O2 in every link.
-lk_count(+Links, -N): number of links.
+link_source(+Links, -Sources): O1 from each link.
+link_target(+Links, -Targets): O2 from each link.
+link_invert(+Links, -Inverted): swap O1 and O2 in every link.
+link_count(+Links, -N): number of links.
 
 3. Applying Correspondence
 
-lk_apply_color(+Links, -Result): recolor O1 with O2's color; keep O1's cells.
-lk_apply_cells(+Links, -Result): replace O1's cells with O2's cells; keep O1's color.
+link_apply_color(+Links, -Result): recolor O1 with O2's color; keep O1's cells.
+link_apply_cells(+Links, -Result): replace O1's cells with O2's cells; keep O1's color.
 
 4. Filtering and Unlinked
 
-lk_filter_same_color(+Links, -Same): keep links where both share a color.
-lk_filter_diff_color(+Links, -Diff): keep links where colors differ.
-lk_unlinked(+Objs, +Links, -Unlinked): objects not appearing as O1 in any link.
+link_filter_same_color(+Links, -Same): keep links where both share a color.
+link_filter_diff_color(+Links, -Diff): keep links where colors differ.
+link_unlinked(+Objs, +Links, -Unlinked): objects not appearing as O1 in any link.
 
 Chapter 141: Layout Pack (lt_*)
 
@@ -18611,15 +18611,15 @@ extraction, comparison, and border/color mask generation.
 
 % Overlay br region on tl region:
 GA = [[r,r,x],[r,r,x],[x,x,x]], GB = [[x,x,x],[x,b,b],[x,b,b]].
-gm_overlay(GA, GB, x, r, R).
+gridmask_overlay(GA, GB, x, r, R).
 % R = [[r,r,x],[r,b,b],[x,b,b]]
 
 % Color mask for red cells:
-gm_color_mask([[r,r,b],[b,r,r],[r,b,b]], r, sel, Mask).
+gridmask_color_mask([[r,r,b],[b,r,r],[r,b,b]], r, sel, Mask).
 % Mask = [[sel,sel,bg],[bg,sel,sel],[sel,bg,bg]]
 
 % Border mask N=1 on 3x3:
-gm_border_mask([[p,p,p],[p,p,p],[p,p,p]], 1, M).
+gridmask_border_mask([[p,p,p],[p,p,p],[p,p,p]], 1, M).
 % M = [[border,border,border],[border,interior,border],[border,border,border]]
 
 14 gm_* predicates. 44 tests pass. Layer 206.
