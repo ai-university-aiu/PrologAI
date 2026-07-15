@@ -122,14 +122,14 @@ test(group_by_color_three) :-
 
 % cluster_sort_by_dist/4 tests
 
-test(sort_by_dist_basic) :-
+test(sorting_by_dist_basic) :-
     cluster_sort_by_dist(0, 0, [3-3,1-1,2-2], Sorted),
     Sorted = [1-1,2-2,3-3].
 
-test(sort_by_dist_single) :-
+test(sorting_by_dist_single) :-
     cluster_sort_by_dist(0, 0, [4-4], Sorted), Sorted = [4-4].
 
-test(sort_by_dist_equal_first) :-
+test(sorting_by_dist_equal_first) :-
     cluster_sort_by_dist(0, 0, [0-2,2-0,1-1], Sorted),
     Sorted = [1-1,0-2,2-0].
 

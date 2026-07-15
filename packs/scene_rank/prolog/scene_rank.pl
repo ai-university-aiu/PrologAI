@@ -74,16 +74,16 @@ scene_rank_apply_(remove_color(Color), Scene, Scene2) :-
     findall(O, (member(O, Scene), O = obj(C,_), C \== Color), Scene2).
 scene_rank_apply_(keep_color(Color), Scene, Scene2) :-
     findall(O, (member(O, Scene), O = obj(C,_), C == Color), Scene2).
-scene_rank_apply_(sort_size_desc, Scene, Sorted) :-
+scene_rank_apply_(sorting_size_desc, Scene, Sorted) :-
     findall(NegN-O, (member(O, Scene), O = obj(_,Cells), length(Cells,N), NegN is -N), Keyed),
     msort(Keyed, KSorted),
     pairs_values_(KSorted, Sorted).
-scene_rank_apply_(sort_size_asc, Scene, Sorted) :-
+scene_rank_apply_(sorting_size_asc, Scene, Sorted) :-
     findall(N-O, (member(O, Scene), O = obj(_,Cells), length(Cells,N)), Keyed),
     msort(Keyed, KSorted),
     pairs_values_(KSorted, Sorted).
 scene_rank_apply_(top_n(N), Scene, TopN) :-
-    scene_rank_apply_(sort_size_desc, Scene, Sorted),
+    scene_rank_apply_(sorting_size_desc, Scene, Sorted),
     length(Prefix, N),
     append(Prefix, _, Sorted),
     !,

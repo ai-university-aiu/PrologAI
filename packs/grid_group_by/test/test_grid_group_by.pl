@@ -135,16 +135,16 @@ test('AC-GGB-022: filter_smaller none') :-
     grid_group_by_filter_smaller([O3], 2, []).
 
 % AC-GGB-023: grid_group_by_sort_by_size_asc on empty list.
-test('AC-GGB-023: sort_by_size_asc empty') :-
+test('AC-GGB-023: sorting_by_size_asc empty') :-
     grid_group_by_sort_by_size_asc([], []).
 
 % AC-GGB-024: grid_group_by_sort_by_size_asc orders smallest first.
-test('AC-GGB-024: sort_by_size_asc basic') :-
+test('AC-GGB-024: sorting_by_size_asc basic') :-
     ob1(O1), ob2(O2), ob3(O3),
     grid_group_by_sort_by_size_asc([O3,O1,O2], [O1,O2,O3]).
 
 % AC-GGB-025: grid_group_by_sort_by_size_asc stable for equal-size objects.
-test('AC-GGB-025: sort_by_size_asc equal sizes') :-
+test('AC-GGB-025: sorting_by_size_asc equal sizes') :-
     ob1(O1), ob4(O4),
     grid_group_by_sort_by_size_asc([O1,O4], Sorted),
     length(Sorted, 2),
@@ -153,30 +153,30 @@ test('AC-GGB-025: sort_by_size_asc equal sizes') :-
     grid_group_by_filter_by_size([Second], 1, [_]).
 
 % AC-GGB-026: grid_group_by_sort_by_size_desc on empty list.
-test('AC-GGB-026: sort_by_size_desc empty') :-
+test('AC-GGB-026: sorting_by_size_desc empty') :-
     grid_group_by_sort_by_size_desc([], []).
 
 % AC-GGB-027: grid_group_by_sort_by_size_desc orders largest first.
-test('AC-GGB-027: sort_by_size_desc basic') :-
+test('AC-GGB-027: sorting_by_size_desc basic') :-
     ob1(O1), ob2(O2), ob3(O3),
     grid_group_by_sort_by_size_desc([O1,O2,O3], [O3,O2,O1]).
 
 % AC-GGB-028: grid_group_by_sort_by_size_desc single element.
-test('AC-GGB-028: sort_by_size_desc single') :-
+test('AC-GGB-028: sorting_by_size_desc single') :-
     ob2(O2),
     grid_group_by_sort_by_size_desc([O2], [O2]).
 
 % AC-GGB-029: grid_group_by_sort_by_row on empty list.
-test('AC-GGB-029: sort_by_row empty') :-
+test('AC-GGB-029: sorting_by_row empty') :-
     grid_group_by_sort_by_row([], []).
 
 % AC-GGB-030: grid_group_by_sort_by_row orders by top row ascending.
-test('AC-GGB-030: sort_by_row basic') :-
+test('AC-GGB-030: sorting_by_row basic') :-
     ob1(O1), ob3(O3), ob4(O4),
     grid_group_by_sort_by_row([O4,O3,O1], [O1,O3,O4]).
 
 % AC-GGB-031: grid_group_by_sort_by_row objects on same row preserve input order.
-test('AC-GGB-031: sort_by_row same row') :-
+test('AC-GGB-031: sorting_by_row same row') :-
     ob1(O1), ob2(O2),
     grid_group_by_sort_by_row([O1,O2], Sorted),
     Sorted = [A,B],
@@ -184,11 +184,11 @@ test('AC-GGB-031: sort_by_row same row') :-
     memberchk(B, [O1,O2]).
 
 % AC-GGB-032: grid_group_by_sort_by_col on empty list.
-test('AC-GGB-032: sort_by_col empty') :-
+test('AC-GGB-032: sorting_by_col empty') :-
     grid_group_by_sort_by_col([], []).
 
 % AC-GGB-033: grid_group_by_sort_by_col orders by left column ascending.
-test('AC-GGB-033: sort_by_col basic') :-
+test('AC-GGB-033: sorting_by_col basic') :-
     ob1(O1), ob2(O2),
     grid_group_by_sort_by_col([O2,O1], [O1,O2]).
 

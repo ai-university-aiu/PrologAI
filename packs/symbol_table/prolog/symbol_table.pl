@@ -1,6 +1,6 @@
 % Module declaration with all fourteen public predicates.
 :- module(symbol_table, [
-% Build a symbol table: list of sym(Feature, Value) from training pairs.
+% Build a symbol data_table: list of sym(Feature, Value) from training pairs.
     symbol_table_build_table/2,
 % Find objects that co-vary with the output operation across training pairs.
     symbol_table_identify_symbols/2,
