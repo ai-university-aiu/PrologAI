@@ -276,7 +276,7 @@ test(at_cell_second) :-
 
 :- begin_tests(object_sort_size).
 
-test(sorting_asc) :-
+test(sort_asc) :-
     % Sort three objects ascending by size.
     object_from_cells(1, [r(0,0)], O1),
     object_from_cells(2, [r(0,0),r(0,1),r(0,2)], O3),
@@ -284,7 +284,7 @@ test(sorting_asc) :-
     object_sort_size([O3, O1, O2], asc, Sorted),
     maplist(object_size, Sorted, [1,2,3]).
 
-test(sorting_desc) :-
+test(sort_desc) :-
     % Sort three objects descending by size.
     object_from_cells(1, [r(0,0)], O1),
     object_from_cells(2, [r(0,0),r(0,1),r(0,2)], O3),
@@ -292,7 +292,7 @@ test(sorting_desc) :-
     object_sort_size([O1, O2, O3], desc, Sorted),
     maplist(object_size, Sorted, [3,2,1]).
 
-test(sorting_single) :-
+test(sort_single) :-
     % Single object: sort is identity.
     object_from_cells(1, [r(0,0),r(1,0)], Obj),
     object_sort_size([Obj], asc, [Obj]).

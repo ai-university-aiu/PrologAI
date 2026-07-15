@@ -172,7 +172,7 @@ test(normalize_single) :-
 :- begin_tests(scene_sort).
 
 % Sort ascending by size returns smallest first.
-test(sorting_asc, nondet) :-
+test(sort_asc, nondet) :-
     Objs = [obj(1, [r(0,0), r(0,1), r(0,2)]),
             obj(2, [r(0,0)]),
             obj(3, [r(0,0), r(0,1)])],
@@ -182,7 +182,7 @@ test(sorting_asc, nondet) :-
     scene_obj_size(O3, 3).
 
 % Sort descending returns largest first.
-test(sorting_desc, nondet) :-
+test(sort_desc, nondet) :-
     Objs = [obj(1, [r(0,0)]),
             obj(2, [r(0,0), r(0,1), r(0,2)])],
     scene_sort_by_size(Objs, desc, [First|_]),

@@ -151,13 +151,13 @@ test(invert_table_single) :-
     pigment_invert_table([3-7], [7-3]).
 
 % pigment_table_from/2 - sorted From colors.
-test(data_table_from_basic) :-
+test(table_from_basic) :-
     pigment_table_from([1-5, 2-6], [1,2]).
 
-test(data_table_from_unsorted) :-
+test(table_from_unsorted) :-
     pigment_table_from([3-9, 1-5], [1,3]).
 
-test(data_table_from_single) :-
+test(table_from_single) :-
     pigment_table_from([7-2], [7]).
 
 % pigment_consistent/1 - no conflicting From mappings.

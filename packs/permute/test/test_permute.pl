@@ -149,7 +149,7 @@ test(cycled_cols) :-
 
 :- begin_tests(permute_sort_rows).
 
-test(sorting_two_rows_in_order) :-
+test(sort_two_rows_in_order) :-
     permute_sort_rows([[3,4],[1,2]], R),
     R = [[1,2],[3,4]].
 
@@ -157,7 +157,7 @@ test(already_sorted_unchanged) :-
     permute_sort_rows([[1,2],[3,4]], R),
     R = [[1,2],[3,4]].
 
-test(sorting_three_rows) :-
+test(sort_three_rows) :-
     permute_sort_rows([[5,6],[1,2],[3,4]], R),
     R = [[1,2],[3,4],[5,6]].
 
@@ -167,7 +167,7 @@ test(sorting_three_rows) :-
 
 :- begin_tests(permute_sort_cols).
 
-test(sorting_two_cols) :-
+test(sort_two_cols) :-
     permute_sort_cols([[2,1],[4,3]], R),
     R = [[1,2],[3,4]].
 
@@ -175,7 +175,7 @@ test(already_sorted_cols_unchanged) :-
     permute_sort_cols([[1,2],[3,4]], R),
     R = [[1,2],[3,4]].
 
-test(sorting_three_cols) :-
+test(sort_three_cols) :-
     permute_sort_cols([[3,1,2],[6,4,5]], R),
     R = [[1,2,3],[4,5,6]].
 

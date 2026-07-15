@@ -86,10 +86,10 @@ test(apply_keep_color) :-
     grid_solve_apply(keep_color(r), [R, B], Result),
     Result == [R].
 
-% grid_solve_apply: sorting_size_desc
+% grid_solve_apply: sort_size_desc
 test(apply_sort_size_desc) :-
     red_bar(RB), red_obj(R),
-    grid_solve_apply(sorting_size_desc, [R, RB], Result),
+    grid_solve_apply(sort_size_desc, [R, RB], Result),
     Result == [RB, R].
 
 % grid_solve_apply: top_n

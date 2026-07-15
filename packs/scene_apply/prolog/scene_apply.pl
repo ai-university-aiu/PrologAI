@@ -2,8 +2,8 @@
 % Applies symbolic rule terms to obj(Color, Cells) scene lists.
 % A rule term is one of: recolor(Old,New), recolor_all(New), color_map(Map),
 % shift(DR,DC), to_origin, reflect_h(Width), reflect_v(Height),
-% remove_color(Color), keep_color(Color), sorting_size_desc, sorting_size_asc,
-% sorting_pos, top_n(N), dedup_form.
+% remove_color(Color), keep_color(Color), sort_size_desc, sort_size_asc,
+% sort_pos, top_n(N), dedup_form.
 % Companion to ruleinfer (ri_*) which infers rule terms from Before-After pairs.
 % No cross-pack dependencies.
 :- module(scene_apply, [
@@ -152,20 +152,20 @@ scene_apply_apply(remove_color(Color), Scene, Scene2) :-
     include(scene_apply_not_color_(Color), Scene, Scene2).
 scene_apply_apply(keep_color(Color), Scene, Scene2) :-
     include(scene_apply_is_color_(Color), Scene, Scene2).
-scene_apply_apply(sorting_size_desc, Scene, Sorted) :-
+scene_apply_apply(sort_size_desc, Scene, Sorted) :-
     findall(NegN-O, (member(O, Scene), scene_apply_size_(O, N), NegN is -N), Keyed),
     msort(Keyed, SortedKeyed),
     findall(O, member(_-O, SortedKeyed), Sorted).
-scene_apply_apply(sorting_size_asc, Scene, Sorted) :-
+scene_apply_apply(sort_size_asc, Scene, Sorted) :-
     findall(N-O, (member(O, Scene), scene_apply_size_(O, N)), Keyed),
     msort(Keyed, SortedKeyed),
     findall(O, member(_-O, SortedKeyed), Sorted).
-scene_apply_apply(sorting_pos, Scene, Sorted) :-
+scene_apply_apply(sort_pos, Scene, Sorted) :-
     findall(r(R,C)-O, (member(O, Scene), scene_apply_topleft_(O, r(R,C))), Keyed),
     msort(Keyed, SortedKeyed),
     findall(O, member(_-O, SortedKeyed), Sorted).
 scene_apply_apply(top_n(N), Scene, TopN) :-
-    scene_apply_apply(sorting_size_desc, Scene, Sorted),
+    scene_apply_apply(sort_size_desc, Scene, Sorted),
     length(Prefix, N),
     append(Prefix, _, Sorted),
     !,
@@ -214,9 +214,9 @@ scene_apply_rule_type(reflect_h(_), spatial).
 scene_apply_rule_type(reflect_v(_), spatial).
 scene_apply_rule_type(remove_color(_), filter).
 scene_apply_rule_type(keep_color(_), filter).
-scene_apply_rule_type(sorting_size_desc, order).
-scene_apply_rule_type(sorting_size_asc, order).
-scene_apply_rule_type(sorting_pos, order).
+scene_apply_rule_type(sort_size_desc, order).
+scene_apply_rule_type(sort_size_asc, order).
+scene_apply_rule_type(sort_pos, order).
 scene_apply_rule_type(top_n(_), filter).
 scene_apply_rule_type(dedup_form, dedup).
 
@@ -241,9 +241,9 @@ scene_apply_colors_affected(shift(_,_), []).
 scene_apply_colors_affected(to_origin, []).
 scene_apply_colors_affected(reflect_h(_), []).
 scene_apply_colors_affected(reflect_v(_), []).
-scene_apply_colors_affected(sorting_size_desc, []).
-scene_apply_colors_affected(sorting_size_asc, []).
-scene_apply_colors_affected(sorting_pos, []).
+scene_apply_colors_affected(sort_size_desc, []).
+scene_apply_colors_affected(sort_size_asc, []).
+scene_apply_colors_affected(sort_pos, []).
 scene_apply_colors_affected(top_n(_), []).
 scene_apply_colors_affected(dedup_form, []).
 
