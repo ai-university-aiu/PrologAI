@@ -5,45 +5,45 @@
 % connects two obj terms (cell offset, overlap, cell-set arithmetic, D4 discovery,
 % scale factor, and cell-set merge).
 :- module(xform, [
-    % xf_recolor/3: create a new obj with a different color, keeping the same cells.
-    xf_recolor/3,
-    % xf_translate/3: shift all cells of an obj by a row-column offset r(DR,DC).
-    xf_translate/3,
-    % xf_normalize/2: translate an obj to the origin (min row=0, min col=0).
-    xf_normalize/2,
-    % xf_d4/3: apply a named D4 symmetry operation to the normalized form of an obj.
-    xf_d4/3,
-    % xf_same_cells/2: succeed if two obj terms have identical sorted cell sets.
-    xf_same_cells/2,
-    % xf_cell_offset/3: r(DR,DC) such that shifting Obj1 cells by (DR,DC) gives Obj2 cells.
-    xf_cell_offset/3,
-    % xf_is_recolor/2: same cells, different color.
-    xf_is_recolor/2,
-    % xf_cells_added/3: cells present in Obj2 but absent from Obj1.
-    xf_cells_added/3,
-    % xf_cells_removed/3: cells present in Obj1 but absent from Obj2.
-    xf_cells_removed/3,
-    % xf_cells_kept/3: cells present in both Obj1 and Obj2 (sorted intersection).
-    xf_cells_kept/3,
-    % xf_overlap_count/3: number of cells shared by Obj1 and Obj2.
-    xf_overlap_count/3,
-    % xf_any_d4/3: find a D4 Op such that applying Op to Obj1's normalized form gives Obj2's normalized form.
-    xf_any_d4/3,
-    % xf_scale_factor/3: integer N >= 1 such that Obj2 has N * size(Obj1) cells.
-    xf_scale_factor/3,
-    % xf_merge/3: merge two same-color obj terms into one obj with the union cell set.
-    xf_merge/3
+    % xform_recolor/3: create a new obj with a different color, keeping the same cells.
+    xform_recolor/3,
+    % xform_translate/3: shift all cells of an obj by a row-column offset r(DR,DC).
+    xform_translate/3,
+    % xform_normalize/2: translate an obj to the origin (min row=0, min col=0).
+    xform_normalize/2,
+    % xform_d4/3: apply a named D4 symmetry operation to the normalized form of an obj.
+    xform_d4/3,
+    % xform_same_cells/2: succeed if two obj terms have identical sorted cell sets.
+    xform_same_cells/2,
+    % xform_cell_offset/3: r(DR,DC) such that shifting Obj1 cells by (DR,DC) gives Obj2 cells.
+    xform_cell_offset/3,
+    % xform_is_recolor/2: same cells, different color.
+    xform_is_recolor/2,
+    % xform_cells_added/3: cells present in Obj2 but absent from Obj1.
+    xform_cells_added/3,
+    % xform_cells_removed/3: cells present in Obj1 but absent from Obj2.
+    xform_cells_removed/3,
+    % xform_cells_kept/3: cells present in both Obj1 and Obj2 (sorted intersection).
+    xform_cells_kept/3,
+    % xform_overlap_count/3: number of cells shared by Obj1 and Obj2.
+    xform_overlap_count/3,
+    % xform_any_d4/3: find a D4 Op such that applying Op to Obj1's normalized form gives Obj2's normalized form.
+    xform_any_d4/3,
+    % xform_scale_factor/3: integer N >= 1 such that Obj2 has N * size(Obj1) cells.
+    xform_scale_factor/3,
+    % xform_merge/3: merge two same-color obj terms into one obj with the union cell set.
+    xform_merge/3
 ]).
 
 % Import list utilities; sort/2, findall/3, length/2 are built-ins.
 :- use_module(library(lists), [member/2, min_list/2, max_list/2, subtract/3,
                                 memberchk/2]).
 
-% xf_recolor(+Obj, +Color, -Out): replace the color field; keep the cell list unchanged.
-xf_recolor(obj(_, Cells), Color, obj(Color, Cells)).
+% xform_recolor(+Obj, +Color, -Out): replace the color field; keep the cell list unchanged.
+xform_recolor(obj(_, Cells), Color, obj(Color, Cells)).
 
-% xf_translate(+Obj, +r(DR,DC), -Out): shift every cell by (DR,DC); sort the result.
-xf_translate(obj(Color, Cells), r(DR, DC), obj(Color, Out)) :-
+% xform_translate(+Obj, +r(DR,DC), -Out): shift every cell by (DR,DC); sort the result.
+xform_translate(obj(Color, Cells), r(DR, DC), obj(Color, Out)) :-
 % Build the shifted cell list.
     findall(r(R2,C2), (
         member(r(R,C), Cells),
@@ -53,8 +53,8 @@ xf_translate(obj(Color, Cells), r(DR, DC), obj(Color, Out)) :-
 % Sort to maintain canonical cell order.
     sort(Raw, Out).
 
-% xf_normalize(+Obj, -Out): translate obj so that min row = 0 and min col = 0.
-xf_normalize(obj(Color, Cells), obj(Color, Norm)) :-
+% xform_normalize(+Obj, -Out): translate obj so that min row = 0 and min col = 0.
+xform_normalize(obj(Color, Cells), obj(Color, Norm)) :-
 % Extract row and column indices.
     findall(R, member(r(R,_), Cells), Rs),
     findall(C, member(r(_,C), Cells), Cs),
@@ -70,28 +70,28 @@ xf_normalize(obj(Color, Cells), obj(Color, Norm)) :-
 % Sort to maintain canonical cell order.
     sort(Raw, Norm).
 
-% xf_cell_d4_(+Op, +R, +C, +H1, +W1, -NR, -NC): one D4 operation on a single cell.
+% xform_cell_d4_(+Op, +R, +C, +H1, +W1, -NR, -NC): one D4 operation on a single cell.
 % H1 = max row, W1 = max col of the normalized (origin-anchored) cell set.
 % identity.
-xf_cell_d4_(id,  R, C,  _,  _, R,  C).
+xform_cell_d4_(id,  R, C,  _,  _, R,  C).
 % 90 degrees CW: (R,C) -> (C, H1-R).
-xf_cell_d4_(r90, R, C, H1,  _, NR, NC) :- NR is C,      NC is H1 - R.
+xform_cell_d4_(r90, R, C, H1,  _, NR, NC) :- NR is C,      NC is H1 - R.
 % 180 degrees: (R,C) -> (H1-R, W1-C).
-xf_cell_d4_(r180,R, C, H1, W1, NR, NC) :- NR is H1 - R, NC is W1 - C.
+xform_cell_d4_(r180,R, C, H1, W1, NR, NC) :- NR is H1 - R, NC is W1 - C.
 % 270 degrees CW: (R,C) -> (W1-C, R).
-xf_cell_d4_(r270,R, C,  _, W1, NR, NC) :- NR is W1 - C, NC is R.
+xform_cell_d4_(r270,R, C,  _, W1, NR, NC) :- NR is W1 - C, NC is R.
 % Horizontal flip: (R,C) -> (R, W1-C).
-xf_cell_d4_(fh,  R, C,  _, W1, R,  NC) :- NC is W1 - C.
+xform_cell_d4_(fh,  R, C,  _, W1, R,  NC) :- NC is W1 - C.
 % Vertical flip: (R,C) -> (H1-R, C).
-xf_cell_d4_(fv,  R, C, H1,  _, NR, C)  :- NR is H1 - R.
+xform_cell_d4_(fv,  R, C, H1,  _, NR, C)  :- NR is H1 - R.
 % Main diagonal transpose: (R,C) -> (C, R).
-xf_cell_d4_(fd1, R, C,  _,  _, C,  R).
+xform_cell_d4_(fd1, R, C,  _,  _, C,  R).
 % Anti-diagonal transpose: (R,C) -> (W1-C, H1-R).
-xf_cell_d4_(fd2, R, C, H1, W1, NR, NC) :- NR is W1 - C, NC is H1 - R.
+xform_cell_d4_(fd2, R, C, H1, W1, NR, NC) :- NR is W1 - C, NC is H1 - R.
 
-% xf_d4(+Obj, +Op, -Out): apply named D4 op to the normalized form of Obj.
+% xform_d4(+Obj, +Op, -Out): apply named D4 op to the normalized form of Obj.
 % The result is translated back to the same top-left corner as the input.
-xf_d4(Obj, Op, Out) :-
+xform_d4(Obj, Op, Out) :-
 % Extract color and cells.
     Obj = obj(Color, Cells),
 % Find the top-left corner (used to restore position after normalization).
@@ -113,7 +113,7 @@ xf_d4(Obj, Op, Out) :-
 % Apply the D4 operation and sort.
     findall(r(TR,TC), (
         member(r(R3,C3), NormCells),
-        xf_cell_d4_(Op, R3, C3, H1, W1, TR, TC)
+        xform_cell_d4_(Op, R3, C3, H1, W1, TR, TC)
     ), TransRaw),
     sort(TransRaw, TransNorm),
 % Translate back to the original top-left corner.
@@ -125,15 +125,15 @@ xf_d4(Obj, Op, Out) :-
     sort(OutRaw, OutCells),
     Out = obj(Color, OutCells).
 
-% xf_same_cells(+Obj1, +Obj2): succeed if both obj terms have identical sorted cell sets.
-xf_same_cells(obj(_, Cells), obj(_, Cells)).
+% xform_same_cells(+Obj1, +Obj2): succeed if both obj terms have identical sorted cell sets.
+xform_same_cells(obj(_, Cells), obj(_, Cells)).
 
-% xf_cell_offset(+Obj1, +Obj2, -r(DR,DC)): translation vector from Obj1 to Obj2.
+% xform_cell_offset(+Obj1, +Obj2, -r(DR,DC)): translation vector from Obj1 to Obj2.
 % Succeeds only when Obj1 and Obj2 have the same normalized shape (pure translation).
-xf_cell_offset(Obj1, Obj2, r(DR, DC)) :-
+xform_cell_offset(Obj1, Obj2, r(DR, DC)) :-
 % Normalize both objects to origin.
-    xf_normalize(Obj1, obj(_, Norm1)),
-    xf_normalize(Obj2, obj(_, Norm2)),
+    xform_normalize(Obj1, obj(_, Norm1)),
+    xform_normalize(Obj2, obj(_, Norm2)),
 % Normalized cell sets must be identical (same shape).
     Norm1 = Norm2,
 % The offset is the difference of the original top-left corners.
@@ -150,40 +150,40 @@ xf_cell_offset(Obj1, Obj2, r(DR, DC)) :-
     DR is MinR2 - MinR1,
     DC is MinC2 - MinC1.
 
-% xf_is_recolor(+Obj1, +Obj2): succeed if Obj1 and Obj2 have the same cells and different colors.
-xf_is_recolor(obj(C1, Cells), obj(C2, Cells)) :-
+% xform_is_recolor(+Obj1, +Obj2): succeed if Obj1 and Obj2 have the same cells and different colors.
+xform_is_recolor(obj(C1, Cells), obj(C2, Cells)) :-
 % Colors must differ; cell lists are equal by unification.
     C1 \= C2.
 
-% xf_cells_added(+Obj1, +Obj2, -Added): cells in Obj2 not present in Obj1 (sorted).
-xf_cells_added(obj(_, C1), obj(_, C2), Added) :-
+% xform_cells_added(+Obj1, +Obj2, -Added): cells in Obj2 not present in Obj1 (sorted).
+xform_cells_added(obj(_, C1), obj(_, C2), Added) :-
 % subtract/3 removes elements of C1 from C2; both must be sorted for correct results.
     subtract(C2, C1, Added).
 
-% xf_cells_removed(+Obj1, +Obj2, -Removed): cells in Obj1 not present in Obj2 (sorted).
-xf_cells_removed(obj(_, C1), obj(_, C2), Removed) :-
+% xform_cells_removed(+Obj1, +Obj2, -Removed): cells in Obj1 not present in Obj2 (sorted).
+xform_cells_removed(obj(_, C1), obj(_, C2), Removed) :-
 % subtract/3 removes elements of C2 from C1.
     subtract(C1, C2, Removed).
 
-% xf_cells_kept(+Obj1, +Obj2, -Kept): cells present in both Obj1 and Obj2 (sorted).
-xf_cells_kept(obj(_, C1), obj(_, C2), Kept) :-
+% xform_cells_kept(+Obj1, +Obj2, -Kept): cells present in both Obj1 and Obj2 (sorted).
+xform_cells_kept(obj(_, C1), obj(_, C2), Kept) :-
 % Collect cells in C1 that also appear in C2.
     findall(Cell, (member(Cell, C1), memberchk(Cell, C2)), Raw),
 % Sort removes duplicates in case the same cell appears twice.
     sort(Raw, Kept).
 
-% xf_overlap_count(+Obj1, +Obj2, -N): number of cells shared by both obj terms.
-xf_overlap_count(Obj1, Obj2, N) :-
+% xform_overlap_count(+Obj1, +Obj2, -N): number of cells shared by both obj terms.
+xform_overlap_count(Obj1, Obj2, N) :-
 % Compute the intersection first.
-    xf_cells_kept(Obj1, Obj2, Kept),
+    xform_cells_kept(Obj1, Obj2, Kept),
 % Count the shared cells.
     length(Kept, N).
 
-% xf_any_d4(+Obj1, +Obj2, -Op): find a D4 Op s.t. d4(Op, Obj1.normalized) = Obj2.normalized.
-xf_any_d4(Obj1, Obj2, Op) :-
+% xform_any_d4(+Obj1, +Obj2, -Op): find a D4 Op s.t. d4(Op, Obj1.normalized) = Obj2.normalized.
+xform_any_d4(Obj1, Obj2, Op) :-
 % Normalize both objects to origin.
-    xf_normalize(Obj1, obj(_, N1)),
-    xf_normalize(Obj2, obj(_, N2)),
+    xform_normalize(Obj1, obj(_, N1)),
+    xform_normalize(Obj2, obj(_, N2)),
 % Compute H1 and W1 of N1.
     findall(R, member(r(R,_), N1), Rs1),
     findall(C, member(r(_,C), N1), Cs1),
@@ -194,15 +194,15 @@ xf_any_d4(Obj1, Obj2, Op) :-
 % Apply Op to N1 and sort.
     findall(r(NR,NC), (
         member(r(R,C), N1),
-        xf_cell_d4_(Op, R, C, H1, W1, NR, NC)
+        xform_cell_d4_(Op, R, C, H1, W1, NR, NC)
     ), Raw),
     sort(Raw, N2),
 % Cut after first matching operation to prevent choicepoint.
     !.
 
-% xf_scale_factor(+Obj1, +Obj2, -N): integer N >= 1 such that |Obj2.cells| = N * |Obj1.cells|.
+% xform_scale_factor(+Obj1, +Obj2, -N): integer N >= 1 such that |Obj2.cells| = N * |Obj1.cells|.
 % Fails if the ratio is not a positive integer.
-xf_scale_factor(obj(_, C1), obj(_, C2), N) :-
+xform_scale_factor(obj(_, C1), obj(_, C2), N) :-
 % Cell counts.
     length(C1, Len1),
     length(C2, Len2),
@@ -214,8 +214,8 @@ xf_scale_factor(obj(_, C1), obj(_, C2), N) :-
 % Require a positive scale factor.
     N >= 1.
 
-% xf_merge(+Obj1, +Obj2, -Out): merge two same-color obj terms into one with the union cell set.
-xf_merge(obj(Color, C1), obj(Color, C2), obj(Color, Merged)) :-
+% xform_merge(+Obj1, +Obj2, -Out): merge two same-color obj terms into one with the union cell set.
+xform_merge(obj(Color, C1), obj(Color, C2), obj(Color, Merged)) :-
 % Concatenate the two cell lists.
     append(C1, C2, Combined),
 % sort removes duplicates and produces a canonical sorted list.

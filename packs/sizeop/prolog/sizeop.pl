@@ -6,45 +6,45 @@
 % color assignment in size order, exact/above/below size filtering, distinct
 % size enumeration, and total cell count aggregation.
 :- module(sizeop, [
-    sz_of/2,
-    sz_sort_asc/2,
-    sz_sort_desc/2,
-    sz_smallest/2,
-    sz_largest/2,
-    sz_nth_smallest/3,
-    sz_nth_largest/3,
-    sz_rank_of/3,
-    sz_assign_colors/3,
-    sz_by_size/3,
-    sz_above/3,
-    sz_below/3,
-    sz_unique_sizes/2,
-    sz_total_cells/2
+    sizeop_of/2,
+    sizeop_sort_asc/2,
+    sizeop_sort_desc/2,
+    sizeop_smallest/2,
+    sizeop_largest/2,
+    sizeop_nth_smallest/3,
+    sizeop_nth_largest/3,
+    sizeop_rank_of/3,
+    sizeop_assign_colors/3,
+    sizeop_by_size/3,
+    sizeop_above/3,
+    sizeop_below/3,
+    sizeop_unique_sizes/2,
+    sizeop_total_cells/2
 ]).
 % Import list utilities; length/2, findall/3, sort/2, keysort/2 are built-ins.
 :- use_module(library(lists), [member/2, nth1/3, min_list/2, max_list/2,
                                  sum_list/2]).
 
-% sz_of(+Obj, -N): N is the number of cells (size) of Obj.
-sz_of(obj(_, Cells), N) :-
+% sizeop_of(+Obj, -N): N is the number of cells (size) of Obj.
+sizeop_of(obj(_, Cells), N) :-
 % Count the cells by measuring the length of the Cells list.
     length(Cells, N).
 
-% sz_sort_asc(+Objs, -Sorted): sort Objs by cell count ascending (smallest first).
+% sizeop_sort_asc(+Objs, -Sorted): sort Objs by cell count ascending (smallest first).
 % Objects with equal size retain their relative order from the input (stable sort).
-sz_sort_asc(Objs, Sorted) :-
+sizeop_sort_asc(Objs, Sorted) :-
 % Build N-Obj pairs where N is each object's cell count.
-    findall(N-O, (member(O, Objs), sz_of(O, N)), Pairs),
+    findall(N-O, (member(O, Objs), sizeop_of(O, N)), Pairs),
 % keysort/2 is a built-in stable sort ascending by key.
     keysort(Pairs, SortedPairs),
 % Strip the keys to recover the sorted object list.
     findall(O, member(_-O, SortedPairs), Sorted).
 
-% sz_sort_desc(+Objs, -Sorted): sort Objs by cell count descending (largest first).
+% sizeop_sort_desc(+Objs, -Sorted): sort Objs by cell count descending (largest first).
 % Objects with equal size retain their relative order from the input (stable sort).
-sz_sort_desc(Objs, Sorted) :-
+sizeop_sort_desc(Objs, Sorted) :-
 % Build N-Obj pairs where N is each object's cell count.
-    findall(N-O, (member(O, Objs), sz_of(O, N)), Pairs),
+    findall(N-O, (member(O, Objs), sizeop_of(O, N)), Pairs),
 % Negate each key so that keysort ascending produces descending size order.
     findall(Neg-O, (member(N-O, Pairs), Neg is -N), NegPairs),
 % Sort by negated key ascending = sort by original key descending.
@@ -52,93 +52,93 @@ sz_sort_desc(Objs, Sorted) :-
 % Strip keys to get the final sorted object list.
     findall(O, member(_-O, SortedNeg), Sorted).
 
-% sz_smallest(+Objs, -Obj): Obj is the first object in Objs (by input order) with
+% sizeop_smallest(+Objs, -Obj): Obj is the first object in Objs (by input order) with
 % the fewest cells. Fails if Objs is empty.
-sz_smallest(Objs, Obj) :-
+sizeop_smallest(Objs, Obj) :-
 % Collect all sizes to find the minimum.
-    findall(N, (member(O, Objs), sz_of(O, N)), Sizes),
+    findall(N, (member(O, Objs), sizeop_of(O, N)), Sizes),
 % Find the minimum size value.
     min_list(Sizes, MinN),
 % Return the first object in input order that has the minimum size.
-    member(Obj, Objs), sz_of(Obj, MinN), !.
+    member(Obj, Objs), sizeop_of(Obj, MinN), !.
 
-% sz_largest(+Objs, -Obj): Obj is the first object in Objs (by input order) with
+% sizeop_largest(+Objs, -Obj): Obj is the first object in Objs (by input order) with
 % the most cells. Fails if Objs is empty.
-sz_largest(Objs, Obj) :-
+sizeop_largest(Objs, Obj) :-
 % Collect all sizes to find the maximum.
-    findall(N, (member(O, Objs), sz_of(O, N)), Sizes),
+    findall(N, (member(O, Objs), sizeop_of(O, N)), Sizes),
 % Find the maximum size value.
     max_list(Sizes, MaxN),
 % Return the first object in input order that has the maximum size.
-    member(Obj, Objs), sz_of(Obj, MaxN), !.
+    member(Obj, Objs), sizeop_of(Obj, MaxN), !.
 
-% sz_nth_smallest(+Objs, +N, -Obj): Obj is the Nth object in ascending size order.
+% sizeop_nth_smallest(+Objs, +N, -Obj): Obj is the Nth object in ascending size order.
 % N is 1-based. Ties preserve input order (stable sort).
-sz_nth_smallest(Objs, N, Obj) :-
+sizeop_nth_smallest(Objs, N, Obj) :-
 % Sort ascending to get objects in size order, then index.
-    sz_sort_asc(Objs, Sorted),
+    sizeop_sort_asc(Objs, Sorted),
     nth1(N, Sorted, Obj).
 
-% sz_nth_largest(+Objs, +N, -Obj): Obj is the Nth object in descending size order.
+% sizeop_nth_largest(+Objs, +N, -Obj): Obj is the Nth object in descending size order.
 % N is 1-based. Ties preserve input order (stable sort).
-sz_nth_largest(Objs, N, Obj) :-
+sizeop_nth_largest(Objs, N, Obj) :-
 % Sort descending to get objects in reverse size order, then index.
-    sz_sort_desc(Objs, Sorted),
+    sizeop_sort_desc(Objs, Sorted),
     nth1(N, Sorted, Obj).
 
-% sz_rank_of(+Objs, +Obj, -Rank): Rank is the 1-based position of Obj in the
+% sizeop_rank_of(+Objs, +Obj, -Rank): Rank is the 1-based position of Obj in the
 % ascending size ordering of Objs. Ties are broken by input order (stable sort).
-sz_rank_of(Objs, Obj, Rank) :-
+sizeop_rank_of(Objs, Obj, Rank) :-
 % Sort ascending and find the position of Obj via nth1.
-    sz_sort_asc(Objs, Sorted),
+    sizeop_sort_asc(Objs, Sorted),
     nth1(Rank, Sorted, Obj).
 
-% sz_assign_colors(+Objs, +Colors, -Result): sort Objs by size ascending, then
+% sizeop_assign_colors(+Objs, +Colors, -Result): sort Objs by size ascending, then
 % recolor each object with the corresponding color from Colors. Truncates at
 % the shorter of Objs and Colors. Result is a list of recolored obj terms.
-sz_assign_colors(Objs, Colors, Result) :-
+sizeop_assign_colors(Objs, Colors, Result) :-
 % Sort objects by size so smallest gets Colors[1], next gets Colors[2], etc.
-    sz_sort_asc(Objs, Sorted),
+    sizeop_sort_asc(Objs, Sorted),
 % Zip sorted objects with colors and recolor each.
-    sz_zip_recolor_(Sorted, Colors, Result).
+    sizeop_zip_recolor_(Sorted, Colors, Result).
 
-% sz_zip_recolor_(+Objs, +Colors, -Result): private helper to zip and recolor.
+% sizeop_zip_recolor_(+Objs, +Colors, -Result): private helper to zip and recolor.
 % Base case: first list exhausted.
-sz_zip_recolor_([], _, []) :- !.
+sizeop_zip_recolor_([], _, []) :- !.
 % Base case: second list exhausted.
-sz_zip_recolor_(_, [], []) :- !.
+sizeop_zip_recolor_(_, [], []) :- !.
 % Pair each object with a color; create obj(NewColor, OriginalCells) and recurse.
-sz_zip_recolor_([obj(_, Cells)|Ts], [C|Tc], [obj(C, Cells)|Rs]) :-
-    sz_zip_recolor_(Ts, Tc, Rs).
+sizeop_zip_recolor_([obj(_, Cells)|Ts], [C|Tc], [obj(C, Cells)|Rs]) :-
+    sizeop_zip_recolor_(Ts, Tc, Rs).
 
-% sz_by_size(+Objs, +N, -Filtered): Filtered is the sub-list of Objs whose objects
+% sizeop_by_size(+Objs, +N, -Filtered): Filtered is the sub-list of Objs whose objects
 % have exactly N cells. Returns [] if none match.
-sz_by_size(Objs, N, Filtered) :-
+sizeop_by_size(Objs, N, Filtered) :-
 % Keep objects whose cell count equals N.
-    findall(O, (member(O, Objs), sz_of(O, N)), Filtered).
+    findall(O, (member(O, Objs), sizeop_of(O, N)), Filtered).
 
-% sz_above(+Objs, +N, -Filtered): Filtered is the sub-list of Objs whose objects
+% sizeop_above(+Objs, +N, -Filtered): Filtered is the sub-list of Objs whose objects
 % have strictly more than N cells.
-sz_above(Objs, N, Filtered) :-
+sizeop_above(Objs, N, Filtered) :-
 % Keep objects whose cell count is strictly greater than N.
-    findall(O, (member(O, Objs), sz_of(O, S), S > N), Filtered).
+    findall(O, (member(O, Objs), sizeop_of(O, S), S > N), Filtered).
 
-% sz_below(+Objs, +N, -Filtered): Filtered is the sub-list of Objs whose objects
+% sizeop_below(+Objs, +N, -Filtered): Filtered is the sub-list of Objs whose objects
 % have strictly fewer than N cells.
-sz_below(Objs, N, Filtered) :-
+sizeop_below(Objs, N, Filtered) :-
 % Keep objects whose cell count is strictly less than N.
-    findall(O, (member(O, Objs), sz_of(O, S), S < N), Filtered).
+    findall(O, (member(O, Objs), sizeop_of(O, S), S < N), Filtered).
 
-% sz_unique_sizes(+Objs, -Sizes): Sizes is the sorted list of distinct cell counts
+% sizeop_unique_sizes(+Objs, -Sizes): Sizes is the sorted list of distinct cell counts
 % across all objects in Objs. Duplicates are removed by sort/2.
-sz_unique_sizes(Objs, Sizes) :-
+sizeop_unique_sizes(Objs, Sizes) :-
 % Collect all cell counts; sort/2 deduplicates and orders ascending.
-    findall(N, (member(O, Objs), sz_of(O, N)), Ns),
+    findall(N, (member(O, Objs), sizeop_of(O, N)), Ns),
     sort(Ns, Sizes).
 
-% sz_total_cells(+Objs, -N): N is the sum of cell counts across all objects.
+% sizeop_total_cells(+Objs, -N): N is the sum of cell counts across all objects.
 % Returns 0 for empty Objs.
-sz_total_cells(Objs, N) :-
+sizeop_total_cells(Objs, N) :-
 % Collect all individual sizes then sum them.
-    findall(S, (member(O, Objs), sz_of(O, S)), Sizes),
+    findall(S, (member(O, Objs), sizeop_of(O, S)), Sizes),
     sum_list(Sizes, N).

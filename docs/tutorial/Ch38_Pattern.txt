@@ -24,20 +24,20 @@ A list [1, 2, 3, 1, 2, 3] has period 3.
 
 A uniform list [7, 7, 7] has period 1.
 
-pt_row_period(Row, P) finds the smallest period P of a row (a flat list
+pattern_row_period(Row, P) finds the smallest period P of a row (a flat list
 of color values).
 
 Example:
 
-pt_row_period([0,1,0,1], P).
+pattern_row_period([0,1,0,1], P).
 % P = 2
 
-pt_col_period(Grid, C, P) finds the smallest period of column C in Grid.
+pattern_col_period(Grid, C, P) finds the smallest period of column C in Grid.
 
 Example:
 
 G = [[0,1,0,1],[1,0,1,0],[0,1,0,1],[1,0,1,0]],
-pt_col_period(G, 0, P).
+pattern_col_period(G, 0, P).
 % P = 2
 
 (Column 0 is [0,1,0,1], period 2.)
@@ -45,17 +45,17 @@ pt_col_period(G, 0, P).
 
 38.3 Grid-Level Period Detection
 
-pt_grid_period_h(Grid, P) finds the smallest column period shared by
+pattern_grid_period_h(Grid, P) finds the smallest column period shared by
 every row - the horizontal tiling period of the entire grid.
 
-pt_grid_period_v(Grid, P) finds the smallest row period - the vertical
+pattern_grid_period_v(Grid, P) finds the smallest row period - the vertical
 tiling period.
 
 Example:
 
 G = [[0,1,0,1],[0,1,0,1],[0,1,0,1]],
-pt_grid_period_h(G, PH),
-pt_grid_period_v(G, PV).
+pattern_grid_period_h(G, PH),
+pattern_grid_period_v(G, PV).
 % PH = 2 (row [0,1,0,1] has period 2)
 % PV = 1 (all rows identical)
 
@@ -64,18 +64,18 @@ pt_grid_period_v(G, PV).
 
 Once the periods are known, the minimal tile unit can be extracted.
 
-pt_tile_unit_h(Grid, Tile) extracts the leftmost PH columns of the grid
+pattern_tile_unit_h(Grid, Tile) extracts the leftmost PH columns of the grid
 as the horizontal tile.
 
-pt_tile_unit_v(Grid, Tile) extracts the topmost PV rows.
+pattern_tile_unit_v(Grid, Tile) extracts the topmost PV rows.
 
-pt_tile_unit(Grid, Tile) extracts the minimal 2D tile: PH columns wide
+pattern_tile_unit(Grid, Tile) extracts the minimal 2D tile: PH columns wide
 and PV rows tall.
 
 Example:
 
 G = [[0,1,0,1],[1,0,1,0],[0,1,0,1],[1,0,1,0]],
-pt_tile_unit(G, Tile).
+pattern_tile_unit(G, Tile).
 % Tile = [[0,1],[1,0]]
 
 This is the unique 2x2 tile that, when tiled, produces the entire grid.
@@ -83,7 +83,7 @@ This is the unique 2x2 tile that, when tiled, produces the entire grid.
 
 38.5 Testing Tiling
 
-pt_is_tiling(Grid, Tile) tests whether Grid is an exact tiling of Tile.
+pattern_is_tiling(Grid, Tile) tests whether Grid is an exact tiling of Tile.
 
 It checks that every cell (R, C) in Grid equals Tile[R mod TH][C mod TW].
 
@@ -91,74 +91,74 @@ Example:
 
 Tile = [[0,1],[1,0]],
 G = [[0,1,0,1],[1,0,1,0],[0,1,0,1],[1,0,1,0]],
-pt_is_tiling(G, Tile).
+pattern_is_tiling(G, Tile).
 % true
 
 
 38.6 Finding and Counting Tile Occurrences
 
-pt_find_tile(Grid, Tile, Positions) returns all r(R,C) positions where
+pattern_find_tile(Grid, Tile, Positions) returns all r(R,C) positions where
 Tile matches Grid at top-left corner (R, C). Matches may overlap.
 
-pt_count_tile(Grid, Tile, N) counts these positions.
+pattern_count_tile(Grid, Tile, N) counts these positions.
 
 Example:
 
 G = [[5,5,0],[5,5,0],[0,0,0]],
-pt_find_tile(G, [[5,5],[5,5]], Positions).
+pattern_find_tile(G, [[5,5],[5,5]], Positions).
 % Positions = [r(0,0)]
 
-pt_count_tile(G, [[5,5],[5,5]], N).
+pattern_count_tile(G, [[5,5],[5,5]], N).
 % N = 1
 
 
 38.7 Subgrid Extraction
 
-pt_extract_tile(Grid, r(R,C), H, W, Tile) extracts an H-row by W-column
+pattern_extract_tile(Grid, r(R,C), H, W, Tile) extracts an H-row by W-column
 subgrid starting at top-left (R, C).
 
 Example:
 
 G = [[0,1,2],[3,4,5],[6,7,8]],
-pt_extract_tile(G, r(1,1), 2, 2, Tile).
+pattern_extract_tile(G, r(1,1), 2, 2, Tile).
 % Tile = [[4,5],[7,8]]
 
 
 38.8 Row and Column Diversity
 
-pt_unique_rows(Grid, N) counts the number of distinct rows.
+pattern_unique_rows(Grid, N) counts the number of distinct rows.
 
-pt_unique_cols(Grid, N) counts the number of distinct columns.
+pattern_unique_cols(Grid, N) counts the number of distinct columns.
 
-pt_has_uniform_rows(Grid) succeeds when every row is identical.
+pattern_has_uniform_rows(Grid) succeeds when every row is identical.
 
 Example:
 
 G = [[1,2],[1,2],[3,4]],
-pt_unique_rows(G, N).
+pattern_unique_rows(G, N).
 % N = 2
 
-pt_has_uniform_rows([[5,5,5],[5,5,5]]).
+pattern_has_uniform_rows([[5,5,5],[5,5,5]]).
 % true
 
 
 38.9 Summary
 
 Predicate             Arity   Description
-pt_row_period         2       Tiling period of a row list
-pt_col_period         3       Tiling period of a column
-pt_grid_period_h      2       Horizontal tiling period of grid
-pt_grid_period_v      2       Vertical tiling period of grid
-pt_tile_unit_h        2       Minimal horizontal tile
-pt_tile_unit_v        2       Minimal vertical tile
-pt_tile_unit          2       Minimal 2D tile
-pt_is_tiling          2       Test exact tiling membership
-pt_count_tile         3       Count all tile match positions
-pt_find_tile          3       List all tile match positions
-pt_extract_tile       5       Extract H x W subgrid at r(R,C)
-pt_unique_rows        2       Number of distinct rows
-pt_unique_cols        2       Number of distinct columns
-pt_has_uniform_rows   1       Test all rows identical
+pattern_row_period         2       Tiling period of a row list
+pattern_col_period         3       Tiling period of a column
+pattern_grid_period_h      2       Horizontal tiling period of grid
+pattern_grid_period_v      2       Vertical tiling period of grid
+pattern_tile_unit_h        2       Minimal horizontal tile
+pattern_tile_unit_v        2       Minimal vertical tile
+pattern_tile_unit          2       Minimal 2D tile
+pattern_is_tiling          2       Test exact tiling membership
+pattern_count_tile         3       Count all tile match positions
+pattern_find_tile          3       List all tile match positions
+pattern_extract_tile       5       Extract H x W subgrid at r(R,C)
+pattern_unique_rows        2       Number of distinct rows
+pattern_unique_cols        2       Number of distinct columns
+pattern_has_uniform_rows   1       Test all rows identical
 
 The pattern pack ships 43 PLUnit tests.
 

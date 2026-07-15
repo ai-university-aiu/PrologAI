@@ -26,144 +26,144 @@ DC - the column displacement (positive = rightward, negative = leftward)
 For example, the vector (2, -3) means "2 rows down and 3 columns left."
 
 
-86.1 Displacement Between Cells - vv_offset/6
+86.1 Displacement Between Cells - vec2_offset/6
 
-vv_offset(+R1, +C1, +R2, +C2, -DR, -DC)
+vec2_offset(+R1, +C1, +R2, +C2, -DR, -DC)
 
 Compute the vector from cell (R1,C1) to cell (R2,C2).
 DR = R2 - R1, DC = C2 - C1.
 
 Example:
 
-vv_offset(0, 0, 3, 4, DR, DC).
+vec2_offset(0, 0, 3, 4, DR, DC).
 % DR = 3, DC = 4
 
-vv_offset(3, 4, 0, 0, DR, DC).
+vec2_offset(3, 4, 0, 0, DR, DC).
 % DR = -3, DC = -4
 
 
-86.2 Applying a Vector - vv_add/6
+86.2 Applying a Vector - vec2_add/6
 
-vv_add(+R, +C, +DR, +DC, -NR, -NC)
+vec2_add(+R, +C, +DR, +DC, -NR, -NC)
 
 Apply vector (DR,DC) to point (R,C). NR = R + DR, NC = C + DC.
 
 Example:
 
-vv_add(1, 1, 2, 3, NR, NC).
+vec2_add(1, 1, 2, 3, NR, NC).
 % NR = 3, NC = 4
 
 
-86.3 Scaling - vv_scale/5
+86.3 Scaling - vec2_scale/5
 
-vv_scale(+DR, +DC, +K, -SDR, -SDC)
+vec2_scale(+DR, +DC, +K, -SDR, -SDC)
 
 Scale vector (DR,DC) by integer K. SDR = K * DR, SDC = K * DC.
 Negative K reverses direction. K = 0 yields the zero vector.
 
 Example:
 
-vv_scale(1, 2, 3, SDR, SDC).
+vec2_scale(1, 2, 3, SDR, SDC).
 % SDR = 3, SDC = 6
 
-vv_scale(2, 3, -1, SDR, SDC).
+vec2_scale(2, 3, -1, SDR, SDC).
 % SDR = -2, SDC = -3
 
 
-86.4 Negation - vv_neg/4
+86.4 Negation - vec2_neg/4
 
-vv_neg(+DR, +DC, -NDR, -NDC)
+vec2_neg(+DR, +DC, -NDR, -NDC)
 
 Reverse the direction of a vector. NDR = -DR, NDC = -DC.
 
 Example:
 
-vv_neg(3, -4, NDR, NDC).
+vec2_neg(3, -4, NDR, NDC).
 % NDR = -3, NDC = 4
 
 
-86.5 Squared Length - vv_len_sq/3
+86.5 Squared Length - vec2_len_sq/3
 
-vv_len_sq(+DR, +DC, -LSq)
+vec2_len_sq(+DR, +DC, -LSq)
 
 Squared Euclidean length: LSq = DR^2 + DC^2. Integer arithmetic, no square
 root needed. Useful for comparing distances without floating-point arithmetic.
 
 Example:
 
-vv_len_sq(3, 4, LSq).   % 3-4-5 right triangle
+vec2_len_sq(3, 4, LSq).   % 3-4-5 right triangle
 % LSq = 25
 
 
-86.6 Manhattan Magnitude - vv_manhattan/3
+86.6 Manhattan Magnitude - vec2_manhattan/3
 
-vv_manhattan(+DR, +DC, -M)
+vec2_manhattan(+DR, +DC, -M)
 
 L1 magnitude: M = |DR| + |DC|. The minimum number of 4-connected (orthogonal)
 steps to travel the vector.
 
 Example:
 
-vv_manhattan(3, 4, M).
+vec2_manhattan(3, 4, M).
 % M = 7
 
-vv_manhattan(-2, -3, M).
+vec2_manhattan(-2, -3, M).
 % M = 5
 
 
-86.7 Chebyshev Magnitude - vv_chebyshev/3
+86.7 Chebyshev Magnitude - vec2_chebyshev/3
 
-vv_chebyshev(+DR, +DC, -D)
+vec2_chebyshev(+DR, +DC, -D)
 
 L-infinity magnitude: D = max(|DR|, |DC|). The minimum number of 8-connected
 (king) steps to travel the vector.
 
 Example:
 
-vv_chebyshev(3, 4, D).
+vec2_chebyshev(3, 4, D).
 % D = 4   (the column component dominates)
 
 
-86.8 90-Degree Rotations - vv_rot90_cw/4 and vv_rot90_ccw/4
+86.8 90-Degree Rotations - vec2_rot90_cw/4 and vec2_rot90_ccw/4
 
-vv_rot90_cw(+DR, +DC, -RDR, -RDC)
+vec2_rot90_cw(+DR, +DC, -RDR, -RDC)
 
 Rotate vector 90 degrees clockwise. In row-column coordinates (row axis
 pointing downward): RDR = DC, RDC = -DR.
 
 Example:
 
-vv_rot90_cw(0, 1, RDR, RDC).   % right -> down
+vec2_rot90_cw(0, 1, RDR, RDC).   % right -> down
 % RDR = 1, RDC = 0
 
-vv_rot90_cw(1, 0, RDR, RDC).   % down -> left
+vec2_rot90_cw(1, 0, RDR, RDC).   % down -> left
 % RDR = 0, RDC = -1
 
-vv_rot90_ccw(+DR, +DC, -RDR, -RDC)
+vec2_rot90_ccw(+DR, +DC, -RDR, -RDC)
 
 Rotate vector 90 degrees counter-clockwise: RDR = -DC, RDC = DR.
 
 Example:
 
-vv_rot90_ccw(0, 1, RDR, RDC).   % right -> up
+vec2_rot90_ccw(0, 1, RDR, RDC).   % right -> up
 % RDR = -1, RDC = 0
 
 
-86.9 180-Degree Rotation - vv_rot180/4
+86.9 180-Degree Rotation - vec2_rot180/4
 
-vv_rot180(+DR, +DC, -RDR, -RDC)
+vec2_rot180(+DR, +DC, -RDR, -RDC)
 
 Rotate vector 180 degrees. Equivalent to negation: RDR = -DR, RDC = -DC.
 
 Example:
 
-vv_rot180(1, 1, RDR, RDC).
+vec2_rot180(1, 1, RDR, RDC).
 % RDR = -1, RDC = -1
 
 
-86.10 Dot Product - vv_dot/5
+86.10 Dot Product - vec2_dot/5
 
-vv_dot(+DR1, +DC1, +DR2, +DC2, -D)
+vec2_dot(+DR1, +DC1, +DR2, +DC2, -D)
 
 Dot product: D = DR1*DR2 + DC1*DC2.
 Positive when vectors point in the same general direction.
@@ -172,16 +172,16 @@ Negative when vectors point in opposite directions.
 
 Example:
 
-vv_dot(1, 0, 0, 1, D).   % perpendicular
+vec2_dot(1, 0, 0, 1, D).   % perpendicular
 % D = 0
 
-vv_dot(1, 0, -1, 0, D).   % opposite directions
+vec2_dot(1, 0, -1, 0, D).   % opposite directions
 % D = -1
 
 
-86.11 Cross Product - vv_cross/5
+86.11 Cross Product - vec2_cross/5
 
-vv_cross(+DR1, +DC1, +DR2, +DC2, -C)
+vec2_cross(+DR1, +DC1, +DR2, +DC2, -C)
 
 Z-component of the 3D cross product for 2D vectors:
 C = DR1*DC2 - DC1*DR2.
@@ -192,40 +192,40 @@ Zero when parallel.
 
 Example:
 
-vv_cross(1, 0, 0, 1, C).   % right to up-right is CCW
+vec2_cross(1, 0, 0, 1, C).   % right to up-right is CCW
 % C = 1
 
-vv_cross(0, 1, 1, 0, C).   % right to down is CW
+vec2_cross(0, 1, 1, 0, C).   % right to down is CW
 % C = -1
 
 
-86.12 Parallelism Test - vv_parallel/4
+86.12 Parallelism Test - vec2_parallel/4
 
-vv_parallel(+DR1, +DC1, +DR2, +DC2)
+vec2_parallel(+DR1, +DC1, +DR2, +DC2)
 
 Succeed if two vectors are parallel (cross product is zero). Includes
 anti-parallel (opposite directions) and the zero vector case.
 
 Example:
 
-vv_parallel(1, 2, 3, 6).   % same direction, different scale
-vv_parallel(1, 1, -2, -2).   % anti-parallel
-\+ vv_parallel(1, 0, 0, 1).   % perpendicular - fails
+vec2_parallel(1, 2, 3, 6).   % same direction, different scale
+vec2_parallel(1, 1, -2, -2).   % anti-parallel
+\+ vec2_parallel(1, 0, 0, 1).   % perpendicular - fails
 
 
-86.13 Region Translation - vv_translate_region/4
+86.13 Region Translation - vec2_translate_region/4
 
-vv_translate_region(+Cells, +DR, +DC, -NewCells)
+vec2_translate_region(+Cells, +DR, +DC, -NewCells)
 
 Translate a list of R-C cell coordinates by vector (DR,DC). Each cell R-C
 becomes (R+DR)-(C+DC). The order of cells is preserved.
 
 Example:
 
-vv_translate_region([0-0, 0-1, 1-0], 2, 3, NewCells).
+vec2_translate_region([0-0, 0-1, 1-0], 2, 3, NewCells).
 % NewCells = [2-3, 2-4, 3-3]
 
-vv_translate_region([1-1, 2-2], -1, -1, NewCells).
+vec2_translate_region([1-1, 2-2], -1, -1, NewCells).
 % NewCells = [0-0, 1-1]
 
 
@@ -236,40 +236,40 @@ Computing the transformation that maps one object to another:
 object_transform(FromCells, ToCells, DR, DC) :-
     FromCells = [FR-FC|_],
     ToCells   = [TR-TC|_],
-    vv_offset(FR, FC, TR, TC, DR, DC).
+    vec2_offset(FR, FC, TR, TC, DR, DC).
 
 Checking if two objects have the same shape at a displacement:
 
 same_shape_displaced(Cells1, Cells2) :-
     Cells1 = [R1-C1|_], Cells2 = [R2-C2|_],
-    vv_offset(R1, C1, R2, C2, DR, DC),
-    vv_translate_region(Cells1, DR, DC, Cells2).
+    vec2_offset(R1, C1, R2, C2, DR, DC),
+    vec2_translate_region(Cells1, DR, DC, Cells2).
 
 Rotating a displacement and checking if a new target exists:
 
 rotated_target(R, C, DR, DC, NR, NC) :-
-    vv_rot90_cw(DR, DC, RDR, RDC),
-    vv_add(R, C, RDR, RDC, NR, NC).
+    vec2_rot90_cw(DR, DC, RDR, RDC),
+    vec2_add(R, C, RDR, RDC, NR, NC).
 
 
 86.15 Summary
 
 The vec2 pack provides a complete vocabulary for 2D integer vector arithmetic:
 
-• vv_offset     - vector between two cells
-• vv_add        - apply vector to a point
-• vv_scale      - multiply a vector by a scalar
-• vv_neg        - reverse a vector
-• vv_len_sq     - squared Euclidean magnitude
-• vv_manhattan  - L1 (4-connected step count) magnitude
-• vv_chebyshev  - L-infinity (8-connected step count) magnitude
-• vv_rot90_cw   - 90-degree clockwise rotation
-• vv_rot90_ccw  - 90-degree counter-clockwise rotation
-• vv_rot180     - 180-degree rotation
-• vv_dot        - dot product
-• vv_cross      - 2D cross product (z-component)
-• vv_parallel   - parallelism test
-• vv_translate_region - translate a cell list by a vector
+• vec2_offset     - vector between two cells
+• vec2_add        - apply vector to a point
+• vec2_scale      - multiply a vector by a scalar
+• vec2_neg        - reverse a vector
+• vec2_len_sq     - squared Euclidean magnitude
+• vec2_manhattan  - L1 (4-connected step count) magnitude
+• vec2_chebyshev  - L-infinity (8-connected step count) magnitude
+• vec2_rot90_cw   - 90-degree clockwise rotation
+• vec2_rot90_ccw  - 90-degree counter-clockwise rotation
+• vec2_rot180     - 180-degree rotation
+• vec2_dot        - dot product
+• vec2_cross      - 2D cross product (z-component)
+• vec2_parallel   - parallelism test
+• vec2_translate_region - translate a cell list by a vector
 
 All predicates are pure arithmetic, deterministic, and require no grid input.
 

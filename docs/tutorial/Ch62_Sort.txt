@@ -11,118 +11,118 @@ Sort the columns so the emptiest come first.
 
 62.2 Row and Column Sums
 
-so_row_sums(+Grid, -Sums)
+sort_row_sums(+Grid, -Sums)
   Sums is a list with one integer per row: the sum of all cell values in that row.
   Values must be numeric.
 
 Example:
-  ?- so_row_sums([[1,2],[3,4]], S).
+  ?- sort_row_sums([[1,2],[3,4]], S).
   S = [3,7].
 
-so_col_sums(+Grid, -Sums)
+sort_col_sums(+Grid, -Sums)
   Sums is a list with one integer per column: the sum of all cell values in that column.
 
 Example:
-  ?- so_col_sums([[1,2],[3,4]], S).
+  ?- sort_col_sums([[1,2],[3,4]], S).
   S = [4,6].
 
 62.3 Value Counting per Row and Column
 
-so_row_count(+Grid, +Val, -Counts)
+sort_row_count(+Grid, +Val, -Counts)
   Counts is a list with one integer per row: the number of cells equal to Val.
 
 Example:
-  ?- so_row_count([[1,0,1],[0,0,1]], 1, C).
+  ?- sort_row_count([[1,0,1],[0,0,1]], 1, C).
   C = [2,1].
 
-so_col_count(+Grid, +Val, -Counts)
+sort_col_count(+Grid, +Val, -Counts)
   Counts is a list with one integer per column: the number of cells equal to Val.
 
 Example:
-  ?- so_col_count([[1,0],[1,0],[0,1]], 1, C).
+  ?- sort_col_count([[1,0],[1,0],[0,1]], 1, C).
   C = [2,1].
 
 62.4 Sorting Rows
 
-so_sort_rows_asc(+Grid, +Val, -Sorted)
+sort_sort_rows_asc(+Grid, +Val, -Sorted)
   Sorted has the same rows as Grid, ordered ascending by count of Val.
   Rows with fewer Val cells come first. Ties preserve original row order.
 
 Example:
-  ?- so_sort_rows_asc([[1,1,0],[0,0,0],[1,0,0]], 1, S).
+  ?- sort_sort_rows_asc([[1,1,0],[0,0,0],[1,0,0]], 1, S).
   S = [[0,0,0],[1,0,0],[1,1,0]].
 
-so_sort_rows_desc(+Grid, +Val, -Sorted)
+sort_sort_rows_desc(+Grid, +Val, -Sorted)
   Sorted has the same rows as Grid, ordered descending by count of Val.
   Rows with more Val cells come first.
 
 Example:
-  ?- so_sort_rows_desc([[0,0],[1,0],[1,1]], 1, S).
+  ?- sort_sort_rows_desc([[0,0],[1,0],[1,1]], 1, S).
   S = [[1,1],[1,0],[0,0]].
 
 62.5 Sorting Columns
 
-so_sort_cols_asc(+Grid, +Val, -Sorted)
+sort_sort_cols_asc(+Grid, +Val, -Sorted)
   Sorted has the same columns as Grid, ordered ascending by count of Val.
   Columns with fewer Val cells come first.
 
-so_sort_cols_desc(+Grid, +Val, -Sorted)
+sort_sort_cols_desc(+Grid, +Val, -Sorted)
   Sorted has the same columns as Grid, ordered descending by count of Val.
 
 Note: Column sorting is implemented as: transpose, sort rows, transpose back.
 
 62.6 Finding Extremal Rows and Columns
 
-so_max_row(+Grid, +Val, -R)
+sort_max_row(+Grid, +Val, -R)
   R is the 0-based row index with the highest count of Val.
   On ties, returns the smallest index.
 
 Example:
-  ?- so_max_row([[0,0],[1,0],[1,1]], 1, R).
+  ?- sort_max_row([[0,0],[1,0],[1,1]], 1, R).
   R = 2.
 
-so_min_row(+Grid, +Val, -R)
+sort_min_row(+Grid, +Val, -R)
   R is the 0-based row index with the lowest count of Val.
 
-so_max_col(+Grid, +Val, -C)
+sort_max_col(+Grid, +Val, -C)
   C is the 0-based column index with the highest count of Val.
 
-so_min_col(+Grid, +Val, -C)
+sort_min_col(+Grid, +Val, -C)
   C is the 0-based column index with the lowest count of Val.
 
 62.7 Value Ordering
 
-so_sorted_vals(+Grid, -Vals)
+sort_sorted_vals(+Grid, -Vals)
   Vals is all cell values from Grid sorted ascending, preserving duplicates.
   Useful for analyzing the distribution of values.
 
 Example:
-  ?- so_sorted_vals([[3,1],[2,1]], V).
+  ?- sort_sorted_vals([[3,1],[2,1]], V).
   V = [1,1,2,3].
 
-so_cell_rank(+Grid, +R, +C, -Rank)
+sort_cell_rank(+Grid, +R, +C, -Rank)
   Rank is the 1-based position of Grid[R,C] among the distinct values of Grid
   in ascending order. The smallest distinct value has rank 1.
 
 Example:
-  ?- so_cell_rank([[1,2],[3,4]], 1, 1, Rank).
+  ?- sort_cell_rank([[1,2],[3,4]], 1, 1, Rank).
   Rank = 4.
 
 Example:
-  ?- so_cell_rank([[1,3],[5,7]], 0, 1, Rank).
+  ?- sort_cell_rank([[1,3],[5,7]], 0, 1, Rank).
   Rank = 2.  % 3 is the 2nd of [1,3,5,7]
 
 62.8 Common Patterns
 
 Pattern: Find the dominant color row:
-  so_max_row(Grid, 1, R),
+  sort_max_row(Grid, 1, R),
   nth0(R, Grid, DominantRow).
 
 Pattern: Bring the fullest rows to the top:
-  so_sort_rows_desc(Grid, ForegroundVal, Reordered).
+  sort_sort_rows_desc(Grid, ForegroundVal, Reordered).
 
 Pattern: Compare row densities:
-  so_row_count(Grid, 1, Counts),
+  sort_row_count(Grid, 1, Counts),
   msort(Counts, SortedCounts),
   last(SortedCounts, MaxCount).
 
@@ -130,17 +130,17 @@ Pattern: Get rank of each cell:
   length(Grid, NRows), Grid = [FR|_], length(FR, NCols),
   NRM1 is NRows-1, NCM1 is NCols-1,
   numlist(0, NRM1, Rs), numlist(0, NCM1, Cs),
-  findall(R-C-Rank, (member(R, Rs), member(C, Cs), so_cell_rank(Grid, R, C, Rank)), RankTriples).
+  findall(R-C-Rank, (member(R, Rs), member(C, Cs), sort_cell_rank(Grid, R, C, Rank)), RankTriples).
 
 62.9 Summary
 
 The sort pack's 14 predicates organize into five groups:
 
-Aggregation:  so_row_sums/2, so_col_sums/2, so_row_count/3, so_col_count/3
-Row sort:     so_sort_rows_asc/3, so_sort_rows_desc/3
-Column sort:  so_sort_cols_asc/3, so_sort_cols_desc/3
-Extrema:      so_max_row/3, so_min_row/3, so_max_col/3, so_min_col/3
-Ranking:      so_sorted_vals/2, so_cell_rank/4
+Aggregation:  sort_row_sums/2, sort_col_sums/2, sort_row_count/3, sort_col_count/3
+Row sort:     sort_sort_rows_asc/3, sort_sort_rows_desc/3
+Column sort:  sort_sort_cols_asc/3, sort_sort_cols_desc/3
+Extrema:      sort_max_row/3, sort_min_row/3, sort_max_col/3, sort_min_col/3
+Ranking:      sort_sorted_vals/2, sort_cell_rank/4
 
 All 42 PLUnit acceptance tests are in packs/sort/test/test_sort.pl.
 The Specification entry is Part 91 (SO-SO-001 through SO-SO-014).

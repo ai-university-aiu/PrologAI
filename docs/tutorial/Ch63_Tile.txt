@@ -9,139 +9,139 @@ repeats.
 Overview of Predicates
 
 Tiling - building a larger grid from a small tile:
-  ti_tile_h/3    repeat a tile N times horizontally
-  ti_tile_v/3    repeat a tile N times vertically
-  ti_tile/4      tile a motif into NR rows of NC copies
+  tile_tile_h/3    repeat a tile N times horizontally
+  tile_tile_v/3    repeat a tile N times vertically
+  tile_tile/4      tile a motif into NR rows of NC copies
 
 Splitting - decomposing a grid into sub-grids:
-  ti_split_rows/3    split into horizontal bands of TH rows each
-  ti_split_cols/3    split into vertical stripes of TW cols each
-  ti_split/4         split into a list-of-tile-rows of TH x TW tiles
-  ti_flatten_tiles/2 reassemble split tiles back into one grid
+  tile_split_rows/3    split into horizontal bands of TH rows each
+  tile_split_cols/3    split into vertical stripes of TW cols each
+  tile_split/4         split into a list-of-tile-rows of TH x TW tiles
+  tile_flatten_tiles/2 reassemble split tiles back into one grid
 
 Stamping - placing a motif at a position:
-  ti_stamp/5       overlay a motif at (R, C) into a base grid
-  ti_stamp_all/4   stamp a motif at every position in a list
+  tile_stamp/5       overlay a motif at (R, C) into a base grid
+  tile_stamp_all/4   stamp a motif at every position in a list
 
 Extraction and verification:
-  ti_extract_tile/6  extract the tile at tile-position (TR, TC)
-  ti_is_tiling/3     check if a grid is an exact tiling of one motif
+  tile_extract_tile/6  extract the tile at tile-position (TR, TC)
+  tile_is_tiling/3     check if a grid is an exact tiling of one motif
 
 Period detection:
-  ti_find_period_h/2  smallest horizontal period (in columns)
-  ti_find_period_v/2  smallest vertical period (in rows)
+  tile_find_period_h/2  smallest horizontal period (in columns)
+  tile_find_period_v/2  smallest vertical period (in rows)
 
 Pattern generation:
-  ti_checkerboard/5   generate an H x W checkerboard
+  tile_checkerboard/5   generate an H x W checkerboard
 
 
 Tiling Predicates
 
-ti_tile_h(+Tile, +N, -Grid) repeats Tile N times side-by-side. Each row of
+tile_tile_h(+Tile, +N, -Grid) repeats Tile N times side-by-side. Each row of
 Grid is the corresponding row of Tile concatenated N times.
 
-  ti_tile_h([[1,0],[0,1]], 3, G).
+  tile_tile_h([[1,0],[0,1]], 3, G).
   % G = [[1,0,1,0,1,0],[0,1,0,1,0,1]]
 
-ti_tile_v(+Tile, +N, -Grid) stacks Tile N times vertically. Grid contains N
+tile_tile_v(+Tile, +N, -Grid) stacks Tile N times vertically. Grid contains N
 consecutive copies of the rows of Tile.
 
-  ti_tile_v([[1,2]], 4, G).
+  tile_tile_v([[1,2]], 4, G).
   % G = [[1,2],[1,2],[1,2],[1,2]]
 
-ti_tile(+Tile, +NR, +NC, -Grid) combines both: NR copies vertically, NC copies
+tile_tile(+Tile, +NR, +NC, -Grid) combines both: NR copies vertically, NC copies
 horizontally. The resulting grid has NR * height(Tile) rows and NC * width(Tile)
 columns.
 
-  ti_tile([[1,0],[0,1]], 2, 2, G).
+  tile_tile([[1,0],[0,1]], 2, 2, G).
   % G = [[1,0,1,0],[0,1,0,1],[1,0,1,0],[0,1,0,1]]
 
 
 Splitting Predicates
 
-ti_split_rows(+Grid, +TH, -Bands) partitions Grid into horizontal bands of TH
+tile_split_rows(+Grid, +TH, -Bands) partitions Grid into horizontal bands of TH
 rows each. The length of Grid must be divisible by TH.
 
-  ti_split_rows([[1,2],[3,4],[5,6],[7,8]], 2, B).
+  tile_split_rows([[1,2],[3,4],[5,6],[7,8]], 2, B).
   % B = [[[1,2],[3,4]], [[5,6],[7,8]]]
 
-ti_split_cols(+Grid, +TW, -Stripes) partitions Grid into vertical stripes of
+tile_split_cols(+Grid, +TW, -Stripes) partitions Grid into vertical stripes of
 TW columns each. Each stripe is a complete sub-grid with all rows but only TW
 columns. The grid width must be divisible by TW.
 
-  ti_split_cols([[1,2,3,4],[5,6,7,8]], 2, S).
+  tile_split_cols([[1,2,3,4],[5,6,7,8]], 2, S).
   % S = [[[1,2],[5,6]], [[3,4],[7,8]]]
 
-ti_split(+Grid, +TH, +TW, -TileGrid) combines both: TileGrid is a list of
+tile_split(+Grid, +TH, +TW, -TileGrid) combines both: TileGrid is a list of
 tile-rows, where TileGrid[I][J] is the TH x TW sub-grid at tile-row I and
 tile-column J. Both TH and TW must divide the grid dimensions.
 
-  ti_split([[1,2,3,4],[5,6,7,8]], 2, 2, TG).
+  tile_split([[1,2,3,4],[5,6,7,8]], 2, 2, TG).
   % TG = [[[[1,2],[5,6]], [[3,4],[7,8]]]]
 
-ti_flatten_tiles(+TileGrid, -Grid) is the inverse of ti_split. It joins tiles
+tile_flatten_tiles(+TileGrid, -Grid) is the inverse of tile_split. It joins tiles
 horizontally within each tile-row and then stacks the bands vertically.
 
-  ti_flatten_tiles([[[[1,2],[5,6]], [[3,4],[7,8]]]], G).
+  tile_flatten_tiles([[[[1,2],[5,6]], [[3,4],[7,8]]]], G).
   % G = [[1,2,3,4],[5,6,7,8]]
 
 
 Stamping Predicates
 
-ti_stamp(+Base, +Motif, +R, +C, -Result) overlays Motif onto Base with the
+tile_stamp(+Base, +Motif, +R, +C, -Result) overlays Motif onto Base with the
 top-left corner of Motif placed at cell (R, C). Motif cells that fall outside
 the bounds of Base are silently ignored.
 
-  ti_stamp([[0,0,0],[0,0,0],[0,0,0]], [[1,1],[1,1]], 0, 0, R).
+  tile_stamp([[0,0,0],[0,0,0],[0,0,0]], [[1,1],[1,1]], 0, 0, R).
   % R = [[1,1,0],[1,1,0],[0,0,0]]
 
-  ti_stamp([[0,0,0],[0,0,0],[0,0,0]], [[5]], 1, 1, R).
+  tile_stamp([[0,0,0],[0,0,0],[0,0,0]], [[5]], 1, 1, R).
   % R = [[0,0,0],[0,5,0],[0,0,0]]
 
-ti_stamp_all(+Base, +Motif, +Positions, -Result) applies ti_stamp repeatedly
+tile_stamp_all(+Base, +Motif, +Positions, -Result) applies tile_stamp repeatedly
 for each R-C pair in Positions. Later stamps overwrite earlier ones in areas
 that overlap.
 
-  ti_stamp_all([[0,0,0],[0,0,0]], [[1]], [0-0, 0-2, 1-1], R).
+  tile_stamp_all([[0,0,0],[0,0,0]], [[1]], [0-0, 0-2, 1-1], R).
   % R = [[1,0,1],[0,1,0]]
 
 
 Extraction and Verification
 
-ti_extract_tile(+Grid, +TH, +TW, +TR, +TC, -Tile) extracts the TH x TW
+tile_extract_tile(+Grid, +TH, +TW, +TR, +TC, -Tile) extracts the TH x TW
 sub-grid at tile-position (TR, TC). Cell (0,0) of Tile corresponds to Grid
 cell (TR*TH, TC*TW).
 
-  ti_extract_tile([[1,2,3,4],[5,6,7,8]], 2, 2, 0, 1, T).
+  tile_extract_tile([[1,2,3,4],[5,6,7,8]], 2, 2, 0, 1, T).
   % T = [[3,4],[7,8]]
 
-ti_is_tiling(+Grid, +TH, +TW) succeeds if and only if Grid is an exact tiling
+tile_is_tiling(+Grid, +TH, +TW) succeeds if and only if Grid is an exact tiling
 by a single TH x TW motif. All tiles in the grid must be structurally identical
 to the tile at position (0, 0). Fails if dimensions are not exact multiples.
 
-  ti_is_tiling([[1,0,1,0],[0,1,0,1],[1,0,1,0],[0,1,0,1]], 2, 2).
+  tile_is_tiling([[1,0,1,0],[0,1,0,1],[1,0,1,0],[0,1,0,1]], 2, 2).
   % succeeds
 
-  \+ ti_is_tiling([[1,0,1,1],[0,1,0,1]], 2, 2).
+  \+ tile_is_tiling([[1,0,1,1],[0,1,0,1]], 2, 2).
   % succeeds (second tile differs)
 
 
 Period Detection
 
-ti_find_period_h(+Grid, -PH) finds the smallest integer PH such that PH
+tile_find_period_h(+Grid, -PH) finds the smallest integer PH such that PH
 divides the grid width and every row has horizontal period PH (row[I] equals
 row[I mod PH] for all I). Commits deterministically to the smallest period.
 
-  ti_find_period_h([[1,0,1,0],[0,1,0,1]], P).
+  tile_find_period_h([[1,0,1,0],[0,1,0,1]], P).
   % P = 2
 
-  ti_find_period_h([[1,1,1],[1,1,1]], P).
+  tile_find_period_h([[1,1,1],[1,1,1]], P).
   % P = 1
 
-ti_find_period_v(+Grid, -PV) finds the smallest integer PV such that PV
+tile_find_period_v(+Grid, -PV) finds the smallest integer PV such that PV
 divides the grid height and Grid[I] equals Grid[I mod PV] for all I.
 
-  ti_find_period_v([[1,0],[0,1],[1,0],[0,1]], P).
+  tile_find_period_v([[1,0],[0,1],[1,0],[0,1]], P).
   % P = 2
 
 Note: a period always exists (the full width or height is always a valid
@@ -150,32 +150,32 @@ period), so these predicates always succeed for non-empty grids.
 
 Pattern Generation
 
-ti_checkerboard(+H, +W, +V1, +V2, -Grid) generates an H x W checkerboard
+tile_checkerboard(+H, +W, +V1, +V2, -Grid) generates an H x W checkerboard
 where cell (R, C) is V1 when (R + C) is even and V2 when (R + C) is odd.
 
-  ti_checkerboard(2, 3, 1, 0, G).
+  tile_checkerboard(2, 3, 1, 0, G).
   % G = [[1,0,1],[0,1,0]]
 
-  ti_checkerboard(3, 3, 5, 9, G).
+  tile_checkerboard(3, 3, 5, 9, G).
   % G = [[5,9,5],[9,5,9],[5,9,5]]
 
 
 Design Notes
 
-ti_tile_h and ti_tile_v use foldl over a numlist to repeatedly append copies,
-building the result incrementally. ti_tile composes them.
+tile_tile_h and tile_tile_v use foldl over a numlist to repeatedly append copies,
+building the result incrementally. tile_tile composes them.
 
-ti_split_rows and ti_split_cols both use maplist with numlist-generated index
-ranges to extract sub-grids without transposing. ti_flatten_tiles reconstructs
+tile_split_rows and tile_split_cols both use maplist with numlist-generated index
+ranges to extract sub-grids without transposing. tile_flatten_tiles reconstructs
 the grid by horizontally joining each tile-row (collecting one row from each
 tile, appending the parts) then stacking the joined bands with append.
 
-ti_stamp uses maplist/4 over row indices and column indices, computing the
+tile_stamp uses maplist/4 over row indices and column indices, computing the
 motif-relative offsets MRI = RI - R and MCI = CI - C. When an offset is
 negative or the motif has no row/column at that offset, the base cell is kept.
 
-ti_is_tiling and ti_find_period_h/v use forall/2 for their universally-
-quantified checks. ti_find_period_h and ti_find_period_v commit with cut after
+tile_is_tiling and tile_find_period_h/v use forall/2 for their universally-
+quantified checks. tile_find_period_h and tile_find_period_v commit with cut after
 finding the smallest period.
 
 END OF CHAPTER 63

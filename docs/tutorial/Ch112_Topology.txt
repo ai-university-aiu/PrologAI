@@ -41,209 +41,209 @@ G5h = [[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]]
 G3m = [[0,0,0],[0,1,0],[0,0,0]]
 
 
-1. tp_component/4 - Flood Fill From a Seed
+1. topology_component/4 - Flood Fill From a Seed
 
-tp_component(+Grid, +Val, +Seed, -Cells) finds all cells of value Val
+topology_component(+Grid, +Val, +Seed, -Cells) finds all cells of value Val
 that are 4-connected to Seed. Returns sorted R-C pairs.
 
-?- tp_component([[1,1,1],[1,1,1],[1,1,1]], 1, 0-0, C), length(C, N).
+?- topology_component([[1,1,1],[1,1,1],[1,1,1]], 1, 0-0, C), length(C, N).
 N = 9.
 
-?- tp_component([[1,0,0],[0,0,0],[0,0,1]], 1, 0-0, C).
+?- topology_component([[1,0,0],[0,0,0],[0,0,1]], 1, 0-0, C).
 C = [0-0].
 
 
-2. tp_all_components/3 - All Connected Components
+2. topology_all_components/3 - All Connected Components
 
-tp_all_components(+Grid, +Val, -Components) returns a list of all
+topology_all_components(+Grid, +Val, -Components) returns a list of all
 4-connected components of Val, each as a sorted R-C pair list.
 
-?- tp_all_components([[1,0,0],[0,0,0],[0,0,1]], 1, Comps),
+?- topology_all_components([[1,0,0],[0,0,0],[0,0,1]], 1, Comps),
    length(Comps, N).
 N = 2.
 
-?- tp_all_components([[1,1,1],[1,1,1],[1,1,1]], 1, Comps),
+?- topology_all_components([[1,1,1],[1,1,1],[1,1,1]], 1, Comps),
    length(Comps, N).
 N = 1.
 
 
-3. tp_component_count/3 - Count Components
+3. topology_component_count/3 - Count Components
 
-tp_component_count(+Grid, +Val, -N) returns the count of 4-connected
+topology_component_count(+Grid, +Val, -N) returns the count of 4-connected
 components.
 
-?- tp_component_count([[1,0,0],[0,0,0],[0,0,1]], 1, N).
+?- topology_component_count([[1,0,0],[0,0,0],[0,0,1]], 1, N).
 N = 2.
 
-?- tp_component_count([[1,1,1],[1,1,1],[1,1,1]], 1, N).
+?- topology_component_count([[1,1,1],[1,1,1],[1,1,1]], 1, N).
 N = 1.
 
 
-4. tp_component_size/4 - Component Size
+4. topology_component_size/4 - Component Size
 
-tp_component_size(+Grid, +Val, +Seed, -N) returns the cell count of
+topology_component_size(+Grid, +Val, +Seed, -N) returns the cell count of
 the 4-connected component of Val containing Seed.
 
-?- tp_component_size([[1,1,2,2],[1,1,2,2],[1,1,2,2],[1,1,2,2]], 1, 0-0, N).
+?- topology_component_size([[1,1,2,2],[1,1,2,2],[1,1,2,2],[1,1,2,2]], 1, 0-0, N).
 N = 8.
 
-?- tp_component_size([[1,0,0],[0,0,0],[0,0,1]], 1, 0-0, N).
+?- topology_component_size([[1,0,0],[0,0,0],[0,0,1]], 1, 0-0, N).
 N = 1.
 
 
-5. tp_largest_component/3 - Largest Component
+5. topology_largest_component/3 - Largest Component
 
-tp_largest_component(+Grid, +Val, -Cells) returns the cells of the
+topology_largest_component(+Grid, +Val, -Cells) returns the cells of the
 largest 4-connected component.
 
-?- tp_largest_component([[1,1,2,2],[1,1,2,2],[1,1,2,2],[1,1,2,2]], 1, C),
+?- topology_largest_component([[1,1,2,2],[1,1,2,2],[1,1,2,2],[1,1,2,2]], 1, C),
    length(C, N).
 N = 8.
 
 
-6. tp_reachable/5 - Reachability Test
+6. topology_reachable/5 - Reachability Test
 
-tp_reachable(+Grid, +Val, +Src, +Dst, -Bool) returns Bool=1 iff Dst
+topology_reachable(+Grid, +Val, +Src, +Dst, -Bool) returns Bool=1 iff Dst
 is reachable from Src through 4-connected Val cells.
 
-?- tp_reachable([[1,1,1],[1,1,1],[1,1,1]], 1, 0-0, 2-2, Bool).
+?- topology_reachable([[1,1,1],[1,1,1],[1,1,1]], 1, 0-0, 2-2, Bool).
 Bool = 1.
 
 % Isolated corners are not reachable from each other.
-?- tp_reachable([[1,0,0],[0,0,0],[0,0,1]], 1, 0-0, 2-2, Bool).
+?- topology_reachable([[1,0,0],[0,0,0],[0,0,1]], 1, 0-0, 2-2, Bool).
 Bool = 0.
 
 
-7. tp_enclosed/4 - Enclosed Cells
+7. topology_enclosed/4 - Enclosed Cells
 
-tp_enclosed(+Grid, +Val, +Bg, -Cells) returns Bg cells that are
+topology_enclosed(+Grid, +Val, +Bg, -Cells) returns Bg cells that are
 completely enclosed by Val (cannot reach the grid border via Bg cells).
 
-?- tp_enclosed([[1,1,1],[1,0,1],[1,1,1]], 1, 0, Cells).
+?- topology_enclosed([[1,1,1],[1,0,1],[1,1,1]], 1, 0, Cells).
 Cells = [1-1].
 
 % Open grid: the 0-cells can reach the border, so none are enclosed.
-?- tp_enclosed([[1,0,0],[0,0,0],[0,0,1]], 1, 0, Cells).
+?- topology_enclosed([[1,0,0],[0,0,0],[0,0,1]], 1, 0, Cells).
 Cells = [].
 
 % 5x5 grid with 1-border: all 9 interior 0s are enclosed.
-?- tp_enclosed([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]],
+?- topology_enclosed([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]],
                1, 0, Cells), length(Cells, N).
 N = 9.
 
 
-8. tp_has_hole/4 - Hole Test
+8. topology_has_hole/4 - Hole Test
 
-tp_has_hole(+Grid, +Val, +Bg, -Bool) returns Bool=1 iff Val encloses
+topology_has_hole(+Grid, +Val, +Bg, -Bool) returns Bool=1 iff Val encloses
 any Bg region.
 
-?- tp_has_hole([[1,1,1],[1,0,1],[1,1,1]], 1, 0, Bool).
+?- topology_has_hole([[1,1,1],[1,0,1],[1,1,1]], 1, 0, Bool).
 Bool = 1.
 
-?- tp_has_hole([[1,0,0],[0,0,0],[0,0,1]], 1, 0, Bool).
+?- topology_has_hole([[1,0,0],[0,0,0],[0,0,1]], 1, 0, Bool).
 Bool = 0.
 
 
-9. tp_hole_count/4 - Count Holes
+9. topology_hole_count/4 - Count Holes
 
-tp_hole_count(+Grid, +Val, +Bg, -N) returns the count of distinct
+topology_hole_count(+Grid, +Val, +Bg, -N) returns the count of distinct
 enclosed Bg components.
 
-?- tp_hole_count([[1,1,1],[1,0,1],[1,1,1]], 1, 0, N).
+?- topology_hole_count([[1,1,1],[1,0,1],[1,1,1]], 1, 0, N).
 N = 1.
 
-?- tp_hole_count([[1,0,0],[0,0,0],[0,0,1]], 1, 0, N).
+?- topology_hole_count([[1,0,0],[0,0,0],[0,0,1]], 1, 0, N).
 N = 0.
 
 
-10. tp_fill_holes/4 - Fill Enclosed Regions
+10. topology_fill_holes/4 - Fill Enclosed Regions
 
-tp_fill_holes(+Grid, +Val, +Bg, -Grid2) replaces all enclosed Bg cells
+topology_fill_holes(+Grid, +Val, +Bg, -Grid2) replaces all enclosed Bg cells
 with Val, leaving other cells unchanged.
 
-?- tp_fill_holes([[1,1,1],[1,0,1],[1,1,1]], 1, 0, G2).
+?- topology_fill_holes([[1,1,1],[1,0,1],[1,1,1]], 1, 0, G2).
 G2 = [[1,1,1],[1,1,1],[1,1,1]].
 
 % Grid with open 0-cells: nothing changes.
-?- tp_fill_holes([[1,0,0],[0,0,0],[0,0,1]], 1, 0, G2).
+?- topology_fill_holes([[1,0,0],[0,0,0],[0,0,1]], 1, 0, G2).
 G2 = [[1,0,0],[0,0,0],[0,0,1]].
 
 
-11. tp_border_components/3 - Border-Touching Components
+11. topology_border_components/3 - Border-Touching Components
 
-tp_border_components(+Grid, +Val, -Components) returns components of
+topology_border_components(+Grid, +Val, -Components) returns components of
 Val that have at least one cell on the outer grid border.
 
 % Uniform grid: one component, it touches the border.
-?- tp_border_components([[1,1,1],[1,1,1],[1,1,1]], 1, C),
+?- topology_border_components([[1,1,1],[1,1,1],[1,1,1]], 1, C),
    length(C, N).
 N = 1.
 
 % Center cell of G3m does not touch the border.
-?- tp_border_components([[0,0,0],[0,1,0],[0,0,0]], 1, C).
+?- topology_border_components([[0,0,0],[0,1,0],[0,0,0]], 1, C).
 C = [].
 
 
-12. tp_interior_components/3 - Interior-Only Components
+12. topology_interior_components/3 - Interior-Only Components
 
-tp_interior_components(+Grid, +Val, -Components) returns components
+topology_interior_components(+Grid, +Val, -Components) returns components
 that have NO cell on the outer grid border.
 
 % Center 1 of G3m is interior.
-?- tp_interior_components([[0,0,0],[0,1,0],[0,0,0]], 1, C),
+?- topology_interior_components([[0,0,0],[0,1,0],[0,0,0]], 1, C),
    length(C, N).
 N = 1.
 
 % Uniform grid: the component touches all borders, so interior = [].
-?- tp_interior_components([[1,1,1],[1,1,1],[1,1,1]], 1, C).
+?- topology_interior_components([[1,1,1],[1,1,1],[1,1,1]], 1, C).
 C = [].
 
 
-13. tp_label_components/3 - Label Grid
+13. topology_label_components/3 - Label Grid
 
-tp_label_components(+Grid, +Val, -LabelGrid) produces a same-size
+topology_label_components(+Grid, +Val, -LabelGrid) produces a same-size
 grid where each Val cell gets its component's 1-based index and
 non-Val cells get 0.
 
 % All 1s: one component labeled 1.
-?- tp_label_components([[1,1,1],[1,1,1],[1,1,1]], 1, L),
+?- topology_label_components([[1,1,1],[1,1,1],[1,1,1]], 1, L),
    nth0(0, L, Row), nth0(0, Row, V).
 V = 1.
 
 % G3h: center 0 gets label 0 (it's not value 1).
-?- tp_label_components([[1,1,1],[1,0,1],[1,1,1]], 1, L),
+?- topology_label_components([[1,1,1],[1,0,1],[1,1,1]], 1, L),
    nth0(1, L, Row), nth0(1, Row, V).
 V = 0.
 
 
-14. tp_same_component/5 - Same Component Test
+14. topology_same_component/5 - Same Component Test
 
-tp_same_component(+Grid, +Val, +P1, +P2, -Bool) returns Bool=1 iff
+topology_same_component(+Grid, +Val, +P1, +P2, -Bool) returns Bool=1 iff
 P1 and P2 are in the same 4-connected component of Val.
 
-?- tp_same_component([[1,1,1],[1,1,1],[1,1,1]], 1, 0-0, 2-2, Bool).
+?- topology_same_component([[1,1,1],[1,1,1],[1,1,1]], 1, 0-0, 2-2, Bool).
 Bool = 1.
 
-?- tp_same_component([[1,0,0],[0,0,0],[0,0,1]], 1, 0-0, 2-2, Bool).
+?- topology_same_component([[1,0,0],[0,0,0],[0,0,1]], 1, 0-0, 2-2, Bool).
 Bool = 0.
 
 
 Summary of tp_* Predicates
 
-tp_component/4 - cells of 4-connected component at Seed
-tp_all_components/3 - all 4-connected components of a value
-tp_component_count/3 - count of components
-tp_component_size/4 - cell count of component at Seed
-tp_largest_component/3 - cells of the largest component
-tp_reachable/5 - reachability test (Bool)
-tp_enclosed/4 - enclosed Bg cells (cannot reach border)
-tp_has_hole/4 - hole existence test (Bool)
-tp_hole_count/4 - count of enclosed Bg components
-tp_fill_holes/4 - fill enclosed Bg cells with Val
-tp_border_components/3 - components touching the outer border
-tp_interior_components/3 - components not touching the outer border
-tp_label_components/3 - label grid with 1-based component indices
-tp_same_component/5 - same-component test (Bool)
+topology_component/4 - cells of 4-connected component at Seed
+topology_all_components/3 - all 4-connected components of a value
+topology_component_count/3 - count of components
+topology_component_size/4 - cell count of component at Seed
+topology_largest_component/3 - cells of the largest component
+topology_reachable/5 - reachability test (Bool)
+topology_enclosed/4 - enclosed Bg cells (cannot reach border)
+topology_has_hole/4 - hole existence test (Bool)
+topology_hole_count/4 - count of enclosed Bg components
+topology_fill_holes/4 - fill enclosed Bg cells with Val
+topology_border_components/3 - components touching the outer border
+topology_interior_components/3 - components not touching the outer border
+topology_label_components/3 - label grid with 1-based component indices
+topology_same_component/5 - same-component test (Bool)
 
 
 END OF CHAPTER 112

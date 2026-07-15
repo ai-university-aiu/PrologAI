@@ -26,88 +26,88 @@ g_1([[7]]).
 
 :- begin_tests(rowsig).
 
-% rs_col_at: extract a single column as a top-to-bottom list.
-test(col_at_1) :- g3(G), rs_col_at(G, 0, Col), Col = [1,4,7].
-test(col_at_2) :- g3(G), rs_col_at(G, 1, Col), Col = [2,5,8].
-test(col_at_3) :- g3(G), rs_col_at(G, 2, Col), Col = [3,6,9].
-test(col_at_4) :- g_dr(G), rs_col_at(G, 0, Col), Col = [1,3,1].
+% rowsig_col_at: extract a single column as a top-to-bottom list.
+test(col_at_1) :- g3(G), rowsig_col_at(G, 0, Col), Col = [1,4,7].
+test(col_at_2) :- g3(G), rowsig_col_at(G, 1, Col), Col = [2,5,8].
+test(col_at_3) :- g3(G), rowsig_col_at(G, 2, Col), Col = [3,6,9].
+test(col_at_4) :- g_dr(G), rowsig_col_at(G, 0, Col), Col = [1,3,1].
 
-% rs_all_cols: extract all columns.
-test(all_cols_1) :- g3(G), rs_all_cols(G, Cols), Cols = [[1,4,7],[2,5,8],[3,6,9]].
-test(all_cols_2) :- g_dr(G), rs_all_cols(G, Cols), Cols = [[1,3,1],[2,4,2]].
-test(all_cols_3) :- g_dc(G), rs_all_cols(G, Cols), Cols = [[1,2,5],[3,4,6],[1,2,5]].
+% rowsig_all_cols: extract all columns.
+test(all_cols_1) :- g3(G), rowsig_all_cols(G, Cols), Cols = [[1,4,7],[2,5,8],[3,6,9]].
+test(all_cols_2) :- g_dr(G), rowsig_all_cols(G, Cols), Cols = [[1,3,1],[2,4,2]].
+test(all_cols_3) :- g_dc(G), rowsig_all_cols(G, Cols), Cols = [[1,2,5],[3,4,6],[1,2,5]].
 
-% rs_row_freq: row frequency table sorted by count descending.
+% rowsig_row_freq: row frequency table sorted by count descending.
 test(row_freq_1) :-
-    g_dr(G), rs_row_freq(G, Freqs),
+    g_dr(G), rowsig_row_freq(G, Freqs),
     Freqs = [[1,2]-2, [3,4]-1].
 test(row_freq_2) :-
-    g3(G), rs_row_freq(G, Freqs), length(Freqs, 3).
+    g3(G), rowsig_row_freq(G, Freqs), length(Freqs, 3).
 test(row_freq_3) :-
-    g_all(G), rs_row_freq(G, Freqs), Freqs = [[1,2]-3].
+    g_all(G), rowsig_row_freq(G, Freqs), Freqs = [[1,2]-3].
 
-% rs_col_freq: column frequency table sorted by count descending.
+% rowsig_col_freq: column frequency table sorted by count descending.
 test(col_freq_1) :-
-    g_dc(G), rs_col_freq(G, Freqs),
+    g_dc(G), rowsig_col_freq(G, Freqs),
     Freqs = [[1,2,5]-2, [3,4,6]-1].
 test(col_freq_2) :-
-    g3(G), rs_col_freq(G, Freqs), length(Freqs, 3).
+    g3(G), rowsig_col_freq(G, Freqs), length(Freqs, 3).
 test(col_freq_3) :-
-    g_sym(G), rs_col_freq(G, Freqs),
+    g_sym(G), rowsig_col_freq(G, Freqs),
     Freqs = [[1,3,5]-2, [2,4,6]-1].
 
-% rs_modal_row: most frequent row; largest row wins on tie.
-test(modal_row_1) :- g_dr(G), rs_modal_row(G, Row), Row = [1,2].
-test(modal_row_2) :- g3(G), rs_modal_row(G, Row), Row = [7,8,9].
-test(modal_row_3) :- g_all(G), rs_modal_row(G, Row), Row = [1,2].
+% rowsig_modal_row: most frequent row; largest row wins on tie.
+test(modal_row_1) :- g_dr(G), rowsig_modal_row(G, Row), Row = [1,2].
+test(modal_row_2) :- g3(G), rowsig_modal_row(G, Row), Row = [7,8,9].
+test(modal_row_3) :- g_all(G), rowsig_modal_row(G, Row), Row = [1,2].
 
-% rs_modal_col: most frequent column list; largest column wins on tie.
-test(modal_col_1) :- g_dc(G), rs_modal_col(G, Col), Col = [1,2,5].
-test(modal_col_2) :- g3(G), rs_modal_col(G, Col), Col = [3,6,9].
-test(modal_col_3) :- g_sym(G), rs_modal_col(G, Col), Col = [1,3,5].
+% rowsig_modal_col: most frequent column list; largest column wins on tie.
+test(modal_col_1) :- g_dc(G), rowsig_modal_col(G, Col), Col = [1,2,5].
+test(modal_col_2) :- g3(G), rowsig_modal_col(G, Col), Col = [3,6,9].
+test(modal_col_3) :- g_sym(G), rowsig_modal_col(G, Col), Col = [1,3,5].
 
-% rs_uniq_rows: rows that appear exactly once.
-test(uniq_rows_1) :- g_dr(G), rs_uniq_rows(G, Pairs), Pairs = [1-[3,4]].
-test(uniq_rows_2) :- g3(G), rs_uniq_rows(G, Pairs), length(Pairs, 3).
-test(uniq_rows_3) :- g_all(G), rs_uniq_rows(G, Pairs), Pairs = [].
+% rowsig_uniq_rows: rows that appear exactly once.
+test(uniq_rows_1) :- g_dr(G), rowsig_uniq_rows(G, Pairs), Pairs = [1-[3,4]].
+test(uniq_rows_2) :- g3(G), rowsig_uniq_rows(G, Pairs), length(Pairs, 3).
+test(uniq_rows_3) :- g_all(G), rowsig_uniq_rows(G, Pairs), Pairs = [].
 
-% rs_uniq_cols: columns that appear exactly once.
-test(uniq_cols_1) :- g_dc(G), rs_uniq_cols(G, Pairs), Pairs = [1-[3,4,6]].
-test(uniq_cols_2) :- g3(G), rs_uniq_cols(G, Pairs), length(Pairs, 3).
-test(uniq_cols_3) :- g_sym(G), rs_uniq_cols(G, Pairs), Pairs = [1-[2,4,6]].
+% rowsig_uniq_cols: columns that appear exactly once.
+test(uniq_cols_1) :- g_dc(G), rowsig_uniq_cols(G, Pairs), Pairs = [1-[3,4,6]].
+test(uniq_cols_2) :- g3(G), rowsig_uniq_cols(G, Pairs), length(Pairs, 3).
+test(uniq_cols_3) :- g_sym(G), rowsig_uniq_cols(G, Pairs), Pairs = [1-[2,4,6]].
 
-% rs_dup_row_pairs: ordered index pairs of equal rows.
-test(dup_row_pairs_1) :- g_dr(G), rs_dup_row_pairs(G, Pairs), Pairs = [0-2].
-test(dup_row_pairs_2) :- g3(G), rs_dup_row_pairs(G, Pairs), Pairs = [].
-test(dup_row_pairs_3) :- g_all(G), rs_dup_row_pairs(G, Pairs), Pairs = [0-1,0-2,1-2].
+% rowsig_dup_row_pairs: ordered index pairs of equal rows.
+test(dup_row_pairs_1) :- g_dr(G), rowsig_dup_row_pairs(G, Pairs), Pairs = [0-2].
+test(dup_row_pairs_2) :- g3(G), rowsig_dup_row_pairs(G, Pairs), Pairs = [].
+test(dup_row_pairs_3) :- g_all(G), rowsig_dup_row_pairs(G, Pairs), Pairs = [0-1,0-2,1-2].
 
-% rs_dup_col_pairs: ordered index pairs of equal columns.
-test(dup_col_pairs_1) :- g_dc(G), rs_dup_col_pairs(G, Pairs), Pairs = [0-2].
-test(dup_col_pairs_2) :- g3(G), rs_dup_col_pairs(G, Pairs), Pairs = [].
-test(dup_col_pairs_3) :- g_sym(G), rs_dup_col_pairs(G, Pairs), Pairs = [0-2].
+% rowsig_dup_col_pairs: ordered index pairs of equal columns.
+test(dup_col_pairs_1) :- g_dc(G), rowsig_dup_col_pairs(G, Pairs), Pairs = [0-2].
+test(dup_col_pairs_2) :- g3(G), rowsig_dup_col_pairs(G, Pairs), Pairs = [].
+test(dup_col_pairs_3) :- g_sym(G), rowsig_dup_col_pairs(G, Pairs), Pairs = [0-2].
 
-% rs_row_palindrome: row reads same left-to-right and right-to-left.
-test(row_palindrome_1) :- g_pr(G), rs_row_palindrome(G, 0).
-test(row_palindrome_2) :- g_pr(G), rs_row_palindrome(G, 2).
-test(row_palindrome_3, [fail]) :- g_pr(G), rs_row_palindrome(G, 1).
-test(row_palindrome_4) :- g_1(G), rs_row_palindrome(G, 0).
+% rowsig_row_palindrome: row reads same left-to-right and right-to-left.
+test(row_palindrome_1) :- g_pr(G), rowsig_row_palindrome(G, 0).
+test(row_palindrome_2) :- g_pr(G), rowsig_row_palindrome(G, 2).
+test(row_palindrome_3, [fail]) :- g_pr(G), rowsig_row_palindrome(G, 1).
+test(row_palindrome_4) :- g_1(G), rowsig_row_palindrome(G, 0).
 
-% rs_col_palindrome: column reads same top-to-bottom and bottom-to-top.
-test(col_palindrome_1) :- g_pc(G), rs_col_palindrome(G, 0).
-test(col_palindrome_2, [fail]) :- g_pc(G), rs_col_palindrome(G, 1).
-test(col_palindrome_3) :- G = [[3,5],[4,6],[3,7]], rs_col_palindrome(G, 0).
-test(col_palindrome_4, [fail]) :- g3(G), rs_col_palindrome(G, 0).
+% rowsig_col_palindrome: column reads same top-to-bottom and bottom-to-top.
+test(col_palindrome_1) :- g_pc(G), rowsig_col_palindrome(G, 0).
+test(col_palindrome_2, [fail]) :- g_pc(G), rowsig_col_palindrome(G, 1).
+test(col_palindrome_3) :- G = [[3,5],[4,6],[3,7]], rowsig_col_palindrome(G, 0).
+test(col_palindrome_4, [fail]) :- g3(G), rowsig_col_palindrome(G, 0).
 
-% rs_rows_anagram: rows have same value multiset.
-test(rows_anagram_1) :- g_an(G), rs_rows_anagram(G, 0, 1).
-test(rows_anagram_2, [fail]) :- g_an(G), rs_rows_anagram(G, 0, 2).
-test(rows_anagram_3) :- g3(G), rs_rows_anagram(G, 0, 0).
-test(rows_anagram_4, [fail]) :- g3(G), rs_rows_anagram(G, 0, 1).
+% rowsig_rows_anagram: rows have same value multiset.
+test(rows_anagram_1) :- g_an(G), rowsig_rows_anagram(G, 0, 1).
+test(rows_anagram_2, [fail]) :- g_an(G), rowsig_rows_anagram(G, 0, 2).
+test(rows_anagram_3) :- g3(G), rowsig_rows_anagram(G, 0, 0).
+test(rows_anagram_4, [fail]) :- g3(G), rowsig_rows_anagram(G, 0, 1).
 
-% rs_cols_anagram: columns have same value multiset.
-test(cols_anagram_1) :- g_ac(G), rs_cols_anagram(G, 0, 1).
-test(cols_anagram_2, [fail]) :- g3(G), rs_cols_anagram(G, 0, 1).
-test(cols_anagram_3) :- g_dc(G), rs_cols_anagram(G, 0, 2).
-test(cols_anagram_4) :- g3(G), rs_cols_anagram(G, 0, 0).
+% rowsig_cols_anagram: columns have same value multiset.
+test(cols_anagram_1) :- g_ac(G), rowsig_cols_anagram(G, 0, 1).
+test(cols_anagram_2, [fail]) :- g3(G), rowsig_cols_anagram(G, 0, 1).
+test(cols_anagram_3) :- g_dc(G), rowsig_cols_anagram(G, 0, 2).
+test(cols_anagram_4) :- g3(G), rowsig_cols_anagram(G, 0, 0).
 
 :- end_tests(rowsig).

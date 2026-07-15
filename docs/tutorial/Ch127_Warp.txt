@@ -11,51 +11,51 @@ and so on. This creates a staircase or parallelogram effect.
 
 Shifting a Single Row or Column
 
-wr_shift_row(+Grid, +R, +N, +Bg, -Out): shift row R right by N cells.
+warp_shift_row(+Grid, +R, +N, +Bg, -Out): shift row R right by N cells.
 Positive N shifts right; negative N shifts left. Vacated cells fill with Bg.
 
-    wr_shift_row([[1,2,3],[4,5,6]], 0, 1, 0, Out).
+    warp_shift_row([[1,2,3],[4,5,6]], 0, 1, 0, Out).
     % Out = [[0,1,2],[4,5,6]]
 
-    wr_shift_row([[1,2,3],[4,5,6]], 0, -1, 0, Out).
+    warp_shift_row([[1,2,3],[4,5,6]], 0, -1, 0, Out).
     % Out = [[2,3,0],[4,5,6]]
 
-wr_shift_col(+Grid, +C, +N, +Bg, -Out): shift column C down by N cells.
+warp_shift_col(+Grid, +C, +N, +Bg, -Out): shift column C down by N cells.
 
-    wr_shift_col([[1,2],[3,4],[5,6]], 0, 1, 0, Out).
+    warp_shift_col([[1,2],[3,4],[5,6]], 0, 1, 0, Out).
     % Out = [[0,2],[1,4],[3,6]]
 
 
 Horizontal Shear
 
-wr_shear_h(+Grid, +Step, +Bg, -Out): row I shifts right by I*Step. Row 0 unchanged.
+warp_shear_h(+Grid, +Step, +Bg, -Out): row I shifts right by I*Step. Row 0 unchanged.
 
-    wr_shear_h([[a,b,c],[d,e,f],[g,h,i]], 1, 0, Out).
+    warp_shear_h([[a,b,c],[d,e,f],[g,h,i]], 1, 0, Out).
     % Out = [[a,b,c],[0,d,e],[0,0,g]]
 
-    wr_shear_h([[a,b,c],[d,e,f],[g,h,i]], -1, 0, Out).
+    warp_shear_h([[a,b,c],[d,e,f],[g,h,i]], -1, 0, Out).
     % Out = [[a,b,c],[e,f,0],[i,0,0]]
 
 Step=0 is identity. Step>0 creates a rightward staircase; Step<0 leftward.
 
-wr_unshear_h(+Grid, +Step, +Bg, -Out): undo horizontal shear; row I shifts left by
-I*Step. Is the perfect inverse of wr_shear_h when no content was lost to clipping.
+warp_unshear_h(+Grid, +Step, +Bg, -Out): undo horizontal shear; row I shifts left by
+I*Step. Is the perfect inverse of warp_shear_h when no content was lost to clipping.
 
     Grid = [[a,b,c,0],[d,e,0,0],[g,0,0,0]].
-    wr_shear_h(Grid, 1, 0, Sh).
+    warp_shear_h(Grid, 1, 0, Sh).
     % Sh = [[a,b,c,0],[0,d,e,0],[0,0,g,0]]
-    wr_unshear_h(Sh, 1, 0, Back).
+    warp_unshear_h(Sh, 1, 0, Back).
     % Back = [[a,b,c,0],[d,e,0,0],[g,0,0,0]] = Grid
 
 
 Vertical Shear
 
-wr_shear_v(+Grid, +Step, +Bg, -Out): column J shifts down by J*Step. Column 0 unchanged.
+warp_shear_v(+Grid, +Step, +Bg, -Out): column J shifts down by J*Step. Column 0 unchanged.
 
-    wr_shear_v([[a,b,c],[d,e,f],[g,h,i]], 1, 0, Out).
+    warp_shear_v([[a,b,c],[d,e,f],[g,h,i]], 1, 0, Out).
     % Out = [[a,0,0],[d,b,0],[g,e,c]]
 
-wr_unshear_v(+Grid, +Step, +Bg, -Out): undo vertical shear; column J shifts up by
+warp_unshear_v(+Grid, +Step, +Bg, -Out): undo vertical shear; column J shifts up by
 J*Step.
 
 
@@ -63,16 +63,16 @@ Cyclic (Toroidal) Shifts
 
 Cyclic predicates wrap values around the grid edges; no fill color is needed.
 
-wr_cyclic_h(+Grid, +N, -Out): all rows shift right by N cyclically.
+warp_cyclic_h(+Grid, +N, -Out): all rows shift right by N cyclically.
 
-    wr_cyclic_h([[1,2,3],[4,5,6]], 1, Out).
+    warp_cyclic_h([[1,2,3],[4,5,6]], 1, Out).
     % Out = [[3,1,2],[6,4,5]]
 
 Shifting by W (row width) returns the original. Negative N shifts left.
 
-wr_cyclic_v(+Grid, +N, -Out): all columns shift down by N cyclically.
+warp_cyclic_v(+Grid, +N, -Out): all columns shift down by N cyclically.
 
-    wr_cyclic_v([[1,2],[3,4],[5,6]], 1, Out).
+    warp_cyclic_v([[1,2],[3,4],[5,6]], 1, Out).
     % Out = [[5,6],[1,2],[3,4]]
 
 Shifting by H (row count) returns the original.
@@ -80,58 +80,58 @@ Shifting by H (row count) returns the original.
 
 Cyclic Shear
 
-wr_cyclic_shear_h(+Grid, +Step, -Out): row I wraps right by I*Step.
+warp_cyclic_shear_h(+Grid, +Step, -Out): row I wraps right by I*Step.
 
-    wr_cyclic_shear_h([[1,2,3],[4,5,6],[7,8,9]], 1, Out).
+    warp_cyclic_shear_h([[1,2,3],[4,5,6],[7,8,9]], 1, Out).
     % Out = [[1,2,3],[6,4,5],[8,9,7]]
 
-wr_cyclic_shear_v(+Grid, +Step, -Out): column J wraps down by J*Step.
+warp_cyclic_shear_v(+Grid, +Step, -Out): column J wraps down by J*Step.
 
-    wr_cyclic_shear_v([[1,2,3],[4,5,6],[7,8,9]], 1, Out).
+    warp_cyclic_shear_v([[1,2,3],[4,5,6],[7,8,9]], 1, Out).
     % Out = [[1,8,6],[4,2,9],[7,5,3]]
 
 
 Per-Row Arbitrary Offsets
 
-wr_skew_offsets(+Grid, +Offsets, +Bg, -Out): row I shifts right by Offsets[I].
-Offsets must have the same length as Grid. This generalizes wr_shear_h.
+warp_skew_offsets(+Grid, +Offsets, +Bg, -Out): row I shifts right by Offsets[I].
+Offsets must have the same length as Grid. This generalizes warp_shear_h.
 
-    wr_skew_offsets([[a,b,c],[d,e,f],[g,h,i]], [0,1,2], 0, Out).
+    warp_skew_offsets([[a,b,c],[d,e,f],[g,h,i]], [0,1,2], 0, Out).
     % Out = [[a,b,c],[0,d,e],[0,0,g]]  (same as shear_h step=1)
 
-    wr_skew_offsets([[a,b,c],[d,e,f]], [0,-1], 0, Out).
+    warp_skew_offsets([[a,b,c],[d,e,f]], [0,-1], 0, Out).
     % Out = [[a,b,c],[e,f,0]]
 
 
 Anti-Diagonal Transpose
 
-wr_transpose_anti(+Grid, -Out): reflects across the anti-diagonal.
+warp_transpose_anti(+Grid, -Out): reflects across the anti-diagonal.
 Formula: Out[W-1-C][H-1-R] = Grid[R][C]. Out has W rows and H columns.
 
-    wr_transpose_anti([[a,b],[c,d]], Out).
+    warp_transpose_anti([[a,b],[c,d]], Out).
     % Out = [[d,b],[c,a]]
 
-    wr_transpose_anti([[1,2,3],[4,5,6],[7,8,9]], Out).
+    warp_transpose_anti([[1,2,3],[4,5,6],[7,8,9]], Out).
     % Out = [[9,6,3],[8,5,2],[7,4,1]]
 
 For square grids, applying anti-diagonal transpose twice returns the original.
 For a 2x3 grid (H=2, W=3), the result is a 3x2 grid:
 
-    wr_transpose_anti([[a,b,c],[d,e,f]], Out).
+    warp_transpose_anti([[a,b,c],[d,e,f]], Out).
     % Out = [[f,c],[e,b],[d,a]]
 
 
 Finding Shear Relationships
 
-wr_find_shear_h(+GridA, +GridB, +Bg, -Step): find the shear step mapping A to B.
-Returns the first Step in [-(W-1), W-1] such that wr_shear_h(A, Step, Bg) = B.
+warp_find_shear_h(+GridA, +GridB, +Bg, -Step): find the shear step mapping A to B.
+Returns the first Step in [-(W-1), W-1] such that warp_shear_h(A, Step, Bg) = B.
 
     Grid = [[1,2,3],[4,5,6],[7,8,9]],
-    wr_shear_h(Grid, 1, 0, Sh),
-    wr_find_shear_h(Grid, Sh, 0, Step).
+    warp_shear_h(Grid, 1, 0, Sh),
+    warp_find_shear_h(Grid, Sh, 0, Step).
     % Step = 1
 
-wr_find_shear_v(+GridA, +GridB, +Bg, -Step): find the vertical shear step.
+warp_find_shear_v(+GridA, +GridB, +Bg, -Step): find the vertical shear step.
 
 
 Library Requirements

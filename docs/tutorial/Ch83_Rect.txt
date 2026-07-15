@@ -20,163 +20,163 @@ whether a region is uniformly filled.
 
 83.2 Cell Enumeration
 
-rt_cells(+R1, +C1, +R2, +C2, -Cells) lists all cells in the solid rectangle
+rect_cells(+R1, +C1, +R2, +C2, -Cells) lists all cells in the solid rectangle
 with top-left corner (R1,C1) and bottom-right corner (R2,C2). Cells are returned
 in row-major order.
 
 Example:
 
-?- rt_cells(0, 0, 2, 2, Cells).
+?- rect_cells(0, 0, 2, 2, Cells).
 Cells = [0-0,0-1,0-2,1-0,1-1,1-2,2-0,2-1,2-2]
 
-?- rt_cells(1, 1, 1, 1, Cells).
+?- rect_cells(1, 1, 1, 1, Cells).
 Cells = [1-1]
 
-rt_border(+R1, +C1, +R2, +C2, -Cells) lists only the frame cells: top row,
+rect_border(+R1, +C1, +R2, +C2, -Cells) lists only the frame cells: top row,
 bottom row, left column, and right column (excluding the corners already in the
 top and bottom rows). Cells are sorted in row-major order.
 
 Example:
 
-?- rt_border(0, 0, 2, 2, Cells).
+?- rect_border(0, 0, 2, 2, Cells).
 Cells = [0-0,0-1,0-2,1-0,1-2,2-0,2-1,2-2]
 
-rt_interior(+R1, +C1, +R2, +C2, -Cells) lists cells strictly inside the frame.
+rect_interior(+R1, +C1, +R2, +C2, -Cells) lists cells strictly inside the frame.
 Requires at least 3 rows and 3 columns; for thinner rectangles Cells = [].
 
 Example:
 
-?- rt_interior(0, 0, 2, 2, Cells).
+?- rect_interior(0, 0, 2, 2, Cells).
 Cells = [1-1]
 
-?- rt_interior(0, 0, 1, 1, Cells).
+?- rect_interior(0, 0, 1, 1, Cells).
 Cells = []
 
 
 83.3 Grid Drawing
 
-rt_draw(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) fills the solid rectangle
+rect_draw(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) fills the solid rectangle
 with Color.
 
-rt_draw_border(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) draws only the frame.
+rect_draw_border(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) draws only the frame.
 
-rt_draw_interior(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) fills only the
+rect_draw_interior(+Grid, +R1, +C1, +R2, +C2, +Color, -Result) fills only the
 interior. If the rectangle has no interior, Result = Grid unchanged.
 
 Example:
 
 ?- Grid = [[0,0,0],[0,0,0],[0,0,0]],
-   rt_draw_border(Grid, 0, 0, 2, 2, 1, Result).
+   rect_draw_border(Grid, 0, 0, 2, 2, 1, Result).
 Result = [[1,1,1],[1,0,1],[1,1,1]]
 
 ?- Grid = [[1,1,1],[1,0,1],[1,1,1]],
-   rt_draw_interior(Grid, 0, 0, 2, 2, 9, Result).
+   rect_draw_interior(Grid, 0, 0, 2, 2, 9, Result).
 Result = [[1,1,1],[1,9,1],[1,1,1]]
 
 
 83.4 Area
 
-rt_area(+R1, +C1, +R2, +C2, -Area) computes the number of cells in the
+rect_area(+R1, +C1, +R2, +C2, -Area) computes the number of cells in the
 rectangle as (R2 - R1 + 1) * (C2 - C1 + 1).
 
 Example:
 
-?- rt_area(0, 0, 2, 2, Area).
+?- rect_area(0, 0, 2, 2, Area).
 Area = 9
 
-?- rt_area(0, 0, 1, 3, Area).
+?- rect_area(0, 0, 1, 3, Area).
 Area = 8
 
 
 83.5 Containment
 
-rt_contains(+R1, +C1, +R2, +C2, +R, +C) succeeds if cell (R,C) lies within
+rect_contains(+R1, +C1, +R2, +C2, +R, +C) succeeds if cell (R,C) lies within
 the rectangle. Inclusion is inclusive on all four sides.
 
 Example:
 
-?- rt_contains(0, 0, 2, 2, 1, 1).
+?- rect_contains(0, 0, 2, 2, 1, 1).
 true.
 
-?- rt_contains(0, 0, 2, 2, 0, 0).
+?- rect_contains(0, 0, 2, 2, 0, 0).
 true.
 
-?- rt_contains(0, 0, 2, 2, 3, 1).
+?- rect_contains(0, 0, 2, 2, 3, 1).
 false.
 
 
 83.6 Corners
 
-rt_corners(+R1, +C1, +R2, +C2, -Corners) returns a list of four corner cells
+rect_corners(+R1, +C1, +R2, +C2, -Corners) returns a list of four corner cells
 in top-left, top-right, bottom-left, bottom-right order.
 
 Example:
 
-?- rt_corners(0, 0, 2, 3, Corners).
+?- rect_corners(0, 0, 2, 3, Corners).
 Corners = [0-0, 0-3, 2-0, 2-3].
 
-?- rt_corners(1, 1, 1, 1, Corners).
+?- rect_corners(1, 1, 1, 1, Corners).
 Corners = [1-1, 1-1, 1-1, 1-1].
 
 
 83.7 Bounding Box
 
-rt_bbox(+Cells, -MinR, -MinC, -MaxR, -MaxC) computes the bounding box of a
-non-empty list of R-C cells. Cells need not form a rectangle; rt_bbox works on
+rect_bbox(+Cells, -MinR, -MinC, -MaxR, -MaxC) computes the bounding box of a
+non-empty list of R-C cells. Cells need not form a rectangle; rect_bbox works on
 any non-empty cell list.
 
 Example:
 
-?- rt_bbox([0-0, 1-2, 3-1], MinR, MinC, MaxR, MaxC).
+?- rect_bbox([0-0, 1-2, 3-1], MinR, MinC, MaxR, MaxC).
 MinR = 0, MinC = 0, MaxR = 3, MaxC = 2.
 
-?- rt_bbox([2-3], MinR, MinC, MaxR, MaxC).
+?- rect_bbox([2-3], MinR, MinC, MaxR, MaxC).
 MinR = 2, MinC = 3, MaxR = 2, MaxC = 3.
 
 
 83.8 Color Tests
 
-rt_is_solid(+Grid, +R1, +C1, +R2, +C2, -Color) succeeds if every cell in the
+rect_is_solid(+Grid, +R1, +C1, +R2, +C2, -Color) succeeds if every cell in the
 rectangle has the same color. Color is unified with the value of the first cell.
 
 Example:
 
-?- rt_is_solid([[5,5,5],[5,5,5],[5,5,5]], 0, 0, 2, 2, Color).
+?- rect_is_solid([[5,5,5],[5,5,5],[5,5,5]], 0, 0, 2, 2, Color).
 Color = 5.
 
-?- rt_is_solid([[5,5,5],[5,3,5],[5,5,5]], 0, 0, 2, 2, _).
+?- rect_is_solid([[5,5,5],[5,3,5],[5,5,5]], 0, 0, 2, 2, _).
 false.
 
-rt_is_frame(+Grid, +R1, +C1, +R2, +C2, -Color) succeeds if every border cell
+rect_is_frame(+Grid, +R1, +C1, +R2, +C2, -Color) succeeds if every border cell
 of the rectangle has the same color. It does not constrain the interior.
 
 Example:
 
-?- rt_is_frame([[1,1,1],[1,0,1],[1,1,1]], 0, 0, 2, 2, Color).
+?- rect_is_frame([[1,1,1],[1,0,1],[1,1,1]], 0, 0, 2, 2, Color).
 Color = 1.
 
 
 83.9 Overlap
 
-rt_overlap(+R1a, +C1a, +R2a, +C2a, +R1b, +C1b, +R2b, +C2b) succeeds if two
+rect_overlap(+R1a, +C1a, +R2a, +C2a, +R1b, +C1b, +R2b, +C2b) succeeds if two
 rectangles share at least one cell. The test uses interval arithmetic: the row
 intervals must overlap and the column intervals must overlap.
 
 Example:
 
-?- rt_overlap(0, 0, 2, 2, 1, 1, 3, 3).
+?- rect_overlap(0, 0, 2, 2, 1, 1, 3, 3).
 true.
 
-?- rt_overlap(0, 0, 4, 4, 1, 1, 3, 3).
+?- rect_overlap(0, 0, 4, 4, 1, 1, 3, 3).
 true.
 
-?- rt_overlap(0, 0, 1, 1, 2, 2, 3, 3).
+?- rect_overlap(0, 0, 1, 1, 2, 2, 3, 3).
 false.
 
 
 83.10 Scaling
 
-rt_scale(+R1, +C1, +R2, +C2, +Factor, -R2New, -C2New) scales the rectangle by
+rect_scale(+R1, +C1, +R2, +C2, +Factor, -R2New, -C2New) scales the rectangle by
 an integer Factor from its top-left corner. The top-left stays fixed at (R1,C1).
 The new bottom-right is:
   R2New = R1 + (R2 - R1) * Factor
@@ -184,23 +184,23 @@ The new bottom-right is:
 
 Example:
 
-?- rt_scale(0, 0, 2, 2, 2, R2, C2).
+?- rect_scale(0, 0, 2, 2, 2, R2, C2).
 R2 = 4, C2 = 4.
 
-?- rt_scale(1, 1, 2, 3, 3, R2, C2).
+?- rect_scale(1, 1, 2, 3, 3, R2, C2).
 R2 = 4, C2 = 7.
 
 
 83.11 Implementation Notes
 
-Determinism is maintained throughout. rt_cells uses maplist/4 (three levels of
+Determinism is maintained throughout. rect_cells uses maplist/4 (three levels of
 mapping) with unification lambdas [C, RC]>>(RC = R-C) to avoid the false
-choicepoints that arise from [C, R-C]>>true. rt_border uses if-then-else guards
-for each of its four sides and sort/2 to produce canonical output. rt_interior
-uses a single if-then-else. rt_fill_cells_ uses if-then-else for its base vs.
-recursive case. rt_replace_nth_ and rt_set_cell_ use cuts on their base cases.
+choicepoints that arise from [C, R-C]>>true. rect_border uses if-then-else guards
+for each of its four sides and sort/2 to produce canonical output. rect_interior
+uses a single if-then-else. rect_fill_cells_ uses if-then-else for its base vs.
+recursive case. rect_replace_nth_ and rect_set_cell_ use cuts on their base cases.
 
-The bounding box predicate rt_bbox uses unification lambdas [RC, R]>>(RC = R-_)
+The bounding box predicate rect_bbox uses unification lambdas [RC, R]>>(RC = R-_)
 to extract row indices because _ in a lambda body creates a fresh anonymous
 variable each call, making the extraction deterministic.
 

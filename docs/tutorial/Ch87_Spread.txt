@@ -33,9 +33,9 @@ Example: for Grid=[[0,0,1,0,0]] with Bg=0 and source at (0,0):
 - (0,3) and (0,4) are unreachable
 
 
-87.1 Single-Source Distance Map - sd_dist_map/5
+87.1 Single-Source Distance Map - spread_dist_map/5
 
-sd_dist_map(+Grid, +R, +C, +Bg, -DistMap)
+spread_dist_map(+Grid, +R, +C, +Bg, -DistMap)
 
 Run BFS from source cell (R,C) through Bg cells. DistMap is a list of Cell-D
 pairs giving the BFS distance D from (R,C) to every reachable Bg cell,
@@ -48,17 +48,17 @@ canonical ordering.
 
 Example:
 
-sd_dist_map([[0,0,0]], 0, 0, 0, DM),
+spread_dist_map([[0,0,0]], 0, 0, 0, DM),
 sort(DM, S).
 % S = [(0-0)-0, (0-1)-1, (0-2)-2]
 
-sd_dist_map([[0,1,0]], 0, 1, 0, DM).
+spread_dist_map([[0,1,0]], 0, 1, 0, DM).
 % DM = [] (source is not Bg)
 
 
-87.2 Multi-Source Distance Map - sd_dist_multi/4
+87.2 Multi-Source Distance Map - spread_dist_multi/4
 
-sd_dist_multi(+Grid, +Seeds, +Bg, -DistMap)
+spread_dist_multi(+Grid, +Seeds, +Bg, -DistMap)
 
 Run BFS simultaneously from all cells in Seeds. DistMap gives the minimum BFS
 distance from any seed to every reachable Bg cell. Non-Bg seeds are silently
@@ -68,57 +68,57 @@ contributes the recorded distance.
 
 Example:
 
-sd_dist_multi([[0,0,0,0]], [0-0, 0-3], 0, DM),
+spread_dist_multi([[0,0,0,0]], [0-0, 0-3], 0, DM),
 sort(DM, S).
 % S = [(0-0)-0, (0-1)-1, (0-2)-1, (0-3)-0]
 % Both ends are seeds; midpoints are equidistant at distance 1.
 
 
-87.3 Reachable Cells - sd_reachable/5
+87.3 Reachable Cells - spread_reachable/5
 
-sd_reachable(+Grid, +R, +C, +Bg, -Cells)
+spread_reachable(+Grid, +R, +C, +Bg, -Cells)
 
 All Bg cells reachable from (R,C) by 4-connected steps through Bg cells.
 Returns a sorted list of R-C cell coordinates.
 
 Example:
 
-sd_reachable([[0,0,0],[0,1,0],[0,0,0]], 0, 0, 0, Cells).
+spread_reachable([[0,0,0],[0,1,0],[0,0,0]], 0, 0, 0, Cells).
 % Cells = [0-0, 0-1, 0-2, 1-0, 1-2, 2-0, 2-1, 2-2]
 % (1-1) is a wall and is excluded.
 
 
-87.4 Shortest Path Distance - sd_path_dist/7
+87.4 Shortest Path Distance - spread_path_dist/7
 
-sd_path_dist(+Grid, +R1, +C1, +R2, +C2, +Bg, -D)
+spread_path_dist(+Grid, +R1, +C1, +R2, +C2, +Bg, -D)
 
 BFS shortest path distance from (R1,C1) to (R2,C2) through Bg cells. Fails if
 (R2,C2) is not reachable.
 
 Example:
 
-sd_path_dist([[0,0,0]], 0, 0, 0, 2, 0, D).
+spread_path_dist([[0,0,0]], 0, 0, 0, 2, 0, D).
 % D = 2
 
-sd_path_dist([[0,1,0]], 0, 0, 0, 2, 0, _).
+spread_path_dist([[0,1,0]], 0, 0, 0, 2, 0, _).
 % fails (wall at (0,1) blocks path)
 
 
-87.5 Reachability Test - sd_path_exists/6
+87.5 Reachability Test - spread_path_exists/6
 
-sd_path_exists(+Grid, +R1, +C1, +R2, +C2, +Bg)
+spread_path_exists(+Grid, +R1, +C1, +R2, +C2, +Bg)
 
 Succeed if (R2,C2) is reachable from (R1,C1) through Bg cells. Deterministic.
 
 Example:
 
-sd_path_exists([[0,0,0]], 0, 0, 0, 2, 0).    % succeeds
-\+ sd_path_exists([[0,1,0]], 0, 0, 0, 2, 0). % succeeds (path blocked)
+spread_path_exists([[0,0,0]], 0, 0, 0, 2, 0).    % succeeds
+\+ spread_path_exists([[0,1,0]], 0, 0, 0, 2, 0). % succeeds (path blocked)
 
 
-87.6 Ring at Exact Distance - sd_ring/6
+87.6 Ring at Exact Distance - spread_ring/6
 
-sd_ring(+Grid, +R, +C, +Bg, +D, -Cells)
+spread_ring(+Grid, +R, +C, +Bg, +D, -Cells)
 
 All Bg cells at exactly BFS distance D from (R,C). Returns a sorted list.
 Cells at distance 0 is just the source; cells at distance 1 are the immediate
@@ -126,61 +126,61 @@ Cells at distance 0 is just the source; cells at distance 1 are the immediate
 
 Example:
 
-sd_ring([[0,0,0],[0,0,0],[0,0,0]], 1, 1, 0, 1, Cells).
+spread_ring([[0,0,0],[0,0,0],[0,0,0]], 1, 1, 0, 1, Cells).
 % Cells = [0-1, 1-0, 1-2, 2-1]  (four orthogonal neighbors of center)
 
-sd_ring([[0,0,0],[0,0,0],[0,0,0]], 1, 1, 0, 2, Cells).
+spread_ring([[0,0,0],[0,0,0],[0,0,0]], 1, 1, 0, 2, Cells).
 % Cells = [0-0, 0-2, 2-0, 2-2]  (the four corners)
 
 
-87.7 Zone Within Distance - sd_zone/6
+87.7 Zone Within Distance - spread_zone/6
 
-sd_zone(+Grid, +R, +C, +Bg, +MaxD, -Cells)
+spread_zone(+Grid, +R, +C, +Bg, +MaxD, -Cells)
 
 All Bg cells at BFS distance at most MaxD from (R,C). Returns a sorted list.
-Equivalent to filtering sd_dist_map to D <= MaxD.
+Equivalent to filtering spread_dist_map to D <= MaxD.
 
 Example:
 
-sd_zone([[0,0,0]], 0, 0, 0, 1, Cells).
+spread_zone([[0,0,0]], 0, 0, 0, 1, Cells).
 % Cells = [0-0, 0-1]
 
-sd_zone([[0,0,0]], 0, 0, 0, 0, Cells).
+spread_zone([[0,0,0]], 0, 0, 0, 0, Cells).
 % Cells = [0-0]  (only the source itself)
 
 
-87.8 Distance to a Target Set - sd_dist_to_set/6
+87.8 Distance to a Target Set - spread_dist_to_set/6
 
-sd_dist_to_set(+Grid, +R, +C, +Targets, +Bg, -D)
+spread_dist_to_set(+Grid, +R, +C, +Targets, +Bg, -D)
 
 Minimum BFS distance from (R,C) to any cell in the list Targets through Bg
 cells. Fails if no target cell is reachable.
 
 Example:
 
-sd_dist_to_set([[0,0,0,0]], 0, 0, [0-2, 0-3], 0, D).
+spread_dist_to_set([[0,0,0,0]], 0, 0, [0-2, 0-3], 0, D).
 % D = 2  (0-2 is closer than 0-3)
 
 
-87.9 Farthest Reachable Cell - sd_farthest/5
+87.9 Farthest Reachable Cell - spread_farthest/5
 
-sd_farthest(+Grid, +R, +C, +Bg, -Cell)
+spread_farthest(+Grid, +R, +C, +Bg, -Cell)
 
 The Bg cell with the greatest BFS distance from (R,C). If multiple cells share
 the maximum distance the first in BFS traversal order is returned.
 
 Example:
 
-sd_farthest([[0,0,0]], 0, 0, 0, Cell).
+spread_farthest([[0,0,0]], 0, 0, 0, Cell).
 % Cell = 0-2
 
-sd_farthest([[0,0,0,0]], 0, 1, 0, Cell).
+spread_farthest([[0,0,0,0]], 0, 1, 0, Cell).
 % Cell = 0-3  (distance 2, vs 0-0 at distance 1)
 
 
-87.10 One BFS Expansion Step - sd_expand_once/5
+87.10 One BFS Expansion Step - spread_expand_once/5
 
-sd_expand_once(+Grid, +Frontier, +Visited, +Bg, -NextFrontier)
+spread_expand_once(+Grid, +Frontier, +Visited, +Bg, -NextFrontier)
 
 One BFS level expansion. Frontier is the current BFS level (a list of R-C
 cells). Returns the sorted, deduplicated list of Bg 4-neighbors of any cell in
@@ -191,16 +191,16 @@ control the expansion loop manually.
 
 Example:
 
-sd_expand_once([[0,0,0]], [0-0], [0-0], 0, Next).
+spread_expand_once([[0,0,0]], [0-0], [0-0], 0, Next).
 % Next = [0-1]
 
-sd_expand_once([[0,0],[0,0]], [0-0], [0-0], 0, Next).
+spread_expand_once([[0,0],[0,0]], [0-0], [0-0], 0, Next).
 % Next = [0-1, 1-0]  (two neighbors of the top-left corner)
 
 
-87.11 Spreading Color - sd_spread_color/5
+87.11 Spreading Color - spread_spread_color/5
 
-sd_spread_color(+Grid, +Color, +Bg, +MaxD, -Out)
+spread_spread_color(+Grid, +Color, +Bg, +MaxD, -Out)
 
 Spread Color cells outward through Bg cells up to MaxD BFS steps. All cells of
 value Color serve as simultaneous BFS seeds. Each Bg cell within MaxD steps of
@@ -209,30 +209,30 @@ all non-Bg, non-Color cells are unchanged.
 
 Example:
 
-sd_spread_color([[1,0,0,0]], 1, 0, 2, Out).
+spread_spread_color([[1,0,0,0]], 1, 0, 2, Out).
 % Out = [[1,1,1,0]]
 % Color 1 at (0,0) spreads to (0,1) and (0,2); (0,3) is beyond MaxD=2.
 
-sd_spread_color([[1,0,0]], 1, 0, 0, Out).
+spread_spread_color([[1,0,0]], 1, 0, 0, Out).
 % Out = [[1,0,0]]  (MaxD=0 means no spreading)
 
 
-87.12 Maximum BFS Distance - sd_max_dist/5
+87.12 Maximum BFS Distance - spread_max_dist/5
 
-sd_max_dist(+Grid, +R, +C, +Bg, -MaxD)
+spread_max_dist(+Grid, +R, +C, +Bg, -MaxD)
 
 The maximum BFS distance from (R,C) to any reachable Bg cell. Returns 0 when
 (R,C) is the only reachable cell (isolated source).
 
 Example:
 
-sd_max_dist([[0,0,0,0]], 0, 0, 0, MaxD).
+spread_max_dist([[0,0,0,0]], 0, 0, 0, MaxD).
 % MaxD = 3
 
 
-87.13 Distance Overlay - sd_fill_dist/5
+87.13 Distance Overlay - spread_fill_dist/5
 
-sd_fill_dist(+Grid, +R, +C, +Bg, -Out)
+spread_fill_dist(+Grid, +R, +C, +Bg, -Out)
 
 Overlay BFS distances onto the grid. Each Bg cell reachable from (R,C) is set
 to its BFS distance in the output. All other cells (non-Bg, or Bg but
@@ -240,17 +240,17 @@ unreachable) retain their original values.
 
 Example:
 
-sd_fill_dist([[0,0,0]], 0, 0, 0, Out).
+spread_fill_dist([[0,0,0]], 0, 0, 0, Out).
 % Out = [[0,1,2]]
 
-sd_fill_dist([[0,0,1,0]], 0, 0, 0, Out).
+spread_fill_dist([[0,0,1,0]], 0, 0, 0, Out).
 % Out = [[0,1,1,0]]
 % (0,0)=0, (0,1)=1, (0,2)=1 (wall, unchanged), (0,3)=0 (unreachable, unchanged)
 
 
-87.14 Voronoi Assignment - sd_voronoi/4
+87.14 Voronoi Assignment - spread_voronoi/4
 
-sd_voronoi(+Grid, +Seeds, +Bg, -Assignment)
+spread_voronoi(+Grid, +Seeds, +Bg, -Assignment)
 
 Voronoi assignment of Bg cells to the nearest seed. Seeds is a list of R-C
 cells; each valid (Bg) seed is assigned a 1-based index. Assignment is a list
@@ -261,11 +261,11 @@ before indexing.
 
 Example:
 
-sd_voronoi([[0,0,0]], [0-0, 0-2], 0, A), sort(A, S).
+spread_voronoi([[0,0,0]], [0-0, 0-2], 0, A), sort(A, S).
 % S = [(0-0)-1, (0-1)-1, (0-2)-2]
 % (0-1) is equidistant from both seeds; seed 1 (lower index) wins.
 
-sd_voronoi([[0,1,0]], [0-0, 0-1, 0-2], 0, A), sort(A, S).
+spread_voronoi([[0,1,0]], [0-0, 0-1, 0-2], 0, A), sort(A, S).
 % S = [(0-0)-1, (0-2)-2]
 % (0-1) is filtered out as non-Bg; indices go to the remaining seeds only.
 
@@ -275,48 +275,48 @@ sd_voronoi([[0,1,0]], [0-0, 0-1, 0-2], 0, A), sort(A, S).
 Checking if two cells are connected through a color region:
 
 connected_in_color(Grid, R1-C1, R2-C2, Color) :-
-    sd_path_exists(Grid, R1, C1, R2, C2, Color).
+    spread_path_exists(Grid, R1, C1, R2, C2, Color).
 
 Finding the diameter (longest shortest path) of a color region:
 
 region_diameter(Grid, Bg, Diameter) :-
-    sd_reachable(Grid, 0, 0, Bg, Cells),
+    spread_reachable(Grid, 0, 0, Bg, Cells),
     Cells \= [],
     Cells = [SR-SC|_],
-    sd_max_dist(Grid, SR, SC, Bg, D1),
-    sd_farthest(Grid, SR, SC, Bg, FR-FC),
-    sd_max_dist(Grid, FR, FC, Bg, Diameter),
+    spread_max_dist(Grid, SR, SC, Bg, D1),
+    spread_farthest(Grid, SR, SC, Bg, FR-FC),
+    spread_max_dist(Grid, FR, FC, Bg, Diameter),
     Diameter >= D1.
 
 Expanding a color region exactly one BFS step:
 
 expand_color_one_step(Grid, Color, Bg, Out) :-
-    sd_spread_color(Grid, Color, Bg, 1, Out).
+    spread_spread_color(Grid, Color, Bg, 1, Out).
 
 Finding cells that can "see" a target in 4-directions within N steps:
 
 within_n_steps(Grid, TargetR, TargetC, Bg, N, Cells) :-
-    sd_zone(Grid, TargetR, TargetC, Bg, N, Cells).
+    spread_zone(Grid, TargetR, TargetC, Bg, N, Cells).
 
 
 87.16 Summary
 
 The spread pack provides a complete BFS vocabulary for grid reasoning:
 
-- sd_dist_map      - single-source BFS distance map
-- sd_dist_multi    - multi-source BFS distance map (minimum distances)
-- sd_reachable     - all Bg cells reachable from a source
-- sd_path_dist     - BFS shortest path distance between two cells
-- sd_path_exists   - reachability test between two cells
-- sd_ring          - cells at exactly BFS distance D
-- sd_zone          - cells within BFS distance MaxD
-- sd_dist_to_set   - minimum distance from source to any target set
-- sd_farthest      - farthest reachable cell
-- sd_expand_once   - one BFS level expansion step
-- sd_spread_color  - spread a color outward through background cells
-- sd_max_dist      - maximum BFS distance to any reachable cell
-- sd_fill_dist     - grid with BFS distances overlaid
-- sd_voronoi       - Voronoi cell-to-seed assignment
+- spread_dist_map      - single-source BFS distance map
+- spread_dist_multi    - multi-source BFS distance map (minimum distances)
+- spread_reachable     - all Bg cells reachable from a source
+- spread_path_dist     - BFS shortest path distance between two cells
+- spread_path_exists   - reachability test between two cells
+- spread_ring          - cells at exactly BFS distance D
+- spread_zone          - cells within BFS distance MaxD
+- spread_dist_to_set   - minimum distance from source to any target set
+- spread_farthest      - farthest reachable cell
+- spread_expand_once   - one BFS level expansion step
+- spread_spread_color  - spread a color outward through background cells
+- spread_max_dist      - maximum BFS distance to any reachable cell
+- spread_fill_dist     - grid with BFS distances overlaid
+- spread_voronoi       - Voronoi cell-to-seed assignment
 
 All predicates are deterministic. BFS traverses only 4-adjacent Bg cells.
 

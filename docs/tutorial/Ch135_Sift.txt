@@ -58,7 +58,7 @@ si_smaller_than(+Objs, +N, -Out): keep objs with strictly fewer than N cells.
 Extreme Size Filters
 
 These return ALL objects tied for the extreme value, unlike the query pack's
-qu_largest_obj and qu_smallest_obj which return only the first tied object.
+query_largest_obj and query_smallest_obj which return only the first tied object.
 
 si_max_size(+Objs, -Out): keep all objs with the maximum cell count.
 
@@ -134,8 +134,8 @@ All predicates use findall for filtering. This:
   - Returns [] when no objects match (not failure)
   - Is deterministic
 
-si_max_size vs qu_largest_obj: sift returns ALL tied objects because the use case
-for filtering is "give me all the biggest ones." The query pack's qu_largest_obj
+si_max_size vs query_largest_obj: sift returns ALL tied objects because the use case
+for filtering is "give me all the biggest ones." The query pack's query_largest_obj
 exists for the "give me one representative" use case.
 
 Library imports: library(lists): member/2, memberchk/2, min_list/2, max_list/2.

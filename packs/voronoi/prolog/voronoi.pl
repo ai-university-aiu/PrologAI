@@ -6,45 +6,45 @@
 % equidistant boundary cells (Voronoi edges); and expand color regions by N steps.
 % All predicates treat the background as a distinguished value passed as Bg.
 :- module(voronoi, [
-    vn_non_bg_cells/3,
-    vn_non_bg_colors/3,
-    vn_nearest_dist/5,
-    vn_nearest_color/5,
-    vn_paint_bg/3,
-    vn_dist_map/3,
-    vn_region_cells/4,
-    vn_regions/3,
-    vn_max_dist/3,
-    vn_at_dist/4,
-    vn_within_dist/4,
-    vn_medial/3,
-    vn_expand1/4,
-    vn_expand_n/5
+    voronoi_non_bg_cells/3,
+    voronoi_non_bg_colors/3,
+    voronoi_nearest_dist/5,
+    voronoi_nearest_color/5,
+    voronoi_paint_bg/3,
+    voronoi_dist_map/3,
+    voronoi_region_cells/4,
+    voronoi_regions/3,
+    voronoi_max_dist/3,
+    voronoi_at_dist/4,
+    voronoi_within_dist/4,
+    voronoi_medial/3,
+    voronoi_expand1/4,
+    voronoi_expand_n/5
 ]).
 % member/2, nth0/3, min_list/2, max_list/2, append/3 from library(lists).
 :- use_module(library(lists), [member/2, nth0/3, min_list/2, max_list/2, append/3]).
 
-% vn_non_bg_cells(+Grid, +Bg, -Cells): sorted list of r(R,C) positions whose
+% voronoi_non_bg_cells(+Grid, +Bg, -Cells): sorted list of r(R,C) positions whose
 % value differs from Bg. These are the "sources" for nearest-color computations.
-vn_non_bg_cells(Grid, Bg, Cells) :-
+voronoi_non_bg_cells(Grid, Bg, Cells) :-
 % Collect every grid cell whose value is not the background.
     findall(r(R,C),
             (nth0(R, Grid, Row), nth0(C, Row, V), V \= Bg),
             Raw),
     sort(Raw, Cells).
 
-% vn_non_bg_colors(+Grid, +Bg, -Colors): sorted list of distinct values in Grid
+% voronoi_non_bg_colors(+Grid, +Bg, -Colors): sorted list of distinct values in Grid
 % that are not equal to Bg.
-vn_non_bg_colors(Grid, Bg, Colors) :-
+voronoi_non_bg_colors(Grid, Bg, Colors) :-
 % Gather all non-Bg values and deduplicate.
     findall(V,
             (nth0(_, Grid, Row), nth0(_, Row, V), V \= Bg),
             Raw),
     sort(Raw, Colors).
 
-% vn_nearest_dist(+Grid, +Bg, +R, +C, -Dist): minimum Manhattan distance from
+% voronoi_nearest_dist(+Grid, +Bg, +R, +C, -Dist): minimum Manhattan distance from
 % position r(R,C) to any non-background cell. Fails if no non-Bg cells exist.
-vn_nearest_dist(Grid, Bg, R, C, Dist) :-
+voronoi_nearest_dist(Grid, Bg, R, C, Dist) :-
 % Collect distance to every non-Bg cell.
     findall(D,
             (nth0(NR, Grid, Row), nth0(NC, Row, V), V \= Bg,
@@ -53,10 +53,10 @@ vn_nearest_dist(Grid, Bg, R, C, Dist) :-
 % Pick the minimum distance.
     min_list(Dists, Dist).
 
-% vn_nearest_color(+Grid, +Bg, +R, +C, -Color): color of the closest non-Bg
+% voronoi_nearest_color(+Grid, +Bg, +R, +C, -Color): color of the closest non-Bg
 % cell to r(R,C) by Manhattan distance. When two cells are equidistant the one
 % first in standard term order wins.
-vn_nearest_color(Grid, Bg, R, C, Color) :-
+voronoi_nearest_color(Grid, Bg, R, C, Color) :-
 % Build D-V pairs for every non-Bg cell.
     findall(D-V,
             (nth0(NR, Grid, Row), nth0(NC, Row, V), V \= Bg,
@@ -65,24 +65,24 @@ vn_nearest_color(Grid, Bg, R, C, Color) :-
 % Sort ascending; smallest distance (then smallest V) is first.
     sort(Pairs, [_-Color|_]).
 
-% vn_paint_bg(+Grid, +Bg, -Painted): replace every Bg cell with the color of
+% voronoi_paint_bg(+Grid, +Bg, -Painted): replace every Bg cell with the color of
 % the nearest non-Bg cell. Non-Bg cells are left unchanged. Same dimensions.
-vn_paint_bg(Grid, Bg, Painted) :-
+voronoi_paint_bg(Grid, Bg, Painted) :-
 % Build each row: for non-Bg cells keep value; for Bg cells find nearest color.
     findall(PRow,
             (nth0(R, Grid, GRow),
              findall(New,
                      (nth0(C, GRow, V),
                       (V \= Bg -> New = V
-                               ;  vn_nearest_color(Grid, Bg, R, C, New))),
+                               ;  voronoi_nearest_color(Grid, Bg, R, C, New))),
                      PRow)),
             Painted).
 
-% vn_dist_map(+Grid, +Bg, -DGrid): replace each cell value with the Manhattan
+% voronoi_dist_map(+Grid, +Bg, -DGrid): replace each cell value with the Manhattan
 % distance to the nearest non-Bg cell. Non-Bg cells get distance 0.
-vn_dist_map(Grid, Bg, DGrid) :-
+voronoi_dist_map(Grid, Bg, DGrid) :-
 % Pre-collect all non-Bg cells so we don't re-scan Grid for each cell.
-    vn_non_bg_cells(Grid, Bg, NonBg),
+    voronoi_non_bg_cells(Grid, Bg, NonBg),
 % Build each row of the distance grid.
     findall(DRow,
             (nth0(R, Grid, GRow),
@@ -98,65 +98,65 @@ vn_dist_map(Grid, Bg, DGrid) :-
                      DRow)),
             DGrid).
 
-% vn_region_cells(+Grid, +Bg, +Color, -Cells): sorted list of Bg cells whose
+% voronoi_region_cells(+Grid, +Bg, +Color, -Cells): sorted list of Bg cells whose
 % nearest non-Bg color is Color.
-vn_region_cells(Grid, Bg, Color, Cells) :-
+voronoi_region_cells(Grid, Bg, Color, Cells) :-
 % Keep Bg cells where the nearest color matches.
     findall(r(R,C),
             (nth0(R, Grid, Row), nth0(C, Row, Bg),
-             vn_nearest_color(Grid, Bg, R, C, Color)),
+             voronoi_nearest_color(Grid, Bg, R, C, Color)),
             Raw),
     sort(Raw, Cells).
 
-% vn_regions(+Grid, +Bg, -Pairs): sorted list of Color-[Cells] pairs covering
+% voronoi_regions(+Grid, +Bg, -Pairs): sorted list of Color-[Cells] pairs covering
 % all distinct non-Bg colors; Cells is the Voronoi region of that color.
-vn_regions(Grid, Bg, Pairs) :-
+voronoi_regions(Grid, Bg, Pairs) :-
 % Enumerate colors then build one pair per color.
-    vn_non_bg_colors(Grid, Bg, Colors),
+    voronoi_non_bg_colors(Grid, Bg, Colors),
     findall(Color-Cells,
             (member(Color, Colors),
-             vn_region_cells(Grid, Bg, Color, Cells)),
+             voronoi_region_cells(Grid, Bg, Color, Cells)),
             Pairs).
 
-% vn_max_dist(+Grid, +Bg, -MaxDist): maximum distance of any Bg cell from
+% voronoi_max_dist(+Grid, +Bg, -MaxDist): maximum distance of any Bg cell from
 % its nearest non-Bg cell. Fails if Grid contains no Bg cells.
-vn_max_dist(Grid, Bg, MaxDist) :-
+voronoi_max_dist(Grid, Bg, MaxDist) :-
 % Collect distances of all Bg cells.
     findall(D,
             (nth0(R, Grid, Row), nth0(C, Row, Bg),
-             vn_nearest_dist(Grid, Bg, R, C, D)),
+             voronoi_nearest_dist(Grid, Bg, R, C, D)),
             Dists),
 % Require at least one Bg cell and return the maximum.
     Dists \= [],
     max_list(Dists, MaxDist).
 
-% vn_at_dist(+Grid, +Bg, +D, -Cells): sorted list of Bg cells at Manhattan
+% voronoi_at_dist(+Grid, +Bg, +D, -Cells): sorted list of Bg cells at Manhattan
 % distance exactly D from the nearest non-Bg cell.
-vn_at_dist(Grid, Bg, D, Cells) :-
+voronoi_at_dist(Grid, Bg, D, Cells) :-
     findall(r(R,C),
             (nth0(R, Grid, Row), nth0(C, Row, Bg),
-             vn_nearest_dist(Grid, Bg, R, C, D)),
+             voronoi_nearest_dist(Grid, Bg, R, C, D)),
             Raw),
     sort(Raw, Cells).
 
-% vn_within_dist(+Grid, +Bg, +D, -Cells): sorted list of Bg cells at Manhattan
+% voronoi_within_dist(+Grid, +Bg, +D, -Cells): sorted list of Bg cells at Manhattan
 % distance =< D from the nearest non-Bg cell.
-vn_within_dist(Grid, Bg, D, Cells) :-
+voronoi_within_dist(Grid, Bg, D, Cells) :-
     findall(r(R,C),
             (nth0(R, Grid, Row), nth0(C, Row, Bg),
-             vn_nearest_dist(Grid, Bg, R, C, Dist),
+             voronoi_nearest_dist(Grid, Bg, R, C, Dist),
              Dist =< D),
             Raw),
     sort(Raw, Cells).
 
-% vn_medial(+Grid, +Bg, -Cells): sorted list of Bg cells that are equidistant
+% voronoi_medial(+Grid, +Bg, -Cells): sorted list of Bg cells that are equidistant
 % from non-Bg cells of two or more distinct colors. These are the Voronoi edge
 % cells (the medial axis of the partition).
-vn_medial(Grid, Bg, Cells) :-
+voronoi_medial(Grid, Bg, Cells) :-
     findall(r(R,C),
             (nth0(R, Grid, Row), nth0(C, Row, Bg),
 % Find the minimum distance to any non-Bg cell.
-             vn_nearest_dist(Grid, Bg, R, C, MinD),
+             voronoi_nearest_dist(Grid, Bg, R, C, MinD),
 % Collect all non-Bg colors that achieve that minimum distance.
              findall(V,
                      (nth0(NR, Grid, NRow), nth0(NC, NRow, V), V \= Bg,
@@ -167,10 +167,10 @@ vn_medial(Grid, Bg, Cells) :-
             Raw),
     sort(Raw, Cells).
 
-% vn_expand1(+Grid, +Bg, +Color, -Cells): sorted list of Bg cells that are
+% voronoi_expand1(+Grid, +Bg, +Color, -Cells): sorted list of Bg cells that are
 % 4-connected to at least one non-Bg cell of Color. These are the Bg cells
 % one step away from the Color region.
-vn_expand1(Grid, Bg, Color, Cells) :-
+voronoi_expand1(Grid, Bg, Color, Cells) :-
 % Pre-collect the Color cells for neighbor checking.
     findall(r(R,C),
             (nth0(R, Grid, Row), nth0(C, Row, Color), Color \= Bg),
@@ -184,11 +184,11 @@ vn_expand1(Grid, Bg, Color, Cells) :-
             Raw),
     sort(Raw, Cells).
 
-% vn_expand_n(+Grid, +Bg, +Color, +N, -Cells): sorted list of Bg cells reachable
+% voronoi_expand_n(+Grid, +Bg, +Color, +N, -Cells): sorted list of Bg cells reachable
 % by expanding the Color region N steps outward through background cells.
 % Uses Manhattan distance: a Bg cell is included if there exists a Color cell
 % at Manhattan distance =< N.
-vn_expand_n(Grid, Bg, Color, N, Cells) :-
+voronoi_expand_n(Grid, Bg, Color, N, Cells) :-
 % Collect all cells of Color in Grid.
     findall(r(CR,CC),
             (nth0(CR, Grid, CRow), nth0(CC, CRow, Color), Color \= Bg),

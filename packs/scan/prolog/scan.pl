@@ -6,41 +6,41 @@
 % Module declaration naming this file scan with its 14 exported predicates.
 :- module(scan, [
     % Enumerate all R-C-V triples in row-major order (top-to-bottom, left-to-right).
-    sn_row_major/2,
+    scan_row_major/2,
     % Enumerate all R-C-V triples in column-major order (left-to-right, top-to-bottom).
-    sn_col_major/2,
+    scan_col_major/2,
     % List all R-C position pairs where the cell value equals V.
-    sn_cells_of/3,
+    scan_cells_of/3,
     % Return a new grid identical to Grid except cell (R,C) holds value V.
-    sn_set_cell/5,
+    scan_set_cell/5,
     % Apply Goal(R, C, OldV, NewV) to every cell, producing a transformed grid.
-    sn_map_cells/3,
+    scan_map_cells/3,
     % Collect all R-C-V triples satisfying Pred(R, C, V).
-    sn_filter_cells/3,
+    scan_filter_cells/3,
     % Apply a list of R-C-V triples as batch cell updates, returning a new grid.
-    sn_update_cells/3,
+    scan_update_cells/3,
     % Enumerate cells in boustrophedon order: even rows left-to-right, odd rows right-to-left.
-    sn_zigzag/2,
+    scan_zigzag/2,
     % Enumerate cells in clockwise spiral order from the outer ring inward.
-    sn_spiral_in/2,
+    scan_spiral_in/2,
     % Enumerate the outer border cells clockwise starting at the top-left corner.
-    sn_border_traversal/2,
+    scan_border_traversal/2,
     % Enumerate cells along NE-going diagonals where R+C is constant.
-    sn_diag_traversal_ne/2,
+    scan_diag_traversal_ne/2,
     % Enumerate cells along SE-going diagonals where C-R is constant.
-    sn_diag_traversal_se/2,
+    scan_diag_traversal_se/2,
     % Build an H-by-W grid from a sparse list of R-C-V triples, filling gaps with Bg.
-    sn_grid_from_cells/5,
+    scan_grid_from_cells/5,
     % Find the first occurrence of value V in the grid in row-major order.
-    sn_index_of/4
+    scan_index_of/4
 ]).
 % Import memberchk for membership test, nth0 for indexed access,
 % append/3 for list concatenation, and reverse/2 for list reversal.
 :- use_module(library(lists), [memberchk/2, nth0/3, append/3, reverse/2]).
 
-% sn_row_major(+Grid, -Cells): all R-C-V triples enumerated in row-major order.
+% scan_row_major(+Grid, -Cells): all R-C-V triples enumerated in row-major order.
 % Visits row 0 column 0..W-1, then row 1 column 0..W-1, and so on.
-sn_row_major(Grid, Cells) :-
+scan_row_major(Grid, Cells) :-
 % Get the grid height.
     length(Grid, H), H1 is H - 1,
 % Get the grid width from the first row, defaulting to 0 for an empty grid.
@@ -57,9 +57,9 @@ sn_row_major(Grid, Cells) :-
         nth0(C, Row, V)
     ), Cells).
 
-% sn_col_major(+Grid, -Cells): all R-C-V triples enumerated in column-major order.
+% scan_col_major(+Grid, -Cells): all R-C-V triples enumerated in column-major order.
 % Visits column 0 row 0..H-1, then column 1 row 0..H-1, and so on.
-sn_col_major(Grid, Cells) :-
+scan_col_major(Grid, Cells) :-
 % Get the grid height.
     length(Grid, H), H1 is H - 1,
 % Get the grid width from the first row, defaulting to 0 for an empty grid.
@@ -76,9 +76,9 @@ sn_col_major(Grid, Cells) :-
         nth0(C, Row, V)
     ), Cells).
 
-% sn_cells_of(+Grid, +V, -Cells): list of all R-C pairs where the cell equals V.
+% scan_cells_of(+Grid, +V, -Cells): list of all R-C pairs where the cell equals V.
 % Each element of Cells is a pair R-C (row, column).
-sn_cells_of(Grid, V, Cells) :-
+scan_cells_of(Grid, V, Cells) :-
 % Get the grid height.
     length(Grid, H), H1 is H - 1,
 % Get the grid width from the first row, defaulting to 0 for an empty grid.
@@ -93,9 +93,9 @@ sn_cells_of(Grid, V, Cells) :-
         nth0(C, Row, V)
     ), Cells).
 
-% sn_set_cell(+Grid, +R, +C, +V, -New): new grid with cell (R,C) set to V.
+% scan_set_cell(+Grid, +R, +C, +V, -New): new grid with cell (R,C) set to V.
 % All other cells are unchanged. R and C are 0-based.
-sn_set_cell(Grid, R, C, V, New) :-
+scan_set_cell(Grid, R, C, V, New) :-
 % Compute the maximum valid row index.
     length(Grid, H), H1 is H - 1,
 % Build the new grid row by row.
@@ -106,13 +106,13 @@ sn_set_cell(Grid, R, C, V, New) :-
         nth0(Ri, Grid, OldRow),
 % Replace the target row; copy all other rows unchanged.
         (   Ri =:= R
-        ->  sn_set_elem_(OldRow, C, V, NewRow)
+        ->  scan_set_elem_(OldRow, C, V, NewRow)
         ;   NewRow = OldRow
         )
     ), New).
 
-% sn_set_elem_(+Row, +C, +V, -New): list with position C replaced by V.
-sn_set_elem_(Row, C, V, New) :-
+% scan_set_elem_(+Row, +C, +V, -New): list with position C replaced by V.
+scan_set_elem_(Row, C, V, New) :-
 % Compute the maximum valid column index.
     length(Row, Len), Len1 is Len - 1,
 % Build the new row element by element.
@@ -125,9 +125,9 @@ sn_set_elem_(Row, C, V, New) :-
         (Ci =:= C -> Cell = V ; Cell = OldV)
     ), New).
 
-% sn_map_cells(+Grid, :Goal, -New): apply Goal(R, C, OldV, NewV) to every cell.
+% scan_map_cells(+Grid, :Goal, -New): apply Goal(R, C, OldV, NewV) to every cell.
 % New is the grid produced by replacing each cell value with the NewV from Goal.
-sn_map_cells(Grid, Goal, New) :-
+scan_map_cells(Grid, Goal, New) :-
 % Get the grid height.
     length(Grid, H), H1 is H - 1,
 % Get the grid width from the first row, defaulting to 0 for an empty grid.
@@ -149,9 +149,9 @@ sn_map_cells(Grid, Goal, New) :-
         ), NewRow)
     ), New).
 
-% sn_filter_cells(+Grid, :Pred, -Cells): R-C-V triples satisfying Pred(R, C, V).
+% scan_filter_cells(+Grid, :Pred, -Cells): R-C-V triples satisfying Pred(R, C, V).
 % Pred is called as call(Pred, R, C, V) and must succeed for a cell to be kept.
-sn_filter_cells(Grid, Pred, Cells) :-
+scan_filter_cells(Grid, Pred, Cells) :-
 % Get the grid height.
     length(Grid, H), H1 is H - 1,
 % Get the grid width from the first row, defaulting to 0 for an empty grid.
@@ -168,10 +168,10 @@ sn_filter_cells(Grid, Pred, Cells) :-
         call(Pred, R, C, V)
     ), Cells).
 
-% sn_update_cells(+Grid, +Updates, -New): apply batch R-C-V cell updates.
+% scan_update_cells(+Grid, +Updates, -New): apply batch R-C-V cell updates.
 % Updates is a list of R-C-V triples. Cells listed in Updates get the new value;
 % all other cells are unchanged. If a cell appears multiple times, the first match wins.
-sn_update_cells(Grid, Updates, New) :-
+scan_update_cells(Grid, Updates, New) :-
 % Get the grid height.
     length(Grid, H), H1 is H - 1,
 % Get the grid width from the first row, defaulting to 0 for an empty grid.
@@ -196,9 +196,9 @@ sn_update_cells(Grid, Updates, New) :-
         ), NewRow)
     ), New).
 
-% sn_zigzag(+Grid, -Cells): boustrophedon traversal (alternating row directions).
+% scan_zigzag(+Grid, -Cells): boustrophedon traversal (alternating row directions).
 % Even rows (0, 2, 4, ...) are visited left-to-right; odd rows right-to-left.
-sn_zigzag(Grid, Cells) :-
+scan_zigzag(Grid, Cells) :-
 % Get the grid height.
     length(Grid, H), H1 is H - 1,
 % Get the grid width from the first row, defaulting to 0 for an empty grid.
@@ -220,20 +220,20 @@ sn_zigzag(Grid, Cells) :-
         nth0(C, Row, V)
     ), Cells).
 
-% sn_spiral_in(+Grid, -Cells): clockwise spiral from the outermost ring inward.
+% scan_spiral_in(+Grid, -Cells): clockwise spiral from the outermost ring inward.
 % Visits: top row left-to-right, right column top-to-bottom, bottom row
 % right-to-left, left column bottom-to-top, then recurses on the inner ring.
-sn_spiral_in(Grid, Cells) :-
+scan_spiral_in(Grid, Cells) :-
 % Compute grid dimensions.
     length(Grid, H), B0 is H - 1,
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0), R0 is W - 1,
 % Delegate to the recursive ring helper.
-    sn_spiral_(Grid, 0, B0, 0, R0, Cells).
+    scan_spiral_(Grid, 0, B0, 0, R0, Cells).
 
-% sn_spiral_(+Grid, +T, +B, +L, +R, -Cells): collect one ring then recurse.
+% scan_spiral_(+Grid, +T, +B, +L, +R, -Cells): collect one ring then recurse.
 % T, B, L, R are inclusive row/column bounds for the current ring.
 % Terminates when T > B (no rows) or L > R (no columns).
-sn_spiral_(Grid, T, B, L, R, Cells) :-
+scan_spiral_(Grid, T, B, L, R, Cells) :-
 % Base case: the ring is empty when rows or columns are exhausted.
     (   T > B
     ->  Cells = []
@@ -263,7 +263,7 @@ sn_spiral_(Grid, T, B, L, R, Cells) :-
         ;   LeftC = []
         ),
 % Recurse on the inner ring with shrunk bounds.
-        sn_spiral_(Grid, T1, B1, L1, R1, Rest),
+        scan_spiral_(Grid, T1, B1, L1, R1, Rest),
 % Concatenate: top, right, bottom-reversed, left-reversed, inner.
         append(TopC, RightC, P1),
         append(P1, BotC, P2),
@@ -271,10 +271,10 @@ sn_spiral_(Grid, T, B, L, R, Cells) :-
         append(P3, Rest, Cells)
     ).
 
-% sn_border_traversal(+Grid, -Cells): outer border cells in clockwise order.
+% scan_border_traversal(+Grid, -Cells): outer border cells in clockwise order.
 % Visits: top row left-to-right, right column (excluding top), bottom row
 % right-to-left (excluding right corner), left column (excluding both corners).
-sn_border_traversal(Grid, Cells) :-
+scan_border_traversal(Grid, Cells) :-
 % Compute grid dimensions.
     length(Grid, H),
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0),
@@ -304,10 +304,10 @@ sn_border_traversal(Grid, Cells) :-
     append(P1, BotC, P2),
     append(P2, LeftC, Cells).
 
-% sn_diag_traversal_ne(+Grid, -Cells): cells along NE-going diagonals.
+% scan_diag_traversal_ne(+Grid, -Cells): cells along NE-going diagonals.
 % Each diagonal has a constant sum D = R + C, traversed from D=0 to D=H+W-2.
 % Within each diagonal, row increases and column decreases.
-sn_diag_traversal_ne(Grid, Cells) :-
+scan_diag_traversal_ne(Grid, Cells) :-
 % Get grid dimensions.
     length(Grid, H), H1 is H - 1,
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0), W1 is W - 1,
@@ -329,10 +329,10 @@ sn_diag_traversal_ne(Grid, Cells) :-
         nth0(C, Row, V)
     ), Cells).
 
-% sn_diag_traversal_se(+Grid, -Cells): cells along SE-going diagonals.
+% scan_diag_traversal_se(+Grid, -Cells): cells along SE-going diagonals.
 % Each diagonal has a constant difference D = C - R, traversed from D=-(H-1) to D=W-1.
 % Within each diagonal, both row and column increase.
-sn_diag_traversal_se(Grid, Cells) :-
+scan_diag_traversal_se(Grid, Cells) :-
 % Get grid dimensions.
     length(Grid, H), H1 is H - 1,
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0), W1 is W - 1,
@@ -354,10 +354,10 @@ sn_diag_traversal_se(Grid, Cells) :-
         nth0(C, Row, V)
     ), Cells).
 
-% sn_grid_from_cells(+H, +W, +Cells, +Bg, -Grid): build an H-by-W grid.
+% scan_grid_from_cells(+H, +W, +Cells, +Bg, -Grid): build an H-by-W grid.
 % Cells is a list of R-C-V triples. Each cell not mentioned in Cells gets Bg.
 % If a cell appears multiple times, the first match in Cells is used.
-sn_grid_from_cells(H, W, Cells, Bg, Grid) :-
+scan_grid_from_cells(H, W, Cells, Bg, Grid) :-
 % Compute the maximum valid row and column indices.
     H1 is H - 1, W1 is W - 1,
 % Build each row.
@@ -376,9 +376,9 @@ sn_grid_from_cells(H, W, Cells, Bg, Grid) :-
         ), Row)
     ), Grid).
 
-% sn_index_of(+Grid, +V, -R, -C): row and column of the first occurrence of V.
+% scan_index_of(+Grid, +V, -R, -C): row and column of the first occurrence of V.
 % Searches in row-major order and commits to the first match via cut.
-sn_index_of(Grid, V, R, C) :-
+scan_index_of(Grid, V, R, C) :-
 % Get grid dimensions.
     length(Grid, H), H1 is H - 1,
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0), W1 is W - 1,

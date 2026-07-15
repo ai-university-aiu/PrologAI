@@ -28,13 +28,13 @@ pt_list_period/2 finds the shortest period of a flat list.
     ?- pt_list_period([1,2,3,4], P).
     P = 4.
 
-pt_row_period/3 and pt_col_period/3 apply the same detection to a specific
+pattern_row_period/3 and pattern_col_period/3 apply the same detection to a specific
 row or column of a grid.
 
-    ?- Grid = [[0,1,0,1],[2,2,2,2]], pt_row_period(Grid, 0, P).
+    ?- Grid = [[0,1,0,1],[2,2,2,2]], pattern_row_period(Grid, 0, P).
     P = 2.
 
-    ?- Grid = [[0,1],[0,1],[0,1]], pt_col_period(Grid, 0, P).
+    ?- Grid = [[0,1],[0,1],[0,1]], pattern_col_period(Grid, 0, P).
     P = 1.
 
 TILING
@@ -44,13 +44,13 @@ pt_tile_grid/4 fills a target grid by repeating a smaller tile.
     ?- Tile = [[1,2],[3,4]], pt_tile_grid(Tile, 4, 6, G).
     G = [[1,2,1,2,1,2],[3,4,3,4,3,4],[1,2,1,2,1,2],[3,4,3,4,3,4]].
 
-pt_extract_tile/4 crops the top-left sub-grid to recover the base tile.
+pattern_extract_tile/4 crops the top-left sub-grid to recover the base tile.
 
-    ?- pt_extract_tile(G, 2, 2, Tile).
+    ?- pattern_extract_tile(G, 2, 2, Tile).
 
-pt_is_tiling/3 verifies that a grid is a proper tiling of a given tile.
+pattern_is_tiling/3 verifies that a grid is a proper tiling of a given tile.
 
-    ?- pt_is_tiling(G, [[1,2],[3,4]], 2).
+    ?- pattern_is_tiling(G, [[1,2],[3,4]], 2).
     true.
 
 The third argument is the expected row period (equal to the tile height).
@@ -125,15 +125,15 @@ Detect whether an output grid is a scaled copy of the input:
 Detect whether an output is a tiling of a smaller pattern found in the input:
 
     solve_tiling(InputGrid, OutputGrid, TileH, TileW) :-
-        pt_extract_tile(InputGrid, TileH, TileW, Tile),
+        pattern_extract_tile(InputGrid, TileH, TileW, Tile),
         gd_size(OutputGrid, Rows, Cols),
-        pt_is_tiling(OutputGrid, Tile, TileH),
+        pattern_is_tiling(OutputGrid, Tile, TileH),
         Rows > TileH.
 
 Detect period and extract one repeating unit from a row:
 
     row_unit(Grid, R, Unit) :-
-        pt_row_period(Grid, R, P),
+        pattern_row_period(Grid, R, P),
         gd_row(Grid, R, Row),
         length(Unit, P),
         append(Unit, _, Row).

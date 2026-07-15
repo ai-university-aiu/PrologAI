@@ -18,41 +18,41 @@ the D4 symmetry closure of a set of cells.
 
 69.2 Centroid and coordinate conversion
 
-pv_centroid/2 finds the integer floor centroid of a cell list.
+pivot_centroid/2 finds the integer floor centroid of a cell list.
 
-?- pv_centroid([0-0, 0-2, 2-0, 2-2], PR-PC).
+?- pivot_centroid([0-0, 0-2, 2-0, 2-2], PR-PC).
 PR = 1, PC = 1.
 
-?- pv_centroid([3-5], PR-PC).
+?- pivot_centroid([3-5], PR-PC).
 PR = 3, PC = 5.
 
-pv_to_rel/3 converts an absolute cell to a pivot-relative offset.
-pv_from_rel/3 is the inverse.
+pivot_to_rel/3 converts an absolute cell to a pivot-relative offset.
+pivot_from_rel/3 is the inverse.
 
-?- pv_to_rel(2-2, 1-4, DR-DC).
+?- pivot_to_rel(2-2, 1-4, DR-DC).
 DR = -1, DC = 2.
 
-?- pv_from_rel(2-2, (-1)-2, R-C).
+?- pivot_from_rel(2-2, (-1)-2, R-C).
 R = 1, C = 4.
 
 
 69.3 Single-cell and multi-cell rotation
 
-pv_rotate_cell_cw/3 rotates one cell 90 degrees clockwise around a pivot.
+pivot_rotate_cell_cw/3 rotates one cell 90 degrees clockwise around a pivot.
 
-?- pv_rotate_cell_cw(2-2, 1-2, R2-C2).  % up of pivot -> right of pivot
+?- pivot_rotate_cell_cw(2-2, 1-2, R2-C2).  % up of pivot -> right of pivot
 R2 = 2, C2 = 3.
 
-?- pv_rotate_cell_cw(2-2, 2-3, R2-C2).  % right -> down
+?- pivot_rotate_cell_cw(2-2, 2-3, R2-C2).  % right -> down
 R2 = 3, C2 = 2.
 
-pv_rotate_cells_cw/3, pv_rotate_cells_180/3, and pv_rotate_cells_ccw/3
+pivot_rotate_cells_cw/3, pivot_rotate_cells_180/3, and pivot_rotate_cells_ccw/3
 operate on lists of cells.
 
-?- pv_rotate_cells_cw(2-2, [1-2, 2-3, 3-2, 2-1], Cells2).
+?- pivot_rotate_cells_cw(2-2, [1-2, 2-3, 3-2, 2-1], Cells2).
 Cells2 = [2-3, 3-2, 2-1, 1-2].  % up->right, right->down, down->left, left->up
 
-?- pv_rotate_cells_180(0-0, [1-2], [R2-C2]).
+?- pivot_rotate_cells_180(0-0, [1-2], [R2-C2]).
 R2 = -1, C2 = -2.
 
 
@@ -60,76 +60,76 @@ R2 = -1, C2 = -2.
 
 Four reflection predicates cover the four symmetry axes through the pivot.
 
-pv_reflect_cells_h/3: reflect left-right around the pivot column.
-pv_reflect_cells_v/3: reflect top-bottom around the pivot row.
-pv_reflect_cells_diag/3: reflect across the main diagonal through the pivot.
-pv_reflect_cells_antidiag/3: reflect across the anti-diagonal through the pivot.
+pivot_reflect_cells_h/3: reflect left-right around the pivot column.
+pivot_reflect_cells_v/3: reflect top-bottom around the pivot row.
+pivot_reflect_cells_diag/3: reflect across the main diagonal through the pivot.
+pivot_reflect_cells_antidiag/3: reflect across the anti-diagonal through the pivot.
 
-?- pv_reflect_cells_h(2-2, [2-4, 2-0], Cells2).
+?- pivot_reflect_cells_h(2-2, [2-4, 2-0], Cells2).
 Cells2 = [2-0, 2-4].  % cells swap left and right
 
-?- pv_reflect_cells_v(2-2, [0-2, 4-2], Cells2).
+?- pivot_reflect_cells_v(2-2, [0-2, 4-2], Cells2).
 Cells2 = [4-2, 0-2].  % cells swap top and bottom
 
-?- pv_reflect_cells_diag(0-0, [1-3], Cells2).
+?- pivot_reflect_cells_diag(0-0, [1-3], Cells2).
 Cells2 = [3-1].  % row and column offsets swapped
 
-?- pv_reflect_cells_antidiag(0-0, [1-3], Cells2).
+?- pivot_reflect_cells_antidiag(0-0, [1-3], Cells2).
 Cells2 = [-3-(-1)].  % negated and swapped
 
 
 69.5 Orbit and symmetry closure
 
-pv_orbit/3 computes all distinct positions a cell can reach under the D4 group
+pivot_orbit/3 computes all distinct positions a cell can reach under the D4 group
 around a pivot. For a general cell, the orbit has 8 elements. For cells on
 symmetry axes, it may have 1, 2, or 4 elements.
 
-?- pv_orbit(0-0, 1-0, Orbit).  % cardinal neighbor: 4-element orbit
+?- pivot_orbit(0-0, 1-0, Orbit).  % cardinal neighbor: 4-element orbit
 Orbit = [(-1)-0, 0-(-1), 0-1, 1-0].
 
-?- pv_orbit(0-0, 1-1, Orbit).  % diagonal cell: 4-element orbit
+?- pivot_orbit(0-0, 1-1, Orbit).  % diagonal cell: 4-element orbit
 Orbit = [(-1)-(-1), (-1)-1, 1-(-1), 1-1].
 
-?- pv_orbit(2-2, 2-2, Orbit).  % the pivot itself: 1-element orbit
+?- pivot_orbit(2-2, 2-2, Orbit).  % the pivot itself: 1-element orbit
 Orbit = [2-2].
 
-pv_sym_closure/3 computes the D4 symmetry closure of a cell list: the
+pivot_sym_closure/3 computes the D4 symmetry closure of a cell list: the
 smallest D4-symmetric set containing all input cells.
 
-?- pv_sym_closure(0-0, [1-0], Closure).
+?- pivot_sym_closure(0-0, [1-0], Closure).
 % The closure includes all 4 cardinal neighbors.
 Closure = [(-1)-0, 0-(-1), 0-1, 1-0].
 
-?- pv_sym_closure(0-0, [], Closure).
+?- pivot_sym_closure(0-0, [], Closure).
 Closure = [].
 
 
 69.6 Stamping at a pivot
 
-pv_stamp_at/5 paints a value at each position specified by DR-DC offset
+pivot_stamp_at/5 paints a value at each position specified by DR-DC offset
 pairs, relative to a pivot cell in a grid. Out-of-bounds offsets are skipped.
 
-?- pv_stamp_at([[0,0,0],[0,0,0],[0,0,0]], [(-1)-0, 0-0, 1-0], 5, 1-1, R).
+?- pivot_stamp_at([[0,0,0],[0,0,0],[0,0,0]], [(-1)-0, 0-0, 1-0], 5, 1-1, R).
 % Paints column 1 at rows 0, 1, 2 with value 5.
 R = [[0,5,0],[0,5,0],[0,5,0]].
 
-?- pv_stamp_at([[0,0],[0,0]], [0-(-1)], 9, 0-0, R).
+?- pivot_stamp_at([[0,0],[0,0]], [0-(-1)], 9, 0-0, R).
 % Offset (0,-1) from (0,0) is column -1: out of bounds, grid unchanged.
 R = [[0,0],[0,0]].
 
 
 69.7 Combining pivot with other packs
 
-Use pv_centroid with the obj pack to find the natural rotation center of any
-object. Use pv_rotate_cells_cw to produce the rotated version of an object's
-cell list, then use pv_stamp_at to paint it back into a grid. Combine
-pv_sym_closure with the scene pack to test whether an object's cell pattern
+Use pivot_centroid with the obj pack to find the natural rotation center of any
+object. Use pivot_rotate_cells_cw to produce the rotated version of an object's
+cell list, then use pivot_stamp_at to paint it back into a grid. Combine
+pivot_sym_closure with the scene pack to test whether an object's cell pattern
 is D4-symmetric around its own center.
 
 Example: rotate an L-shaped object 90 degrees CW around its centroid.
 
 ?- Cells = [0-0, 1-0, 2-0, 2-1],
-   pv_centroid(Cells, Pivot),
-   pv_rotate_cells_cw(Pivot, Cells, Rotated).
+   pivot_centroid(Cells, Pivot),
+   pivot_rotate_cells_cw(Pivot, Cells, Rotated).
 Pivot = 1-0,
 Rotated = [0-1, 0-0, 0-(-1), 1-(-1)].

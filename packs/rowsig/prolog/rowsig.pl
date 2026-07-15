@@ -5,46 +5,46 @@
 % index pairs, testing rows and columns for palindrome structure, and testing
 % whether two rows or two columns are anagrams (same value multiset).
 :- module(rowsig, [
-    rs_col_at/3,
-    rs_all_cols/2,
-    rs_row_freq/2,
-    rs_col_freq/2,
-    rs_modal_row/2,
-    rs_modal_col/2,
-    rs_uniq_rows/2,
-    rs_uniq_cols/2,
-    rs_dup_row_pairs/2,
-    rs_dup_col_pairs/2,
-    rs_row_palindrome/2,
-    rs_col_palindrome/2,
-    rs_rows_anagram/3,
-    rs_cols_anagram/3
+    rowsig_col_at/3,
+    rowsig_all_cols/2,
+    rowsig_row_freq/2,
+    rowsig_col_freq/2,
+    rowsig_modal_row/2,
+    rowsig_modal_col/2,
+    rowsig_uniq_rows/2,
+    rowsig_uniq_cols/2,
+    rowsig_dup_row_pairs/2,
+    rowsig_dup_col_pairs/2,
+    rowsig_row_palindrome/2,
+    rowsig_col_palindrome/2,
+    rowsig_rows_anagram/3,
+    rowsig_cols_anagram/3
 ]).
 % Import list utilities; sort/2, msort/2, length/2, between/3, findall/3 are built-ins.
 :- use_module(library(lists), [member/2, nth0/3, reverse/2, last/2]).
 % Import include/3 for filtering by row or column equality.
 :- use_module(library(apply), [include/3]).
 
-% rs_col_at(+Grid, +C, -Col): Col is the ordered list of values in column C,
+% rowsig_col_at(+Grid, +C, -Col): Col is the ordered list of values in column C,
 % enumerated top-to-bottom (row 0 first). Fails if C is out of range.
-rs_col_at(Grid, C, Col) :-
+rowsig_col_at(Grid, C, Col) :-
 % Collect the value at column C from every row in Grid order.
     findall(V, (member(Row, Grid), nth0(C, Row, V)), Col).
 
-% rs_all_cols(+Grid, -Cols): Cols is the list of all columns in column order
+% rowsig_all_cols(+Grid, -Cols): Cols is the list of all columns in column order
 % (column 0 first). Each element of Cols is a top-to-bottom list of values.
-rs_all_cols(Grid, Cols) :-
+rowsig_all_cols(Grid, Cols) :-
 % Determine column count from the first row; default 0 for empty grid.
     (Grid = [Fr|_] -> length(Fr, W) ; W = 0),
 % Highest valid column index.
     W1 is W - 1,
-% Collect each column as a list using rs_col_at.
-    findall(Col, (between(0, W1, C), rs_col_at(Grid, C, Col)), Cols).
+% Collect each column as a list using rowsig_col_at.
+    findall(Col, (between(0, W1, C), rowsig_col_at(Grid, C, Col)), Cols).
 
-% rs_row_freq(+Grid, -Freqs): Freqs is the list of Row-N pairs where N is the
+% rowsig_row_freq(+Grid, -Freqs): Freqs is the list of Row-N pairs where N is the
 % number of times Row appears in Grid. Sorted by N descending (most common first);
 % rows with equal count are ordered by reverse standard order (largest row last).
-rs_row_freq(Grid, Freqs) :-
+rowsig_row_freq(Grid, Freqs) :-
 % Collect unique rows via sort (removes duplicates; sorts ascending).
     sort(Grid, UniqRows),
 % For each unique row, count its occurrences in Grid.
@@ -56,11 +56,11 @@ rs_row_freq(Grid, Freqs) :-
 % Convert N-Row key format to Row-N output format.
     findall(Row-N, member(N-Row, Rev), Freqs).
 
-% rs_col_freq(+Grid, -Freqs): Freqs is the list of Col-N pairs where N is the
+% rowsig_col_freq(+Grid, -Freqs): Freqs is the list of Col-N pairs where N is the
 % number of times column list Col appears. Sorted by N descending.
-rs_col_freq(Grid, Freqs) :-
+rowsig_col_freq(Grid, Freqs) :-
 % Extract all columns as lists.
-    rs_all_cols(Grid, Cols),
+    rowsig_all_cols(Grid, Cols),
 % Collect unique column lists.
     sort(Cols, UniqCols),
 % For each unique column, count its occurrences.
@@ -72,10 +72,10 @@ rs_col_freq(Grid, Freqs) :-
 % Convert N-Col key format to Col-N output format.
     findall(Col-N, member(N-Col, Rev), Freqs).
 
-% rs_modal_row(+Grid, -Row): Row is the row that appears most often in Grid.
+% rowsig_modal_row(+Grid, -Row): Row is the row that appears most often in Grid.
 % Ties broken by standard order descending (largest row wins, via msort + last).
 % Fails if Grid is empty.
-rs_modal_row(Grid, Row) :-
+rowsig_modal_row(Grid, Row) :-
 % Collect unique rows.
     sort(Grid, UniqRows),
 % Count each unique row.
@@ -85,12 +85,12 @@ rs_modal_row(Grid, Row) :-
     msort(Raw, Sorted),
     last(Sorted, _-Row).
 
-% rs_modal_col(+Grid, -Col): Col is the column list that appears most often.
+% rowsig_modal_col(+Grid, -Col): Col is the column list that appears most often.
 % Ties broken by largest column list (standard order, via msort + last).
 % Fails if Grid is empty or has no columns.
-rs_modal_col(Grid, Col) :-
+rowsig_modal_col(Grid, Col) :-
 % Extract all columns.
-    rs_all_cols(Grid, Cols),
+    rowsig_all_cols(Grid, Cols),
 % Collect unique columns.
     sort(Cols, UniqCols),
 % Count each unique column.
@@ -100,9 +100,9 @@ rs_modal_col(Grid, Col) :-
     msort(Raw, Sorted),
     last(Sorted, _-Col).
 
-% rs_uniq_rows(+Grid, -Pairs): Pairs is the list of R-Row terms for each row index R
+% rowsig_uniq_rows(+Grid, -Pairs): Pairs is the list of R-Row terms for each row index R
 % whose row value appears exactly once in Grid. Ordered by row index ascending.
-rs_uniq_rows(Grid, Pairs) :-
+rowsig_uniq_rows(Grid, Pairs) :-
 % Determine row index range.
     length(Grid, H), H1 is H - 1,
 % Collect rows that appear exactly once (include count = 1).
@@ -110,11 +110,11 @@ rs_uniq_rows(Grid, Pairs) :-
         nth0(R, Grid, Row),
         include(=(Row), Grid, M), length(M, 1)), Pairs).
 
-% rs_uniq_cols(+Grid, -Pairs): Pairs is the list of C-Col terms for each column
+% rowsig_uniq_cols(+Grid, -Pairs): Pairs is the list of C-Col terms for each column
 % index C whose column list appears exactly once. Ordered by column index ascending.
-rs_uniq_cols(Grid, Pairs) :-
+rowsig_uniq_cols(Grid, Pairs) :-
 % Extract all columns.
-    rs_all_cols(Grid, Cols),
+    rowsig_all_cols(Grid, Cols),
 % Determine column index range.
     length(Cols, W), W1 is W - 1,
 % Collect columns that appear exactly once.
@@ -122,9 +122,9 @@ rs_uniq_cols(Grid, Pairs) :-
         nth0(C, Cols, Col),
         include(=(Col), Cols, M), length(M, 1)), Pairs).
 
-% rs_dup_row_pairs(+Grid, -Pairs): Pairs is the list of R1-R2 index pairs where
+% rowsig_dup_row_pairs(+Grid, -Pairs): Pairs is the list of R1-R2 index pairs where
 % row R1 equals row R2 and R1 < R2. Ordered lexicographically by R1 then R2.
-rs_dup_row_pairs(Grid, Pairs) :-
+rowsig_dup_row_pairs(Grid, Pairs) :-
 % Determine row index range.
     length(Grid, H), H1 is H - 1,
 % Find all strictly ordered index pairs sharing the same row value.
@@ -132,11 +132,11 @@ rs_dup_row_pairs(Grid, Pairs) :-
         R1 < R2,
         nth0(R1, Grid, Row), nth0(R2, Grid, Row)), Pairs).
 
-% rs_dup_col_pairs(+Grid, -Pairs): Pairs is the list of C1-C2 index pairs where
+% rowsig_dup_col_pairs(+Grid, -Pairs): Pairs is the list of C1-C2 index pairs where
 % column C1 equals column C2 and C1 < C2. Ordered by C1 then C2.
-rs_dup_col_pairs(Grid, Pairs) :-
+rowsig_dup_col_pairs(Grid, Pairs) :-
 % Extract all column lists.
-    rs_all_cols(Grid, Cols),
+    rowsig_all_cols(Grid, Cols),
 % Determine column index range.
     length(Cols, W), W1 is W - 1,
 % Find all strictly ordered index pairs sharing the same column value list.
@@ -144,25 +144,25 @@ rs_dup_col_pairs(Grid, Pairs) :-
         C1 < C2,
         nth0(C1, Cols, Col), nth0(C2, Cols, Col)), Pairs).
 
-% rs_row_palindrome(+Grid, +R): succeeds if row R reads the same left-to-right
+% rowsig_row_palindrome(+Grid, +R): succeeds if row R reads the same left-to-right
 % and right-to-left (i.e., the row list equals its own reverse).
-rs_row_palindrome(Grid, R) :-
+rowsig_row_palindrome(Grid, R) :-
 % Extract row R.
     nth0(R, Grid, Row),
 % Palindrome iff reverse equals original.
     reverse(Row, Row).
 
-% rs_col_palindrome(+Grid, +C): succeeds if column C reads the same top-to-bottom
+% rowsig_col_palindrome(+Grid, +C): succeeds if column C reads the same top-to-bottom
 % and bottom-to-top (i.e., the column list equals its own reverse).
-rs_col_palindrome(Grid, C) :-
+rowsig_col_palindrome(Grid, C) :-
 % Extract column C as a list.
-    rs_col_at(Grid, C, Col),
+    rowsig_col_at(Grid, C, Col),
 % Palindrome iff reverse equals original.
     reverse(Col, Col).
 
-% rs_rows_anagram(+Grid, +R1, +R2): succeeds if rows R1 and R2 in Grid have the
+% rowsig_rows_anagram(+Grid, +R1, +R2): succeeds if rows R1 and R2 in Grid have the
 % same multiset of values (i.e., msort of both rows produces the same list).
-rs_rows_anagram(Grid, R1, R2) :-
+rowsig_rows_anagram(Grid, R1, R2) :-
 % Extract both rows.
     nth0(R1, Grid, Row1),
     nth0(R2, Grid, Row2),
@@ -170,12 +170,12 @@ rs_rows_anagram(Grid, R1, R2) :-
     msort(Row1, Sorted),
     msort(Row2, Sorted).
 
-% rs_cols_anagram(+Grid, +C1, +C2): succeeds if columns C1 and C2 in Grid have
+% rowsig_cols_anagram(+Grid, +C1, +C2): succeeds if columns C1 and C2 in Grid have
 % the same multiset of values (i.e., msort of both columns produces the same list).
-rs_cols_anagram(Grid, C1, C2) :-
+rowsig_cols_anagram(Grid, C1, C2) :-
 % Extract both columns.
-    rs_col_at(Grid, C1, Col1),
-    rs_col_at(Grid, C2, Col2),
+    rowsig_col_at(Grid, C1, Col1),
+    rowsig_col_at(Grid, C2, Col2),
 % Anagram iff sorted multisets are equal.
     msort(Col1, Sorted),
     msort(Col2, Sorted).
