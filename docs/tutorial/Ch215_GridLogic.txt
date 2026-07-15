@@ -18,106 +18,106 @@ Dependencies: library(lists)
 
 Pairwise Binary Operations
 
-ggl_and(+Grid1, +Grid2, +BgColor, -Result)
+gridlogic_and(+Grid1, +Grid2, +BgColor, -Result)
 Both cells non-bg → Grid1's value. Otherwise bg.
 
     A = [[r,b],[b,b]], B = [[r,b],[r,b]].
-    ggl_and(A, B, b, R).
+    gridlogic_and(A, B, b, R).
     % R = [[r,b],[b,b]]   (only (0,0) is non-bg in both)
 
-ggl_or(+Grid1, +Grid2, +BgColor, -Result)
+gridlogic_or(+Grid1, +Grid2, +BgColor, -Result)
 First non-bg wins (Grid1 over Grid2). If both bg → bg.
 
-    ggl_or([[r,b],[b,b]], [[b,g],[b,b]], b, R).
+    gridlogic_or([[r,b],[b,b]], [[b,g],[b,b]], b, R).
     % R = [[r,g],[b,b]]
 
-ggl_xor(+Grid1, +Grid2, +BgColor, -Result)
+gridlogic_xor(+Grid1, +Grid2, +BgColor, -Result)
 Exactly one non-bg → that value. Both bg or both non-bg → bg.
 
-    ggl_xor([[r,b],[b,b]], [[r,g],[b,b]], b, R).
+    gridlogic_xor([[r,b],[b,b]], [[r,g],[b,b]], b, R).
     % R = [[b,g],[b,b]]   ((0,0) is non-bg in both → bg)
 
-ggl_not(+Grid, +BgColor, +FgColor, -Result)
+gridlogic_not(+Grid, +BgColor, +FgColor, -Result)
 Logical NOT: bg → FgColor; non-bg → bg.
 
-    ggl_not([[r,b],[b,g]], b, x, R).
+    gridlogic_not([[r,b],[b,g]], b, x, R).
     % R = [[b,x],[x,b]]
 
-ggl_subtract(+Grid1, +Grid2, +BgColor, -Result)
+gridlogic_subtract(+Grid1, +Grid2, +BgColor, -Result)
 Grid1 cells that are absent from Grid2: Grid1 non-bg AND Grid2 is bg → Grid1 value.
 
-    ggl_subtract([[r,b],[b,g]], [[r,b],[b,b]], b, R).
+    gridlogic_subtract([[r,b],[b,g]], [[r,b],[b,b]], b, R).
     % R = [[b,b],[b,g]]   (r is in both; only g is unique to Grid1)
 
-ggl_common(+Grid1, +Grid2, +BgColor, -Result)
+gridlogic_common(+Grid1, +Grid2, +BgColor, -Result)
 Cells where both grids agree on the same non-bg value → that value. Else bg.
 
-    ggl_common([[r,b],[b,g]], [[r,b],[r,b]], b, R).
+    gridlogic_common([[r,b],[b,g]], [[r,b],[r,b]], b, R).
     % R = [[r,b],[b,b]]
 
-ggl_differ(+Grid1, +Grid2, +BgColor, -Result)
+gridlogic_differ(+Grid1, +Grid2, +BgColor, -Result)
 Cells where both grids are non-bg but have different values → Grid1's value. Else bg.
 
-    ggl_differ([[r,b],[b,g]], [[x,b],[b,g]], b, R).
+    gridlogic_differ([[r,b],[b,g]], [[x,b],[b,g]], b, R).
     % R = [[r,b],[b,b]]   ((0,0) r≠x; (1,1) g=g so not a difference)
 
 
 List-Wide Reductions
 
-ggl_any(+Grids, +BgColor, -Result)
+gridlogic_any(+Grids, +BgColor, -Result)
 First non-bg value at each position across the list wins. Equivalent to fold-or.
 
-    ggl_any([[[r,b],[b,b]], [[b,b],[b,g]]], b, R).
+    gridlogic_any([[[r,b],[b,b]], [[b,b],[b,g]]], b, R).
     % R = [[r,b],[b,g]]
 
-ggl_all(+Grids, +BgColor, -Result)
+gridlogic_all(+Grids, +BgColor, -Result)
 Non-bg value if all grids in the list agree at that position. Equivalent to fold-and.
 
-    ggl_all([[[r,b],[b,g]], [[r,b],[b,g]]], b, R).
+    gridlogic_all([[[r,b],[b,g]], [[r,b],[b,g]]], b, R).
     % R = [[r,b],[b,g]]
-    ggl_all([[[r,b],[b,g]], [[r,b],[b,x]]], b, R).
+    gridlogic_all([[[r,b],[b,g]], [[r,b],[b,x]]], b, R).
     % R = [[r,b],[b,b]]   (disagreement at (1,1))
 
-ggl_majority(+Grids, +BgColor, -Result)
+gridlogic_majority(+Grids, +BgColor, -Result)
 Plurality vote: most frequent non-bg at each cell if count > N/2; else bg.
 
-    ggl_majority([G, G, H], b, R).  % 2 of 3 agree at r-position → r wins
+    gridlogic_majority([G, G, H], b, R).  % 2 of 3 agree at r-position → r wins
 
-ggl_unanimous(+Grids, +BgColor, -Result)
+gridlogic_unanimous(+Grids, +BgColor, -Result)
 Strict all-grids agreement including bg cells. Any disagreement → bg.
 
 
 Conditional and Filtering
 
-ggl_mask(+Grid, +MaskGrid, +MaskColor, +BgColor, -Result)
+gridlogic_mask(+Grid, +MaskGrid, +MaskColor, +BgColor, -Result)
 Keep Grid's cell where MaskGrid = MaskColor; all others → BgColor.
 
-    ggl_mask([[r,g],[g,r]], [[m,b],[b,m]], m, b, R).
+    gridlogic_mask([[r,g],[g,r]], [[m,b],[b,m]], m, b, R).
     % R = [[r,b],[b,r]]
 
-ggl_if(+CondGrid, +CondColor, +ThenGrid, +ElseGrid, -Result)
+gridlogic_if(+CondGrid, +CondColor, +ThenGrid, +ElseGrid, -Result)
 Cell-wise conditional: CondGrid = CondColor → ThenGrid cell; else ElseGrid cell.
 
-    ggl_if([[c,b],[b,c]], c, [[r,g],[g,r]], [[x,y],[y,x]], R).
+    gridlogic_if([[c,b],[b,c]], c, [[r,g],[g,r]], [[x,y],[y,x]], R).
     % R = [[r,y],[y,r]]
 
-ggl_filter(+Grid, +Colors, +BgColor, -Result)
+gridlogic_filter(+Grid, +Colors, +BgColor, -Result)
 Keep cells whose color is in Colors; replace all others with BgColor.
 
-    ggl_filter([[r,g],[g,r]], [r], b, R).
+    gridlogic_filter([[r,g],[g,r]], [r], b, R).
     % R = [[r,b],[b,r]]
 
 
 Typical Workflows
 
 % Combine two layers with Grid2 on top of Grid1:
-ggl_or(Grid2, Grid1, Bg, Composite).
+gridlogic_or(Grid2, Grid1, Bg, Composite).
 
 % Find cells unique to each grid:
-ggl_xor(Grid1, Grid2, Bg, Unique).
+gridlogic_xor(Grid1, Grid2, Bg, Unique).
 
 % Keep only cells present in all sample grids:
-ggl_all(SampleGrids, Bg, Common).
+gridlogic_all(SampleGrids, Bg, Common).
 
 % Majority vote from multiple transformation candidates:
-ggl_majority(Candidates, Bg, Result).
+gridlogic_majority(Candidates, Bg, Result).

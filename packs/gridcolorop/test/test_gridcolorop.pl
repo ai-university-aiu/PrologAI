@@ -3,263 +3,263 @@
 
 :- begin_tests(gridcolorop).
 
-% AC-GCO-001: gco_color_counts returns correct counts.
+% AC-GCO-001: gridcolorop_color_counts returns correct counts.
 test('AC-GCO-001: color_counts basic') :-
     Grid = [[r,r,g],[b,b,b]],
-    gco_color_counts(Grid, b, Counts),
+    gridcolorop_color_counts(Grid, b, Counts),
     member(cc(r,2), Counts),
     member(cc(g,1), Counts).
 
-% AC-GCO-002: gco_color_counts most frequent first.
+% AC-GCO-002: gridcolorop_color_counts most frequent first.
 test('AC-GCO-002: color_counts ordered') :-
     Grid = [[r,r,r],[g,g,b]],
-    gco_color_counts(Grid, b, [cc(r,3)|_]).
+    gridcolorop_color_counts(Grid, b, [cc(r,3)|_]).
 
-% AC-GCO-003: gco_color_counts on all-bg grid returns empty.
+% AC-GCO-003: gridcolorop_color_counts on all-bg grid returns empty.
 test('AC-GCO-003: color_counts all bg') :-
     Grid = [[b,b],[b,b]],
-    gco_color_counts(Grid, b, []).
+    gridcolorop_color_counts(Grid, b, []).
 
-% AC-GCO-004: gco_distinct_colors returns colors by frequency.
+% AC-GCO-004: gridcolorop_distinct_colors returns colors by frequency.
 test('AC-GCO-004: distinct_colors') :-
     Grid = [[r,r,g],[b,b,b]],
-    gco_distinct_colors(Grid, b, [r,g]).
+    gridcolorop_distinct_colors(Grid, b, [r,g]).
 
-% AC-GCO-005: gco_distinct_colors on single color.
+% AC-GCO-005: gridcolorop_distinct_colors on single color.
 test('AC-GCO-005: distinct_colors single') :-
     Grid = [[r,r],[r,r]],
-    gco_distinct_colors(Grid, b, [r]).
+    gridcolorop_distinct_colors(Grid, b, [r]).
 
-% AC-GCO-006: gco_distinct_colors on all-bg returns empty.
+% AC-GCO-006: gridcolorop_distinct_colors on all-bg returns empty.
 test('AC-GCO-006: distinct_colors empty') :-
     Grid = [[b,b],[b,b]],
-    gco_distinct_colors(Grid, b, []).
+    gridcolorop_distinct_colors(Grid, b, []).
 
-% AC-GCO-007: gco_nth_color returns most frequent.
+% AC-GCO-007: gridcolorop_nth_color returns most frequent.
 test('AC-GCO-007: nth_color 0') :-
     Grid = [[r,r,g],[b,b,b]],
-    gco_nth_color(Grid, b, 0, r).
+    gridcolorop_nth_color(Grid, b, 0, r).
 
-% AC-GCO-008: gco_nth_color returns second most frequent.
+% AC-GCO-008: gridcolorop_nth_color returns second most frequent.
 test('AC-GCO-008: nth_color 1') :-
     Grid = [[r,r,g],[b,b,b]],
-    gco_nth_color(Grid, b, 1, g).
+    gridcolorop_nth_color(Grid, b, 1, g).
 
-% AC-GCO-009: gco_count_distinct returns 2 for two colors.
+% AC-GCO-009: gridcolorop_count_distinct returns 2 for two colors.
 test('AC-GCO-009: count_distinct two') :-
     Grid = [[r,g],[b,b]],
-    gco_count_distinct(Grid, b, 2).
+    gridcolorop_count_distinct(Grid, b, 2).
 
-% AC-GCO-010: gco_count_distinct returns 0 for all-bg.
+% AC-GCO-010: gridcolorop_count_distinct returns 0 for all-bg.
 test('AC-GCO-010: count_distinct zero') :-
     Grid = [[b,b],[b,b]],
-    gco_count_distinct(Grid, b, 0).
+    gridcolorop_count_distinct(Grid, b, 0).
 
-% AC-GCO-011: gco_swap exchanges two colors.
+% AC-GCO-011: gridcolorop_swap exchanges two colors.
 test('AC-GCO-011: swap basic') :-
     Grid = [[r,g],[g,r]],
-    gco_swap(Grid, r, g, b, Result),
+    gridcolorop_swap(Grid, r, g, b, Result),
     Result = [[g,r],[r,g]].
 
-% AC-GCO-012: gco_swap with no occurrence of one color is identity.
+% AC-GCO-012: gridcolorop_swap with no occurrence of one color is identity.
 test('AC-GCO-012: swap no color2') :-
     Grid = [[r,b],[r,b]],
-    gco_swap(Grid, r, g, b, Result),
+    gridcolorop_swap(Grid, r, g, b, Result),
     Result = [[g,b],[g,b]].
 
-% AC-GCO-013: gco_swap does not affect bg.
+% AC-GCO-013: gridcolorop_swap does not affect bg.
 test('AC-GCO-013: swap bg unchanged') :-
     Grid = [[r,b],[b,g]],
-    gco_swap(Grid, r, g, b, Result),
+    gridcolorop_swap(Grid, r, g, b, Result),
     Result = [[g,b],[b,r]].
 
-% AC-GCO-014: gco_replace replaces one color.
+% AC-GCO-014: gridcolorop_replace replaces one color.
 test('AC-GCO-014: replace basic') :-
     Grid = [[r,b],[r,g]],
-    gco_replace(Grid, r, x, b, Result),
+    gridcolorop_replace(Grid, r, x, b, Result),
     Result = [[x,b],[x,g]].
 
-% AC-GCO-015: gco_replace with non-existent color is identity.
+% AC-GCO-015: gridcolorop_replace with non-existent color is identity.
 test('AC-GCO-015: replace no match') :-
     Grid = [[r,b],[b,g]],
-    gco_replace(Grid, y, x, b, Result),
+    gridcolorop_replace(Grid, y, x, b, Result),
     Result = [[r,b],[b,g]].
 
-% AC-GCO-016: gco_apply_map applies multiple replacements.
+% AC-GCO-016: gridcolorop_apply_map applies multiple replacements.
 test('AC-GCO-016: apply_map two pairs') :-
     Grid = [[r,g],[b,b]],
-    gco_apply_map(Grid, [r-x, g-y], b, Result),
+    gridcolorop_apply_map(Grid, [r-x, g-y], b, Result),
     Result = [[x,y],[b,b]].
 
-% AC-GCO-017: gco_apply_map with empty map is identity.
+% AC-GCO-017: gridcolorop_apply_map with empty map is identity.
 test('AC-GCO-017: apply_map empty') :-
     Grid = [[r,g],[b,b]],
-    gco_apply_map(Grid, [], b, Result),
+    gridcolorop_apply_map(Grid, [], b, Result),
     Result = [[r,g],[b,b]].
 
-% AC-GCO-018: gco_keep_only keeps target color, bg-ifies rest.
+% AC-GCO-018: gridcolorop_keep_only keeps target color, bg-ifies rest.
 test('AC-GCO-018: keep_only basic') :-
     Grid = [[r,g],[b,b]],
-    gco_keep_only(Grid, r, b, Result),
+    gridcolorop_keep_only(Grid, r, b, Result),
     Result = [[r,b],[b,b]].
 
-% AC-GCO-019: gco_keep_only on all-bg returns all-bg.
+% AC-GCO-019: gridcolorop_keep_only on all-bg returns all-bg.
 test('AC-GCO-019: keep_only all bg') :-
     Grid = [[b,b],[b,b]],
-    gco_keep_only(Grid, r, b, Result),
+    gridcolorop_keep_only(Grid, r, b, Result),
     Result = [[b,b],[b,b]].
 
-% AC-GCO-020: gco_remove_color removes target color.
+% AC-GCO-020: gridcolorop_remove_color removes target color.
 test('AC-GCO-020: remove_color basic') :-
     Grid = [[r,g],[b,b]],
-    gco_remove_color(Grid, r, b, Result),
+    gridcolorop_remove_color(Grid, r, b, Result),
     Result = [[b,g],[b,b]].
 
-% AC-GCO-021: gco_remove_color with no match is identity.
+% AC-GCO-021: gridcolorop_remove_color with no match is identity.
 test('AC-GCO-021: remove_color no match') :-
     Grid = [[r,g],[b,b]],
-    gco_remove_color(Grid, y, b, Result),
+    gridcolorop_remove_color(Grid, y, b, Result),
     Result = [[r,g],[b,b]].
 
-% AC-GCO-022: gco_cycle shifts colors by 1 forward.
+% AC-GCO-022: gridcolorop_cycle shifts colors by 1 forward.
 test('AC-GCO-022: cycle N=1') :-
     Grid = [[r,g],[b,b]],
-    gco_cycle(Grid, [r,g,y], 1, b, Result),
+    gridcolorop_cycle(Grid, [r,g,y], 1, b, Result),
     Result = [[g,y],[b,b]].
 
-% AC-GCO-023: gco_cycle wraps around (last -> first).
+% AC-GCO-023: gridcolorop_cycle wraps around (last -> first).
 test('AC-GCO-023: cycle wrap') :-
     Grid = [[y,b],[b,b]],
-    gco_cycle(Grid, [r,g,y], 1, b, Result),
+    gridcolorop_cycle(Grid, [r,g,y], 1, b, Result),
     Result = [[r,b],[b,b]].
 
-% AC-GCO-024: gco_cycle with N=0 is identity.
+% AC-GCO-024: gridcolorop_cycle with N=0 is identity.
 test('AC-GCO-024: cycle N=0') :-
     Grid = [[r,g],[b,b]],
-    gco_cycle(Grid, [r,g,y], 0, b, Result),
+    gridcolorop_cycle(Grid, [r,g,y], 0, b, Result),
     Result = [[r,g],[b,b]].
 
-% AC-GCO-025: gco_cycle leaves non-palette colors unchanged.
+% AC-GCO-025: gridcolorop_cycle leaves non-palette colors unchanged.
 test('AC-GCO-025: cycle non-palette unchanged') :-
     Grid = [[r,x],[b,b]],
-    gco_cycle(Grid, [r,g], 1, b, Result),
+    gridcolorop_cycle(Grid, [r,g], 1, b, Result),
     Result = [[g,x],[b,b]].
 
-% AC-GCO-026: gco_rank_grid replaces cells with frequency ranks.
+% AC-GCO-026: gridcolorop_rank_grid replaces cells with frequency ranks.
 test('AC-GCO-026: rank_grid basic') :-
     Grid = [[r,r,r],[g,g,b]],
 % r appears 3 times (rank 0), g appears 2 times (rank 1).
-    gco_rank_grid(Grid, b, Result),
+    gridcolorop_rank_grid(Grid, b, Result),
     Result = [[0,0,0],[1,1,b]].
 
-% AC-GCO-027: gco_rank_grid single color gets rank 0.
+% AC-GCO-027: gridcolorop_rank_grid single color gets rank 0.
 test('AC-GCO-027: rank_grid single color') :-
     Grid = [[r,b],[r,b]],
-    gco_rank_grid(Grid, b, Result),
+    gridcolorop_rank_grid(Grid, b, Result),
     Result = [[0,b],[0,b]].
 
-% AC-GCO-028: gco_rank_grid all-bg returns unchanged.
+% AC-GCO-028: gridcolorop_rank_grid all-bg returns unchanged.
 test('AC-GCO-028: rank_grid all bg') :-
     Grid = [[b,b],[b,b]],
-    gco_rank_grid(Grid, b, Result),
+    gridcolorop_rank_grid(Grid, b, Result),
     Result = [[b,b],[b,b]].
 
-% AC-GCO-029: gco_apply_palette maps most-frequent to first palette color.
+% AC-GCO-029: gridcolorop_apply_palette maps most-frequent to first palette color.
 test('AC-GCO-029: apply_palette basic') :-
     Grid = [[r,r,r],[g,g,b]],
-    gco_apply_palette(Grid, b, [x,y], Result),
+    gridcolorop_apply_palette(Grid, b, [x,y], Result),
 % r (rank 0) -> x; g (rank 1) -> y.
     Result = [[x,x,x],[y,y,b]].
 
-% AC-GCO-030: gco_apply_palette with shorter palette leaves unmatched colors.
+% AC-GCO-030: gridcolorop_apply_palette with shorter palette leaves unmatched colors.
 test('AC-GCO-030: apply_palette partial') :-
     Grid = [[r,r,g],[b,b,b]],
-    gco_apply_palette(Grid, b, [x], Result),
+    gridcolorop_apply_palette(Grid, b, [x], Result),
 % r (rank 0) -> x; g (rank 1) unchanged.
     Result = [[x,x,g],[b,b,b]].
 
-% AC-GCO-031: gco_most_least basic.
+% AC-GCO-031: gridcolorop_most_least basic.
 test('AC-GCO-031: most_least basic') :-
     Grid = [[r,r,r],[g,g,b]],
-    gco_most_least(Grid, b, Most, Least),
+    gridcolorop_most_least(Grid, b, Most, Least),
     Most = r, Least = g.
 
-% AC-GCO-032: gco_most_least single color: most = least.
+% AC-GCO-032: gridcolorop_most_least single color: most = least.
 test('AC-GCO-032: most_least single') :-
     Grid = [[r,r],[r,b]],
-    gco_most_least(Grid, b, r, r).
+    gridcolorop_most_least(Grid, b, r, r).
 
-% AC-GCO-033: gco_invert swaps non-bg with Bg.
+% AC-GCO-033: gridcolorop_invert swaps non-bg with Bg.
 test('AC-GCO-033: invert basic') :-
     Grid = [[r,b],[b,g]],
-    gco_invert(Grid, b, x, Result),
+    gridcolorop_invert(Grid, b, x, Result),
     Result = [[b,x],[x,b]].
 
-% AC-GCO-034: gco_invert on all-bg fills all with FgColor.
+% AC-GCO-034: gridcolorop_invert on all-bg fills all with FgColor.
 test('AC-GCO-034: invert all bg') :-
     Grid = [[b,b],[b,b]],
-    gco_invert(Grid, b, r, Result),
+    gridcolorop_invert(Grid, b, r, Result),
     Result = [[r,r],[r,r]].
 
-% AC-GCO-035: gco_invert on all non-bg returns all bg.
+% AC-GCO-035: gridcolorop_invert on all non-bg returns all bg.
 test('AC-GCO-035: invert all fg') :-
     Grid = [[r,g],[y,p]],
-    gco_invert(Grid, b, x, Result),
+    gridcolorop_invert(Grid, b, x, Result),
     Result = [[b,b],[b,b]].
 
-% AC-GCO-036: gco_replace replaces bg cells too.
+% AC-GCO-036: gridcolorop_replace replaces bg cells too.
 test('AC-GCO-036: replace bg cells') :-
     Grid = [[r,b],[b,g]],
-    gco_replace(Grid, b, x, b, Result),
+    gridcolorop_replace(Grid, b, x, b, Result),
     Result = [[r,x],[x,g]].
 
-% AC-GCO-037: gco_cycle backward (N=-1).
+% AC-GCO-037: gridcolorop_cycle backward (N=-1).
 test('AC-GCO-037: cycle backward') :-
     Grid = [[r,b],[b,b]],
-    gco_cycle(Grid, [r,g,y], -1, b, Result),
+    gridcolorop_cycle(Grid, [r,g,y], -1, b, Result),
     Result = [[y,b],[b,b]].
 
-% AC-GCO-038: gco_apply_map with no matching cells is identity.
+% AC-GCO-038: gridcolorop_apply_map with no matching cells is identity.
 test('AC-GCO-038: apply_map no match') :-
     Grid = [[r,b],[g,b]],
-    gco_apply_map(Grid, [y-z], b, Result),
+    gridcolorop_apply_map(Grid, [y-z], b, Result),
     Result = [[r,b],[g,b]].
 
-% AC-GCO-039: gco_keep_only on grid with only that color returns grid.
+% AC-GCO-039: gridcolorop_keep_only on grid with only that color returns grid.
 test('AC-GCO-039: keep_only all that color') :-
     Grid = [[r,r],[r,r]],
-    gco_keep_only(Grid, r, b, Result),
+    gridcolorop_keep_only(Grid, r, b, Result),
     Result = [[r,r],[r,r]].
 
-% AC-GCO-040: gco_color_counts has correct count for three colors.
+% AC-GCO-040: gridcolorop_color_counts has correct count for three colors.
 test('AC-GCO-040: color_counts three colors') :-
     Grid = [[r,r,g],[g,y,b]],
-    gco_color_counts(Grid, b, Counts),
+    gridcolorop_color_counts(Grid, b, Counts),
     length(Counts, 3).
 
-% AC-GCO-041: gco_count_distinct three colors.
+% AC-GCO-041: gridcolorop_count_distinct three colors.
 test('AC-GCO-041: count_distinct three') :-
     Grid = [[r,g,y],[b,b,b]],
-    gco_count_distinct(Grid, b, 3).
+    gridcolorop_count_distinct(Grid, b, 3).
 
-% AC-GCO-042: gco_cycle N=2 shifts two steps.
+% AC-GCO-042: gridcolorop_cycle N=2 shifts two steps.
 test('AC-GCO-042: cycle N=2') :-
     Grid = [[r,b],[b,b]],
-    gco_cycle(Grid, [r,g,y], 2, b, Result),
+    gridcolorop_cycle(Grid, [r,g,y], 2, b, Result),
     Result = [[y,b],[b,b]].
 
 % AC-GCO-043: integration - rank then apply_palette to recolor.
 test('AC-GCO-043: integration rank and palette') :-
     Grid = [[r,r,g],[g,g,b]],
-    gco_apply_palette(Grid, b, [a,c], Result),
+    gridcolorop_apply_palette(Grid, b, [a,c], Result),
 % g appears 3 times (rank 0) -> a; r appears 2 times (rank 1) -> c.
     Result = [[c,c,a],[a,a,b]].
 
 % AC-GCO-044: integration - remove then count_distinct.
 test('AC-GCO-044: integration remove then count') :-
     Grid = [[r,g],[g,r]],
-    gco_remove_color(Grid, r, b, Cleaned),
-    gco_count_distinct(Cleaned, b, Count),
+    gridcolorop_remove_color(Grid, r, b, Cleaned),
+    gridcolorop_count_distinct(Cleaned, b, Count),
     Count = 1.
 
 :- end_tests(gridcolorop).

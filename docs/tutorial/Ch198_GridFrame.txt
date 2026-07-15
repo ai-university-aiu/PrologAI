@@ -40,177 +40,177 @@ The maximum frame depth for an H x W grid is floor((min(H,W)-1)/2).
 
 4. Cell Depth
 
-gfr_cell_depth/4:
+gridframe_cell_depth/4:
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gfr_cell_depth(G, 0, 0, D).
+    gridframe_cell_depth(G, 0, 0, D).
     % D = 0   (corner)
 
-    gfr_cell_depth(G, 1, 1, D).
+    gridframe_cell_depth(G, 1, 1, D).
     % D = 1   (center of 3x3)
 
     G5 = [[...],...].   % 5x5
-    gfr_cell_depth(G5, 2, 2, D).
+    gridframe_cell_depth(G5, 2, 2, D).
     % D = 2   (center of 5x5)
 
 
 5. Frame Extraction
 
-gfr_frame/3 returns cells at a given depth as R-C pairs:
+gridframe_frame/3 returns cells at a given depth as R-C pairs:
 
     G = [[a,b,c],[d,e,f],[g,h,i]].   % 3x3
-    gfr_frame(G, 0, Cells).
+    gridframe_frame(G, 0, Cells).
     % Cells = [0-0, 0-1, 0-2, 1-0, 1-2, 2-0, 2-1, 2-2]   (8 border cells)
 
-    gfr_frame(G, 1, Cells).
+    gridframe_frame(G, 1, Cells).
     % Cells = [1-1]   (center)
 
-gfr_max_depth/2 and gfr_frame_count/2:
+gridframe_max_depth/2 and gridframe_frame_count/2:
 
-    gfr_max_depth(G, D).
+    gridframe_max_depth(G, D).
     % D = 1   (for 3x3)
 
-    gfr_frame_count(G, N).
+    gridframe_frame_count(G, N).
     % N = 2   (depths 0 and 1)
 
     G5 = [[...],...]   % 5x5
-    gfr_max_depth(G5, D).
+    gridframe_max_depth(G5, D).
     % D = 2
 
-    gfr_frame_count(G5, N).
+    gridframe_frame_count(G5, N).
     % N = 3
 
-gfr_all_frames/2 returns all frame cell-lists:
+gridframe_all_frames/2 returns all frame cell-lists:
 
-    gfr_all_frames(G, Frames).
+    gridframe_all_frames(G, Frames).
     % Frames = [[0-0,...,2-2], [1-1]]  (frame 0 and frame 1)
 
 
 6. Peeling
 
-gfr_peel/2 removes the outermost frame, returning the (H-2)x(W-2) inner grid:
+gridframe_peel/2 removes the outermost frame, returning the (H-2)x(W-2) inner grid:
 
     Ring = [[r,r,r,r,r],
             [r,x,x,x,r],
             [r,x,b,x,r],
             [r,x,x,x,r],
             [r,r,r,r,r]].
-    gfr_peel(Ring, Inner).
+    gridframe_peel(Ring, Inner).
     % Inner = [[x,x,x],[x,b,x],[x,x,x]]   (3x3 inner)
 
-    gfr_peel(Inner, Core).
+    gridframe_peel(Inner, Core).
     % Core = [[b]]   (the center cell)
 
-Note: gfr_peel fails if the grid has fewer than 3 rows or 3 columns.
+Note: gridframe_peel fails if the grid has fewer than 3 rows or 3 columns.
 
 
 7. Frame Uniformity and Colors
 
-gfr_frame_uniform/3 tests whether a frame is all one color:
+gridframe_frame_uniform/3 tests whether a frame is all one color:
 
     Ring = [[r,r,r],[r,x,r],[r,r,r]].
-    gfr_frame_uniform(Ring, 0, Bool).
+    gridframe_frame_uniform(Ring, 0, Bool).
     % Bool = yes   (all r)
 
-    gfr_frame_uniform(Ring, 1, Bool).
+    gridframe_frame_uniform(Ring, 1, Bool).
     % Bool = yes   (center is x)
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gfr_frame_uniform(G, 0, Bool).
+    gridframe_frame_uniform(G, 0, Bool).
     % Bool = no   (border has many distinct values)
 
-gfr_frame_colors/3 returns distinct colors in a frame:
+gridframe_frame_colors/3 returns distinct colors in a frame:
 
-    gfr_frame_colors(Ring, 0, Colors).
+    gridframe_frame_colors(Ring, 0, Colors).
     % Colors = [r]
 
-    gfr_frame_colors(G, 0, Colors).
+    gridframe_frame_colors(G, 0, Colors).
     % Colors = [a, b, c, d, f, g, h, i]   (all distinct border values)
 
 
 8. Counting and Uniformity Collection
 
-gfr_count_in_frame/4 counts a specific color in a frame:
+gridframe_count_in_frame/4 counts a specific color in a frame:
 
     Ring = [[r,r,r],[r,x,r],[r,r,r]].
-    gfr_count_in_frame(Ring, 0, r, Count).
+    gridframe_count_in_frame(Ring, 0, r, Count).
     % Count = 8
 
-gfr_uniform_frames/2 collects all depths with uniform frames:
+gridframe_uniform_frames/2 collects all depths with uniform frames:
 
     Ring5 = [[r,r,r,r,r],[r,x,x,x,r],[r,x,b,x,r],[r,x,x,x,r],[r,r,r,r,r]].
-    gfr_uniform_frames(Ring5, Ds).
+    gridframe_uniform_frames(Ring5, Ds).
     % Ds = [0, 1, 2]
 
 
 9. Modification
 
-gfr_set_frame/4 sets all cells at depth D to a given Color:
+gridframe_set_frame/4 sets all cells at depth D to a given Color:
 
     G = [[r,r,r],[r,x,r],[r,r,r]].
-    gfr_set_frame(G, 0, y, Result).
+    gridframe_set_frame(G, 0, y, Result).
     % Result = [[y,y,y],[y,x,y],[y,y,y]]
 
-gfr_fill_frames/3 fills each frame with a color from a list:
+gridframe_fill_frames/3 fills each frame with a color from a list:
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gfr_fill_frames(G, [r, x], Result).
+    gridframe_fill_frames(G, [r, x], Result).
     % Result = [[r,r,r],[r,x,r],[r,r,r]]
 
     G5 = [[...,...],...]   % 5x5 grid
-    gfr_fill_frames(G5, [r, x, b], Result).
+    gridframe_fill_frames(G5, [r, x, b], Result).
     % Result = [[r,r,r,r,r],[r,x,x,x,r],[r,x,b,x,r],[r,x,x,x,r],[r,r,r,r,r]]
 
 
 10. Innermost Frame and Onion Patterns
 
-gfr_innermost/2 returns cells at the maximum depth:
+gridframe_innermost/2 returns cells at the maximum depth:
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gfr_innermost(G, Cells).
+    gridframe_innermost(G, Cells).
     % Cells = [1-1]   (the center)
 
     G5 = [[...],...].   % 5x5
-    gfr_innermost(G5, Cells).
+    gridframe_innermost(G5, Cells).
     % Cells = [2-2]   (center)
 
-gfr_onion_layers/2 returns D-Color pairs for each uniform frame:
+gridframe_onion_layers/2 returns D-Color pairs for each uniform frame:
 
     Ring = [[r,r,r],[r,x,r],[r,r,r]].
-    gfr_onion_layers(Ring, Layers).
+    gridframe_onion_layers(Ring, Layers).
     % Layers = [0-r, 1-x]
 
     Ring5 = [[r,r,r,r,r],[r,x,x,x,r],[r,x,b,x,r],[r,x,x,x,r],[r,r,r,r,r]].
-    gfr_onion_layers(Ring5, Layers).
+    gridframe_onion_layers(Ring5, Layers).
     % Layers = [0-r, 1-x, 2-b]
 
-A grid is a "perfect onion" when the length of gfr_onion_layers equals gfr_frame_count.
+A grid is a "perfect onion" when the length of gridframe_onion_layers equals gridframe_frame_count.
 
 
 11. Test Coverage
 
 44 acceptance criteria (AC-GFR-001 through AC-GFR-044) exercised in
-packs/gridframe/test/test_gridframe.pl. Tests cover gfr_cell_depth (4 tests),
-frame cell counts (5 tests), gfr_max_depth (4 tests), gfr_frame_count (3 tests),
-gfr_peel (4 tests), gfr_all_frames (2 tests), gfr_frame_uniform (5 tests),
-gfr_frame_colors (3 tests), gfr_set_frame (2 tests), gfr_count_in_frame (3 tests),
-gfr_uniform_frames (3 tests), gfr_fill_frames (2 tests), gfr_innermost (2 tests),
-and gfr_onion_layers (2 tests).
+packs/gridframe/test/test_gridframe.pl. Tests cover gridframe_cell_depth (4 tests),
+frame cell counts (5 tests), gridframe_max_depth (4 tests), gridframe_frame_count (3 tests),
+gridframe_peel (4 tests), gridframe_all_frames (2 tests), gridframe_frame_uniform (5 tests),
+gridframe_frame_colors (3 tests), gridframe_set_frame (2 tests), gridframe_count_in_frame (3 tests),
+gridframe_uniform_frames (3 tests), gridframe_fill_frames (2 tests), gridframe_innermost (2 tests),
+and gridframe_onion_layers (2 tests).
 
 
 12. Summary
 
-gfr_cell_depth/4      - frame depth of a specific cell
-gfr_frame/3           - cells at frame depth D
-gfr_max_depth/2       - maximum frame depth: floor((min(H,W)-1)/2)
-gfr_frame_count/2     - number of distinct frame depths
-gfr_peel/2            - inner (H-2)x(W-2) grid after removing outermost frame
-gfr_all_frames/2      - all frame cell-lists from depth 0 to max_depth
-gfr_frame_uniform/3   - yes/no uniformity of frame D
-gfr_frame_colors/3    - distinct colors in frame D
-gfr_set_frame/4       - set frame D to Color
-gfr_count_in_frame/4  - count Color at frame depth D
-gfr_uniform_frames/2  - list of depths with uniform frames
-gfr_fill_frames/3     - fill each frame with Colors[D]
-gfr_innermost/2       - cells at maximum depth
-gfr_onion_layers/2    - D-Color pairs for uniform frames (onion pattern)
+gridframe_cell_depth/4      - frame depth of a specific cell
+gridframe_frame/3           - cells at frame depth D
+gridframe_max_depth/2       - maximum frame depth: floor((min(H,W)-1)/2)
+gridframe_frame_count/2     - number of distinct frame depths
+gridframe_peel/2            - inner (H-2)x(W-2) grid after removing outermost frame
+gridframe_all_frames/2      - all frame cell-lists from depth 0 to max_depth
+gridframe_frame_uniform/3   - yes/no uniformity of frame D
+gridframe_frame_colors/3    - distinct colors in frame D
+gridframe_set_frame/4       - set frame D to Color
+gridframe_count_in_frame/4  - count Color at frame depth D
+gridframe_uniform_frames/2  - list of depths with uniform frames
+gridframe_fill_frames/3     - fill each frame with Colors[D]
+gridframe_innermost/2       - cells at maximum depth
+gridframe_onion_layers/2    - D-Color pairs for uniform frames (onion pattern)

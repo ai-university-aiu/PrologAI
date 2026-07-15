@@ -4459,78 +4459,78 @@ Load:
 
 DETECTING A UNIFORM BORDER
 
-fr_border_color(+Grid, -Color)
-fr_has_border(+Grid, -Color)
+frame_border_color(+Grid, -Color)
+frame_has_border(+Grid, -Color)
 
 Succeed if the outer ring of Grid is all one color (and bind that color).
 
-  ?- fr_border_color([[1,1,1,1],[1,2,2,1],[1,2,2,1],[1,1,1,1]], Color).
+  ?- frame_border_color([[1,1,1,1],[1,2,2,1],[1,2,2,1],[1,1,1,1]], Color).
   Color = 1.
 
-fr_border_cells(+Grid, -Pairs)
+frame_border_cells(+Grid, -Pairs)
   Returns all (r(R,C)-Color) pairs on the outer ring.
 
 
 EXTRACTING THE INTERIOR
 
-fr_inner(+Grid, -Inner)
+frame_inner(+Grid, -Inner)
   Remove the single-cell outer border. Fails if Grid < 3 rows or < 3 cols.
 
-  ?- fr_inner([[1,1,1],[1,7,1],[1,1,1]], Inner).
+  ?- frame_inner([[1,1,1],[1,7,1],[1,1,1]], Inner).
   Inner = [[7]].
 
-fr_interior_uniform(+Grid)
+frame_interior_uniform(+Grid)
   Succeeds if the interior is a single color.
 
-fr_interior_color(+Grid, -Color)
+frame_interior_color(+Grid, -Color)
   Binds Color to the uniform interior color.
 
 
 GENERATING FRAMES
 
-fr_make_framed(+Rows, +Cols, +FrameColor, +FillColor, -Grid)
+frame_make_framed(+Rows, +Cols, +FrameColor, +FillColor, -Grid)
   Build a new grid with outer ring FrameColor, interior FillColor.
 
-fr_add_border(+Grid, +Thickness, +Color, -Grid2)
+frame_add_border(+Grid, +Thickness, +Color, -Grid2)
   Wrap a grid with a new border of given Thickness and Color.
 
-  ?- fr_add_border([[7]], 1, 5, Grid2).
+  ?- frame_add_border([[7]], 1, 5, Grid2).
   Grid2 = [[5,5,5],[5,7,5],[5,5,5]].
 
 
 SUB-REGION BORDERS
 
-fr_region_has_border(+Grid, +R0, +C0, +R1, +C1, -Color)
-fr_region_border_color(+Grid, +R0, +C0, +R1, +C1, -Color)
+frame_region_has_border(+Grid, +R0, +C0, +R1, +C1, -Color)
+frame_region_border_color(+Grid, +R0, +C0, +R1, +C1, -Color)
   Test or return the uniform outer ring of the sub-rectangle (R0,C0)-(R1,C1).
 
 
 BOUNDING BOX
 
-fr_bounding_box(+Grid, +FrameColor, -R0, -C0, -R1, -C1)
+frame_bounding_box(+Grid, +FrameColor, -R0, -C0, -R1, -C1)
   Find the outermost ring of FrameColor; return its corners.
 
 
 NESTING
 
-fr_is_nested(+Grid, -ColorA, -ColorB)
+frame_is_nested(+Grid, -ColorA, -ColorB)
   Outer ring = ColorA, second ring = ColorB, ColorA not equal to ColorB.
 
-fr_ring_count(+Grid, -N)
+frame_ring_count(+Grid, -N)
   Count concentric rings (each must have an extractable interior).
 
-  ?- fr_ring_count([[1,1,1,1,1],[1,2,2,2,1],[1,2,3,2,1],[1,2,2,2,1],[1,1,1,1,1]], N).
+  ?- frame_ring_count([[1,1,1,1,1],[1,2,2,2,1],[1,2,3,2,1],[1,2,2,2,1],[1,1,1,1,1]], N).
   N = 2.
 
 
 PREDICATE SUMMARY
 
-  fr_border_cells/2, fr_border_color/2, fr_has_border/2
-  fr_inner/2, fr_interior_uniform/1, fr_interior_color/2
-  fr_make_framed/5, fr_add_border/4
-  fr_region_has_border/6, fr_region_border_color/6
-  fr_bounding_box/6
-  fr_is_nested/3, fr_ring_count/2
+  frame_border_cells/2, frame_border_color/2, frame_has_border/2
+  frame_inner/2, frame_interior_uniform/1, frame_interior_color/2
+  frame_make_framed/5, frame_add_border/4
+  frame_region_has_border/6, frame_region_border_color/6
+  frame_bounding_box/6
+  frame_is_nested/3, frame_ring_count/2
 
 
 WHAT COMES NEXT
@@ -5207,86 +5207,86 @@ All indices are 0-indexed. Load with :- use_module(library(crop)).
 
 BOUNDING BOX AND CONTENT CROPPING
 
-cr_bbox(+Grid, +BG, -bbox(MinR,MinC,MaxR,MaxC))
+crop_bbox(+Grid, +BG, -bbox(MinR,MinC,MaxR,MaxC))
   Tight bounding box of all cells != BG. Fails if all cells equal BG.
 
-cr_crop_bbox(+Grid, +R1, +C1, +R2, +C2, -Sub)
+crop_crop_bbox(+Grid, +R1, +C1, +R2, +C2, -Sub)
   Sub = rectangular subgrid rows R1..R2, cols C1..C2 (inclusive, 0-indexed).
 
-cr_crop_content(+Grid, +BG, -Cropped)
+crop_crop_content(+Grid, +BG, -Cropped)
   Crop Grid to tight bounding box of non-background content.
 
-:- cr_crop_content([[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]], 0, C).
+:- crop_crop_content([[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]], 0, C).
 % C = [[1,2],[3,4]].
 
 
 PADDING AND BORDER REMOVAL
 
-cr_pad(+Grid, +Color, +N, -Padded)
+crop_pad(+Grid, +Color, +N, -Padded)
   Add N-cell border of Color on all sides.
 
-cr_strip_border(+Grid, +N, -Inner)
+crop_strip_border(+Grid, +N, -Inner)
   Remove N rows/cols from all sides. Fails if grid is too small.
 
-:- cr_pad([[1]], 0, 2, P).   % 5x5 grid with [[1]] in center.
-:- cr_strip_border(P, 2, G). % G = [[1]].
+:- crop_pad([[1]], 0, 2, P).   % 5x5 grid with [[1]] in center.
+:- crop_strip_border(P, 2, G). % G = [[1]].
 
 
 SPLITTING
 
-cr_split_h(+Grid, +R, -Top, -Bottom)  - top has R rows; bottom has the rest.
-cr_split_v(+Grid, +C, -Left, -Right)  - left has C cols; right has the rest.
+crop_split_h(+Grid, +R, -Top, -Bottom)  - top has R rows; bottom has the rest.
+crop_split_v(+Grid, +C, -Left, -Right)  - left has C cols; right has the rest.
 
-:- cr_split_h([[1,2],[3,4],[5,6]], 2, Top, Bot).
+:- crop_split_h([[1,2],[3,4],[5,6]], 2, Top, Bot).
 % Top=[[1,2],[3,4]], Bot=[[5,6]].
 
 
 ROW AND COLUMN BANDS
 
-cr_rows(+Grid, +From, +To, -Sub)  - rows From..To-1 (exclusive end).
-cr_cols(+Grid, +From, +To, -Sub)  - cols From..To-1 (exclusive end).
+crop_rows(+Grid, +From, +To, -Sub)  - rows From..To-1 (exclusive end).
+crop_cols(+Grid, +From, +To, -Sub)  - cols From..To-1 (exclusive end).
 
-:- cr_rows([[a,b],[c,d],[e,f],[g,h]], 1, 3, Sub). % Sub=[[c,d],[e,f]].
+:- crop_rows([[a,b],[c,d],[e,f],[g,h]], 1, 3, Sub). % Sub=[[c,d],[e,f]].
 
 
 JOINING GRIDS
 
-cr_stitch_h(+Left, +Right, -Joined) - side by side (same height).
-cr_stitch_v(+Top, +Bottom, -Joined) - top to bottom (same width).
+crop_stitch_h(+Left, +Right, -Joined) - side by side (same height).
+crop_stitch_v(+Top, +Bottom, -Joined) - top to bottom (same width).
 
 Round-trip:
-:- cr_split_v(G, 2, L, R), cr_stitch_h(L, R, G). % recovers G.
+:- crop_split_v(G, 2, L, R), crop_stitch_h(L, R, G). % recovers G.
 
 
 EMBEDDING AND CENTER
 
-cr_embed(+Base, +Sub, +R, +C, -Result)
+crop_embed(+Base, +Sub, +R, +C, -Result)
   Overwrite Base[R..R+H-1][C..C+W-1] with Sub.
 
-cr_center(+Grid, +Rows, +Cols, -Center)
+crop_center(+Grid, +Rows, +Cols, -Center)
   Extract centered Rows x Cols subgrid.
 
-:- cr_embed([[0,0,0],[0,0,0],[0,0,0]], [[7]], 1, 1, R).
+:- crop_embed([[0,0,0],[0,0,0],[0,0,0]], [[7]], 1, 1, R).
 % R = [[0,0,0],[0,7,0],[0,0,0]].
 
 
 QUADRANTS
 
-cr_quadrants(+Grid, -Q1, -Q2, -Q3, -Q4)
+crop_quadrants(+Grid, -Q1, -Q2, -Q3, -Q4)
   Split at (Rows//2, Cols//2). Q1=top-left, Q2=top-right,
   Q3=bottom-left, Q4=bottom-right.
 
-:- cr_quadrants([[1,2],[3,4]], Q1, Q2, Q3, Q4).
+:- crop_quadrants([[1,2],[3,4]], Q1, Q2, Q3, Q4).
 % Q1=[[1]], Q2=[[2]], Q3=[[3]], Q4=[[4]].
 
 
 PREDICATE SUMMARY
 
-Extraction: cr_bbox/3, cr_crop_bbox/6, cr_crop_content/3
-Padding:    cr_pad/4, cr_strip_border/3
-Splitting:  cr_split_h/4, cr_split_v/4, cr_rows/4, cr_cols/4
-Joining:    cr_stitch_h/3, cr_stitch_v/3
-Placement:  cr_embed/5, cr_center/4, cr_quadrants/5
+Extraction: crop_bbox/3, crop_crop_bbox/6, crop_crop_content/3
+Padding:    crop_pad/4, crop_strip_border/3
+Splitting:  crop_split_h/4, crop_split_v/4, crop_rows/4, crop_cols/4
+Joining:    crop_stitch_h/3, crop_stitch_v/3
+Placement:  crop_embed/5, crop_center/4, crop_quadrants/5
 
 END OF CHAPTER 31
 
@@ -5742,119 +5742,119 @@ Load the pack:
 
 Counting Cells by Color
 
-cn_color_count/3 counts how many cells in a grid equal a specific color.
+count_color_count/3 counts how many cells in a grid equal a specific color.
 
-    ?- cn_color_count([[0,1,0],[1,0,1]], 0, N).
+    ?- count_color_count([[0,1,0],[1,0,1]], 0, N).
     N = 3.
 
-cn_by_value/3 counts occurrences of a value in a flat list.
+count_by_value/3 counts occurrences of a value in a flat list.
 
-    ?- cn_by_value([1,2,1,3,1], 1, N).
+    ?- count_by_value([1,2,1,3,1], 1, N).
     N = 3.
 
 
 Color Histogram
 
-cn_histogram/3 produces parallel lists of all colors and their cell counts,
+count_histogram/3 produces parallel lists of all colors and their cell counts,
 sorted by color value ascending.
 
-    ?- cn_histogram([[0,1,2],[0,1,2]], Colors, Counts).
+    ?- count_histogram([[0,1,2],[0,1,2]], Colors, Counts).
     Colors = [0,1,2], Counts = [2,2,2].
 
-    ?- cn_histogram([[0,0,0],[0,1,0],[0,0,0]], Colors, Counts).
+    ?- count_histogram([[0,0,0],[0,1,0],[0,0,0]], Colors, Counts).
     Colors = [0,1], Counts = [8,1].
 
 
 Most and Least Frequent Colors
 
-cn_max_color/2 returns the most frequently occurring color. When tied, it
+count_max_color/2 returns the most frequently occurring color. When tied, it
 returns the lowest color value.
 
-cn_min_color/2 returns the least frequently occurring color.
+count_min_color/2 returns the least frequently occurring color.
 
-    ?- cn_max_color([[0,0,0],[0,1,0],[0,0,0]], C).
+    ?- count_max_color([[0,0,0],[0,1,0],[0,0,0]], C).
     C = 0.   % 0 appears 8 times, 1 appears once.
 
-    ?- cn_min_color([[0,0,0],[0,1,0],[0,0,0]], C).
+    ?- count_min_color([[0,0,0],[0,1,0],[0,0,0]], C).
     C = 1.   % 1 appears only once.
 
 
 Row and Column Color Presence
 
-cn_color_rows/3 counts rows containing a specific color at least once.
-cn_color_cols/3 counts columns containing a specific color at least once.
+count_color_rows/3 counts rows containing a specific color at least once.
+count_color_cols/3 counts columns containing a specific color at least once.
 
-    ?- cn_color_rows([[0,1,2],[0,1,2],[9,9,9]], 0, N).
+    ?- count_color_rows([[0,1,2],[0,1,2],[9,9,9]], 0, N).
     N = 2.   % color 0 in rows 0 and 1, not row 2.
 
-    ?- cn_color_cols([[0,1,0],[0,1,0]], 0, N).
+    ?- count_color_cols([[0,1,0],[0,1,0]], 0, N).
     N = 2.   % color 0 in cols 0 and 2.
 
 
 Value Diversity in Rows and Columns
 
-cn_row_distinct/3 counts distinct values in a specific row.
-cn_col_distinct/3 counts distinct values in a specific column.
+count_row_distinct/3 counts distinct values in a specific row.
+count_col_distinct/3 counts distinct values in a specific column.
 
-    ?- cn_row_distinct([[1,2,3],[4,4,4]], 0, N).
+    ?- count_row_distinct([[1,2,3],[4,4,4]], 0, N).
     N = 3.   % row 0 has three distinct values.
 
-    ?- cn_col_distinct([[1,2],[1,3],[1,4]], 0, N).
+    ?- count_col_distinct([[1,2],[1,3],[1,4]], 0, N).
     N = 1.   % column 0 has all 1s.
 
 
 Grid Size
 
-cn_grid_total/2 returns the total cell count (Rows * Cols).
+count_grid_total/2 returns the total cell count (Rows * Cols).
 
-    ?- cn_grid_total([[1,2,3],[4,5,6]], N).
+    ?- count_grid_total([[1,2,3],[4,5,6]], N).
     N = 6.
 
 
 Comparing Two Grids
 
-cn_equal_cells/3 counts positions where two same-size grids have equal values.
-cn_diff_cells/3 counts positions where they differ.
+count_equal_cells/3 counts positions where two same-size grids have equal values.
+count_diff_cells/3 counts positions where they differ.
 
-    ?- cn_equal_cells([[1,2],[3,4]], [[1,9],[3,4]], N).
+    ?- count_equal_cells([[1,2],[3,4]], [[1,9],[3,4]], N).
     N = 3.   % only position (0,1) differs.
 
-    ?- cn_diff_cells([[1,2],[3,4]], [[1,9],[3,4]], N).
+    ?- count_diff_cells([[1,2],[3,4]], [[1,9],[3,4]], N).
     N = 1.
 
 
 Region Colors
 
-cn_region_color/3 returns the color of a region by looking up the grid value
+count_region_color/3 returns the color of a region by looking up the grid value
 at the region's first cell. For a connected component, all cells share the
 same color, so this gives the region's color.
 
-    ?- cn_region_color([[0,1],[2,3]], [r(0,1), r(1,1)], C).
+    ?- count_region_color([[0,1],[2,3]], [r(0,1), r(1,1)], C).
     C = 1.
 
-cn_regions_per_color/3 tallies regions by color, producing Color-Count pairs.
+count_regions_per_color/3 tallies regions by color, producing Color-Count pairs.
 
     ?- Regions = [[r(0,0)], [r(0,1)], [r(1,0)]],
-       cn_regions_per_color([[0,1],[0,2]], Regions, Pairs).
+       count_regions_per_color([[0,1],[0,2]], Regions, Pairs).
     Pairs = [0-2, 1-1].  % two color-0 regions, one color-1 region.
 
 
 Exported Predicates
 
-cn_color_count/3       - cell count for a specific color
-cn_histogram/3         - sorted color histogram
-cn_max_color/2         - most frequent color
-cn_min_color/2         - least frequent color
-cn_color_rows/3        - rows containing a color
-cn_color_cols/3        - columns containing a color
-cn_row_distinct/3      - distinct values in a row
-cn_col_distinct/3      - distinct values in a column
-cn_grid_total/2        - total cell count
-cn_equal_cells/3       - matching cell count between two grids
-cn_diff_cells/3        - differing cell count between two grids
-cn_region_color/3      - color of a region from the grid
-cn_regions_per_color/3 - per-color region tally
-cn_by_value/3          - value count in a flat list
+count_color_count/3       - cell count for a specific color
+count_histogram/3         - sorted color histogram
+count_max_color/2         - most frequent color
+count_min_color/2         - least frequent color
+count_color_rows/3        - rows containing a color
+count_color_cols/3        - columns containing a color
+count_row_distinct/3      - distinct values in a row
+count_col_distinct/3      - distinct values in a column
+count_grid_total/2        - total cell count
+count_equal_cells/3       - matching cell count between two grids
+count_diff_cells/3        - differing cell count between two grids
+count_region_color/3      - color of a region from the grid
+count_regions_per_color/3 - per-color region tally
+count_by_value/3          - value count in a flat list
 
 END OF CHAPTER 36
 
@@ -5878,103 +5878,103 @@ To use the fill pack in your code:
 
 37.2 Filling Regions and Bounding Boxes
 
-fl_fill_region(Grid, Region, Color, Result) fills every r(R,C) cell in Region
+fill_fill_region(Grid, Region, Color, Result) fills every r(R,C) cell in Region
 with Color and returns the updated grid in Result.
 
 Example:
 
 G = [[0,0,0],[0,0,0],[0,0,0]],
 Region = [r(0,0), r(1,1), r(2,2)],
-fl_fill_region(G, Region, 5, Result).
+fill_fill_region(G, Region, 5, Result).
 % Result = [[5,0,0],[0,5,0],[0,0,5]]
 
-fl_fill_bbox(Grid, bbox(R1,C1,R2,C2), Color, Result) fills all cells whose row is
+fill_fill_bbox(Grid, bbox(R1,C1,R2,C2), Color, Result) fills all cells whose row is
 between R1 and R2 inclusive and whose column is between C1 and C2 inclusive.
 
 Example:
 
 G = [[0,0,0],[0,0,0],[0,0,0]],
-fl_fill_bbox(G, bbox(0,1,1,2), 3, Result).
+fill_fill_bbox(G, bbox(0,1,1,2), 3, Result).
 % Result = [[0,3,3],[0,3,3],[0,0,0]]
 
 
 37.3 Row, Column, and Cell Filling
 
-fl_fill_row(Grid, R, Color, Result) replaces every cell in row R with Color.
+fill_fill_row(Grid, R, Color, Result) replaces every cell in row R with Color.
 
-fl_fill_col(Grid, C, Color, Result) replaces every cell in column C with Color.
+fill_fill_col(Grid, C, Color, Result) replaces every cell in column C with Color.
 
-fl_fill_cells(Grid, Cells, Color, Result) fills a specific list of r(R,C) cells.
-This is semantically identical to fl_fill_region but communicates intent clearly
+fill_fill_cells(Grid, Cells, Color, Result) fills a specific list of r(R,C) cells.
+This is semantically identical to fill_fill_region but communicates intent clearly
 when the caller is working with an explicit list of target cells.
 
 
 37.4 Border and Outline Operations
 
-fl_fill_border(Grid, Color, Result) fills the four outermost edges of the grid
+fill_fill_border(Grid, Color, Result) fills the four outermost edges of the grid
 with Color.
 
 Example:
 
 G = [[0,0,0],[0,0,0],[0,0,0]],
-fl_fill_border(G, 1, Result).
+fill_fill_border(G, 1, Result).
 % Result = [[1,1,1],[1,0,1],[1,1,1]]
 
-fl_outline_region(Grid, Region, Color, Result) fills only the boundary cells of
+fill_outline_region(Grid, Region, Color, Result) fills only the boundary cells of
 a region with Color, leaving interior cells unchanged.
 
 A cell is a boundary cell if at least one of its four orthogonal neighbors is not
 in the region.
 
-fl_fill_interior(Grid, Region, Color, Result) fills only the interior cells.
+fill_fill_interior(Grid, Region, Color, Result) fills only the interior cells.
 
 A cell is an interior cell if all four orthogonal neighbors are in the region.
 
 
 37.5 Creating New Grids
 
-fl_solid_rect(Rows, Cols, Color, Grid) creates a brand-new grid of given
+fill_solid_rect(Rows, Cols, Color, Grid) creates a brand-new grid of given
 dimensions filled entirely with Color.
 
 Example:
 
-fl_solid_rect(2, 3, 7, Grid).
+fill_solid_rect(2, 3, 7, Grid).
 % Grid = [[7,7,7],[7,7,7]]
 
-fl_checkerboard(Rows, Cols, C1, C2, Grid) creates a new grid where cells
+fill_checkerboard(Rows, Cols, C1, C2, Grid) creates a new grid where cells
 alternate between C1 and C2 based on whether (R + C) is even or odd.
 
 Example:
 
-fl_checkerboard(3, 3, 0, 1, Grid).
+fill_checkerboard(3, 3, 0, 1, Grid).
 % Grid = [[0,1,0],[1,0,1],[0,1,0]]
 
 
 37.6 Line Segments
 
-fl_draw_hline(Grid, R, C1, C2, Color, Result) fills cells in row R from column
+fill_draw_hline(Grid, R, C1, C2, Color, Result) fills cells in row R from column
 C1 to column C2.
 
-fl_draw_vline(Grid, C, R1, R2, Color, Result) fills cells in column C from row R1
+fill_draw_vline(Grid, C, R1, R2, Color, Result) fills cells in column C from row R1
 to row R2.
 
-Both are thin wrappers around fl_fill_bbox.
+Both are thin wrappers around fill_fill_bbox.
 
 
 37.7 Diagonal Filling
 
-fl_fill_main_diag(Grid, Color, Result) fills cells r(I,I) for all valid I.
+fill_fill_main_diag(Grid, Color, Result) fills cells r(I,I) for all valid I.
 
 Example:
 
 G = [[0,0,0],[0,0,0],[0,0,0]],
-fl_fill_main_diag(G, 9, Result).
+fill_fill_main_diag(G, 9, Result).
 % Result = [[9,0,0],[0,9,0],[0,0,9]]
 
 
 37.8 Stamp Overlay
 
-fl_stamp(Base, Stamp, SR, SC, BG, Result) overlays the Stamp grid onto Base
+fill_stamp(Base, Stamp, SR, SC, BG, Result) overlays the Stamp grid onto Base
 starting at row SR, column SC.
 
 Stamp cells equal to BG are treated as transparent: the corresponding Base
@@ -5986,7 +5986,7 @@ Example:
 
 Base = [[0,0,0],[0,0,0],[0,0,0]],
 Stamp = [[0,1],[1,0]],
-fl_stamp(Base, Stamp, 0, 0, 0, Result).
+fill_stamp(Base, Stamp, 0, 0, 0, Result).
 % Stamp has 0 as BG; only the 1-cells are applied.
 % Result = [[0,1,0],[1,0,0],[0,0,0]]
 
@@ -5994,20 +5994,20 @@ fl_stamp(Base, Stamp, 0, 0, 0, Result).
 37.9 Summary
 
 Predicate           Arity   Description
-fl_fill_region      4       Fill r(R,C) region cells
-fl_fill_bbox        4       Fill rectangular bounding box
-fl_fill_row         4       Fill entire row
-fl_fill_col         4       Fill entire column
-fl_fill_cells       4       Fill explicit cell list
-fl_fill_border      3       Fill outermost grid ring
-fl_outline_region   4       Fill region boundary cells
-fl_fill_interior    4       Fill region interior cells
-fl_solid_rect       4       Create uniform-color grid
-fl_checkerboard     5       Create alternating-color grid
-fl_draw_hline       6       Draw horizontal line segment
-fl_draw_vline       6       Draw vertical line segment
-fl_fill_main_diag   3       Fill main diagonal
-fl_stamp            6       Overlay subgrid with transparency
+fill_fill_region      4       Fill r(R,C) region cells
+fill_fill_bbox        4       Fill rectangular bounding box
+fill_fill_row         4       Fill entire row
+fill_fill_col         4       Fill entire column
+fill_fill_cells       4       Fill explicit cell list
+fill_fill_border      3       Fill outermost grid ring
+fill_outline_region   4       Fill region boundary cells
+fill_fill_interior    4       Fill region interior cells
+fill_solid_rect       4       Create uniform-color grid
+fill_checkerboard     5       Create alternating-color grid
+fill_draw_hline       6       Draw horizontal line segment
+fill_draw_vline       6       Draw vertical line segment
+fill_fill_main_diag   3       Fill main diagonal
+fill_stamp            6       Overlay subgrid with transparency
 
 The fill pack ships 46 PLUnit tests.
 
@@ -6586,7 +6586,7 @@ COLUMN UTILITIES
 
 FALLING DOWN AND UP
 
-  gv_fall_down(+Grid, +BG, -Result)
+  gravity_fall_down(+Grid, +BG, -Result)
   gv_compact_col(+Grid, +BG, -Result)
 
   Non-BG cells fall to the bottom of their column. BG fills the top.
@@ -6594,18 +6594,18 @@ FALLING DOWN AND UP
 
   Example:
 
-    gv_fall_down([[0,1],[2,0],[0,3]], 0, R).
+    gravity_fall_down([[0,1],[2,0],[0,3]], 0, R).
     % Column 0: [0,2,0] -> [0,0,2]
     % Column 1: [1,0,3] -> [0,1,3]
     % R = [[0,0],[0,1],[2,3]]
 
-  gv_fall_up(+Grid, +BG, -Result)
+  gravity_fall_up(+Grid, +BG, -Result)
 
   Non-BG cells rise to the top of their column. BG sinks to the bottom.
 
   Example:
 
-    gv_fall_up([[0,0],[2,0],[0,3]], 0, R).
+    gravity_fall_up([[0,0],[2,0],[0,3]], 0, R).
     % Column 0: [0,2,0] -> [2,0,0]
     % Column 1: [0,0,3] -> [3,0,0]
     % R = [[2,3],[0,0],[0,0]]
@@ -6613,7 +6613,7 @@ FALLING DOWN AND UP
 
 FALLING LEFT AND RIGHT
 
-  gv_fall_left(+Grid, +BG, -Result)
+  gravity_fall_left(+Grid, +BG, -Result)
   gv_compact_row(+Grid, +BG, -Result)
 
   Non-BG cells shift to the left of their row. BG fills the right.
@@ -6621,16 +6621,16 @@ FALLING LEFT AND RIGHT
 
   Example:
 
-    gv_fall_left([[0,1,0,2]], 0, R).
+    gravity_fall_left([[0,1,0,2]], 0, R).
     % R = [[1,2,0,0]]
 
-  gv_fall_right(+Grid, +BG, -Result)
+  gravity_fall_right(+Grid, +BG, -Result)
 
   Non-BG cells shift to the right of their row.
 
   Example:
 
-    gv_fall_right([[0,1,0,2]], 0, R).
+    gravity_fall_right([[0,1,0,2]], 0, R).
     % R = [[0,0,1,2]]
 
 
@@ -6689,7 +6689,7 @@ CUSTOM TRANSFORMS
   Example using built-in compact_bottom:
 
     gv_apply_col(Grid, 0, gv_compact_list_bottom_, Result).
-    % Equivalent to gv_fall_down(Grid, 0, Result).
+    % Equivalent to gravity_fall_down(Grid, 0, Result).
 
   gv_apply_row(+Grid, +BG, :Pred, -Result)
 
@@ -6698,7 +6698,7 @@ CUSTOM TRANSFORMS
   Example using built-in compact_top:
 
     gv_apply_row(Grid, 0, gv_compact_list_top_, Result).
-    % Equivalent to gv_fall_left(Grid, 0, Result).
+    % Equivalent to gravity_fall_left(Grid, 0, Result).
 
 
 PUTTING IT TOGETHER
@@ -6707,11 +6707,11 @@ Combining the gravity pack with the fill and compare packs gives a
 complete toolkit for physics-like grid transformations:
 
   % Apply gravity then compare with expected output.
-  gv_fall_down(Input, 0, Settled),
+  gravity_fall_down(Input, 0, Settled),
   cp_grids_equal(Settled, ExpectedOutput).
 
   % Check if output is just the input after falling.
-  gv_fall_down(Input, 0, R),
+  gravity_fall_down(Input, 0, R),
   id_is_recolor(R, Output).  % Would fail; fall changes positions
 
 
@@ -7435,7 +7435,7 @@ The connect pack integrates with spatial, lookup, and fill packs:
 
   % Find the largest blob and fill it with color 3.
   cc_largest4(Grid, 1, Blob),
-  fl_fill_region(Grid, Blob, 3, NewGrid).
+  fill_fill_region(Grid, Blob, 3, NewGrid).
 
   % Find enclosed holes and index their positions.
   cc_enclosed(Grid, 0, Holes),
@@ -7601,7 +7601,7 @@ The morph pack integrates naturally with the connect and fill packs:
 
   % Find the outline (boundary) of the largest connected region.
   cc_largest4(Grid, 1, Blob),
-  fl_fill_region(Grid, Blob, 1, BlobGrid),
+  fill_fill_region(Grid, Blob, 1, BlobGrid),
   mo_boundary4(BlobGrid, 1, Outline).
 
   % Expand a region by 2 cells, avoiding other colors.
@@ -8617,7 +8617,7 @@ A context map is a Prolog list of Key-Value pairs:
   Map = [color-red, operation-rotate_90, count-3]
 
 Keys are unique Prolog terms. The predicates maintain this invariant.
-ctx_put replaces an existing binding for a key rather than adding a duplicate.
+context_put replaces an existing binding for a key rather than adding a duplicate.
 
 
 PREDICATE REFERENCE
@@ -8625,138 +8625,138 @@ PREDICATE REFERENCE
 
 Core Operations
 
-ctx_put(+Map, +Key, +Value, -Map2)
+context_put(+Map, +Key, +Value, -Map2)
 
   Add or replace the binding for Key in Map. Map2 is the updated map.
 
-  ctx_put([], color, red, Map).
+  context_put([], color, red, Map).
   % Map = [color-red]
 
-  ctx_put([color-red, count-3], color, blue, Map).
+  context_put([color-red, count-3], color, blue, Map).
   % Map = [color-blue, count-3]
 
-ctx_get(+Map, +Key, -Value)
+context_get(+Map, +Key, -Value)
 
   Retrieve the value for Key. Fails if Key is absent.
 
-  ctx_get([a-1, b-2, c-3], b, V).
+  context_get([a-1, b-2, c-3], b, V).
   % V = 2
 
-  ctx_get([a-1], z, _).
+  context_get([a-1], z, _).
   % fails
 
-ctx_has(+Map, +Key)
+context_has(+Map, +Key)
 
   Succeed if Key is in the map.
 
-  ctx_has([x-10, y-20], x).   % succeeds
-  ctx_has([x-10, y-20], z).   % fails
+  context_has([x-10, y-20], x).   % succeeds
+  context_has([x-10, y-20], z).   % fails
 
-ctx_delete(+Map, +Key, -Map2)
+context_delete(+Map, +Key, -Map2)
 
   Remove the binding for Key. Succeeds even if Key is absent.
 
-  ctx_delete([a-1, b-2, c-3], b, Map2).
+  context_delete([a-1, b-2, c-3], b, Map2).
   % Map2 = [a-1, c-3]
 
-  ctx_delete([a-1], missing, Map2).
+  context_delete([a-1], missing, Map2).
   % Map2 = [a-1]
 
 
 Extraction
 
-ctx_keys(+Map, -Keys)
+context_keys(+Map, -Keys)
 
   Keys is the list of all keys, in insertion order.
 
-  ctx_keys([x-1, y-2, z-3], Keys).
+  context_keys([x-1, y-2, z-3], Keys).
   % Keys = [x, y, z]
 
-ctx_values(+Map, -Values)
+context_values(+Map, -Values)
 
   Values is the list of all values, in insertion order.
 
-  ctx_values([x-1, y-2, z-3], Vals).
+  context_values([x-1, y-2, z-3], Vals).
   % Vals = [1, 2, 3]
 
-ctx_size(+Map, -N)
+context_size(+Map, -N)
 
   N is the number of entries.
 
-  ctx_size([a-1, b-2, c-3], N).
+  context_size([a-1, b-2, c-3], N).
   % N = 3
 
 
 Construction and Conversion
 
-ctx_from_pairs(+Pairs, -Map)
+context_from_pairs(+Pairs, -Map)
 
   Build a context map from a list of Key-Value pairs. If the same key
   appears more than once, the last binding wins.
 
-  ctx_from_pairs([a-1, b-2, a-99], Map).
-  % ctx_get(Map, a, 99)  -- last 'a' wins
+  context_from_pairs([a-1, b-2, a-99], Map).
+  % context_get(Map, a, 99)  -- last 'a' wins
 
-ctx_to_pairs(+Map, -Pairs)
+context_to_pairs(+Map, -Pairs)
 
   Convert a context map to a Key-Value pair list (identity operation).
 
-  ctx_to_pairs([x-1, y-2], Pairs).
+  context_to_pairs([x-1, y-2], Pairs).
   % Pairs = [x-1, y-2]
 
-ctx_merge(+Map1, +Map2, -Merged)
+context_merge(+Map1, +Map2, -Merged)
 
   Merge two context maps. Bindings in Map2 override bindings in Map1.
 
-  ctx_merge([x-1, y-2], [x-99, z-3], Merged).
-  % ctx_get(Merged, x, 99)  -- Map2 overrides
-  % ctx_get(Merged, y, 2)   -- from Map1
-  % ctx_get(Merged, z, 3)   -- from Map2
+  context_merge([x-1, y-2], [x-99, z-3], Merged).
+  % context_get(Merged, x, 99)  -- Map2 overrides
+  % context_get(Merged, y, 2)   -- from Map1
+  % context_get(Merged, z, 3)   -- from Map2
 
 
 Dispatch and Selection
 
-ctx_dispatch(+Map, +Key, +DefaultGoal, +Args)
+context_dispatch(+Map, +Key, +DefaultGoal, +Args)
 
   Look up Key in Map; call the associated goal with Args. If Key is absent,
   call DefaultGoal with Args. The goal is called as call(Goal, Args).
 
   % Context map: key 'rotate' maps to a rotation handler.
-  ctx_dispatch(
+  context_dispatch(
     [rotate-[G]>>(tr_rotate90(G, G2), write(G2))],
     rotate,
     [_]>>(write(no_handler)),
     InputGrid
   ).
 
-ctx_select(+Map, +Keys, +Default, -Value)
+context_select(+Map, +Keys, +Default, -Value)
 
   Find the value for the first key in Keys that exists in Map.
   Returns Default if none of the keys are present.
 
-  ctx_select([color-red, size-3], [size, color], none, V).
+  context_select([color-red, size-3], [size, color], none, V).
   % V = 3  (size is first in the priority list and is present)
 
-  ctx_select([a-1, b-2], [x, y, z], fallback, V).
+  context_select([a-1, b-2], [x, y, z], fallback, V).
   % V = fallback  (none of x,y,z are in the map)
 
 
 Transformation
 
-ctx_map_values(+Map, +Goal, -Map2)
+context_map_values(+Map, +Goal, -Map2)
 
   Apply Goal(OldValue, NewValue) to every value. Keys are unchanged.
 
-  ctx_map_values([a-1, b-2, c-3], [V, V2]>>(V2 is V * 10), Map2).
-  % ctx_get(Map2, a, 10)
-  % ctx_get(Map2, b, 20)
-  % ctx_get(Map2, c, 30)
+  context_map_values([a-1, b-2, c-3], [V, V2]>>(V2 is V * 10), Map2).
+  % context_get(Map2, a, 10)
+  % context_get(Map2, b, 20)
+  % context_get(Map2, c, 30)
 
-ctx_filter_keys(+Map, +Goal, -Map2)
+context_filter_keys(+Map, +Goal, -Map2)
 
   Keep only entries whose key satisfies Goal(Key).
 
-  ctx_filter_keys([red-1, green-2, blue-3], [K]>>(K = red), Map2).
+  context_filter_keys([red-1, green-2, blue-3], [K]>>(K = red), Map2).
   % Map2 = [red-1]
 
 
@@ -8765,28 +8765,28 @@ COMBINING WITH OTHER PACKS
 The context pack integrates naturally with the pipeline, obj, and rewrite packs:
 
   % Build a symbol table mapping colors to step names.
-  ctx_from_pairs([1-rotate_90, 2-flip_h, 3-noop], SymbolTable),
+  context_from_pairs([1-rotate_90, 2-flip_h, 3-noop], SymbolTable),
 
   % Look up what operation to apply for color 2.
-  ctx_get(SymbolTable, 2, StepName),
+  context_get(SymbolTable, 2, StepName),
   pl_run([StepName], InputGrid, OutputGrid).
 
   % Pass a context map through a pipeline via a step that reads from it.
   pl_register(apply_ctx_op, [ctx_op(Map), G, G2]>>(
-      ctx_select(Map, [operation], noop, Op),
+      context_select(Map, [operation], noop, Op),
       pl_run([Op], G, G2)
   )).
 
   % Merge two partial symbol tables from two training pairs.
-  ctx_merge(SymTable1, SymTable2, Combined).
+  context_merge(SymTable1, SymTable2, Combined).
 
   % Filter out background-color entries.
-  ctx_filter_keys(ColorMap, [K]>>(K > 0), ForegroundMap).
+  context_filter_keys(ColorMap, [K]>>(K > 0), ForegroundMap).
 
   % Update a count in the context.
-  ctx_get(Map, count, OldCount),
+  context_get(Map, count, OldCount),
   NewCount is OldCount + 1,
-  ctx_put(Map, count, NewCount, Map2).
+  context_put(Map, count, NewCount, Map2).
 
 
 END OF CHAPTER 53
@@ -10502,66 +10502,66 @@ that finds patterns common across all training examples.
 
 71.2 Single-pair cell diff
 
-df_cell_diff/3 finds every cell that changed between two grids.
+diff_cell_diff/3 finds every cell that changed between two grids.
 Each changed cell is represented as a diff(R, C, OldValue, NewValue) term.
 
-?- df_cell_diff([[1,0],[0,0]], [[1,0],[0,9]], D).
+?- diff_cell_diff([[1,0],[0,0]], [[1,0],[0,9]], D).
 D = [diff(1,1,0,9)].
 
-?- df_cell_diff([[1,2],[3,4]], [[1,2],[3,4]], D).
+?- diff_cell_diff([[1,2],[3,4]], [[1,2],[3,4]], D).
 D = [].
 
-?- df_cell_diff([[0,0]], [[1,2]], D).
+?- diff_cell_diff([[0,0]], [[1,2]], D).
 D = [diff(0,0,0,1), diff(0,1,0,2)].
 
 
 71.3 Background-aware cell change types
 
-df_added/4 finds cells that went from the background value to a non-background value.
+diff_added/4 finds cells that went from the background value to a non-background value.
 
-?- df_added([[0,0],[0,0]], [[0,0],[0,3]], 0, A).
+?- diff_added([[0,0],[0,0]], [[0,0],[0,3]], 0, A).
 A = [1-1].
 
-?- df_added([[0,0],[0,0]], [[1,0],[0,2]], 0, A).
+?- diff_added([[0,0],[0,0]], [[1,0],[0,2]], 0, A).
 A = [0-0, 1-1].
 
-df_removed/4 finds cells that went from non-background to background.
+diff_removed/4 finds cells that went from non-background to background.
 
-?- df_removed([[0,5],[0,0]], [[0,0],[0,0]], 0, R).
+?- diff_removed([[0,5],[0,0]], [[0,0],[0,0]], 0, R).
 R = [0-1].
 
-?- df_removed([[3,0],[0,7]], [[0,0],[0,0]], 0, R).
+?- diff_removed([[3,0],[0,7]], [[0,0],[0,0]], 0, R).
 R = [0-0, 1-1].
 
-df_recolored/4 finds cells that stayed non-background but changed their color.
+diff_recolored/4 finds cells that stayed non-background but changed their color.
 
-?- df_recolored([[1,0]], [[2,0]], 0, T).
+?- diff_recolored([[1,0]], [[2,0]], 0, T).
 T = [0-0-1-2].
 
-?- df_recolored([[0,0]], [[1,0]], 0, T).
+?- diff_recolored([[0,0]], [[1,0]], 0, T).
 T = [].
 
-df_stable/3 finds cells whose value did not change at all.
+diff_stable/3 finds cells whose value did not change at all.
 
-?- df_stable([[1,0],[0,4]], [[1,9],[0,4]], S).
+?- diff_stable([[1,0],[0,4]], [[1,9],[0,4]], S).
 S = [0-0, 1-0, 1-1].
 
-?- df_stable([[1]], [[2]], S).
+?- diff_stable([[1]], [[2]], S).
 S = [].
 
 
 71.4 Palette change
 
-df_palette_change/4 reports which distinct colors were added to or lost from
+diff_palette_change/4 reports which distinct colors were added to or lost from
 the palette when going from Grid1 to Grid2.
 
-?- df_palette_change([[1,1]], [[1,2]], Added, Lost).
+?- diff_palette_change([[1,1]], [[1,2]], Added, Lost).
 Added = [2], Lost = [].
 
-?- df_palette_change([[1,2]], [[1,1]], Added, Lost).
+?- diff_palette_change([[1,2]], [[1,1]], Added, Lost).
 Added = [], Lost = [2].
 
-?- df_palette_change([[1,0]], [[2,0]], Added, Lost).
+?- diff_palette_change([[1,0]], [[2,0]], Added, Lost).
 Added = [2], Lost = [1].
 
 
@@ -10570,87 +10570,87 @@ Added = [2], Lost = [1].
 These predicates take a list of In-Out pairs (In-Out terms) and find
 patterns that hold across every pair.
 
-df_common_diffs/2 finds cells that CHANGED in every training pair.
+diff_common_diffs/2 finds cells that CHANGED in every training pair.
 
 ?- Pairs = [[[0,0]]-[[0,1]], [[0,0]]-[[0,1]]],
-   df_common_diffs(Pairs, C).
+   diff_common_diffs(Pairs, C).
 C = [0-1].
 
 ?- Pairs = [[[0,0]]-[[1,0]], [[0,0]]-[[0,1]]],
-   df_common_diffs(Pairs, C).
+   diff_common_diffs(Pairs, C).
 C = [].
 
-df_common_stable/2 finds cells that stayed STABLE in every training pair.
+diff_common_stable/2 finds cells that stayed STABLE in every training pair.
 
 ?- Pairs = [[[1,0]]-[[1,2]], [[1,0]]-[[1,3]]],
-   df_common_stable(Pairs, S).
+   diff_common_stable(Pairs, S).
 S = [0-0].
 
-df_always_added/3 finds cells that transitioned BG to non-BG in EVERY pair.
+diff_always_added/3 finds cells that transitioned BG to non-BG in EVERY pair.
 
 ?- Pairs = [[[0,1]]-[[2,1]], [[0,1]]-[[3,1]]],
-   df_always_added(Pairs, 0, A).
+   diff_always_added(Pairs, 0, A).
 A = [0-0].
 
-df_always_removed/3 finds cells that transitioned non-BG to BG in EVERY pair.
+diff_always_removed/3 finds cells that transitioned non-BG to BG in EVERY pair.
 
 ?- Pairs = [[[1,0]]-[[0,0]], [[1,0]]-[[0,0]]],
-   df_always_removed(Pairs, 0, R).
+   diff_always_removed(Pairs, 0, R).
 R = [0-0].
 
 
 71.6 Counting, applying, and inverting diffs
 
-df_total_changes/3 counts how many cells differed.
+diff_total_changes/3 counts how many cells differed.
 
-?- df_total_changes([[1,2]], [[1,2]], N).
+?- diff_total_changes([[1,2]], [[1,2]], N).
 N = 0.
 
-?- df_total_changes([[1,2],[3,4]], [[5,6],[7,8]], N).
+?- diff_total_changes([[1,2],[3,4]], [[5,6],[7,8]], N).
 N = 4.
 
-df_apply_diffs/3 applies a list of diff terms to a grid.
+diff_apply_diffs/3 applies a list of diff terms to a grid.
 
-?- df_apply_diffs([[0,0],[0,0]], [diff(1,1,0,7)], G).
+?- diff_apply_diffs([[0,0],[0,0]], [diff(1,1,0,7)], G).
 G = [[0,0],[0,7]].
 
-?- df_apply_diffs([[1,2]], [], G).
+?- diff_apply_diffs([[1,2]], [], G).
 G = [[1,2]].
 
-df_invert_diffs/2 reverses each diff so the new value becomes the old and vice versa.
+diff_invert_diffs/2 reverses each diff so the new value becomes the old and vice versa.
 Applying the inverted diffs to the output grid recovers the input.
 
-?- df_invert_diffs([diff(0,0,1,2)], Inv).
+?- diff_invert_diffs([diff(0,0,1,2)], Inv).
 Inv = [diff(0,0,2,1)].
 
-?- df_invert_diffs([diff(0,0,3,4), diff(1,1,5,6)], Inv).
+?- diff_invert_diffs([diff(0,0,3,4), diff(1,1,5,6)], Inv).
 Inv = [diff(0,0,4,3), diff(1,1,6,5)].
 
-df_filter_diffs/3 keeps only diffs matching a goal predicate.
+diff_filter_diffs/3 keeps only diffs matching a goal predicate.
 
 ?- Diffs = [diff(0,0,1,2), diff(1,0,3,4)],
-   df_filter_diffs(Diffs, [D]>>(D = diff(0,_,_,_)), F).
+   diff_filter_diffs(Diffs, [D]>>(D = diff(0,_,_,_)), F).
 F = [diff(0,0,1,2)].
 
 
 71.7 Combining diff with other packs
 
-Use df_common_stable with multiple training pairs to find the "background
+Use diff_common_stable with multiple training pairs to find the "background
 structure" - cells that never change and may be part of a fixed frame or
 template that the rule leaves untouched.
 
-Use df_always_added together with the scene pack to locate cells that are
+Use diff_always_added together with the scene pack to locate cells that are
 always painted in, then infer the color and shape of the newly-added object.
 
-Use df_cell_diff followed by df_invert_diffs and df_apply_diffs to "undo" a
+Use diff_cell_diff followed by diff_invert_diffs and diff_apply_diffs to "undo" a
 transformation: find what changed, invert it, and apply the inverse to the
 output to recover the original input.
 
-Use df_palette_change across multiple pairs to identify which colors are
+Use diff_palette_change across multiple pairs to identify which colors are
 invariant (never added or lost) versus which colors participate in the
 transformation.
 
-Use df_common_diffs to narrow the hypothesis space: if the same set of cells
+Use diff_common_diffs to narrow the hypothesis space: if the same set of cells
 changes in every training pair, the rule almost certainly targets those cells.
 Chapter 72: Object Spatial Ordering and Ranking - The Order Pack
 
@@ -11487,24 +11487,24 @@ while treating all other non-Bg cells as immovable walls.
 These four predicates work on a single list of values (a row or column) and
 compact non-Bg values to one end.
 
-gv_pack_row_left/3 compacts non-Bg values to the left, padding with Bg on the right.
+gravity_pack_row_left/3 compacts non-Bg values to the left, padding with Bg on the right.
 
-?- gv_pack_row_left([0,1,0,2], 0, R).
+?- gravity_pack_row_left([0,1,0,2], 0, R).
 R = [1,2,0,0].
 
-gv_pack_row_right/3 compacts non-Bg values to the right, padding with Bg on the left.
+gravity_pack_row_right/3 compacts non-Bg values to the right, padding with Bg on the left.
 
-?- gv_pack_row_right([0,1,0,2], 0, R).
+?- gravity_pack_row_right([0,1,0,2], 0, R).
 R = [0,0,1,2].
 
-gv_pack_col_up/3 compacts non-Bg values to the top (start of list).
+gravity_pack_col_up/3 compacts non-Bg values to the top (start of list).
 
-?- gv_pack_col_up([0,1,0,2], 0, R).
+?- gravity_pack_col_up([0,1,0,2], 0, R).
 R = [1,2,0,0].
 
-gv_pack_col_down/3 compacts non-Bg values to the bottom (end of list).
+gravity_pack_col_down/3 compacts non-Bg values to the bottom (end of list).
 
-?- gv_pack_col_down([0,1,0,2], 0, R).
+?- gravity_pack_col_down([0,1,0,2], 0, R).
 R = [0,0,1,2].
 
 All four predicates preserve the relative order of non-Bg values and return
@@ -11513,35 +11513,35 @@ the list unchanged if there is nothing to move.
 
 77.3 Full-grid directional gravity
 
-gv_fall_left/3 applies gv_pack_row_left to every row independently.
+gravity_fall_left/3 applies gravity_pack_row_left to every row independently.
 
-?- gv_fall_left([[0,1,0],[2,0,3]], 0, R).
+?- gravity_fall_left([[0,1,0],[2,0,3]], 0, R).
 R = [[1,0,0],[2,3,0]].
 
-gv_fall_right/3 applies gv_pack_row_right to every row independently.
+gravity_fall_right/3 applies gravity_pack_row_right to every row independently.
 
-?- gv_fall_right([[0,1,0],[2,0,3]], 0, R).
+?- gravity_fall_right([[0,1,0],[2,0,3]], 0, R).
 R = [[0,0,1],[0,2,3]].
 
-gv_fall_down/3 makes all non-Bg cells fall to the bottom of each column.
+gravity_fall_down/3 makes all non-Bg cells fall to the bottom of each column.
 
-?- gv_fall_down([[1,0,2],[0,3,0],[4,0,5]], 0, R).
+?- gravity_fall_down([[1,0,2],[0,3,0],[4,0,5]], 0, R).
 R = [[0,0,0],[1,0,2],[4,3,5]].
 
-gv_fall_up/3 makes all non-Bg cells rise to the top of each column.
+gravity_fall_up/3 makes all non-Bg cells rise to the top of each column.
 
-?- gv_fall_up([[1,0,2],[0,3,0],[4,0,5]], 0, R).
+?- gravity_fall_up([[1,0,2],[0,3,0],[4,0,5]], 0, R).
 R = [[1,3,2],[4,0,5],[0,0,0]].
 
 
 77.4 Direction dispatch
 
-gv_fall_dir/4 dispatches to the correct directional predicate using an atom.
+gravity_fall_dir/4 dispatches to the correct directional predicate using an atom.
 
-?- gv_fall_dir([[0,1],[2,0]], 0, down, R).
+?- gravity_fall_dir([[0,1],[2,0]], 0, down, R).
 R = [[0,0],[2,1]].
 
-?- gv_fall_dir([[0,1],[2,0]], 0, up, R).
+?- gravity_fall_dir([[0,1],[2,0]], 0, up, R).
 R = [[2,1],[0,0]].
 
 Valid direction atoms: down, up, left, right.
@@ -11553,30 +11553,30 @@ These predicates move only cells of a specific Color. Other non-Bg cells act
 as immovable walls that divide the row or column into independent segments.
 Color cells can only slide within the segment they start in.
 
-gv_fall_color_left/4 slides Color cells left within each segment.
+gravity_fall_color_left/4 slides Color cells left within each segment.
 
-?- gv_fall_color_left([[0,1,0,2,0,1]], 0, 1, R).
+?- gravity_fall_color_left([[0,1,0,2,0,1]], 0, 1, R).
 R = [[1,0,0,2,1,0]].
 
 The cell with value 2 is a wall. Color 1 slides left within the left segment
 (before 2) and also within the right segment (after 2), independently.
 
-gv_fall_color_right/4 slides Color cells right within each segment.
+gravity_fall_color_right/4 slides Color cells right within each segment.
 
-?- gv_fall_color_right([[1,0,2,0,1]], 0, 1, R).
+?- gravity_fall_color_right([[1,0,2,0,1]], 0, 1, R).
 R = [[0,1,2,0,1]].
 
-gv_fall_color_down/4 drops Color cells to the bottom within each column segment.
+gravity_fall_color_down/4 drops Color cells to the bottom within each column segment.
 
-?- gv_fall_color_down([[1,0],[0,0],[2,0]], 0, 1, R).
+?- gravity_fall_color_down([[1,0],[0,0],[2,0]], 0, 1, R).
 R = [[0,0],[1,0],[2,0]].
 
 Here column 0 contains [1,0,2] (from top to bottom). Value 2 is a wall.
 Color 1 falls to just above the wall.
 
-gv_fall_color_up/4 raises Color cells to the top within each column segment.
+gravity_fall_color_up/4 raises Color cells to the top within each column segment.
 
-?- gv_fall_color_up([[0,0],[1,0],[2,0]], 0, 1, R).
+?- gravity_fall_color_up([[0,0],[1,0],[2,0]], 0, 1, R).
 R = [[1,0],[0,0],[2,0]].
 
 Color 1 rises above the Bg cell but cannot pass the wall at row 2.
@@ -11584,9 +11584,9 @@ Color 1 rises above the Bg cell but cannot pass the wall at row 2.
 
 77.6 Color-direction dispatch
 
-gv_fall_color_dir/5 dispatches color-specific gravity by direction atom.
+gravity_fall_color_dir/5 dispatches color-specific gravity by direction atom.
 
-?- gv_fall_color_dir([[1,0],[0,1],[0,0]], 0, 1, down, R).
+?- gravity_fall_color_dir([[1,0],[0,1],[0,0]], 0, 1, down, R).
 R = [[0,0],[0,0],[1,1]].
 
 Valid direction atoms: down, up, left, right.
@@ -11604,32 +11604,32 @@ The predicates are exported under the cn_* prefix. Load the pack with:
 
 78.1 Counting a Single Value
 
-cn_by_value(+List, +V, -N) counts how many elements in a flat list equal V:
+count_by_value(+List, +V, -N) counts how many elements in a flat list equal V:
 
-  ?- cn_by_value([0,1,0,2,0], 0, N).
+  ?- count_by_value([0,1,0,2,0], 0, N).
   N = 3.
 
-cn_color_count(+Grid, +Color, -N) does the same for a 2D grid by flattening it:
+count_color_count(+Grid, +Color, -N) does the same for a 2D grid by flattening it:
 
-  ?- cn_color_count([[0,1,0],[1,0,1],[0,1,0]], 0, N).
+  ?- count_color_count([[0,1,0],[1,0,1],[0,1,0]], 0, N).
   N = 5.
 
 Both predicates work for any value type:
 
-  ?- cn_by_value([red, blue, red, red], red, N).
+  ?- count_by_value([red, blue, red, red], red, N).
   N = 3.
 
 
 78.2 Frequency Histograms
 
-cn_histogram(+Grid, -Colors, -Counts) returns two parallel lists: Colors is the
+count_histogram(+Grid, -Colors, -Counts) returns two parallel lists: Colors is the
 sorted list of distinct values, Counts is how often each appears:
 
-  ?- cn_histogram([[0,1,2],[0,1,2],[0,1,2]], Colors, Counts).
+  ?- count_histogram([[0,1,2],[0,1,2],[0,1,2]], Colors, Counts).
   Colors = [0, 1, 2],
   Counts = [3, 3, 3].
 
-  ?- cn_histogram([[0,0,0],[0,1,0],[0,0,0]], Colors, Counts).
+  ?- count_histogram([[0,0,0],[0,1,0],[0,0,0]], Colors, Counts).
   Colors = [0, 1],
   Counts = [8, 1].
 
@@ -11640,72 +11640,72 @@ grouping equal ones.
 
 78.3 Extremes: Most and Least Frequent
 
-cn_max_color(+Grid, -Color) returns the value with the highest count:
+count_max_color(+Grid, -Color) returns the value with the highest count:
 
-  ?- cn_max_color([[0,0,0],[0,1,0],[0,0,0]], C).
+  ?- count_max_color([[0,0,0],[0,1,0],[0,0,0]], C).
   C = 0.
 
-cn_min_color(+Grid, -Color) returns the value with the lowest count:
+count_min_color(+Grid, -Color) returns the value with the lowest count:
 
-  ?- cn_min_color([[0,0,0],[0,1,0],[0,0,0]], C).
+  ?- count_min_color([[0,0,0],[0,1,0],[0,0,0]], C).
   C = 1.
 
 When two values have the same count, both predicates return the one that sorts
 first (the lowest integer, or the first atom alphabetically):
 
-  ?- cn_max_color([[0,1,2],[0,1,2]], C).
+  ?- count_max_color([[0,1,2],[0,1,2]], C).
   C = 0.    % all three have count 2; 0 sorts first
 
 
 78.4 Row and Column Presence
 
-cn_color_rows(+Grid, +Color, -N) counts how many rows contain at least one cell
+count_color_rows(+Grid, +Color, -N) counts how many rows contain at least one cell
 equal to Color:
 
-  ?- cn_color_rows([[0,1,2],[0,1,2],[0,0,0]], 1, N).
+  ?- count_color_rows([[0,1,2],[0,1,2],[0,0,0]], 1, N).
   N = 2.    % rows 0 and 1 contain 1; row 2 does not
 
-cn_color_cols(+Grid, +Color, -N) counts how many columns contain Color:
+count_color_cols(+Grid, +Color, -N) counts how many columns contain Color:
 
-  ?- cn_color_cols([[0,1,0],[0,1,0],[0,1,0]], 1, N).
+  ?- count_color_cols([[0,1,0],[0,1,0],[0,1,0]], 1, N).
   N = 1.    % only column 1 contains 1
 
 
 78.5 Distinct Values per Row or Column
 
-cn_row_distinct(+Grid, +R, -N) counts distinct values in row R (0-based):
+count_row_distinct(+Grid, +R, -N) counts distinct values in row R (0-based):
 
-  ?- cn_row_distinct([[0,0,1,0,2,0]], 0, N).
+  ?- count_row_distinct([[0,0,1,0,2,0]], 0, N).
   N = 3.    % values 0, 1, 2
 
-cn_col_distinct(+Grid, +C, -N) counts distinct values in column C (0-based):
+count_col_distinct(+Grid, +C, -N) counts distinct values in column C (0-based):
 
-  ?- cn_col_distinct([[0,0],[1,0],[0,0]], 0, N).
+  ?- count_col_distinct([[0,0],[1,0],[0,0]], 0, N).
   N = 2.    % column 0 contains 0 and 1
 
 
 78.6 Total Cell Count
 
-cn_grid_total(+Grid, -N) returns rows times columns:
+count_grid_total(+Grid, -N) returns rows times columns:
 
-  ?- cn_grid_total([[1,2,3],[4,5,6]], N).
+  ?- count_grid_total([[1,2,3],[4,5,6]], N).
   N = 6.    % 2 rows * 3 columns
 
 
 78.7 Comparing Two Grids
 
-cn_equal_cells(+Grid1, +Grid2, -N) counts cells where both grids have the same
+count_equal_cells(+Grid1, +Grid2, -N) counts cells where both grids have the same
 value:
 
-  ?- cn_equal_cells([[1,2],[3,4]], [[1,9],[3,4]], N).
+  ?- count_equal_cells([[1,2],[3,4]], [[1,9],[3,4]], N).
   N = 3.    % cells (0,0), (1,0), (1,1) match; (0,1) differs
 
-cn_diff_cells(+Grid1, +Grid2, -N) counts cells where they differ:
+count_diff_cells(+Grid1, +Grid2, -N) counts cells where they differ:
 
-  ?- cn_diff_cells([[1,2],[3,4]], [[1,9],[3,4]], N).
+  ?- count_diff_cells([[1,2],[3,4]], [[1,9],[3,4]], N).
   N = 1.
 
-Note: cn_equal_cells + cn_diff_cells always sums to cn_grid_total when both
+Note: count_equal_cells + count_diff_cells always sums to count_grid_total when both
 grids have the same dimensions.
 
 
@@ -11714,18 +11714,18 @@ grids have the same dimensions.
 These predicates work with region data as produced by the connect pack. A region
 is a list of r(R,C) coordinate terms.
 
-cn_region_color(+Grid, +Region, -Color) looks up the grid value at the first
+count_region_color(+Grid, +Region, -Color) looks up the grid value at the first
 cell of the region:
 
-  ?- cn_region_color([[0,1,0],[1,2,1],[0,1,0]], [r(1,1), r(0,1)], C).
+  ?- count_region_color([[0,1,0],[1,2,1],[0,1,0]], [r(1,1), r(0,1)], C).
   C = 2.    % first cell r(1,1) has value 2
 
-cn_regions_per_color(+Grid, +Regions, -Pairs) produces a Color-Count tally for a
+count_regions_per_color(+Grid, +Regions, -Pairs) produces a Color-Count tally for a
 list of regions. Each Pair has the form Color-N where N is how many regions have
 that color:
 
   Regions = [[r(0,0), r(0,1)], [r(1,0)], [r(2,0), r(2,1)]],
-  ?- cn_regions_per_color([[0,0],[1,2],[0,0]], Regions, Pairs).
+  ?- count_regions_per_color([[0,0],[1,2],[0,0]], Regions, Pairs).
   Pairs = [0-2, 1-1].    % two regions of color 0, one of color 1
 
 The tally order reflects the order the colors were encountered (not sorted), so
@@ -11734,11 +11734,11 @@ use member/2 or sort/2 on the result if you need a particular order.
 
 78.9 Full Example: Dominant Color per Row
 
-This example finds the most common value in each row of a grid, using cn_histogram
+This example finds the most common value in each row of a grid, using count_histogram
 applied to each row individually:
 
   row_dominant(Row, DomColor) :-
-      cn_histogram([Row], Colors, Counts),
+      count_histogram([Row], Colors, Counts),
       max_list(Counts, MaxC),
       nth0(Idx, Counts, MaxC), !,
       nth0(Idx, Colors, DomColor).
@@ -11746,7 +11746,7 @@ applied to each row individually:
   ?- maplist(row_dominant, [[0,0,1],[1,2,2],[3,3,3]], Doms).
   Doms = [0, 2, 3].
 
-Note that cn_histogram wraps the row in a list [[Row]] because it expects a
+Note that count_histogram wraps the row in a list [[Row]] because it expects a
 2D grid. This pattern applies histogram analysis to sub-structures of any shape.
 
 
@@ -11754,20 +11754,20 @@ Note that cn_histogram wraps the row in a list [[Row]] because it expects a
 
 The count pack provides the basic arithmetic of value distributions in grids:
 
-  cn_by_value/3          - count a value in a flat list
-  cn_color_count/3       - count a value in a 2D grid
-  cn_histogram/3         - frequency histogram (Colors + Counts)
-  cn_max_color/2         - most frequent value
-  cn_min_color/2         - least frequent value
-  cn_color_rows/3        - number of rows containing a value
-  cn_color_cols/3        - number of columns containing a value
-  cn_row_distinct/3      - distinct values in one row
-  cn_col_distinct/3      - distinct values in one column
-  cn_grid_total/2        - total cell count
-  cn_equal_cells/3       - cells equal between two grids
-  cn_diff_cells/3        - cells different between two grids
-  cn_region_color/3      - color of a region's first cell
-  cn_regions_per_color/3 - Color-Count tally for a region list
+  count_by_value/3          - count a value in a flat list
+  count_color_count/3       - count a value in a 2D grid
+  count_histogram/3         - frequency histogram (Colors + Counts)
+  count_max_color/2         - most frequent value
+  count_min_color/2         - least frequent value
+  count_color_rows/3        - number of rows containing a value
+  count_color_cols/3        - number of columns containing a value
+  count_row_distinct/3      - distinct values in one row
+  count_col_distinct/3      - distinct values in one column
+  count_grid_total/2        - total cell count
+  count_equal_cells/3       - cells equal between two grids
+  count_diff_cells/3        - cells different between two grids
+  count_region_color/3      - color of a region's first cell
+  count_regions_per_color/3 - Color-Count tally for a region list
 
 END OF CHAPTER 78
 Chapter 79: Uniform Row and Column Stripe Operations - The Stripe Pack
@@ -11973,102 +11973,102 @@ N-th anti-diagonal: cells where R + C = N. N = 0 is the top-left corner alone.
 
 80.2 Extracting Diagonal Values
 
-dg_main_diag(+Grid, -Diag) extracts the main diagonal:
+diagonal_main_diag(+Grid, -Diag) extracts the main diagonal:
 
-  ?- dg_main_diag([[1,2,3],[4,5,6],[7,8,9]], D).
+  ?- diagonal_main_diag([[1,2,3],[4,5,6],[7,8,9]], D).
   D = [1, 5, 9].
 
 For a non-square grid, the diagonal is truncated at min(NR, NC) elements:
 
-  ?- dg_main_diag([[1,2,3],[4,5,6]], D).
+  ?- diagonal_main_diag([[1,2,3],[4,5,6]], D).
   D = [1, 5].    % 2 rows, so only cells (0,0) and (1,1)
 
-dg_anti_diag(+Grid, -Diag) extracts the main anti-diagonal:
+diagonal_anti_diag(+Grid, -Diag) extracts the main anti-diagonal:
 
-  ?- dg_anti_diag([[1,2,3],[4,5,6],[7,8,9]], D).
+  ?- diagonal_anti_diag([[1,2,3],[4,5,6],[7,8,9]], D).
   D = [3, 5, 7].    % cells (0,2), (1,1), (2,0)
 
-dg_nth_diag(+Grid, +N, -Diag) extracts any diagonal:
+diagonal_nth_diag(+Grid, +N, -Diag) extracts any diagonal:
 
-  ?- dg_nth_diag([[1,2,3],[4,5,6],[7,8,9]], 1, D).
+  ?- diagonal_nth_diag([[1,2,3],[4,5,6],[7,8,9]], 1, D).
   D = [2, 6].    % N=1: cells (0,1), (1,2)
 
-  ?- dg_nth_diag([[1,2,3],[4,5,6],[7,8,9]], -1, D).
+  ?- diagonal_nth_diag([[1,2,3],[4,5,6],[7,8,9]], -1, D).
   D = [4, 8].    % N=-1: cells (1,0), (2,1)
 
-dg_nth_anti_diag(+Grid, +N, -Diag) extracts any anti-diagonal:
+diagonal_nth_anti_diag(+Grid, +N, -Diag) extracts any anti-diagonal:
 
-  ?- dg_nth_anti_diag([[1,2,3],[4,5,6],[7,8,9]], 2, D).
+  ?- diagonal_nth_anti_diag([[1,2,3],[4,5,6],[7,8,9]], 2, D).
   D = [3, 5, 7].    % N=2: cells (0,2), (1,1), (2,0) — the main anti-diagonal
 
 
 80.3 Enumerating All Diagonals
 
-dg_all_diags(+Grid, -Diags) returns all diagonals in offset order from -(NR-1) to NC-1:
+diagonal_all_diags(+Grid, -Diags) returns all diagonals in offset order from -(NR-1) to NC-1:
 
-  ?- dg_all_diags([[1,2],[3,4]], Diags).
+  ?- diagonal_all_diags([[1,2],[3,4]], Diags).
   Diags = [[3], [1,4], [2]].
   % offset -1: [3], offset 0: [1,4], offset 1: [2]
 
-dg_all_anti_diags(+Grid, -ADiags) returns all anti-diagonals in sum order from 0 to NR+NC-2:
+diagonal_all_anti_diags(+Grid, -ADiags) returns all anti-diagonals in sum order from 0 to NR+NC-2:
 
-  ?- dg_all_anti_diags([[1,2],[3,4]], ADiags).
+  ?- diagonal_all_anti_diags([[1,2],[3,4]], ADiags).
   ADiags = [[1], [2,3], [4]].
   % sum 0: [1], sum 1: [2,3], sum 2: [4]
 
 
 80.4 Filling Diagonals with a Color
 
-dg_fill_main(+Grid, +Color, -Result) fills the main diagonal:
+diagonal_fill_main(+Grid, +Color, -Result) fills the main diagonal:
 
-  ?- dg_fill_main([[1,2,3],[4,5,6],[7,8,9]], 0, R).
+  ?- diagonal_fill_main([[1,2,3],[4,5,6],[7,8,9]], 0, R).
   R = [[0,2,3],[4,0,6],[7,8,0]].
 
-dg_fill_anti(+Grid, +Color, -Result) fills the main anti-diagonal:
+diagonal_fill_anti(+Grid, +Color, -Result) fills the main anti-diagonal:
 
-  ?- dg_fill_anti([[1,2,3],[4,5,6],[7,8,9]], 0, R).
+  ?- diagonal_fill_anti([[1,2,3],[4,5,6],[7,8,9]], 0, R).
   R = [[1,2,0],[4,0,6],[0,8,9]].
 
-dg_fill_nth_diag(+Grid, +N, +Color, -Result) fills any diagonal:
+diagonal_fill_nth_diag(+Grid, +N, +Color, -Result) fills any diagonal:
 
-  ?- dg_fill_nth_diag([[1,2,3],[4,5,6],[7,8,9]], 1, 0, R).
+  ?- diagonal_fill_nth_diag([[1,2,3],[4,5,6],[7,8,9]], 1, 0, R).
   R = [[1,0,3],[4,5,0],[7,8,9]].
 
-dg_fill_nth_anti_diag(+Grid, +N, +Color, -Result) fills any anti-diagonal:
+diagonal_fill_nth_anti_diag(+Grid, +N, +Color, -Result) fills any anti-diagonal:
 
-  ?- dg_fill_nth_anti_diag([[1,2,3],[4,5,6],[7,8,9]], 2, 0, R).
+  ?- diagonal_fill_nth_anti_diag([[1,2,3],[4,5,6],[7,8,9]], 2, 0, R).
   R = [[1,2,0],[4,0,6],[0,8,9]].    % same as fill_anti for a 3x3 grid
 
 
 80.5 Cell Diagonal Membership
 
-dg_cell_diag(+R, +C, -N) computes which diagonal cell (R,C) belongs to:
+diagonal_cell_diag(+R, +C, -N) computes which diagonal cell (R,C) belongs to:
 
-  ?- dg_cell_diag(1, 3, N).
+  ?- diagonal_cell_diag(1, 3, N).
   N = 2.    % C - R = 3 - 1 = 2
 
-  ?- dg_cell_diag(2, 0, N).
+  ?- diagonal_cell_diag(2, 0, N).
   N = -2.    % C - R = 0 - 2 = -2
 
-dg_cell_anti_diag(+R, +C, -N) computes which anti-diagonal cell (R,C) belongs to:
+diagonal_cell_anti_diag(+R, +C, -N) computes which anti-diagonal cell (R,C) belongs to:
 
-  ?- dg_cell_anti_diag(2, 3, N).
+  ?- diagonal_cell_anti_diag(2, 3, N).
   N = 5.    % R + C = 2 + 3 = 5
 
 
 80.6 Testing Diagonal Uniformity
 
-dg_uniform_diag(+Grid, +N, -Color) succeeds if the N-th diagonal is all one value:
+diagonal_uniform_diag(+Grid, +N, -Color) succeeds if the N-th diagonal is all one value:
 
-  ?- dg_uniform_diag([[5,1],[2,5]], 0, C).
+  ?- diagonal_uniform_diag([[5,1],[2,5]], 0, C).
   C = 5.    % main diagonal is [5,5]
 
-  ?- dg_uniform_diag([[1,2,3],[4,5,6],[7,8,9]], 0, _).
+  ?- diagonal_uniform_diag([[1,2,3],[4,5,6],[7,8,9]], 0, _).
   false.    % main diagonal is [1,5,9] - not uniform
 
-dg_uniform_anti_diag(+Grid, +N, -Color) tests an anti-diagonal:
+diagonal_uniform_anti_diag(+Grid, +N, -Color) tests an anti-diagonal:
 
-  ?- dg_uniform_anti_diag([[1,5],[5,2]], 1, C).
+  ?- diagonal_uniform_anti_diag([[1,5],[5,2]], 1, C).
   C = 5.    % anti-diagonal sum 1: cells (0,1)=5 and (1,0)=5
 
 
@@ -12077,8 +12077,8 @@ dg_uniform_anti_diag(+Grid, +N, -Color) tests an anti-diagonal:
 This example tests whether a grid has the same value on both diagonals (an "X"):
 
   has_x_pattern(Grid, Color) :-
-      dg_uniform_diag(Grid, 0, Color),
-      dg_uniform_anti_diag(Grid, _, Color).
+      diagonal_uniform_diag(Grid, 0, Color),
+      diagonal_uniform_anti_diag(Grid, _, Color).
 
   ?- has_x_pattern([[1,0,1],[0,1,0],[1,0,1]], 1).
   false.    % main diagonal is [1,1,1]=uniform; anti-diag sum 2 = [1,1,1]=uniform
@@ -12088,8 +12088,8 @@ This example tests whether a grid has the same value on both diagonals (an "X"):
 
   has_x_pattern(Grid, Color) :-
       Grid = [FR|_], length(FR, NC), NC1 is NC - 1,
-      dg_uniform_diag(Grid, 0, Color),
-      dg_uniform_anti_diag(Grid, NC1, Color).
+      diagonal_uniform_diag(Grid, 0, Color),
+      diagonal_uniform_anti_diag(Grid, NC1, Color).
 
   ?- has_x_pattern([[1,0,1],[0,1,0],[1,0,1]], 1).
   true.
@@ -12099,20 +12099,20 @@ This example tests whether a grid has the same value on both diagonals (an "X"):
 
 The diagonal pack covers extraction, filling, and testing of diagonal lines:
 
-  dg_main_diag/2          - main diagonal values (C == R)
-  dg_anti_diag/2          - main anti-diagonal values (R+C = NC-1)
-  dg_nth_diag/3           - N-th diagonal values (C-R = N)
-  dg_nth_anti_diag/3      - N-th anti-diagonal values (R+C = N)
-  dg_all_diags/2          - all diagonals, sorted by offset
-  dg_all_anti_diags/2     - all anti-diagonals, sorted by sum
-  dg_fill_main/3          - fill main diagonal with Color
-  dg_fill_anti/3          - fill main anti-diagonal with Color
-  dg_fill_nth_diag/4      - fill N-th diagonal with Color
-  dg_fill_nth_anti_diag/4 - fill N-th anti-diagonal with Color
-  dg_cell_diag/3          - diagonal index of (R,C): N = C-R
-  dg_cell_anti_diag/3     - anti-diagonal index of (R,C): N = R+C
-  dg_uniform_diag/3       - succeed if N-th diagonal is all Color
-  dg_uniform_anti_diag/3  - succeed if N-th anti-diagonal is all Color
+  diagonal_main_diag/2          - main diagonal values (C == R)
+  diagonal_anti_diag/2          - main anti-diagonal values (R+C = NC-1)
+  diagonal_nth_diag/3           - N-th diagonal values (C-R = N)
+  diagonal_nth_anti_diag/3      - N-th anti-diagonal values (R+C = N)
+  diagonal_all_diags/2          - all diagonals, sorted by offset
+  diagonal_all_anti_diags/2     - all anti-diagonals, sorted by sum
+  diagonal_fill_main/3          - fill main diagonal with Color
+  diagonal_fill_anti/3          - fill main anti-diagonal with Color
+  diagonal_fill_nth_diag/4      - fill N-th diagonal with Color
+  diagonal_fill_nth_anti_diag/4 - fill N-th anti-diagonal with Color
+  diagonal_cell_diag/3          - diagonal index of (R,C): N = C-R
+  diagonal_cell_anti_diag/3     - anti-diagonal index of (R,C): N = R+C
+  diagonal_uniform_diag/3       - succeed if N-th diagonal is all Color
+  diagonal_uniform_anti_diag/3  - succeed if N-th anti-diagonal is all Color
 
 END OF CHAPTER 80
 Chapter 81: Arithmetic Progression and Periodic Recurrence Detection - The Recur Pack
@@ -13924,102 +13924,102 @@ In contrast, in:
 The four corner 0s are on the border and exterior; there are no interior 0s.
 
 
-88.1 Border Cells - en_border_cells/2
+88.1 Border Cells - enclosure_border_cells/2
 
-en_border_cells(+Grid, -Cells)
+enclosure_border_cells(+Grid, -Cells)
 
 All cells on the four edges of the grid (row 0, last row, col 0, last col),
 returned as a sorted list of R-C pairs.
 
 Example:
 
-en_border_cells([[1,1,1],[1,0,1],[1,1,1]], Cells).
+enclosure_border_cells([[1,1,1],[1,0,1],[1,1,1]], Cells).
 % Cells = [0-0,0-1,0-2,1-0,1-2,2-0,2-1,2-2]
 
 
-88.2 Exterior Background Cells - en_outer_cells/3
+88.2 Exterior Background Cells - enclosure_outer_cells/3
 
-en_outer_cells(+Grid, +Bg, -Cells)
+enclosure_outer_cells(+Grid, +Bg, -Cells)
 
 All background cells reachable from the grid border by 4-connected Bg steps.
 Returned as a sorted list. If no Bg cell lies on the border, the result is [].
 
 Example:
 
-en_outer_cells([[1,1,1],[1,0,1],[1,1,1]], 0, Outer).
+enclosure_outer_cells([[1,1,1],[1,0,1],[1,1,1]], 0, Outer).
 % Outer = []  (no Bg cell touches the border)
 
-en_outer_cells([[0,1,0]], 0, Outer).
+enclosure_outer_cells([[0,1,0]], 0, Outer).
 % Outer = [0-0, 0-2]  (both 0s are on the border; wall at (0,1) separates them)
 
 
-88.3 Interior Background Cells - en_inner_cells/3
+88.3 Interior Background Cells - enclosure_inner_cells/3
 
-en_inner_cells(+Grid, +Bg, -Cells)
+enclosure_inner_cells(+Grid, +Bg, -Cells)
 
 All Bg cells that are NOT reachable from the grid border. These are the
 enclosed cells. Returned as a sorted list.
 
 Example:
 
-en_inner_cells([[1,1,1],[1,0,1],[1,1,1]], 0, Inner).
+enclosure_inner_cells([[1,1,1],[1,0,1],[1,1,1]], 0, Inner).
 % Inner = [1-1]
 
-en_inner_cells([[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,1,1,1]], 0, Inner).
+enclosure_inner_cells([[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,1,1,1]], 0, Inner).
 % Inner = [1-1, 1-2, 2-1, 2-2]
 
 
-88.4 Testing Individual Cells - en_is_inner/4 and en_is_outer/4
+88.4 Testing Individual Cells - enclosure_is_inner/4 and enclosure_is_outer/4
 
-en_is_inner(+Grid, +R, +C, +Bg)
-en_is_outer(+Grid, +R, +C, +Bg)
+enclosure_is_inner(+Grid, +R, +C, +Bg)
+enclosure_is_outer(+Grid, +R, +C, +Bg)
 
-Deterministic tests. en_is_inner succeeds if (R,C) is a Bg cell not
-reachable from the border. en_is_outer succeeds if (R,C) is a Bg cell
+Deterministic tests. enclosure_is_inner succeeds if (R,C) is a Bg cell not
+reachable from the border. enclosure_is_outer succeeds if (R,C) is a Bg cell
 reachable from the border. Both fail if (R,C) is not a Bg cell.
 
 Example:
 
-en_is_inner([[1,1,1],[1,0,1],[1,1,1]], 1, 1, 0).  % succeeds
-en_is_inner([[0,1,0]], 0, 0, 0).                   % fails (outer cell)
-en_is_outer([[0,1,0]], 0, 0, 0).                   % succeeds
+enclosure_is_inner([[1,1,1],[1,0,1],[1,1,1]], 1, 1, 0).  % succeeds
+enclosure_is_inner([[0,1,0]], 0, 0, 0).                   % fails (outer cell)
+enclosure_is_outer([[0,1,0]], 0, 0, 0).                   % succeeds
 
 
-88.5 Filling Enclosed Cells - en_fill_inner/4
+88.5 Filling Enclosed Cells - enclosure_fill_inner/4
 
-en_fill_inner(+Grid, +Bg, +Color, -Out)
+enclosure_fill_inner(+Grid, +Bg, +Color, -Out)
 
 Paint all enclosed Bg cells with Color. Returns Grid unchanged if there
 are no enclosed Bg cells.
 
 Example:
 
-en_fill_inner([[1,1,1],[1,0,1],[1,1,1]], 0, 2, Out).
+enclosure_fill_inner([[1,1,1],[1,0,1],[1,1,1]], 0, 2, Out).
 % Out = [[1,1,1],[1,2,1],[1,1,1]]
 
-en_fill_inner([[0,1,0]], 0, 2, Out).
+enclosure_fill_inner([[0,1,0]], 0, 2, Out).
 % Out = [[0,1,0]]  (no inner cells; grid unchanged)
 
 
-88.6 Counting and Testing - en_inner_count/3 and en_has_inner/2
+88.6 Counting and Testing - enclosure_inner_count/3 and enclosure_has_inner/2
 
-en_inner_count(+Grid, +Bg, -N)
-en_has_inner(+Grid, +Bg)
+enclosure_inner_count(+Grid, +Bg, -N)
+enclosure_has_inner(+Grid, +Bg)
 
-en_inner_count gives the number of enclosed Bg cells.
-en_has_inner succeeds if there is at least one.
+enclosure_inner_count gives the number of enclosed Bg cells.
+enclosure_has_inner succeeds if there is at least one.
 
 Example:
 
-en_inner_count([[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,1,1,1]], 0, N).  % N=4
-en_has_inner([[1,1,1],[1,0,1],[1,1,1]], 0).                         % succeeds
-\+ en_has_inner([[0,1,0]], 0).                                       % succeeds
+enclosure_inner_count([[1,1,1,1],[1,0,0,1],[1,0,0,1],[1,1,1,1]], 0, N).  % N=4
+enclosure_has_inner([[1,1,1],[1,0,1],[1,1,1]], 0).                         % succeeds
+\+ enclosure_has_inner([[0,1,0]], 0).                                       % succeeds
 
 
-88.7 Connected Components - en_inner_components/3 and en_outer_components/3
+88.7 Connected Components - enclosure_inner_components/3 and enclosure_outer_components/3
 
-en_inner_components(+Grid, +Bg, -Comps)
-en_outer_components(+Grid, +Bg, -Comps)
+enclosure_inner_components(+Grid, +Bg, -Comps)
+enclosure_outer_components(+Grid, +Bg, -Comps)
 
 Partition the interior (or exterior) Bg cells into their 4-connected
 components. Each element of Comps is a list of R-C cells forming one
@@ -14028,17 +14028,17 @@ component.
 Example:
 
 % Grid with two separate enclosed holes:
-en_inner_components([[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1]], 0, Comps).
+enclosure_inner_components([[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1]], 0, Comps).
 % Comps = [[1-1], [1-3]]  (two singleton components)
 
 % Grid with one connected exterior region:
-en_outer_components([[0,0,0],[0,1,0],[0,0,0]], 0, Comps).
+enclosure_outer_components([[0,0,0],[0,1,0],[0,0,0]], 0, Comps).
 % Comps = [[...8 cells...]]  (one big exterior component)
 
 
-88.8 Filling a Specific Hole - en_fill_hole/6
+88.8 Filling a Specific Hole - enclosure_fill_hole/6
 
-en_fill_hole(+Grid, +Bg, +R, +C, +Color, -Out)
+enclosure_fill_hole(+Grid, +Bg, +R, +C, +Color, -Out)
 
 Fill only the enclosed Bg component that contains cell (R,C). If Grid has
 multiple enclosed components, only the one containing (R,C) is painted.
@@ -14046,16 +14046,16 @@ Fails if (R,C) is not an enclosed Bg cell.
 
 Example:
 
-en_fill_hole([[1,1,1],[1,0,1],[1,1,1]], 0, 1, 1, 5, Out).
+enclosure_fill_hole([[1,1,1],[1,0,1],[1,1,1]], 0, 1, 1, 5, Out).
 % Out = [[1,1,1],[1,5,1],[1,1,1]]
 
-% en_fill_hole fails when called on an outer cell:
-\+ en_fill_hole([[0,1,0]], 0, 0, 0, 2, _).  % succeeds (fill_hole fails)
+% enclosure_fill_hole fails when called on an outer cell:
+\+ enclosure_fill_hole([[0,1,0]], 0, 0, 0, 2, _).  % succeeds (fill_hole fails)
 
 
-88.9 Color Region Boundary - en_boundary_cells/3
+88.9 Color Region Boundary - enclosure_boundary_cells/3
 
-en_boundary_cells(+Grid, +Color, -Cells)
+enclosure_boundary_cells(+Grid, +Color, -Cells)
 
 Within the set of Color cells, find those on the boundary: a Color cell is
 a boundary cell if it lies on the grid edge (fewer than 4 in-bounds
@@ -14064,17 +14064,17 @@ neighbors) or has at least one in-bounds neighbor with a different value.
 Example:
 
 % Single Color cell surrounded by non-Color:
-en_boundary_cells([[0,0,0],[0,1,0],[0,0,0]], 1, Cells).
+enclosure_boundary_cells([[0,0,0],[0,1,0],[0,0,0]], 1, Cells).
 % Cells = [1-1]  (the sole Color cell is a boundary cell)
 
 % 3x3 all-Color grid: center is interior, all 8 perimeter cells are boundary:
-en_boundary_cells([[1,1,1],[1,1,1],[1,1,1]], 1, Cells).
+enclosure_boundary_cells([[1,1,1],[1,1,1],[1,1,1]], 1, Cells).
 % Cells = [0-0,0-1,0-2,1-0,1-2,2-0,2-1,2-2]
 
 
-88.10 Color Region Interior - en_interior_cells/3
+88.10 Color Region Interior - enclosure_interior_cells/3
 
-en_interior_cells(+Grid, +Color, -Cells)
+enclosure_interior_cells(+Grid, +Color, -Cells)
 
 Within the Color region, find cells strictly interior: a Color cell is
 interior if it has exactly 4 in-bounds neighbors and all 4 are also Color.
@@ -14083,17 +14083,17 @@ Interior cells are the complement of boundary cells within the Color region.
 Example:
 
 % 3x3 all-Color grid: only the center has all 4 Color neighbors:
-en_interior_cells([[1,1,1],[1,1,1],[1,1,1]], 1, Cells).
+enclosure_interior_cells([[1,1,1],[1,1,1],[1,1,1]], 1, Cells).
 % Cells = [1-1]
 
 % No interior cells if any Color cell borders a non-Color cell or grid edge:
-en_interior_cells([[1,1,1],[1,0,1],[1,1,1]], 1, Cells).
+enclosure_interior_cells([[1,1,1],[1,0,1],[1,1,1]], 1, Cells).
 % Cells = []
 
 
-88.11 Surround Test - en_is_surrounded/4
+88.11 Surround Test - enclosure_is_surrounded/4
 
-en_is_surrounded(+Grid, +R, +C, +WallColor)
+enclosure_is_surrounded(+Grid, +R, +C, +WallColor)
 
 Succeed if every 4-adjacent neighbor of cell (R,C) is either out of bounds
 or has value WallColor. Fails if any in-bounds neighbor has a different value.
@@ -14101,13 +14101,13 @@ or has value WallColor. Fails if any in-bounds neighbor has a different value.
 Example:
 
 % Center of a ring: all 4 neighbors are walls:
-en_is_surrounded([[1,1,1],[1,0,1],[1,1,1]], 1, 1, 1).  % succeeds
+enclosure_is_surrounded([[1,1,1],[1,0,1],[1,1,1]], 1, 1, 1).  % succeeds
 
 % Corner cell: 2 out-of-bounds neighbors, 2 neighbors are walls:
-en_is_surrounded([[1,1,1],[1,0,1],[1,1,1]], 0, 0, 1).  % succeeds
+enclosure_is_surrounded([[1,1,1],[1,0,1],[1,1,1]], 0, 0, 1).  % succeeds
 
 % Fails when a neighbor is not WallColor:
-\+ en_is_surrounded([[1,1,1],[1,0,1],[1,1,1]], 0, 1, 1).  % (1,1)=0 not 1
+\+ enclosure_is_surrounded([[1,1,1],[1,0,1],[1,1,1]], 0, 1, 1).  % (1,1)=0 not 1
 
 
 88.12 Common Patterns
@@ -14115,47 +14115,47 @@ en_is_surrounded([[1,1,1],[1,0,1],[1,1,1]], 0, 0, 1).  % succeeds
 Count enclosed holes:
 
 count_holes(Grid, Bg, N) :-
-    en_inner_count(Grid, Bg, N).
+    enclosure_inner_count(Grid, Bg, N).
 
 Fill all holes with a color:
 
 fill_all_holes(Grid, Bg, Color, Out) :-
-    en_fill_inner(Grid, Bg, Color, Out).
+    enclosure_fill_inner(Grid, Bg, Color, Out).
 
 Test if a color region is a solid block (no holes inside its bounding box):
 
 no_holes_in_region(Grid, Color, Bg) :-
-    \+ en_has_inner(Grid, Bg).
+    \+ enclosure_has_inner(Grid, Bg).
 
 Find the eroded (interior) subset of a color region:
 
 erode_color(Grid, Color, Interior) :-
-    en_interior_cells(Grid, Color, Interior).
+    enclosure_interior_cells(Grid, Color, Interior).
 
 Find cells on the perimeter of a color region:
 
 region_border(Grid, Color, Border) :-
-    en_boundary_cells(Grid, Color, Border).
+    enclosure_boundary_cells(Grid, Color, Border).
 
 
 88.13 Summary
 
 The enclosure pack provides inside/outside reasoning for 2D grids:
 
-- en_border_cells      - cells on the four grid edges
-- en_outer_cells       - Bg cells reachable from the border (exterior)
-- en_inner_cells       - Bg cells not reachable from the border (interior)
-- en_is_inner          - test if a cell is enclosed
-- en_is_outer          - test if a cell is exterior
-- en_fill_inner        - paint all enclosed Bg cells
-- en_inner_count       - count enclosed Bg cells
-- en_has_inner         - test for any enclosed Bg cell
-- en_inner_components  - 4-connected components of enclosed Bg cells
-- en_outer_components  - 4-connected components of exterior Bg cells
-- en_fill_hole         - fill one enclosed component at a given cell
-- en_boundary_cells    - Color cells on the boundary of a Color region
-- en_interior_cells    - Color cells strictly interior to a Color region
-- en_is_surrounded     - test if all orthogonal neighbors are a given color
+- enclosure_border_cells      - cells on the four grid edges
+- enclosure_outer_cells       - Bg cells reachable from the border (exterior)
+- enclosure_inner_cells       - Bg cells not reachable from the border (interior)
+- enclosure_is_inner          - test if a cell is enclosed
+- enclosure_is_outer          - test if a cell is exterior
+- enclosure_fill_inner        - paint all enclosed Bg cells
+- enclosure_inner_count       - count enclosed Bg cells
+- enclosure_has_inner         - test for any enclosed Bg cell
+- enclosure_inner_components  - 4-connected components of enclosed Bg cells
+- enclosure_outer_components  - 4-connected components of exterior Bg cells
+- enclosure_fill_hole         - fill one enclosed component at a given cell
+- enclosure_boundary_cells    - Color cells on the boundary of a Color region
+- enclosure_interior_cells    - Color cells strictly interior to a Color region
+- enclosure_is_surrounded     - test if all orthogonal neighbors are a given color
 
 All predicates are deterministic. BFS traverses only 4-adjacent background
 cells to compute exterior/interior classification.
@@ -15002,42 +15002,42 @@ an anti-diagonal. Aggregate queries cover sums, value counts, unique value
 sets, and the mode (most frequent value). Layer 121, Work Package 142.
 
 Public predicates:
-cx_row(+Grid, +R, -Row).             % extract row R as a list
-cx_col(+Grid, +C, -Col).             % extract column C as a list
-cx_diag(+Grid, -Diag).               % main diagonal Grid[R][R]
-cx_antidiag(+Grid, -Diag).           % anti-diagonal Grid[R][W-1-R]
-cx_row_sum(+Grid, +R, -Sum).         % sum of row R
-cx_col_sum(+Grid, +C, -Sum).         % sum of column C
-cx_row_count(+Grid, +R, +V, -N).     % count of V in row R
-cx_col_count(+Grid, +C, +V, -N).     % count of V in column C
-cx_rows_with(+Grid, +V, -Rows).      % sorted row indices containing V
-cx_cols_with(+Grid, +V, -Cols).      % sorted column indices containing V
-cx_row_uniq(+Grid, +R, -Vals).       % sorted unique values in row R
-cx_col_uniq(+Grid, +C, -Vals).       % sorted unique values in column C
-cx_row_mode(+Grid, +R, +Bg, -Mode).  % most frequent value in row R; Bg on tie
-cx_col_mode(+Grid, +C, +Bg, -Mode).  % most frequent value in column C; Bg on tie
+cross_row(+Grid, +R, -Row).             % extract row R as a list
+cross_col(+Grid, +C, -Col).             % extract column C as a list
+cross_diag(+Grid, -Diag).               % main diagonal Grid[R][R]
+cross_antidiag(+Grid, -Diag).           % anti-diagonal Grid[R][W-1-R]
+cross_row_sum(+Grid, +R, -Sum).         % sum of row R
+cross_col_sum(+Grid, +C, -Sum).         % sum of column C
+cross_row_count(+Grid, +R, +V, -N).     % count of V in row R
+cross_col_count(+Grid, +C, +V, -N).     % count of V in column C
+cross_rows_with(+Grid, +V, -Rows).      % sorted row indices containing V
+cross_cols_with(+Grid, +V, -Cols).      % sorted column indices containing V
+cross_row_uniq(+Grid, +R, -Vals).       % sorted unique values in row R
+cross_col_uniq(+Grid, +C, -Vals).       % sorted unique values in column C
+cross_row_mode(+Grid, +R, +Bg, -Mode).  % most frequent value in row R; Bg on tie
+cross_col_mode(+Grid, +C, +Bg, -Mode).  % most frequent value in column C; Bg on tie
 
 Examples:
-cx_row([[1,2,3],[4,5,6],[7,8,9]], 1, Row).    % Row=[4,5,6]
-cx_col([[1,2,3],[4,5,6],[7,8,9]], 2, Col).    % Col=[3,6,9]
-cx_diag([[1,2,3],[4,5,6],[7,8,9]], Diag).     % Diag=[1,5,9]
-cx_antidiag([[1,2,3],[4,5,6],[7,8,9]], D).    % D=[3,5,7]
-cx_row_sum([[1,2,3],[4,5,6]], 1, Sum).         % Sum=15
-cx_col_sum([[1,2],[3,4],[5,6]], 1, Sum).       % Sum=12
-cx_row_count([[1,2,1,1]], 0, 1, N).            % N=3
-cx_rows_with([[0,0],[1,0],[0,1]], 1, Rows).    % Rows=[1,2]
-cx_cols_with([[1,0],[0,1],[1,1]], 1, Cols).    % Cols=[0,1]
-cx_row_uniq([[3,1,2,1,3]], 0, Vals).           % Vals=[1,2,3]
-cx_row_mode([[1,2,1,1]], 0, 0, Mode).          % Mode=1
-cx_row_mode([[1,2]], 0, 0, Mode).              % Mode=0 (tie -> Bg)
+cross_row([[1,2,3],[4,5,6],[7,8,9]], 1, Row).    % Row=[4,5,6]
+cross_col([[1,2,3],[4,5,6],[7,8,9]], 2, Col).    % Col=[3,6,9]
+cross_diag([[1,2,3],[4,5,6],[7,8,9]], Diag).     % Diag=[1,5,9]
+cross_antidiag([[1,2,3],[4,5,6],[7,8,9]], D).    % D=[3,5,7]
+cross_row_sum([[1,2,3],[4,5,6]], 1, Sum).         % Sum=15
+cross_col_sum([[1,2],[3,4],[5,6]], 1, Sum).       % Sum=12
+cross_row_count([[1,2,1,1]], 0, 1, N).            % N=3
+cross_rows_with([[0,0],[1,0],[0,1]], 1, Rows).    % Rows=[1,2]
+cross_cols_with([[1,0],[0,1],[1,1]], 1, Cols).    % Cols=[0,1]
+cross_row_uniq([[3,1,2,1,3]], 0, Vals).           % Vals=[1,2,3]
+cross_row_mode([[1,2,1,1]], 0, 0, Mode).          % Mode=1
+cross_row_mode([[1,2]], 0, 0, Mode).              % Mode=0 (tie -> Bg)
 
-cx_row/cx_col: nth0 for row; member+nth0 per row for column.
-cx_diag: nth0(R,Grid,Row), nth0(R,Row,V) collects Grid[R][R].
-cx_antidiag: C=W-1-R with guard C>=0 for non-square grids.
-cx_row_sum/cx_col_sum: delegate to sum_list/2 from library(lists).
-cx_rows_with/cx_cols_with: findall+sort to deduplicate repeated indices.
-cx_row_uniq/cx_col_uniq: sort/2 on extracted list.
-cx_row_mode/cx_col_mode: cx_mode_ with findall+max_list+unique-winner-or-Bg.
+cross_row/cross_col: nth0 for row; member+nth0 per row for column.
+cross_diag: nth0(R,Grid,Row), nth0(R,Row,V) collects Grid[R][R].
+cross_antidiag: C=W-1-R with guard C>=0 for non-square grids.
+cross_row_sum/cross_col_sum: delegate to sum_list/2 from library(lists).
+cross_rows_with/cross_cols_with: findall+sort to deduplicate repeated indices.
+cross_row_uniq/cross_col_uniq: sort/2 on extracted list.
+cross_row_mode/cross_col_mode: cross_mode_ with findall+max_list+unique-winner-or-Bg.
 
 Predicate count: 14 (cx_* prefix). Tests: 42/42. Layer: 121.
 
@@ -15364,29 +15364,29 @@ A boundary cell has at least one 4-connected neighbor with a different value.
 Load: :- use_module('packs/edge/prolog/edge.pl').
 
 Examples:
-ed_h_edges([[0,0,0],[1,1,1],[0,0,0]],E).      % E=[0-0,0-1,0-2,1-0,1-1,1-2]
-ed_v_edges([[0,0,1,1],[0,0,1,1]],E).           % E=[0-1,1-1]
-ed_h_edge([[0,0,0],[1,1,1],[0,0,0]],0,0,B).   % B=1
-ed_v_edge([[0,0,1,1],[0,0,1,1]],0,1,B).       % B=1
-ed_all_edges([[1,1],[1,1]],E).                 % E=[]
-ed_boundary_cells([[0,0,0],[0,1,0],[0,0,0]],1,C). % C=[1-1]
-ed_outer_boundary([[2,2,2],[2,2,2],[2,2,2]],C),length(C,N). % N=8
-ed_inner_cells([[2,2,2],[2,2,2],[2,2,2]],2,C),length(C,N). % N=9
-ed_edge_count([[0,1,0],[1,0,1],[0,1,0]],N).   % N=12
-ed_is_smooth([[2,2,2],[2,2,2],[2,2,2]]).       % succeeds
-ed_label_edges([[0,0,0],[0,1,0],[0,0,0]],0,G2). % G2=[[0,1,0],[1,1,1],[0,1,0]]
-ed_has_edge([[0,0,0],[0,1,0],[0,0,0]],1,1,B). % B=1
-ed_corners([[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]],C),length(C,N). % N=3
-ed_corner_count([[0,1,0],[1,0,1],[0,1,0]],N). % N=4
+edge_h_edges([[0,0,0],[1,1,1],[0,0,0]],E).      % E=[0-0,0-1,0-2,1-0,1-1,1-2]
+edge_v_edges([[0,0,1,1],[0,0,1,1]],E).           % E=[0-1,1-1]
+edge_h_edge([[0,0,0],[1,1,1],[0,0,0]],0,0,B).   % B=1
+edge_v_edge([[0,0,1,1],[0,0,1,1]],0,1,B).       % B=1
+edge_all_edges([[1,1],[1,1]],E).                 % E=[]
+edge_boundary_cells([[0,0,0],[0,1,0],[0,0,0]],1,C). % C=[1-1]
+edge_outer_boundary([[2,2,2],[2,2,2],[2,2,2]],C),length(C,N). % N=8
+edge_inner_cells([[2,2,2],[2,2,2],[2,2,2]],2,C),length(C,N). % N=9
+edge_edge_count([[0,1,0],[1,0,1],[0,1,0]],N).   % N=12
+edge_is_smooth([[2,2,2],[2,2,2],[2,2,2]]).       % succeeds
+edge_label_edges([[0,0,0],[0,1,0],[0,0,0]],0,G2). % G2=[[0,1,0],[1,1,1],[0,1,0]]
+edge_has_edge([[0,0,0],[0,1,0],[0,0,0]],1,1,B). % B=1
+edge_corners([[0,0,1,1],[0,0,1,1],[0,0,1,1],[0,0,1,1]],C),length(C,N). % N=3
+edge_corner_count([[0,1,0],[1,0,1],[0,1,0]],N). % N=4
 
 Key implementation patterns:
-ed_h_edges/ed_v_edges: findall with between for dimension iteration;
+edge_h_edges/edge_v_edges: findall with between for dimension iteration;
   H2=H-2 (not H1=H-1) to avoid singleton warnings since H1 is unused.
-ed_boundary_cells: disjunctive findall body; uses C0 is C-1 (not C-1 directly).
-ed_inner_cells: delegates to ed_boundary_cells then filters with \+member.
-ed_label_edges: outer findall over rows; inner findall over columns;
-  private ed_has_diff_nbr_/6 helper for four-direction if-then-else.
-ed_corners: findall over 2x2 top-left positions; \+ uniformity test.
+edge_boundary_cells: disjunctive findall body; uses C0 is C-1 (not C-1 directly).
+edge_inner_cells: delegates to edge_boundary_cells then filters with \+member.
+edge_label_edges: outer findall over rows; inner findall over columns;
+  private edge_has_diff_nbr_/6 helper for four-direction if-then-else.
+edge_corners: findall over 2x2 top-left positions; \+ uniformity test.
 
 Library imports: library(lists): member/2, nth0/3. Built-ins: length/2, between/3.
 
@@ -15403,27 +15403,27 @@ supported: Manhattan (L1), Chebyshev (L-inf), and squared Euclidean.
 Load: :- use_module('packs/distance/prolog/distance.pl').
 
 Examples:
-dt_manhattan(0,0,2,2,D).                      % D=4
-dt_chebyshev(0,0,2,2,D).                      % D=2
-dt_euclidean_sq(0,0,1,1,DSq).                 % DSq=2
-dt_nearest([[0,0,0],[0,1,0],[0,0,0]],1,0-0,R-C). % R=1,C=1
-dt_farthest([[1,0,0],[0,0,0],[0,0,1]],1,1-1,R-C). % R=2,C=2
-dt_all_at([[1,0,0],[0,0,0],[0,0,1]],1,1-1,2,C). % C=[0-0,2-2]
-dt_within_manhattan([[0,0,0],[0,0,0],[0,0,0]],1,1,1,C),length(C,N). % N=5
-dt_within_chebyshev([[0,0,0],[0,0,0],[0,0,0]],1,1,1,C),length(C,N). % N=9
-dt_map_manhattan([[0,0,0],[0,1,0],[0,0,0]],1,M). % M=[[2,1,2],[1,0,1],[2,1,2]]
-dt_map_chebyshev([[0,0,0],[0,1,0],[0,0,0]],1,M). % M=[[1,1,1],[1,0,1],[1,1,1]]
-dt_ring_manhattan([[0,0,0],[0,0,0],[0,0,0]],1,1,1,C). % C=[0-1,1-0,1-2,2-1]
-dt_centroid([[1,0,0],[0,0,0],[0,0,1]],1,RC).   % RC=1-1
-dt_diameter_manhattan([0-0,2-2],_,D).          % D=4
-dt_diameter_chebyshev([0-0,2-2],_,D).          % D=2
+distance_manhattan(0,0,2,2,D).                      % D=4
+distance_chebyshev(0,0,2,2,D).                      % D=2
+distance_euclidean_sq(0,0,1,1,DSq).                 % DSq=2
+distance_nearest([[0,0,0],[0,1,0],[0,0,0]],1,0-0,R-C). % R=1,C=1
+distance_farthest([[1,0,0],[0,0,0],[0,0,1]],1,1-1,R-C). % R=2,C=2
+distance_all_at([[1,0,0],[0,0,0],[0,0,1]],1,1-1,2,C). % C=[0-0,2-2]
+distance_within_manhattan([[0,0,0],[0,0,0],[0,0,0]],1,1,1,C),length(C,N). % N=5
+distance_within_chebyshev([[0,0,0],[0,0,0],[0,0,0]],1,1,1,C),length(C,N). % N=9
+distance_map_manhattan([[0,0,0],[0,1,0],[0,0,0]],1,M). % M=[[2,1,2],[1,0,1],[2,1,2]]
+distance_map_chebyshev([[0,0,0],[0,1,0],[0,0,0]],1,M). % M=[[1,1,1],[1,0,1],[1,1,1]]
+distance_ring_manhattan([[0,0,0],[0,0,0],[0,0,0]],1,1,1,C). % C=[0-1,1-0,1-2,2-1]
+distance_centroid([[1,0,0],[0,0,0],[0,0,1]],1,RC).   % RC=1-1
+distance_diameter_manhattan([0-0,2-2],_,D).          % D=4
+distance_diameter_chebyshev([0-0,2-2],_,D).          % D=2
 
 Key implementation patterns:
-dt_nearest/dt_farthest: findall D-R-C triples; private min_list_key_/max_list_key_
+distance_nearest/distance_farthest: findall D-R-C triples; private min_list_key_/max_list_key_
   accumulators use @< / @> term ordering for row-major tie-breaking.
-dt_map_manhattan/chebyshev: pre-collect all Val-cell positions; nested findall;
+distance_map_manhattan/chebyshev: pre-collect all Val-cell positions; nested findall;
   min_list/2 per cell; if-then-else returns -1 if Val absent.
-dt_centroid: two separate findall for rows and columns; sumlist_ accumulator;
+distance_centroid: two separate findall for rows and columns; sumlist_ accumulator;
   integer floor division.
 dt_diameter_*: enumerate unordered pairs with A @< B guard; max_list_key_.
 
@@ -15525,28 +15525,28 @@ sums, and second-order differences in 2D grids.
 Load: :- use_module('packs/gradient/prolog/gradient.pl').
 
 Example queries:
-gr_h_diffs([[1,2,3],[4,5,6],[7,8,9]],D). % D=[[1,1],[1,1],[1,1]]
-gr_v_diffs([[1,2,3],[4,5,6],[7,8,9]],D). % D=[[3,3,3],[3,3,3]]
-gr_h_mono([[1,2,3],[3,2,1],[1,1,1]],F). % F=[1,-1,1]
-gr_v_mono([[7,8,9],[4,5,6],[1,2,3]],F). % F=[-1,-1,-1]
-gr_h_range([[1,2,3],[4,5,6],[7,8,9]],R). % R=[2,2,2]
-gr_v_range([[1,2,3],[4,5,6],[7,8,9]],R). % R=[6,6,6]
-gr_h_slope([[1,2,3],[4,5,6],[7,8,9]],S). % S=[2,2,2]
-gr_v_slope([[7,8,9],[4,5,6],[1,2,3]],S). % S=[-6,-6,-6]
-gr_h_const([[1,1,1],[2,2,2],[3,3,3]],B). % B=[1,1,1]
-gr_v_const([[1,2],[1,2],[1,2]],B). % B=[1,1]
-gr_h_cum([[1,2,3],[4,5,6],[7,8,9]],C). % C=[[1,3,6],[4,9,15],[7,15,24]]
-gr_v_cum([[1,2,3],[4,5,6],[7,8,9]],C). % C=[[1,2,3],[5,7,9],[12,15,18]]
-gr_h_second([[1,2,4],[1,2,4],[1,2,4]],D). % D=[[1],[1],[1]]
-gr_v_second([[1,1,1],[2,2,2],[4,4,4],[7,7,7]],D). % D=[[1,1,1],[1,1,1]]
+gradient_h_diffs([[1,2,3],[4,5,6],[7,8,9]],D). % D=[[1,1],[1,1],[1,1]]
+gradient_v_diffs([[1,2,3],[4,5,6],[7,8,9]],D). % D=[[3,3,3],[3,3,3]]
+gradient_h_mono([[1,2,3],[3,2,1],[1,1,1]],F). % F=[1,-1,1]
+gradient_v_mono([[7,8,9],[4,5,6],[1,2,3]],F). % F=[-1,-1,-1]
+gradient_h_range([[1,2,3],[4,5,6],[7,8,9]],R). % R=[2,2,2]
+gradient_v_range([[1,2,3],[4,5,6],[7,8,9]],R). % R=[6,6,6]
+gradient_h_slope([[1,2,3],[4,5,6],[7,8,9]],S). % S=[2,2,2]
+gradient_v_slope([[7,8,9],[4,5,6],[1,2,3]],S). % S=[-6,-6,-6]
+gradient_h_const([[1,1,1],[2,2,2],[3,3,3]],B). % B=[1,1,1]
+gradient_v_const([[1,2],[1,2],[1,2]],B). % B=[1,1]
+gradient_h_cum([[1,2,3],[4,5,6],[7,8,9]],C). % C=[[1,3,6],[4,9,15],[7,15,24]]
+gradient_v_cum([[1,2,3],[4,5,6],[7,8,9]],C). % C=[[1,2,3],[5,7,9],[12,15,18]]
+gradient_h_second([[1,2,4],[1,2,4],[1,2,4]],D). % D=[[1],[1],[1]]
+gradient_v_second([[1,1,1],[2,2,2],[4,4,4],[7,7,7]],D). % D=[[1,1,1],[1,1,1]]
 
 Key implementation patterns:
-gr_adj_diffs_: three clauses for [], [_], and [A,B|T]; recurses with [B|T].
-gr_v_diffs_: pairs adjacent rows R1,R2; computes gr_pair_diffs_(R1,R2,D).
-gr_mono_: if-then-else over gr_is_nondec_/gr_is_noninc_; constant → 1.
-gr_v_cum_acc_: first row passthrough, subsequent rows use gr_row_add_.
-gr_second_diffs_: calls gr_adj_diffs_ twice.
-gr_v_second: calls gr_v_diffs twice (D1 then D2Grid).
+gradient_adj_diffs_: three clauses for [], [_], and [A,B|T]; recurses with [B|T].
+gradient_v_diffs_: pairs adjacent rows R1,R2; computes gradient_pair_diffs_(R1,R2,D).
+gradient_mono_: if-then-else over gradient_is_nondec_/gradient_is_noninc_; constant → 1.
+gradient_v_cum_acc_: first row passthrough, subsequent rows use gradient_row_add_.
+gradient_second_diffs_: calls gradient_adj_diffs_ twice.
+gradient_v_second: calls gradient_v_diffs twice (D1 then D2Grid).
 
 Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2,
   last/2. library(apply): maplist/3.
@@ -15565,27 +15565,27 @@ and sparse cell enumeration in 2D grids.
 Load: :- use_module('packs/extrema/prolog/extrema.pl').
 
 Example queries:
-ex_max_val([[1,2,3],[4,5,6],[7,8,9]],V). % V=9
-ex_min_val([[0,1],[1,0]],V). % V=0
-ex_max_cells([[1,2,3],[4,5,6],[7,8,9]],C). % C=[2-2]
-ex_min_cells([[0,1],[1,0]],C). % C=[0-0,1-1]
-ex_row_argmax([[1,2,3],[4,5,6],[7,8,9]],R). % R=2
-ex_col_argmax([[1,2,3],[4,5,6],[7,8,9]],C). % C=2
-ex_row_argmin([[1,2,3],[4,5,6],[7,8,9]],R). % R=0
-ex_col_argmin([[1,2,3],[4,5,6],[7,8,9]],C). % C=0
-ex_local_max4([[1,2,1],[2,4,2],[1,2,1]],C). % C=[1-1]
-ex_local_min4([[1,2,1],[2,4,2],[1,2,1]],C),length(C,N). % N=4
-ex_above([[1,2,3],[4,5,6],[7,8,9]],5,C),length(C,N). % N=4
-ex_below([[0,1],[1,0]],1,C),length(C,N). % N=2
-ex_range([[1,2,3],[4,5,6],[7,8,9]],R). % R=8
-ex_nonzero([[0,1],[1,0]],C). % C=[0-1,1-0]
+extrema_max_val([[1,2,3],[4,5,6],[7,8,9]],V). % V=9
+extrema_min_val([[0,1],[1,0]],V). % V=0
+extrema_max_cells([[1,2,3],[4,5,6],[7,8,9]],C). % C=[2-2]
+extrema_min_cells([[0,1],[1,0]],C). % C=[0-0,1-1]
+extrema_row_argmax([[1,2,3],[4,5,6],[7,8,9]],R). % R=2
+extrema_col_argmax([[1,2,3],[4,5,6],[7,8,9]],C). % C=2
+extrema_row_argmin([[1,2,3],[4,5,6],[7,8,9]],R). % R=0
+extrema_col_argmin([[1,2,3],[4,5,6],[7,8,9]],C). % C=0
+extrema_local_max4([[1,2,1],[2,4,2],[1,2,1]],C). % C=[1-1]
+extrema_local_min4([[1,2,1],[2,4,2],[1,2,1]],C),length(C,N). % N=4
+extrema_above([[1,2,3],[4,5,6],[7,8,9]],5,C),length(C,N). % N=4
+extrema_below([[0,1],[1,0]],1,C),length(C,N). % N=2
+extrema_range([[1,2,3],[4,5,6],[7,8,9]],R). % R=8
+extrema_nonzero([[0,1],[1,0]],C). % C=[0-1,1-0]
 
 Key implementation patterns:
-ex_flat_vals_: findall(V, (member(Row,Grid), member(V,Row)), Vals).
-ex_argmax_acc_/ex_argmin_acc_: recursive with strict > / < for first-win ties.
-ex_check_nbr_lt_/gt_: if-then-else for bounds check, then V < / > comparison.
-ex_all_nbr4_lt_/gt_: computes RU/RD/CL/CR offsets, calls check for each.
-ex_col_sum_: findall + sum_list for each column.
+extrema_flat_vals_: findall(V, (member(Row,Grid), member(V,Row)), Vals).
+extrema_argmax_acc_/extrema_argmin_acc_: recursive with strict > / < for first-win ties.
+extrema_check_nbr_lt_/gt_: if-then-else for bounds check, then V < / > comparison.
+extrema_all_nbr4_lt_/gt_: computes RU/RD/CL/CR offsets, calls check for each.
+extrema_col_sum_: findall + sum_list for each column.
 
 Library imports: library(lists): member/2, nth0/3, max_list/2, min_list/2,
   sum_list/2. Built-ins: length/2, between/3.
@@ -15805,34 +15805,34 @@ enumerating border values; testing shared borders; building horizontal
 transition frequency tables; and finding the most co-adjacent value.
 
 Predicates:
-co_h_pairs/2, co_v_pairs/2, co_d_pairs_dr/2, co_d_pairs_dl/2,
-co_count_h/4, co_count_v/4, co_count_adj4/4,
-co_always_adj4/3, co_never_adj4/3,
-co_isolated4/3, co_border_vals/3, co_shared_border/3,
-co_row_transitions/2, co_most_common_adj4/3.
+cooccur_h_pairs/2, cooccur_v_pairs/2, cooccur_d_pairs_dr/2, cooccur_d_pairs_dl/2,
+cooccur_count_h/4, cooccur_count_v/4, cooccur_count_adj4/4,
+cooccur_always_adj4/3, cooccur_never_adj4/3,
+cooccur_isolated4/3, cooccur_border_vals/3, cooccur_shared_border/3,
+cooccur_row_transitions/2, cooccur_most_common_adj4/3.
 
 Usage examples:
 G = [[1,1,1],[1,2,1],[1,1,1]].
-co_h_pairs(G, P).             % P=[1-1,1-1,1-2,2-1,1-1,1-1]
-co_count_adj4(G, 1, 2, N).    % N=4 (four 1-2 edges)
-co_count_adj4(G, 1, 1, N).    % N=8 (eight 1-1 edges)
-co_always_adj4(G, 2, 1).      % succeeds: center 2 surrounded by 1s
-co_never_adj4(G, 2, 2).       % succeeds: no 2-2 adjacency
-co_isolated4(G, 2, C).        % C=[1-1]
-co_border_vals(G, 2, V).      % V=[1]
-co_row_transitions(G, T).     % T=[1-1-4,2-1-1,1-2-1]
-co_most_common_adj4(G, 1, W). % W=2
+cooccur_h_pairs(G, P).             % P=[1-1,1-1,1-2,2-1,1-1,1-1]
+cooccur_count_adj4(G, 1, 2, N).    % N=4 (four 1-2 edges)
+cooccur_count_adj4(G, 1, 1, N).    % N=8 (eight 1-1 edges)
+cooccur_always_adj4(G, 2, 1).      % succeeds: center 2 surrounded by 1s
+cooccur_never_adj4(G, 2, 2).       % succeeds: no 2-2 adjacency
+cooccur_isolated4(G, 2, C).        % C=[1-1]
+cooccur_border_vals(G, 2, V).      % V=[1]
+cooccur_row_transitions(G, T).     % T=[1-1-4,2-1-1,1-2-1]
+cooccur_most_common_adj4(G, 1, W). % W=2
 G3=[[1,2,3],[4,5,6],[7,8,9]].
-co_v_pairs(G3, P).            % P=[1-4,4-7,2-5,5-8,3-6,6-9] (col-major)
-co_d_pairs_dr(G3, P).         % P=[1-5,2-6,4-8,5-9]
-co_border_vals(G3, 5, V).     % V=[2,4,6,8]
-co_never_adj4(G3, 1, 9).      % succeeds: opposite corners
+cooccur_v_pairs(G3, P).            % P=[1-4,4-7,2-5,5-8,3-6,6-9] (col-major)
+cooccur_d_pairs_dr(G3, P).         % P=[1-5,2-6,4-8,5-9]
+cooccur_border_vals(G3, 5, V).     % V=[2,4,6,8]
+cooccur_never_adj4(G3, 1, 9).      % succeeds: opposite corners
 
 Key implementation patterns:
-co_v_pairs: column-major order (all pairs for col 0 before col 1).
-co_count_adj4: sums directed V1-V2 and V2-V1 for undirected count.
-co_shared_border: cut after first match for determinism.
-co_most_common_adj4: msort+last; ties resolved by largest value.
+cooccur_v_pairs: column-major order (all pairs for col 0 before col 1).
+cooccur_count_adj4: sums directed V1-V2 and V2-V1 for undirected count.
+cooccur_shared_border: cut after first match for determinism.
+cooccur_most_common_adj4: msort+last; ties resolved by largest value.
 
 Library imports: library(lists): member/2, nth0/3, last/2, append/3.
                  library(apply): include/3.
@@ -15951,77 +15951,77 @@ max, min, overlay, intersect).
 
 Predicates:
 
-go_always(+Grids, +V, -Cells)
+gridops_always(+Grids, +V, -Cells)
   Cells is the sorted list of R-C positions where EVERY grid has value V.
 
-go_never(+Grids, +V, -Cells)
+gridops_never(+Grids, +V, -Cells)
   Cells is the sorted list of R-C positions where NO grid has value V.
 
-go_sometimes(+Grids, +V, -Cells)
+gridops_sometimes(+Grids, +V, -Cells)
   Cells is the sorted list of R-C positions where SOME (>=1) grid has value V
   but NOT all grids do.
 
-go_count_v(+Grids, +V, -CountGrid)
+gridops_count_v(+Grids, +V, -CountGrid)
   CountGrid is a grid; each cell (R,C) holds the count of grids having V there.
 
-go_modal(+Grids, -ModalGrid)
+gridops_modal(+Grids, -ModalGrid)
   ModalGrid[R][C] = most frequent value across grids at (R,C). Smallest wins ties.
 
-go_stable(+Grids, -Triples)
+gridops_stable(+Grids, -Triples)
   R-C-V triples for positions where ALL grids agree on value V.
 
-go_unstable(+Grids, -Cells)
+gridops_unstable(+Grids, -Cells)
   R-C positions where grids disagree (not all have the same value).
 
-go_eq(+G1, +G2)
+gridops_eq(+G1, +G2)
   Succeeds if G1 and G2 are cell-for-cell identical.
 
-go_add(+G1, +G2, -G)
+gridops_add(+G1, +G2, -G)
   G[R][C] = G1[R][C] + G2[R][C].
 
-go_sub(+G1, +G2, -G)
+gridops_sub(+G1, +G2, -G)
   G[R][C] = G1[R][C] - G2[R][C].
 
-go_emax(+G1, +G2, -G)
+gridops_emax(+G1, +G2, -G)
   G[R][C] = max(G1[R][C], G2[R][C]).
 
-go_emin(+G1, +G2, -G)
+gridops_emin(+G1, +G2, -G)
   G[R][C] = min(G1[R][C], G2[R][C]).
 
-go_overlay(+Grids, +Bg, -G)
+gridops_overlay(+Grids, +Bg, -G)
   G[R][C] = first non-Bg value at (R,C) across Grids in order; else Bg.
 
-go_intersect(+Grids, +Bg, -G)
+gridops_intersect(+Grids, +Bg, -G)
   G[R][C] = V if ALL grids have same non-Bg value V at (R,C); else Bg.
 
 Usage examples:
 
 Gs = [[[1,2],[3,0]], [[1,5],[3,0]]].
-go_always(Gs, 1, C).    % C=[0-0]
-go_never(Gs, 0, C).     % C=[0-0,0-1,1-0]
-go_sometimes(Gs, 2, C). % C=[0-1]
-go_count_v(Gs, 0, CG).  % CG=[[0,0],[0,2]]
-go_modal(Gs, MG).       % MG=[[1,2],[3,0]]
-go_stable(Gs, T).       % T=[0-0-1,1-0-3,1-1-0]
-go_unstable(Gs, C).     % C=[0-1]
+gridops_always(Gs, 1, C).    % C=[0-0]
+gridops_never(Gs, 0, C).     % C=[0-0,0-1,1-0]
+gridops_sometimes(Gs, 2, C). % C=[0-1]
+gridops_count_v(Gs, 0, CG).  % CG=[[0,0],[0,2]]
+gridops_modal(Gs, MG).       % MG=[[1,2],[3,0]]
+gridops_stable(Gs, T).       % T=[0-0-1,1-0-3,1-1-0]
+gridops_unstable(Gs, C).     % C=[0-1]
 
-go_add([[1,2],[3,4]], [[10,20],[30,40]], G). % G=[[11,22],[33,44]]
-go_emax([[1,5],[3,2]], [[4,2],[1,5]], G).    % G=[[4,5],[3,5]]
-go_overlay([[[1,0],[0,2]],[[0,3],[4,0]]], 0, G). % G=[[1,3],[4,2]]
-go_intersect([[[1,0],[0,2]],[[1,3],[4,0]]], 0, G). % G=[[1,0],[0,0]]
+gridops_add([[1,2],[3,4]], [[10,20],[30,40]], G). % G=[[11,22],[33,44]]
+gridops_emax([[1,5],[3,2]], [[4,2],[1,5]], G).    % G=[[4,5],[3,5]]
+gridops_overlay([[[1,0],[0,2]],[[0,3],[4,0]]], 0, G). % G=[[1,3],[4,2]]
+gridops_intersect([[[1,0],[0,2]],[[1,3],[4,0]]], 0, G). % G=[[1,0],[0,0]]
 
 Key implementation notes:
 
-go_always uses forall; go_never uses \+exists; go_sometimes uses sort to
+gridops_always uses forall; gridops_never uses \+exists; gridops_sometimes uses sort to
   deduplicate positions found across multiple source grids.
 
-go_modal uses go_mode_ which builds Count-Value pairs, msorts ascending,
+gridops_modal uses gridops_mode_ which builds Count-Value pairs, msorts ascending,
   then picks last for max count; ties resolved by smallest V (first in sorted
   order within same count).
 
-go_stable uses the first grid's value as anchor, then forall tests all rest.
+gridops_stable uses the first grid's value as anchor, then forall tests all rest.
 
-go_overlay and go_intersect use SWI-Prolog if-then-else (Cond -> True ; False)
+gridops_overlay and gridops_intersect use SWI-Prolog if-then-else (Cond -> True ; False)
   for deterministic selection without needing cut.
 
 Library imports: library(lists): member/2, nth0/3, last/2.
@@ -17342,26 +17342,26 @@ The delta pack compares two object scenes and computes what changed.
 A scene is a list of obj(Color, Cells) terms. Two objects match iff they have
 the same Cells list (exact cell-set equality via Prolog unification).
 
-dl_added(+S1, +S2, -Added): objects in S2 with no cell-set match in S1.
-dl_removed(+S1, +S2, -Removed): objects in S1 with no cell-set match in S2.
-dl_matched(+S1, +S2, -Pairs): O1-O2 pairs sharing identical cell sets.
-dl_recolored(+S1, +S2, -Changes): C1-C2 color change pairs for matched objects.
-dl_unchanged(+S1, +S2, -Objs): objects with identical color+cells in both.
-dl_color_gain(+S1, +S2, -Colors): colors in S2 not in S1.
-dl_color_loss(+S1, +S2, -Colors): colors in S1 not in S2.
-dl_count_diff(+S1, +S2, -N): N = length(S2) - length(S1).
-dl_size_diff(+S1, +S2, -N): N = total_cells(S2) - total_cells(S1).
-dl_is_added_only(+S1, +S2): no removals or recolorings.
-dl_is_removed_only(+S1, +S2): no additions or recolorings.
-dl_is_recolor_only(+S1, +S2): no additions or removals.
-dl_is_stable(+S1, +S2): scenes are identical.
-dl_scene_diff(+S1, +S2, -delta(Added, Removed, Recolored, Unchanged)): all four components.
+delta_added(+S1, +S2, -Added): objects in S2 with no cell-set match in S1.
+delta_removed(+S1, +S2, -Removed): objects in S1 with no cell-set match in S2.
+delta_matched(+S1, +S2, -Pairs): O1-O2 pairs sharing identical cell sets.
+delta_recolored(+S1, +S2, -Changes): C1-C2 color change pairs for matched objects.
+delta_unchanged(+S1, +S2, -Objs): objects with identical color+cells in both.
+delta_color_gain(+S1, +S2, -Colors): colors in S2 not in S1.
+delta_color_loss(+S1, +S2, -Colors): colors in S1 not in S2.
+delta_count_diff(+S1, +S2, -N): N = length(S2) - length(S1).
+delta_size_diff(+S1, +S2, -N): N = total_cells(S2) - total_cells(S1).
+delta_is_added_only(+S1, +S2): no removals or recolorings.
+delta_is_removed_only(+S1, +S2): no additions or recolorings.
+delta_is_recolor_only(+S1, +S2): no additions or removals.
+delta_is_stable(+S1, +S2): scenes are identical.
+delta_scene_diff(+S1, +S2, -delta(Added, Removed, Recolored, Unchanged)): all four components.
 
 Example:
 
     S1 = [obj(1,[r(0,0)]), obj(2,[r(1,1)])],
     S2 = [obj(3,[r(0,0)]), obj(4,[r(2,2)])],
-    dl_scene_diff(S1, S2, delta(Added, Removed, Recolored, Unchanged)).
+    delta_scene_diff(S1, S2, delta(Added, Removed, Recolored, Unchanged)).
     % Added     = [obj(4,[r(2,2)])]
     % Removed   = [obj(2,[r(1,1)])]
     % Recolored = [1-3]
@@ -18068,39 +18068,39 @@ the remaining objects unchanged. Complements scenexf (uniform transforms).
 :- use_module(pack(condxf/prolog/condxf)).
 
 % Partition by color
-xc_split_color([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, Reds, Others).
+condxf_split_color([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, Reds, Others).
 % Reds = [obj(r,[r(0,0)])], Others = [obj(b,[r(0,1)])]
 
 % Recolor only matching objects
-xc_recolor_matching([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, g, Out).
+condxf_recolor_matching([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, g, Out).
 % Out = [obj(g,[r(0,0)]),obj(b,[r(0,1)])]
 
 % Shift only red objects
-xc_shift_color([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, 1, 0, Out).
+condxf_shift_color([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, 1, 0, Out).
 % Out = [obj(r,[r(1,0)]),obj(b,[r(0,1)])]
 
 % Swap two colors throughout
-xc_swap_colors([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, b, Out).
+condxf_swap_colors([obj(r,[r(0,0)]),obj(b,[r(0,1)])], r, b, Out).
 % Out = [obj(b,[r(0,0)]),obj(r,[r(0,1)])]
 
 % Recolor by size comparison (gt/lt/eq/ge/le)
-xc_recolor_by_size([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], 1, gt, y, Out).
+condxf_recolor_by_size([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], 1, gt, y, Out).
 % Out = [obj(r,[r(0,0)]),obj(y,[r(0,0),r(0,1),r(0,2)])]
 
 % Largest and smallest
-xc_largest([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], Obj).
+condxf_largest([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], Obj).
 % Obj = obj(r,[r(0,0),r(0,1),r(0,2)])
 
 % Recolor the largest
-xc_recolor_largest([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], g, Out).
+condxf_recolor_largest([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], g, Out).
 % Out = [obj(r,[r(0,0)]),obj(g,[r(0,0),r(0,1),r(0,2)])]
 
 % Unique-size object
-xc_unique_size([obj(r,[r(0,0)]),obj(b,[r(0,1)]),obj(p,[r(0,0),r(1,0),r(1,1)])], Obj).
+condxf_unique_size([obj(r,[r(0,0)]),obj(b,[r(0,1)]),obj(p,[r(0,0),r(1,0),r(1,1)])], Obj).
 % Obj = obj(p,[r(0,0),r(1,0),r(1,1)])
 
 % Partition by size
-xc_split_size([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], 1, gt, Match, NoMatch).
+condxf_split_size([obj(r,[r(0,0)]),obj(r,[r(0,0),r(0,1),r(0,2)])], 1, gt, Match, NoMatch).
 % Match = [obj(r,[r(0,0),r(0,1),r(0,2)])], NoMatch = [obj(r,[r(0,0)])]
 
 14 xc_* predicates. 41 tests pass. Layer 187.
@@ -18214,13 +18214,13 @@ it selects and applies the best transformation rule.
 :- use_module(pack(gridsolve/prolog/gridsolve)).
 
 % Infer and apply the best rule to test input
-gs_solve(TrainingPairs, TestScene, OutputScene, Rule).
+gridsolve_solve(TrainingPairs, TestScene, OutputScene, Rule).
 
 % Check how many pairs a rule explains
-gs_coverage(Rule, Pairs, N).
+gridsolve_coverage(Rule, Pairs, N).
 
 % Verify a rule is consistent with all training pairs
-gs_consistent(Rule, Pairs).
+gridsolve_consistent(Rule, Pairs).
 
 14 gs_* predicates. 41 tests pass. Layer 191.
 All 41 tests pass. See docs/tutorial/Ch173_GridSolve.txt for the full chapter.
@@ -18317,11 +18317,11 @@ format (list of rows, each a list of color atoms).
 :- use_module(pack(gridquery/prolog/gridquery)).
 
 % Grid dimensions
-gq_size([[r,b],[r,r],[r,r]], H, W).
+gridquery_size([[r,b],[r,r],[r,r]], H, W).
 % H = 3, W = 2
 
 % Cell value at (R, C)
-gq_at([[r,b],[r,r]], 0, 1, V).
+gridquery_at([[r,b],[r,r]], 0, 1, V).
 % V = b
 
 % Most frequent color
@@ -18386,27 +18386,27 @@ color counts, morphological dilation and erosion, and Conway-like steps.
 :- use_module(pack(gridnbr/prolog/gridnbr)).
 
 % 4-connected neighbor values at (R,C)
-gn_nbr4([[r,r,r],[r,b,r],[r,r,r]], 1, 1, Vals).
+gridnbr_nbr4([[r,r,r],[r,b,r],[r,r,r]], 1, 1, Vals).
 % Vals = [r,r,r,r]
 
 % Count r-neighbors at center
-gn_count4([[r,r,r],[r,b,r],[r,r,r]], 1, 1, r, N).
+gridnbr_count4([[r,r,r],[r,b,r],[r,r,r]], 1, 1, r, N).
 % N = 4
 
 % Morphological dilation: grow b by one layer
-gn_expand_color([[r,r,r],[r,b,r],[r,r,r]], b, E).
+gridnbr_expand_color([[r,r,r],[r,b,r],[r,r,r]], b, E).
 % b spreads to left, right, above, below center
 
 % Morphological erosion: shrink a 3x3 b block
-gn_shrink_color(G5x5, b, S).
+gridnbr_shrink_color(G5x5, b, S).
 % outer ring of b removed; inner center remains b
 
 % Mark border cells (foreground touching background)
-gn_mark_border([[r,r,r],[r,b,r],[r,r,r]], r, MG).
+gridnbr_mark_border([[r,r,r],[r,b,r],[r,r,r]], r, MG).
 % MG[1][1] = border
 
 % Conway step: kill isolated b (0 b-neighbors)
-gn_conway_step([[r,r,r],[r,b,r],[r,r,r]], b, 0, NG).
+gridnbr_conway_step([[r,r,r],[r,b,r],[r,r,r]], b, 0, NG).
 % NG = all r
 
 14 gn_* predicates. 51 tests pass. Layer 199.
@@ -18499,23 +18499,23 @@ factor-aligned cropping.
 :- use_module(pack(gridscale/prolog/gridscale)).
 
 % Upsample 2x2 checkerboard by 2 to 4x4:
-gsc_upsample([[r,b],[b,r]], 2, S).
+gridscale_upsample([[r,b],[b,r]], 2, S).
 % S = [[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]]
 
 % Downsample back (fails if blocks are not uniform):
-gsc_downsample([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2, D).
+gridscale_downsample([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], 2, D).
 % D = [[r,b],[b,r]]
 
 % Detect scale factor between two grids:
-gsc_scale_factor([[r,b],[b,r]], [[r,r,r,b,b,b],[r,r,r,b,b,b],[r,r,r,b,b,b],[b,b,b,r,r,r],[b,b,b,r,r,r],[b,b,b,r,r,r]], N).
+gridscale_scale_factor([[r,b],[b,r]], [[r,r,r,b,b,b],[r,r,r,b,b,b],[r,r,r,b,b,b],[b,b,b,r,r,r],[b,b,b,r,r,r],[b,b,b,r,r,r]], N).
 % N = 3
 
 % Infer the smallest tile of a repeated-tile grid:
-gsc_infer_tile([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], T).
+gridscale_infer_tile([[r,r,b,b],[r,r,b,b],[b,b,r,r],[b,b,r,r]], T).
 % T = [[r,b],[b,r]]
 
 % Pad with a border of color g:
-gsc_pad([[r,b],[b,r]], 1, g, P).
+gridscale_pad([[r,b],[b,r]], 1, g, P).
 % P = [[g,g,g,g],[g,r,b,g],[g,b,r,g],[g,g,g,g]]
 
 14 gsc_* predicates. 60 tests pass. Layer 202.
@@ -18563,15 +18563,15 @@ and connected-component enumeration for raw grids.
 :- use_module(pack(gridflood/prolog/gridflood)).
 
 % 4-connected flood-fill:
-gf_fill([[r,r,b],[r,r,b],[b,b,b]], 0, 0, g, R).
+gridflood_fill([[r,r,b],[r,r,b],[b,b,b]], 0, 0, g, R).
 % R = [[g,g,b],[g,g,b],[b,b,b]]
 
 % Enclosed hole detection:
-gf_enclosed_cells([[r,r,r,r],[r,b,b,r],[r,b,b,r],[r,r,r,r]], b, Enc).
+gridflood_enclosed_cells([[r,r,r,r],[r,b,b,r],[r,b,b,r],[r,r,r,r]], b, Enc).
 % Enc = [1-1,1-2,2-1,2-2]
 
 % Connected components:
-gf_n_components([[r,b,r],[b,b,b],[r,b,r]], r, N).
+gridflood_n_components([[r,b,r],[b,b,b],[r,b,r]], r, N).
 % N = 4
 
 14 gf_* predicates. 54 tests pass. Layer 204.
@@ -18586,15 +18586,15 @@ expansion, wavefront extraction, line-of-sight, and multi-region path discovery.
 :- use_module(pack(gridpath/prolog/gridpath)).
 
 % Shortest path avoiding walls:
-gpa_shortest_path([[p,p,p],[p,w,p],[p,p,p]], 0, 0, 2, 2, w, Path).
+gridpath_shortest_path([[p,p,p],[p,w,p],[p,p,p]], 0, 0, 2, 2, w, Path).
 % Path is 5 cells long (length 5, 4 steps)
 
 % Distance map from corner:
-gpa_distance_map([[p,p,p],[p,p,p],[p,p,p]], 0, 0, w, Map).
+gridpath_distance_map([[p,p,p],[p,p,p],[p,p,p]], 0, 0, w, Map).
 % Map includes 0-0-0 ... 2-2-4
 
 % Wavefront at distance 2:
-gpa_wavefront([[p,p,p],[p,p,p],[p,p,p]], 1, 1, 2, w, Cells).
+gridpath_wavefront([[p,p,p],[p,p,p],[p,p,p]], 1, 1, 2, w, Cells).
 % Cells = [0-0, 0-2, 2-0, 2-2]  (4 corners)
 
 14 gpa_* predicates. 57 tests pass. Layer 205.
@@ -18790,16 +18790,16 @@ connected-component size filtering.
 
 :- use_module(pack(gridmorph/prolog/gridmorph)).
 
-gmo_dilate/4 expands FgColor by N layers; gmo_erode/4 shrinks by N layers.
-gmo_open/4 removes small FgColor protrusions; gmo_close/4 fills small holes.
-gmo_boundary_inner/3 returns FgColor cells on the inner border;
-gmo_boundary_outer/3 returns non-FgColor cells on the outer border;
-gmo_gradient_cells/3 returns their union.
-gmo_top_hat/4 highlights cells removed by opening;
-gmo_bottom_hat/4 highlights cells added by closing.
-gmo_fill_holes/4 fills enclosed background regions with FgColor.
-gmo_connected_border/4 BFS-floods from the grid border through TargetColor cells.
-gmo_remove_small/5 removes FgColor components below a size threshold.
+gridmorph_dilate/4 expands FgColor by N layers; gridmorph_erode/4 shrinks by N layers.
+gridmorph_open/4 removes small FgColor protrusions; gridmorph_close/4 fills small holes.
+gridmorph_boundary_inner/3 returns FgColor cells on the inner border;
+gridmorph_boundary_outer/3 returns non-FgColor cells on the outer border;
+gridmorph_gradient_cells/3 returns their union.
+gridmorph_top_hat/4 highlights cells removed by opening;
+gridmorph_bottom_hat/4 highlights cells added by closing.
+gridmorph_fill_holes/4 fills enclosed background regions with FgColor.
+gridmorph_connected_border/4 BFS-floods from the grid border through TargetColor cells.
+gridmorph_remove_small/5 removes FgColor components below a size threshold.
 
 14 gmo_* predicates. 44 tests pass. Layer 212.
 
@@ -18813,18 +18813,18 @@ element morphology (dilation, erosion, and first-match replacement).
 
 :- use_module(pack(gridconv/prolog/gridconv)).
 
-Window radius N gives a (2N+1) x (2N+1) neighborhood. gcv_window/6 extracts
-it with out-of-bounds fill; gcv_count_in/6 counts a Color in the window;
-gcv_density_map/4 builds a per-cell count grid; gcv_majority/5 returns the
-most frequent color; gcv_majority_map/3 applies this over the whole grid;
-gcv_uniform_at/5 tests window uniformity; gcv_uniform_cells/3 collects
+Window radius N gives a (2N+1) x (2N+1) neighborhood. gridconv_window/6 extracts
+it with out-of-bounds fill; gridconv_count_in/6 counts a Color in the window;
+gridconv_density_map/4 builds a per-cell count grid; gridconv_majority/5 returns the
+most frequent color; gridconv_majority_map/3 applies this over the whole grid;
+gridconv_uniform_at/5 tests window uniformity; gridconv_uniform_cells/3 collects
 uniform positions.
 
-gcv_find_pattern/3 finds all subgrid matches; gcv_count_pattern/3 counts
-them; gcv_has_pattern/2 tests for existence.
-gcv_hot_spots/5 returns cells where Color density meets a threshold.
-gcv_dilate_sq/4 and gcv_erode_sq/4 apply square SE morphology.
-gcv_replace_pattern/4 replaces the first pattern match.
+gridconv_find_pattern/3 finds all subgrid matches; gridconv_count_pattern/3 counts
+them; gridconv_has_pattern/2 tests for existence.
+gridconv_hot_spots/5 returns cells where Color density meets a threshold.
+gridconv_dilate_sq/4 and gridconv_erode_sq/4 apply square SE morphology.
+gridconv_replace_pattern/4 replaces the first pattern match.
 
 14 gcv_* predicates. 46 tests pass. Layer 213.
 
@@ -18840,15 +18840,15 @@ merging, and 4-connected component counting and partitioning.
 
 :- use_module(pack(gridgraph/prolog/gridgraph)).
 
-ggr_adj_colors/2 collects sorted (C1-C2, C1@<C2) pairs of 4-adjacent colors;
-ggr_adj_of/3 returns colors adjacent to a given color; ggr_adj_graph/2 builds
-the full adjacency list; ggr_are_adj/3 tests adjacency. ggr_color_degree/3
-counts adjacent colors; ggr_shared_border/4 collects the boundary cells;
-ggr_border_length/4 counts them. ggr_isolated_colors/2 finds degree-0 colors;
-ggr_enclosed_colors/3 finds colors fully surrounded by OuterColor with no
-border cells. ggr_spanning_h/2 and ggr_spanning_v/2 find colors crossing
-the grid. ggr_merge_colors/4 replaces one color with another. 
-ggr_color_components/3 counts connected components; ggr_component_cells/3
+gridgraph_adj_colors/2 collects sorted (C1-C2, C1@<C2) pairs of 4-adjacent colors;
+gridgraph_adj_of/3 returns colors adjacent to a given color; gridgraph_adj_graph/2 builds
+the full adjacency list; gridgraph_are_adj/3 tests adjacency. gridgraph_color_degree/3
+counts adjacent colors; gridgraph_shared_border/4 collects the boundary cells;
+gridgraph_border_length/4 counts them. gridgraph_isolated_colors/2 finds degree-0 colors;
+gridgraph_enclosed_colors/3 finds colors fully surrounded by OuterColor with no
+border cells. gridgraph_spanning_h/2 and gridgraph_spanning_v/2 find colors crossing
+the grid. gridgraph_merge_colors/4 replaces one color with another. 
+gridgraph_color_components/3 counts connected components; gridgraph_component_cells/3
 partitions them.
 
 14 ggr_* predicates. 44 tests pass. Layer 214.
@@ -18862,19 +18862,19 @@ of symbolic grids. Main diagonal K = 0 is the principal diagonal.
 
 :- use_module(pack(griddiag/prolog/griddiag)).
 
-gdi_main_diag/3 extracts values on main diagonal K in ascending R order;
-gdi_anti_diag/3 extracts values on anti-diagonal K in ascending C order;
-gdi_trace/2 returns the principal diagonal (K=0, length = min(H,W)).
-gdi_all_main_diags/2 and gdi_all_anti_diags/2 return all H+W-1 diagonals
+griddiag_main_diag/3 extracts values on main diagonal K in ascending R order;
+griddiag_anti_diag/3 extracts values on anti-diagonal K in ascending C order;
+griddiag_trace/2 returns the principal diagonal (K=0, length = min(H,W)).
+griddiag_all_main_diags/2 and griddiag_all_anti_diags/2 return all H+W-1 diagonals
 or anti-diagonals as lists of value lists.
 
-gdi_main_count/4 and gdi_anti_count/4 count Color occurrences on a specific
-diagonal. gdi_main_uniform/3 and gdi_anti_uniform/3 return yes/no for whether
-all values on a diagonal are equal. gdi_uniform_main_diags/2 and
-gdi_uniform_anti_diags/2 collect K values of uniform diagonals. 
-gdi_diag_length/3 gives the cell count of main diagonal K.
+griddiag_main_count/4 and griddiag_anti_count/4 count Color occurrences on a specific
+diagonal. griddiag_main_uniform/3 and griddiag_anti_uniform/3 return yes/no for whether
+all values on a diagonal are equal. griddiag_uniform_main_diags/2 and
+griddiag_uniform_anti_diags/2 collect K values of uniform diagonals. 
+griddiag_diag_length/3 gives the cell count of main diagonal K.
 
-gdi_set_main_diag/4 and gdi_set_anti_diag/4 return a modified grid with all
+griddiag_set_main_diag/4 and griddiag_set_anti_diag/4 return a modified grid with all
 cells on the specified diagonal set to a new Color.
 
 14 gdi_* predicates. 44 tests pass. Layer 215.
@@ -18888,17 +18888,17 @@ min(R, H-1-R, C, W-1-C) equals D. Frame 0 is the outermost border.
 
 :- use_module(pack(gridframe/prolog/gridframe)).
 
-gfr_cell_depth/4 computes the depth of a specific cell; gfr_frame/3 returns
-all cells at depth D as R-C pairs; gfr_max_depth/2 returns floor((min(H,W)-1)/2);
-gfr_frame_count/2 returns max_depth+1. gfr_peel/2 returns the inner (H-2)x(W-2)
+gridframe_cell_depth/4 computes the depth of a specific cell; gridframe_frame/3 returns
+all cells at depth D as R-C pairs; gridframe_max_depth/2 returns floor((min(H,W)-1)/2);
+gridframe_frame_count/2 returns max_depth+1. gridframe_peel/2 returns the inner (H-2)x(W-2)
 grid after stripping the outermost frame (fails for grids smaller than 3x3).
-gfr_all_frames/2 lists all frame cell-lists in depth order.
+gridframe_all_frames/2 lists all frame cell-lists in depth order.
 
-gfr_frame_uniform/3 returns yes/no for frame uniformity; gfr_frame_colors/3
-gives distinct colors in a frame; gfr_count_in_frame/4 counts a specific color.
-gfr_set_frame/4 sets frame D to Color; gfr_fill_frames/3 assigns Colors[D] to
-each frame. gfr_uniform_frames/2 collects depths of uniform frames.
-gfr_innermost/2 returns cells at max depth; gfr_onion_layers/2 returns D-Color
+gridframe_frame_uniform/3 returns yes/no for frame uniformity; gridframe_frame_colors/3
+gives distinct colors in a frame; gridframe_count_in_frame/4 counts a specific color.
+gridframe_set_frame/4 sets frame D to Color; gridframe_fill_frames/3 assigns Colors[D] to
+each frame. gridframe_uniform_frames/2 collects depths of uniform frames.
+gridframe_innermost/2 returns cells at max depth; gridframe_onion_layers/2 returns D-Color
 pairs for all uniform frames, enabling onion/target pattern detection.
 
 14 gfr_* predicates. 44 tests pass. Layer 216.
@@ -18926,14 +18926,14 @@ along the spiral; gsp_spiral_slice/4 returns spiral cells from Start to End.
 Chapter 195: griddelta Pack - Grid Delta Analysis (gdt_*, Layer 218)
 
 The griddelta pack (Layer 218) compares two same-size grids, detecting changes
-and mapping transitions. gdt_compatible/2 tests dimension compatibility;
-gdt_diff_cells/3 finds changed cells; gdt_diff_count/3 counts them; gdt_same_cells/3
-finds unchanged cells. gdt_changed_pairs/3 maps R-C-(Old->New) for each change;
-gdt_color_changes/4 counts changes from a specific color; gdt_changed_colors/3
-returns new colors. gdt_apply_delta/4 applies G1→G2 changes to a third grid;
-gdt_invert_delta/3 reverses them. gdt_diff_rows/3 and gdt_diff_cols/3 find
-changed rows and columns. gdt_agree_region/6 tests a rectangular sub-region.
-gdt_overlay/4 overlays G2 on G1 with Marker as transparent. gdt_is_identity/2
+and mapping transitions. griddelta_compatible/2 tests dimension compatibility;
+griddelta_diff_cells/3 finds changed cells; griddelta_diff_count/3 counts them; griddelta_same_cells/3
+finds unchanged cells. griddelta_changed_pairs/3 maps R-C-(Old->New) for each change;
+griddelta_color_changes/4 counts changes from a specific color; griddelta_changed_colors/3
+returns new colors. griddelta_apply_delta/4 applies G1→G2 changes to a third grid;
+griddelta_invert_delta/3 reverses them. griddelta_diff_rows/3 and griddelta_diff_cols/3 find
+changed rows and columns. griddelta_agree_region/6 tests a rectangular sub-region.
+griddelta_overlay/4 overlays G2 on G1 with Marker as transparent. griddelta_is_identity/2
 tests if two grids are identical.
 
 :- use_module(pack(griddelta/prolog/griddelta)).
@@ -18944,14 +18944,14 @@ tests if two grids are identical.
 Chapter 196: gridrowcol Pack - Grid Row and Column Comparative Analysis (grc_*, Layer 219)
 
 The gridrowcol pack (Layer 219) treats rows and columns as first-class list
-objects for comparison, sorting, and lookup. grc_row/3 extracts a row; grc_col/3
-extracts a column as a top-to-bottom list. grc_row_uniform/3 and grc_col_uniform/3
-test uniformity and bind the shared color. grc_equal_rows/3 and grc_equal_cols/3
-test whether two rows or columns are identical. grc_row_positions/3 and
-grc_col_positions/3 return the indices of rows or columns matching a given pattern.
-grc_matching_rows/2 and grc_matching_cols/2 return all ordered pairs of identical
-rows or columns. grc_unique_rows/2 and grc_unique_cols/2 return indices of rows or
-columns that appear exactly once. grc_row_sort/2 sorts rows; grc_col_sort/2
+objects for comparison, sorting, and lookup. gridrowcol_row/3 extracts a row; gridrowcol_col/3
+extracts a column as a top-to-bottom list. gridrowcol_row_uniform/3 and gridrowcol_col_uniform/3
+test uniformity and bind the shared color. gridrowcol_equal_rows/3 and gridrowcol_equal_cols/3
+test whether two rows or columns are identical. gridrowcol_row_positions/3 and
+gridrowcol_col_positions/3 return the indices of rows or columns matching a given pattern.
+gridrowcol_matching_rows/2 and gridrowcol_matching_cols/2 return all ordered pairs of identical
+rows or columns. gridrowcol_unique_rows/2 and gridrowcol_unique_cols/2 return indices of rows or
+columns that appear exactly once. gridrowcol_row_sort/2 sorts rows; gridrowcol_col_sort/2
 reorders columns by their lexicographic content.
 
 :- use_module(pack(gridrowcol/prolog/gridrowcol)).
@@ -18962,15 +18962,15 @@ reorders columns by their lexicographic content.
 Chapter 197: gridseg Pack - Grid Segmentation by Separator Rows and Columns (gsg_*, Layer 220)
 
 The gridseg pack (Layer 220) detects uniform-color separator rows and columns
-and uses them to split, trim, and extract panels from a raw grid. gsg_is_sep_row/3
-and gsg_is_sep_col/3 test uniformity and bind the separator color. gsg_sep_rows/3
-and gsg_sep_cols/3 collect all separator indices. gsg_split_h/3 splits by
+and uses them to split, trim, and extract panels from a raw grid. gridseg_is_sep_row/3
+and gridseg_is_sep_col/3 test uniformity and bind the separator color. gridseg_sep_rows/3
+and gridseg_sep_cols/3 collect all separator indices. gridseg_split_h/3 splits by
 separator rows into sub-grids (consecutive separators = one boundary, no empty
-segments). gsg_split_v/3 splits by separator columns. gsg_segment_count_h/3 and
-gsg_segment_count_v/3 count segments. gsg_panels/3 splits by both separator kinds
-and returns all rectangular panels as a flat row-major list. gsg_panel_count/3
-counts panels. gsg_trim_h/3 removes border separator rows; gsg_trim_v/3 removes
-border separator columns; gsg_trim/3 removes both. gsg_sep_color/2 finds the
+segments). gridseg_split_v/3 splits by separator columns. gridseg_segment_count_h/3 and
+gridseg_segment_count_v/3 count segments. gridseg_panels/3 splits by both separator kinds
+and returns all rectangular panels as a flat row-major list. gridseg_panel_count/3
+counts panels. gridseg_trim_h/3 removes border separator rows; gridseg_trim_v/3 removes
+border separator columns; gridseg_trim/3 removes both. gridseg_sep_color/2 finds the
 unique separator color used in the grid.
 
 :- use_module(pack(gridseg/prolog/gridseg)).
@@ -19001,14 +19001,14 @@ Chapter 199: gridpos Pack - Grid Positional Analysis (gps_*, Layer 222)
 The gridpos pack (Layer 222) provides fourteen predicates for extracting sub-grids
 and cell positions based on geometric position: halves, quadrants, even/odd rows
 and columns, checkerboard patterns, center cell, corner cells, and center cross.
-gps_top_half/2 returns rows [0, H//2); gps_bottom_half/2 returns rows [H//2, H).
-gps_left_half/2 and gps_right_half/2 do the same for columns. gps_quadrant/3
+gridpos_top_half/2 returns rows [0, H//2); gridpos_bottom_half/2 returns rows [H//2, H).
+gridpos_left_half/2 and gridpos_right_half/2 do the same for columns. gridpos_quadrant/3
 takes tl/tr/bl/br and returns the corresponding rectangular sub-grid.
-gps_even_rows/2 and gps_odd_rows/2 filter by row parity; gps_even_cols/2 and
-gps_odd_cols/2 filter by column parity. gps_checkerboard/3 returns R-C pairs
-where (R+C) mod 2 = Parity (Parity must be bound). gps_center_cell/3 returns
-the center coordinates (H//2, W//2). gps_corners/2 returns four R-C-Value terms
-for the corner cells. gps_cross_h/3 and gps_cross_v/3 return the center row and
+gridpos_even_rows/2 and gridpos_odd_rows/2 filter by row parity; gridpos_even_cols/2 and
+gridpos_odd_cols/2 filter by column parity. gridpos_checkerboard/3 returns R-C pairs
+where (R+C) mod 2 = Parity (Parity must be bound). gridpos_center_cell/3 returns
+the center coordinates (H//2, W//2). gridpos_corners/2 returns four R-C-Value terms
+for the corner cells. gridpos_cross_h/3 and gridpos_cross_v/3 return the center row and
 center column respectively.
 
 :- use_module(pack(gridpos/prolog/gridpos)).
@@ -19019,9 +19019,9 @@ Chapter 200: gridgrav Pack - Grid Gravity Simulation (gv_*, Layer 223)
 
 The gridgrav pack (Layer 223) provides fourteen predicates for simulating gravity
 within a raw grid. Non-background (non-bg) cells are those whose color differs
-from a user-specified BgColor. gv_fall_down/3 settles non-bg cells to the bottom
-of each column; gv_fall_up/3 to the top; gv_fall_left/3 to the left of each row;
-gv_fall_right/3 to the right. All four preserve relative order within each row or
+from a user-specified BgColor. gravity_fall_down/3 settles non-bg cells to the bottom
+of each column; gravity_fall_up/3 to the top; gravity_fall_left/3 to the left of each row;
+gravity_fall_right/3 to the right. All four preserve relative order within each row or
 column. gv_col_pile_h/4 and gv_row_pile_w/4 count non-bg cells in a column or row.
 gv_all_col_piles/3 and gv_all_row_piles/3 return these counts for all columns or
 rows. gv_floating_cells/3 returns R-C pairs of non-bg cells with a bg cell directly
@@ -19059,14 +19059,14 @@ Chapter 202: gridmark Pack - Grid Marking and Annotation (gmk_*, Layer 225)
 
 The gridmark pack (Layer 225) provides fourteen predicates for creating annotated
 copies of a grid with specific cells overwritten by a mark color. All operations
-are non-destructive. gmk_mark_cell/5 marks a single cell. gmk_mark_cells/4 marks
-a list of R-C pairs. gmk_mark_row/4 and gmk_mark_col/4 mark entire rows or
-columns. gmk_mark_rect/7 marks a rectangular region. gmk_mark_border/3 marks the
-outer ring. gmk_mark_diagonal/3 marks cells where R=C. gmk_mark_anti_diagonal/3
-marks cells where R+C=W-1. gmk_mark_corners/3 marks the four corners.
-gmk_mark_cross/3 marks the center row and column. gmk_mark_checkerboard/3 marks
-cells where (R+C) mod 2 = 0. gmk_marked_cells/3 returns R-C pairs of marked
-cells. gmk_is_marked/4 checks a single cell. gmk_erase/4 replaces mark color
+are non-destructive. gridmark_mark_cell/5 marks a single cell. gridmark_mark_cells/4 marks
+a list of R-C pairs. gridmark_mark_row/4 and gridmark_mark_col/4 mark entire rows or
+columns. gridmark_mark_rect/7 marks a rectangular region. gridmark_mark_border/3 marks the
+outer ring. gridmark_mark_diagonal/3 marks cells where R=C. gridmark_mark_anti_diagonal/3
+marks cells where R+C=W-1. gridmark_mark_corners/3 marks the four corners.
+gridmark_mark_cross/3 marks the center row and column. gridmark_mark_checkerboard/3 marks
+cells where (R+C) mod 2 = 0. gridmark_marked_cells/3 returns R-C pairs of marked
+cells. gridmark_is_marked/4 checks a single cell. gridmark_erase/4 replaces mark color
 with a background color.
 
 :- use_module(pack(gridmark/prolog/gridmark)).
@@ -19077,14 +19077,14 @@ Chapter 203: gridcrop Pack - Grid Cropping and Padding (gcr_*, Layer 226)
 
 The gridcrop pack (Layer 226) provides fourteen predicates for resizing grids by
 cropping, trimming, padding, centering, and expanding. All operations are
-non-destructive. gcr_bbox/3 returns the bounding box R0-C0-R1-C1 of all
-non-background cells. gcr_crop_bbox/3 and gcr_trim/3 crop the grid to that box.
-gcr_trim_rows/3 removes leading and trailing uniform-background rows only;
-gcr_trim_cols/3 removes uniform-background columns only. gcr_crop/6 extracts an
-explicit rectangle. gcr_pad_to/5 extends the grid to at least a target size.
-gcr_center_in/5 places the grid inside a background frame. gcr_add_border/4 and
-gcr_remove_border/4 add or remove an N-cell color border. gcr_expand_down/4 and
-gcr_expand_right/4 append rows or columns. gcr_content_h/3 and gcr_content_w/3
+non-destructive. gridcrop_bbox/3 returns the bounding box R0-C0-R1-C1 of all
+non-background cells. gridcrop_crop_bbox/3 and gridcrop_trim/3 crop the grid to that box.
+gridcrop_trim_rows/3 removes leading and trailing uniform-background rows only;
+gridcrop_trim_cols/3 removes uniform-background columns only. gridcrop_crop/6 extracts an
+explicit rectangle. gridcrop_pad_to/5 extends the grid to at least a target size.
+gridcrop_center_in/5 places the grid inside a background frame. gridcrop_add_border/4 and
+gridcrop_remove_border/4 add or remove an N-cell color border. gridcrop_expand_down/4 and
+gridcrop_expand_right/4 append rows or columns. gridcrop_content_h/3 and gridcrop_content_w/3
 return the height and width of the non-background bounding box.
 
 :- use_module(pack(gridcrop/prolog/gridcrop)).
@@ -19095,15 +19095,15 @@ Chapter 204: gridpatch Pack - Grid Patch Operations (gpt_*, Layer 227)
 
 The gridpatch pack (Layer 227) provides fourteen predicates for working with
 sub-grid regions called patches. A patch is itself a grid: a list of rows of
-color atoms. gpt_extract/6 copies a rectangular region from a grid. gpt_place/5
-pastes a patch at a position, overwriting cells. gpt_overlay/6 pastes with
-transparency: patch cells matching a transparency color are skipped. gpt_match_at/4
-checks if a patch matches at a specific position. gpt_find_all/3 returns all
-positions where a patch matches. gpt_count/3 counts them. gpt_replace_first/4
-replaces the first (top-left) match with a new patch. gpt_scatter/4 places a patch
-at each of a list of positions. gpt_tile_fill/4 builds an H x W grid by repeating
-a tile. gpt_h/2, gpt_w/2, and gpt_size/3 return dimensions. gpt_eq/2 checks
-equality. gpt_inpaint/7 fills a rectangular region with a color.
+color atoms. gridpatch_extract/6 copies a rectangular region from a grid. gridpatch_place/5
+pastes a patch at a position, overwriting cells. gridpatch_overlay/6 pastes with
+transparency: patch cells matching a transparency color are skipped. gridpatch_match_at/4
+checks if a patch matches at a specific position. gridpatch_find_all/3 returns all
+positions where a patch matches. gridpatch_count/3 counts them. gridpatch_replace_first/4
+replaces the first (top-left) match with a new patch. gridpatch_scatter/4 places a patch
+at each of a list of positions. gridpatch_tile_fill/4 builds an H x W grid by repeating
+a tile. gridpatch_h/2, gridpatch_w/2, and gridpatch_size/3 return dimensions. gridpatch_eq/2 checks
+equality. gridpatch_inpaint/7 fills a rectangular region with a color.
 
 :- use_module(pack(gridpatch/prolog/gridpatch)).
 
@@ -19112,14 +19112,14 @@ equality. gpt_inpaint/7 fills a rectangular region with a color.
 Chapter 205: gridscan Pack - Grid Ray Scanning (gsn_*, Layer 228)
 
 The gridscan pack (Layer 228) provides fourteen predicates for scanning a grid in
-four directions (right, left, down, up) to find non-background cells. gsn_scan_row/4
-collects all non-background cells in a row as C-V pairs. gsn_scan_col/4 does the
-same for a column as R-V pairs. gsn_first_right/5, gsn_first_left/5,
-gsn_first_down/5, and gsn_first_up/5 each return the nearest non-background cell
-in the named direction, failing if none exists. gsn_dist_right/5, gsn_dist_left/5,
-gsn_dist_down/5, and gsn_dist_up/5 return the step count to the nearest
-non-background cell, also failing if none. gsn_blocked_right/4, gsn_blocked_left/4,
-gsn_blocked_down/4, and gsn_blocked_up/4 succeed if any non-background cell exists
+four directions (right, left, down, up) to find non-background cells. gridscan_scan_row/4
+collects all non-background cells in a row as C-V pairs. gridscan_scan_col/4 does the
+same for a column as R-V pairs. gridscan_first_right/5, gridscan_first_left/5,
+gridscan_first_down/5, and gridscan_first_up/5 each return the nearest non-background cell
+in the named direction, failing if none exists. gridscan_dist_right/5, gridscan_dist_left/5,
+gridscan_dist_down/5, and gridscan_dist_up/5 return the step count to the nearest
+non-background cell, also failing if none. gridscan_blocked_right/4, gridscan_blocked_left/4,
+gridscan_blocked_down/4, and gridscan_blocked_up/4 succeed if any non-background cell exists
 in the named direction from the given position.
 
 :- use_module(pack(gridscan/prolog/gridscan)).
@@ -19156,29 +19156,29 @@ gwv_contract_n/4 - N contraction steps
 Chapter 212: gridshift - Grid Shifting and Cyclic Rolling (gsh_*, Layer 230)
 
 The gridshift pack provides fourteen predicates for shifting and rolling grids.
-Four directional shifts (gsh_shift_right, gsh_shift_left, gsh_shift_down,
-gsh_shift_up) move cells with bg fill for vacated positions. Four cyclic rolls
-(gsh_roll_right, gsh_roll_left, gsh_roll_down, gsh_roll_up) wrap cells toroidally.
-Per-row/column operations (gsh_roll_row, gsh_roll_col, gsh_shift_row, gsh_shift_col)
-modify individual rows or columns. gsh_shift_color shifts cells of one color,
-and gsh_offset shifts the entire grid by (DR, DC).
+Four directional shifts (gridshift_shift_right, gridshift_shift_left, gridshift_shift_down,
+gridshift_shift_up) move cells with bg fill for vacated positions. Four cyclic rolls
+(gridshift_roll_right, gridshift_roll_left, gridshift_roll_down, gridshift_roll_up) wrap cells toroidally.
+Per-row/column operations (gridshift_roll_row, gridshift_roll_col, gridshift_shift_row, gridshift_shift_col)
+modify individual rows or columns. gridshift_shift_color shifts cells of one color,
+and gridshift_offset shifts the entire grid by (DR, DC).
 
 :- use_module(pack(gridshift/prolog/gridshift)).
 
-gsh_shift_right/4  - shift each row right by N (bg fill left)
-gsh_shift_left/4   - shift each row left by N (bg fill right)
-gsh_shift_down/4   - shift grid down by N rows (bg rows at top)
-gsh_shift_up/4     - shift grid up by N rows (bg rows at bottom)
-gsh_roll_right/3   - cyclic roll each row right (toroidal)
-gsh_roll_left/3    - cyclic roll each row left (toroidal)
-gsh_roll_down/3    - cyclic roll grid down N rows (toroidal)
-gsh_roll_up/3      - cyclic roll grid up N rows (toroidal)
-gsh_roll_row/4     - cyclic roll single row right by N
-gsh_roll_col/4     - cyclic roll single column down by N
-gsh_shift_color/6  - shift cells of specific Color by (DR, DC)
-gsh_offset/5       - shift entire grid by (DR, DC) with bg fill
-gsh_shift_row/5    - shift single row by N (pos=right, neg=left)
-gsh_shift_col/5    - shift single column by N (pos=down, neg=up)
+gridshift_shift_right/4  - shift each row right by N (bg fill left)
+gridshift_shift_left/4   - shift each row left by N (bg fill right)
+gridshift_shift_down/4   - shift grid down by N rows (bg rows at top)
+gridshift_shift_up/4     - shift grid up by N rows (bg rows at bottom)
+gridshift_roll_right/3   - cyclic roll each row right (toroidal)
+gridshift_roll_left/3    - cyclic roll each row left (toroidal)
+gridshift_roll_down/3    - cyclic roll grid down N rows (toroidal)
+gridshift_roll_up/3      - cyclic roll grid up N rows (toroidal)
+gridshift_roll_row/4     - cyclic roll single row right by N
+gridshift_roll_col/4     - cyclic roll single column down by N
+gridshift_shift_color/6  - shift cells of specific Color by (DR, DC)
+gridshift_offset/5       - shift entire grid by (DR, DC) with bg fill
+gridshift_shift_row/5    - shift single row by N (pos=right, neg=left)
+gridshift_shift_col/5    - shift single column by N (pos=down, neg=up)
 
 14 gsh_* predicates. 44 tests pass. Layer 230.
 
@@ -19192,32 +19192,32 @@ inversion and cycling, deriving mappings from aligned grids, and composing maps.
 :- use_module(pack(gridmap/prolog/gridmap)).
 
 G = [[r,g,r],[g,b,g],[r,g,r]].
-gmp_remap(G, [r-x, g-y], R).
+gridmap_remap(G, [r-x, g-y], R).
 % R = [[x,y,x],[y,b,y],[x,y,x]]
 
-gmp_normalize(G, b, N).
+gridmap_normalize(G, b, N).
 % N = [[1,2,1],[2,b,2],[1,2,1]]
 
-gmp_palette(G, b, P).
+gridmap_palette(G, b, P).
 % P = [r, g]
 
-gmp_build_map([[r,g],[b,r]], [[x,y],[z,x]], q, M).
+gridmap_build_map([[r,g],[b,r]], [[x,y],[z,x]], q, M).
 % M = [r-x, g-y, b-z]
 
-gmp_remap/3   - apply From-To mapping list; unmapped cells unchanged
-gmp_swap/4    - swap two colors (bidirectional remap)
-gmp_replace/4 - replace one color with another
-gmp_merge/4   - replace list of colors with single target
-gmp_normalize/3 - assign integer rank labels in row-major order
-gmp_palette/3   - ordered distinct non-bg colors in first-occurrence order
-gmp_recolor_fg/4  - replace all non-bg cells with FgColor
-gmp_mask_color/4  - keep one color; replace all others with bg
-gmp_invert/3    - reverse palette assignments (c_i -> c_(n+1-i))
-gmp_cycle/4     - cyclic palette index shift by N
-gmp_build_map/4 - derive mapping from two aligned grids
-gmp_invert_map/2 - reverse all From-To pairs
-gmp_compose_maps/3 - chain two maps (From-Mid, Mid-To -> From-To)
-gmp_map_count/3  - count cells with a From key in the mapping
+gridmap_remap/3   - apply From-To mapping list; unmapped cells unchanged
+gridmap_swap/4    - swap two colors (bidirectional remap)
+gridmap_replace/4 - replace one color with another
+gridmap_merge/4   - replace list of colors with single target
+gridmap_normalize/3 - assign integer rank labels in row-major order
+gridmap_palette/3   - ordered distinct non-bg colors in first-occurrence order
+gridmap_recolor_fg/4  - replace all non-bg cells with FgColor
+gridmap_mask_color/4  - keep one color; replace all others with bg
+gridmap_invert/3    - reverse palette assignments (c_i -> c_(n+1-i))
+gridmap_cycle/4     - cyclic palette index shift by N
+gridmap_build_map/4 - derive mapping from two aligned grids
+gridmap_invert_map/2 - reverse all From-To pairs
+gridmap_compose_maps/3 - chain two maps (From-Mid, Mid-To -> From-To)
+gridmap_map_count/3  - count cells with a From key in the mapping
 
 14 gmp_* predicates. 44 tests pass. Layer 231.
 
@@ -19231,35 +19231,35 @@ on h/v/d/a axes, axis enumeration, and symmetry completion.
 :- use_module(pack(gridrefl/prolog/gridrefl)).
 
 G = [[1,2,3],[4,5,6],[7,8,9]].
-grf_rot90(G, R).
+gridrefl_rot90(G, R).
 % R = [[7,4,1],[8,5,2],[9,6,3]]
 
-grf_rot180(G, R).
+gridrefl_rot180(G, R).
 % R = [[9,8,7],[6,5,4],[3,2,1]]
 
-grf_transpose(G, T).
+gridrefl_transpose(G, T).
 % T = [[1,4,7],[2,5,8],[3,6,9]]
 
-grf_sym_axes([[1,2,1],[3,4,3],[1,2,1]], Axes).
+gridrefl_sym_axes([[1,2,1],[3,4,3],[1,2,1]], Axes).
 % Axes = [h,v]
 
-grf_make_sym_h([[r,b,b],[b,b,g]], b, R).
+gridrefl_make_sym_h([[r,b,b],[b,b,g]], b, R).
 % R = [[r,b,r],[g,b,g]]
 
-grf_flip_h/2    - reverse each row (left-right mirror)
-grf_flip_v/2    - reverse list of rows (top-bottom mirror)
-grf_rot90/2     - rotate 90 degrees clockwise
-grf_rot180/2    - rotate 180 degrees
-grf_rot270/2    - rotate 270 degrees clockwise (90 counter-clockwise)
-grf_transpose/2 - swap rows and columns
-grf_antidiag/2  - reflect across anti-diagonal (rot180 then transpose)
-grf_is_sym_h/1  - succeed if grid equals its horizontal flip
-grf_is_sym_v/1  - succeed if grid equals its vertical flip
-grf_is_sym_d/1  - succeed if grid equals its own transpose
-grf_is_sym_a/1  - succeed if grid equals its own anti-diagonal reflection
-grf_sym_axes/2  - return subset of [h,v,d,a] for satisfied symmetry axes
-grf_make_sym_h/3 - make horizontally symmetric by merging row with its reverse
-grf_make_sym_v/3 - make vertically symmetric by merging row R with row H-1-R
+gridrefl_flip_h/2    - reverse each row (left-right mirror)
+gridrefl_flip_v/2    - reverse list of rows (top-bottom mirror)
+gridrefl_rot90/2     - rotate 90 degrees clockwise
+gridrefl_rot180/2    - rotate 180 degrees
+gridrefl_rot270/2    - rotate 270 degrees clockwise (90 counter-clockwise)
+gridrefl_transpose/2 - swap rows and columns
+gridrefl_antidiag/2  - reflect across anti-diagonal (rot180 then transpose)
+gridrefl_is_sym_h/1  - succeed if grid equals its horizontal flip
+gridrefl_is_sym_v/1  - succeed if grid equals its vertical flip
+gridrefl_is_sym_d/1  - succeed if grid equals its own transpose
+gridrefl_is_sym_a/1  - succeed if grid equals its own anti-diagonal reflection
+gridrefl_sym_axes/2  - return subset of [h,v,d,a] for satisfied symmetry axes
+gridrefl_make_sym_h/3 - make horizontally symmetric by merging row with its reverse
+gridrefl_make_sym_v/3 - make vertically symmetric by merging row R with row H-1-R
 
 14 grf_* predicates. 44 tests pass. Layer 232.
 
@@ -19273,32 +19273,32 @@ unanimous, and conditional mask/if/filter.
 :- use_module(pack(gridlogic/prolog/gridlogic)).
 
 A = [[r,b],[b,b]], B = [[r,b],[r,b]].
-ggl_and(A, B, b, R).
+gridlogic_and(A, B, b, R).
 % R = [[r,b],[b,b]]  (only (0,0) non-bg in both)
 
-ggl_or([[r,b],[b,b]], [[b,g],[b,b]], b, R).
+gridlogic_or([[r,b],[b,b]], [[b,g],[b,b]], b, R).
 % R = [[r,g],[b,b]]
 
-ggl_not([[r,b],[b,g]], b, x, R).
+gridlogic_not([[r,b],[b,g]], b, x, R).
 % R = [[b,x],[x,b]]
 
-ggl_any([A, B, C], b, R).  % first non-bg across list wins
-ggl_majority([G, G, H], b, R).  % 2/3 majority wins
+gridlogic_any([A, B, C], b, R).  % first non-bg across list wins
+gridlogic_majority([G, G, H], b, R).  % 2/3 majority wins
 
-ggl_and/4       - both non-bg → Grid1; else bg
-ggl_or/4        - first non-bg wins (Grid1 over Grid2)
-ggl_xor/4       - exactly one non-bg → that; else bg
-ggl_not/4       - bg → FgColor; non-bg → bg
-ggl_subtract/4  - Grid1 non-bg AND Grid2 bg → Grid1; else bg
-ggl_common/4    - same non-bg value in both → value; else bg
-ggl_differ/4    - both non-bg but different → Grid1; else bg
-ggl_any/3       - list-wide OR (first non-bg wins)
-ggl_all/3       - list-wide AND (unanimous non-bg agreement)
-ggl_majority/3  - plurality vote per cell (>N/2 threshold)
-ggl_unanimous/3 - strict all-grids agreement including bg
-ggl_mask/5      - keep Grid where Mask = MaskColor; else bg
-ggl_if/5        - CondColor → ThenGrid; else ElseGrid
-ggl_filter/4    - keep cells in Colors list; else bg
+gridlogic_and/4       - both non-bg → Grid1; else bg
+gridlogic_or/4        - first non-bg wins (Grid1 over Grid2)
+gridlogic_xor/4       - exactly one non-bg → that; else bg
+gridlogic_not/4       - bg → FgColor; non-bg → bg
+gridlogic_subtract/4  - Grid1 non-bg AND Grid2 bg → Grid1; else bg
+gridlogic_common/4    - same non-bg value in both → value; else bg
+gridlogic_differ/4    - both non-bg but different → Grid1; else bg
+gridlogic_any/3       - list-wide OR (first non-bg wins)
+gridlogic_all/3       - list-wide AND (unanimous non-bg agreement)
+gridlogic_majority/3  - plurality vote per cell (>N/2 threshold)
+gridlogic_unanimous/3 - strict all-grids agreement including bg
+gridlogic_mask/5      - keep Grid where Mask = MaskColor; else bg
+gridlogic_if/5        - CondColor → ThenGrid; else ElseGrid
+gridlogic_filter/4    - keep cells in Colors list; else bg
 
 14 ggl_* predicates. 44 tests pass. Layer 233.
 
@@ -19312,20 +19312,20 @@ change masks.
 
 :- use_module(pack(gridchain/prolog/gridchain)).
 
-gch_pairs/2       - consecutive two-element pairs: [[G1,G2],[G2,G3],...]
-gch_window/3      - sliding windows of W consecutive grids
-gch_zip/3         - element-wise zip of two sequences into pairs
-gch_take/3        - first N grids (clamps to length)
-gch_drop/3        - drop first N grids (clamps to length)
-gch_nth/3         - 0-indexed element access
-gch_all_same/1    - succeed if all grids identical
-gch_dedup/2       - remove duplicate grids, preserve first occurrence
-gch_cycle/3       - N copies of a grid
-gch_interleave/3  - interleave two sequences element by element
-gch_split_at/4    - split at index N into Before and After
-gch_reverse/2     - reverse the sequence
-gch_diff_counts/3 - per-pair count of differing cell positions
-gch_changes_mask/4 - first-vs-last change mask with MarkColor
+gridchain_pairs/2       - consecutive two-element pairs: [[G1,G2],[G2,G3],...]
+gridchain_window/3      - sliding windows of W consecutive grids
+gridchain_zip/3         - element-wise zip of two sequences into pairs
+gridchain_take/3        - first N grids (clamps to length)
+gridchain_drop/3        - drop first N grids (clamps to length)
+gridchain_nth/3         - 0-indexed element access
+gridchain_all_same/1    - succeed if all grids identical
+gridchain_dedup/2       - remove duplicate grids, preserve first occurrence
+gridchain_cycle/3       - N copies of a grid
+gridchain_interleave/3  - interleave two sequences element by element
+gridchain_split_at/4    - split at index N into Before and After
+gridchain_reverse/2     - reverse the sequence
+gridchain_diff_counts/3 - per-pair count of differing cell positions
+gridchain_changes_mask/4 - first-vs-last change mask with MarkColor
 
 14 gch_* predicates. 44 tests pass. Layer 234.
 
@@ -19357,20 +19357,20 @@ bounding boxes, extracting crops, counting regions, and building object registri
 
 :- use_module(pack(gridextract/prolog/gridextract)).
 
-gxt_nonbg_cells/3    - all non-bg cells as r(R,C,V) triples in row-major order
-gxt_color_cells/3    - all cells of a specific color as r(R,C,Color) triples
-gxt_bbox/4           - tight bounding box of all non-bg cells + cell list
-gxt_crop_bbox/5      - extract sub-grid for a bounding box + offset
-gxt_object_at/5      - BFS flood bbox of 4-connected same-color region from (R,C)
-gxt_all_colors/3     - sorted unique list of non-bg colors in the grid
-gxt_color_count/4    - count occurrences of a specific color
-gxt_largest_color/3  - non-bg color with the highest cell count
-gxt_smallest_color/3 - non-bg color with the lowest cell count
-gxt_centered_crop/5  - crop of given size centered on centroid of non-bg cells
-gxt_row_cells/4      - non-bg cells in a specific 0-indexed row
-gxt_col_cells/4      - non-bg cells in a specific 0-indexed column
-gxt_region_count/4   - count distinct 4-connected regions of a given color
-gxt_registry/3       - obj(Color,Count,BBox) for each unique non-bg color
+gridextract_nonbg_cells/3    - all non-bg cells as r(R,C,V) triples in row-major order
+gridextract_color_cells/3    - all cells of a specific color as r(R,C,Color) triples
+gridextract_bbox/4           - tight bounding box of all non-bg cells + cell list
+gridextract_crop_bbox/5      - extract sub-grid for a bounding box + offset
+gridextract_object_at/5      - BFS flood bbox of 4-connected same-color region from (R,C)
+gridextract_all_colors/3     - sorted unique list of non-bg colors in the grid
+gridextract_color_count/4    - count occurrences of a specific color
+gridextract_largest_color/3  - non-bg color with the highest cell count
+gridextract_smallest_color/3 - non-bg color with the lowest cell count
+gridextract_centered_crop/5  - crop of given size centered on centroid of non-bg cells
+gridextract_row_cells/4      - non-bg cells in a specific 0-indexed row
+gridextract_col_cells/4      - non-bg cells in a specific 0-indexed column
+gridextract_region_count/4   - count distinct 4-connected regions of a given color
+gridextract_registry/3       - obj(Color,Count,BBox) for each unique non-bg color
 
 14 gxt_* predicates. 44 tests pass. Layer 236.
 
@@ -19382,20 +19382,20 @@ directions, blocked gravity, individual setters, and a settled-state test.
 
 :- use_module(pack(gridgrav/prolog/gridgrav)).
 
-gra_fall_down/3      - non-bg values sink to bottom of each column
-gra_fall_up/3        - non-bg values rise to top of each column
-gra_fall_left/3      - non-bg values slide to left of each row
-gra_fall_right/3     - non-bg values slide to right of each row
-gra_fall/4           - direction dispatch: down | up | left | right
-gra_col_nonbg/4      - collect non-bg values from a column, top to bottom
-gra_row_nonbg/4      - collect non-bg values from a row, left to right
-gra_set_col_bottom/5 - place values at bottom of column; bg fills above
-gra_set_col_top/5    - place values at top of column; bg fills below
-gra_set_row_left/5   - place values at left of row; bg fills to right
-gra_set_row_right/5  - place values at right of row; bg fills to left
-gra_blocked_fall/5   - gravity with BlockColor as immovable walls
-gra_is_settled/2     - true if fall_down leaves the grid unchanged
-gra_gravity_score/3  - count of cell positions displaced by fall_down
+gridgrav_fall_down/3      - non-bg values sink to bottom of each column
+gridgrav_fall_up/3        - non-bg values rise to top of each column
+gridgrav_fall_left/3      - non-bg values slide to left of each row
+gridgrav_fall_right/3     - non-bg values slide to right of each row
+gridgrav_fall/4           - direction dispatch: down | up | left | right
+gridgrav_col_nonbg/4      - collect non-bg values from a column, top to bottom
+gridgrav_row_nonbg/4      - collect non-bg values from a row, left to right
+gridgrav_set_col_bottom/5 - place values at bottom of column; bg fills above
+gridgrav_set_col_top/5    - place values at top of column; bg fills below
+gridgrav_set_row_left/5   - place values at left of row; bg fills to right
+gridgrav_set_row_right/5  - place values at right of row; bg fills to left
+gridgrav_blocked_fall/5   - gravity with BlockColor as immovable walls
+gridgrav_is_settled/2     - true if fall_down leaves the grid unchanged
+gridgrav_gravity_score/3  - count of cell positions displaced by fall_down
 
 14 gra_* predicates. 44 tests pass. Layer 237.
 
@@ -19423,14 +19423,14 @@ of symbolic grids: center of mass, bounding box, translation, overlap scoring,
 IoU, offset search, center alignment, placement, anchor-based placement, and
 any-overlap offset enumeration.
 
-Predicates: gal_center_of_mass/3, gal_nonbg_bbox/3, gal_bbox_center/3,
-gal_translate/5, gal_overlap_count/4, gal_overlap_score/4, gal_iou/4,
-gal_find_offset/5, gal_align_centers/4, gal_align_bbox_centers/4,
-gal_nonbg_offset/4, gal_place_at/6, gal_anchor_to/8, gal_match_any_offset/4.
+Predicates: gridalign_center_of_mass/3, gridalign_nonbg_bbox/3, gridalign_bbox_center/3,
+gridalign_translate/5, gridalign_overlap_count/4, gridalign_overlap_score/4, gridalign_iou/4,
+gridalign_find_offset/5, gridalign_align_centers/4, gridalign_align_bbox_centers/4,
+gridalign_nonbg_offset/4, gridalign_place_at/6, gridalign_anchor_to/8, gridalign_match_any_offset/4.
 
-Key design: gal_iou uses \+(V1=Bg, V2=Bg) for the union to avoid double-counting.
-gal_find_offset searches cell sets, not full translated grids, for efficiency.
-gal_place_at is transparent (same model as gst_stamp).
+Key design: gridalign_iou uses \+(V1=Bg, V2=Bg) for the union to avoid double-counting.
+gridalign_find_offset searches cell sets, not full translated grids, for efficiency.
+gridalign_place_at is transparent (same model as gst_stamp).
 
 See docs/tutorial/Ch221_GridAlign.txt for full details and examples.
 
@@ -19440,15 +19440,15 @@ The gridcolorop pack adds fourteen predicates for querying and transforming
 colors in symbolic grids: counting, ranking, swapping, replacing, masking,
 cycling, palette application, and binary inversion.
 
-Predicates: gco_color_counts/3, gco_distinct_colors/3, gco_nth_color/4,
-gco_count_distinct/3, gco_swap/5, gco_replace/5, gco_apply_map/4,
-gco_keep_only/4, gco_remove_color/4, gco_cycle/5, gco_rank_grid/3,
-gco_apply_palette/4, gco_most_least/4, gco_invert/4.
+Predicates: gridcolorop_color_counts/3, gridcolorop_distinct_colors/3, gridcolorop_nth_color/4,
+gridcolorop_count_distinct/3, gridcolorop_swap/5, gridcolorop_replace/5, gridcolorop_apply_map/4,
+gridcolorop_keep_only/4, gridcolorop_remove_color/4, gridcolorop_cycle/5, gridcolorop_rank_grid/3,
+gridcolorop_apply_palette/4, gridcolorop_most_least/4, gridcolorop_invert/4.
 
-Key design: gco_sort_by_count_desc_ uses Neg is -N (arithmetic integer) not
+Key design: gridcolorop_sort_by_count_desc_ uses Neg is -N (arithmetic integer) not
 the term -N (compound -(N)) to ensure msort produces descending count order.
-gco_cycle uses ((Idx+N) mod PLen + PLen) mod PLen to handle negative N.
-gco_invert is binary: all non-bg becomes Bg, all Bg becomes FgColor.
+gridcolorop_cycle uses ((Idx+N) mod PLen + PLen) mod PLen to handle negative N.
+gridcolorop_invert is binary: all non-bg becomes Bg, all Bg becomes FgColor.
 
 See docs/tutorial/Ch222_GridColorOp.txt for full predicate descriptions,
 design notes, example session, and test coverage summary.
@@ -19461,15 +19461,15 @@ double and halve shortcuts, nearest-neighbor resize, modular tiling, rectangular
 crop, border crop, letterbox fit, canvas centering, dimension query, aspect ratio,
 and square test.
 
-Predicates: grs_scale_up/3, grs_scale_down/4, grs_scale_down_mode/4,
-grs_double/2, grs_halve/3, grs_resize/5, grs_tile_to/4, grs_crop/6,
-grs_border_crop/4, grs_fit_in/5, grs_embed_in/5, grs_grid_size/3,
-grs_aspect_ratio/4, grs_is_square/1.
+Predicates: gridresize_scale_up/3, gridresize_scale_down/4, gridresize_scale_down_mode/4,
+gridresize_double/2, gridresize_halve/3, gridresize_resize/5, gridresize_tile_to/4, gridresize_crop/6,
+gridresize_border_crop/4, gridresize_fit_in/5, gridresize_embed_in/5, gridresize_grid_size/3,
+gridresize_aspect_ratio/4, gridresize_is_square/1.
 
-Key design: all if-then-else blocks following grs_dims_ must be wrapped in
-outer parentheses; without them SWI-Prolog parses grs_dims_ as part of the
-condition and H, W are unbound in the else branch. grs_mode_ uses arithmetic
-negation (Neg is -N) for sort keys. grs_fit_in uses round/1 for pixel rounding.
+Key design: all if-then-else blocks following gridresize_dims_ must be wrapped in
+outer parentheses; without them SWI-Prolog parses gridresize_dims_ as part of the
+condition and H, W are unbound in the else branch. gridresize_mode_ uses arithmetic
+negation (Neg is -N) for sort keys. gridresize_fit_in uses round/1 for pixel rounding.
 
 See docs/tutorial/Ch223_GridResize.txt for full details and examples.
 
@@ -19496,16 +19496,16 @@ Chapter 225: gridgroupby - Grid Group-By Operations (ggb_*, Layer 243)
 The gridgroupby pack adds fourteen predicates for grouping, filtering, sorting,
 pairing, and counting ob(Color,Cells,BBox) object terms produced by gob_all_objects.
 
-Predicates: ggb_group_by_color/2, ggb_group_by_size/2, ggb_group_by_row/2,
-ggb_group_by_col/2, ggb_filter_by_color/3, ggb_filter_by_size/3,
-ggb_filter_larger/3, ggb_filter_smaller/3, ggb_sort_by_size_asc/2,
-ggb_sort_by_size_desc/2, ggb_sort_by_row/2, ggb_sort_by_col/2,
-ggb_pair_by_color/2, ggb_count_per_color/2.
+Predicates: gridgroupby_group_by_color/2, gridgroupby_group_by_size/2, gridgroupby_group_by_row/2,
+gridgroupby_group_by_col/2, gridgroupby_filter_by_color/3, gridgroupby_filter_by_size/3,
+gridgroupby_filter_larger/3, gridgroupby_filter_smaller/3, gridgroupby_sort_by_size_asc/2,
+gridgroupby_sort_by_size_desc/2, gridgroupby_sort_by_row/2, gridgroupby_sort_by_col/2,
+gridgroupby_pair_by_color/2, gridgroupby_count_per_color/2.
 
-Key design: all group-by predicates share ggb_group_by_key_/3 which collects
+Key design: all group-by predicates share gridgroupby_group_by_key_/3 which collects
 k(Key,Obj) pairs, msort-s by key, then collects same-key runs into grp terms.
 Descending sort uses neg(Neg,Obj) keys (Neg is -Size) so msort produces largest
-first. ggb_pair_by_color emits pair/3 only for colors with exactly two objects.
+first. gridgroupby_pair_by_color emits pair/3 only for colors with exactly two objects.
 
 See docs/tutorial/Ch225_GridGroupBy.txt for full details and examples.
 
@@ -19550,15 +19550,15 @@ matching ob(Color,Cells,BBox) object terms between two lists and detecting what
 changed from one list to the other. Objects are produced by gob_all_objects/3 from
 the gridobj pack.
 
-Predicates: gom_match_color/3, gom_match_nearest/3, gom_match_size/3,
-gom_unmatched_a/3, gom_unmatched_b/3, gom_color_diff/3, gom_move_vector/2,
-gom_move_vectors/2, gom_constant_move/2, gom_infer_color_map/2, gom_appeared/3,
-gom_disappeared/3, gom_same_structure/2, gom_count_change/3.
+Predicates: gridobjmatch_match_color/3, gridobjmatch_match_nearest/3, gridobjmatch_match_size/3,
+gridobjmatch_unmatched_a/3, gridobjmatch_unmatched_b/3, gridobjmatch_color_diff/3, gridobjmatch_move_vector/2,
+gridobjmatch_move_vectors/2, gridobjmatch_constant_move/2, gridobjmatch_infer_color_map/2, gridobjmatch_appeared/3,
+gridobjmatch_disappeared/3, gridobjmatch_same_structure/2, gridobjmatch_count_change/3.
 
 Key design: match(O1,O2) pairing terms; mv(DR,DC) movement vectors; cm(Old,New)
-color maps. gom_match_nearest uses doubled centroid (R0+R1, C0+C1) for exact
-integer arithmetic. gom_constant_move fails for empty list. gom_appeared and
-gom_disappeared operate on color classes across the two lists.
+color maps. gridobjmatch_match_nearest uses doubled centroid (R0+R1, C0+C1) for exact
+integer arithmetic. gridobjmatch_constant_move fails for empty list. gridobjmatch_appeared and
+gridobjmatch_disappeared operate on color classes across the two lists.
 
 See docs/tutorial/Ch228_GridObjMatch.txt for full details and examples.
 
@@ -19607,16 +19607,16 @@ The contrast pack (Work Package 270, Layer 249) provides fourteen predicates for
 contrastive pair analysis. It finds which input features co-vary with output changes
 across all training pairs - the key causal signal for identifying transformation rules.
 
-Predicates: ca_pairwise_delta/2, ca_covarying_features/2, ca_context_gate/2,
-ca_discriminating_pair/4, ca_correlated_features/3, ca_change_count/3,
-ca_common_context/3, ca_separates/4, ca_minimal_features/2, ca_feature_profile/2,
-ca_profile_diff/3, ca_stable_features/2, ca_unstable_features/2, ca_rank_features/2.
+Predicates: contrast_pairwise_delta/2, contrast_covarying_features/2, contrast_context_gate/2,
+contrast_discriminating_pair/4, contrast_correlated_features/3, contrast_change_count/3,
+contrast_common_context/3, contrast_separates/4, contrast_minimal_features/2, contrast_feature_profile/2,
+contrast_profile_diff/3, contrast_stable_features/2, contrast_unstable_features/2, contrast_rank_features/2.
 
 Key design: deltas are delta(I, Changes) terms where Changes is a list of
-chg(R,C,OldV,NewV). Features are feat(Name, Value) terms. ca_covarying_features
+chg(R,C,OldV,NewV). Features are feat(Name, Value) terms. contrast_covarying_features
 returns features present in ALL changing pairs but absent from stable pairs.
-ca_rank_features scores features by change_count / total_changing and returns
-them in descending correlation order. ca_context_gate returns the top-ranked feature.
+contrast_rank_features scores features by change_count / total_changing and returns
+them in descending correlation order. contrast_context_gate returns the top-ranked feature.
 
 See docs/tutorial/Ch231_Contrast.txt for full details and examples.
 
@@ -19706,9 +19706,9 @@ hy_sequence_hyp(+Pairs, +Maps1, +Maps2, -Hyp): find a two-step color-map hypothe
 
 Chapter 237: condxf Enhancement - Context Gate Inference (WP-276)
 
-xc_infer_gate/3 infers which scene-object color acts as a context gate:
+condxf_infer_gate/3 infers which scene-object color acts as a context gate:
 
-    xc_infer_gate(Pairs, [], gate_color(GateColor)).
+    condxf_infer_gate(Pairs, [], gate_color(GateColor)).
 
 For each sorted candidate color, the predicate partitions pairs into those that
 contain the color in their input scene vs those that do not, then checks whether

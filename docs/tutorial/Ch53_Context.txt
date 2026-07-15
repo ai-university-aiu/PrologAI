@@ -25,7 +25,7 @@ A context map is a Prolog list of Key-Value pairs:
   Map = [color-red, operation-rotate_90, count-3]
 
 Keys are unique Prolog terms. The predicates maintain this invariant.
-ctx_put replaces an existing binding for a key rather than adding a duplicate.
+context_put replaces an existing binding for a key rather than adding a duplicate.
 
 
 PREDICATE REFERENCE
@@ -33,138 +33,138 @@ PREDICATE REFERENCE
 
 Core Operations
 
-ctx_put(+Map, +Key, +Value, -Map2)
+context_put(+Map, +Key, +Value, -Map2)
 
   Add or replace the binding for Key in Map. Map2 is the updated map.
 
-  ctx_put([], color, red, Map).
+  context_put([], color, red, Map).
   % Map = [color-red]
 
-  ctx_put([color-red, count-3], color, blue, Map).
+  context_put([color-red, count-3], color, blue, Map).
   % Map = [color-blue, count-3]
 
-ctx_get(+Map, +Key, -Value)
+context_get(+Map, +Key, -Value)
 
   Retrieve the value for Key. Fails if Key is absent.
 
-  ctx_get([a-1, b-2, c-3], b, V).
+  context_get([a-1, b-2, c-3], b, V).
   % V = 2
 
-  ctx_get([a-1], z, _).
+  context_get([a-1], z, _).
   % fails
 
-ctx_has(+Map, +Key)
+context_has(+Map, +Key)
 
   Succeed if Key is in the map.
 
-  ctx_has([x-10, y-20], x).   % succeeds
-  ctx_has([x-10, y-20], z).   % fails
+  context_has([x-10, y-20], x).   % succeeds
+  context_has([x-10, y-20], z).   % fails
 
-ctx_delete(+Map, +Key, -Map2)
+context_delete(+Map, +Key, -Map2)
 
   Remove the binding for Key. Succeeds even if Key is absent.
 
-  ctx_delete([a-1, b-2, c-3], b, Map2).
+  context_delete([a-1, b-2, c-3], b, Map2).
   % Map2 = [a-1, c-3]
 
-  ctx_delete([a-1], missing, Map2).
+  context_delete([a-1], missing, Map2).
   % Map2 = [a-1]
 
 
 Extraction
 
-ctx_keys(+Map, -Keys)
+context_keys(+Map, -Keys)
 
   Keys is the list of all keys, in insertion order.
 
-  ctx_keys([x-1, y-2, z-3], Keys).
+  context_keys([x-1, y-2, z-3], Keys).
   % Keys = [x, y, z]
 
-ctx_values(+Map, -Values)
+context_values(+Map, -Values)
 
   Values is the list of all values, in insertion order.
 
-  ctx_values([x-1, y-2, z-3], Vals).
+  context_values([x-1, y-2, z-3], Vals).
   % Vals = [1, 2, 3]
 
-ctx_size(+Map, -N)
+context_size(+Map, -N)
 
   N is the number of entries.
 
-  ctx_size([a-1, b-2, c-3], N).
+  context_size([a-1, b-2, c-3], N).
   % N = 3
 
 
 Construction and Conversion
 
-ctx_from_pairs(+Pairs, -Map)
+context_from_pairs(+Pairs, -Map)
 
   Build a context map from a list of Key-Value pairs. If the same key
   appears more than once, the last binding wins.
 
-  ctx_from_pairs([a-1, b-2, a-99], Map).
-  % ctx_get(Map, a, 99)  -- last 'a' wins
+  context_from_pairs([a-1, b-2, a-99], Map).
+  % context_get(Map, a, 99)  -- last 'a' wins
 
-ctx_to_pairs(+Map, -Pairs)
+context_to_pairs(+Map, -Pairs)
 
   Convert a context map to a Key-Value pair list (identity operation).
 
-  ctx_to_pairs([x-1, y-2], Pairs).
+  context_to_pairs([x-1, y-2], Pairs).
   % Pairs = [x-1, y-2]
 
-ctx_merge(+Map1, +Map2, -Merged)
+context_merge(+Map1, +Map2, -Merged)
 
   Merge two context maps. Bindings in Map2 override bindings in Map1.
 
-  ctx_merge([x-1, y-2], [x-99, z-3], Merged).
-  % ctx_get(Merged, x, 99)  -- Map2 overrides
-  % ctx_get(Merged, y, 2)   -- from Map1
-  % ctx_get(Merged, z, 3)   -- from Map2
+  context_merge([x-1, y-2], [x-99, z-3], Merged).
+  % context_get(Merged, x, 99)  -- Map2 overrides
+  % context_get(Merged, y, 2)   -- from Map1
+  % context_get(Merged, z, 3)   -- from Map2
 
 
 Dispatch and Selection
 
-ctx_dispatch(+Map, +Key, +DefaultGoal, +Args)
+context_dispatch(+Map, +Key, +DefaultGoal, +Args)
 
   Look up Key in Map; call the associated goal with Args. If Key is absent,
   call DefaultGoal with Args. The goal is called as call(Goal, Args).
 
   % Context map: key 'rotate' maps to a rotation handler.
-  ctx_dispatch(
+  context_dispatch(
     [rotate-[G]>>(tr_rotate90(G, G2), write(G2))],
     rotate,
     [_]>>(write(no_handler)),
     InputGrid
   ).
 
-ctx_select(+Map, +Keys, +Default, -Value)
+context_select(+Map, +Keys, +Default, -Value)
 
   Find the value for the first key in Keys that exists in Map.
   Returns Default if none of the keys are present.
 
-  ctx_select([color-red, size-3], [size, color], none, V).
+  context_select([color-red, size-3], [size, color], none, V).
   % V = 3  (size is first in the priority list and is present)
 
-  ctx_select([a-1, b-2], [x, y, z], fallback, V).
+  context_select([a-1, b-2], [x, y, z], fallback, V).
   % V = fallback  (none of x,y,z are in the map)
 
 
 Transformation
 
-ctx_map_values(+Map, +Goal, -Map2)
+context_map_values(+Map, +Goal, -Map2)
 
   Apply Goal(OldValue, NewValue) to every value. Keys are unchanged.
 
-  ctx_map_values([a-1, b-2, c-3], [V, V2]>>(V2 is V * 10), Map2).
-  % ctx_get(Map2, a, 10)
-  % ctx_get(Map2, b, 20)
-  % ctx_get(Map2, c, 30)
+  context_map_values([a-1, b-2, c-3], [V, V2]>>(V2 is V * 10), Map2).
+  % context_get(Map2, a, 10)
+  % context_get(Map2, b, 20)
+  % context_get(Map2, c, 30)
 
-ctx_filter_keys(+Map, +Goal, -Map2)
+context_filter_keys(+Map, +Goal, -Map2)
 
   Keep only entries whose key satisfies Goal(Key).
 
-  ctx_filter_keys([red-1, green-2, blue-3], [K]>>(K = red), Map2).
+  context_filter_keys([red-1, green-2, blue-3], [K]>>(K = red), Map2).
   % Map2 = [red-1]
 
 
@@ -173,28 +173,28 @@ COMBINING WITH OTHER PACKS
 The context pack integrates naturally with the pipeline, obj, and rewrite packs:
 
   % Build a symbol table mapping colors to step names.
-  ctx_from_pairs([1-rotate_90, 2-flip_h, 3-noop], SymbolTable),
+  context_from_pairs([1-rotate_90, 2-flip_h, 3-noop], SymbolTable),
 
   % Look up what operation to apply for color 2.
-  ctx_get(SymbolTable, 2, StepName),
+  context_get(SymbolTable, 2, StepName),
   pl_run([StepName], InputGrid, OutputGrid).
 
   % Pass a context map through a pipeline via a step that reads from it.
   pl_register(apply_ctx_op, [ctx_op(Map), G, G2]>>(
-      ctx_select(Map, [operation], noop, Op),
+      context_select(Map, [operation], noop, Op),
       pl_run([Op], G, G2)
   )).
 
   % Merge two partial symbol tables from two training pairs.
-  ctx_merge(SymTable1, SymTable2, Combined).
+  context_merge(SymTable1, SymTable2, Combined).
 
   % Filter out background-color entries.
-  ctx_filter_keys(ColorMap, [K]>>(K > 0), ForegroundMap).
+  context_filter_keys(ColorMap, [K]>>(K > 0), ForegroundMap).
 
   % Update a count in the context.
-  ctx_get(Map, count, OldCount),
+  context_get(Map, count, OldCount),
   NewCount is OldCount + 1,
-  ctx_put(Map, count, NewCount, Map2).
+  context_put(Map, count, NewCount, Map2).
 
 
 END OF CHAPTER 53

@@ -28,16 +28,16 @@ Color change entries use cm(OldColor, NewColor).
 
 Three strategies are available for pairing objects.
 
-gom_match_color(+Objs1, +Objs2, -Pairs)
+gridobjmatch_match_color(+Objs1, +Objs2, -Pairs)
   For each object in Objs1, find the first object in Objs2 with the same color.
   Matched objects in Objs2 are consumed (not reused). Unmatched objects are dropped.
 
 ?- Objs1 = [ob(r,[r(0,0)],r0(0,0,0,0)), ob(b,[r(1,1)],r0(1,1,1,1))],
    Objs2 = [ob(r,[r(0,2)],r0(0,2,0,2)), ob(b,[r(1,3)],r0(1,3,1,3))],
-   gom_match_color(Objs1, Objs2, Pairs).
+   gridobjmatch_match_color(Objs1, Objs2, Pairs).
 % Pairs = [match(ob(r,...),ob(r,...)), match(ob(b,...),ob(b,...))]
 
-gom_match_nearest(+Objs1, +Objs2, -Pairs)
+gridobjmatch_match_nearest(+Objs1, +Objs2, -Pairs)
   For each object in Objs1, find the nearest object in Objs2 by doubled-centroid
   Manhattan distance. Nearest objects are consumed greedily.
   When Objs2 is exhausted, remaining Objs1 objects are unmatched.
@@ -45,80 +45,80 @@ gom_match_nearest(+Objs1, +Objs2, -Pairs)
 ?- O1 = ob(r,[r(0,0)],r0(0,0,0,0)),
    Near = ob(b,[r(0,1)],r0(0,1,0,1)),
    Far  = ob(g,[r(5,5)],r0(5,5,5,5)),
-   gom_match_nearest([O1], [Far, Near], Pairs).
+   gridobjmatch_match_nearest([O1], [Far, Near], Pairs).
 % Pairs = [match(O1, Near)]   % selects nearest, not first
 
-gom_match_size(+Objs1, +Objs2, -Pairs)
+gridobjmatch_match_size(+Objs1, +Objs2, -Pairs)
   For each object in Objs1, find the first object in Objs2 with the same number of
   cells (cell count). Unmatched objects are dropped.
 
 
 3. Finding Unmatched Objects
 
-gom_unmatched_a(+Pairs, +Objs1, -Unmatched)
+gridobjmatch_unmatched_a(+Pairs, +Objs1, -Unmatched)
   Unmatched is the sub-list of Objs1 with no partner in any match/2 pair.
 
-gom_unmatched_b(+Pairs, +Objs2, -Unmatched)
+gridobjmatch_unmatched_b(+Pairs, +Objs2, -Unmatched)
   Unmatched is the sub-list of Objs2 with no partner in any match/2 pair.
 
 ?- Pairs = [match(ob(r,...), ob(r,...))],
    Objs1 = [ob(r,...), ob(b,...), ob(g,...)],
-   gom_unmatched_a(Pairs, Objs1, UA).
+   gridobjmatch_unmatched_a(Pairs, Objs1, UA).
 % UA = [ob(b,...), ob(g,...)]
 
 
 4. Detecting Color Changes
 
-gom_color_diff(+Pairs, -Same, -Diff)
+gridobjmatch_color_diff(+Pairs, -Same, -Diff)
   Partitions a match list into Same (both objects share the same color) and Diff
   (the two objects have different colors).
 
 ?- R1 = ob(r,[r(0,0)],r0(0,0,0,0)), R2 = ob(r,[r(0,1)],r0(0,1,0,1)),
    B1 = ob(b,[r(1,1)],r0(1,1,1,1)), G2 = ob(g,[r(1,1)],r0(1,1,1,1)),
-   gom_color_diff([match(R1,R2), match(B1,G2)], Same, Diff).
+   gridobjmatch_color_diff([match(R1,R2), match(B1,G2)], Same, Diff).
 % Same = [match(R1,R2)], Diff = [match(B1,G2)]
 
 
 5. Movement Vectors
 
-gom_move_vector(+match(O1,O2), -mv(DR,DC))
+gridobjmatch_move_vector(+match(O1,O2), -mv(DR,DC))
   DR and DC are the row and column displacement from the top-left bounding-box corner
   of O1 to that of O2. Positive DR = downward, positive DC = rightward.
 
-gom_move_vectors(+Pairs, -Vectors)
+gridobjmatch_move_vectors(+Pairs, -Vectors)
   Returns the list of mv/2 vectors for every pair.
 
-gom_constant_move(+Pairs, -mv(DR,DC))
+gridobjmatch_constant_move(+Pairs, -mv(DR,DC))
   Succeeds if every pair has the same move vector. Fails for an empty list.
 
 ?- O1 = ob(r,[r(0,0)],r0(0,0,0,0)), O2 = ob(r,[r(0,2)],r0(0,2,0,2)),
-   gom_move_vector(match(O1,O2), V).
+   gridobjmatch_move_vector(match(O1,O2), V).
 % V = mv(0, 2)
 
 ?- Pairs = [match(ob(r,_,r0(0,0,0,0)), ob(r,_,r0(0,1,0,1))),
             match(ob(b,_,r0(1,1,1,1)), ob(b,_,r0(1,2,1,2)))],
-   gom_constant_move(Pairs, V).
+   gridobjmatch_constant_move(Pairs, V).
 % V = mv(0, 1)
 
 
 6. Inferring Color Maps
 
-gom_infer_color_map(+Pairs, -Map)
+gridobjmatch_infer_color_map(+Pairs, -Map)
   Map is a sorted, deduplicated list of cm(OldColor,NewColor) for matched pairs
   where the two objects have different colors.
 
 ?- Pairs = [match(ob(r,_,_), ob(b,_,_)), match(ob(g,_,_), ob(y,_,_))],
-   gom_infer_color_map(Pairs, Map).
+   gridobjmatch_infer_color_map(Pairs, Map).
 % Map = [cm(g,y), cm(r,b)]
 
 
 7. Appeared and Disappeared Objects
 
-gom_appeared(+Objs1, +Objs2, -Appeared)
+gridobjmatch_appeared(+Objs1, +Objs2, -Appeared)
   Appeared contains objects in Objs2 whose color does not appear in any object
   in Objs1 (brand-new color classes).
 
-gom_disappeared(+Objs1, +Objs2, -Disappeared)
+gridobjmatch_disappeared(+Objs1, +Objs2, -Disappeared)
   Disappeared contains objects in Objs1 whose color does not appear in any object
   in Objs2 (lost color classes).
 
@@ -127,11 +127,11 @@ These predicates detect color-class changes, not individual object identity.
 
 8. Structural Comparison
 
-gom_same_structure(+Objs1, +Objs2)
+gridobjmatch_same_structure(+Objs1, +Objs2)
   Succeeds if both lists contain the same multiset of object colors. Order and
   position do not matter.
 
-gom_count_change(+Objs1, +Objs2, -N)
+gridobjmatch_count_change(+Objs1, +Objs2, -N)
   N = length(Objs2) - length(Objs1). Positive = objects added; negative = removed;
   zero = same count.
 
@@ -147,12 +147,12 @@ two object lists (typical in grid puzzle analysis).
 analyze_transformation(GridIn, GridOut, BgColor, Analysis) :-
     gob_all_objects(GridIn,  BgColor, ObjsIn),
     gob_all_objects(GridOut, BgColor, ObjsOut),
-    gom_match_color(ObjsIn, ObjsOut, Pairs),
-    gom_color_diff(Pairs, Same, Diff),
-    gom_constant_move(Pairs, MoveVec),
-    gom_infer_color_map(Diff, ColorMap),
-    gom_appeared(ObjsIn, ObjsOut, New),
-    gom_disappeared(ObjsIn, ObjsOut, Lost),
+    gridobjmatch_match_color(ObjsIn, ObjsOut, Pairs),
+    gridobjmatch_color_diff(Pairs, Same, Diff),
+    gridobjmatch_constant_move(Pairs, MoveVec),
+    gridobjmatch_infer_color_map(Diff, ColorMap),
+    gridobjmatch_appeared(ObjsIn, ObjsOut, New),
+    gridobjmatch_disappeared(ObjsIn, ObjsOut, Lost),
     Analysis = analysis(move(MoveVec), color_map(ColorMap),
                         appeared(New), disappeared(Lost),
                         same_color(Same)).
@@ -160,19 +160,19 @@ analyze_transformation(GridIn, GridOut, BgColor, Analysis) :-
 
 10. Design Notes
 
-The doubled-centroid technique in gom_match_nearest uses R0+R1 and C0+C1 instead
+The doubled-centroid technique in gridobjmatch_match_nearest uses R0+R1 and C0+C1 instead
 of dividing by 2. This produces exact integer arithmetic with no rounding error.
 The centroid ordering is preserved: the nearest object in Euclidean space is also
 the nearest by doubled-centroid Manhattan distance.
 
-gom_constant_move intentionally fails for an empty list. The absence of any pairs
+gridobjmatch_constant_move intentionally fails for an empty list. The absence of any pairs
 provides no evidence of a constant move; the predicate should not succeed vacuously.
 
-gom_appeared and gom_disappeared work on color classes. If red appears in both
+gridobjmatch_appeared and gridobjmatch_disappeared work on color classes. If red appears in both
 lists but with different cell sets, these predicates are silent. They detect
 structural change at the level of "which colors are present," not "where are they."
 
-Private helpers use the trailing-underscore convention: gom_color_/2, gom_size_/2,
-gom_top_left_/3, gom_centroid_/3, gom_select_color_/4, gom_select_size_/4,
-gom_find_nearest_/3, gom_remove_once_/3, gom_has_vector_/2, gom_new_color_/2,
-gom_gone_color_/2.
+Private helpers use the trailing-underscore convention: gridobjmatch_color_/2, gridobjmatch_size_/2,
+gridobjmatch_top_left_/3, gridobjmatch_centroid_/3, gridobjmatch_select_color_/4, gridobjmatch_select_size_/4,
+gridobjmatch_find_nearest_/3, gridobjmatch_remove_once_/3, gridobjmatch_has_vector_/2, gridobjmatch_new_color_/2,
+gridobjmatch_gone_color_/2.

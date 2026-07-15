@@ -15,24 +15,24 @@ Layer 191. Pack prefix: gs_*. Work Package 212.
 
 The Pipeline
 
-1. Infer: gs_infer_candidates derives specific rule terms from the training
+1. Infer: gridsolve_infer_candidates derives specific rule terms from the training
    pairs (e.g., if all pairs show red becoming green, infer recolor(r,g)).
 
-2. Enumerate: gs_default_candidates provides a broad fallback set covering
+2. Enumerate: gridsolve_default_candidates provides a broad fallback set covering
    all common rule patterns.
 
-3. Rank: gs_rank_rules sorts candidate rules by how many training pairs each
+3. Rank: gridsolve_rank_rules sorts candidate rules by how many training pairs each
    one correctly explains.
 
-4. Apply: gs_apply applies the best rule to a new test input.
+4. Apply: gridsolve_apply applies the best rule to a new test input.
 
-gs_solve wraps all four steps into a single predicate call.
+gridsolve_solve wraps all four steps into a single predicate call.
 
 
 Exported Predicates
 
 
-gs_apply(+Rule, +Scene, -Result)
+gridsolve_apply(+Rule, +Scene, -Result)
 
 Apply a symbolic rule term to an obj(Color,Cells) scene list.
 
@@ -43,56 +43,56 @@ top_n(N), identity.
 
 Example:
 
-gs_apply(recolor(r,g), [obj(r,[r(0,0)]), obj(b,[r(0,1)])], Result).
+gridsolve_apply(recolor(r,g), [obj(r,[r(0,0)]), obj(b,[r(0,1)])], Result).
 % Result = [obj(g,[r(0,0)]), obj(b,[r(0,1)])]
 
 
-gs_coverage(+Rule, +Pairs, -N)
+gridsolve_coverage(+Rule, +Pairs, -N)
 
 Count how many Before-After pairs the rule correctly explains.
 
 Example:
 
 Pairs = [[obj(r,[r(0,0)])]-[obj(g,[r(0,0)])]],
-gs_coverage(recolor(r,g), Pairs, N).
+gridsolve_coverage(recolor(r,g), Pairs, N).
 % N = 1
 
 
-gs_consistent(+Rule, +Pairs)
+gridsolve_consistent(+Rule, +Pairs)
 
 Succeed if the rule correctly transforms every pair.
 
 Example:
 
-gs_consistent(recolor(r,g), Pairs).  % true if all pairs are r->g
+gridsolve_consistent(recolor(r,g), Pairs).  % true if all pairs are r->g
 
 
-gs_rank_rules(+Rules, +Pairs, -Ranked)
+gridsolve_rank_rules(+Rules, +Pairs, -Ranked)
 
 Sort rules by coverage descending. Ties broken by standard term order.
 
 Example:
 
-gs_rank_rules([recolor(r,b), recolor(r,g)], Pairs, Ranked).
+gridsolve_rank_rules([recolor(r,b), recolor(r,g)], Pairs, Ranked).
 % Ranked = [recolor(r,g), recolor(r,b)]
 
 
-gs_best_rule(+Rules, +Pairs, -Best)
+gridsolve_best_rule(+Rules, +Pairs, -Best)
 
 The rule with the highest coverage. Fails if Rules is empty.
 
 
-gs_consistent_rules(+Rules, +Pairs, -Consistent)
+gridsolve_consistent_rules(+Rules, +Pairs, -Consistent)
 
 The subset of Rules that are fully consistent with every pair.
 
 
-gs_valid_rules(+Rules, +Pairs, -Valid)
+gridsolve_valid_rules(+Rules, +Pairs, -Valid)
 
 The subset of Rules with coverage > 0.
 
 
-gs_infer_candidates(+Pairs, -Candidates)
+gridsolve_infer_candidates(+Pairs, -Candidates)
 
 Infer specific rule terms from training pairs by pattern matching.
 Tries: recolor, recolor_all, color_map, shift, to_origin, remove_color.
@@ -100,18 +100,18 @@ Tries: recolor, recolor_all, color_map, shift, to_origin, remove_color.
 Example:
 
 Pairs = [[obj(r,[r(0,0)])]-[obj(g,[r(0,0)])]],
-gs_infer_candidates(Pairs, Cands).
+gridsolve_infer_candidates(Pairs, Cands).
 % Cands includes recolor(r,g), recolor_all(g), color_map([r-g]), ...
 
 
-gs_default_candidates(-Candidates)
+gridsolve_default_candidates(-Candidates)
 
 A broad static set of candidate rule terms for exhaustive search.
 Covers recolor (r/b/g/y/p variants), recolor_all, shift (8 directions),
 to_origin, remove_color, sort, top_n, and identity.
 
 
-gs_solve(+Pairs, +TestInput, -Output)
+gridsolve_solve(+Pairs, +TestInput, -Output)
 
 Full end-to-end solve. Infers candidates, unions with defaults, ranks,
 applies the best rule to TestInput.
@@ -123,44 +123,44 @@ TrainingPairs = [
     [obj(r,[r(1,0)])]-[obj(g,[r(1,0)])]
 ],
 TestInput = [obj(r,[r(2,0)])],
-gs_solve(TrainingPairs, TestInput, Output).
+gridsolve_solve(TrainingPairs, TestInput, Output).
 % Output = [obj(g,[r(2,0)])]
 
 
-gs_solve_n(+Pairs, +N, -TopRules, -BestRule)
+gridsolve_solve_n(+Pairs, +N, -TopRules, -BestRule)
 
 Return the top N rules as Coverage-Rule pairs and the best rule.
 
 Example:
 
-gs_solve_n(Pairs, 3, TopRules, Best).
+gridsolve_solve_n(Pairs, 3, TopRules, Best).
 % TopRules = [2-recolor(r,g), 2-color_map([r-g]), 0-shift(1,0)]
 % Best = recolor(r,g)
 
 
-gs_explain(+Pairs, -BestRule, -Coverage)
+gridsolve_explain(+Pairs, -BestRule, -Coverage)
 
 Return the best rule and its coverage for the training pairs.
 
 Example:
 
-gs_explain(Pairs, BestRule, Coverage).
+gridsolve_explain(Pairs, BestRule, Coverage).
 % BestRule = color_map([r-g]), Coverage = 2
 
 
-gs_all_same_output(+Rule, +TestInputs, -Outputs)
+gridsolve_all_same_output(+Rule, +TestInputs, -Outputs)
 
 Apply Rule to each test input in a list.
 
 Example:
 
-gs_all_same_output(recolor(r,g),
+gridsolve_all_same_output(recolor(r,g),
     [[obj(r,[r(0,0)])], [obj(r,[r(1,0)])]],
     Outputs).
 % Outputs = [[obj(g,[r(0,0)])], [obj(g,[r(1,0)])]]
 
 
-gs_n_pairs(+Pairs, -N)
+gridsolve_n_pairs(+Pairs, -N)
 
 Count training pairs.
 
@@ -168,10 +168,10 @@ Count training pairs.
 Typical Usage
 
 solve_puzzle(TrainingPairs, TestInput, Output) :-
-    gs_solve(TrainingPairs, TestInput, Output).
+    gridsolve_solve(TrainingPairs, TestInput, Output).
 
 explain_puzzle(TrainingPairs, Rule, Coverage) :-
-    gs_explain(TrainingPairs, Rule, Coverage).
+    gridsolve_explain(TrainingPairs, Rule, Coverage).
 
 
 Dependencies

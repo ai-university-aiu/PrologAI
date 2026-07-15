@@ -20,71 +20,71 @@ To load the pack:
 
 2. Color Adjacency
 
-ggr_adj_colors(+Grid, -Pairs)
+gridgraph_adj_colors(+Grid, -Pairs)
   Pairs is the sorted list of C1-C2 color pairs (C1 @< C2) where the two
   color regions share at least one 4-connected boundary.
 
-ggr_adj_of(+Grid, +Color, -Neighbors)
+gridgraph_adj_of(+Grid, +Color, -Neighbors)
   Neighbors is the sorted list of distinct colors 4-adjacent to Color.
 
-ggr_adj_graph(+Grid, -Graph)
+gridgraph_adj_graph(+Grid, -Graph)
   Graph is a list of (Color, Neighbors) pairs for every distinct color.
 
-ggr_are_adj(+Grid, +C1, +C2)
+gridgraph_are_adj(+Grid, +C1, +C2)
   Succeeds if C1 and C2 share at least one 4-connected boundary.
 
 Example:
 G = [[r,r,x],[r,r,x],[x,x,x]].
 
-ggr_adj_colors(G, Pairs).
+gridgraph_adj_colors(G, Pairs).
 % Pairs = [r-x]
 
-ggr_adj_of(G, r, Nbrs).
+gridgraph_adj_of(G, r, Nbrs).
 % Nbrs = [x]
 
-ggr_are_adj(G, r, x).
+gridgraph_are_adj(G, r, x).
 % succeeds
 
-\+ ggr_are_adj(G, r, r).
+\+ gridgraph_are_adj(G, r, r).
 % succeeds (same color not adj to itself)
 
 Three-color example:
 ABC = [[a,a,a],[b,b,b],[c,c,c]].
-ggr_adj_colors(ABC, Pairs).
+gridgraph_adj_colors(ABC, Pairs).
 % Pairs = [a-b, b-c]   (a and c do not share a boundary)
 
 
 3. Degree and Border
 
-ggr_color_degree(+Grid, +Color, -N)
+gridgraph_color_degree(+Grid, +Color, -N)
   N is the count of distinct colors adjacent to Color.
 
-ggr_shared_border(+Grid, +C1, +C2, -Cells)
+gridgraph_shared_border(+Grid, +C1, +C2, -Cells)
   Cells is the list of C1 positions that have at least one C2 4-neighbor.
   Uses once/1 so each C1 cell appears at most once.
 
-ggr_border_length(+Grid, +C1, +C2, -N)
+gridgraph_border_length(+Grid, +C1, +C2, -N)
   N is the count of C1 cells touching C2. Note: border_length(C1,C2) may
   differ from border_length(C2,C1) because the boundary cell counts differ
   by side.
 
 Example:
 G = [[r,r,x],[r,r,x],[x,x,x]].
-ggr_shared_border(G, r, x, Cells).
+gridgraph_shared_border(G, r, x, Cells).
 % Cells = [0-1, 1-0, 1-1]  (3 r cells touching x)
-ggr_shared_border(G, x, r, Cells).
+gridgraph_shared_border(G, x, r, Cells).
 % Cells = [0-2, 1-2, 2-0, 2-1]  (4 x cells touching r)
-ggr_border_length(G, r, x, 3).
-ggr_border_length(G, x, r, 4).
+gridgraph_border_length(G, r, x, 3).
+gridgraph_border_length(G, x, r, 4).
 
 
 4. Isolated and Enclosed Colors
 
-ggr_isolated_colors(+Grid, -Colors)
+gridgraph_isolated_colors(+Grid, -Colors)
   Colors with degree 0: no differently-colored in-bounds 4-neighbor.
   A solid uniform grid has one isolated color.
 
-ggr_enclosed_colors(+Grid, -InnerColors, +OuterColor)
+gridgraph_enclosed_colors(+Grid, -InnerColors, +OuterColor)
   InnerColors is the list of colors C such that:
   (1) No cell of C is on the grid border.
   (2) Every non-C 4-neighbor of every C cell has color OuterColor.
@@ -92,83 +92,83 @@ ggr_enclosed_colors(+Grid, -InnerColors, +OuterColor)
 
 Example (ring with enclosed hole):
 Ring = [[r,r,r,r,r],[r,x,x,x,r],[r,x,x,x,r],[r,x,x,x,r],[r,r,r,r,r]].
-ggr_enclosed_colors(Ring, Inner, r).
+gridgraph_enclosed_colors(Ring, Inner, r).
 % Inner = [x]   (x has no border cells AND every non-x neighbor is r)
 
 Example (block):
 Block = [[x,x,x,x,x],[x,r,r,r,x],[x,r,r,r,x],[x,r,r,r,x],[x,x,x,x,x]].
-ggr_enclosed_colors(Block, Inner, x).
+gridgraph_enclosed_colors(Block, Inner, x).
 % Inner = [r]   (r has no border cells AND every non-r neighbor is x)
 
 
 5. Spanning Detection
 
-ggr_spanning_h(+Grid, -Colors)
+gridgraph_spanning_h(+Grid, -Colors)
   Colors with at least one cell in column 0 AND at least one cell in the
   last column (spanning the grid horizontally).
 
-ggr_spanning_v(+Grid, -Colors)
+gridgraph_spanning_v(+Grid, -Colors)
   Colors with at least one cell in row 0 AND at least one cell in the last
   row (spanning the grid vertically).
 
 Example:
 G = [[x,x,x],[r,r,r],[x,x,x]].
-ggr_spanning_h(G, Colors).
+gridgraph_spanning_h(G, Colors).
 % Colors = [r, x]   (both span from col 0 to col 2)
-ggr_spanning_v(G, Colors).
+gridgraph_spanning_v(G, Colors).
 % Colors = [x]   (only x is in both row 0 and row 2)
 
 
 6. Color Merging
 
-ggr_merge_colors(+Grid, +From, +To, -Result)
+gridgraph_merge_colors(+Grid, +From, +To, -Result)
   Result is Grid with every occurrence of From replaced by To. Uses maplist
   over rows and cells. If From is not present in Grid, Result = Grid.
 
 Example:
 G = [[r,r,x],[r,r,x],[x,x,x]].
-ggr_merge_colors(G, r, x, Result).
+gridgraph_merge_colors(G, r, x, Result).
 % Result = [[x,x,x],[x,x,x],[x,x,x]]
 
 
 7. Connected Components
 
-ggr_color_components(+Grid, +Color, -N)
+gridgraph_color_components(+Grid, +Color, -N)
   N is the number of distinct 4-connected components of Color in Grid.
 
-ggr_component_cells(+Grid, +Color, -Components)
+gridgraph_component_cells(+Grid, +Color, -Components)
   Components is a list of cell-lists; each inner list is one 4-connected
   component of Color, ordered by first cell in row-major order.
 
 Example (block):
 Block = [[x,x,x,x,x],[x,r,r,r,x],[x,r,r,r,x],[x,r,r,r,x],[x,x,x,x,x]].
-ggr_color_components(Block, r, 1).
-ggr_component_cells(Block, r, [Comp]).
+gridgraph_color_components(Block, r, 1).
+gridgraph_component_cells(Block, r, [Comp]).
 % length(Comp, 9)
 
 Example (4 corner dots):
 Two = [[r,x,x,x,r],[x,x,x,x,x],[x,x,x,x,x],[x,x,x,x,x],[r,x,x,x,r]].
-ggr_color_components(Two, r, 4).
-ggr_component_cells(Two, r, Comps).
+gridgraph_color_components(Two, r, 4).
+gridgraph_component_cells(Two, r, Comps).
 % 4 components each with 1 cell
 
 
 8. Predicate Index
 
-ggr_adj_colors/2       - sorted list of adjacent color pairs (C1-C2, C1 @< C2)
-ggr_adj_of/3           - colors adjacent to Color (sorted, distinct)
-ggr_adj_graph/2        - full adjacency as list of (Color, Neighbors)
-ggr_are_adj/3          - test if two colors share a 4-connected boundary
-ggr_color_degree/3     - count distinct adjacent colors
-ggr_shared_border/4    - C1 cells with at least one C2 4-neighbor
-ggr_border_length/4    - count of shared border cells (directional)
-ggr_isolated_colors/2  - colors with no differently-colored neighbors
-ggr_enclosed_colors/3  - colors enclosed by OuterColor (no border cells, only OuterColor neighbors)
-ggr_spanning_h/2       - colors with cells in both leftmost and rightmost column
-ggr_spanning_v/2       - colors with cells in both topmost and bottommost row
-ggr_merge_colors/4     - replace From color with To color everywhere
-ggr_color_components/3 - count 4-connected components of Color
-ggr_component_cells/3  - partition Color cells into connected components
+gridgraph_adj_colors/2       - sorted list of adjacent color pairs (C1-C2, C1 @< C2)
+gridgraph_adj_of/3           - colors adjacent to Color (sorted, distinct)
+gridgraph_adj_graph/2        - full adjacency as list of (Color, Neighbors)
+gridgraph_are_adj/3          - test if two colors share a 4-connected boundary
+gridgraph_color_degree/3     - count distinct adjacent colors
+gridgraph_shared_border/4    - C1 cells with at least one C2 4-neighbor
+gridgraph_border_length/4    - count of shared border cells (directional)
+gridgraph_isolated_colors/2  - colors with no differently-colored neighbors
+gridgraph_enclosed_colors/3  - colors enclosed by OuterColor (no border cells, only OuterColor neighbors)
+gridgraph_spanning_h/2       - colors with cells in both leftmost and rightmost column
+gridgraph_spanning_v/2       - colors with cells in both topmost and bottommost row
+gridgraph_merge_colors/4     - replace From color with To color everywhere
+gridgraph_color_components/3 - count 4-connected components of Color
+gridgraph_component_cells/3  - partition Color cells into connected components
 
 
 9. Test Coverage

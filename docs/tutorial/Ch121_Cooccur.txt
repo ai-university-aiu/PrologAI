@@ -8,93 +8,93 @@ frequency tables; and finding the most frequently co-adjacent value.
 
 Predicates:
 
-co_h_pairs(+Grid, -Pairs)
+cooccur_h_pairs(+Grid, -Pairs)
   Ordered horizontal adjacent value pairs A-B: A immediately left of B.
 
-co_v_pairs(+Grid, -Pairs)
+cooccur_v_pairs(+Grid, -Pairs)
   Ordered vertical adjacent value pairs A-B: A immediately above B.
   Column-major order (all pairs for column 0 first, then column 1, etc.).
 
-co_d_pairs_dr(+Grid, -Pairs)
+cooccur_d_pairs_dr(+Grid, -Pairs)
   Down-right diagonal pairs A-B: A at (R,C), B at (R+1,C+1).
 
-co_d_pairs_dl(+Grid, -Pairs)
+cooccur_d_pairs_dl(+Grid, -Pairs)
   Down-left diagonal pairs A-B: A at (R,C), B at (R+1,C-1).
 
-co_count_h(+Grid, +V1, +V2, -N)
+cooccur_count_h(+Grid, +V1, +V2, -N)
   N is the count of directed horizontal V1-V2 adjacent pairs.
 
-co_count_v(+Grid, +V1, +V2, -N)
+cooccur_count_v(+Grid, +V1, +V2, -N)
   N is the count of directed vertical V1-V2 adjacent pairs.
 
-co_count_adj4(+Grid, +V1, +V2, -N)
+cooccur_count_adj4(+Grid, +V1, +V2, -N)
   N is the total undirected 4-adjacent {V1,V2} pair count.
   When V1==V2: counts V1-V1 directed pairs. When V1\=V2: adds V1-V2 and V2-V1.
 
-co_always_adj4(+Grid, +V1, +V2)
+cooccur_always_adj4(+Grid, +V1, +V2)
   Succeeds if every V1 cell has at least one 4-adjacent V2 cell.
 
-co_never_adj4(+Grid, +V1, +V2)
+cooccur_never_adj4(+Grid, +V1, +V2)
   Succeeds if no V1 cell is 4-adjacent to any V2 cell.
 
-co_isolated4(+Grid, +V, -Cells)
+cooccur_isolated4(+Grid, +V, -Cells)
   Sorted R-C positions of V cells with no 4-adjacent V-neighbor.
 
-co_border_vals(+Grid, +V, -Vals)
+cooccur_border_vals(+Grid, +V, -Vals)
   Sorted distinct values W (W \= V) that 4-neighbor at least one V cell.
 
-co_shared_border(+Grid, +V1, +V2)
+cooccur_shared_border(+Grid, +V1, +V2)
   Succeeds if some V1 cell is 4-adjacent to some V2 cell.
 
-co_row_transitions(+Grid, -Triples)
+cooccur_row_transitions(+Grid, -Triples)
   A-B-N frequency triples for horizontal V1-V2 pairs, sorted by N descending.
 
-co_most_common_adj4(+Grid, +V, -W)
+cooccur_most_common_adj4(+Grid, +V, -W)
   W is the value most frequently 4-adjacent to V cells.
   Ties: largest value wins. Fails if no other value borders V.
 
 Usage examples:
 
 G = [[1,1,1],[1,2,1],[1,1,1]].
-co_h_pairs(G, P).        % P=[1-1,1-1,1-2,2-1,1-1,1-1]
-co_v_pairs(G, P).        % P=[1-1,1-1,1-2,2-1,1-1,1-1]
-co_count_h(G, 1, 2, N). % N=1 (one left-of-2 horizontal edge)
-co_count_adj4(G, 1, 2, N). % N=4 (four undirected 1-2 edges)
-co_count_adj4(G, 1, 1, N). % N=8 (eight undirected 1-1 edges)
-co_always_adj4(G, 2, 1). % succeeds: center 2 is surrounded by 1s
-co_never_adj4(G, 2, 2).  % succeeds: only one 2 cell, no 2-2 edge
-co_isolated4(G, 2, C).   % C=[1-1]: center 2 has no 2-neighbor
-co_isolated4(G, 1, C).   % C=[]: all 1 cells have 1-neighbors
-co_border_vals(G, 2, V). % V=[1]: 2 only borders 1
-co_shared_border(G, 1, 2). % succeeds
-co_row_transitions(G, T).  % T=[1-1-4,2-1-1,1-2-1]
-co_most_common_adj4(G, 1, W). % W=2 (only adjacent value)
+cooccur_h_pairs(G, P).        % P=[1-1,1-1,1-2,2-1,1-1,1-1]
+cooccur_v_pairs(G, P).        % P=[1-1,1-1,1-2,2-1,1-1,1-1]
+cooccur_count_h(G, 1, 2, N). % N=1 (one left-of-2 horizontal edge)
+cooccur_count_adj4(G, 1, 2, N). % N=4 (four undirected 1-2 edges)
+cooccur_count_adj4(G, 1, 1, N). % N=8 (eight undirected 1-1 edges)
+cooccur_always_adj4(G, 2, 1). % succeeds: center 2 is surrounded by 1s
+cooccur_never_adj4(G, 2, 2).  % succeeds: only one 2 cell, no 2-2 edge
+cooccur_isolated4(G, 2, C).   % C=[1-1]: center 2 has no 2-neighbor
+cooccur_isolated4(G, 1, C).   % C=[]: all 1 cells have 1-neighbors
+cooccur_border_vals(G, 2, V). % V=[1]: 2 only borders 1
+cooccur_shared_border(G, 1, 2). % succeeds
+cooccur_row_transitions(G, T).  % T=[1-1-4,2-1-1,1-2-1]
+cooccur_most_common_adj4(G, 1, W). % W=2 (only adjacent value)
 
 For G3 = [[1,2,3],[4,5,6],[7,8,9]]:
-co_h_pairs(G3, P). % P=[1-2,2-3,4-5,5-6,7-8,8-9]
-co_v_pairs(G3, P). % P=[1-4,4-7,2-5,5-8,3-6,6-9] (column-major)
-co_d_pairs_dr(G3, P). % P=[1-5,2-6,4-8,5-9]
-co_d_pairs_dl(G3, P). % P=[2-4,3-5,5-7,6-8]
-co_border_vals(G3, 5, V). % V=[2,4,6,8] (4 neighbors of center)
-co_most_common_adj4(G3, 5, W). % W=8 (all tied at 1; largest wins)
-co_never_adj4(G3, 1, 9). % succeeds: opposite corners
+cooccur_h_pairs(G3, P). % P=[1-2,2-3,4-5,5-6,7-8,8-9]
+cooccur_v_pairs(G3, P). % P=[1-4,4-7,2-5,5-8,3-6,6-9] (column-major)
+cooccur_d_pairs_dr(G3, P). % P=[1-5,2-6,4-8,5-9]
+cooccur_d_pairs_dl(G3, P). % P=[2-4,3-5,5-7,6-8]
+cooccur_border_vals(G3, 5, V). % V=[2,4,6,8] (4 neighbors of center)
+cooccur_most_common_adj4(G3, 5, W). % W=8 (all tied at 1; largest wins)
+cooccur_never_adj4(G3, 1, 9). % succeeds: opposite corners
 
 Key implementation notes:
 
-co_v_pairs generates in column-major order. When using the result, note that
+cooccur_v_pairs generates in column-major order. When using the result, note that
   pairs for column C all appear before pairs for column C+1.
 
-co_count_adj4 uses directed pair counts: for V1 \= V2, adds count(V1-V2) +
+cooccur_count_adj4 uses directed pair counts: for V1 \= V2, adds count(V1-V2) +
   count(V2-V1) from the horizontal+vertical pair lists. This gives the total
   number of undirected edges between V1 and V2 cells.
 
-co_shared_border uses cut after finding the first matching pair for
+cooccur_shared_border uses cut after finding the first matching pair for
   determinism. It does not count all matches.
 
-co_row_transitions sorts by count descending. Ties within the same count
+cooccur_row_transitions sorts by count descending. Ties within the same count
   are ordered by msort on N-A-B triples (A then B after N tie), reversed.
 
-co_most_common_adj4 uses msort on N-X pairs and takes the last element,
+cooccur_most_common_adj4 uses msort on N-X pairs and takes the last element,
   giving the highest-N entry. On ties, the largest X wins.
 
 Library imports: library(lists): member/2, nth0/3, last/2, append/3.

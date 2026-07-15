@@ -9,76 +9,76 @@ measure distances, and check whether a path is blocked.
 
 1. Row and Column Scans
 
-gsn_scan_row/4 collects all non-background cells in a row as column-value pairs:
+gridscan_scan_row/4 collects all non-background cells in a row as column-value pairs:
 
   G = [[b,b,b,b,b],[b,x,b,b,b],[b,b,b,y,b],[b,b,x,b,b],[b,b,b,b,z]].
-  gsn_scan_row(G, 2, b, Pairs).  % Pairs = [3-y]
-  gsn_scan_row(G, 0, b, Pairs).  % Pairs = [] (all background)
+  gridscan_scan_row(G, 2, b, Pairs).  % Pairs = [3-y]
+  gridscan_scan_row(G, 0, b, Pairs).  % Pairs = [] (all background)
 
-gsn_scan_col/4 collects all non-background cells in a column as row-value pairs:
+gridscan_scan_col/4 collects all non-background cells in a column as row-value pairs:
 
-  gsn_scan_col(G, 1, b, Pairs).  % Pairs = [1-x]
-  gsn_scan_col(G, 0, b, Pairs).  % Pairs = [] (all background)
+  gridscan_scan_col(G, 1, b, Pairs).  % Pairs = [1-x]
+  gridscan_scan_col(G, 0, b, Pairs).  % Pairs = [] (all background)
 
 
 2. First Hit in a Direction
 
-gsn_first_right/5 finds the leftmost non-background cell to the right:
+gridscan_first_right/5 finds the leftmost non-background cell to the right:
 
-  gsn_first_right(G, 2, 0, b, C-V).  % C=3, V=y
-  gsn_first_right(G, 0, 0, b, _).     % fails — row 0 all background
+  gridscan_first_right(G, 2, 0, b, C-V).  % C=3, V=y
+  gridscan_first_right(G, 0, 0, b, _).     % fails — row 0 all background
 
-gsn_first_left/5 finds the nearest (rightmost) non-background cell to the left:
+gridscan_first_left/5 finds the nearest (rightmost) non-background cell to the left:
 
-  gsn_first_left(G, 2, 4, b, C-V).  % C=3, V=y (nearest left of col 4)
+  gridscan_first_left(G, 2, 4, b, C-V).  % C=3, V=y (nearest left of col 4)
 
-gsn_first_down/5 finds the topmost non-background cell below a row:
+gridscan_first_down/5 finds the topmost non-background cell below a row:
 
-  gsn_first_down(G, 0, 1, b, R-V).  % R=1, V=x
+  gridscan_first_down(G, 0, 1, b, R-V).  % R=1, V=x
 
-gsn_first_up/5 finds the nearest (bottommost) non-background cell above a row:
+gridscan_first_up/5 finds the nearest (bottommost) non-background cell above a row:
 
-  gsn_first_up(G, 4, 1, b, R-V).  % R=1, V=x (nearest above row 4)
+  gridscan_first_up(G, 4, 1, b, R-V).  % R=1, V=x (nearest above row 4)
 
 All four predicates fail if no non-background cell exists in that direction.
 
 
 3. Distances
 
-gsn_dist_right/5 returns the step count to the first non-background cell going
+gridscan_dist_right/5 returns the step count to the first non-background cell going
 right (D = hit_column - start_column):
 
-  gsn_dist_right(G, 1, 0, b, D).  % D=1 (x is 1 step right of col 0)
-  gsn_dist_right(G, 2, 0, b, D).  % D=3 (y is at col 3)
+  gridscan_dist_right(G, 1, 0, b, D).  % D=1 (x is 1 step right of col 0)
+  gridscan_dist_right(G, 2, 0, b, D).  % D=3 (y is at col 3)
 
-gsn_dist_left/5, gsn_dist_down/5, and gsn_dist_up/5 work similarly.
+gridscan_dist_left/5, gridscan_dist_down/5, and gridscan_dist_up/5 work similarly.
 All distance predicates fail if no non-background cell is found.
 
 
 4. Blocking Detection
 
-gsn_blocked_right/4 succeeds if any non-background cell exists to the right:
+gridscan_blocked_right/4 succeeds if any non-background cell exists to the right:
 
-  gsn_blocked_right(G, 1, 0, b).  % succeeds (x at col 1)
-  gsn_blocked_right(G, 0, 0, b).  % fails (row 0 all background)
+  gridscan_blocked_right(G, 1, 0, b).  % succeeds (x at col 1)
+  gridscan_blocked_right(G, 0, 0, b).  % fails (row 0 all background)
 
-gsn_blocked_left/4, gsn_blocked_down/4, and gsn_blocked_up/4 work in the
+gridscan_blocked_left/4, gridscan_blocked_down/4, and gridscan_blocked_up/4 work in the
 same way for their respective directions.
 
 
 5. Predicate Reference
 
-  gsn_scan_row/4     - non-bg cells in row R as C-V pairs
-  gsn_scan_col/4     - non-bg cells in col C as R-V pairs
-  gsn_first_right/5  - first non-bg cell going right from C0
-  gsn_first_left/5   - nearest non-bg cell going left from C0
-  gsn_first_down/5   - first non-bg cell going down from R0
-  gsn_first_up/5     - nearest non-bg cell going up from R0
-  gsn_dist_right/5   - steps to first non-bg going right
-  gsn_dist_left/5    - steps to nearest non-bg going left
-  gsn_dist_down/5    - steps to first non-bg going down
-  gsn_dist_up/5      - steps to nearest non-bg going up
-  gsn_blocked_right/4 - non-bg exists to the right
-  gsn_blocked_left/4  - non-bg exists to the left
-  gsn_blocked_down/4  - non-bg exists below
-  gsn_blocked_up/4    - non-bg exists above
+  gridscan_scan_row/4     - non-bg cells in row R as C-V pairs
+  gridscan_scan_col/4     - non-bg cells in col C as R-V pairs
+  gridscan_first_right/5  - first non-bg cell going right from C0
+  gridscan_first_left/5   - nearest non-bg cell going left from C0
+  gridscan_first_down/5   - first non-bg cell going down from R0
+  gridscan_first_up/5     - nearest non-bg cell going up from R0
+  gridscan_dist_right/5   - steps to first non-bg going right
+  gridscan_dist_left/5    - steps to nearest non-bg going left
+  gridscan_dist_down/5    - steps to first non-bg going down
+  gridscan_dist_up/5      - steps to nearest non-bg going up
+  gridscan_blocked_right/4 - non-bg exists to the right
+  gridscan_blocked_left/4  - non-bg exists to the left
+  gridscan_blocked_down/4  - non-bg exists below
+  gridscan_blocked_up/4    - non-bg exists above

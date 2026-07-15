@@ -20,158 +20,158 @@ To load the pack:
 
 2. Window Extraction and Counting
 
-gcv_window(+Grid, +R, +C, +N, +Fill, -Window)
+gridconv_window(+Grid, +R, +C, +N, +Fill, -Window)
   Extract the (2N+1) x (2N+1) subgrid centered at (R,C). Out-of-bounds
   positions are filled with Fill. Window always has the full (2N+1)x(2N+1) size.
 
-gcv_count_in(+Grid, +R, +C, +N, +Color, -Count)
+gridconv_count_in(+Grid, +R, +C, +N, +Color, -Count)
   Count in-bounds cells equal to Color in the (2N+1) x (2N+1) window.
   Out-of-bounds positions are not counted.
 
-gcv_density_map(+Grid, +N, +Color, -DMap)
+gridconv_density_map(+Grid, +N, +Color, -DMap)
   Build a grid of the same size as Grid. Each cell holds the Color count
   from its (2N+1) x (2N+1) window.
 
 Example:
 G = [[r,r,x],[r,r,x],[x,x,x]].
 
-gcv_window(G, 0, 0, 1, z, W).
+gridconv_window(G, 0, 0, 1, z, W).
 % W = [[z,z,z],[z,r,r],[z,r,r]]  (5 out-of-bounds cells filled with z)
 
-gcv_count_in(G, 1, 1, 1, r, C).
+gridconv_count_in(G, 1, 1, 1, r, C).
 % C = 4  (center 3x3 window has 4 r cells)
 
-gcv_density_map(G, 1, r, DMap).
+gridconv_density_map(G, 1, r, DMap).
 % DMap[1][1] = 4 (center window has 4 r)
 % DMap[2][2] = 1 (corner window has 1 r: only (1,1)=r in-bounds)
 
 
 3. Window Statistics
 
-gcv_majority(+Grid, +R, +C, +N, -Color)
+gridconv_majority(+Grid, +R, +C, +N, -Color)
   Most frequent color among in-bounds cells of the window.
   Ties broken by Prolog term order (via msort).
 
-gcv_majority_map(+Grid, +N, -Result)
+gridconv_majority_map(+Grid, +N, -Result)
   Each cell replaced by its local majority color.
 
-gcv_uniform_at(+Grid, +R, +C, +N, -Bool)
+gridconv_uniform_at(+Grid, +R, +C, +N, -Bool)
   Bool = yes if all in-bounds window cells are the same color; no otherwise.
 
-gcv_uniform_cells(+Grid, +N, -Cells)
+gridconv_uniform_cells(+Grid, +N, -Cells)
   List of (R,C) positions where the in-bounds window is uniform.
 
 Example:
 G = [[r,r,x],[r,r,x],[x,x,x]].
 
-gcv_majority(G, 1, 1, 1, x).
+gridconv_majority(G, 1, 1, 1, x).
 % 4 r vs 5 x in full 3x3 window -> x is majority
 
-gcv_majority(G, 0, 0, 1, r).
+gridconv_majority(G, 0, 0, 1, r).
 % corner window: only 4 in-bounds cells (0,0),(0,1),(1,0),(1,1) = all r
 
-gcv_uniform_at(G, 0, 0, 1, yes).
+gridconv_uniform_at(G, 0, 0, 1, yes).
 % corner window all-r -> yes
 
-gcv_uniform_cells(G, 1, Cells).
+gridconv_uniform_cells(G, 1, Cells).
 % Cells = [0-0]   (only corner window is uniform)
 
 
 4. Pattern Matching
 
-gcv_find_pattern(+Grid, +Pattern, -Positions)
+gridconv_find_pattern(+Grid, +Pattern, -Positions)
   Positions is the list of (R,C) where Pattern exactly matches as a subgrid
   of Grid, with (R,C) as the top-left corner.
 
-gcv_count_pattern(+Grid, +Pattern, -Count)
+gridconv_count_pattern(+Grid, +Pattern, -Count)
   Count of matching positions.
 
-gcv_has_pattern(+Grid, +Pattern)
+gridconv_has_pattern(+Grid, +Pattern)
   Succeeds if Pattern occurs at least once in Grid (uses once for efficiency).
 
 Example:
 G = [[x,x,x,x,x],[x,r,r,x,x],[x,r,r,x,x],[x,x,x,r,r],[x,x,x,r,r]].
 P = [[r,r],[r,r]].
 
-gcv_find_pattern(G, P, Positions).
+gridconv_find_pattern(G, P, Positions).
 % Positions = [1-1, 3-3]   (two non-overlapping 2x2 blocks)
 
-gcv_count_pattern(G, P, Count).
+gridconv_count_pattern(G, P, Count).
 % Count = 2
 
-gcv_has_pattern(G, [[r]], true).
+gridconv_has_pattern(G, [[r]], true).
 % Succeeds (r exists)
 
-gcv_has_pattern([[x,x],[x,x]], [[r]], false).
+gridconv_has_pattern([[x,x],[x,x]], [[r]], false).
 % Fails (no r)
 
 
 5. Hot Spots
 
-gcv_hot_spots(+Grid, +N, +Color, +Threshold, -Cells)
+gridconv_hot_spots(+Grid, +N, +Color, +Threshold, -Cells)
   Cells is the list of (R,C) where the Color count in the (2N+1) x (2N+1)
   window is >= Threshold.
 
 Example:
 Dot = [[x,x,x,x,x],[x,x,x,x,x],[x,x,r,x,x],[x,x,x,x,x],[x,x,x,x,x]].
-gcv_hot_spots(Dot, 1, r, 1, Cells).
+gridconv_hot_spots(Dot, 1, r, 1, Cells).
 % Cells: 9 positions (the 3x3 region around center sees the r dot)
 
 G = [[r,r,r],[r,r,r],[r,r,r]].
-gcv_hot_spots(G, 1, r, 9, Cells).
+gridconv_hot_spots(G, 1, r, 9, Cells).
 % Cells = [1-1]   (only center has 9 in-bounds r cells)
 
 
 6. Square Structuring Element Morphology
 
-gcv_dilate_sq(+Grid, +FgColor, +N, -Result)
+gridconv_dilate_sq(+Grid, +FgColor, +N, -Result)
   Square dilation: a cell becomes FgColor if any cell in its (2N+1)x(2N+1)
-  window is FgColor. Larger than cross-dilation (gmo_dilate); fills corners.
+  window is FgColor. Larger than cross-dilation (gridmorph_dilate); fills corners.
 
-gcv_erode_sq(+Grid, +FgColor, +N, -Result)
+gridconv_erode_sq(+Grid, +FgColor, +N, -Result)
   Square erosion: a FgColor cell loses its color if any in-bounds window cell
   is not FgColor. Near-boundary cells have smaller effective windows.
 
 Example:
 Dot = [[x,x,x,x,x],[x,x,x,x,x],[x,x,r,x,x],[x,x,x,x,x],[x,x,x,x,x]].
-gcv_dilate_sq(Dot, r, 1, D).
+gridconv_dilate_sq(Dot, r, 1, D).
 % D has 9 r cells (the full 3x3 square around center)
-% Compare gmo_dilate which gives 5 cells (cross shape)
+% Compare gridmorph_dilate which gives 5 cells (cross shape)
 
 Block = [[x,x,x,x,x],[x,r,r,r,x],[x,r,r,r,x],[x,r,r,r,x],[x,x,x,x,x]].
-gcv_erode_sq(Block, r, 1, E).
+gridconv_erode_sq(Block, r, 1, E).
 % Only center (2,2) survives: its 3x3 window is all-r
 
 
 7. Pattern Replacement
 
-gcv_replace_pattern(+Grid, +Pattern, +Replacement, -Result)
+gridconv_replace_pattern(+Grid, +Pattern, +Replacement, -Result)
   Replace the first-found (row-major) occurrence of Pattern with Replacement.
   Pattern and Replacement must have the same dimensions. If no match, Grid
   is returned unchanged.
 
 Example:
 G = [[x,x,x,x,x],[x,r,r,x,x],[x,r,r,x,x],[x,x,x,r,r],[x,x,x,r,r]].
-gcv_replace_pattern(G, [[r,r],[r,r]], [[a,a],[a,a]], Result).
+gridconv_replace_pattern(G, [[r,r],[r,r]], [[a,a],[a,a]], Result).
 % First match at (1,1) is replaced; second block at (3,3) remains r
 
 
 8. Predicate Index
 
-gcv_window/6           - extract (2N+1)x(2N+1) window with out-of-bounds fill
-gcv_count_in/6         - count Color in in-bounds window cells
-gcv_density_map/4      - grid of Color counts per window
-gcv_majority/5         - most frequent color in window
-gcv_majority_map/3     - each cell replaced by local majority
-gcv_uniform_at/5       - yes/no: window is all one color
-gcv_uniform_cells/3    - cells where window is uniform
-gcv_find_pattern/3     - positions where Pattern matches as subgrid
-gcv_count_pattern/3    - count matching pattern positions
-gcv_has_pattern/2      - test if pattern occurs at least once
-gcv_hot_spots/5        - cells where Color density >= Threshold
-gcv_dilate_sq/4        - square structuring element dilation
-gcv_erode_sq/4         - square structuring element erosion
-gcv_replace_pattern/4  - replace first pattern match with replacement
+gridconv_window/6           - extract (2N+1)x(2N+1) window with out-of-bounds fill
+gridconv_count_in/6         - count Color in in-bounds window cells
+gridconv_density_map/4      - grid of Color counts per window
+gridconv_majority/5         - most frequent color in window
+gridconv_majority_map/3     - each cell replaced by local majority
+gridconv_uniform_at/5       - yes/no: window is all one color
+gridconv_uniform_cells/3    - cells where window is uniform
+gridconv_find_pattern/3     - positions where Pattern matches as subgrid
+gridconv_count_pattern/3    - count matching pattern positions
+gridconv_has_pattern/2      - test if pattern occurs at least once
+gridconv_hot_spots/5        - cells where Color density >= Threshold
+gridconv_dilate_sq/4        - square structuring element dilation
+gridconv_erode_sq/4         - square structuring element erosion
+gridconv_replace_pattern/4  - replace first pattern match with replacement
 
 
 9. Test Coverage

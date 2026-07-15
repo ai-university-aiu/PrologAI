@@ -15,90 +15,90 @@ Dependencies: library(lists)
 
 Linear Shifts (with background fill)
 
-gsh_shift_right(+Grid, +N, +BgColor, -Result)
+gridshift_shift_right(+Grid, +N, +BgColor, -Result)
 Shift each row right by N; leftmost N cells become BgColor.
 
     G = [[a,b,c],[d,e,f],[g,h,i]].
-    gsh_shift_right(G, 1, z, R).
+    gridshift_shift_right(G, 1, z, R).
     % R = [[z,a,b],[z,d,e],[z,g,h]]
 
-gsh_shift_left(+Grid, +N, +BgColor, -Result)
+gridshift_shift_left(+Grid, +N, +BgColor, -Result)
 Shift each row left by N; rightmost N cells become BgColor.
 
-gsh_shift_down(+Grid, +N, +BgColor, -Result)
+gridshift_shift_down(+Grid, +N, +BgColor, -Result)
 Shift grid down by N rows; N BgColor rows appear at the top.
 
-    gsh_shift_down(G, 1, z, R).
+    gridshift_shift_down(G, 1, z, R).
     % R = [[z,z,z],[a,b,c],[d,e,f]]
 
-gsh_shift_up(+Grid, +N, +BgColor, -Result)
+gridshift_shift_up(+Grid, +N, +BgColor, -Result)
 Shift grid up by N rows; N BgColor rows appear at the bottom.
 
 
 Cyclic Rolls (toroidal, no data loss)
 
-gsh_roll_right(+Grid, +N, -Result)
+gridshift_roll_right(+Grid, +N, -Result)
 Cyclically roll each row right by N; last N cells wrap to front.
 
-    gsh_roll_right(G, 1, R).
+    gridshift_roll_right(G, 1, R).
     % R = [[c,a,b],[f,d,e],[i,g,h]]
 
-gsh_roll_left(+Grid, +N, -Result)
+gridshift_roll_left(+Grid, +N, -Result)
 Cyclically roll each row left by N; first N cells wrap to back.
 
-gsh_roll_down(+Grid, +N, -Result)
+gridshift_roll_down(+Grid, +N, -Result)
 Cyclically roll entire grid down by N rows; last N rows wrap to top.
 
-    gsh_roll_down(G, 1, R).
+    gridshift_roll_down(G, 1, R).
     % R = [[g,h,i],[a,b,c],[d,e,f]]
 
-gsh_roll_up(+Grid, +N, -Result)
+gridshift_roll_up(+Grid, +N, -Result)
 Cyclically roll entire grid up by N rows; first N rows wrap to bottom.
 
-Roll inverses: gsh_roll_right(G, N, R1), gsh_roll_left(R1, N, G) holds for any N.
-Full rotation: gsh_roll_right(G, W, G) and gsh_roll_down(G, H, G) always hold.
+Roll inverses: gridshift_roll_right(G, N, R1), gridshift_roll_left(R1, N, G) holds for any N.
+Full rotation: gridshift_roll_right(G, W, G) and gridshift_roll_down(G, H, G) always hold.
 
 
 Per-Row and Per-Column Operations
 
-gsh_roll_row(+Grid, +R, +N, -Result)
+gridshift_roll_row(+Grid, +R, +N, -Result)
 Cyclically roll row R right by N; all other rows are unchanged.
 
-    gsh_roll_row(G, 0, 1, R).
+    gridshift_roll_row(G, 0, 1, R).
     % R = [[c,a,b],[d,e,f],[g,h,i]]
 
-gsh_roll_col(+Grid, +C, +N, -Result)
+gridshift_roll_col(+Grid, +C, +N, -Result)
 Cyclically roll column C down by N; all other columns are unchanged.
 Implemented via transpose.
 
-gsh_shift_row(+Grid, +R, +N, +BgColor, -Result)
+gridshift_shift_row(+Grid, +R, +N, +BgColor, -Result)
 Shift row R by N (positive = right, negative = left); vacated cells = BgColor.
 Other rows are unchanged.
 
-gsh_shift_col(+Grid, +C, +N, +BgColor, -Result)
+gridshift_shift_col(+Grid, +C, +N, +BgColor, -Result)
 Shift column C by N (positive = down, negative = up); vacated cells = BgColor.
 Implemented via transpose.
 
 
 Color-Specific and Full-Grid Offset
 
-gsh_shift_color(+Grid, +Color, +DR, +DC, +BgColor, -Result)
+gridshift_shift_color(+Grid, +Color, +DR, +DC, +BgColor, -Result)
 Shift all cells of Color by (DR, DC). Cells that move out-of-bounds disappear.
 Vacated positions become BgColor. Non-Color non-BgColor cells are unchanged.
 
     G = [[x,b,b],[b,b,b],[b,b,y]].
-    gsh_shift_color(G, x, 0, 1, b, R).
+    gridshift_shift_color(G, x, 0, 1, b, R).
     % R = [[b,x,b],[b,b,b],[b,b,y]]  (x moved right; y unchanged)
 
-gsh_offset(+Grid, +DR, +DC, +BgColor, -Result)
+gridshift_offset(+Grid, +DR, +DC, +BgColor, -Result)
 Shift the entire grid by (DR, DC): Result[R][C] = Grid[R-DR][C-DC] if in bounds,
-else BgColor. Equivalent to gsh_shift_right(N=DC) then gsh_shift_down(N=DR) for
+else BgColor. Equivalent to gridshift_shift_right(N=DC) then gridshift_shift_down(N=DR) for
 non-negative offsets.
 
-    gsh_offset(G, 1, 1, b, R).
+    gridshift_offset(G, 1, 1, b, R).
     % R = [[b,b,b],[b,x,b],[b,b,b]]  (everything shifted right and down)
 
-Equivalence: gsh_shift_right(G, N, Bg, R) equals gsh_offset(G, 0, N, Bg, R).
+Equivalence: gridshift_shift_right(G, N, Bg, R) equals gridshift_offset(G, 0, N, Bg, R).
 
 
 Tests

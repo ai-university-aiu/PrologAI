@@ -38,256 +38,256 @@ all_blue_pair(pair2,
 
 :- begin_tests(gridsolve).
 
-% gs_apply: recolor
+% gridsolve_apply: recolor
 test(apply_recolor) :-
     red_obj(R),
-    gs_apply(recolor(r,g), [R], Result),
+    gridsolve_apply(recolor(r,g), [R], Result),
     Result == [obj(g,[r(0,0)])].
 
-% gs_apply: recolor_all
+% gridsolve_apply: recolor_all
 test(apply_recolor_all) :-
     red_obj(R), blue_obj(B),
-    gs_apply(recolor_all(g), [R, B], Result),
+    gridsolve_apply(recolor_all(g), [R, B], Result),
     msort(Result, S),
     S == [obj(g,[r(0,0)]), obj(g,[r(0,0)])].
 
-% gs_apply: shift
+% gridsolve_apply: shift
 test(apply_shift) :-
     red_obj(R),
-    gs_apply(shift(1,0), [R], Result),
+    gridsolve_apply(shift(1,0), [R], Result),
     Result == [obj(r,[r(1,0)])].
 
-% gs_apply: shift negative
+% gridsolve_apply: shift negative
 test(apply_shift_negative) :-
     red_shifted(R),
-    gs_apply(shift(-1,0), [R], Result),
+    gridsolve_apply(shift(-1,0), [R], Result),
     Result == [obj(r,[r(0,0)])].
 
-% gs_apply: to_origin
+% gridsolve_apply: to_origin
 test(apply_to_origin) :-
     red_shifted(R),
-    gs_apply(to_origin, [R], Result),
+    gridsolve_apply(to_origin, [R], Result),
     Result == [obj(r,[r(0,0)])].
 
-% gs_apply: reflect_h
+% gridsolve_apply: reflect_h
 test(apply_reflect_h) :-
-    gs_apply(reflect_h(3), [obj(r,[r(0,0)])], Result),
+    gridsolve_apply(reflect_h(3), [obj(r,[r(0,0)])], Result),
     Result == [obj(r,[r(0,2)])].
 
-% gs_apply: remove_color
+% gridsolve_apply: remove_color
 test(apply_remove_color) :-
     red_obj(R), blue_obj(B),
-    gs_apply(remove_color(r), [R, B], Result),
+    gridsolve_apply(remove_color(r), [R, B], Result),
     Result == [B].
 
-% gs_apply: keep_color
+% gridsolve_apply: keep_color
 test(apply_keep_color) :-
     red_obj(R), blue_obj(B),
-    gs_apply(keep_color(r), [R, B], Result),
+    gridsolve_apply(keep_color(r), [R, B], Result),
     Result == [R].
 
-% gs_apply: sort_size_desc
+% gridsolve_apply: sort_size_desc
 test(apply_sort_size_desc) :-
     red_bar(RB), red_obj(R),
-    gs_apply(sort_size_desc, [R, RB], Result),
+    gridsolve_apply(sort_size_desc, [R, RB], Result),
     Result == [RB, R].
 
-% gs_apply: top_n
+% gridsolve_apply: top_n
 test(apply_top_n) :-
     red_bar(RB), red_obj(R),
-    gs_apply(top_n(1), [R, RB], Result),
+    gridsolve_apply(top_n(1), [R, RB], Result),
     Result == [RB].
 
-% gs_apply: identity
+% gridsolve_apply: identity
 test(apply_identity) :-
     red_obj(R), blue_obj(B),
-    gs_apply(identity, [R, B], Result),
+    gridsolve_apply(identity, [R, B], Result),
     Result == [R, B].
 
-% gs_apply: color_map
+% gridsolve_apply: color_map
 test(apply_color_map) :-
     red_obj(R), blue_obj(B),
-    gs_apply(color_map([r-g, b-y]), [R, B], Result),
+    gridsolve_apply(color_map([r-g, b-y]), [R, B], Result),
     msort(Result, S),
     S == [obj(g,[r(0,0)]), obj(y,[r(0,0)])].
 
-% gs_coverage: correct rule covers all pairs
+% gridsolve_coverage: correct rule covers all pairs
 test(coverage_correct_rule) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_coverage(recolor(r,g), [P1, P2], N),
+    gridsolve_coverage(recolor(r,g), [P1, P2], N),
     N == 2.
 
-% gs_coverage: wrong rule covers zero pairs
+% gridsolve_coverage: wrong rule covers zero pairs
 test(coverage_wrong_rule) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_coverage(recolor(r,b), [P1, P2], N),
+    gridsolve_coverage(recolor(r,b), [P1, P2], N),
     N == 0.
 
-% gs_coverage: empty pairs
+% gridsolve_coverage: empty pairs
 test(coverage_empty_pairs) :-
-    gs_coverage(recolor(r,g), [], N),
+    gridsolve_coverage(recolor(r,g), [], N),
     N == 0.
 
-% gs_consistent: correct rule
+% gridsolve_consistent: correct rule
 test(consistent_correct) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_consistent(recolor(r,g), [P1, P2]).
+    gridsolve_consistent(recolor(r,g), [P1, P2]).
 
-% gs_consistent: wrong rule fails
+% gridsolve_consistent: wrong rule fails
 test(consistent_wrong_fails) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    \+ gs_consistent(recolor(r,b), [P1, P2]).
+    \+ gridsolve_consistent(recolor(r,b), [P1, P2]).
 
-% gs_consistent: empty pairs always passes
+% gridsolve_consistent: empty pairs always passes
 test(consistent_empty_pairs) :-
-    gs_consistent(recolor(r,g), []).
+    gridsolve_consistent(recolor(r,g), []).
 
-% gs_rank_rules: higher coverage first
+% gridsolve_rank_rules: higher coverage first
 test(rank_rules_order) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_rank_rules([recolor(r,b), recolor(r,g)], [P1, P2], Ranked),
+    gridsolve_rank_rules([recolor(r,b), recolor(r,g)], [P1, P2], Ranked),
     Ranked == [recolor(r,g), recolor(r,b)].
 
-% gs_rank_rules: empty rule list
+% gridsolve_rank_rules: empty rule list
 test(rank_rules_empty) :-
     recolor_pair(pair1, P1),
-    gs_rank_rules([], [P1], Ranked),
+    gridsolve_rank_rules([], [P1], Ranked),
     Ranked == [].
 
-% gs_best_rule: correct rule wins
+% gridsolve_best_rule: correct rule wins
 test(best_rule_wins) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_best_rule([recolor(r,b), recolor(r,g)], [P1, P2], Best),
+    gridsolve_best_rule([recolor(r,b), recolor(r,g)], [P1, P2], Best),
     Best == recolor(r,g).
 
-% gs_consistent_rules: filters to fully consistent
+% gridsolve_consistent_rules: filters to fully consistent
 test(consistent_rules_filter) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_consistent_rules([recolor(r,g), recolor(r,b)], [P1, P2], Consistent),
+    gridsolve_consistent_rules([recolor(r,g), recolor(r,b)], [P1, P2], Consistent),
     Consistent == [recolor(r,g)].
 
-% gs_consistent_rules: empty candidates
+% gridsolve_consistent_rules: empty candidates
 test(consistent_rules_empty_candidates) :-
     recolor_pair(pair1, P1),
-    gs_consistent_rules([], [P1], Consistent),
+    gridsolve_consistent_rules([], [P1], Consistent),
     Consistent == [].
 
-% gs_valid_rules: filters to rules with coverage > 0
+% gridsolve_valid_rules: filters to rules with coverage > 0
 test(valid_rules_filter) :-
     recolor_pair(pair1, P1),
-    gs_valid_rules([recolor(r,g), recolor(r,b)], [P1], Valid),
+    gridsolve_valid_rules([recolor(r,g), recolor(r,b)], [P1], Valid),
     Valid == [recolor(r,g)].
 
-% gs_valid_rules: identity has zero coverage on recolor pair
+% gridsolve_valid_rules: identity has zero coverage on recolor pair
 test(valid_rules_identity_zero) :-
     recolor_pair(pair1, P1),
-    gs_valid_rules([identity, recolor(r,g)], [P1], Valid),
+    gridsolve_valid_rules([identity, recolor(r,g)], [P1], Valid),
     Valid == [recolor(r,g)].
 
-% gs_infer_candidates: recolor task
+% gridsolve_infer_candidates: recolor task
 test(infer_candidates_recolor) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_infer_candidates([P1, P2], Candidates),
+    gridsolve_infer_candidates([P1, P2], Candidates),
     member(recolor(r,g), Candidates).
 
-% gs_infer_candidates: shift task
+% gridsolve_infer_candidates: shift task
 test(infer_candidates_shift) :-
     shift_pair(pair1, P1), shift_pair(pair2, P2),
-    gs_infer_candidates([P1, P2], Candidates),
+    gridsolve_infer_candidates([P1, P2], Candidates),
     member(shift(1,0), Candidates).
 
-% gs_infer_candidates: empty pairs gives empty list
+% gridsolve_infer_candidates: empty pairs gives empty list
 test(infer_candidates_empty) :-
-    gs_infer_candidates([], Candidates),
+    gridsolve_infer_candidates([], Candidates),
     Candidates == [].
 
-% gs_default_candidates: contains common rules
+% gridsolve_default_candidates: contains common rules
 test(default_candidates_contents) :-
-    gs_default_candidates(Cands),
+    gridsolve_default_candidates(Cands),
     member(recolor(r,b), Cands),
     member(shift(1,0), Cands),
     member(to_origin, Cands),
     member(identity, Cands).
 
-% gs_solve: recolor task
+% gridsolve_solve: recolor task
 test(solve_recolor) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_solve([P1, P2], [obj(r,[r(2,0)])], Output),
+    gridsolve_solve([P1, P2], [obj(r,[r(2,0)])], Output),
     msort(Output, S),
     S == [obj(g,[r(2,0)])].
 
-% gs_solve: shift task
+% gridsolve_solve: shift task
 test(solve_shift) :-
     shift_pair(pair1, P1), shift_pair(pair2, P2),
-    gs_solve([P1, P2], [obj(r,[r(0,0)])], Output),
+    gridsolve_solve([P1, P2], [obj(r,[r(0,0)])], Output),
     Output == [obj(r,[r(1,0)])].
 
-% gs_solve: recolor_all task
+% gridsolve_solve: recolor_all task
 test(solve_recolor_all) :-
     all_blue_pair(pair1, P1), all_blue_pair(pair2, P2),
-    gs_solve([P1, P2], [obj(g,[r(5,5)])], Output),
+    gridsolve_solve([P1, P2], [obj(g,[r(5,5)])], Output),
     Output == [obj(b,[r(5,5)])].
 
-% gs_solve_n: returns top N rules
+% gridsolve_solve_n: returns top N rules
 test(solve_n_returns_n) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_solve_n([P1, P2], 2, TopRules, _),
+    gridsolve_solve_n([P1, P2], 2, TopRules, _),
     length(TopRules, 2).
 
-% gs_solve_n: best rule achieves full coverage and applies correctly
+% gridsolve_solve_n: best rule achieves full coverage and applies correctly
 test(solve_n_best_rule) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_solve_n([P1, P2], 1, [Cov-_], BestRule),
+    gridsolve_solve_n([P1, P2], 1, [Cov-_], BestRule),
     Cov == 2,
-    gs_apply(BestRule, [obj(r,[r(2,0)])], Out),
+    gridsolve_apply(BestRule, [obj(r,[r(2,0)])], Out),
     msort(Out, S),
     S == [obj(g,[r(2,0)])].
 
-% gs_explain: returns a fully-covering rule that works on new input
+% gridsolve_explain: returns a fully-covering rule that works on new input
 test(explain_recolor) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_explain([P1, P2], BestRule, Coverage),
+    gridsolve_explain([P1, P2], BestRule, Coverage),
     Coverage == 2,
-    gs_apply(BestRule, [obj(r,[r(5,5)])], Out),
+    gridsolve_apply(BestRule, [obj(r,[r(5,5)])], Out),
     msort(Out, S),
     S == [obj(g,[r(5,5)])].
 
-% gs_explain: shift task
+% gridsolve_explain: shift task
 test(explain_shift) :-
     shift_pair(pair1, P1), shift_pair(pair2, P2),
-    gs_explain([P1, P2], BestRule, Coverage),
+    gridsolve_explain([P1, P2], BestRule, Coverage),
     BestRule == shift(1,0),
     Coverage == 2.
 
-% gs_n_pairs: count
+% gridsolve_n_pairs: count
 test(n_pairs_count) :-
     recolor_pair(pair1, P1), recolor_pair(pair2, P2),
-    gs_n_pairs([P1, P2], N),
+    gridsolve_n_pairs([P1, P2], N),
     N == 2.
 
-% gs_n_pairs: empty
+% gridsolve_n_pairs: empty
 test(n_pairs_empty) :-
-    gs_n_pairs([], N),
+    gridsolve_n_pairs([], N),
     N == 0.
 
-% gs_all_same_output: apply rule to multiple inputs
+% gridsolve_all_same_output: apply rule to multiple inputs
 test(all_same_output) :-
-    gs_all_same_output(recolor(r,g),
+    gridsolve_all_same_output(recolor(r,g),
         [[obj(r,[r(0,0)])], [obj(r,[r(1,0)])]],
         Outputs),
     Outputs == [[obj(g,[r(0,0)])], [obj(g,[r(1,0)])]].
 
-% gs_all_same_output: empty inputs
+% gridsolve_all_same_output: empty inputs
 test(all_same_output_empty) :-
-    gs_all_same_output(recolor(r,g), [], Outputs),
+    gridsolve_all_same_output(recolor(r,g), [], Outputs),
     Outputs == [].
 
-% gs_solve: identity rule wins when all pairs already match
+% gridsolve_solve: identity rule wins when all pairs already match
 test(solve_identity_wins) :-
     % Both pairs: same scene before and after
     P1 = [obj(r,[r(0,0)])]-[obj(r,[r(0,0)])],
     P2 = [obj(r,[r(1,0)])]-[obj(r,[r(1,0)])],
-    gs_solve([P1, P2], [obj(r,[r(5,5)])], Output),
+    gridsolve_solve([P1, P2], [obj(r,[r(5,5)])], Output),
     % Output should be the scene unchanged (some consistent rule applies)
     Output = [obj(_, [r(5,5)])].
 

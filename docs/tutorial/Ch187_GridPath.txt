@@ -15,7 +15,7 @@ Load the pack:
 
 1. Shortest-Path Operations
 
-gpa_shortest_path(+Grid, +R1, +C1, +R2, +C2, +ObsColor, -Path)
+gridpath_shortest_path(+Grid, +R1, +C1, +R2, +C2, +ObsColor, -Path)
 
 Finds the shortest 4-connected path from (R1,C1) to (R2,C2) avoiding
 ObsColor cells. Path is a list of R-C coordinates including both endpoints.
@@ -24,31 +24,31 @@ Fails if either endpoint is ObsColor or if no path exists.
 Example:
 
 G = [[p,p,p],[p,w,p],[p,p,p]].
-gpa_shortest_path(G, 0, 0, 2, 2, w, Path).
+gridpath_shortest_path(G, 0, 0, 2, 2, w, Path).
 % Path = [0-0, 0-1, 0-2, 1-2, 2-2]  or  [0-0, 1-0, 2-0, 2-1, 2-2]
 
-gpa_path_length(+Grid, +R1, +C1, +R2, +C2, +ObsColor, -N)
+gridpath_path_length(+Grid, +R1, +C1, +R2, +C2, +ObsColor, -N)
 
 N is the number of steps (path length minus 1). If start = end, N = 0.
 
-gpa_reachable(+Grid, +R1, +C1, +R2, +C2, +ObsColor)
+gridpath_reachable(+Grid, +R1, +C1, +R2, +C2, +ObsColor)
 
 Succeeds if (R2,C2) is reachable from (R1,C1) via 4-connected non-ObsColor cells.
 
 Example:
 
 G = [[p,w,p],[p,w,p],[p,w,p]].
-\+ gpa_reachable(G, 0, 0, 0, 2, w).  % wall separates columns
+\+ gridpath_reachable(G, 0, 0, 0, 2, w).  % wall separates columns
 
 
 2. Reachability and Distance Maps
 
-gpa_all_reachable(+Grid, +R, +C, +ObsColor, -Cells)
+gridpath_all_reachable(+Grid, +R, +C, +ObsColor, -Cells)
 
 Cells is the list of all R-C positions reachable from (R,C) via 4-connected
 non-ObsColor paths. Includes the seed cell itself.
 
-gpa_distance_map(+Grid, +R, +C, +ObsColor, -Map)
+gridpath_distance_map(+Grid, +R, +C, +ObsColor, -Map)
 
 Map is a list of NR-NC-Dist triples: the BFS distance from (R,C) to every
 reachable cell. The seed has Dist = 0; unreachable cells are omitted.
@@ -56,18 +56,18 @@ reachable cell. The seed has Dist = 0; unreachable cells are omitted.
 Example:
 
 G = [[p,p,p],[p,p,p],[p,p,p]].
-gpa_distance_map(G, 0, 0, w, Map).
+gridpath_distance_map(G, 0, 0, w, Map).
 % Map includes 0-0-0, 0-1-1, 1-0-1, 0-2-2, 1-1-2, 2-0-2, 1-2-3, 2-1-3, 2-2-4
 
 
 3. Flood and Wavefront Operations
 
-gpa_nearest(+Grid, +R, +C, +TargetColor, +ObsColor, -NR-NC)
+gridpath_nearest(+Grid, +R, +C, +TargetColor, +ObsColor, -NR-NC)
 
 NR-NC is the nearest reachable cell of TargetColor. Ties are broken by BFS
 discovery order. Fails if no reachable TargetColor cell exists.
 
-gpa_flood_n(+Grid, +R, +C, +N, +ObsColor, -Cells)
+gridpath_flood_n(+Grid, +R, +C, +N, +ObsColor, -Cells)
 
 Cells is the list of all R-C positions reachable within N steps from (R,C).
 N = 0 returns just the seed cell.
@@ -75,10 +75,10 @@ N = 0 returns just the seed cell.
 Example:
 
 G = [[p,p,p],[p,p,p],[p,p,p]].
-gpa_flood_n(G, 1, 1, 1, w, Cells).
+gridpath_flood_n(G, 1, 1, 1, w, Cells).
 % Cells = [1-1, 0-1, 2-1, 1-0, 1-2]  (center + 4 neighbors)
 
-gpa_wavefront(+Grid, +R, +C, +N, +ObsColor, -Cells)
+gridpath_wavefront(+Grid, +R, +C, +N, +ObsColor, -Cells)
 
 Cells contains only the cells at exactly BFS distance N. Returns [] if no
 cells exist at that distance (e.g., N is larger than the grid).
@@ -86,47 +86,47 @@ cells exist at that distance (e.g., N is larger than the grid).
 Example:
 
 G = [[p,p,p],[p,p,p],[p,p,p]].
-gpa_wavefront(G, 1, 1, 2, w, Cells).
+gridpath_wavefront(G, 1, 1, 2, w, Cells).
 % Cells = [0-0, 0-2, 2-0, 2-2]  (4 corners)
 
 
 4. Straight-Line Operations
 
-gpa_straight_h(+R, +C1, +C2, -Cells)
+gridpath_straight_h(+R, +C1, +C2, -Cells)
 
 Cells is the list of R-C positions on row R from column C1 to column C2
 inclusive. Direction follows C1-to-C2 order (left-to-right when C1 =< C2,
 right-to-left when C1 > C2).
 
-gpa_straight_v(+C, +R1, +R2, -Cells)
+gridpath_straight_v(+C, +R1, +R2, -Cells)
 
 Cells is the list of R-C positions on column C from row R1 to row R2 inclusive.
 
-gpa_between_h(+R, +C1, +C2, -Cells)
+gridpath_between_h(+R, +C1, +C2, -Cells)
 
 Cells is the strictly interior cells of the horizontal segment (endpoints
 excluded), in ascending column order. Returns [] for adjacent cells.
 
-gpa_between_v(+R1, +R2, +C, -Cells)
+gridpath_between_v(+R1, +R2, +C, -Cells)
 
 Cells is the strictly interior cells of the vertical segment (endpoints
 excluded), in ascending row order.
 
 Examples:
 
-gpa_straight_h(0, 0, 4, Cells).
+gridpath_straight_h(0, 0, 4, Cells).
 % Cells = [0-0, 0-1, 0-2, 0-3, 0-4]
 
-gpa_between_h(0, 0, 4, Cells).
+gridpath_between_h(0, 0, 4, Cells).
 % Cells = [0-1, 0-2, 0-3]
 
-gpa_between_v(0, 3, 1, Cells).
+gridpath_between_v(0, 3, 1, Cells).
 % Cells = [1-1, 2-1]
 
 
 5. Line-of-Sight and Region Path
 
-gpa_line_of_sight(+Grid, +R1, +C1, +R2, +C2, +ObsColor)
+gridpath_line_of_sight(+Grid, +R1, +C1, +R2, +C2, +ObsColor)
 
 Succeeds if (R1,C1) and (R2,C2) share the same row or column AND no ObsColor
 cell lies strictly between them. Fails for diagonal pairs or if any intervening
@@ -135,10 +135,10 @@ cell is ObsColor.
 Example:
 
 G = [[p,p,p,p,p],[p,w,w,p,p],[p,p,p,p,p]].
-gpa_line_of_sight(G, 1, 0, 1, 4, w).  % fails: w at (1,1) and (1,2) block it
-gpa_line_of_sight(G, 0, 0, 0, 4, w).  % succeeds: row 0 is clear
+gridpath_line_of_sight(G, 1, 0, 1, 4, w).  % fails: w at (1,1) and (1,2) block it
+gridpath_line_of_sight(G, 0, 0, 0, 4, w).  % succeeds: row 0 is clear
 
-gpa_region_path(+Grid, +Color1, +Color2, +ObsColor, -Path)
+gridpath_region_path(+Grid, +Color1, +Color2, +ObsColor, -Path)
 
 Finds the shortest 4-connected path from any cell of Color1 to any cell of
 Color2, avoiding ObsColor. Returns the globally shortest such path.
@@ -147,23 +147,23 @@ Fails if no Color1 or Color2 cells exist, or no path can be found.
 Example:
 
 G = [[r,p,p,p],[p,p,p,p],[p,p,p,p],[p,p,p,b]].
-gpa_region_path(G, r, b, w, Path).
+gridpath_region_path(G, r, b, w, Path).
 % Path starts at 0-0 and ends at 3-3 with length 7
 
 
 6. Summary of Predicates
 
-gpa_shortest_path/7  - BFS shortest 4-path avoiding ObsColor (with path list)
-gpa_path_length/7    - step count of shortest path
-gpa_reachable/6      - succeed if target reachable from seed
-gpa_all_reachable/5  - all cells reachable from seed
-gpa_distance_map/5   - BFS distance from seed to each reachable cell
-gpa_nearest/6        - nearest reachable cell of a given color
-gpa_flood_n/6        - all cells reachable within N steps
-gpa_wavefront/6      - cells at exactly N BFS steps
-gpa_straight_h/4     - cells on horizontal segment (inclusive)
-gpa_straight_v/4     - cells on vertical segment (inclusive)
-gpa_line_of_sight/6  - same row or column with no obstacle between
-gpa_between_h/4      - interior cells of horizontal segment (exclusive)
-gpa_between_v/4      - interior cells of vertical segment (exclusive)
-gpa_region_path/5    - shortest path between any Color1 and Color2 cell
+gridpath_shortest_path/7  - BFS shortest 4-path avoiding ObsColor (with path list)
+gridpath_path_length/7    - step count of shortest path
+gridpath_reachable/6      - succeed if target reachable from seed
+gridpath_all_reachable/5  - all cells reachable from seed
+gridpath_distance_map/5   - BFS distance from seed to each reachable cell
+gridpath_nearest/6        - nearest reachable cell of a given color
+gridpath_flood_n/6        - all cells reachable within N steps
+gridpath_wavefront/6      - cells at exactly N BFS steps
+gridpath_straight_h/4     - cells on horizontal segment (inclusive)
+gridpath_straight_v/4     - cells on vertical segment (inclusive)
+gridpath_line_of_sight/6  - same row or column with no obstacle between
+gridpath_between_h/4      - interior cells of horizontal segment (exclusive)
+gridpath_between_v/4      - interior cells of vertical segment (exclusive)
+gridpath_region_path/5    - shortest path between any Color1 and Color2 cell
