@@ -191,14 +191,14 @@ test(translate_zero) :-
     Obj = obj(3,[r(2,2),r(3,2)]),
     motion_obj_translate(Obj, 0, 0, Obj2),
     Obj2 = obj(3,_),
-    sc_obj_cells(Obj, Cells),
-    sc_obj_cells(Obj2, Cells2),
+    scene_obj_cells(Obj, Cells),
+    scene_obj_cells(Obj2, Cells2),
     msort(Cells, S), msort(Cells2, S).
 
 % Color is preserved through translation.
 test(translate_preserves_color) :-
     motion_obj_translate(obj(5,[r(0,0)]), 3, 3, Obj2),
-    sc_obj_color(Obj2, 5).
+    scene_obj_color(Obj2, 5).
 
 :- end_tests(motion_obj_translate).
 

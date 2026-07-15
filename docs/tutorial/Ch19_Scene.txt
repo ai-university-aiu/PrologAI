@@ -54,156 +54,156 @@ This makes all sc_* predicates available.
 
 BUILDING A SCENE FROM A GRID
 
-sc_bg_color(+Grid, -BgColor)
+scene_bg_color(+Grid, -BgColor)
 
 Identifies the most frequently occurring color as the background.
 
-    ?- sc_bg_color([[0,0,1],[0,1,0],[0,0,0]], BgColor).
+    ?- scene_bg_color([[0,0,1],[0,1,0],[0,0,0]], BgColor).
     BgColor = 0.
 
-sc_objects(+Grid, -Objects)
+scene_objects(+Grid, -Objects)
 
 Extracts all foreground objects (connected components of non-background colors).
 
     ?- G = [[0,1,0],[1,1,0],[0,0,2]],
-       sc_objects(G, Objects).
+       scene_objects(G, Objects).
     Objects = [obj(1,[r(0,1),r(1,0),r(1,1)]), obj(2,[r(2,2)])].
 
-sc_grid_to_scene(+Grid, -Scene)
+scene_grid_to_scene(+Grid, -Scene)
 
 Builds the complete scene term.
 
     ?- G = [[0,1,0],[1,1,0],[0,0,2]],
-       sc_grid_to_scene(G, Scene).
+       scene_grid_to_scene(G, Scene).
     Scene = scene(3, 3, 0, [obj(1,...), obj(2,...)]).
 
 
 OBJECT PROPERTIES
 
-sc_obj_color(+Obj, -Color)
+scene_obj_color(+Obj, -Color)
 
-    ?- sc_obj_color(obj(3, [r(0,0)]), Color).
+    ?- scene_obj_color(obj(3, [r(0,0)]), Color).
     Color = 3.
 
-sc_obj_cells(+Obj, -Cells)
+scene_obj_cells(+Obj, -Cells)
 
-    ?- sc_obj_cells(obj(1, [r(0,0), r(1,0)]), Cells).
+    ?- scene_obj_cells(obj(1, [r(0,0), r(1,0)]), Cells).
     Cells = [r(0,0), r(1,0)].
 
-sc_obj_size(+Obj, -Size)
+scene_obj_size(+Obj, -Size)
 
 Returns the number of cells.
 
-    ?- sc_obj_size(obj(1, [r(0,0), r(0,1), r(1,0)]), Size).
+    ?- scene_obj_size(obj(1, [r(0,0), r(0,1), r(1,0)]), Size).
     Size = 3.
 
-sc_obj_bbox(+Obj, -TL, -BR)
+scene_obj_bbox(+Obj, -TL, -BR)
 
 Returns the bounding box as top-left r(Rmin, Cmin) and bottom-right r(Rmax, Cmax).
 
-    ?- sc_obj_bbox(obj(1, [r(1,2), r(2,3), r(1,4)]), TL, BR).
+    ?- scene_obj_bbox(obj(1, [r(1,2), r(2,3), r(1,4)]), TL, BR).
     TL = r(1,2), BR = r(2,4).
 
-sc_obj_shape(+Obj, -Shape)
+scene_obj_shape(+Obj, -Shape)
 
 Returns the normalized cell set: translated to top-left origin r(0,0) and sorted.
 
-    ?- sc_obj_shape(obj(1, [r(3,5), r(3,6), r(4,5)]), Shape).
+    ?- scene_obj_shape(obj(1, [r(3,5), r(3,6), r(4,5)]), Shape).
     Shape = [r(0,0), r(0,1), r(1,0)].
 
-Two objects have the same shape if their sc_obj_shape results are identical, regardless of their position in the grid or their colors.
+Two objects have the same shape if their scene_obj_shape results are identical, regardless of their position in the grid or their colors.
 
-sc_obj_centroid(+Obj, -R, -C)
+scene_obj_centroid(+Obj, -R, -C)
 
 Returns the center of mass, rounded to the nearest integer.
 
-    ?- sc_obj_centroid(obj(1, [r(0,0), r(0,2), r(2,0), r(2,2)]), R, C).
+    ?- scene_obj_centroid(obj(1, [r(0,0), r(0,2), r(2,0), r(2,2)]), R, C).
     R = 1, C = 1.
 
 
 FILTERING AND COUNTING
 
-sc_objects_of_color(+Objects, +Color, -Filtered)
+scene_objects_of_color(+Objects, +Color, -Filtered)
 
 Returns only the objects of the given color.
 
-    ?- sc_objects(G, Objs),
-       sc_objects_of_color(Objs, 1, RedObjs).
+    ?- scene_objects(G, Objs),
+       scene_objects_of_color(Objs, 1, RedObjs).
 
-sc_count(+Objects, -Count)
+scene_count(+Objects, -Count)
 
 Returns the total number of objects.
 
-    ?- sc_count([obj(1,[r(0,0)]), obj(2,[r(1,1)])], Count).
+    ?- scene_count([obj(1,[r(0,0)]), obj(2,[r(1,1)])], Count).
     Count = 2.
 
-sc_count_of_color(+Objects, +Color, -Count)
+scene_count_of_color(+Objects, +Color, -Count)
 
 Counts how many objects have the given color.
 
-    ?- sc_count_of_color([obj(1,[r(0,0)]), obj(1,[r(2,2)]), obj(2,[r(1,1)])], 1, Count).
+    ?- scene_count_of_color([obj(1,[r(0,0)]), obj(1,[r(2,2)]), obj(2,[r(1,1)])], 1, Count).
     Count = 2.
 
 
 SORTING AND SELECTION
 
-sc_sort_by_size(+Objects, +Order, -Sorted)
+scene_sort_by_size(+Objects, +Order, -Sorted)
 
 Order is asc (smallest first) or desc (largest first).
 
     ?- Objs = [obj(1,[r(0,0),r(0,1),r(0,2)]), obj(2,[r(1,1)])],
-       sc_sort_by_size(Objs, asc, [Small|_]).
+       scene_sort_by_size(Objs, asc, [Small|_]).
     Small = obj(2, [r(1,1)]).   % 1 cell, smallest
 
-sc_largest(+Objects, -Largest)
+scene_largest(+Objects, -Largest)
 
 Returns the object with the most cells.
 
-    ?- sc_largest([obj(1,[r(0,0)]), obj(2,[r(1,0),r(2,0)])], Big).
+    ?- scene_largest([obj(1,[r(0,0)]), obj(2,[r(1,0),r(2,0)])], Big).
     Big = obj(2, [r(1,0), r(2,0)]).
 
-sc_smallest(+Objects, -Smallest)
+scene_smallest(+Objects, -Smallest)
 
 Returns the object with the fewest cells.
 
 
 SPATIAL RELATIONS
 
-sc_above(+Obj1, +Obj2): Obj1 is above Obj2 (lower row index).
-sc_below(+Obj1, +Obj2): Obj1 is below Obj2.
-sc_left_of(+Obj1, +Obj2): Obj1 is to the left of Obj2 (lower column index).
-sc_right_of(+Obj1, +Obj2): Obj1 is to the right of Obj2.
+scene_above(+Obj1, +Obj2): Obj1 is above Obj2 (lower row index).
+scene_below(+Obj1, +Obj2): Obj1 is below Obj2.
+scene_left_of(+Obj1, +Obj2): Obj1 is to the left of Obj2 (lower column index).
+scene_right_of(+Obj1, +Obj2): Obj1 is to the right of Obj2.
 
     ?- Obj1 = obj(1, [r(0,0)]),
        Obj2 = obj(2, [r(3,0)]),
-       sc_above(Obj1, Obj2).
+       scene_above(Obj1, Obj2).
     true.
 
-sc_cells_touching(+Obj1, +Obj2): succeeds if any cell of Obj1 is 4-connected to any cell of Obj2 (Manhattan distance 1).
+scene_cells_touching(+Obj1, +Obj2): succeeds if any cell of Obj1 is 4-connected to any cell of Obj2 (Manhattan distance 1).
 
-    ?- sc_cells_touching(obj(1,[r(0,0)]), obj(2,[r(0,1)])).
+    ?- scene_cells_touching(obj(1,[r(0,0)]), obj(2,[r(0,1)])).
     true.
 
-    ?- sc_cells_touching(obj(1,[r(0,0)]), obj(2,[r(1,1)])).
+    ?- scene_cells_touching(obj(1,[r(0,0)]), obj(2,[r(1,1)])).
     false.   % diagonal, not 4-connected
 
-sc_contained_in(+Obj1, +Obj2): succeeds if the bounding box of Obj1 is entirely inside the bounding box of Obj2.
+scene_contained_in(+Obj1, +Obj2): succeeds if the bounding box of Obj1 is entirely inside the bounding box of Obj2.
 
-    ?- sc_contained_in(obj(1,[r(1,1)]),
+    ?- scene_contained_in(obj(1,[r(1,1)]),
                        obj(2,[r(0,0),r(3,3)])).
     true.
 
 
 SHAPE AND COLOR COMPARISON
 
-sc_same_shape(+Obj1, +Obj2): succeeds if both objects have identical normalized shapes.
+scene_same_shape(+Obj1, +Obj2): succeeds if both objects have identical normalized shapes.
 
     ?- Obj1 = obj(1, [r(0,0), r(1,0), r(1,1)]),
        Obj2 = obj(3, [r(5,3), r(6,3), r(6,4)]),
-       sc_same_shape(Obj1, Obj2).
+       scene_same_shape(Obj1, Obj2).
     true.   % both are L-shapes at different positions and colors
 
-sc_same_color(+Obj1, +Obj2): succeeds if both objects have the same color.
+scene_same_color(+Obj1, +Obj2): succeeds if both objects have the same color.
 
 
 A COMPLETE EXAMPLE: COUNT AND SORT
@@ -214,52 +214,52 @@ Given a grid, find how many distinct objects there are, which is largest, and ho
             [0,1,0,0,2],
             [0,0,0,0,2],
             [3,0,0,0,0]],
-       sc_grid_to_scene(G, scene(_, _, Bg, Objects)),
-       sc_count(Objects, Total),
-       sc_largest(Objects, Big),
-       sc_obj_size(Big, BigSize),
-       sc_count_of_color(Objects, 1, RedCount).
+       scene_grid_to_scene(G, scene(_, _, Bg, Objects)),
+       scene_count(Objects, Total),
+       scene_largest(Objects, Big),
+       scene_obj_size(Big, BigSize),
+       scene_count_of_color(Objects, 1, RedCount).
     Bg = 0, Total = 4, BigSize = 3, RedCount = 1.
 
 (Grid has 4 objects: the red L-shape at 3 cells, the two-cell blue column, the single-cell green, and the isolated red cell at r(0,3)... actually let me count: red L at (0,1),(0,2),(1,1) = 3 cells; blue at (1,4),(2,4) = 2 cells; green at (3,0) = 1 cell. That is 3 objects. Let me not make claims about the exact grid here.)
 
 FINDING OBJECTS WITH THE SAME SHAPE
 
-    ?- sc_objects(G, Objects),
+    ?- scene_objects(G, Objects),
        member(A, Objects),
        member(B, Objects),
        A \= B,
-       sc_same_shape(A, B).
+       scene_same_shape(A, B).
 
 This finds pairs of objects with matching shapes. A common ARC-AGI task pattern.
 
 
 SUMMARY
 
-sc_bg_color/2         Most frequent color (background).
-sc_objects/2          All foreground objects as obj(Color, Cells) list.
-sc_grid_to_scene/2    Build scene(Rows, Cols, BgColor, Objects).
-sc_obj_color/2        Extract color from obj term.
-sc_obj_cells/2        Extract cell list from obj term.
-sc_obj_size/2         Number of cells.
-sc_obj_bbox/3         Bounding box top-left and bottom-right.
-sc_obj_shape/2        Normalized (position-independent) cell set.
-sc_obj_centroid/3     Center of mass, rounded.
-sc_normalize_cells/2  Translate cell set to (0,0) origin, sort.
-sc_objects_of_color/3 Filter objects by color.
-sc_sort_by_size/3     Sort by cell count (asc or desc).
-sc_largest/2          Object with the most cells.
-sc_smallest/2         Object with the fewest cells.
-sc_count/2            Total number of objects.
-sc_count_of_color/3   Count objects of a given color.
-sc_above/2            Obj1 above Obj2 (lower min row).
-sc_below/2            Obj1 below Obj2.
-sc_left_of/2          Obj1 left of Obj2 (lower min col).
-sc_right_of/2         Obj1 right of Obj2.
-sc_cells_touching/2   4-connected neighbor cells exist between objects.
-sc_contained_in/2     Bounding box of Obj1 inside bounding box of Obj2.
-sc_same_shape/2       Identical normalized shapes.
-sc_same_color/2       Same color integer.
+scene_bg_color/2         Most frequent color (background).
+scene_objects/2          All foreground objects as obj(Color, Cells) list.
+scene_grid_to_scene/2    Build scene(Rows, Cols, BgColor, Objects).
+scene_obj_color/2        Extract color from obj term.
+scene_obj_cells/2        Extract cell list from obj term.
+scene_obj_size/2         Number of cells.
+scene_obj_bbox/3         Bounding box top-left and bottom-right.
+scene_obj_shape/2        Normalized (position-independent) cell set.
+scene_obj_centroid/3     Center of mass, rounded.
+scene_normalize_cells/2  Translate cell set to (0,0) origin, sort.
+scene_objects_of_color/3 Filter objects by color.
+scene_sort_by_size/3     Sort by cell count (asc or desc).
+scene_largest/2          Object with the most cells.
+scene_smallest/2         Object with the fewest cells.
+scene_count/2            Total number of objects.
+scene_count_of_color/3   Count objects of a given color.
+scene_above/2            Obj1 above Obj2 (lower min row).
+scene_below/2            Obj1 below Obj2.
+scene_left_of/2          Obj1 left of Obj2 (lower min col).
+scene_right_of/2         Obj1 right of Obj2.
+scene_cells_touching/2   4-connected neighbor cells exist between objects.
+scene_contained_in/2     Bounding box of Obj1 inside bounding box of Obj2.
+scene_same_shape/2       Identical normalized shapes.
+scene_same_color/2       Same color integer.
 
 
 WHAT COMES NEXT

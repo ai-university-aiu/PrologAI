@@ -239,7 +239,7 @@ motion_scene_gravity(Scene, Scene2) :-
 % Apply column gravity with Bg as background color.
     motion_gravity_down(Grid, Bg, Grid2),
 % Re-parse the grid into a new scene.
-    sc_grid_to_scene(Grid2, Scene2).
+    scene_grid_to_scene(Grid2, Scene2).
 
 
 % DISTANCE METRICS

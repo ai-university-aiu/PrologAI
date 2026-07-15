@@ -3464,18 +3464,18 @@ LOOP LIFECYCLE
 
 Step 1 - Create a loop:
 
-    ?- ag_loop_create(my_goal, 20, LoopId).
+    ?- agency_loop_create(my_goal, 20, LoopId).
 
 Step 2 - Run the loop (my_reasoner is a Prolog predicate you write):
 
-    ?- ag_loop_run(LoopId, my_reasoner, Outcome).
+    ?- agency_loop_run(LoopId, my_reasoner, Outcome).
 
 Your reasoner is called as: call(my_reasoner, LoopId, CurrentGoal, Thought, Action).
 
 Step 3 - Inspect outcome and trace:
 
-    ?- ag_loop_outcome(LoopId, Outcome).
-    ?- ag_loop_trace(LoopId, Steps).
+    ?- agency_loop_outcome(LoopId, Outcome).
+    ?- agency_loop_trace(LoopId, Steps).
 
 
 THE SEVEN ACTION TYPES
@@ -3491,9 +3491,9 @@ action_pop_goal                Remove the current subgoal from the stack.
 
 BUDGET AND LOOP DETECTION
 
-    ?- ag_budget_remaining(LoopId, N).
+    ?- agency_budget_remaining(LoopId, N).
 
-    ?- ag_detect_loop(LoopId, IsLooping).
+    ?- agency_detect_loop(LoopId, IsLooping).
 
 When IsLooping is true, two consecutive steps had the same thought and action. The reasoner should change strategy or escalate.
 
@@ -3502,23 +3502,23 @@ ESCALATION
 
     Action = action_escalate(need_credentials)
 
-    ?- ag_loop_outcome(LoopId, escalated(need_credentials)).
+    ?- agency_loop_outcome(LoopId, escalated(need_credentials)).
 
 
 SUMMARY
 
-ag_loop_create/3      Allocate a loop with a goal and step budget.
-ag_loop_run/3         Run the loop to completion.
-ag_loop_step/3        Execute a single step.
-ag_loop_done/1        Check whether the loop has reached a terminal state.
-ag_loop_outcome/2     Retrieve the final status.
-ag_loop_trace/2       Retrieve the full step-by-step trace.
-ag_push_subgoal/2     Add a subgoal to the goal stack.
-ag_pop_subgoal/2      Remove the top subgoal.
-ag_budget_remaining/2 Query remaining steps.
-ag_detect_loop/2      Detect repeated thought-action pairs.
-ag_escalate/2         Record escalation and halt the loop safely.
-ag_step_record/4      Record one step manually.
+agency_loop_create/3      Allocate a loop with a goal and step budget.
+agency_loop_run/3         Run the loop to completion.
+agency_loop_step/3        Execute a single step.
+agency_loop_done/1        Check whether the loop has reached a terminal state.
+agency_loop_outcome/2     Retrieve the final status.
+agency_loop_trace/2       Retrieve the full step-by-step trace.
+agency_push_subgoal/2     Add a subgoal to the goal stack.
+agency_pop_subgoal/2      Remove the top subgoal.
+agency_budget_remaining/2 Query remaining steps.
+agency_detect_loop/2      Detect repeated thought-action pairs.
+agency_escalate/2         Record escalation and halt the loop safely.
+agency_step_record/4      Record one step manually.
 
 
 WHAT COMES NEXT
@@ -3551,23 +3551,23 @@ Write criteria using YALL lambda notation so they are portable across modules:
     Criteria = [criterion(non_empty, [O]>>(O \= [])),
                 criterion(short,     [O]>>(length(O, L), L < 5))].
 
-rn_critique(+Output, +Criteria, +MaxSteps, -Critique)
+refinery_critique(+Output, +Criteria, +MaxSteps, -Critique)
 
-    ?- rn_critique([a,b,c], Criteria, 5, Critique).
+    ?- refinery_critique([a,b,c], Criteria, 5, Critique).
     Critique = [].
 
-    ?- rn_critique([], Criteria, 5, Critique).
+    ?- refinery_critique([], Criteria, 5, Critique).
     Critique = [found_issue(non_empty, fail)].
 
 
 SCORING
 
-rn_score(+Output, +Criteria, -Score)
+refinery_score(+Output, +Criteria, -Score)
 
-    ?- rn_score([a,b], Criteria, Score).
+    ?- refinery_score([a,b], Criteria, Score).
     Score = 1.0.
 
-    ?- rn_score([a,b,c,d,e,f], Criteria, Score).
+    ?- refinery_score([a,b,c,d,e,f], Criteria, Score).
     Score = 0.5.
 
 Score is a float in [0.0, 1.0].
@@ -3575,41 +3575,41 @@ Score is a float in [0.0, 1.0].
 
 EVALUATOR-OPTIMIZER LOOP
 
-rn_optimize(:GeneratorGoal, :EvaluatorGoal, +QualityBar, +MaxIter, -Best)
+refinery_optimize(:GeneratorGoal, :EvaluatorGoal, +QualityBar, +MaxIter, -Best)
 
     Gen  = ([O]>>(O = [a,b,c])).
     Eval = ([O,S]>>(length(O,L), S is float(L)/10.0)).
 
-    ?- rn_optimize(Gen, Eval, 0.3, 5, Best).
+    ?- refinery_optimize(Gen, Eval, 0.3, 5, Best).
     Best = [a, b, c].
 
 
 MULTI-PATH EXPLORATION
 
-rn_explore_paths(+Problem, :ExplorerGoal, +NumPaths, -Ranked)
+refinery_explore_paths(+Problem, :ExplorerGoal, +NumPaths, -Ranked)
 
 Explores NumPaths different approaches and returns them ranked by score (highest first):
 
-    ?- rn_explore_paths(problem, my_explorer, 3, Ranked).
+    ?- refinery_explore_paths(problem, my_explorer, 3, Ranked).
 
 
 THE LESSON DATABASE
 
-    ?- rn_learn(math_problems, negative_answer, use_abs_value).
-    ?- rn_recall(math_problems, Lessons).
-    ?- rn_forget(math_problems).
+    ?- refinery_learn(math_problems, negative_answer, use_abs_value).
+    ?- refinery_recall(math_problems, Lessons).
+    ?- refinery_forget(math_problems).
 
 
 SUMMARY
 
-rn_critique/4        Critique an output against a criteria list.
-rn_score/3           Score an output (fraction of criteria that pass).
-rn_improve/5         Iterative improvement loop.
-rn_optimize/5        Evaluator-optimizer loop with run logging.
-rn_explore_paths/4   Multi-path exploration ranked by score.
-rn_learn/3           Store a lesson from a past failure.
-rn_recall/2          Recall lessons for a given problem type.
-rn_forget/1          Clear lessons for a given problem type.
+refinery_critique/4        Critique an output against a criteria list.
+refinery_score/3           Score an output (fraction of criteria that pass).
+refinery_improve/5         Iterative improvement loop.
+refinery_optimize/5        Evaluator-optimizer loop with run logging.
+refinery_explore_paths/4   Multi-path exploration ranked by score.
+refinery_learn/3           Store a lesson from a past failure.
+refinery_recall/2          Recall lessons for a given problem type.
+refinery_forget/1          Clear lessons for a given problem type.
 
 
 WHAT COMES NEXT
@@ -3894,156 +3894,156 @@ This makes all sc_* predicates available.
 
 BUILDING A SCENE FROM A GRID
 
-sc_bg_color(+Grid, -BgColor)
+scene_bg_color(+Grid, -BgColor)
 
 Identifies the most frequently occurring color as the background.
 
-    ?- sc_bg_color([[0,0,1],[0,1,0],[0,0,0]], BgColor).
+    ?- scene_bg_color([[0,0,1],[0,1,0],[0,0,0]], BgColor).
     BgColor = 0.
 
-sc_objects(+Grid, -Objects)
+scene_objects(+Grid, -Objects)
 
 Extracts all foreground objects (connected components of non-background colors).
 
     ?- G = [[0,1,0],[1,1,0],[0,0,2]],
-       sc_objects(G, Objects).
+       scene_objects(G, Objects).
     Objects = [obj(1,[r(0,1),r(1,0),r(1,1)]), obj(2,[r(2,2)])].
 
-sc_grid_to_scene(+Grid, -Scene)
+scene_grid_to_scene(+Grid, -Scene)
 
 Builds the complete scene term.
 
     ?- G = [[0,1,0],[1,1,0],[0,0,2]],
-       sc_grid_to_scene(G, Scene).
+       scene_grid_to_scene(G, Scene).
     Scene = scene(3, 3, 0, [obj(1,...), obj(2,...)]).
 
 
 OBJECT PROPERTIES
 
-sc_obj_color(+Obj, -Color)
+scene_obj_color(+Obj, -Color)
 
-    ?- sc_obj_color(obj(3, [r(0,0)]), Color).
+    ?- scene_obj_color(obj(3, [r(0,0)]), Color).
     Color = 3.
 
-sc_obj_cells(+Obj, -Cells)
+scene_obj_cells(+Obj, -Cells)
 
-    ?- sc_obj_cells(obj(1, [r(0,0), r(1,0)]), Cells).
+    ?- scene_obj_cells(obj(1, [r(0,0), r(1,0)]), Cells).
     Cells = [r(0,0), r(1,0)].
 
-sc_obj_size(+Obj, -Size)
+scene_obj_size(+Obj, -Size)
 
 Returns the number of cells.
 
-    ?- sc_obj_size(obj(1, [r(0,0), r(0,1), r(1,0)]), Size).
+    ?- scene_obj_size(obj(1, [r(0,0), r(0,1), r(1,0)]), Size).
     Size = 3.
 
-sc_obj_bbox(+Obj, -TL, -BR)
+scene_obj_bbox(+Obj, -TL, -BR)
 
 Returns the bounding box as top-left r(Rmin, Cmin) and bottom-right r(Rmax, Cmax).
 
-    ?- sc_obj_bbox(obj(1, [r(1,2), r(2,3), r(1,4)]), TL, BR).
+    ?- scene_obj_bbox(obj(1, [r(1,2), r(2,3), r(1,4)]), TL, BR).
     TL = r(1,2), BR = r(2,4).
 
-sc_obj_shape(+Obj, -Shape)
+scene_obj_shape(+Obj, -Shape)
 
 Returns the normalized cell set: translated to top-left origin r(0,0) and sorted.
 
-    ?- sc_obj_shape(obj(1, [r(3,5), r(3,6), r(4,5)]), Shape).
+    ?- scene_obj_shape(obj(1, [r(3,5), r(3,6), r(4,5)]), Shape).
     Shape = [r(0,0), r(0,1), r(1,0)].
 
-Two objects have the same shape if their sc_obj_shape results are identical, regardless of their position in the grid or their colors.
+Two objects have the same shape if their scene_obj_shape results are identical, regardless of their position in the grid or their colors.
 
-sc_obj_centroid(+Obj, -R, -C)
+scene_obj_centroid(+Obj, -R, -C)
 
 Returns the center of mass, rounded to the nearest integer.
 
-    ?- sc_obj_centroid(obj(1, [r(0,0), r(0,2), r(2,0), r(2,2)]), R, C).
+    ?- scene_obj_centroid(obj(1, [r(0,0), r(0,2), r(2,0), r(2,2)]), R, C).
     R = 1, C = 1.
 
 
 FILTERING AND COUNTING
 
-sc_objects_of_color(+Objects, +Color, -Filtered)
+scene_objects_of_color(+Objects, +Color, -Filtered)
 
 Returns only the objects of the given color.
 
-    ?- sc_objects(G, Objs),
-       sc_objects_of_color(Objs, 1, RedObjs).
+    ?- scene_objects(G, Objs),
+       scene_objects_of_color(Objs, 1, RedObjs).
 
-sc_count(+Objects, -Count)
+scene_count(+Objects, -Count)
 
 Returns the total number of objects.
 
-    ?- sc_count([obj(1,[r(0,0)]), obj(2,[r(1,1)])], Count).
+    ?- scene_count([obj(1,[r(0,0)]), obj(2,[r(1,1)])], Count).
     Count = 2.
 
-sc_count_of_color(+Objects, +Color, -Count)
+scene_count_of_color(+Objects, +Color, -Count)
 
 Counts how many objects have the given color.
 
-    ?- sc_count_of_color([obj(1,[r(0,0)]), obj(1,[r(2,2)]), obj(2,[r(1,1)])], 1, Count).
+    ?- scene_count_of_color([obj(1,[r(0,0)]), obj(1,[r(2,2)]), obj(2,[r(1,1)])], 1, Count).
     Count = 2.
 
 
 SORTING AND SELECTION
 
-sc_sort_by_size(+Objects, +Order, -Sorted)
+scene_sort_by_size(+Objects, +Order, -Sorted)
 
 Order is asc (smallest first) or desc (largest first).
 
     ?- Objs = [obj(1,[r(0,0),r(0,1),r(0,2)]), obj(2,[r(1,1)])],
-       sc_sort_by_size(Objs, asc, [Small|_]).
+       scene_sort_by_size(Objs, asc, [Small|_]).
     Small = obj(2, [r(1,1)]).   % 1 cell, smallest
 
-sc_largest(+Objects, -Largest)
+scene_largest(+Objects, -Largest)
 
 Returns the object with the most cells.
 
-    ?- sc_largest([obj(1,[r(0,0)]), obj(2,[r(1,0),r(2,0)])], Big).
+    ?- scene_largest([obj(1,[r(0,0)]), obj(2,[r(1,0),r(2,0)])], Big).
     Big = obj(2, [r(1,0), r(2,0)]).
 
-sc_smallest(+Objects, -Smallest)
+scene_smallest(+Objects, -Smallest)
 
 Returns the object with the fewest cells.
 
 
 SPATIAL RELATIONS
 
-sc_above(+Obj1, +Obj2): Obj1 is above Obj2 (lower row index).
-sc_below(+Obj1, +Obj2): Obj1 is below Obj2.
-sc_left_of(+Obj1, +Obj2): Obj1 is to the left of Obj2 (lower column index).
-sc_right_of(+Obj1, +Obj2): Obj1 is to the right of Obj2.
+scene_above(+Obj1, +Obj2): Obj1 is above Obj2 (lower row index).
+scene_below(+Obj1, +Obj2): Obj1 is below Obj2.
+scene_left_of(+Obj1, +Obj2): Obj1 is to the left of Obj2 (lower column index).
+scene_right_of(+Obj1, +Obj2): Obj1 is to the right of Obj2.
 
     ?- Obj1 = obj(1, [r(0,0)]),
        Obj2 = obj(2, [r(3,0)]),
-       sc_above(Obj1, Obj2).
+       scene_above(Obj1, Obj2).
     true.
 
-sc_cells_touching(+Obj1, +Obj2): succeeds if any cell of Obj1 is 4-connected to any cell of Obj2 (Manhattan distance 1).
+scene_cells_touching(+Obj1, +Obj2): succeeds if any cell of Obj1 is 4-connected to any cell of Obj2 (Manhattan distance 1).
 
-    ?- sc_cells_touching(obj(1,[r(0,0)]), obj(2,[r(0,1)])).
+    ?- scene_cells_touching(obj(1,[r(0,0)]), obj(2,[r(0,1)])).
     true.
 
-    ?- sc_cells_touching(obj(1,[r(0,0)]), obj(2,[r(1,1)])).
+    ?- scene_cells_touching(obj(1,[r(0,0)]), obj(2,[r(1,1)])).
     false.   % diagonal, not 4-connected
 
-sc_contained_in(+Obj1, +Obj2): succeeds if the bounding box of Obj1 is entirely inside the bounding box of Obj2.
+scene_contained_in(+Obj1, +Obj2): succeeds if the bounding box of Obj1 is entirely inside the bounding box of Obj2.
 
-    ?- sc_contained_in(obj(1,[r(1,1)]),
+    ?- scene_contained_in(obj(1,[r(1,1)]),
                        obj(2,[r(0,0),r(3,3)])).
     true.
 
 
 SHAPE AND COLOR COMPARISON
 
-sc_same_shape(+Obj1, +Obj2): succeeds if both objects have identical normalized shapes.
+scene_same_shape(+Obj1, +Obj2): succeeds if both objects have identical normalized shapes.
 
     ?- Obj1 = obj(1, [r(0,0), r(1,0), r(1,1)]),
        Obj2 = obj(3, [r(5,3), r(6,3), r(6,4)]),
-       sc_same_shape(Obj1, Obj2).
+       scene_same_shape(Obj1, Obj2).
     true.   % both are L-shapes at different positions and colors
 
-sc_same_color(+Obj1, +Obj2): succeeds if both objects have the same color.
+scene_same_color(+Obj1, +Obj2): succeeds if both objects have the same color.
 
 
 A COMPLETE EXAMPLE: COUNT AND SORT
@@ -4054,52 +4054,52 @@ Given a grid, find how many distinct objects there are, which is largest, and ho
             [0,1,0,0,2],
             [0,0,0,0,2],
             [3,0,0,0,0]],
-       sc_grid_to_scene(G, scene(_, _, Bg, Objects)),
-       sc_count(Objects, Total),
-       sc_largest(Objects, Big),
-       sc_obj_size(Big, BigSize),
-       sc_count_of_color(Objects, 1, RedCount).
+       scene_grid_to_scene(G, scene(_, _, Bg, Objects)),
+       scene_count(Objects, Total),
+       scene_largest(Objects, Big),
+       scene_obj_size(Big, BigSize),
+       scene_count_of_color(Objects, 1, RedCount).
     Bg = 0, Total = 4, BigSize = 3, RedCount = 1.
 
 (Grid has 4 objects: the red L-shape at 3 cells, the two-cell blue column, the single-cell green, and the isolated red cell at r(0,3)... actually let me count: red L at (0,1),(0,2),(1,1) = 3 cells; blue at (1,4),(2,4) = 2 cells; green at (3,0) = 1 cell. That is 3 objects. Let me not make claims about the exact grid here.)
 
 FINDING OBJECTS WITH THE SAME SHAPE
 
-    ?- sc_objects(G, Objects),
+    ?- scene_objects(G, Objects),
        member(A, Objects),
        member(B, Objects),
        A \= B,
-       sc_same_shape(A, B).
+       scene_same_shape(A, B).
 
 This finds pairs of objects with matching shapes. A common ARC-AGI task pattern.
 
 
 SUMMARY
 
-sc_bg_color/2         Most frequent color (background).
-sc_objects/2          All foreground objects as obj(Color, Cells) list.
-sc_grid_to_scene/2    Build scene(Rows, Cols, BgColor, Objects).
-sc_obj_color/2        Extract color from obj term.
-sc_obj_cells/2        Extract cell list from obj term.
-sc_obj_size/2         Number of cells.
-sc_obj_bbox/3         Bounding box top-left and bottom-right.
-sc_obj_shape/2        Normalized (position-independent) cell set.
-sc_obj_centroid/3     Center of mass, rounded.
-sc_normalize_cells/2  Translate cell set to (0,0) origin, sort.
-sc_objects_of_color/3 Filter objects by color.
-sc_sort_by_size/3     Sort by cell count (asc or desc).
-sc_largest/2          Object with the most cells.
-sc_smallest/2         Object with the fewest cells.
-sc_count/2            Total number of objects.
-sc_count_of_color/3   Count objects of a given color.
-sc_above/2            Obj1 above Obj2 (lower min row).
-sc_below/2            Obj1 below Obj2.
-sc_left_of/2          Obj1 left of Obj2 (lower min col).
-sc_right_of/2         Obj1 right of Obj2.
-sc_cells_touching/2   4-connected neighbor cells exist between objects.
-sc_contained_in/2     Bounding box of Obj1 inside bounding box of Obj2.
-sc_same_shape/2       Identical normalized shapes.
-sc_same_color/2       Same color integer.
+scene_bg_color/2         Most frequent color (background).
+scene_objects/2          All foreground objects as obj(Color, Cells) list.
+scene_grid_to_scene/2    Build scene(Rows, Cols, BgColor, Objects).
+scene_obj_color/2        Extract color from obj term.
+scene_obj_cells/2        Extract cell list from obj term.
+scene_obj_size/2         Number of cells.
+scene_obj_bbox/3         Bounding box top-left and bottom-right.
+scene_obj_shape/2        Normalized (position-independent) cell set.
+scene_obj_centroid/3     Center of mass, rounded.
+scene_normalize_cells/2  Translate cell set to (0,0) origin, sort.
+scene_objects_of_color/3 Filter objects by color.
+scene_sort_by_size/3     Sort by cell count (asc or desc).
+scene_largest/2          Object with the most cells.
+scene_smallest/2         Object with the fewest cells.
+scene_count/2            Total number of objects.
+scene_count_of_color/3   Count objects of a given color.
+scene_above/2            Obj1 above Obj2 (lower min row).
+scene_below/2            Obj1 below Obj2.
+scene_left_of/2          Obj1 left of Obj2 (lower min col).
+scene_right_of/2         Obj1 right of Obj2.
+scene_cells_touching/2   4-connected neighbor cells exist between objects.
+scene_contained_in/2     Bounding box of Obj1 inside bounding box of Obj2.
+scene_same_shape/2       Identical normalized shapes.
+scene_same_color/2       Same color integer.
 
 
 WHAT COMES NEXT
@@ -4133,7 +4133,7 @@ GROUPING
 quant_group_by_color/2, quant_group_by_size/2, quant_group_by_shape/2 partition
 an object list into Color-[Objs] (or Size-[Objs] or Shape-[Objs]) pairs.
 
-    ?- sc_objects(G, Objs), quant_group_by_color(Objs, Groups).
+    ?- scene_objects(G, Objs), quant_group_by_color(Objs, Groups).
 
 UNIQUE SHAPES
 
@@ -4383,7 +4383,7 @@ motion_scene_to_grid(+Scene, -Grid)
 
 motion_scene_gravity(+Scene, -Scene2)
   Applies downward gravity to a scene via a grid round-trip:
-  render -> motion_gravity_down -> sc_grid_to_scene.
+  render -> motion_gravity_down -> scene_grid_to_scene.
   Same-color objects that fall into contact may be merged.
 
   ?- motion_scene_gravity(scene(3,1,0,[obj(2,[r(0,0)])]), Scene2).
@@ -7784,124 +7784,124 @@ Load the pack:
 
 ENCODING AND DECODING
 
-rn_encode/2 converts a flat list to Value-Count pairs:
+run_encode/2 converts a flat list to Value-Count pairs:
 
   % [1,1,2,2,2,1] encodes to [1-2, 2-3, 1-1].
-  rn_encode([1,1,2,2,2,1], Runs).
+  run_encode([1,1,2,2,2,1], Runs).
   % Runs = [1-2, 2-3, 1-1]
 
   % Uniform list collapses to a single run.
-  rn_encode([3,3,3], Runs).
+  run_encode([3,3,3], Runs).
   % Runs = [3-3]
 
-rn_decode/2 converts Value-Count pairs back to a flat list:
+run_decode/2 converts Value-Count pairs back to a flat list:
 
   % Decode [1-2, 2-3] -> [1,1,2,2,2].
-  rn_decode([1-2, 2-3], List).
+  run_decode([1-2, 2-3], List).
   % List = [1,1,2,2,2]
 
 Encoding and decoding are inverses:
 
   % Encode then decode recovers the original.
-  rn_encode([1,2,2,3], Runs),
-  rn_decode(Runs, List).
+  run_encode([1,2,2,3], Runs),
+  run_decode(Runs, List).
   % List = [1,2,2,3]
 
 
 GRID ROW AND COLUMN ENCODING
 
-rn_row_encode/3 encodes a single grid row:
+run_row_encode/3 encodes a single grid row:
 
   G = [[0,0,0],[1,1,2],[0,0,0]],
-  rn_row_encode(G, 1, Runs).
+  run_row_encode(G, 1, Runs).
   % Runs = [1-2, 2-1]
 
-rn_col_encode/3 encodes a single grid column:
+run_col_encode/3 encodes a single grid column:
 
   G = [[1,0],[1,0],[2,0]],
-  rn_col_encode(G, 0, Runs).
+  run_col_encode(G, 0, Runs).
   % Runs = [1-2, 2-1]
 
-rn_grid_rows/2 encodes all rows:
+run_grid_rows/2 encodes all rows:
 
   G = [[1,1,2],[3,3,3]],
-  rn_grid_rows(G, RowRuns).
+  run_grid_rows(G, RowRuns).
   % RowRuns = [[1-2, 2-1], [3-3]]
 
-rn_grid_cols/2 encodes all columns:
+run_grid_cols/2 encodes all columns:
 
   G = [[1,2,1],[1,2,1]],
-  rn_grid_cols(G, ColRuns).
+  run_grid_cols(G, ColRuns).
   % ColRuns = [[1-2], [2-2], [1-2]]
 
 
 ANALYSIS PREDICATES
 
-rn_length/2 gives the total element count of a run list:
+run_length/2 gives the total element count of a run list:
 
   % [1-2, 2-3, 1-1] represents 2+3+1=6 elements.
-  rn_length([1-2, 2-3, 1-1], N).
+  run_length([1-2, 2-3, 1-1], N).
   % N = 6
 
-rn_at/3 looks up the value at a 0-indexed position:
+run_at/3 looks up the value at a 0-indexed position:
 
   % Position 2 falls in the second run of [1-2, 2-3].
-  rn_at([1-2, 2-3], 2, V).
+  run_at([1-2, 2-3], 2, V).
   % V = 2
 
-rn_max_run/3 finds the longest run of a given color:
+run_max_run/3 finds the longest run of a given color:
 
   % Longest run of 2 in [1-2, 2-3, 2-1] is 3.
-  rn_max_run([1-2, 2-3, 2-1], 2, N).
+  run_max_run([1-2, 2-3, 2-1], 2, N).
   % N = 3
 
   % Color absent: max run is 0.
-  rn_max_run([1-2, 2-3], 9, N).
+  run_max_run([1-2, 2-3], 9, N).
   % N = 0
 
-rn_count_runs/3 counts distinct runs of a color:
+run_count_runs/3 counts distinct runs of a color:
 
   % Color 1 appears in 2 runs in [1-2, 2-3, 1-1].
-  rn_count_runs([1-2, 2-3, 1-1], 1, N).
+  run_count_runs([1-2, 2-3, 1-1], 1, N).
   % N = 2
 
-rn_uniform/1 tests whether all values are the same:
+run_uniform/1 tests whether all values are the same:
 
   % All runs have value 5: uniform.
-  rn_uniform([5-3, 5-2, 5-1]).
+  run_uniform([5-3, 5-2, 5-1]).
   % succeeds
 
   % Different values: not uniform.
-  \+ rn_uniform([1-2, 2-3]).
+  \+ run_uniform([1-2, 2-3]).
   % succeeds (\+ means "not provable")
 
 
 STRUCTURAL OPERATIONS
 
-rn_trim/3 removes leading and trailing occurrences of a background value:
+run_trim/3 removes leading and trailing occurrences of a background value:
 
   % Remove 0s from both ends; interior 0 is kept.
-  rn_trim([0,1,0,2,0], 0, Trimmed).
+  run_trim([0,1,0,2,0], 0, Trimmed).
   % Trimmed = [1,0,2]
 
-rn_repeat/3 repeats a sequence N times, merging same-value runs at boundaries:
+run_repeat/3 repeats a sequence N times, merging same-value runs at boundaries:
 
   % No boundary merging needed.
-  rn_repeat([1-2, 2-1], 2, Runs).
+  run_repeat([1-2, 2-1], 2, Runs).
   % Runs = [1-2, 2-1, 1-2, 2-1]
 
   % Boundary merge: [1-3] repeated twice merges to [1-6].
-  rn_repeat([1-3], 2, Runs).
+  run_repeat([1-3], 2, Runs).
   % Runs = [1-6]
 
-rn_positions/3 returns the 0-indexed positions of all cells with a given value:
+run_positions/3 returns the 0-indexed positions of all cells with a given value:
 
   % Color 1 appears at positions 0, 1, and 5.
-  rn_positions([1-2, 2-3, 1-1], 1, Ps).
+  run_positions([1-2, 2-3, 1-1], 1, Ps).
   % Ps = [0, 1, 5]
 
   % Color absent: empty list.
-  rn_positions([1-2, 2-3], 9, Ps).
+  run_positions([1-2, 2-3], 9, Ps).
   % Ps = []
 
 
@@ -7910,26 +7910,26 @@ COMBINING WITH OTHER PACKS
 The run pack integrates naturally with the grid, compare, and rewrite packs:
 
   % Find rows that have the same run-length pattern as a target.
-  rn_row_encode(TargetGrid, 0, Pattern),
+  run_row_encode(TargetGrid, 0, Pattern),
   findall(R,
     (nth0(R, TestGrid, _),
-     rn_row_encode(TestGrid, R, Pattern)),
+     run_row_encode(TestGrid, R, Pattern)),
     MatchingRows).
 
   % Check whether a column is a periodic pattern.
-  rn_col_encode(Grid, 0, ColRuns),
-  rn_uniform(ColRuns).  % true if all column cells are the same color
+  run_col_encode(Grid, 0, ColRuns),
+  run_uniform(ColRuns).  % true if all column cells are the same color
 
   % Get the dominant stripe color (the color with the longest max run in a row).
-  rn_row_encode(Grid, 2, Runs),
-  rn_max_run(Runs, 1, MaxLen).
+  run_row_encode(Grid, 2, Runs),
+  run_max_run(Runs, 1, MaxLen).
 
   % Trim noise from a 1D row and check if it is uniform.
-  rn_row_encode(Grid, R, _Runs),
+  run_row_encode(Grid, R, _Runs),
   nth0(R, Grid, Row),
-  rn_trim(Row, 0, Trimmed),
-  rn_encode(Trimmed, TrimmedRuns),
-  rn_uniform(TrimmedRuns).
+  run_trim(Row, 0, Trimmed),
+  run_encode(Trimmed, TrimmedRuns),
+  run_uniform(TrimmedRuns).
 
 
 END OF CHAPTER 49
@@ -8816,79 +8816,79 @@ These metrics let the system rank hypotheses and select the best one.
 
 SECTION 54.2 - BASIC ACCURACY
 
-sc_accuracy(+Grid1, +Grid2, -Acc)
+score_accuracy(+Grid1, +Grid2, -Acc)
 
 Acc is a float in [0.0, 1.0]. 1.0 means all cells match; 0.0 means none.
 
 Example:
 
-  sc_accuracy([[1,2],[3,4]], [[1,2],[3,4]], Acc).
+  score_accuracy([[1,2],[3,4]], [[1,2],[3,4]], Acc).
   % Acc = 1.0
 
-  sc_accuracy([[1,2],[3,4]], [[1,9],[3,9]], Acc).
+  score_accuracy([[1,2],[3,4]], [[1,9],[3,9]], Acc).
   % Acc = 0.5
 
-sc_cell_match(+Grid1, +Grid2, -N) counts the matching cells.
-sc_cell_total(+Grid, -N) counts all cells (Rows * Cols).
-sc_exact(+Grid1, +Grid2) succeeds if grids are identical.
+score_cell_match(+Grid1, +Grid2, -N) counts the matching cells.
+score_cell_total(+Grid, -N) counts all cells (Rows * Cols).
+score_exact(+Grid1, +Grid2) succeeds if grids are identical.
 
 SECTION 54.3 - COLOR METRICS
 
-sc_color_recall(+Produced, +Expected, +Color, -Recall)
+score_color_recall(+Produced, +Expected, +Color, -Recall)
 
 Recall = (cells produced with Color that are also in Expected) /
          (cells in Expected with Color).
 
 Returns 1.0 if Expected has no cells of Color (vacuously correct).
 
-sc_color_precision(+Produced, +Expected, +Color, -Precision)
+score_color_precision(+Produced, +Expected, +Color, -Precision)
 
 Precision = (cells produced with Color that match Expected) /
             (cells produced with Color).
 
 Returns 1.0 if Produced has no cells of Color.
 
-sc_color_f1(+Produced, +Expected, +Color, -F1)
+score_color_f1(+Produced, +Expected, +Color, -F1)
 
 F1 = 2 * P * R / (P + R). Returns 0.0 if P + R = 0.
 
 SECTION 54.4 - PAIR SCORING
 
-sc_pair_score(+Pair, +Goal, -Acc)
+score_pair_score(+Pair, +Goal, -Acc)
 
 Pair is Input-Expected. Goal is a 2-argument callable Goal(Input, Actual).
-The predicate applies Goal to Input, then calls sc_accuracy(Actual, Expected).
+The predicate applies Goal to Input, then calls score_accuracy(Actual, Expected).
 
-sc_pairs_score(+Pairs, +Goal, -MeanAcc) computes the arithmetic mean accuracy
+score_pairs_score(+Pairs, +Goal, -MeanAcc) computes the arithmetic mean accuracy
 over all pairs in the list. This is the standard ARC-AGI evaluation metric.
 
 SECTION 54.5 - EXACTNESS TESTS
 
-sc_perfect(+Input, +Expected, +Goal) succeeds if Goal produces an exact match.
+score_perfect(+Input, +Expected, +Goal) succeeds if Goal produces an exact match.
 
-sc_pairs_perfect(+Pairs, +Goal) succeeds only if every pair is solved exactly.
+score_pairs_perfect(+Pairs, +Goal) succeeds only if every pair is solved exactly.
 This is the ARC-AGI pass criterion: all training pairs solved perfectly.
 
 SECTION 54.6 - RANKING AND SELECTION
 
-sc_rank(+Candidates, +Expected, -Ranked)
+score_rank(+Candidates, +Expected, -Ranked)
 
 Ranked is a list of Acc-Grid pairs sorted by accuracy descending. The best
 candidate is first.
 
-sc_best(+Candidates, +Expected, -Best)
+score_best(+Candidates, +Expected, -Best)
 
 Best is the highest-accuracy candidate grid.
 
-sc_threshold(+Candidates, +Expected, +MinAcc, -Filtered)
+score_threshold(+Candidates, +Expected, +MinAcc, -Filtered)
 
 Filtered is the subset of Candidates whose accuracy >= MinAcc. Pass
 MinAcc = 1.0 to keep only perfect solutions.
 
 SECTION 54.7 - DESIGN NOTES
 
-sc_accuracy uses float(Match) / float(Total) to guarantee float output.
-Without this, integer division (4/4 = 1 not 1.0) would break sc_rank.
+score_accuracy uses float(Match) / float(Total) to guarantee float output.
+Without this, integer division (4/4 = 1 not 1.0) would break score_rank.
 
 SECTION 54.8 - ACCEPTANCE TESTS
 
@@ -11110,7 +11110,7 @@ Use region_region to identify the content region around a specific cell, then us
 the scene pack to analyze objects within that region:
 
 ?- region_region(Grid, 0, R, C, Region),
-   sc_objects(Region, 0, Objs).
+   scene_objects(Region, 0, Objs).
 
 
 74.9 Summary
@@ -16660,128 +16660,128 @@ and column of the cell list.
 
 Object Centroid
 
-ag_centroid(+Obj, -r(CR,CC)): compute the floor-average centroid of an obj term.
+arrange_centroid(+Obj, -r(CR,CC)): compute the floor-average centroid of an obj term.
 The centroid row is the sum of all cell rows divided by the cell count (// operator).
 The centroid column is computed the same way.
 
-    ag_centroid(obj(1, [r(4,6)]), C).
+    arrange_centroid(obj(1, [r(4,6)]), C).
     % C = r(4,6)   (single cell; centroid is the cell itself)
 
-    ag_centroid(obj(2, [r(0,0), r(0,2)]), C).
+    arrange_centroid(obj(2, [r(0,0), r(0,2)]), C).
     % C = r(0,1)   (sum of cols = 0+2=2; 2//2=1)
 
-    ag_centroid(obj(3, [r(0,0), r(0,1), r(1,0), r(1,1)]), C).
+    arrange_centroid(obj(3, [r(0,0), r(0,1), r(1,0), r(1,1)]), C).
     % C = r(0,0)   (sum of rows = 0+0+1+1=2; 2//4=0)
 
-ag_offset(+Obj1, +Obj2, -r(DR,DC)): displacement vector from Obj1 centroid to Obj2.
+arrange_offset(+Obj1, +Obj2, -r(DR,DC)): displacement vector from Obj1 centroid to Obj2.
 
-    ag_offset(obj(1,[r(0,0)]), obj(2,[r(0,3)]), Offset).
+    arrange_offset(obj(1,[r(0,0)]), obj(2,[r(0,3)]), Offset).
     % Offset = r(0,3)
 
-    ag_offset(obj(1,[r(1,1)]), obj(2,[r(3,4)]), Offset).
+    arrange_offset(obj(1,[r(1,1)]), obj(2,[r(3,4)]), Offset).
     % Offset = r(2,3)
 
 
 Pairwise Spatial Order
 
-ag_row_order(+Obj1, +Obj2): Obj1 centroid row is at most Obj2 centroid row.
+arrange_row_order(+Obj1, +Obj2): Obj1 centroid row is at most Obj2 centroid row.
 
-    ag_row_order(obj(1,[r(0,0)]), obj(2,[r(3,0)])).  % succeeds (0 =< 3)
-    ag_row_order(obj(1,[r(2,0)]), obj(2,[r(2,5)])).  % succeeds (equal rows)
-    % ag_row_order(obj(1,[r(5,0)]), obj(2,[r(1,0)])).  % fails (5 > 1)
+    arrange_row_order(obj(1,[r(0,0)]), obj(2,[r(3,0)])).  % succeeds (0 =< 3)
+    arrange_row_order(obj(1,[r(2,0)]), obj(2,[r(2,5)])).  % succeeds (equal rows)
+    % arrange_row_order(obj(1,[r(5,0)]), obj(2,[r(1,0)])).  % fails (5 > 1)
 
-ag_col_order(+Obj1, +Obj2): Obj1 centroid column is at most Obj2 centroid column.
+arrange_col_order(+Obj1, +Obj2): Obj1 centroid column is at most Obj2 centroid column.
 
-    ag_col_order(obj(1,[r(0,0)]), obj(2,[r(0,4)])).  % succeeds (0 =< 4)
-    % ag_col_order(obj(1,[r(0,7)]), obj(2,[r(0,2)])).  % fails (7 > 2)
+    arrange_col_order(obj(1,[r(0,0)]), obj(2,[r(0,4)])).  % succeeds (0 =< 4)
+    % arrange_col_order(obj(1,[r(0,7)]), obj(2,[r(0,2)])).  % fails (7 > 2)
 
-ag_row_aligned(+Obj1, +Obj2): both objects share the same centroid row.
+arrange_row_aligned(+Obj1, +Obj2): both objects share the same centroid row.
 
-    ag_row_aligned(obj(1,[r(2,0)]), obj(2,[r(2,5)])).  % succeeds
-    % ag_row_aligned(obj(1,[r(0,0)]), obj(2,[r(1,0)])).  % fails
+    arrange_row_aligned(obj(1,[r(2,0)]), obj(2,[r(2,5)])).  % succeeds
+    % arrange_row_aligned(obj(1,[r(0,0)]), obj(2,[r(1,0)])).  % fails
 
-ag_col_aligned(+Obj1, +Obj2): both objects share the same centroid column.
+arrange_col_aligned(+Obj1, +Obj2): both objects share the same centroid column.
 
-    ag_col_aligned(obj(1,[r(0,3)]), obj(2,[r(4,3)])).  % succeeds
+    arrange_col_aligned(obj(1,[r(0,3)]), obj(2,[r(4,3)])).  % succeeds
 
 
 Sorting Objects by Position
 
-ag_sort_by_row(+Objs, -Sorted): sort obj list top to bottom by centroid row.
+arrange_sort_by_row(+Objs, -Sorted): sort obj list top to bottom by centroid row.
 Uses keysort/2, which is stable: equal-row objects preserve their input order.
 
     Objs = [obj(1,[r(3,0)]), obj(2,[r(1,0)]), obj(3,[r(2,0)])],
-    ag_sort_by_row(Objs, Sorted).
+    arrange_sort_by_row(Objs, Sorted).
     % Sorted = [obj(2,[r(1,0)]), obj(3,[r(2,0)]), obj(1,[r(3,0)])]
 
-ag_sort_by_col(+Objs, -Sorted): sort obj list left to right by centroid column.
+arrange_sort_by_col(+Objs, -Sorted): sort obj list left to right by centroid column.
 
     Objs = [obj(1,[r(0,5)]), obj(2,[r(0,1)]), obj(3,[r(0,3)])],
-    ag_sort_by_col(Objs, Sorted).
+    arrange_sort_by_col(Objs, Sorted).
     % Sorted = [obj(2,[r(0,1)]), obj(3,[r(0,3)]), obj(1,[r(0,5)])]
 
 
 Gap Analysis
 
-ag_row_gaps(+Objs, -Gaps): consecutive gaps between sorted distinct centroid rows.
+arrange_row_gaps(+Objs, -Gaps): consecutive gaps between sorted distinct centroid rows.
 Deduplicates centroid rows first (sort/2), so coincident objects count once.
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(3,0)]), obj(3,[r(7,0)])],
-    ag_row_gaps(Objs, Gaps).
+    arrange_row_gaps(Objs, Gaps).
     % Gaps = [3, 4]
 
     Objs2 = [obj(1,[r(0,0)]), obj(2,[r(2,0)]), obj(3,[r(4,0)])],
-    ag_row_gaps(Objs2, Gaps2).
+    arrange_row_gaps(Objs2, Gaps2).
     % Gaps2 = [2, 2]
 
-ag_col_gaps(+Objs, -Gaps): consecutive gaps between sorted distinct centroid columns.
+arrange_col_gaps(+Objs, -Gaps): consecutive gaps between sorted distinct centroid columns.
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(0,3)]), obj(3,[r(0,6)])],
-    ag_col_gaps(Objs, Gaps).
+    arrange_col_gaps(Objs, Gaps).
     % Gaps = [3, 3]
 
-ag_equal_row_gaps(+Objs): all consecutive centroid row gaps are equal.
+arrange_equal_row_gaps(+Objs): all consecutive centroid row gaps are equal.
 Requires at least two objects with distinct centroid rows.
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(3,0)]), obj(3,[r(6,0)])],
-    ag_equal_row_gaps(Objs).  % succeeds (both gaps are 3)
+    arrange_equal_row_gaps(Objs).  % succeeds (both gaps are 3)
 
     Objs2 = [obj(1,[r(0,0)]), obj(2,[r(2,0)]), obj(3,[r(5,0)])],
-    % ag_equal_row_gaps(Objs2).  % fails (gaps are 2 and 3)
+    % arrange_equal_row_gaps(Objs2).  % fails (gaps are 2 and 3)
 
-ag_equal_col_gaps(+Objs): all consecutive centroid column gaps are equal.
+arrange_equal_col_gaps(+Objs): all consecutive centroid column gaps are equal.
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(0,4)]), obj(3,[r(0,8)])],
-    ag_equal_col_gaps(Objs).  % succeeds (both gaps are 4)
+    arrange_equal_col_gaps(Objs).  % succeeds (both gaps are 4)
 
 
 Group Bounding Box
 
-ag_group_bbox(+Objs, -R0, -C0, -R1, -C1): bounding box of all cells of all objs.
+arrange_group_bbox(+Objs, -R0, -C0, -R1, -C1): bounding box of all cells of all objs.
 This is not the box around centroids but around the actual cells.
 
     Objs = [obj(1,[r(0,0), r(0,1)]), obj(2,[r(3,2), r(3,3)])],
-    ag_group_bbox(Objs, R0, C0, R1, C1).
+    arrange_group_bbox(Objs, R0, C0, R1, C1).
     % R0=0, C0=0, R1=3, C1=3
 
     Objs2 = [obj(1,[r(0,0)]), obj(2,[r(5,0)]), obj(3,[r(0,8)])],
-    ag_group_bbox(Objs2, R0, C0, R1, C1).
+    arrange_group_bbox(Objs2, R0, C0, R1, C1).
     % R0=0, C0=0, R1=5, C1=8
 
 
 Nearest Neighbor
 
-ag_nearest(+RefObj, +Objs, -Nearest): find the obj in Objs whose centroid is
+arrange_nearest(+RefObj, +Objs, -Nearest): find the obj in Objs whose centroid is
 closest (Manhattan distance) to RefObj's centroid.
 
     Ref = obj(1, [r(0,0)]),
     Candidates = [obj(2,[r(0,5)]), obj(3,[r(0,2)])],
-    ag_nearest(Ref, Candidates, Nearest).
+    arrange_nearest(Ref, Candidates, Nearest).
     % Nearest = obj(3,[r(0,2)])   (distance 2 vs 5)
 
     Ref2 = obj(1, [r(5,5)]),
     Cands2 = [obj(2,[r(0,0)]), obj(3,[r(4,4)]), obj(4,[r(9,9)])],
-    ag_nearest(Ref2, Cands2, N).
+    arrange_nearest(Ref2, Cands2, N).
     % N = obj(3,[r(4,4)])   (Manhattan distance 2)
 
 
@@ -17754,28 +17754,28 @@ objdelta_cell_diff/4: Added (in O2 not O1) and Removed (in O1 not O2).
 Chapter 148: Object Tiling and Multi-Copy Layout (objcopy Pack, tc_*, Layer 177)
 
 1. Placement
-tc_place_at/4: place obj with bbox top-left at (R0, C0).
-tc_recolor_all/3: recolor all objs to a uniform color.
+objcopy_place_at/4: place obj with bbox top-left at (R0, C0).
+objcopy_recolor_all/3: recolor all objs to a uniform color.
 
 2. Tiling
-tc_tile_row/4: N copies along a row, Step cols apart.
-tc_tile_col/4: N copies along a column, Step rows apart.
-tc_tile_grid/6: NR x NC grid of copies.
-tc_at_positions/3: one copy per r(R,C) in a position list.
+objcopy_tile_row/4: N copies along a row, Step cols apart.
+objcopy_tile_col/4: N copies along a column, Step rows apart.
+objcopy_tile_grid/6: NR x NC grid of copies.
+objcopy_at_positions/3: one copy per r(R,C) in a position list.
 
 3. Alignment
-tc_align_top/2: all objs to minimum top row.
-tc_align_left/2: all objs to minimum left col.
+objcopy_align_top/2: all objs to minimum top row.
+objcopy_align_left/2: all objs to minimum left col.
 
 4. Packing
-tc_pack_row/5: pack in a row with Gap between bboxes.
-tc_pack_col/5: pack in a column with Gap between bboxes.
+objcopy_pack_row/5: pack in a row with Gap between bboxes.
+objcopy_pack_col/5: pack in a column with Gap between bboxes.
 
 5. Spreading and Centering
-tc_spread_h/4: redistribute at fixed column intervals.
-tc_spread_v/4: redistribute at fixed row intervals.
-tc_center/4: center in H x W canvas.
-tc_flip_h/3: reflect within canvas width W.
+objcopy_spread_h/4: redistribute at fixed column intervals.
+objcopy_spread_v/4: redistribute at fixed row intervals.
+objcopy_center/4: center in H x W canvas.
+objcopy_flip_h/3: reflect within canvas width W.
 
 
 Chapter 149: Object-List Correspondence and Matching (objmatch Pack, mx_*, Layer 178)
@@ -19664,15 +19664,15 @@ The taskcat pack (Work Package 273, Layer 252) provides fourteen predicates for
 classifying grid transformation tasks by type and selecting solving strategies.
 The four task categories are: single_rule, multi_step, context_gated, symbol_table.
 
-Predicates: tc_categorize/2, tc_is_single_rule/1, tc_is_multi_step/1,
-tc_has_context_gate/1, tc_has_symbol_table/1, tc_suggest_strategies/2,
-tc_preserves_dims/1, tc_preserves_colors/1, tc_consistent_change_count/1,
-tc_max_change_count/2, tc_distinct_change_patterns/2, tc_is_fill_task/1,
-tc_is_deletion_task/1, tc_confidence/2.
+Predicates: taskcat_categorize/2, taskcat_is_single_rule/1, taskcat_is_multi_step/1,
+taskcat_has_context_gate/1, taskcat_has_symbol_table/1, taskcat_suggest_strategies/2,
+taskcat_preserves_dims/1, taskcat_preserves_colors/1, taskcat_consistent_change_count/1,
+taskcat_max_change_count/2, taskcat_distinct_change_patterns/2, taskcat_is_fill_task/1,
+taskcat_is_deletion_task/1, taskcat_confidence/2.
 
-Key design: Chain of Responsibility ordering in tc_categorize (simplest wins).
-tc_suggest_strategies returns ordered fallback strategy lists per category.
-tc_confidence provides a 0.0-1.0 score using dims, count, and pattern uniformity.
+Key design: Chain of Responsibility ordering in taskcat_categorize (simplest wins).
+taskcat_suggest_strategies returns ordered fallback strategy lists per category.
+taskcat_confidence provides a 0.0-1.0 score using dims, count, and pattern uniformity.
 
 See docs/tutorial/Ch234_TaskCat.txt for full details and examples.
 

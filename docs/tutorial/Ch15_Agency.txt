@@ -38,14 +38,14 @@ Every goal pursuit is tracked as a loop.
 
 Step 1 - Create a loop:
 
-    ?- ag_loop_create(my_goal, 20, LoopId).
+    ?- agency_loop_create(my_goal, 20, LoopId).
     LoopId = ag_loop_1.
 
 This allocates a unique loop identifier, stores the goal (my_goal) and budget (20 steps), and initializes the goal stack with my_goal as the first item.
 
 Step 2 - Run the loop:
 
-    ?- ag_loop_run(LoopId, my_reasoner, Outcome).
+    ?- agency_loop_run(LoopId, my_reasoner, Outcome).
 
 my_reasoner is the name of a Prolog predicate you write that decides what to do at each step.
 
@@ -55,12 +55,12 @@ Your reasoner produces a Thought (a term recording your reasoning) and an Action
 
 Step 3 - Inspect the outcome:
 
-    ?- ag_loop_outcome(LoopId, Outcome).
+    ?- agency_loop_outcome(LoopId, Outcome).
     Outcome = done(success).
 
 Step 4 - Inspect the trace:
 
-    ?- ag_loop_trace(LoopId, Steps).
+    ?- agency_loop_trace(LoopId, Steps).
 
 
 THE SEVEN ACTION TYPES
@@ -127,9 +127,9 @@ Here is a simple example that evaluates one arithmetic goal and then marks done:
             Action  = action_mark_done(success)
         ).
 
-The reasoner can also call ag_detect_loop/2 to check for cycles:
+The reasoner can also call agency_detect_loop/2 to check for cycles:
 
-    ?- ag_detect_loop(LoopId, IsLooping).
+    ?- agency_detect_loop(LoopId, IsLooping).
     IsLooping = false.
 
 If IsLooping is true, the reasoner can escalate or change strategy.
@@ -145,11 +145,11 @@ As the loop runs, the reasoner can push subgoals to decompose the top-level goal
 
 To push a subgoal manually:
 
-    ?- ag_push_subgoal(LoopId, sub_task_a).
+    ?- agency_push_subgoal(LoopId, sub_task_a).
 
 To pop the current subgoal:
 
-    ?- ag_pop_subgoal(LoopId, Popped).
+    ?- agency_pop_subgoal(LoopId, Popped).
     Popped = sub_task_a.
 
 
@@ -161,7 +161,7 @@ Each step costs one unit of budget.
 
 To check how much budget remains:
 
-    ?- ag_budget_remaining(LoopId, N).
+    ?- agency_budget_remaining(LoopId, N).
     N = 15.
 
 The budget is decremented automatically at the start of each step.
@@ -173,16 +173,16 @@ The budget floor is zero; it never goes negative.
 
 LOOP DETECTION
 
-If your reasoner keeps producing the same thought and the same action in consecutive steps, ag_detect_loop/2 returns true.
+If your reasoner keeps producing the same thought and the same action in consecutive steps, agency_detect_loop/2 returns true.
 
-    ?- ag_detect_loop(LoopId, IsLooping).
+    ?- agency_detect_loop(LoopId, IsLooping).
 
 Check this in your reasoner to avoid getting stuck.
 
 
 ESCALATION
 
-When the loop cannot proceed without human input, call ag_escalate:
+When the loop cannot proceed without human input, call agency_escalate:
 
     Action = action_escalate(need_password_for_database)
 
@@ -192,7 +192,7 @@ The loop is now terminal.
 
 To check the outcome:
 
-    ?- ag_loop_outcome(LoopId, escalated(Reason)).
+    ?- agency_loop_outcome(LoopId, escalated(Reason)).
     Reason = need_password_for_database.
 
 
@@ -200,7 +200,7 @@ READING THE TRACE
 
 Every step is recorded.
 
-    ?- ag_loop_trace(LoopId, Steps).
+    ?- agency_loop_trace(LoopId, Steps).
 
 Each entry is a step(N, Thought, Action, Observation) term.
 
@@ -219,7 +219,7 @@ TAKING INDIVIDUAL STEPS
 
 Instead of running the full loop, you can take one step at a time:
 
-    ?- ag_loop_step(LoopId, my_reasoner, StepResult).
+    ?- agency_loop_step(LoopId, my_reasoner, StepResult).
     StepResult = step_ok(Thought, Action, Observation).
 
 This gives you fine-grained control, useful for debugging or interactive sessions.
@@ -227,19 +227,19 @@ This gives you fine-grained control, useful for debugging or interactive session
 
 SUMMARY
 
-ag_loop_create/3      Allocate a loop with a goal and step budget.
-ag_loop_run/3         Run the loop to completion.
-ag_loop_step/3        Execute a single step.
-ag_loop_done/1        Check whether the loop has reached a terminal state.
-ag_loop_outcome/2     Retrieve the final status.
-ag_loop_trace/2       Retrieve the full step-by-step trace.
-ag_push_subgoal/2     Add a subgoal to the goal stack.
-ag_pop_subgoal/2      Remove the top subgoal.
-ag_budget_remaining/2 Query remaining steps.
-ag_budget_decrement/1 Consume one step (called automatically each step).
-ag_detect_loop/2      Detect repeated thought-action pairs.
-ag_escalate/2         Record escalation and halt the loop safely.
-ag_step_record/4      Record one step manually.
+agency_loop_create/3      Allocate a loop with a goal and step budget.
+agency_loop_run/3         Run the loop to completion.
+agency_loop_step/3        Execute a single step.
+agency_loop_done/1        Check whether the loop has reached a terminal state.
+agency_loop_outcome/2     Retrieve the final status.
+agency_loop_trace/2       Retrieve the full step-by-step trace.
+agency_push_subgoal/2     Add a subgoal to the goal stack.
+agency_pop_subgoal/2      Remove the top subgoal.
+agency_budget_remaining/2 Query remaining steps.
+agency_budget_decrement/1 Consume one step (called automatically each step).
+agency_detect_loop/2      Detect repeated thought-action pairs.
+agency_escalate/2         Record escalation and halt the loop safely.
+agency_step_record/4      Record one step manually.
 
 
 WHAT COMES NEXT

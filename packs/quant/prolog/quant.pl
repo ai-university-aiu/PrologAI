@@ -37,7 +37,7 @@
 % quant_histogram(+Objects, -Pairs): list of Color-Count pairs for all object colors.
 quant_histogram(Objects, Pairs) :-
 % Collect all colors from the objects.
-    maplist(sc_obj_color, Objects, Colors),
+    maplist(scene_obj_color, Objects, Colors),
 % Sort colors to get the unique set.
     sort(Colors, UniqueColors),
 % Build one Color-Count pair per unique color.
@@ -46,7 +46,7 @@ quant_histogram(Objects, Pairs) :-
 % color_count_pair(+Objects, +Color, -Color-Count): helper for quant_histogram.
 color_count_pair(Objects, Color, Color-Count) :-
 % Count how many objects have this color.
-    sc_count_of_color(Objects, Color, Count).
+    scene_count_of_color(Objects, Color, Count).
 
 
 % GROUPING
@@ -62,7 +62,7 @@ quant_group_by_color(Objects, Groups) :-
 % obj_to_color_pair(+Obj, -Color-Obj): build a keyed pair for grouping.
 obj_to_color_pair(Obj, Color-Obj) :-
 % Extract the color as the grouping key.
-    sc_obj_color(Obj, Color).
+    scene_obj_color(Obj, Color).
 
 % quant_group_by_size(+Objects, -Groups): list of Size-[Objects] pairs.
 quant_group_by_size(Objects, Groups) :-
@@ -76,7 +76,7 @@ quant_group_by_size(Objects, Groups) :-
 % obj_to_size_pair(+Obj, -Size-Obj): build a size-keyed pair for grouping.
 obj_to_size_pair(Obj, Size-Obj) :-
 % Compute cell count as the grouping key.
-    sc_obj_size(Obj, Size).
+    scene_obj_size(Obj, Size).
 
 % quant_group_by_shape(+Objects, -Groups): list of Shape-[Objects] pairs.
 quant_group_by_shape(Objects, Groups) :-
@@ -90,7 +90,7 @@ quant_group_by_shape(Objects, Groups) :-
 % obj_to_shape_pair(+Obj, -Shape-Obj): build a shape-keyed pair for grouping.
 obj_to_shape_pair(Obj, Shape-Obj) :-
 % Normalize the cell set as the grouping key.
-    sc_obj_shape(Obj, Shape).
+    scene_obj_shape(Obj, Shape).
 
 
 % FREQUENCY ANALYSIS
@@ -131,7 +131,7 @@ quant_min_color_count(Objects, Min) :-
 % quant_unique_shapes(+Objects, -Shapes): sorted list of distinct normalized shapes.
 quant_unique_shapes(Objects, Shapes) :-
 % Compute the normalized shape of every object.
-    maplist(sc_obj_shape, Objects, RawShapes),
+    maplist(scene_obj_shape, Objects, RawShapes),
 % Remove duplicates, keeping canonical order.
     sort(RawShapes, Shapes).
 
@@ -153,14 +153,14 @@ quant_all_same_color([_]).
 % Single-element list: trivially true.
 quant_all_same_color([H|T]) :-
 % Get the reference color from the first object.
-    sc_obj_color(H, C),
+    scene_obj_color(H, C),
 % Verify every remaining object has the same color.
     maplist(has_color_eq(C), T).
 
 % has_color_eq(+Color, +Obj): succeeds if Obj has Color.
 has_color_eq(Color, Obj) :-
-% Delegate to sc_obj_color for color extraction.
-    sc_obj_color(Obj, Color).
+% Delegate to scene_obj_color for color extraction.
+    scene_obj_color(Obj, Color).
 
 % quant_all_same_size(+Objects): succeeds if all objects have the same cell count.
 quant_all_same_size([]).
@@ -169,14 +169,14 @@ quant_all_same_size([_]).
 % Single element: trivially true.
 quant_all_same_size([H|T]) :-
 % Get the reference size from the first object.
-    sc_obj_size(H, S),
+    scene_obj_size(H, S),
 % Verify every remaining object has the same size.
     maplist(has_size_eq(S), T).
 
 % has_size_eq(+Size, +Obj): succeeds if Obj has Size cells.
 has_size_eq(Size, Obj) :-
-% Delegate to sc_obj_size for size extraction.
-    sc_obj_size(Obj, Size).
+% Delegate to scene_obj_size for size extraction.
+    scene_obj_size(Obj, Size).
 
 % quant_all_same_shape(+Objects): succeeds if all objects have the same normalized shape.
 quant_all_same_shape([]).
@@ -185,23 +185,23 @@ quant_all_same_shape([_]).
 % Single element: trivially true.
 quant_all_same_shape([H|T]) :-
 % Compute the reference normalized shape from the first object.
-    sc_obj_shape(H, Shape),
+    scene_obj_shape(H, Shape),
 % Verify every remaining object has the same normalized shape.
     maplist(has_shape_eq(Shape), T).
 
 % has_shape_eq(+Shape, +Obj): succeeds if Obj's normalized shape equals Shape.
 has_shape_eq(Shape, Obj) :-
 % Normalize and compare.
-    sc_obj_shape(Obj, Shape).
+    scene_obj_shape(Obj, Shape).
 
 
 % MULTISET MATCHING
 % quant_colors_match(+Objects1, +Objects2): same multiset of colors in both lists.
 quant_colors_match(Objs1, Objs2) :-
 % Collect colors from first list.
-    maplist(sc_obj_color, Objs1, Colors1),
+    maplist(scene_obj_color, Objs1, Colors1),
 % Collect colors from second list.
-    maplist(sc_obj_color, Objs2, Colors2),
+    maplist(scene_obj_color, Objs2, Colors2),
 % Sort both (multiset sort) and compare.
     msort(Colors1, S1),
     msort(Colors2, S2),
@@ -211,8 +211,8 @@ quant_colors_match(Objs1, Objs2) :-
 % quant_shapes_match(+Objects1, +Objects2): same multiset of normalized shapes.
 quant_shapes_match(Objs1, Objs2) :-
 % Compute normalized shapes of both lists.
-    maplist(sc_obj_shape, Objs1, Shapes1),
-    maplist(sc_obj_shape, Objs2, Shapes2),
+    maplist(scene_obj_shape, Objs1, Shapes1),
+    maplist(scene_obj_shape, Objs2, Shapes2),
 % Sort both shape lists for multiset comparison.
     msort(Shapes1, S1),
     msort(Shapes2, S2),
@@ -222,8 +222,8 @@ quant_shapes_match(Objs1, Objs2) :-
 % quant_sizes_match(+Objects1, +Objects2): same multiset of sizes.
 quant_sizes_match(Objs1, Objs2) :-
 % Compute sizes of both lists.
-    maplist(sc_obj_size, Objs1, Sizes1),
-    maplist(sc_obj_size, Objs2, Sizes2),
+    maplist(scene_obj_size, Objs1, Sizes1),
+    maplist(scene_obj_size, Objs2, Sizes2),
 % Sort both for multiset comparison.
     msort(Sizes1, S1),
     msort(Sizes2, S2),

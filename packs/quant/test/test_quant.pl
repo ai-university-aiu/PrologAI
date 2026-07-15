@@ -135,8 +135,8 @@ test(count_where_size2) :-
 :- end_tests(quant_count_where).
 
 % Helper predicates for count_where tests (named, not lambdas).
-has_color_1(Obj) :- sc_obj_color(Obj, 1).
-has_size_2(Obj) :- sc_obj_size(Obj, 2).
+has_color_1(Obj) :- scene_obj_color(Obj, 1).
+has_size_2(Obj) :- scene_obj_size(Obj, 2).
 
 
 :- begin_tests(quant_uniformity).
