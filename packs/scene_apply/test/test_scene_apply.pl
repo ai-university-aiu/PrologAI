@@ -75,21 +75,21 @@ test(apply_keep_color) :-
     red_dot(R), blue_dot(B), red_bar(RB),
     scene_apply_apply(keep_color(r), [R, B, RB], [R, RB]).
 
-% --- scene_apply_apply: sort_size_desc / sort_size_asc ---
+% --- scene_apply_apply: sorting_size_desc / sorting_size_asc ---
 
 test(apply_sort_size_desc) :-
     red_dot(R), red_bar(RB),
-    scene_apply_apply(sort_size_desc, [R, RB], [RB, R]).
+    scene_apply_apply(sorting_size_desc, [R, RB], [RB, R]).
 
 test(apply_sort_size_asc) :-
     red_dot(R), red_bar(RB),
-    scene_apply_apply(sort_size_asc, [RB, R], [R, RB]).
+    scene_apply_apply(sorting_size_asc, [RB, R], [R, RB]).
 
-% --- scene_apply_apply: sort_pos ---
+% --- scene_apply_apply: sorting_pos ---
 
 test(apply_sort_pos) :-
     green_dot(G), blue_dot(B), red_dot(R),
-    scene_apply_apply(sort_pos, [G, B, R], [R, B, G]).
+    scene_apply_apply(sorting_pos, [G, B, R], [R, B, G]).
 
 % --- scene_apply_apply: top_n ---
 
@@ -170,7 +170,7 @@ test(rule_type_filter) :-
     scene_apply_rule_type(keep_color(r), filter).
 
 test(rule_type_order) :-
-    scene_apply_rule_type(sort_size_desc, order).
+    scene_apply_rule_type(sorting_size_desc, order).
 
 test(rule_type_dedup) :-
     scene_apply_rule_type(dedup_form, dedup).

@@ -267,7 +267,7 @@ Everything is inspectable.
 | `remap` | Color Remapping and Palette Manipulation (PR 98) |
 | `logic` | Boolean and Mask Grid Operations (PR 99) |
 | `window` | Sliding Window and Neighborhood Operations (PR 100) |
-| `sort` | Sorting, Ranking, and Ordering (PR 101) |
+| `sorting` | Sorting, Ranking, and Ordering (PR 101) |
 | `tile` | Tiling, Stamping, and Period Detection (PR 102) |
 | `trace` | Path Tracing, Rays, and Grid Boundaries (PR 103) |
 | `label` | Connected Component Labeling and Region Queries (PR 104) |
@@ -289,7 +289,7 @@ Everything is inspectable.
 | `automaton` | Cellular Automaton Neighborhood Aggregation (PR 141) |
 | `cross` | 1D Cross-Section Extraction from 2D Grids (PR 142) |
 | `mask` | Boolean Mask Operations on 2D Grids (PR 143) |
-| `table` | Grid-as-Table Operations (PR 144) |
+| `data_table` | Grid-as-Table Operations (PR 144) |
 | `numeric_sequence` | Numerical Sequence Operations on 1D Lists (PR 145) |
 | `grid_math` | Cell-Wise Arithmetic on 2D Grids (PR 146) |
 | `block` | Rectangular Sub-Grid Block Decomposition (PR 148) |

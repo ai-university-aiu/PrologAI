@@ -84,7 +84,7 @@ test(single_object) :-
 
 :- begin_tests(order_sort_color).
 
-test(sort_colors_asc) :-
+test(sorting_colors_asc) :-
     make_obj(3, [0-0], O3), make_obj(1, [1-0], O1), make_obj(2, [2-0], O2),
     order_sort_color([O3, O1, O2], [O1, O2, O3]).
 

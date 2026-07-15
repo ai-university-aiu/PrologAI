@@ -137,32 +137,32 @@ test(keep_color_none) :-
 
 % --- scene_transform_sort_size_desc/2 ---
 
-test(sort_size_desc_basic) :-
+test(sorting_size_desc_basic) :-
     red_dot(D), red_bar(B), lshape(L),
     % sizes: 1, 3, 3
     scene_transform_sort_size_desc([D, B, L], [First|_]),
     First \== D.  % smallest should not be first
 
-test(sort_size_desc_empty) :-
+test(sorting_size_desc_empty) :-
     scene_transform_sort_size_desc([], []).
 
-test(sort_size_desc_order) :-
+test(sorting_size_desc_order) :-
     red_dot(D), red_bar(B),
     scene_transform_sort_size_desc([D, B], [B, D]).
 
 % --- scene_transform_sort_size_asc/2 ---
 
-test(sort_size_asc_basic) :-
+test(sorting_size_asc_basic) :-
     red_dot(D), red_bar(B),
     scene_transform_sort_size_asc([D, B], [D, B]).
 
-test(sort_size_asc_reverse) :-
+test(sorting_size_asc_reverse) :-
     red_dot(D), red_bar(B),
     scene_transform_sort_size_asc([B, D], [D, B]).
 
 % --- scene_transform_sort_pos/2 ---
 
-test(sort_pos_basic) :-
+test(sorting_pos_basic) :-
     green_dot(G),  % r(1,0)
     red_dot(R),    % r(0,0)
     blue_dot(B),   % r(0,1)
@@ -224,7 +224,7 @@ test(top_n_exact) :-
     scene_transform_top_n([D, B], 2, TopN),
     length(TopN, 2).
 
-test(sort_pos_single) :-
+test(sorting_pos_single) :-
     red_dot(R),
     scene_transform_sort_pos([R], [R]).
 

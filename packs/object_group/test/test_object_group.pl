@@ -249,19 +249,19 @@ test(all_same_size_empty) :-
 
 % --- object_group_sort_desc/2 ---
 
-test(sort_desc_basic) :-
+test(sorting_desc_basic) :-
     red_dot(R), blue_dot(B), red_bar(RB), red_sq(S),
     object_group_by_color([R, B, RB, S], Groups),
     object_group_sort_desc(Groups, [First|_]),
     First = r-_.
 
-test(sort_desc_equal) :-
+test(sorting_desc_equal) :-
     red_dot(R), blue_dot(B),
     object_group_by_color([R, B], Groups),
     object_group_sort_desc(Groups, Sorted),
     length(Sorted, 2).
 
-test(sort_desc_three) :-
+test(sorting_desc_three) :-
     red_dot(R), blue_dot(B), red_bar(RB), red_sq(S), green_dot(G),
     object_group_by_color([R, B, RB, S, G], Groups),
     % r has 3, b has 1, g has 1

@@ -108,7 +108,7 @@ transform_generate_from_scenes(Before, After, Candidates) :-
     ;   MapRules = []
     ),
     transform_generate_shift_candidates(3, 3, Shifts),
-    Sorting = [sort_size_desc, sort_size_asc, to_origin, identity],
+    Sorting = [sorting_size_desc, sorting_size_asc, to_origin, identity],
     append([Recolors, RecolorAlls, Removes, Keeps, MapRules, Shifts, Sorting], Combined),
     list_to_set(Combined, Candidates).
 
@@ -173,16 +173,16 @@ transform_generate_apply_(remove_color(Color), Scene, Result) :-
     include(transform_generate_not_color_(Color), Scene, Result).
 transform_generate_apply_(keep_color(Color), Scene, Result) :-
     include(transform_generate_is_color_(Color), Scene, Result).
-transform_generate_apply_(sort_size_desc, Scene, Result) :-
+transform_generate_apply_(sorting_size_desc, Scene, Result) :-
     findall(NegN-O, (member(O, Scene), O=obj(_,Cells), length(Cells,N), NegN is -N), Keyed),
     msort(Keyed, Sorted),
     transform_generate_values_(Sorted, Result).
-transform_generate_apply_(sort_size_asc, Scene, Result) :-
+transform_generate_apply_(sorting_size_asc, Scene, Result) :-
     findall(N-O, (member(O, Scene), O=obj(_,Cells), length(Cells,N)), Keyed),
     msort(Keyed, Sorted),
     transform_generate_values_(Sorted, Result).
 transform_generate_apply_(top_n(N), Scene, Result) :-
-    transform_generate_apply_(sort_size_desc, Scene, Sorted),
+    transform_generate_apply_(sorting_size_desc, Scene, Sorted),
     length(Sorted, Len),
     Take is min(N, Len),
     length(Result, Take),
@@ -230,6 +230,6 @@ transform_generate_all_scene_candidates(Scene, MaxShift, Candidates) :-
     ->  findall(top_n(K), between(1, Len, K), Tops)
     ;   Tops = []
     ),
-    Extras = [to_origin, sort_size_desc, sort_size_asc, identity],
+    Extras = [to_origin, sorting_size_desc, sorting_size_asc, identity],
     append([Recolors, RecolorAlls, Removes, Keeps, Shifts, Tops, Extras], Combined),
     list_to_set(Combined, Candidates).

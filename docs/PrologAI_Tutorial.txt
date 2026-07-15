@@ -9724,122 +9724,122 @@ Sort the columns so the emptiest come first.
 
 62.1 Loading the Pack
 
-:- use_module(library(sort)).
+:- use_module(library(sorting)).
 
 62.2 Row and Column Sums
 
-sort_row_sums(+Grid, -Sums)
+sorting_row_sums(+Grid, -Sums)
   Sums is a list with one integer per row: the sum of all cell values in that row.
   Values must be numeric.
 
 Example:
-  ?- sort_row_sums([[1,2],[3,4]], S).
+  ?- sorting_row_sums([[1,2],[3,4]], S).
   S = [3,7].
 
-sort_col_sums(+Grid, -Sums)
+sorting_col_sums(+Grid, -Sums)
   Sums is a list with one integer per column: the sum of all cell values in that column.
 
 Example:
-  ?- sort_col_sums([[1,2],[3,4]], S).
+  ?- sorting_col_sums([[1,2],[3,4]], S).
   S = [4,6].
 
 62.3 Value Counting per Row and Column
 
-sort_row_count(+Grid, +Val, -Counts)
+sorting_row_count(+Grid, +Val, -Counts)
   Counts is a list with one integer per row: the number of cells equal to Val.
 
 Example:
-  ?- sort_row_count([[1,0,1],[0,0,1]], 1, C).
+  ?- sorting_row_count([[1,0,1],[0,0,1]], 1, C).
   C = [2,1].
 
-sort_col_count(+Grid, +Val, -Counts)
+sorting_col_count(+Grid, +Val, -Counts)
   Counts is a list with one integer per column: the number of cells equal to Val.
 
 Example:
-  ?- sort_col_count([[1,0],[1,0],[0,1]], 1, C).
+  ?- sorting_col_count([[1,0],[1,0],[0,1]], 1, C).
   C = [2,1].
 
 62.4 Sorting Rows
 
-sort_sort_rows_asc(+Grid, +Val, -Sorted)
+sorting_sort_rows_asc(+Grid, +Val, -Sorted)
   Sorted has the same rows as Grid, ordered ascending by count of Val.
   Rows with fewer Val cells come first. Ties preserve original row order.
 
 Example:
-  ?- sort_sort_rows_asc([[1,1,0],[0,0,0],[1,0,0]], 1, S).
+  ?- sorting_sort_rows_asc([[1,1,0],[0,0,0],[1,0,0]], 1, S).
   S = [[0,0,0],[1,0,0],[1,1,0]].
 
-sort_sort_rows_desc(+Grid, +Val, -Sorted)
+sorting_sort_rows_desc(+Grid, +Val, -Sorted)
   Sorted has the same rows as Grid, ordered descending by count of Val.
   Rows with more Val cells come first.
 
 Example:
-  ?- sort_sort_rows_desc([[0,0],[1,0],[1,1]], 1, S).
+  ?- sorting_sort_rows_desc([[0,0],[1,0],[1,1]], 1, S).
   S = [[1,1],[1,0],[0,0]].
 
 62.5 Sorting Columns
 
-sort_sort_cols_asc(+Grid, +Val, -Sorted)
+sorting_sort_cols_asc(+Grid, +Val, -Sorted)
   Sorted has the same columns as Grid, ordered ascending by count of Val.
   Columns with fewer Val cells come first.
 
-sort_sort_cols_desc(+Grid, +Val, -Sorted)
+sorting_sort_cols_desc(+Grid, +Val, -Sorted)
   Sorted has the same columns as Grid, ordered descending by count of Val.
 
 Note: Column sorting is implemented as: transpose, sort rows, transpose back.
 
 62.6 Finding Extremal Rows and Columns
 
-sort_max_row(+Grid, +Val, -R)
+sorting_max_row(+Grid, +Val, -R)
   R is the 0-based row index with the highest count of Val.
   On ties, returns the smallest index.
 
 Example:
-  ?- sort_max_row([[0,0],[1,0],[1,1]], 1, R).
+  ?- sorting_max_row([[0,0],[1,0],[1,1]], 1, R).
   R = 2.
 
-sort_min_row(+Grid, +Val, -R)
+sorting_min_row(+Grid, +Val, -R)
   R is the 0-based row index with the lowest count of Val.
 
-sort_max_col(+Grid, +Val, -C)
+sorting_max_col(+Grid, +Val, -C)
   C is the 0-based column index with the highest count of Val.
 
-sort_min_col(+Grid, +Val, -C)
+sorting_min_col(+Grid, +Val, -C)
   C is the 0-based column index with the lowest count of Val.
 
 62.7 Value Ordering
 
-sort_sorted_vals(+Grid, -Vals)
+sorting_sorted_vals(+Grid, -Vals)
   Vals is all cell values from Grid sorted ascending, preserving duplicates.
   Useful for analyzing the distribution of values.
 
 Example:
-  ?- sort_sorted_vals([[3,1],[2,1]], V).
+  ?- sorting_sorted_vals([[3,1],[2,1]], V).
   V = [1,1,2,3].
 
-sort_cell_rank(+Grid, +R, +C, -Rank)
+sorting_cell_rank(+Grid, +R, +C, -Rank)
   Rank is the 1-based position of Grid[R,C] among the distinct values of Grid
   in ascending order. The smallest distinct value has rank 1.
 
 Example:
-  ?- sort_cell_rank([[1,2],[3,4]], 1, 1, Rank).
+  ?- sorting_cell_rank([[1,2],[3,4]], 1, 1, Rank).
   Rank = 4.
 
 Example:
-  ?- sort_cell_rank([[1,3],[5,7]], 0, 1, Rank).
+  ?- sorting_cell_rank([[1,3],[5,7]], 0, 1, Rank).
   Rank = 2.  % 3 is the 2nd of [1,3,5,7]
 
 62.8 Common Patterns
 
 Pattern: Find the dominant color row:
-  sort_max_row(Grid, 1, R),
+  sorting_max_row(Grid, 1, R),
   nth0(R, Grid, DominantRow).
 
 Pattern: Bring the fullest rows to the top:
-  sort_sort_rows_desc(Grid, ForegroundVal, Reordered).
+  sorting_sort_rows_desc(Grid, ForegroundVal, Reordered).
 
 Pattern: Compare row densities:
-  sort_row_count(Grid, 1, Counts),
+  sorting_row_count(Grid, 1, Counts),
   msort(Counts, SortedCounts),
   last(SortedCounts, MaxCount).
 
@@ -9847,19 +9847,19 @@ Pattern: Get rank of each cell:
   length(Grid, NRows), Grid = [FR|_], length(FR, NCols),
   NRM1 is NRows-1, NCM1 is NCols-1,
   numlist(0, NRM1, Rs), numlist(0, NCM1, Cs),
-  findall(R-C-Rank, (member(R, Rs), member(C, Cs), sort_cell_rank(Grid, R, C, Rank)), RankTriples).
+  findall(R-C-Rank, (member(R, Rs), member(C, Cs), sorting_cell_rank(Grid, R, C, Rank)), RankTriples).
 
 62.9 Summary
 
 The sort pack's 14 predicates organize into five groups:
 
-Aggregation:  sort_row_sums/2, sort_col_sums/2, sort_row_count/3, sort_col_count/3
-Row sort:     sort_sort_rows_asc/3, sort_sort_rows_desc/3
-Column sort:  sort_sort_cols_asc/3, sort_sort_cols_desc/3
-Extrema:      sort_max_row/3, sort_min_row/3, sort_max_col/3, sort_min_col/3
-Ranking:      sort_sorted_vals/2, sort_cell_rank/4
+Aggregation:  sorting_row_sums/2, sorting_col_sums/2, sorting_row_count/3, sorting_col_count/3
+Row sorting:     sorting_sort_rows_asc/3, sorting_sort_rows_desc/3
+Column sorting:  sorting_sort_cols_asc/3, sorting_sort_cols_desc/3
+Extrema:      sorting_max_row/3, sorting_min_row/3, sorting_max_col/3, sorting_min_col/3
+Ranking:      sorting_sorted_vals/2, sorting_cell_rank/4
 
-All 42 PLUnit acceptance tests are in packs/sort/test/test_sort.pl.
+All 42 PLUnit acceptance tests are in packs/sorting/test/test_sorting.pl.
 The Specification entry is Part 91 (SO-SO-001 through SO-SO-014).
 The Architecture entry is ARCH-67.
 The Refinement entry covers AC-SO-001 through AC-SO-042.
@@ -15097,44 +15097,44 @@ manipulation, row manipulation, and extremum row queries.
 Layer 123, Work Package 144.
 
 Public predicates:
-table_transpose(+Grid, -TGrid).             % rows become columns
-table_sort_rows(+Grid, +C, -Sorted).        % sort rows by column C value
-table_filter_rows(+Grid, +C, +V, -Filtered). % keep rows where col C = V
-table_group_by(+Grid, +C, -Groups).         % V-Rows pairs per unique col C value
-table_count_by(+Grid, +C, -Counts).         % V-N pairs counting rows per col C value
-table_unique_rows(+Grid, -UniqueGrid).      % deduplicate rows preserving order
-table_select_cols(+Grid, +ColIdxs, -Sub).   % extract columns by index list
-table_drop_col(+Grid, +C, -Grid2).          % remove column C
-table_add_col(+Grid, +NewCol, -Grid2).      % append list as new rightmost column
-table_insert_row(+Grid, +Row, +R, -Grid2).  % insert Row before position R
-table_delete_row(+Grid, +R, -Grid2).        % delete row at position R
-table_swap_rows(+Grid, +R1, +R2, -Grid2).   % swap rows R1 and R2
-table_col_max_row(+Grid, +C, -R).           % first row with max column C value
-table_col_min_row(+Grid, +C, -R).           % first row with min column C value
+data_table_transpose(+Grid, -TGrid).             % rows become columns
+data_table_sort_rows(+Grid, +C, -Sorted).        % sort rows by column C value
+data_table_filter_rows(+Grid, +C, +V, -Filtered). % keep rows where col C = V
+data_table_group_by(+Grid, +C, -Groups).         % V-Rows pairs per unique col C value
+data_table_count_by(+Grid, +C, -Counts).         % V-N pairs counting rows per col C value
+data_table_unique_rows(+Grid, -UniqueGrid).      % deduplicate rows preserving order
+data_table_select_cols(+Grid, +ColIdxs, -Sub).   % extract columns by index list
+data_table_drop_col(+Grid, +C, -Grid2).          % remove column C
+data_table_add_col(+Grid, +NewCol, -Grid2).      % append list as new rightmost column
+data_table_insert_row(+Grid, +Row, +R, -Grid2).  % insert Row before position R
+data_table_delete_row(+Grid, +R, -Grid2).        % delete row at position R
+data_table_swap_rows(+Grid, +R1, +R2, -Grid2).   % swap rows R1 and R2
+data_table_col_max_row(+Grid, +C, -R).           % first row with max column C value
+data_table_col_min_row(+Grid, +C, -R).           % first row with min column C value
 
 Examples:
-table_transpose([[1,2,3],[4,5,6]], T).       % T=[[1,4],[2,5],[3,6]]
-table_sort_rows([[3,a],[1,b],[2,c]], 0, S).  % S=[[1,b],[2,c],[3,a]]
-table_filter_rows([[1,a],[2,b],[1,c]], 0, 1, F). % F=[[1,a],[1,c]]
-table_group_by([[1,a],[2,b],[1,c]], 0, G).   % G=[1-[[1,a],[1,c]], 2-[[2,b]]]
-table_count_by([[1,a],[2,b],[1,c]], 0, C).   % C=[1-2, 2-1]
-table_unique_rows([[1,2],[3,4],[1,2]], U).   % U=[[1,2],[3,4]]
-table_select_cols([[1,2,3]], [2,0], Sub).    % Sub=[[3,1]]  (reorder columns)
-table_drop_col([[1,2,3],[4,5,6]], 1, G).    % G=[[1,3],[4,6]]
-table_add_col([[1,2],[3,4]], [5,6], G).     % G=[[1,2,5],[3,4,6]]
-table_insert_row([[1,2],[5,6]], [3,4], 1, G). % G=[[1,2],[3,4],[5,6]]
-table_delete_row([[1,2],[3,4],[5,6]], 1, G). % G=[[1,2],[5,6]]
-table_swap_rows([[1,2],[3,4],[5,6]], 0, 2, G). % G=[[5,6],[3,4],[1,2]]
-table_col_max_row([[1,5],[3,2],[2,8]], 1, R). % R=2
-table_col_min_row([[9,0],[1,0],[3,0]], 0, R). % R=1
+data_table_transpose([[1,2,3],[4,5,6]], T).       % T=[[1,4],[2,5],[3,6]]
+data_table_sort_rows([[3,a],[1,b],[2,c]], 0, S).  % S=[[1,b],[2,c],[3,a]]
+data_table_filter_rows([[1,a],[2,b],[1,c]], 0, 1, F). % F=[[1,a],[1,c]]
+data_table_group_by([[1,a],[2,b],[1,c]], 0, G).   % G=[1-[[1,a],[1,c]], 2-[[2,b]]]
+data_table_count_by([[1,a],[2,b],[1,c]], 0, C).   % C=[1-2, 2-1]
+data_table_unique_rows([[1,2],[3,4],[1,2]], U).   % U=[[1,2],[3,4]]
+data_table_select_cols([[1,2,3]], [2,0], Sub).    % Sub=[[3,1]]  (reorder columns)
+data_table_drop_col([[1,2,3],[4,5,6]], 1, G).    % G=[[1,3],[4,6]]
+data_table_add_col([[1,2],[3,4]], [5,6], G).     % G=[[1,2,5],[3,4,6]]
+data_table_insert_row([[1,2],[5,6]], [3,4], 1, G). % G=[[1,2],[3,4],[5,6]]
+data_table_delete_row([[1,2],[3,4],[5,6]], 1, G). % G=[[1,2],[5,6]]
+data_table_swap_rows([[1,2],[3,4],[5,6]], 0, 2, G). % G=[[5,6],[3,4],[1,2]]
+data_table_col_max_row([[1,5],[3,2],[2,8]], 1, R). % R=2
+data_table_col_min_row([[9,0],[1,0],[3,0]], 0, R). % R=1
 
-table_transpose: findall over col indices; member+nth0 collects each column.
-table_sort_rows: V-Row pairs + keysort/2 (built-in) + unwrap.
-table_group_by: sort unique keys first; then per-key findall for row lists.
-table_unique_rows: recursive accumulator with \+member/2 duplicate test.
-table_insert_row: two-clause recursion (R=0 prepends; else recurse on tail).
-table_swap_rows: pre-fetch both rows; rebuild with if-then-else.
-table_col_max_row/min_row: max_list/min_list then nth0+cut for first match.
+data_table_transpose: findall over col indices; member+nth0 collects each column.
+data_table_sort_rows: V-Row pairs + keysort/2 (built-in) + unwrap.
+data_table_group_by: sort unique keys first; then per-key findall for row lists.
+data_table_unique_rows: recursive accumulator with \+member/2 duplicate test.
+data_table_insert_row: two-clause recursion (R=0 prepends; else recurse on tail).
+data_table_swap_rows: pre-fetch both rows; rebuild with if-then-else.
+data_table_col_max_row/min_row: max_list/min_list then nth0+cut for first match.
 
 Predicate count: 14 (tb_* prefix). Tests: 42/42. Layer: 123.
 
@@ -18032,7 +18032,7 @@ Loading:
 
 Rule terms: recolor(Old,New), recolor_all(New), color_map(Map), shift(DR,DC),
 to_origin, reflect_h(Width), reflect_v(Height), remove_color(Color),
-keep_color(Color), sort_size_desc, sort_size_asc, sort_pos, top_n(N), dedup_form.
+keep_color(Color), sorting_size_desc, sorting_size_asc, sorting_pos, top_n(N), dedup_form.
 
 14 exported predicates:
 

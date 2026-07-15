@@ -23,6 +23,12 @@ RETIRED_SHARED=" pai "
 # Short helper stubs that are real English words / conventional predicates and
 # are fine as minority prefixes (so is_valid, eq_, id_ are not false-flagged).
 GENERIC_OK=" is eq ok no id on at up in of to do go my as if "
+# SWI-Prolog stdlib module names: a pack must not be named one of these, or the
+# pack shadows the stdlib module on the library path (arithmetic shadowed
+# library(arithmetic), breaking arithmetic_function/1). Queried live from the
+# installed SWI, with a hardcoded core fallback when swipl is unavailable.
+SWI_STDLIB=" $(swipl -q -g "absolute_file_name(swi(library),D),atom_concat(D,'/*.pl',P),expand_file_name(P,Fs),forall(member(F,Fs),(file_base_name(F,B),file_name_extension(N,pl,B),write(N),write(' '))),halt" 2>/dev/null) "
+[ "${SWI_STDLIB// /}" = "" ] && SWI_STDLIB=" aggregate apply arithmetic assoc broadcast charsio check clpfd csv dcg debug dicts error gensym heaps http lists main option ordsets pairs pcre persistency random rbtrees readutil record settings sgml shell sort statistics strings tables table tabling terms thread ugraphs url when yall "
 # Concatenation heads: a pack name starting with one of these followed by more
 # letters with NO underscore is a jammed concatenation (gridblend -> grid_blend).
 # Only heads that do not themselves begin a common whole word (so 'arithmetic'
@@ -57,6 +63,13 @@ for p in "${targets[@]}"; do
     violations=$((violations+1))
     echo "VIOLATION [NAME]  pack '$p' is an abbreviation/concatenation (use whole words, underscore-separated)"
   fi
+
+  # (4) pack NAME must not shadow an SWI-Prolog stdlib module
+  case "$SWI_STDLIB" in
+    *" $p "*)
+      violations=$((violations+1))
+      echo "VIOLATION [SWI-STDLIB]  pack '$p' shadows SWI stdlib library($p) (pick a distinct whole-word name)" ;;
+  esac
 
   # collect every col-0 predicate prefix cluster with its count
   mapfile -t clusters < <(grep -oE '^[a-z][a-z0-9]*_' "$f" 2>/dev/null | sort | uniq -c | sort -rn)

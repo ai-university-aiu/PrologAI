@@ -63,32 +63,32 @@ test(col_aligned_fail, [fail]) :-
     arrange_col_aligned(obj(1, [r(0,0)]), obj(2, [r(0,1)])).
 
 % arrange_sort_by_row/2 tests.
-test(sort_row_basic) :-
+test(sorting_row_basic) :-
     Objs = [obj(1,[r(3,0)]), obj(2,[r(1,0)]), obj(3,[r(2,0)])],
     arrange_sort_by_row(Objs, Sorted),
     Sorted = [obj(2,[r(1,0)]), obj(3,[r(2,0)]), obj(1,[r(3,0)])].
 
-test(sort_row_equal) :-
+test(sorting_row_equal) :-
     Objs = [obj(1,[r(0,2)]), obj(2,[r(0,0)])],
     arrange_sort_by_row(Objs, Sorted),
     Sorted = [obj(1,[r(0,2)]), obj(2,[r(0,0)])].
 
-test(sort_row_single) :-
+test(sorting_row_single) :-
     arrange_sort_by_row([obj(5,[r(1,1)])], Sorted),
     Sorted = [obj(5,[r(1,1)])].
 
 % arrange_sort_by_col/2 tests.
-test(sort_col_basic) :-
+test(sorting_col_basic) :-
     Objs = [obj(1,[r(0,5)]), obj(2,[r(0,1)]), obj(3,[r(0,3)])],
     arrange_sort_by_col(Objs, Sorted),
     Sorted = [obj(2,[r(0,1)]), obj(3,[r(0,3)]), obj(1,[r(0,5)])].
 
-test(sort_col_equal) :-
+test(sorting_col_equal) :-
     Objs = [obj(1,[r(2,3)]), obj(2,[r(0,3)])],
     arrange_sort_by_col(Objs, Sorted),
     Sorted = [obj(1,[r(2,3)]), obj(2,[r(0,3)])].
 
-test(sort_col_single) :-
+test(sorting_col_single) :-
     arrange_sort_by_col([obj(7,[r(3,2)])], Sorted),
     Sorted = [obj(7,[r(3,2)])].
 

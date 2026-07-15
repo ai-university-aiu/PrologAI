@@ -28,9 +28,9 @@ reflect_h(Width)        - flip all objects horizontally
 reflect_v(Height)       - flip all objects vertically
 remove_color(Color)     - discard all objects of Color
 keep_color(Color)       - keep only objects of Color
-sort_size_desc          - sort by cell count descending
-sort_size_asc           - sort by cell count ascending
-sort_pos                - sort by top-left position row-major
+sorting_size_desc          - sort by cell count descending
+sorting_size_asc           - sort by cell count ascending
+sorting_pos                - sort by top-left position row-major
 top_n(N)                - the N largest objects
 dedup_form              - keep first of each distinct normalized shape
 
@@ -103,7 +103,7 @@ Classify a rule term. Returns one of: color, spatial, filter, order, dedup.
   :- scene_apply_rule_type(recolor(r,g), T).   T = color.
   :- scene_apply_rule_type(shift(1,2), T).     T = spatial.
   :- scene_apply_rule_type(keep_color(r), T).  T = filter.
-  :- scene_apply_rule_type(sort_size_desc, T). T = order.
+  :- scene_apply_rule_type(sorting_size_desc, T). T = order.
   :- scene_apply_rule_type(dedup_form, T).     T = dedup.
 
 scene_apply_is_color_rule(+Rule)
