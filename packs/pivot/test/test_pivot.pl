@@ -227,7 +227,7 @@ test(reflect_diag_on_axis) :-
 % Anti-diagonal reflection negates and swaps offsets.
 test(reflect_antidiag_negate_swap) :-
     % Cell at (0,3) relative to pivot (1,1): offset (-1,2).
-    % Anti-diag reflex_actors: (-DC,-DR) = (-2,1). Absolute: (1-2, 1+1) = (-1,2).
+    % Anti-diag reflection: (-DC,-DR) = (-2,1). Absolute: (1-2, 1+1) = (-1,2).
     pivot_reflect_cells_antidiag(1-1, [0-3], [R2-C2]),
     R2 =:= -1, C2 =:= 2.
 
@@ -241,7 +241,7 @@ test(reflect_antidiag_involution) :-
 % Cell on the anti-diagonal (DR = -DC) is unchanged by anti-diag reflection.
 test(reflect_antidiag_on_axis) :-
     % Cell at (0,2) relative to pivot (1,1): offset (-1,1); DR = -DC? -1 = -1 yes.
-    % Anti-diag reflex_actors: (-DC,-DR) = (-1,1). Absolute: (1-1, 1+1) = (0,2).
+    % Anti-diag reflection: (-DC,-DR) = (-1,1). Absolute: (1-1, 1+1) = (0,2).
     pivot_reflect_cells_antidiag(1-1, [0-2], [R2-C2]),
     R2 =:= 0, C2 =:= 2.
 

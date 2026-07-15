@@ -102,7 +102,7 @@ pr17_setup :-
     % Add a new fact or rule to the runtime knowledge base.
     assertz(refinement:modification_id_counter(0)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)).
+    retractall(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)).
 
 % Execute: pr17_cleanup :-.
 pr17_cleanup :-
@@ -111,7 +111,7 @@ pr17_cleanup :-
     % Remove all matching facts from the runtime knowledge base.
     retractall(refinement:modification_proposal(_, _, _, _, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(sona:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)),
+    retractall(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_entry(_, _, _, _, _, _)),
     % State the fact: lattice close(N).
     lattice_close(N).
 
@@ -129,7 +129,7 @@ test(repeated_failure_generates_proposal) :-
         % Continue the multi-line expression started above.
         ( Ti is T0 - (105 - I) * 100,
           % Continue the multi-line expression started above.
-          assertz(sona:synaptic_ontological_neural_aggregator_trajectory_entry(I, situation_garden,
+          assertz(synaptic_ontological_neural_aggregator:synaptic_ontological_neural_aggregator_trajectory_entry(I, situation_garden,
                                              % Continue the multi-line expression started above.
                                              [garden_watering, irrigate],
                                              % Continue the multi-line expression started above.

@@ -51,29 +51,29 @@
 % Execute: pr46_setup :-.
 pr46_setup :-
     % Remove all matching facts from the runtime knowledge base.
-    retractall(ros_bridge:robot_operating_system_bridge_robot_body(_, _, _)),
+    retractall(robot_operating_system_bridge:robot_operating_system_bridge_robot_body(_, _, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(ros_bridge:robot_operating_system_bridge_body_counter(_)),
+    retractall(robot_operating_system_bridge:robot_operating_system_bridge_body_counter(_)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(ros_bridge:robot_operating_system_bridge_bridge_percept(_, _, _)),
+    retractall(robot_operating_system_bridge:robot_operating_system_bridge_bridge_percept(_, _, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(ros_bridge:robot_operating_system_bridge_percept_counter(_)),
+    retractall(robot_operating_system_bridge:robot_operating_system_bridge_percept_counter(_)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(ros_bridge:robot_operating_system_bridge_act_log(_, _, _)),
+    retractall(robot_operating_system_bridge:robot_operating_system_bridge_act_log(_, _, _)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(ros_bridge:robot_operating_system_bridge_action_counter(_)),
+    retractall(robot_operating_system_bridge:robot_operating_system_bridge_action_counter(_)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(ros_bridge:robot_operating_system_bridge_capability_level(_)),
+    retractall(robot_operating_system_bridge:robot_operating_system_bridge_capability_level(_)),
     % Remove all matching facts from the runtime knowledge base.
-    retractall(ros_bridge:robot_operating_system_bridge_topic(_, _, _)),
+    retractall(robot_operating_system_bridge:robot_operating_system_bridge_topic(_, _, _)),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(ros_bridge:robot_operating_system_bridge_body_counter(0)),
+    assertz(robot_operating_system_bridge:robot_operating_system_bridge_body_counter(0)),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(ros_bridge:robot_operating_system_bridge_percept_counter(0)),
+    assertz(robot_operating_system_bridge:robot_operating_system_bridge_percept_counter(0)),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(ros_bridge:robot_operating_system_bridge_action_counter(0)),
+    assertz(robot_operating_system_bridge:robot_operating_system_bridge_action_counter(0)),
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(ros_bridge:robot_operating_system_bridge_capability_level(simulation_only)).
+    assertz(robot_operating_system_bridge:robot_operating_system_bridge_capability_level(simulation_only)).
 
 % Execute: pr46_cleanup :- pr46_setup..
 pr46_cleanup :- pr46_setup.
@@ -126,12 +126,12 @@ test(enroll_registers_body, [setup(pr46_setup)]) :-
     Robot = robot(bot46, [camera, lidar, odometry], urdf(bot46)),
     % State a fact for 'once' with the arguments listed below.
     once(robot_operating_system_bridge_enroll(Robot, webots, BodyId)),
-    % Execute: ros_bridge:robot_operating_system_bridge_robot_body(BodyId, Robot, webots),.
-    ros_bridge:robot_operating_system_bridge_robot_body(BodyId, Robot, webots),
-    % Execute: ros_bridge:robot_operating_system_bridge_topic(BodyId, '/camera/image_raw', sensor_msgs_image),.
-    ros_bridge:robot_operating_system_bridge_topic(BodyId, '/camera/image_raw', sensor_msgs_image),
-    % Execute: ros_bridge:robot_operating_system_bridge_topic(BodyId, '/scan', sensor_msgs_laser_scan)..
-    ros_bridge:robot_operating_system_bridge_topic(BodyId, '/scan', sensor_msgs_laser_scan).
+    % Execute: robot_operating_system_bridge:robot_operating_system_bridge_robot_body(BodyId, Robot, webots),.
+    robot_operating_system_bridge:robot_operating_system_bridge_robot_body(BodyId, Robot, webots),
+    % Execute: robot_operating_system_bridge:robot_operating_system_bridge_topic(BodyId, '/camera/image_raw', sensor_msgs_image),.
+    robot_operating_system_bridge:robot_operating_system_bridge_topic(BodyId, '/camera/image_raw', sensor_msgs_image),
+    % Execute: robot_operating_system_bridge:robot_operating_system_bridge_topic(BodyId, '/scan', sensor_msgs_laser_scan)..
+    robot_operating_system_bridge:robot_operating_system_bridge_topic(BodyId, '/scan', sensor_msgs_laser_scan).
 
 %  AC-PR46-004: camera topic maps to visual_percept
 % Define a clause for 'test': succeed when the following conditions hold.
