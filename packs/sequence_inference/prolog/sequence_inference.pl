@@ -80,19 +80,19 @@ sequence_inference_apply_one_(remove_color(C), Scene, Result) :-
 % keep_color(C): retain only objects of color C.
 sequence_inference_apply_one_(keep_color(C), Scene, Result) :-
     include(sequence_inference_is_color_(C), Scene, Result).
-% sorting_size_desc: sort objects from largest to smallest by cell count.
-sequence_inference_apply_one_(sorting_size_desc, Scene, Result) :-
+% sort_size_desc: sort objects from largest to smallest by cell count.
+sequence_inference_apply_one_(sort_size_desc, Scene, Result) :-
     findall(NegN-Obj, (member(Obj, Scene), Obj=obj(_,Cells), length(Cells,N), NegN is -N), Keyed),
     msort(Keyed, Sorted),
     maplist([_-O, O]>>true, Sorted, Result).
-% sorting_size_asc: sort objects from smallest to largest by cell count.
-sequence_inference_apply_one_(sorting_size_asc, Scene, Result) :-
+% sort_size_asc: sort objects from smallest to largest by cell count.
+sequence_inference_apply_one_(sort_size_asc, Scene, Result) :-
     findall(N-Obj, (member(Obj, Scene), Obj=obj(_,Cells), length(Cells,N)), Keyed),
     msort(Keyed, Sorted),
     maplist([_-O, O]>>true, Sorted, Result).
 % top_n(N): keep only the N largest objects.
 sequence_inference_apply_one_(top_n(N), Scene, Result) :-
-    sequence_inference_apply_one_(sorting_size_desc, Scene, Sorted),
+    sequence_inference_apply_one_(sort_size_desc, Scene, Sorted),
     sequence_inference_take_(Sorted, N, Result).
 % color_map(Map): apply a color substitution map (list of C1-C2 pairs).
 sequence_inference_apply_one_(color_map(Map), Scene, Result) :-
@@ -221,7 +221,7 @@ sequence_inference_default_rules([
     reflect_h, reflect_v,
     remove_color(r), remove_color(b), remove_color(g),
     keep_color(r), keep_color(b), keep_color(g),
-    sorting_size_desc, sorting_size_asc
+    sort_size_desc, sort_size_asc
 ]).
 
 % sequence_inference_solve(+Pairs, +Candidates, -BestSeq)
@@ -285,6 +285,6 @@ sequence_inference_arc2_candidates([
     remove_color(4), remove_color(5), remove_color(6),
     keep_color(1), keep_color(2), keep_color(3),
     keep_color(4), keep_color(5), keep_color(6),
-    sorting_size_desc, sorting_size_asc,
+    sort_size_desc, sort_size_asc,
     top_n(1), top_n(2), top_n(3)
 ]).

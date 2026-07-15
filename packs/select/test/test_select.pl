@@ -56,18 +56,18 @@ test(smallest_last) :-
 
 :- begin_tests(select_sort_by_area).
 
-test(sorting_empty) :-
+test(sort_empty) :-
     select_sort_by_area([], []).
 
-test(sorting_single) :-
+test(sort_single) :-
     r3(A), select_sort_by_area([A], [A]).
 
-test(sorting_ascending) :-
+test(sort_ascending) :-
     r1(A), r3(B), r5(C),
     select_sort_by_area([C, A, B], Sorted),
     Sorted = [A, B, C].
 
-test(sorting_equal_areas_stable) :-
+test(sort_equal_areas_stable) :-
     r3(A), r3b(B),
     select_sort_by_area([A, B], Sorted),
     length(Sorted, 2),

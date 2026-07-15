@@ -235,13 +235,13 @@ test(max_degree_single_obj) :-
 
 % object_component_sort_by_degree tests.
 
-test(sorting_by_degree_first_is_min) :-
+test(sort_by_degree_first_is_min) :-
     % E has degree 0, so it should be first.
     objs_abcdef(Objs), e_obj(E),
     object_component_sort_by_degree(Objs, Sorted),
     Sorted = [E|_].
 
-test(sorting_by_degree_length) :-
+test(sort_by_degree_length) :-
     objs_abcdef(Objs),
     object_component_sort_by_degree(Objs, Sorted),
     length(Sorted, 6).

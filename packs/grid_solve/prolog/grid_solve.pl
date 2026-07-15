@@ -50,16 +50,16 @@ grid_solve_apply(remove_color(Color), Scene, Result) :-
     include(grid_solve_not_color_(Color), Scene, Result).
 grid_solve_apply(keep_color(Color), Scene, Result) :-
     include(grid_solve_is_color_(Color), Scene, Result).
-grid_solve_apply(sorting_size_desc, Scene, Result) :-
+grid_solve_apply(sort_size_desc, Scene, Result) :-
     findall(NegN-O, (member(O, Scene), O = obj(_, Cells), length(Cells, N), NegN is -N), Keyed),
     msort(Keyed, Sorted),
     grid_solve_pairs_values_(Sorted, Result).
-grid_solve_apply(sorting_size_asc, Scene, Result) :-
+grid_solve_apply(sort_size_asc, Scene, Result) :-
     findall(N-O, (member(O, Scene), O = obj(_, Cells), length(Cells, N)), Keyed),
     msort(Keyed, Sorted),
     grid_solve_pairs_values_(Sorted, Result).
 grid_solve_apply(top_n(N), Scene, Result) :-
-    grid_solve_apply(sorting_size_desc, Scene, Sorted),
+    grid_solve_apply(sort_size_desc, Scene, Sorted),
     length(Sorted, Len),
     Take is min(N, Len),
     length(Result, Take),
@@ -248,7 +248,7 @@ grid_solve_default_candidates([
     shift(1, 1), shift(1, -1), shift(-1, 1), shift(-1, -1),
     to_origin,
     remove_color(r), remove_color(b), remove_color(g),
-    sorting_size_desc, sorting_size_asc,
+    sort_size_desc, sort_size_asc,
     top_n(1), top_n(2),
     identity
 ]).

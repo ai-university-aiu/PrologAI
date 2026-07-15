@@ -81,9 +81,9 @@ test(apply_keep_color) :-
     scene_two(S), sequence_inference_apply([keep_color(r)], S, R),
     R == [obj(r,[r(0,0)])].
 
-% sequence_inference_apply: sorting_size_desc on equal-size objects preserves order
+% sequence_inference_apply: sort_size_desc on equal-size objects preserves order
 test(apply_sort_size_desc) :-
-    scene_two(S), sequence_inference_apply([sorting_size_desc], S, R),
+    scene_two(S), sequence_inference_apply([sort_size_desc], S, R),
     length(R, 2).
 
 % sequence_inference_apply: reflect_h on single cell: cell at r(0,0) in 1-row bbox stays at r(0,0)
@@ -248,9 +248,9 @@ test(apply_reflect_v_single) :-
     scene_r(S), sequence_inference_apply([reflect_v], S, R),
     R == [obj(r,[r(0,0)])].
 
-% sequence_inference_apply: sorting_size_asc on two equal-size objects preserves all
+% sequence_inference_apply: sort_size_asc on two equal-size objects preserves all
 test(apply_sort_size_asc) :-
-    scene_two(S), sequence_inference_apply([sorting_size_asc], S, R),
+    scene_two(S), sequence_inference_apply([sort_size_asc], S, R),
     length(R, 2).
 
 :- end_tests(sequence_inference).

@@ -18,15 +18,15 @@ test(transpose_1x1) :-
 
 % --- data_table_sort_rows ---
 
-test(sorting_rows_by_col0) :-
+test(sort_rows_by_col0) :-
     data_table_sort_rows([[3,a],[1,b],[2,c]], 0, Sorted),
     Sorted = [[1,b],[2,c],[3,a]].
 
-test(sorting_rows_by_col1) :-
+test(sort_rows_by_col1) :-
     data_table_sort_rows([[1,3],[2,1],[3,2]], 1, Sorted),
     Sorted = [[2,1],[3,2],[1,3]].
 
-test(sorting_rows_already_sorted) :-
+test(sort_rows_already_sorted) :-
     data_table_sort_rows([[1,2],[3,4]], 0, Sorted),
     Sorted = [[1,2],[3,4]].
 

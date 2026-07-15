@@ -66,69 +66,69 @@ test(col_count_all) :-
 
 :- end_tests(sorting_col_count).
 
-:- begin_tests(sorting_rows_asc).
+:- begin_tests(sort_rows_asc).
 
-test(sorting_rows_asc_basic) :-
+test(sort_rows_asc_basic) :-
     sorting_sort_rows_asc([[1,1,0],[0,0,0],[1,0,0]], 1, S),
     S = [[0,0,0],[1,0,0],[1,1,0]].
 
-test(sorting_rows_asc_already) :-
+test(sort_rows_asc_already) :-
     sorting_sort_rows_asc([[0,0],[1,0],[1,1]], 1, S),
     S = [[0,0],[1,0],[1,1]].
 
-test(sorting_rows_asc_all_zero) :-
+test(sort_rows_asc_all_zero) :-
     sorting_sort_rows_asc([[0,0],[0,0]], 1, S),
     S = [[0,0],[0,0]].
 
-:- end_tests(sorting_rows_asc).
+:- end_tests(sort_rows_asc).
 
-:- begin_tests(sorting_rows_desc).
+:- begin_tests(sort_rows_desc).
 
-test(sorting_rows_desc_basic) :-
+test(sort_rows_desc_basic) :-
     sorting_sort_rows_desc([[1,0,0],[1,1,0],[0,0,0]], 1, S),
     S = [[1,1,0],[1,0,0],[0,0,0]].
 
-test(sorting_rows_desc_single) :-
+test(sort_rows_desc_single) :-
     sorting_sort_rows_desc([[1,1]], 1, S),
     S = [[1,1]].
 
-test(sorting_rows_desc_reverse) :-
+test(sort_rows_desc_reverse) :-
     sorting_sort_rows_desc([[0,0],[1,0],[1,1]], 1, S),
     S = [[1,1],[1,0],[0,0]].
 
-:- end_tests(sorting_rows_desc).
+:- end_tests(sort_rows_desc).
 
-:- begin_tests(sorting_cols_asc).
+:- begin_tests(sort_cols_asc).
 
-test(sorting_cols_asc_basic) :-
+test(sort_cols_asc_basic) :-
     sorting_sort_cols_asc([[1,0,1],[1,0,0],[0,0,1]], 1, S),
     S = [[0,1,1],[0,1,0],[0,0,1]].
 
-test(sorting_cols_asc_no_change) :-
+test(sort_cols_asc_no_change) :-
     sorting_sort_cols_asc([[0,0,1],[0,1,1]], 1, S),
     S = [[0,0,1],[0,1,1]].
 
-test(sorting_cols_asc_all_same) :-
+test(sort_cols_asc_all_same) :-
     sorting_sort_cols_asc([[1,1],[1,1]], 1, S),
     S = [[1,1],[1,1]].
 
-:- end_tests(sorting_cols_asc).
+:- end_tests(sort_cols_asc).
 
-:- begin_tests(sorting_cols_desc).
+:- begin_tests(sort_cols_desc).
 
-test(sorting_cols_desc_basic) :-
+test(sort_cols_desc_basic) :-
     sorting_sort_cols_desc([[1,0,1],[1,0,0],[0,0,1]], 1, S),
     S = [[1,1,0],[1,0,0],[0,1,0]].
 
-test(sorting_cols_desc_single_col) :-
+test(sort_cols_desc_single_col) :-
     sorting_sort_cols_desc([[1],[0],[1]], 1, S),
     S = [[1],[0],[1]].
 
-test(sorting_cols_desc_two_cols) :-
+test(sort_cols_desc_two_cols) :-
     sorting_sort_cols_desc([[0,1],[0,1]], 1, S),
     S = [[1,0],[1,0]].
 
-:- end_tests(sorting_cols_desc).
+:- end_tests(sort_cols_desc).
 
 :- begin_tests(sorting_max_row).
 
