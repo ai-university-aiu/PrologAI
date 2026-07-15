@@ -42,7 +42,7 @@
 % path_neighbors(+Grid, +r(R,C), -Neighbors)
 % Return the list of valid 4-connected neighbors of r(R,C) within grid bounds.
 path_neighbors(Grid, r(R, C), Neighbors) :-
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     MaxR is Rows - 1,
     MaxC is Cols - 1,
     % Compute the four candidate neighbor coordinates.
@@ -59,7 +59,7 @@ path_neighbors(Grid, r(R, C), Neighbors) :-
 % Find all cells reachable from r(R,C) via 4-connectivity where the cell color = Color.
 % Region is a sorted list of r(R,C) terms.
 path_flood_fill(Grid, Seed, Color, Region) :-
-    gd_cell(Grid, Seed, Color),
+    grid_cell(Grid, Seed, Color),
     path_bfs_same_color_(Grid, Color, [Seed], [Seed], Region0),
     msort(Region0, Region).
 
@@ -79,7 +79,7 @@ path_bfs_same_color_(Grid, Color, [Current|Rest], Visited, Region) :-
 % path_unvisited_color_(Grid, Color, Visited, Cell)
 % Succeeds if Cell has Color and is not in Visited.
 path_unvisited_color_(Grid, Color, Visited, Cell) :-
-    gd_cell(Grid, Cell, Color),
+    grid_cell(Grid, Cell, Color),
     \+ member(Cell, Visited).
 
 % path_connected(+Grid, +CellA, +CellB, +Color)
@@ -93,13 +93,13 @@ path_connected(Grid, CellA, CellB, Color) :-
 % Components is a list of sorted cell lists.
 path_components(Grid, Color, Components) :-
     % Find all cells of this Color.
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     R1 is Rows - 1,
     C1 is Cols - 1,
     findall(r(R, C),
         (   between(0, R1, R),
             between(0, C1, C),
-            gd_cell(Grid, R, C, Color)
+            grid_cell(Grid, R, C, Color)
         ),
         AllCells),
     % Group into connected components.
@@ -147,8 +147,8 @@ path_max_component_(Comp, Best, NewBest) :-
 % Path is a list of r(R,C) terms from Start to Goal (inclusive).
 % Fails if no path exists.
 path_shortest_path(Grid, Start, Goal, Wall, Path) :-
-    gd_cell(Grid, Start, StartColor), StartColor \= Wall,
-    gd_cell(Grid, Goal, GoalColor), GoalColor \= Wall,
+    grid_cell(Grid, Start, StartColor), StartColor \= Wall,
+    grid_cell(Grid, Goal, GoalColor), GoalColor \= Wall,
     path_bfs_path_(Grid, Wall, [[Start]], Goal, RevPath),
     reverse(RevPath, Path).
 
@@ -168,7 +168,7 @@ path_bfs_path_(Grid, Wall, [Current|Rest], Goal, Path) :-
 
 % path_not_wall_or_visited_(Grid, Wall, Visited, Cell)
 path_not_wall_or_visited_(Grid, Wall, Visited, Cell) :-
-    gd_cell(Grid, Cell, CellColor),
+    grid_cell(Grid, Cell, CellColor),
     CellColor \= Wall,
     \+ member(Cell, Visited).
 
@@ -191,7 +191,7 @@ path_path_exists(Grid, Start, Goal, Wall) :-
 % Find all cells reachable from Seed by 4-connectivity without crossing Wall-colored cells.
 % Seed itself must not be Wall.
 path_reachable(Grid, Seed, Wall, Cells) :-
-    gd_cell(Grid, Seed, SeedColor),
+    grid_cell(Grid, Seed, SeedColor),
     SeedColor \= Wall,
     path_bfs_not_wall_(Grid, Wall, [Seed], [Seed], Cells0),
     msort(Cells0, Cells).
@@ -207,7 +207,7 @@ path_bfs_not_wall_(Grid, Wall, [Current|Rest], Visited, Result) :-
 
 % path_not_wall_unvisited_(Grid, Wall, Visited, Cell)
 path_not_wall_unvisited_(Grid, Wall, Visited, Cell) :-
-    gd_cell(Grid, Cell, Color),
+    grid_cell(Grid, Cell, Color),
     Color \= Wall,
     \+ member(Cell, Visited).
 
@@ -237,6 +237,6 @@ path_is_connected(Grid, Color) :-
     length(Components, N),
     N =< 1.
 
-% gd_cell/3 overload accepting r(R,C) term - delegates to gd_cell/4.
-gd_cell(Grid, r(R, C), Color) :-
-    gd_cell(Grid, R, C, Color).
+% grid_cell/3 overload accepting r(R,C) term - delegates to grid_cell/4.
+grid_cell(Grid, r(R, C), Color) :-
+    grid_cell(Grid, R, C, Color).

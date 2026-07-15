@@ -220,10 +220,10 @@ test(orbit_hsym, [nondet]) :-
 
 test(canonical_same_for_equiv, [nondet]) :-
     asym_grid(G),
-    gd_rotate90(G, R90),
+    grid_rotate90(G, R90),
     symmetry_canonical(G, C1),
     symmetry_canonical(R90, C2),
-    gd_equal(C1, C2).
+    grid_equal(C1, C2).
 
 test(canonical_is_in_orbit, [nondet]) :-
     asym_grid(G),
@@ -236,18 +236,18 @@ test(canonical_is_in_orbit, [nondet]) :-
 
 % symmetry_matches_canon_(Canon, Grid) - helper for include.
 symmetry_matches_canon_(Canon, Grid) :-
-    gd_equal(Canon, Grid).
+    grid_equal(Canon, Grid).
 
 :- begin_tests(symmetry_equivalent).
 
 test(equiv_rotation, [nondet]) :-
     asym_grid(G),
-    gd_rotate90(G, R90),
+    grid_rotate90(G, R90),
     symmetry_equivalent(G, R90).
 
 test(equiv_reflection, [nondet]) :-
     asym_grid(G),
-    gd_reflect_v(G, Flip),
+    grid_reflect_v(G, Flip),
     symmetry_equivalent(G, Flip).
 
 test(not_equiv, [fail]) :-

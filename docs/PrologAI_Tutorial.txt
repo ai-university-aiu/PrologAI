@@ -3659,95 +3659,95 @@ LOADING THE GRID PACK
 
 GRID DIMENSIONS
 
-gd_size(+Grid, -Rows, -Cols)
+grid_size(+Grid, -Rows, -Cols)
 
-    ?- gd_size([[1,2,3],[4,5,6]], Rows, Cols).
+    ?- grid_size([[1,2,3],[4,5,6]], Rows, Cols).
     Rows = 2, Cols = 3.
 
 
 CELL ACCESS
 
-gd_cell(+Grid, +R, +C, -Color)
+grid_cell(+Grid, +R, +C, -Color)
 
-    ?- gd_cell([[0,1,2],[3,4,5],[6,7,8]], 1, 2, Color).
+    ?- grid_cell([[0,1,2],[3,4,5],[6,7,8]], 1, 2, Color).
     Color = 5.
 
-gd_row(+Grid, +R, -Row) and gd_col(+Grid, +C, -Col) extract rows and columns.
+grid_row(+Grid, +R, -Row) and grid_col(+Grid, +C, -Col) extract rows and columns.
 
 
 COLOR ANALYSIS
 
-gd_colors(+Grid, -ColorSet) returns a sorted list of distinct colors.
+grid_colors(+Grid, -ColorSet) returns a sorted list of distinct colors.
 
-gd_color_count(+Grid, +Color, -Count) counts cells of a given color.
+grid_color_count(+Grid, +Color, -Count) counts cells of a given color.
 
-gd_color_map(+Grid, +Map, -Grid2) substitutes colors using a From-To pair list.
+grid_color_map(+Grid, +Map, -Grid2) substitutes colors using a From-To pair list.
 
-    ?- gd_color_map([[1,2],[2,1]], [1-3, 2-4], G2).
+    ?- grid_color_map([[1,2],[2,1]], [1-3, 2-4], G2).
     G2 = [[3,4],[4,3]].
 
 
 OBJECT EXTRACTION
 
-gd_objects(+Grid, +Color, -Objects) finds all maximal 4-connected regions of Color. Each object is a list of r(Row, Col) terms.
+grid_objects(+Grid, +Color, -Objects) finds all maximal 4-connected regions of Color. Each object is a list of r(Row, Col) terms.
 
-gd_bounding_box(+Cells, -TopLeft, -BottomRight) computes the smallest axis-aligned rectangle containing a cell set.
+grid_bounding_box(+Cells, -TopLeft, -BottomRight) computes the smallest axis-aligned rectangle containing a cell set.
 
 
 SPATIAL TRANSFORMATIONS
 
-gd_rotate90(+Grid, -Grid2): rotate 90 degrees clockwise.
-gd_rotate180(+Grid, -Grid2): rotate 180 degrees.
-gd_rotate270(+Grid, -Grid2): rotate 270 degrees clockwise.
-gd_reflect_h(+Grid, -Grid2): flip upside-down.
-gd_reflect_v(+Grid, -Grid2): flip left-right.
-gd_reflect_d1(+Grid, -Grid2): transpose (main diagonal flip).
-gd_reflect_d2(+Grid, -Grid2): anti-diagonal flip.
+grid_rotate90(+Grid, -Grid2): rotate 90 degrees clockwise.
+grid_rotate180(+Grid, -Grid2): rotate 180 degrees.
+grid_rotate270(+Grid, -Grid2): rotate 270 degrees clockwise.
+grid_reflect_h(+Grid, -Grid2): flip upside-down.
+grid_reflect_v(+Grid, -Grid2): flip left-right.
+grid_reflect_d1(+Grid, -Grid2): transpose (main diagonal flip).
+grid_reflect_d2(+Grid, -Grid2): anti-diagonal flip.
 
-    ?- gd_rotate90([[1,2,3],[4,5,6]], G2).
+    ?- grid_rotate90([[1,2,3],[4,5,6]], G2).
     G2 = [[4,1],[5,2],[6,3]].
 
 
 TRANSLATION, CROP, AND OVERLAY
 
-gd_translate(+Grid, +DR, +DC, +Background, -Grid2): shift grid; fill gaps with Background.
+grid_translate(+Grid, +DR, +DC, +Background, -Grid2): shift grid; fill gaps with Background.
 
-gd_crop(+Grid, +R0, +C0, +R1, +C1, -Grid2): extract rectangular sub-grid (zero-based inclusive bounds).
+grid_crop(+Grid, +R0, +C0, +R1, +C1, -Grid2): extract rectangular sub-grid (zero-based inclusive bounds).
 
-gd_overlay(+Base, +Patch, +DR, +DC, -Grid2): composite Patch onto Base at offset; zero patch cells are transparent.
+grid_overlay(+Base, +Patch, +DR, +DC, -Grid2): composite Patch onto Base at offset; zero patch cells are transparent.
 
 
 COMPARISON AND SYMMETRY
 
-gd_diff(+Grid1, +Grid2, -Diffs): list of r(R,C,Old,New) differing cells.
+grid_diff(+Grid1, +Grid2, -Diffs): list of r(R,C,Old,New) differing cells.
 
-gd_equal(+Grid1, +Grid2): succeed when grids are identical.
+grid_equal(+Grid1, +Grid2): succeed when grids are identical.
 
-gd_symmetry(+Grid, -Axes): detect symmetry axes (subset of [h, v, d1, d2]).
+grid_symmetry(+Grid, -Axes): detect symmetry axes (subset of [h, v, d1, d2]).
 
-    ?- gd_symmetry([[1,2,1],[2,3,2],[1,2,1]], Axes).
+    ?- grid_symmetry([[1,2,1],[2,3,2],[1,2,1]], Axes).
     Axes = [h, v].
 
 
 FLOOD FILL AND CONSTRUCTION
 
-gd_fill(+Grid, +R, +C, +Color, -Grid2): flood-fill connected region with Color.
+grid_fill(+Grid, +R, +C, +Color, -Grid2): flood-fill connected region with Color.
 
-gd_make(+Rows, +Cols, +Color, -Grid): create uniform grid.
+grid_make(+Rows, +Cols, +Color, -Grid): create uniform grid.
 
-gd_set_cell(+Grid, +R, +C, +Color, -Grid2): set one cell (functional update).
+grid_set_cell(+Grid, +R, +C, +Color, -Grid2): set one cell (functional update).
 
 
 SUMMARY
 
-gd_size/3, gd_cell/4, gd_row/3, gd_col/3,
-gd_colors/2, gd_color_count/3, gd_color_map/3,
-gd_objects/3, gd_connected/3, gd_bounding_box/3,
-gd_rotate90/2, gd_rotate180/2, gd_rotate270/2,
-gd_reflect_h/2, gd_reflect_v/2, gd_reflect_d1/2, gd_reflect_d2/2,
-gd_translate/5, gd_crop/6, gd_overlay/5,
-gd_diff/3, gd_equal/2, gd_symmetry/2,
-gd_fill/5, gd_make/4, gd_set_cell/5.
+grid_size/3, grid_cell/4, grid_row/3, grid_col/3,
+grid_colors/2, grid_color_count/3, grid_color_map/3,
+grid_objects/3, grid_connected/3, grid_bounding_box/3,
+grid_rotate90/2, grid_rotate180/2, grid_rotate270/2,
+grid_reflect_h/2, grid_reflect_v/2, grid_reflect_d1/2, grid_reflect_d2/2,
+grid_translate/5, grid_crop/6, grid_overlay/5,
+grid_diff/3, grid_equal/2, grid_symmetry/2,
+grid_fill/5, grid_make/4, grid_set_cell/5.
 
 
 WHAT COMES NEXT
@@ -4263,14 +4263,14 @@ BASIC APPLICATION
 compose_apply/3 dispatches to any rule. compose_identity/2 is the identity.
 compose_const/3 always returns its first argument regardless of input.
 
-    ?- compose_apply(gd_reflect_h, [[1,2],[3,4]], G).
+    ?- compose_apply(grid_reflect_h, [[1,2],[3,4]], G).
     G = [[3,4],[1,2]].
 
 SEQUENTIAL PIPELINES
 
 compose_pipe/3 applies a list of rules in order. Empty list = identity.
 
-    ?- compose_pipe([gd_rotate90, gd_rotate90], [[1,2],[3,4]], G).
+    ?- compose_pipe([grid_rotate90, grid_rotate90], [[1,2],[3,4]], G).
     G = [[4,3],[2,1]].
 
 compose_pipe_n/4 and compose_repeat/4 repeat a rule exactly N times.
@@ -4631,8 +4631,8 @@ Load:
 
 INDIVIDUAL SYMMETRY TESTS
 
-symmetry_is_hsymmetric(+Grid)   - left-right symmetry (gd_reflect_v = self)
-symmetry_is_vsymmetric(+Grid)   - top-bottom symmetry (gd_reflect_h = self)
+symmetry_is_hsymmetric(+Grid)   - left-right symmetry (grid_reflect_v = self)
+symmetry_is_vsymmetric(+Grid)   - top-bottom symmetry (grid_reflect_h = self)
 symmetry_is_rot180(+Grid)       - 180-degree rotational symmetry
 symmetry_is_rot90(+Grid)        - 90-degree rotational symmetry (square only)
 symmetry_is_diagonal(+Grid)     - main-diagonal symmetry (square only)
@@ -10908,7 +10908,7 @@ R = [[1,2],[5,6],[3,4],[7,8]].
 73.8 Paste and mask
 
 assemble_paste/5 unconditionally pastes a sub-grid into a base grid at a given
-row and column offset. Unlike gd_overlay in the grid pack, assemble_paste always
+row and column offset. Unlike grid_overlay in the grid pack, assemble_paste always
 overwrites regardless of cell value.
 
 ?- assemble_paste([[0,0,0],[0,0,0],[0,0,0]], [[5]], 1, 1, R).
@@ -18423,31 +18423,31 @@ lookup.
 :- use_module(pack(griddist/prolog/griddist)).
 
 % Manhattan distance between (0,0) and (2,3): 2+3 = 5
-gd_manhattan(0, 0, 2, 3, D).
+griddist_manhattan(0, 0, 2, 3, D).
 % D = 5
 
 % Chebyshev distance: max(2,3) = 3
-gd_chebyshev(0, 0, 2, 3, D).
+griddist_chebyshev(0, 0, 2, 3, D).
 % D = 3
 
 % Distance map: each cell holds min Manhattan dist to nearest b
-gd_dist_map([[r,r,r],[r,b,r],[r,r,r]], b, DMap).
+griddist_dist_map([[r,r,r],[r,b,r],[r,r,r]], b, DMap).
 % DMap = [[2,1,2],[1,0,1],[2,1,2]]
 
 % Voronoi: background cells assigned color of nearest foreground cell
-gd_voronoi([[r,r,r],[b,r,g],[r,r,r]], VG).
+griddist_voronoi([[r,r,r],[b,r,g],[r,r,r]], VG).
 % VG = [[b,b,g],[b,b,g],[b,b,g]]
 
 % BFS flood: distances from (0,0) with b as wall
-gd_bfs_flood([[r,r,r],[r,b,r],[r,r,r]], 0, 0, b, DG).
+griddist_bfs_flood([[r,r,r],[r,b,r],[r,r,r]], 0, 0, b, DG).
 % DG[1][1] = 9999 (blocked); DG[1][2] = 3 (detour via top row)
 
 % N-step expand: grow b outward by 1 step
-gd_expand_n([[r,r,r],[r,b,r],[r,r,r]], b, 1, E).
+griddist_expand_n([[r,r,r],[r,b,r],[r,r,r]], b, 1, E).
 % E = [[r,b,r],[b,b,b],[r,b,r]]
 
 % N-step shrink: erode b by 1 step (removes b at center; it touches r)
-gd_shrink_n([[r,r,r],[r,b,r],[r,r,r]], b, 1, S).
+griddist_shrink_n([[r,r,r],[r,b,r],[r,r,r]], b, 1, S).
 % S = [[r,r,r],[r,r,r],[r,r,r]]
 
 14 gd_* predicates. 53 tests pass. Layer 200.

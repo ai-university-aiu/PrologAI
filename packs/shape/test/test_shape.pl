@@ -315,23 +315,23 @@ test(place_dot) :-
     empty_5x5(G),
     shape_from_cells([r(0,0)], Shape),
     shape_to_grid(Shape, 2, 3, 7, G, G2),
-    gd_cell(G2, 2, 3, 7).
+    grid_cell(G2, 2, 3, 7).
 
 test(place_bar) :-
     empty_5x5(G),
     shape_from_cells([r(0,0), r(0,1), r(0,2)], Shape),
     shape_to_grid(Shape, 1, 1, 5, G, G2),
-    gd_cell(G2, 1, 1, 5),
-    gd_cell(G2, 1, 2, 5),
-    gd_cell(G2, 1, 3, 5).
+    grid_cell(G2, 1, 1, 5),
+    grid_cell(G2, 1, 2, 5),
+    grid_cell(G2, 1, 3, 5).
 
 test(place_l) :-
     empty_5x5(G),
     shape_from_cells([r(0,0), r(1,0), r(2,0), r(2,1)], Shape),
     shape_to_grid(Shape, 0, 0, 3, G, G2),
-    gd_cell(G2, 0, 0, 3),
-    gd_cell(G2, 1, 0, 3),
-    gd_cell(G2, 2, 0, 3),
-    gd_cell(G2, 2, 1, 3).
+    grid_cell(G2, 0, 0, 3),
+    grid_cell(G2, 1, 0, 3),
+    grid_cell(G2, 2, 0, 3),
+    grid_cell(G2, 2, 1, 3).
 
 :- end_tests(shape_to_grid).

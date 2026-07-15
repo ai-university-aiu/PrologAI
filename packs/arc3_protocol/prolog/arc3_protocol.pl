@@ -72,7 +72,7 @@
 ]).
 
 % Import grid measurement for frame validation.
-:- use_module(library(grid), [gd_size/3]).
+:- use_module(library(grid), [grid_size/3]).
 % Import list helpers.
 :- use_module(library(lists), [member/2]).
 
@@ -167,7 +167,7 @@ arc3_protocol_colour_count(16).
 % Define arc3_protocol_valid_frame: a frame of legal shape and colour.
 arc3_protocol_valid_frame(Frame) :-
     % It must measure as a grid.
-    gd_size(Frame, Rows, Cols),
+    grid_size(Frame, Rows, Cols),
     % The maximum dimension.
     arc3_protocol_max_dim(Max),
     % Rows must be within bounds and positive.

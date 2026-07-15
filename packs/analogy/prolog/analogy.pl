@@ -299,23 +299,23 @@ analogy_grid_isometry(Grid1, Grid2, Isos) :-
     findall(Iso, (
         member(Iso, [identity, rot90, rot180, rot270, ref_h, ref_v, ref_d1, ref_d2]),
         analogy_apply_isometry(Grid1, Iso, Grid1Transformed),
-        gd_equal(Grid1Transformed, Grid2)
+        grid_equal(Grid1Transformed, Grid2)
     ), Isos).
 
 % analogy_apply_isometry(+Grid, +Iso, -Grid2): apply a named D4 isometry to a grid.
 analogy_apply_isometry(Grid, identity, Grid).
-analogy_apply_isometry(Grid, rot90,   Grid2) :- gd_rotate90(Grid, Grid2).
-analogy_apply_isometry(Grid, rot180,  Grid2) :- gd_rotate180(Grid, Grid2).
-analogy_apply_isometry(Grid, rot270,  Grid2) :- gd_rotate270(Grid, Grid2).
-analogy_apply_isometry(Grid, ref_h,   Grid2) :- gd_reflect_h(Grid, Grid2).
-analogy_apply_isometry(Grid, ref_v,   Grid2) :- gd_reflect_v(Grid, Grid2).
-analogy_apply_isometry(Grid, ref_d1,  Grid2) :- gd_reflect_d1(Grid, Grid2).
-analogy_apply_isometry(Grid, ref_d2,  Grid2) :- gd_reflect_d2(Grid, Grid2).
+analogy_apply_isometry(Grid, rot90,   Grid2) :- grid_rotate90(Grid, Grid2).
+analogy_apply_isometry(Grid, rot180,  Grid2) :- grid_rotate180(Grid, Grid2).
+analogy_apply_isometry(Grid, rot270,  Grid2) :- grid_rotate270(Grid, Grid2).
+analogy_apply_isometry(Grid, ref_h,   Grid2) :- grid_reflect_h(Grid, Grid2).
+analogy_apply_isometry(Grid, ref_v,   Grid2) :- grid_reflect_v(Grid, Grid2).
+analogy_apply_isometry(Grid, ref_d1,  Grid2) :- grid_reflect_d1(Grid, Grid2).
+analogy_apply_isometry(Grid, ref_d2,  Grid2) :- grid_reflect_d2(Grid, Grid2).
 
 % analogy_apply_color_map(+Grid, +Map, -Grid2): apply a From-To color map to a grid.
 analogy_apply_color_map(Grid, Map, Grid2) :-
-    % Delegate to gd_color_map for the actual substitution.
-    gd_color_map(Grid, Map, Grid2).
+    % Delegate to grid_color_map for the actual substitution.
+    grid_color_map(Grid, Map, Grid2).
 
 % ===========================================================================
 % SECTION 6 — CROSS-EXAMPLE CONSISTENCY
@@ -348,7 +348,7 @@ analogy_verify_pair(Iso, ColorMap, InGrid, OutGrid) :-
     % Apply the color map to the isometry result.
     analogy_apply_color_map(TGrid, ColorMap, Predicted),
     % Check that the prediction matches the expected output.
-    gd_equal(Predicted, OutGrid).
+    grid_equal(Predicted, OutGrid).
 
 % pairs_to_lists(+Pairs, -Ins, -Outs): split in(I)-out(O) list into two lists.
 pairs_to_lists([], [], []).

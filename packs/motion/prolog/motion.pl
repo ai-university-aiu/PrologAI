@@ -31,7 +31,7 @@
 % motion_gravity_down(+Grid, +Bg, -Grid2): non-Bg cells sink to the bottom of each column.
 motion_gravity_down(Grid, Bg, Grid2) :-
 % Get column count.
-    gd_size(Grid, _, Cols),
+    grid_size(Grid, _, Cols),
     C1 is Cols - 1,
     numlist(0, C1, ColIndices),
 % Apply downward gravity to each column in sequence.
@@ -40,7 +40,7 @@ motion_gravity_down(Grid, Bg, Grid2) :-
 % apply_gravity_down(+Bg, +C, +GridAcc, -GridAcc2): sink non-Bg in column C.
 apply_gravity_down(Bg, C, GridAcc, GridAcc2) :-
 % Extract the column.
-    gd_col(GridAcc, C, Col),
+    grid_col(GridAcc, C, Col),
 % Separate non-Bg cells from Bg cells.
     include(not_color(Bg), Col, Fg),
     length(Col, Len),
@@ -58,14 +58,14 @@ not_color(Bg, Color) :- Color \== Bg.
 
 % motion_gravity_up(+Grid, +Bg, -Grid2): non-Bg cells rise to the top of each column.
 motion_gravity_up(Grid, Bg, Grid2) :-
-    gd_size(Grid, _, Cols),
+    grid_size(Grid, _, Cols),
     C1 is Cols - 1,
     numlist(0, C1, ColIndices),
     foldl(apply_gravity_up(Bg), ColIndices, Grid, Grid2).
 
 % apply_gravity_up(+Bg, +C, +GridAcc, -GridAcc2): raise non-Bg in column C.
 apply_gravity_up(Bg, C, GridAcc, GridAcc2) :-
-    gd_col(GridAcc, C, Col),
+    grid_col(GridAcc, C, Col),
     include(not_color(Bg), Col, Fg),
     length(Col, Len),
     length(Fg, FgLen),
@@ -108,14 +108,14 @@ slide_row_right(Bg, Row, Row2) :-
 % SET A COLUMN IN A GRID
 % set_col(+Grid, +C, +NewCol, -Grid2): replace column C with NewCol.
 set_col(Grid, C, NewCol, Grid2) :-
-    gd_size(Grid, Rows, _),
+    grid_size(Grid, Rows, _),
     R1 is Rows - 1,
     numlist(0, R1, RowIndices),
     maplist(set_col_row(Grid, C, NewCol), RowIndices, Grid2).
 
 % set_col_row(+Grid, +C, +NewCol, +R, -Row2): update cell C in row R.
 set_col_row(Grid, C, NewCol, R, Row2) :-
-    gd_row(Grid, R, Row),
+    grid_row(Grid, R, Row),
     nth0(R, NewCol, NewColor),
     set_nth(Row, C, NewColor, Row2).
 
@@ -129,16 +129,16 @@ set_nth([H|T], I, Val, [H|T2]) :-
 % GRID SHIFT
 % motion_shift_grid(+Grid, +DR, +DC, +Bg, -Grid2): shift all content by (DR, DC).
 motion_shift_grid(Grid, DR, DC, Bg, Grid2) :-
-% Delegate to gd_translate which handles out-of-bounds with a fill color.
-    gd_translate(Grid, DR, DC, Bg, Grid2).
+% Delegate to grid_translate which handles out-of-bounds with a fill color.
+    grid_translate(Grid, DR, DC, Bg, Grid2).
 
 
 % INDIVIDUAL COLUMN AND ROW SLIDING
 % motion_slide_col(+Grid, +C, +Dir, -Grid2): slide column C up or down.
 motion_slide_col(Grid, C, down, Grid2) :-
 % Extract column, apply downward gravity.
-    gd_col(Grid, C, Col),
-    gd_size(Grid, _, _),
+    grid_col(Grid, C, Col),
+    grid_size(Grid, _, _),
 % Move all non-zero cells to the bottom.
     include(is_fg, Col, Fg),
     length(Col, Len),
@@ -149,7 +149,7 @@ motion_slide_col(Grid, C, down, Grid2) :-
     append(BgTop, Fg, NewCol),
     set_col(Grid, C, NewCol, Grid2).
 motion_slide_col(Grid, C, up, Grid2) :-
-    gd_col(Grid, C, Col),
+    grid_col(Grid, C, Col),
     include(is_fg, Col, Fg),
     length(Col, Len),
     length(Fg, FgLen),
@@ -161,7 +161,7 @@ motion_slide_col(Grid, C, up, Grid2) :-
 
 % motion_slide_row(+Grid, +R, +Dir, -Grid2): slide row R left or right.
 motion_slide_row(Grid, R, left, Grid2) :-
-    gd_row(Grid, R, Row),
+    grid_row(Grid, R, Row),
     include(is_fg, Row, Fg),
     length(Row, Len),
     length(Fg, FgLen),
@@ -171,7 +171,7 @@ motion_slide_row(Grid, R, left, Grid2) :-
     append(Fg, BgRight, NewRow),
     set_row(Grid, R, NewRow, Grid2).
 motion_slide_row(Grid, R, right, Grid2) :-
-    gd_row(Grid, R, Row),
+    grid_row(Grid, R, Row),
     include(is_fg, Row, Fg),
     length(Row, Len),
     length(Fg, FgLen),
@@ -216,7 +216,7 @@ translate_obj(DR, DC, Obj, Obj2) :-
 % motion_scene_to_grid(+Scene, -Grid): render a scene back to a raw grid.
 motion_scene_to_grid(scene(Rows, Cols, Bg, Objects), Grid) :-
 % Start with a uniform background grid.
-    gd_make(Rows, Cols, Bg, BaseGrid),
+    grid_make(Rows, Cols, Bg, BaseGrid),
 % Paint each object's cells onto the grid.
     foldl(paint_obj, Objects, BaseGrid, Grid).
 
@@ -227,7 +227,7 @@ paint_obj(obj(Color, Cells), GridAcc, GridAcc2) :-
 
 % paint_cell(+Color, +r(R,C), +GridAcc, -GridAcc2): set one cell's color.
 paint_cell(Color, r(R, C), GridAcc, GridAcc2) :-
-    gd_set_cell(GridAcc, R, C, Color, GridAcc2).
+    grid_set_cell(GridAcc, R, C, Color, GridAcc2).
 
 
 % SCENE-LEVEL GRAVITY (ROUND-TRIP)

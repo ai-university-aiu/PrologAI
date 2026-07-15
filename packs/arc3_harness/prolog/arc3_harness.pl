@@ -75,7 +75,7 @@
 % Import the planner used when a route to the goal is known.
 :- use_module(library(causal_planner), [causal_planner_chain/3]).
 % Import the grid pack for frame perception and diffs.
-:- use_module(library(grid), [gd_size/3, gd_cell/4, gd_diff/3]).
+:- use_module(library(grid), [grid_size/3, grid_cell/4, grid_diff/3]).
 % Import list helpers.
 :- use_module(library(lists), [member/2, memberchk/2, reverse/2]).
 
@@ -112,7 +112,7 @@ arc3_harness_reset :-
 % Define arc3_harness_perceive: a frame becomes cell_state occurrents.
 arc3_harness_perceive(Frame, Occurrents) :-
     % Measure the frame.
-    gd_size(Frame, Rows, Cols),
+    grid_size(Frame, Rows, Cols),
     % Bounds for enumeration.
     MaxR is Rows - 1,
     % Column bound.
@@ -124,13 +124,13 @@ arc3_harness_perceive(Frame, Occurrents) :-
           % Every column.
           between(0, MaxC, C),
           % Read the cell value.
-          gd_cell(Frame, R, C, V) ),
+          grid_cell(Frame, R, C, V) ),
         Occurrents).
 
 % Define arc3_harness_delta: the change occurrents between successive frames.
 arc3_harness_delta(Frame0, Frame1, Delta) :-
     % The grid pack computes the raw cell differences.
-    gd_diff(Frame0, Frame1, Diffs),
+    grid_diff(Frame0, Frame1, Diffs),
     % Each difference becomes a change occurrent.
     findall(changed(R, C, Old, New),
         % Take each raw difference.

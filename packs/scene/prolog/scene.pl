@@ -43,10 +43,10 @@
 % scene_bg_color(+Grid, -BgColor): the most frequently occurring color in Grid.
 scene_bg_color(Grid, BgColor) :-
 % Get sorted unique color set from the grid.
-    gd_colors(Grid, Colors),
+    grid_colors(Grid, Colors),
 % Build Count-Color pairs for all colors.
     findall(Count-Color,
-            (member(Color, Colors), gd_color_count(Grid, Color, Count)),
+            (member(Color, Colors), grid_color_count(Grid, Color, Count)),
             Pairs),
 % max_member selects the pair with the greatest standard-order key (numeric max).
     max_member(_MaxCount-BgColor, Pairs).
@@ -58,7 +58,7 @@ scene_objects(Grid, Objects) :-
 % Find the background color to exclude it from object extraction.
     scene_bg_color(Grid, BgColor),
 % Get all colors in the grid.
-    gd_colors(Grid, AllColors),
+    grid_colors(Grid, AllColors),
 % Remove the background color so only foreground colors remain.
     delete(AllColors, BgColor, FgColors),
 % For each foreground color collect its connected components, accumulate all.
@@ -67,7 +67,7 @@ scene_objects(Grid, Objects) :-
 % collect_color_objects(+Grid, +Color, +Acc, -NewAcc): helper for foldl.
 collect_color_objects(Grid, Color, Acc, NewAcc) :-
 % Get all maximal 4-connected components for this color.
-    gd_objects(Grid, Color, CellSets),
+    grid_objects(Grid, Color, CellSets),
 % Wrap each cell set as obj(Color, Cells).
     maplist(make_obj(Color), CellSets, ColorObjs),
 % Append new objects to the accumulator.
@@ -81,7 +81,7 @@ make_obj(Color, Cells, obj(Color, Cells)).
 % scene_grid_to_scene(+Grid, -Scene): build scene(Rows, Cols, BgColor, Objects).
 scene_grid_to_scene(Grid, scene(Rows, Cols, BgColor, Objects)) :-
 % Get grid dimensions.
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
 % Identify the background color.
     scene_bg_color(Grid, BgColor),
 % Extract all foreground objects.
@@ -103,7 +103,7 @@ scene_obj_size(obj(_, Cells), Size) :-
 % scene_obj_bbox(+Obj, -TL, -BR): axis-aligned bounding box of the object.
 scene_obj_bbox(obj(_, Cells), TL, BR) :-
 % Delegate to grid pack bounding box predicate.
-    gd_bounding_box(Cells, TL, BR).
+    grid_bounding_box(Cells, TL, BR).
 
 % scene_obj_shape(+Obj, -Shape): normalized cell set (translated to (0,0), sorted).
 scene_obj_shape(obj(_, Cells), Shape) :-

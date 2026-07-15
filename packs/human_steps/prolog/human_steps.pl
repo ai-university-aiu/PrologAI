@@ -86,7 +86,7 @@
 :- use_module(library(jacobian_space),
     [jacobian_space_open/1, jacobian_space_hold/4, jacobian_space_active/2, jacobian_space_reading/2, jacobian_space_decay/2]).
 % Import grid measurement and cell access for the Jacobian.
-:- use_module(library(grid), [gd_size/3, gd_cell/4, gd_diff/3, gd_colors/2]).
+:- use_module(library(grid), [grid_size/3, grid_cell/4, grid_diff/3, grid_colors/2]).
 % Import list helpers.
 :- use_module(library(lists), [member/2, nth0/3, sum_list/2]).
 
@@ -271,7 +271,7 @@ human_steps_sensitivity(Transitions, Sensitivity) :-
         % Take each transition.
         ( member(t(Action, F0, F1), Transitions),
           % The differing cells between the two frames.
-          gd_diff(F0, F1, Diffs),
+          grid_diff(F0, F1, Diffs),
           % How many cells changed.
           length(Diffs, N) ),
         Sensitivity).
@@ -283,7 +283,7 @@ human_steps_controllable(Transitions, Colour) :-
     % There must be a transition to look at.
     Transitions = [t(_, F0, _) | _],
     % The candidate colours are those present, minus the background zero.
-    gd_colors(F0, Colours0),
+    grid_colors(F0, Colours0),
     % Drop the background.
     findall(C, ( member(C, Colours0), C =\= 0 ), Candidates),
     % Score each candidate by the total motion of its centroid.
@@ -363,7 +363,7 @@ human_steps_goal_gradient(Jacobian, cell(FR, FC), cell(GR, GC), Ranked) :-
 % human_steps_centroid(+Frame, +Colour, -R, -C): the rounded centre of mass of a colour.
 human_steps_centroid(Frame, Colour, R, C) :-
     % Measure the frame.
-    gd_size(Frame, Rows, Cols),
+    grid_size(Frame, Rows, Cols),
     % The last row and column indices.
     MaxR is Rows - 1, MaxC is Cols - 1,
     % Collect every cell carrying the colour.
@@ -371,7 +371,7 @@ human_steps_centroid(Frame, Colour, R, C) :-
         % Enumerate the cells.
         ( between(0, MaxR, RR), between(0, MaxC, CC),
           % Read the cell and keep the matches.
-          gd_cell(Frame, RR, CC, Colour) ),
+          grid_cell(Frame, RR, CC, Colour) ),
         Cells),
     % The colour must appear at least once.
     Cells \== [],

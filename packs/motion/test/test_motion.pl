@@ -32,31 +32,31 @@ test(gravity_down_basic, nondet) :-
     grid_scattered(G),
     motion_gravity_down(G, 0, G2),
 % Column 0: no foreground; column 1: 1 cell sinks to row 3.
-    gd_cell(G2, 3, 1, 1),
-    gd_cell(G2, 0, 1, 0),
+    grid_cell(G2, 3, 1, 1),
+    grid_cell(G2, 0, 1, 0),
 % Column 2: 1 cell sinks to row 3.
-    gd_cell(G2, 3, 2, 2),
+    grid_cell(G2, 3, 2, 2),
 % Column 3: 1 cell sinks to row 3.
-    gd_cell(G2, 3, 3, 3).
+    grid_cell(G2, 3, 3, 3).
 
 % Gravity-down on a grid with no foreground is identity.
 test(gravity_down_empty, nondet) :-
-    gd_make(3, 3, 0, G),
+    grid_make(3, 3, 0, G),
     motion_gravity_down(G, 0, G2),
-    gd_equal(G, G2).
+    grid_equal(G, G2).
 
 % Gravity-down on a grid already at the bottom is identity.
 test(gravity_down_already_down, nondet) :-
     G = [[0,0],[1,2]],
     motion_gravity_down(G, 0, G2),
-    gd_equal(G, G2).
+    grid_equal(G, G2).
 
 % Gravity-down preserves grid dimensions.
 test(gravity_down_size, nondet) :-
     grid_sparse(G),
     motion_gravity_down(G, 0, G2),
-    gd_size(G, R, C),
-    gd_size(G2, R, C).
+    grid_size(G, R, C),
+    grid_size(G2, R, C).
 
 :- end_tests(motion_gravity_down).
 
@@ -67,21 +67,21 @@ test(gravity_down_size, nondet) :-
 test(gravity_up_basic, nondet) :-
     grid_scattered(G),
     motion_gravity_up(G, 0, G2),
-    gd_cell(G2, 0, 1, 1),
-    gd_cell(G2, 0, 2, 2),
-    gd_cell(G2, 0, 3, 3).
+    grid_cell(G2, 0, 1, 1),
+    grid_cell(G2, 0, 2, 2),
+    grid_cell(G2, 0, 3, 3).
 
 % Gravity-up on empty grid is identity.
 test(gravity_up_empty, nondet) :-
-    gd_make(3, 3, 0, G),
+    grid_make(3, 3, 0, G),
     motion_gravity_up(G, 0, G2),
-    gd_equal(G, G2).
+    grid_equal(G, G2).
 
 % Gravity-up on a grid already at the top is identity.
 test(gravity_up_already_up, nondet) :-
     G = [[1,2],[0,0]],
     motion_gravity_up(G, 0, G2),
-    gd_equal(G, G2).
+    grid_equal(G, G2).
 
 :- end_tests(motion_gravity_up).
 
@@ -93,26 +93,26 @@ test(gravity_left_basic) :-
     grid_sparse(G),
     motion_gravity_left(G, 0, G2),
 % Row 0: [0,1,0,2] -> [1,2,0,0].
-    gd_cell(G2, 0, 0, 1),
-    gd_cell(G2, 0, 1, 2),
-    gd_cell(G2, 0, 2, 0),
+    grid_cell(G2, 0, 0, 1),
+    grid_cell(G2, 0, 1, 2),
+    grid_cell(G2, 0, 2, 0),
 % Row 1: [3,0,0,0] -> [3,0,0,0] (already leftmost).
-    gd_cell(G2, 1, 0, 3).
+    grid_cell(G2, 1, 0, 3).
 
 % Gravity-right: foreground cells slide to the right of each row.
 test(gravity_right_basic) :-
     grid_sparse(G),
     motion_gravity_right(G, 0, G2),
 % Row 0: [0,1,0,2] -> [0,0,1,2].
-    gd_cell(G2, 0, 2, 1),
-    gd_cell(G2, 0, 3, 2).
+    grid_cell(G2, 0, 2, 1),
+    grid_cell(G2, 0, 3, 2).
 
 % Gravity-left then gravity-right is not necessarily identity, but sizes match.
 test(gravity_lr_size) :-
     grid_sparse(G),
     motion_gravity_left(G, 0, G2),
-    gd_size(G, R, C),
-    gd_size(G2, R, C).
+    grid_size(G, R, C),
+    grid_size(G2, R, C).
 
 :- end_tests(motion_gravity_lr).
 
@@ -123,29 +123,29 @@ test(gravity_lr_size) :-
 test(slide_col_down, nondet) :-
     G = [[1,0],[0,0],[0,0]],
     motion_slide_col(G, 0, down, G2),
-    gd_cell(G2, 2, 0, 1),
-    gd_cell(G2, 0, 0, 0).
+    grid_cell(G2, 2, 0, 1),
+    grid_cell(G2, 0, 0, 0).
 
 % Slide column up.
 test(slide_col_up, nondet) :-
     G = [[0,0],[0,0],[1,0]],
     motion_slide_col(G, 0, up, G2),
-    gd_cell(G2, 0, 0, 1),
-    gd_cell(G2, 2, 0, 0).
+    grid_cell(G2, 0, 0, 1),
+    grid_cell(G2, 2, 0, 0).
 
 % Slide row left.
 test(slide_row_left, nondet) :-
     G = [[0,1,0],[0,0,0]],
     motion_slide_row(G, 0, left, G2),
-    gd_cell(G2, 0, 0, 1),
-    gd_cell(G2, 0, 1, 0).
+    grid_cell(G2, 0, 0, 1),
+    grid_cell(G2, 0, 1, 0).
 
 % Slide row right.
 test(slide_row_right) :-
     G = [[1,0,0],[0,0,0]],
     motion_slide_row(G, 0, right, G2),
-    gd_cell(G2, 0, 2, 1),
-    gd_cell(G2, 0, 0, 0).
+    grid_cell(G2, 0, 2, 1),
+    grid_cell(G2, 0, 0, 0).
 
 :- end_tests(motion_slide_col_row).
 
@@ -156,21 +156,21 @@ test(slide_row_right) :-
 test(shift_down) :-
     grid_2x2(G),
     motion_shift_grid(G, 1, 0, 0, G2),
-    gd_cell(G2, 1, 0, 1),
-    gd_cell(G2, 0, 0, 0).
+    grid_cell(G2, 1, 0, 1),
+    grid_cell(G2, 0, 0, 0).
 
 % Shift grid right by 1.
 test(shift_right) :-
     grid_2x2(G),
     motion_shift_grid(G, 0, 1, 0, G2),
-    gd_cell(G2, 0, 1, 1),
-    gd_cell(G2, 0, 0, 0).
+    grid_cell(G2, 0, 1, 1),
+    grid_cell(G2, 0, 0, 0).
 
 % Shift by (0,0) is identity.
 test(shift_zero) :-
     grid_2x2(G),
     motion_shift_grid(G, 0, 0, 0, G2),
-    gd_equal(G, G2).
+    grid_equal(G, G2).
 
 :- end_tests(motion_shift_grid).
 
@@ -230,21 +230,21 @@ test(scene_translate_dims) :-
 test(scene_to_grid_size) :-
     scene_two_objs(Scene),
     motion_scene_to_grid(Scene, Grid),
-    gd_size(Grid, 4, 4).
+    grid_size(Grid, 4, 4).
 
 % Object cells appear in the rendered grid with correct colors.
 test(scene_to_grid_cells) :-
     scene_two_objs(Scene),
     motion_scene_to_grid(Scene, Grid),
-    gd_cell(Grid, 0, 0, 1),
-    gd_cell(Grid, 1, 2, 2),
-    gd_cell(Grid, 0, 1, 0).
+    grid_cell(Grid, 0, 0, 1),
+    grid_cell(Grid, 1, 2, 2),
+    grid_cell(Grid, 0, 1, 0).
 
 % Rendering a scene with no objects gives a uniform background.
 test(scene_to_grid_empty_scene) :-
     motion_scene_to_grid(scene(3, 3, 0, []), Grid),
-    gd_make(3, 3, 0, Expected),
-    gd_equal(Grid, Expected).
+    grid_make(3, 3, 0, Expected),
+    grid_equal(Grid, Expected).
 
 :- end_tests(motion_scene_to_grid).
 
@@ -257,9 +257,9 @@ test(scene_gravity_basic, nondet) :-
     motion_scene_gravity(Scene, Scene2),
 % After gravity, the grid should have objects at the bottom rows.
     motion_scene_to_grid(Scene2, Grid2),
-    gd_size(Grid2, 4, 4),
+    grid_size(Grid2, 4, 4),
 % Color 1 object was at (0,0); should now be near row 3.
-    gd_cell(Grid2, 3, 0, 1).
+    grid_cell(Grid2, 3, 0, 1).
 
 :- end_tests(motion_scene_gravity).
 
