@@ -88,7 +88,7 @@ compose_fixed_point(Rule, Grid, Grid2) :-
 % Apply the rule once.
     compose_apply(Rule, Grid, Mid),
 % Check for convergence using structural equality.
-    ( gd_equal(Grid, Mid) ->
+    ( grid_equal(Grid, Mid) ->
 % Grid unchanged: convergence reached.
         Grid2 = Grid
     ;
@@ -106,7 +106,7 @@ compose_map_rows(RowRule, Grid, Grid2) :-
 % compose_map_cols(+ColRule, +Grid, -Grid2): apply ColRule independently to each column.
 compose_map_cols(ColRule, Grid, Grid2) :-
 % Get grid dimensions.
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
 % Build the column index list.
     C1 is Cols - 1,
     numlist(0, C1, ColIndices),
@@ -120,7 +120,7 @@ compose_map_cols(ColRule, Grid, Grid2) :-
 % transform_col(+Grid, +ColRule, +C, -TransformedCol): apply ColRule to column C.
 transform_col(Grid, ColRule, C, TransformedCol) :-
 % Extract the column as a flat list of cell colors.
-    gd_col(Grid, C, Col),
+    grid_col(Grid, C, Col),
 % Apply ColRule: call(ColRule, Col, TransformedCol).
     call(ColRule, Col, TransformedCol).
 

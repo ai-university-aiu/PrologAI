@@ -42,13 +42,13 @@
 % color_palette(+Grid, -Palette)
 % Palette is the sorted list of distinct colors appearing in Grid.
 color_palette(Grid, Palette) :-
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     R1 is Rows - 1,
     C1 is Cols - 1,
     findall(Color,
         (   between(0, R1, R),
             between(0, C1, C),
-            gd_cell(Grid, R, C, Color)
+            grid_cell(Grid, R, C, Color)
         ),
         AllColors),
     sort(AllColors, Palette).
@@ -62,13 +62,13 @@ color_count(Grid, Color, N) :-
 % color_palette_cells_(Grid, Color, Cells)
 % Collect all (R,C) positions in Grid where the cell color = Color.
 color_palette_cells_(Grid, Color, Cells) :-
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     R1 is Rows - 1,
     C1 is Cols - 1,
     findall(r(R,C),
         (   between(0, R1, R),
             between(0, C1, C),
-            gd_cell(Grid, R, C, Color)
+            grid_cell(Grid, R, C, Color)
         ),
         Cells).
 
@@ -179,12 +179,12 @@ color_color_count(Grid, N) :-
 % color_has_color(+Grid, +Color)
 % Succeed if Grid contains at least one cell of Color.
 color_has_color(Grid, Color) :-
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     R1 is Rows - 1,
     C1 is Cols - 1,
     between(0, R1, R),
     between(0, C1, C),
-    gd_cell(Grid, R, C, Color),
+    grid_cell(Grid, R, C, Color),
     !.
 
 % color_swap(+Grid, +ColorA, +ColorB, -Grid2)

@@ -128,7 +128,7 @@ ay_grid_isometry(+Grid1, +Grid2, -Isometries)
 Finds all D4 isometries mapping Grid1 to Grid2.
 
     ?- G1 = [[1,2],[3,4]],
-       gd_rotate90(G1, G2),
+       grid_rotate90(G1, G2),
        ay_grid_isometry(G1, G2, Isos).
     Isos = [rot90].
 
@@ -159,11 +159,11 @@ Training pairs are written as in(InputGrid)-out(OutputGrid) terms.
 
     % A training pair where the rule is rot90.
     ?- G1in  = [[1,0],[0,2]],
-       gd_rotate90(G1in, G1out),
+       grid_rotate90(G1in, G1out),
        Train  = [in(G1in)-out(G1out)],
        GTest  = [[3,0],[0,4]],
        ay_solve_from_examples(Train, GTest, Answer).
-    Answer = [[0,3],[4,0]].   % = gd_rotate90(GTest)
+    Answer = [[0,3],[4,0]].   % = grid_rotate90(GTest)
 
 With two training pairs:
 

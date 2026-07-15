@@ -246,7 +246,7 @@ test(grid_iso_identity) :-
 test(grid_iso_rot90, nondet) :-
     % A 2x2 grid and its 90-degree rotation.
     G1 = [[1,2],[3,4]],
-    gd_rotate90(G1, G2),
+    grid_rotate90(G1, G2),
     analogy_grid_isometry(G1, G2, Isos),
     member(rot90, Isos).
 
@@ -258,7 +258,7 @@ test(apply_all_isometries, nondet) :-
     member(Iso, [identity, rot90, rot180, rot270, ref_h, ref_v, ref_d1, ref_d2]),
     analogy_apply_isometry(G, Iso, _G2).
 
-% AC-AY-005-d: apply_color_map delegates to gd_color_map.
+% AC-AY-005-d: apply_color_map delegates to grid_color_map.
 test(apply_color_map) :-
     % A grid with colors 1 and 2.
     G = [[1,2],[2,1]],
@@ -277,18 +277,18 @@ test(apply_color_map) :-
 test(solve_rot90, nondet) :-
     % Training: input rotated 90 degrees gives output.
     G1in  = [[1,0],[0,2]],
-    gd_rotate90(G1in, G1out),
+    grid_rotate90(G1in, G1out),
     G2in  = [[0,1],[2,0]],
-    gd_rotate90(G2in, G2out),
+    grid_rotate90(G2in, G2out),
     % Training pairs.
     Train = [in(G1in)-out(G1out), in(G2in)-out(G2out)],
     % Test grid.
     GTest = [[1,2],[3,4]],
     % Expected output.
-    gd_rotate90(GTest, Expected),
+    grid_rotate90(GTest, Expected),
     % Solve.
     analogy_solve_from_examples(Train, GTest, Predicted),
-    gd_equal(Predicted, Expected).
+    grid_equal(Predicted, Expected).
 
 % AC-AY-006-b: solve with pure color-map rule.
 test(solve_color_map, nondet) :-
@@ -301,19 +301,19 @@ test(solve_color_map, nondet) :-
     GTest = [[0,1],[1,0]],
     GExpected = [[0,3],[3,0]],
     analogy_solve_from_examples(Train, GTest, Predicted),
-    gd_equal(Predicted, GExpected).
+    grid_equal(Predicted, GExpected).
 
 % AC-AY-006-c: solve with rot90 + color swap rule.
 test(solve_iso_plus_color, nondet) :-
     % Training: rotate 90 CW AND swap 1->2.
     G1in = [[1,0],[0,0]],
-    gd_rotate90(G1in, G1rot),
-    gd_color_map(G1rot, [1-2], G1out),
+    grid_rotate90(G1in, G1rot),
+    grid_color_map(G1rot, [1-2], G1out),
     Train = [in(G1in)-out(G1out)],
     GTest = [[0,0],[1,0]],
-    gd_rotate90(GTest, GTestRot),
-    gd_color_map(GTestRot, [1-2], Expected),
+    grid_rotate90(GTest, GTestRot),
+    grid_color_map(GTestRot, [1-2], Expected),
     analogy_solve_from_examples(Train, GTest, Predicted),
-    gd_equal(Predicted, Expected).
+    grid_equal(Predicted, Expected).
 
 :- end_tests(analogy_solve).

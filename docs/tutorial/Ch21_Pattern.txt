@@ -126,7 +126,7 @@ Detect whether an output is a tiling of a smaller pattern found in the input:
 
     solve_tiling(InputGrid, OutputGrid, TileH, TileW) :-
         pattern_extract_tile(InputGrid, TileH, TileW, Tile),
-        gd_size(OutputGrid, Rows, Cols),
+        grid_size(OutputGrid, Rows, Cols),
         pattern_is_tiling(OutputGrid, Tile, TileH),
         Rows > TileH.
 
@@ -134,7 +134,7 @@ Detect period and extract one repeating unit from a row:
 
     row_unit(Grid, R, Unit) :-
         pattern_row_period(Grid, R, P),
-        gd_row(Grid, R, Row),
+        grid_row(Grid, R, Row),
         length(Unit, P),
         append(Unit, _, Row).
 

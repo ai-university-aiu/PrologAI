@@ -16,7 +16,7 @@ Layer 200. Pack prefix: gd_*. Work Package 221.
 Exported Predicates
 
 
-gd_manhattan(+R1, +C1, +R2, +C2, -D)
+griddist_manhattan(+R1, +C1, +R2, +C2, -D)
 
 D is the Manhattan (L1, city-block) distance between grid positions (R1,C1)
 and (R2,C2): the sum of the absolute row difference and absolute column
@@ -24,11 +24,11 @@ difference.
 
 Example:
 
-gd_manhattan(0, 0, 1, 1, D).  % D = 2
-gd_manhattan(0, 0, 0, 3, D).  % D = 3
+griddist_manhattan(0, 0, 1, 1, D).  % D = 2
+griddist_manhattan(0, 0, 0, 3, D).  % D = 3
 
 
-gd_chebyshev(+R1, +C1, +R2, +C2, -D)
+griddist_chebyshev(+R1, +C1, +R2, +C2, -D)
 
 D is the Chebyshev (L-infinity, chessboard) distance: the maximum of the
 absolute row difference and absolute column difference. A diagonal step costs
@@ -36,11 +36,11 @@ the same as a cardinal step.
 
 Example:
 
-gd_chebyshev(0, 0, 1, 1, D).  % D = 1 (not 2 as in Manhattan)
-gd_chebyshev(0, 0, 2, 3, D).  % D = 3
+griddist_chebyshev(0, 0, 1, 1, D).  % D = 1 (not 2 as in Manhattan)
+griddist_chebyshev(0, 0, 2, 3, D).  % D = 3
 
 
-gd_dist_map(+Grid, +Color, -DistGrid)
+griddist_dist_map(+Grid, +Color, -DistGrid)
 
 DistGrid is a raw grid of the same dimensions where each cell holds the
 minimum Manhattan distance from that cell to the nearest cell in Grid whose
@@ -49,22 +49,22 @@ value equals Color. If Color is absent from Grid, every cell gets 9999.
 Example:
 
 % b at center (1,1) of 3x3 grid
-gd_dist_map([[r,r,r],[r,b,r],[r,r,r]], b, DMap).
+griddist_dist_map([[r,r,r],[r,b,r],[r,r,r]], b, DMap).
 % DMap = [[2,1,2],[1,0,1],[2,1,2]]
 
 
-gd_dist_map8(+Grid, +Color, -DistGrid)
+griddist_dist_map8(+Grid, +Color, -DistGrid)
 
-Like gd_dist_map but uses Chebyshev distance. Diagonal neighbors count as
+Like griddist_dist_map but uses Chebyshev distance. Diagonal neighbors count as
 distance 1, so corners in the example above become 1 rather than 2.
 
 Example:
 
-gd_dist_map8([[r,r,r],[r,b,r],[r,r,r]], b, DMap8).
+griddist_dist_map8([[r,r,r],[r,b,r],[r,r,r]], b, DMap8).
 % DMap8 = [[1,1,1],[1,0,1],[1,1,1]]
 
 
-gd_nearest_coord(+Grid, +R, +C, +Color, -Coord)
+griddist_nearest_coord(+Grid, +R, +C, +Color, -Coord)
 
 Coord is [R2,C2] where (R2,C2) is the nearest cell to (R,C) whose value
 equals Color. Ties are broken by standard term order (top-left wins).
@@ -72,11 +72,11 @@ Fails if no Color cell exists in Grid.
 
 Example:
 
-gd_nearest_coord([[r,r,r],[r,b,r],[r,r,r]], 0, 0, b, Coord).
+griddist_nearest_coord([[r,r,r],[r,b,r],[r,r,r]], 0, 0, b, Coord).
 % Coord = [1,1]
 
 
-gd_zone(+Grid, +Color, +N, -ZoneGrid)
+griddist_zone(+Grid, +Color, +N, -ZoneGrid)
 
 ZoneGrid is Grid with every non-Color cell within Manhattan distance N of any
 Color cell replaced by the atom zone. Color cells keep their original value.
@@ -84,25 +84,25 @@ Cells farther than N from all Color cells keep their original value.
 
 Example:
 
-gd_zone([[r,r,r],[r,b,r],[r,r,r]], b, 1, ZG).
+griddist_zone([[r,r,r],[r,b,r],[r,r,r]], b, 1, ZG).
 % ZG = [[r,zone,r],[zone,b,zone],[r,zone,r]]
 
 
-gd_ring(+Grid, +R0, +C0, +D, -Coords)
+griddist_ring(+Grid, +R0, +C0, +D, -Coords)
 
 Coords is the list of [R,C] pairs within Grid at exactly Manhattan distance D
 from (R0,C0). Out-of-bounds positions are excluded. D=0 returns [[R0,C0]].
 
 Example:
 
-gd_ring([[r,r,r],[r,b,r],[r,r,r]], 1, 1, 1, Ring).
+griddist_ring([[r,r,r],[r,b,r],[r,r,r]], 1, 1, 1, Ring).
 % Ring = [[0,1],[1,0],[1,2],[2,1]]
 
-gd_ring([[r,r,r],[r,b,r],[r,r,r]], 1, 1, 2, Ring2).
+griddist_ring([[r,r,r],[r,b,r],[r,r,r]], 1, 1, 2, Ring2).
 % Ring2 = [[0,0],[0,2],[2,0],[2,2]]
 
 
-gd_voronoi(+Grid, -VGrid)
+griddist_voronoi(+Grid, -VGrid)
 
 VGrid is Grid with every background cell replaced by the color of the nearest
 non-background cell (Manhattan distance). Background is detected as the most
@@ -112,11 +112,11 @@ exist, VGrid equals Grid unchanged.
 Example:
 
 % b at (1,0), g at (1,2), r background
-gd_voronoi([[r,r,r],[b,r,g],[r,r,r]], VG).
+griddist_voronoi([[r,r,r],[b,r,g],[r,r,r]], VG).
 % VG = [[b,b,g],[b,b,g],[b,b,g]]  (equidistant cells get b since b < g)
 
 
-gd_bfs_flood(+Grid, +R0, +C0, +Wall, -DistGrid)
+griddist_bfs_flood(+Grid, +R0, +C0, +Wall, -DistGrid)
 
 DistGrid is a raw grid of BFS distances from (R0,C0) treating cells with
 value Wall as impassable. The start cell gets distance 0. Unreachable cells
@@ -125,12 +125,12 @@ and Wall cells get 9999. Fails if the start cell itself has value Wall.
 Example:
 
 % b at center acts as wall; path to (1,2) detours via (0,2)
-gd_bfs_flood([[r,r,r],[r,b,r],[r,r,r]], 0, 0, b, DG).
+griddist_bfs_flood([[r,r,r],[r,b,r],[r,r,r]], 0, 0, b, DG).
 % DG[1][2] = 3  (path: 0,0 -> 0,1 -> 0,2 -> 1,2)
 % DG[1][1] = 9999  (blocked wall)
 
 
-gd_recolor_by_dist(+Grid, +Color, +Palette, -NewGrid)
+griddist_recolor_by_dist(+Grid, +Color, +Palette, -NewGrid)
 
 Each Color cell at Manhattan distance D from the nearest background cell is
 recolored to the D-th element of Palette (1-indexed). Color cells with D
@@ -140,11 +140,11 @@ cells are unchanged. Background is detected as the most frequent color.
 Example:
 
 % 5x5 grid with 3x3 b block; center b at dist 2, border b at dist 1
-gd_recolor_by_dist(G5x5, b, [red, blue], NewG).
+griddist_recolor_by_dist(G5x5, b, [red, blue], NewG).
 % Border b cells -> red; center b -> blue
 
 
-gd_expand_n(+Grid, +Color, +N, -Expanded)
+griddist_expand_n(+Grid, +Color, +N, -Expanded)
 
 Expanded is Grid with every cell within Manhattan distance N of any Color
 cell set to Color. This is N-step morphological dilation of Color regions.
@@ -153,11 +153,11 @@ N=0 leaves the grid unchanged.
 Example:
 
 % Expand single center b outward by 1 step
-gd_expand_n([[r,r,r],[r,b,r],[r,r,r]], b, 1, E).
+griddist_expand_n([[r,r,r],[r,b,r],[r,r,r]], b, 1, E).
 % E = [[r,b,r],[b,b,b],[r,b,r]]
 
 
-gd_shrink_n(+Grid, +Color, +N, -Shrunk)
+griddist_shrink_n(+Grid, +Color, +N, -Shrunk)
 
 Shrunk is Grid with every Color cell within Manhattan distance N of the
 nearest background cell replaced by background. This is N-step morphological
@@ -166,11 +166,11 @@ erosion of Color regions. N=0 leaves the grid unchanged.
 Example:
 
 % 5x5 grid 3x3 b block: border b cells at dist 1 eroded; center b at dist 2 survives
-gd_shrink_n(G5x5, b, 1, S).
+griddist_shrink_n(G5x5, b, 1, S).
 % S has b only at (2,2)
 
 
-gd_equidistant(+Grid, +ColorA, +ColorB, -EqGrid)
+griddist_equidistant(+Grid, +ColorA, +ColorB, -EqGrid)
 
 EqGrid is Grid with every cell where the Manhattan distance to ColorA equals
 the Manhattan distance to ColorB replaced by the atom equidist. ColorA and
@@ -179,11 +179,11 @@ ColorB cells keep their original value even if they happen to be equidistant.
 Example:
 
 % b at (0,0), g at (2,2); cells on the anti-diagonal at equal distance
-gd_equidistant([[b,r,r],[r,r,r],[r,r,g]], b, g, EqG).
+griddist_equidistant([[b,r,r],[r,r,r],[r,r,g]], b, g, EqG).
 % EqG[1][1] = equidist, EqG[0][2] = equidist, EqG[2][0] = equidist
 
 
-gd_max_dist(+Grid, +Color, -R, -C)
+griddist_max_dist(+Grid, +Color, -R, -C)
 
 (R,C) is the position of the cell farthest (by Manhattan distance) from any
 Color cell. Ties resolved by row-major order (top-left). Fails if Grid
@@ -192,30 +192,30 @@ contains no Color cells.
 Example:
 
 % b at center; all corners are at dist 2; top-left corner wins
-gd_max_dist([[r,r,r],[r,b,r],[r,r,r]], b, R, C).
+griddist_max_dist([[r,r,r],[r,b,r],[r,r,r]], b, R, C).
 % R = 0, C = 0
 
 
 Typical Use Cases
 
 Proximity zone (mark cells near a region):
-  gd_zone(Grid, Color, 2, ZoneGrid)
+  griddist_zone(Grid, Color, 2, ZoneGrid)
 
 Voronoi assignment (partition by nearest foreground):
-  gd_voronoi(Grid, VGrid)
+  griddist_voronoi(Grid, VGrid)
 
 Path planning around obstacles:
-  gd_bfs_flood(Grid, StartR, StartC, WallColor, DistGrid)
+  griddist_bfs_flood(Grid, StartR, StartC, WallColor, DistGrid)
 
 Morphological grow/shrink by N steps:
-  gd_expand_n(Grid, Color, 3, Expanded)
-  gd_shrink_n(Grid, Color, 2, Shrunk)
+  griddist_expand_n(Grid, Color, 3, Expanded)
+  griddist_shrink_n(Grid, Color, 2, Shrunk)
 
 Distance-gradient recoloring:
-  gd_recolor_by_dist(Grid, Color, [outer, middle, inner], NewGrid)
+  griddist_recolor_by_dist(Grid, Color, [outer, middle, inner], NewGrid)
 
 Equidistant boundary detection:
-  gd_equidistant(Grid, ColorA, ColorB, EqGrid)
+  griddist_equidistant(Grid, ColorA, ColorB, EqGrid)
 
 
 Dependencies

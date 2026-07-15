@@ -69,13 +69,13 @@ shape_from_cells(Cells, Shape) :-
 % shape_from_grid(+Grid, +Color, -Shape)
 % Extract all cells of Color from Grid and normalize to a shape.
 shape_from_grid(Grid, Color, Shape) :-
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     R1 is Rows - 1,
     C1 is Cols - 1,
     findall(r(R,C),
         (   between(0, R1, R),
             between(0, C1, C),
-            gd_cell(Grid, R, C, Color)
+            grid_cell(Grid, R, C, Color)
         ),
         Cells),
     Cells = [_|_],
@@ -207,5 +207,5 @@ shape_to_grid([], _DR, _DC, _Color, Grid, Grid).
 shape_to_grid([r(R,C)|T], DR, DC, Color, Grid, Grid2) :-
     R2 is R + DR,
     C2 is C + DC,
-    gd_set_cell(Grid, R2, C2, Color, Grid1),
+    grid_set_cell(Grid, R2, C2, Color, Grid1),
     shape_to_grid(T, DR, DC, Color, Grid1, Grid2).

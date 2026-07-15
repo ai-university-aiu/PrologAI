@@ -49,7 +49,7 @@
 ]).
 
 % Import grid measurement and reading.
-:- use_module(library(grid), [gd_size/3, gd_cell/4, gd_colors/2, gd_color_count/3]).
+:- use_module(library(grid), [grid_size/3, grid_cell/4, grid_colors/2, grid_color_count/3]).
 % Import connected-component object detection.
 :- use_module(library(gridobj), [gridobj_all_objects/3]).
 % Import list helpers.
@@ -113,10 +113,10 @@ grid_perception_background(Frame, Bg) :-
 % grid_perception_background_compute(+Frame, -Bg): the uncached background computation.
 grid_perception_background_compute(Frame, Bg) :-
     % The colours present.
-    gd_colors(Frame, Colours),
+    grid_colors(Frame, Colours),
     % Pair each colour with how many cells carry it.
     findall(N - Colour,
-        ( member(Colour, Colours), gd_color_count(Frame, Colour, N) ),
+        ( member(Colour, Colours), grid_color_count(Frame, Colour, N) ),
         Counts),
     % There must be at least one colour.
     Counts \== [],
@@ -196,7 +196,7 @@ grid_perception_inventory(Frame, Items) :-
     % The objects, largest first.
     grid_perception_objects(Frame, Objects),
     % The grid area, to judge "large".
-    ( gd_size(Frame, H, W) -> Area is H * W ; Area = 4096 ),
+    ( grid_size(Frame, H, W) -> Area is H * W ; Area = 4096 ),
     % Tag each object with an id and a role.
     findall(seen(Id, Colour, Size, cell(CR, CC), Role),
         ( nth1(Id, Objects, obj(Colour, Size, cell(CR, CC), bbox(R0, C0, R1, C1))),
@@ -253,14 +253,14 @@ grid_perception_bars(Frame, Bars) :-
 % Define grid_perception_changed_cells: the cells whose colour differs between two frames.
 grid_perception_changed_cells(Frame0, Frame1, Cells) :-
     % The dimensions (assume the two frames share them).
-    gd_size(Frame0, H, W),
+    grid_size(Frame0, H, W),
     % The last row and column indices.
     H1 is H - 1, W1 is W - 1,
     % Every cell whose value changed.
     findall(cell(R, C),
         ( between(0, H1, R), between(0, W1, C),
-          gd_cell(Frame0, R, C, V0),
-          gd_cell(Frame1, R, C, V1),
+          grid_cell(Frame0, R, C, V0),
+          grid_cell(Frame1, R, C, V1),
           V0 \== V1 ),
         Cells).
 
@@ -278,7 +278,7 @@ grid_perception_avatar_move(Frame0, Frame1, cell(R, C)) :-
     % The changed cells that are now non-background — where the avatar moved to.
     findall(cell(RR, CC),
         ( member(cell(RR, CC), Changed),
-          gd_cell(Frame1, RR, CC, V), V \== Bg1 ),
+          grid_cell(Frame1, RR, CC, V), V \== Bg1 ),
         NewCells),
     % Prefer the moved-into cells; fall back to all changed cells.
     ( NewCells \== [] -> Pick = NewCells ; Pick = Changed ),

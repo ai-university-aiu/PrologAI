@@ -42,7 +42,7 @@
 % The outer ring is row 0, row Rows-1, column 0, column Cols-1.
 frame_border_cells(Grid, Pairs) :-
     % Get grid dimensions.
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     % Collect all (R,C) positions on the outer ring.
     frame_ring_positions_(0, 0, Rows, Cols, Positions),
     % Map each position to a r(R,C)-Color pair.
@@ -85,7 +85,7 @@ frame_pair_c_(C, R, r(R, C)).
 
 % frame_read_cell_(Grid, r(R,C), r(R,C)-Color) - read cell color at r(R,C).
 frame_read_cell_(Grid, r(R, C), r(R, C)-Color) :-
-    gd_cell(Grid, R, C, Color).
+    grid_cell(Grid, R, C, Color).
 
 % frame_border_color(+Grid, -Color)
 % The outer border of Grid is uniform and has the given Color.
@@ -110,7 +110,7 @@ frame_has_border(Grid, Color) :-
 % Fails if the grid is too small (less than 3 rows or 3 cols).
 frame_inner(Grid, Inner) :-
     % Grid must be at least 3x3 to have a non-empty interior.
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     Rows >= 3,
     Cols >= 3,
     % Extract each interior row.
@@ -125,25 +125,25 @@ frame_inner(Grid, Inner) :-
 % frame_extract_row_(Grid, Cols, R, Row)
 % Extract a sub-row of Grid at row R for the given column indices.
 frame_extract_row_(Grid, Cols, R, Row) :-
-    maplist(gd_cell(Grid, R), Cols, Row).
+    maplist(grid_cell(Grid, R), Cols, Row).
 
 % frame_add_border(+Grid, +Thickness, +Color, -Grid2)
 % Wrap Grid with a border of given Thickness and Color.
 % Each added layer increases rows and cols by 2.
 frame_add_border(Grid, Thickness, Color, Grid2) :-
     % Compute new dimensions.
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     Rows2 is Rows + 2 * Thickness,
     Cols2 is Cols + 2 * Thickness,
     % Build a uniform grid of Color.
-    gd_make(Rows2, Cols2, Color, Base),
+    grid_make(Rows2, Cols2, Color, Base),
     % Paint the interior with the original grid cells.
     frame_paint_inner_(Grid, Thickness, Thickness, Base, Grid2).
 
 % frame_paint_inner_(Src, DR, DC, Acc, Out)
 % Paint Src into Acc starting at offset (DR, DC).
 frame_paint_inner_(Src, DR, DC, Acc, Out) :-
-    gd_size(Src, Rows, Cols),
+    grid_size(Src, Rows, Cols),
     numlist(0, Rows, AllRows0), last(AllRows0, _),
     R1 is Rows - 1,
     C1 is Cols - 1,
@@ -161,9 +161,9 @@ frame_paint_rows_(Src, [R|Rs], SrcCols, DR, DC, Acc, Out) :-
 % frame_paint_row_cells_ - iterate over columns in a row.
 frame_paint_row_cells_(_Src, _R, [], _DC, _DestR, Acc, Acc).
 frame_paint_row_cells_(Src, R, [C|Cs], DC, DestR, Acc, Out) :-
-    gd_cell(Src, R, C, Color),
+    grid_cell(Src, R, C, Color),
     DestC is C + DC,
-    gd_set_cell(Acc, DestR, DestC, Color, Acc2),
+    grid_set_cell(Acc, DestR, DestC, Color, Acc2),
     frame_paint_row_cells_(Src, R, Cs, DC, DestR, Acc2, Out).
 
 % frame_region_has_border(+Grid, +R0, +C0, +R1, +C1, -Color)
@@ -173,16 +173,16 @@ frame_region_has_border(Grid, R0, C0, R1, C1, Color) :-
     Cols is C1 - C0 + 1,
     frame_ring_positions_(R0, C0, Rows, Cols, Positions),
     Positions = [First|Rest],
-    gd_cell(Grid, First, Color),
+    grid_cell(Grid, First, Color),
     maplist(frame_region_cell_color_(Grid, Color), Rest).
 
 % frame_region_cell_color_(Grid, Color, r(R,C)) - check cell color in region.
 frame_region_cell_color_(Grid, Color, r(R, C)) :-
-    gd_cell(Grid, R, C, Color).
+    grid_cell(Grid, R, C, Color).
 
-% gd_cell/3 overload: accept r(R,C) term.
-gd_cell(Grid, r(R, C), Color) :-
-    gd_cell(Grid, R, C, Color).
+% grid_cell/3 overload: accept r(R,C) term.
+grid_cell(Grid, r(R, C), Color) :-
+    grid_cell(Grid, R, C, Color).
 
 % frame_region_border_color(+Grid, +R0, +C0, +R1, +C1, -Color)
 % Color of the uniform outer ring of sub-rectangle (R0,C0)-(R1,C1).
@@ -198,7 +198,7 @@ frame_interior_uniform(Grid) :-
 % frame_grid_uniform_(Grid, Color)
 % Succeeds if every cell in Grid has the same Color.
 frame_grid_uniform_(Grid, Color) :-
-    gd_size(Grid, _Rows, Cols),
+    grid_size(Grid, _Rows, Cols),
     C1 is Cols - 1,
     numlist(0, C1, Cs),
     Grid = [FirstRow|_],
@@ -224,7 +224,7 @@ frame_interior_color(Grid, Color) :-
 % Build a Rows x Cols grid: outer border of FrameColor, interior of FillColor.
 frame_make_framed(Rows, Cols, FrameColor, FillColor, Grid) :-
     % Fill entire grid with FrameColor.
-    gd_make(Rows, Cols, FrameColor, Base),
+    grid_make(Rows, Cols, FrameColor, Base),
     % Fill interior with FillColor.
     InnerR0 is 1,
     InnerR1 is Rows - 2,
@@ -252,7 +252,7 @@ frame_fill_rows_(Grid, [R|Rs], Cols, Color, Out) :-
 % frame_fill_cols_ - paint each column in a row.
 frame_fill_cols_(Grid, _R, [], _Color, Grid).
 frame_fill_cols_(Grid, R, [C|Cs], Color, Out) :-
-    gd_set_cell(Grid, R, C, Color, Grid2),
+    grid_set_cell(Grid, R, C, Color, Grid2),
     frame_fill_cols_(Grid2, R, Cs, Color, Out).
 
 % frame_bounding_box(+Grid, +FrameColor, -R0, -C0, -R1, -C1)
@@ -260,7 +260,7 @@ frame_fill_cols_(Grid, R, [C|Cs], Color, Out) :-
 % R0,C0 = top-left corner; R1,C1 = bottom-right corner.
 % Uses the rule: find the smallest rectangle whose outer ring is all FrameColor.
 frame_bounding_box(Grid, FrameColor, R0, C0, R1, C1) :-
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     MaxR is Rows - 1,
     MaxC is Cols - 1,
     frame_find_bounding_box_(Grid, FrameColor, 0, MaxR, 0, MaxC, R0, R1, C0, C1).
@@ -300,7 +300,7 @@ frame_ring_count(Grid, N) :-
 % frame_ring_count_(Grid, Acc, N) - recursive helper.
 % A ring is counted only when it has a proper interior (frame_inner succeeds).
 frame_ring_count_(Grid, Acc, N) :-
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     (Rows < 3 ; Cols < 3),
     !,
     N = Acc.

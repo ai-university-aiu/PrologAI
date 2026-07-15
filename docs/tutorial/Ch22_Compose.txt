@@ -20,7 +20,7 @@ BASIC APPLICATION
 
 compose_apply/3 is the fundamental dispatch predicate.
 
-    ?- compose_apply(gd_reflect_h, [[1,2],[3,4]], G).
+    ?- compose_apply(grid_reflect_h, [[1,2],[3,4]], G).
     G = [[3,4],[1,2]].
 
 compose_identity/2 returns the grid unchanged.
@@ -39,7 +39,7 @@ SEQUENTIAL PIPELINES
 compose_pipe/3 applies a list of rules in order. The output of each step becomes
 the input of the next.
 
-    ?- compose_pipe([gd_rotate90, gd_rotate90], [[1,2],[3,4]], G).
+    ?- compose_pipe([grid_rotate90, grid_rotate90], [[1,2],[3,4]], G).
     G = [[4,3],[2,1]].
 
 An empty list is the identity:
@@ -49,7 +49,7 @@ An empty list is the identity:
 
 compose_pipe_n/4 repeats a single rule exactly N times.
 
-    ?- compose_pipe_n(gd_rotate90, 4, [[1,2,3],[4,5,6],[7,8,9]], G).
+    ?- compose_pipe_n(grid_rotate90, 4, [[1,2,3],[4,5,6],[7,8,9]], G).
     G = [[1,2,3],[4,5,6],[7,8,9]].
 
 compose_repeat/4 is an alias for compose_pipe_n.
@@ -59,9 +59,9 @@ CONDITIONAL BRANCHING
 compose_branch/5 applies ThenRule when a condition holds, and ElseRule otherwise.
 The condition is a predicate that accepts one argument (the grid).
 
-    is_tall(Grid) :- gd_size(Grid, Rows, Cols), Rows > Cols.
+    is_tall(Grid) :- grid_size(Grid, Rows, Cols), Rows > Cols.
 
-    ?- compose_branch(is_tall, gd_rotate90, compose_identity, Grid, Grid2).
+    ?- compose_branch(is_tall, grid_rotate90, compose_identity, Grid, Grid2).
 
 If Grid has more rows than columns, it gets rotated. Otherwise it passes
 through unchanged.
@@ -70,7 +70,7 @@ REPETITION UNTIL CONVERGENCE
 
 compose_until/4 applies a rule repeatedly until a condition holds on the result.
 
-    ?- compose_until(gd_rotate90, gd_equal([[1,2,3],[4,5,6],[7,8,9]]),
+    ?- compose_until(grid_rotate90, grid_equal([[1,2,3],[4,5,6],[7,8,9]]),
                 SomeGrid, G).
 
 compose_fixed_point/3 applies a rule until the grid stops changing.
@@ -94,7 +94,7 @@ compose_map_cols/3 applies a rule to each column independently. The rule is a
 predicate that maps one column list to another column list.
 
     ?- compose_map_cols(reverse, [[1,2],[3,4]], G).
-    G = [[3,4],[1,2]].   % same as gd_reflect_h for a 2x2 grid
+    G = [[3,4],[1,2]].   % same as grid_reflect_h for a 2x2 grid
 
 PAIRWISE GRID COMBINATION
 
@@ -112,9 +112,9 @@ compose_fold/4 left-folds a rule over a list of grids. The rule combines an
 accumulator grid with the current list element to produce a new accumulator.
 
     overlay_grids(Base, Patch, Result) :-
-        gd_size(Patch, R, C), R1 is R-1, C1 is C-1,
-        gd_crop(Patch, 0, 0, R1, C1, P),
-        gd_overlay(Base, P, 0, 0, Result).
+        grid_size(Patch, R, C), R1 is R-1, C1 is C-1,
+        grid_crop(Patch, 0, 0, R1, C1, P),
+        grid_overlay(Base, P, 0, 0, Result).
 
     ?- compose_fold(overlay_grids, BaseGrid, [Patch1, Patch2], Result).
 
@@ -130,7 +130,7 @@ A common ARC-AGI solution pattern: try an isometry, then verify.
 A pipeline that applies a rule conditionally:
 
     solve_conditional(Grid, Out) :-
-        compose_branch(is_tall, gd_rotate90, compose_identity, Grid, Mid),
+        compose_branch(is_tall, grid_rotate90, compose_identity, Grid, Mid),
         compose_apply(some_color_rule, Mid, Out).
 
 WHAT COMES NEXT

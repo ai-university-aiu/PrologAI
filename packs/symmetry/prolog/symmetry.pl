@@ -36,50 +36,50 @@
 :- use_module(library(grid)).
 
 % symmetry_is_hsymmetric(+Grid)
-% Grid is horizontally symmetric (left-right mirror): Grid = gd_reflect_v(Grid).
-% gd_reflect_v reverses each row (left-right reflection).
+% Grid is horizontally symmetric (left-right mirror): Grid = grid_reflect_v(Grid).
+% grid_reflect_v reverses each row (left-right reflection).
 symmetry_is_hsymmetric(Grid) :-
-    gd_reflect_v(Grid, Grid2),
-    gd_equal(Grid, Grid2).
+    grid_reflect_v(Grid, Grid2),
+    grid_equal(Grid, Grid2).
 
 % symmetry_is_vsymmetric(+Grid)
-% Grid is vertically symmetric (top-bottom mirror): Grid = gd_reflect_h(Grid).
-% gd_reflect_h reverses the row order (top-bottom reflection).
+% Grid is vertically symmetric (top-bottom mirror): Grid = grid_reflect_h(Grid).
+% grid_reflect_h reverses the row order (top-bottom reflection).
 symmetry_is_vsymmetric(Grid) :-
-    gd_reflect_h(Grid, Grid2),
-    gd_equal(Grid, Grid2).
+    grid_reflect_h(Grid, Grid2),
+    grid_equal(Grid, Grid2).
 
 % symmetry_is_rot180(+Grid)
 % Grid is invariant under 180-degree rotation.
 symmetry_is_rot180(Grid) :-
-    gd_rotate90(Grid, R90),
-    gd_rotate90(R90, R180),
-    gd_equal(Grid, R180).
+    grid_rotate90(Grid, R90),
+    grid_rotate90(R90, R180),
+    grid_equal(Grid, R180).
 
 % symmetry_is_rot90(+Grid)
 % Grid is invariant under 90-degree clockwise rotation.
 % Only possible for square grids.
 symmetry_is_rot90(Grid) :-
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     Rows =:= Cols,
-    gd_rotate90(Grid, Grid2),
-    gd_equal(Grid, Grid2).
+    grid_rotate90(Grid, Grid2),
+    grid_equal(Grid, Grid2).
 
 % symmetry_is_diagonal(+Grid)
-% Grid equals its main-diagonal reflection (gd_reflect_d1 = transpose).
+% Grid equals its main-diagonal reflection (grid_reflect_d1 = transpose).
 symmetry_is_diagonal(Grid) :-
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     Rows =:= Cols,
-    gd_reflect_d1(Grid, Grid2),
-    gd_equal(Grid, Grid2).
+    grid_reflect_d1(Grid, Grid2),
+    grid_equal(Grid, Grid2).
 
 % symmetry_is_antidiagonal(+Grid)
-% Grid equals its anti-diagonal reflection (gd_reflect_d2).
+% Grid equals its anti-diagonal reflection (grid_reflect_d2).
 symmetry_is_antidiagonal(Grid) :-
-    gd_size(Grid, Rows, Cols),
+    grid_size(Grid, Rows, Cols),
     Rows =:= Cols,
-    gd_reflect_d2(Grid, Grid2),
-    gd_equal(Grid, Grid2).
+    grid_reflect_d2(Grid, Grid2),
+    grid_equal(Grid, Grid2).
 
 % symmetry_group(+Grid, -Group)
 % Group is the list of symmetry atoms that hold for Grid.
@@ -103,16 +103,16 @@ symmetry_test_sym_(Grid, antidiag) :- symmetry_is_antidiagonal(Grid).
 % All distinct rotations of Grid: R0 (identity), R90, R180, R270.
 % Distinct means equal rotations are included only once.
 symmetry_rotations(Grid, Rotations) :-
-    gd_rotate90(Grid, R90),
-    gd_rotate90(R90, R180),
-    gd_rotate90(R180, R270),
+    grid_rotate90(Grid, R90),
+    grid_rotate90(R90, R180),
+    grid_rotate90(R180, R270),
     symmetry_unique_grids_([Grid, R90, R180, R270], Rotations).
 
 % symmetry_orbit(+Grid, -Orbit)
 % The dihedral orbit: all distinct grids reachable by rotations and reflections.
 % Maximum 8 elements (4 rotations x 2 for reflection).
 symmetry_orbit(Grid, Orbit) :-
-    gd_reflect_v(Grid, HFlip),
+    grid_reflect_v(Grid, HFlip),
     symmetry_rotations(Grid, Rots),
     symmetry_rotations(HFlip, FlipRots),
     append(Rots, FlipRots, All),
@@ -127,7 +127,7 @@ symmetry_unique_grids_([G|Gs], [G|Unique]) :-
 
 % symmetry_not_equal_(A, B) - true if A and B are NOT grid-equal.
 symmetry_not_equal_(A, B) :-
-    \+ gd_equal(A, B).
+    \+ grid_equal(A, B).
 
 % symmetry_canonical(+Grid, -Canon)
 % The lexicographically smallest element of symmetry_orbit(Grid).
@@ -147,7 +147,7 @@ symmetry_lex_min_(Grid, Best, NewBest) :-
 symmetry_equivalent(GridA, GridB) :-
     symmetry_canonical(GridA, Canon),
     symmetry_canonical(GridB, Canon2),
-    gd_equal(Canon, Canon2).
+    grid_equal(Canon, Canon2).
 
 % symmetry_order(+Grid, -N)
 % N is the number of distinct transforms (from the 8-element dihedral group)

@@ -37,7 +37,7 @@ Evaluator-Optimizer and Metacognitive Quality Layer (PR 55)
 grid
 ARC-AGI Grid Perception and Manipulation (PR 56)
 
-    native grid operations for the ARC-AGI benchmark: dimensions (`gd_size/3`), zero-based cell access (`gd_cell/4`, `gd_row/3`, `gd_col/3`), color analysis (`gd_colors/2`, `gd_color_count/3`, `gd_color_map/3`), 4-connected object extraction (`gd_objects/3`, `gd_connected/3`), bounding box (`gd_bounding_box/3`), seven spatial transformations (rotate 90/180/270, reflect h/v/d1/d2), translation, cropping, overlay compositing, diff, symmetry detection (`gd_symmetry/2`), flood fill (`gd_fill/5`), uniform grid construction (`gd_make/4`), and single-cell mutation (`gd_set_cell/5`). The perceptual foundation for ARC-AGI solving.
+    native grid operations for the ARC-AGI benchmark: dimensions (`grid_size/3`), zero-based cell access (`grid_cell/4`, `grid_row/3`, `grid_col/3`), color analysis (`grid_colors/2`, `grid_color_count/3`, `grid_color_map/3`), 4-connected object extraction (`grid_objects/3`, `grid_connected/3`), bounding box (`grid_bounding_box/3`), seven spatial transformations (rotate 90/180/270, reflect h/v/d1/d2), translation, cropping, overlay compositing, diff, symmetry detection (`grid_symmetry/2`), flood fill (`grid_fill/5`), uniform grid construction (`grid_make/4`), and single-cell mutation (`grid_set_cell/5`). The perceptual foundation for ARC-AGI solving.
 
 analogy
 Analogy (analogy_*, Layer 394, WP-419; converged with the ARC grid-analogy pack)
@@ -956,20 +956,20 @@ Grid Neighbor Analysis: Cell Adjacency, Morphological Ops, and Neighbor Counts (
 
 griddist
 Grid Distance Transform: Cell-to-Color Distances, BFS Flood, Voronoi, and Morphological N-Step Ops (gd_*, Layer 200)
-    gd_manhattan/5: Manhattan (L1) distance between two grid positions (R1,C1) and (R2,C2)
-    gd_chebyshev/5: Chebyshev (L-infinity) distance between two grid positions
-    gd_dist_map/3: grid of minimum Manhattan distances from each cell to the nearest Color cell
-    gd_dist_map8/3: grid of minimum Chebyshev distances from each cell to the nearest Color cell
-    gd_nearest_coord/5: [R2,C2] coordinates of the nearest Color cell from a given position
-    gd_zone/4: mark non-Color cells within Manhattan distance N of any Color cell with atom zone
-    gd_ring/5: list of in-bounds [R,C] positions at exactly Manhattan distance D from a given cell
-    gd_voronoi/2: replace each background cell with the color of its nearest non-background cell
-    gd_bfs_flood/5: BFS distances from a start cell treating Wall-color cells as impassable
-    gd_recolor_by_dist/4: recolor each Color cell based on its Manhattan distance from background
-    gd_expand_n/4: N-step morphological dilation — expand Color region outward by N steps
-    gd_shrink_n/4: N-step morphological erosion — shrink Color region inward by N steps
-    gd_equidistant/4: mark cells equidistant from ColorA and ColorB with atom equidist
-    gd_max_dist/4: row and column of the cell farthest from any Color cell (Manhattan)
+    griddist_manhattan/5: Manhattan (L1) distance between two grid positions (R1,C1) and (R2,C2)
+    griddist_chebyshev/5: Chebyshev (L-infinity) distance between two grid positions
+    griddist_dist_map/3: grid of minimum Manhattan distances from each cell to the nearest Color cell
+    griddist_dist_map8/3: grid of minimum Chebyshev distances from each cell to the nearest Color cell
+    griddist_nearest_coord/5: [R2,C2] coordinates of the nearest Color cell from a given position
+    griddist_zone/4: mark non-Color cells within Manhattan distance N of any Color cell with atom zone
+    griddist_ring/5: list of in-bounds [R,C] positions at exactly Manhattan distance D from a given cell
+    griddist_voronoi/2: replace each background cell with the color of its nearest non-background cell
+    griddist_bfs_flood/5: BFS distances from a start cell treating Wall-color cells as impassable
+    griddist_recolor_by_dist/4: recolor each Color cell based on its Manhattan distance from background
+    griddist_expand_n/4: N-step morphological dilation — expand Color region outward by N steps
+    griddist_shrink_n/4: N-step morphological erosion — shrink Color region inward by N steps
+    griddist_equidistant/4: mark cells equidistant from ColorA and ColorB with atom equidist
+    griddist_max_dist/4: row and column of the cell farthest from any Color cell (Manhattan)
 
 gridperiod
 Grid Periodic Pattern Detection and Extension: Row/Column Period, Tiling, Autocorrelation, and Wrap-Shift (gper_*, Layer 201)

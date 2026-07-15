@@ -73,7 +73,7 @@
 % Import the learned avoid-set so hazards are never chosen.
 :- use_module(library(causal_learning), [causal_learning_avoid/1]).
 % Import grid measurement and colour reading for the signature.
-:- use_module(library(grid), [gd_size/3, gd_cell/4, gd_colors/2, gd_color_count/3]).
+:- use_module(library(grid), [grid_size/3, grid_cell/4, grid_colors/2, grid_color_count/3]).
 % Import object detection so salient click cells are object centroids.
 :- use_module(library(gridobj), [gridobj_all_objects/3]).
 % Import list helpers.
@@ -94,15 +94,15 @@ curiosity_reset :-
 % Define curiosity_signature: a frame's canonical, order-free signature.
 curiosity_signature(Frame, sig(Rows, Cols, Hist)) :-
     % Measure the frame's dimensions.
-    gd_size(Frame, Rows, Cols),
+    grid_size(Frame, Rows, Cols),
     % Find the colours actually present.
-    gd_colors(Frame, Colors),
+    grid_colors(Frame, Colors),
     % Pair each colour with how many cells carry it.
     findall(Colour-N,
         % Enumerate the present colours.
         ( member(Colour, Colors),
           % Count the cells of that colour.
-          gd_color_count(Frame, Colour, N) ),
+          grid_color_count(Frame, Colour, N) ),
         Hist0),
     % Sort the histogram so the signature is order-free.
     msort(Hist0, Hist).
