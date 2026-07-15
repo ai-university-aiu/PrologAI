@@ -134,29 +134,29 @@ pai_robot_enroll(RobotDesc, Simulator, BodyId) :-
     % Add a new fact or rule to the runtime knowledge base.
     assertz(robot_body(BodyId, RobotDesc, Simulator)),
     % State the fact: register topics(BodyId, RobotDesc).
-    register_topics(BodyId, RobotDesc).
+    ros_bridge_topics(BodyId, RobotDesc).
 
 % Define a clause for 'register topics': succeed when the following conditions hold.
-register_topics(BodyId, robot(_, Caps, _)) :-
-    % State the fact: maplist(register_cap_topic(BodyId), Caps).
-    maplist(register_cap_topic(BodyId), Caps).
+ros_bridge_topics(BodyId, robot(_, Caps, _)) :-
+    % State the fact: maplist(ros_bridge_cap_topic(BodyId), Caps).
+    maplist(ros_bridge_cap_topic(BodyId), Caps).
 % State the fact: register topics(_, _).
-register_topics(_, _).
+ros_bridge_topics(_, _).
 
 % Define a clause for 'register cap topic': succeed when the following conditions hold.
-register_cap_topic(BodyId, camera)     :- assertz(ros_topic(BodyId, '/camera/image_raw',    sensor_msgs_image)).
+ros_bridge_cap_topic(BodyId, camera)     :- assertz(ros_topic(BodyId, '/camera/image_raw',    sensor_msgs_image)).
 % Define a clause for 'register cap topic': succeed when the following conditions hold.
-register_cap_topic(BodyId, lidar)      :- assertz(ros_topic(BodyId, '/scan',                sensor_msgs_laser_scan)).
+ros_bridge_cap_topic(BodyId, lidar)      :- assertz(ros_topic(BodyId, '/scan',                sensor_msgs_laser_scan)).
 % Define a clause for 'register cap topic': succeed when the following conditions hold.
-register_cap_topic(BodyId, imu)        :- assertz(ros_topic(BodyId, '/imu/data',            sensor_msgs_imu)).
+ros_bridge_cap_topic(BodyId, imu)        :- assertz(ros_topic(BodyId, '/imu/data',            sensor_msgs_imu)).
 % Define a clause for 'register cap topic': succeed when the following conditions hold.
-register_cap_topic(BodyId, odometry)   :- assertz(ros_topic(BodyId, '/odom',                nav_msgs_odometry)).
+ros_bridge_cap_topic(BodyId, odometry)   :- assertz(ros_topic(BodyId, '/odom',                nav_msgs_odometry)).
 % Define a clause for 'register cap topic': succeed when the following conditions hold.
-register_cap_topic(BodyId, drive_base) :- assertz(ros_topic(BodyId, '/cmd_vel',             geometry_msgs_twist)).
+ros_bridge_cap_topic(BodyId, drive_base) :- assertz(ros_topic(BodyId, '/cmd_vel',             geometry_msgs_twist)).
 % Define a clause for 'register cap topic': succeed when the following conditions hold.
-register_cap_topic(BodyId, arm)        :- assertz(ros_topic(BodyId, '/joint_states',        sensor_msgs_joint_state)).
+ros_bridge_cap_topic(BodyId, arm)        :- assertz(ros_topic(BodyId, '/joint_states',        sensor_msgs_joint_state)).
 % State a fact for 'register cap topic' with the arguments listed below.
-register_cap_topic(_, _).   % unknown capabilities silently ignored
+ros_bridge_cap_topic(_, _).   % unknown capabilities silently ignored
 
 % ---------------------------------------------------------------------------
 % pai_ros_bridge/2 — relay an incoming ROS 2 message as a percept

@@ -14,7 +14,7 @@ Layer 201. Pack prefix: gper_*. Work Package 222.
 Exported Predicates
 
 
-gper_is_row_periodic(+Grid, +P)
+gridperiod_is_row_periodic(+Grid, +P)
 
 Succeed if Grid has row period P: every pair of rows separated by P distance
 are identical. Vacuously true if no valid pair exists (when P >= H).
@@ -22,11 +22,11 @@ are identical. Vacuously true if no valid pair exists (when P >= H).
 Example:
 
 % g4x2_alt = [[r,b],[b,r],[r,b],[b,r]]: rows repeat every 2
-gper_is_row_periodic([[r,b],[b,r],[r,b],[b,r]], 2).  % succeeds
-\+ gper_is_row_periodic([[r,b],[b,r],[r,b],[b,r]], 1).  % fails
+gridperiod_is_row_periodic([[r,b],[b,r],[r,b],[b,r]], 2).  % succeeds
+\+ gridperiod_is_row_periodic([[r,b],[b,r],[r,b],[b,r]], 1).  % fails
 
 
-gper_is_col_periodic(+Grid, +P)
+gridperiod_is_col_periodic(+Grid, +P)
 
 Succeed if Grid has column period P: every pair of columns separated by P
 distance are identical. Vacuously true if P >= W.
@@ -34,31 +34,31 @@ distance are identical. Vacuously true if P >= W.
 Example:
 
 % [[r,b,r,b],[r,b,r,b]]: col period 2
-gper_is_col_periodic([[r,b,r,b],[r,b,r,b]], 2).
+gridperiod_is_col_periodic([[r,b,r,b],[r,b,r,b]], 2).
 
 
-gper_row_period(+Grid, -P)
+gridperiod_row_period(+Grid, -P)
 
-P is the smallest positive integer for which gper_is_row_periodic holds.
+P is the smallest positive integer for which gridperiod_is_row_periodic holds.
 Always succeeds (P=H is the vacuous upper bound). Uses cut after first match.
 
 Example:
 
-gper_row_period([[r,b],[r,b]], P).   % P = 1 (both rows identical)
-gper_row_period([[r,b],[b,r]], P).   % P = 2 (rows differ, must use full H)
+gridperiod_row_period([[r,b],[r,b]], P).   % P = 1 (both rows identical)
+gridperiod_row_period([[r,b],[b,r]], P).   % P = 2 (rows differ, must use full H)
 
 
-gper_col_period(+Grid, -P)
+gridperiod_col_period(+Grid, -P)
 
-P is the smallest positive integer for which gper_is_col_periodic holds.
+P is the smallest positive integer for which gridperiod_is_col_periodic holds.
 
 Example:
 
-gper_col_period([[r,b,r,b]], P).   % P = 2 (r,b alternating)
-gper_col_period([[r,b,g]], P).     % P = 3 (all distinct)
+gridperiod_col_period([[r,b,r,b]], P).   % P = 2 (r,b alternating)
+gridperiod_col_period([[r,b,g]], P).     % P = 3 (all distinct)
 
 
-gper_tile_dims(+Grid, -PH, -PW)
+gridperiod_tile_dims(+Grid, -PH, -PW)
 
 PH and PW are the smallest tile dimensions (row period and column period)
 whose tiling with wrap-around reproduces the grid.
@@ -66,125 +66,125 @@ whose tiling with wrap-around reproduces the grid.
 Example:
 
 % 4x4 grid with 2x2 tile [[r,b],[b,r]] repeated:
-gper_tile_dims([[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]], PH, PW).
+gridperiod_tile_dims([[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]], PH, PW).
 % PH = 2, PW = 2
 
 
-gper_extract_tile(+Grid, +TH, +TW, -Tile)
+gridperiod_extract_tile(+Grid, +TH, +TW, -Tile)
 
 Tile is the top-left TH x TW sub-grid of Grid.
 
 Example:
 
-gper_extract_tile([[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]], 2, 2, Tile).
+gridperiod_extract_tile([[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]], 2, 2, Tile).
 % Tile = [[r,b],[b,r]]
 
 
-gper_tile_grid(+Tile, +H, +W, -Grid)
+gridperiod_tile_grid(+Tile, +H, +W, -Grid)
 
 Grid is an H x W grid formed by repeating Tile with wrap-around indexing:
 Grid[r][c] = Tile[r mod TH][c mod TW].
 
 Example:
 
-gper_tile_grid([[r,b],[b,r]], 4, 4, G).
+gridperiod_tile_grid([[r,b],[b,r]], 4, 4, G).
 % G = [[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]]
 
 
-gper_extend_rows(+Grid, +TargetH, -Extended)
+gridperiod_extend_rows(+Grid, +TargetH, -Extended)
 
 Extended has TargetH rows; row R of Extended = row (R mod H) of Grid.
 If TargetH <= H, only the first TargetH rows are returned.
 
 Example:
 
-gper_extend_rows([[r,b],[g,r]], 4, E).
+gridperiod_extend_rows([[r,b],[g,r]], 4, E).
 % E = [[r,b],[g,r],[r,b],[g,r]]
 
 
-gper_extend_cols(+Grid, +TargetW, -Extended)
+gridperiod_extend_cols(+Grid, +TargetW, -Extended)
 
 Extended has TargetW columns per row; column C of each row = column (C mod W)
 of the corresponding original row.
 
 Example:
 
-gper_extend_cols([[r,b],[g,r]], 4, E).
+gridperiod_extend_cols([[r,b],[g,r]], 4, E).
 % E = [[r,b,r,b],[g,r,g,r]]
 
 
-gper_extend(+Grid, +TargetH, +TargetW, -Extended)
+gridperiod_extend(+Grid, +TargetH, +TargetW, -Extended)
 
 Extended is a TargetH x TargetW grid formed by tiling Grid. Equivalent to
-gper_tile_grid with the original grid as the tile.
+gridperiod_tile_grid with the original grid as the tile.
 
 Example:
 
-gper_extend([[r,b],[b,r]], 4, 4, E).
+gridperiod_extend([[r,b],[b,r]], 4, 4, E).
 % E = [[r,b,r,b],[b,r,b,r],[r,b,r,b],[b,r,b,r]]
 
 
-gper_autocorr_row(+Grid, +P, -Score)
+gridperiod_autocorr_row(+Grid, +P, -Score)
 
 Score (0.0 to 1.0) is the fraction of row pairs (r, r+P) where
 Grid[r] == Grid[r+P]. Returns 1.0 when no such pairs exist.
 
 Example:
 
-gper_autocorr_row([[r,b],[b,r],[r,b],[b,r]], 2, S).  % S = 1.0
-gper_autocorr_row([[r,b],[b,r],[r,b],[b,r]], 1, S).  % S = 0.0
+gridperiod_autocorr_row([[r,b],[b,r],[r,b],[b,r]], 2, S).  % S = 1.0
+gridperiod_autocorr_row([[r,b],[b,r],[r,b],[b,r]], 1, S).  % S = 0.0
 
 
-gper_autocorr_col(+Grid, +P, -Score)
+gridperiod_autocorr_col(+Grid, +P, -Score)
 
 Score (0.0 to 1.0) is the fraction of column pairs (c, c+P) that are
 identical column lists. Returns 1.0 when no such pairs exist.
 
 Example:
 
-gper_autocorr_col([[r,b,r,b],[r,b,r,b]], 2, S).  % S = 1.0
-gper_autocorr_col([[r,b,r,b],[r,b,r,b]], 1, S).  % S = 0.0
+gridperiod_autocorr_col([[r,b,r,b],[r,b,r,b]], 2, S).  % S = 1.0
+gridperiod_autocorr_col([[r,b,r,b],[r,b,r,b]], 1, S).  % S = 0.0
 
 
-gper_shift_wrap_rows(+Grid, +N, -Shifted)
+gridperiod_shift_wrap_rows(+Grid, +N, -Shifted)
 
 Shifted is Grid with rows shifted down by N (wrapping): row R of Shifted
 = row (R - N) mod H of Grid. N=0 returns Grid unchanged. N=H returns Grid.
 
 Example:
 
-gper_shift_wrap_rows([[r,r,r],[b,b,b],[g,g,g]], 1, S).
+gridperiod_shift_wrap_rows([[r,r,r],[b,b,b],[g,g,g]], 1, S).
 % S = [[g,g,g],[r,r,r],[b,b,b]]  (last row wraps to first)
 
 
-gper_shift_wrap_cols(+Grid, +N, -Shifted)
+gridperiod_shift_wrap_cols(+Grid, +N, -Shifted)
 
 Shifted is Grid with each row's columns shifted right by N (wrapping):
 cell (R,C) of Shifted = cell (R, (C-N) mod W) of Grid.
 
 Example:
 
-gper_shift_wrap_cols([[r,b,g],[r,b,g],[r,b,g]], 1, S).
+gridperiod_shift_wrap_cols([[r,b,g],[r,b,g],[r,b,g]], 1, S).
 % S = [[g,r,b],[g,r,b],[g,r,b]]  (last column wraps to first)
 
 
 Typical Use Cases
 
 Detect if a grid is a repeated tile:
-  gper_tile_dims(Grid, PH, PW),
-  gper_extract_tile(Grid, PH, PW, Tile),
-  gper_tile_grid(Tile, H, W, Grid)  % verify round-trip
+  gridperiod_tile_dims(Grid, PH, PW),
+  gridperiod_extract_tile(Grid, PH, PW, Tile),
+  gridperiod_tile_grid(Tile, H, W, Grid)  % verify round-trip
 
 Extend a pattern to a larger canvas:
-  gper_extend(SmallGrid, TargetH, TargetW, BigGrid)
+  gridperiod_extend(SmallGrid, TargetH, TargetW, BigGrid)
 
 Measure how periodic a grid is (for rule inference):
-  gper_autocorr_row(Grid, 2, RowScore),
-  gper_autocorr_col(Grid, 2, ColScore)
+  gridperiod_autocorr_row(Grid, 2, RowScore),
+  gridperiod_autocorr_col(Grid, 2, ColScore)
 
 Apply a cyclic shift (like rotation of rows or columns):
-  gper_shift_wrap_rows(Grid, N, Shifted)
-  gper_shift_wrap_cols(Grid, N, Shifted)
+  gridperiod_shift_wrap_rows(Grid, N, Shifted)
+  gridperiod_shift_wrap_cols(Grid, N, Shifted)
 
 
 Dependencies

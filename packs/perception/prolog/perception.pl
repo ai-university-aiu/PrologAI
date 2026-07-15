@@ -62,19 +62,19 @@
 :- dynamic venue_locale/2.     % VenueId, LocaleId
 % Declare 'locale_place/2.     % LocaleId, PlaceId' as dynamic — its facts may be added or removed at runtime.
 :- dynamic locale_place/2.     % LocaleId, PlaceId
-% Declare 'venue_id_counter/1' as dynamic — its facts may be added or removed at runtime.
-:- dynamic venue_id_counter/1.
+% Declare 'perception_id_counter/1' as dynamic — its facts may be added or removed at runtime.
+:- dynamic perception_id_counter/1.
 % Declare 'locale_id_counter/1' as dynamic — its facts may be added or removed at runtime.
 :- dynamic locale_id_counter/1.
-% Declare 'scene_id_counter/1' as dynamic — its facts may be added or removed at runtime.
-:- dynamic scene_id_counter/1.
+% Declare 'perception_id_counter/1' as dynamic — its facts may be added or removed at runtime.
+:- dynamic perception_id_counter/1.
 
 % State the fact: venue id counter(0).
-venue_id_counter(0).
+perception_id_counter(0).
 % State the fact: locale id counter(0).
 locale_id_counter(0).
 % State the fact: scene id counter(0).
-scene_id_counter(0).
+perception_id_counter(0).
 
 % Define a clause for 'next id': succeed when the following conditions hold.
 next_id(Counter, Id) :-
@@ -100,11 +100,11 @@ next_id(Counter, Id) :-
 % Define a clause for 'next venue id': succeed when the following conditions hold.
 next_venue_id(Id) :-
     % Remove a single matching fact or rule from the runtime knowledge base.
-    retract(venue_id_counter(N)),
+    retract(perception_id_counter(N)),
     % Evaluate the arithmetic expression 'N + 1' and bind the result to 'N1'.
     N1 is N + 1,
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(venue_id_counter(N1)),
+    assertz(perception_id_counter(N1)),
     % State the fact: atomic list concat([venue_, N1], Id).
     atomic_list_concat([venue_, N1], Id).
 
@@ -122,17 +122,17 @@ next_locale_id(Id) :-
 % Define a clause for 'next scene id': succeed when the following conditions hold.
 next_scene_id(Id) :-
     % Remove a single matching fact or rule from the runtime knowledge base.
-    retract(scene_id_counter(N)),
+    retract(perception_id_counter(N)),
     % Evaluate the arithmetic expression 'N + 1' and bind the result to 'N1'.
     N1 is N + 1,
     % Add a new fact or rule to the runtime knowledge base.
-    assertz(scene_id_counter(N1)),
+    assertz(perception_id_counter(N1)),
     % State the fact: atomic list concat([scene_, N1], Id).
     atomic_list_concat([scene_, N1], Id).
 
 % Similarity threshold for venue merging
-% Check that 'venue_merge_threshold(0.3).  % Jaccard similarity' is greater than or equal to 'this → same venue'.
-venue_merge_threshold(0.3).  % Jaccard similarity >= this → same venue
+% Check that 'perception_merge_threshold(0.3).  % Jaccard similarity' is greater than or equal to 'this → same venue'.
+perception_merge_threshold(0.3).  % Jaccard similarity >= this → same venue
 
 % ---------------------------------------------------------------------------
 % pai_detect/3
@@ -157,7 +157,7 @@ pai_detect(PerceptRef, DetectorList, TraitSets) :-
         % Continue the multi-line expression started above.
         member(Det, Detectors),
         % Continue the multi-line expression started above.
-        run_detector(Det, PerceptRef, Traits),
+        perception_detector(Det, PerceptRef, Traits),
         % Store traits (append-only; all disagreements preserved)
         % Continue the multi-line expression started above.
         assertz(percept_traits(PerceptRef, Det, Traits))
@@ -169,7 +169,7 @@ pai_detect(PerceptRef, DetectorList, TraitSets) :-
 % percept ref atom to derive deterministic pseudo-features.
 
 % Define a clause for 'run detector': succeed when the following conditions hold.
-run_detector(icon, Ref, Traits) :-
+perception_detector(icon, Ref, Traits) :-
     % Execute: ( percept_traits(Ref, icon, OldTraits).
     ( percept_traits(Ref, icon, OldTraits)
     % If the condition above succeeded, perform the following action.
@@ -180,7 +180,7 @@ run_detector(icon, Ref, Traits) :-
     ).
 
 % Define a clause for 'run detector': succeed when the following conditions hold.
-run_detector(geon, Ref, Traits) :-
+perception_detector(geon, Ref, Traits) :-
     % Execute: ( percept_traits(Ref, geon, OldTraits).
     ( percept_traits(Ref, geon, OldTraits)
     % If the condition above succeeded, perform the following action.
@@ -191,7 +191,7 @@ run_detector(geon, Ref, Traits) :-
     ).
 
 % Define a clause for 'run detector': succeed when the following conditions hold.
-run_detector(shape, Ref, Traits) :-
+perception_detector(shape, Ref, Traits) :-
     % Execute: ( percept_traits(Ref, shape, OldTraits).
     ( percept_traits(Ref, shape, OldTraits)
     % If the condition above succeeded, perform the following action.
@@ -202,7 +202,7 @@ run_detector(shape, Ref, Traits) :-
     ).
 
 % Define a clause for 'run detector': succeed when the following conditions hold.
-run_detector(object, Ref, Traits) :-
+perception_detector(object, Ref, Traits) :-
     % Execute: ( percept_traits(Ref, object, OldTraits).
     ( percept_traits(Ref, object, OldTraits)
     % If the condition above succeeded, perform the following action.
@@ -213,7 +213,7 @@ run_detector(object, Ref, Traits) :-
     ).
 
 % Define a clause for 'run detector': succeed when the following conditions hold.
-run_detector(scene, Ref, Traits) :-
+perception_detector(scene, Ref, Traits) :-
     % Execute: ( percept_traits(Ref, scene, OldTraits).
     ( percept_traits(Ref, scene, OldTraits)
     % If the condition above succeeded, perform the following action.
@@ -238,7 +238,7 @@ run_detector(scene, Ref, Traits) :-
     ).
 
 % Define a clause for 'run detector': succeed when the following conditions hold.
-run_detector(image_schema, Ref, Traits) :-
+perception_detector(image_schema, Ref, Traits) :-
     % Execute: ( percept_traits(Ref, image_schema, OldTraits).
     ( percept_traits(Ref, image_schema, OldTraits)
     % If the condition above succeeded, perform the following action.
@@ -289,7 +289,7 @@ nth1(N, [_|T], E) :- N > 1, N1 is N - 1, nth1(N1, T, E).
 %
 %   Algorithm:
 %     1. Compute Jaccard similarity of SceneTraits against each existing venue.
-%     2. If best match >= venue_merge_threshold → assign to that venue.
+%     2. If best match >= perception_merge_threshold → assign to that venue.
 %     3. Otherwise → create a new venue.
 % ---------------------------------------------------------------------------
 
@@ -312,7 +312,7 @@ pai_locate(SceneTraits, VenueId) :-
     % Continue the multi-line expression started above.
     ), Candidates),
     % State a fact for 'venue merge threshold' with the arguments listed below.
-    venue_merge_threshold(Thresh),
+    perception_merge_threshold(Thresh),
     % Check that '( Candidates' is not unifiable with '[]'.
     ( Candidates \= [],
       % Continue the multi-line expression started above.

@@ -57,11 +57,11 @@
 % Piagetian milestone proxy evidence
 % ---------------------------------------------------------------------------
 
-%  milestone_evidence(+Level, +Nexus, +NodeFactList, -Bool)
+%  assessment_evidence(+Level, +Nexus, +NodeFactList, -Bool)
 %  True when the proxy evidence for Level is present in the Lattice.
 
 % Define a clause for 'milestone evidence': succeed when the following conditions hold.
-milestone_evidence(1, Nexus, _Ids) :-
+assessment_evidence(1, Nexus, _Ids) :-
     % reflex_coordination: any percept_signal node_fact exists
     % State a fact for 'once' with the arguments listed below.
     once((
@@ -70,7 +70,7 @@ milestone_evidence(1, Nexus, _Ids) :-
     % Close the expression opened above.
     )).
 % Define a clause for 'milestone evidence': succeed when the following conditions hold.
-milestone_evidence(2, Nexus, _Ids) :-
+assessment_evidence(2, Nexus, _Ids) :-
     % object_permanence: any object_tracking node_fact exists
     % State a fact for 'once' with the arguments listed below.
     once((
@@ -79,7 +79,7 @@ milestone_evidence(2, Nexus, _Ids) :-
     % Close the expression opened above.
     )).
 % Define a clause for 'milestone evidence': succeed when the following conditions hold.
-milestone_evidence(3, Nexus, _Ids) :-
+assessment_evidence(3, Nexus, _Ids) :-
     % goal_directed_behavior: any objective node_fact
     % State a fact for 'once' with the arguments listed below.
     once((
@@ -88,7 +88,7 @@ milestone_evidence(3, Nexus, _Ids) :-
     % Close the expression opened above.
     )).
 % Define a clause for 'milestone evidence': succeed when the following conditions hold.
-milestone_evidence(4, Nexus, _Ids) :-
+assessment_evidence(4, Nexus, _Ids) :-
     % deferred_imitation: any agent_action imitation record
     % State a fact for 'once' with the arguments listed below.
     once((
@@ -97,7 +97,7 @@ milestone_evidence(4, Nexus, _Ids) :-
     % Close the expression opened above.
     )).
 % Define a clause for 'milestone evidence': succeed when the following conditions hold.
-milestone_evidence(5, Nexus, _Ids) :-
+assessment_evidence(5, Nexus, _Ids) :-
     % symbolic_representation: any symbolic node_fact
     % State a fact for 'once' with the arguments listed below.
     once((
@@ -106,7 +106,7 @@ milestone_evidence(5, Nexus, _Ids) :-
     % Close the expression opened above.
     )).
 % Define a clause for 'milestone evidence': succeed when the following conditions hold.
-milestone_evidence(6, Nexus, _Ids) :-
+assessment_evidence(6, Nexus, _Ids) :-
     % conservation: any conservation_demonstrated node_fact
     % State a fact for 'once' with the arguments listed below.
     once((
@@ -115,7 +115,7 @@ milestone_evidence(6, Nexus, _Ids) :-
     % Close the expression opened above.
     )).
 % Define a clause for 'milestone evidence': succeed when the following conditions hold.
-milestone_evidence(7, Nexus, _Ids) :-
+assessment_evidence(7, Nexus, _Ids) :-
     % theory_of_mind: any theory_of_mind node_fact
     % State a fact for 'once' with the arguments listed below.
     once((
@@ -124,7 +124,7 @@ milestone_evidence(7, Nexus, _Ids) :-
     % Close the expression opened above.
     )).
 % Define a clause for 'milestone evidence': succeed when the following conditions hold.
-milestone_evidence(8, Nexus, _Ids) :-
+assessment_evidence(8, Nexus, _Ids) :-
     % formal_operations: any formal_proof or abstract_reasoning node_fact
     % State a fact for 'once' with the arguments listed below.
     once((
@@ -135,21 +135,21 @@ milestone_evidence(8, Nexus, _Ids) :-
 
 % Milestone name mapping
 % State the fact: milestone name(1, reflex_coordination).
-milestone_name(1, reflex_coordination).
+assessment_name(1, reflex_coordination).
 % State the fact: milestone name(2, object_permanence).
-milestone_name(2, object_permanence).
+assessment_name(2, object_permanence).
 % State the fact: milestone name(3, goal_directed_behavior).
-milestone_name(3, goal_directed_behavior).
+assessment_name(3, goal_directed_behavior).
 % State the fact: milestone name(4, deferred_imitation).
-milestone_name(4, deferred_imitation).
+assessment_name(4, deferred_imitation).
 % State the fact: milestone name(5, symbolic_representation).
-milestone_name(5, symbolic_representation).
+assessment_name(5, symbolic_representation).
 % State the fact: milestone name(6, conservation).
-milestone_name(6, conservation).
+assessment_name(6, conservation).
 % State the fact: milestone name(7, theory_of_mind).
-milestone_name(7, theory_of_mind).
+assessment_name(7, theory_of_mind).
 % State the fact: milestone name(8, formal_operations).
-milestone_name(8, formal_operations).
+assessment_name(8, formal_operations).
 
 % ---------------------------------------------------------------------------
 % assess_piaget/3
@@ -164,7 +164,7 @@ assess_piaget(_MindId, Level, Result) :-
     % If the condition above succeeded, perform the following action.
     ->  live_node_facts(Nexus, Ids),
         % Continue the multi-line expression started above.
-        ( catch(milestone_evidence(Level, Nexus, Ids), _, fail)
+        ( catch(assessment_evidence(Level, Nexus, Ids), _, fail)
         % If the condition above succeeded, perform the following action.
         ->  Result = milestone_achieved
         % Otherwise (else branch), perform the following action.
