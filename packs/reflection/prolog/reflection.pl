@@ -1,5 +1,13 @@
 /*  PrologAI — Reflection Pattern Actors  (Specification Section 3.11, PR 13)
 
+    This is the runtime actor/scheduler layer, deliberately kept separate from
+    the metacognition faculty. metacognition is a pure self-monitor (per-strategy
+    calibration, confusion detection; imports only lists), whereas this pack
+    orchestrates twelve cyclic actors and two sentinels over the LIVE scheduler
+    (imports cyclic_actor, the Lattice, node_facts, scopes, and sentinels). The
+    two collaborate but sit at different abstraction layers — a faculty versus the
+    engine that runs it — so they are not merged.
+
     Implements the twelve reflection actors specified in Section 3.11:
 
     Cyclic actors:
