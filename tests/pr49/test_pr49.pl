@@ -115,9 +115,9 @@ test(ecdh_hybrid_roundtrip) :-
     % Generate a recipient ECDH key pair on prime256v1.
     lattice_cryptography_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
     % Encrypt a secret value.
-    lattice_cryptography_encrypt_ecdh(RecipPub, 'Password:hunter2', Bundle, Tag),
+    lattice_cryptography_encrypt(lattice_cryptography_algo_ecdh, RecipPub, 'Password:hunter2', Bundle, Tag),
     % Decrypt the bundle using the recipient's private scalar.
-    lattice_cryptography_decrypt_ecdh(RecipPriv, Bundle, Tag, Plain, prime256v1),
+    lattice_cryptography_decrypt(lattice_cryptography_algo_ecdh, RecipPriv, Bundle, Tag, Plain),
     % Assert the plaintext was recovered.
     Plain = 'Password:hunter2'.
 
@@ -132,9 +132,9 @@ test(ecdh_wrong_key_fails, [throws(_)]) :-
     % Generate a different private scalar (wrong key).
     lattice_cryptography_keygen_ecdh(prime256v1, WrongPriv, _),
     % Encrypt a secret.
-    lattice_cryptography_encrypt_ecdh(RecipPub, 'secret', Bundle, Tag),
+    lattice_cryptography_encrypt(lattice_cryptography_algo_ecdh, RecipPub, 'secret', Bundle, Tag),
     % Decrypt with wrong key — AES-GCM authentication must fail.
-    lattice_cryptography_decrypt_ecdh(WrongPriv, Bundle, Tag, _Plain, prime256v1).
+    lattice_cryptography_decrypt(lattice_cryptography_algo_ecdh, WrongPriv, Bundle, Tag, _Plain).
 
 % ---------------------------------------------------------------------------
 % AC-PR49-006 — lattice_cryptography_keygen_ecdh produces distinct public points
@@ -202,11 +202,11 @@ test(tampered_tag_fails, [throws(_)]) :-
     % Generate ECDH key pair.
     lattice_cryptography_keygen_ecdh(prime256v1, RecipPriv, RecipPub),
     % Encrypt a value.
-    lattice_cryptography_encrypt_ecdh(RecipPub, 'tamper-test', Bundle, _Tag),
+    lattice_cryptography_encrypt(lattice_cryptography_algo_ecdh, RecipPub, 'tamper-test', Bundle, _Tag),
     % Forge a bogus tag (all zeros, 32 hex chars = 16 bytes).
     FakeTag = '00000000000000000000000000000000',
     % Attempt decryption with the forged tag — must throw.
-    lattice_cryptography_decrypt_ecdh(RecipPriv, Bundle, FakeTag, _Plain, prime256v1).
+    lattice_cryptography_decrypt(lattice_cryptography_algo_ecdh, RecipPriv, Bundle, FakeTag, _Plain).
 
 % Execute the compile-time directive: end_tests(pr49).
 :- end_tests(pr49).
