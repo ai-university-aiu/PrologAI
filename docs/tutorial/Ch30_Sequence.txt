@@ -12,191 +12,191 @@ Load the pack:
 
 Integer Ranges
 
-sq_range/3 generates a list of consecutive integers from Lo to Hi inclusive.
+sequence_range/3 generates a list of consecutive integers from Lo to Hi inclusive.
 If Lo > Hi, the result is the empty list.
 
-    ?- sq_range(1, 5, L).
+    ?- sequence_range(1, 5, L).
     L = [1,2,3,4,5].
 
-    ?- sq_range(3, 3, L).
+    ?- sequence_range(3, 3, L).
     L = [3].
 
-    ?- sq_range(7, 4, L).
+    ?- sequence_range(7, 4, L).
     L = [].
 
 
 First Differences
 
-sq_delta/2 computes the sequence of consecutive differences. For a list of N
+sequence_delta/2 computes the sequence of consecutive differences. For a list of N
 elements, the result has N-1 elements.
 
-    ?- sq_delta([1,3,6,10], D).
+    ?- sequence_delta([1,3,6,10], D).
     D = [2,3,4].
 
-    ?- sq_delta([2,4,6,8], D).
+    ?- sequence_delta([2,4,6,8], D).
     D = [2,2,2].
 
-    ?- sq_delta([5], D).
+    ?- sequence_delta([5], D).
     D = [].
 
 
 Arithmetic Sequences
 
-sq_is_arithmetic/1 succeeds when every consecutive pair has the same
+sequence_is_arithmetic/1 succeeds when every consecutive pair has the same
 difference. The empty list and single-element lists are trivially arithmetic.
 
-    ?- sq_is_arithmetic([2,4,6,8,10]).
+    ?- sequence_is_arithmetic([2,4,6,8,10]).
     true.
 
-    ?- sq_is_arithmetic([1,3,6,10]).
+    ?- sequence_is_arithmetic([1,3,6,10]).
     false.
 
-sq_common_diff/2 extracts the common difference. It fails if the sequence is
+sequence_common_diff/2 extracts the common difference. It fails if the sequence is
 not arithmetic.
 
-    ?- sq_common_diff([2,4,6,8], D).
+    ?- sequence_common_diff([2,4,6,8], D).
     D = 2.
 
-    ?- sq_common_diff([10,7,4,1], D).
+    ?- sequence_common_diff([10,7,4,1], D).
     D = -3.
 
-sq_extend_arith/3 appends N more terms to an arithmetic sequence.
+sequence_extend_arith/3 appends N more terms to an arithmetic sequence.
 
-    ?- sq_extend_arith([1,3,5], 2, Extended).
+    ?- sequence_extend_arith([1,3,5], 2, Extended).
     Extended = [1,3,5,7,9].
 
-    ?- sq_extend_arith([10,8,6], 3, Extended).
+    ?- sequence_extend_arith([10,8,6], 3, Extended).
     Extended = [10,8,6,4,2,0].
 
 
 Chunking
 
-sq_chunk/3 groups a list into consecutive N-element sublists. It fails if the
+sequence_chunk/3 groups a list into consecutive N-element sublists. It fails if the
 list length is not divisible by N.
 
-    ?- sq_chunk([1,2,3,4,5,6], 2, Chunks).
+    ?- sequence_chunk([1,2,3,4,5,6], 2, Chunks).
     Chunks = [[1,2],[3,4],[5,6]].
 
-    ?- sq_chunk([1,2,3,4,5,6], 3, Chunks).
+    ?- sequence_chunk([1,2,3,4,5,6], 3, Chunks).
     Chunks = [[1,2,3],[4,5,6]].
 
-    ?- sq_chunk([1,2,3,4,5], 2, Chunks).
+    ?- sequence_chunk([1,2,3,4,5], 2, Chunks).
     false.
 
 
 Zipping and Unzipping
 
-sq_zip/3 pairs corresponding elements of two same-length lists into A-B pairs.
-sq_unzip/3 reverses the operation.
+sequence_zip/3 pairs corresponding elements of two same-length lists into A-B pairs.
+sequence_unzip/3 reverses the operation.
 
-    ?- sq_zip([1,2,3], [a,b,c], Pairs).
+    ?- sequence_zip([1,2,3], [a,b,c], Pairs).
     Pairs = [1-a,2-b,3-c].
 
-    ?- sq_unzip([1-a,2-b,3-c], As, Bs).
+    ?- sequence_unzip([1-a,2-b,3-c], As, Bs).
     As = [1,2,3],
     Bs = [a,b,c].
 
 Round-trip guarantee:
 
-    ?- sq_zip([x,y,z], [1,2,3], Pairs),
-       sq_unzip(Pairs, Xs, Ns).
+    ?- sequence_zip([x,y,z], [1,2,3], Pairs),
+       sequence_unzip(Pairs, Xs, Ns).
     Xs = [x,y,z], Ns = [1,2,3].
 
 
 Cumulative Sums
 
-sq_cumsum/2 computes prefix sums. Result[i] = List[0] + List[1] + ... + List[i].
+sequence_cumsum/2 computes prefix sums. Result[i] = List[0] + List[1] + ... + List[i].
 
-    ?- sq_cumsum([1,2,3,4], Sums).
+    ?- sequence_cumsum([1,2,3,4], Sums).
     Sums = [1,3,6,10].
 
-    ?- sq_cumsum([], Sums).
+    ?- sequence_cumsum([], Sums).
     Sums = [].
 
 
 Slicing
 
-sq_slice/4 extracts a sublist by 0-indexed From (inclusive) to To (exclusive).
+sequence_slice/4 extracts a sublist by 0-indexed From (inclusive) to To (exclusive).
 
-    ?- sq_slice([a,b,c,d,e], 1, 3, Sub).
+    ?- sequence_slice([a,b,c,d,e], 1, 3, Sub).
     Sub = [b,c].
 
-    ?- sq_slice([1,2,3,4,5], 0, 3, Sub).
+    ?- sequence_slice([1,2,3,4,5], 0, 3, Sub).
     Sub = [1,2,3].
 
-    ?- sq_slice([a,b,c,d], 2, 2, Sub).
+    ?- sequence_slice([a,b,c,d], 2, 2, Sub).
     Sub = [].
 
 
 One-Level Flatten
 
-sq_flatten1/2 concatenates a list of sublists into a single list. It performs
+sequence_flatten1/2 concatenates a list of sublists into a single list. It performs
 exactly one level of flattening (equivalent to append/2).
 
-    ?- sq_flatten1([[1,2],[3,4],[5]], Flat).
+    ?- sequence_flatten1([[1,2],[3,4],[5]], Flat).
     Flat = [1,2,3,4,5].
 
-    ?- sq_flatten1([[a,b,c]], Flat).
+    ?- sequence_flatten1([[a,b,c]], Flat).
     Flat = [a,b,c].
 
 
 Transposing a Matrix
 
-sq_transpose/2 transposes a rectangular list-of-lists. Rows become columns
+sequence_transpose/2 transposes a rectangular list-of-lists. Rows become columns
 and columns become rows.
 
-    ?- sq_transpose([[1,2,3],[4,5,6]], T).
+    ?- sequence_transpose([[1,2,3],[4,5,6]], T).
     T = [[1,4],[2,5],[3,6]].
 
-    ?- sq_transpose([[1,2],[3,4],[5,6]], T).
+    ?- sequence_transpose([[1,2],[3,4],[5,6]], T).
     T = [[1,3,5],[2,4,6]].
 
 
 Period Detection
 
-sq_period/2 finds the smallest repeating unit of a list. Every list has at
+sequence_period/2 finds the smallest repeating unit of a list. Every list has at
 least a trivial period (itself). The predicate is deterministic.
 
-    ?- sq_period([1,2,1,2,1,2], P).
+    ?- sequence_period([1,2,1,2,1,2], P).
     P = [1,2].
 
-    ?- sq_period([5,5,5,5], P).
+    ?- sequence_period([5,5,5,5], P).
     P = [5].
 
-    ?- sq_period([1,2,3], P).
+    ?- sequence_period([1,2,3], P).
     P = [1,2,3].        % no shorter period; result is the list itself
 
-sq_is_periodic/1 succeeds only when the period is strictly shorter than the
+sequence_is_periodic/1 succeeds only when the period is strictly shorter than the
 list (a proper period).
 
-    ?- sq_is_periodic([1,2,1,2]).
+    ?- sequence_is_periodic([1,2,1,2]).
     true.
 
-    ?- sq_is_periodic([3,3,3,3]).
+    ?- sequence_is_periodic([3,3,3,3]).
     true.
 
-    ?- sq_is_periodic([1,2,3]).
+    ?- sequence_is_periodic([1,2,3]).
     false.
 
-    ?- sq_is_periodic([1]).
+    ?- sequence_is_periodic([1]).
     false.
 
 
 Exported Predicates
 
-sq_range/3         - integer list Lo to Hi
-sq_delta/2         - first differences
-sq_is_arithmetic/1 - constant-difference test
-sq_common_diff/2   - extract common difference
-sq_extend_arith/3  - extend arithmetic sequence
-sq_chunk/3         - divide into N-element chunks
-sq_zip/3           - zip two lists into pairs
-sq_unzip/3         - split pairs into two lists
-sq_cumsum/2        - cumulative prefix sums
-sq_slice/4         - 0-indexed sublist
-sq_flatten1/2      - one-level flatten
-sq_transpose/2     - transpose list-of-lists
-sq_period/2        - smallest repeating unit
-sq_is_periodic/1   - proper period existence test
+sequence_range/3         - integer list Lo to Hi
+sequence_delta/2         - first differences
+sequence_is_arithmetic/1 - constant-difference test
+sequence_common_diff/2   - extract common difference
+sequence_extend_arith/3  - extend arithmetic sequence
+sequence_chunk/3         - divide into N-element chunks
+sequence_zip/3           - zip two lists into pairs
+sequence_unzip/3         - split pairs into two lists
+sequence_cumsum/2        - cumulative prefix sums
+sequence_slice/4         - 0-indexed sublist
+sequence_flatten1/2      - one-level flatten
+sequence_transpose/2     - transpose list-of-lists
+sequence_period/2        - smallest repeating unit
+sequence_is_periodic/1   - proper period existence test
 
 END OF CHAPTER 30

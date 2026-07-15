@@ -33,139 +33,139 @@ swipl -p "library=packs/grid/prolog" \
 
 PALETTE AND COLOR COUNTING
 
-cl_palette(+Grid, -Palette)
+color_palette(+Grid, -Palette)
 
 Palette is the sorted list of distinct colors used anywhere in Grid.
 
 % Get the palette of a 3x3 grid.
-:- cl_palette([[1,2,3],[2,3,1],[3,1,2]], P).
+:- color_palette([[1,2,3],[2,3,1],[3,1,2]], P).
 % P = [1, 2, 3].
 
-cl_count(+Grid, +Color, -N)
+color_count(+Grid, +Color, -N)
 
 N is the number of cells in Grid with value Color.
 
 % Count how many cells are color 0 in a background grid.
-:- cl_count([[0,1,0],[1,0,2],[0,2,0]], 0, N).
+:- color_count([[0,1,0],[1,0,2],[0,2,0]], 0, N).
 % N = 5.
 
-cl_histogram(+Grid, -Hist)
+color_histogram(+Grid, -Hist)
 
 Hist is the list of Color-Count pairs for every palette color, sorted by Color.
 
 % Get the histogram.
-:- cl_histogram([[0,1,0],[1,0,2],[0,2,0]], Hist).
+:- color_histogram([[0,1,0],[1,0,2],[0,2,0]], Hist).
 % Hist = [0-5, 1-2, 2-2].
 
-cl_color_count(+Grid, -N)
+color_color_count(+Grid, -N)
 
 N is the number of distinct colors.
 
 % Count distinct colors.
-:- cl_color_count([[1,2,3],[2,3,1],[3,1,2]], N).
+:- color_color_count([[1,2,3],[2,3,1],[3,1,2]], N).
 % N = 3.
 
-cl_has_color(+Grid, +Color)
+color_has_color(+Grid, +Color)
 
 Succeed if Color appears anywhere in Grid.
 
 % Test for color presence.
-:- cl_has_color([[1,2],[2,1]], 2).
+:- color_has_color([[1,2],[2,1]], 2).
 % Succeeds.
 
-:- cl_has_color([[1,2],[2,1]], 9).
+:- color_has_color([[1,2],[2,1]], 9).
 % Fails.
 
-cl_is_mono(+Grid)
+color_is_mono(+Grid)
 
 Succeed if Grid contains exactly one distinct color.
 
 % Test monochromatic.
-:- cl_is_mono([[5,5],[5,5]]).
+:- color_is_mono([[5,5],[5,5]]).
 % Succeeds.
 
-:- cl_is_mono([[1,2],[2,1]]).
+:- color_is_mono([[1,2],[2,1]]).
 % Fails.
 
-cl_same_palette(+Grid1, +Grid2)
+color_same_palette(+Grid1, +Grid2)
 
 Succeed if both grids use exactly the same set of colors.
 
 % Compare palettes.
-:- cl_same_palette([[1,2],[2,1]], [[2,2],[1,1]]).
+:- color_same_palette([[1,2],[2,1]], [[2,2],[1,1]]).
 % Succeeds.
 
-:- cl_same_palette([[1,2],[2,1]], [[1,1],[1,1]]).
+:- color_same_palette([[1,2],[2,1]], [[1,1],[1,1]]).
 % Fails.
 
 
 DOMINANT AND RAREST COLOR
 
-cl_dominant(+Grid, -Color)
+color_dominant(+Grid, -Color)
 
 Color is the most frequently occurring color.
 
 % Find the dominant color.
-:- cl_dominant([[1,1,1,1],[1,1,1,1],[2,0,0,2],[0,0,0,0]], C).
+:- color_dominant([[1,1,1,1],[1,1,1,1],[2,0,0,2],[0,0,0,0]], C).
 % C = 1.
 
-cl_rarest(+Grid, -Color)
+color_rarest(+Grid, -Color)
 
 Color is the least frequently occurring color.
 
 % Find the rarest color.
-:- cl_rarest([[1,1,1,1],[1,1,1,1],[2,0,0,2],[0,0,0,0]], C).
+:- color_rarest([[1,1,1,1],[1,1,1,1],[2,0,0,2],[0,0,0,0]], C).
 % C = 2.
 
 
 COLOR REPLACEMENT AND REMAPPING
 
-cl_replace(+Grid, +OldColor, +NewColor, -Grid2)
+color_replace(+Grid, +OldColor, +NewColor, -Grid2)
 
 Replace every cell of OldColor with NewColor. Other cells unchanged.
 
 % Replace all 1s with 9s.
-:- cl_replace([[0,1,0],[1,0,1]], 1, 9, G2).
+:- color_replace([[0,1,0],[1,0,1]], 1, 9, G2).
 % G2 = [[0,9,0],[9,0,9]].
 
-cl_remap(+Grid, +Mapping, -Grid2)
+color_remap(+Grid, +Mapping, -Grid2)
 
 Apply a color mapping. Mapping is a list of OldColor-NewColor pairs.
 Colors not in the mapping are unchanged.
 
 % Remap 1->9 and 2->8 in a grid.
-:- cl_remap([[0,1,0],[1,0,2],[0,2,0]], [1-9, 2-8], G2).
+:- color_remap([[0,1,0],[1,0,2],[0,2,0]], [1-9, 2-8], G2).
 % G2 = [[0,9,0],[9,0,8],[0,8,0]].
 
 % Empty mapping leaves grid unchanged.
-:- cl_remap([[1,2],[2,1]], [], G2).
+:- color_remap([[1,2],[2,1]], [], G2).
 % G2 = [[1,2],[2,1]].
 
-cl_swap(+Grid, +ColorA, +ColorB, -Grid2)
+color_swap(+Grid, +ColorA, +ColorB, -Grid2)
 
 Swap ColorA and ColorB: cells of ColorA become ColorB and vice versa.
 
 % Swap 1 and 2 in a 2x2 grid.
-:- cl_swap([[1,2],[2,1]], 1, 2, G2).
+:- color_swap([[1,2],[2,1]], 1, 2, G2).
 % G2 = [[2,1],[1,2]].
 
 
 COLOR FILTERING
 
-cl_isolate(+Grid, +Color, +BgColor, -Grid2)
+color_isolate(+Grid, +Color, +BgColor, -Grid2)
 
 Keep cells of Color; replace all others with BgColor.
 
 % Isolate color 1 against background 0.
-:- cl_isolate([[0,1,0],[1,0,2],[0,2,0]], 1, 0, G2).
+:- color_isolate([[0,1,0],[1,0,2],[0,2,0]], 1, 0, G2).
 % G2 = [[0,1,0],[1,0,0],[0,0,0]].
 
-cl_remove(+Grid, +Color, +BgColor, -Grid2)
+color_remove(+Grid, +Color, +BgColor, -Grid2)
 
 Replace all cells of Color with BgColor; keep all others.
 
 % Remove all 0s, replacing with 9.
-:- cl_remove([[0,1,0],[1,0,2],[0,2,0]], 0, 9, G2).
+:- color_remove([[0,1,0],[1,0,2],[0,2,0]], 0, 9, G2).
 % G2 = [[9,1,9],[1,9,2],[9,2,9]].
 
 
@@ -175,24 +175,24 @@ Finding a transformation key color:
 
 % Find the color that appears exactly once (a key marker).
 find_key_color(Grid, Key) :-
-    cl_histogram(Grid, Hist),
+    color_histogram(Grid, Hist),
     member(Key-1, Hist).
 
 Normalizing a palette:
 
 % Remap palette to canonical integers 0,1,2,...
 normalize_palette(Grid, Grid2, Map) :-
-    cl_palette(Grid, Palette),
+    color_palette(Grid, Palette),
     numlist(0, _, Targets),
     pairs_keys_values(Map, Palette, Targets),
-    cl_remap(Grid, Map, Grid2).
+    color_remap(Grid, Map, Grid2).
 
 Testing color change between input and output:
 
 % Check if the two grids differ only in one color substitution.
 single_color_sub(Input, Output, OldC, NewC) :-
-    cl_palette(Input, P1),
-    cl_palette(Output, P2),
+    color_palette(Input, P1),
+    color_palette(Output, P2),
     subtract(P1, P2, [OldC]),
     subtract(P2, P1, [NewC]).
 
@@ -200,26 +200,26 @@ single_color_sub(Input, Output, OldC, NewC) :-
 PREDICATE SUMMARY
 
 Palette and inspection:
-  cl_palette/2      - sorted distinct color list
-  cl_count/3        - count of a specific color
-  cl_histogram/2    - Color-Count pairs for all palette colors
-  cl_same_palette/2 - test palette equality between two grids
-  cl_is_mono/1      - test for single-color grid
-  cl_color_count/2  - number of distinct colors
-  cl_has_color/2    - membership test for a color
+  color_palette/2      - sorted distinct color list
+  color_count/3        - count of a specific color
+  color_histogram/2    - Color-Count pairs for all palette colors
+  color_same_palette/2 - test palette equality between two grids
+  color_is_mono/1      - test for single-color grid
+  color_color_count/2  - number of distinct colors
+  color_has_color/2    - membership test for a color
 
 Selection:
-  cl_dominant/2     - most frequent color
-  cl_rarest/2       - least frequent color
+  color_dominant/2     - most frequent color
+  color_rarest/2       - least frequent color
 
 Replacement:
-  cl_replace/4      - replace one color with another
-  cl_remap/3        - apply a color mapping list
-  cl_swap/4         - swap two colors
+  color_replace/4      - replace one color with another
+  color_remap/3        - apply a color mapping list
+  color_swap/4         - swap two colors
 
 Filtering:
-  cl_isolate/4      - keep one color, fill rest with background
-  cl_remove/4       - replace one color with background
+  color_isolate/4      - keep one color, fill rest with background
+  color_remove/4       - replace one color with background
 
 
 WHAT COMES NEXT

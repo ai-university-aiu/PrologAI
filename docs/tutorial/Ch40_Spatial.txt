@@ -18,7 +18,7 @@ To use the spatial pack in your code:
 
 40.2 Direction Between Cells
 
-sp_direction(Cell1, Cell2, Dir) gives the cardinal direction from Cell1
+spatial_direction(Cell1, Cell2, Dir) gives the cardinal direction from Cell1
 to Cell2.
 
 Dir is one of: north, south, east, west, northeast, northwest,
@@ -26,96 +26,96 @@ southeast, southwest, or same.
 
 Example:
 
-sp_direction(r(3,2), r(1,2), Dir).
+spatial_direction(r(3,2), r(1,2), Dir).
 % Dir = north
 
-sp_direction(r(1,3), r(3,1), Dir).
+spatial_direction(r(1,3), r(3,1), Dir).
 % Dir = southwest
 
 
 40.3 Distance Metrics
 
-sp_distance_manhattan(Cell1, Cell2, D) computes D = |R2-R1| + |C2-C1|.
+spatial_distance_manhattan(Cell1, Cell2, D) computes D = |R2-R1| + |C2-C1|.
 
 This is the shortest path distance when only horizontal and vertical
 moves are allowed.
 
-sp_distance_chebyshev(Cell1, Cell2, D) computes D = max(|R2-R1|, |C2-C1|).
+spatial_distance_chebyshev(Cell1, Cell2, D) computes D = max(|R2-R1|, |C2-C1|).
 
 This is the shortest path distance when diagonal moves are also allowed.
 
 Example:
 
-sp_distance_manhattan(r(0,0), r(2,2), D).
+spatial_distance_manhattan(r(0,0), r(2,2), D).
 % D = 4
 
-sp_distance_chebyshev(r(0,0), r(2,2), D).
+spatial_distance_chebyshev(r(0,0), r(2,2), D).
 % D = 2
 
 
 40.4 Neighbor Enumeration
 
-sp_neighbors4(Cell, Rows-Cols, Neighbors) returns the list of in-bounds
+spatial_neighbors4(Cell, Rows-Cols, Neighbors) returns the list of in-bounds
 4-connected neighbors (up, down, left, right).
 
-sp_neighbors8(Cell, Rows-Cols, Neighbors) returns all 8-connected
+spatial_neighbors8(Cell, Rows-Cols, Neighbors) returns all 8-connected
 in-bounds neighbors (including diagonals).
 
 Example:
 
-sp_neighbors4(r(1,1), 3-3, N).
+spatial_neighbors4(r(1,1), 3-3, N).
 % N = [r(0,1), r(2,1), r(1,0), r(1,2)]  (order may vary)
 
 
 40.5 Adjacency Tests
 
-sp_adjacent4(Cell1, Cell2) succeeds when Manhattan distance is exactly 1.
+spatial_adjacent4(Cell1, Cell2) succeeds when Manhattan distance is exactly 1.
 
-sp_adjacent8(Cell1, Cell2) succeeds when Chebyshev distance is exactly 1.
+spatial_adjacent8(Cell1, Cell2) succeeds when Chebyshev distance is exactly 1.
 
 
 40.6 Containment Tests
 
-sp_bbox_contains(bbox(R1,C1,R2,C2), Cell) succeeds when Cell is inside
+spatial_bbox_contains(bbox(R1,C1,R2,C2), Cell) succeeds when Cell is inside
 the bounding box (inclusive on all edges).
 
-sp_in_region(Cell, Region) succeeds when Cell is a member of a region
+spatial_in_region(Cell, Region) succeeds when Cell is a member of a region
 list. Deterministic: the cut removes the choicepoint.
 
 
 40.7 Region Band Filtering
 
-sp_row_between(Region, MinR, MaxR, Filtered) keeps cells with row index
+spatial_row_between(Region, MinR, MaxR, Filtered) keeps cells with row index
 in [MinR, MaxR].
 
-sp_col_between(Region, MinC, MaxC, Filtered) keeps cells with column
+spatial_col_between(Region, MinC, MaxC, Filtered) keeps cells with column
 index in [MinC, MaxC].
 
 Example:
 
 Region = [r(0,0), r(1,0), r(2,0), r(3,0)],
-sp_row_between(Region, 1, 2, Filtered).
+spatial_row_between(Region, 1, 2, Filtered).
 % Filtered = [r(1,0), r(2,0)]
 
 
 40.8 Nearest and Farthest
 
-sp_closest(Ref, Region, Closest) returns the cell in Region with the
+spatial_closest(Ref, Region, Closest) returns the cell in Region with the
 smallest Manhattan distance from Ref. On ties, the first cell in the
 list is returned.
 
-sp_farthest(Ref, Region, Farthest) returns the cell with the largest
+spatial_farthest(Ref, Region, Farthest) returns the cell with the largest
 Manhattan distance.
 
 Example:
 
-sp_closest(r(0,0), [r(5,5), r(1,1), r(3,3)], Closest).
+spatial_closest(r(0,0), [r(5,5), r(1,1), r(3,3)], Closest).
 % Closest = r(1,1)
 
 
 40.9 Integer Centroid
 
-sp_centroid(Region, Row, Col) computes the integer centroid of a region:
+spatial_centroid(Region, Row, Col) computes the integer centroid of a region:
 Row = sum_of_row_indices // count, Col = sum_of_col_indices // count.
 
 The result is truncated (not rounded), consistent with the measure pack.
@@ -124,20 +124,20 @@ The result is truncated (not rounded), consistent with the measure pack.
 40.10 Summary
 
 Predicate               Arity   Description
-sp_direction            3       Cardinal direction between cells
-sp_distance_manhattan   3       Manhattan (L1) distance
-sp_distance_chebyshev   3       Chebyshev (L-inf) distance
-sp_neighbors4           3       4-connected in-bounds neighbors
-sp_neighbors8           3       8-connected in-bounds neighbors
-sp_adjacent4            2       4-connected adjacency test
-sp_adjacent8            2       8-connected adjacency test
-sp_bbox_contains        2       Cell inside bounding box
-sp_in_region            2       Cell in region membership
-sp_row_between          4       Filter region by row range
-sp_col_between          4       Filter region by column range
-sp_closest              3       Nearest region cell
-sp_farthest             3       Farthest region cell
-sp_centroid             3       Integer centroid
+spatial_direction            3       Cardinal direction between cells
+spatial_distance_manhattan   3       Manhattan (L1) distance
+spatial_distance_chebyshev   3       Chebyshev (L-inf) distance
+spatial_neighbors4           3       4-connected in-bounds neighbors
+spatial_neighbors8           3       8-connected in-bounds neighbors
+spatial_adjacent4            2       4-connected adjacency test
+spatial_adjacent8            2       8-connected adjacency test
+spatial_bbox_contains        2       Cell inside bounding box
+spatial_in_region            2       Cell in region membership
+spatial_row_between          4       Filter region by row range
+spatial_col_between          4       Filter region by column range
+spatial_closest              3       Nearest region cell
+spatial_farthest             3       Farthest region cell
+spatial_centroid             3       Integer centroid
 
 The spatial pack ships 49 PLUnit tests.
 

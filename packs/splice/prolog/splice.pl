@@ -4,34 +4,34 @@
 % structurally reshape the grid by changing its row or column count, unlike
 % cell-level predicates that only modify individual values.
 :- module(splice, [
-    % sp_insert_row/4: insert a new row before row index R.
-    sp_insert_row/4,
-    % sp_delete_row/3: delete the row at index R.
-    sp_delete_row/3,
-    % sp_insert_col/4: insert a column of constant value V before column index C.
-    sp_insert_col/4,
-    % sp_delete_col/3: delete the column at index C.
-    sp_delete_col/3,
-    % sp_swap_rows/4: swap rows R1 and R2.
-    sp_swap_rows/4,
-    % sp_swap_cols/4: swap columns C1 and C2.
-    sp_swap_cols/4,
-    % sp_reverse_rows/2: reverse the order of rows (top-bottom flip at row level).
-    sp_reverse_rows/2,
-    % sp_reverse_cols/2: reverse the order of cells in each row (left-right flip).
-    sp_reverse_cols/2,
-    % sp_rotate_rows/3: shift rows cyclically so that row K becomes row 0.
-    sp_rotate_rows/3,
-    % sp_rotate_cols/3: shift columns cyclically so that column K becomes column 0.
-    sp_rotate_cols/3,
-    % sp_replicate_row/4: replace row R with N copies of it in the output.
-    sp_replicate_row/4,
-    % sp_replicate_col/4: replace column C with N copies of it in the output.
-    sp_replicate_col/4,
-    % sp_select_rows/3: keep only the rows at the given list of indices (in order).
-    sp_select_rows/3,
-    % sp_select_cols/3: keep only the columns at the given list of indices (in order).
-    sp_select_cols/3
+    % splice_insert_row/4: insert a new row before row index R.
+    splice_insert_row/4,
+    % splice_delete_row/3: delete the row at index R.
+    splice_delete_row/3,
+    % splice_insert_col/4: insert a column of constant value V before column index C.
+    splice_insert_col/4,
+    % splice_delete_col/3: delete the column at index C.
+    splice_delete_col/3,
+    % splice_swap_rows/4: swap rows R1 and R2.
+    splice_swap_rows/4,
+    % splice_swap_cols/4: swap columns C1 and C2.
+    splice_swap_cols/4,
+    % splice_reverse_rows/2: reverse the order of rows (top-bottom flip at row level).
+    splice_reverse_rows/2,
+    % splice_reverse_cols/2: reverse the order of cells in each row (left-right flip).
+    splice_reverse_cols/2,
+    % splice_rotate_rows/3: shift rows cyclically so that row K becomes row 0.
+    splice_rotate_rows/3,
+    % splice_rotate_cols/3: shift columns cyclically so that column K becomes column 0.
+    splice_rotate_cols/3,
+    % splice_replicate_row/4: replace row R with N copies of it in the output.
+    splice_replicate_row/4,
+    % splice_replicate_col/4: replace column C with N copies of it in the output.
+    splice_replicate_col/4,
+    % splice_select_rows/3: keep only the rows at the given list of indices (in order).
+    splice_select_rows/3,
+    % splice_select_cols/3: keep only the columns at the given list of indices (in order).
+    splice_select_cols/3
 ]).
 
 % Import list utilities; sort/2, length/2, between/3, forall/2 are built-ins.
@@ -39,10 +39,10 @@
 % Import maplist/2 and maplist/3 for row-level transformations.
 :- use_module(library(apply), [maplist/2, maplist/3]).
 
-% sp_insert_row(+Grid, +R, +NewRow, -Out): insert NewRow before row index R.
+% splice_insert_row(+Grid, +R, +NewRow, -Out): insert NewRow before row index R.
 % Rows originally at R, R+1, ... shift to R+1, R+2, ... .
 % R must satisfy 0 =< R =< H where H is the number of rows in Grid.
-sp_insert_row(Grid, R, NewRow, Out) :-
+splice_insert_row(Grid, R, NewRow, Out) :-
 % Split Grid at position R: Prefix holds the first R rows.
     length(Prefix, R),
 % Unify Prefix with the first R rows and Suffix with the rest.
@@ -50,9 +50,9 @@ sp_insert_row(Grid, R, NewRow, Out) :-
 % Re-assemble with NewRow inserted between Prefix and Suffix.
     append(Prefix, [NewRow|Suffix], Out).
 
-% sp_delete_row(+Grid, +R, -Out): delete the row at index R.
+% splice_delete_row(+Grid, +R, -Out): delete the row at index R.
 % Out has one fewer row than Grid. R must be a valid row index.
-sp_delete_row(Grid, R, Out) :-
+splice_delete_row(Grid, R, Out) :-
 % Split Grid at R: the next element is the row to remove.
     length(Prefix, R),
 % Unify Prefix with the first R rows; [_|Suffix] discards row R.
@@ -60,8 +60,8 @@ sp_delete_row(Grid, R, Out) :-
 % Re-assemble without the deleted row.
     append(Prefix, Suffix, Out).
 
-% sp_insert_col_row_(+C, +V, +Row, -NewRow): insert V before column C in one row.
-sp_insert_col_row_(C, V, Row, NewRow) :-
+% splice_insert_col_row_(+C, +V, +Row, -NewRow): insert V before column C in one row.
+splice_insert_col_row_(C, V, Row, NewRow) :-
 % Split Row at column C.
     length(Prefix, C),
 % Unify Prefix with the first C cells; Suffix holds the rest.
@@ -69,14 +69,14 @@ sp_insert_col_row_(C, V, Row, NewRow) :-
 % Re-assemble with V inserted at position C.
     append(Prefix, [V|Suffix], NewRow).
 
-% sp_insert_col(+Grid, +C, +V, -Out): insert a column of value V before column C.
+% splice_insert_col(+Grid, +C, +V, -Out): insert a column of value V before column C.
 % Every row gets V inserted at position C; all columns >= C shift right.
-sp_insert_col(Grid, C, V, Out) :-
+splice_insert_col(Grid, C, V, Out) :-
 % Apply column insertion to every row independently.
-    maplist(sp_insert_col_row_(C, V), Grid, Out).
+    maplist(splice_insert_col_row_(C, V), Grid, Out).
 
-% sp_delete_col_row_(+C, +Row, -NewRow): delete the cell at column C from one row.
-sp_delete_col_row_(C, Row, NewRow) :-
+% splice_delete_col_row_(+C, +Row, -NewRow): delete the cell at column C from one row.
+splice_delete_col_row_(C, Row, NewRow) :-
 % Split Row at column C.
     length(Prefix, C),
 % Unify Prefix with the first C cells; [_|Suffix] discards cell C.
@@ -84,15 +84,15 @@ sp_delete_col_row_(C, Row, NewRow) :-
 % Re-assemble without the deleted cell.
     append(Prefix, Suffix, NewRow).
 
-% sp_delete_col(+Grid, +C, -Out): delete the column at index C from every row.
+% splice_delete_col(+Grid, +C, -Out): delete the column at index C from every row.
 % Out has one fewer column than Grid. C must be a valid column index.
-sp_delete_col(Grid, C, Out) :-
+splice_delete_col(Grid, C, Out) :-
 % Apply column deletion to every row independently.
-    maplist(sp_delete_col_row_(C), Grid, Out).
+    maplist(splice_delete_col_row_(C), Grid, Out).
 
-% sp_swap_rows(+Grid, +R1, +R2, -Out): swap the rows at indices R1 and R2.
+% splice_swap_rows(+Grid, +R1, +R2, -Out): swap the rows at indices R1 and R2.
 % If R1 = R2 the grid is unchanged. Both indices must be valid.
-sp_swap_rows(Grid, R1, R2, Out) :-
+splice_swap_rows(Grid, R1, R2, Out) :-
 % Fetch the two rows to be exchanged.
     nth0(R1, Grid, Row1),
 % Fetch the second row.
@@ -110,8 +110,8 @@ sp_swap_rows(Grid, R1, R2, Out) :-
         ; Row = OldRow )
     ), Out).
 
-% sp_swap_in_row_(+C1, +C2, +Row, -NewRow): swap cells at C1 and C2 within one row.
-sp_swap_in_row_(C1, C2, Row, NewRow) :-
+% splice_swap_in_row_(+C1, +C2, +Row, -NewRow): swap cells at C1 and C2 within one row.
+splice_swap_in_row_(C1, C2, Row, NewRow) :-
 % Fetch the two values to exchange.
     nth0(C1, Row, V1),
 % Fetch the second value.
@@ -129,28 +129,28 @@ sp_swap_in_row_(C1, C2, Row, NewRow) :-
         ; V = OldV )
     ), NewRow).
 
-% sp_swap_cols(+Grid, +C1, +C2, -Out): swap columns C1 and C2 in every row.
+% splice_swap_cols(+Grid, +C1, +C2, -Out): swap columns C1 and C2 in every row.
 % If C1 = C2 the grid is unchanged. Both indices must be valid.
-sp_swap_cols(Grid, C1, C2, Out) :-
+splice_swap_cols(Grid, C1, C2, Out) :-
 % Apply column swap to every row independently.
-    maplist(sp_swap_in_row_(C1, C2), Grid, Out).
+    maplist(splice_swap_in_row_(C1, C2), Grid, Out).
 
-% sp_reverse_rows(+Grid, -Out): reverse the order of rows.
+% splice_reverse_rows(+Grid, -Out): reverse the order of rows.
 % Row 0 becomes the last row; row H-1 becomes row 0.
-sp_reverse_rows(Grid, Out) :-
+splice_reverse_rows(Grid, Out) :-
 % Reverse the top-level list of rows.
     reverse(Grid, Out).
 
-% sp_reverse_cols(+Grid, -Out): reverse the order of cells in each row.
+% splice_reverse_cols(+Grid, -Out): reverse the order of cells in each row.
 % Column 0 becomes the last column; mirrors the grid left-right.
-sp_reverse_cols(Grid, Out) :-
+splice_reverse_cols(Grid, Out) :-
 % Reverse each row independently.
     maplist(reverse, Grid, Out).
 
-% sp_rotate_rows(+Grid, +K, -Out): shift rows cyclically so that row K becomes row 0.
+% splice_rotate_rows(+Grid, +K, -Out): shift rows cyclically so that row K becomes row 0.
 % Row K moves to index 0; row K+1 to index 1; row K-1 to index H-1.
 % K is taken modulo H so values >= H and negative values work correctly.
-sp_rotate_rows(Grid, K, Out) :-
+splice_rotate_rows(Grid, K, Out) :-
 % Get the total number of rows.
     length(Grid, H),
 % Reduce K to the range [0, H-1].
@@ -162,8 +162,8 @@ sp_rotate_rows(Grid, K, Out) :-
 % Re-assemble with Suffix first then Prefix.
     append(Suffix, Prefix, Out).
 
-% sp_rotate_row_cols_(+K, +Row, -RotRow): cyclically shift one row by K positions.
-sp_rotate_row_cols_(K, Row, RotRow) :-
+% splice_rotate_row_cols_(+K, +Row, -RotRow): cyclically shift one row by K positions.
+splice_rotate_row_cols_(K, Row, RotRow) :-
 % Get the length of the row.
     length(Row, W),
 % Reduce K to the range [0, W-1].
@@ -175,15 +175,15 @@ sp_rotate_row_cols_(K, Row, RotRow) :-
 % Re-assemble with Suffix first then Prefix.
     append(Suffix, Prefix, RotRow).
 
-% sp_rotate_cols(+Grid, +K, -Out): shift columns cyclically so that column K becomes column 0.
+% splice_rotate_cols(+Grid, +K, -Out): shift columns cyclically so that column K becomes column 0.
 % Column K moves to index 0; column K+1 to index 1; column K-1 to index W-1.
-sp_rotate_cols(Grid, K, Out) :-
+splice_rotate_cols(Grid, K, Out) :-
 % Apply column rotation to every row independently.
-    maplist(sp_rotate_row_cols_(K), Grid, Out).
+    maplist(splice_rotate_row_cols_(K), Grid, Out).
 
-% sp_replicate_row(+Grid, +R, +N, -Out): replace row R with N copies of it.
+% splice_replicate_row(+Grid, +R, +N, -Out): replace row R with N copies of it.
 % N=1 leaves row R unchanged; N=0 deletes it; N=2 inserts one extra copy after R.
-sp_replicate_row(Grid, R, N, Out) :-
+splice_replicate_row(Grid, R, N, Out) :-
 % Fetch the row to replicate.
     nth0(R, Grid, Row),
 % Split Grid at position R: Prefix holds the R rows before row R.
@@ -197,8 +197,8 @@ sp_replicate_row(Grid, R, N, Out) :-
 % Assemble: Prefix, N copies of Row, Suffix.
     append([Prefix, Copies, Suffix], Out).
 
-% sp_replicate_col_in_row_(+C, +N, +Row, -NewRow): replace column C with N copies.
-sp_replicate_col_in_row_(C, N, Row, NewRow) :-
+% splice_replicate_col_in_row_(+C, +N, +Row, -NewRow): replace column C with N copies.
+splice_replicate_col_in_row_(C, N, Row, NewRow) :-
 % Split Row at position C: Prefix holds the C cells before column C.
     length(Prefix, C),
 % Unify Prefix and [V|Suffix] with Row to isolate the cell value V.
@@ -210,27 +210,27 @@ sp_replicate_col_in_row_(C, N, Row, NewRow) :-
 % Assemble: Prefix, N copies of V, Suffix.
     append([Prefix, Copies, Suffix], NewRow).
 
-% sp_replicate_col(+Grid, +C, +N, -Out): replace column C with N copies of it.
+% splice_replicate_col(+Grid, +C, +N, -Out): replace column C with N copies of it.
 % N=1 leaves the column unchanged; N=0 deletes it; N=2 inserts one extra copy.
-sp_replicate_col(Grid, C, N, Out) :-
+splice_replicate_col(Grid, C, N, Out) :-
 % Apply column replication to every row independently.
-    maplist(sp_replicate_col_in_row_(C, N), Grid, Out).
+    maplist(splice_replicate_col_in_row_(C, N), Grid, Out).
 
-% sp_select_rows(+Grid, +Indices, -Out): keep only the rows at the given indices.
+% splice_select_rows(+Grid, +Indices, -Out): keep only the rows at the given indices.
 % Out is the list of rows in the order Indices specifies.
 % Indices may repeat indices or omit any row index.
-sp_select_rows(Grid, Indices, Out) :-
+splice_select_rows(Grid, Indices, Out) :-
 % Collect each row in order by its index.
     findall(Row, (member(I, Indices), nth0(I, Grid, Row)), Out).
 
-% sp_select_col_from_row_(+Indices, +Row, -NewRow): keep only columns at Indices.
-sp_select_col_from_row_(Indices, Row, NewRow) :-
+% splice_select_col_from_row_(+Indices, +Row, -NewRow): keep only columns at Indices.
+splice_select_col_from_row_(Indices, Row, NewRow) :-
 % Collect each cell value in order by column index.
     findall(V, (member(C, Indices), nth0(C, Row, V)), NewRow).
 
-% sp_select_cols(+Grid, +Indices, -Out): keep only the columns at the given indices.
+% splice_select_cols(+Grid, +Indices, -Out): keep only the columns at the given indices.
 % Out has columns reordered and filtered according to Indices.
 % Indices may repeat indices or omit any column index.
-sp_select_cols(Grid, Indices, Out) :-
+splice_select_cols(Grid, Indices, Out) :-
 % Apply column selection to every row independently.
-    maplist(sp_select_col_from_row_(Indices), Grid, Out).
+    maplist(splice_select_col_from_row_(Indices), Grid, Out).

@@ -19,95 +19,95 @@ Each element is a Key-[Objs] pair using the -/2 functor. Keys are sorted.
 
 Partition Predicates
 
-gp_by_color(+Objs, -Groups): partition by color.
+group_by_color(+Objs, -Groups): partition by color.
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(1,1)]), obj(1,[r(0,1)])],
-    gp_by_color(Objs, Groups).
+    group_by_color(Objs, Groups).
     % Groups = [1-[obj(1,[r(0,0)]),obj(1,[r(0,1)])], 2-[obj(2,[r(1,1)])]]
 
-gp_by_size(+Objs, -Groups): partition by cell count.
+group_by_size(+Objs, -Groups): partition by cell count.
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(1,1),r(1,2)])],
-    gp_by_size(Objs, Groups).
+    group_by_size(Objs, Groups).
     % Groups = [1-[obj(1,[r(0,0)])], 2-[obj(2,[r(1,1),r(1,2)])]]
 
-gp_by_row(+Objs, -Groups): partition by minimum row of cells (topmost row).
+group_by_row(+Objs, -Groups): partition by minimum row of cells (topmost row).
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(1,1)])],
-    gp_by_row(Objs, Groups).
+    group_by_row(Objs, Groups).
     % Groups = [0-[obj(1,[r(0,0)])], 1-[obj(2,[r(1,1)])]]
 
-gp_by_col(+Objs, -Groups): partition by minimum column (leftmost column).
+group_by_col(+Objs, -Groups): partition by minimum column (leftmost column).
 
-gp_by_form(+Objs, -Groups): partition by origin-normalized cell list (shape).
+group_by_form(+Objs, -Groups): partition by origin-normalized cell list (shape).
 Two objects share a form iff their cells, after translation to min-row=0,
 min-col=0 and sorting, are identical. The form is used as the group key.
 
     Objs = [obj(1,[r(0,0)]), obj(2,[r(1,1)])],  % both are single cells
-    gp_by_form(Objs, Groups).
+    group_by_form(Objs, Groups).
     % Groups = [[r(0,0)]-[obj(1,[r(0,0)]),obj(2,[r(1,1)])]]
     % The key is the normalized form [r(0,0)] - a single-cell dot shape.
 
 
 Inspection Predicates
 
-gp_size_of(+Groups, -N): number of groups.
+group_size_of(+Groups, -N): number of groups.
 
-    gp_size_of([1-[O1,O2], 2-[O3]], 2).  % two groups
+    group_size_of([1-[O1,O2], 2-[O3]], 2).  % two groups
 
-gp_flatten(+Groups, -Objs): flatten all groups into a single object list.
+group_flatten(+Groups, -Objs): flatten all groups into a single object list.
 
-    gp_flatten([1-[O1,O2], 2-[O3]], [O1,O2,O3]).
+    group_flatten([1-[O1,O2], 2-[O3]], [O1,O2,O3]).
 
-gp_group_sizes(+Groups, -Sizes): sorted distinct group cardinalities.
+group_group_sizes(+Groups, -Sizes): sorted distinct group cardinalities.
 
-    gp_group_sizes([1-[O1,O2], 2-[O3]], [1,2]).  % one group has 2, one has 1
+    group_group_sizes([1-[O1,O2], 2-[O3]], [1,2]).  % one group has 2, one has 1
 
-gp_all_same_size(+Groups): succeeds iff all groups have the same cardinality.
+group_all_same_size(+Groups): succeeds iff all groups have the same cardinality.
 
-    gp_all_same_size([1-[O1], 2-[O2]]).   % succeeds (both size 1)
-    gp_all_same_size([1-[O1,O2], 2-[O3]]).  % fails (2 vs 1)
-    gp_all_same_size([]).  % succeeds (vacuously)
+    group_all_same_size([1-[O1], 2-[O2]]).   % succeeds (both size 1)
+    group_all_same_size([1-[O1,O2], 2-[O3]]).  % fails (2 vs 1)
+    group_all_same_size([]).  % succeeds (vacuously)
 
-gp_keys(+Groups, -Keys): sorted list of group keys.
+group_keys(+Groups, -Keys): sorted list of group keys.
 
-    gp_keys([3-[O3], 1-[O1], 2-[O2]], [1,2,3]).  % sorted even if input is not
+    group_keys([3-[O3], 1-[O1], 2-[O2]], [1,2,3]).  % sorted even if input is not
 
 
 Extrema Predicates
 
-gp_largest_group(+Groups, -Largest): Key-[Objs] pair with the most objects.
+group_largest_group(+Groups, -Largest): Key-[Objs] pair with the most objects.
 Ties broken by smallest key. Deterministic (uses cut + memberchk).
 
-    gp_largest_group([1-[O1,O2], 2-[O3]], 1-[O1,O2]).  % group 1 has 2 objs
+    group_largest_group([1-[O1,O2], 2-[O3]], 1-[O1,O2]).  % group 1 has 2 objs
 
-gp_smallest_group(+Groups, -Smallest): Key-[Objs] pair with the fewest objects.
+group_smallest_group(+Groups, -Smallest): Key-[Objs] pair with the fewest objects.
 
-    gp_smallest_group([1-[O1,O2], 2-[O3]], 2-[O3]).  % group 2 has 1 obj
+    group_smallest_group([1-[O1,O2], 2-[O3]], 2-[O3]).  % group 2 has 1 obj
 
 
 Filter Predicates
 
-gp_singleton_groups(+Groups, -Singles): groups with exactly one object.
+group_singleton_groups(+Groups, -Singles): groups with exactly one object.
 
-    gp_singleton_groups([1-[O1,O2], 2-[O3]], [2-[O3]]).
+    group_singleton_groups([1-[O1,O2], 2-[O3]], [2-[O3]]).
 
-gp_shared_groups(+Groups, -Shared): groups with more than one object.
+group_shared_groups(+Groups, -Shared): groups with more than one object.
 
-    gp_shared_groups([1-[O1,O2], 2-[O3]], [1-[O1,O2]]).
+    group_shared_groups([1-[O1,O2], 2-[O3]], [1-[O1,O2]]).
 
 
 Design Notes
 
-Self-contained: gp_norm_ is defined privately, not imported from query or sift.
+Self-contained: group_norm_ is defined privately, not imported from query or sift.
 All three packs use the same normalization algorithm.
 
-gp_by_form key: the group key for gp_by_form is itself a list (the normalized
+group_by_form key: the group key for group_by_form is itself a list (the normalized
 form). This is a valid Prolog term and sorts correctly under standard order.
 
 Empty input: all partition predicates return [] for empty Objs.
 
-Ties in extrema: gp_largest_group and gp_smallest_group return the first group
+Ties in extrema: group_largest_group and group_smallest_group return the first group
 in the sorted Groups order (smallest key) when multiple groups tie.
 
 42/42 PLUnit tests pass. No warnings.

@@ -24,13 +24,13 @@ the highest coverage on the training pairs.
 Exported Predicates
 
 
-sq_apply(+Rules, +Scene, -Result)
+seqinfer_apply(+Rules, +Scene, -Result)
 
 Apply a list of rule terms left-to-right to Scene. Returns the final Result.
 
 Example:
 
-sq_apply([recolor(r, b), shift(1, 0)], [obj(r, [r(0,0)])], Result).
+seqinfer_apply([recolor(r, b), shift(1, 0)], [obj(r, [r(0,0)])], Result).
 % Applies recolor first, then shift.
 % Result = [obj(b, [r(1,0)])]
 
@@ -50,23 +50,23 @@ Supported rule terms:
   color_map(Map)         - apply a color substitution table (list of C1-C2 pairs)
 
 
-sq_verify(+Rules, +Before, +After)
+seqinfer_verify(+Rules, +Before, +After)
 
 Succeed if applying Rules to Before produces After (order-independent comparison).
 
 
-sq_consistent(+Rules, +Pairs)
+seqinfer_consistent(+Rules, +Pairs)
 
 Succeed if Rules correctly transforms every pair in Pairs.
 Succeeds vacuously for empty Pairs.
 
 
-sq_coverage(+Rules, +Pairs, -N)
+seqinfer_coverage(+Rules, +Pairs, -N)
 
 N is the count of pairs that Rules correctly transforms.
 
 
-sq_infer_2step(+Candidates, +Pairs, -BestSeq)
+seqinfer_infer_2step(+Candidates, +Pairs, -BestSeq)
 
 Find the 2-element rule sequence [R1, R2] from Candidates with the highest
 coverage on Pairs. Enumerates all ordered pairs from the candidate list.
@@ -74,63 +74,63 @@ Fails if no combination has positive coverage.
 
 Example:
 
-sq_infer_2step([recolor(r,b), shift(1,0), identity], Pairs, BestSeq).
+seqinfer_infer_2step([recolor(r,b), shift(1,0), identity], Pairs, BestSeq).
 % Tries all ordered pairs; returns the best-coverage sequence.
 
 
-sq_infer_3step(+Candidates, +Pairs, -BestSeq)
+seqinfer_infer_3step(+Candidates, +Pairs, -BestSeq)
 
 Find the 3-element sequence with highest coverage.
 Note: enumerates O(|Candidates|^3) combinations; use small candidate lists.
 
 
-sq_default_rules(-Rules)
+seqinfer_default_rules(-Rules)
 
 Standard single-step rule candidates: identity, recolor pairs for r/b/g/y,
 recolor_all, shifts in 8 directions, to_origin, reflect_h, reflect_v,
 remove_color/keep_color for r/b/g, sort_size_desc, sort_size_asc.
 
 
-sq_solve(+Pairs, +Candidates, -BestSeq)
+seqinfer_solve(+Pairs, +Candidates, -BestSeq)
 
 Attempts to find the best rule sequence. Tries 2-step first (requires full
 coverage); falls back to best single-step rule if 2-step search fails.
 
 Example:
 
-sq_default_rules(Rules),
-sq_solve(TrainingPairs, Rules, BestSeq),
-sq_apply(BestSeq, TestScene, Output).
+seqinfer_default_rules(Rules),
+seqinfer_solve(TrainingPairs, Rules, BestSeq),
+seqinfer_apply(BestSeq, TestScene, Output).
 
 
-sq_coverage_ratio(+Rules, +Pairs, -Num/Den)
+seqinfer_coverage_ratio(+Rules, +Pairs, -Num/Den)
 
 Coverage as an integer fraction Num/Den. Den is the total number of pairs.
 
 
-sq_rank_seqs(+Seqs, +Pairs, -Ranked)
+seqinfer_rank_seqs(+Seqs, +Pairs, -Ranked)
 
 Ranked is Seqs sorted by coverage descending (highest coverage first).
 
 
-sq_all_consistent(+Seqs, +Pairs, -Consistent)
+seqinfer_all_consistent(+Seqs, +Pairs, -Consistent)
 
 Consistent is the sub-list of Seqs that fully explain all Pairs.
 
 
-sq_n_pairs(+Pairs, -N)
+seqinfer_n_pairs(+Pairs, -N)
 
 Number of pairs in the list.
 
 
-sq_explain(+Rules, +Pairs, -Coverage)
+seqinfer_explain(+Rules, +Pairs, -Coverage)
 
 Returns the coverage count for Rules on Pairs.
 
 
-sq_verify_all(+Rules, +Pairs)
+seqinfer_verify_all(+Rules, +Pairs)
 
-Alias for sq_consistent/2. Succeeds if Rules transforms every pair.
+Alias for seqinfer_consistent/2. Succeeds if Rules transforms every pair.
 
 
 Combining with Other Packs
@@ -139,8 +139,8 @@ A typical usage flow:
 
 1. Use sceneinv (si_*) to find invariants.
 2. Use transformgen (tg_*) to generate candidate single rules.
-3. Use sq_infer_2step to find the best 2-step sequence.
-4. Use sq_apply to apply it to the test scene.
+3. Use seqinfer_infer_2step to find the best 2-step sequence.
+4. Use seqinfer_apply to apply it to the test scene.
 
 
 Dependencies

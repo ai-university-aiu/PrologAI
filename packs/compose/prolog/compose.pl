@@ -1,18 +1,18 @@
 % Module declaration: compose exports all cp_* predicates.
 :- module(compose, [
-    cp_apply/3,
-    cp_identity/2,
-    cp_const/3,
-    cp_pipe/3,
-    cp_pipe_n/4,
-    cp_branch/5,
-    cp_repeat/4,
-    cp_until/4,
-    cp_fixed_point/3,
-    cp_map_rows/3,
-    cp_map_cols/3,
-    cp_zip/4,
-    cp_fold/4
+    compose_apply/3,
+    compose_identity/2,
+    compose_const/3,
+    compose_pipe/3,
+    compose_pipe_n/4,
+    compose_branch/5,
+    compose_repeat/4,
+    compose_until/4,
+    compose_fixed_point/3,
+    compose_map_rows/3,
+    compose_map_cols/3,
+    compose_zip/4,
+    compose_fold/4
 ]).
 
 % Import list utilities.
@@ -24,87 +24,87 @@
 
 
 % SINGLE STEP APPLICATION
-% cp_apply(+Rule, +Grid, -Grid2): apply Rule as call(Rule, Grid, Grid2).
-cp_apply(Rule, Grid, Grid2) :-
+% compose_apply(+Rule, +Grid, -Grid2): apply Rule as call(Rule, Grid, Grid2).
+compose_apply(Rule, Grid, Grid2) :-
 % Dispatch through meta-call; Rule may be a predicate name or partial application.
     call(Rule, Grid, Grid2).
 
-% cp_identity(+Grid, -Grid2): identity transformation; output equals input.
-cp_identity(Grid, Grid).
+% compose_identity(+Grid, -Grid2): identity transformation; output equals input.
+compose_identity(Grid, Grid).
 
-% cp_const(+ConstGrid, +_Grid, -Grid2): always return ConstGrid regardless of input.
-cp_const(ConstGrid, _Grid, ConstGrid).
+% compose_const(+ConstGrid, +_Grid, -Grid2): always return ConstGrid regardless of input.
+compose_const(ConstGrid, _Grid, ConstGrid).
 
 
 % SEQUENTIAL PIPELINE
-% cp_pipe(+Rules, +Grid, -Grid2): apply Rules in sequence; output of each feeds the next.
-cp_pipe([], Grid, Grid).
-cp_pipe([Rule|Rest], Grid, Grid2) :-
+% compose_pipe(+Rules, +Grid, -Grid2): apply Rules in sequence; output of each feeds the next.
+compose_pipe([], Grid, Grid).
+compose_pipe([Rule|Rest], Grid, Grid2) :-
 % Apply the current rule to get the intermediate grid.
-    cp_apply(Rule, Grid, Mid),
+    compose_apply(Rule, Grid, Mid),
 % Feed the intermediate into the rest of the pipeline.
-    cp_pipe(Rest, Mid, Grid2).
+    compose_pipe(Rest, Mid, Grid2).
 
-% cp_pipe_n(+Rule, +N, +Grid, -Grid2): apply Rule exactly N times in sequence.
-cp_pipe_n(Rule, N, Grid, Grid2) :-
+% compose_pipe_n(+Rule, +N, +Grid, -Grid2): apply Rule exactly N times in sequence.
+compose_pipe_n(Rule, N, Grid, Grid2) :-
 % Build a list of N identical rule references.
     length(Rules, N),
     maplist(=(Rule), Rules),
 % Execute as a sequential pipeline.
-    cp_pipe(Rules, Grid, Grid2).
+    compose_pipe(Rules, Grid, Grid2).
 
 
 % CONDITIONAL BRANCHING
-% cp_branch(+Cond,+ThenRule,+ElseRule,+Grid,-Grid2): apply Then or Else based on Cond.
-cp_branch(Cond, ThenRule, _ElseRule, Grid, Grid2) :-
+% compose_branch(+Cond,+ThenRule,+ElseRule,+Grid,-Grid2): apply Then or Else based on Cond.
+compose_branch(Cond, ThenRule, _ElseRule, Grid, Grid2) :-
 % Condition holds: apply ThenRule.
     call(Cond, Grid),
     !,
-    cp_apply(ThenRule, Grid, Grid2).
-cp_branch(_Cond, _ThenRule, ElseRule, Grid, Grid2) :-
+    compose_apply(ThenRule, Grid, Grid2).
+compose_branch(_Cond, _ThenRule, ElseRule, Grid, Grid2) :-
 % Condition failed: apply ElseRule.
-    cp_apply(ElseRule, Grid, Grid2).
+    compose_apply(ElseRule, Grid, Grid2).
 
 
 % REPETITION COMBINATORS
-% cp_repeat(+Rule, +N, +Grid, -Grid2): apply Rule exactly N times (alias for cp_pipe_n).
-cp_repeat(Rule, N, Grid, Grid2) :-
-% Delegate to cp_pipe_n.
-    cp_pipe_n(Rule, N, Grid, Grid2).
+% compose_repeat(+Rule, +N, +Grid, -Grid2): apply Rule exactly N times (alias for compose_pipe_n).
+compose_repeat(Rule, N, Grid, Grid2) :-
+% Delegate to compose_pipe_n.
+    compose_pipe_n(Rule, N, Grid, Grid2).
 
-% cp_until(+Rule, +Cond, +Grid, -Grid2): apply Rule until call(Cond, Grid) succeeds.
-cp_until(_Rule, Cond, Grid, Grid) :-
+% compose_until(+Rule, +Cond, +Grid, -Grid2): apply Rule until call(Cond, Grid) succeeds.
+compose_until(_Rule, Cond, Grid, Grid) :-
 % Base case: condition already holds; return the grid unchanged.
     call(Cond, Grid),
     !.
-cp_until(Rule, Cond, Grid, Grid2) :-
+compose_until(Rule, Cond, Grid, Grid2) :-
 % Apply the rule once to get the next grid.
-    cp_apply(Rule, Grid, Mid),
+    compose_apply(Rule, Grid, Mid),
 % Recurse until the condition holds.
-    cp_until(Rule, Cond, Mid, Grid2).
+    compose_until(Rule, Cond, Mid, Grid2).
 
-% cp_fixed_point(+Rule, +Grid, -Grid2): apply Rule until the grid stops changing.
-cp_fixed_point(Rule, Grid, Grid2) :-
+% compose_fixed_point(+Rule, +Grid, -Grid2): apply Rule until the grid stops changing.
+compose_fixed_point(Rule, Grid, Grid2) :-
 % Apply the rule once.
-    cp_apply(Rule, Grid, Mid),
+    compose_apply(Rule, Grid, Mid),
 % Check for convergence using structural equality.
     ( gd_equal(Grid, Mid) ->
 % Grid unchanged: convergence reached.
         Grid2 = Grid
     ;
 % Grid changed: recurse on the new grid.
-        cp_fixed_point(Rule, Mid, Grid2)
+        compose_fixed_point(Rule, Mid, Grid2)
     ).
 
 
 % ROW AND COLUMN MAPPING
-% cp_map_rows(+RowRule, +Grid, -Grid2): apply RowRule independently to each row.
-cp_map_rows(RowRule, Grid, Grid2) :-
+% compose_map_rows(+RowRule, +Grid, -Grid2): apply RowRule independently to each row.
+compose_map_rows(RowRule, Grid, Grid2) :-
 % maplist calls call(RowRule, Row, TransformedRow) for each row.
     maplist(RowRule, Grid, Grid2).
 
-% cp_map_cols(+ColRule, +Grid, -Grid2): apply ColRule independently to each column.
-cp_map_cols(ColRule, Grid, Grid2) :-
+% compose_map_cols(+ColRule, +Grid, -Grid2): apply ColRule independently to each column.
+compose_map_cols(ColRule, Grid, Grid2) :-
 % Get grid dimensions.
     gd_size(Grid, Rows, Cols),
 % Build the column index list.
@@ -138,8 +138,8 @@ pick_row_cell(TransformedCols, R, C, Color) :-
 
 
 % PAIRWISE GRID COMBINATION
-% cp_zip(+Rule, +GridA, +GridB, -GridC): combine two same-size grids cell by cell.
-cp_zip(Rule, GridA, GridB, GridC) :-
+% compose_zip(+Rule, +GridA, +GridB, -GridC): combine two same-size grids cell by cell.
+compose_zip(Rule, GridA, GridB, GridC) :-
 % Zip rows pairwise; maplist/4 iterates three lists in lock-step.
     maplist(zip_row(Rule), GridA, GridB, GridC).
 
@@ -150,10 +150,10 @@ zip_row(Rule, RowA, RowB, RowC) :-
 
 
 % LEFT FOLD OVER A LIST OF GRIDS
-% cp_fold(+Rule, +Init, +Grids, -Result): left-fold Rule over Grids with accumulator Init.
-cp_fold(_Rule, Acc, [], Acc).
-cp_fold(Rule, Acc, [G|Gs], Result) :-
+% compose_fold(+Rule, +Init, +Grids, -Result): left-fold Rule over Grids with accumulator Init.
+compose_fold(_Rule, Acc, [], Acc).
+compose_fold(Rule, Acc, [G|Gs], Result) :-
 % Apply Rule to the accumulator and the current grid to get a new accumulator.
     call(Rule, Acc, G, NewAcc),
 % Continue folding over the tail.
-    cp_fold(Rule, NewAcc, Gs, Result).
+    compose_fold(Rule, NewAcc, Gs, Result).

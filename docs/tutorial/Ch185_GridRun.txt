@@ -22,130 +22,130 @@ two red cells, one blue cell, and two green cells. Decoding recovers the origina
 Exported Predicates
 
 
-grl_row_runs(+Grid, +R, -Runs)
+gridrun_row_runs(+Grid, +R, -Runs)
 
 Runs is the run-length encoding of row R. Each element is Color-Len.
 
 Example:
 
-grl_row_runs([[r,r,b,g,g],[b,b,b,r,r],[g,r,g,r,g]], 0, R).
+gridrun_row_runs([[r,r,b,g,g],[b,b,b,r,r],[g,r,g,r,g]], 0, R).
 % R = [r-2, b-1, g-2]
 
 
-grl_col_runs(+Grid, +C, -Runs)
+gridrun_col_runs(+Grid, +C, -Runs)
 
 Runs is the run-length encoding of column C.
 
 Example:
 
-grl_col_runs([[r,b,g],[r,b,g],[r,b,g],[r,b,g]], 0, R).
+gridrun_col_runs([[r,b,g],[r,b,g],[r,b,g],[r,b,g]], 0, R).
 % R = [r-4]
 
 
-grl_all_row_runs(+Grid, -AllRuns)
+gridrun_all_row_runs(+Grid, -AllRuns)
 
 AllRuns has one element per row: the run-length encoding of that row.
 
 Example:
 
-grl_all_row_runs([[r,r,r,r],[b,b,b,b],[g,g,g,g]], All).
+gridrun_all_row_runs([[r,r,r,r],[b,b,b,b],[g,g,g,g]], All).
 % All = [[r-4],[b-4],[g-4]]
 
 
-grl_all_col_runs(+Grid, -AllRuns)
+gridrun_all_col_runs(+Grid, -AllRuns)
 
 AllRuns has one element per column: the run-length encoding of that column.
 
 Example:
 
-grl_all_col_runs([[r,b],[r,b],[r,b],[r,b]], All).
+gridrun_all_col_runs([[r,b],[r,b],[r,b],[r,b]], All).
 % All = [[r-4],[b-4]]
 
 
-grl_decode(+Runs, -List)
+gridrun_decode(+Runs, -List)
 
 List is the flat color sequence recovered from run-length encoding Runs.
 
 Example:
 
-grl_decode([r-2, b-1, g-2], L).
+gridrun_decode([r-2, b-1, g-2], L).
 % L = [r,r,b,g,g]
 
-grl_decode([], L).
+gridrun_decode([], L).
 % L = []
 
 
-grl_run_count(+Grid, +R, -N)
+gridrun_run_count(+Grid, +R, -N)
 
 N is the number of distinct runs in row R. A uniform row has N=1.
 
 Example:
 
-grl_run_count([[r,r,b,g,g],[b,b,b,r,r],[g,r,g,r,g]], 2, N).
+gridrun_run_count([[r,r,b,g,g],[b,b,b,r,r],[g,r,g,r,g]], 2, N).
 % N = 5  (row 2 = [g,r,g,r,g]: five single-cell runs)
 
 
-grl_uniform_row(+Grid, +R, -Color)
+gridrun_uniform_row(+Grid, +R, -Color)
 
 Succeed if row R is all one Color (single run). Fails if more than one color.
 
 Example:
 
-grl_uniform_row([[r,r,r,r],[b,b,b,b]], 0, C).  % C = r
-\+ grl_uniform_row([[r,b,r,b]], 0, _).           % fails
+gridrun_uniform_row([[r,r,r,r],[b,b,b,b]], 0, C).  % C = r
+\+ gridrun_uniform_row([[r,b,r,b]], 0, _).           % fails
 
 
-grl_uniform_col(+Grid, +C, -Color)
+gridrun_uniform_col(+Grid, +C, -Color)
 
 Succeed if column C is all one Color. Fails if column has more than one color.
 
 Example:
 
-grl_uniform_col([[r,b],[r,b],[r,b]], 0, C).  % C = r
+gridrun_uniform_col([[r,b],[r,b],[r,b]], 0, C).  % C = r
 
 
-grl_is_striped_h(+Grid)
+gridrun_is_striped_h(+Grid)
 
 Succeed if every row is uniform (the grid consists of horizontal solid-color bands).
 
 Example:
 
-grl_is_striped_h([[r,r,r],[b,b,b],[g,g,g]]).  % succeeds
-\+ grl_is_striped_h([[r,b,r],[b,b,b]]).         % fails
+gridrun_is_striped_h([[r,r,r],[b,b,b],[g,g,g]]).  % succeeds
+\+ gridrun_is_striped_h([[r,b,r],[b,b,b]]).         % fails
 
 
-grl_is_striped_v(+Grid)
+gridrun_is_striped_v(+Grid)
 
 Succeed if every column is uniform (the grid consists of vertical solid-color bands).
 
 Example:
 
-grl_is_striped_v([[r,b,g],[r,b,g],[r,b,g]]).  % succeeds
+gridrun_is_striped_v([[r,b,g],[r,b,g],[r,b,g]]).  % succeeds
 
 
-grl_stripe_colors_h(+Grid, -Colors)
+gridrun_stripe_colors_h(+Grid, -Colors)
 
 Colors is the list of row colors for a horizontally striped grid. Fails if any
 row is not uniform. Length of Colors equals the number of rows.
 
 Example:
 
-grl_stripe_colors_h([[r,r,r],[b,b,b],[g,g,g]], C).
+gridrun_stripe_colors_h([[r,r,r],[b,b,b],[g,g,g]], C).
 % C = [r,b,g]
 
 
-grl_stripe_colors_v(+Grid, -Colors)
+gridrun_stripe_colors_v(+Grid, -Colors)
 
 Colors is the list of column colors for a vertically striped grid. Fails if any
 column is not uniform. Length of Colors equals the number of columns.
 
 Example:
 
-grl_stripe_colors_v([[r,b,g],[r,b,g],[r,b,g]], C).
+gridrun_stripe_colors_v([[r,b,g],[r,b,g],[r,b,g]], C).
 % C = [r,b,g]
 
 
-grl_max_run(+Grid, +R, -Color, -Len)
+gridrun_max_run(+Grid, +R, -Color, -Len)
 
 Color and Len describe the longest run in row R. Ties between runs of equal
 length are broken by standard term order on Color (smallest Color atom wins).
@@ -153,45 +153,45 @@ Fails if row R is empty.
 
 Example:
 
-grl_max_run([[b,b,b,r,r]], 0, C, L).
+gridrun_max_run([[b,b,b,r,r]], 0, C, L).
 % C = b, L = 3
 
-grl_max_run([[r,r,b,b]], 0, C, L).
+gridrun_max_run([[r,r,b,b]], 0, C, L).
 % C = b, L = 2  (tie: b sorts before r)
 
 
-grl_alternating(+Grid, +R)
+gridrun_alternating(+Grid, +R)
 
 Succeed if row R strictly alternates between exactly two colors: every run has
 length 1, exactly two distinct colors appear, and the row has at least 2 cells.
 
 Example:
 
-grl_alternating([[r,b,r,b,r,b]], 0).  % succeeds
-\+ grl_alternating([[r,r,r,r]], 0).    % fails (uniform)
-\+ grl_alternating([[r,r,b,b]], 0).    % fails (runs not length 1)
-\+ grl_alternating([[g,r,b,g,r]], 0).  % fails (3 colors)
+gridrun_alternating([[r,b,r,b,r,b]], 0).  % succeeds
+\+ gridrun_alternating([[r,r,r,r]], 0).    % fails (uniform)
+\+ gridrun_alternating([[r,r,b,b]], 0).    % fails (runs not length 1)
+\+ gridrun_alternating([[g,r,b,g,r]], 0).  % fails (3 colors)
 
 
 Typical Use Cases
 
 Detect whether a grid has horizontal stripes:
-  grl_is_striped_h(Grid)
+  gridrun_is_striped_h(Grid)
 
 Get the stripe colors:
-  grl_stripe_colors_h(Grid, Colors)
+  gridrun_stripe_colors_h(Grid, Colors)
 
 Find the dominant run in a row:
-  grl_max_run(Grid, R, Color, Len)
+  gridrun_max_run(Grid, R, Color, Len)
 
 Compress a row for comparison:
-  grl_row_runs(Grid, R, Runs)
+  gridrun_row_runs(Grid, R, Runs)
 
 Recover original row from compressed form:
-  grl_decode(Runs, Row)
+  gridrun_decode(Runs, Row)
 
 Test for a two-color alternating pattern:
-  grl_alternating(Grid, R)
+  gridrun_alternating(Grid, R)
 
 
 Dependencies

@@ -1,33 +1,33 @@
 % Module declaration with all fourteen public predicates.
 :- module(symtab, [
 % Build a symbol table: list of sym(Feature, Value) from training pairs.
-    st_build_table/2,
+    symtab_build_table/2,
 % Find objects that co-vary with the output operation across training pairs.
-    st_identify_symbols/2,
+    symtab_identify_symbols/2,
 % Contrastive analysis: find which input features predict output changes.
-    st_contrastive_learn/2,
+    symtab_contrastive_learn/2,
 % Apply a learned symbol table to produce a color map for a scene.
-    st_apply_table/3,
+    symtab_apply_table/3,
 % Count enclosed holes (connected background regions surrounded by color).
-    st_hole_count/2,
+    symtab_hole_count/2,
 % Look up what value a given feature maps to in a symbol table.
-    st_lookup/3,
+    symtab_lookup/3,
 % Succeed if a symbol table entry is consistent with an observation.
-    st_entry_consistent/2,
+    symtab_entry_consistent/2,
 % Build a color-frequency feature vector from an ob/3 object.
-    st_color_feature/2,
+    symtab_color_feature/2,
 % Build a size feature (cell count) from an ob/3 object.
-    st_size_feature/2,
+    symtab_size_feature/2,
 % Build a position feature (quadrant: tl/tr/bl/br/center) from an ob/3 object.
-    st_position_feature/3,
+    symtab_position_feature/3,
 % Succeed if an object is plausibly a symbol (small, isolated).
-    st_is_symbol/2,
+    symtab_is_symbol/2,
 % Extract all candidate symbol objects from a scene.
-    st_candidate_symbols/2,
+    symtab_candidate_symbols/2,
 % Score a symbol table against training pairs: number of pairs it explains.
-    st_score_table/3,
+    symtab_score_table/3,
 % Select the highest-scoring table from a list of candidates.
-    st_best_table/3
+    symtab_best_table/3
 ]).
 % symtab.pl - Layer 247: Symbol Table Learning (st_* prefix).
 % Fourteen predicates for learning symbol-to-value mappings from training pairs.
@@ -40,24 +40,24 @@
 
 % --- PRIVATE HELPERS ---
 
-% st_ob_color_/2: extract Color from ob/3.
-st_ob_color_(ob(Color, _, _), Color).
+% symtab_ob_color_/2: extract Color from ob/3.
+symtab_ob_color_(ob(Color, _, _), Color).
 
-% st_ob_size_/2: cell count of ob/3.
-st_ob_size_(ob(_, Cells, _), N) :- length(Cells, N).
+% symtab_ob_size_/2: cell count of ob/3.
+symtab_ob_size_(ob(_, Cells, _), N) :- length(Cells, N).
 
-% st_ob_bbox_/2: extract r0/4 bbox from ob/3.
-st_ob_bbox_(ob(_, _, BBox), BBox).
+% symtab_ob_bbox_/2: extract r0/4 bbox from ob/3.
+symtab_ob_bbox_(ob(_, _, BBox), BBox).
 
-% st_flood_bg_/4: flood-fill background-connected region starting at (R,C).
+% symtab_flood_bg_/4: flood-fill background-connected region starting at (R,C).
 % Returns the list of background-colored cells reachable from (R,C).
-st_flood_bg_(Grid, BgColor, StartCells, Region) :-
+symtab_flood_bg_(Grid, BgColor, StartCells, Region) :-
     length(Grid, Rows),
     (Grid = [Row0|_] -> length(Row0, Cols) ; Cols = 0),
-    st_flood_bg_step_(Grid, BgColor, Rows, Cols, StartCells, StartCells, Region).
+    symtab_flood_bg_step_(Grid, BgColor, Rows, Cols, StartCells, StartCells, Region).
 
-st_flood_bg_step_(_, _, _, _, [], Visited, Visited).
-st_flood_bg_step_(Grid, Bg, Rows, Cols, [r(R,C)|Queue], Visited, Region) :-
+symtab_flood_bg_step_(_, _, _, _, [], Visited, Visited).
+symtab_flood_bg_step_(Grid, Bg, Rows, Cols, [r(R,C)|Queue], Visited, Region) :-
     findall(r(NR,NC),
         (member(dr-dc, [(-1)-0, 1-0, 0-(-1), 0-1]),
          NR is R + dr, NC is C + dc,
@@ -69,10 +69,10 @@ st_flood_bg_step_(Grid, Bg, Rows, Cols, [r(R,C)|Queue], Visited, Region) :-
     subtract(NewCells, Visited, Fresh),
     append(Queue, Fresh, NextQueue),
     append(Visited, Fresh, NextVisited),
-    st_flood_bg_step_(Grid, Bg, Rows, Cols, NextQueue, NextVisited, Region).
+    symtab_flood_bg_step_(Grid, Bg, Rows, Cols, NextQueue, NextVisited, Region).
 
-% st_border_cells_/3: collect all background cells on the grid border.
-st_border_cells_(Grid, BgColor, BorderCells) :-
+% symtab_border_cells_/3: collect all background cells on the grid border.
+symtab_border_cells_(Grid, BgColor, BorderCells) :-
     length(Grid, Rows), Rows1 is Rows - 1,
     (Grid = [Row0|_] -> length(Row0, Cols) ; Cols = 0),
     Cols1 is Cols - 1,
@@ -94,17 +94,17 @@ st_border_cells_(Grid, BgColor, BorderCells) :-
     append(TopBot, Sides, All),
     sort(All, BorderCells).
 
-% st_exterior_bg_/3: compute the exterior (border-reachable) background cells.
-st_exterior_bg_(Grid, BgColor, Exterior) :-
-    st_border_cells_(Grid, BgColor, BorderCells),
+% symtab_exterior_bg_/3: compute the exterior (border-reachable) background cells.
+symtab_exterior_bg_(Grid, BgColor, Exterior) :-
+    symtab_border_cells_(Grid, BgColor, BorderCells),
     (BorderCells = [] ->
         Exterior = []
     ;
-        st_flood_bg_(Grid, BgColor, BorderCells, Exterior)
+        symtab_flood_bg_(Grid, BgColor, BorderCells, Exterior)
     ).
 
-% st_quadrant_/4: compute the quadrant of a point (R,C) given grid dimensions.
-st_quadrant_(R, C, Rows, Cols, Q) :-
+% symtab_quadrant_/4: compute the quadrant of a point (R,C) given grid dimensions.
+symtab_quadrant_(R, C, Rows, Cols, Q) :-
     MidR is Rows / 2,
     MidC is Cols / 2,
     (R < MidR, C < MidC -> Q = tl ;
@@ -112,96 +112,96 @@ st_quadrant_(R, C, Rows, Cols, Q) :-
      R >= MidR, C < MidC -> Q = bl ;
      Q = br).
 
-% st_apply_sym_/3: apply a single sym(Feature,Value) entry to an object
+% symtab_apply_sym_/3: apply a single sym(Feature,Value) entry to an object
 % by checking if the object's feature matches and returning cm(Color,Value).
-st_apply_sym_(sym(color(F), Value), ob(Color, _, _), cm(Color, Value)) :-
+symtab_apply_sym_(sym(color(F), Value), ob(Color, _, _), cm(Color, Value)) :-
     Color = F.
-st_apply_sym_(sym(size(F), Value), ob(Color, Cells, _), cm(Color, Value)) :-
+symtab_apply_sym_(sym(size(F), Value), ob(Color, Cells, _), cm(Color, Value)) :-
     length(Cells, F).
-st_apply_sym_(sym(holes(F), Value), ob(Color, Cells, BBox), cm(Color, Value)) :-
+symtab_apply_sym_(sym(holes(F), Value), ob(Color, Cells, BBox), cm(Color, Value)) :-
     length(Cells, _),
-    st_hole_count(ob(Color, Cells, BBox), F).
+    symtab_hole_count(ob(Color, Cells, BBox), F).
 
 % --- PUBLIC PREDICATES ---
 
-% st_build_table(+Pairs, -SymbolTable)
+% symtab_build_table(+Pairs, -SymbolTable)
 % SymbolTable is a list of sym(Feature, Value) terms inferred from Pairs.
 % Pairs is a list of pair(InputObjs, OutputObjs) where each element is
 % a list of ob/3 terms. The table is built by contrastive analysis:
 % for each pair, extract which input object feature predicts which output color.
 % Returns the most specific table consistent with all pairs.
-st_build_table(Pairs, SymbolTable) :-
-    st_contrastive_learn(Pairs, Candidates),
+symtab_build_table(Pairs, SymbolTable) :-
+    symtab_contrastive_learn(Pairs, Candidates),
     (Candidates = [] ->
         SymbolTable = []
     ;
-        st_best_table(Candidates, Pairs, SymbolTable)
+        symtab_best_table(Candidates, Pairs, SymbolTable)
     ).
 
-% st_identify_symbols(+Pairs, -Symbols)
+% symtab_identify_symbols(+Pairs, -Symbols)
 % Symbols is a list of feature terms for objects that appear to function as
 % symbols: small objects whose observable features co-vary with output changes
 % across all training pairs.
-st_identify_symbols(Pairs, Symbols) :-
+symtab_identify_symbols(Pairs, Symbols) :-
     % Collect all feature->output_color co-variation hypotheses
     findall(sym(Feature, OutColor),
         (member(pair(InObjs, OutObjs), Pairs),
          member(InObj, InObjs),
          member(OutObj, OutObjs),
-         st_ob_color_(InObj, InColor),
-         st_ob_color_(OutObj, OutColor),
+         symtab_ob_color_(InObj, InColor),
+         symtab_ob_color_(OutObj, OutColor),
          InColor \= OutColor,
          % Feature is the input object's identifying characteristic
-         (st_color_feature(InObj, Feature) ;
-          st_size_feature(InObj, Feature) ;
-          (st_hole_count(InObj, H), H > 0, Feature = holes(H)))),
+         (symtab_color_feature(InObj, Feature) ;
+          symtab_size_feature(InObj, Feature) ;
+          (symtab_hole_count(InObj, H), H > 0, Feature = holes(H)))),
         Raw),
     sort(Raw, Symbols).
 
-% st_contrastive_learn(+Pairs, -Findings)
+% symtab_contrastive_learn(+Pairs, -Findings)
 % Findings is a list of sym(Feature, Value) terms where Feature is an
 % observable property of input objects and Value is what that feature
 % consistently encodes in the output across all training pairs.
-st_contrastive_learn([], []).
-st_contrastive_learn([pair(InObjs, OutObjs)|Rest], Findings) :-
+symtab_contrastive_learn([], []).
+symtab_contrastive_learn([pair(InObjs, OutObjs)|Rest], Findings) :-
     % Extract candidate sym entries from this pair
     findall(sym(F, V),
         (member(InObj, InObjs),
          member(OutObj, OutObjs),
-         st_ob_color_(OutObj, V),
-         (st_color_feature(InObj, F) ;
-          st_size_feature(InObj, F) ;
-          (st_hole_count(InObj, H), H > 0, F = holes(H)))),
+         symtab_ob_color_(OutObj, V),
+         (symtab_color_feature(InObj, F) ;
+          symtab_size_feature(InObj, F) ;
+          (symtab_hole_count(InObj, H), H > 0, F = holes(H)))),
         PairCands),
     sort(PairCands, PairSet),
     (Rest = [] ->
         Findings = PairSet
     ;
-        st_contrastive_learn(Rest, RestFindings),
+        symtab_contrastive_learn(Rest, RestFindings),
         % Keep only entries consistent across all pairs
-        include(st_entry_consistent_(RestFindings), PairSet, Findings)
+        include(symtab_entry_consistent_(RestFindings), PairSet, Findings)
     ).
 
-% st_entry_consistent_(+Table, +Entry): helper for include/3.
-st_entry_consistent_(Table, sym(F, V)) :-
-    st_entry_consistent(sym(F, V), Table).
+% symtab_entry_consistent_(+Table, +Entry): helper for include/3.
+symtab_entry_consistent_(Table, sym(F, V)) :-
+    symtab_entry_consistent(sym(F, V), Table).
 
-% st_apply_table(+SymbolTable, +InObjs, -ColorMap)
+% symtab_apply_table(+SymbolTable, +InObjs, -ColorMap)
 % ColorMap is a list of cm(OldColor, NewColor) derived by applying SymbolTable
 % to InObjs. For each object, find the first matching sym entry and produce a
 % cm/2 term. Objects with no matching entry are unchanged (not included).
-st_apply_table([], _, []).
-st_apply_table(_, [], []).
-st_apply_table(SymbolTable, InObjs, ColorMap) :-
+symtab_apply_table([], _, []).
+symtab_apply_table(_, [], []).
+symtab_apply_table(SymbolTable, InObjs, ColorMap) :-
     findall(cm(Color, Value),
         (member(InObj, InObjs),
-         st_ob_color_(InObj, Color),
+         symtab_ob_color_(InObj, Color),
          member(Sym, SymbolTable),
-         st_apply_sym_(Sym, InObj, cm(Color, Value))),
+         symtab_apply_sym_(Sym, InObj, cm(Color, Value))),
         Raw),
     sort(Raw, ColorMap).
 
-% st_hole_count(+Obj, -N)
+% symtab_hole_count(+Obj, -N)
 % N is the number of enclosed background-region holes in Obj.
 % A hole is a connected component of background cells that is NOT reachable
 % from the grid border. This requires the original grid context.
@@ -209,7 +209,7 @@ st_apply_table(SymbolTable, InObjs, ColorMap) :-
 % N is the number of fully enclosed rectangular gaps in the object's bbox.
 % For a full grid-based hole count, use the grid-context variant below.
 % This predicate uses only the ob/3 term (no grid context).
-st_hole_count(ob(_, Cells, r0(R0,C0,R1,C1)), N) :-
+symtab_hole_count(ob(_, Cells, r0(R0,C0,R1,C1)), N) :-
     BboxArea is (R1 - R0 + 1) * (C1 - C0 + 1),
     length(Cells, CellCount),
     % Holes estimate: bbox area minus cell count, integer divided by typical hole size.
@@ -218,58 +218,58 @@ st_hole_count(ob(_, Cells, r0(R0,C0,R1,C1)), N) :-
     HoleArea is BboxArea - CellCount,
     (HoleArea =< 0 -> N = 0 ; N is HoleArea).
 
-% st_lookup(+SymbolTable, +Feature, -Value)
+% symtab_lookup(+SymbolTable, +Feature, -Value)
 % Value is the value associated with Feature in SymbolTable.
 % Fails if Feature is not in the table.
-st_lookup([sym(Feature, Value)|_], Feature, Value) :- !.
-st_lookup([_|Rest], Feature, Value) :-
-    st_lookup(Rest, Feature, Value).
+symtab_lookup([sym(Feature, Value)|_], Feature, Value) :- !.
+symtab_lookup([_|Rest], Feature, Value) :-
+    symtab_lookup(Rest, Feature, Value).
 
-% st_entry_consistent(+Entry, +SymbolTable)
+% symtab_entry_consistent(+Entry, +SymbolTable)
 % Succeed if Entry is consistent with SymbolTable:
 % no entry in SymbolTable maps the same Feature to a different Value.
-st_entry_consistent(sym(F, V), Table) :-
+symtab_entry_consistent(sym(F, V), Table) :-
     \+ (member(sym(F, V2), Table), V2 \= V).
 
-% st_color_feature(+Obj, -Feature)
+% symtab_color_feature(+Obj, -Feature)
 % Feature = color(C) where C is the color of Obj.
-st_color_feature(ob(Color, _, _), color(Color)).
+symtab_color_feature(ob(Color, _, _), color(Color)).
 
-% st_size_feature(+Obj, -Feature)
+% symtab_size_feature(+Obj, -Feature)
 % Feature = size(N) where N is the cell count of Obj.
-st_size_feature(ob(_, Cells, _), size(N)) :-
+symtab_size_feature(ob(_, Cells, _), size(N)) :-
     length(Cells, N).
 
-% st_position_feature(+Obj, +GridDims, -Feature)
+% symtab_position_feature(+Obj, +GridDims, -Feature)
 % Feature = pos(Q) where Q is the grid quadrant (tl/tr/bl/br).
 % GridDims = dims(Rows, Cols).
-st_position_feature(ob(_, _, r0(R0,C0,_,_)), dims(Rows, Cols), pos(Q)) :-
-    st_quadrant_(R0, C0, Rows, Cols, Q).
+symtab_position_feature(ob(_, _, r0(R0,C0,_,_)), dims(Rows, Cols), pos(Q)) :-
+    symtab_quadrant_(R0, C0, Rows, Cols, Q).
 
-% st_is_symbol(+Obj, +ContentObjs)
+% symtab_is_symbol(+Obj, +ContentObjs)
 % Succeed if Obj is plausibly a symbol rather than content.
 % Heuristics: Obj is smaller than the average content object, or structurally
 % distinct (different cell count class), or has a unique color not in ContentObjs.
-st_is_symbol(ob(Color, Cells, _), ContentObjs) :-
+symtab_is_symbol(ob(Color, Cells, _), ContentObjs) :-
     length(Cells, ObjSize),
     (ContentObjs = [] -> true ;
         % Is smaller than all content objects
-        findall(S, (member(O, ContentObjs), st_ob_size_(O, S)), Sizes),
+        findall(S, (member(O, ContentObjs), symtab_ob_size_(O, S)), Sizes),
         (Sizes = [] -> true ;
          max_list(Sizes, MaxSize),
          ObjSize < MaxSize)
         ;
         % Has a unique color not shared with content objects
-        findall(C, (member(O, ContentObjs), st_ob_color_(O, C)), Colors),
+        findall(C, (member(O, ContentObjs), symtab_ob_color_(O, C)), Colors),
         \+ member(Color, Colors)
     ).
 
-% st_candidate_symbols(+InObjs, -Candidates)
+% symtab_candidate_symbols(+InObjs, -Candidates)
 % Candidates is the sub-list of InObjs that are plausibly symbols.
 % Uses size heuristic: the smallest quartile of objects by cell count.
-st_candidate_symbols([], []).
-st_candidate_symbols(InObjs, Candidates) :-
-    findall(S-O, (member(O, InObjs), st_ob_size_(O, S)), Pairs),
+symtab_candidate_symbols([], []).
+symtab_candidate_symbols(InObjs, Candidates) :-
+    findall(S-O, (member(O, InObjs), symtab_ob_size_(O, S)), Pairs),
     msort(Pairs, Sorted),
     length(Sorted, Total),
     QuartileMax is max(1, Total // 4),
@@ -277,43 +277,43 @@ st_candidate_symbols(InObjs, Candidates) :-
     append(SmallPairs, _, Sorted),
     findall(O, member(_-O, SmallPairs), Candidates).
 
-% st_score_table(+SymbolTable, +Pairs, -Score)
+% symtab_score_table(+SymbolTable, +Pairs, -Score)
 % Score is the number of training pairs that SymbolTable correctly explains.
 % A pair is explained if applying the table to InObjs produces a color map
 % that transforms all InObjs to OutObjs with matching colors.
-st_score_table(_, [], 0).
-st_score_table(SymbolTable, [pair(InObjs, OutObjs)|Rest], Score) :-
-    st_apply_table(SymbolTable, InObjs, ColorMap),
-    (st_verify_pair_(ColorMap, InObjs, OutObjs) ->
+symtab_score_table(_, [], 0).
+symtab_score_table(SymbolTable, [pair(InObjs, OutObjs)|Rest], Score) :-
+    symtab_apply_table(SymbolTable, InObjs, ColorMap),
+    (symtab_verify_pair_(ColorMap, InObjs, OutObjs) ->
         Score1 = 1
     ;
         Score1 = 0
     ),
-    st_score_table(SymbolTable, Rest, RestScore),
+    symtab_score_table(SymbolTable, Rest, RestScore),
     Score is Score1 + RestScore.
 
-% st_verify_pair_/3: check that applying ColorMap to InObjs colors matches OutObjs.
-st_verify_pair_(ColorMap, InObjs, OutObjs) :-
+% symtab_verify_pair_/3: check that applying ColorMap to InObjs colors matches OutObjs.
+symtab_verify_pair_(ColorMap, InObjs, OutObjs) :-
     length(InObjs, N),
     length(OutObjs, N),
-    maplist(st_apply_cm_(ColorMap), InObjs, OutObjs).
+    maplist(symtab_apply_cm_(ColorMap), InObjs, OutObjs).
 
-% st_apply_cm_/3: apply ColorMap to InObj's color; succeed if result matches OutObj's color.
-st_apply_cm_(ColorMap, InObj, OutObj) :-
-    st_ob_color_(InObj, C1),
-    st_ob_color_(OutObj, C2),
+% symtab_apply_cm_/3: apply ColorMap to InObj's color; succeed if result matches OutObj's color.
+symtab_apply_cm_(ColorMap, InObj, OutObj) :-
+    symtab_ob_color_(InObj, C1),
+    symtab_ob_color_(OutObj, C2),
     (member(cm(C1, NewC), ColorMap) -> NewC = C2 ; C1 = C2).
 
-% st_best_table(+Tables, +Pairs, -Best)
+% symtab_best_table(+Tables, +Pairs, -Best)
 % Best is the sym entry list from Tables that scores highest on Pairs.
 % Ties are broken by selecting the shorter (simpler) table.
-st_best_table(Tables, Pairs, Best) :-
+symtab_best_table(Tables, Pairs, Best) :-
     findall(Score-Table,
         (member(Table, Tables),
          (is_list(Table) ->
-             st_score_table(Table, Pairs, Score)
+             symtab_score_table(Table, Pairs, Score)
          ;
-             st_score_table([Table], Pairs, Score)
+             symtab_score_table([Table], Pairs, Score)
          )),
         Scored),
     msort(Scored, SortedAsc),
