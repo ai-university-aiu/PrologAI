@@ -16,7 +16,7 @@
     list of rows of small integers (ARC-AGI-3: up to 64x64, values 0-15) —
     and perception into occurrents (Section 9.5) abstracts a frame into
     cell_state/3 occurrents while the diff of successive frames yields the
-    delta occurrents from which CROs are induced.
+    delta occurrents from which causal_relation_objects are induced.
 
     Action selection (Section 9.4): if a plan to the inferred goal exists,
     follow it; else let curiosity choose the least-tried, non-avoided
@@ -69,7 +69,7 @@
 ]).
 
 % Import the verb layer whose relations the harness induces and reads.
-:- use_module(library(causal_core), [causal_core_cro/8, causal_core_predict/2]).
+:- use_module(library(causal_core), [causal_core_causal_relation_object/8, causal_core_predict/2]).
 % Import the interventional learner that induces the relations.
 :- use_module(library(causal_learning), [causal_learning_causal/2, causal_learning_preventive/2, causal_learning_avoid/1]).
 % Import the planner used when a route to the goal is known.

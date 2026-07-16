@@ -29,7 +29,7 @@
       world_model_reachable/4, world_model_diff/4, world_model_learn/2, world_model_novelty/3
 
     CAUSALONTOLOGY BRIDGE - the model speaks the shared language.
-      world_model_as_cros/2   -- emit the learned (Mode 1) transitions as reified cro/8
+      world_model_as_causal_relation_objects/2   -- emit the learned (Mode 1) transitions as reified causal_relation_object/8
                         terms, so the model can be written into the shared store.
 */
 
@@ -94,8 +94,8 @@
     % world_model_novelty/3: fraction of a state never seen before.
     world_model_novelty/3,
     % --- Causalontology bridge ---
-    % world_model_as_cros/2: emit the learned transitions as reified CROs.
-    world_model_as_cros/2
+    % world_model_as_causal_relation_objects/2: emit the learned transitions as reified causal_relation_objects.
+    world_model_as_causal_relation_objects/2
 ]).
 
 % List helpers (member, max_member, subtract, append, intersection, reverse, last).
@@ -540,18 +540,18 @@ world_model_novelty(KnownStates, State, Score) :-
     ).
 
 % ===========================================================================
-% CAUSALONTOLOGY BRIDGE — the learned model, spoken as reified CROs
+% CAUSALONTOLOGY BRIDGE — the learned model, spoken as reified causal_relation_objects
 % ===========================================================================
 
-% world_model_as_cros(+Model, -CROs): emit each learned (Mode 1) transition as a reified
+% world_model_as_causal_relation_objects(+Model, -causal_relation_objects): emit each learned (Mode 1) transition as a reified
 % Causal Relation Object of the causal_core shape, so the model can be written into the
 % shared store and read by the rest of the family. The cause is the action, the
 % effect is the observed effect, the strength is the effect's share of the
 % observations in its context, and the provenance records that world_model learned it.
-world_model_as_cros(Model, CROs) :-
-    % Turn every stored transition into a CRO term.
+world_model_as_causal_relation_objects(Model, CausalRelationObjects) :-
+    % Turn every stored transition into a causal_relation_object term.
     findall(
-        cro(cro_wm(Context, Action, Effect),
+        causal_relation_object(causal_relation_object_wm(Context, Action, Effect),
             [do(Action)], [Effect],
             temporal(0, 0, instant), sufficient, Strength,
             [context(Context)],
@@ -562,4 +562,4 @@ world_model_as_cros(Model, CROs) :-
           aggregate_all(sum(N), world_model_obs_(Model, Context, Action, _, N), Total),
           % Strength is this effect's share of them.
           Strength is Count / Total ),
-        CROs).
+        CausalRelationObjects).

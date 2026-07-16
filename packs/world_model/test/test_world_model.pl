@@ -406,7 +406,7 @@ test(novelty_empty) :-
 % Open the Causalontology-bridge test block.
 :- begin_tests(world_model_bridge).
 
-% The learned model can be emitted as reified CROs with correct strengths.
+% The learned model can be emitted as reified causal_relation_objects with correct strengths.
 test(as_cros_shape) :-
     % Start from an empty model.
     world_model_reset,
@@ -414,13 +414,13 @@ test(as_cros_shape) :-
     world_model_observe(g, any, right, move_east),
     world_model_observe(g, any, right, move_east),
     world_model_observe(g, any, right, blocked),
-    % Emit the learned transitions as CROs.
-    world_model_as_cros(g, CROs),
-    % The move_east transition is a CRO whose cause is the action and whose
+    % Emit the learned transitions as causal_relation_objects.
+    world_model_as_causal_relation_objects(g, CausalRelationObjects),
+    % The move_east transition is a causal_relation_object whose cause is the action and whose
     % strength is its share of the observations (two of three).
-    memberchk(cro(cro_wm(any, right, move_east), [do(right)], [move_east],
+    memberchk(causal_relation_object(causal_relation_object_wm(any, right, move_east), [do(right)], [move_east],
                   temporal(0, 0, instant), sufficient, S,
-                  [context(any)], prov(world_model, learned_by_observation, S)), CROs),
+                  [context(any)], prov(world_model, learned_by_observation, S)), CausalRelationObjects),
     % Its strength is two thirds.
     assertion(abs(S - 0.6666666666666666) < 1.0e-9).
 

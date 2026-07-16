@@ -22,28 +22,28 @@
 :- use_module(library(realizable_hinge)).
 
 % ===========================================================================
-% THE CRO — validation, prediction, strengthening
+% THE causal_relation_object — validation, prediction, strengthening
 % ===========================================================================
 
-:- begin_tests(co_core_cro).
+:- begin_tests(co_core_causal_relation_object).
 
-% A lawful CRO round-trips with its full payload.
-test(cro_roundtrip) :-
+% A lawful causal_relation_object round-trips with its full payload.
+test(causal_relation_object_roundtrip) :-
     % A fresh verb layer.
     causal_core_reset,
     % Assert the canonical example relation.
-    causal_core_cro_assert(cro(c1, [press(b_red)], [light(red, on)],
+    causal_core_causal_relation_object_assert(causal_relation_object(c1, [press(b_red)], [light(red, on)],
                       temporal(0, 0, instant), sufficient, 0.7, [],
                       prov(agent, learned_by_intervention, 0.7))),
     % Fetch it whole.
-    causal_core_the_cro(c1, cro(c1, [press(b_red)], [light(red, on)], _, sufficient, 0.7, _, _)).
+    causal_core_the_causal_relation_object(c1, causal_relation_object(c1, [press(b_red)], [light(red, on)], _, sufficient, 0.7, _, _)).
 
 % An unlawful modality is refused.
 test(bad_modality_refused, [fail]) :-
     % A fresh verb layer.
     causal_core_reset,
     % The modality must be one of the four.
-    causal_core_cro_assert(cro(c1, [a], [b], temporal(0, 0, instant), maybe, 0.5, [],
+    causal_core_causal_relation_object_assert(causal_relation_object(c1, [a], [b], temporal(0, 0, instant), maybe, 0.5, [],
                       prov(kb, asserted, 0.5))).
 
 % A strength outside the unit interval is refused.
@@ -51,7 +51,7 @@ test(bad_strength_refused, [fail]) :-
     % A fresh verb layer.
     causal_core_reset,
     % Strength is a fraction.
-    causal_core_cro_assert(cro(c1, [a], [b], temporal(0, 0, instant), sufficient, 1.5, [],
+    causal_core_causal_relation_object_assert(causal_relation_object(c1, [a], [b], temporal(0, 0, instant), sufficient, 1.5, [],
                       prov(kb, asserted, 0.5))).
 
 % A disordered temporal window is refused: the window is the mechanism.
@@ -59,7 +59,7 @@ test(bad_window_refused, [fail]) :-
     % A fresh verb layer.
     causal_core_reset,
     % The minimum delay cannot exceed the maximum.
-    causal_core_cro_assert(cro(c1, [a], [b], temporal(6, 1, hours), sufficient, 0.5, [],
+    causal_core_causal_relation_object_assert(causal_relation_object(c1, [a], [b], temporal(6, 1, hours), sufficient, 0.5, [],
                       prov(kb, asserted, 0.5))).
 
 % Confirmation raises strength, capped at 0.99.
@@ -67,12 +67,12 @@ test(strengthen_capped) :-
     % A fresh verb layer.
     causal_core_reset,
     % A relation at 0.7.
-    causal_core_new_cro([a], [b], temporal(0, 0, instant), sufficient, 0.7, [],
+    causal_core_new_causal_relation_object([a], [b], temporal(0, 0, instant), sufficient, 0.7, [],
                prov(agent, learned_by_intervention, 0.7), Id),
     % One confirmation.
     causal_core_strengthen(Id, 0.2),
     % Read back the raised strength.
-    causal_core_cro(Id, _, _, _, _, S1, _, _),
+    causal_core_causal_relation_object(Id, _, _, _, _, S1, _, _),
     % It rose by the delta.
     abs(S1 - 0.9) < 1.0e-9,
     % Confirm twice more to hit the cap.
@@ -80,7 +80,7 @@ test(strengthen_capped) :-
     % And once more.
     causal_core_strengthen(Id, 0.2),
     % Read back the capped strength.
-    causal_core_cro(Id, _, _, _, _, S2, _, _),
+    causal_core_causal_relation_object(Id, _, _, _, _, S2, _, _),
     % Capped at 0.99.
     abs(S2 - 0.99) < 1.0e-9.
 
@@ -89,10 +89,10 @@ test(predict_excludes_preventive, [nondet]) :-
     % A fresh verb layer.
     causal_core_reset,
     % A productive relation.
-    causal_core_new_cro([press(b)], [light(on)], temporal(0, 0, instant), sufficient,
+    causal_core_new_causal_relation_object([press(b)], [light(on)], temporal(0, 0, instant), sufficient,
                0.7, [], prov(agent, learned_by_intervention, 0.7), _),
     % A preventive relation.
-    causal_core_new_cro([touch(spike)], [penalty], temporal(0, 0, instant), preventive,
+    causal_core_new_causal_relation_object([touch(spike)], [penalty], temporal(0, 0, instant), preventive,
                0.9, [], prov(agent, learned_by_intervention, 0.9), Pid),
     % The productive effect is predicted.
     causal_core_predict(press(b), light(on)),
@@ -101,7 +101,7 @@ test(predict_excludes_preventive, [nondet]) :-
     % But it is queryable as preventive.
     causal_core_preventive(Pid).
 
-:- end_tests(co_core_cro).
+:- end_tests(co_core_causal_relation_object).
 
 % ===========================================================================
 % TEMPORAL VERSUS CAUSAL SUCCESSION, AND TIMING AS MECHANISM
@@ -127,11 +127,11 @@ test(temporal_abduction_gate, [nondet]) :-
     % A fresh verb layer.
     causal_core_reset,
     % Spoiled shellfish acts within one to six hours.
-    causal_core_new_cro([ate(spoiled_shellfish)], [state(gastroenteritis)],
+    causal_core_new_causal_relation_object([ate(spoiled_shellfish)], [state(gastroenteritis)],
                temporal(1, 6, hours), contributory, 0.7, [],
                prov(kb, asserted, 0.7), _),
     % Undercooked poultry acts within six to seventy-two hours.
-    causal_core_new_cro([ate(undercooked_poultry)], [state(gastroenteritis)],
+    causal_core_new_causal_relation_object([ate(undercooked_poultry)], [state(gastroenteritis)],
                temporal(6, 72, hours), contributory, 0.6, [],
                prov(kb, asserted, 0.6), _),
     % Two recent meals: shellfish three hours ago, poultry two hours ago.
@@ -163,16 +163,16 @@ test(hierarchy_consistent, [nondet]) :-
     % A fresh verb layer.
     causal_core_reset,
     % The coarse relation: fuel burns to motion.
-    causal_core_new_cro([ignite], [motion], temporal(0, 1, seconds), sufficient, 0.8,
+    causal_core_new_causal_relation_object([ignite], [motion], temporal(0, 1, seconds), sufficient, 0.8,
                [], prov(kb, asserted, 0.8), Parent),
     % Fine step one: ignition to combustion.
-    causal_core_new_cro([ignite], [combustion], temporal(0, 0, instant), sufficient,
+    causal_core_new_causal_relation_object([ignite], [combustion], temporal(0, 0, instant), sufficient,
                0.9, [], prov(kb, asserted, 0.9), S1),
     % Fine step two: combustion to expansion.
-    causal_core_new_cro([combustion], [expansion], temporal(0, 0, instant), sufficient,
+    causal_core_new_causal_relation_object([combustion], [expansion], temporal(0, 0, instant), sufficient,
                0.9, [], prov(kb, asserted, 0.9), S2),
     % Fine step three: expansion to motion.
-    causal_core_new_cro([expansion], [motion], temporal(0, 0, instant), sufficient,
+    causal_core_new_causal_relation_object([expansion], [motion], temporal(0, 0, instant), sufficient,
                0.9, [], prov(kb, asserted, 0.9), S3),
     % Attach the mechanism sub-graph.
     causal_core_decompose_add(Parent, [S1, S2, S3]),
@@ -186,10 +186,10 @@ test(hierarchy_inconsistent, [fail]) :-
     % A fresh verb layer.
     causal_core_reset,
     % The coarse relation.
-    causal_core_new_cro([ignite], [motion], temporal(0, 1, seconds), sufficient, 0.8,
+    causal_core_new_causal_relation_object([ignite], [motion], temporal(0, 1, seconds), sufficient, 0.8,
                [], prov(kb, asserted, 0.8), Parent),
     % A fine step that never reaches the parent's effect.
-    causal_core_new_cro([ignite], [smoke], temporal(0, 0, instant), sufficient, 0.9,
+    causal_core_new_causal_relation_object([ignite], [smoke], temporal(0, 0, instant), sufficient, 0.9,
                [], prov(kb, asserted, 0.9), S1),
     % Attach the broken mechanism.
     causal_core_decompose_add(Parent, [S1]),
@@ -200,19 +200,19 @@ test(hierarchy_inconsistent, [fail]) :-
 test(import_and_refine) :-
     % A fresh verb layer.
     causal_core_reset,
-    % ConceptNet's bare "Causes" becomes a provisional degenerate CRO.
+    % ConceptNet's bare "Causes" becomes a provisional degenerate causal_relation_object.
     causal_core_import_external(conceptnet, smoking, cancer, Id),
     % It is flagged provisional.
     causal_core_provisional(Id),
     % Its unspecified window is open-ended.
-    causal_core_cro(Id, [smoking], [cancer], temporal(0, unspecified, unspecified),
+    causal_core_causal_relation_object(Id, [smoking], [cancer], temporal(0, unspecified, unspecified),
            contributory, 0.5, _, prov(conceptnet, imported_external, _)),
     % Refinement fills the payload the import omitted.
     causal_core_refine_import(Id, temporal(3650, unspecified, days), contributory, 0.8),
     % The relation is now owned and no longer provisional.
     \+ causal_core_provisional(Id),
     % And strictly more expressive than the bare import.
-    causal_core_cro(Id, [smoking], [cancer], temporal(3650, unspecified, days),
+    causal_core_causal_relation_object(Id, [smoking], [cancer], temporal(3650, unspecified, days),
            contributory, 0.8, _, prov(conceptnet, refined_after_import, _)).
 
 % The glass-box why returns the full story of a relation.
@@ -220,7 +220,7 @@ test(why_full_story) :-
     % A fresh verb layer.
     causal_core_reset,
     % One relation.
-    causal_core_new_cro([press(b)], [light(on)], temporal(0, 0, instant), sufficient,
+    causal_core_new_causal_relation_object([press(b)], [light(on)], temporal(0, 0, instant), sufficient,
                0.7, [], prov(agent, learned_by_intervention, 0.7), Id),
     % Ask why.
     causal_core_why(Id, Why),
@@ -246,7 +246,7 @@ test(cross_layer_acceptance, [nondet]) :-
     % SEAM: the disposition is realized in pressing.
     realizable_hinge_realized_in_add(d1, press(b_red)),
     % VERB: pressing participates as cause in a causal relation.
-    causal_core_new_cro([press(b_red)], [light(red, on)], temporal(0, 0, instant),
+    causal_core_new_causal_relation_object([press(b_red)], [light(red, on)], temporal(0, 0, instant),
                sufficient, 0.7, [], prov(agent, learned_by_intervention, 0.7), _),
     % THE CROSS-LAYER QUERY: from the object, through its realizable and its
     % realizing occurrent, to the effect that occurrent produces.

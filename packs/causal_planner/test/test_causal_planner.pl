@@ -103,10 +103,10 @@ test(chain_assembles_plan, [nondet]) :-
     % Clear the learning state.
     causal_learning_reset,
     % A two-link causal chain: flip causes power; power causes light.
-    causal_core_new_cro([flip(switch)], [power(on)], temporal(0, 0, instant),
+    causal_core_new_causal_relation_object([flip(switch)], [power(on)], temporal(0, 0, instant),
                sufficient, 0.9, [], prov(agent, learned_by_intervention, 0.9), _),
     % The second link.
-    causal_core_new_cro([power(on)], [light(on)], temporal(0, 0, instant),
+    causal_core_new_causal_relation_object([power(on)], [light(on)], temporal(0, 0, instant),
                sufficient, 0.9, [], prov(kb, asserted, 0.9), _),
     % Chain backward from the light to the flip.
     causal_planner_chain(light(on), 5, Plan),

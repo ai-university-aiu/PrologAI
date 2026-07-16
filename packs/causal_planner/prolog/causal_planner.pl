@@ -1,7 +1,7 @@
 /*  PrologAI — Causalontology Planning  (WP-395, Layer 370)
 
     Composition and planning over the causal graph (Causalontology_v5,
-    Sections 4.5 and 4.6): a procedure is a higher-level CRO whose cause is
+    Sections 4.5 and 4.6): a procedure is a higher-level causal_relation_object whose cause is
     a sequence; planning chains backward from a goal to that sequence,
     provided each step is achievable and not on the avoid-set. Where no
     procedure has been composed yet, causal_planner_chain/3 searches the graph of
@@ -12,7 +12,7 @@
     curious agent explores widely but never plans through a learned hazard.
 
     Predicates:
-      causal_planner_compose_procedure/3  -- +Seq, +Goal, -Id  (a sequence-cause CRO)
+      causal_planner_compose_procedure/3  -- +Seq, +Goal, -Id  (a sequence-cause causal_relation_object)
       causal_planner_procedure/3          -- ?Id, ?Seq, ?Goal
       causal_planner_achievable/1         -- +Action  (known, non-preventive)
       causal_planner_plan/2               -- +Goal, -Plan  (via a procedure relation)
@@ -40,7 +40,7 @@
 ]).
 
 % Import the verb layer this pack plans over.
-:- use_module(library(causal_core), [causal_core_cro/8, causal_core_new_cro/8]).
+:- use_module(library(causal_core), [causal_core_causal_relation_object/8, causal_core_new_causal_relation_object/8]).
 % Import the avoid-set the planner must respect.
 :- use_module(library(causal_learning), [causal_learning_avoid/1]).
 % Import list helpers.
@@ -60,18 +60,18 @@ causal_planner_compose_procedure(Seq, Goal, Id) :-
     % Non-empty.
     Seq \== [],
     % Do not duplicate an existing procedure for this goal and sequence.
-    (   causal_core_cro(Id0, [sequence(Seq)], [Goal], _, _, _, _, _)
+    (   causal_core_causal_relation_object(Id0, [sequence(Seq)], [Goal], _, _, _, _, _)
     % Already composed: return the existing identifier.
     ->  Id = Id0
     % New: reify it at the canonical composed strength.
-    ;   causal_core_new_cro([sequence(Seq)], [Goal], temporal(0, 1, short), sufficient,
+    ;   causal_core_new_causal_relation_object([sequence(Seq)], [Goal], temporal(0, 1, short), sufficient,
                    0.60, [], prov(composition, composed_procedure, 0.60), Id)
     ).
 
 % Define causal_planner_procedure: query the procedure relations.
 causal_planner_procedure(Id, Seq, Goal) :-
     % A procedure is a relation whose single cause is a sequence.
-    causal_core_cro(Id, [sequence(Seq)], [Goal], _, _, _, _, _).
+    causal_core_causal_relation_object(Id, [sequence(Seq)], [Goal], _, _, _, _, _).
 
 % ---------------------------------------------------------------------------
 % ACHIEVABILITY AND SAFETY
@@ -80,7 +80,7 @@ causal_planner_procedure(Id, Seq, Goal) :-
 % Define causal_planner_achievable: the agent knows a non-preventive relation for it.
 causal_planner_achievable(Action) :-
     % Some relation has this action as a cause.
-    causal_core_cro(_, [Action], [_], _, Modality, _, _, _),
+    causal_core_causal_relation_object(_, [Action], [_], _, Modality, _, _, _),
     % Preventive relations mark hazards, not abilities.
     Modality \== preventive,
     % One witness suffices.
@@ -99,7 +99,7 @@ causal_planner_safe(Plan) :-
 % every step is achievable and not avoided (Section 4.5).
 causal_planner_plan(Goal, Plan) :-
     % A procedure relation produces the goal.
-    causal_core_cro(_, [sequence(Seq)], [Goal], _, _, _, _, _),
+    causal_core_causal_relation_object(_, [sequence(Seq)], [Goal], _, _, _, _, _),
     % Every step must be achievable.
     forall(member(Step, Seq), causal_planner_achievable(Step)),
     % And none may be a learned hazard.
@@ -124,7 +124,7 @@ causal_planner_chain_back(Goal, Depth, Seen, [Action | Rest]) :-
     % Depth must remain.
     Depth > 0,
     % A non-preventive relation produces the goal.
-    causal_core_cro(_, [Cause], Effects, _, Modality, _, _, _),
+    causal_core_causal_relation_object(_, [Cause], Effects, _, Modality, _, _, _),
     % Preventive relations are never planned through.
     Modality \== preventive,
     % The goal is among its effects.
@@ -147,7 +147,7 @@ causal_planner_chain_back(Goal, Depth, Seen, [Action | Rest]) :-
 % a directly performable action.
 causal_planner_action_like(Cause) :-
     % Nothing in the store produces it.
-    \+ ( causal_core_cro(_, _, Effects, _, M, _, _, _), M \== preventive,
+    \+ ( causal_core_causal_relation_object(_, _, Effects, _, M, _, _, _), M \== preventive,
          memberchk(Cause, Effects) ).
 
 % ---------------------------------------------------------------------------

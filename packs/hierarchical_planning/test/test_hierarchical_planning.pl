@@ -11,7 +11,7 @@
 :- use_module(library(plunit)).
 % Load the module under test from the library path.
 :- use_module(library(hierarchical_planning)).
-% Load the CRO core, used to read the reified plan back out of the graph.
+% Load the causal_relation_object core, used to read the reified plan back out of the graph.
 :- use_module(library(causal_core)).
 % List helpers used inside the tests.
 :- use_module(library(lists), [member/2, memberchk/2]).
@@ -60,9 +60,9 @@ test(act_leaves_are_controls) :-
     assertion(memberchk(hnode(control(action(1)), primitive, []), ActLeaves)),
     assertion(memberchk(hnode(control(select(x, y)), primitive, []), ActLeaves)).
 
-% Reifying the tree creates a root CRO carrying a mechanism sub-graph.
+% Reifying the tree creates a root causal_relation_object carrying a mechanism sub-graph.
 test(reify_builds_mechanism) :-
-    % Start from a clean CRO store and a clean plan.
+    % Start from a clean causal_relation_object store and a clean plan.
     causal_core_reset, hierarchical_planning_reset,
     % Build and reify a plan.
     hierarchical_planning_win_plan(ls20, [action(1), action(2), select(x, y)], Tree),
@@ -71,15 +71,15 @@ test(reify_builds_mechanism) :-
     causal_core_mechanism(RootId, Subs),
     assertion(Subs \== []).
 
-% The plan can be read back PURELY from the CRO graph, and the reconstructed
+% The plan can be read back PURELY from the causal_relation_object graph, and the reconstructed
 % top goal and its six ordered phases match the original.
-test(plan_from_cros_roundtrip) :-
+test(plan_from_causal_relation_objects_roundtrip) :-
     % A clean slate, then build and reify.
     causal_core_reset, hierarchical_planning_reset,
     hierarchical_planning_win_plan(ls20, [action(1), action(2), select(x, y)], Tree),
     hierarchical_planning_reify(Tree, Root),
     % Rebuild the tree from the causal graph alone.
-    hierarchical_planning_plan_from_cros(Root, Rebuilt),
+    hierarchical_planning_plan_from_causal_relation_objects(Root, Rebuilt),
     % The reconstructed top goal is win(ls20).
     assertion(Rebuilt = hnode(win(ls20), reified, _)),
     % The same six phases appear in the same order.

@@ -2,7 +2,7 @@
 
     Interventional acquisition of causal structure (Causalontology_v5,
     Sections 4.3, 6.1, 6.3, 6.4): the agent acts, which is an intervention;
-    it observes the effect; it induces a new CRO or confirms an existing one
+    it observes the effect; it induces a new causal_relation_object or confirms an existing one
     by raising its strength; and on first inducing an action-effect it
     posits, on the noun side, the disposition the verb-side causation has
     revealed — populating the hinge from the bottom up.
@@ -61,7 +61,7 @@
 ]).
 
 % Import the verb layer this pack writes into.
-:- use_module(library(causal_core), [causal_core_cro/8, causal_core_new_cro/8, causal_core_strengthen/2]).
+:- use_module(library(causal_core), [causal_core_causal_relation_object/8, causal_core_new_causal_relation_object/8, causal_core_strengthen/2]).
 % Import the hinge this pack populates from the bottom up.
 :- use_module(library(realizable_hinge), [realizable_hinge_realizable/3, realizable_hinge_realizable_add/3, realizable_hinge_realized_in_add/2]).
 % Import the fresh-identifier generator.
@@ -115,11 +115,11 @@ causal_learning_intervene(ActGoal, Action, Outcome) :-
 % exactly as the specification's pseudocode prescribes (Section 4.3).
 causal_learning_causal(Action, Effect) :-
     % Is the relation already known?
-    (   causal_core_cro(Id, [Action], [Effect], _, _, _, _, _)
+    (   causal_core_causal_relation_object(Id, [Action], [Effect], _, _, _, _, _)
     % Confirmation: a repeated intervention raises the strength.
     ->  causal_core_strengthen(Id, 0.2)
     % Induction: a new relation at the canonical initial strength.
-    ;   causal_core_new_cro([Action], [Effect], temporal(0, 0, instant), sufficient,
+    ;   causal_core_new_causal_relation_object([Action], [Effect], temporal(0, 0, instant), sufficient,
                    0.70, [], prov(agent, learned_by_intervention, 0.70), _Id),
         % Verb-side causation reveals a noun-side realizable.
         causal_learning_posit_disposition(Action)
@@ -134,7 +134,7 @@ causal_learning_preventive(Action, Effect) :-
     % First discovery: avoid it and reify the preventive relation.
     ;   assertz(causal_learning_avoid_(Action)),
         % The preventive relation at the canonical hazard strength.
-        causal_core_new_cro([Action], [Effect], temporal(0, 0, instant), preventive,
+        causal_core_new_causal_relation_object([Action], [Effect], temporal(0, 0, instant), preventive,
                    0.90, [], prov(agent, learned_by_intervention, 0.90), _Id)
     ).
 
@@ -172,11 +172,11 @@ causal_learning_null_effects(Action, Count) :-
 % recorded observational-only at a deliberately low strength (Section 6.1).
 causal_learning_observe(Cause, Effect) :-
     % Do not duplicate an existing relation for the pair.
-    (   causal_core_cro(_, [Cause], [Effect], _, _, _, _, _)
+    (   causal_core_causal_relation_object(_, [Cause], [Effect], _, _, _, _, _)
     % Already known: observation adds nothing over intervention.
     ->  true
     % New: flagged observational in the context, weighted down.
-    ;   causal_core_new_cro([Cause], [Effect], temporal(0, unspecified, unspecified),
+    ;   causal_core_new_causal_relation_object([Cause], [Effect], temporal(0, unspecified, unspecified),
                    contributory, 0.30, [observational],
                    prov(observation, observational_only, 0.30), _Id)
     ).
@@ -184,7 +184,7 @@ causal_learning_observe(Cause, Effect) :-
 % Define causal_learning_interventional: relations backed by doing rather than seeing.
 causal_learning_interventional(Id) :-
     % Read the provenance of the relation.
-    causal_core_cro(Id, _, _, _, _, _, _, prov(_, Evidence, _)),
+    causal_core_causal_relation_object(Id, _, _, _, _, _, _, prov(_, Evidence, _)),
     % Interventional evidence is the mark.
     Evidence == learned_by_intervention.
 

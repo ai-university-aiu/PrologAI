@@ -24,23 +24,23 @@
 
     The showcase is the MESH with Causalontology's own hierarchy. Causalontology
     core already reifies hierarchical decomposition: a coarse Causal Relation
-    Object (CRO) may carry a mechanism sub-graph of finer CROs (causal_core_decompose_add /
+    Object (causal_relation_object) may carry a mechanism sub-graph of finer causal_relation_objects (causal_core_decompose_add /
     causal_core_mechanism), and causal_core_hierarchy_consistent checks that the fine relations chain
     from the coarse relation's causes to its effects. This pack reifies a plan tree
-    directly onto that structure: every plan node becomes a CRO, a node's children
+    directly onto that structure: every plan node becomes a causal_relation_object, a node's children
     become its mechanism sub-graph, and the endpoints are laid out as ordered
     waypoints so the coarse "achieve this goal" relation is consistent with the
     composition of its parts. The plan hierarchy is therefore not a separate data
-    structure bolted on — it IS a hierarchy of CROs, and the whole plan can be read
-    back out of the causal graph alone (hierarchical_planning_plan_from_cros).
+    structure bolted on — it IS a hierarchy of causal_relation_objects, and the whole plan can be read
+    back out of the causal graph alone (hierarchical_planning_plan_from_causal_relation_objects).
 
     Predicates:
-      hierarchical_planning_reset/0                 clear the reified plan CROs
+      hierarchical_planning_reset/0                 clear the reified plan causal_relation_objects
       hierarchical_planning_ooda_phases/1           -- -Phases   (the six phase names, in order)
       hierarchical_planning_phase_ops/2             -- +Phase, -Ops
       hierarchical_planning_win_plan/3              -- +Game, +Actions, -Tree
       hierarchical_planning_reify/2                 -- +Tree, -RootId  (mesh into Causalontology)
-      hierarchical_planning_plan_from_cros/2        -- +RootId, -Tree  (read the plan back from CROs)
+      hierarchical_planning_plan_from_causal_relation_objects/2        -- +RootId, -Tree  (read the plan back from causal_relation_objects)
       hierarchical_planning_consistent/1            -- +RootId  (every level hierarchy-consistent)
       hierarchical_planning_render/2                -- +Tree, -Lines   (indented glass-box text)
       hierarchical_planning_render_json/2           -- +Tree, -Dict    (nested dict for the trace/Why)
@@ -49,7 +49,7 @@
 
 % Declare this module and its hierarchical-planning interface.
 :- module(hierarchical_planning, [
-    % hierarchical_planning_reset/0: clear the reified plan CROs.
+    % hierarchical_planning_reset/0: clear the reified plan causal_relation_objects.
     hierarchical_planning_reset/0,
     % hierarchical_planning_ooda_phases/1: the six OODA-style phase names, in order.
     hierarchical_planning_ooda_phases/1,
@@ -59,8 +59,8 @@
     hierarchical_planning_win_plan/3,
     % hierarchical_planning_reify/2: reify a plan tree into the Causalontology decomposition graph.
     hierarchical_planning_reify/2,
-    % hierarchical_planning_plan_from_cros/2: reconstruct a plan tree purely from the CRO graph.
-    hierarchical_planning_plan_from_cros/2,
+    % hierarchical_planning_plan_from_causal_relation_objects/2: reconstruct a plan tree purely from the causal_relation_object graph.
+    hierarchical_planning_plan_from_causal_relation_objects/2,
     % hierarchical_planning_consistent/1: every node's coarse relation agrees with its mechanism.
     hierarchical_planning_consistent/1,
     % hierarchical_planning_render/2: an indented, human-readable rendering of a plan tree.
@@ -71,9 +71,9 @@
     hierarchical_planning_classify_basis/3
 ]).
 
-% Import the CRO store and constructor this planner reifies onto.
+% Import the causal_relation_object store and constructor this planner reifies onto.
 :- use_module(library(causal_core),
-    [causal_core_new_cro/8, causal_core_cro/8, causal_core_decompose_add/2, causal_core_mechanism/2,
+    [causal_core_new_causal_relation_object/8, causal_core_causal_relation_object/8, causal_core_decompose_add/2, causal_core_mechanism/2,
      causal_core_hierarchy_consistent/1]).
 % Import list helpers.
 :- use_module(library(lists), [member/2, memberchk/2, append/3, nth1/3]).
@@ -152,32 +152,32 @@ hierarchical_planning_next(N) :-
     % Store it back.
     assertz(hierarchical_planning_ctr_(N)).
 
-% hierarchical_planning_reset: clear every reified plan CRO and the waypoint counter, so a fresh
+% hierarchical_planning_reset: clear every reified plan causal_relation_object and the waypoint counter, so a fresh
 % plan does not inherit a previous one's nodes.
 hierarchical_planning_reset :-
-    % Retract every plan-node CRO (they carry the hplan provenance).
-    retractall(causal_core:causal_core_cro_(_, _, _, _, _, _, _, prov(hplan, _, _))),
+    % Retract every plan-node causal_relation_object (they carry the hplan provenance).
+    retractall(causal_core:causal_core_causal_relation_object_(_, _, _, _, _, _, _, prov(hplan, _, _))),
     % Drop their mechanism links.
     forall(causal_core_mechanism(Id, _),
-        ( \+ causal_core_cro(Id, _, _, _, _, _, _, _)
+        ( \+ causal_core_causal_relation_object(Id, _, _, _, _, _, _, _)
         -> retractall(causal_core:causal_core_mechanism_(Id, _)) ; true )),
     % Reset the waypoint counter.
     retractall(hierarchical_planning_ctr_(_)),
     assertz(hierarchical_planning_ctr_(0)).
 
-% hierarchical_planning_reify(+Tree, -RootId): reify a plan tree onto the CRO decomposition graph.
+% hierarchical_planning_reify(+Tree, -RootId): reify a plan tree onto the causal_relation_object decomposition graph.
 % The whole plan runs from begin(TopGoal) to end(TopGoal).
 hierarchical_planning_reify(hnode(Goal, Method, Children), RootId) :-
     % Reify from the top goal's begin waypoint to its end waypoint.
     hierarchical_planning_reify_(hnode(Goal, Method, Children), RootId, begin(Goal), end(Goal)).
 
-% hierarchical_planning_reify_(+Node, -Id, +Pre, +Post): reify one node as a CRO whose cause is Pre
+% hierarchical_planning_reify_(+Node, -Id, +Pre, +Post): reify one node as a causal_relation_object whose cause is Pre
 % and whose effect is Post. An internal node lays its children out as an ordered
 % chain of waypoints Pre = W0 -> W1 -> ... -> Wn = Post, so the coarse relation is
 % consistent with the composition of its children (causal_core_hierarchy_consistent holds).
 hierarchical_planning_reify_(hnode(Goal, _Method, Children), Id, Pre, Post) :-
     % Create this node's coarse relation, tagged with the goal in its provenance.
-    causal_core_new_cro([Pre], [Post], temporal(0, 1, short), sufficient, 0.60, [],
+    causal_core_new_causal_relation_object([Pre], [Post], temporal(0, 1, short), sufficient, 0.60, [],
                prov(hplan, plan_node(Goal), 0.60), Id),
     % A leaf has no mechanism.
     (   Children == []
@@ -226,16 +226,16 @@ hierarchical_planning_reify_children([Child | Rest], [P0, P1 | Ps], [Id | Ids]) 
 % SECTION 4 — reading the plan back out of the causal graph, and checking it
 % ===========================================================================
 
-% hierarchical_planning_plan_from_cros(+RootId, -Tree): reconstruct the plan tree using ONLY the
+% hierarchical_planning_plan_from_causal_relation_objects(+RootId, -Tree): reconstruct the plan tree using ONLY the
 % Causalontology graph — a node's goal from its provenance, its children from its
 % mechanism sub-graph. This proves the plan lives in the causal structure itself.
-hierarchical_planning_plan_from_cros(Id, hnode(Goal, reified, Children)) :-
-    % The goal is recorded in the node CRO's provenance (the 8th CRO field).
-    causal_core_cro(Id, _, _, _, _, _, _, prov(hplan, plan_node(Goal), _)),
+hierarchical_planning_plan_from_causal_relation_objects(Id, hnode(Goal, reified, Children)) :-
+    % The goal is recorded in the node causal_relation_object's provenance (the 8th causal_relation_object field).
+    causal_core_causal_relation_object(Id, _, _, _, _, _, _, prov(hplan, plan_node(Goal), _)),
     % The children are the mechanism sub-graph, if any.
     (   causal_core_mechanism(Id, SubIds)
     ->  findall(Sub, ( member(ChildId, SubIds),
-                       hierarchical_planning_plan_from_cros(ChildId, Sub) ), Children)
+                       hierarchical_planning_plan_from_causal_relation_objects(ChildId, Sub) ), Children)
     ;   Children = []
     ).
 

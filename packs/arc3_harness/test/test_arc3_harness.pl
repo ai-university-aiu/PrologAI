@@ -129,9 +129,9 @@ test(episode_wins_and_avoids_hazard, [nondet]) :-
     % The spike was tried once, learned, and avoided.
     causal_learning_avoid(action(spike)),
     % The preventive relation was reified.
-    causal_core_cro(_, [action(spike)], [penalty], _, preventive, _, _, _),
+    causal_core_causal_relation_object(_, [action(spike)], [penalty], _, preventive, _, _, _),
     % The transfer mechanic was induced as a causal relation.
-    causal_core_cro(_, [action(transfer)], [delta(_)], _, sufficient, _, _, _),
+    causal_core_causal_relation_object(_, [action(transfer)], [delta(_)], _, sufficient, _, _, _),
     % The glass-box trace recorded the hazard step.
     arc3_harness_trace(Trace),
     % The hazard appears exactly once in the whole episode.
@@ -147,7 +147,7 @@ test(plan_overrides_curiosity, [nondet]) :-
     % Fresh layers.
     fresh,
     % A learned relation: transfer produces the level-raising delta.
-    causal_core_new_cro([action(transfer)], [delta([changed(0, 0, 1, 2)])],
+    causal_core_new_causal_relation_object([action(transfer)], [delta([changed(0, 0, 1, 2)])],
                temporal(0, 0, instant), sufficient, 0.7, [],
                prov(agent, learned_by_intervention, 0.7), _),
     % Register that delta as the goal.

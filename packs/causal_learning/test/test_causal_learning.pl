@@ -53,7 +53,7 @@ test(induce_at_seventy) :-
     % The first press.
     causal_learning_intervene(test_co_learn:world_act, press(b_red), learned(light(red, on))),
     % The relation exists at the canonical initial strength.
-    causal_core_cro(_, [press(b_red)], [light(red, on)], _, sufficient, 0.7, _,
+    causal_core_causal_relation_object(_, [press(b_red)], [light(red, on)], _, sufficient, 0.7, _,
            prov(agent, learned_by_intervention, _)).
 
 % Confirmation: a repeated intervention raises the strength by 0.2.
@@ -65,7 +65,7 @@ test(confirm_raises_strength) :-
     % The second press confirms.
     causal_learning_intervene(test_co_learn:world_act, press(b_red), _),
     % The strength rose from 0.70 to 0.90.
-    causal_core_cro(_, [press(b_red)], [light(red, on)], _, _, S, _, _),
+    causal_core_causal_relation_object(_, [press(b_red)], [light(red, on)], _, _, S, _, _),
     % Check the rise.
     abs(S - 0.9) < 1.0e-9.
 
@@ -89,13 +89,13 @@ test(hazard_avoided) :-
     % The action is on the avoid-set.
     causal_learning_avoid(touch(spike)),
     % The preventive relation was reified at hazard strength.
-    causal_core_cro(Id, [touch(spike)], [penalty], _, preventive, 0.9, _, _),
+    causal_core_causal_relation_object(Id, [touch(spike)], [penalty], _, preventive, 0.9, _, _),
     % Queryable as preventive.
     causal_core_preventive(Id),
     % A repeated hazard is not double-recorded.
     causal_learning_intervene(test_co_learn:world_act, touch(spike), hazard),
     % Still exactly one preventive relation for it.
-    findall(I, causal_core_cro(I, [touch(spike)], [penalty], _, preventive, _, _, _), [_]).
+    findall(I, causal_core_causal_relation_object(I, [touch(spike)], [penalty], _, preventive, _, _, _), [_]).
 
 % Null effects are stored compactly as counters, not as relations.
 test(null_effects_compact) :-
@@ -108,7 +108,7 @@ test(null_effects_compact) :-
     % The counter holds two.
     causal_learning_null_effects(wave(hand), 2),
     % No relation was reified for the non-effect.
-    \+ causal_core_cro(_, [wave(hand)], _, _, _, _, _, _).
+    \+ causal_core_causal_relation_object(_, [wave(hand)], _, _, _, _, _, _).
 
 % Doing versus seeing: an observed relation is flagged and weighted down.
 test(observation_weighted_down) :-
@@ -119,11 +119,11 @@ test(observation_weighted_down) :-
     % A relation merely observed.
     causal_learning_observe(clouds, rain),
     % The interventional relation is marked as such.
-    causal_core_cro(IdI, [press(b_red)], _, _, _, _, _, _),
+    causal_core_causal_relation_object(IdI, [press(b_red)], _, _, _, _, _, _),
     % The mark holds.
     causal_learning_interventional(IdI),
     % The observational relation is flagged and weak.
-    causal_core_cro(IdO, [clouds], [rain], _, contributory, 0.3, Context, _),
+    causal_core_causal_relation_object(IdO, [clouds], [rain], _, contributory, 0.3, Context, _),
     % The flag is in its context.
     memberchk(observational, Context),
     % And it is not interventional.

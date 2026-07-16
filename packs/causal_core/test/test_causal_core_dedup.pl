@@ -3,7 +3,7 @@
     Proves the nuance: only an EXACT duplicate relation is merged and strengthened,
     while a NEAR-duplicate (same core causes/effects, differing in a detail) is kept
     as a separate, linked variant with its delta recorded for attention — never
-    silently merged. causal_core_cro_dedup removes only exact duplicates, not variants.
+    silently merged. causal_core_causal_relation_object_dedup removes only exact duplicates, not variants.
 
     Run:
       swipl -p library=packs/causal_core/prolog -g run_tests -t halt \
@@ -21,9 +21,9 @@ report(Id, Goal) :-
     -> V = 'PASS' ; V = 'FAIL' ),
     format("~w: ~w~n", [Id, V]).
 
-% count_cro(+Causes, +Effects, -N): how many stored relations have this content.
-count_cro(Causes, Effects, N) :-
-    aggregate_all(count, causal_core_cro(_, Causes, Effects, _, _, _, _, _), N).
+% count_causal_relation_object(+Causes, +Effects, -N): how many stored relations have this content.
+count_causal_relation_object(Causes, Effects, N) :-
+    aggregate_all(count, causal_core_causal_relation_object(_, Causes, Effects, _, _, _, _, _), N).
 
 % run_tests: exercise the assert-if-new facility.
 run_tests :-
@@ -34,33 +34,33 @@ run_tests :-
 
     % AC-DD-001: the first unique assertion creates the relation.
     report('AC-DD-001',
-        ( causal_core_new_cro_unique([a], [b], temporal(0,0,instant), sufficient, 0.7, [], P, Id1),
+        ( causal_core_new_causal_relation_object_unique([a], [b], temporal(0,0,instant), sufficient, 0.7, [], P, Id1),
           ground(Id1) )),
 
     % AC-DD-002: a second identical assertion returns the SAME id and adds nothing.
     report('AC-DD-002',
-        ( causal_core_new_cro_unique([a], [b], temporal(0,0,instant), sufficient, 0.7, [], P, Id2),
-          causal_core_cro_find([a], [b], sufficient, Id0),
+        ( causal_core_new_causal_relation_object_unique([a], [b], temporal(0,0,instant), sufficient, 0.7, [], P, Id2),
+          causal_core_causal_relation_object_find([a], [b], sufficient, Id0),
           Id2 == Id0,
-          count_cro([a], [b], 1) )),
+          count_causal_relation_object([a], [b], 1) )),
 
     % AC-DD-003: a genuinely different relation still inserts.
     report('AC-DD-003',
-        ( causal_core_new_cro_unique([a], [c], temporal(0,0,instant), sufficient, 0.7, [], P, Id3),
-          count_cro([a], [c], 1),
-          \+ causal_core_cro_find([a], [b], sufficient, Id3) )),
+        ( causal_core_new_causal_relation_object_unique([a], [c], temporal(0,0,instant), sufficient, 0.7, [], P, Id3),
+          count_causal_relation_object([a], [c], 1),
+          \+ causal_core_causal_relation_object_find([a], [b], sufficient, Id3) )),
 
     % AC-DD-004: the repeat raised the strength of the existing relation (evidence).
     report('AC-DD-004',
-        ( causal_core_cro(Idx, [a], [b], _, sufficient, S, _, _), Idx = Id0x, S > 0.7 )),
+        ( causal_core_causal_relation_object(Idx, [a], [b], _, sufficient, S, _, _), Idx = Id0x, S > 0.7 )),
 
-    % AC-DD-005: causal_core_cro_dedup cleans EXACT duplicates made through the RAW door.
+    % AC-DD-005: causal_core_causal_relation_object_dedup cleans EXACT duplicates made through the RAW door.
     report('AC-DD-005',
-        ( causal_core_new_cro([x], [y], temporal(0,0,instant), sufficient, 0.7, [], P, _),
-          causal_core_new_cro([x], [y], temporal(0,0,instant), sufficient, 0.7, [], P, _),
-          count_cro([x], [y], 2),
-          causal_core_cro_dedup(Removed), Removed >= 1,
-          count_cro([x], [y], 1) )),
+        ( causal_core_new_causal_relation_object([x], [y], temporal(0,0,instant), sufficient, 0.7, [], P, _),
+          causal_core_new_causal_relation_object([x], [y], temporal(0,0,instant), sufficient, 0.7, [], P, _),
+          count_causal_relation_object([x], [y], 2),
+          causal_core_causal_relation_object_dedup(Removed), Removed >= 1,
+          count_causal_relation_object([x], [y], 1) )),
 
     % --- the nuance: near-duplicates are variants, not duplicates ---
 
@@ -69,30 +69,30 @@ run_tests :-
     P1 = prov(draft_one, evidence_a, 0.7),
     P2 = prov(draft_two, evidence_b, 0.7),
     report('AC-DD-006',
-        ( causal_core_new_cro_unique([m], [n], temporal(0,0,instant), sufficient, 0.7, [], P1, IdA),
-          causal_core_new_cro_unique([m], [n], temporal(0,0,instant), sufficient, 0.7, [], P2, IdB),
+        ( causal_core_new_causal_relation_object_unique([m], [n], temporal(0,0,instant), sufficient, 0.7, [], P1, IdA),
+          causal_core_new_causal_relation_object_unique([m], [n], temporal(0,0,instant), sufficient, 0.7, [], P2, IdB),
           IdA \== IdB,
-          count_cro([m], [n], 2) )),
+          count_causal_relation_object([m], [n], 2) )),
 
     % AC-DD-007: the two are linked as variants, and the delta names the field that
     % differs (the provenance) — the nugget surfaced for attention, not dropped.
     report('AC-DD-007',
-        ( causal_core_cro_variant(Canon, Var, Deltas),
+        ( causal_core_causal_relation_object_variant(Canon, Var, Deltas),
           member(delta(prov, _, _), Deltas),
           ( Canon == IdA ; Canon == IdB ), ( Var == IdA ; Var == IdB ) )),
 
     % AC-DD-008: the nuanced door reports status directly — exact for an identical
     % assertion, variant for a detail-differing one.
     report('AC-DD-008',
-        ( causal_core_new_cro_nuanced([m], [n], temporal(0,0,instant), sufficient, 0.7, [], P1, _, S1),
+        ( causal_core_new_causal_relation_object_nuanced([m], [n], temporal(0,0,instant), sufficient, 0.7, [], P1, _, S1),
           S1 = exact(_),
-          causal_core_new_cro_nuanced([m], [n], temporal(0,0,instant), preventive, 0.7, [], P1, _, S2),
+          causal_core_new_causal_relation_object_nuanced([m], [n], temporal(0,0,instant), preventive, 0.7, [], P1, _, S2),
           S2 = variant(_, D2), member(delta(modality, sufficient, preventive), D2) )),
 
-    % AC-DD-009: causal_core_cro_dedup does NOT remove variants — the near-duplicates survive.
+    % AC-DD-009: causal_core_causal_relation_object_dedup does NOT remove variants — the near-duplicates survive.
     report('AC-DD-009',
-        ( causal_core_cro_dedup(_), count_cro([m], [n], N), N >= 2 )),
+        ( causal_core_causal_relation_object_dedup(_), count_causal_relation_object([m], [n], N), N >= 2 )),
 
     % Show the flagged variants.
-    ( causal_core_cro_variants(V) -> true ; V = [] ),
+    ( causal_core_causal_relation_object_variants(V) -> true ; V = [] ),
     format("~nflagged variants: ~q~n~n", [V]).
