@@ -152,6 +152,48 @@ test(l2_isolation_prevents_lost_updates) :-
     % The fix: serializable isolation yields the exact total.
     assertion(Isolated =:= Expected).
 
+% -------------------------------------------------------------------------
+% L3 — reactive await woken by a write, with no polling (Ledger entry L3).
+% -------------------------------------------------------------------------
+
+% AC-L3-001: an awaiting reader is woken by a write, not by a poll loop.
+% The write happens ~200 ms after the await starts; the reader wakes right then.
+test(l3_await_woken_by_write) :-
+    % Open a nexus to coordinate through.
+    lattice_open('locus://localhost/l3_await', N),
+    % A result queue to collect the awaiter's outcome.
+    message_queue_create(RQ),
+    % Note the start time.
+    get_time(T0),
+    % Spawn a reader that blocks on a 'ready' fact for up to five seconds.
+    thread_create(( ( lattice_await(N, ready, 5, Got, _) -> W = Got ; W = timeout ),
+                    get_time(T1), Dt is T1 - T0,
+                    thread_send_message(RQ, awoke(W, Dt)) ), _, [detached(true)]),
+    % Let the reader reach its blocking wait, then write.
+    sleep(0.2),
+    lattice_put(N, ready, [go], []),
+    % Collect the reader's outcome.
+    thread_get_message(RQ, awoke(Woke, Elapsed)),
+    % The reader saw the written value.
+    assertion(Woke == [go]),
+    % It woke promptly after the write (well under the five-second timeout).
+    assertion(Elapsed < 1.0).
+
+% AC-L3-002: await returns immediately when the fact is already present.
+test(l3_await_immediate_when_present, [cleanup(lattice_close(N))]) :-
+    % Open a nexus and write the fact first.
+    lattice_open('locus://localhost/l3_now', N),
+    lattice_put(N, ready, [here], []),
+    % Await returns at once without blocking.
+    assertion(lattice_await(N, ready, 5, [here], _)).
+
+% AC-L3-003: await times out (and fails) when no write ever arrives.
+test(l3_await_times_out, [cleanup(lattice_close(N))]) :-
+    % Open a nexus with nothing to await.
+    lattice_open('locus://localhost/l3_to', N),
+    % A short-timeout await for an absent fact fails.
+    assertion(\+ lattice_await(N, never, 0.2, _, _)).
+
 % Close the block of 'lattice' tests.
 :- end_tests(lattice).
 
