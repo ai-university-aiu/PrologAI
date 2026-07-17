@@ -1,0 +1,116 @@
+THE STRICT LAYER RULE — A GUIDE FOR ADOPTERS  (v1)
+
+WHAT IT IS
+
+PrologAI rests on a strict layer rule: a lower layer may not depend on a higher
+one. Kept that way, the static import graph is acyclic and the architecture can
+grow to many components without dependency cycles. Until Wave 1 of the PrologAI
+Requirements Ledger, that rule was honoured only by convention — no pack could
+state its layer, nothing checked the rule, and no violation was ever reported.
+The "layer" pack (Work Package 426) makes the rule a first-class, checkable,
+enforceable construct.
+
+The construct sits beneath everything it governs. It imports only SWI-Prolog
+standard libraries and depends on neither the Lattice, the actors pack, nor any
+Causalontology pack, so it can judge all of them.
+
+DECLARING A LAYER
+
+A pack declares its rank with a single fact in its own manifest, packs/<name>/
+pack.pl, beside name, version, and requires:
+
+    layer(0).
+
+The number is the layer. A lower number is a lower (more foundational) layer. The
+declaration lives in the pack itself, not in an external registry, so it cannot
+drift away from the code it describes. Declaring a layer is cheap: it is one
+fact, read by the checker, and it changes nothing at run time.
+
+The initial adoption in Wave 1 declares three packs: the Lattice at layer 0 (base
+shared-memory infrastructure), the actor framework at layer 1 (built above the
+infrastructure), and the layer pack itself at layer 0.
+
+UNDECLARED PACKS ARE GAPS, NOT ERRORS
+
+A pack with no layer(N) fact is UNDECLARED. Adoption is meant to be incremental,
+so an undeclared pack is never a violation and never breaks a working build. The
+checker simply reports how many packs are undeclared, as gaps to fill over time.
+At the close of Wave 1, 296 of 299 packs are undeclared; that is expected.
+
+WHAT A VIOLATION IS
+
+The checker parses the actual import graph — every use_module(library(...))
+directive across every pack's source — and maps each imported library to the
+pack that owns it. A violation is any edge where a declared pack imports another
+declared pack whose layer is strictly higher. Because the check reads the real
+imports rather than a hand-written dependency list, it cannot be fooled by a
+stale manifest.
+
+A violation is reported as one readable, glass-box line naming the rule, both
+packs, both layer numbers, and the breaking dependency, for example:
+
+    layer_rule violation: pack 'base' (layer 0) depends on higher pack 'high'
+    (layer 2) via use_module(library(high))
+
+An import of an UNDECLARED pack produces no violation (there is no higher layer
+to compare against), and a pack importing its own files is ignored (that is not
+an inter-pack edge).
+
+RUNNING THE CHECKER
+
+From a Prolog session with the packs on the library path:
+
+    ?- use_module(library(layer)).
+    ?- layer_report.          % prints declared layers, the undeclared gap
+                              % count, and every violation line
+    ?- layer_check(V).        % V is the list of violations, [] when clean
+
+From the shell, for Continuous Integration (CI):
+
+    bin/check_layers.sh
+
+The script prints the report and sets its exit code: 0 when the configuration is
+clean, 1 when at least one violation is found, and 2 when it could not run. The
+.github/workflows/layer-rule.yml workflow runs it on every push and pull request,
+so an upward dependency blocks the merge.
+
+STRICT MODE VERSUS REPORTING MODE
+
+Enforcement is a load-time property and comes in two modes:
+
+    layer_enforce(strict)
+
+throws when any violation is present. Placed in a boot sequence — for example
+:- initialization(layer_enforce(strict)) — it refuses to finish loading a
+violating configuration.
+
+    layer_enforce(report)
+
+prints the same report but never refuses. Reporting mode is what makes adoption
+incremental: a team can turn on visibility everywhere before any pack is required
+to be clean, then move to strict mode once the declarations are in place.
+
+THE DATA-REFERENCE LINT (A HEURISTIC, AND ITS LIMIT)
+
+The layer checker sees the static import graph. The strict rule can also be
+eroded in a subtler way, recorded in the Ledger as entry L5: a lower-layer
+component can hold the literal address of a higher-layer one as ordinary DATA (a
+string), so the import graph stays clean while an upward reference lives on in a
+constant. The layer pack ships an opt-in heuristic lint for this,
+layer_data_references/2, which flags a quoted literal in a lower pack's source
+that embeds a higher pack's name.
+
+This is a best-effort aid, not a guarantee. A load-time checker cannot see an
+upward reference that is computed, read from a fact, or assembled at run time,
+because it never appears in the source as a literal. Fully closing L5 needs a
+run-time, layer-aware transport — a send that knows the layers of both endpoints
+— which is a different construct. Use the lint as a smell test, not a proof.
+
+WHERE THE CONSTRUCT LIVES
+
+    packs/layer/pack.pl                 the manifest, declaring layer(0)
+    packs/layer/prolog/layer.pl         the module (declare, check, enforce, lint)
+    packs/layer/test/test_layer.pl      14 PLUnit tests, including the spike replay
+    packs/layer/test/fixtures/          a read-only snapshot of the two spike arms
+    bin/check_layers.sh                 the CI checker
+    .github/workflows/layer-rule.yml    the CI gate

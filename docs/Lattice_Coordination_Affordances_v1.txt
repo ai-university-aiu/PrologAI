@@ -1,0 +1,125 @@
+LATTICE COORDINATION AFFORDANCES — L1, L2, L3, AND THE HYBRID BRIDGE  (v1)
+
+WHY THESE EXIST
+
+The frozen prologai-loops spike closed a reentrant cognitive loop through the
+Lattice by stigmergy: one actor writes a coordination fact into the shared
+environment, another reads it and reacts, and no actor ever names another. That
+is the coupling property a large architecture needs. But the spike found three
+frictions on today's Lattice, recorded in the PrologAI Requirements Ledger as
+entries L1, L2, and L3. Wave 1 closes all three, additively, on the base lattice
+module. None of the changes alters an existing predicate's behaviour; the
+intended semantic write door, anchor_node/4, is untouched.
+
+Throughout, a "nexus" is one Lattice store, opened with lattice_open/2 at a
+locus:// address.
+
+L1 — A LIGHTWEIGHT, BACKEND-FREE WRITE DOOR
+
+The problem. The intended write door, anchor_node/4, hard-requires the
+vector-embedding backend, so storing a plain, non-semantic coordination token
+dragged in the whole similarity index. There was no "just put a fact" path.
+
+The affordance. Four predicates on the base lattice module, which imports no
+backend, so a lightweight write genuinely avoids loading the vector index:
+
+    lattice_put(+Nexus, +Relation, +Args, +Referents)
+        Store a fact directly through the journal. No embedding is computed.
+
+    lattice_get(+Nexus, ?Relation, ?Args, ?Referents)
+        Peek: read a matching fact without removing it. Nondeterministic.
+
+    lattice_take(+Nexus, ?Relation, ?Args, ?Referents)
+        Read AND remove one matching fact (the Linda "take" operation).
+
+    lattice_replace(+Nexus, +Relation, +Args, +Referents)
+        Keep exactly one fact per relation: drop every prior fact of that
+        relation, then store the new one. This is the bounded coordination
+        token — a single beat that is updated, not accumulated.
+
+A test confirms a fact written with lattice_put reads back while
+current_module(vector_backend) is false.
+
+L2 — REAL TRANSACTION ISOLATION
+
+The problem. lattice_transaction/2 writes begin, commit, and rollback markers to
+the journal but takes no lock. Two threads can interleave a read and a write and
+corrupt a shared fact. "Transaction" there means durability and framing, not
+isolation.
+
+The affordance. A three-argument transaction that takes an options list:
+
+    lattice_transaction(+Nexus, +Options, :Goal)
+
+With Options = [isolation(serializable)] it wraps the journaled transaction in a
+per-nexus reentrant mutex, so concurrent read-modify-write on that nexus is
+serialised with NO caller-supplied lock. Without that option it falls back to the
+plain journaled transaction. The original lattice_transaction/2 is unchanged and
+is now named, honestly, for what it is: the non-isolating mode.
+
+Honesty about cost. A mutex is not free. Measured on an uncontended workload, the
+isolation overhead is about 1.6 microseconds per transaction, roughly eleven
+percent over plain journaling. The cost is real and is stated here rather than
+hidden inside the fix.
+
+A deterministic concurrency test makes the difference visible: four writer
+threads each increment a shared counter twenty-five times, with a one-millisecond
+window inserted between the read and the write to force the race. Under
+isolation(serializable) the final count is exactly one hundred; under the plain
+transaction it loses updates (twenty-five of one hundred, in the recorded run).
+
+L3 — A REACTIVE AWAIT, AND THE HYBRID BRIDGE
+
+The problem. The Lattice had no blocking "await a fact matching a pattern", so a
+stigmergic reader had to busy-poll. Polling costs work proportional to the number
+of actors times the poll rate — the single biggest threat to a large connectome's
+performance, even where stigmergy wins on coupling.
+
+The affordance. A reader can block until a matching fact appears, and a write
+wakes it:
+
+    lattice_await(+Nexus, +Relation, +Timeout, -Args, -Referents)
+        Block until a fact matching Relation exists, then unify Args and
+        Referents with the first match. Timeout is seconds, or the atom
+        'infinite'. The reader blocks with no Central Processing Unit (CPU) use
+        on a private queue; it does not spin.
+
+    lattice_notify(+Nexus)
+        Wake every reader awaiting on the nexus. Each L1 write (lattice_put,
+        lattice_take, lattice_replace) calls this automatically after it commits.
+
+THE HYBRID BRIDGE — STIGMERGY FOR STATE, NOTIFICATION FOR REACTIVITY
+
+L3 is the most strategically important item, because it is the bridge the spike
+recommended between the two ways of closing a loop. State still lives in the
+environment: a reader awaits a PATTERN (a relation and its shape), never another
+actor's address, so actor-to-actor references stay at zero and the strict layer
+rule is not eroded. Reactivity no longer costs a spin: the write that changes the
+state also sends the wake. Coordination remains fully decoupled — the writer does
+not know who is waiting, and the reader does not know who will write — yet the
+awaiting reader is woken the instant its condition can be met.
+
+Every Connectome repository is expected to be built on this pattern: put or
+replace a coordination fact for state, and await plus notify for reactivity.
+
+A correctness detail worth knowing: an awaiting reader registers its wake queue
+BEFORE its first existence check, so a write that happens between registration
+and the check cannot be lost — the wake is queued and the reader re-checks
+immediately.
+
+AN IMPLEMENTATION NOTE
+
+SWI-Prolog offers thread_wait/2, advertised for waiting on database
+modifications. On the platform used here (version 9.0.4) its modification signal
+did not fire — it only re-checked on its own retry timer, which is still polling.
+L3 therefore uses a genuine message-queue condition variable instead of
+thread_wait/2. This is recorded as new gap N2 in LEDGER.md.
+
+WHERE THESE LIVE
+
+    packs/lattice/prolog/lattice.pl     L1, L2, L3 added to the base module
+    packs/lattice/test/test_lattice.pl  10 new PLUnit tests (15 total, all green)
+
+See also LEDGER.md at the repository root for the Ledger status of L1, L2, L3,
+and the still-open L9 (the /tmp journal), and docs/Strict_Layer_Rule_v1.txt for
+the layer construct that keeps actor-to-actor references honest.

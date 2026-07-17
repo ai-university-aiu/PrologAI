@@ -2423,3 +2423,25 @@ Causalontology Lore (co_*, Layer 399)
     lore_advise(+CurrentSituation,-Response,-Confidence): the response that most often turned out good.
     lore_maxim(?Situation,-Maxim): the standing advice for a theme - do(R) if a response usually works, else avoid(R).
     lore_count(-N): how many experiences are recorded.
+
+layer
+Strict Layer Rule (WP-426, Layer 400)
+    layer_of(+Pack,-Layer): the declared numeric layer of a pack (fails if undeclared).
+    layer_declared(?Pack,?Layer) / layer_undeclared(?Pack): enumerate declared packs / undeclared gaps.
+    layer_graph_violations(+Nodes,-Violations): the pure core - upward inter-pack edges from a node(Name,Layer,Imports) set.
+    layer_scan(+PacksDir,-Nodes,-Undeclared): build the graph from the actual use_module(library(...)) imports.
+    layer_check(-Violations) / layer_check_dir(+PacksDir,-Violations): violations for the repo / a given packs dir ([] when clean).
+    layer_report/0 / layer_report_dir(+PacksDir): print declared layers, undeclared gap count, and each readable violation line.
+    layer_enforce(+Mode): strict (throws on violation, refusing a load) or report (lists without refusing).
+    layer_library_imports(+File,-Names) / layer_import_specs(+File,-Specs): the library imports / raw import argument text of one file.
+    layer_data_references(+PacksDir,-Suspects) / layer_data_references_files(+Files,-Suspects): the L5 heuristic lint - a lower pack's quoted literal naming a higher pack.
+    layer_default_packs_dir(-PacksDir): locate the repository's packs directory.
+
+lattice (Wave 1 additions - coordination affordances L1/L2/L3)
+    lattice_put(+Nexus,+Relation,+Args,+Referents): store a node-fact directly, no vector backend (L1).
+    lattice_get(+Nexus,?Relation,?Args,?Referents): peek a matching fact without removing it (L1).
+    lattice_take(+Nexus,?Relation,?Args,?Referents): read and remove one matching fact - Linda take (L1).
+    lattice_replace(+Nexus,+Relation,+Args,+Referents): keep exactly one fact per relation - a bounded coordination token (L1).
+    lattice_transaction(+Nexus,+Options,:Goal): isolation(serializable) serialises concurrent read-modify-write behind a per-nexus mutex, no caller lock (L2).
+    lattice_await(+Nexus,+Relation,+Timeout,-Args,-Referents): block until a matching fact exists, woken by a write, no polling (L3).
+    lattice_notify(+Nexus): wake every reader awaiting on the nexus - the stigmergy-plus-notification bridge (L3).
