@@ -109,15 +109,40 @@ test(enforce_strict_clean_succeeds) :-
     % Strict mode succeeds because the repository is clean.
     assertion(catch(layer_enforce(strict), _, fail)).
 
-% AC-L4-010: strict mode THROWS when a violation is present (via the pure core
-% wired through a tiny in-memory check — proving strict refuses a bad config).
-test(strict_throws_on_violation) :-
-    % Build a deliberately violating node set.
-    Nodes = [node(base, 0, [cortex]), node(cortex, 3, [])],
-    % Compute its violations directly.
-    layer_graph_violations(Nodes, Violations),
-    % The violation list is non-empty, which is what strict mode refuses.
-    assertion(Violations \== []).
+% AC-L4-010: strict mode THROWS when run against a REAL violating configuration.
+% This exercises the actual enforcement path — layer_enforce_dir/2 in strict mode
+% over a packs directory that holds a genuine upward edge — not merely the pure
+% core. The fixture packs (fixture_low at layer 0 importing fixture_high at layer
+% 5) live read-only under fixtures/violation_packs/.
+test(strict_throws_on_violation,
+     [throws(error(layer_rule_violation(_), _))]) :-
+    % Point at the violating fixture packs directory.
+    fixture(violation_packs, ViolatingDir),
+    % Strict enforcement over a violating configuration must refuse by throwing.
+    layer_enforce_dir(ViolatingDir, strict).
+
+% AC-L4-010b: the SAME violating configuration really is a violation (pure core).
+% Kept separate so the throw test above is anchored to a configuration the
+% checker independently confirms is violating, naming both endpoints and layers.
+test(violating_fixture_is_a_violation) :-
+    % Point at the violating fixture packs directory.
+    fixture(violation_packs, ViolatingDir),
+    % The directory-scoped check reports the violation list for that directory.
+    layer_check_dir(ViolatingDir, Violations),
+    % Exactly the one deliberate upward edge is found (layer 0 → layer 5).
+    assertion(Violations == [violation(upward_dependency,
+                                       from(fixture_low, 0),
+                                       to(fixture_high, 5),
+                                       via(use_module(library(fixture_high))))]).
+
+% AC-L4-010c: report mode over the SAME violating configuration does NOT throw.
+% It reports the violation without refusing, so incremental adoption never breaks
+% a build even where a real upward edge already exists.
+test(report_does_not_throw_on_violation) :-
+    % Point at the violating fixture packs directory.
+    fixture(violation_packs, ViolatingDir),
+    % Report mode succeeds (never throws) even with a violation present.
+    assertion(catch(layer_enforce_dir(ViolatingDir, report), _, fail)).
 
 % AC-L4-011 (SPIKE REPLAY): the mailbox arm has ZERO upward static import edges.
 test(replay_mailbox_zero_upward_edges) :-

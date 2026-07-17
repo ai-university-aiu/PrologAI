@@ -1,4 +1,4 @@
-/*  PrologAI — Strict Layer Rule construct  (WP-426, Layer 400)
+/*  PrologAI — Strict Layer Rule construct  (WP-426, Layer 0)
 
     THE GAP THIS CLOSES (Ledger entry L4, the keystone).
     PrologAI rests on a strict layer rule: a lower layer may not depend on a
@@ -54,6 +54,7 @@
       layer_report/0                                  print a human report
       layer_report_dir/1     +PacksDir                print a report for a dir
       layer_enforce/1        +Mode (strict|report)    load-time enforcement
+      layer_enforce_dir/2    +PacksDir, +Mode         enforce over a given dir
       layer_library_imports/2  +File, -LibNames       library imports of a file
       layer_import_specs/2   +File, -RawSpecs         raw import argument text
       layer_data_references/2  +PacksDir, -Suspects   L5 heuristic data lint
@@ -82,6 +83,8 @@
     layer_report_dir/1,
     % layer_enforce/1: enforce the rule at load time in strict or report mode.
     layer_enforce/1,
+    % layer_enforce_dir/2: enforce the rule over an explicit packs directory.
+    layer_enforce_dir/2,
     % layer_library_imports/2: the library(...) imports named in one source file.
     layer_library_imports/2,
     % layer_import_specs/2: the raw first-argument text of every import directive.
@@ -400,7 +403,15 @@ layer_report_dir(PacksDir) :-
 layer_enforce(Mode) :-
     % Locate the repository's packs directory to enforce over.
     layer_default_packs_dir(PacksDir),
-    % Compute the violations once.
+    % Delegate to the directory-scoped enforcement over the repo's own packs.
+    layer_enforce_dir(PacksDir, Mode).
+
+% Define layer_enforce_dir/2: enforce the rule over an explicit packs directory.
+% This is the sibling of layer_check_dir/2 and layer_report_dir/1: it carries the
+% same strict/report enforcement but over any packs directory, so the actual
+% throw-on-violation path can be exercised against a violating configuration.
+layer_enforce_dir(PacksDir, Mode) :-
+    % Compute the violations once for the given packs directory.
     layer_check_dir(PacksDir, Violations),
     % Print the report so the outcome is visible either way.
     layer_report_dir(PacksDir),

@@ -156,3 +156,65 @@ out of Wave 1 scope; L9 stands.
   broadcasts to all registered waiters with no ordering guarantee and no cap on
   the waiter registry. Fine at current scale; worth a bound and a fairness note
   before the 140-construct Connectome.
+
+---
+
+## Wave 1.5 — quality-assurance cleanup (2026-07-17)
+
+Branch `ledger/wave-1.5-cleanup`. Rollback tag `pre-wave-1.5`. All work
+additive; the ARC-AGI solving core was not modified. Gates held unchanged from
+baseline: ARC-AGI-1 400/400, ARC-AGI-2 120/120, Causalontology conformance
+107/107. Every item below traces to a finding from the Wave 1 QA sweep; nothing
+new was added beyond the findings. Ledger **N1**, **N2**, **N4**, and **N5**
+remain **STILL OPEN** — out of scope for this cleanup.
+
+- **The hybrid pattern is now documented where a newcomer looks.** The
+  stigmergy-plus-notification bridge (stigmergy for STATE with zero
+  actor-to-actor references, notification for REACTIVITY) previously lived only
+  in code comments and this Ledger. It is now a newcomer-readable document,
+  `docs/lattice-hybrid-pattern.md`, linked from `README.md` — with the
+  principle, the evidence (citing the frozen `prologai-loops/RESULT.md`), the
+  exact API (`lattice_await/5`, `lattice_notify/1`, `lattice_put/4`,
+  `lattice_get/4`, `lattice_take/4`, `lattice_replace/4`), a worked example, the
+  await-a-PATTERN-never-an-address rule, and the legibility cost stated honestly.
+
+- **The layer construct is now documented where a newcomer looks.**
+  `docs/layer-rule.md` (linked from `README.md`) explains the strict layer rule,
+  how a pack declares its layer, how to run `bin/check_layers.sh`, strict vs
+  reporting mode, how undeclared packs are treated, and how to read a violation
+  line.
+
+- **N3 — adoption reality now stated plainly.** The pack count is reconciled
+  (see below) and both `README.md` and `docs/layer-rule.md` now say plainly:
+  the layer construct is live and gated in CI; **3 of 299 packs** declare a
+  layer today; the remaining 296 are undeclared gaps, not violations; adoption
+  is deliberately incremental; and until it spreads, a passing check verifies
+  only the declared packs. No layers were mass-declared to inflate the number —
+  the honest disclosure is the fix. **N3 stays open** as a standing adoption
+  program; this cleanup only made its reality legible.
+
+- **The strict-mode enforcement test now actually tests enforcement.** The Wave
+  1 `test(strict_throws_on_violation)` never ran `layer_enforce/1` with a
+  violation present — it only re-checked the pure core. It now exercises the real
+  throw path: `layer_enforce_dir/2` (the new dir-scoped sibling of
+  `layer_check_dir/2` and `layer_report_dir/1`) is run in strict mode over a
+  read-only violating fixture (`fixtures/violation_packs/`: `fixture_low` at
+  layer 0 importing `fixture_high` at layer 5) and asserted to throw
+  `layer_rule_violation`. A companion test confirms report mode over the **same**
+  violating configuration does not throw and still reports. The layer suite is
+  now 16/16.
+
+- **Pack count reconciled.** `README.md` claimed **315** packs; the true count of
+  pack directories carrying a `pack.pl` is **299** (matching this Ledger's N3).
+  `README.md` was corrected to 299; N3 was already correct.
+
+- **Layer header inconsistency fixed.** `packs/layer/prolog/layer.pl`'s header
+  read `(WP-426, Layer 400)` while `packs/layer/pack.pl` declares `layer(0)`. The
+  header now reads `(WP-426, Layer 0)`, agreeing with the declaration.
+
+- **Finding: the Lattice acceptance tests were ungated.** No workflow ran
+  `packs/lattice/test/test_lattice.pl` (the L1/L2/L3 acceptance suite), so a
+  regression in the Lattice coordination affordances could merge unseen — the
+  same class of invisible rot the pack-naming TEST-PRESENCE check exists to
+  prevent. A new workflow `.github/workflows/lattice-tests.yml` now runs the
+  suite on push and pull request, failing the job on any failure (15/15 green).

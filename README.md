@@ -67,7 +67,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       315 work packages — the complete cognitive engine (see below)
+├── packs/       299 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -88,7 +88,11 @@ Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transfo
 
 The full layer table is in Architecture Section 0.4.
 
-### The 315 Work Packages
+**The strict layer rule is live and gated in CI, and adoption is deliberately incremental.** The rule — a lower-layer pack may not depend on a higher-layer one — is now a first-class construct: a pack declares its layer with a `layer(N)` fact in its `pack.pl`, `bin/check_layers.sh` checks the real import graph, and `.github/workflows/layer-rule.yml` blocks a merge on any violation. Honestly, though: **3 of the 299 packs declare a layer today** (`layer` and `lattice` at layer 0, `actors` at layer 1); the remaining 296 are undeclared **gaps, not violations**. Until adoption spreads pack by pack, a passing check verifies only the declared packs. See **[docs/layer-rule.md](docs/layer-rule.md)** for how to declare a layer, run the checker, read a violation line, and choose strict vs reporting mode.
+
+**Coordinating actors through the Lattice.** Actors coordinate through the Lattice by stigmergy (shared state, zero actor-to-actor references) and react through notification (a write wakes awaiting readers; nobody polls). This stigmergy-plus-notification bridge (L3) is the pattern every Connectome repository is built on — see **[docs/lattice-hybrid-pattern.md](docs/lattice-hybrid-pattern.md)** for the principle, the exact API (`lattice_await/5`, `lattice_notify/1`, `lattice_put/4`, `lattice_get/4`, `lattice_take/4`, `lattice_replace/4`), a worked example, and the legibility cost it must pay deliberately.
+
+### The 299 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
