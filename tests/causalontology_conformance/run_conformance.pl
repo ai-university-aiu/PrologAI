@@ -28,6 +28,11 @@
 :- use_module(library(lists)).
 :- use_module(library(apply)).
 
+% The 107 vector clauses (co_v/1) are interleaved with their per-vector helper
+% predicates for readability, so they are legitimately discontiguous; declare it
+% to keep the load clean (no behavioural change — ordering does not affect co_v/1).
+:- discontiguous co_v/1.
+
 % The pinned causalontology source commit the vectors were copied from.
 co_vectors_commit('8991c8b5ef12e998ff932855fabe29edf4cc16cc').
 

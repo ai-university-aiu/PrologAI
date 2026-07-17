@@ -41,7 +41,8 @@ co_content_kind(continuant).      co_content_kind(realizable).
 co_content_kind(stratum).         co_content_kind(bridge).
 co_content_kind(port).            co_content_kind(conduit).
 co_content_kind(quality).         co_content_kind(token_individual).
-co_content_kind(token_occurrence).co_content_kind(state_assertion).
+co_content_kind(token_occurrence).
+co_content_kind(state_assertion).
 co_content_kind(token_causal_claim).
 % The provenance record kinds accepted by put_record.
 co_record_kind(assertion).  co_record_kind(enrichment).

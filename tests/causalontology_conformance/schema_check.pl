@@ -123,7 +123,7 @@ co_resolve_ref(Ref, _Root, Schema, RootOut) :-
 split_hash(S, Before, After) :-
     % Find the "#/" separator and split around it.
     sub_string(S, B, _, A, "#/"), !,
-    sub_string(S, 0, B, _, Before), sub_string_after(S, _, After0),
+    sub_string(S, 0, B, _, Before), sub_string_after(S, _, _After0),
     string_length(S, L), APos is L - A, sub_string(S, APos, A, 0, After).
 
 % -- co_navigate(+Doc, +Pointer, -Node): walk a JSON pointer like "$defs/croId".
