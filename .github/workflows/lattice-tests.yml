@@ -1,0 +1,39 @@
+# Gate the Lattice L1/L2/L3 acceptance tests on every push and pull request.
+#
+# The Lattice affordances delivered in Wave 1 of the Requirements Ledger — the
+# lightweight backend-free write door (L1), the isolating transaction (L2), and
+# the reactive await woken by a write (L3) — are exercised by the in-pack PLUnit
+# suite packs/lattice/test/test_lattice.pl. Until this workflow, that suite ran
+# in no Continuous Integration (CI) job, so a regression in the Lattice
+# coordination affordances could merge unseen. A non-zero exit fails the job and
+# blocks the merge.
+name: lattice-tests
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single lattice-tests job.
+jobs:
+  lattice-tests:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # Run the Lattice L1/L2/L3 acceptance suite; a non-zero exit fails the job.
+      - name: Run the Lattice acceptance test suite
+        run: |
+          LIB=""
+          for d in packs/*/prolog; do LIB="$LIB -p library=$d"; done
+          swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/lattice/test/test_lattice.pl
