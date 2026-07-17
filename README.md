@@ -61,6 +61,8 @@ No guessing.
 
 > PrologAI, through its Mentova Synthetic Mind implementation, is the **first digital system in the world** to achieve confirmed perfect scores on both ARC-AGI-1 (Abstract Reasoning Corpus for Artificial General Intelligence Version 1) and ARC-AGI-2 (Abstract Reasoning Corpus for Artificial General Intelligence Version 2) — 400/400 = 100.00% on ARC-AGI-1 and 120/120 = 100.00% on ARC-AGI-2 — using pure symbolic induction with named glass-box rules — no neural weights, no internet knowledge, no large language model (LLM).
 
+> **Regression policy:** these 400/400 and 120/120 scores rest on the last **full** benchmark run. The per-wave gate is a 10 percent [mini regression](REGRESSION_DEBT.md) (ARC-AGI-1 40/40, ARC-AGI-2 12/12) that detects gross breakage only; a green mini run never refreshes these claims. The full regression is deferred and is mandatory before any public re-assertion of the scores.
+
 ---
 
 ## Architecture
