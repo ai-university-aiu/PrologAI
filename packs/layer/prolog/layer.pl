@@ -1,4 +1,4 @@
-/*  PrologAI — Strict Layer Rule construct  (WP-426, Layer 400)
+/*  PrologAI — Strict Layer Rule construct  (WP-426, Layer 0)
 
     THE GAP THIS CLOSES (Ledger entry L4, the keystone).
     PrologAI rests on a strict layer rule: a lower layer may not depend on a

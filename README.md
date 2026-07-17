@@ -67,7 +67,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       315 work packages — the complete cognitive engine (see below)
+├── packs/       299 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -92,7 +92,7 @@ The full layer table is in Architecture Section 0.4.
 
 **Coordinating actors through the Lattice.** Actors coordinate through the Lattice by stigmergy (shared state, zero actor-to-actor references) and react through notification (a write wakes awaiting readers; nobody polls). This stigmergy-plus-notification bridge (L3) is the pattern every Connectome repository is built on — see **[docs/lattice-hybrid-pattern.md](docs/lattice-hybrid-pattern.md)** for the principle, the exact API (`lattice_await/5`, `lattice_notify/1`, `lattice_put/4`, `lattice_get/4`, `lattice_take/4`, `lattice_replace/4`), a worked example, and the legibility cost it must pay deliberately.
 
-### The 315 Work Packages
+### The 299 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
