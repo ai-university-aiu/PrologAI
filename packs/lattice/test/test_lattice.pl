@@ -133,5 +133,62 @@ test(l1_take_removes, [cleanup(lattice_close(N))]) :-
     lattice_take(N, token, [x], []),
     assertion(\+ lattice_get(N, token, _, _)).
 
+% -------------------------------------------------------------------------
+% L2 — real transaction isolation (Ledger entry L2).
+% -------------------------------------------------------------------------
+
+% AC-L2-001: concurrent read-modify-write is EXACT under isolation(serializable),
+% with no caller-supplied lock — and LOSES updates under the plain /2 transaction.
+% A 1 ms window between read and write forces the race deterministically.
+test(l2_isolation_prevents_lost_updates) :-
+    % Four writers each increment the shared counter twenty-five times.
+    Threads = 4, Per = 25, Expected is Threads * Per,
+    % The unisolated /2 path loses updates (no mutual exclusion).
+    l2_run(unisolated, Threads, Per, Unisolated),
+    % The isolated /3 serializable path is exact (mutual exclusion, no caller lock).
+    l2_run(isolated, Threads, Per, Isolated),
+    % Today's behaviour: the plain transaction is not isolating.
+    assertion(Unisolated < Expected),
+    % The fix: serializable isolation yields the exact total.
+    assertion(Isolated =:= Expected).
+
 % Close the block of 'lattice' tests.
 :- end_tests(lattice).
+
+% -------------------------------------------------------------------------
+% Helper: run one L2 concurrency scenario and report the final counter.
+% -------------------------------------------------------------------------
+
+% One read-modify-write of the shared counter fact (id 1), with a widened window.
+l2_rmw(N) :-
+    % Take the current value out.
+    retract(lattice_node_fact(N, 1, counter, [V], [])),
+    % Widen the read->write gap so an unisolated race is deterministic.
+    sleep(0.001),
+    % Compute the incremented value.
+    V1 is V + 1,
+    % Write it back.
+    assertz(lattice_node_fact(N, 1, counter, [V1], [])).
+
+% Increment under the requested isolation mode.
+l2_increment(isolated, N)   :- lattice_transaction(N, [isolation(serializable)], l2_rmw(N)).
+l2_increment(unisolated, N) :- lattice_transaction(N, l2_rmw(N)).
+
+% Run Threads writers, each doing Per increments, and read the final total.
+l2_run(Mode, Threads, Per, Final) :-
+    % Use a distinct nexus per mode.
+    atom_concat('locus://localhost/l2_', Mode, Addr),
+    lattice_open(Addr, N),
+    % Reset the counter to zero.
+    retractall(lattice_node_fact(N, 1, counter, _, _)),
+    assertz(lattice_node_fact(N, 1, counter, [0], [])),
+    % Spawn the writer threads.
+    numlist(1, Threads, Seq),
+    findall(TId,
+            ( member(_, Seq),
+              thread_create(forall(between(1, Per, _), l2_increment(Mode, N)), TId, []) ),
+            TIds),
+    % Wait for them all to finish.
+    forall(member(TId, TIds), thread_join(TId, _)),
+    % Read the final counter value.
+    lattice_node_fact(N, 1, counter, [Final], []).

@@ -39,7 +39,9 @@
     % L1 — read-and-remove one matching fact (Linda take).
     lattice_take/4,          % +Nexus, ?Relation, ?Args, ?Referents
     % L1 — replace all facts of a relation with one (a bounded coordination token).
-    lattice_replace/4        % +Nexus, +Relation, +Args, +Referents
+    lattice_replace/4,       % +Nexus, +Relation, +Args, +Referents
+    % L2 — an explicitly isolating transaction (Ledger entry L2).
+    lattice_transaction/3    % +Nexus, +Options, :Goal
 % Close the expression opened above.
 ]).
 
@@ -47,8 +49,8 @@
 :- use_module(library(crypto),  [crypto_data_hash/3]).
 % Import [maplist/2] from the built-in 'apply' library.
 :- use_module(library(apply),   [maplist/2]).
-% Import [member/2] from the built-in 'lists' library.
-:- use_module(library(lists),   [member/2]).
+% Import [member/2, memberchk/2] from the built-in 'lists' library.
+:- use_module(library(lists),   [member/2, memberchk/2]).
 
 % ---------------------------------------------------------------------------
 % Nexus registry
@@ -377,3 +379,35 @@ lattice_replace(Nexus, Relation, Args, Referents) :-
     lattice_transaction(Nexus,
         ( retractall(lattice_node_fact(Nexus, _, Relation, _, _)),
           assertz(lattice_node_fact(Nexus, Id, Relation, Args, Referents)) )).
+
+% ===========================================================================
+% L2 — an explicitly isolating transaction  (Ledger entry L2)
+% ---------------------------------------------------------------------------
+% lattice_transaction/2 gives journaling (durability/framing) but NOT isolation:
+% two threads can interleave a read and a write and corrupt a shared fact.
+% lattice_transaction/3 with isolation(serializable) wraps the journaled
+% transaction in a per-nexus reentrant mutex, so concurrent read-modify-write is
+% serialised with NO caller-supplied lock. lattice_transaction/2 is unchanged and
+% remains, honestly, the NON-isolating mode.
+% ===========================================================================
+
+% Define a clause for 'lattice nexus mutex': the stable per-nexus mutex name.
+lattice_nexus_mutex(Nexus, Mutex) :-
+    % Render the nexus term to an atom for a deterministic mutex name.
+    term_to_atom(Nexus, NexusAtom),
+    % Prefix it so the name is unambiguous; with_mutex auto-creates it on first use.
+    atom_concat('lattice_nexus_mutex_', NexusAtom, Mutex).
+
+% Declare lattice_transaction/3 as a meta-predicate so the caller's module is
+% carried onto the transaction Goal (its third argument is a goal to run).
+:- meta_predicate lattice_transaction(?, ?, 0).
+
+% Define a clause for 'lattice transaction/3': run a transaction under an isolation option.
+lattice_transaction(Nexus, Options, Goal) :-
+    % Branch on whether serialisable isolation was requested.
+    ( memberchk(isolation(serializable), Options)
+    % Serialisable: hold the per-nexus mutex across the whole journaled transaction.
+    ->  lattice_nexus_mutex(Nexus, Mutex),
+        with_mutex(Mutex, lattice_transaction(Nexus, Goal))
+    % No isolation requested: fall back to the plain journaled transaction.
+    ;   lattice_transaction(Nexus, Goal) ).
