@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/port.schema.json",
+  "title": "Port",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "bearer",
+    "label",
+    "direction",
+    "accepts"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^port:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "port"
+    },
+    "bearer": {
+      "type": "string",
+      "pattern": "^continuant:[0-9a-f]{64}$",
+      "description": "the continuant TYPE that has this interface"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "the name of the interface (for example: perforant_path, fornix)"
+    },
+    "direction": {
+      "enum": [
+        "in",
+        "out",
+        "bidirectional"
+      ]
+    },
+    "accepts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^occurrent:[0-9a-f]{64}$"
+      },
+      "description": "the kinds of occurrent this port accepts (direction in) or emits (direction out) or both (bidirectional)"
+    },
+    "realizable": {
+      "type": "string",
+      "pattern": "^realizable:[0-9a-f]{64}$",
+      "description": "optional: the disposition, function, or role this port serves"
+    }
+  }
+}

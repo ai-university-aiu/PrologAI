@@ -8,6 +8,7 @@
   <img src="https://img.shields.io/badge/SWI--Prolog-9.0.4%2B-E44B19?style=for-the-badge" alt="SWI-Prolog 9.0.4+">
   <img src="https://img.shields.io/badge/reasoning-48%20types-B22313?style=for-the-badge" alt="48 Reasoning Types">
   <img src="https://img.shields.io/badge/protocols-MCP%20%7C%20A2A%20%7C%20ACP%20%7C%20ANP-670100?style=for-the-badge" alt="MCP | A2A | ACP | ANP">
+  <img src="https://img.shields.io/badge/Causalontology-2.0.0%20%7C%20107%2F107%20vectors-B22313?style=for-the-badge" alt="Causalontology 2.0.0: 107/107 conformance vectors">
   <img src="https://img.shields.io/badge/license-Attribution%20No%20Profit%20No%20Problem-3A0000?style=for-the-badge" alt="The Attribution Always; No Profit, No Problem License.">
 </p>
 
@@ -43,6 +44,8 @@ No black box.
 No guessing.
 
 **Naming.** Identifiers are whole English words, never abbreviations — packs and predicates are pack-qualified `snake_case` (`world_model`, not `wm`), and the reified causal primitive is spelled `causal_relation_object` (`cro` retired), aligning with the Causalontology standard's whole-word Principle P7. See [NAMING.md](NAMING.md).
+
+**Conformance.** PrologAI implements **Causalontology specification 2.0.0** and passes **all 107 conformance vectors (V01–V107)** — canonicalization (RFC 8785), content identity (SHA-256), schema validity for the seventeen kinds, the local semantic rules, and the five normative algorithms (bridge closure, bridged reachability, stratal classification, the skip decision, unit normalization), plus Ed25519 (RFC 8032) provenance. The vectors are vendored from the causalontology repository at commit `8991c8b` (the 2.0.0 whole-word baseline) and gated in CI by `bin/run_causalontology_conformance.sh`. Nothing pending — the full suite passes. See the [conformance section of NAMING.md](NAMING.md#conformance-to-causalontology-specification-200).
 
 ---
 

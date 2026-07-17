@@ -1,0 +1,15 @@
+{
+  "vector": "V31",
+  "name": "retraction_excludes_assertion_from_default_views",
+  "group": "E - provenance, signatures, retraction, succession",
+  "operation": "put_record + assertions_about",
+  "steps": [
+    "lab1 asserts about cro:X",
+    "lab1 signs a retraction of that assertion"
+  ],
+  "expect": {
+    "default_view": "excludes the retracted assertion",
+    "history_view": "includes it, marked retracted",
+    "foreign_retraction": "a retraction signed by a source outside the lineage is semantically invalid and has no effect"
+  }
+}

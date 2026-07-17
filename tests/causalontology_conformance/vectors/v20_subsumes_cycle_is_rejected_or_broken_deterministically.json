@@ -1,0 +1,21 @@
+{
+  "vector": "V20",
+  "name": "subsumes_cycle_is_rejected_or_broken_deterministically",
+  "group": "B - semantic validity",
+  "operation": "put_record / materialized view",
+  "given": {
+    "materialized_subsumes": [
+      "continuant:d5da1fa1357b07df5d665379cee32f99c5973725245f0a593897c6046dbd58b0",
+      "continuant:45c30cb772f59e6a7f213fb207d6abc2d44c8e7ff8f5c06b01292b093ce997eb"
+    ]
+  },
+  "input": {
+    "field": "subsumes",
+    "about": "continuant:ab91a82d14cfc6125c1a40e6920a4cd3fcc3e2f9940347175b06367845a9bcbc",
+    "entry": "continuant:cd6357efdd966de8c0cb2f876cc89ec74ce35f0968e11743987084bd42fb8944"
+  },
+  "expect": {
+    "enforcing_tier": "write rejected: would create a cycle in the materialized subsumes graph",
+    "decentralized_merge": "the conformant view excludes the cycle-completing record with the latest timestamp (ties by lexicographic record identifier) and surfaces it as a repair gap"
+  }
+}

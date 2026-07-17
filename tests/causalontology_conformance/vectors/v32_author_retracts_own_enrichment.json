@@ -1,0 +1,14 @@
+{
+  "vector": "V32",
+  "name": "author_retracts_own_enrichment",
+  "group": "E - provenance, signatures, retraction, succession",
+  "operation": "put_record + materialized view",
+  "steps": [
+    "Bob adds an alias enrichment on occ:press_button",
+    "Bob signs a retraction of that enrichment"
+  ],
+  "expect": {
+    "materialized_view": "no longer contains Bob's entry (unless another unretracted record contributes the same entry)",
+    "history_view": "the record survives, marked retracted"
+  }
+}

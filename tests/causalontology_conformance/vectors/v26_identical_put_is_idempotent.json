@@ -1,0 +1,14 @@
+{
+  "vector": "V26",
+  "name": "identical_put_is_idempotent",
+  "group": "D - identity, canonicalization, and merge",
+  "operation": "put",
+  "steps": [
+    "put(occurrent {label press_button, category action})",
+    "put(the same occurrent again)"
+  ],
+  "expect": {
+    "objects_in_store": 1,
+    "second_put": "returns the same identifier and changes nothing"
+  }
+}

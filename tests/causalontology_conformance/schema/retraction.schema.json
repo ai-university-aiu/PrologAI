@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/retraction.schema.json",
+  "title": "Retraction",
+  "type": "object",
+  "required": [
+    "id",
+    "retracts",
+    "source",
+    "timestamp"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^retraction:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "retraction"
+    },
+    "retracts": {
+      "type": "string",
+      "pattern": "^(assertion|enrichment):[0-9a-f]{64}$",
+      "description": "the assertion or enrichment being withdrawn"
+    },
+    "source": {
+      "type": "string",
+      "pattern": "^ed25519:[0-9a-f]{64}$",
+      "description": "must be the retracted record's source, or a key in its succession lineage"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    }
+  }
+}

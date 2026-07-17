@@ -540,3 +540,721 @@ causal_core_why(Id, why(Id, causes(Causes), effects(Effects), window(Temporal),
     causal_core_causal_relation_object_(Id, Causes, Effects, Temporal, Modality, Strength, Context, Prov),
     % Fetch its mechanism, empty when it has none.
     ( causal_core_mechanism_(Id, SubIds) -> true ; SubIds = [] ).
+
+% ===========================================================================
+% CAUSALONTOLOGY 2.0.0 CONFORMANCE VOCABULARY (WP-425)
+%
+% This section makes causal_core speak the Causalontology 2.0.0 standard as
+% published data structures: RFC 8785 canonicalization, SHA-256 content
+% identity for all seventeen kinds, the locally-checkable semantic rules, and
+% the five normative algorithms of Section 12 (bridge closure, bridged
+% reachability, stratal classification, the skip decision, unit
+% normalization). Objects are SWI dicts with atom keys; string values are
+% Prolog strings; booleans are the atoms true/false; null is the atom null.
+% Every predicate here is additive and side-effect free (no dynamic state),
+% so nothing in the existing verb layer or the ARC solving core is touched.
+% ===========================================================================
+
+% Bring in the SHA-256 primitive used by content identity.
+:- use_module(library(sha)).
+
+% Export the whole conformance vocabulary surface.
+:- export(causal_core_identity_fields/2).
+:- export(causal_core_jcs/2).
+:- export(causal_core_canonicalize/3).
+:- export(causal_core_identify/3).
+:- export(causal_core_infer_kind/2).
+:- export(causal_core_unit_seconds/2).
+:- export(causal_core_to_seconds/3).
+:- export(causal_core_validate_semantics/3).
+:- export(causal_core_is_partial/3).
+:- export(causal_core_admissible/3).
+:- export(causal_core_conflicts/2).
+:- export(causal_core_refinement_valid/3).
+:- export(causal_core_bridge_closure/3).
+:- export(causal_core_hierarchy_consistent/4).
+:- export(causal_core_classify/4).
+:- export(causal_core_endpoints_mixed/2).
+:- export(causal_core_skip_gaps/3).
+:- export(causal_core_delay_within_window/3).
+:- export(causal_core_bridge_wellformed/4).
+:- export(causal_core_conduit_wellformed/4).
+:- export(causal_core_state_gaps/3).
+:- export(causal_core_covering_law_mismatch/3).
+:- export(causal_core_retrocausal/2).
+:- export(causal_core_has_cycle/1).
+:- export(causal_core_enrichment_field/3).
+:- export(causal_core_atomize/2).
+
+% -- The identity-bearing fields of each of the seventeen kinds (identity.md).
+% The "type" field is always injected, so it is not listed in these tables.
+% occurrent identity: its label, category, and stratum.
+causal_core_identity_fields(occurrent, [label, category, stratum]).
+% causal_relation_object identity: the full causal payload.
+causal_core_identity_fields(causal_relation_object,
+    [causes, effects, mechanism, temporal, modality, context, refines, skips]).
+% continuant identity: label and category.
+causal_core_identity_fields(continuant, [label, category]).
+% realizable identity: its kind, bearer, and optional label.
+causal_core_identity_fields(realizable, [kind, bearer, label]).
+% stratum identity: label, scheme, ordinal, unit, governs.
+causal_core_identity_fields(stratum, [label, scheme, ordinal, unit, governs]).
+% bridge identity: the coarse occurrent, its fine set, and the relation.
+causal_core_identity_fields(bridge, [coarse, fine, relation]).
+% port identity: bearer, label, direction, accepted occurrents, realizable.
+causal_core_identity_fields(port, [bearer, label, direction, accepts, realizable]).
+% conduit identity: label, from, to, carried occurrents, transform.
+causal_core_identity_fields(conduit, [label, from, to, carries, transform]).
+% quality identity: label, datatype, unit, stratum.
+causal_core_identity_fields(quality, [label, datatype, unit, stratum]).
+% token_individual identity: what it instantiates, its designator, its whole.
+causal_core_identity_fields(token_individual, [instantiates, designator, part_of]).
+% token_occurrence identity: instantiates, interval, participants, locus, observer.
+causal_core_identity_fields(token_occurrence,
+    [instantiates, interval, participants, locus, observer]).
+% state_assertion identity: subject, quality, value, interval.
+causal_core_identity_fields(state_assertion, [subject, quality, value, interval]).
+% token_causal_claim identity: causes, effects, covering law, delay, counterfactual.
+causal_core_identity_fields(token_causal_claim,
+    [causes, effects, covering_law, actual_delay, counterfactual]).
+% assertion identity: about, source, evidence type/body, strength, confidence, timestamp, evidenced_by.
+causal_core_identity_fields(assertion,
+    [about, source, evidence_type, evidence, strength, confidence, timestamp, evidenced_by]).
+% enrichment identity: about, field, entry, source, timestamp.
+causal_core_identity_fields(enrichment, [about, field, entry, source, timestamp]).
+% retraction identity: what it retracts, source, timestamp.
+causal_core_identity_fields(retraction, [retracts, source, timestamp]).
+% succession identity: predecessor, successor, timestamp.
+causal_core_identity_fields(succession, [predecessor, successor, timestamp]).
+
+% -- causal_core_infer_kind(+Obj, -Kind): the kind of a dict (type, id, or shape).
+% An explicit type field wins.
+causal_core_infer_kind(Obj, Kind) :-
+    get_dict(type, Obj, TypeVal), !,
+    ( atom(TypeVal) -> Kind = TypeVal ; atom_string(Kind, TypeVal) ).
+% Otherwise a known id-scheme prefix names the kind.
+causal_core_infer_kind(Obj, Kind) :-
+    get_dict(id, Obj, Id), causal_core_kind_of_id_str(Id, K), K \== unknown, !, Kind = K.
+% coarse+fine is a bridge.
+causal_core_infer_kind(Obj, bridge) :- get_dict(coarse, Obj, _), get_dict(fine, Obj, _), !.
+% causes+effects is a causal_relation_object.
+causal_core_infer_kind(Obj, causal_relation_object) :- get_dict(causes, Obj, _), get_dict(effects, Obj, _), !.
+% retracts is a retraction.
+causal_core_infer_kind(Obj, retraction) :- get_dict(retracts, Obj, _), !.
+% predecessor+successor is a succession.
+causal_core_infer_kind(Obj, succession) :- get_dict(predecessor, Obj, _), get_dict(successor, Obj, _), !.
+% field+entry is an enrichment.
+causal_core_infer_kind(Obj, enrichment) :- get_dict(field, Obj, _), get_dict(entry, Obj, _), !.
+% evidence_type, or about+confidence, is an assertion.
+causal_core_infer_kind(Obj, assertion) :- ( get_dict(evidence_type, Obj, _) ; ( get_dict(about, Obj, _), get_dict(confidence, Obj, _) ) ), !.
+% kind+bearer is a realizable.
+causal_core_infer_kind(Obj, realizable) :- get_dict(kind, Obj, _), get_dict(bearer, Obj, _), !.
+
+% -- causal_core_kind_of_id_str(+Id, -Kind): kind named by an id string prefix.
+causal_core_kind_of_id_str(Id, Kind) :-
+    ( sub_string(Id, B, _, _, ":") -> sub_string(Id, 0, B, _, SchemeS) ; SchemeS = Id ),
+    ( atom_string(SchemeA, SchemeS), causal_core_identity_fields(SchemeA, _) -> Kind = SchemeA ; Kind = unknown ).
+
+% -- causal_core_identity_bearing(+Kind, +Obj, -Bearing): the identity subset.
+causal_core_identity_bearing(Kind, Obj, Bearing) :-
+    % Look up the identity-bearing field list for this kind.
+    causal_core_identity_fields(Kind, Fields),
+    % Inject the type as a string, matching the reference serializer.
+    atom_string(Kind, KindStr),
+    % Keep only the present identity fields, building key-value pairs.
+    findall(F-V, (member(F, Fields), get_dict(F, Obj, V)), Pairs0),
+    % Prepend the injected type field.
+    Pairs = [type-KindStr|Pairs0],
+    % Build a dict from the retained pairs (tag is irrelevant to canonical form).
+    dict_pairs(Bearing, _, Pairs).
+
+% -- causal_core_jcs(+Value, -String): RFC 8785 canonical serialization.
+% The atom null serializes to the JSON null literal.
+causal_core_jcs(null, "null") :- !.
+% The atom true serializes to the JSON true literal.
+causal_core_jcs(true, "true") :- !.
+% The atom false serializes to the JSON false literal.
+causal_core_jcs(false, "false") :- !.
+% Integers serialize as their base-ten form.
+causal_core_jcs(V, S) :- integer(V), !, number_string(V, S).
+% Floats serialize by the RFC 8785 number rules for our value ranges.
+causal_core_jcs(V, S) :- float(V), !, causal_core_jcs_float(V, S).
+% Strings serialize as escaped, quoted JSON strings.
+causal_core_jcs(V, S) :- string(V), !, causal_core_jcs_string(V, S).
+% Dicts serialize with keys sorted by code point (JCS object rule).
+causal_core_jcs(V, S) :- is_dict(V), !, causal_core_jcs_object(V, S).
+% Lists serialize as JSON arrays, element order preserved.
+causal_core_jcs(V, S) :- is_list(V), !, causal_core_jcs_array(V, S).
+% Any remaining atom (a non-boolean enum) serializes as a JSON string.
+causal_core_jcs(V, S) :- atom(V), !, atom_string(V, Str), causal_core_jcs_string(Str, S).
+
+% -- causal_core_jcs_float(+Float, -String): the number rule for our ranges.
+causal_core_jcs_float(V, S) :-
+    % Zero prints as a bare 0.
+    ( V =:= 0 -> S = "0"
+    % An integer-valued float below 1e21 prints as that integer.
+    ; ( V =:= truncate(V), abs(V) < 1.0e21 )
+        -> I is truncate(V), number_string(I, S)
+    % Otherwise SWI's shortest round-trip decimal is used (ES6-compatible here).
+    ; format(string(S), "~w", [V])
+    ).
+
+% -- causal_core_jcs_string(+String, -Quoted): escape and quote a JSON string.
+causal_core_jcs_string(Str, Quoted) :-
+    % Take the string as a list of character codes.
+    string_codes(Str, Codes),
+    % Escape each code per the JCS/RFC 8785 rules (source order preserved).
+    foldl(causal_core_jcs_escape, Codes, Esc, []),
+    % Flatten the per-character code fragments into one list.
+    flatten(Esc, EscCodes),
+    % Wrap the escaped body in double quotes.
+    string_codes(Body, EscCodes),
+    % Concatenate the opening quote, body, and closing quote.
+    causal_core_atomics_string(["\"", Body, "\""], Quoted).
+
+% -- causal_core_jcs_escape(+Code, -Acc, +Acc0): one character's escape codes.
+causal_core_jcs_escape(0'", [[0'\\, 0'"]|A], A) :- !.
+% Backslash escapes to \\.
+causal_core_jcs_escape(0'\\, [[0'\\, 0'\\]|A], A) :- !.
+% Backspace escapes to \b.
+causal_core_jcs_escape(8, [[0'\\, 0'b]|A], A) :- !.
+% Tab escapes to \t.
+causal_core_jcs_escape(9, [[0'\\, 0't]|A], A) :- !.
+% Line feed escapes to \n.
+causal_core_jcs_escape(10, [[0'\\, 0'n]|A], A) :- !.
+% Form feed escapes to \f.
+causal_core_jcs_escape(12, [[0'\\, 0'f]|A], A) :- !.
+% Carriage return escapes to \r.
+causal_core_jcs_escape(13, [[0'\\, 0'r]|A], A) :- !.
+% Any other control character below 0x20 escapes to a \u00xx sequence.
+causal_core_jcs_escape(C, [U|A], A) :- C < 0x20, !,
+    format(codes(U), "\\u~|~`0t~16r~4+", [C]).
+% All other characters pass through unchanged.
+causal_core_jcs_escape(C, [[C]|A], A).
+
+% -- causal_core_jcs_array(+List, -String): serialize a JSON array.
+causal_core_jcs_array(List, S) :-
+    % Serialize each element.
+    maplist(causal_core_jcs, List, Parts),
+    % Join the parts with commas.
+    causal_core_atomics_string(Parts, ",", Inner),
+    % Wrap in square brackets.
+    causal_core_atomics_string(["[", Inner, "]"], S).
+
+% -- causal_core_jcs_object(+Dict, -String): serialize a JSON object.
+causal_core_jcs_object(Dict, S) :-
+    % Take the dict's key-value pairs.
+    dict_pairs(Dict, _, Pairs),
+    % Sort the pairs by key using standard order (code-point order for ASCII keys).
+    sort(1, @=<, Pairs, Sorted),
+    % Serialize each pair as "key":value.
+    maplist(causal_core_jcs_member, Sorted, Parts),
+    % Join the members with commas.
+    causal_core_atomics_string(Parts, ",", Inner),
+    % Wrap in braces.
+    causal_core_atomics_string(["{", Inner, "}"], S).
+
+% -- causal_core_jcs_member(+Key-Value, -String): one serialized object member.
+causal_core_jcs_member(K-V, S) :-
+    % Serialize the key as a JSON string.
+    atom_string(K, KStr), causal_core_jcs_string(KStr, KS),
+    % Serialize the value.
+    causal_core_jcs(V, VS),
+    % Join key and value with a colon.
+    causal_core_atomics_string([KS, ":", VS], S).
+
+% -- causal_core_atomics_string helpers (concatenate / join a list of atomics).
+causal_core_atomics_string(List, S) :- causal_core_atomic_concat(List, "", S).
+% Join with a separator.
+causal_core_atomics_string(List, Sep, S) :- causal_core_atomic_concat(List, Sep, S).
+% Concatenate a list of strings/atoms/numbers into one string with a separator.
+causal_core_atomic_concat(List, Sep, S) :-
+    % Reuse the library join over atoms, then cast to a string.
+    atomic_list_concat(List, Sep, A), atom_string(A, S).
+
+% -- causal_core_canonicalize(+Obj, +Kind, -Bytes): the identity-bearing bytes.
+causal_core_canonicalize(Obj, Kind0, Bytes) :-
+    % Resolve the kind, inferring it from the type field when unbound.
+    ( var(Kind0) -> causal_core_infer_kind(Obj, Kind) ; Kind = Kind0 ),
+    % Reduce the object to its identity-bearing subset.
+    causal_core_identity_bearing(Kind, Obj, Bearing),
+    % Serialize that subset with the RFC 8785 rules.
+    causal_core_jcs(Bearing, Bytes).
+
+% -- causal_core_identify(+Obj, +Kind, -Id): scheme + ':' + SHA-256 hex digest.
+causal_core_identify(Obj, Kind0, Id) :-
+    % Resolve the kind as above.
+    ( var(Kind0) -> causal_core_infer_kind(Obj, Kind) ; Kind = Kind0 ),
+    % Compute the canonical bytes.
+    causal_core_canonicalize(Obj, Kind, Bytes),
+    % Hash them with SHA-256 over their UTF-8 encoding.
+    sha_hash(Bytes, Digest, [algorithm(sha256), encoding(utf8)]),
+    % Render the digest as lowercase hexadecimal.
+    hash_atom(Digest, HexAtom),
+    % The scheme is the whole-word kind name (Principle P7).
+    atom_string(Kind, KindStr),
+    % Assemble scheme + ':' + digest as the content-addressed identifier.
+    causal_core_atomics_string([KindStr, ":", HexAtom], Id).
+
+% ---------------------------------------------------------------------------
+% Unit normalization (Algorithm E) and temporal admissibility (Rule 4)
+% ---------------------------------------------------------------------------
+
+% -- causal_core_unit_seconds(+Unit, -Seconds): the fixed conversion table.
+% An instant is zero seconds.
+causal_core_unit_seconds(instant, 0).
+% One second.
+causal_core_unit_seconds(seconds, 1).
+% One minute is sixty seconds.
+causal_core_unit_seconds(minutes, 60).
+% One hour.
+causal_core_unit_seconds(hours, 3600).
+% One day.
+causal_core_unit_seconds(days, 86400).
+% One week.
+causal_core_unit_seconds(weeks, 604800).
+% One mean Gregorian month (normative constant).
+causal_core_unit_seconds(months, 2629746).
+% One mean Gregorian year (normative constant, 365.2425 days).
+causal_core_unit_seconds(years, 31556952).
+
+% -- causal_core_unit_seconds accepts a unit given as a string too.
+causal_core_unit_atom(U, A) :- ( atom(U) -> A = U ; atom_string(A, U) ).
+
+% -- causal_core_to_seconds(+Duration, +Unit, -Seconds): normalize a delay.
+causal_core_to_seconds(_, Unit, 0) :- causal_core_unit_atom(Unit, instant), !.
+% Any other unit multiplies the duration by its second-count.
+causal_core_to_seconds(Duration, Unit, Seconds) :-
+    causal_core_unit_atom(Unit, A), causal_core_unit_seconds(A, Per),
+    Seconds is Duration * Per.
+
+% -- causal_core_admissible(+Cro, +ElapsedSeconds, -Bool): Rule 4.
+causal_core_admissible(Cro, _, true) :- \+ get_dict(temporal, Cro, _), !.
+% With a window, the elapsed time must fall inside the normalized bounds.
+causal_core_admissible(Cro, Elapsed, Bool) :-
+    get_dict(temporal, Cro, T),
+    get_dict(unit, T, U), causal_core_unit_atom(U, Unit),
+    causal_core_unit_seconds(Unit, Per),
+    get_dict(minimum_delay, T, Lo0), get_dict(maximum_delay, T, Hi0),
+    Lo is Lo0 * Per, Hi is Hi0 * Per,
+    ( ( Lo =< Elapsed, Elapsed =< Hi ) -> Bool = true ; Bool = false ).
+
+% ---------------------------------------------------------------------------
+% Local semantic rules (validate_semantics)
+% ---------------------------------------------------------------------------
+
+% -- causal_core_validate_semantics(+Obj, +Kind, -Reasons): [] iff valid.
+causal_core_validate_semantics(Obj, Kind0, Reasons) :-
+    ( var(Kind0) -> causal_core_infer_kind(Obj, Kind) ; Kind = Kind0 ),
+    findall(R, causal_core_semantic_error(Kind, Obj, R), Reasons).
+
+% -- Rule 4: a causal_relation_object's minimum delay may not exceed its maximum.
+causal_core_semantic_error(causal_relation_object, Obj, "minimum_delay must be <= maximum_delay") :-
+    get_dict(temporal, Obj, T),
+    get_dict(minimum_delay, T, Lo), get_dict(maximum_delay, T, Hi),
+    number(Lo), number(Hi), Lo > Hi.
+% Acyclicity: a causal_relation_object may not list its own id in its mechanism.
+causal_core_semantic_error(causal_relation_object, Obj,
+        "mechanism must be acyclic (a Causal Relation Object may not contain itself)") :-
+    get_dict(id, Obj, Id), get_dict(mechanism, Obj, M), memberchk(Id, M).
+% Acyclicity: a causal_relation_object may not refine itself.
+causal_core_semantic_error(causal_relation_object, Obj, "refines must be acyclic") :-
+    get_dict(id, Obj, Id), get_dict(refines, Obj, Id).
+% Rule 16 clause 1: skips:true with a non-empty mechanism is a hard contradiction.
+causal_core_semantic_error(causal_relation_object, Obj,
+        "contradictory_skip: skips is true but a mechanism is present") :-
+    get_dict(skips, Obj, true), get_dict(mechanism, Obj, M), M \== [].
+% Rule 12: an enrichment field must be legal for the kind it is about.
+causal_core_semantic_error(enrichment, Obj, Msg) :-
+    get_dict(field, Obj, FieldV), causal_core_atomize(FieldV, Field),
+    causal_core_enrichment_field(Field, LegalKinds, _Shape),
+    get_dict(about, Obj, AboutV), causal_core_atomize(AboutV, About),
+    causal_core_kind_of_id(About, AboutKind), AboutKind \== unknown,
+    \+ memberchk(AboutKind, LegalKinds),
+    format(string(Msg), "~w is not a legal field for a ~w (rule 12)", [Field, AboutKind]).
+% Rule 12: an aliases entry must be a language-tagged text object.
+causal_core_semantic_error(enrichment, Obj, "an aliases entry must be a language-tagged text object") :-
+    get_dict(field, Obj, FieldV), causal_core_atomize(FieldV, aliases),
+    get_dict(entry, Obj, Entry),
+    \+ ( is_dict(Entry), get_dict(lang, Entry, _), get_dict(text, Entry, _) ).
+% Rule 12: a reference-shaped enrichment entry must be an identifier of the right scheme.
+causal_core_semantic_error(enrichment, Obj, Msg) :-
+    get_dict(field, Obj, FieldV), causal_core_atomize(FieldV, Field),
+    causal_core_enrichment_field(Field, _, Shape), Shape \== alias,
+    get_dict(entry, Obj, Entry),
+    \+ ( string(Entry), atom_string(Shape, ShapeS), string_concat(ShapeS, ":", Pfx), string_concat(Pfx, _, Entry) ),
+    format(string(Msg), "a ~w entry must be a ~w: identifier", [Field, Shape]).
+
+% -- The enrichment field-to-kind table (Rule 12), with entry shapes.
+causal_core_enrichment_field(aliases, [occurrent, continuant], alias).
+% participants attach continuants to an occurrent.
+causal_core_enrichment_field(participants, [occurrent], continuant).
+% subsumes relates continuants.
+causal_core_enrichment_field(subsumes, [continuant], continuant).
+% part_of relates continuants.
+causal_core_enrichment_field(part_of, [continuant], continuant).
+% realized_in attaches an occurrent to a realizable.
+causal_core_enrichment_field(realized_in, [realizable], occurrent).
+% occurrent_subsumes relates occurrents (new in 2.0.0).
+causal_core_enrichment_field(occurrent_subsumes, [occurrent], occurrent).
+% occurrent_part_of relates occurrents (new in 2.0.0).
+causal_core_enrichment_field(occurrent_part_of, [occurrent], occurrent).
+
+% -- causal_core_kind_of_id(+Id, -Kind): the kind named by an identifier's scheme.
+causal_core_kind_of_id(Id, Kind) :-
+    % Split the identifier at the first colon to recover the scheme.
+    ( sub_atom(Id, Before, _, After, ":")
+        -> sub_atom(Id, 0, Before, _, SchemeA), _ = After
+        ;  SchemeA = Id ),
+    % A scheme that names a known kind yields that kind; otherwise unknown.
+    ( causal_core_identity_fields(SchemeA, _) -> Kind = SchemeA ; Kind = unknown ).
+
+% -- causal_core_atomize(+V, -Atom): normalize a string or atom to an atom.
+causal_core_atomize(V, A) :- ( atom(V) -> A = V ; atom_string(A, V) ).
+
+% -- causal_core_is_partial(+Cro, -Partial, -Missing): unspecified optional fields.
+causal_core_is_partial(Cro, Partial, Missing) :-
+    findall(F, (member(F, [mechanism, temporal, modality, context]), \+ get_dict(F, Cro, _)), Missing),
+    ( Missing == [] -> Partial = false ; Partial = true ).
+
+% ---------------------------------------------------------------------------
+% Rule 6: the formal conflict test
+% ---------------------------------------------------------------------------
+
+% -- causal_core_conflicts(+A, +B, -Bool) via the four gates plus modality opposition.
+causal_core_conflicts(A, B) :-
+    % Same cause set (as sets).
+    get_dict(causes, A, CA), get_dict(causes, B, CB), causal_core_same_set(CA, CB),
+    % Same effect set.
+    get_dict(effects, A, EA), get_dict(effects, B, EB), causal_core_same_set(EA, EB),
+    % Compatible contexts.
+    causal_core_contexts_compatible(A, B),
+    % Overlapping temporal windows.
+    causal_core_window_overlap(A, B),
+    % One preventive against one of the positive modalities.
+    causal_core_modality(A, MA), causal_core_modality(B, MB),
+    ( ( MA == preventive, causal_core_positive(MB) )
+    ; ( MB == preventive, causal_core_positive(MA) ) ).
+
+% -- causal_core_modality(+Cro, -Atom): the modality as an atom, or none.
+causal_core_modality(Cro, M) :- ( get_dict(modality, Cro, V) -> causal_core_atomize(V, M) ; M = none ).
+
+% -- The four mutually-compatible positive modalities (Rule 6, amended).
+causal_core_positive(necessary).
+causal_core_positive(sufficient).
+causal_core_positive(contributory).
+causal_core_positive(enabling).
+
+% -- causal_core_same_set(+A, +B): equal as sets.
+causal_core_same_set(A, B) :- sort(A, S), sort(B, S).
+
+% -- causal_core_contexts_compatible(+A, +B): equal, subset, or either empty.
+causal_core_contexts_compatible(A, _B) :-
+    ( \+ get_dict(context, A, _) ; get_dict(context, A, []) ), !.
+causal_core_contexts_compatible(_A, B) :-
+    ( \+ get_dict(context, B, _) ; get_dict(context, B, []) ), !.
+causal_core_contexts_compatible(A, B) :-
+    get_dict(context, A, CA), get_dict(context, B, CB),
+    sort(CA, SA), sort(CB, SB),
+    ( SA == SB ; ord_subset(SA, SB) ; ord_subset(SB, SA) ).
+
+% -- causal_core_window_overlap(+A, +B): overlap, or either window absent.
+causal_core_window_overlap(A, _B) :- \+ get_dict(temporal, A, _), !.
+causal_core_window_overlap(_A, B) :- \+ get_dict(temporal, B, _), !.
+causal_core_window_overlap(A, B) :-
+    causal_core_window_bounds(A, LoA, HiA), causal_core_window_bounds(B, LoB, HiB),
+    LoA =< HiB, LoB =< HiA.
+
+% -- causal_core_window_bounds(+Cro, -LoSeconds, -HiSeconds).
+causal_core_window_bounds(Cro, Lo, Hi) :-
+    get_dict(temporal, Cro, T), get_dict(unit, T, U), causal_core_unit_atom(U, Unit),
+    causal_core_unit_seconds(Unit, Per),
+    get_dict(minimum_delay, T, L), get_dict(maximum_delay, T, H),
+    Lo is L * Per, Hi is H * Per.
+
+% ---------------------------------------------------------------------------
+% Rule 3: refinement validity
+% ---------------------------------------------------------------------------
+
+% -- causal_core_refinement_valid(+Child, +Parent, -Result): ok(_) or invalid(Reason).
+causal_core_refinement_valid(Child, Parent, Result) :-
+    ( \+ ( get_dict(refines, Child, R), get_dict(id, Parent, R) )
+        -> Result = invalid("child does not name the parent in refines")
+    ; ( get_dict(causes, Child, CC), get_dict(causes, Parent, PC), \+ causal_core_same_set(CC, PC)
+      ; get_dict(effects, Child, EC), get_dict(effects, Parent, PE), \+ causal_core_same_set(EC, PE) )
+        -> Result = invalid("a refinement must keep the parent's causes and effects")
+    ; causal_core_refine_conflict(Child, Parent)
+        -> Result = invalid("a refinement may not change a field the parent specified; this is a rival claim")
+    ; causal_core_refine_added(Child, Parent, 0)
+        -> Result = invalid("a refinement must add at least one unspecified field")
+    ; Result = ok("valid refinement")
+    ).
+
+% -- causal_core_refine_conflict: the child changes a field the parent specified.
+causal_core_refine_conflict(Child, Parent) :-
+    member(F, [mechanism, temporal, modality, context]),
+    get_dict(F, Parent, PV), ( \+ get_dict(F, Child, PV) ).
+
+% -- causal_core_refine_added: count fields the child adds that the parent lacked.
+causal_core_refine_added(Child, Parent, N) :-
+    findall(F, ( member(F, [mechanism, temporal, modality, context]),
+                 \+ get_dict(F, Parent, _), get_dict(F, Child, _) ), Added),
+    length(Added, N).
+
+% ===========================================================================
+% 2.0.0 NORMATIVE ALGORITHMS (Section 12)
+% ===========================================================================
+
+% -- ALGORITHM A. causal_core_bridge_closure(+OccId, +Bridges, -Set).
+causal_core_bridge_closure(OccId, Bridges, Set) :-
+    % Seed the frontier and result with the starting occurrent.
+    causal_core_bc_loop([OccId], Bridges, [OccId], Set0),
+    % Return the sorted closure set.
+    sort(Set0, Set).
+
+% -- The worklist loop for bridge closure, guarded against cycles by Result.
+causal_core_bc_loop([], _, Acc, Acc).
+% Pop the current node and expand it via every bridge whose coarse it is.
+causal_core_bc_loop([Cur|Rest], Bridges, Acc, Out) :-
+    findall(F, ( member(B, Bridges), get_dict(coarse, B, Cur),
+                 get_dict(fine, B, Fine), member(F, Fine) ), Fines),
+    % Keep only fines not already seen, to terminate on malformed cyclic data.
+    findall(F, (member(F, Fines), \+ memberchk(F, Acc)), New),
+    append(Acc, New, Acc1), append(New, Rest, Frontier),
+    causal_core_bc_loop(Frontier, Bridges, Acc1, Out).
+
+% -- ALGORITHM B (amended Rule 7). causal_core_hierarchy_consistent(+Parent, +Members, +Bridges, -Verdict).
+causal_core_hierarchy_consistent(Parent, _Members, _Bridges, consistent) :-
+    % Nothing claimed (no mechanism) is trivially consistent.
+    ( \+ get_dict(mechanism, Parent, _) ; get_dict(mechanism, Parent, []) ), !.
+causal_core_hierarchy_consistent(Parent, Members, Bridges, Verdict) :-
+    get_dict(mechanism, Parent, Mech),
+    ( causal_core_any_dangling(Mech, Members)
+        % A dangling mechanism entry is ignorance, not refutation.
+        -> Verdict = indeterminate
+        ;  causal_core_hierarchy_check(Parent, Mech, Members, Bridges, Verdict)
+    ).
+
+% -- True if any mechanism id is missing from the members map.
+causal_core_any_dangling(Mech, Members) :-
+    member(Mid, Mech), \+ causal_core_map_get(Mid, Members, _), !.
+
+% -- Build the edge relation and test every parent cause/effect pair for a bridged path.
+causal_core_hierarchy_check(Parent, Mech, Members, Bridges, Verdict) :-
+    findall(C-E, ( member(Mid, Mech), causal_core_map_get(Mid, Members, M),
+                   get_dict(causes, M, MCs), member(C, MCs),
+                   get_dict(effects, M, MEs), member(E, MEs) ), EdgePairs),
+    get_dict(causes, Parent, PCauses), get_dict(effects, Parent, PEffects),
+    ( ( member(PC, PCauses), member(PE, PEffects),
+        \+ causal_core_bridged_connected(PC, PE, EdgePairs, Bridges) )
+        -> Verdict = inconsistent
+        ;  Verdict = consistent
+    ).
+
+% -- A parent cause reaches a parent effect if any of their bridge-closures are path-connected.
+causal_core_bridged_connected(PC, PE, EdgePairs, Bridges) :-
+    causal_core_bridge_closure(PC, Bridges, CSet),
+    causal_core_bridge_closure(PE, Bridges, ESet),
+    member(Cp, CSet), member(Ep, ESet),
+    causal_core_path_exists(EdgePairs, Cp, Ep), !.
+
+% -- causal_core_path_exists(+EdgePairs, +Src, +Dst): reachability over Cause-Effect edges.
+causal_core_path_exists(Edges, Src, Dst) :- causal_core_reach([Src], Edges, [], Dst).
+% The destination is reached when it is the current node.
+causal_core_reach([Dst|_], _, _, Dst) :- !.
+causal_core_reach([N|Rest], Edges, Seen, Dst) :-
+    ( memberchk(N, Seen)
+        -> causal_core_reach(Rest, Edges, Seen, Dst)
+        ;  findall(E, member(N-E, Edges), Succs),
+           append(Succs, Rest, Frontier),
+           causal_core_reach(Frontier, Edges, [N|Seen], Dst)
+    ).
+
+% -- causal_core_map_get(+Key, +Map, -Value): read from a dict keyed by id strings.
+% The members map is a dict whose keys are the (atomized) identifiers.
+causal_core_map_get(Key, Map, Value) :-
+    causal_core_atomize(Key, KA), get_dict(KA, Map, Value).
+
+% -- ALGORITHM C (Rule 15). causal_core_classify(+Cro, +OccMap, +StratumMap, -Class).
+causal_core_classify(Cro, OccMap, StratumMap, Class) :-
+    get_dict(causes, Cro, Causes), get_dict(effects, Cro, Effects),
+    ( ( maplist(causal_core_stratum_of(OccMap), Causes, CStrata),
+        maplist(causal_core_stratum_of(OccMap), Effects, EStrata) )
+        -> causal_core_classify_known(CStrata, EStrata, StratumMap, Class)
+        ;  Class = unclassifiable
+    ).
+
+% -- Look up the stratum id of an occurrent; fail (→ unclassifiable) if absent.
+causal_core_stratum_of(OccMap, OccId, Stratum) :-
+    causal_core_map_get(OccId, OccMap, Occ), get_dict(stratum, Occ, Stratum).
+
+% -- Classify once every endpoint's stratum is known.
+causal_core_classify_known(CStrata, EStrata, StratumMap, Class) :-
+    append(CStrata, EStrata, All), sort(All, AllStrata),
+    findall(Sc, (member(S, AllStrata), causal_core_scheme_of(StratumMap, S, Sc)), Schemes),
+    sort(Schemes, USchemes),
+    ( USchemes = [_,_|_]
+        -> Class = scheme_mismatch
+        ;  maplist(causal_core_ordinal_of(StratumMap), CStrata, COrd),
+           maplist(causal_core_ordinal_of(StratumMap), EStrata, EOrd),
+           causal_core_classify_ordinals(COrd, EOrd, Class)
+    ).
+
+% -- Scheme of a stratum id via the stratum map.
+causal_core_scheme_of(StratumMap, S, Scheme) :- causal_core_map_get(S, StratumMap, St), get_dict(scheme, St, Scheme).
+% -- Ordinal of a stratum id via the stratum map.
+causal_core_ordinal_of(StratumMap, S, Ord) :- causal_core_map_get(S, StratumMap, St), get_dict(ordinal, St, Ord).
+
+% -- Decide the class from cause and effect ordinal lists.
+causal_core_classify_ordinals(COrd, EOrd, Class) :-
+    max_list(COrd, CMax), min_list(COrd, CMin), max_list(EOrd, EMax), min_list(EOrd, EMin),
+    ( CMax =:= CMin, CMin =:= EMax, EMax =:= EMin
+        -> Class = intra_stratal
+        ;  findall(D, (member(I, COrd), member(J, EOrd), D is abs(I-J)), Ds),
+           min_list(Ds, Gap), max_list(Ds, Span),
+           ( Span =:= 1 -> Class = adjacent_stratal
+           ; Gap > 1    -> Class = skipping
+           ;               Class = mixed )
+    ).
+
+% -- causal_core_endpoints_mixed(+Cro, +OccMap): causes or effects span >1 stratum.
+causal_core_endpoints_mixed(Cro, OccMap) :-
+    get_dict(causes, Cro, Causes), get_dict(effects, Cro, Effects),
+    maplist(causal_core_stratum_of(OccMap), Causes, CS),
+    maplist(causal_core_stratum_of(OccMap), Effects, ES),
+    sort(CS, UCS), sort(ES, UES),
+    ( length(UCS, NC), NC > 1 ; length(UES, NE), NE > 1 ), !.
+
+% -- ALGORITHM D (Rule 16). causal_core_skip_gaps(+Cro, +Class, -Gaps).
+causal_core_skip_gaps(Cro, Class, Gaps) :-
+    ( get_dict(mechanism, Cro, M), M \== [] -> HasMech = true ; HasMech = false ),
+    ( get_dict(skips, Cro, true) -> Skips = true ; Skips = false ),
+    ( Skips == true, HasMech == true
+        % A hard contradiction short-circuits every other gap.
+        -> Gaps = [contradictory_skip]
+        ;  findall(G, causal_core_skip_gap(Skips, HasMech, Class, G), Gaps)
+    ).
+
+% -- vacuous_skip: skips:true where the classification is not skipping/unclassifiable.
+causal_core_skip_gap(true, _, Class, vacuous_skip) :-
+    Class \== skipping, Class \== unclassifiable.
+% incomplete_mechanism: a skipping relation without a mechanism and without skips:true.
+causal_core_skip_gap(false, false, skipping, incomplete_mechanism).
+
+% -- ALGORITHM E surface (Rule 20). causal_core_delay_within_window(+ActualDelay, +Temporal, -Bool).
+causal_core_delay_within_window(ActualDelay, Temporal, true) :-
+    ( ActualDelay == none ; Temporal == none ), !.
+causal_core_delay_within_window(ActualDelay, Temporal, Bool) :-
+    get_dict(duration, ActualDelay, Dur), get_dict(unit, ActualDelay, AU),
+    causal_core_to_seconds(Dur, AU, Observed),
+    get_dict(minimum_delay, Temporal, Lo0), get_dict(unit, Temporal, TU),
+    causal_core_to_seconds(Lo0, TU, Lo),
+    get_dict(maximum_delay, Temporal, Hi0), causal_core_to_seconds(Hi0, TU, Hi),
+    ( ( Lo =< Observed, Observed =< Hi ) -> Bool = true ; Bool = false ).
+
+% -- Rule 14 (N3.2.1). causal_core_bridge_wellformed(+Bridge, +OccMap, +StratumMap, -Result).
+causal_core_bridge_wellformed(Bridge, OccMap, StratumMap, Result) :-
+    ( \+ ( get_dict(coarse, Bridge, Coarse), causal_core_stratum_of_id(OccMap, Coarse, _) )
+        -> Result = invalid("malformed_bridge: coarse has no stratum (a)")
+    ; get_dict(fine, Bridge, Fine),
+      \+ maplist(causal_core_has_stratum(OccMap), Fine)
+        -> Result = invalid("malformed_bridge: a fine member has no stratum (b)")
+    ; get_dict(fine, Bridge, Fine2),
+      maplist(causal_core_stratum_of_id(OccMap), Fine2, FineStrata), sort(FineStrata, US), US = [_,_|_]
+        -> Result = invalid("malformed_bridge: fine members span >1 stratum (c)")
+    ; get_dict(coarse, Bridge, C3), causal_core_stratum_of_id(OccMap, C3, CS),
+      get_dict(fine, Bridge, [F1|_]), causal_core_stratum_of_id(OccMap, F1, FS),
+      causal_core_scheme_of(StratumMap, CS, ScC), causal_core_scheme_of(StratumMap, FS, ScF), ScC \== ScF
+        -> Result = invalid("malformed_bridge: coarse and fine differ in scheme (d)")
+    ; get_dict(coarse, Bridge, C4), causal_core_stratum_of_id(OccMap, C4, CS4),
+      get_dict(fine, Bridge, [F2|_]), causal_core_stratum_of_id(OccMap, F2, FS4),
+      causal_core_ordinal_of(StratumMap, CS4, OC), causal_core_ordinal_of(StratumMap, FS4, OF), \+ OC > OF
+        -> Result = invalid("malformed_bridge: coarse ordinal not > fine ordinal (e)")
+    ; Result = ok("well-formed bridge")
+    ).
+
+% -- Helpers: the stratum id of an occurrent id, and a presence check.
+causal_core_stratum_of_id(OccMap, OccId, Stratum) :- causal_core_map_get(OccId, OccMap, Occ), get_dict(stratum, Occ, Stratum).
+% Succeeds if the occurrent has a stratum.
+causal_core_has_stratum(OccMap, OccId) :- causal_core_stratum_of_id(OccMap, OccId, _).
+
+% -- Rule 17 (N4.2.1-2). causal_core_conduit_wellformed(+Conduit, +PortMap, +CroMap, -Result).
+causal_core_conduit_wellformed(Conduit, PortMap, CroMap, Result) :-
+    ( \+ ( get_dict(from, Conduit, Fr), causal_core_map_get(Fr, PortMap, _) )
+        -> Result = invalid("malformed_conduit: dangling port reference")
+    ; \+ ( get_dict(to, Conduit, To0), causal_core_map_get(To0, PortMap, _) )
+        -> Result = invalid("malformed_conduit: dangling port reference")
+    ; get_dict(from, Conduit, Fr1), causal_core_map_get(Fr1, PortMap, FromPort),
+      get_dict(direction, FromPort, FDir), causal_core_atomize(FDir, FDA), \+ member(FDA, [out, bidirectional])
+        -> Result = invalid("malformed_conduit: from port is not out/bidirectional (a)")
+    ; get_dict(to, Conduit, To1), causal_core_map_get(To1, PortMap, ToPort),
+      get_dict(direction, ToPort, TDir), causal_core_atomize(TDir, TDA), \+ member(TDA, [in, bidirectional])
+        -> Result = invalid("malformed_conduit: to port is not in/bidirectional (b)")
+    ; get_dict(from, Conduit, Fr2), causal_core_map_get(Fr2, PortMap, FromPort2), get_dict(accepts, FromPort2, FAcc),
+      get_dict(carries, Conduit, Carries), \+ forall(member(O, Carries), memberchk(O, FAcc))
+        -> Result = invalid("malformed_conduit: carries not accepted by from (c)")
+    ; causal_core_conduit_to_ok(Conduit, PortMap, CroMap)
+        -> Result = ok("well-formed conduit")
+    ; Result = invalid("malformed_conduit: carries/transform effects not accepted by to (d)")
+    ).
+
+% -- The to-side acceptance check, with the transform exception of N4.2.2.
+causal_core_conduit_to_ok(Conduit, PortMap, _CroMap) :-
+    \+ get_dict(transform, Conduit, _), !,
+    get_dict(to, Conduit, To), causal_core_map_get(To, PortMap, ToPort), get_dict(accepts, ToPort, TAcc),
+    get_dict(carries, Conduit, Carries), forall(member(O, Carries), memberchk(O, TAcc)).
+% With a transform whose law is known, the law's effects must be accepted by the to-port.
+causal_core_conduit_to_ok(Conduit, PortMap, CroMap) :-
+    get_dict(transform, Conduit, Tid),
+    ( causal_core_map_get(Tid, CroMap, Law)
+        -> get_dict(to, Conduit, To), causal_core_map_get(To, PortMap, ToPort), get_dict(accepts, ToPort, TAcc),
+           get_dict(effects, Law, Effects), forall(member(O, Effects), memberchk(O, TAcc))
+        ;  true  % an unknown transform law is not refuted (relaxed per N4.2.2)
+    ).
+
+% -- Rule 19 (N5.3.1-2). causal_core_state_gaps(+State, +Quality, -Gaps).
+causal_core_state_gaps(State, Quality, Gaps) :-
+    get_dict(datatype, Quality, DtV), causal_core_atomize(DtV, Dt),
+    get_dict(value, State, V),
+    ( get_dict(quantity, V, _) -> Shape = quantity
+    ; get_dict(categorical, V, _) -> Shape = categorical
+    ; get_dict(boolean, V, _) -> Shape = boolean
+    ; Shape = none ),
+    ( Shape \== Dt
+        -> Gaps = [value_type_mismatch]
+    ;  ( Dt == quantity, get_dict(unit, V, VU), get_dict(unit, Quality, QU), \+ VU == QU )
+        -> Gaps = [unit_mismatch]
+    ;  Gaps = []
+    ).
+
+% -- Rule 20. causal_core_covering_law_mismatch(+Tcc, +TokenMap, +Law): tokens do not instantiate the law.
+causal_core_covering_law_mismatch(Tcc, TokenMap, Law) :-
+    get_dict(causes, Law, LC), sort(LC, LCauses), get_dict(effects, Law, LE), sort(LE, LEffects),
+    ( get_dict(causes, Tcc, TCs), member(C, TCs), causal_core_map_get(C, TokenMap, Tok),
+      get_dict(instantiates, Tok, Inst), \+ memberchk(Inst, LCauses)
+    ; get_dict(effects, Tcc, TEs), member(E, TEs), causal_core_map_get(E, TokenMap, Tok2),
+      get_dict(instantiates, Tok2, Inst2), \+ memberchk(Inst2, LEffects)
+    ), !.
+
+% -- Rule 21. causal_core_retrocausal(+Tcc, +TokenMap): a cause token starts after an effect token.
+causal_core_retrocausal(Tcc, TokenMap) :-
+    get_dict(causes, Tcc, TCs), member(C, TCs), causal_core_map_get(C, TokenMap, Tok),
+    get_dict(interval, Tok, CI), get_dict(start, CI, CStart),
+    get_dict(effects, Tcc, TEs), member(E, TEs), causal_core_map_get(E, TokenMap, Tok2),
+    get_dict(interval, Tok2, EI), get_dict(start, EI, EStart),
+    CStart @> EStart, !.
+
+% -- Generic acyclicity. causal_core_has_cycle(+Edges): Edges is a dict node -> list of successors.
+causal_core_has_cycle(Edges) :-
+    dict_pairs(Edges, _, Pairs),
+    member(Start-_, Pairs),
+    causal_core_dfs_cycle(Start, Edges, [], _), !.
+
+% -- Depth-first cycle detection tracking the current path.
+causal_core_dfs_cycle(Node, _Edges, Path, cycle) :-
+    memberchk(Node, Path), !.
+causal_core_dfs_cycle(Node, Edges, Path, Res) :-
+    ( get_dict(Node, Edges, Succs) -> true ; Succs = [] ),
+    member(Next, Succs),
+    causal_core_dfs_cycle(Next, Edges, [Node|Path], Res),
+    Res == cycle, !.

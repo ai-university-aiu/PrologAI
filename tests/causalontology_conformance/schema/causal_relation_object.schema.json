@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/causal_relation_object.schema.json",
+  "title": "Causal Relation Object",
+  "type": "object",
+  "required": [
+    "id",
+    "causes",
+    "effects"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "$ref": "#/$defs/croId"
+    },
+    "type": {
+      "const": "causal_relation_object"
+    },
+    "causes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/occId"
+      }
+    },
+    "effects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/occId"
+      }
+    },
+    "mechanism": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/croId"
+      },
+      "description": "identifiers of finer Causal Relation Objects whose composition realizes this one (hierarchical decomposition; must be acyclic; consistency per semantics.md rule 7, amended to BRIDGED reachability in 2.0.0)"
+    },
+    "temporal": {
+      "$ref": "#/$defs/temporalWindow"
+    },
+    "modality": {
+      "enum": [
+        "necessary",
+        "sufficient",
+        "contributory",
+        "preventive",
+        "enabling"
+      ]
+    },
+    "context": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/occId"
+      },
+      "description": "enabling conditions under which the relation holds"
+    },
+    "refines": {
+      "$ref": "#/$defs/croId",
+      "description": "the more partial Causal Relation Object this one enriches (lineage; acyclic; must preserve the parent's specified fields)"
+    },
+    "skips": {
+      "type": "boolean",
+      "description": "TRUE asserts that this relation crosses non-adjacent strata WITHOUT being re-encoded at the intervening strata: the absence of a mechanism is a POSITIVE FINDING, not a gap (2.0.0 4.4)"
+    }
+  },
+  "$defs": {
+    "croId": {
+      "type": "string",
+      "pattern": "^causal_relation_object:[0-9a-f]{64}$"
+    },
+    "occId": {
+      "type": "string",
+      "pattern": "^occurrent:[0-9a-f]{64}$"
+    },
+    "temporalWindow": {
+      "type": "object",
+      "required": [
+        "minimum_delay",
+        "maximum_delay",
+        "unit"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minimum_delay": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maximum_delay": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "enum": [
+            "instant",
+            "seconds",
+            "minutes",
+            "hours",
+            "days",
+            "weeks",
+            "months",
+            "years"
+          ]
+        }
+      }
+    }
+  }
+}

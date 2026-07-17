@@ -40,6 +40,41 @@ mapping and the field renames (`dmin` → `minimum_delay`, `dmax` →
 `maximum_delay`) live in the standard's own
 [NAMING.md](https://github.com/ai-university-aiu/causalontology/blob/main/NAMING.md).
 
+## Conformance to Causalontology specification 2.0.0
+
+**PrologAI implements Causalontology specification 2.0.0 and passes all 107
+conformance vectors (V01–V107).** The standard's own conformance rule is that
+an implementation is conformant if and only if it passes every vector for the
+version it declares; PrologAI declares 2.0.0 and passes 107/107.
+
+The vectors are vendored under
+[`tests/causalontology_conformance/vectors/`](tests/causalontology_conformance/vectors/),
+copied from the causalontology repository at commit
+`8991c8b5ef12e998ff932855fabe29edf4cc16cc` (the whole-word 2.0.0 baseline), with
+the seventeen JSON schemas under
+[`tests/causalontology_conformance/schema/`](tests/causalontology_conformance/schema/).
+The harness (`tests/causalontology_conformance/run_conformance.pl`) drives the
+`causal_core`, `noun_backbone`, and `realizable_hinge` vocabulary packs across
+every vector, exercising:
+
+- **canonicalization** — RFC 8785 (JSON Canonicalization Scheme);
+- **content identity** — SHA-256 over the identity-bearing bytes of each kind;
+- **schema validity** — for all seventeen kinds, against the vendored schemas;
+- **local semantic rules** — acyclicity, temporal admissibility, refinement,
+  the conflict test, and the enrichment field table;
+- **the five normative algorithms** (Section 12) — bridge closure, bridged
+  reachability (the amended Rule 7), stratal classification, the skip decision,
+  and unit normalization;
+- **provenance** — Ed25519 (RFC 8032) record signing and verification,
+  retraction lineage, and succession, implemented in pure Prolog.
+
+The conformance engine (canonicalization, identity, semantics, and the five
+algorithms) lives in the `causal_core` vocabulary pack; schema interpretation,
+signing, and the in-memory store are additive harness layers that import none of
+the ARC grid/ILP/sequence packs. Nothing pending: the full suite passes.
+
+Run it with `bin/run_causalontology_conformance.sh` (exit 0 iff 107/107).
+
 ## Exempt external proper names
 
 Whole-word spelling governs PrologAI's own identifiers. It does not rewrite the

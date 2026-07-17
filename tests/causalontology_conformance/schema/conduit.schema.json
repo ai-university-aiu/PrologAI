@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/conduit.schema.json",
+  "title": "Conduit",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "from",
+    "to",
+    "carries"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^conduit:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "conduit"
+    },
+    "label": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "the name of the connection (for example: corticospinal_tract)"
+    },
+    "from": {
+      "type": "string",
+      "pattern": "^port:[0-9a-f]{64}$"
+    },
+    "to": {
+      "type": "string",
+      "pattern": "^port:[0-9a-f]{64}$"
+    },
+    "carries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^occurrent:[0-9a-f]{64}$"
+      },
+      "description": "the kinds of occurrent this conduit conducts"
+    },
+    "transform": {
+      "type": "string",
+      "pattern": "^causal_relation_object:[0-9a-f]{64}$",
+      "description": "OPTIONAL. ABSENT asserts the conduit is TRANSMISSIVE. PRESENT names the Causal Relation Object the conduit performs upon what it carries, asserting the conduit is COMPUTATIONAL."
+    }
+  }
+}

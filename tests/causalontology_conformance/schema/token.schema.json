@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/token.schema.json",
+  "title": "Token Occurrence",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "instantiates",
+    "interval"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^token_occurrence:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "token_occurrence"
+    },
+    "instantiates": {
+      "type": "string",
+      "pattern": "^occurrent:[0-9a-f]{64}$",
+      "description": "the occurrent TYPE of which this is an instance; MANDATORY (P1)"
+    },
+    "interval": {
+      "$ref": "#/$defs/interval"
+    },
+    "participants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rolefill"
+      }
+    },
+    "locus": {
+      "type": "string",
+      "pattern": "^token_individual:[0-9a-f]{64}$",
+      "description": "optional: the particular place or bearer at which it occurred"
+    },
+    "observer": {
+      "type": "string",
+      "pattern": "^ed25519:[0-9a-f]{64}$",
+      "description": "optional: the source whose experience this token belongs to"
+    }
+  },
+  "$defs": {
+    "interval": {
+      "type": "object",
+      "required": [
+        "start"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "description": "RFC 3339, UTC, mandatory Z suffix"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "open": {
+          "type": "boolean",
+          "description": "true asserts the occurrence had NOT ENDED as of this record"
+        }
+      }
+    },
+    "rolefill": {
+      "type": "object",
+      "required": [
+        "role",
+        "filler"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": [
+            "agent",
+            "patient",
+            "instrument",
+            "recipient",
+            "source",
+            "destination",
+            "medium"
+          ],
+          "description": "CLOSED enumeration; extending it is a MAJOR change"
+        },
+        "filler": {
+          "type": "string",
+          "pattern": "^token_individual:[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

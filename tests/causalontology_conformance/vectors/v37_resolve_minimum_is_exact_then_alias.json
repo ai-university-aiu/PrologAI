@@ -1,0 +1,21 @@
+{
+  "vector": "V37",
+  "name": "resolve_minimum_is_exact_then_alias",
+  "group": "F - conflict, hierarchy, resolve, stigmergy",
+  "operation": "resolve",
+  "given": {
+    "occurrent": {
+      "label": "press_button",
+      "category": "action"
+    },
+    "alias": {
+      "lang": "en",
+      "text": "Press the Button"
+    }
+  },
+  "expect": {
+    "resolve('Press  The   Button', en)": "returns the occurrent (alias match, case-insensitive)",
+    "resolve('press_button', en)": "returns it ranked first (canonical-label match)",
+    "fuzzy_extras": "rank after both"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/quality.schema.json",
+  "title": "Quality",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "label",
+    "datatype"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^quality:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "quality"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "for example: cortisol_concentration, membrane_potential, mass"
+    },
+    "datatype": {
+      "enum": [
+        "quantity",
+        "categorical",
+        "boolean"
+      ]
+    },
+    "unit": {
+      "type": "string",
+      "description": "the canonical UCUM unit code; REQUIRED when datatype is quantity, and MUST be absent otherwise"
+    },
+    "stratum": {
+      "type": "string",
+      "pattern": "^stratum:[0-9a-f]{64}$",
+      "description": "optional: the level of description at which this quality is defined"
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/assertion.schema.json",
+  "title": "Assertion",
+  "type": "object",
+  "required": [
+    "id",
+    "about",
+    "source",
+    "evidence_type",
+    "confidence",
+    "timestamp"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^assertion:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "assertion"
+    },
+    "about": {
+      "type": "string",
+      "pattern": "^(causal_relation_object|occurrent|continuant|realizable|stratum|bridge|port|conduit|quality|token_individual|token_occurrence|state_assertion|token_causal_claim):[0-9a-f]{64}$",
+      "description": "the content object this assertion is about (widened in 2.0.0 to the nine new content kinds); about a non-causal object it means the source vouches for the vocabulary item"
+    },
+    "source": {
+      "type": "string",
+      "pattern": "^ed25519:[0-9a-f]{64}$"
+    },
+    "evidence_type": {
+      "enum": [
+        "intervention",
+        "observation",
+        "simulation",
+        "derivation",
+        "human_hint",
+        "imported"
+      ],
+      "description": "how the source came to the claim; ordering from strongest to weakest is intervention, observation, simulation, testimony (2.0.0 6.2)"
+    },
+    "evidence": {
+      "type": "string"
+    },
+    "strength": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "the source's estimate of causal strength (semantics.md rule 5); meaningful only when about references a Causal Relation Object"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evidenced_by": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(token_occurrence|token_causal_claim|state_assertion):[0-9a-f]{64}$"
+      },
+      "description": "the PARTICULAR token records that are the evidence for this claim (2.0.0 6.2). IDENTITY-BEARING."
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$",
+      "description": "Ed25519 signature over the record's canonical identity-bearing bytes; excluded from the identity hash"
+    }
+  }
+}

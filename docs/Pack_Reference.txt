@@ -2078,6 +2078,22 @@ Causalontology Core: The Reified Causal Relation Object (co_*, Layer 368)
     causal_core_import_external(+Source,+Cause,+Effect,-Id): subsumption — a degenerate provisional import.
     causal_core_provisional(?Id) / causal_core_refine_import(+Id,+Temporal,+Modality,+Strength): refine into an owned relation.
     causal_core_why(+Id,-Why): the glass-box story of a relation.
+    -- Causalontology 2.0.0 conformance vocabulary (WP-425), on SWI-dict objects --
+    causal_core_identity_fields(+Kind,-Fields): the identity-bearing fields of each of the seventeen kinds.
+    causal_core_infer_kind(+Obj,-Kind): the kind of a dict, from its type, id prefix, or shape.
+    causal_core_jcs(+Value,-String): RFC 8785 (JSON Canonicalization Scheme) serialization.
+    causal_core_canonicalize(+Obj,?Kind,-Bytes): the identity-bearing canonical bytes.
+    causal_core_identify(+Obj,?Kind,-Id): scheme + ':' + SHA-256 hex content identifier.
+    causal_core_validate_semantics(+Obj,?Kind,-Reasons): the locally checkable semantic rules ([] iff valid).
+    causal_core_is_partial(+Cro,-Partial,-Missing): unspecified optional causal_relation_object fields.
+    causal_core_admissible(+Cro,+ElapsedSeconds,-Bool) / causal_core_to_seconds(+Dur,+Unit,-Seconds): Rule 4 and unit normalization (Algorithm E).
+    causal_core_conflicts(+A,+B): Rule 6, the formal conflict test.
+    causal_core_refinement_valid(+Child,+Parent,-Result): Rule 3, ok(_) or invalid(Reason).
+    causal_core_bridge_closure(+OccId,+Bridges,-Set): Algorithm A.
+    causal_core_hierarchy_consistent(+Parent,+Members,+Bridges,-Verdict): Algorithm B, bridged reachability (amended Rule 7).
+    causal_core_classify(+Cro,+OccMap,+StratumMap,-Class): Algorithm C, stratal classification.
+    causal_core_skip_gaps(+Cro,+Class,-Gaps): Algorithm D, the skip decision.
+    causal_core_endpoints_mixed/2, causal_core_delay_within_window/3, causal_core_bridge_wellformed/4, causal_core_conduit_wellformed/4, causal_core_state_gaps/3, causal_core_covering_law_mismatch/3, causal_core_retrocausal/2, causal_core_has_cycle/1: the remaining 2.0.0 rules (14, 17, 19, 20, 21) and generic acyclicity.
 
 causal_learning
 Causalontology Learning: Causal Structure Acquired by Intervention (co_*, Layer 369)

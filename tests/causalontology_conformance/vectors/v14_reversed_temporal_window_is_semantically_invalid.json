@@ -1,0 +1,25 @@
+{
+  "vector": "V14",
+  "name": "reversed_temporal_window_is_semantically_invalid",
+  "group": "B - semantic validity",
+  "operation": "validate_semantics",
+  "input": {
+    "id": "causal_relation_object:61ea51136a1eb39db39c889c9c53ebd21e5ce9e78721a6c2c40f8e16b782a879",
+    "causes": [
+      "occurrent:559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+    ],
+    "effects": [
+      "occurrent:df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c"
+    ],
+    "temporal": {
+      "minimum_delay": 6,
+      "maximum_delay": 1,
+      "unit": "hours"
+    }
+  },
+  "expect": {
+    "schema_valid": true,
+    "semantically_valid": false,
+    "reason": "dmin must be <= dmax"
+  }
+}

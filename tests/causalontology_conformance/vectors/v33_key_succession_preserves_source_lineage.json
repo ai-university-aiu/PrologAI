@@ -1,0 +1,16 @@
+{
+  "vector": "V33",
+  "name": "key_succession_preserves_source_lineage",
+  "group": "E - provenance, signatures, retraction, succession",
+  "operation": "lineage + put_record",
+  "steps": [
+    "records signed by K1",
+    "succession K1 -> K2 signed by K1",
+    "retraction of one K1 record signed by K2"
+  ],
+  "expect": {
+    "lineage_of_K2_contains_K1": true,
+    "retraction_valid": true,
+    "trust": "granted to the lineage covers records under both keys"
+  }
+}
