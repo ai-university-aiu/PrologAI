@@ -1,0 +1,33 @@
+# ARC-AGI-2 Mini Regression Manifest
+#
+# PURPOSE: a FIXED 10 percent spot-check of the ARC-AGI-2 public
+#          evaluation set. Same tasks every run - determinism is the point.
+#
+# SELECTION RULE (mechanical, un-cherry-picked, regenerable):
+#   1. Take every ARC-AGI-2 task id from the canonical facts file
+#      /home/ccaitwo/Mentova/data/arc_agi_2/arc_tasks_2.pl
+#   2. Sort the ids lexicographically (ascending) -> canonical order.
+#   3. Keep every tenth id, 1-indexed, starting at index 1
+#      (indices 1, 11, 21, ..., 111) -> exactly 12 ids.
+#   Regenerate with:
+#     grep -oP "^arc2_task\('\K[^']+" arc_tasks_2.pl | sort | awk 'NR%10==1'
+#
+# DRAWN FROM: 120 ARC-AGI-2 public evaluation tasks.
+# COUNT: 12 (gate: 12/12 must pass).
+# DATE: 2026-07-17
+#
+# NOT cherry-picked: the rule spans the whole sorted list and selects by
+# position only; no task was chosen for being known-passing.
+#
+0934a4d8
+20270e3b
+2ba387bc
+3e6067c3
+5545f144
+6e453dd6
+7b80bb43
+8b7bacbf
+a251c730
+b5ca7ac4
+d59b0160
+e3721c99

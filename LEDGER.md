@@ -218,3 +218,66 @@ remain **STILL OPEN** — out of scope for this cleanup.
   same class of invisible rot the pack-naming TEST-PRESENCE check exists to
   prevent. A new workflow `.github/workflows/lattice-tests.yml` now runs the
   suite on push and pull request, failing the job on any failure (15/15 green).
+
+---
+
+## Wave 2 — the 10 percent mini regression harness (2026-07-17)
+
+Branch `ledger/mini-regression-harness`. Rollback tag `pre-mini-harness`. All
+work additive; the ARC-AGI solving core (in Mentova) was **not** modified, and
+the full regression runners were left untouched. Baseline gates held: mini
+ARC-AGI-1 40/40, mini ARC-AGI-2 12/12, Causalontology conformance 107/107,
+strict layer rule green.
+
+### New standing rule — mini regression as the per-wave gate · **DELIVERED**
+- **Why.** The full ARC-AGI regression (400 + 120 tasks through the Mentova
+  solving core) is too slow to run every wave. To keep wave velocity, the
+  standing per-wave gate becomes a fixed 10 percent spot-check. This is a
+  **deferral, not a cancellation** — recorded as debt in `REGRESSION_DEBT.md`.
+- **What.** A committed, deterministic sample of one task in ten:
+  ARC-AGI-1 40/400 (gate 40/40), ARC-AGI-2 12/120 (gate 12/12). The sample is
+  mechanical and auditable — every tenth task id in lexicographic order — so it
+  is obviously un-cherry-picked; the selection rule is documented in each
+  manifest header (`tests/mini_regression/manifest_arc_agi_{1,2}.txt`).
+- **How it runs.** `bin/run_mini_regression.sh` (additive; the full runner is
+  untouched) loads the **same** Mentova solving core and the **same** task
+  facts the full runners use, and dispatches each manifest task through the
+  core's own per-task attempt predicate (`arc_benchmark:arc_attempt_task/2`,
+  `arc_benchmark_2:arc2_attempt_task_/2`). Exit 0 iff 40/40 and 12/12. A driver
+  (`tests/mini_regression/mini_regression_driver.pl`) does the work; it locates
+  the two repos via `$PROLOGAI_HOME`/`$MENTOVA_HOME` (local paths as fallback)
+  so it runs both locally and in CI. **Materially faster, measured:** the whole
+  mini gate (both benchmarks) runs in ~21s, versus 10:25 (625s) for the full
+  ARC-AGI-1 run alone (400/400, measured on this branch) — roughly a 30x
+  speedup before the full ARC-AGI-2 run is even added.
+- **CI.** New additive workflow `.github/workflows/mini-regression.yml` checks
+  out PrologAI and Mentova side by side, points `MENTOVA_HOME` at the Mentova
+  checkout, and fails the build on any non-zero exit. No existing workflow was
+  removed or disabled.
+- **Honesty guardrail.** The blind spot is stated everywhere the mini result is
+  reported: the mini gate detects **gross breakage only** and is blind to the
+  untested 90 percent. A green mini run **never** asserts or refreshes the
+  400/400 or 120/120 claims; those rest on the last **full** run alone. A full
+  regression is mandatory at the conclusion of all waves and before any public
+  re-assertion of the scores. The README benchmark section now carries a
+  one-line pointer to `REGRESSION_DEBT.md` beside the claims.
+
+### Gap discovered while building it
+- **The ARC solving core and task data live entirely in Mentova, not PrologAI,
+  and PrologAI CI had never run any ARC regression.** The existing PrologAI
+  workflows gate conformance, the layer rule, and the Lattice suite — none
+  touch ARC. So the mini harness is the *first* time an ARC benchmark runs from
+  the PrologAI side, and it structurally depends on a Mentova checkout being
+  present. The driver was therefore made repo-root-relative
+  (`$PROLOGAI_HOME`/`$MENTOVA_HOME`) rather than pinned to one machine's
+  absolute paths, and the CI workflow must check Mentova out beside PrologAI
+  (via a `MENTOVA_REPO_TOKEN` secret). Without that checkout the job is red by
+  design — there is nothing to gate without the core. This cross-repo coupling
+  is the standing constraint the next wave (Part Two) inherits.
+- **The full ARC-AGI-2 benchmark had no committed runner script or demo.**
+  ARC-AGI-1 ships `demos/arc_agi_benchmark.pl`; ARC-AGI-2 has the
+  `arc_benchmark_2` module and `arc2_benchmark_print/0` but no committed
+  entry-point script — the 120/120 run was driven ad hoc. The mini driver
+  supplies a repeatable entry for the 12-task ARC-AGI-2 subset; a committed
+  full ARC-AGI-2 runner remains an open Mentova-side gap (out of scope here —
+  Mentova is read-only for this task).

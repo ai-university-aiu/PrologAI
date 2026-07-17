@@ -1,0 +1,65 @@
+# Gate the 10 percent ARC-AGI mini regression on every push and pull request.
+#
+# STANDING WAVE GATE. Runs ONLY the fixed manifest tasks:
+#   ARC-AGI-1  40 of 400  (tests/mini_regression/manifest_arc_agi_1.txt)
+#   ARC-AGI-2  12 of 120  (tests/mini_regression/manifest_arc_agi_2.txt)
+# The job fails on any non-zero exit (i.e. anything short of 40/40 and 12/12).
+#
+# ADDITIVE: this workflow sits BESIDE the existing workflows
+# (causalontology-conformance, layer-rule, lattice-tests). It disables none of
+# them.
+#
+# HONESTY: a green mini run detects GROSS breakage only and is blind to the
+# untested 90 percent. It MUST NOT be used to assert or refresh the 400/400 or
+# 120/120 claims; those rest on the last FULL run only. See REGRESSION_DEBT.md.
+#
+# DEPENDENCY: the ARC solving core and task facts live in the Mentova
+# repository, so this job checks Mentova out beside PrologAI and points
+# MENTOVA_HOME at it. Mentova access uses the MENTOVA_REPO_TOKEN secret (a PAT
+# or deploy token with read access to the Mentova repo). If that secret is not
+# configured, the Mentova checkout step fails and the job is red — by design,
+# because without the core there is nothing to gate.
+name: mini-regression
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single mini-regression job.
+jobs:
+  mini-regression:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out PrologAI into a named subdirectory of the workspace.
+      - name: Checkout PrologAI
+        uses: actions/checkout@v4
+        with:
+          # Place this repository under ./PrologAI.
+          path: PrologAI
+      # Check out Mentova (the ARC solving core) beside PrologAI, read-only.
+      - name: Checkout Mentova (ARC solving core)
+        uses: actions/checkout@v4
+        with:
+          # The Mentova repository that holds the benchmark runners and task facts.
+          repository: ai-university-aiu/Mentova
+          # A token with read access to Mentova (configure as a repo/org secret).
+          token: ${{ secrets.MENTOVA_REPO_TOKEN }}
+          # Place the Mentova checkout under ./Mentova.
+          path: Mentova
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # Run the mini regression gate; a non-zero exit fails the job.
+      - name: Run the 10 percent ARC-AGI mini regression
+        # Point the harness at the sibling Mentova checkout.
+        env:
+          MENTOVA_HOME: ${{ github.workspace }}/Mentova
+        # Invoke the additive runner from the PrologAI checkout.
+        run: bash PrologAI/bin/run_mini_regression.sh
