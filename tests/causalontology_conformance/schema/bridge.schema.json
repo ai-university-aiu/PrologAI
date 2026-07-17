@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/bridge.schema.json",
+  "title": "Bridge",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "coarse",
+    "fine",
+    "relation"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^bridge:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "bridge"
+    },
+    "coarse": {
+      "type": "string",
+      "pattern": "^occurrent:[0-9a-f]{64}$",
+      "description": "the occurrent at the coarser stratum"
+    },
+    "fine": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^occurrent:[0-9a-f]{64}$"
+      },
+      "description": "the occurrents at the finer stratum that jointly constitute, aggregate to, realize, or subvene the coarse one"
+    },
+    "relation": {
+      "enum": [
+        "constitutes",
+        "aggregates",
+        "realizes",
+        "supervenes_on"
+      ],
+      "description": "the cross-stratal relation asserted; CLOSED enumeration"
+    }
+  }
+}

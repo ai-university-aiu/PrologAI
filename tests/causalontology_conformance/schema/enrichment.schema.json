@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/enrichment.schema.json",
+  "title": "Enrichment",
+  "type": "object",
+  "required": [
+    "id",
+    "about",
+    "field",
+    "entry",
+    "source",
+    "timestamp"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^enrichment:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "enrichment"
+    },
+    "about": {
+      "type": "string",
+      "pattern": "^(occurrent|continuant|realizable):[0-9a-f]{64}$",
+      "description": "the content object being enriched (Causal Relation Objects are never enriched in place - they are refined)"
+    },
+    "field": {
+      "enum": [
+        "aliases",
+        "participants",
+        "subsumes",
+        "part_of",
+        "realized_in",
+        "occurrent_subsumes",
+        "occurrent_part_of"
+      ],
+      "description": "field-to-kind validity is fixed by semantics.md rule 12 (amended in 2.0.0: two occurrent forms added)"
+    },
+    "entry": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "lang",
+            "text"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "lang": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "description": "the entry shape for the aliases field (lang is a BCP 47 language tag)"
+        },
+        {
+          "type": "string",
+          "pattern": "^(occurrent|continuant):[0-9a-f]{64}$",
+          "description": "the entry shape for the reference fields, checked per field by semantics.md rule 12"
+        }
+      ]
+    },
+    "source": {
+      "type": "string",
+      "pattern": "^ed25519:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    }
+  }
+}

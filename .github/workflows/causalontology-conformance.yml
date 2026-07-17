@@ -1,0 +1,36 @@
+# Gate Causalontology 2.0.0 conformance on every push and pull request.
+#
+# Mirrors how the causalontology repository gates its language bindings: an
+# implementation is conformant iff it passes every vendored vector for the
+# specification version it declares. PrologAI declares 2.0.0 and must pass all
+# 107 vectors (V01-V107). A red run blocks the merge.
+name: causalontology-conformance
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single conformance job.
+jobs:
+  conformance:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository (with the vendored vectors and schemas).
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # Run the 107-vector conformance suite; a non-zero exit fails the job.
+      - name: Run Causalontology 2.0.0 conformance vectors (V01-V107)
+        run: bash bin/run_causalontology_conformance.sh
+      # Enforce the whole-word pack-naming rules alongside conformance.
+      - name: Check pack naming
+        run: bash bin/check_pack_naming.sh

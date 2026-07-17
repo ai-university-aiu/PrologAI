@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/token_causal_claim.schema.json",
+  "title": "Token Causal Claim",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "causes",
+    "effects"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^token_causal_claim:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "token_causal_claim"
+    },
+    "causes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^token_occurrence:[0-9a-f]{64}$"
+      }
+    },
+    "effects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^token_occurrence:[0-9a-f]{64}$"
+      }
+    },
+    "covering_law": {
+      "type": "string",
+      "pattern": "^causal_relation_object:[0-9a-f]{64}$",
+      "description": "OPTIONAL. The type-level Causal Relation Object this token claim instantiates."
+    },
+    "actual_delay": {
+      "type": "object",
+      "required": [
+        "duration",
+        "unit"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "duration": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "enum": [
+            "instant",
+            "seconds",
+            "minutes",
+            "hours",
+            "days",
+            "weeks",
+            "months",
+            "years"
+          ]
+        }
+      },
+      "description": "the delay ACTUALLY OBSERVED on this occasion"
+    },
+    "counterfactual": {
+      "type": "boolean",
+      "description": "true asserts the BUT-FOR test for THIS OCCASION ONLY"
+    }
+  }
+}

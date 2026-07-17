@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/state.schema.json",
+  "title": "State Assertion",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "subject",
+    "quality",
+    "value",
+    "interval"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^state_assertion:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "state_assertion"
+    },
+    "subject": {
+      "type": "string",
+      "pattern": "^token_individual:[0-9a-f]{64}$",
+      "description": "the PARTICULAR individual in this state"
+    },
+    "quality": {
+      "type": "string",
+      "pattern": "^quality:[0-9a-f]{64}$"
+    },
+    "value": {
+      "$ref": "#/$defs/value"
+    },
+    "interval": {
+      "$ref": "https://causalontology.org/schema/token.schema.json#/$defs/interval",
+      "description": "over what span of absolute time the subject held this value"
+    }
+  },
+  "$defs": {
+    "value": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "quantity",
+            "unit"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "quantity": {
+              "type": "number"
+            },
+            "unit": {
+              "type": "string",
+              "minLength": 1,
+              "description": "UCUM unit code; MUST match the quality's unit"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "categorical"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "categorical": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "boolean"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "boolean": {
+              "type": "boolean"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

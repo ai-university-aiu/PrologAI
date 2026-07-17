@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/continuant.schema.json",
+  "title": "Continuant",
+  "type": "object",
+  "required": [
+    "id",
+    "label",
+    "category"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^continuant:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "continuant"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "canonical label, same discipline as occurrents; homonyms by qualification (bat_animal, bat_club)"
+    },
+    "category": {
+      "enum": [
+        "object",
+        "agent",
+        "place",
+        "substance",
+        "collection",
+        "information"
+      ],
+      "description": "REQUIRED and CLOSED; extending this enumeration is a MAJOR version change"
+    }
+  }
+}

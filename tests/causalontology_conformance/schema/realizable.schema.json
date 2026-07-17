@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/realizable.schema.json",
+  "title": "Realizable Entity",
+  "type": "object",
+  "required": [
+    "id",
+    "kind",
+    "bearer"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^realizable:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "realizable"
+    },
+    "kind": {
+      "enum": [
+        "disposition",
+        "function",
+        "role"
+      ]
+    },
+    "bearer": {
+      "type": "string",
+      "pattern": "^continuant:[0-9a-f]{64}$"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "OPTIONAL, IDENTITY-BEARING: the name of this disposition, function, or role. Repairs the 1.0.0 identity collision that limited a bearer to one realizable per kind (2.0.0 4.3)"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/stratum.schema.json",
+  "title": "Stratum",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "label",
+    "scheme",
+    "ordinal"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^stratum:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "stratum"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "canonical label, snake_case, English (for example: cellular, macromolecular)"
+    },
+    "scheme": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "the stratification scheme this stratum belongs to; strata are comparable only within a scheme"
+    },
+    "ordinal": {
+      "type": "integer",
+      "description": "position within the scheme; STRICTLY LOWER IS FINER-GRAINED; need not be contiguous"
+    },
+    "unit": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "the principal unit of analysis at this stratum (for example: cell, synapse, region)"
+    },
+    "governs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "description": "the governing frameworks or bodies of law at this stratum (for example: quantum_mechanics, cell_biology)"
+    }
+  }
+}

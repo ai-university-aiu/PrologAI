@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/occurrent.schema.json",
+  "title": "Occurrent",
+  "type": "object",
+  "required": [
+    "id",
+    "label",
+    "category"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^occurrent:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "occurrent"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "canonical label: English, lowercase snake_case, whole words (press_button, light_on); homonyms disambiguated by qualification (charge_battery, charge_attack)"
+    },
+    "category": {
+      "enum": [
+        "action",
+        "event",
+        "process",
+        "state",
+        "state_change"
+      ],
+      "description": "REQUIRED and CLOSED so identity inputs are deterministic; extending this enumeration is a MAJOR version change (GOVERNANCE.md)"
+    },
+    "stratum": {
+      "type": "string",
+      "pattern": "^stratum:[0-9a-f]{64}$",
+      "description": "OPTIONAL, IDENTITY-BEARING: the level of description at which this occurrent is pitched (2.0.0 N3.3)"
+    }
+  }
+}

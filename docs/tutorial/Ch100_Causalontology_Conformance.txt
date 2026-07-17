@@ -1,0 +1,33 @@
+Chapter 100: Proving It - Causalontology 2.0.0 Conformance
+
+A standard is only as real as the test a system either passes or fails. The
+Causalontology standard ships a conformance suite of 107 vectors, V01 through
+V107, each a frozen fact about how a conformant implementation must behave. The
+standard's rule is blunt: an implementation is conformant if and only if it
+passes every vector for the version it declares. That is what lets a Prolog and a
+Python implementation agree without sharing a line of code.
+
+PrologAI declares Causalontology specification 2.0.0 and passes all 107 vectors.
+The vectors and the seventeen JSON schemas are vendored under
+tests/causalontology_conformance/ from the causalontology repository at the
+pinned commit 8991c8b (the whole-word 2.0.0 baseline). The harness
+run_conformance.pl drives the three vocabulary packs - causal_core,
+noun_backbone, and realizable_hinge - across every vector.
+
+What is checked spans the whole standard: RFC 8785 canonicalization; SHA-256
+content identity for all seventeen kinds; schema validity against the vendored
+schemas; the local semantic rules (acyclicity, the temporal window, refinement,
+the conflict test, the enrichment field table); and the five normative algorithms
+of Section 12 - bridge closure, bridged reachability (the amended Rule 7, which
+the negative vector V58 exists to catch), stratal classification, the skip
+decision with its asymmetry, and unit normalization with its fixed constants.
+Provenance is exercised too: Ed25519 signing and verification per RFC 8032,
+retraction lineage, and succession, all written in pure Prolog.
+
+The reusable engine lives in the causal_core pack, so it is part of the platform.
+The schema interpreter, the signing layer, and the in-memory store are additive
+harness layers that import none of the ARC grid, Inductive Logic Programming, or
+sequence packs - which is what guarantees the work cannot move the ARC-AGI-1 or
+ARC-AGI-2 score (both were run before and after: 400/400 and 120/120, unchanged).
+Run it with bin/run_causalontology_conformance.sh (exit 0 iff 107/107); a GitHub
+Actions workflow gates it on every push.
