@@ -97,5 +97,41 @@ test(status_fields, [cleanup(lattice_close(N))]) :-
     % Assert an empty nexus reports zero node-facts.
     assertion(memberchk(node_facts(0), Status)).
 
+% -------------------------------------------------------------------------
+% L1 — lightweight, backend-free write/read door (Ledger entry L1).
+% -------------------------------------------------------------------------
+
+% AC-L1-001: a fact can be put and read back with NO vector backend loaded.
+test(l1_put_get_backend_free, [cleanup(lattice_close(N))]) :-
+    % Open a coordination nexus.
+    lattice_open('locus://localhost/l1_pg', N),
+    % Store a non-semantic coordination token directly (no embedding index).
+    lattice_put(N, beat, [lap(0), phase(0)], []),
+    % Read it back with a non-destructive peek.
+    assertion(lattice_get(N, beat, [lap(0), phase(0)], [])),
+    % The vector backend module must NOT have been pulled in by the write path.
+    assertion(\+ current_module(vector_backend)).
+
+% AC-L1-002: replace keeps exactly one fact per relation (a bounded token).
+test(l1_replace_bounded, [cleanup(lattice_close(N))]) :-
+    % Open a nexus.
+    lattice_open('locus://localhost/l1_rep', N),
+    % Put an initial beat, then replace it twice.
+    lattice_put(N, beat, [lap(0)], []),
+    lattice_replace(N, beat, [lap(1)], []),
+    lattice_replace(N, beat, [lap(2)], []),
+    % Exactly one beat fact remains, holding the latest value.
+    findall(A, lattice_get(N, beat, A, _), All),
+    assertion(All == [[lap(2)]]).
+
+% AC-L1-003: take reads and removes one matching fact.
+test(l1_take_removes, [cleanup(lattice_close(N))]) :-
+    % Open a nexus and store one token.
+    lattice_open('locus://localhost/l1_take', N),
+    lattice_put(N, token, [x], []),
+    % Take it: the value comes back and the fact is gone.
+    lattice_take(N, token, [x], []),
+    assertion(\+ lattice_get(N, token, _, _)).
+
 % Close the block of 'lattice' tests.
 :- end_tests(lattice).

@@ -31,7 +31,15 @@
     % Continue the multi-line expression started above.
     nexus_state/2,           % +Nexus, -State (open|closed)
     % Continue the multi-line expression started above.
-    lattice_node_fact/5      % +Nexus, ?Id, ?Relation, ?Args, ?Referents
+    lattice_node_fact/5,     % +Nexus, ?Id, ?Relation, ?Args, ?Referents
+    % L1 — lightweight, backend-free write door (Ledger entry L1).
+    lattice_put/4,           % +Nexus, +Relation, +Args, +Referents
+    % L1 — non-destructive read (peek) of a matching fact.
+    lattice_get/4,           % +Nexus, ?Relation, ?Args, ?Referents
+    % L1 — read-and-remove one matching fact (Linda take).
+    lattice_take/4,          % +Nexus, ?Relation, ?Args, ?Referents
+    % L1 — replace all facts of a relation with one (a bounded coordination token).
+    lattice_replace/4        % +Nexus, +Relation, +Args, +Referents
 % Close the expression opened above.
 ]).
 
@@ -304,3 +312,68 @@ journal_write(Path, Term) :-
         true
     % Close the expression opened above.
     ).
+
+% ===========================================================================
+% L1 — a lightweight, backend-free write/read door  (Ledger entry L1)
+% ---------------------------------------------------------------------------
+% The intended write door anchor_node/4 (node_facts.pl) hard-requires the vector
+% embedding backend, so storing a non-semantic coordination token drags in the
+% whole similarity index. These predicates store and read a node_fact DIRECTLY,
+% through the journal only, with NO vector backend loaded. anchor_node/4 is left
+% unchanged for every existing caller. Ids are drawn from a private counter so a
+% lightweight write never has to invent a meaningful identity.
+% ===========================================================================
+
+% Declare 'lattice_put_seq/1' as dynamic — the private id counter for lattice_put.
+:- dynamic lattice_put_seq/1.
+% Seed the counter at zero.
+lattice_put_seq(0).
+
+% Define a clause for 'lattice next put id': allocate the next unique put id atomically.
+lattice_next_put_id(Id) :-
+    % Serialise the read-modify-write of the counter so concurrent puts never clash.
+    with_mutex(lattice_put_seq_mutex,
+        % Advance the counter and return the fresh id.
+        ( retract(lattice_put_seq(N)),
+          % Compute the next id value.
+          N1 is N + 1,
+          % Store the advanced counter.
+          assertz(lattice_put_seq(N1)),
+          % The allocated id is the advanced value.
+          Id = N1 )).
+
+% Define a clause for 'lattice put': store a fact with no vector backend.
+lattice_put(Nexus, Relation, Args, Referents) :-
+    % The nexus must be open to accept a write.
+    nexus_is_open(Nexus),
+    % Allocate a fresh id for the new fact.
+    lattice_next_put_id(Id),
+    % Journal and apply the direct assertion (no vector index touched).
+    lattice_transaction(Nexus,
+        assertz(lattice_node_fact(Nexus, Id, Relation, Args, Referents))).
+
+% Define a clause for 'lattice get': peek a matching fact without removing it.
+lattice_get(Nexus, Relation, Args, Referents) :-
+    % Unify against any stored fact for this nexus (nondeterministic).
+    lattice_node_fact(Nexus, _Id, Relation, Args, Referents).
+
+% Define a clause for 'lattice take': read AND remove one matching fact.
+lattice_take(Nexus, Relation, Args, Referents) :-
+    % The nexus must be open.
+    nexus_is_open(Nexus),
+    % Bind the first matching fact (and its id) without leaving a choice point.
+    once(lattice_node_fact(Nexus, Id, Relation, Args, Referents)),
+    % Journal and apply the removal of exactly that fact.
+    lattice_transaction(Nexus,
+        retract(lattice_node_fact(Nexus, Id, Relation, Args, Referents))).
+
+% Define a clause for 'lattice replace': keep one fact per relation (bounded token).
+lattice_replace(Nexus, Relation, Args, Referents) :-
+    % The nexus must be open.
+    nexus_is_open(Nexus),
+    % Allocate a fresh id for the replacement fact.
+    lattice_next_put_id(Id),
+    % Journal and apply: drop every prior fact of this relation, then store one.
+    lattice_transaction(Nexus,
+        ( retractall(lattice_node_fact(Nexus, _, Relation, _, _)),
+          assertz(lattice_node_fact(Nexus, Id, Relation, Args, Referents)) )).
