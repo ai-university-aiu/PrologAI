@@ -42,6 +42,8 @@ No black box.
 
 No guessing.
 
+**Naming.** Identifiers are whole English words, never abbreviations — packs and predicates are pack-qualified `snake_case` (`world_model`, not `wm`), and the reified causal primitive is spelled `causal_relation_object` (`cro` retired), aligning with the Causalontology standard's whole-word Principle P7. See [NAMING.md](NAMING.md).
+
 ---
 
 ## Landmark Achievements
