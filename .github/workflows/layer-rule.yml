@@ -1,0 +1,40 @@
+# Gate the STRICT LAYER RULE (Ledger entry L4) on every push and pull request.
+#
+# A lower-layer pack may not depend on a higher-layer one. Each pack declares its
+# layer with a layer(N) fact in its pack.pl; the checker parses the actual
+# use_module(library(...)) graph and fails the job on any upward edge among
+# declared packs. Undeclared packs are gaps, not violations. A red run blocks the
+# merge.
+name: layer-rule
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single layer-rule job.
+jobs:
+  layer-rule:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # Run the strict layer-rule checker; a non-zero exit fails the job.
+      - name: Check the strict layer rule
+        run: bash bin/check_layers.sh
+      # Run the layer construct's own PLUnit suite (includes the spike-arm replay).
+      - name: Run the layer construct test suite
+        run: |
+          LIB=""
+          for d in packs/*/prolog; do LIB="$LIB -p library=$d"; done
+          swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/layer/test/test_layer.pl

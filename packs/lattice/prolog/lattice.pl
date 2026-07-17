@@ -31,7 +31,21 @@
     % Continue the multi-line expression started above.
     nexus_state/2,           % +Nexus, -State (open|closed)
     % Continue the multi-line expression started above.
-    lattice_node_fact/5      % +Nexus, ?Id, ?Relation, ?Args, ?Referents
+    lattice_node_fact/5,     % +Nexus, ?Id, ?Relation, ?Args, ?Referents
+    % L1 — lightweight, backend-free write door (Ledger entry L1).
+    lattice_put/4,           % +Nexus, +Relation, +Args, +Referents
+    % L1 — non-destructive read (peek) of a matching fact.
+    lattice_get/4,           % +Nexus, ?Relation, ?Args, ?Referents
+    % L1 — read-and-remove one matching fact (Linda take).
+    lattice_take/4,          % +Nexus, ?Relation, ?Args, ?Referents
+    % L1 — replace all facts of a relation with one (a bounded coordination token).
+    lattice_replace/4,       % +Nexus, +Relation, +Args, +Referents
+    % L2 — an explicitly isolating transaction (Ledger entry L2).
+    lattice_transaction/3,   % +Nexus, +Options, :Goal
+    % L3 — reactive await: block until a matching fact exists (Ledger entry L3).
+    lattice_await/5,         % +Nexus, +Relation, +Timeout, -Args, -Referents
+    % L3 — wake every reader awaiting on a nexus (the write-triggers-notify bridge).
+    lattice_notify/1         % +Nexus
 % Close the expression opened above.
 ]).
 
@@ -39,8 +53,8 @@
 :- use_module(library(crypto),  [crypto_data_hash/3]).
 % Import [maplist/2] from the built-in 'apply' library.
 :- use_module(library(apply),   [maplist/2]).
-% Import [member/2] from the built-in 'lists' library.
-:- use_module(library(lists),   [member/2]).
+% Import [member/2, memberchk/2] from the built-in 'lists' library.
+:- use_module(library(lists),   [member/2, memberchk/2]).
 
 % ---------------------------------------------------------------------------
 % Nexus registry
@@ -304,3 +318,176 @@ journal_write(Path, Term) :-
         true
     % Close the expression opened above.
     ).
+
+% ===========================================================================
+% L1 — a lightweight, backend-free write/read door  (Ledger entry L1)
+% ---------------------------------------------------------------------------
+% The intended write door anchor_node/4 (node_facts.pl) hard-requires the vector
+% embedding backend, so storing a non-semantic coordination token drags in the
+% whole similarity index. These predicates store and read a node_fact DIRECTLY,
+% through the journal only, with NO vector backend loaded. anchor_node/4 is left
+% unchanged for every existing caller. Ids are drawn from a private counter so a
+% lightweight write never has to invent a meaningful identity.
+% ===========================================================================
+
+% Declare 'lattice_put_seq/1' as dynamic — the private id counter for lattice_put.
+:- dynamic lattice_put_seq/1.
+% Seed the counter at zero.
+lattice_put_seq(0).
+
+% Define a clause for 'lattice next put id': allocate the next unique put id atomically.
+lattice_next_put_id(Id) :-
+    % Serialise the read-modify-write of the counter so concurrent puts never clash.
+    with_mutex(lattice_put_seq_mutex,
+        % Advance the counter and return the fresh id.
+        ( retract(lattice_put_seq(N)),
+          % Compute the next id value.
+          N1 is N + 1,
+          % Store the advanced counter.
+          assertz(lattice_put_seq(N1)),
+          % The allocated id is the advanced value.
+          Id = N1 )).
+
+% Define a clause for 'lattice put': store a fact with no vector backend.
+lattice_put(Nexus, Relation, Args, Referents) :-
+    % The nexus must be open to accept a write.
+    nexus_is_open(Nexus),
+    % Allocate a fresh id for the new fact.
+    lattice_next_put_id(Id),
+    % Journal and apply the direct assertion (no vector index touched).
+    lattice_transaction(Nexus,
+        assertz(lattice_node_fact(Nexus, Id, Relation, Args, Referents))),
+    % Wake any reader awaiting a matching fact (the L3 stigmergy-notify bridge).
+    lattice_notify(Nexus).
+
+% Define a clause for 'lattice get': peek a matching fact without removing it.
+lattice_get(Nexus, Relation, Args, Referents) :-
+    % Unify against any stored fact for this nexus (nondeterministic).
+    lattice_node_fact(Nexus, _Id, Relation, Args, Referents).
+
+% Define a clause for 'lattice take': read AND remove one matching fact.
+lattice_take(Nexus, Relation, Args, Referents) :-
+    % The nexus must be open.
+    nexus_is_open(Nexus),
+    % Bind the first matching fact (and its id) without leaving a choice point.
+    once(lattice_node_fact(Nexus, Id, Relation, Args, Referents)),
+    % Journal and apply the removal of exactly that fact.
+    lattice_transaction(Nexus,
+        retract(lattice_node_fact(Nexus, Id, Relation, Args, Referents))),
+    % A removal is a state change; wake awaiting readers to re-evaluate.
+    lattice_notify(Nexus).
+
+% Define a clause for 'lattice replace': keep one fact per relation (bounded token).
+lattice_replace(Nexus, Relation, Args, Referents) :-
+    % The nexus must be open.
+    nexus_is_open(Nexus),
+    % Allocate a fresh id for the replacement fact.
+    lattice_next_put_id(Id),
+    % Journal and apply: drop every prior fact of this relation, then store one.
+    lattice_transaction(Nexus,
+        ( retractall(lattice_node_fact(Nexus, _, Relation, _, _)),
+          assertz(lattice_node_fact(Nexus, Id, Relation, Args, Referents)) )),
+    % Wake any reader awaiting the new value.
+    lattice_notify(Nexus).
+
+% ===========================================================================
+% L2 — an explicitly isolating transaction  (Ledger entry L2)
+% ---------------------------------------------------------------------------
+% lattice_transaction/2 gives journaling (durability/framing) but NOT isolation:
+% two threads can interleave a read and a write and corrupt a shared fact.
+% lattice_transaction/3 with isolation(serializable) wraps the journaled
+% transaction in a per-nexus reentrant mutex, so concurrent read-modify-write is
+% serialised with NO caller-supplied lock. lattice_transaction/2 is unchanged and
+% remains, honestly, the NON-isolating mode.
+% ===========================================================================
+
+% Define a clause for 'lattice nexus mutex': the stable per-nexus mutex name.
+lattice_nexus_mutex(Nexus, Mutex) :-
+    % Render the nexus term to an atom for a deterministic mutex name.
+    term_to_atom(Nexus, NexusAtom),
+    % Prefix it so the name is unambiguous; with_mutex auto-creates it on first use.
+    atom_concat('lattice_nexus_mutex_', NexusAtom, Mutex).
+
+% Declare lattice_transaction/3 as a meta-predicate so the caller's module is
+% carried onto the transaction Goal (its third argument is a goal to run).
+:- meta_predicate lattice_transaction(?, ?, 0).
+
+% Define a clause for 'lattice transaction/3': run a transaction under an isolation option.
+lattice_transaction(Nexus, Options, Goal) :-
+    % Branch on whether serialisable isolation was requested.
+    ( memberchk(isolation(serializable), Options)
+    % Serialisable: hold the per-nexus mutex across the whole journaled transaction.
+    ->  lattice_nexus_mutex(Nexus, Mutex),
+        with_mutex(Mutex, lattice_transaction(Nexus, Goal))
+    % No isolation requested: fall back to the plain journaled transaction.
+    ;   lattice_transaction(Nexus, Goal) ).
+
+% ===========================================================================
+% L3 — a reactive await + the stigmergy-plus-notification bridge  (Ledger L3)
+% ---------------------------------------------------------------------------
+% The Lattice had no blocking "await a fact matching a pattern", so a stigmergic
+% reader had to busy-poll — O(actors x poll-rate) wasted work, the biggest threat
+% to surviving 140 constructs on performance. lattice_await/5 blocks with NO CPU
+% (it waits on a private message queue) and is woken the instant a write calls
+% lattice_notify/1. This is the HYBRID BRIDGE: coordination stays through the
+% environment (a reader awaits a PATTERN, never an actor's address, so
+% actor-to-actor references remain zero) while reactivity stops costing a spin.
+% A registered waiter always registers BEFORE its first existence check, so a
+% write between registration and check cannot be lost.
+% ===========================================================================
+
+% Declare 'lattice_waiter/2' as dynamic — one private queue per awaiting reader.
+:- dynamic lattice_waiter/2.  % Nexus, Queue
+
+% Define a clause for 'lattice notify': wake every reader awaiting on a nexus.
+lattice_notify(Nexus) :-
+    % Send a wake token to each registered waiter's queue.
+    forall(lattice_waiter(Nexus, Queue),
+           % A queue may be torn down concurrently; a failed send is harmless.
+           catch(thread_send_message(Queue, lattice_wrote), _, true)).
+
+% Define a clause for 'lattice await': block until a matching fact exists.
+% Timeout is seconds, or the atom 'infinite' to wait forever.
+lattice_await(Nexus, Relation, Timeout, Args, Referents) :-
+    % The nexus must be open to await on.
+    nexus_is_open(Nexus),
+    % Turn a numeric timeout into an absolute deadline; keep 'infinite' as-is.
+    ( Timeout == infinite
+    ->  Deadline = infinite
+    ;   get_time(T0), Deadline is T0 + Timeout ),
+    % Create this reader's private wake queue.
+    message_queue_create(Queue),
+    % Register, wait, and always deregister and destroy the queue on the way out.
+    setup_call_cleanup(
+        % Register BEFORE any existence check so no wake can be lost.
+        assertz(lattice_waiter(Nexus, Queue)),
+        % Enter the wait loop.
+        lattice_await_loop(Nexus, Relation, Deadline, Queue, Args, Referents),
+        % Deregister this waiter and reclaim its queue.
+        ( retractall(lattice_waiter(Nexus, Queue)),
+          message_queue_destroy(Queue) )).
+
+% Define a clause for 'lattice await loop': check, then block until woken or timed out.
+lattice_await_loop(Nexus, Relation, Deadline, Queue, Args, Referents) :-
+    % First, see whether a matching fact is already present.
+    ( lattice_get(Nexus, Relation, Args, Referents)
+    % Present: succeed with the first match.
+    ->  true
+    % Absent: block on the wake queue until a write notifies or the deadline passes.
+    ;   ( Deadline == infinite
+        % No deadline: block indefinitely for the next wake token.
+        ->  thread_get_message(Queue, _Woken), Continue = true
+        % With a deadline: compute the remaining time and wait at most that long.
+        ;   get_time(Now),
+            Remaining is Deadline - Now,
+            ( Remaining =< 0
+            % The deadline has already passed: stop without a match.
+            ->  Continue = false
+            % Wait up to the remaining time for a wake token.
+            ;   ( thread_get_message(Queue, _Woken, [timeout(Remaining)])
+                ->  Continue = true
+                ;   Continue = false ) ) ),
+        % Loop on a wake; give up on a timeout.
+        ( Continue == true
+        ->  lattice_await_loop(Nexus, Relation, Deadline, Queue, Args, Referents)
+        ;   fail ) ).

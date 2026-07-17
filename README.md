@@ -145,8 +145,9 @@ Everything is inspectable.
 | Pack | What it Does |
 |---|---|
 | `kernel` | The minimal kernel — lattice-resident rewrite rules and a kernel interpreter with full trace. The lowest layer of the cognitive stack. |
-| `lattice` | The Persistent Shared Memory Network — the unified knowledge store that every other pack reads and writes. |
+| `lattice` | The Persistent Shared Memory Network — the unified knowledge store that every other pack reads and writes. Wave 1 of the Requirements Ledger adds three coordination affordances: a lightweight backend-free write door (`lattice_put`/`get`/`take`/`replace`, L1), an isolating transaction (`lattice_transaction/3` with `isolation(serializable)`, L2), and a reactive `lattice_await`/`lattice_notify` woken by a write with no polling — the stigmergy-plus-notification bridge (L3). |
 | `actors` | The Actor Framework — cyclic_actor, receptor, and pub-sub messaging. Every cognitive process runs as an actor. |
+| `layer` | The Strict Layer Rule (WP-426) — the load-bearing invariant made first-class: a pack declares its rank with `layer(N)` in its manifest, and the checker parses the actual import graph to flag any pack that depends on a higher-layer one. Strict mode refuses a violating load; reporting mode lists without refusing; undeclared packs are gaps, not errors. Runs in Continuous Integration via `bin/check_layers.sh`. Sits beneath every pack it governs. |
 | `sentinels` | Neuro-Symbolic Opportunistic Forward Chaining (sentinels_*) — the constitutional guard layer that monitors for violations and fires proactively; a registry (`sentinels_register`, `sentinels_list`, `sentinels_retract`, ...) and a firing engine (`sentinels_evaluate`). |
 | `types` | Gradual Lattice Types — an off-by-default type checker where types are first-class Lattice node_facts, not annotations. |
 

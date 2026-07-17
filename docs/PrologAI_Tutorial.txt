@@ -27190,3 +27190,74 @@ ARC-AGI-1 or ARC-AGI-2 score, and both were run before and after to confirm it
 bin/run_causalontology_conformance.sh; it exits zero only when all 107 pass, and a
 GitHub Actions workflow runs it on every push so conformance can never silently
 rot.
+
+
+Chapter 359: Closing the Ledger's First Four - The Layer Rule and Three Lattice Affordances
+
+Every large architecture rests on a rule it dare not break. For PrologAI that rule
+is the strict layer rule: a lower layer may not depend on a higher one. Keep it,
+and the import graph stays acyclic and the system can grow to hundreds of parts
+without a dependency cycle. A companion spike, prologai-loops, set out to close a
+reentrant cognitive loop under that rule, and in doing so produced a Requirements
+Ledger - a list of the things PrologAI could not yet express cleanly. Its keystone
+finding was blunt: PrologAI had no construct that expressed the strict layer rule
+at all. The rule was honoured by convention, checked by no one. This chapter is
+the wave that built the construct, and three smaller affordances the spike also
+asked for.
+
+The layer pack (Work Package 426) makes the rule first-class. A pack states its
+rank with one fact in its own manifest - layer(0), say, in packs/<name>/pack.pl -
+so the declaration lives with the code and cannot drift into a registry that
+forgets to update. The checker then does something a hand-written dependency list
+cannot: it reads the actual imports. It parses every use_module(library(...))
+across every pack, maps each imported library to the pack that owns it, and
+reports any declared pack that imports another declared pack of a higher layer.
+Each violation is a single readable line - pack 'base' (layer 0) depends on higher
+pack 'high' (layer 2) via use_module(library(high)) - naming the rule, both packs,
+both numbers, and the offending edge. A pack with no layer fact is undeclared,
+which is a gap to fill, never an error, so a real system can adopt the rule pack by
+pack instead of all at once.
+
+Enforcement is a load-time property, and it comes in two temperaments.
+layer_enforce(strict) throws when a violation is present, so a boot that runs it
+refuses to finish loading a broken configuration. layer_enforce(report) prints the
+same findings but never refuses. Reporting mode is how a team turns on visibility
+everywhere before any pack is required to be clean. From the shell,
+bin/check_layers.sh runs the check and returns zero when clean and non-zero on a
+violation, and a Continuous Integration (CI) workflow runs it on every change so an
+upward dependency cannot slip in.
+
+The construct proves itself against the very spike that motivated it. The two arms
+of the frozen spike - one closing the loop by mailbox addressing, one by stigmergy
+through the shared environment - are snapshotted read-only inside the pack's tests,
+and the checker shows by construction that neither arm has a single upward static
+import edge. What the spike proved by hand, the construct now reproduces
+mechanically. There is one thing the load-time checker honestly cannot do, recorded
+in the Ledger as entry L5: an upward reference can be carried not as an import but
+as DATA - a lower component holding the literal address of a higher one as a
+string. The pack ships a heuristic lint that flags such a quoted literal, and it
+correctly separates the mailbox arm (which holds one) from the stigmergy arm (which
+holds none) - but a computed address escapes any static check, so L5 stays open for
+the general case. Saying so plainly is part of the work.
+
+The same wave closed three frictions the spike hit on the Lattice, all additive.
+First, a lightweight write. The intended door, anchor_node/4, drags in the whole
+vector-embedding backend, so storing a plain coordination token was expensive;
+lattice_put, lattice_get, lattice_take, and lattice_replace now store and read a
+fact directly through the journal with no backend loaded at all. Second, real
+isolation. lattice_transaction/2 journals but does not lock, so two threads can
+corrupt a shared fact; lattice_transaction/3 with isolation(serializable) serialises
+concurrent read-modify-write behind a per-nexus lock, with no caller-supplied lock,
+at a measured cost of about 1.6 microseconds per transaction - stated, not hidden.
+Third, and most important, a reactive await. lattice_await blocks a reader until a
+matching fact appears, and a write wakes it through lattice_notify, so a stigmergic
+reader no longer has to busy-poll. This is the hybrid bridge the spike recommended:
+state lives in the environment and a reader awaits a pattern, never another actor's
+address, so actor-to-actor references stay at zero - yet reactivity costs a wake
+instead of a spin. Every future Connectome repository is meant to be built on
+exactly this: put or replace for state, await and notify for reactivity.
+
+None of this touched the ARC-AGI solving core. The layer construct and the three
+affordances are documented for adopters in docs/Strict_Layer_Rule_v1.txt and
+docs/Lattice_Coordination_Affordances_v1.txt, and the living Ledger continuation is
+LEDGER.md at the repository root.

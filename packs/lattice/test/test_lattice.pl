@@ -97,5 +97,140 @@ test(status_fields, [cleanup(lattice_close(N))]) :-
     % Assert an empty nexus reports zero node-facts.
     assertion(memberchk(node_facts(0), Status)).
 
+% -------------------------------------------------------------------------
+% L1 — lightweight, backend-free write/read door (Ledger entry L1).
+% -------------------------------------------------------------------------
+
+% AC-L1-001: a fact can be put and read back with NO vector backend loaded.
+test(l1_put_get_backend_free, [cleanup(lattice_close(N))]) :-
+    % Open a coordination nexus.
+    lattice_open('locus://localhost/l1_pg', N),
+    % Store a non-semantic coordination token directly (no embedding index).
+    lattice_put(N, beat, [lap(0), phase(0)], []),
+    % Read it back with a non-destructive peek.
+    assertion(lattice_get(N, beat, [lap(0), phase(0)], [])),
+    % The vector backend module must NOT have been pulled in by the write path.
+    assertion(\+ current_module(vector_backend)).
+
+% AC-L1-002: replace keeps exactly one fact per relation (a bounded token).
+test(l1_replace_bounded, [cleanup(lattice_close(N))]) :-
+    % Open a nexus.
+    lattice_open('locus://localhost/l1_rep', N),
+    % Put an initial beat, then replace it twice.
+    lattice_put(N, beat, [lap(0)], []),
+    lattice_replace(N, beat, [lap(1)], []),
+    lattice_replace(N, beat, [lap(2)], []),
+    % Exactly one beat fact remains, holding the latest value.
+    findall(A, lattice_get(N, beat, A, _), All),
+    assertion(All == [[lap(2)]]).
+
+% AC-L1-003: take reads and removes one matching fact.
+test(l1_take_removes, [cleanup(lattice_close(N))]) :-
+    % Open a nexus and store one token.
+    lattice_open('locus://localhost/l1_take', N),
+    lattice_put(N, token, [x], []),
+    % Take it: the value comes back and the fact is gone.
+    lattice_take(N, token, [x], []),
+    assertion(\+ lattice_get(N, token, _, _)).
+
+% -------------------------------------------------------------------------
+% L2 — real transaction isolation (Ledger entry L2).
+% -------------------------------------------------------------------------
+
+% AC-L2-001: concurrent read-modify-write is EXACT under isolation(serializable),
+% with no caller-supplied lock — and LOSES updates under the plain /2 transaction.
+% A 1 ms window between read and write forces the race deterministically.
+test(l2_isolation_prevents_lost_updates) :-
+    % Four writers each increment the shared counter twenty-five times.
+    Threads = 4, Per = 25, Expected is Threads * Per,
+    % The unisolated /2 path loses updates (no mutual exclusion).
+    l2_run(unisolated, Threads, Per, Unisolated),
+    % The isolated /3 serializable path is exact (mutual exclusion, no caller lock).
+    l2_run(isolated, Threads, Per, Isolated),
+    % Today's behaviour: the plain transaction is not isolating.
+    assertion(Unisolated < Expected),
+    % The fix: serializable isolation yields the exact total.
+    assertion(Isolated =:= Expected).
+
+% -------------------------------------------------------------------------
+% L3 — reactive await woken by a write, with no polling (Ledger entry L3).
+% -------------------------------------------------------------------------
+
+% AC-L3-001: an awaiting reader is woken by a write, not by a poll loop.
+% The write happens ~200 ms after the await starts; the reader wakes right then.
+test(l3_await_woken_by_write) :-
+    % Open a nexus to coordinate through.
+    lattice_open('locus://localhost/l3_await', N),
+    % A result queue to collect the awaiter's outcome.
+    message_queue_create(RQ),
+    % Note the start time.
+    get_time(T0),
+    % Spawn a reader that blocks on a 'ready' fact for up to five seconds.
+    thread_create(( ( lattice_await(N, ready, 5, Got, _) -> W = Got ; W = timeout ),
+                    get_time(T1), Dt is T1 - T0,
+                    thread_send_message(RQ, awoke(W, Dt)) ), _, [detached(true)]),
+    % Let the reader reach its blocking wait, then write.
+    sleep(0.2),
+    lattice_put(N, ready, [go], []),
+    % Collect the reader's outcome.
+    thread_get_message(RQ, awoke(Woke, Elapsed)),
+    % The reader saw the written value.
+    assertion(Woke == [go]),
+    % It woke promptly after the write (well under the five-second timeout).
+    assertion(Elapsed < 1.0).
+
+% AC-L3-002: await returns immediately when the fact is already present.
+test(l3_await_immediate_when_present, [cleanup(lattice_close(N))]) :-
+    % Open a nexus and write the fact first.
+    lattice_open('locus://localhost/l3_now', N),
+    lattice_put(N, ready, [here], []),
+    % Await returns at once without blocking.
+    assertion(lattice_await(N, ready, 5, [here], _)).
+
+% AC-L3-003: await times out (and fails) when no write ever arrives.
+test(l3_await_times_out, [cleanup(lattice_close(N))]) :-
+    % Open a nexus with nothing to await.
+    lattice_open('locus://localhost/l3_to', N),
+    % A short-timeout await for an absent fact fails.
+    assertion(\+ lattice_await(N, never, 0.2, _, _)).
+
 % Close the block of 'lattice' tests.
 :- end_tests(lattice).
+
+% -------------------------------------------------------------------------
+% Helper: run one L2 concurrency scenario and report the final counter.
+% -------------------------------------------------------------------------
+
+% One read-modify-write of the shared counter fact (id 1), with a widened window.
+l2_rmw(N) :-
+    % Take the current value out.
+    retract(lattice_node_fact(N, 1, counter, [V], [])),
+    % Widen the read->write gap so an unisolated race is deterministic.
+    sleep(0.001),
+    % Compute the incremented value.
+    V1 is V + 1,
+    % Write it back.
+    assertz(lattice_node_fact(N, 1, counter, [V1], [])).
+
+% Increment under the requested isolation mode.
+l2_increment(isolated, N)   :- lattice_transaction(N, [isolation(serializable)], l2_rmw(N)).
+l2_increment(unisolated, N) :- lattice_transaction(N, l2_rmw(N)).
+
+% Run Threads writers, each doing Per increments, and read the final total.
+l2_run(Mode, Threads, Per, Final) :-
+    % Use a distinct nexus per mode.
+    atom_concat('locus://localhost/l2_', Mode, Addr),
+    lattice_open(Addr, N),
+    % Reset the counter to zero.
+    retractall(lattice_node_fact(N, 1, counter, _, _)),
+    assertz(lattice_node_fact(N, 1, counter, [0], [])),
+    % Spawn the writer threads.
+    numlist(1, Threads, Seq),
+    findall(TId,
+            ( member(_, Seq),
+              thread_create(forall(between(1, Per, _), l2_increment(Mode, N)), TId, []) ),
+            TIds),
+    % Wait for them all to finish.
+    forall(member(TId, TIds), thread_join(TId, _)),
+    % Read the final counter value.
+    lattice_node_fact(N, 1, counter, [Final], []).
