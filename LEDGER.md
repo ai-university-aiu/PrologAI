@@ -303,8 +303,10 @@ gap, and the finding — not the arm's code — is what ships.
   bound the two: a pack could declare a layer that contradicts the ordinal of the
   stratum it claims to be, and L4 — which checks that layers are ORDERED
   correctly, not that a layer matches the ordinal it should — would pass. The
-  Wave 3 verdict's winning decomposition (one pack per stratum) rests on "pack
-  layer tracks stratum ordinal", which was maintained BY HAND. Worse, a
+  Wave 3 verdict's winning decomposition (one pack per stratum; see
+  `WAVE_3_VERDICT.txt`, Part Five — the decision that promoted STRATA-3 into this
+  PrologAI requirement) rests on "pack layer tracks stratum ordinal", which was
+  maintained BY HAND. Worse, a
   mis-declared layer can DISGUISE an ordinal-upward dependency as a
   layer-downward one, so L4 alone can be fooled into passing a genuine upward
   edge.
@@ -348,6 +350,8 @@ gap, and the finding — not the arm's code — is what ships.
   `packs/layer/test/test_layer.pl` (layer suite now 25/25), over fixtures under
   `packs/layer/test/fixtures/binding/` (a strata source plus consistent, upward,
   mis-bound, and unbound configurations). Documented in `docs/layer-binding.md`.
+- **Closing commit.** `ab34fed` (the binding construct), with docs in `0513b9e`;
+  merged to main as `798fbe5`.
 - **STRATA-3 status: CLOSED.** The alignment "pack layer tracks stratum ordinal"
   is now a checked, load-time, CI-gated invariant rather than a hand-maintained
   convention — the same promotion L4 gave the strict layer rule after the spike.
