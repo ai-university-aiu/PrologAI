@@ -234,3 +234,129 @@ inter_actor_edges(Nodes, Count) :-
             Edges),
     % The number of such edges.
     length(Edges, Count).
+
+% ---------------------------------------------------------------------------
+% Layer-to-stratum BINDING tests (N6 — closes STRATA-3).
+%
+% Fixtures under fixtures/binding/:
+%   strata/     three stratum records (low ordinal 4, mid 7, high 14)
+%   consistent/ layers 1/2/3 bound to low/mid/high; pack_high (ord 14) imports
+%               pack_low (ord 4) — a legitimate DOWNWARD SKIP across the gap
+%   upward/     pack_ulow (ord 4, layer 1) imports pack_uhigh (ord 14, layer 3)
+%               — an UPWARD edge (L4 must fail; the binding is still consistent)
+%   misbound/   pack_sneaky_high mis-declares layer 0 for the ordinal-14 stratum,
+%               DISGUISING an upward dependency as downward: L4 is fooled and
+%               passes, but the BINDING catches the layer/ordinal contradiction
+%   unbound/    a pack with a layer but no stratum — an unbound gap, not an error
+% ---------------------------------------------------------------------------
+
+% Open the test block for the binding construct.
+:- begin_tests(layer_binding).
+
+% AC-N6-001: stratum ordinals are read from the authoritative structure records.
+test(reads_stratum_ordinals) :-
+    % Locate the strata-source fixture directory.
+    fixture('binding/strata', Strata),
+    % Read the label-to-ordinal pairs.
+    layer_stratum_ordinals(Strata, Pairs),
+    % The three declared strata and their ordinals are recovered exactly.
+    assertion(memberchk(low_stratum-4, Pairs)),
+    assertion(memberchk(mid_stratum-7, Pairs)),
+    assertion(memberchk(high_stratum-14, Pairs)).
+
+% AC-N6-002: a consistent layer/stratum configuration PASSES the binding check.
+test(consistent_config_passes) :-
+    % Point at the consistent packs directory and the strata source.
+    fixture('binding/consistent', Packs), fixture('binding/strata', Strata),
+    % The binding check reports no violations.
+    layer_bind_check_dir(Packs, Strata, Violations),
+    assertion(Violations == []),
+    % Strict enforcement succeeds (does not throw) on the consistent configuration.
+    assertion(catch(layer_bind_enforce_dir(Packs, Strata, strict), _, fail)).
+
+% AC-N6-003: a legitimate DOWNWARD SKIP (high ordinal depending on low) passes both.
+test(downward_skip_passes_binding_and_layer_rule) :-
+    % The consistent fixture has pack_high (stratum ordinal 14) importing pack_low (ordinal 4).
+    fixture('binding/consistent', Packs), fixture('binding/strata', Strata),
+    % The binding check passes (the layers honour the ordinals).
+    layer_bind_check_dir(Packs, Strata, BindViolations),
+    assertion(BindViolations == []),
+    % And the L4 layer rule passes too (the skip is a downward edge: layer 3 -> layer 1).
+    layer_check_dir(Packs, LayerViolations),
+    assertion(LayerViolations == []).
+
+% AC-N6-004: a deliberate BINDING VIOLATION is detected, readable, and refused in strict mode.
+test(binding_violation_detected_and_refused) :-
+    % Point at the mis-bound packs directory and the strata source.
+    fixture('binding/misbound', Packs), fixture('binding/strata', Strata),
+    % The binding check reports at least one violation.
+    layer_bind_check_dir(Packs, Strata, Violations),
+    assertion(Violations \== []),
+    % The violation renders a readable one-line explanation naming the reason.
+    Violations = [V|_], layer_binding_violation_line(V, Line),
+    assertion(sub_atom(Line, _, _, _, 'binding_rule violation')),
+    % Strict enforcement over the violating configuration refuses by throwing.
+    assertion(\+ catch(layer_bind_enforce_dir(Packs, Strata, strict), _, fail)).
+
+% AC-N6-005: an UPWARD edge fails the L4 layer rule while the binding stays consistent.
+test(upward_edge_fails_layer_rule_binding_clean) :-
+    % Point at the upward packs directory and the strata source.
+    fixture('binding/upward', Packs), fixture('binding/strata', Strata),
+    % The L4 layer rule catches the upward edge (a low layer importing a higher one).
+    layer_check_dir(Packs, LayerViolations),
+    assertion(LayerViolations \== []),
+    % The binding check is clean: the two packs' layers are consistent with their ordinals.
+    layer_bind_check_dir(Packs, Strata, BindViolations),
+    assertion(BindViolations == []).
+
+% AC-N6-006: the BINDING catches an upward dependency DISGUISED as downward by a mis-declared
+% layer — exactly the loophole L4 alone cannot see. This is the reason the binding must exist.
+test(binding_catches_disguised_upward_that_fools_layer_rule) :-
+    % The mis-bound fixture disguises an ordinal-upward dependency as a layer-downward one.
+    fixture('binding/misbound', Packs), fixture('binding/strata', Strata),
+    % L4 is FOOLED: the mis-declared layers make the edge look downward, so it passes.
+    layer_check_dir(Packs, LayerViolations),
+    assertion(LayerViolations == []),
+    % The BINDING catches the disguise: a coarse stratum was given a lower layer than a fine one.
+    layer_bind_check_dir(Packs, Strata, BindViolations),
+    assertion(BindViolations \== []).
+
+% AC-N6-007: an UNBOUND pack (a layer but no stratum) is a gap, not a violation.
+test(unbound_pack_is_a_gap_not_an_error) :-
+    % Point at the unbound packs directory and the strata source.
+    fixture('binding/unbound', Packs), fixture('binding/strata', Strata),
+    % Read the ordinals and scan the unbound directory.
+    layer_stratum_ordinals(Strata, Ord),
+    layer_bind_scan(Packs, Ord, Bound, Unbound),
+    % No pack is bound (none declares a stratum).
+    assertion(Bound == []),
+    % The layer-declaring pack with no stratum is reported as an unbound gap.
+    assertion(memberchk(unbound(pack_nostratum, 2, no_stratum_declared), Unbound)),
+    % And there is no binding violation — an unbound pack never breaks the build.
+    layer_bind_check_dir(Packs, Strata, Violations),
+    assertion(Violations == []).
+
+% AC-N6-008: report mode over a violating configuration lists but does NOT throw.
+test(report_mode_does_not_throw_on_violation) :-
+    % Point at the mis-bound packs directory and the strata source.
+    fixture('binding/misbound', Packs), fixture('binding/strata', Strata),
+    % Report mode succeeds (never throws) even with a binding violation present.
+    assertion(catch(layer_bind_enforce_dir(Packs, Strata, report), _, fail)).
+
+% AC-N6-009: the pure binding-violation core detects a contradiction and clears a clean set.
+test(pure_binding_core) :-
+    % A fine stratum (ordinal 4) given a HIGHER layer than a coarse stratum (ordinal 14) is bad.
+    Bad = [bnode(a, 3, s_fine, 4), bnode(b, 1, s_coarse, 14)],
+    layer_binding_violations(Bad, BadV),
+    assertion(BadV \== []),
+    % A monotonic assignment (ordinal up, layer up) is clean.
+    Good = [bnode(a, 1, s_fine, 4), bnode(b, 3, s_coarse, 14)],
+    layer_binding_violations(Good, GoodV),
+    assertion(GoodV == []),
+    % Two packs at the same ordinal must share a layer.
+    Tie = [bnode(a, 1, s_x, 7), bnode(b, 2, s_x, 7)],
+    layer_binding_violations(Tie, TieV),
+    assertion(TieV \== []).
+
+% Close the binding test block.
+:- end_tests(layer_binding).

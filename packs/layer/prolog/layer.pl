@@ -94,7 +94,24 @@
     % layer_data_references_files/2: the L5 heuristic lint over explicit files.
     layer_data_references_files/2,
     % layer_default_packs_dir/1: locate the repository's packs directory.
-    layer_default_packs_dir/1
+    layer_default_packs_dir/1,
+    % --- Layer-to-stratum BINDING (N6, closes STRATA-3) — additive to the above ---
+    % layer_pack_stratum/2: the stratum a pack declares (or 'unbound').
+    layer_pack_stratum/2,
+    % layer_stratum_ordinals/2: read stratum label-to-ordinal pairs from stratum records.
+    layer_stratum_ordinals/2,
+    % layer_bind_scan/4: build the bound-node set and the unbound-gap list.
+    layer_bind_scan/4,
+    % layer_binding_violations/2: the pure order-preserving binding-violation core.
+    layer_binding_violations/2,
+    % layer_binding_violation_line/2: render one binding violation as a readable line.
+    layer_binding_violation_line/2,
+    % layer_bind_check_dir/3: binding violations for a packs dir against a strata source.
+    layer_bind_check_dir/3,
+    % layer_bind_report_dir/2: print a readable binding report.
+    layer_bind_report_dir/2,
+    % layer_bind_enforce_dir/3: enforce the binding at load in strict or report mode.
+    layer_bind_enforce_dir/3
 ]).
 
 % Import list utilities [member/2, memberchk/2, sort/4, exclude/3] from library(lists).
@@ -105,6 +122,11 @@
 :- use_module(library(pcre), [re_foldl/6, re_replace/4]).
 % Import [read_file_to_string/3] from the readutil library.
 :- use_module(library(readutil), [read_file_to_string/3]).
+% Import [json_read_dict/2] from the http/json library — used ONLY by the additive
+% layer-to-stratum binding below, to read stratum ordinals from the authoritative
+% structure records. It is a SWI-Prolog standard library, so this construct still
+% depends on nothing but SWI stdlib (never the Lattice, actors, or a Causalontology pack).
+:- use_module(library(http/json), [json_read_dict/2]).
 
 % ---------------------------------------------------------------------------
 % The pure violation core — no input/output, fully testable in isolation.
@@ -503,3 +525,226 @@ layer_file_mentions_literal(File, Token) :-
     re_foldl([_,A,[x|A]]>>true, Pattern, Code, [], Hits, []),
     % Require at least one hit.
     Hits \== [].
+
+% ---------------------------------------------------------------------------
+% Layer-to-stratum BINDING (PrologAI Ledger N6 — closes the strata arm's STRATA-3).
+%
+% THE GAP (STRATA-3). A pack can DECLARE its layer (the rule above, L4), and the
+% Causalontology data model has strata with ordinals, but nothing binds the two:
+% a pack could declare a layer that contradicts the ordinal of the stratum it
+% claims to be, and L4 — which checks that layers are ORDERED correctly, not that
+% a layer EQUALS the ordinal it should — would happily pass. The Wave 3 verdict's
+% winning decomposition (one pack per stratum) rests on "pack layer tracks stratum
+% ordinal", maintained by hand today. This construct makes that binding a checked,
+% load-time invariant, exactly as L4 made the layer rule a language feature.
+%
+% THE RULE. It is ORDER-PRESERVING, not equality (stratum ordinals are sparse —
+% 4, 6, 7, 9, 14 — while layers are dense 0,1,2,...): for any two BOUND packs,
+% a lower stratum ordinal must not carry a higher layer, and two packs at the same
+% ordinal must share a layer. Layer numbers need not equal ordinal numbers; the
+% layer ASSIGNMENT and the stratum ORDERING must agree in direction and in ties.
+%
+% THE SKIP CASE. A downward reference across a large ordinal gap (a high stratum
+% depending on a much lower one — the cortisol skip) is LEGAL: the binding checks
+% layer/ordinal CONSISTENCY, not dependency gaps, so it never flags a legitimate
+% downward skip. The upward EDGE (a low ordinal depending on a high one) is caught
+% by L4, and the binding additionally stops that upward edge being disguised as
+% downward by a mis-declared layer.
+%
+% ADOPTION IS INCREMENTAL. A pack that declares a layer but NO stratum is UNBOUND,
+% reported as a gap to fill, never an error — the same stigmergic pattern L4 uses
+% for undeclared layers. The declaration is one cheap fact, stratum(Label), in the
+% pack.pl beside layer(N), so it cannot drift into an external registry.
+% ---------------------------------------------------------------------------
+
+% Define layer_pack_stratum/2: the stratum a pack declares in its manifest, or 'unbound'.
+layer_pack_stratum(PackDir, Stratum) :-
+    % Point at the pack's manifest file.
+    atomic_list_concat([PackDir, '/pack.pl'], ManifestPath),
+    % Read the stratum(Label) fact if present; otherwise the pack is unbound.
+    ( exists_file(ManifestPath),
+      layer_manifest_atom(ManifestPath, stratum, S)
+    % A stratum label was declared: use it.
+    ->  Stratum = S
+    % No stratum fact: the pack is unbound (a gap, not an error).
+    ;   Stratum = unbound ).
+
+% Define layer_manifest_atom/3: read a whole-word-atom-valued manifest fact by functor.
+% The sibling of layer_manifest_int/3 (which reads integer-valued facts like layer(2)):
+% this reads an atom-valued fact like stratum(macromolecular), matching a lowercase
+% snake_case word so it accepts only a valid unquoted Prolog atom.
+layer_manifest_atom(ManifestPath, Functor, Atom) :-
+    % Take the manifest's code with comment lines removed.
+    layer_code_text(ManifestPath, Code),
+    % Build the pattern FUNCTOR( <lowercase snake_case word> ) matching a real code line.
+    format(atom(Pattern), "~w\\(\\s*([a-z][a-z0-9_]*)\\s*\\)", [Functor]),
+    % Capture each word the pattern matches.
+    re_foldl([M,A,[W|A]]>>get_dict(1, M, W), Pattern, Code, [], Words, []),
+    % There must be at least one match to succeed.
+    Words = [First|_],
+    % Convert the captured word string to an atom.
+    atom_string(Atom, First).
+
+% Define layer_stratum_ordinals/2: read stratum Label-Ordinal pairs from a strata source.
+% The StrataSource is a directory of Causalontology structure records (JSON), the
+% AUTHORITATIVE place stratum ordinals already live; a pack cannot claim an ordinal
+% the data disagrees with, because the ordinal is read from the record, not the pack.
+layer_stratum_ordinals(StrataSource, Pairs) :-
+    % Glob every JSON record file in the strata source directory.
+    atomic_list_concat([StrataSource, '/*.json'], Glob),
+    % Expand the glob to concrete record paths.
+    expand_file_name(Glob, Files),
+    % Keep the label-ordinal of every record whose kind is 'stratum'.
+    findall(Label-Ordinal,
+            ( member(File, Files),
+              % Read the record as a dict.
+              layer_read_json_dict(File, Dict),
+              % Only stratum records carry a stratum ordinal (accept string or atom kind).
+              get_dict(type, Dict, TypeVal), layer_is_stratum_type(TypeVal),
+              % Read the stratum's label and its ordinal.
+              get_dict(label, Dict, LabelVal),
+              get_dict(ordinal, Dict, Ordinal),
+              integer(Ordinal),
+              % Normalise the label to an atom to match the pack's stratum(Label) declaration.
+              ( atom(LabelVal) -> Label = LabelVal ; atom_string(Label, LabelVal) ) ),
+            Raw),
+    % Sort and deduplicate the pairs.
+    sort(Raw, Pairs).
+
+% Define layer_is_stratum_type/1: true when a record's type value names the stratum kind.
+layer_is_stratum_type("stratum").
+layer_is_stratum_type(stratum).
+
+% Define layer_read_json_dict/2: read one JSON object file into a dict.
+layer_read_json_dict(File, Dict) :-
+    % Open the file, read one JSON value as a dict, and always close the stream.
+    setup_call_cleanup(open(File, read, Stream),
+                       json_read_dict(Stream, Dict),
+                       close(Stream)).
+
+% Define layer_bind_scan/4: build the bound-node set and the unbound-gap list.
+% A bnode(Pack, Layer, Stratum, Ordinal) is a pack that declares a numeric layer AND
+% a stratum whose ordinal is known from the strata source. An unbound(Pack, Layer,
+% Reason) is a pack with a numeric layer but no usable stratum binding — a gap.
+layer_bind_scan(PacksDir, OrdinalMap, BoundNodes, Unbound) :-
+    % Enumerate the pack directories under the packs dir.
+    layer_pack_dirs(PacksDir, PackDirs),
+    % Collect the bound nodes: a numeric layer plus a stratum with a known ordinal.
+    findall(bnode(Pack, Layer, Stratum, Ordinal),
+            ( member(Dir, PackDirs),
+              file_base_name(Dir, Pack),
+              layer_pack_layer(Dir, Layer), integer(Layer),
+              layer_pack_stratum(Dir, Stratum), Stratum \== unbound,
+              memberchk(Stratum-Ordinal, OrdinalMap) ),
+            BoundRaw),
+    % Sort and deduplicate the bound nodes.
+    sort(BoundRaw, BoundNodes),
+    % Collect the unbound gaps: a numeric layer but no usable stratum binding.
+    findall(unbound(Pack, Layer, Reason),
+            ( member(Dir, PackDirs),
+              file_base_name(Dir, Pack),
+              layer_pack_layer(Dir, Layer), integer(Layer),
+              layer_pack_stratum(Dir, Stratum),
+              % Distinguish "no stratum declared" from "stratum ordinal unknown to the source".
+              ( Stratum == unbound
+              ->  Reason = no_stratum_declared
+              ;   \+ memberchk(Stratum-_, OrdinalMap)
+              ->  Reason = stratum_ordinal_unknown(Stratum)
+              ;   fail ) ),
+            UnboundRaw),
+    % Sort and deduplicate the unbound gaps.
+    sort(UnboundRaw, Unbound).
+
+% Define layer_binding_violations/2: the pure order-preserving binding-violation core.
+% No input/output, fully testable in isolation. A violation is any pair of bound
+% packs whose LAYER order contradicts their stratum ORDINAL order, or that share an
+% ordinal but not a layer.
+layer_binding_violations(BoundNodes, Violations) :-
+    % Gather one violation term per offending unordered pair.
+    findall(
+        % The glass-box violation term: both bound packs and the reason they disagree.
+        binding_violation(pack(A, LA, SA, OA), pack(B, LB, SB, OB), Reason),
+        ( % Enumerate an ordered pair of distinct bound packs (by name, once each).
+          member(bnode(A, LA, SA, OA), BoundNodes),
+          member(bnode(B, LB, SB, OB), BoundNodes),
+          A @< B,
+          % The pair breaks the order-preserving rule.
+          layer_binding_pair_bad(OA, LA, OB, LB, Reason) ),
+        Violations).
+
+% Define layer_binding_pair_bad/5: true iff two bound packs break order-preservation.
+layer_binding_pair_bad(OA, LA, OB, LB, finer_stratum_has_higher_layer) :-
+    % A finer stratum (lower ordinal) must not carry a higher layer.
+    OA < OB, LA > LB, !.
+layer_binding_pair_bad(OA, LA, OB, LB, coarser_stratum_has_lower_layer) :-
+    % A coarser stratum (higher ordinal) must not carry a lower layer.
+    OA > OB, LA < LB, !.
+layer_binding_pair_bad(OA, LA, OB, LB, same_stratum_ordinal_needs_same_layer) :-
+    % Two packs at the same stratum ordinal must share a layer.
+    OA =:= OB, LA =\= LB.
+
+% Define layer_binding_violation_line/2: render one binding violation as a readable line.
+layer_binding_violation_line(
+        binding_violation(pack(A, LA, SA, OA), pack(B, LB, SB, OB), Reason), Line) :-
+    % Compose the one-line, glass-box explanation naming both packs, layers, strata, and ordinals.
+    format(atom(Line),
+      "binding_rule violation (~w): pack '~w' (layer ~w, stratum '~w' ordinal ~w) and pack '~w' (layer ~w, stratum '~w' ordinal ~w) — the layer order contradicts the stratum ordinal order",
+      [Reason, A, LA, SA, OA, B, LB, SB, OB]).
+
+% Define layer_bind_check_dir/3: binding violations for a packs dir against a strata source.
+layer_bind_check_dir(PacksDir, StrataSource, Violations) :-
+    % Read the authoritative stratum ordinals.
+    layer_stratum_ordinals(StrataSource, OrdinalMap),
+    % Build the bound-node set for the packs directory.
+    layer_bind_scan(PacksDir, OrdinalMap, BoundNodes, _),
+    % Run the pure binding-violation core over the bound nodes.
+    layer_binding_violations(BoundNodes, Violations).
+
+% Define layer_bind_report_dir/2: print bound packs, unbound gaps, and binding violations.
+layer_bind_report_dir(PacksDir, StrataSource) :-
+    % Read the authoritative stratum ordinals.
+    layer_stratum_ordinals(StrataSource, OrdinalMap),
+    % Build the bound-node set and the unbound-gap list.
+    layer_bind_scan(PacksDir, OrdinalMap, BoundNodes, Unbound),
+    % Compute the binding violations.
+    layer_binding_violations(BoundNodes, Violations),
+    % Print a header for the binding report.
+    format("~n=== Layer-to-Stratum Binding report (~w against strata source ~w) ===~n", [PacksDir, StrataSource]),
+    % Report each bound pack with its layer, stratum, and the stratum's ordinal, sorted by ordinal.
+    findall(O-b(P, L, S), member(bnode(P, L, S, O), BoundNodes), BoundPairs),
+    keysort(BoundPairs, BoundSorted),
+    length(BoundSorted, BoundCount),
+    format("Bound packs: ~w~n", [BoundCount]),
+    forall(member(O-b(P, L, S), BoundSorted),
+           format("  layer ~w  stratum ~w (ordinal ~w)  ~w~n", [L, S, O, P])),
+    % Report the unbound packs as gaps to fill (never errors).
+    length(Unbound, UnboundCount),
+    format("Unbound packs (gaps, not violations): ~w~n", [UnboundCount]),
+    % Print each violation on its own readable line, or state that none were found.
+    ( Violations == []
+    ->  format("Binding violations: 0 — every pack's layer honours its stratum's ordinal order.~n", [])
+    ;   length(Violations, VCount),
+        format("Binding violations: ~w~n", [VCount]),
+        forall(member(V, Violations),
+               ( layer_binding_violation_line(V, Line), format("  ~w~n", [Line]) )) ).
+
+% Define layer_bind_enforce_dir/3: enforce the binding at load time (strict or report mode).
+% The sibling of layer_enforce_dir/2: strict mode throws on any binding violation (so a
+% :- initialization(layer_bind_enforce_dir(...)) refuses a mis-bound configuration);
+% report mode lists violations without refusing, so the binding is adopted incrementally.
+layer_bind_enforce_dir(PacksDir, StrataSource, Mode) :-
+    % Compute the binding violations once for the given directory and strata source.
+    layer_bind_check_dir(PacksDir, StrataSource, Violations),
+    % Print the report so the outcome is visible either way.
+    layer_bind_report_dir(PacksDir, StrataSource),
+    % Branch on the requested enforcement mode.
+    ( Mode == strict
+    % Strict mode: a non-empty violation list refuses the load by throwing.
+    ->  ( Violations == []
+        ->  true
+        ;   throw(error(layer_binding_violation(Violations), layer_bind_enforce_dir/3)) )
+    % Report mode: never refuse; violations were already printed above.
+    ;   Mode == report
+    ->  true
+    % Any other mode is a usage error.
+    ;   throw(error(domain_error(layer_bind_enforce_mode, Mode), layer_bind_enforce_dir/3)) ).

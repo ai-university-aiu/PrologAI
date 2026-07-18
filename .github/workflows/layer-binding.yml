@@ -1,0 +1,47 @@
+# Gate the LAYER-TO-STRATUM BINDING (Ledger entry N6) on every push and pull request.
+#
+# A stratum-primary pack declares stratum(Label) beside its layer(N); this gate
+# checks the declared layer honours the ordinal of that stratum (order-preserving,
+# not equality), closing the strata arm's STRATA-3 finding. It is ADDITIVE to the
+# separate layer-rule (L4) gate, which is untouched. A red run blocks the merge.
+name: layer-binding
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single layer-binding job.
+jobs:
+  layer-binding:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # A consistent stratum-primary configuration must PASS the binding gate (exit 0).
+      - name: Consistent binding passes
+        run: bash bin/check_layer_binding.sh packs/layer/test/fixtures/binding/consistent packs/layer/test/fixtures/binding/strata
+      # A mis-bound configuration (a mis-declared layer disguising an upward edge) must FAIL.
+      - name: Deliberate binding violation is caught
+        run: |
+          if bash bin/check_layer_binding.sh packs/layer/test/fixtures/binding/misbound packs/layer/test/fixtures/binding/strata; then
+            echo "ERROR: the binding checker did not catch the deliberate violation"; exit 1
+          else
+            echo "OK: the binding checker caught the deliberate violation (a mis-declared layer that fools L4)"
+          fi
+      # The binding construct's PLUnit suite (the 9 AC-N6 tests plus the 16 L4 tests).
+      - name: Run the layer construct test suite (L4 + binding)
+        run: |
+          LIB=""
+          for d in packs/*/prolog; do LIB="$LIB -p library=$d"; done
+          swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/layer/test/test_layer.pl
