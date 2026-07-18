@@ -281,3 +281,91 @@ strict layer rule green.
   supplies a repeatable entry for the 12-task ARC-AGI-2 subset; a committed
   full ARC-AGI-2 runner remains an open Mentova-side gap (out of scope here —
   Mentova is read-only for this task).
+
+---
+
+## Wave 4, Part One — bind pack layer to stratum ordinal (2026-07-18)
+
+Branch `ledger/wave-4-bind-layer-to-stratum`. Rollback tag `pre-wave-4-bind`.
+All work **additive**; the ARC-AGI solving core was **not** modified, and the L4
+layer construct's existing predicates and checker behaviour were preserved
+byte-for-byte (only the module export list gained a comma to append new exports).
+Baseline gates held unchanged: mini ARC-AGI-1 40/40, mini ARC-AGI-2 12/12,
+Causalontology conformance 107/107, and the strict layer rule (L4) still reports
+3 declared packs, 296 undeclared gaps, 0 violations. This is the Connectome
+program's fourth Ledger delivery back into PrologAI: the strata arm found the
+gap, and the finding — not the arm's code — is what ships.
+
+### N6 — bind a pack's layer to the ordinal of the stratum it declares · S=H · **DELIVERED** (closes STRATA-3)
+
+- **The gap (STRATA-3, from `connectome-strata`).** A pack can DECLARE its layer
+  (L4), and the Causalontology data model has strata with ordinals, but nothing
+  bound the two: a pack could declare a layer that contradicts the ordinal of the
+  stratum it claims to be, and L4 — which checks that layers are ORDERED
+  correctly, not that a layer matches the ordinal it should — would pass. The
+  Wave 3 verdict's winning decomposition (one pack per stratum) rests on "pack
+  layer tracks stratum ordinal", which was maintained BY HAND. Worse, a
+  mis-declared layer can DISGUISE an ordinal-upward dependency as a
+  layer-downward one, so L4 alone can be fooled into passing a genuine upward
+  edge.
+- **What was delivered (the minimum that closes it).** An additive extension of
+  the `layer` construct (in `packs/layer/prolog/layer.pl`), with no dependency
+  beyond SWI-Prolog standard libraries — never the Lattice, actors, or any
+  Causalontology pack, exactly as L4 requires:
+  - A pack DECLARES the stratum it represents with one cheap fact,
+    `stratum(Label)`, in its `pack.pl` beside `layer(N)` — in the pack, so it
+    cannot drift into an external registry (`layer_pack_stratum/2`).
+  - The stratum ORDINAL is read from the AUTHORITATIVE place it already lives —
+    the Causalontology stratum records (`layer_stratum_ordinals/2` reads the
+    `label`/`ordinal` of every `type:"stratum"` record from a strata-source
+    directory), so a pack cannot claim an ordinal the data disagrees with.
+  - An ORDER-PRESERVING consistency check, not equality (stratum ordinals are
+    sparse — 4, 6, 7, 9, 14 — while layers are dense 0,1,2,…): for any two bound
+    packs, a lower ordinal must not carry a higher layer, and equal ordinals must
+    share a layer (`layer_binding_violations/2`, the pure testable core; the
+    readable line names both packs, their layers, strata, and ordinals).
+  - LOAD-TIME ENFORCEMENT matching L4: `layer_bind_enforce_dir/3` in `strict`
+    mode throws on any binding violation and in `report` mode lists without
+    refusing, so the binding is adopted incrementally.
+  - A CI CHECKER, `bin/check_layer_binding.sh` (exit non-zero on a violation),
+    gated by the additive `.github/workflows/layer-binding.yml`. The existing
+    `bin/check_layers.sh` (L4) is untouched and independently runnable.
+- **The skip is legal; the upward edge is not — and the disguise is caught.**
+  Confirmed by fixtures and PLUnit: a legitimate DOWNWARD SKIP (a high-ordinal
+  stratum depending on a much lower one — the cortisol channel) PASSES both the
+  binding and L4, because it is a downward layer edge across a large ordinal gap,
+  not an upward one. A plain UPWARD edge FAILS L4. And the decisive case — an
+  upward-ordinal dependency DISGUISED as downward by a mis-declared layer — FOOLS
+  L4 (which passes it) but is CAUGHT by the binding (the coarse stratum was given
+  a lower layer than a fine one). This is precisely the loophole the binding
+  exists to close.
+- **Adoption is incremental.** A pack that declares a layer but NO stratum is
+  UNBOUND — reported as a gap to fill, never an error that breaks a build (the
+  same stigmergic pattern L4 uses for undeclared layers). The construct is a
+  no-op for a repository that declares no strata yet — including PrologAI itself
+  today, where the binding checker reports every pack unbound and exits clean.
+- **Evidence / tests.** 9 new `AC-N6-*` PLUnit tests in
+  `packs/layer/test/test_layer.pl` (layer suite now 25/25), over fixtures under
+  `packs/layer/test/fixtures/binding/` (a strata source plus consistent, upward,
+  mis-bound, and unbound configurations). Documented in `docs/layer-binding.md`.
+- **STRATA-3 status: CLOSED.** The alignment "pack layer tracks stratum ordinal"
+  is now a checked, load-time, CI-gated invariant rather than a hand-maintained
+  convention — the same promotion L4 gave the strict layer rule after the spike.
+  It closes for every pack that opts in by declaring its stratum; adoption across
+  a codebase is incremental, as with L4.
+
+### New gap discovered while building it (be greedy)
+
+- **N7 — the binding trusts the structure-record ARTIFACTS as its ordinal source,
+  with no check that they are current with the pack's minting code.** The ordinal
+  is read from the Causalontology stratum records (the JSON the validator writes),
+  not from the pack's own stratum-minting Prolog — because reading the ordinal
+  from the minting code would mean RUNNING the pack inside a load-time checker,
+  which is exactly the kind of heavyweight coupling the layer construct avoids. So
+  if a stratum's ordinal changes in the minting code but the structure records are
+  not regenerated, the binding checks against STALE ordinals and a real drift
+  would pass. The minimum remedy is a freshness check that the strata-source
+  records are consistent with the packs that mint them (a records-up-to-date gate),
+  or a lighter, load-safe way to read a stratum's ordinal directly from its pack.
+  Recorded, not closed — the same "read ordinals out of the data from a load-time
+  checker" limit STRATA-3 anticipated.

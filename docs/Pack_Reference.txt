@@ -2436,6 +2436,13 @@ Strict Layer Rule (WP-426, Layer 400)
     layer_library_imports(+File,-Names) / layer_import_specs(+File,-Specs): the library imports / raw import argument text of one file.
     layer_data_references(+PacksDir,-Suspects) / layer_data_references_files(+Files,-Suspects): the L5 heuristic lint - a lower pack's quoted literal naming a higher pack.
     layer_default_packs_dir(-PacksDir): locate the repository's packs directory.
+    Layer-to-stratum binding (N6, closes STRATA-3 - additive):
+    layer_pack_stratum(+PackDir,-Stratum): the stratum a pack declares in its manifest, or 'unbound'.
+    layer_stratum_ordinals(+StrataSource,-Pairs): read stratum label-to-ordinal pairs from the Causalontology structure records.
+    layer_bind_scan(+PacksDir,+OrdinalMap,-Bound,-Unbound): build the bound-node set (bnode(Pack,Layer,Stratum,Ordinal)) and the unbound-gap list.
+    layer_binding_violations(+Bound,-Violations): the pure order-preserving core - a lower ordinal must not carry a higher layer; equal ordinals share a layer.
+    layer_binding_violation_line(+Violation,-Line) / layer_bind_check_dir(+PacksDir,+StrataSource,-Violations): render one violation / violations for a dir against a strata source.
+    layer_bind_report_dir(+PacksDir,+StrataSource) / layer_bind_enforce_dir(+PacksDir,+StrataSource,+Mode): print the binding report / enforce it at load (strict throws, report lists).
 
 lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_put(+Nexus,+Relation,+Args,+Referents): store a node-fact directly, no vector backend (L1).
