@@ -20,7 +20,7 @@ Status: **CLOSED** · **PARTIALLY CLOSED** · **STILL OPEN**.
 > three granularity arms (ATOMIC / LOOPS / STRATA), and the region builds (ARBITER,
 > HIPPO, CEREBELLUM, AMYGDALA) — into one navigable document, with the open-gaps
 > forward agenda and the closed track record, now lives at
-> **`docs/PrologAI_Requirements_Ledger_v1.txt`**. That consolidated Ledger cites the
+> **`docs/PrologAI_Requirements_Ledger_v2.txt`**. That consolidated Ledger cites the
 > per-repository Ledgers; it does not replace them.
 
 ---
@@ -711,3 +711,41 @@ and amygdala regions rest on it.
   it, is a distinct `find_member` mode that backtracks the guarded predicate until the
   check passes or solutions are exhausted, kept membership-specific. Recorded, not
   closed.
+
+---
+
+## Wave 10, Stage 1 — adopt Causalontology 3.0.0 into PrologAI (2026-07-19)
+
+Branch `feature/wave-10-stage-1-adopt-causalontology-3-0-0`. Rollback tag
+`pre-wave-10-stage-1`. Additive; the ARC-AGI solving core was NOT modified.
+Wave 10 turns the program from DISCOVERING requirements to IMPLEMENTING the
+consolidated Ledger; Stage 1 is the spine.
+
+### STAGE-1 — PrologAI now rests on Causalontology 3.0.0 · **DELIVERED** (closes no gap; the foundation)
+
+- **What was delivered.** PrologAI adopts Causalontology 3.0.0 (shipped in Wave
+  9.5). The vendored conformance suite under
+  `tests/causalontology_conformance/` was re-vendored from the causalontology
+  repository at its 3.0.0 commit `98ebb33`: the 107-vector 2.0.0 set became
+  the **119-vector 3.0.0 set** (V01–V119, adding V108–V119 for the tick unit, the
+  cross_stratal_seam kind, and realized_by), and the 17 schemas became **18**
+  (adding `cross_stratal_seam.schema.json`; the tick unit and realized_by amend
+  the CRO/token_causal_claim and conduit schemas). The `causal_core` vocabulary
+  pack was additively extended to make the three elements USABLE: the ordinal
+  `ticks` temporal unit (a disjoint dimension — integer-ordered, no wall-clock
+  mapping, to_seconds refuses it), the eighteenth kind `cross_stratal_seam` (its
+  identity fields, Algorithm F / `causal_core_seam_wellformed`, the coarsest-
+  stratum `causal_core_seam_home`, and the drawn-chain contradictory-seam rule),
+  and the conduit `realized_by` identity-bearing field. This is adoption
+  plumbing, not new runtime cognition.
+- **Gate.** `bin/run_causalontology_conformance.sh` green at **119/119** (the 107
+  originals preserved plus 12 new); the mini-regression unmoved at **40/40 and
+  12/12**; L4/N6/N8/N11/N14 and the closure hybrid unchanged. Every existing
+  eighteen-kind record still validates.
+- **Closes.** Nothing on its own — it is the foundation. It moves the structure
+  halves of Themes A, B, and C from "blocked on adoption" to "buildable", so
+  Stage 3 (temporal enactment), Stage 4 (the managed seam), and Stage 5
+  (structure-to-dynamics) may now proceed. Stage 2 (affect) may overlap.
+- **Pinned Causalontology.** commit `98ebb33` (specification 3.0.0). The
+  standard is FROZEN for the whole of Wave 10; only this stage's read-only
+  adoption touches it.

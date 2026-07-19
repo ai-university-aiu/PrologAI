@@ -5,7 +5,7 @@
 % 8991c8b5ef12e998ff932855fabe29edf4cc16cc, driving PrologAI's Causalontology
 % vocabulary packs (causal_core, noun_backbone, realizable_hinge) plus the
 % additive conformance layers (schema_check, signing, store, ed25519) against
-% all 107 frozen vectors V01-V107. Canonicalization (RFC 8785), content
+% all 119 frozen vectors V01-V119. Canonicalization (RFC 8785), content
 % identity (SHA-256), schema validity for the seventeen kinds, the local
 % semantic rules, and the five normative algorithms are exercised here.
 %
@@ -34,7 +34,7 @@
 :- discontiguous co_v/1.
 
 % The pinned causalontology source commit the vectors were copied from.
-co_vectors_commit('8991c8b5ef12e998ff932855fabe29edf4cc16cc').
+co_vectors_commit('98ebb332d1a529e676c0e1f20ec432f864728e19').
 
 % -- co_vecdir(-Dir): the vendored vector directory beside this file.
 co_vecdir(Dir) :-
@@ -764,21 +764,122 @@ co_internal_checks :-
     realizable_hinge_quality_add(q_cortisol, concentration, continuant_hippocampus),
     realizable_hinge_quality(q_cortisol, concentration, continuant_hippocampus).
 
-% -- co_run/0: run all 107 vectors, print a report, and fail on any failure.
+% ===========================================================================
+% V108 - V119: the 3.0.0 additions (tick unit, cross_stratal_seam, realized_by).
+% ===========================================================================
+
+% -- co_id_of(+Obj, -Id): read an object's id (a small helper for maplist).
+co_id_of(Obj, Id) :- get_dict(id, Obj, Id).
+
+% -- co_seam_fixture: build a Cross Stratal Seam over the neuroendocrine strata, with maps.
+co_seam_fixture(SrcOrd, TgtOrd, Status, ChainOrds, Seam, OccMap, StratumMap) :-
+    co_neuro(S),
+    get_dict(SrcOrd, S, SrcSt), get_dict(id, SrcSt, SrcSid),
+    get_dict(TgtOrd, S, TgtSt), get_dict(id, TgtSt, TgtSid),
+    co_occ("source_event", SrcSid, SrcOcc), co_occ("target_event", TgtSid, TgtOcc),
+    co_chain_occs(S, ChainOrds, 0, ChainOccs),
+    maplist(co_id_of, ChainOccs, ChainIds),
+    get_dict(id, SrcOcc, SId), get_dict(id, TgtOcc, TId),
+    ( ChainOrds == []
+      -> co_mk(_{type:"cross_stratal_seam", source:SId, target:TId, mechanism_status:Status}, Seam)
+      ;  co_mk(_{type:"cross_stratal_seam", source:SId, target:TId, mechanism_status:Status, chain:ChainIds}, Seam) ),
+    append([SrcOcc, TgtOcc], ChainOccs, AllOccs), co_map_of(AllOccs, OccMap),
+    findall(St, ( member(O, [SrcOrd, TgtOrd|ChainOrds]), get_dict(O, S, St) ), Strata),
+    co_map_of(Strata, StratumMap).
+
+% -- co_chain_occs: build one intervening occurrent per chain ordinal, with unique labels.
+co_chain_occs(_, [], _, []).
+co_chain_occs(S, [O|Os], I, [Occ|Rest]) :-
+    get_dict(O, S, St), get_dict(id, St, Sid),
+    format(string(L), "chain_~w", [I]), co_occ(L, Sid, Occ),
+    I1 is I + 1, co_chain_occs(S, Os, I1, Rest).
+
+% -- co_conduit_rb(+RealizedBy, -Out): a conduit optionally carrying realized_by (none for unbound).
+co_conduit_rb(RB, Out) :-
+    co_sym("port:p1", Frm), co_sym("port:p2", To), co_sym("occurrent:x", X),
+    B0 = _{type:"conduit", label:"conn", from:Frm, to:To, carries:[X]},
+    ( RB == none -> B1 = B0 ; put_dict(realized_by, B0, RB, B1) ),
+    co_mk(B1, Out).
+
+% V108: a Causal Relation Object with a tick temporal window is schema- and semantically valid.
+co_v(108) :- co_sym("occurrent:a", A), co_sym("occurrent:b", B),
+    co_cro([A], [B], [temporal-_{minimum_delay:0, maximum_delay:5, unit:"ticks"}, modality-"sufficient"], P),
+    co_schema_ok(P, causal_relation_object), co_sem_ok(P, causal_relation_object).
+% V109: a tick window is ordered by integer comparison of tick counts.
+co_v(109) :- co_sym("occurrent:a", A), co_sym("occurrent:b", B),
+    co_cro([A], [B], [temporal-_{minimum_delay:2, maximum_delay:5, unit:"ticks"}], P),
+    causal_core_admissible(P, 3, true), causal_core_admissible(P, 2, true),
+    causal_core_admissible(P, 5, true), causal_core_admissible(P, 6, false), causal_core_admissible(P, 1, false).
+% V110: a tick unit and a wall-clock unit are disjoint dimensions; ticks-to-seconds is refused.
+co_v(110) :-
+    TickW = _{minimum_delay:0, maximum_delay:5, unit:"ticks"},
+    WallW = _{minimum_delay:0, maximum_delay:5, unit:"seconds"},
+    causal_core_delay_within_window(_{duration:3, unit:"ticks"}, TickW, true),
+    causal_core_delay_within_window(_{duration:1, unit:"ticks"}, WallW, false),
+    causal_core_delay_within_window(_{duration:1, unit:"seconds"}, TickW, false),
+    co_sym("occurrent:a", A), co_sym("occurrent:b", B),
+    co_cro([A], [B], [temporal-TickW, modality-"sufficient"], PT),
+    co_cro([A], [B], [temporal-WallW, modality-"preventive"], PW),
+    \+ causal_core_conflicts(PT, PW),
+    catch((causal_core_to_seconds(1, ticks, _), Ok = bad),
+          error(type_error(wall_clock_unit, ticks), _), Ok = refused),
+    Ok == refused.
+% V111: the temporal unit is identity-bearing (a tick record differs from a seconds record).
+co_v(111) :- co_sym("occurrent:a", A), co_sym("occurrent:b", B),
+    co_cro([A], [B], [temporal-_{minimum_delay:0, maximum_delay:1, unit:"ticks"}, modality-"sufficient"], PT),
+    co_cro([A], [B], [temporal-_{minimum_delay:0, maximum_delay:1, unit:"seconds"}, modality-"sufficient"], PS),
+    get_dict(id, PT, IdT), get_dict(id, PS, IdS), IdT \== IdS.
+% V112: a Cross Stratal Seam over non-adjacent endpoints (mechanism_status unmodeled) is valid and well-formed.
+co_v(112) :- co_seam_fixture(14, 4, "unmodeled", [], Seam, OccMap, StratumMap),
+    co_schema_ok(Seam, cross_stratal_seam), co_sem_ok(Seam, cross_stratal_seam),
+    causal_core_seam_wellformed(Seam, OccMap, StratumMap, ok(_)).
+% V113: mechanism_status is identity-bearing (unmodeled vs absent give distinct identities).
+co_v(113) :- co_seam_fixture(14, 4, "unmodeled", [], A, _, _),
+    co_seam_fixture(14, 4, "absent", [], B, OccMap, StratumMap),
+    co_schema_ok(B, cross_stratal_seam), causal_core_seam_wellformed(B, OccMap, StratumMap, ok(_)),
+    get_dict(id, A, IdA), get_dict(id, B, IdB), IdA \== IdB.
+% V114: a drawn chain is well-formed; a chain with mechanism_status absent is refused (contradictory_seam).
+co_v(114) :- co_seam_fixture(14, 4, "unmodeled", [9, 7, 6, 5], Drawn, OccMap, StratumMap),
+    co_schema_ok(Drawn, cross_stratal_seam), causal_core_seam_wellformed(Drawn, OccMap, StratumMap, ok(_)),
+    co_seam_fixture(14, 4, "absent", [9, 7, 6, 5], Bad, OccMap2, StratumMap2),
+    co_sem_bad(Bad, cross_stratal_seam, "contradictory_seam"),
+    causal_core_seam_wellformed(Bad, OccMap2, StratumMap2, invalid(_)).
+% V115: the home rule - a seam belongs to the coarsest (greater-ordinal) stratum it touches.
+co_v(115) :- co_seam_fixture(14, 4, "unmodeled", [], Seam, OccMap, StratumMap),
+    co_neuro(S), get_dict(14, S, S14), get_dict(id, S14, Home14),
+    causal_core_seam_home(Seam, OccMap, StratumMap, Home), Home == Home14.
+% V116: an adjacent or co-stratal seam is malformed; cross_stratal_seam is a new identity scheme.
+co_v(116) :- co_seam_fixture(6, 5, "unmodeled", [], Adj, O1, S1),
+    causal_core_seam_wellformed(Adj, O1, S1, invalid(_)),
+    co_seam_fixture(6, 6, "unmodeled", [], Co, O2, S2),
+    causal_core_seam_wellformed(Co, O2, S2, invalid(_)),
+    co_seam_fixture(14, 4, "unmodeled", [], Seam, _, _),
+    get_dict(id, Seam, SeamId), atom_concat('cross_stratal_seam:', _, SeamId).
+% V117: a conduit carrying realized_by is schema-valid (scheme-qualified reference).
+co_v(117) :- co_conduit_rb("native:region_stratum_predict", C), co_schema_ok(C, conduit),
+    co_conduit_rb("causal_relation_object:law_reference", C2), co_schema_ok(C2, conduit).
+% V118: realized_by is identity-bearing (a bound conduit differs from an unbound one).
+co_v(118) :- co_conduit_rb("native:region_stratum_predict", Bound), co_conduit_rb(none, Unbound),
+    get_dict(id, Bound, IdB), get_dict(id, Unbound, IdU), IdB \== IdU.
+% V119: an unbound conduit is legal; a malformed realized_by (not scheme-qualified) is rejected.
+co_v(119) :- co_conduit_rb(none, Unbound), co_schema_ok(Unbound, conduit),
+    co_conduit_rb("not_a_scheme_qualified_reference", Bad), co_schema_bad(Bad, conduit, "realized_by").
+
+% -- co_run/0: run all 119 vectors, print a report, and fail on any failure.
 co_run :- co_run(_).
 % -- co_run(-Failures): run all vectors and unify Failures with the failed ids.
 co_run(Failures) :-
     co_vectors_commit(Commit),
-    format("PrologAI Causalontology 2.0.0 conformance run~n"),
+    format("PrologAI Causalontology 3.0.0 conformance run~n"),
     format("vectors pinned at causalontology commit ~w~n", [Commit]),
     ( co_internal_checks -> format("internal checks (RFC 8785, unit constants, vocab-pack drive) ... ok~n")
     ; ( format("internal checks FAILED~n"), fail ) ),
-    findall(N-Res, ( between(1, 107, N), co_run_one(N, Res) ), Results),
+    findall(N-Res, ( between(1, 119, N), co_run_one(N, Res) ), Results),
     findall(Nm, ( member(N-fail, Results), co_vec_name(N, Nm) ), Failures),
     aggregate_all(count, member(_-pass, Results), Pass),
     format("~`-t~60|~n"),
-    format("~w/107 vectors passed~n", [Pass]),
-    ( Failures == [] -> format("PrologAI is CONFORMANT to the suite (vectors frozen at specification 2.0.0).~n")
+    format("~w/119 vectors passed~n", [Pass]),
+    ( Failures == [] -> format("PrologAI is CONFORMANT to the suite (vectors frozen at specification 3.0.0).~n")
     ; format("FAILED: ~w~n", [Failures]) ).
 
 % -- co_run_one(+N, -Result): run one vector, printing PASS/FAIL, never throwing.

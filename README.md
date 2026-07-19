@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/SWI--Prolog-9.0.4%2B-E44B19?style=for-the-badge" alt="SWI-Prolog 9.0.4+">
   <img src="https://img.shields.io/badge/reasoning-48%20types-B22313?style=for-the-badge" alt="48 Reasoning Types">
   <img src="https://img.shields.io/badge/protocols-MCP%20%7C%20A2A%20%7C%20ACP%20%7C%20ANP-670100?style=for-the-badge" alt="MCP | A2A | ACP | ANP">
-  <img src="https://img.shields.io/badge/Causalontology-2.0.0%20%7C%20107%2F107%20vectors-B22313?style=for-the-badge" alt="Causalontology 2.0.0: 107/107 conformance vectors">
+  <img src="https://img.shields.io/badge/Causalontology-3.0.0%20%7C%20119%2F119%20vectors-B22313?style=for-the-badge" alt="Causalontology 3.0.0: 119/119 conformance vectors">
   <img src="https://img.shields.io/badge/license-Attribution%20No%20Profit%20No%20Problem-3A0000?style=for-the-badge" alt="The Attribution Always; No Profit, No Problem License.">
 </p>
 
@@ -45,7 +45,7 @@ No guessing.
 
 **Naming.** Identifiers are whole English words, never abbreviations — packs and predicates are pack-qualified `snake_case` (`world_model`, not `wm`), and the reified causal primitive is spelled `causal_relation_object` (`cro` retired), aligning with the Causalontology standard's whole-word Principle P7. See [NAMING.md](NAMING.md).
 
-**Conformance.** PrologAI implements **Causalontology specification 2.0.0** and passes **all 107 conformance vectors (V01–V107)** — canonicalization (RFC 8785), content identity (SHA-256), schema validity for the seventeen kinds, the local semantic rules, and the five normative algorithms (bridge closure, bridged reachability, stratal classification, the skip decision, unit normalization), plus Ed25519 (RFC 8032) provenance. The vectors are vendored from the causalontology repository at commit `8991c8b` (the 2.0.0 whole-word baseline) and gated in Continuous Integration (CI) by `bin/run_causalontology_conformance.sh`. Nothing pending — the full suite passes. See the [conformance section of NAMING.md](NAMING.md#conformance-to-causalontology-specification-200).
+**Conformance.** PrologAI implements **Causalontology specification 3.0.0** (adopted in Wave 10 Stage 1) and passes **all 119 conformance vectors (V01–V119)** — canonicalization (RFC 8785), content identity (SHA-256), schema validity for the eighteen kinds, the local semantic rules, and the six normative algorithms (bridge closure, bridged reachability, stratal classification, the skip decision, unit normalization, and the cross-stratal seam well-formedness), plus Ed25519 (RFC 8032) provenance. The 3.0.0 additions — the ordinal `ticks` temporal unit, the eighteenth kind `cross_stratal_seam`, and the conduit `realized_by` reference — are all additive and identity-preserving. The vectors are vendored from the causalontology repository at its 3.0.0 tag and gated in Continuous Integration (CI) by `bin/run_causalontology_conformance.sh`. Nothing pending — the full suite passes. See the [conformance section of NAMING.md](NAMING.md#conformance-to-causalontology-specification-200).
 
 ---
 
@@ -624,7 +624,7 @@ Every answer Mentova produces comes with a readable justification tree — the c
 | [PrologAI Tutorial](docs/PrologAI_Tutorial.txt) | 12-chapter tutorial — beginner to advanced |
 | [Certified PrologAI Engineer](docs/Certified_PrologAI_Engineer.txt) | 25-chapter professional reference textbook |
 | [ARC-AGI Human Steps](docs/ARC-AGI_Human_Steps.txt) | Cognitive deconstruction of all 400 ARC-AGI-1 tasks |
-| [PrologAI Requirements Ledger](docs/PrologAI_Requirements_Ledger_v1.txt) | The consolidated program-wide Ledger — every Connectome finding (open gaps, closed track record, cross-cutting patterns, and the forward agenda) gathered into one canonical view |
+| [PrologAI Requirements Ledger](docs/PrologAI_Requirements_Ledger_v2.txt) | The consolidated program-wide Ledger — every Connectome finding (open gaps, closed track record, cross-cutting patterns, and the forward agenda) gathered into one canonical view |
 | [SPARC Series](docs/) | Complete specification, architecture, and completion volumes |
 
 ---

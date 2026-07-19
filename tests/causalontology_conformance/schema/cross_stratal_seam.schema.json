@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/cross_stratal_seam.schema.json",
+  "title": "Cross Stratal Seam",
+  "description": "3.0.0. A first-class MANAGED record of a legitimate jump across NON-ADJACENT strata. Where the Causal Relation Object's boolean 'skips' flag can only assert THAT a relation crosses non-adjacent strata, a Cross Stratal Seam records HOW HONEST that jump is: its mechanism_status distinguishes 'a mechanism exists but is deliberately unmodeled here' from 'no mechanism exists', and an optional chain draws the intervening adjacent-stratum pathway. Its HOME is the coarsest stratum it touches (the endpoint of greater ordinal), which a layer-to-stratum binding can check. The 'skips' boolean is SUBORDINATED to this construct: a bare skipping Causal Relation Object remains valid and is the coarse, mechanism-status-unspecified form.",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "source",
+    "target",
+    "mechanism_status"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^cross_stratal_seam:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "cross_stratal_seam"
+    },
+    "source": {
+      "type": "string",
+      "pattern": "^occurrent:[0-9a-f]{64}$",
+      "description": "one endpoint occurrent of the seam; its stratum ordinal is one end of the jump"
+    },
+    "target": {
+      "type": "string",
+      "pattern": "^occurrent:[0-9a-f]{64}$",
+      "description": "the other endpoint occurrent of the seam; its stratum ordinal is the other end of the jump"
+    },
+    "mechanism_status": {
+      "enum": [
+        "unmodeled",
+        "absent"
+      ],
+      "description": "the HONEST-IGNORANCE distinction. 'unmodeled': an intervening mechanism EXISTS across the skipped strata but is deliberately not drawn here. 'absent': there is genuinely NO intervening mechanism - the jump is direct. This is exactly what the boolean skips flag could not say."
+    },
+    "chain": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^occurrent:[0-9a-f]{64}$"
+      },
+      "description": "OPTIONAL. The intervening pathway DRAWN as an ordered list of occurrents at INTERVENING strata (each strictly between the two endpoints' stratum ordinals, same scheme, strictly monotone from one endpoint toward the other). When present the seam is DRAWN, so its mechanism_status must be 'unmodeled', never 'absent' (a drawn mechanism is not absent)."
+    }
+  }
+}
