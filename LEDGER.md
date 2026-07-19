@@ -20,7 +20,7 @@ Status: **CLOSED** · **PARTIALLY CLOSED** · **STILL OPEN**.
 > three granularity arms (ATOMIC / LOOPS / STRATA), and the region builds (ARBITER,
 > HIPPO, CEREBELLUM, AMYGDALA) — into one navigable document, with the open-gaps
 > forward agenda and the closed track record, now lives at
-> **`docs/PrologAI_Requirements_Ledger_v7.txt`**. That consolidated Ledger cites the
+> **`docs/PrologAI_Requirements_Ledger_v8.txt`**. That consolidated Ledger cites the
 > per-repository Ledgers; it does not replace them.
 
 ---
@@ -910,3 +910,30 @@ Additive extension of the `layer` pack (WP-435); no L4/N6 behaviour changed.
   fixtures), conformance 119/119, mini-regression 40/40 and 12/12, the layer rule 0
   violations, pack naming clean (301 packs). L4/N6/N8/N11/N14 and the closure hybrid
   unchanged.
+
+---
+
+## Wave 10, Stage 7 — packaging and dependency kinds (Theme G) (2026-07-19)
+
+Branch `feature/wave-10-stage-7-packaging`. Rollback tag `pre-wave-10-stage-7`.
+Additive; the ARC-AGI solving core was NOT modified.
+
+### Theme G — packaging and dependency kinds · **CLOSED** (WP-436)
+
+- **The gap.** PrologAI had ONE kind of dependency — a `use_module` import — and no way
+  to say what KIND it was. This bit the one-pack-per-construct arm, whose high pack
+  count turned every intra-pack reference into an inter-pack import. Sightings:
+  ATOMIC-1/2/3/4.
+- **Delivered.** The new **`packaging`** pack (WP-436, layer 0): (1) **dependency kinds**
+  — `structure_only` (mint-time) vs `runtime`, so `packaging_runtime_dependencies/2`
+  returns only the edges the layer graph should count (ATOMIC-1); (2) **loadable faces**
+  — `packaging_required_face/2` and `packaging_face_dependencies/3` let a consumer load
+  ONE face, so validating a record never drags in the runtime substrate (ATOMIC-4);
+  (3) a **facade/bundle** — `packaging_declare_facade/2` and `packaging_expand/2`
+  (recursive, cycle-safe) let a consumer name a bundle instead of every fine pack
+  (ATOMIC-2); (4) a **cross-pack record registry** — `packaging_register_record/3`,
+  `packaging_record/2`, `packaging_record_owner/2` look up a content-addressed record
+  and its owner by id (ATOMIC-3).
+- **Gate.** packaging 10/10, conformance 119/119, mini-regression 40/40 and 12/12, the
+  layer rule 0 violations, pack naming clean (302 packs). L4/N6/N8/N11/N14 and the
+  closure hybrid unchanged.
