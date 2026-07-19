@@ -13,6 +13,16 @@
 Legend: **S** = the spike's severity for the Connectome plan (H/M/L).
 Status: **CLOSED** · **PARTIALLY CLOSED** · **STILL OPEN**.
 
+> **Consolidated program-wide view (Wave 9).** This file remains the authoritative
+> record of PrologAI's own deliveries and native gaps (the N series and the L
+> continuations). The single canonical account that gathers EVERY finding across ALL
+> the program's repositories — the frozen spike (L), this file (N), the slice (P), the
+> three granularity arms (ATOMIC / LOOPS / STRATA), and the region builds (ARBITER,
+> HIPPO, CEREBELLUM, AMYGDALA) — into one navigable document, with the open-gaps
+> forward agenda and the closed track record, now lives at
+> **`docs/PrologAI_Requirements_Ledger_v1.txt`**. That consolidated Ledger cites the
+> per-repository Ledgers; it does not replace them.
+
 ---
 
 ## Wave 1 — the layer construct and the Lattice affordances (2026-07-17)
