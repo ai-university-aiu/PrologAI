@@ -46,6 +46,7 @@ co_schema_file(realizable, 'realizable.schema.json').
 co_schema_file(stratum, 'stratum.schema.json').
 % bridge.
 co_schema_file(bridge, 'bridge.schema.json').
+co_schema_file(cross_stratal_seam, 'cross_stratal_seam.schema.json').
 % port.
 co_schema_file(port, 'port.schema.json').
 % conduit.

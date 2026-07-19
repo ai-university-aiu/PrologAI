@@ -546,7 +546,7 @@ causal_core_why(Id, why(Id, causes(Causes), effects(Effects), window(Temporal),
 %
 % This section makes causal_core speak the Causalontology 2.0.0 standard as
 % published data structures: RFC 8785 canonicalization, SHA-256 content
-% identity for all seventeen kinds, the locally-checkable semantic rules, and
+% identity for all eighteen kinds, the locally-checkable semantic rules, and
 % the five normative algorithms of Section 12 (bridge closure, bridged
 % reachability, stratal classification, the skip decision, unit
 % normalization). Objects are SWI dicts with atom keys; string values are
@@ -578,6 +578,9 @@ causal_core_why(Id, why(Id, causes(Causes), effects(Effects), window(Temporal),
 :- export(causal_core_skip_gaps/3).
 :- export(causal_core_delay_within_window/3).
 :- export(causal_core_bridge_wellformed/4).
+:- export(causal_core_seam_wellformed/4).
+:- export(causal_core_seam_home/4).
+:- export(causal_core_dimension/2).
 :- export(causal_core_conduit_wellformed/4).
 :- export(causal_core_state_gaps/3).
 :- export(causal_core_covering_law_mismatch/3).
@@ -586,7 +589,7 @@ causal_core_why(Id, why(Id, causes(Causes), effects(Effects), window(Temporal),
 :- export(causal_core_enrichment_field/3).
 :- export(causal_core_atomize/2).
 
-% -- The identity-bearing fields of each of the seventeen kinds (identity.md).
+% -- The identity-bearing fields of each of the eighteen kinds (identity.md).
 % The "type" field is always injected, so it is not listed in these tables.
 % occurrent identity: its label, category, and stratum.
 causal_core_identity_fields(occurrent, [label, category, stratum]).
@@ -601,10 +604,12 @@ causal_core_identity_fields(realizable, [kind, bearer, label]).
 causal_core_identity_fields(stratum, [label, scheme, ordinal, unit, governs]).
 % bridge identity: the coarse occurrent, its fine set, and the relation.
 causal_core_identity_fields(bridge, [coarse, fine, relation]).
+% cross_stratal_seam identity (3.0.0, the eighteenth kind): source, target endpoints, mechanism_status, optional chain.
+causal_core_identity_fields(cross_stratal_seam, [source, target, mechanism_status, chain]).
 % port identity: bearer, label, direction, accepted occurrents, realizable.
 causal_core_identity_fields(port, [bearer, label, direction, accepts, realizable]).
-% conduit identity: label, from, to, carried occurrents, transform.
-causal_core_identity_fields(conduit, [label, from, to, carries, transform]).
+% conduit identity: label, from, to, carried occurrents, transform, and (3.0.0) the optional realized_by native-law reference.
+causal_core_identity_fields(conduit, [label, from, to, carries, transform, realized_by]).
 % quality identity: label, datatype, unit, stratum.
 causal_core_identity_fields(quality, [label, datatype, unit, stratum]).
 % token_individual identity: what it instantiates, its designator, its whole.
@@ -821,7 +826,14 @@ causal_core_unit_seconds(years, 31556952).
 % -- causal_core_unit_seconds accepts a unit given as a string too.
 causal_core_unit_atom(U, A) :- ( atom(U) -> A = U ; atom_string(A, U) ).
 
+% -- causal_core_dimension(+Unit, -Dim): 3.0.0. 'ordinal' for the tick unit, else 'wallclock'.
+causal_core_dimension(U, Dim) :- causal_core_unit_atom(U, A), ( A == ticks -> Dim = ordinal ; Dim = wallclock ).
+
 % -- causal_core_to_seconds(+Duration, +Unit, -Seconds): normalize a delay.
+% 3.0.0: an ordinal (tick) unit is dimensionless and has NO wall-clock mapping - converting it is a refused category error.
+causal_core_to_seconds(_, Unit, _) :- causal_core_unit_atom(Unit, ticks), !,
+    throw(error(type_error(wall_clock_unit, ticks),
+                context(causal_core_to_seconds/3, 'ticks is an ordinal (dimensionless) unit with no wall-clock seconds mapping'))).
 causal_core_to_seconds(_, Unit, 0) :- causal_core_unit_atom(Unit, instant), !.
 % Any other unit multiplies the duration by its second-count.
 causal_core_to_seconds(Duration, Unit, Seconds) :-
@@ -830,7 +842,12 @@ causal_core_to_seconds(Duration, Unit, Seconds) :-
 
 % -- causal_core_admissible(+Cro, +ElapsedSeconds, -Bool): Rule 4.
 causal_core_admissible(Cro, _, true) :- \+ get_dict(temporal, Cro, _), !.
-% With a window, the elapsed time must fall inside the normalized bounds.
+% 3.0.0: an ordinal (tick) window is ordered by INTEGER comparison of tick counts (Elapsed is a tick count, no seconds mapping).
+causal_core_admissible(Cro, Elapsed, Bool) :-
+    get_dict(temporal, Cro, T), get_dict(unit, T, U), causal_core_unit_atom(U, ticks), !,
+    get_dict(minimum_delay, T, Lo), get_dict(maximum_delay, T, Hi),
+    ( ( Lo =< Elapsed, Elapsed =< Hi ) -> Bool = true ; Bool = false ).
+% With a wall-clock window, the elapsed time must fall inside the normalized bounds.
 causal_core_admissible(Cro, Elapsed, Bool) :-
     get_dict(temporal, Cro, T),
     get_dict(unit, T, U), causal_core_unit_atom(U, Unit),
@@ -864,6 +881,10 @@ causal_core_semantic_error(causal_relation_object, Obj, "refines must be acyclic
 causal_core_semantic_error(causal_relation_object, Obj,
         "contradictory_skip: skips is true but a mechanism is present") :-
     get_dict(skips, Obj, true), get_dict(mechanism, Obj, M), M \== [].
+% 3.0.0 Rule 22 local clause: a Cross Stratal Seam that DRAWS a chain cannot declare its mechanism 'absent'.
+causal_core_semantic_error(cross_stratal_seam, Obj,
+        "contradictory_seam: a drawn chain cannot carry mechanism_status 'absent' (a drawn mechanism is not absent)") :-
+    get_dict(chain, Obj, _), get_dict(mechanism_status, Obj, MS), causal_core_atomize(MS, absent).
 % Rule 12: an enrichment field must be legal for the kind it is about.
 causal_core_semantic_error(enrichment, Obj, Msg) :-
     get_dict(field, Obj, FieldV), causal_core_atomize(FieldV, Field),
@@ -962,15 +983,18 @@ causal_core_contexts_compatible(A, B) :-
 causal_core_window_overlap(A, _B) :- \+ get_dict(temporal, A, _), !.
 causal_core_window_overlap(_A, B) :- \+ get_dict(temporal, B, _), !.
 causal_core_window_overlap(A, B) :-
-    causal_core_window_bounds(A, LoA, HiA), causal_core_window_bounds(B, LoB, HiB),
+    causal_core_window_bounds(A, DimA, LoA, HiA), causal_core_window_bounds(B, DimB, LoB, HiB),
+    DimA == DimB,                       % 3.0.0: ordinal and wall-clock windows are disjoint dimensions, never overlapping
     LoA =< HiB, LoB =< HiA.
 
-% -- causal_core_window_bounds(+Cro, -LoSeconds, -HiSeconds).
-causal_core_window_bounds(Cro, Lo, Hi) :-
-    get_dict(temporal, Cro, T), get_dict(unit, T, U), causal_core_unit_atom(U, Unit),
-    causal_core_unit_seconds(Unit, Per),
+% -- causal_core_window_bounds(+Cro, -Dim, -Lo, -Hi): the window's dimension and comparable bounds
+% (a tick count in the ordinal dimension, or seconds in the wall-clock dimension).
+causal_core_window_bounds(Cro, Dim, Lo, Hi) :-
+    get_dict(temporal, Cro, T), get_dict(unit, T, U), causal_core_dimension(U, Dim),
     get_dict(minimum_delay, T, L), get_dict(maximum_delay, T, H),
-    Lo is L * Per, Hi is H * Per.
+    ( Dim == ordinal
+      -> Lo = L, Hi = H
+      ;  causal_core_unit_atom(U, Unit), causal_core_unit_seconds(Unit, Per), Lo is L * Per, Hi is H * Per ).
 
 % ---------------------------------------------------------------------------
 % Rule 3: refinement validity
@@ -1144,13 +1168,22 @@ causal_core_skip_gap(false, false, skipping, incomplete_mechanism).
 % -- ALGORITHM E surface (Rule 20). causal_core_delay_within_window(+ActualDelay, +Temporal, -Bool).
 causal_core_delay_within_window(ActualDelay, Temporal, true) :-
     ( ActualDelay == none ; Temporal == none ), !.
+% 3.0.0: an ordinal delay compares to an ordinal window by integer tick count; an ordinal delay and a wall-clock window
+% (or the reverse) are different dimensions and never fall within one another.
 causal_core_delay_within_window(ActualDelay, Temporal, Bool) :-
-    get_dict(duration, ActualDelay, Dur), get_dict(unit, ActualDelay, AU),
-    causal_core_to_seconds(Dur, AU, Observed),
-    get_dict(minimum_delay, Temporal, Lo0), get_dict(unit, Temporal, TU),
-    causal_core_to_seconds(Lo0, TU, Lo),
-    get_dict(maximum_delay, Temporal, Hi0), causal_core_to_seconds(Hi0, TU, Hi),
-    ( ( Lo =< Observed, Observed =< Hi ) -> Bool = true ; Bool = false ).
+    get_dict(unit, ActualDelay, AU), get_dict(unit, Temporal, TU),
+    causal_core_dimension(AU, DimA), causal_core_dimension(TU, DimT),
+    ( DimA \== DimT
+      -> Bool = false
+    ; DimA == ordinal
+      -> get_dict(duration, ActualDelay, Obs),
+         get_dict(minimum_delay, Temporal, Lo), get_dict(maximum_delay, Temporal, Hi),
+         ( ( Lo =< Obs, Obs =< Hi ) -> Bool = true ; Bool = false )
+    ; get_dict(duration, ActualDelay, Dur), causal_core_to_seconds(Dur, AU, Observed),
+      get_dict(minimum_delay, Temporal, Lo0), causal_core_to_seconds(Lo0, TU, Lo),
+      get_dict(maximum_delay, Temporal, Hi0), causal_core_to_seconds(Hi0, TU, Hi),
+      ( ( Lo =< Observed, Observed =< Hi ) -> Bool = true ; Bool = false )
+    ).
 
 % -- Rule 14 (N3.2.1). causal_core_bridge_wellformed(+Bridge, +OccMap, +StratumMap, -Result).
 causal_core_bridge_wellformed(Bridge, OccMap, StratumMap, Result) :-
@@ -1177,6 +1210,65 @@ causal_core_bridge_wellformed(Bridge, OccMap, StratumMap, Result) :-
 causal_core_stratum_of_id(OccMap, OccId, Stratum) :- causal_core_map_get(OccId, OccMap, Occ), get_dict(stratum, Occ, Stratum).
 % Succeeds if the occurrent has a stratum.
 causal_core_has_stratum(OccMap, OccId) :- causal_core_stratum_of_id(OccMap, OccId, _).
+
+% -- 3.0.0 Rule 22 / Algorithm F. causal_core_seam_wellformed(+Seam, +OccMap, +StratumMap, -Result).
+% A Cross Stratal Seam is a MANAGED jump across NON-ADJACENT strata; a drawn chain must be intervening,
+% strictly-between the endpoints, strictly monotone, and forbids mechanism_status 'absent'.
+causal_core_seam_wellformed(Seam, OccMap, StratumMap, Result) :-
+    ( \+ ( get_dict(source, Seam, Src), causal_core_stratum_of_id(OccMap, Src, _) )
+        -> Result = invalid("malformed_seam: source has no stratum (a)")
+    ; \+ ( get_dict(target, Seam, Tgt), causal_core_stratum_of_id(OccMap, Tgt, _) )
+        -> Result = invalid("malformed_seam: target has no stratum (a)")
+    ; get_dict(source, Seam, S1), causal_core_stratum_of_id(OccMap, S1, SS1),
+      get_dict(target, Seam, T1), causal_core_stratum_of_id(OccMap, T1, TS1),
+      causal_core_scheme_of(StratumMap, SS1, ScS), causal_core_scheme_of(StratumMap, TS1, ScT), ScS \== ScT
+        -> Result = invalid("malformed_seam: endpoints differ in scheme (b)")
+    ; get_dict(source, Seam, S2), causal_core_stratum_of_id(OccMap, S2, SS2),
+      get_dict(target, Seam, T2), causal_core_stratum_of_id(OccMap, T2, TS2),
+      causal_core_ordinal_of(StratumMap, SS2, OS), causal_core_ordinal_of(StratumMap, TS2, OT),
+      Gap is abs(OS - OT), Gap =< 1
+        -> Result = invalid("malformed_seam: endpoints are adjacent or co-stratal; a seam is for NON-adjacent strata (c)")
+    ; get_dict(chain, Seam, Chain)
+        -> causal_core_seam_chain_check(Seam, Chain, OccMap, StratumMap, Result)
+    ; Result = ok("well-formed cross_stratal_seam")
+    ).
+
+% -- causal_core_seam_chain_check: a drawn chain forbids 'absent', and each member is intervening + strictly monotone.
+causal_core_seam_chain_check(Seam, Chain, OccMap, StratumMap, Result) :-
+    get_dict(source, Seam, S), causal_core_stratum_of_id(OccMap, S, SS),
+    get_dict(target, Seam, T), causal_core_stratum_of_id(OccMap, T, TS),
+    causal_core_ordinal_of(StratumMap, SS, OS), causal_core_ordinal_of(StratumMap, TS, OT),
+    Lo is min(OS, OT), Hi is max(OS, OT),
+    ( get_dict(mechanism_status, Seam, MS0), causal_core_atomize(MS0, absent)
+        -> Result = invalid("malformed_seam: a drawn chain contradicts mechanism_status 'absent' (d)")
+    ; \+ maplist(causal_core_has_stratum(OccMap), Chain)
+        -> Result = invalid("malformed_seam: a chain member has no stratum (e)")
+    ; maplist(causal_core_chain_ordinal(OccMap, StratumMap), Chain, Ords),
+      \+ forall(member(O, Ords), ( Lo < O, O < Hi ))
+        -> Result = invalid("malformed_seam: a chain member is not at an INTERVENING stratum (f)")
+    ; maplist(causal_core_chain_ordinal(OccMap, StratumMap), Chain, Ords2),
+      \+ causal_core_strictly_monotone(Ords2)
+        -> Result = invalid("malformed_seam: chain is not strictly monotone from one endpoint toward the other (g)")
+    ; Result = ok("well-formed cross_stratal_seam")
+    ).
+
+% -- the ordinal of a chain member's stratum.
+causal_core_chain_ordinal(OccMap, StratumMap, OccId, Ord) :-
+    causal_core_stratum_of_id(OccMap, OccId, St), causal_core_ordinal_of(StratumMap, St, Ord).
+
+% -- strictly monotone: all successive differences share one sign (all up, or all down).
+causal_core_strictly_monotone([_]) :- !.
+causal_core_strictly_monotone([]) :- !.
+causal_core_strictly_monotone(L) :-
+    findall(D, ( nth0(I, L, A), I1 is I + 1, nth0(I1, L, B), D is B - A ), Diffs),
+    ( forall(member(D, Diffs), D > 0) ; forall(member(D, Diffs), D < 0) ).
+
+% -- THE HOME RULE (3.0.0). causal_core_seam_home(+Seam, +OccMap, +StratumMap, -HomeStratumId): the coarsest (max-ordinal) endpoint stratum.
+causal_core_seam_home(Seam, OccMap, StratumMap, Home) :-
+    get_dict(source, Seam, S), causal_core_stratum_of_id(OccMap, S, SS),
+    get_dict(target, Seam, T), causal_core_stratum_of_id(OccMap, T, TS),
+    causal_core_ordinal_of(StratumMap, SS, OS), causal_core_ordinal_of(StratumMap, TS, OT),
+    ( OS >= OT -> Home = SS ; Home = TS ).
 
 % -- Rule 17 (N4.2.1-2). causal_core_conduit_wellformed(+Conduit, +PortMap, +CroMap, -Result).
 causal_core_conduit_wellformed(Conduit, PortMap, CroMap, Result) :-

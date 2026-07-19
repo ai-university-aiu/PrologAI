@@ -45,6 +45,12 @@
       "type": "string",
       "pattern": "^causal_relation_object:[0-9a-f]{64}$",
       "description": "OPTIONAL. ABSENT asserts the conduit is TRANSMISSIVE. PRESENT names the Causal Relation Object the conduit performs upon what it carries, asserting the conduit is COMPUTATIONAL."
+    },
+    "realized_by": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*:.+$",
+      "minLength": 3,
+      "description": "3.0.0 OPTIONAL. A scheme-qualified REFERENCE, by identity, to the native law or signal that REALIZES this conduit's transform (for example a native rate law a computational conduit stands for, or a runtime signal a transmissive conduit stands for). It is a reference, not an embedded law - the native dynamics stay native; the standard only records the binding. ABSENT (unbound) is legal and identity-preserving; a conduit that carried no realized_by in 2.0.0 keeps its identifier under 3.0.0."
     }
   }
 }
