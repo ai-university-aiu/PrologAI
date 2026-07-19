@@ -487,3 +487,66 @@ read pinned at commit `58951b9` and **not modified**.
   filtered. For a selector (deterministic, one answer) this is exactly right; for
   a nondeterministic producer a `once`-style or filtering variant might be wanted.
   Recorded as a scope note, not a defect — the construct is aimed at selectors.
+
+---
+
+## Wave 7, Part One — documentation governance and a SPARC/Tutorial catch-up (2026-07-18)
+
+Branch `docs/wave-7-governance-and-catchup`. Rollback tag `pre-wave-7-docs`. This
+entry is a **documentation-governance note**, not an N-construct — no behaviour
+changed. It is the enforce-then-build Part One of Wave 7: it writes the doc rule
+down and catches the flagship documents up so Part Two (the accessor-form
+membership contract, closing N9) ships under the written rule.
+
+### DOC-GOV-1 — the six-file repository documentation rule was written down · **ADOPTED**
+
+- **What was adopted.** The **Six-File Repository Documentation Rule** was added to
+  the governing (not-publicly-tracked) `CLAUDE.md`: every repository that contains
+  functional code carries a `docs/` folder with the six versioned files
+  `[reponame]_1_Specification` … `_6_Demonstration` (the five SPARC files plus a
+  Demonstration plan of intent), the Pseudocode file written in English-Readable
+  Code, versioned under the existing SPARC and Archive rules. A repository with no
+  functional code (a data-structure or standard, such as `causalontology`) is
+  exempt and instead carries a single standalone specification in its root.
+- **Why it exists.** The per-construct documentation discipline (a `docs/` page, a
+  README paragraph and table row, a Ledger entry, and a Continuous Integration
+  workflow) had always held but was never written down, so the SPARC series and the
+  Tutorial drifted stale with respect to N6 and N8 without any rule being violated.
+  Writing the rule down makes the required documentation set an explicit definition
+  of done.
+
+### DOC-GOV-2 — SPARC and the Tutorial caught up to N6 and N8 · **DELIVERED**
+
+- **SPARC.** Applying the scoping rule (an infrastructure construct always touches
+  Specification, Architecture, and Completion; it touches Refinement when it adds
+  enforcement detail; Pseudocode only on new algorithmic detail; Demonstration only
+  when Mentova is affected), four volumes were bumped by copy-and-append and their
+  superseded versions moved into `docs/archive/` with `git mv`: Specification
+  v411→v412, Architecture v404→v405, Refinement v463→v464, Completion v469→v470.
+  Each now states N6 (the load-time layer-to-stratum binding, closing STRATA-3) and
+  N8 (the runtime membership contract, closing ARBITER-1). Pseudocode (v403) and the
+  Demonstration volume were correctly left untouched (no new algorithmic detail; no
+  Mentova effect).
+- **Tutorial.** Chapters 360 (the N6 binding) and 361 (the N8 membership contract)
+  were appended to `docs/PrologAI_Tutorial.txt`, in the Tutorial's newcomer voice —
+  how to declare a stratum and run the binding checker, and how to declare a
+  contract, name the abstention, and read a violation.
+
+### DOC-GOV-3 — the two label items, reconciled honestly
+
+- **The README SPARC table was corrected** to the actual current filenames
+  (post-bump): Specification v412, Pseudocode v403, Architecture v405, Refinement
+  v464, Completion v470, Demonstration_Mentova v4. It had cited stale numbers
+  (v263/v255/v256/v315/v321) that matched neither the filenames nor the headers.
+- **The "Refinement internal header" is NOT a bug — a finding recorded honestly.**
+  The catch-up surfaced that every volume's line-1 internal header sits at an old
+  version (Specification header v263, Refinement header v314, and so on), older than
+  its filename. This is **correct by design**: the SPARC/copy-and-append rule
+  freezes the line-1 internal header at the volume's origin version and advances
+  only the filename. So no internal header was edited (doing so would violate the
+  rule). The earlier draft of this change order called the Refinement header a bug
+  to fix; the governing rule says the opposite, and the rule wins. The header/
+  filename divergence is intended, not drift.
+
+- **Closing commit.** Recorded in the squash-merge of
+  `docs/wave-7-governance-and-catchup` to main.
