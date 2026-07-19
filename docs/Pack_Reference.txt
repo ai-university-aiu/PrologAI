@@ -2454,9 +2454,14 @@ lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_notify(+Nexus): wake every reader awaiting on the nexus - the stigmergy-plus-notification bridge (L3).
 
 membership_contract
-The Membership Contract construct (N8, closes ARBITER-1) - a runtime output-member-of-input-set postcondition
+The Membership Contract construct (N8, WP-427, closes ARBITER-1 and N9) - a runtime output-member postcondition with a plain-list form and an accessor form over a goal-described set
     membership_contract_enforce(:Pred,+OutPos,+InPos,+Abstention): declare that Pred's OutPos-th argument must be a member of its InPos-th argument (a list) or the Abstention value, and wrap Pred so every call is checked (RUNTIME postcondition, opt-in).
     membership_contract_check(+Pred,+Out,+In,+Abstention): the pure postcondition - succeeds on the abstention or a member of In, throws a glass-box membership_contract_violation otherwise (never endorses a non-member).
     membership_contract_holds(+Out,+In,+Abstention): a boolean membership test that never throws (true for the abstention or a member, false otherwise).
-    membership_contract_declared(?Pred,?OutPos,?InPos,?Abstention): enumerate the predicates that declare a contract, with their output/input positions and abstention value.
-    membership_contract_violation_line(+Error,-Line): render one contract violation as a readable line naming the predicate, the offending output, and the offered set.
+    membership_contract_declared(?Pred,?OutPos,?InPos,?Abstention): enumerate the predicates that declare a plain-list contract, with their output/input positions and abstention value.
+    membership_contract_enforce_goal(:Pred,+OutPos,:TestGoal,+Abstention): declare an ACCESSOR contract (N11) - Pred's OutPos-th argument must satisfy the membership-TEST goal TestGoal (called with the candidate appended) or be the Abstention; checks membership WITHOUT materialising the set.
+    membership_contract_enforce_producer(:Pred,+OutPos,:ProducerGoal,+Abstention): declare an ACCESSOR contract whose set is the list ProducerGoal builds; a convenience that MATERIALISES, so prefer the test-goal form for a growing store.
+    membership_contract_check_goal(+Pred,+Out,:TestGoal,+Abstention): the test-goal postcondition - succeeds on the abstention or when TestGoal accepts Out, else throws a glass-box membership_contract_goal_violation naming the goal.
+    membership_contract_holds_goal(+Out,:TestGoal,+Abstention): a boolean test-goal membership check that never throws.
+    membership_contract_declared_goal(?Pred,?OutPos,?Form,?Abstention): enumerate the predicates that declare an accessor contract (Form = test or producer).
+    membership_contract_violation_line(+Error,-Line): render one contract violation as a readable line naming the predicate, the offending output, and the offered set (plain-list form) or the membership-test goal (accessor form).

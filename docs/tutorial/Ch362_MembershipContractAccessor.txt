@@ -1,0 +1,36 @@
+Chapter 362: A Membership Promise Over a Store - The Accessor Form of the Contract
+
+The membership contract of the previous chapter requires the offered set to be a
+plain list, passed as an argument. That is fine for a selector handed a short list.
+It is wrong for a memory: a store of remembered things is a growing set of facts, not
+a list, and turning the whole store into a list on every recall - just to ask whether
+one item is in it - is wasteful, and impossible if the set is very large or endless.
+The Wave 6 memory region hit exactly this wall and recorded it as gap N9. The
+accessor form (Ledger entry N11) closes it.
+
+Instead of naming the set as a list argument, you name it with a membership-TEST
+goal: a predicate that, given a candidate, succeeds if the candidate is in the set
+and fails if not. You declare it with membership_contract_enforce_goal, naming the
+guarded predicate, its output argument, the test goal, and the abstention:
+
+    stored_pattern_member(Pattern) :- stored_pattern(Pattern).
+
+    :- membership_contract_enforce_goal(store_recall/2, 2, stored_pattern_member, no_recall).
+
+Every recall is now checked by running that test on the produced output. A stored
+memory passes; the explicit no_recall passes; a memory nobody stored is refused. The
+important part is what does NOT happen: the store is never flattened into a list. The
+check is a single fact lookup, not a copy of the whole store, so the no-confabulation
+guarantee is obtained with no per-call materialisation. The form is so free of the
+list that it can guard membership of an infinite set - the positive even numbers, say
+- which no list could hold. When a test-goal check refuses an output, the violation
+names the goal rather than a list, since there is no list to print.
+
+There is a second, convenience form, membership_contract_enforce_producer, which
+names a goal that builds the set as a list and reuses the plain-list check. It is
+honest about its cost: it does materialise, so it does not solve the growing-store
+problem - use it only for a small set. The accessor form is opt-in and additive: the
+plain-list contract of the previous chapter is unchanged, and a predicate may use
+either form or neither. It is documented in docs/membership-contract.md, and it is
+the reason the next memory-using region can guard recall against its live store
+directly, with no flatten-on-every-call workaround.

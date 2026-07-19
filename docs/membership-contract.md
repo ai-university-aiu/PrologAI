@@ -1,4 +1,4 @@
-# The membership contract (Ledger N8)
+# The membership contract (Ledger N8; accessor form N11)
 
 This construct lets a predicate declare that one of its **output** arguments must
 be a **member** of one of its **input** arguments (a list) — or equal to a
@@ -118,7 +118,69 @@ in `packs/membership_contract/test/test_membership_contract.pl`. The frozen
 - `membership_contract_declared/4` — `?Pred, ?OutPos, ?InPos, ?Abstention`:
   enumerate the declared contracts (introspection).
 - `membership_contract_violation_line/2` — `+Error, -Line`: render a violation as
-  one readable line.
+  one readable line (both the plain-list and the accessor form).
+
+## The accessor form — membership against a goal-described set (Ledger N11, closes N9)
+
+The plain-list form above reads the offered set from a **list argument**. But a
+growing store — the Wave 6 memory region's stored-memory facts on the Lattice — is
+**not** a plain list, and flattening it into one on every call is O(store size) per
+call (recorded as N9, second-sighted as the memory region's HIPPO-1). The **accessor
+form** lets a contract name the set by a **goal** instead of a list argument, so a
+growing or streaming set can be guarded without materialising it.
+
+**The test-goal form (primary — avoids materialisation).** You name a
+semi-deterministic **membership-test goal**: a closure that, given a candidate
+output appended as its last argument, **succeeds** if that candidate is in the set
+and **fails** otherwise. For a recall over a fact store:
+
+```prolog
+% the membership-test goal — a single fact lookup, not a list build
+stored_pattern_member(Pattern) :- stored_pattern(Pattern).
+
+% recall's output (argument 2) must satisfy the test goal, or be the abstention no_recall
+:- membership_contract_enforce_goal(store_recall/2, 2, stored_pattern_member, no_recall).
+```
+
+On every call the contract runs `call(stored_pattern_member, Out)` on the produced
+output: a member passes, `no_recall` passes, and a non-member is **refused**. The
+**full set is never built** — for a fact store this is a single lookup, not an
+O(store size) copy. This is the form that retires HIPPO-1's cost, and it even guards
+membership of an **infinite** set (for example the positive even integers) that no
+list could hold.
+
+**The producer form (convenience — still materialises).**
+`membership_contract_enforce_producer/4` names a goal that **produces** the set as a
+list; the contract then reuses the plain-list check. Because it builds the whole
+list, it does **not** avoid the cost N9 named — so for a growing store, prefer the
+test-goal form. It is offered only for a small set.
+
+**The violation, when there is no list to print.** A test-goal refusal throws
+`membership_contract_goal_violation(Pred, Out, GoalLabel)`, and
+`membership_contract_violation_line/2` renders it naming the set **goal** rather than
+a list — for example: *"…store_recall/2 produced [never,stored], which the
+membership-test goal stored_pattern_member does not accept (it is not a member of the
+set that goal defines, and is not the declared abstention)."* So "why did this call
+fail?" still has a readable answer.
+
+**Purity and adoption.** The test goal is called as a **pure membership test** (with
+the candidate appended); the contract must not mutate the set, and the goal should be
+cheap and non-destructive because it may run on every call. The accessor form is
+**opt-in and additive** — the plain-list form is unchanged, and a predicate may use
+either form or neither.
+
+**The accessor predicates.**
+
+- `membership_contract_enforce_goal/4` — `:Pred, +OutPos, :TestGoal, +Abstention`:
+  declare the test-goal form (no materialisation).
+- `membership_contract_enforce_producer/4` — `:Pred, +OutPos, :ProducerGoal,
+  +Abstention`: declare the producer form (materialises; convenience).
+- `membership_contract_check_goal/4` — `+Pred, +Out, :TestGoal, +Abstention`: the
+  pure test-goal postcondition (succeed or throw).
+- `membership_contract_holds_goal/3` — `+Out, :TestGoal, +Abstention`: a **boolean**
+  test-goal check that **never throws**.
+- `membership_contract_declared_goal/4` — `?Pred, ?OutPos, ?Form, ?Abstention`:
+  enumerate accessor contracts (`Form` is `test` or `producer`).
 
 ## Dependencies
 
@@ -137,16 +199,23 @@ The construct is gated by the additive workflow
 `packs/membership_contract/test/test_membership_contract.pl`. Because membership is
 a runtime property, the suite **is** the gate: it exercises a member passing, the
 abstention passing, a non-member being refused, an unguarded predicate being
-unaffected, and the arbiter re-expression. It is separate from, and does not
-alter, the L4 `layer-rule`, N6 `layer-binding`, mini-regression, or conformance
-gates.
+unaffected, and the arbiter re-expression — and, since the accessor form, the
+eleven accessor tests too (the test-goal member/abstention/non-member cases, the
+no-materialisation proof, the infinite-set case, the producer form, and the
+hippocampus re-expression). The workflow runs the whole suite file, so both the
+nine plain-list tests and the eleven accessor tests are gated together. It is
+separate from, and does not alter, the L4 `layer-rule`, N6 `layer-binding`,
+mini-regression, or conformance gates.
 
 ## Limits, stated honestly
 
-- The offered set must be a single input argument that is a **proper list** at call
-  time. A selector whose candidates live in an assoc, a goal's solutions, or a
-  field inside a compound term must first project them into a list argument. That
-  follow-on gap is recorded as Ledger entry N9.
+- The **plain-list** form requires the offered set to be a single input argument
+  that is a **proper list** at call time. That follow-on gap (N9) is now **closed**
+  by the **accessor form** above (Ledger N11): a set that lives elsewhere — a store
+  on the Lattice, a set of facts, a computed or infinite collection — is guarded by
+  naming a membership-test goal, with no list ever built. The plain-list and
+  test-goal forms are the supported set; the producer form is a materialising
+  convenience, not the fix.
 - `wrap_predicate/4` runs the postcondition on **every** solution of a
   non-deterministic predicate. For a selector (deterministic, one answer) this is
   exactly right; a non-deterministic producer that yields one bad solution among

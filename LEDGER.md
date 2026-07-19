@@ -479,7 +479,10 @@ read pinned at commit `58951b9` and **not modified**.
   contract directly — it must first project its candidates into a list argument.
   The minimum remedy is an accessor form (a membership contract that names a
   deterministic goal `Candidates(+Args, -List)` to produce the set), so the
-  offered set need not already be a bare list argument. Recorded, not closed.
+  offered set need not already be a bare list argument. **CLOSED by N11** (Wave 7
+  Part Two) — delivered as a membership-TEST-goal accessor form that checks
+  membership without materialising the set at all, better than the list-producer
+  remedy this gap first sketched.
 - **N10 — enforcement is per-solution, with no once/deterministic contract mode.**
   `wrap_predicate/4` runs the postcondition on EVERY solution of a
   non-deterministic guarded predicate, which is correct but means a generator that
@@ -550,3 +553,79 @@ membership contract, closing N9) ships under the written rule.
 
 - **Closing commit.** Recorded in the squash-merge of
   `docs/wave-7-governance-and-catchup` to main.
+
+---
+
+## Wave 7, Part Two — the membership contract accessor form (2026-07-18)
+
+Branch `feature/wave-7-accessor-contract`. Rollback tag `pre-wave-7-accessor`. All
+work **additive**; the ARC-AGI solving core was **not** modified, and only the
+`membership_contract` pack changed. Baseline gates held unchanged: mini ARC-AGI-1
+40/40, mini ARC-AGI-2 12/12, Causalontology conformance 107/107, the strict layer
+rule (L4) and the layer-to-stratum binding (N6) with 0 violations, and — critically
+— the N8 plain-list membership form byte-for-byte in behaviour (its nine tests pass
+unchanged). This is the enforce-then-build Part Two: the wall a region hit (HIPPO-1)
+ships back into PrologAI as a delivery.
+
+### N11 — an accessor form for the membership contract · S=M · **DELIVERED** (closes N9 / HIPPO-1, WP-427)
+
+- **The gap (N9, second-sighted as HIPPO-1).** The N8 membership contract could read
+  the offered set only from a plain-LIST argument. A growing store — the Wave 6
+  memory region's stored-memory facts on the Lattice — is not a list, so the region
+  had to flatten the whole store into a list on every recall (O(store size) per call,
+  copying the entire set). It recorded this as an honest workaround, not a fix.
+- **What was delivered (the minimum that closes it).** An additive extension of the
+  `membership_contract` pack (WP-427), depending only on the same SWI-Prolog standard
+  libraries — never the Lattice, actors, any Causalontology pack, or any Connectome
+  repository:
+  - **The test-goal form (primary, no materialisation).**
+    `membership_contract_enforce_goal(:Pred, +OutPos, :TestGoal, +Abstention)` names a
+    semi-deterministic membership-TEST goal — a closure that succeeds when called with
+    the candidate output appended, iff the candidate is in the set. On every call the
+    contract runs that test on the produced output; a member passes, the abstention
+    passes, a non-member is refused with a glass-box `membership_contract_goal_violation`
+    naming the **goal** (there is no list to print). **The full set is never built** —
+    for a fact store, a single lookup, not an O(size) copy. It even guards membership of
+    an infinite set no list could hold.
+  - **The producer form (convenience, materialises).**
+    `membership_contract_enforce_producer/4` names a goal that builds the set as a
+    list and reuses the plain-list check; offered for a small set, it still
+    materialises, so it does NOT retire N9's cost — the test-goal form does.
+  - Boolean sibling `membership_contract_holds_goal/3` (never throws), introspection
+    `membership_contract_declared_goal/4`, and a second `membership_contract_violation_line/2`
+    clause that renders the goal violation. The plain-list predicates are untouched.
+- **The hippocampus recall is re-expressible with no flattening.** A PrologAI-side test
+  (`accessor_hippocampus_reexpression`) declares the test-goal form on a recall over a
+  fact store and proves, through a materialisation counter that stays at zero, that the
+  no-confabulation guarantee is obtained without ever building the store as a list. The
+  frozen `connectome-hippocampus` repository was **not** touched.
+- **Evidence / tests.** 11 `AC-N11-*` PLUnit tests added to
+  `packs/membership_contract/test/test_membership_contract.pl` (the suite is now 20:
+  9 plain-list unchanged + 11 accessor), gated by the existing
+  `.github/workflows/membership-contract.yml` (it runs the whole suite). Documented in
+  `docs/membership-contract.md`; SPARC volumes bumped (Specification v412→v413,
+  Pseudocode v403→v404, Architecture v405→v406, Refinement v464→v465, Completion
+  v470→v471) with the accessor section; Tutorial chapter 362 added.
+- **Closing commit.** Recorded in the squash-merge of `feature/wave-7-accessor-contract`
+  to main.
+- **N9 status: CLOSED.** Delivered better than N9's own sketch (which proposed a list
+  producer): the primary form is a membership-TEST goal that never materialises. The
+  supported set is the plain-list form (N8) and the test-goal form (N11); the producer
+  form is a materialising convenience, not the fix.
+
+### New gaps discovered while building it (be greedy)
+
+- **N12 — the accessor form checks per solution, and cannot short-circuit a
+  nondeterministic producer.** Like N8/N10, the wrapped check runs on every solution;
+  the test-goal form has no `once`/filtering mode to accept the first member of a
+  nondeterministic guarded predicate and stop. For a selector or a recall
+  (deterministic, one answer) this is exactly right; a `once`-style accessor variant is
+  the minimum remedy if a nondeterministic producer ever needs it. This subsumes N10 for
+  the accessor form. Recorded, not closed.
+- **N13 — the test goal's cost and purity are the caller's responsibility, unchecked.**
+  The contract calls the membership-test goal on every call and trusts it to be cheap
+  and side-effect-free; nothing enforces that a named test goal does not mutate state or
+  run expensively. Documented as an expectation, but a genuinely destructive or costly
+  test goal would silently break the "a check may run on every call" assumption. The
+  minimum remedy is a purity/determinism lint or a `\+ \+`-guarded call mode. Recorded,
+  not closed.

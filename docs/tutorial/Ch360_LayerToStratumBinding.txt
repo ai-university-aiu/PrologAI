@@ -1,0 +1,26 @@
+Chapter 360: Binding a Layer to Its Stratum - The N6 Layer-to-Stratum Binding
+
+The strict layer rule checks that layers are ordered correctly, not that a layer
+matches the thing it represents. The Connectome program builds regions one pack per
+Causalontology stratum, and a stratum has an ordinal - a number, read from the
+Causalontology structure records, naming how coarse or fine it is. If those packs
+are to sit in the right layer order, each pack's layer must track its stratum's
+ordinal, and until the N6 binding that alignment was maintained by hand.
+
+You turn the binding on with one extra fact. A stratum-primary pack already declares
+its layer with layer(N) in its pack.pl; it now also declares the stratum it
+represents, with stratum(Label). The checker bin/check_layer_binding.sh reads each
+stratum's ordinal from the authoritative Causalontology records and verifies that
+the pack layers are order-preserving with the ordinals: a lower ordinal must not
+carry a higher layer, and equal ordinals must share a layer. A pack that declares no
+stratum is simply unbound - a gap to fill, never an error - so adoption is
+incremental, exactly as with the layer rule.
+
+The point the binding adds over the layer rule alone is that a mis-declared layer can
+disguise an upward dependency as a downward one; the binding catches that disguise,
+because the coarse stratum was given a lower layer than a finer one, contradicting
+the ordinal order the data records. It runs in strict mode (a violation refuses the
+load) or reporting mode (a violation is listed without refusing), and is gated in
+Continuous Integration (CI). Its honest limit - the ordinal is read from record
+artifacts, which could go stale - is filed as Ledger entry N7. The construct is
+documented for adopters in docs/layer-binding.md.
