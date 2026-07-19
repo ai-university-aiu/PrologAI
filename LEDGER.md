@@ -20,7 +20,7 @@ Status: **CLOSED** · **PARTIALLY CLOSED** · **STILL OPEN**.
 > three granularity arms (ATOMIC / LOOPS / STRATA), and the region builds (ARBITER,
 > HIPPO, CEREBELLUM, AMYGDALA) — into one navigable document, with the open-gaps
 > forward agenda and the closed track record, now lives at
-> **`docs/PrologAI_Requirements_Ledger_v4.txt`**. That consolidated Ledger cites the
+> **`docs/PrologAI_Requirements_Ledger_v5.txt`**. That consolidated Ledger cites the
 > per-repository Ledgers; it does not replace them.
 
 ---
@@ -813,3 +813,37 @@ Additive; the ARC-AGI solving core was NOT modified.
 - **Gate.** tick_scheduler 9/9, conformance 119/119, mini-regression 40/40 and
   12/12, the layer rule 0 violations (a same-layer edge to the layer-0 lattice is
   allowed), pack naming clean. L4/N6/N8/N11/N14 and the closure hybrid unchanged.
+
+---
+
+## Wave 10, Stage 4 — the managed cross-stratal seam (Theme B) (2026-07-19)
+
+Branch `feature/wave-10-stage-4-seam`. Rollback tag `pre-wave-10-stage-4`.
+Additive; the ARC-AGI solving core was NOT modified.
+
+### Theme B — a first-class managed cross-stratal seam · **CLOSED** (WP-433)
+
+- **The gap (the most-recurring; six sightings).** A process legitimately spans
+  NON-ADJACENT strata, but a bare `skips:true` boolean could not: distinguish "a
+  mechanism exists but is unmodeled here" from "no mechanism exists"; draw the
+  intervening mechanism as a chain of adjacent-stratum steps; or give a cross-stratal
+  (edge) construct a checkable home. Sightings: P1 (seam facet), P2, STRATA-2,
+  ARBITER-2, HIPPO-3, CEREBELLUM-2, AMYGDALA-2.
+- **Delivered.** The new **`managed_seam`** pack (WP-433, layer 0): a first-class
+  managed seam carrying a **mechanism_status** of `absent` / `unmodeled` / `modeled`
+  (the honest-ignorance distinction), with the chain coupled to the status so the
+  absent-plus-chain contradiction is unrepresentable. Well-formedness (Algorithm F)
+  and the HOME rule (the coarsest endpoint) delegate to the frozen `causal_core`
+  engine; `managed_seam_home_check/5` lets a stratum pack **verify** a spanning
+  construct's home; `managed_seam_emit/2` records the seam as a **queryable Lattice
+  event**, so a skip is visible to the runtime. API: `managed_seam_new/5`, `status/1`,
+  `status_meaning/2`, `mechanism_status/2`, `is_honest_ignorance/1`, `wellformed/4`,
+  `home/4`, `home_check/5`, `emit/2`, `events/2`, `events_by_status/3`.
+- **Demonstration.** The cortisol skip (community 14 → macromolecular 4) is recorded
+  as an `unmodeled` seam, emitted as a queryable event, and distinguished from an
+  `absent` seam by status (P1/P2, ARBITER-2, AMYGDALA-2); its home is checked to be
+  the coarsest endpoint (STRATA-2); the consolidation jump is drawn as an intervening,
+  strictly-monotone chain and checked well-formed (HIPPO-3, CEREBELLUM-2).
+- **Gate.** managed_seam 12/12, conformance 119/119, mini-regression 40/40 and 12/12,
+  the layer rule 0 violations, pack naming clean (300 packs). L4/N6/N8/N11/N14 and the
+  closure hybrid unchanged. P1 is now PARTIALLY CLOSED (its dynamics facet is Stage 5).

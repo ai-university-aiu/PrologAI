@@ -2453,6 +2453,20 @@ lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_await(+Nexus,+Relation,+Timeout,-Args,-Referents): block until a matching fact exists, woken by a write, no polling (L3).
     lattice_notify(+Nexus): wake every reader awaiting on the nexus - the stigmergy-plus-notification bridge (L3).
 
+managed_seam
+A first-class managed cross-stratal seam (WP-433, Layer 0; closes Theme B - P1 seam facet, P2, STRATA-2, ARBITER-2, HIPPO-3, CEREBELLUM-2, AMYGDALA-2) - records a cross-stratal jump with an honest-ignorance mechanism status, an optional drawn chain, a checkable home rule, and a queryable runtime event
+    managed_seam_new(+Source, +Target, +Status, +Chain, -Seam): build a managed seam; Status is absent, unmodeled, or modeled, with the chain coupled to the status (modeled requires a non-empty chain; absent/unmodeled forbid one).
+    managed_seam_status(?Status): enumerate the recognised mechanism statuses (absent, unmodeled, modeled).
+    managed_seam_status_meaning(+Status, -Meaning): the glass-box English meaning of a mechanism status.
+    managed_seam_mechanism_status(+Seam, -Status): read a seam's mechanism status.
+    managed_seam_is_honest_ignorance(+Seam): true exactly when the status is unmodeled (a mechanism exists but is deliberately unmodelled).
+    managed_seam_wellformed(+Seam, +OccMap, +StratumMap, -Result): Algorithm F well-formedness (non-adjacent endpoints sharing a scheme; an intervening strictly-monotone chain); delegates to causal_core.
+    managed_seam_home(+Seam, +OccMap, +StratumMap, -HomeStratum): the home stratum - the coarsest (max-ordinal) endpoint; delegates to causal_core.
+    managed_seam_home_check(+Seam, +OccMap, +StratumMap, +ProposedHome, -Result): verify a proposed home equals the seam's true home (the checkable home rule).
+    managed_seam_emit(+Nexus, +Seam): record the seam as a queryable Lattice event (a skip becomes visible to the runtime).
+    managed_seam_events(+Nexus, -Seams): every emitted seam event on the nexus.
+    managed_seam_events_by_status(+Nexus, +Status, -Seams): emitted seam events of a given mechanism status.
+
 tick_scheduler
 A Lattice-backed deferred-reactivation construct on ordinal ticks (WP-432, Layer 0; closes HIPPO-2 and CEREBELLUM-1) - schedules and ENACTS a future reactivation, measured in the Causalontology 3.0.0 ordinal tick unit, never in wall-clock seconds
     tick_scheduler_open(+Address, -Nexus): open a Lattice nexus and initialise it (clock zero, empty schedule).

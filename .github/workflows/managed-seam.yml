@@ -1,0 +1,42 @@
+# Gate the MANAGED_SEAM construct (Ledger Theme B; closes P1 seam facet, P2, STRATA-2,
+# ARBITER-2, HIPPO-3, CEREBELLUM-2, AMYGDALA-2) on every push and pull request.
+#
+# The managed_seam is a first-class managed cross-stratal seam, so its gate is its
+# PLUnit suite, which exercises the acceptance: the honest-ignorance mechanism_status
+# (absent / unmodeled / modeled), the chain-status coupling, the Algorithm F
+# well-formedness (non-adjacent endpoints, a valid intervening chain), the checkable
+# home rule (the coarsest endpoint), and the queryable runtime event. Additive; it
+# alters no existing gate. It loads the lattice store and the causal_core vocabulary
+# the pack depends on.
+name: managed-seam
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single managed-seam job.
+jobs:
+  managed-seam:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # Run the managed_seam construct's PLUnit suite; a non-zero exit fails the job.
+      - name: Run the managed seam test suite
+        run: |
+          swipl -p library=packs/managed_seam/prolog \
+            -p library=packs/lattice/prolog \
+            -p library=packs/causal_core/prolog \
+            -g "run_tests, halt" -t "halt(1)" \
+            packs/managed_seam/test/test_managed_seam.pl

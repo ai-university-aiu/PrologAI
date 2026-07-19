@@ -1,0 +1,50 @@
+Chapter 366 — The Managed Cross-Stratal Seam: managed_seam (Wave 10 Stage 4)
+
+This chapter closes the Requirements Ledger's most-recurring wall - Theme B,
+cross-stratal seams and managed skips. It returned in six places (P1, P2, STRATA-2,
+ARBITER-2, HIPPO-3, CEREBELLUM-2, AMYGDALA-2), wherever a process legitimately spanned
+NON-ADJACENT strata.
+
+Plain-language idea. Some causes reach across many levels at once - a hormone made in a
+gland acts on a molecule ten levels down; a memory consolidates from molecule up to a
+whole region. Before this chapter, PrologAI could only mark such a jump with a single
+yes/no flag ("this skips levels: true"). A yes/no flag cannot say three important
+things, and the managed_seam construct now says all three.
+
+One - honest ignorance. There is a real difference between "there is NO mechanism in
+between" and "there IS a mechanism in between, but we have chosen not to draw it here."
+A managed seam carries a mechanism status that is one of three whole words:
+
+ • absent - no intervening mechanism exists; the jump is genuinely direct.
+ • unmodeled - a mechanism exists but is deliberately left undrawn here (honest
+   ignorance).
+ • modeled - the mechanism is drawn as a chain of adjacent-level steps.
+
+Two - a drawn chain. When the pathway IS drawn (status modeled), the seam carries a
+chain of the in-between occurrents. The chain is coupled to the status: a modeled seam
+must draw a non-empty chain, and an absent or unmodeled seam must draw none - so the
+contradiction "no mechanism, but here is its chain" simply cannot be built. The chain is
+checked well-formed by the Causalontology 3.0.0 Algorithm F: the endpoints are
+non-adjacent and share a scheme, and each chain step sits strictly between them and
+moves in one direction.
+
+Three - a home. A construct that lives on the EDGE between two levels has no single
+home level, so earlier arms had to pile it into a level by convention. The seam's home
+is defined by a rule the language checks: the coarsest (highest-ordinal) endpoint.
+managed_seam_home_check lets a level's pack VERIFY that a spanning construct belongs to
+it, instead of guessing.
+
+And a fourth thing, for the runtime. managed_seam_emit records the seam as a queryable
+event in the shared Lattice store, so a skip is visible to the running system (you can
+ask "what skips happened, and of what kind?"), not merely legible to the static picture.
+
+The managed_seam pack (WP-433, layer 0). Public operations: managed_seam_new/5,
+managed_seam_status/1, managed_seam_status_meaning/2, managed_seam_mechanism_status/2,
+managed_seam_is_honest_ignorance/1, managed_seam_wellformed/4, managed_seam_home/4,
+managed_seam_home_check/5, managed_seam_emit/2, managed_seam_events/2, and
+managed_seam_events_by_status/3. The well-formedness and home rules delegate to the
+frozen causal_core engine; this pack is the ergonomic, honest-ignorance-aware,
+runtime-visible construct built on that vocabulary.
+
+Gate. managed_seam 12/12; Causalontology conformance 119/119; the mini-regression 40/40
+and 12/12; the layer rule and pack-naming clean; L4/N6/N8/N11/N14 unchanged.
