@@ -1,0 +1,47 @@
+Chapter 365 — Temporal Enactment: the tick_scheduler (Wave 10 Stage 3)
+
+This chapter closes the Requirements Ledger's highest-priority wall - Theme A,
+temporal and scheduling (the HIPPO-2 and CEREBELLUM-1 sightings). Before it,
+PrologAI could describe a timed process but could not ENACT one: consolidation ran
+the instant a memory was written, and the cerebellum - whose defining job is timing -
+had to record a tick as "seconds" because there was no way to schedule and fire a
+future reactivation.
+
+Plain-language idea. A mind does some things not now but LATER - it consolidates a
+memory hours after forming it, it expects a consequence a few steps after an action.
+"Later" here is counted in ordinal ticks: a plain, dimensionless count of steps, not
+seconds on a wall clock. The tick_scheduler is a clock-and-schedule kept in the shared
+Lattice store: a current tick, and a list of reactivations each due at some future
+tick. You advance the clock; whatever has come due fires, in due-tick order, and is
+handed back (or run) so it can be enacted.
+
+The tick_scheduler pack (WP-432, layer 0). Public operations:
+
+ • tick_scheduler_open(Address, Nexus) - open a Lattice nexus and start its clock at
+   zero with an empty schedule.
+ • tick_scheduler_now(Nexus, Tick) - read the current ordinal tick.
+ • tick_scheduler_schedule_after(Nexus, Delay, Label, Payload) - schedule a
+   reactivation Delay ticks into the future.
+ • tick_scheduler_schedule_at(Nexus, DueTick, Label, Payload) - schedule at an
+   absolute future tick.
+ • tick_scheduler_schedule_after_unit(Nexus, Delay, Unit, Label, Payload) - the same,
+   but the Unit must be ordinal; a wall-clock unit (seconds) is refused.
+ • tick_scheduler_pending(Nexus, List) - the still-pending reactivations, in order.
+ • tick_scheduler_tick(Nexus, Fired) - advance one tick.
+ • tick_scheduler_advance(Nexus, Delta, Fired) - advance Delta ticks; return and
+   remove whatever became due.
+ • tick_scheduler_advance_enact(Nexus, Delta, Goal, Fired) - advance, then run Goal on
+   each fired reactivation, in due-tick order.
+
+Why ordinal ticks and not seconds. Time is counted in ticks - the Causalontology 3.0.0
+ordinal unit, a dimensionless integer. The scheduler asks the Causalontology core
+(causal_core_dimension) whether a unit is ordinal, and refuses a wall-clock unit with a
+clear category error. That is the exact closure of CEREBELLUM-1: no tick is forced into
+a "seconds" distortion.
+
+How it closes HIPPO-2. A deferred consolidation is scheduled a number of ticks out and
+enacted only when the ordinal clock reaches its due tick - a real scheduler, where
+before there was none, so the region no longer has to consolidate synchronously.
+
+Gate. tick_scheduler 9/9; Causalontology conformance 119/119; the mini-regression
+40/40 and 12/12; the layer rule and pack-naming clean; L4/N6/N8/N11/N14 unchanged.

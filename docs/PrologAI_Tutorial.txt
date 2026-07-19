@@ -27122,6 +27122,7 @@ strategies; regulation works at the level of a single behaviour, sharpening it.
 
 lore - Lore (WP-424, Layer 399)
 affective_state - a persisted, modulatory affective state (WP-430, Layer 0)
+tick_scheduler - deferred reactivation on ordinal ticks (WP-432, Layer 0)
 --------------------------------------------------------------------------------
 A mind should not only remember what happened but learn the lesson of it.
 lore records experiences as a situation, the response taken, and how it turned
@@ -27433,3 +27434,8 @@ PrologAI now rests on Causalontology 3.0.0. The vendored conformance suite is th
 ## Wave 10, Stage 2 — affect (WP-430, WP-431)
 
 PrologAI gains a first-class affective state (the `affective_state` pack: a held valence/salience/mood/cortisol context that persists and derives a baseline/stress regime) and a context-aware membership accessor (`membership_contract_enforce_context/6`) whose test goal receives `(Output, HeldContext)`. Together they close AMYGDALA-1: an output's legality can depend on a held affective context without smuggling the context into the value.
+
+
+## Wave 10, Stage 3 — temporal enactment (WP-432)
+
+The `tick_scheduler` pack closes Theme A (HIPPO-2 and CEREBELLUM-1): a Lattice-backed deferred-reactivation construct that schedules and ENACTS a future reactivation, measured in ordinal ticks (the Causalontology 3.0.0 ordinal unit), never in wall-clock seconds. A monotone logical clock and a set of scheduled reactivations live in a Lattice nexus; as the clock advances, whatever became due fires in due-tick order and is enacted. A wall-clock unit is refused via `causal_core_dimension`.

@@ -20,7 +20,7 @@ Status: **CLOSED** · **PARTIALLY CLOSED** · **STILL OPEN**.
 > three granularity arms (ATOMIC / LOOPS / STRATA), and the region builds (ARBITER,
 > HIPPO, CEREBELLUM, AMYGDALA) — into one navigable document, with the open-gaps
 > forward agenda and the closed track record, now lives at
-> **`docs/PrologAI_Requirements_Ledger_v3.txt`**. That consolidated Ledger cites the
+> **`docs/PrologAI_Requirements_Ledger_v4.txt`**. That consolidated Ledger cites the
 > per-repository Ledgers; it does not replace them.
 
 ---
@@ -780,3 +780,36 @@ Additive; the ARC-AGI solving core was NOT modified.
 - **Gate.** affective_state 5/5, the membership_contract suite (with the new
   context tests) green, conformance 119/119, mini-regression 40/40 and 12/12, the
   layer rule 0 violations, pack naming clean. L4/N6/N8/N11/N14 unchanged.
+
+---
+
+## Wave 10, Stage 3 — temporal enactment (Theme A) (2026-07-19)
+
+Branch `feature/wave-10-stage-3-temporal`. Rollback tag `pre-wave-10-stage-3`.
+Additive; the ARC-AGI solving core was NOT modified.
+
+### HIPPO-2 and CEREBELLUM-1 — a deferred-reactivation construct on ordinal ticks · **CLOSED** (WP-432)
+
+- **The gap (Theme A, the highest-priority wall).** PrologAI had no temporal or
+  scheduled construct: no way to run a process after a delay, at a tick, or over
+  time. Consolidation ran synchronously (HIPPO-2); the cerebellum could not enact
+  timing and was forced to record a tick as "seconds" (CEREBELLUM-1). The
+  representational half — a native ordinal/tick unit — was closed in Wave 9.5 /
+  Stage 1; the **enactment** half was still open.
+- **Delivered.** The new **`tick_scheduler`** pack (WP-432, layer 0): a
+  Lattice-backed deferred-reactivation construct. It holds, in a Lattice nexus, a
+  **monotone logical clock** and a set of **scheduled reactivations**; as the clock
+  advances, every reactivation whose **due tick** has arrived fires in due-tick
+  order, leaves the schedule, and (in the enact form) is handed to a caller goal to
+  **enact**. Time is measured in **ordinal ticks** — the Causalontology 3.0.0
+  ordinal unit — and a **wall-clock unit is refused** (via `causal_core_dimension`,
+  a glass-box category error). API: `tick_scheduler_open/2`, `init/1`, `now/2`,
+  `schedule_at/4`, `schedule_after/4`, `schedule_after_unit/5`, `pending/2`,
+  `tick/2`, `advance/3`, `advance_enact/4`.
+- **Demonstration.** A consolidation scheduled four ticks out is enacted only when
+  the clock reaches its due tick (HIPPO-2); an ordinal `ticks` unit is accepted and
+  a `seconds` unit refused (CEREBELLUM-1). The two regions' workarounds are now
+  unnecessary.
+- **Gate.** tick_scheduler 9/9, conformance 119/119, mini-regression 40/40 and
+  12/12, the layer rule 0 violations (a same-layer edge to the layer-0 lattice is
+  allowed), pack naming clean. L4/N6/N8/N11/N14 and the closure hybrid unchanged.
