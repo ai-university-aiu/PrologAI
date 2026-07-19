@@ -1,0 +1,57 @@
+Chapter 370 — Coordination Ergonomics: coordination (Wave 10 Stage 8)
+
+This chapter closes the Requirements Ledger's Theme F. The shared-memory coordination
+that Wave 1 delivered (a store that wakes readers on a write) carried every reentrant
+loop in the program, but left a handful of small ergonomic gaps around it. The
+coordination pack fills them.
+
+Plain-language idea. Coordination in this system is single-threaded and reentrant: one
+step function runs again and again, and the loop settles to an answer. So the pack does
+not need heavyweight blocking or background threads; it keeps a small in-memory notebook
+(that writes nothing to disk) and offers a handful of well-behaved helpers.
+
+ • A keyed look-up. Before, you could only ask "is there ANY fact of this kind?" Now
+   coordination_get_key asks "is there a fact of this kind whose first field is exactly
+   K?" - the precise question a phase-by-phase loop needs to ask.
+
+ • A bounded wait. coordination_await_key checks for that keyed fact; if it is not there
+   yet, it runs one producer step and checks again, up to a fixed number of steps. It
+   can never spin forever, and it needs no fairness rules because it is bounded.
+
+ • An ordered mailbox. coordination_publish_ordered stamps each message with a sequence
+   number and keeps it; coordination_consume_ordered delivers them in order, once each -
+   unlike a fire-and-forget send that a tight loop could not trust.
+
+ • A bounded loop. coordination_bounded_loop runs a step until an until-condition holds
+   or a maximum number of turns is reached, and it TELLS you which happened
+   (completed with the turn count, or bounded_stop at the limit) - so no loop has to
+   hand-roll its own done-signal and external stop.
+
+ • A loop descriptor. coordination_declare_loop writes down a loop's stages, its forward
+   arrows, and the single back-arrow that makes it repeat. coordination_loop_check then
+   verifies both that the forward arrows never form a cycle AND that the back-arrow is a
+   genuine return to an earlier stage - two proofs about one written-down object.
+
+ • A runtime layer wall. The layer rule catches an illegal upward dependency in the
+   import graph, but not an address carried as data at run time. coordination_send looks
+   up the layer of the actor you are sending to, right now, and refuses a message that
+   would travel from a lower layer up to a higher one.
+
+ • A hop trace. coordination_trace_hop records each hop a message takes, and
+   coordination_trace reads them back in order - a glass-box record of the path.
+
+Two more small fixes ride along: on the shared-memory pack, lattice_transaction is now
+properly marked as taking a goal argument (so its module handling is explicit), and a
+known quirk of one SWI-Prolog version's wake-up primitive is documented and side-stepped,
+because this pack is driven step by step rather than waiting to be woken.
+
+Public operations: coordination_open/1, coordination_put/3, coordination_get/3,
+coordination_take/3, coordination_get_key/4, coordination_await_key/6,
+coordination_publish_ordered/3, coordination_consume_ordered/3, coordination_bounded_loop/6,
+coordination_declare_loop/4, coordination_loop/4, coordination_loop_check/2,
+coordination_register_actor/2, coordination_actor_layer/2, coordination_send/4,
+coordination_trace_hop/3, and coordination_trace/2.
+
+Gate. coordination 12/12; the lattice suite 15/15; Causalontology conformance 119/119;
+the mini-regression 40/40 and 12/12; the layer rule and pack-naming clean; L4/N6/N8/N11/N14
+and the closure hybrid unchanged.

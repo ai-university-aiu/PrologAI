@@ -20,7 +20,7 @@ Status: **CLOSED** · **PARTIALLY CLOSED** · **STILL OPEN**.
 > three granularity arms (ATOMIC / LOOPS / STRATA), and the region builds (ARBITER,
 > HIPPO, CEREBELLUM, AMYGDALA) — into one navigable document, with the open-gaps
 > forward agenda and the closed track record, now lives at
-> **`docs/PrologAI_Requirements_Ledger_v8.txt`**. That consolidated Ledger cites the
+> **`docs/PrologAI_Requirements_Ledger_v9.txt`**. That consolidated Ledger cites the
 > per-repository Ledgers; it does not replace them.
 
 ---
@@ -937,3 +937,35 @@ Additive; the ARC-AGI solving core was NOT modified.
 - **Gate.** packaging 10/10, conformance 119/119, mini-regression 40/40 and 12/12, the
   layer rule 0 violations, pack naming clean (302 packs). L4/N6/N8/N11/N14 and the
   closure hybrid unchanged.
+
+---
+
+## Wave 10, Stage 8 — coordination ergonomics (Theme F) (2026-07-19)
+
+Branch `feature/wave-10-stage-8-coordination`. Rollback tag `pre-wave-10-stage-8`.
+Additive; the ARC-AGI solving core was NOT modified.
+
+### Theme F — coordination and closure primitives · **CLOSED** (WP-437 + N1)
+
+- **The gap.** The Wave 1 closure hybrid (stigmergy plus notification) carried every
+  reentrant loop, but left bounded ergonomics gaps on the substrate: L5/L6/L7/L8/L9,
+  P8/P9/P10, N1/N2/N4/N5. L5 was the last **partially-closed** finding.
+- **Delivered.** The new **`coordination`** pack (WP-437, layer 0) provides its
+  affordances over a **journal-free, synchronously-driven in-memory store**, matching
+  the single-threaded reentrant-loop model: `coordination_get_key/4` and the bounded
+  `coordination_await_key/6` (a keyed await that never spins — P8/N5); an ordered FIFO
+  channel `coordination_publish_ordered/3` + `coordination_consume_ordered/3` (L6); a
+  bounded reentrant-loop driver `coordination_bounded_loop/6` with an until-condition and
+  a completion signal (L7/P9); a reentrant-loop descriptor
+  `coordination_declare_loop/4` + `coordination_loop_check/2` — two checks (acyclic
+  forward graph + genuine back-edge closure) on one object (P10); a **runtime layer-aware
+  transport** `coordination_register_actor/2` + `coordination_send/4` that refuses an
+  upward send at send time (L5's general case + N4); a glass-box hop trace
+  `coordination_trace_hop/3` + `coordination_trace/2` (L8); and the store writes no
+  journal (L9). On the **lattice** pack, `lattice_transaction/2` is now a `meta_predicate`
+  (N1); the SWI-Prolog `thread_wait/2` behaviour (N2) is documented and avoided.
+- **Gate.** coordination 12/12, the lattice suite 15/15 (the N1 change is
+  behaviour-preserving), conformance 119/119, mini-regression 40/40 and 12/12, the layer
+  rule 0 violations, pack naming clean (303 packs). L4/N6/N8/N11/N14 and the L1/L2/L3
+  closure hybrid unchanged. **L5 — the last partial finding — is now fully CLOSED; no
+  finding remains partial.**
