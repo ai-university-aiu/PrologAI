@@ -27337,3 +27337,48 @@ once-only mode (entry N10). The construct is documented for adopters in
 docs/membership-contract.md, and its first real user is the Connectome memory
 region, whose recall declares it so the region cannot return a memory it never
 stored.
+
+
+Chapter 362: A Membership Promise Over a Store - The Accessor Form of the Contract
+
+The membership contract of the previous chapter has one requirement that becomes a
+problem at scale: the offered set must be a plain list, passed as an argument. That
+is fine for a selector handed a short list of options. It is wrong for a memory: a
+store of remembered things is a growing set of facts, not a list, and turning the
+whole store into a list on every recall - just to ask whether one item is in it - is
+wasteful, and impossible if the set is very large or has no end. The Wave 6 memory
+region hit exactly this wall and recorded it as a gap. The accessor form closes it.
+
+The idea is small. Instead of naming the set as a list argument, you name it with a
+GOAL - specifically a membership-TEST goal, a little predicate that, given a
+candidate, succeeds if the candidate is in the set and fails if it is not. You
+declare the contract with membership_contract_enforce_goal, naming the guarded
+predicate, which argument is its output, the test goal, and the abstention value.
+Suppose memories are held as stored_pattern facts and a recall predicate returns one
+of them. You write a one-line test goal and one declaration:
+
+    stored_pattern_member(Pattern) :- stored_pattern(Pattern).
+
+    :- membership_contract_enforce_goal(store_recall/2, 2, stored_pattern_member, no_recall).
+
+From then on, every recall is checked by running that test on the produced output. A
+stored memory passes; the explicit no_recall passes; a memory nobody stored is
+refused with a readable, glass-box violation. The important part is what does NOT
+happen: the store is never flattened into a list. The check is a single fact lookup,
+not a copy of the whole store. The guarantee that recall cannot confabulate is
+obtained with no per-call materialisation, which is the whole point. The form is so
+free of the list that you can even guard membership of an infinite set - say, the
+positive even numbers - which no list could ever hold.
+
+There is a second, convenience form, membership_contract_enforce_producer, which
+names a goal that builds the set as a list and then reuses the plain-list check. It
+is honest about its cost: it does materialise, so it does not solve the growing-store
+problem - it is offered only for a small set where building the list is cheap. When
+the set can grow, the test-goal form is the one to use. When a test-goal check
+refuses an output, the violation names the goal rather than a list, since there is no
+list to print, so "why did this call fail?" still has a plain answer: the output is
+not a member of the set that goal defines. The accessor form is opt-in and additive -
+the plain-list contract of the previous chapter is unchanged, and a predicate may use
+either form or neither. It is documented for adopters in docs/membership-contract.md,
+and it is the reason the next memory-using region can guard recall against its live
+store directly, with no flatten-on-every-call workaround.

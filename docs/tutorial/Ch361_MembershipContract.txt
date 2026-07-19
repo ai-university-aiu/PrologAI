@@ -1,0 +1,29 @@
+Chapter 361: A Promise a Predicate Keeps - The N8 Membership Contract
+
+Some safety properties can only be checked while the program runs. Whether a value
+is a member of a set depends on the actual value produced on an actual call, so it
+can only be checked when the call happens. The membership contract is PrologAI's
+first construct for exactly this kind of runtime promise, and the promise is narrow:
+the output of a predicate shall be a member of one of its inputs - a named list - or
+else a single, declared value meaning none of them.
+
+Consider a selector: a predicate that, given offered options, returns one of them.
+You never want it to return something nobody offered. You declare the contract with
+one directive naming the predicate, which argument is the output, which argument is
+the offered set, and the abstention value:
+
+    :- membership_contract_enforce(region_stratum_recall/3, 3, 1, no_recall).
+
+From then on every call is checked. If the output is a member of the offered set it
+passes; if it is the declared abstention it passes; if it is anything else the call
+is refused with a glass-box error naming the predicate, the offending output, and
+the set. A predicate that declares no contract is unaffected - the construct is
+opt-in. The enforcement is a runtime postcondition, installed by wrapping the
+predicate, which is the deep difference from the layer rule and the binding: those
+are checked once, at load time, off the static structure; this is checked on every
+solution, because only the running call knows the answer. Its two honest limits are
+recorded in the Ledger: the offered set must be a plain list argument (entry N9,
+later closed by the accessor form of the next chapter), and the check runs per
+solution (entry N10). The construct is documented in docs/membership-contract.md,
+and its first real user is the Connectome memory region, whose recall declares it so
+the region cannot return a memory it never stored.
