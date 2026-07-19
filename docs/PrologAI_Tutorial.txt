@@ -27382,3 +27382,43 @@ the plain-list contract of the previous chapter is unchanged, and a predicate ma
 either form or neither. It is documented for adopters in docs/membership-contract.md,
 and it is the reason the next memory-using region can guard recall against its live
 store directly, with no flatten-on-every-call workaround.
+
+
+Chapter 363: Guarding the Committed Answer - The Once-Deterministic Mode
+
+The membership contract of the previous two chapters checks its promise on every
+solution the guarded predicate produces. That is right when a predicate has one
+answer - the memory region's recall was deterministic, so nothing was amiss there.
+But some predicates work differently: they GENERATE several candidates by
+backtracking and then COMMIT one. A selector proposes options and picks the top; a
+corrector considers several adjustments and emits one. For those, you want the
+guarantee on the COMMITTED answer - the one it actually returns - not a refusal
+somewhere in the middle of its backtracking. That was gap N12.
+
+Once mode closes it, and you ask for it with one extra argument. The enforce
+predicates gain a five-argument form whose last argument is the mode: per_solution,
+the unchanged default, or once. Suppose a selector proposes candidates in priority
+order:
+
+    propose(_Allowed, Choice) :- member(Choice, [top, second, third]).
+
+    :- membership_contract_enforce(propose/2, 2, 1, no_choice, once).
+
+In once mode the selector commits to its first solution, that committed output is
+checked once, and the predicate is left deterministic. propose returns top and only
+top - collecting all solutions now yields a one-element list, not three. A member
+passes; the declared abstention passes; a non-member is refused with the same
+readable violation as before.
+
+The honest part is the commitment. Once mode commits to the FIRST solution: if the
+first is a non-member, it is refused on that first solution, even if a later one
+would have been a member. So once mode is for a predicate whose first answer IS the
+answer it means to commit - a selector that has already chosen, a corrector that has
+already computed its adjustment. It is not a search that hunts through solutions for
+the first member; that would be a larger, different feature, and it is deliberately
+not built. Once mode works with both the plain-list form and the accessor form, and
+once plus the test-goal accessor form still builds no list at all - the committed
+output is checked against the membership-test goal a single time. Everything is
+opt-in: a contract declared without a mode behaves exactly as it always did, per
+solution. Once mode is documented for adopters in docs/membership-contract.md, and it
+is the guarantee the next selector-like or corrector-like region rests on.

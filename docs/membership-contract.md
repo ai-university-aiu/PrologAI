@@ -1,4 +1,4 @@
-# The membership contract (Ledger N8; accessor form N11)
+# The membership contract (Ledger N8; accessor form N11; once mode N14)
 
 This construct lets a predicate declare that one of its **output** arguments must
 be a **member** of one of its **input** arguments (a list) — or equal to a
@@ -182,6 +182,62 @@ either form or neither.
 - `membership_contract_declared_goal/4` — `?Pred, ?OutPos, ?Form, ?Abstention`:
   enumerate accessor contracts (`Form` is `test` or `producer`).
 
+## The once-deterministic mode (Ledger N14, closes N12 / N10)
+
+By default the contract checks **every** solution the guarded predicate produces.
+That is right for a predicate that yields one answer (the memory region's recall is
+deterministic, so this "did not bite" there). But a predicate that **generates**
+several candidates on backtracking and then **commits** one — a selector that
+proposes, compares, and picks; a corrector that considers adjustments and emits one
+— wants the guarantee on the **committed** answer, not a throw partway through its
+backtracking. That was gap N12 (which subsumed N10).
+
+**Once mode** provides it. The enforce entry points gain a mode-carrying `/5` form
+with a trailing `+Mode` argument — `per_solution` (the unchanged default) or `once`:
+
+```prolog
+% a selector that proposes candidates on backtracking and commits the first (top) one
+propose(_Allowed, Choice) :- member(Choice, [top, second, third]).
+
+% guard the COMMITTED output: argument 2 must be a member of argument 1, once mode
+:- membership_contract_enforce(propose/2, 2, 1, no_choice, once).
+```
+
+In once mode the guarded predicate **commits to its first solution**, that committed
+output is checked for membership **exactly once**, and the predicate is left
+**deterministic** (no choice points for the contract's sake). `propose([top, second,
+third], C)` now returns `C = top` and **only** `top` — a `findall` yields
+`[top]`, not `[top, second, third]`. A member passes, the declared abstention passes,
+and a non-member is refused with the same glass-box violation as the base form.
+
+**It commits honestly to the first solution.** If the first solution is a non-member,
+once mode refuses it — *even if a later solution would have been a member*. Once mode
+is for a predicate whose first answer **is** the committed answer (a selector that has
+already chosen, a corrector that has already computed its adjustment). It is **not** a
+find-the-first-member search over solutions; that is a different, larger feature and
+is deliberately not built.
+
+**Both forms, no materialisation.** Once mode is available to the plain-list form
+(`membership_contract_enforce/5`) and to the accessor form
+(`membership_contract_enforce_goal/5`, `membership_contract_enforce_producer/5`).
+Once **plus** the test-goal accessor form still materialises **no set**: the
+committed output is checked against the membership-test goal exactly once, with no
+list built.
+
+**The mode predicates.**
+
+- `membership_contract_enforce/5` — `:Pred, +OutPos, +InPos, +Abstention, +Mode`:
+  the plain-list form with a mode.
+- `membership_contract_enforce_goal/5` — `:Pred, +OutPos, :TestGoal, +Abstention,
+  +Mode`: the accessor test-goal form with a mode (no materialisation).
+- `membership_contract_enforce_producer/5` — `:Pred, +OutPos, :ProducerGoal,
+  +Abstention, +Mode`: the accessor producer form with a mode.
+- `membership_contract_declared_mode/2` — `?Pred, ?Mode`: the mode (`per_solution`
+  or `once`) a declared contract runs in.
+
+Opt-in and additive: a contract declared **without** a mode (the `/4` entry points)
+behaves exactly as before — per solution.
+
 ## Dependencies
 
 The construct imports **only** SWI-Prolog standard libraries (`lists` for
@@ -202,8 +258,11 @@ abstention passing, a non-member being refused, an unguarded predicate being
 unaffected, and the arbiter re-expression — and, since the accessor form, the
 eleven accessor tests too (the test-goal member/abstention/non-member cases, the
 no-materialisation proof, the infinite-set case, the producer form, and the
-hippocampus re-expression). The workflow runs the whole suite file, so both the
-nine plain-list tests and the eleven accessor tests are gated together. It is
+hippocampus re-expression), and the nine once-mode tests (commit-to-first
+determinism, the per-solution default unchanged, non-member-first refusal, once
+plus the accessor form with no materialisation, and the selector-like
+re-expression). The workflow runs the whole suite file, so all twenty-nine tests —
+the plain-list, accessor, and once-mode blocks — are gated together. It is
 separate from, and does not alter, the L4 `layer-rule`, N6 `layer-binding`,
 mini-regression, or conformance gates.
 

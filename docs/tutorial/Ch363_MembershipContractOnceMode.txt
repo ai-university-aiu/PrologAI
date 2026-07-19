@@ -1,0 +1,29 @@
+Chapter 363: Guarding the Committed Answer - The Once-Deterministic Mode
+
+The membership contract checks its promise on every solution the guarded predicate
+produces. That is right for a predicate with one answer. But some predicates GENERATE
+several candidates by backtracking and then COMMIT one: a selector proposes options
+and picks the top; a corrector considers several adjustments and emits one. For those
+you want the guarantee on the COMMITTED answer, not a refusal in the middle of the
+backtracking. That was gap N12 (which subsumed the earlier N10). Once mode (Ledger
+entry N14) closes it.
+
+You ask for it with one extra argument. The enforce predicates gain a five-argument
+form whose last argument is the mode: per_solution, the unchanged default, or once:
+
+    propose(_Allowed, Choice) :- member(Choice, [top, second, third]).
+
+    :- membership_contract_enforce(propose/2, 2, 1, no_choice, once).
+
+In once mode the selector commits to its first solution, that committed output is
+checked once, and the predicate is left deterministic - propose returns top and only
+top. A member passes, the declared abstention passes, a non-member is refused with the
+same readable violation as the base form.
+
+The commitment is honest: once mode commits to the FIRST solution, and if that first
+is a non-member it is refused on it, even if a later solution would have been a
+member. So once mode is for a predicate whose first answer IS the committed answer, not
+a search that hunts through solutions for the first member (a larger feature, not
+built). It works with both the plain-list and accessor forms, and once plus the
+test-goal accessor form still builds no list. It is opt-in: a contract declared
+without a mode behaves exactly as before. Documented in docs/membership-contract.md.
