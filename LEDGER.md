@@ -20,7 +20,7 @@ Status: **CLOSED** · **PARTIALLY CLOSED** · **STILL OPEN**.
 > three granularity arms (ATOMIC / LOOPS / STRATA), and the region builds (ARBITER,
 > HIPPO, CEREBELLUM, AMYGDALA) — into one navigable document, with the open-gaps
 > forward agenda and the closed track record, now lives at
-> **`docs/PrologAI_Requirements_Ledger_v2.txt`**. That consolidated Ledger cites the
+> **`docs/PrologAI_Requirements_Ledger_v3.txt`**. That consolidated Ledger cites the
 > per-repository Ledgers; it does not replace them.
 
 ---
@@ -749,3 +749,34 @@ consolidated Ledger; Stage 1 is the spine.
 - **Pinned Causalontology.** commit `98ebb33` (specification 3.0.0). The
   standard is FROZEN for the whole of Wave 10; only this stage's read-only
   adoption touches it.
+
+---
+
+## Wave 10, Stage 2 — affect and appraisal (Theme D) (2026-07-19)
+
+Branch `feature/wave-10-stage-2-affect`. Rollback tag `pre-wave-10-stage-2`.
+Additive; the ARC-AGI solving core was NOT modified.
+
+### AMYGDALA-1 — a first-class persisted, modulatory affective state · **CLOSED** (WP-430, WP-431)
+
+- **The gap.** PrologAI had no construct for a persisted, modulatory affective
+  state; the amygdala had to SMUGGLE its cortisol regime into the committed
+  appraisal value (`appraisal(Valence, Salience, Regime)`) because a legal-set
+  test could only see the output value, not a held context.
+- **Delivered.** (1) The new **`affective_state`** pack (WP-430, layer 0): a held
+  affective context (valence, salience, mood, cortisol tone) that persists across
+  calls and derives a regime (baseline/stress) later processing reads
+  (`affective_state_get/1`, `affective_state_regime/1`, modulate/decay/clear).
+  (2) An additive **context-aware accessor** on the membership_contract pack
+  (WP-431): `membership_contract_enforce_context/6`, whose membership-test goal
+  receives `(Output, HeldContext)` — the context read at check time from a goal
+  like `affective_state_regime` — so an output's legality can depend on the held
+  context WITHOUT smuggling it into the value.
+- **Demonstration (PrologAI-side; the frozen amygdala repo untouched).** A
+  stand-in appraisal whose committed value is `appraisal(Valence, Salience)` (no
+  regime) is REFUSED an appetitive appraisal under a held stress regime and
+  ACCEPTS it at baseline — the regime consulted as context, not carried in the
+  value. The amygdala's AMYGDALA-1 workaround is now unnecessary.
+- **Gate.** affective_state 5/5, the membership_contract suite (with the new
+  context tests) green, conformance 119/119, mini-regression 40/40 and 12/12, the
+  layer rule 0 violations, pack naming clean. L4/N6/N8/N11/N14 unchanged.

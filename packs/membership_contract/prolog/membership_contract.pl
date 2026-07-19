@@ -129,6 +129,12 @@
     membership_contract_enforce_producer/5,
     % membership_contract_declared_mode/2: enumerate the mode (per_solution/once) each declared contract runs in.
     membership_contract_declared_mode/2,
+    % membership_contract_enforce_context/6: declare a CONTEXT-AWARE accessor - the test goal takes (Output, HeldContext) (WP-431).
+    membership_contract_enforce_context/6,
+    % membership_contract_check_context/5: the context-aware postcondition — succeed on a member-in-context/abstention, else throw.
+    membership_contract_check_context/5,
+    % membership_contract_holds_context/4: a boolean context-aware check that never throws.
+    membership_contract_holds_context/4,
     % membership_contract_violation_line/2: render one contract violation as a readable line (either form).
     membership_contract_violation_line/2
 ]).
@@ -160,6 +166,13 @@
     membership_contract_enforce(:, +, +, +, +),
     membership_contract_enforce_goal(:, +, 1, +, +),
     membership_contract_enforce_producer(:, +, 1, +, +).
+
+% The context-aware accessor (WP-431): the test goal is called with (Output, Context) — two
+% appended arguments — and the context goal with (Context) — one appended argument.
+:- meta_predicate
+    membership_contract_enforce_context(:, +, 2, 1, +, +),
+    membership_contract_check_context(+, +, 2, 1, +),
+    membership_contract_holds_context(+, 2, 1, +).
 
 % ---------------------------------------------------------------------------
 % Declaring and enforcing a contract.
@@ -423,6 +436,59 @@ membership_contract_enforce_producer(M:Name/Arity, OutPos, ProducerGoal, Abstent
     % Install the wrapper for the requested mode, reusing the producer postcondition.
     membership_contract_wrap_mode(M, Head, Mode,
         membership_contract:membership_contract_check_producer(M:Name/Arity, Out, ProducerGoal, Abstention)).
+
+% ---------------------------------------------------------------------------
+% THE CONTEXT-AWARE ACCESSOR (WP-431, Wave 10 Stage 2) — legality may depend on a HELD CONTEXT, closing AMYGDALA-1.
+% ---------------------------------------------------------------------------
+
+% -- membership_contract_enforce_context(:Pred, +OutPos, :TestGoal, :ContextGoal, +Abstention, +Mode):
+% The CONTEXT-AWARE accessor contract. Its membership-TEST goal receives TWO arguments — the committed
+% output AND a HELD CONTEXT that ContextGoal produces at check time (for example the affective_state
+% pack's derived regime) — so an output's legality may depend on a persisted modulatory context WITHOUT
+% smuggling that context into the committed value (the amygdala's AMYGDALA-1 workaround). The full set is
+% never materialised; the abstention always passes; a non-member-in-context is refused with the same
+% glass-box membership_contract_goal_violation. Mode is per_solution or once, exactly as the other forms.
+membership_contract_enforce_context(M:Name/Arity, OutPos, TestGoal, ContextGoal, Abstention, Mode) :-
+    % The mode must be recognised.
+    membership_contract_valid_mode(Mode),
+    % Validate the predicate and output position and bind the output argument (shared accessor validation).
+    membership_contract_out_head(M, Name, Arity, OutPos, membership_contract_enforce_context/6, Head, Out),
+    % Derive a readable label for the test goal.
+    membership_contract_goal_label(TestGoal, Label),
+    % Record the accessor contract (context form) in the goal registry and record its mode.
+    retractall(membership_contract_goal_registry(M:Name/Arity, _, _, _, _)),
+    assertz(membership_contract_goal_registry(M:Name/Arity, OutPos, context, Label, Abstention)),
+    membership_contract_record_mode(M:Name/Arity, Mode),
+    % Install the wrapper for the requested mode, checking the output against the test goal IN its held context.
+    membership_contract_wrap_mode(M, Head, Mode,
+        membership_contract:membership_contract_check_context(M:Name/Arity, Out, TestGoal, ContextGoal, Abstention)).
+
+% -- membership_contract_check_context(+Pred, +Out, :TestGoal, :ContextGoal, +Abstention): the context postcondition.
+% Succeeds when Out is the abstention, or when the test goal accepts Out IN the held context ContextGoal reads;
+% throws the glass-box violation otherwise. The context is read ONCE per check, at check time, from the held state.
+membership_contract_check_context(_Pred, Out, _TestGoal, _ContextGoal, Abstention) :-
+    % The declared abstention value always satisfies the contract, whatever the context.
+    Out == Abstention,
+    !.
+membership_contract_check_context(_Pred, Out, TestGoal, ContextGoal, _Abstention) :-
+    % Read the HELD context once (deterministically), then the output is legal exactly when the test goal accepts it in that context.
+    once(call(ContextGoal, Context)),
+    call(TestGoal, Out, Context),
+    !.
+membership_contract_check_context(Pred, Out, TestGoal, _ContextGoal, _Abstention) :-
+    % An output illegal in its held context is REFUSED with a glass-box violation naming the goal.
+    membership_contract_goal_label(TestGoal, Label),
+    throw(error(membership_contract_goal_violation(Pred, Out, Label), membership_contract)).
+
+% -- membership_contract_holds_context(+Out, :TestGoal, :ContextGoal, +Abstention): a boolean context check that never throws.
+membership_contract_holds_context(Out, _TestGoal, _ContextGoal, Abstention) :-
+    % The declared abstention satisfies the contract.
+    Out == Abstention,
+    !.
+membership_contract_holds_context(Out, TestGoal, ContextGoal, _Abstention) :-
+    % Otherwise read the held context and require the test goal to accept the output in it, deterministically.
+    once(call(ContextGoal, Context)),
+    once(call(TestGoal, Out, Context)).
 
 % -- membership_contract_valid_mode(+Mode): succeed for a recognised mode, else throw a clear error.
 membership_contract_valid_mode(Mode) :-
