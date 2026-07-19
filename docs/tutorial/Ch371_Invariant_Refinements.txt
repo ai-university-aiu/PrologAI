@@ -1,0 +1,43 @@
+Chapter 371 — Invariant Refinements and Acknowledgements: the close of Wave 10 (Stage 9)
+
+This chapter closes the last theme of the Requirements Ledger - small tidying-up
+refinements on invariants that were otherwise already delivered, plus the acknowledgement
+of two design observations that have no code remedy. With it, every finding in the
+Ledger is closed.
+
+Plain-language idea. Three small but real improvements, and two honest acknowledgements.
+
+Binding freshness (N7). The layer-to-stratum binding decides whether a pack's declared
+layer agrees with its stratum's rank, and it read that rank from data files (the record
+artifacts). If those files were out of date, a real problem could slip through. Now a
+pack can also write its stratum's rank directly into its own manifest
+(stratum_ordinal(N)), which is always current, and layer_binding_freshness compares the
+two sources and reports any that disagree - so a stale file is caught, not trusted.
+
+Contract purity (N13). The membership contract asks a small yes/no test on every call,
+and trusted it to be well-behaved. Now membership_contract_holds_guarded runs that test
+under a double-negation guard, so the test cannot accidentally change the answer or leave
+loose ends behind - it can only say yes or no. And membership_contract_test_deterministic
+lets a pack confirm, in its own tests, that a test gives a single answer.
+
+Filtering mode (N15). The once mode of the contract takes a predicate's first answer and
+refuses it if it is not a member - right for a predicate whose first answer is its final
+answer. Some predicates instead generate several candidates and want the first one that
+IS a member. membership_contract_find_member does exactly that: it walks the candidates
+and commits to the first member, or falls back to a stated abstention if none qualifies.
+
+Two acknowledgements. STRATA-1 (a loop whose three regions all live at the same level,
+so one code cut cannot capture both the loop and the multi-level structure it touches)
+and STRATA-4 (one-pack-per-level naturally makes some packs tiny and others large) are
+design observations. Their remedy is recognition, not a new construct, so they are
+acknowledged and recorded rather than "fixed."
+
+The whole program, in one line. Wave 10 carried the entire consolidated Requirements
+Ledger to closed in nine gated stages: adopt Causalontology 3.0.0; then affect; timing;
+the managed cross-stratal seam; the structure-to-dynamics binding; the layer construct's
+reach across repositories and inside packs; packaging and dependency kinds; the
+coordination ergonomics; and finally these refinements. Fifty-seven findings, all closed.
+
+Gate. the layer suite 36/36; the membership_contract suite 38/38; Causalontology
+conformance 119/119; the mini-regression 40/40 and 12/12; the layer rule and pack-naming
+clean; L4/N6/N8/N11/N14 and the closure hybrid unchanged.

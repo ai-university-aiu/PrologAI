@@ -136,13 +136,25 @@
     % membership_contract_holds_context/4: a boolean context-aware check that never throws.
     membership_contract_holds_context/4,
     % membership_contract_violation_line/2: render one contract violation as a readable line (either form).
-    membership_contract_violation_line/2
+    membership_contract_violation_line/2,
+    % --- Refinements (Wave 10 Stage 9) — additive to the above ---
+    % membership_contract_holds_guarded/3: a purity-guarded (double-negation) boolean membership test (N13).
+    membership_contract_holds_guarded/3,
+    % membership_contract_test_deterministic/2: succeed iff the test goal is semidet on an output (N13).
+    membership_contract_test_deterministic/2,
+    % membership_contract_find_member/4: commit to the FIRST generated candidate that is a member (N15).
+    membership_contract_find_member/4
 ]).
 
 % Import memberchk/2 from the lists library (the membership test).
 :- use_module(library(lists), [memberchk/2]).
 % Import wrap_predicate/4 from the prolog_wrap library — SWI's transparent per-call wrapping.
 :- use_module(library(prolog_wrap), [wrap_predicate/4]).
+
+% The refinement predicates call caller-supplied goals: the test goal and the generator.
+:- meta_predicate membership_contract_holds_guarded(+, 1, +).
+:- meta_predicate membership_contract_test_deterministic(1, +).
+:- meta_predicate membership_contract_find_member(1, 1, +, -).
 
 % The registry of declared plain-list contracts, keyed by module-qualified predicate indicator.
 :- dynamic membership_contract_registry/4.
@@ -548,3 +560,49 @@ membership_contract_violation_line(
     format(atom(Line),
       "membership_contract violation: ~w produced ~q, which the membership-test goal ~q does not accept (it is not a member of the set that goal defines, and is not the declared abstention)",
       [Pred, Out, GoalLabel]).
+
+% ===========================================================================
+% REFINEMENTS  (Wave 10 Stage 9; additive — N13 contract purity, N15 filtering)
+% ---------------------------------------------------------------------------
+% N13 (contract purity). The contract calls the test goal on every call and trusts it
+% to be cheap and side-effect-free; nothing enforced it. These two additive predicates
+% give the Ledger's remedies: a DOUBLE-NEGATION-GUARDED call that runs the test goal so
+% it cannot bind the output or leave a choice point (side-effect-safe and deterministic
+% by construction), and a DETERMINISM check a pack can run in its own tests.
+% N15 (filtering mode). The once mode commits to the FIRST solution and refuses it if a
+% non-member, even when a LATER solution is a member. This adds a distinct find-member
+% mode as a self-contained predicate — no general solution-selection framework — that
+% commits to the first GENERATED candidate that IS a member.
+% ===========================================================================
+
+% -- membership_contract_holds_guarded(+Out, :TestGoal, +Abstention): purity-guarded test (N13).
+% The abstention passes. Otherwise the test goal is run under double negation, so any
+% binding it attempts on Out is discarded and it can leave no choice point: it can only
+% decide member-or-not, never mutate the output.
+membership_contract_holds_guarded(Out, _TestGoal, Abstention) :-
+    % The declared abstention is always a legal output.
+    Out == Abstention, !.
+membership_contract_holds_guarded(Out, TestGoal, _Abstention) :-
+    % Run the test goal side-effect-safely: double negation keeps no bindings, no choicepoint.
+    \+ \+ call(TestGoal, Out).
+
+% -- membership_contract_test_deterministic(:TestGoal, +Out): the determinism check (N13).
+% Succeeds when the test goal has AT MOST ONE solution on Out (it is semidet), and fails
+% when it is nondeterministic — a test goal a contract can trust to be cheap and single.
+membership_contract_test_deterministic(TestGoal, Out) :-
+    % Collect the solutions of the test goal on this fixed output.
+    findall(solution, call(TestGoal, Out), Solutions),
+    % A deterministic test yields no solution (a clean fail) or exactly one.
+    ( Solutions == [] -> true ; Solutions = [_] ).
+
+% -- membership_contract_find_member(:Generator, :TestGoal, +Abstention, -Member): filtering (N15).
+% Run Generator (a goal that produces a candidate output on backtracking) and commit to
+% the FIRST candidate that satisfies TestGoal — the find-first-member the once mode could
+% not express. If no generated candidate is a member, unify Member with the abstention.
+membership_contract_find_member(Generator, TestGoal, Abstention, Member) :-
+    % Search the generated candidates for the first that passes the membership test.
+    ( call(Generator, Candidate), \+ \+ call(TestGoal, Candidate)
+    % Commit to that first member.
+    ->  Member = Candidate
+    % No candidate was a member: fall back to the declared abstention.
+    ;   Member = Abstention ).

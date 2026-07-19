@@ -412,3 +412,53 @@ test(context_value_carries_no_regime) :-
 
 % Close the context-aware test block.
 :- end_tests(membership_contract_context).
+
+% ---------------------------------------------------------------------------
+% REFINEMENTS (Wave 10 Stage 9): N13 contract purity, N15 filtering mode
+% ---------------------------------------------------------------------------
+
+% A pure membership test: the candidate is one of a small allowed set.
+mc_ref_allowed(X) :- member(X, [a, b, c]).
+% An IMPURE test that tries to BIND its argument (must be neutralised by the guard).
+mc_ref_binds(bound_by_test).
+% A NONDETERMINISTIC test: it succeeds more than once for the same input.
+mc_ref_nondet(_) :- member(_, [1, 2]).
+% A generator of candidate outputs on backtracking (some members, some not).
+mc_ref_generate(X) :- member(X, [x, y, b, a]).
+
+% Open the refinements test block.
+:- begin_tests(membership_contract_refinements).
+
+% N13: the guarded test passes a real member and the abstention, and refuses a non-member.
+test(guarded_holds_member_and_abstention) :-
+    assertion(membership_contract_holds_guarded(a, test_membership_contract:mc_ref_allowed, no_choice)),
+    assertion(membership_contract_holds_guarded(no_choice, test_membership_contract:mc_ref_allowed, no_choice)),
+    assertion(\+ membership_contract_holds_guarded(z, test_membership_contract:mc_ref_allowed, no_choice)).
+
+% N13: the guard NEUTRALISES a test goal that tries to bind the output — no binding leaks.
+test(guarded_neutralises_binding) :-
+    Out = _Fresh,
+    % The impure test succeeds only when its arg unifies with bound_by_test; under the
+    % guard the binding is discarded, so Out stays unbound afterwards.
+    ( membership_contract_holds_guarded(Out, test_membership_contract:mc_ref_binds, no_choice) -> true ; true ),
+    assertion(var(Out)).
+
+% N13: the determinism check accepts a semidet test and rejects a nondeterministic one.
+test(determinism_check) :-
+    assertion(membership_contract_test_deterministic(test_membership_contract:mc_ref_allowed, a)),   % one solution
+    assertion(membership_contract_test_deterministic(test_membership_contract:mc_ref_allowed, z)),   % zero solutions
+    assertion(\+ membership_contract_test_deterministic(test_membership_contract:mc_ref_nondet, a)). % two solutions
+
+% N15: find_member commits to the FIRST generated candidate that is a member (skipping non-members).
+test(find_member_commits_to_first_member) :-
+    membership_contract_find_member(test_membership_contract:mc_ref_generate, test_membership_contract:mc_ref_allowed, no_member, M),
+    % x and y are not allowed; b is the first allowed candidate the generator yields.
+    assertion(M == b).
+
+% N15: when no generated candidate is a member, find_member yields the abstention.
+test(find_member_falls_back_to_abstention) :-
+    membership_contract_find_member([X]>>member(X, [p, q, r]), test_membership_contract:mc_ref_allowed, no_member, M),
+    assertion(M == no_member).
+
+% Close the refinements test block.
+:- end_tests(membership_contract_refinements).

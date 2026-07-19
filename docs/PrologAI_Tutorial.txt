@@ -27468,3 +27468,8 @@ The `packaging` pack closes Theme G. It adds dependency KINDS (structure_only vs
 ## Wave 10, Stage 8 — coordination ergonomics (WP-437)
 
 The `coordination` pack closes Theme F over a journal-free, synchronously-driven in-memory store: a keyed lookup and a bounded keyed await (P8/N5), an ordered FIFO channel (L6), a bounded reentrant-loop driver with an until-condition and completion signal (L7/P9), a reentrant-loop descriptor whose one check proves both acyclicity and a genuine back-edge closure (P10), a runtime layer-aware transport that refuses an upward send (L5/N4), and a glass-box hop trace (L8); the store writes no journal (L9). On the lattice pack `lattice_transaction/2` is now a `meta_predicate` (N1), and the SWI `thread_wait/2` behaviour (N2) is documented and avoided. L5, the last partial finding, is now fully closed.
+
+
+## Wave 10, Stage 9 — invariant refinements and acknowledgements (WP-438) · WAVE 10 COMPLETE
+
+Additive refinements close Theme H: N7 (binding freshness — `layer_pack_ordinal/2` reads a stratum ordinal directly from a manifest, `layer_binding_freshness/3` flags a stale artifact), N13 (contract purity — `membership_contract_holds_guarded/3` guards the test goal under double negation, `membership_contract_test_deterministic/2` checks it is semidet), and N15 (filtering — `membership_contract_find_member/4` commits to the first generated member). STRATA-1 and STRATA-4 are acknowledged design observations. With this, every finding in the consolidated Requirements Ledger is closed — 57 of 57 — and Wave 10 is complete.

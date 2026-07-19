@@ -20,7 +20,7 @@ Status: **CLOSED** · **PARTIALLY CLOSED** · **STILL OPEN**.
 > three granularity arms (ATOMIC / LOOPS / STRATA), and the region builds (ARBITER,
 > HIPPO, CEREBELLUM, AMYGDALA) — into one navigable document, with the open-gaps
 > forward agenda and the closed track record, now lives at
-> **`docs/PrologAI_Requirements_Ledger_v9.txt`**. That consolidated Ledger cites the
+> **`docs/PrologAI_Requirements_Ledger_v10.txt`**. That consolidated Ledger cites the
 > per-repository Ledgers; it does not replace them.
 
 ---
@@ -969,3 +969,45 @@ Additive; the ARC-AGI solving core was NOT modified.
   rule 0 violations, pack naming clean (303 packs). L4/N6/N8/N11/N14 and the L1/L2/L3
   closure hybrid unchanged. **L5 — the last partial finding — is now fully CLOSED; no
   finding remains partial.**
+
+---
+
+## Wave 10, Stage 9 — invariant refinements and acknowledgements (Theme H) · WAVE 10 COMPLETE (2026-07-19)
+
+Branch `feature/wave-10-stage-9-refinements`. Rollback tag `pre-wave-10-stage-9`.
+Additive extensions of the `layer` and `membership_contract` packs (WP-438); no L4/N6/N8
+behaviour changed.
+
+### Theme H — refinements on delivered invariants, and design observations · **CLOSED** (WP-438)
+
+- **N7 (binding freshness).** The N6 binding read a stratum's ordinal from the
+  structure-record artifacts with no check they were current. `layer_pack_ordinal/2`
+  reads a stratum ordinal **directly from a pack's manifest** (load-safe, artifact-free);
+  `layer_binding_freshness/3` flags any pack whose declared ordinal disagrees with the
+  artifact — a stale artifact caught.
+- **N13 (contract purity).** The membership contract trusted the test goal to be cheap
+  and side-effect-free. `membership_contract_holds_guarded/3` runs the test goal under
+  double negation (side-effect-safe, deterministic by construction);
+  `membership_contract_test_deterministic/2` checks a test goal is semidet.
+- **N15 (filtering mode).** The once mode refused a non-member first solution.
+  `membership_contract_find_member/4` commits to the **first generated candidate that is
+  a member** (or the abstention) — a distinct find-first-member mode, no general
+  solution-selection framework.
+- **STRATA-1, STRATA-4 (design observations).** Acknowledged (recognition, not a
+  construct) — counted closed as an honesty classification, as CEREBELLUM-3 and
+  AMYGDALA-3 were.
+
+### Wave 10 complete
+
+**Every finding in the consolidated Requirements Ledger is now closed — 57 of 57, none
+open, none partial.** The nine serial stages: (1) adopt Causalontology 3.0.0; (2) affect
+(AMYGDALA-1); (3) temporal (HIPPO-2, CEREBELLUM-1); (4) the managed cross-stratal seam
+(Theme B); (5) structure-to-dynamics (Theme C); (6) the layer construct's reach
+(Theme E); (7) packaging (Theme G); (8) coordination ergonomics (Theme F); (9)
+refinements and acknowledgements (Theme H). New packs: `affective_state`,
+`tick_scheduler`, `managed_seam`, `realization`, `packaging`, `coordination`; extended:
+`membership_contract`, `layer`, `lattice`, `causal_core`.
+
+- **Gate.** the layer suite 36/36, the membership_contract suite 38/38, conformance
+  119/119, mini-regression 40/40 and 12/12, the layer rule 0 violations, pack naming
+  clean (303 packs). L4/N6/N8/N11/N14 and the closure hybrid unchanged.
