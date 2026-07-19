@@ -76,6 +76,28 @@
       membership_contract_check_goal/4        +Pred, +Out, :TestGoal, +Abstention      the test-goal postcondition (succeed or throw)
       membership_contract_holds_goal/3        +Out, :TestGoal, +Abstention             boolean test-goal check (never throws)
       membership_contract_declared_goal/4     ?Pred, ?OutPos, ?Form, ?Abstention        enumerate accessor contracts (Form = test/producer)
+
+    THE ONCE / DETERMINISTIC MODE (Ledger entry N14, closes N12 / N10, WP-428). By
+    default the contract checks EVERY solution the guarded predicate produces — right
+    for a predicate that yields one answer, but wrong for one that GENERATES several
+    candidates on backtracking and COMMITS one (a selector that proposes then picks; a
+    corrector that considers adjustments then emits one). Such a predicate wants the
+    guarantee on the COMMITTED answer, not a throw partway through its backtracking.
+    The ONCE mode provides exactly that: the mode-carrying enforce entry points take a
+    trailing +Mode argument (per_solution — the unchanged default — or once). In once
+    mode the guarded predicate commits to its FIRST solution, that committed output is
+    checked for membership exactly once, and the predicate is left DETERMINISTIC (no
+    choice points for the contract's sake). It commits HONESTLY to the first solution:
+    if that first solution is a non-member it is refused on it (once mode is for a
+    predicate whose first answer IS the committed answer, not a search-and-filter). It
+    is available to BOTH the plain-list form and the accessor form; once plus the
+    test-goal accessor form still materialises NO set. Opt-in and additive: a contract
+    declared without a mode behaves exactly as before.
+
+      membership_contract_enforce/5           :Pred, +OutPos, +InPos, +Abstention, +Mode      plain-list with a mode (per_solution/once)
+      membership_contract_enforce_goal/5      :Pred, +OutPos, :TestGoal, +Abstention, +Mode   accessor test-goal with a mode
+      membership_contract_enforce_producer/5  :Pred, +OutPos, :ProducerGoal, +Abstention, +Mode  accessor producer with a mode
+      membership_contract_declared_mode/2     ?Pred, ?Mode                                     the mode (per_solution/once) a contract runs in
       membership_contract_violation_line/2  +Error, -Line                    render a violation readably (both forms)
 */
 
@@ -99,6 +121,14 @@
     membership_contract_holds_goal/3,
     % membership_contract_declared_goal/4: enumerate the predicates that declare an accessor contract.
     membership_contract_declared_goal/4,
+    % membership_contract_enforce/5: declare a plain-list contract with a MODE (per_solution default, or once — commit the first solution).
+    membership_contract_enforce/5,
+    % membership_contract_enforce_goal/5: declare an accessor test-goal contract with a MODE (per_solution or once).
+    membership_contract_enforce_goal/5,
+    % membership_contract_enforce_producer/5: declare an accessor producer contract with a MODE (per_solution or once).
+    membership_contract_enforce_producer/5,
+    % membership_contract_declared_mode/2: enumerate the mode (per_solution/once) each declared contract runs in.
+    membership_contract_declared_mode/2,
     % membership_contract_violation_line/2: render one contract violation as a readable line (either form).
     membership_contract_violation_line/2
 ]).
@@ -112,6 +142,9 @@
 :- dynamic membership_contract_registry/4.
 % The registry of declared ACCESSOR contracts: Pred, OutPos, Form (test/producer), the readable goal label, Abstention.
 :- dynamic membership_contract_goal_registry/5.
+% The MODE a mode-carrying declaration installed: Pred, Mode. Only 'once' is recorded; a
+% contract declared without a mode is per_solution by default and records no entry here.
+:- dynamic membership_contract_mode_registry/2.
 
 % The plain-list enforce predicate is module-transparent: it wraps a predicate in the CALLER's module.
 :- meta_predicate membership_contract_enforce(:, +, +, +).
@@ -122,6 +155,11 @@
     membership_contract_check_goal(+, +, 1, +),
     membership_contract_check_producer(+, +, 1, +),
     membership_contract_holds_goal(+, 1, +).
+% The mode-carrying enforce predicates mirror the base ones with a trailing +Mode argument.
+:- meta_predicate
+    membership_contract_enforce(:, +, +, +, +),
+    membership_contract_enforce_goal(:, +, 1, +, +),
+    membership_contract_enforce_producer(:, +, 1, +, +).
 
 % ---------------------------------------------------------------------------
 % Declaring and enforcing a contract.
@@ -312,6 +350,123 @@ membership_contract_holds_goal(Out, TestGoal, _Abstention) :-
 membership_contract_declared_goal(Pred, OutPos, Form, Abstention) :-
     % Yield each registered accessor contract's predicate, output position, form (test/producer), and abstention.
     membership_contract_goal_registry(Pred, OutPos, Form, _Label, Abstention).
+
+% ---------------------------------------------------------------------------
+% THE ONCE / DETERMINISTIC MODE — guard the COMMITTED single answer (N14, closes N12 / N10).
+% ---------------------------------------------------------------------------
+
+% -- membership_contract_enforce(:Pred, +OutPos, +InPos, +Abstention, +Mode):
+% The plain-list contract WITH A MODE. Mode is per_solution (identical to enforce/4 — the
+% check fires on every solution) or once (the guarded predicate commits to its FIRST
+% solution, that committed output is checked once, and the predicate is deterministic).
+membership_contract_enforce(M:Name/Arity, OutPos, InPos, Abstention, Mode) :-
+    % The mode must be a recognised one.
+    membership_contract_valid_mode(Mode),
+    % The arity must be a positive integer (same validation as the plain-list enforce/4).
+    ( integer(Arity), Arity >= 1
+    ->  true
+    ;   throw(error(type_error(predicate_arity, Arity), membership_contract_enforce/5)) ),
+    % The output and input positions must be argument indices within the arity.
+    ( integer(OutPos), OutPos >= 1, OutPos =< Arity,
+      integer(InPos), InPos >= 1, InPos =< Arity
+    ->  true
+    ;   throw(error(domain_error(argument_position, OutPos-InPos), membership_contract_enforce/5)) ),
+    % Build the head skeleton and bind the output and input-set arguments by position.
+    functor(Head, Name, Arity),
+    arg(OutPos, Head, Out),
+    arg(InPos, Head, In),
+    % The predicate must already be defined before it can be guarded.
+    ( predicate_property(M:Head, defined)
+    ->  true
+    ;   throw(error(existence_error(procedure, M:Name/Arity), membership_contract_enforce/5)) ),
+    % Record the plain-list contract in the base registry (so declared/4 still enumerates it) and record its mode.
+    retractall(membership_contract_registry(M:Name/Arity, _, _, _)),
+    assertz(membership_contract_registry(M:Name/Arity, OutPos, InPos, Abstention)),
+    membership_contract_record_mode(M:Name/Arity, Mode),
+    % Install the wrapper for the requested mode, checking membership of the (committed) output.
+    membership_contract_wrap_mode(M, Head, Mode,
+        membership_contract:membership_contract_check(M:Name/Arity, Out, In, Abstention)).
+
+% -- membership_contract_enforce_goal(:Pred, +OutPos, :TestGoal, +Abstention, +Mode):
+% The accessor test-goal contract WITH A MODE. In once mode the committed output is checked
+% against the membership-TEST goal exactly once — and, as in the per-solution test-goal form,
+% the full set is NEVER materialised.
+membership_contract_enforce_goal(M:Name/Arity, OutPos, TestGoal, Abstention, Mode) :-
+    % The mode must be recognised.
+    membership_contract_valid_mode(Mode),
+    % Validate the predicate and output position and bind the output argument (shared accessor validation).
+    membership_contract_out_head(M, Name, Arity, OutPos, membership_contract_enforce_goal/5, Head, Out),
+    % Derive a readable label for the test goal.
+    membership_contract_goal_label(TestGoal, Label),
+    % Record the accessor contract (test form) in the goal registry and record its mode.
+    retractall(membership_contract_goal_registry(M:Name/Arity, _, _, _, _)),
+    assertz(membership_contract_goal_registry(M:Name/Arity, OutPos, test, Label, Abstention)),
+    membership_contract_record_mode(M:Name/Arity, Mode),
+    % Install the wrapper for the requested mode, checking the output against the test goal (no set built).
+    membership_contract_wrap_mode(M, Head, Mode,
+        membership_contract:membership_contract_check_goal(M:Name/Arity, Out, TestGoal, Abstention)).
+
+% -- membership_contract_enforce_producer(:Pred, +OutPos, :ProducerGoal, +Abstention, +Mode):
+% The accessor producer contract WITH A MODE. Once mode commits the first solution; the
+% producer still materialises the set (the convenience trade-off is unchanged from N11).
+membership_contract_enforce_producer(M:Name/Arity, OutPos, ProducerGoal, Abstention, Mode) :-
+    % The mode must be recognised.
+    membership_contract_valid_mode(Mode),
+    % Validate the predicate and output position and bind the output argument.
+    membership_contract_out_head(M, Name, Arity, OutPos, membership_contract_enforce_producer/5, Head, Out),
+    % Derive a readable label for the producer goal.
+    membership_contract_goal_label(ProducerGoal, Label),
+    % Record the accessor contract (producer form) in the goal registry and record its mode.
+    retractall(membership_contract_goal_registry(M:Name/Arity, _, _, _, _)),
+    assertz(membership_contract_goal_registry(M:Name/Arity, OutPos, producer, Label, Abstention)),
+    membership_contract_record_mode(M:Name/Arity, Mode),
+    % Install the wrapper for the requested mode, reusing the producer postcondition.
+    membership_contract_wrap_mode(M, Head, Mode,
+        membership_contract:membership_contract_check_producer(M:Name/Arity, Out, ProducerGoal, Abstention)).
+
+% -- membership_contract_valid_mode(+Mode): succeed for a recognised mode, else throw a clear error.
+membership_contract_valid_mode(Mode) :-
+    % Accept exactly per_solution and once; anything else is a usage error.
+    ( ( Mode == per_solution ; Mode == once )
+    ->  true
+    ;   throw(error(domain_error(membership_contract_mode, Mode), membership_contract)) ).
+
+% -- membership_contract_record_mode(+Pred, +Mode): remember a contract's mode (only once needs a record).
+membership_contract_record_mode(Pred, Mode) :-
+    % Replace any prior mode record for this predicate.
+    retractall(membership_contract_mode_registry(Pred, _)),
+    % Record the once mode explicitly; per_solution is the default and needs no record.
+    ( Mode == once
+    ->  assertz(membership_contract_mode_registry(Pred, once))
+    ;   true ).
+
+% -- membership_contract_wrap_mode(+M, +Head, +Mode, +CheckGoal): install the postcondition wrapper for a mode.
+% per_solution wraps as ( original, check ) — the check fires on every solution, exactly as the base forms.
+% once wraps as once(( original, check )) — the original commits to its first solution, the check runs on that
+% committed output exactly once, and the predicate is left DETERMINISTIC (no choice points for the contract).
+membership_contract_wrap_mode(M, Head, per_solution, CheckGoal) :-
+    % Per-solution: the base wrapper shape, unchanged in behaviour.
+    wrap_predicate(M:Head, membership_contract, Closure, ( Closure, CheckGoal )).
+membership_contract_wrap_mode(M, Head, once, CheckGoal) :-
+    % Once: commit to the first solution and check that committed output a single time, deterministically.
+    wrap_predicate(M:Head, membership_contract, Closure, once(( Closure, CheckGoal ))).
+
+% -- membership_contract_declared_mode(?Pred, ?Mode): the mode (per_solution or once) a declared contract runs in.
+membership_contract_declared_mode(Pred, once) :-
+    % A predicate with a recorded once mode runs in once mode.
+    membership_contract_mode_registry(Pred, once).
+membership_contract_declared_mode(Pred, per_solution) :-
+    % Any declared contract with no recorded once mode runs in the per-solution default.
+    membership_contract_any_contract(Pred),
+    \+ membership_contract_mode_registry(Pred, once).
+
+% -- membership_contract_any_contract(?Pred): true when Pred has any declared contract (plain-list or accessor).
+membership_contract_any_contract(Pred) :-
+    % A plain-list registry entry counts.
+    membership_contract_registry(Pred, _, _, _).
+membership_contract_any_contract(Pred) :-
+    % An accessor registry entry counts too.
+    membership_contract_goal_registry(Pred, _, _, _, _).
 
 % -- membership_contract_violation_line(+Error, -Line): render a contract violation as a readable line.
 membership_contract_violation_line(

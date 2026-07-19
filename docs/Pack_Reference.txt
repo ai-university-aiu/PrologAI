@@ -2454,7 +2454,7 @@ lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_notify(+Nexus): wake every reader awaiting on the nexus - the stigmergy-plus-notification bridge (L3).
 
 membership_contract
-The Membership Contract construct (N8, WP-427, closes ARBITER-1 and N9) - a runtime output-member postcondition with a plain-list form and an accessor form over a goal-described set
+The Membership Contract construct (N8, WP-427, WP-428, closes ARBITER-1, N9, N12) - a runtime output-member postcondition with a plain-list form, an accessor form over a goal-described set, and an opt-in once-deterministic mode
     membership_contract_enforce(:Pred,+OutPos,+InPos,+Abstention): declare that Pred's OutPos-th argument must be a member of its InPos-th argument (a list) or the Abstention value, and wrap Pred so every call is checked (RUNTIME postcondition, opt-in).
     membership_contract_check(+Pred,+Out,+In,+Abstention): the pure postcondition - succeeds on the abstention or a member of In, throws a glass-box membership_contract_violation otherwise (never endorses a non-member).
     membership_contract_holds(+Out,+In,+Abstention): a boolean membership test that never throws (true for the abstention or a member, false otherwise).
@@ -2464,4 +2464,8 @@ The Membership Contract construct (N8, WP-427, closes ARBITER-1 and N9) - a runt
     membership_contract_check_goal(+Pred,+Out,:TestGoal,+Abstention): the test-goal postcondition - succeeds on the abstention or when TestGoal accepts Out, else throws a glass-box membership_contract_goal_violation naming the goal.
     membership_contract_holds_goal(+Out,:TestGoal,+Abstention): a boolean test-goal membership check that never throws.
     membership_contract_declared_goal(?Pred,?OutPos,?Form,?Abstention): enumerate the predicates that declare an accessor contract (Form = test or producer).
+    membership_contract_enforce(:Pred,+OutPos,+InPos,+Abstention,+Mode): the plain-list contract WITH A MODE (N14) - Mode is per_solution (default, every solution checked) or once (commit the FIRST solution, check it once, deterministic).
+    membership_contract_enforce_goal(:Pred,+OutPos,:TestGoal,+Abstention,+Mode): the accessor test-goal contract with a mode; once mode checks the committed output against the test goal exactly once and materialises no set.
+    membership_contract_enforce_producer(:Pred,+OutPos,:ProducerGoal,+Abstention,+Mode): the accessor producer contract with a mode.
+    membership_contract_declared_mode(?Pred,?Mode): enumerate the mode (per_solution or once) each declared contract runs in.
     membership_contract_violation_line(+Error,-Line): render one contract violation as a readable line naming the predicate, the offending output, and the offered set (plain-list form) or the membership-test goal (accessor form).

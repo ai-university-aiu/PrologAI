@@ -490,6 +490,8 @@ read pinned at commit `58951b9` and **not modified**.
   filtered. For a selector (deterministic, one answer) this is exactly right; for
   a nondeterministic producer a `once`-style or filtering variant might be wanted.
   Recorded as a scope note, not a defect — the construct is aimed at selectors.
+  **CLOSED by N14** (Wave 8 Part One), via the once-deterministic mode; N12 subsumed
+  and re-recorded this gap, and N14 closes both.
 
 ---
 
@@ -621,7 +623,8 @@ ships back into PrologAI as a delivery.
   nondeterministic guarded predicate and stop. For a selector or a recall
   (deterministic, one answer) this is exactly right; a `once`-style accessor variant is
   the minimum remedy if a nondeterministic producer ever needs it. This subsumes N10 for
-  the accessor form. Recorded, not closed.
+  the accessor form. **CLOSED by N14** (Wave 8 Part One) — the once-deterministic mode
+  commits to the first solution and checks it once, deterministically. N10 is closed too.
 - **N13 — the test goal's cost and purity are the caller's responsibility, unchecked.**
   The contract calls the membership-test goal on every call and trusts it to be cheap
   and side-effect-free; nothing enforces that a named test goal does not mutate state or
@@ -629,3 +632,72 @@ ships back into PrologAI as a delivery.
   test goal would silently break the "a check may run on every call" assumption. The
   minimum remedy is a purity/determinism lint or a `\+ \+`-guarded call mode. Recorded,
   not closed.
+
+---
+
+## Wave 8, Part One — the membership contract once-deterministic mode (2026-07-19)
+
+Branch `feature/wave-8-once-mode`. Rollback tag `pre-wave-8-once`. All work
+**additive**; the ARC-AGI solving core was **not** modified, and only the
+`membership_contract` pack changed. Baseline gates held unchanged: mini ARC-AGI-1
+40/40, mini ARC-AGI-2 12/12, conformance 107/107, L4 and N6 with 0 violations, and
+BOTH existing membership forms — the plain-list (N8) and the accessor (N11: test-goal
+and producer) — byte-for-byte in behaviour (their 20 tests pass unchanged). This is
+the enforce-then-build Part One of Wave 8: the once mode lands before the cerebellum
+and amygdala regions rest on it.
+
+### N14 — an opt-in once-deterministic mode for the membership contract · S=M · **DELIVERED** (closes N12 / N10, WP-428)
+
+- **The gap (N12, subsuming N10).** The contract checks the membership property on
+  EVERY solution the guarded predicate produces. That is right for a predicate that
+  yields one answer, but a predicate that GENERATES several candidates on backtracking
+  and COMMITS one (a selector; a corrector) wants the guarantee on the COMMITTED
+  answer, not a throw partway through its backtracking. There was no once/deterministic
+  mode.
+- **What was delivered (the minimum that closes it).** An additive ONCE mode on the
+  `membership_contract` pack (WP-428), expressed as a MODE ARGUMENT on the enforce
+  entry points (not a parallel predicate set): `membership_contract_enforce/5`,
+  `membership_contract_enforce_goal/5`, and `membership_contract_enforce_producer/5`
+  each take a trailing `+Mode` (`per_solution` — the unchanged default — or `once`),
+  plus `membership_contract_declared_mode/2`. A single shared installer,
+  `membership_contract_wrap_mode/4`, emits either the base `( original, check )`
+  wrapper or a `once(( original, check ))` wrapper. In once mode the guarded predicate
+  commits to its FIRST solution, that committed output is checked once, and the
+  predicate is left deterministic. Because SWI-Prolog's `once/1` does not catch
+  exceptions, a non-member first solution still throws the base glass-box violation —
+  commit-to-first is enforced by construction. Once plus the test-goal accessor form
+  materialises no set. Depends only on SWI-Prolog standard libraries; no
+  Lattice/actors/Causalontology/Connectome dependency. The base `/4` entry points and
+  every check/holds predicate are unchanged and shared by both modes — one construct
+  with an option.
+- **Honest scope.** Once mode commits to the first solution; it is NOT a
+  find-the-first-member search over solutions. That larger feature was declined and
+  recorded (see the new gap below), per the order's "record the temptation as a
+  finding" instruction.
+- **Selector-like re-expression.** A PrologAI-side test (`once_selector_reexpression`)
+  shows a predicate that generates several candidates and commits one obtains the
+  committed-output guarantee by declaring once mode, with no caller-supplied `once/1`.
+  No Connectome repository was touched.
+- **Evidence / tests.** 9 `AC-N14-*` PLUnit tests added (suite now 29: 9 plain-list +
+  11 accessor unchanged + 9 once), gated by the existing
+  `.github/workflows/membership-contract.yml` (it runs the whole suite). Documented in
+  `docs/membership-contract.md`; SPARC volumes bumped (Specification v413→v414,
+  Pseudocode v404→v405, Architecture v406→v407, Refinement v465→v466, Completion
+  v471→v472; the Demonstration volume left unchanged, as a language-level mode does not
+  change how PrologAI is demonstrated); Tutorial chapter 363 added.
+- **Closing commit.** Recorded in the squash-merge of `feature/wave-8-once-mode` to
+  main.
+- **N12 status: CLOSED (and N10, which N12 subsumed).** The supported modes are
+  `per_solution` (default) and `once`, on both the plain-list and accessor forms.
+
+### New gap discovered while building it (be greedy)
+
+- **N15 — no find-first-member (filtering) mode.** Once mode commits to the FIRST
+  solution and refuses it if it is a non-member, even when a LATER solution would be a
+  member. A predicate that legitimately wants "the first SOLUTION THAT IS A MEMBER,
+  skipping non-members" has no mode for it — that is a solution-filtering search, a
+  larger feature deliberately not built here (it risks growing the contract into a
+  general solution-selection framework). The minimum remedy, if a future region needs
+  it, is a distinct `find_member` mode that backtracks the guarded predicate until the
+  check passes or solutions are exhausted, kept membership-specific. Recorded, not
+  closed.

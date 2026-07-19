@@ -265,3 +265,90 @@ test(accessor_hippocampus_reexpression) :-
 
 % Close the accessor test block.
 :- end_tests(membership_contract_accessor).
+
+% ===========================================================================
+% THE ONCE / DETERMINISTIC MODE — guard the COMMITTED single answer (N14, closes N12/N10).
+% ===========================================================================
+
+% A nondeterministic generator that yields several candidates on backtracking (a, b, c).
+once_gen(_Allowed, C) :- member(C, [a, b, c]).
+% Declare it in ONCE mode: argument 2 (output) must be a member of argument 1 (the allowed list); commit the first.
+:- membership_contract_enforce(once_gen/2, 2, 1, no_choice, once).
+
+% The SAME generator in the default per-solution mode, for contrast.
+per_solution_gen(_Allowed, C) :- member(C, [a, b, c]).
+% Declare it in the explicit per-solution mode (identical to the default enforce/4 behaviour).
+:- membership_contract_enforce(per_solution_gen/2, 2, 1, no_choice, per_solution).
+
+% A generator whose FIRST solution is a non-member (ghost), whose second would be a member (a).
+once_gen_badfirst(_Allowed, C) :- member(C, [ghost, a]).
+% Declare it in ONCE mode; once mode commits to the first solution (ghost) and refuses it.
+:- membership_contract_enforce(once_gen_badfirst/2, 2, 1, no_choice, once).
+
+% A once-mode plain-list predicate whose first solution is the declared abstention.
+once_abstain(_Allowed, C) :- member(C, [no_choice, a]).
+% Declare it in ONCE mode.
+:- membership_contract_enforce(once_abstain/2, 2, 1, no_choice, once).
+
+% A selector-like predicate over the fact store: it generates several candidates and commits the first,
+% guarded in ONCE plus the TEST-GOAL accessor form (reusing stored_pattern_member), so NO set is materialised.
+once_propose_stored(_Cue, P) :- member(P, [[circle, red, small], [phantom]]).
+% Declare it in ONCE mode against the membership-test goal; abstention no_recall.
+:- membership_contract_enforce_goal(once_propose_stored/2, 2, stored_pattern_member, no_recall, once).
+
+% Open the test block for the once mode.
+:- begin_tests(membership_contract_once).
+
+% AC-N14-001: once mode returns exactly ONE solution (the committed first), deterministically.
+test(once_commits_single) :-
+    findall(C, once_gen([a,b,c], C), Cs),
+    assertion(Cs == [a]).
+
+% AC-N14-002: the per-solution DEFAULT still yields every solution (contrast; default unchanged).
+test(per_solution_default_all) :-
+    findall(C, per_solution_gen([a,b,c], C), Cs),
+    assertion(Cs == [a,b,c]).
+
+% AC-N14-003: once mode checks the committed member and passes.
+test(once_member_passes) :-
+    once_gen([a,b,c], C), assertion(C == a).
+
+% AC-N14-004: once mode returns the abstention when it is the committed first solution.
+test(once_abstention_passes) :-
+    once_abstain([x,y], C), assertion(C == no_choice).
+
+% AC-N14-005: once mode REFUSES when the committed FIRST solution is a non-member — even though a later solution would be a member.
+test(once_refuses_nonmember_first,
+     [throws(error(membership_contract_violation(_, ghost, _), _))]) :-
+    once_gen_badfirst([a], _C).
+
+% AC-N14-006: once plus the TEST-GOAL accessor form checks the committed output against the goal and materialises NOTHING.
+test(once_accessor_no_materialisation) :-
+    accessor_reset_materialise,
+    once_propose_stored(cue, P),
+    assertion(P == [circle, red, small]),
+    accessor_materialise_count(N),
+    assertion(N == 0).
+
+% AC-N14-007: the declared mode is introspectable (once for a once contract, per_solution for a default one).
+test(once_declared_mode) :-
+    once(membership_contract_declared_mode(_:(once_gen/2), M1)), assertion(M1 == once),
+    once(membership_contract_declared_mode(_:(per_solution_gen/2), M2)), assertion(M2 == per_solution).
+
+% AC-N14-008: an unrecognised mode is a clear usage error.
+test(once_invalid_mode_rejected,
+     [throws(error(domain_error(membership_contract_mode, bogus), _))]) :-
+    assertz((tmp_mode_pred(_, X) :- X = a)),
+    membership_contract_enforce(tmp_mode_pred/2, 2, 1, none, bogus).
+
+% AC-N14-009 (THE SELECTOR-LIKE RE-EXPRESSION): a predicate that generates several candidates and commits one
+% obtains the "committed output is a member" guarantee by declaring once mode, with NO caller-supplied once/1.
+test(once_selector_reexpression) :-
+    % Exactly one committed answer comes back, deterministically.
+    findall(C, once_gen([a,b,c], C), [Committed]),
+    assertion(Committed == a),
+    % And that committed answer is provably a member of the allowable set.
+    memberchk(Committed, [a,b,c]).
+
+% Close the once-mode test block.
+:- end_tests(membership_contract_once).
