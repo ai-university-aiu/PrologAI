@@ -624,6 +624,7 @@ Every answer Mentova produces comes with a readable justification tree — the c
 | [PrologAI Tutorial](docs/PrologAI_Tutorial.txt) | 12-chapter tutorial — beginner to advanced |
 | [Certified PrologAI Engineer](docs/Certified_PrologAI_Engineer.txt) | 25-chapter professional reference textbook |
 | [ARC-AGI Human Steps](docs/ARC-AGI_Human_Steps.txt) | Cognitive deconstruction of all 400 ARC-AGI-1 tasks |
+| [PrologAI Requirements Ledger](docs/PrologAI_Requirements_Ledger_v1.txt) | The consolidated program-wide Ledger — every Connectome finding (open gaps, closed track record, cross-cutting patterns, and the forward agenda) gathered into one canonical view |
 | [SPARC Series](docs/) | Complete specification, architecture, and completion volumes |
 
 ---
