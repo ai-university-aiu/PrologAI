@@ -1,0 +1,50 @@
+Chapter 364 — Affect and the Context-Aware Membership Contract (Wave 10 Stage 2)
+
+This chapter adds two things that, together, close the Requirements Ledger's
+AMYGDALA-1 finding: a first-class affective state, and a membership contract that
+can read it.
+
+Plain-language idea. A mind's later choices are coloured by how it feels now - a
+held mood or stress tone. Before this chapter, PrologAI had no place to KEEP that
+feeling, so a region that wanted a later step's legality to depend on stress had
+to SMUGGLE the stress reading into the value it produced (an appraisal carrying
+its own regime). That is a leak: the value now means two things at once.
+
+The affective_state pack (WP-430). This is a single held context - a small record
+(a dict) of a valence (threat, safe, appetitive, neutral), a salience (0.0 to
+1.0), a mood, and a cortisol tone (0.0 to 1.0). It persists across calls, and it
+derives a regime - baseline when calm, stress when the cortisol tone crosses a
+threshold - that later processing reads. The public operations are:
+
+ • affective_state_baseline(-State) - the neutral resting state.
+ • affective_state_set(+State) - hold a full state.
+ • affective_state_get(-State) - read the held state.
+ • affective_state_regime(-Regime) - baseline or stress, from the held tone.
+ • affective_state_modulate(+Delta) - fold a partial update in.
+ • affective_state_decay - relax the tone one step toward baseline.
+ • affective_state_clear - reset to baseline.
+
+It is base infrastructure (layer 0), depends only on SWI-Prolog standard
+libraries, and touches no ARC state.
+
+The context-aware accessor (WP-431). The membership_contract pack already refuses
+an output that is not a member of an offered set. This chapter adds a form whose
+membership TEST is called with two arguments - the committed output AND a held
+context read at check time:
+
+    membership_contract_enforce_context(:Pred, +OutPos, :TestGoal,
+                                        :ContextGoal, +Abstention, +Mode)
+
+The ContextGoal (for example affective_state_regime) yields the held context; the
+TestGoal decides whether the output is legal IN that context. So legality can
+depend on how the mind feels without that feeling being carried inside the value.
+
+Worked closure of AMYGDALA-1. A stand-in appraisal produces appraisal(Valence,
+Salience) - and nothing else; the regime is not in the value. A context contract
+says an appetitive appraisal is legal at baseline but not under stress. With a
+stress state held, the appetitive appraisal is refused; cleared to baseline, it
+passes. The amygdala's old regime-smuggling is now unnecessary.
+
+Gate. affective_state 5/5; the membership_contract suite (with the new context
+tests) green; Causalontology conformance 119/119; the mini-regression 40/40 and
+12/12; the layer rule and pack-naming clean; L4/N6/N8/N11/N14 unchanged.

@@ -2453,8 +2453,18 @@ lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_await(+Nexus,+Relation,+Timeout,-Args,-Referents): block until a matching fact exists, woken by a write, no polling (L3).
     lattice_notify(+Nexus): wake every reader awaiting on the nexus - the stigmergy-plus-notification bridge (L3).
 
+affective_state
+A first-class, persisted, modulatory affective state (WP-430, Layer 0; closes AMYGDALA-1) - a held valence/salience/mood/cortisol context that survives across calls and derives a baseline/stress regime that later processing reads as context
+    affective_state_baseline(-State): the neutral baseline affective state (a dict: valence neutral, salience 0.0, mood calm, cortisol 0.0).
+    affective_state_set(+State): replace the held affective state with State (a full dict).
+    affective_state_get(-State): read the currently held affective state.
+    affective_state_regime(-Regime): derive the regime (baseline or stress) from the held cortisol tone - the context goal a later membership contract consults.
+    affective_state_modulate(+Delta): fold a partial dict Delta into the held state, leaving unmentioned keys unchanged.
+    affective_state_decay: move the held cortisol tone one step toward baseline.
+    affective_state_clear: reset the held state to the baseline.
+
 membership_contract
-The Membership Contract construct (N8, WP-427, WP-428, closes ARBITER-1, N9, N12) - a runtime output-member postcondition with a plain-list form, an accessor form over a goal-described set, and an opt-in once-deterministic mode
+The Membership Contract construct (N8, WP-427, WP-428, WP-431, closes ARBITER-1, N9, N12, AMYGDALA-1) - a runtime output-member postcondition with a plain-list form, an accessor form over a goal-described set, an opt-in once-deterministic mode, and a context-aware accessor
     membership_contract_enforce(:Pred,+OutPos,+InPos,+Abstention): declare that Pred's OutPos-th argument must be a member of its InPos-th argument (a list) or the Abstention value, and wrap Pred so every call is checked (RUNTIME postcondition, opt-in).
     membership_contract_check(+Pred,+Out,+In,+Abstention): the pure postcondition - succeeds on the abstention or a member of In, throws a glass-box membership_contract_violation otherwise (never endorses a non-member).
     membership_contract_holds(+Out,+In,+Abstention): a boolean membership test that never throws (true for the abstention or a member, false otherwise).
@@ -2468,4 +2478,7 @@ The Membership Contract construct (N8, WP-427, WP-428, closes ARBITER-1, N9, N12
     membership_contract_enforce_goal(:Pred,+OutPos,:TestGoal,+Abstention,+Mode): the accessor test-goal contract with a mode; once mode checks the committed output against the test goal exactly once and materialises no set.
     membership_contract_enforce_producer(:Pred,+OutPos,:ProducerGoal,+Abstention,+Mode): the accessor producer contract with a mode.
     membership_contract_declared_mode(?Pred,?Mode): enumerate the mode (per_solution or once) each declared contract runs in.
+    membership_contract_enforce_context(:Pred,+OutPos,:TestGoal,:ContextGoal,+Abstention,+Mode): declare a CONTEXT-AWARE accessor contract (WP-431, closes AMYGDALA-1) - Pred's OutPos-th output must satisfy TestGoal called with the output AND a held context that ContextGoal produces at check time, or be the Abstention; legality can depend on a held modulatory context (a regime, a mood) without the caller carrying it in the value.
+    membership_contract_check_context(+Pred,+Out,:TestGoal,:ContextGoal,+Abstention): the context postcondition - succeeds on the abstention or when TestGoal accepts (Out, Context) for the Context that ContextGoal yields, else throws a glass-box membership_contract_goal_violation.
+    membership_contract_holds_context(+Out,:TestGoal,:ContextGoal,+Abstention): a boolean context-aware membership check that never throws.
     membership_contract_violation_line(+Error,-Line): render one contract violation as a readable line naming the predicate, the offending output, and the offered set (plain-list form) or the membership-test goal (accessor form).

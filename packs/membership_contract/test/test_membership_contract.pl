@@ -352,3 +352,63 @@ test(once_selector_reexpression) :-
 
 % Close the once-mode test block.
 :- end_tests(membership_contract_once).
+
+% ===========================================================================
+% WP-431 — the CONTEXT-AWARE accessor form (Wave 10 Stage 2), demonstrating AMYGDALA-1's closure:
+% an appraisal's legality depends on a HELD affective context, WITHOUT smuggling the regime into the value.
+% ===========================================================================
+
+% Import the affective_state pack so the held regime can be the contract's context goal.
+:- use_module(library(affective_state)).
+
+% -- stage2_appraise(+Proposed, -Committed): a stand-in appraisal whose committed value carries NO regime.
+% This is the amygdala's appraisal WITHOUT the AMYGDALA-1 workaround: appraisal(Valence, Salience), two arguments.
+stage2_appraise(Proposed, Proposed).
+
+% -- stage2_legal_appraisal(+Appraisal, +Regime): an appraisal is legal iff its valence is legal IN the held regime.
+% The context (the regime) arrives as a SECOND argument, read from the held affective_state - not from the value.
+stage2_legal_appraisal(appraisal(V, S), Regime) :-
+    number(S), S >= 0.0, S =< 1.0,
+    stage2_valence_in_regime(Regime, V).
+% At baseline all four valences are legal.
+stage2_valence_in_regime(baseline, V) :- member(V, [threat, safe, appetitive, neutral]).
+% Under stress the appetitive valence is suppressed - it is not a legal appraisal.
+stage2_valence_in_regime(stress, V) :- member(V, [threat, safe, neutral]).
+
+% Declare the CONTEXT-AWARE contract: the committed appraisal must be legal in the HELD regime (once mode).
+:- membership_contract_enforce_context(stage2_appraise/2, 2,
+        stage2_legal_appraisal, affective_state_regime, no_appraisal, once).
+
+% Open the context-aware test block.
+:- begin_tests(membership_contract_context).
+
+% Under BASELINE affect, an appetitive appraisal (no regime in its value) commits.
+test(context_appetitive_legal_at_baseline) :-
+    affective_state_clear,
+    stage2_appraise(appraisal(appetitive, 0.8), C),
+    assertion(C == appraisal(appetitive, 0.8)).
+
+% Under STRESS affect, the SAME value is REFUSED - legality consulted the HELD context, not the value.
+test(context_appetitive_refused_under_stress,
+     [throws(error(membership_contract_goal_violation(_, appraisal(appetitive, 0.8), _), _))]) :-
+    affective_state_set(_{valence: threat, salience: 0.9, mood: anxious, cortisol: 0.8}),
+    stage2_appraise(appraisal(appetitive, 0.8), _).
+
+% Threat is legal in both regimes; the abstention always passes.
+test(context_threat_and_abstention) :-
+    affective_state_set(_{cortisol: 0.8}),
+    stage2_appraise(appraisal(threat, 0.9), C1), assertion(C1 == appraisal(threat, 0.9)),
+    affective_state_clear,
+    stage2_appraise(appraisal(threat, 0.9), C2), assertion(C2 == appraisal(threat, 0.9)),
+    affective_state_set(_{cortisol: 0.8}),
+    stage2_appraise(no_appraisal, C3), assertion(C3 == no_appraisal).
+
+% The committed value carries NO regime - AMYGDALA-1's smuggling workaround is unnecessary.
+test(context_value_carries_no_regime) :-
+    affective_state_clear,
+    stage2_appraise(appraisal(safe, 0.3), C),
+    assertion(C = appraisal(_, _)),
+    assertion(\+ C = appraisal(_, _, _)).
+
+% Close the context-aware test block.
+:- end_tests(membership_contract_context).
