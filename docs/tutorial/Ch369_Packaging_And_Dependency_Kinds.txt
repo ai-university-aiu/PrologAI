@@ -1,0 +1,41 @@
+Chapter 369 — Packaging and Dependency Kinds: packaging (Wave 10 Stage 7)
+
+This chapter closes the Requirements Ledger's Theme G. It matters most when a system is
+cut into very many small packs - as the one-pack-per-construct experiment was - because
+then every reference between two pieces becomes a full inter-pack import, and PrologAI
+had only ONE kind of import with no way to say what it was for.
+
+Plain-language idea. Not all dependencies are the same. Some are needed only to build a
+data record once (a mint-time need); others are needed to actually run behaviour. Some
+consumers want a whole family of packs at once; others want to load just the data side
+of a pack without pulling in all its running machinery. The packaging pack adds four
+plain notions for all of this.
+
+One - dependency kinds. You declare a dependency as structure_only (needed only to mint
+a record) or runtime (needed to run behaviour). packaging_runtime_dependencies then
+lists only the runtime ones - the edges that actually matter for the layer graph - so
+mint-time-only edges stop inflating it.
+
+Two - loadable faces. A pack has two faces: a structure face and a runtime face. A
+structure_only dependency needs only the target's structure face; a runtime dependency
+needs its runtime face. packaging_face_dependencies tells you exactly what loading one
+face pulls in, so you can validate a record without dragging in the runtime substrate.
+
+Three - a facade (a bundle). packaging_declare_facade names a group of packs (and a group
+may contain other groups). packaging_expand turns a group name into the concrete list of
+packs, following nested groups and never looping. A consumer names the bundle instead of
+listing every small pack by hand.
+
+Four - a cross-pack record registry. packaging_register_record files a content-addressed
+record under its id and its owning pack; packaging_record and packaging_record_owner look
+it up by id. Ids are looked up in one place instead of being threaded through
+hand-written accessor predicates.
+
+Public operations: packaging_declare_dependency/3, packaging_dependency/3,
+packaging_runtime_dependencies/2, packaging_structure_only_dependencies/2,
+packaging_required_face/2, packaging_face_dependencies/3, packaging_declare_facade/2,
+packaging_facade/2, packaging_expand/2, packaging_register_record/3, packaging_record/2,
+and packaging_record_owner/2.
+
+Gate. packaging 10/10; Causalontology conformance 119/119; the mini-regression 40/40 and
+12/12; the layer rule and pack-naming clean; L4/N6/N8/N11/N14 unchanged.

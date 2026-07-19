@@ -1,0 +1,39 @@
+# Gate the PACKAGING construct (Ledger Theme G; closes ATOMIC-1/2/3/4) on every push and
+# pull request.
+#
+# The packaging pack adds dependency kinds, loadable pack faces, a facade/bundle, and a
+# cross-pack record registry, so its gate is its PLUnit suite, which exercises the
+# acceptance: runtime edges distinguished from structure-only (mint-time) ones, a face
+# pulling only its own kind of dependency, a facade expanding (recursively, cycle-safely)
+# to its concrete pack set, and the record registry looking up a record and owner by id.
+# Additive; it alters no existing gate. It depends only on SWI-Prolog standard libraries.
+name: packaging
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single packaging job.
+jobs:
+  packaging:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # Run the packaging construct's PLUnit suite; a non-zero exit fails the job.
+      - name: Run the packaging test suite
+        run: |
+          swipl -p library=packs/packaging/prolog \
+            -g "run_tests, halt" -t "halt(1)" \
+            packs/packaging/test/test_packaging.pl

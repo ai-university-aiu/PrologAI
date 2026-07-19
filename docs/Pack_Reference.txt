@@ -2459,6 +2459,21 @@ lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_await(+Nexus,+Relation,+Timeout,-Args,-Referents): block until a matching fact exists, woken by a write, no polling (L3).
     lattice_notify(+Nexus): wake every reader awaiting on the nexus - the stigmergy-plus-notification bridge (L3).
 
+packaging
+Dependency kinds, loadable pack faces, a facade/bundle, and a cross-pack record registry (WP-436, Layer 0; closes Theme G - ATOMIC-1/2/3/4)
+    packaging_declare_dependency(+FromPack, +ToPack, +Kind): declare a typed dependency; Kind is structure_only (mint-time) or runtime.
+    packaging_dependency(?FromPack, ?ToPack, ?Kind): query the declared dependencies.
+    packaging_runtime_dependencies(+FromPack, -ToPacks): only the runtime dependency targets (the layer-graph-relevant edges).
+    packaging_structure_only_dependencies(+FromPack, -ToPacks): only the structure-only (mint-time) dependency targets.
+    packaging_required_face(+Kind, -Face): the pack face a dependency kind requires (structure_only->structure, runtime->runtime).
+    packaging_face_dependencies(+Pack, +Face, -RequiredFaces): the (ToPack, Face) requirements loading one face pulls in.
+    packaging_declare_facade(+FacadeName, +Members): declare a named bundle over member packs (or nested facades).
+    packaging_facade(?FacadeName, ?Members): the direct declared members of a facade.
+    packaging_expand(+Target, -Packs): expand a pack or facade to its concrete pack set (recursive, cycle-safe).
+    packaging_register_record(+Id, +Record, +OwnerPack): register a content-addressed record under its id and owning pack.
+    packaging_record(?Id, ?Record): look up a registered record by its id.
+    packaging_record_owner(?Id, ?OwnerPack): the pack that owns a registered id.
+
 realization
 A structure-to-dynamics binding (WP-434, Layer 0; closes Theme C - P1 dynamics facet, P3, P4, STRATA-5) - binds a grounded Causalontology structure record to the native dynamical law or typed Lattice signal that realizes it, by identity, checkably real
     realization_bind(+StructureId, +Realizer): register that Realizer realizes StructureId; a realizer is native_law(Name/Arity or Module:Name/Arity) or lattice_signal(Nexus, Relation).
