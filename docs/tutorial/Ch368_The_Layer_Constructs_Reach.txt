@@ -1,0 +1,38 @@
+Chapter 368 — The Layer Construct's Reach (Wave 10 Stage 6)
+
+This chapter closes the Requirements Ledger's Theme E by giving the layer construct
+(the strict layer rule) a longer reach - across repositories and inside a single pack.
+It is an additive extension: nothing the rule already did changes.
+
+Plain-language idea. The layer rule says a lower layer may not depend on a higher one.
+Until now it could only see ONE repository's packs, its layer numbers were a private
+per-repository count with no shared scale, and it could only reason about whole packs -
+never the pieces inside a pack.
+
+Across repositories. Two repositories each number their layers from zero, so layer "3"
+in one is not comparable to layer "3" in the other. layer_global_layer gives each
+repository an offset - a base repository at 0, an arm stacked at 100 - so the numbers
+share one scale. layer_scan_dirs unions several packs directories and builds the
+ownership map across all of them, so an import from one repository's pack to another's
+is finally visible; layer_check_dirs then runs the very same violation check over the
+union and catches a cross-repository upward edge that the private per-repository numbers
+would hide. The Continuous Integration script bin/check_layers.sh now takes a
+packs-directory argument, so a downstream repository can point it at its own packs
+instead of writing its own wrapper. And layer_adoption reports how many packs declare a
+layer out of the total, so the standing adoption effort has a number to move.
+
+Inside a pack. A pack can now describe its own internal sub-modules as
+submodule(Name, Rank, Calls, TestTarget). layer_submodule_violations applies the layer
+rule at this finer resolution: a call from a sub-module to a strictly-higher-rank
+sub-module is an upward call, and a call to a sub-module that was never declared crosses
+the pack's internal boundary. layer_submodule_untested reports any sub-module that names
+no test target, so a coarse pack cannot hide an internal region that can only be run as
+part of the whole.
+
+Public additions (all on the layer pack): layer_global_layer/3, layer_scan_dirs/3,
+layer_check_dirs/2, layer_report_dirs/1, layer_adoption/4, layer_submodule_violations/2,
+and layer_submodule_untested/2.
+
+Gate. the layer suite 32/32 (including a new block with real cross-repository fixtures);
+Causalontology conformance 119/119; the mini-regression 40/40 and 12/12; the layer rule
+and pack-naming clean; L4, N6, N8, N11, N14 unchanged.

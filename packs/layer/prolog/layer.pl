@@ -111,7 +111,22 @@
     % layer_bind_report_dir/2: print a readable binding report.
     layer_bind_report_dir/2,
     % layer_bind_enforce_dir/3: enforce the binding at load in strict or report mode.
-    layer_bind_enforce_dir/3
+    layer_bind_enforce_dir/3,
+    % --- The layer construct's REACH (Wave 10 Stage 6, closes Theme E) — additive ---
+    % layer_global_layer/3: a local layer plus a per-repository offset = a global coordinate.
+    layer_global_layer/3,
+    % layer_scan_dirs/3: union several packs directories under global coordinates.
+    layer_scan_dirs/3,
+    % layer_check_dirs/2: cross-repository violations over the unioned node set.
+    layer_check_dirs/2,
+    % layer_report_dirs/1: print a readable cross-repository report.
+    layer_report_dirs/1,
+    % layer_adoption/4: how many packs in a directory declare a layer (the N3 coverage report).
+    layer_adoption/4,
+    % layer_submodule_violations/2: the intra-pack sub-module layering + coupling check.
+    layer_submodule_violations/2,
+    % layer_submodule_untested/2: the intra-pack sub-modules that name no test target.
+    layer_submodule_untested/2
 ]).
 
 % Import list utilities [member/2, memberchk/2, sort/4, exclude/3] from library(lists).
@@ -748,3 +763,138 @@ layer_bind_enforce_dir(PacksDir, StrataSource, Mode) :-
     ->  true
     % Any other mode is a usage error.
     ;   throw(error(domain_error(layer_bind_enforce_mode, Mode), layer_bind_enforce_dir/3)) ).
+
+% ===========================================================================
+% THE LAYER CONSTRUCT'S REACH  (Wave 10 Stage 6, WP-435; closes Theme E)
+% ---------------------------------------------------------------------------
+% Theme E had two facets. E-1 (cross-repository): the L4 scan was
+% single-repository, its layer integers a per-repo namespace with no global
+% coordinate, and its owner map built from one packs directory, so a
+% cross-repository import was invisible (P5/P6/P7, ATOMIC-5/6/7, LOOPS-4, N3).
+% E-2 (intra-pack): the construct was pack-granular, so a coarse pack's internal
+% layering, coupling, and testability fell below the language's resolution
+% (LOOPS-1/2/3). These additive predicates give the same pure violation core a
+% longer reach — across repositories under a shared coordinate, and inside a pack
+% at sub-module granularity — without changing any existing L4 or N6 behaviour.
+% ===========================================================================
+
+% -- layer_global_layer(+LocalLayer, +Offset, -GlobalLayer): the offset convention.
+% A repository's local layer numbers become a GLOBAL coordinate by adding a
+% per-repository offset (a base repo at offset 0, an arm stacked at offset 100),
+% so P7/ATOMIC-7's per-repo namespace gains one shared axis. An undeclared layer
+% stays undeclared — an offset shifts a coordinate, it does not invent one.
+layer_global_layer(undeclared, _Offset, undeclared) :- !.
+layer_global_layer(LocalLayer, Offset, GlobalLayer) :-
+    % Only a numeric local layer has a coordinate to shift.
+    integer(LocalLayer), integer(Offset),
+    % The global coordinate is the local layer lifted by the repository's offset.
+    GlobalLayer is LocalLayer + Offset.
+
+% -- layer_scan_dirs(+DirSpecs, -Nodes, -Undeclared): union several packs dirs.
+% DirSpecs is a list of dir(PacksDir, Offset). Every pack across every directory
+% becomes one node under its GLOBAL coordinate, and the owner map is built across
+% the UNION, so an import from one repository's pack to another's is resolved and
+% visible (P6/ATOMIC-6). The undeclared list is the gap set across all directories.
+layer_scan_dirs(DirSpecs, Nodes, Undeclared) :-
+    % Pair every pack directory with the offset of the repository it belongs to.
+    findall(PackDir-Offset,
+            ( member(dir(Dir, Offset), DirSpecs),
+              layer_pack_dirs(Dir, PackDirs),
+              member(PackDir, PackDirs) ),
+            PackDirOffsets),
+    % Collect just the pack directories to build one owner map across all repositories.
+    findall(PD, member(PD-_, PackDirOffsets), AllPackDirs),
+    % Build the library-file-to-owning-pack map across the whole union.
+    layer_lib_owner_map(AllPackDirs, OwnerPairs),
+    % Turn each pack directory into a node under its repository's global coordinate.
+    findall(node(Pack, GlobalLayer, Imports),
+            ( member(PackDir-Offset, PackDirOffsets),
+              layer_dir_node(OwnerPairs, PackDir, node(Pack, LocalLayer, Imports)),
+              layer_global_layer(LocalLayer, Offset, GlobalLayer) ),
+            Nodes),
+    % A node whose global layer is 'undeclared' is a gap, collected and sorted.
+    findall(Name, member(node(Name, undeclared, _), Nodes), UndeclaredRaw),
+    sort(UndeclaredRaw, Undeclared).
+
+% -- layer_check_dirs(+DirSpecs, -Violations): cross-repository violation scan.
+% The SAME pure violation core (layer_graph_violations/2) runs over the unioned,
+% globally-coordinated node set, so a cross-repository upward edge is now a
+% first-class violation (P5/P6/P7, ATOMIC-5/6/7).
+layer_check_dirs(DirSpecs, Violations) :-
+    % Build the unioned node set under global coordinates.
+    layer_scan_dirs(DirSpecs, Nodes, _),
+    % Reuse the pure violation core — an upward edge is an upward edge, cross-repo or not.
+    layer_graph_violations(Nodes, Violations).
+
+% -- layer_report_dirs(+DirSpecs): print a readable cross-repository report.
+layer_report_dirs(DirSpecs) :-
+    % Scan the union and gather violations.
+    layer_scan_dirs(DirSpecs, Nodes, Undeclared),
+    layer_graph_violations(Nodes, Violations),
+    % Count the declared nodes for the header.
+    findall(P, ( member(node(P, L, _), Nodes), integer(L) ), Declared),
+    length(Declared, DeclaredCount),
+    length(Undeclared, UndeclaredCount),
+    % Print the header naming the union's declared and undeclared counts.
+    format("layer reach (cross-repository): ~w declared, ~w undeclared~n",
+           [DeclaredCount, UndeclaredCount]),
+    % Print each cross-repository violation, or a clean line when there are none.
+    ( Violations == []
+    ->  format("no cross-repository upward dependencies — the union honours the layer rule~n", [])
+    ;   forall(member(V, Violations), format("  VIOLATION ~q~n", [V])) ).
+
+% -- layer_adoption(+PacksDir, -Declared, -Total, -Fraction): the N3 coverage report.
+% Adoption of the layer rule is incremental; this reports how far it has reached in a
+% directory (how many packs declare a layer, out of the total), so the standing
+% adoption program has a number to move rather than a prose estimate.
+layer_adoption(PacksDir, Declared, Total, Fraction) :-
+    % Scan the directory into nodes.
+    layer_scan(PacksDir, Nodes, _),
+    % The total is every pack in the directory.
+    length(Nodes, Total),
+    % The declared count is every pack that carries a numeric layer.
+    findall(P, ( member(node(P, L, _), Nodes), integer(L) ), DeclaredPacks),
+    length(DeclaredPacks, Declared),
+    % The fraction is declared over total (zero for an empty directory).
+    ( Total =:= 0 -> Fraction = 0.0 ; Fraction is Declared / Total ).
+
+% -- layer_submodule_violations(+Submodules, -Violations): the intra-pack check.
+% A Submodule is submodule(Name, Rank, Calls, TestTarget): a named internal region,
+% its integer rank, the sub-module names it calls, and its per-sub-module test target.
+% Two violations, mirroring the pack-granular rule at sub-module resolution:
+%   upward_call    — a call to a strictly-HIGHER-rank sub-module (LOOPS-1); and
+%   unknown_callee — a call to a sub-module NOT in the declared set, i.e. across the
+%                    declared intra-pack boundary (LOOPS-2).
+layer_submodule_violations(Submodules, Violations) :-
+    % The set of declared sub-module names bounds the legal call targets.
+    findall(N, member(submodule(N, _, _, _), Submodules), Names),
+    % Gather every offending call across every declared sub-module.
+    findall(Violation,
+            ( member(submodule(From, FromRank, Calls, _), Submodules),
+              member(To, Calls),
+              layer_submodule_violation(From, FromRank, To, Names, Submodules, Violation) ),
+            Violations).
+
+% -- layer_submodule_violation(+From, +FromRank, +To, +Names, +Submodules, -Violation):
+% one offending call, or fails when the call is legal.
+% A call to an undeclared sub-module is a boundary crossing.
+layer_submodule_violation(From, _FromRank, To, Names, _Submodules,
+        violation(unknown_callee, from(From), to(To))) :-
+    % The callee is not among the declared sub-modules of this pack.
+    \+ memberchk(To, Names), !.
+% A call to a strictly-higher-rank sub-module climbs the internal hierarchy.
+layer_submodule_violation(From, FromRank, To, _Names, Submodules,
+        violation(upward_call, from(From, FromRank), to(To, ToRank))) :-
+    % Look up the callee's rank among the declared sub-modules.
+    memberchk(submodule(To, ToRank, _, _), Submodules),
+    % A violation is exactly a call that climbs to a higher rank.
+    ToRank > FromRank.
+
+% -- layer_submodule_untested(+Submodules, -Untested): the LOOPS-3 testability check.
+% A sub-module whose declared test target is the atom 'none' cannot be exercised on
+% its own; it is collected so a coarse pack cannot hide an untestable internal region.
+layer_submodule_untested(Submodules, Untested) :-
+    % Collect the name of every sub-module that names no real test target.
+    findall(Name,
+            member(submodule(Name, _, _, none), Submodules),
+            Untested).

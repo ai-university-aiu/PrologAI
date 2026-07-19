@@ -2443,6 +2443,12 @@ Strict Layer Rule (WP-426, Layer 400)
     layer_binding_violations(+Bound,-Violations): the pure order-preserving core - a lower ordinal must not carry a higher layer; equal ordinals share a layer.
     layer_binding_violation_line(+Violation,-Line) / layer_bind_check_dir(+PacksDir,+StrataSource,-Violations): render one violation / violations for a dir against a strata source.
     layer_bind_report_dir(+PacksDir,+StrataSource) / layer_bind_enforce_dir(+PacksDir,+StrataSource,+Mode): print the binding report / enforce it at load (strict throws, report lists).
+    layer_global_layer(+LocalLayer,+Offset,-GlobalLayer): lift a repository's local layer to a shared global coordinate by a per-repository offset (undeclared stays undeclared). (WP-435)
+    layer_scan_dirs(+DirSpecs,-Nodes,-Undeclared) / layer_check_dirs(+DirSpecs,-Violations): union several packs directories (DirSpecs = dir(PacksDir,Offset) list) under global coordinates / cross-repository violations over the union. (WP-435)
+    layer_report_dirs(+DirSpecs): print a readable cross-repository report over the unioned directories. (WP-435)
+    layer_adoption(+PacksDir,-Declared,-Total,-Fraction): how many packs in a directory declare a layer, out of the total (the N3 adoption coverage report). (WP-435)
+    layer_submodule_violations(+Submodules,-Violations): intra-pack sub-module check over submodule(Name,Rank,Calls,TestTarget) - an upward call (LOOPS-1) or a call outside the declared set (LOOPS-2). (WP-435)
+    layer_submodule_untested(+Submodules,-Untested): the intra-pack sub-modules whose declared test target is 'none' (LOOPS-3). (WP-435)
 
 lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_put(+Nexus,+Relation,+Args,+Referents): store a node-fact directly, no vector backend (L1).

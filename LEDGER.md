@@ -20,7 +20,7 @@ Status: **CLOSED** · **PARTIALLY CLOSED** · **STILL OPEN**.
 > three granularity arms (ATOMIC / LOOPS / STRATA), and the region builds (ARBITER,
 > HIPPO, CEREBELLUM, AMYGDALA) — into one navigable document, with the open-gaps
 > forward agenda and the closed track record, now lives at
-> **`docs/PrologAI_Requirements_Ledger_v6.txt`**. That consolidated Ledger cites the
+> **`docs/PrologAI_Requirements_Ledger_v7.txt`**. That consolidated Ledger cites the
 > per-repository Ledgers; it does not replace them.
 
 ---
@@ -878,3 +878,35 @@ Additive; the ARC-AGI solving core was NOT modified.
   layer rule 0 violations, pack naming clean (301 packs). L4/N6/N8/N11/N14 and the
   closure hybrid unchanged. **With Theme C closed, the four load-bearing walls
   (Themes A–D) are all closed.** P1 is now fully CLOSED.
+
+---
+
+## Wave 10, Stage 6 — the layer construct's reach (Theme E) (2026-07-19)
+
+Branch `feature/wave-10-stage-6-layer-reach`. Rollback tag `pre-wave-10-stage-6`.
+Additive extension of the `layer` pack (WP-435); no L4/N6 behaviour changed.
+
+### Theme E — the layer construct across repositories and inside packs · **CLOSED** (WP-435)
+
+- **The gap.** The strict layer rule (L4) was single-repository (its owner map built
+  from one packs directory; its layer integers a per-repo namespace with no global
+  coordinate; its CI entry point hard-wired to PrologAI's packs; declared for only 3 of
+  299 packs). And it was pack-granular, so a coarse pack's internal layering, coupling,
+  and testability fell below the language's resolution. Sightings: P5/P6/P7,
+  ATOMIC-5/6/7, LOOPS-1/2/3/4, N3.
+- **Delivered (additive on the `layer` pack).** *Cross-repository (E-1):*
+  `layer_global_layer/3` lifts a repo's local layers to a shared **global coordinate**
+  by a per-repo offset (P7/ATOMIC-7); `layer_scan_dirs/3` **unions** several packs
+  directories, building the owner map across the whole union so a cross-repo import is
+  visible (P6/ATOMIC-6); `layer_check_dirs/2` runs the same pure violation core over the
+  unioned node set, catching a cross-repo upward edge per-repo namespaces hide (P5);
+  `bin/check_layers.sh` now takes a **packs-directory argument** (P5/ATOMIC-5/LOOPS-4);
+  `layer_adoption/4` reports declared-out-of-total, a number for the standing adoption
+  program (N3). *Intra-pack (E-2):* `layer_submodule_violations/2` over
+  `submodule(Name, Rank, Calls, TestTarget)` catches an upward call (LOOPS-1) and a call
+  outside the declared set (LOOPS-2); `layer_submodule_untested/2` reports a sub-module
+  with no test target (LOOPS-3).
+- **Gate.** the layer suite 32/32 (new `layer_reach` block with real cross-repo
+  fixtures), conformance 119/119, mini-regression 40/40 and 12/12, the layer rule 0
+  violations, pack naming clean (301 packs). L4/N6/N8/N11/N14 and the closure hybrid
+  unchanged.
