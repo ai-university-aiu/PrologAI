@@ -2453,6 +2453,19 @@ lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_await(+Nexus,+Relation,+Timeout,-Args,-Referents): block until a matching fact exists, woken by a write, no polling (L3).
     lattice_notify(+Nexus): wake every reader awaiting on the nexus - the stigmergy-plus-notification bridge (L3).
 
+tick_scheduler
+A Lattice-backed deferred-reactivation construct on ordinal ticks (WP-432, Layer 0; closes HIPPO-2 and CEREBELLUM-1) - schedules and ENACTS a future reactivation, measured in the Causalontology 3.0.0 ordinal tick unit, never in wall-clock seconds
+    tick_scheduler_open(+Address, -Nexus): open a Lattice nexus and initialise it (clock zero, empty schedule).
+    tick_scheduler_init(+Nexus): initialise an already-open nexus's clock to zero and clear its schedule.
+    tick_scheduler_now(+Nexus, -Tick): read the current ordinal tick (the logical now).
+    tick_scheduler_schedule_at(+Nexus, +DueTick, +Label, +Payload): schedule a reactivation at an absolute future ordinal tick (refused if not strictly after now).
+    tick_scheduler_schedule_after(+Nexus, +Delay, +Label, +Payload): schedule a reactivation Delay ticks after now (Delay a positive integer).
+    tick_scheduler_schedule_after_unit(+Nexus, +Delay, +Unit, +Label, +Payload): as above, but Unit must be ordinal (dimension ordinal via causal_core_dimension); a wall-clock unit is refused with a glass-box category error.
+    tick_scheduler_pending(+Nexus, -Reactivations): the still-pending reactivations as reactivation(Due,Label,Payload) terms, in due-tick order.
+    tick_scheduler_tick(+Nexus, -Fired): advance the clock by one tick and return what fired.
+    tick_scheduler_advance(+Nexus, +Delta, -Fired): advance the clock by Delta ticks; return (and remove) the reactivations that became due, in due-tick order.
+    tick_scheduler_advance_enact(+Nexus, +Delta, :Goal, -Fired): advance the clock and enact each fired reactivation by calling Goal on it, in due-tick order.
+
 affective_state
 A first-class, persisted, modulatory affective state (WP-430, Layer 0; closes AMYGDALA-1) - a held valence/salience/mood/cortisol context that survives across calls and derives a baseline/stress regime that later processing reads as context
     affective_state_baseline(-State): the neutral baseline affective state (a dict: valence neutral, salience 0.0, mood calm, cortisol 0.0).

@@ -1,0 +1,42 @@
+# Gate the TICK_SCHEDULER construct (Ledger Theme A; closes HIPPO-2 and CEREBELLUM-1)
+# on every push and pull request.
+#
+# The tick_scheduler is a Lattice-backed deferred-reactivation construct on ordinal
+# ticks, so — like the membership contract — its gate is its PLUnit suite, which
+# exercises the acceptance: a monotone clock, future-only scheduling, due-tick-ordered
+# firing, genuine enactment via a caller goal, the consolidation-over-time closure of
+# HIPPO-2, and the ordinal-only discipline that closes CEREBELLUM-1 (a wall-clock unit
+# is refused). Additive; it alters no existing gate. It loads the lattice store and the
+# causal_core vocabulary the pack depends on.
+name: tick-scheduler
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single tick-scheduler job.
+jobs:
+  tick-scheduler:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # Run the tick_scheduler construct's PLUnit suite; a non-zero exit fails the job.
+      - name: Run the tick scheduler test suite
+        run: |
+          swipl -p library=packs/tick_scheduler/prolog \
+            -p library=packs/lattice/prolog \
+            -p library=packs/causal_core/prolog \
+            -g "run_tests, halt" -t "halt(1)" \
+            packs/tick_scheduler/test/test_tick_scheduler.pl
