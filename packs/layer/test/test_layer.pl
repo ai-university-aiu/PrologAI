@@ -360,3 +360,109 @@ test(pure_binding_core) :-
 
 % Close the binding test block.
 :- end_tests(layer_binding).
+
+% ---------------------------------------------------------------------------
+% THE LAYER CONSTRUCT'S REACH (Wave 10 Stage 6, WP-435; closes Theme E)
+% ---------------------------------------------------------------------------
+
+% Load filesystem helpers for building throwaway fixture repositories.
+:- use_module(library(filesex)).
+
+% Build a fixture pack under BaseDir: a pack.pl manifest (name, version, optional layer)
+% and a prolog/<Pack>.pl module that use_module(library(...)) each of its imports.
+test_layer_make_fixture_pack(BaseDir, Pack, Layer, Imports) :-
+    format(atom(PackDir), '~w/~w', [BaseDir, Pack]),
+    format(atom(PrologDir), '~w/prolog', [PackDir]),
+    make_directory_path(PrologDir),
+    format(atom(ManifestPath), '~w/pack.pl', [PackDir]),
+    setup_call_cleanup(open(ManifestPath, write, MS),
+        ( format(MS, 'name(~w).~n', [Pack]),
+          format(MS, "version('0.0.1').~n", []),
+          ( integer(Layer) -> format(MS, 'layer(~w).~n', [Layer]) ; true ) ),
+        close(MS)),
+    format(atom(ModPath), '~w/~w.pl', [PrologDir, Pack]),
+    setup_call_cleanup(open(ModPath, write, ModS),
+        ( format(ModS, ':- module(~w, []).~n', [Pack]),
+          forall(member(Imp, Imports),
+                 format(ModS, ':- use_module(library(~w)).~n', [Imp])) ),
+        close(ModS)).
+
+% Make a unique throwaway base directory for one test's fixture repositories.
+test_layer_tmp_base(Base) :-
+    tmp_file(layer_reach, Base),
+    make_directory_path(Base).
+
+% Open the reach test block.
+:- begin_tests(layer_reach).
+
+% The offset convention lifts a local layer to a global coordinate; undeclared stays undeclared.
+test(global_layer_offsets_a_coordinate) :-
+    layer_global_layer(5, 100, G), assertion(G == 105),
+    layer_global_layer(0, 0, G0), assertion(G0 == 0),
+    layer_global_layer(undeclared, 100, U), assertion(U == undeclared).
+
+% A cross-repository upward edge that per-repo namespaces HIDE is caught under a global coordinate.
+test(cross_repo_global_coordinate_catches_hidden_upward_edge) :-
+    test_layer_tmp_base(Base),
+    format(atom(RepoA), '~w/repoA', [Base]), format(atom(RepoB), '~w/repoB', [Base]),
+    make_directory_path(RepoA), make_directory_path(RepoB),
+    % repoA's a_pack is local layer 5 and imports repoB's b_pack (local layer 2).
+    test_layer_make_fixture_pack(RepoA, a_pack, 5, [b_pack]),
+    test_layer_make_fixture_pack(RepoB, b_pack, 2, []),
+    % Per-repo namespaces (both offset 0): 5 -> 2 looks downward, so NO violation is seen.
+    layer_check_dirs([dir(RepoA, 0), dir(RepoB, 0)], V0),
+    assertion(V0 == []),
+    % Under a global coordinate (repoB stacked at +100): a_pack 5 -> b_pack 102, an UPWARD edge.
+    layer_check_dirs([dir(RepoA, 0), dir(RepoB, 100)], V1),
+    assertion(V1 \== []).
+
+% Scanning one directory as a single-element union equals the plain single-dir scan (reduction).
+test(single_dir_union_reduces_to_plain_scan) :-
+    test_layer_tmp_base(Base),
+    format(atom(Repo), '~w/solo', [Base]), make_directory_path(Repo),
+    test_layer_make_fixture_pack(Repo, only_pack, 1, []),
+    layer_check_dirs([dir(Repo, 0)], V), assertion(V == []),
+    layer_scan_dirs([dir(Repo, 0)], Nodes, _),
+    assertion(memberchk(node(only_pack, 1, _), Nodes)).
+
+% The adoption report counts declared packs out of the total (the N3 coverage number).
+test(adoption_reports_a_coverage_number) :-
+    test_layer_tmp_base(Base),
+    format(atom(Repo), '~w/adopt', [Base]), make_directory_path(Repo),
+    test_layer_make_fixture_pack(Repo, declared_one, 0, []),
+    test_layer_make_fixture_pack(Repo, declared_two, 1, []),
+    test_layer_make_fixture_pack(Repo, undeclared_one, none, []),
+    layer_adoption(Repo, Declared, Total, Fraction),
+    assertion(Declared == 2), assertion(Total == 3),
+    assertion(Fraction < 1.0).
+
+% Intra-pack: a call to a strictly-higher-rank sub-module is an upward-call violation (LOOPS-1).
+% Convention: a higher rank is more abstract; a call must go to an equal-or-lower rank.
+test(submodule_upward_call_is_flagged) :-
+    % A pipeline whose calls descend the ranks (3 -> 2 -> 1) is clean.
+    Subs = [ submodule(intake, 3, [compare], t_intake),
+             submodule(compare, 2, [guard], t_compare),
+             submodule(guard, 1, [], t_guard) ],
+    layer_submodule_violations(Subs, V),
+    assertion(V == []),
+    % Now make guard(1) call intake(3): an upward call inside the pack.
+    Bad = [ submodule(guard, 1, [intake], t_guard),
+            submodule(intake, 3, [], t_intake) ],
+    layer_submodule_violations(Bad, BadV),
+    assertion(memberchk(violation(upward_call, from(guard, 1), to(intake, 3)), BadV)).
+
+% Intra-pack: a call to a sub-module OUTSIDE the declared set crosses the boundary (LOOPS-2).
+test(submodule_unknown_callee_is_flagged) :-
+    Subs = [ submodule(intake, 1, [ghost], t_intake) ],   % ghost is not a declared sub-module
+    layer_submodule_violations(Subs, V),
+    assertion(memberchk(violation(unknown_callee, from(intake), to(ghost)), V)).
+
+% Intra-pack: a sub-module that names no test target is reported untestable (LOOPS-3).
+test(submodule_without_test_target_is_reported) :-
+    Subs = [ submodule(intake, 1, [], t_intake),
+             submodule(compare, 2, [], none) ],
+    layer_submodule_untested(Subs, Untested),
+    assertion(Untested == [compare]).
+
+% Close the reach test block.
+:- end_tests(layer_reach).
