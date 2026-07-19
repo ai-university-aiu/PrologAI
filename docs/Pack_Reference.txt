@@ -2452,3 +2452,11 @@ lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_transaction(+Nexus,+Options,:Goal): isolation(serializable) serialises concurrent read-modify-write behind a per-nexus mutex, no caller lock (L2).
     lattice_await(+Nexus,+Relation,+Timeout,-Args,-Referents): block until a matching fact exists, woken by a write, no polling (L3).
     lattice_notify(+Nexus): wake every reader awaiting on the nexus - the stigmergy-plus-notification bridge (L3).
+
+membership_contract
+The Membership Contract construct (N8, closes ARBITER-1) - a runtime output-member-of-input-set postcondition
+    membership_contract_enforce(:Pred,+OutPos,+InPos,+Abstention): declare that Pred's OutPos-th argument must be a member of its InPos-th argument (a list) or the Abstention value, and wrap Pred so every call is checked (RUNTIME postcondition, opt-in).
+    membership_contract_check(+Pred,+Out,+In,+Abstention): the pure postcondition - succeeds on the abstention or a member of In, throws a glass-box membership_contract_violation otherwise (never endorses a non-member).
+    membership_contract_holds(+Out,+In,+Abstention): a boolean membership test that never throws (true for the abstention or a member, false otherwise).
+    membership_contract_declared(?Pred,?OutPos,?InPos,?Abstention): enumerate the predicates that declare a contract, with their output/input positions and abstention value.
+    membership_contract_violation_line(+Error,-Line): render one contract violation as a readable line naming the predicate, the offending output, and the offered set.

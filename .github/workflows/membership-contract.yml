@@ -1,0 +1,38 @@
+# Gate the MEMBERSHIP CONTRACT construct (Ledger entry N8) on every push and pull request.
+#
+# The contract is a RUNTIME postcondition (a guarded predicate's output must be a
+# member of its input set, or a declared abstention), so — unlike the load-time
+# layer rule (L4) and layer-to-stratum binding (N6) — its gate is its PLUnit suite,
+# which exercises the acceptance: a member passes, the abstention passes, a
+# non-member is refused, an unguarded predicate is unaffected, and the arbiter's
+# guard is re-expressible by declaration. Additive; it alters no existing gate.
+name: membership-contract
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single membership-contract job.
+jobs:
+  membership-contract:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # Run the membership-contract construct's PLUnit suite; a non-zero exit fails the job.
+      - name: Run the membership contract test suite
+        run: |
+          swipl -p library=packs/membership_contract/prolog \
+            -g "run_tests, halt" -t "halt(1)" \
+            packs/membership_contract/test/test_membership_contract.pl

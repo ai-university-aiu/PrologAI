@@ -373,3 +373,117 @@ gap, and the finding — not the arm's code — is what ships.
   or a lighter, load-safe way to read a stratum's ordinal directly from its pack.
   Recorded, not closed — the same "read ordinals out of the data from a load-time
   checker" limit STRATA-3 anticipated.
+
+---
+
+## Wave 5 — a first-class membership contract (2026-07-18)
+
+Branch `ledger/wave-5-membership-contract`. Rollback tag `pre-wave-5`.
+All work **additive**; the ARC-AGI solving core was **not** modified, and the two
+load-time checkers — the strict layer rule (L4) and the layer-to-stratum binding
+(N6) — were preserved byte-for-byte and keep their exact verdicts (0 violations,
+exit 0). Baseline gates held unchanged: mini ARC-AGI-1 40/40, mini ARC-AGI-2
+12/12, Causalontology conformance 107/107. This is the Connectome program's fifth
+Ledger delivery back into PrologAI: the arbiter arm found the gap (`ARBITER-1`),
+and the finding — not the arm's code — is what ships. The arbiter repository was
+read pinned at commit `58951b9` and **not modified**.
+
+### N8 — express the membership invariant as a first-class checked property · S=H · **DELIVERED** (closes ARBITER-1)
+
+- **The gap (ARBITER-1, from `connectome-arbiter`).** The Wave 4 safety layer's
+  basal-ganglia selector must never emit an action nobody offered — its output
+  must always be a member of the offered candidate set, or an explicit abstention
+  (`no_selection`). The arbiter PROVED that property holds (a 532-attempt
+  adversarial battery, 0 escapes), but only BY HAND: a guard predicate
+  (`region_stratum_membership_guard/3`), a throwing emit step
+  (`region_stratum_emit/3`), and a standalone checker, each output routed through
+  them by an author who remembered to. A SECOND selector written without that
+  habit would carry no protection, because PrologAI had no way to SAY "the output
+  of this predicate must be a member of this input set" and enforce it. The
+  membership invariant is a behavioural SAFETY property — the same class of thing
+  L4 and N6 promoted from convention to a checked invariant, but about a runtime
+  value rather than the static graph.
+- **What was delivered (the minimum that closes it).** A new, standalone
+  construct, the `membership_contract` pack (`packs/membership_contract/`), with
+  no dependency beyond SWI-Prolog standard libraries (`lists`, `prolog_wrap`) —
+  never the Lattice, actors, any Causalontology pack, or the arbiter, exactly as
+  the layer construct requires of itself:
+  - A predicate OPTS IN with one declaration,
+    `membership_contract_enforce(:Pred, +OutPos, +InPos, +Abstention)`: its
+    OutPos-th argument (the output) must be a member of its InPos-th argument (a
+    list — the offered set), or equal to the declared `Abstention` value.
+  - It is enforced as a **RUNTIME POSTCONDITION** — the key difference from L4 and
+    N6, which are LOAD-TIME properties checkable from the static graph. Membership
+    depends on the actual input and the actual output on a given call, so it can
+    only be checked when the guarded predicate produces a result. The contract
+    wraps the predicate with SWI-Prolog's `wrap_predicate/4` so that on EVERY
+    solution the postcondition runs: a member passes, the declared abstention
+    passes, and a NON-member is refused with a glass-box error naming the
+    predicate, the output, and the set it was not a member of. The guarded
+    predicate cannot return a non-member.
+  - OPT-IN / INCREMENTAL: a predicate with NO contract is UNGUARDED, not violating
+    — it behaves exactly as today (the same adoption pattern L4 uses for
+    undeclared layers and N6 for unbound packs).
+  - GLASS-BOX: `membership_contract_violation_line/2` renders a violation as one
+    readable line.
+  - MEMBERSHIP-SPECIFIC: it is about membership of an output in a named input set,
+    not a general assertion framework or a type system. Deliberately tight.
+  - A pure sibling `membership_contract_check/4` (the postcondition — succeed or
+    throw), a boolean `membership_contract_holds/3` (never throws), and a registry
+    reader `membership_contract_declared/4` for introspection.
+- **The arbiter's hand-rolled guard is re-expressible by DECLARATION.** Confirmed
+  PrologAI-side by PLUnit (`test_membership_contract.pl`, `arbiter_guarantee_by_declaration`):
+  a stand-in future selector obtains the arbiter's exact guarantee — a selection
+  must be a member of the offered candidates, with an explicit no-selection
+  allowed — purely by declaring the contract, with no hand-rolled guard, no
+  throwing emit, and no bespoke battery. A member passes, `no_selection` passes,
+  and an action nobody offered is refused. The frozen arbiter repository was not
+  touched.
+- **Evidence / tests.** 9 `AC-N8-*` PLUnit tests in
+  `packs/membership_contract/test/test_membership_contract.pl` (9/9): member
+  passes, declared abstention passes, non-member refused (throws the glass-box
+  violation), unguarded predicate unaffected, pure postcondition, boolean holds,
+  declared registry introspectable, violation line readable, and the arbiter
+  re-expression. Gated in CI by the additive
+  `.github/workflows/membership-contract.yml`. Documented in
+  `docs/membership-contract.md`.
+- **Closing commit.** `efe5049` (the construct, its test, and the CI gate); this
+  Ledger entry and the docs ship in the immediately following commit on branch
+  `ledger/wave-5-membership-contract`, merged to main.
+- **ARBITER-1 status: CLOSED.** The membership invariant — a selector's output is
+  a member of the offered set, or an explicit abstention — is now a first-class,
+  declarable, glass-box-enforced property rather than a hand-maintained habit. It
+  closes for every predicate that opts in by declaring the contract; adoption
+  across a codebase is incremental, as with L4 and N6. The distinction from L4/N6
+  is intrinsic and recorded: this is the program's first RUNTIME (postcondition)
+  invariant, where those two are LOAD-TIME.
+
+### Delivered vs requested
+
+- **Requested:** a first-class construct to declare that a predicate's output must
+  be a member of an input set (or a declared abstention), enforced as a runtime
+  postcondition, opt-in, glass-box, membership-specific, with no dependency on the
+  Lattice/actors/Causalontology/arbiter, plus a PrologAI-side demonstration that
+  the arbiter's guard is re-expressible with it. **Delivered:** all of it — the
+  `membership_contract` pack, the `wrap_predicate/4` runtime postcondition, the
+  opt-in/unguarded adoption model, the readable violation, and the arbiter
+  re-expression test — with the four hard gates (mini regression, conformance, L4,
+  N6) held unchanged and the ARC solving core untouched.
+
+### New gaps discovered while building it (be greedy)
+
+- **N9 — the contract cannot express membership in a set that is not a plain list
+  argument.** The offered set must be one InPos argument that is a proper list at
+  call time. A selector whose candidates are, say, the keys of an assoc, the
+  solutions of a goal, or a field inside a compound term cannot declare the
+  contract directly — it must first project its candidates into a list argument.
+  The minimum remedy is an accessor form (a membership contract that names a
+  deterministic goal `Candidates(+Args, -List)` to produce the set), so the
+  offered set need not already be a bare list argument. Recorded, not closed.
+- **N10 — enforcement is per-solution, with no once/deterministic contract mode.**
+  `wrap_predicate/4` runs the postcondition on EVERY solution of a
+  non-deterministic guarded predicate, which is correct but means a generator that
+  yields one bad solution among many throws mid-backtracking rather than being
+  filtered. For a selector (deterministic, one answer) this is exactly right; for
+  a nondeterministic producer a `once`-style or filtering variant might be wanted.
+  Recorded as a scope note, not a defect — the construct is aimed at selectors.
