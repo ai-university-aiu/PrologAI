@@ -27261,3 +27261,79 @@ None of this touched the ARC-AGI solving core. The layer construct and the three
 affordances are documented for adopters in docs/Strict_Layer_Rule_v1.txt and
 docs/Lattice_Coordination_Affordances_v1.txt, and the living Ledger continuation is
 LEDGER.md at the repository root.
+
+
+Chapter 360: Binding a Layer to Its Stratum - The N6 Layer-to-Stratum Binding
+
+The strict layer rule of the previous chapter checks that layers are ordered
+correctly - that no lower layer depends on a higher one. It does not check that a
+layer matches the thing it is supposed to represent. The Connectome program builds
+its regions one pack per Causalontology stratum, and a stratum has an ordinal - a
+number naming how coarse or fine it is, read from the Causalontology structure
+records. The macromolecular stratum is ordinal 4, the synaptic stratum ordinal 7,
+the brain-region stratum ordinal 9. If those packs are to sit in the right layer
+order, each pack's layer must track its stratum's ordinal. Until the N6 binding,
+that alignment was maintained by hand, and nothing caught a slip.
+
+The binding closes that gap, and you turn it on with one extra fact. A
+stratum-primary pack already declares its layer with layer(N) in its pack.pl; it
+now also declares the stratum it represents, beside it, with stratum(Label) - for
+example stratum(synaptic). That is the whole adoption cost. The checker,
+bin/check_layer_binding.sh, reads each stratum's ordinal from the authoritative
+Causalontology structure records (so a pack cannot claim an ordinal the data
+disagrees with), and verifies that the pack layers are order-preserving with the
+ordinals: a pack at a lower ordinal must not carry a higher layer, and two packs at
+equal ordinals must share a layer. A pack that declares no stratum is simply
+unbound - a gap to fill, never an error - so a repository can adopt the binding one
+pack at a time, exactly as it adopts the layer rule.
+
+Why bother, when the layer rule already exists? Because a mis-declared layer can
+disguise an upward dependency as a downward one. If a coarse, high-ordinal stratum
+is given a low layer number, a genuine ordinal-upward import looks layer-downward,
+and the layer rule passes it. The binding is what catches that disguise: the coarse
+stratum was given a lower layer than a finer one, which contradicts the ordinal
+order the data records. Run it in strict mode and a violation refuses the load; run
+it in reporting mode and it lists the violations without refusing, so a team can
+clean up gradually. It is gated in Continuous Integration (CI) on every change. The
+construct and its honest limit - the ordinal is read from the record artifacts,
+which could go stale, filed as Ledger entry N7 - are documented for adopters in
+docs/layer-binding.md.
+
+
+Chapter 361: A Promise a Predicate Keeps - The N8 Membership Contract
+
+Some safety properties cannot be checked before the program runs. Whether a value
+is a member of a set depends on the actual value produced on an actual call, so it
+can only be checked when the call happens. The membership contract is PrologAI's
+first construct for exactly this kind of runtime promise, and the promise it makes
+is narrow and useful: the output of a predicate shall be a member of one of its
+inputs - a named list - or else a single, declared value meaning "none of them."
+
+Consider a selector: a predicate that, given a set of offered options, returns one
+of them. You never want it to return something nobody offered - an invented option
+is a bug, and in a memory region it is a confabulated memory. You declare the
+contract with one directive naming the predicate, which argument is the output,
+which argument is the offered set, and what the abstention value is. For a predicate
+region_stratum_recall(StoredPatterns, CompletionResult, Recalled), where argument 1
+is the offered set and argument 3 is the output, you write:
+
+    :- membership_contract_enforce(region_stratum_recall/3, 3, 1, no_recall).
+
+From then on, every call is checked. If the output is a member of the offered set,
+it passes; if it is the declared abstention no_recall, it passes; if it is anything
+else, the call is refused with a glass-box error naming the predicate, the offending
+output, and the set it was not a member of. You read that error in plain English
+with membership_contract_violation_line/2. A predicate that declares no contract is
+unaffected - the construct is opt-in, and adds nothing until you ask for it.
+
+The enforcement is a runtime postcondition, implemented by wrapping the predicate
+with SWI-Prolog's wrap_predicate mechanism, which is the deep difference from the
+layer rule and the binding: those are checked once, at load time, off the static
+structure; this is checked on every solution, because only the running call knows
+the answer. It is deliberately about membership and nothing else - not a general
+type system. Its two honest limits are recorded in the Ledger: the offered set must
+be a plain list argument today (entry N9), and the check runs per solution with no
+once-only mode (entry N10). The construct is documented for adopters in
+docs/membership-contract.md, and its first real user is the Connectome memory
+region, whose recall declares it so the region cannot return a memory it never
+stored.
