@@ -206,6 +206,13 @@ lattice_collect_hash_data(Nexus, Data) :-
 % lattice_transaction/2
 % ---------------------------------------------------------------------------
 
+% Declare lattice_transaction/2 a meta_predicate (Ledger N1, Wave 10 Stage 8): its second
+% argument is a goal, so the caller's module must be carried onto it. It was
+% module-transparent by default before, which worked but was an undocumented footgun;
+% the explicit declaration makes the module-qualification correct and legible. Additive:
+% every existing caller already relied on module transparency, so behaviour is unchanged.
+:- meta_predicate lattice_transaction(?, 0).
+
 % Define a clause for 'lattice transaction': succeed when the following conditions hold.
 lattice_transaction(Nexus, Goal) :-
     % State a fact for 'nexus is open' with the arguments listed below.

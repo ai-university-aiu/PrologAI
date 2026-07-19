@@ -2459,6 +2459,19 @@ lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_await(+Nexus,+Relation,+Timeout,-Args,-Referents): block until a matching fact exists, woken by a write, no polling (L3).
     lattice_notify(+Nexus): wake every reader awaiting on the nexus - the stigmergy-plus-notification bridge (L3).
 
+coordination
+Ergonomic coordination affordances for the single-threaded reentrant-loop model (WP-437, Layer 0; closes Theme F - L5/L6/L7/L8/L9, P8/P9/P10, N1/N2/N4/N5)
+    coordination_open(+Store) / coordination_put(+Store,+Relation,+Args) / coordination_get(+Store,?Relation,?Args) / coordination_take(+Store,+Relation,+Args): a journal-free in-memory store (L9).
+    coordination_get_key(+Store,+Relation,+Key,-Args): a KEYED lookup - a fact of Relation whose first argument is Key (P8).
+    coordination_await_key(+Store,+Relation,+Key,:StepGoal,+MaxSteps,-Args): a BOUNDED keyed await - run a producer step and re-check up to MaxSteps (P8, N5).
+    coordination_publish_ordered(+Store,+Channel,+Message) / coordination_consume_ordered(+Store,+Channel,-Message): an ordered, durable first-in-first-out channel (L6).
+    coordination_bounded_loop(+State0,:StepGoal,:UntilGoal,+MaxIterations,-FinalState,-Outcome): a bounded reentrant-loop driver; Outcome is completed(Iterations) or bounded_stop(Max) (L7, P9).
+    coordination_declare_loop(+LoopName,+Nodes,+ForwardEdges,+ClosureEdge) / coordination_loop(?LoopName,?Nodes,?ForwardEdges,?ClosureEdge): declare / read a reentrant-loop descriptor (P10).
+    coordination_loop_check(+LoopName,-Result): two checks on one object - the forward graph is acyclic AND the closure edge is a genuine back-edge (P10).
+    coordination_register_actor(+Actor,+Layer) / coordination_actor_layer(?Actor,?Layer): declare / read an actor's layer for the transport.
+    coordination_send(+From,+To,+Message,-Result): a RUNTIME layer-aware transport - refuse a send up to a higher-layer actor (L5 general case, N4); Result is sent or refused(...).
+    coordination_trace_hop(+TraceId,+From,+To) / coordination_trace(+TraceId,-Hops): record / read a glass-box hop trace in order (L8).
+
 packaging
 Dependency kinds, loadable pack faces, a facade/bundle, and a cross-pack record registry (WP-436, Layer 0; closes Theme G - ATOMIC-1/2/3/4)
     packaging_declare_dependency(+FromPack, +ToPack, +Kind): declare a typed dependency; Kind is structure_only (mint-time) or runtime.

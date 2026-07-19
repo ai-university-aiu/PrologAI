@@ -27126,6 +27126,7 @@ tick_scheduler - deferred reactivation on ordinal ticks (WP-432, Layer 0)
 managed_seam - a managed cross-stratal seam (WP-433, Layer 0)
 realization - bind a structure record to the dynamics that realizes it (WP-434, Layer 0)
 packaging - dependency kinds, faces, facades, and a record registry (WP-436, Layer 0)
+coordination - ergonomic coordination affordances (keyed await, ordered channel, bounded loop, layer-aware transport) (WP-437, Layer 0)
 --------------------------------------------------------------------------------
 A mind should not only remember what happened but learn the lesson of it.
 lore records experiences as a situation, the response taken, and how it turned
@@ -27462,3 +27463,8 @@ An additive extension of the `layer` pack closes Theme E. Across repositories: `
 ## Wave 10, Stage 7 — packaging and dependency kinds (WP-436)
 
 The `packaging` pack closes Theme G. It adds dependency KINDS (structure_only vs runtime, so the layer graph counts only runtime edges — ATOMIC-1), loadable pack FACES (load one face without dragging in the other — ATOMIC-4), a FACADE/bundle (name a group instead of every fine pack — ATOMIC-2), and a cross-pack RECORD registry (look up a content-addressed record and owner by id — ATOMIC-3).
+
+
+## Wave 10, Stage 8 — coordination ergonomics (WP-437)
+
+The `coordination` pack closes Theme F over a journal-free, synchronously-driven in-memory store: a keyed lookup and a bounded keyed await (P8/N5), an ordered FIFO channel (L6), a bounded reentrant-loop driver with an until-condition and completion signal (L7/P9), a reentrant-loop descriptor whose one check proves both acyclicity and a genuine back-edge closure (P10), a runtime layer-aware transport that refuses an upward send (L5/N4), and a glass-box hop trace (L8); the store writes no journal (L9). On the lattice pack `lattice_transaction/2` is now a `meta_predicate` (N1), and the SWI `thread_wait/2` behaviour (N2) is documented and avoided. L5, the last partial finding, is now fully closed.

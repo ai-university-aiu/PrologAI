@@ -1,0 +1,38 @@
+# Gate the COORDINATION construct (Ledger Theme F; closes L5/L6/L7/L8/L9, P8/P9/P10,
+# N1/N2/N4/N5) on every push and pull request.
+#
+# The coordination pack adds a journal-free store with keyed await, an ordered channel,
+# a bounded reentrant-loop driver, a loop descriptor, a runtime layer-aware transport,
+# and a hop trace, so its gate is its PLUnit suite, which exercises the acceptance for
+# each. Additive; it alters no existing gate. It depends only on SWI-Prolog standard
+# libraries.
+name: coordination
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single coordination job.
+jobs:
+  coordination:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # Run the coordination construct's PLUnit suite; a non-zero exit fails the job.
+      - name: Run the coordination test suite
+        run: |
+          swipl -p library=packs/coordination/prolog \
+            -g "run_tests, halt" -t "halt(1)" \
+            packs/coordination/test/test_coordination.pl
