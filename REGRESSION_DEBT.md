@@ -45,8 +45,12 @@ All public benchmark claims rest on this run and this run alone:
 
 - **ARC-AGI-1: 400/400 = 100.00%**
 - **ARC-AGI-2: 120/120 = 100.00%**
-- **Date last run (full):** ARC-AGI-1 genuine 400/400 re-verified 2026-07-15;
-  ARC-AGI-2 genuine 120/120 re-verified 2026-07-15.
+- **Date last run (full):** ARC-AGI-1 genuine 400/400 and ARC-AGI-2 genuine 120/120
+  re-run 2026-07-19 at the conclusion of Wave 10 (the nine-stage Requirements-Ledger
+  program), with no regression. Every task was attempted through the same solving core
+  the benchmark uses (full manifests of all 400 and all 120 task ids). This run
+  discharges the debt for the Wave 10 additive changes — the debt is CLEAR as of this
+  date. (Prior full run: both genuine, re-verified 2026-07-15.)
 
 ## When the FULL regression is MANDATORY
 
@@ -64,3 +68,4 @@ Each wave appends one row so the debt's size and age stay visible.
 | Wave | Mini result | Date |
 |------|-------------|------|
 | mini-harness introduced | ARC-AGI-1 40/40, ARC-AGI-2 12/12 (10 percent spot-check; full regression deferred) | 2026-07-17 |
+| Wave 10 (Stages 1–9, Ledger closed) | mini ARC-AGI-1 40/40, ARC-AGI-2 12/12 each stage; **FULL ARC-AGI-1 400/400 and ARC-AGI-2 120/120 at wave end** — debt discharged | 2026-07-19 |

@@ -1,0 +1,37 @@
+# Gate the AFFECTIVE_STATE construct (Ledger AMYGDALA-1) on every push and pull request.
+#
+# The affective_state pack holds a persisted, modulatory affective context that later
+# processing reads as a regime, so its gate is its PLUnit suite, which exercises the
+# acceptance: the baseline is neutral, a held stress context persists and derives the
+# stress regime, modulation folds an update, and decay/clear return toward baseline.
+# Additive; it alters no existing gate. It depends only on SWI-Prolog standard libraries.
+name: affective-state
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single affective-state job.
+jobs:
+  affective-state:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # Run the affective_state construct's PLUnit suite; a non-zero exit fails the job.
+      - name: Run the affective state test suite
+        run: |
+          swipl -p library=packs/affective_state/prolog \
+            -g "run_tests, halt" -t "halt(1)" \
+            packs/affective_state/test/test_affective_state.pl
