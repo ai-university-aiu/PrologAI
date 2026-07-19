@@ -2453,6 +2453,19 @@ lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_await(+Nexus,+Relation,+Timeout,-Args,-Referents): block until a matching fact exists, woken by a write, no polling (L3).
     lattice_notify(+Nexus): wake every reader awaiting on the nexus - the stigmergy-plus-notification bridge (L3).
 
+realization
+A structure-to-dynamics binding (WP-434, Layer 0; closes Theme C - P1 dynamics facet, P3, P4, STRATA-5) - binds a grounded Causalontology structure record to the native dynamical law or typed Lattice signal that realizes it, by identity, checkably real
+    realization_bind(+StructureId, +Realizer): register that Realizer realizes StructureId; a realizer is native_law(Name/Arity or Module:Name/Arity) or lattice_signal(Nexus, Relation).
+    realization_unbind(+StructureId): remove every binding of a structure record.
+    realization_realized_by(?StructureId, ?Realizer): the binding relation - a structure record's realizer(s).
+    realization_realizes(?Realizer, ?StructureId): the inverse binding relation - what a realizer realizes.
+    realization_realizer_exists(+Realizer): the realizer is REAL - a defined predicate, or an open nexus - not a dangling label.
+    realization_check(+StructureId, -Result): ok(Realizers) if bound and every realizer real; invalid(dangling(Bad)) or invalid(unbound(Id)) otherwise.
+    realization_check_all(-Report): one Structure-Result line per bound structure.
+    realization_trace(+StructureId, -Trace): a glass-box trace from a record to its realizer(s) and their existence.
+    realization_emit_signal(+Nexus, +Relation, +Value, +SourcePort, +Timestamp): write a typed dynamical signal on the Lattice (the P4 signal helper).
+    realization_signal(+Nexus, +Relation, ?Value, ?SourcePort, ?Timestamp): read the typed signals on the Lattice.
+
 managed_seam
 A first-class managed cross-stratal seam (WP-433, Layer 0; closes Theme B - P1 seam facet, P2, STRATA-2, ARBITER-2, HIPPO-3, CEREBELLUM-2, AMYGDALA-2) - records a cross-stratal jump with an honest-ignorance mechanism status, an optional drawn chain, a checkable home rule, and a queryable runtime event
     managed_seam_new(+Source, +Target, +Status, +Chain, -Seam): build a managed seam; Status is absent, unmodeled, or modeled, with the chain coupled to the status (modeled requires a non-empty chain; absent/unmodeled forbid one).
