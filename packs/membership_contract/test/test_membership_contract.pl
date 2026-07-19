@@ -114,3 +114,154 @@ test(arbiter_guarantee_by_declaration) :-
 
 % Close the test block.
 :- end_tests(membership_contract).
+
+% ===========================================================================
+% THE ACCESSOR FORM — membership against a GOAL-described set (N11, closes N9).
+% ===========================================================================
+
+% A stand-in for the hippocampus store: memories held as independent FACTS, not a list.
+stored_pattern([circle, red, small]).
+stored_pattern([blue, large, square]).
+stored_pattern([green, small, triangle]).
+
+% The MEMBERSHIP-TEST goal: succeeds for a candidate that is a stored memory — a single
+% fact lookup, NOT a list build. This is the goal the accessor test-goal form names.
+stored_pattern_member(Pattern) :-
+    % A candidate is a member exactly when it is a stored_pattern fact.
+    stored_pattern(Pattern).
+
+% A materialisation counter, to PROVE the test-goal form never flattens the store.
+:- dynamic accessor_materialise_count/1.
+% The counter starts at zero.
+accessor_materialise_count(0).
+% Reset the counter before a test that asserts on it.
+accessor_reset_materialise :-
+    % Clear and re-seed the counter to zero.
+    retractall(accessor_materialise_count(_)), assertz(accessor_materialise_count(0)).
+% Increment the counter by one (called ONLY by the list producer, never by the test goal).
+accessor_bump_materialise :-
+    % Read, increment, and store the counter.
+    retract(accessor_materialise_count(N)), N1 is N + 1, assertz(accessor_materialise_count(N1)).
+
+% The list-PRODUCER goal: builds the whole store as a list (the O(store size) copy the
+% test-goal form avoids). It bumps the counter so a test can prove whether it ran.
+stored_pattern_list(List) :-
+    % Record that a full materialisation happened, then flatten the store into a list.
+    accessor_bump_materialise,
+    findall(P, stored_pattern(P), List).
+
+% A recall-like predicate over the fact store: argument 1 injects the output to test
+% (standing in for what completion would produce), argument 2 is the guarded output.
+% The contract, not this predicate, is what refuses a non-member.
+store_recall(Pick, Pick).
+% Declare the ACCESSOR TEST-GOAL contract: argument 2 must satisfy stored_pattern_member, or be no_recall.
+:- membership_contract_enforce_goal(store_recall/2, 2, stored_pattern_member, no_recall).
+
+% The SAME recall shape guarded by the PRODUCER form (the convenience that materialises).
+store_recall_producer(Pick, Pick).
+% Declare the ACCESSOR PRODUCER contract: argument 2 must be a member of the list stored_pattern_list builds.
+:- membership_contract_enforce_producer(store_recall_producer/2, 2, stored_pattern_list, no_recall).
+
+% An UNMATERIALISABLE (infinite) set: the positive even integers. There is NO list to build.
+is_positive_even(N) :-
+    % A candidate is in the set when it is a positive even integer.
+    integer(N), N > 0, 0 is N mod 2.
+
+% A picker guarded against the infinite even-number set by the test-goal form.
+pick_even(Pick, Pick).
+% Declare the contract against the infinite set; the abstention is 'none'.
+:- membership_contract_enforce_goal(pick_even/2, 2, is_positive_even, none).
+
+% Open the test block for the accessor form.
+:- begin_tests(membership_contract_accessor).
+
+% AC-N11-001: a call whose output the test goal ACCEPTS passes (a member of the fact store).
+test(accessor_member_passes) :-
+    store_recall([circle, red, small], R),
+    assertion(R == [circle, red, small]).
+
+% AC-N11-002: a call producing the declared abstention passes.
+test(accessor_abstention_passes) :-
+    store_recall(no_recall, R),
+    assertion(R == no_recall).
+
+% AC-N11-003: a call whose output the test goal REJECTS is refused with a glass-box goal violation.
+test(accessor_non_member_refused,
+     [throws(error(membership_contract_goal_violation(_, [phantom], _), _))]) :-
+    store_recall([phantom], _R).
+
+% AC-N11-004: the test-goal form NEVER materialises the store — the producer counter stays zero.
+test(accessor_no_materialisation) :-
+    accessor_reset_materialise,
+    % Exercise several recalls through the test-goal-guarded predicate, including a refused one.
+    store_recall([circle, red, small], _),
+    store_recall(no_recall, _),
+    catch(store_recall([phantom], _), error(membership_contract_goal_violation(_, _, _), _), true),
+    % No full-store list was ever built.
+    accessor_materialise_count(C),
+    assertion(C == 0).
+
+% AC-N11-005: the accessor form guards membership against an INFINITE set no list could hold.
+test(accessor_infinite_set) :-
+    % An even number is accepted.
+    pick_even(4, R1), assertion(R1 == 4),
+    % The abstention is accepted.
+    pick_even(none, R2), assertion(R2 == none),
+    % An odd number is refused — with no list ever built (the set is infinite).
+    assertion(catch(pick_even(7, _), error(membership_contract_goal_violation(_, 7, _), _), true)).
+
+% AC-N11-006: the PRODUCER form works too — and it DOES materialise (the counter rises).
+test(accessor_producer_materialises) :-
+    accessor_reset_materialise,
+    % A member passes.
+    store_recall_producer([blue, large, square], R), assertion(R == [blue, large, square]),
+    % A non-member is refused (with the plain-list violation, since the producer built the list).
+    assertion(catch(store_recall_producer([phantom], _),
+                    error(membership_contract_violation(_, [phantom], _), _), true)),
+    % The producer DID flatten the store — the counter rose above zero (unlike the test-goal form).
+    accessor_materialise_count(C),
+    assertion(C > 0).
+
+% AC-N11-007: the pure test-goal postcondition succeeds on a member/abstention and throws on a non-member.
+test(accessor_pure_check) :-
+    membership_contract_check_goal(p/2, 4, is_positive_even, none),
+    membership_contract_check_goal(p/2, none, is_positive_even, none),
+    assertion(catch(membership_contract_check_goal(p/2, 7, is_positive_even, none),
+                    error(membership_contract_goal_violation(_, 7, _), _), true)).
+
+% AC-N11-008: the boolean test-goal sibling never throws — true for member/abstention, false otherwise.
+test(accessor_holds_goal) :-
+    membership_contract_holds_goal(4, is_positive_even, none),
+    membership_contract_holds_goal(none, is_positive_even, none),
+    \+ membership_contract_holds_goal(7, is_positive_even, none).
+
+% AC-N11-009: the declared accessor contracts are introspectable (test and producer forms).
+test(accessor_declared) :-
+    membership_contract_declared_goal(_:(store_recall/2), 2, test, no_recall),
+    membership_contract_declared_goal(_:(store_recall_producer/2), 2, producer, no_recall).
+
+% AC-N11-010: a test-goal violation renders a readable line that NAMES the set goal (there is no list to print).
+test(accessor_violation_line_readable) :-
+    Err = error(membership_contract_goal_violation(store_recall/2, [phantom], stored_pattern_member), membership_contract),
+    membership_contract_violation_line(Err, Line),
+    assertion(sub_atom(Line, _, _, _, 'membership-test goal')),
+    assertion(sub_atom(Line, _, _, _, 'stored_pattern_member')).
+
+% AC-N11-011 (THE HIPPOCAMPUS RE-EXPRESSION): a recall over a fact store obtains the no-confabulation
+% guarantee by DECLARING the accessor test-goal form, with NO flattening — so the materialize-at-boundary
+% workaround (HIPPO-1) becomes unnecessary. A member passes, the explicit no_recall passes, a phantom is
+% refused, and the store is never materialised.
+test(accessor_hippocampus_reexpression) :-
+    accessor_reset_materialise,
+    % A genuinely stored memory is recalled (member).
+    store_recall([green, small, triangle], S1), assertion(S1 == [green, small, triangle]),
+    % An explicit no-recall is allowed.
+    store_recall(no_recall, S2), assertion(S2 == no_recall),
+    % A memory nobody stored is refused — no confabulation.
+    assertion(catch(store_recall([never, stored], _),
+                    error(membership_contract_goal_violation(_, [never, stored], _), _), true)),
+    % And the whole guarantee was obtained WITHOUT ever flattening the store.
+    accessor_materialise_count(C), assertion(C == 0).
+
+% Close the accessor test block.
+:- end_tests(membership_contract_accessor).

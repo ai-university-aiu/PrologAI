@@ -1,9 +1,9 @@
 % State the fact: name(membership_contract) — the runtime output-member-of-input-set contract.
 name(membership_contract).
-% State the fact: version('1.0.0').
-version('1.0.0').
-% State the fact: title naming the construct and the finding it closes (N8, ARBITER-1).
-title('The Membership Contract construct (N8) — a runtime output-member-of-input-set postcondition; closes ARBITER-1').
+% State the fact: version('1.1.0') — the accessor form is an additive minor extension.
+version('1.1.0').
+% State the fact: title naming the construct, its two forms, and the findings it closes (N8/ARBITER-1 plain-list; N11/WP-427/N9 accessor).
+title('The Membership Contract construct (N8, WP-427) — a runtime output-member postcondition: a plain-list form (closes ARBITER-1) and an accessor form over a goal-described set (N11, closes N9)').
 % State the fact: author is the PrologAI Community (no AI attribution, per house rules).
 author('PrologAI Community', 'ai.university.aiu@gmail.com').
 % State the fact: home points at the PrologAI repository.
