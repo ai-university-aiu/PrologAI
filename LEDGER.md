@@ -20,7 +20,7 @@ Status: **CLOSED** · **PARTIALLY CLOSED** · **STILL OPEN**.
 > three granularity arms (ATOMIC / LOOPS / STRATA), and the region builds (ARBITER,
 > HIPPO, CEREBELLUM, AMYGDALA) — into one navigable document, with the open-gaps
 > forward agenda and the closed track record, now lives at
-> **`docs/PrologAI_Requirements_Ledger_v5.txt`**. That consolidated Ledger cites the
+> **`docs/PrologAI_Requirements_Ledger_v6.txt`**. That consolidated Ledger cites the
 > per-repository Ledgers; it does not replace them.
 
 ---
@@ -847,3 +847,34 @@ Additive; the ARC-AGI solving core was NOT modified.
 - **Gate.** managed_seam 12/12, conformance 119/119, mini-regression 40/40 and 12/12,
   the layer rule 0 violations, pack naming clean (300 packs). L4/N6/N8/N11/N14 and the
   closure hybrid unchanged. P1 is now PARTIALLY CLOSED (its dynamics facet is Stage 5).
+
+---
+
+## Wave 10, Stage 5 — the structure-to-dynamics binding (Theme C) (2026-07-19)
+
+Branch `feature/wave-10-stage-5-realization`. Rollback tag `pre-wave-10-stage-5`.
+Additive; the ARC-AGI solving core was NOT modified.
+
+### Theme C — bind a grounded structure record to the native law that realizes it · **CLOSED** (WP-434)
+
+- **The gap (the grounding fit).** Every neurochemical and computing construct is two
+  things at once — a grounded Causalontology STRUCTURE record and a native DYNAMICAL
+  law or variable — but the two halves were related only by a shared English word.
+  Sightings: P1 (dynamics facet), P3, P4, STRATA-5.
+- **Delivered.** The new **`realization`** pack (WP-434, layer 0): a construct that
+  **binds** a structure record's id to the realizer that realizes it. A realizer is
+  `native_law(PredicateIndicator)` — a named native predicate (P1, P3) — or
+  `lattice_signal(Nexus, Relation)` — a typed signal carrying a value, a source port,
+  and a timestamp (P4). The binding is **checkably real**: `realization_realizer_exists/1`
+  requires the predicate to be defined (or the nexus open), `realization_check/2`
+  reports a bound-but-missing realizer as a **finding** (dangling) rather than
+  pretending the trace holds, and `realization_trace/2` gives a glass-box trace from a
+  record to its realizer. Because the binding is itself the cross-cut, structure and
+  dynamics need not share a stratum pack — which, per the grounding rule, they never can
+  (STRATA-5); the pack declares no stratum and heals the seam anyway. API:
+  `realization_bind/2`, `unbind/1`, `realized_by/2`, `realizes/2`, `realizer_exists/1`,
+  `check/2`, `check_all/1`, `trace/2`, `emit_signal/5`, `signal/5`.
+- **Gate.** realization 8/8, conformance 119/119, mini-regression 40/40 and 12/12, the
+  layer rule 0 violations, pack naming clean (301 packs). L4/N6/N8/N11/N14 and the
+  closure hybrid unchanged. **With Theme C closed, the four load-bearing walls
+  (Themes A–D) are all closed.** P1 is now fully CLOSED.

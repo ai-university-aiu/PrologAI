@@ -1,0 +1,40 @@
+# Gate the REALIZATION construct (Ledger Theme C; closes P1 dynamics facet, P3, P4,
+# STRATA-5) on every push and pull request.
+#
+# The realization pack binds a grounded structure record to the native law or Lattice
+# signal that realizes it, by identity, so its gate is its PLUnit suite, which exercises
+# the acceptance: bidirectional query, the REAL existence check (a defined predicate; an
+# open nexus) that turns a dangling label into a finding, the unbound case, the
+# glass-box trace, and the P4 typed Lattice signal. Additive; it alters no existing
+# gate. It loads the lattice store the pack depends on.
+name: realization
+
+# Run on pushes and pull requests to any branch.
+on:
+  push:
+  pull_request:
+
+# The single realization job.
+jobs:
+  realization:
+    # Use a current Ubuntu runner.
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install SWI-Prolog from its official stable PPA.
+      - name: Install SWI-Prolog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo apt-add-repository -y ppa:swi-prolog/stable
+          sudo apt-get update
+          sudo apt-get install -y swi-prolog
+      # Run the realization construct's PLUnit suite; a non-zero exit fails the job.
+      - name: Run the realization test suite
+        run: |
+          swipl -p library=packs/realization/prolog \
+            -p library=packs/lattice/prolog \
+            -g "run_tests, halt" -t "halt(1)" \
+            packs/realization/test/test_realization.pl

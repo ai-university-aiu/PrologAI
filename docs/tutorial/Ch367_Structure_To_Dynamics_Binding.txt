@@ -1,0 +1,42 @@
+Chapter 367 — Binding Structure to Dynamics: realization (Wave 10 Stage 5)
+
+This chapter closes the Requirements Ledger's Theme C - the structure-to-dynamics seam,
+also called the grounding fit. With it, the four load-bearing walls the program named
+(temporal, cross-stratal seam, structure-to-dynamics, affect) are all closed.
+
+Plain-language idea. Everything in the mind is two things at once. A hormone is a
+STRUCTURE (a record that says "this thing crosses these levels and suppresses that")
+AND a piece of running CODE (a native law that computes the actual suppression). The
+right way to handle this - proven earlier - is to ground the structure but keep the
+dynamics as fast native code. But then the two halves were tied together only by
+sharing an English name; nothing said, by identity, "THIS record is realized by THAT
+law." So you could not trace from what a synapse computes to how it computes it, and a
+mislabelled or missing law would go unnoticed.
+
+The realization pack (WP-434, layer 0) is that missing tie. You bind a structure
+record's id to the thing that realizes it:
+
+ • native_law(Name/Arity) or native_law(Module:Name/Arity) - a named native predicate
+   (the suppression law, the three-factor plasticity law).
+ • lattice_signal(Nexus, Relation) - a typed signal on the shared Lattice carrying a
+   value, a source port, and a timestamp (a neurotransmitter signal like dopamine).
+
+The important part is that the tie is REAL, not just a label. Before you trust it, the
+pack can check that the named law is actually defined (or the signal's nexus is open).
+If a binding points at a law that does not exist, realization_check reports it as a
+finding - dangling - instead of pretending the trace holds. realization_trace prints
+the whole tie: this record, its realizer, and whether that realizer exists.
+
+Why this also heals a structural problem. The native dynamics are, correctly, NOT
+grounded, so they have no level (no stratum). That means structure and dynamics can
+never live in the same one-level pack - the seam is unavoidable. The binding is exactly
+the cross-cut that heals it without a shared level: the realization pack declares no
+stratum, and the tie works across the seam all the same.
+
+Public operations: realization_bind/2, realization_unbind/1, realization_realized_by/2,
+realization_realizes/2, realization_realizer_exists/1, realization_check/2,
+realization_check_all/1, realization_trace/2, realization_emit_signal/5, and
+realization_signal/5.
+
+Gate. realization 8/8; Causalontology conformance 119/119; the mini-regression 40/40 and
+12/12; the layer rule and pack-naming clean; L4/N6/N8/N11/N14 unchanged.
