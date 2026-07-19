@@ -1,9 +1,9 @@
 % State the fact: name(layer).
 name(layer).
-% State the fact: version('1.1.0') — Wave 10 Stage 6 added the construct's cross-repository and intra-pack reach.
-version('1.1.0').
-% State the fact: title('PrologAI Strict Layer Rule — declare, check, and enforce the acyclic layer discipline (WP-426), with cross-repository and intra-pack reach (WP-435)').
-title('PrologAI Strict Layer Rule — declare, check, and enforce the acyclic layer discipline (WP-426), with cross-repository and intra-pack reach (WP-435)').
+% State the fact: version('1.2.0') — Wave 10 Stage 9 added the N7 binding-freshness predicates.
+version('1.2.0').
+% State the fact: title('PrologAI Strict Layer Rule — declare, check, and enforce the acyclic layer discipline (WP-426), with cross-repository and intra-pack reach (WP-435) and binding freshness (WP-438)').
+title('PrologAI Strict Layer Rule — declare, check, and enforce the acyclic layer discipline (WP-426), with cross-repository and intra-pack reach (WP-435) and binding freshness (WP-438)').
 % State the fact: author('PrologAI Community', 'ai.university.aiu@gmail.com').
 author('PrologAI Community', 'ai.university.aiu@gmail.com').
 % State the fact: home('https://github.com/ai-university-aiu/PrologAI').

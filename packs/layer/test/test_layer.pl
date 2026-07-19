@@ -466,3 +466,75 @@ test(submodule_without_test_target_is_reported) :-
 
 % Close the reach test block.
 :- end_tests(layer_reach).
+
+% ---------------------------------------------------------------------------
+% BINDING FRESHNESS (N7, Wave 10 Stage 9)
+% ---------------------------------------------------------------------------
+
+% Build a stratum fixture pack that declares a stratum and (optionally) a direct ordinal.
+test_layer_make_stratum_pack(BaseDir, Pack, Stratum, Ordinal) :-
+    format(atom(PackDir), '~w/~w', [BaseDir, Pack]),
+    format(atom(PrologDir), '~w/prolog', [PackDir]),
+    make_directory_path(PrologDir),
+    format(atom(ManifestPath), '~w/pack.pl', [PackDir]),
+    setup_call_cleanup(open(ManifestPath, write, MS),
+        ( format(MS, 'name(~w).~n', [Pack]),
+          format(MS, "version('0.0.1').~n", []),
+          format(MS, 'stratum(~w).~n', [Stratum]),
+          ( integer(Ordinal) -> format(MS, 'stratum_ordinal(~w).~n', [Ordinal]) ; true ) ),
+        close(MS)),
+    format(atom(ModPath), '~w/~w.pl', [PrologDir, Pack]),
+    setup_call_cleanup(open(ModPath, write, ModS),
+        format(ModS, ':- module(~w, []).~n', [Pack]), close(ModS)).
+
+% Write one Causalontology stratum record (a JSON artifact) into a strata source directory.
+test_layer_write_stratum_record(StrataDir, Label, Ordinal) :-
+    make_directory_path(StrataDir),
+    format(atom(Path), '~w/~w.json', [StrataDir, Label]),
+    setup_call_cleanup(open(Path, write, S),
+        format(S, '{"type":"stratum","label":"~w","ordinal":~w}~n', [Label, Ordinal]),
+        close(S)).
+
+% Open the freshness test block.
+:- begin_tests(layer_freshness).
+
+% A pack's direct stratum ordinal is read straight from its manifest (load-safe, no artifact).
+test(pack_ordinal_read_directly) :-
+    test_layer_tmp_base(Base),
+    format(atom(Repo), '~w/direct', [Base]), make_directory_path(Repo),
+    test_layer_make_stratum_pack(Repo, region_pack, region, 9),
+    format(atom(PackDir), '~w/region_pack', [Repo]),
+    layer_pack_ordinal(PackDir, Ordinal),
+    assertion(Ordinal == 9).
+
+% A pack that declares no direct ordinal simply has none (the read fails, not errors).
+test(pack_without_direct_ordinal_fails) :-
+    test_layer_tmp_base(Base),
+    format(atom(Repo), '~w/nodirect', [Base]), make_directory_path(Repo),
+    test_layer_make_stratum_pack(Repo, plain_pack, region, none),
+    format(atom(PackDir), '~w/plain_pack', [Repo]),
+    assertion(\+ layer_pack_ordinal(PackDir, _)).
+
+% A pack whose direct ordinal disagrees with the artifact is flagged as a drift (stale artifact).
+test(stale_artifact_is_flagged) :-
+    test_layer_tmp_base(Base),
+    format(atom(Repo), '~w/packs', [Base]), make_directory_path(Repo),
+    format(atom(Strata), '~w/strata', [Base]),
+    % The pack declares stratum region at ordinal 99, but the artifact says 9 — a drift.
+    test_layer_make_stratum_pack(Repo, region_pack, region, 99),
+    test_layer_write_stratum_record(Strata, region, 9),
+    layer_binding_freshness(Repo, Strata, Drifts),
+    assertion(Drifts == [drift(region, declared(99), artifact(9))]).
+
+% A pack whose direct ordinal agrees with the artifact shows no drift.
+test(fresh_artifact_shows_no_drift) :-
+    test_layer_tmp_base(Base),
+    format(atom(Repo), '~w/packs', [Base]), make_directory_path(Repo),
+    format(atom(Strata), '~w/strata', [Base]),
+    test_layer_make_stratum_pack(Repo, region_pack, region, 9),
+    test_layer_write_stratum_record(Strata, region, 9),
+    layer_binding_freshness(Repo, Strata, Drifts),
+    assertion(Drifts == []).
+
+% Close the freshness test block.
+:- end_tests(layer_freshness).

@@ -126,7 +126,12 @@
     % layer_submodule_violations/2: the intra-pack sub-module layering + coupling check.
     layer_submodule_violations/2,
     % layer_submodule_untested/2: the intra-pack sub-modules that name no test target.
-    layer_submodule_untested/2
+    layer_submodule_untested/2,
+    % --- Binding freshness (N7, Wave 10 Stage 9) — additive to the N6 binding ---
+    % layer_pack_ordinal/2: read a stratum ordinal DIRECTLY from a pack's manifest (load-safe).
+    layer_pack_ordinal/2,
+    % layer_binding_freshness/3: flag a pack whose manifest ordinal disagrees with the artifact.
+    layer_binding_freshness/3
 ]).
 
 % Import list utilities [member/2, memberchk/2, sort/4, exclude/3] from library(lists).
@@ -898,3 +903,47 @@ layer_submodule_untested(Submodules, Untested) :-
     findall(Name,
             member(submodule(Name, _, _, none), Submodules),
             Untested).
+
+% ===========================================================================
+% BINDING FRESHNESS  (N7, Wave 10 Stage 9; additive to the N6 binding)
+% ---------------------------------------------------------------------------
+% The N6 binding reads a stratum's ordinal from the Causalontology structure-record
+% ARTIFACTS (the JSON records). N7 observed those artifacts could be STALE with respect
+% to the pack's minting code, so a stale artifact could pass a real drift. These two
+% additive predicates give both remedies the Ledger named: a LOAD-SAFE way to read an
+% ordinal directly from a pack (a pack may declare stratum_ordinal(N) in its manifest,
+% read without consulting any artifact), and a FRESHNESS gate that flags any pack whose
+% directly-declared ordinal disagrees with the artifact-derived one — a stale artifact
+% (or a mis-declared pack) caught, not silently trusted.
+% ===========================================================================
+
+% -- layer_pack_ordinal(+PackDir, -Ordinal): read a stratum ordinal directly from a manifest.
+% Optional: a pack that wants a load-safe, artifact-independent ordinal declares
+% stratum_ordinal(N) beside stratum(Label); this reads it straight from pack.pl.
+layer_pack_ordinal(PackDir, Ordinal) :-
+    % Point at the pack's manifest file.
+    atomic_list_concat([PackDir, '/pack.pl'], ManifestPath),
+    % The manifest must exist and carry a stratum_ordinal(N) integer fact.
+    exists_file(ManifestPath),
+    layer_manifest_int(ManifestPath, stratum_ordinal, Ordinal).
+
+% -- layer_binding_freshness(+PacksDir, +StrataSource, -Drifts): flag stale artifacts.
+% For every pack that declares BOTH a stratum and a direct stratum_ordinal, compare the
+% direct ordinal to the artifact ordinal for that stratum; a disagreement is a drift.
+layer_binding_freshness(PacksDir, StrataSource, Drifts) :-
+    % Read the authoritative stratum ordinals from the record artifacts.
+    layer_stratum_ordinals(StrataSource, ArtifactPairs),
+    % Enumerate the pack directories.
+    layer_pack_dirs(PacksDir, PackDirs),
+    % Collect a drift for every pack whose declared ordinal disagrees with the artifact.
+    findall(drift(Stratum, declared(DeclOrd), artifact(ArtOrd)),
+            ( member(Dir, PackDirs),
+              % The pack must declare a stratum.
+              layer_pack_stratum(Dir, Stratum), Stratum \== unbound,
+              % The pack must also declare a direct ordinal (opt-in freshness).
+              layer_pack_ordinal(Dir, DeclOrd),
+              % The artifact must carry an ordinal for that stratum.
+              memberchk(Stratum-ArtOrd, ArtifactPairs),
+              % A drift is exactly a disagreement between the two sources.
+              DeclOrd =\= ArtOrd ),
+            Drifts).

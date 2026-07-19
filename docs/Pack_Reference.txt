@@ -2449,6 +2449,8 @@ Strict Layer Rule (WP-426, Layer 400)
     layer_adoption(+PacksDir,-Declared,-Total,-Fraction): how many packs in a directory declare a layer, out of the total (the N3 adoption coverage report). (WP-435)
     layer_submodule_violations(+Submodules,-Violations): intra-pack sub-module check over submodule(Name,Rank,Calls,TestTarget) - an upward call (LOOPS-1) or a call outside the declared set (LOOPS-2). (WP-435)
     layer_submodule_untested(+Submodules,-Untested): the intra-pack sub-modules whose declared test target is 'none' (LOOPS-3). (WP-435)
+    layer_pack_ordinal(+PackDir, -Ordinal): read a stratum ordinal DIRECTLY from a pack's manifest (a load-safe stratum_ordinal(N) fact, no artifact) (N7, WP-438).
+    layer_binding_freshness(+PacksDir, +StrataSource, -Drifts): flag any pack whose directly-declared ordinal disagrees with the artifact ordinal - a stale artifact caught (N7, WP-438).
 
 lattice (Wave 1 additions - coordination affordances L1/L2/L3)
     lattice_put(+Nexus,+Relation,+Args,+Referents): store a node-fact directly, no vector backend (L1).
@@ -2552,6 +2554,9 @@ The Membership Contract construct (N8, WP-427, WP-428, WP-431, closes ARBITER-1,
     membership_contract_enforce_goal(:Pred,+OutPos,:TestGoal,+Abstention,+Mode): the accessor test-goal contract with a mode; once mode checks the committed output against the test goal exactly once and materialises no set.
     membership_contract_enforce_producer(:Pred,+OutPos,:ProducerGoal,+Abstention,+Mode): the accessor producer contract with a mode.
     membership_contract_declared_mode(?Pred,?Mode): enumerate the mode (per_solution or once) each declared contract runs in.
+    membership_contract_holds_guarded(+Out,:TestGoal,+Abstention): a purity-guarded boolean membership test - runs the test under double negation, so it cannot bind the output or leave a choicepoint (N13, WP-438).
+    membership_contract_test_deterministic(:TestGoal,+Out): succeed iff the test goal is semidet (at most one solution) on Out - a determinism check (N13, WP-438).
+    membership_contract_find_member(:Generator,:TestGoal,+Abstention,-Member): commit to the FIRST generated candidate that is a member, else the abstention - a find-first-member filtering mode (N15, WP-438).
     membership_contract_enforce_context(:Pred,+OutPos,:TestGoal,:ContextGoal,+Abstention,+Mode): declare a CONTEXT-AWARE accessor contract (WP-431, closes AMYGDALA-1) - Pred's OutPos-th output must satisfy TestGoal called with the output AND a held context that ContextGoal produces at check time, or be the Abstention; legality can depend on a held modulatory context (a regime, a mood) without the caller carrying it in the value.
     membership_contract_check_context(+Pred,+Out,:TestGoal,:ContextGoal,+Abstention): the context postcondition - succeeds on the abstention or when TestGoal accepts (Out, Context) for the Context that ContextGoal yields, else throws a glass-box membership_contract_goal_violation.
     membership_contract_holds_context(+Out,:TestGoal,:ContextGoal,+Abstention): a boolean context-aware membership check that never throws.
