@@ -1064,3 +1064,30 @@ full close-out certification in Section Seven). The full ARC-AGI-1 (400/400) and
 ARC-AGI-2 (120/120) regression re-run at close-out shows no regression from any Wave 10
 additive change. **PrologAI's forward agenda is closed; `konnectome` is the next
 repository** — a separate, later effort, not stood up here.
+
+---
+
+## Tooling fix — run_pr_tests.sh single-test PLUnit false negative (2026-07-19)
+
+Branch `fix/run-pr-tests-single-test-classifier`. A follow-up flagged during the Wave 10
+close-out gate sweep (`task_67e023a7`); it is a pre-existing gate-script quirk, not a
+Wave 10 regression.
+
+`bin/run_pr_tests.sh` classified a passing suite as failed when that suite contains
+exactly ONE PLUnit test. Its result classifier keyed off a grep for the plural string
+`tests passed`, but a single-test suite prints the singular `test passed` (and
+`% test passed`), so the grep missed it and the suite fell through to the "no-result"
+fail branch — making the whole script exit 1 even though every suite passed. It surfaced
+on `tests/causalontology_conformance/test_causalontology_conformance.pl` (one test running
+all 119 vendored 3.0.0 vectors), which exits 0 and reports 119/119.
+
+**Fix.** The classifier now keys off the swipl **exit code**, which is authoritative:
+every suite runs with `-g "run_tests, halt" -t "halt(1)"`, and `run_tests` fails the goal
+on any test failure, so a zero exit means every test passed (empirically verified for a
+single-test pass, a single-test fail, a multi-test pass, and a stale-reference load
+error). A defensive grep for PLUnit/SWI failure signatures (`**FAILED`, `N test(s)
+failed`, `Unknown procedure`, `does not exist`, `not exported`) is retained and can only
+turn a zero exit into a fail, never the reverse. Verified: the full run now reports
+**50/50 passed, exit 0**; a single-test *failing* probe is still correctly reported as a
+fail (exit 1); a single-test *passing* probe passes (exit 0). No system-under-test result
+changed — the conformance suite always genuinely passed.
