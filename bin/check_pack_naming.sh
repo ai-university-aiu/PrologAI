@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check_pack_naming.sh — enforce the NAMING CONVENTION RULE (CLAUDE.md).
+# check_pack_naming.sh — enforce the NAMING CONVENTION RULE (CONSTITUTION.md).
 # Three checks, all merge blockers:
 #   (1) PREDICATE prefix — every pack's predicates must be prefixed with the
 #       pack's own whole-word name (world_model_predict, not wm_predict).
