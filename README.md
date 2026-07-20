@@ -69,7 +69,7 @@ No guessing.
 
 ```
 PrologAI/
-├── packs/       299 work packages — the complete cognitive engine (see below)
+├── packs/       306 work packages — the complete cognitive engine (see below)
 ├── docs/        SPARC documentation series (6 volumes + tutorial + textbook)
 ├── syntax/      PrologAI language syntax rules
 ├── tests/       Acceptance test suite
@@ -90,7 +90,7 @@ Layer 60 and above is the Data Layer: the 200+ perception, analysis, and transfo
 
 The full layer table is in Architecture Section 0.4.
 
-**The strict layer rule is live and gated in CI, and adoption is deliberately incremental.** The rule — a lower-layer pack may not depend on a higher-layer one — is now a first-class construct: a pack declares its layer with a `layer(N)` fact in its `pack.pl`, `bin/check_layers.sh` checks the real import graph, and `.github/workflows/layer-rule.yml` blocks a merge on any violation. Honestly, though: **4 of the 300 packs declare a layer today** (`layer`, `lattice`, and `membership_contract` at layer 0, `actors` at layer 1); the remaining 296 are undeclared **gaps, not violations**. Until adoption spreads pack by pack, a passing check verifies only the declared packs. See **[docs/layer-rule.md](docs/layer-rule.md)** for how to declare a layer, run the checker, read a violation line, and choose strict vs reporting mode.
+**The strict layer rule is live and gated in CI, and adoption is deliberately incremental.** The rule — a lower-layer pack may not depend on a higher-layer one — is now a first-class construct: a pack declares its layer with a `layer(N)` fact in its `pack.pl`, `bin/check_layers.sh` checks the real import graph, and `.github/workflows/layer-rule.yml` blocks a merge on any violation. Honestly, though: **10 of the 306 packs declare a layer today** (`layer`, `lattice`, `membership_contract`, and the six Wave 10 constructs `affective_state`, `tick_scheduler`, `managed_seam`, `realization`, `packaging`, and `coordination` at layer 0, `actors` at layer 1); the remaining 296 are undeclared **gaps, not violations**. Until adoption spreads pack by pack, a passing check verifies only the declared packs. See **[docs/layer-rule.md](docs/layer-rule.md)** for how to declare a layer, run the checker, read a violation line, and choose strict vs reporting mode.
 
 **Binding a pack's layer to its stratum ordinal (Ledger N6).** A stratum-primary pack can additionally declare the Causalontology stratum it represents with a `stratum(Label)` fact beside `layer(N)`; a companion checker (`bin/check_layer_binding.sh`, gated by `.github/workflows/layer-binding.yml`) reads each stratum's ordinal from the authoritative structure records and verifies the declared layer is order-consistent with it — a lower ordinal may not carry a higher layer, equal ordinals must share a layer. This closes the strata arm's STRATA-3 finding: the alignment "pack layer tracks stratum ordinal" is now an enforced, load-time invariant instead of a hand-maintained convention (and it catches an upward dependency disguised as downward by a mis-declared layer, which the layer rule alone cannot see). It is additive to the strict layer rule, which is untouched; a pack that declares no stratum is an unbound gap, never an error. See **[docs/layer-binding.md](docs/layer-binding.md)**.
 
@@ -98,7 +98,7 @@ The full layer table is in Architecture Section 0.4.
 
 **Coordinating actors through the Lattice.** Actors coordinate through the Lattice by stigmergy (shared state, zero actor-to-actor references) and react through notification (a write wakes awaiting readers; nobody polls). This stigmergy-plus-notification bridge (L3) is the pattern every Connectome repository is built on — see **[docs/lattice-hybrid-pattern.md](docs/lattice-hybrid-pattern.md)** for the principle, the exact API (`lattice_await/5`, `lattice_notify/1`, `lattice_put/4`, `lattice_get/4`, `lattice_take/4`, `lattice_replace/4`), a worked example, and the legibility cost it must pay deliberately.
 
-### The 299 Work Packages
+### The 306 Work Packages
 
 Every capability in PrologAI is a self-contained, versioned work package.
 
@@ -630,7 +630,7 @@ Every answer Mentova produces comes with a readable justification tree — the c
 | [PrologAI Tutorial](docs/PrologAI_Tutorial.txt) | 12-chapter tutorial — beginner to advanced |
 | [Certified PrologAI Engineer](docs/Certified_PrologAI_Engineer.txt) | 25-chapter professional reference textbook |
 | [ARC-AGI Human Steps](docs/ARC-AGI_Human_Steps.txt) | Cognitive deconstruction of all 400 ARC-AGI-1 tasks |
-| [PrologAI Requirements Ledger](docs/PrologAI_Requirements_Ledger_v10.txt) | The consolidated program-wide Ledger — every Connectome finding (open gaps, closed track record, cross-cutting patterns, and the forward agenda) gathered into one canonical view |
+| [PrologAI Requirements Ledger](docs/PrologAI_Requirements_Ledger_v11.txt) | The consolidated program-wide Ledger — every Connectome finding gathered into one canonical view. **CLOSED: all 57 findings closed (0 open, 0 partial) at the conclusion of the nine-stage Wave 10 program (WP-429 through WP-438); the full ARC-AGI-1 400/400 and ARC-AGI-2 120/120 regression was re-run at close-out with no regression.** |
 | [SPARC Series](docs/) | Complete specification, architecture, and completion volumes |
 
 ---

@@ -20,7 +20,7 @@ Status: **CLOSED** · **PARTIALLY CLOSED** · **STILL OPEN**.
 > three granularity arms (ATOMIC / LOOPS / STRATA), and the region builds (ARBITER,
 > HIPPO, CEREBELLUM, AMYGDALA) — into one navigable document, with the open-gaps
 > forward agenda and the closed track record, now lives at
-> **`docs/PrologAI_Requirements_Ledger_v10.txt`**. That consolidated Ledger cites the
+> **`docs/PrologAI_Requirements_Ledger_v11.txt`**. That consolidated Ledger cites the
 > per-repository Ledgers; it does not replace them.
 
 ---
@@ -1011,3 +1011,56 @@ refinements and acknowledgements (Theme H). New packs: `affective_state`,
 - **Gate.** the layer suite 36/36, the membership_contract suite 38/38, conformance
   119/119, mini-regression 40/40 and 12/12, the layer rule 0 violations, pack naming
   clean (303 packs). L4/N6/N8/N11/N14 and the closure hybrid unchanged.
+
+---
+
+## WAVE 10 CLOSE-OUT — the PrologAI Requirements Ledger is CLOSED (2026-07-19)
+
+Branch `feature/wave-10-closeout`. Tag `prologai-wave10-complete` on the merged close-out
+commit. A VERIFICATION-only close-out: it built no construct and discovered no new
+requirement. It ran, once, the two standing deferrals every wave postponed to the
+conclusion of all waves — the full regression and the documentation-QA sweep — and then
+declares the Ledger closed.
+
+### The regression gate matrix (all system content green)
+
+| Gate | What | Result | Exit |
+|------|------|--------|------|
+| 1 | Causalontology conformance | 119/119 vectors, CONFORMANT (3.0.0) | 0 |
+| 2 | Full ARC-AGI-1 — booted run **and** isolated `arc_benchmark_run/3` | **400/400**, fail list EMPTY (both) | 0 |
+| 3 | Full ARC-AGI-2 | **120/120** | 0 |
+| 4 | Per-pack regression (full library path) | **306/306** packs green, 0 fail, 0 no-test | 0 |
+| 5 | Pack naming (5 checks) | 0 violations, 303 scanned | 0 |
+| 6a | Layer rule | 0 violations | 0 |
+| 6b | Layer↔stratum binding | 0 violations | 0 |
+| 6c | `run_pr_tests.sh` (legacy acceptance) | 49/50 green + **1 verified false negative** (see note) | 1* |
+| 6d | Mini-regression (final sanity) | 40/40, 12/12 | 0 |
+
+**Gate 6c note (not a regression).** The one non-green suite, `causalontology_conformance`,
+genuinely **passes** (exit 0, 119/119, PLUnit "% test passed"). `run_pr_tests.sh`'s
+classifier greps stdout for the plural "tests passed" and so mislabels a **single-test**
+PLUnit suite that prints the singular "test passed". This is a pre-existing gate-script
+quirk (the suite dates to 2026-07-17, commit 7b3aa86, before Wave 10), not a system
+regression; it is routed to a separate tooling fix and does not affect the certification.
+
+### The documentation-QA sweep
+
+Verified by seven parallel adversarial verifiers. Five dimensions clean (SPARC volumes,
+ERC validity, tutorials, CLAUDE.md, archive/pointers). Two concerns, both real and both
+**genuine Wave 10 doc gaps, fixed at close-out**: (1) `causal_core`'s three 3.0.0
+additions (`causal_core_dimension/2`, `causal_core_seam_wellformed/4`,
+`causal_core_seam_home/4`) added to `docs/Pack_Reference.txt`; (2) `README.md` pack count
+(→ 306), declared-layer list (→ 10, listing the six new Wave 10 packs), and an aggregate
+Ledger-closure statement. Pre-existing out-of-scope drift (the `cro` prose in
+Pack_Reference, the undocumented original lattice core API, a README Data-Layer narrative
+inconsistency, a CLAUDE.md date stamp) is recorded but **not** patched under the close-out
+banner, per the scope boundary.
+
+### Verdict
+
+**Every finding in the consolidated PrologAI Requirements Ledger is CLOSED — 57 of 57,
+zero open, zero partial** (`docs/PrologAI_Requirements_Ledger_v11.txt`, which carries the
+full close-out certification in Section Seven). The full ARC-AGI-1 (400/400) and
+ARC-AGI-2 (120/120) regression re-run at close-out shows no regression from any Wave 10
+additive change. **PrologAI's forward agenda is closed; `konnectome` is the next
+repository** — a separate, later effort, not stood up here.
