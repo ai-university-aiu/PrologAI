@@ -1,23 +1,25 @@
-Chapter 100: Proving It - Causalontology 3.0.0 Conformance
+Chapter 100: Proving It - Causalontology 4.0.0 Conformance
 
 A standard is only as real as the test a system either passes or fails. The
-Causalontology standard ships a conformance suite of 119 vectors, V01 through
-V119, each a frozen fact about how a conformant implementation must behave. The
+Causalontology standard ships a conformance suite of 137 vectors, V01 through
+V137, each a frozen fact about how a conformant implementation must behave. The
 standard's rule is blunt: an implementation is conformant if and only if it
 passes every vector for the version it declares. That is what lets a Prolog and a
 Python implementation agree without sharing a line of code.
 
-PrologAI declares Causalontology specification 3.0.0 and passes all 119 vectors.
-The vectors and the eighteen JSON schemas are vendored under
+PrologAI declares Causalontology specification 4.0.0 and passes all 137 vectors.
+The vectors and the twenty-one JSON schemas are vendored under
 tests/causalontology_conformance/ from the causalontology repository at its
-3.0.0 tag (the eighteen-kind edition). The harness
+4.0.0 tag (the twenty-one-kind edition). The harness
 run_conformance.pl drives the three vocabulary packs - causal_core,
 noun_backbone, and realizable_hinge - across every vector.
 
 What is checked spans the whole standard: RFC 8785 canonicalization; SHA-256
-content identity for all eighteen kinds; schema validity against the vendored
+content identity for all twenty-one kinds; schema validity against the vendored
 schemas; the local semantic rules (acyclicity, the temporal window, refinement,
-the conflict test, the enrichment field table); and the six normative algorithms
+the conflict test, the enrichment field table, and the 4.0.0 rules for the
+attitude quarantine and the single-dimension predicted interval); and the six
+normative algorithms
 of Section 12 - bridge closure, bridged reachability (the amended Rule 7, which
 the negative vector V58 exists to catch), stratal classification, the skip
 decision with its asymmetry, unit normalization with its fixed constants, and
@@ -29,6 +31,9 @@ The reusable engine lives in the causal_core pack, so it is part of the platform
 The schema interpreter, the signing layer, and the in-memory store are additive
 harness layers that import none of the ARC grid, Inductive Logic Programming, or
 sequence packs - which is what guarantees the work cannot move the ARC-AGI-1 or
-ARC-AGI-2 score (both were run before and after: 400/400 and 120/120, unchanged).
-Run it with bin/run_causalontology_conformance.sh (exit 0 iff 119/119); a GitHub
+ARC-AGI-2 score (at the original conformance adoption both full benchmarks were
+run before and after: 400/400 and 120/120, unchanged; the 4.0.0 step held the
+standing gate - mini regression green: ARC-AGI-1 40/40, ARC-AGI-2 12/12
+(10 percent spot-check; full regression deferred)).
+Run it with bin/run_causalontology_conformance.sh (exit 0 iff 137/137); a GitHub
 Actions workflow gates it on every push.

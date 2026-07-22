@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/prediction_error.schema.json",
+  "title": "Prediction Error",
+  "description": "4.0.0. The first-class record of how a prediction met the world: the graded discrepancy between a predicted_occurrence and what was - or was not - observed. When observed is present it names the token_occurrence that answered the prediction and MUST instantiate the same occurrent the prediction instantiates (Rule 24, pairing_mismatch, HARD); when observed is ABSENT the predicted occurrence was not fulfilled by any recorded occurrence. discrepancy reads actual minus expected: positive = exceeded expectation, negative = fell short, zero = fulfilled.",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "predicted",
+    "discrepancy"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^prediction_error:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "prediction_error"
+    },
+    "predicted": {
+      "type": "string",
+      "pattern": "^predicted_occurrence:[0-9a-f]{64}$",
+      "description": "the prediction this error grades; MANDATORY - an error without a prediction is not an error"
+    },
+    "observed": {
+      "type": "string",
+      "pattern": "^token_occurrence:[0-9a-f]{64}$",
+      "description": "OPTIONAL: the token occurrence that answered the prediction. ABSENT means the predicted occurrence was not fulfilled by any recorded occurrence - the surprise of nothing arriving"
+    },
+    "discrepancy": {
+      "type": "number",
+      "description": "signed, graded; actual minus expected - positive = exceeded expectation, negative = fell short, zero = fulfilled (the comparator sign convention)"
+    }
+  }
+}

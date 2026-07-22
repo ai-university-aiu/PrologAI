@@ -361,3 +361,29 @@ centre. The full benchmark now genuinely scores 400/400 = 100.00% (booted run an
 arc_benchmark_run/3 both report 400, empty fail list). Mentova SPARC bumped to Specification
 v358, Pseudocode v350, Architecture v351, Refinement v415, Completion v421; Mentova
 Climbing_ARC-AGI-1.txt carries the correction.
+
+STATE OF 2026-07-22
+
+CAUSALONTOLOGY 4.0.0 CONFORMANCE. PrologAI declares and passes the Causalontology
+specification 4.0.0 conformance suite - all 137 vectors (V01-V137), vendored from the
+causalontology repository at commit 64b1d1a105f91b5fb45df98d0b6583a5ab9e8769 (main at tag
+v4.0.0) under tests/causalontology_conformance/ (137 vectors + the twenty-one schemas).
+The three new 4.0.0 kinds are the standard's first mental-life records: attitude (a
+propositional attitude - a holder, a closed attitude_type enumeration of believes,
+desires, intends, knows, expects, and fears, and a content reference by identity that may
+be FALSE and is quarantined from the conflict test by Rule 25, may nest, and bears no
+strength per Principle P4), predicted_occurrence (a forecast - an instantiated occurrent
+type, an interval carrying exactly one temporal dimension per Rule 24, a predictor, and
+an optional identity-bearing strength), and prediction_error (the grade of a prediction -
+the predicted reference, an optional observed token occurrence, and a signed
+discrepancy). All three are usable from the causal_core vocabulary pack, additively
+bumped from 1.0.0 to 1.1.0 (three new identity rows, the two Rule 24 local semantic
+clauses, explicit-type kind resolution); the harness layers (schema_check, store,
+run_conformance) follow additively, and the frozen earlier identifiers re-pin
+byte-for-byte, so 4.0.0 is identity-preserving. Run with
+bin/run_causalontology_conformance.sh (exit 0 iff 137/137); gated in CI by
+.github/workflows/causalontology-conformance.yml. Gate at adoption: conformance 137/137;
+the causal_core in-pack suite 19/19; pack tests and the naming gate green;
+mini regression green: ARC-AGI-1 40/40, ARC-AGI-2 12/12 (10 percent spot-check; full regression deferred).
+Current SPARC versions: Specification v424, Pseudocode v415,
+Architecture v417, Refinement v476, Completion v482.

@@ -2079,7 +2079,7 @@ Causalontology Core: The Reified Causal Relation Object (co_*, Layer 368)
     causal_core_provisional(?Id) / causal_core_refine_import(+Id,+Temporal,+Modality,+Strength): refine into an owned relation.
     causal_core_why(+Id,-Why): the glass-box story of a relation.
     -- Causalontology 2.0.0 conformance vocabulary (WP-425), on SWI-dict objects --
-    causal_core_identity_fields(+Kind,-Fields): the identity-bearing fields of each of the seventeen kinds.
+    causal_core_identity_fields(+Kind,-Fields): the identity-bearing fields of each of the twenty-one kinds (the eighteen 3.0.0 kinds plus the three 4.0.0 kinds).
     causal_core_infer_kind(+Obj,-Kind): the kind of a dict, from its type, id prefix, or shape.
     causal_core_jcs(+Value,-String): RFC 8785 (JSON Canonicalization Scheme) serialization.
     causal_core_canonicalize(+Obj,?Kind,-Bytes): the identity-bearing canonical bytes.
@@ -2097,6 +2097,9 @@ Causalontology Core: The Reified Causal Relation Object (co_*, Layer 368)
     causal_core_dimension(+Unit,-Dim): 3.0.0 - the temporal dimension of a unit ('ordinal' for the tick unit, else 'wallclock'), so an ordinal tick and a wall-clock duration are never conflated (WP-429).
     causal_core_seam_wellformed(+Seam,+OccMap,+StratumMap,-Result): 3.0.0 Rule 22 / Algorithm F - a cross_stratal_seam (the eighteenth kind) is well-formed when its endpoints have strata, share a scheme, are NON-adjacent, and any drawn chain is intervening and strictly monotone (WP-429).
     causal_core_seam_home(+Seam,+OccMap,+StratumMap,-HomeStratumId): 3.0.0 the HOME rule - a spanning seam belongs to the coarsest (max-ordinal) endpoint stratum (WP-429).
+    -- Causalontology 4.0.0 additions (pack version 1.1.0): the three new kinds attitude, predicted_occurrence, and prediction_error --
+    causal_core_identity_fields/2 and causal_core_identify/3 now also mint and identify the three 4.0.0 kinds under their whole-word schemes: attitude (holder, attitude_type, content - a propositional attitude; no strength, per Principle P4), predicted_occurrence (instantiates, interval, predictor, optional identity-bearing strength - a forecast, not a report), and prediction_error (predicted, optional observed, signed discrepancy - the grade of a prediction). A dict of one of these kinds names its kind with an explicit type field (no shape heuristic).
+    causal_core_validate_semantics/3 now also enforces Rule 24 on a predicted interval: exactly one temporal dimension - a wall-clock start AND an ordinal start_tick is a dimension_conflict, neither is a missing_dimension.
 
 causal_learning
 Causalontology Learning: Causal Structure Acquired by Intervention (co_*, Layer 369)

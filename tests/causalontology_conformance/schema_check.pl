@@ -1,6 +1,6 @@
-% Module: co_schema — JSON-Schema validation for the seventeen Causalontology
-% 2.0.0 kinds, a faithful port of the reference schema.py. It interprets the
-% exact JSON-Schema keyword subset the seventeen schemas use (type, const,
+% Module: co_schema — JSON-Schema validation for the twenty-one Causalontology
+% kinds, a faithful port of the reference schema.py. It interprets the
+% exact JSON-Schema keyword subset the twenty-one schemas use (type, const,
 % enum, pattern, required, properties, additionalProperties, items, minItems,
 % minLength, minimum, maximum, oneOf, local $ref, and cross-file $ref) over the
 % vendored spec/schema/*.schema.json copies. This is additive harness code; it
@@ -69,6 +69,12 @@ co_schema_file(enrichment, 'enrichment.schema.json').
 co_schema_file(retraction, 'retraction.schema.json').
 % succession.
 co_schema_file(succession, 'succession.schema.json').
+% attitude (4.0.0).
+co_schema_file(attitude, 'attitude.schema.json').
+% predicted_occurrence (4.0.0).
+co_schema_file(predicted_occurrence, 'predicted_occurrence.schema.json').
+% prediction_error (4.0.0).
+co_schema_file(prediction_error, 'prediction_error.schema.json').
 
 % -- co_load_file(+File, -Root): load and cache one schema file as a dict.
 co_load_file(File, Root) :-

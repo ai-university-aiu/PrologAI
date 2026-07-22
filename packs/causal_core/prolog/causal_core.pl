@@ -546,7 +546,9 @@ causal_core_why(Id, why(Id, causes(Causes), effects(Effects), window(Temporal),
 %
 % This section makes causal_core speak the Causalontology 2.0.0 standard as
 % published data structures: RFC 8785 canonicalization, SHA-256 content
-% identity for all eighteen kinds, the locally-checkable semantic rules, and
+% identity for all twenty-one kinds (the eighteen 3.0.0 kinds plus the three
+% Causalontology 4.0.0 arrivals attitude, predicted_occurrence, and
+% prediction_error), the locally-checkable semantic rules, and
 % the five normative algorithms of Section 12 (bridge closure, bridged
 % reachability, stratal classification, the skip decision, unit
 % normalization). Objects are SWI dicts with atom keys; string values are
@@ -589,7 +591,7 @@ causal_core_why(Id, why(Id, causes(Causes), effects(Effects), window(Temporal),
 :- export(causal_core_enrichment_field/3).
 :- export(causal_core_atomize/2).
 
-% -- The identity-bearing fields of each of the eighteen kinds (identity.md).
+% -- The identity-bearing fields of each of the twenty-one kinds (identity.md).
 % The "type" field is always injected, so it is not listed in these tables.
 % occurrent identity: its label, category, and stratum.
 causal_core_identity_fields(occurrent, [label, category, stratum]).
@@ -631,6 +633,12 @@ causal_core_identity_fields(enrichment, [about, field, entry, source, timestamp]
 causal_core_identity_fields(retraction, [retracts, source, timestamp]).
 % succession identity: predecessor, successor, timestamp.
 causal_core_identity_fields(succession, [predecessor, successor, timestamp]).
+% attitude identity (4.0.0, the nineteenth kind): the holder, the attitude type, and the content reference.
+causal_core_identity_fields(attitude, [holder, attitude_type, content]).
+% predicted_occurrence identity (4.0.0, the twentieth kind): what it instantiates, its interval, its predictor, and its optional strength (identity-bearing when present).
+causal_core_identity_fields(predicted_occurrence, [instantiates, interval, predictor, strength]).
+% prediction_error identity (4.0.0, the twenty-first kind): the prediction graded, the optional observed occurrence, and the signed discrepancy.
+causal_core_identity_fields(prediction_error, [predicted, observed, discrepancy]).
 
 % -- causal_core_infer_kind(+Obj, -Kind): the kind of a dict (type, id, or shape).
 % An explicit type field wins.
@@ -654,6 +662,9 @@ causal_core_infer_kind(Obj, enrichment) :- get_dict(field, Obj, _), get_dict(ent
 causal_core_infer_kind(Obj, assertion) :- ( get_dict(evidence_type, Obj, _) ; ( get_dict(about, Obj, _), get_dict(confidence, Obj, _) ) ), !.
 % kind+bearer is a realizable.
 causal_core_infer_kind(Obj, realizable) :- get_dict(kind, Obj, _), get_dict(bearer, Obj, _), !.
+% 4.0.0 note: the three new kinds (attitude, predicted_occurrence, prediction_error)
+% carry no shape heuristic here; a dict of one of these kinds must carry an explicit
+% type field, which the first clause above resolves. The shape heuristics stay untouched.
 
 % -- causal_core_kind_of_id_str(+Id, -Kind): kind named by an id string prefix.
 causal_core_kind_of_id_str(Id, Kind) :-
@@ -885,6 +896,20 @@ causal_core_semantic_error(causal_relation_object, Obj,
 causal_core_semantic_error(cross_stratal_seam, Obj,
         "contradictory_seam: a drawn chain cannot carry mechanism_status 'absent' (a drawn mechanism is not absent)") :-
     get_dict(chain, Obj, _), get_dict(mechanism_status, Obj, MS), causal_core_atomize(MS, absent).
+% 4.0.0 Rule 24 local clause: a predicted_occurrence's interval must carry BOTH
+% dimensions is a hard dimension_conflict (a wall-clock start AND an ordinal start_tick).
+causal_core_semantic_error(predicted_occurrence, Obj,
+        "dimension_conflict: a predicted interval must carry exactly one temporal dimension, not a wall-clock start AND an ordinal start_tick") :-
+    get_dict(interval, Obj, Iv),
+    get_dict(start, Iv, _),
+    get_dict(start_tick, Iv, _).
+% 4.0.0 Rule 24 local clause: a predicted_occurrence's interval carrying NEITHER
+% dimension is a hard missing_dimension (neither a wall-clock start nor an ordinal start_tick).
+causal_core_semantic_error(predicted_occurrence, Obj,
+        "missing_dimension: a predicted interval must carry a wall-clock start or an ordinal start_tick") :-
+    ( get_dict(interval, Obj, Iv) -> true ; Iv = _{} ),
+    \+ get_dict(start, Iv, _),
+    \+ get_dict(start_tick, Iv, _).
 % Rule 12: an enrichment field must be legal for the kind it is about.
 causal_core_semantic_error(enrichment, Obj, Msg) :-
     get_dict(field, Obj, FieldV), causal_core_atomize(FieldV, Field),

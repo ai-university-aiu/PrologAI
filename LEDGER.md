@@ -1091,3 +1091,43 @@ turn a zero exit into a fail, never the reverse. Verified: the full run now repo
 **50/50 passed, exit 0**; a single-test *failing* probe is still correctly reported as a
 fail (exit 1); a single-test *passing* probe passes (exit 0). No system-under-test result
 changed — the conformance suite always genuinely passed.
+
+---
+
+## Causalontology 4.0.0 adoption — attitude, predicted_occurrence, prediction_error (2026-07-22)
+
+PrologAI adopts **Causalontology specification 4.0.0** and declares conformance at
+**137/137**. The vendored suite under `tests/causalontology_conformance/` advances from
+the 119-vector 3.0.0 set to the 137-vector 4.0.0 set (V01–V137, 21 schemas), pinned to
+causalontology commit `64b1d1a105f91b5fb45df98d0b6583a5ab9e8769` (main at tag `v4.0.0`).
+
+- **Requested (standard).** Causalontology 4.0.0 adds the standard's first three
+  mental-life kinds: `attitude` (a propositional attitude — holder, closed
+  `attitude_type` enumeration, content by identity; may be false and is quarantined
+  from the conflict test by Rule 25; no strength per Principle P4; may nest),
+  `predicted_occurrence` (a forecast — instantiated occurrent type, single-dimension
+  interval per Rule 24, predictor, optional identity-bearing strength), and
+  `prediction_error` (the grade of a prediction — predicted reference, optional
+  observed token occurrence, signed discrepancy).
+- **Delivered.** The `causal_core` vocabulary pack additively bumped **1.0.0 → 1.1.0**:
+  three new identity rows in `causal_core_identity_fields/2`, the two Rule 24 local
+  clauses (`dimension_conflict`, `missing_dimension`) in
+  `causal_core_semantic_error/3`, and explicit-type kind resolution for the three new
+  kinds (no shape heuristic; the eighteen earlier kinds untouched). The additive
+  harness layers follow (`schema_check.pl` interprets 21 schemas, `store.pl` accepts
+  the three new content kinds, `run_conformance.pl` ports the reference `v120()`–`v137()`
+  semantics exactly); the amended `assertion` schema's `about` pattern also repairs the
+  3.0.0 `cross_stratal_seam` drift. `test_causal_core.pl` grows 13 → 19 tests.
+- **Delivered vs requested.** Fully as specified, identity-preserving: the frozen
+  earlier identifiers re-pin byte-for-byte (V136), and the abbreviated schemes
+  `att:`/`prd:`/`err:` are rejected in favour of the whole-word schemes (V137),
+  aligning with PrologAI's own naming rule.
+- **Gates.** Causalontology conformance **137/137** (`bin/run_causalontology_conformance.sh`
+  exit 0); the `causal_core` in-pack suite 19/19; pack tests and the naming gate green;
+  mini regression green: ARC-AGI-1 40/40, ARC-AGI-2 12/12 (10 percent spot-check; full
+  regression deferred). The ARC solving core untouched.
+- **Documentation.** SPARC bumped to Specification v424, Pseudocode v415, Architecture
+  v417, Refinement v476, Completion v482 (superseded versions archived); both tutorials,
+  `docs/Pack_Reference.txt`, `README.md`, `NAMING.md`, `REGRESSION_DEBT.md`, the
+  CONSTITUTION Dated State Log, and `docs/causalontology-4-0-0-adoption.md` updated in
+  the same change.

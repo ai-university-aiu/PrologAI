@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/attitude.schema.json",
+  "title": "Attitude",
+  "description": "4.0.0. A first-class record of a PROPOSITIONAL ATTITUDE: what a holder's mind CONTAINS, never what is true. The holder is a MODELED agent inside the ontology (a continuant type or a particular token individual), never a cryptographic key; the content is a reference by identity to ANY content object - which may be FALSE, and may itself be another attitude (nesting). An attitude is NOT an assertion and carries no strength (Principle P4): it is asserted, graded, and retracted through the ordinary provenance layer, and the SOURCE that signs an assertion ABOUT an attitude is a different thing from the HOLDER of the attitude (Rule 25).",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "holder",
+    "attitude_type",
+    "content"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^attitude:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "attitude"
+    },
+    "holder": {
+      "type": "string",
+      "pattern": "^(continuant|token_individual):[0-9a-f]{64}$",
+      "description": "the agent whose mind contains the content: a MODELED agent inside the ontology (a continuant type or a particular token individual), never a cryptographic key - the signer of an assertion about this attitude is a SOURCE, and the two are different things (Rule 25)"
+    },
+    "attitude_type": {
+      "enum": [
+        "believes",
+        "desires",
+        "intends",
+        "knows",
+        "expects",
+        "fears"
+      ],
+      "description": "CLOSED enumeration; extending it is a MAJOR change (Locked Decision 24)"
+    },
+    "content": {
+      "type": "string",
+      "pattern": "^(occurrent|causal_relation_object|continuant|realizable|stratum|bridge|cross_stratal_seam|port|conduit|quality|token_individual|token_occurrence|state_assertion|token_causal_claim|attitude|predicted_occurrence|prediction_error):[0-9a-f]{64}$",
+      "description": "a reference by identity to ANY content object, INCLUDING another attitude (nesting: A believes that B believes X). The content records what the holder's mind contains, not what is true - it may be FALSE, and a content that contradicts the actual record raises NO conflict (Rule 25: that mismatch IS a false belief, first-class and shareable)"
+    }
+  }
+}

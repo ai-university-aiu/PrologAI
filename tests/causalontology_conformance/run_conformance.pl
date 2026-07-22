@@ -1,12 +1,12 @@
-% Causalontology 2.0.0 conformance runner for PrologAI.
+% Causalontology 4.0.0 conformance runner for PrologAI.
 %
 % A faithful port of the standard's own reference runner
 % (bindings/python/tests/run_conformance.py) at causalontology commit
-% 8991c8b5ef12e998ff932855fabe29edf4cc16cc, driving PrologAI's Causalontology
-% vocabulary packs (causal_core, noun_backbone, realizable_hinge) plus the
-% additive conformance layers (schema_check, signing, store, ed25519) against
-% all 119 frozen vectors V01-V119. Canonicalization (RFC 8785), content
-% identity (SHA-256), schema validity for the seventeen kinds, the local
+% 64b1d1a105f91b5fb45df98d0b6583a5ab9e8769 (tag v4.0.0), driving PrologAI's
+% Causalontology vocabulary packs (causal_core, noun_backbone, realizable_hinge)
+% plus the additive conformance layers (schema_check, signing, store, ed25519)
+% against all 137 frozen vectors V01-V137. Canonicalization (RFC 8785), content
+% identity (SHA-256), schema validity for the twenty-one kinds, the local
 % semantic rules, and the five normative algorithms are exercised here.
 %
 % This runner imports NONE of the ARC grid/ILP/sequence packs; it cannot
@@ -28,13 +28,14 @@
 :- use_module(library(lists)).
 :- use_module(library(apply)).
 
-% The 107 vector clauses (co_v/1) are interleaved with their per-vector helper
+% The 137 vector clauses (co_v/1) are interleaved with their per-vector helper
 % predicates for readability, so they are legitimately discontiguous; declare it
 % to keep the load clean (no behavioural change — ordering does not affect co_v/1).
 :- discontiguous co_v/1.
 
-% The pinned causalontology source commit the vectors were copied from.
-co_vectors_commit('98ebb332d1a529e676c0e1f20ec432f864728e19').
+% The pinned causalontology source commit the vectors were copied from
+% (Causalontology 4.0.0, merge commit at tag v4.0.0).
+co_vectors_commit('64b1d1a105f91b5fb45df98d0b6583a5ab9e8769').
 
 % -- co_vecdir(-Dir): the vendored vector directory beside this file.
 co_vecdir(Dir) :-
@@ -61,7 +62,8 @@ co_vec_name(N, Name) :-
 co_schemes([occurrent, causal_relation_object, continuant, realizable, assertion,
             enrichment, retraction, succession, stratum, bridge, port, conduit,
             quality, token_individual, token_occurrence, state_assertion,
-            token_causal_claim, ed25519]).
+            token_causal_claim, attitude, predicted_occurrence, prediction_error,
+            ed25519]).
 
 % -- co_key(+Name, -Secret, -Pub): the deterministic keypair for a name.
 co_key(Name, Secret, Pub) :-
@@ -253,7 +255,7 @@ co_neuro(S) :-
 co_stratum_id(Neuro, Ord, Id) :- get_dict(Ord, Neuro, St), get_dict(id, St, Id).
 
 % ===========================================================================
-% The 107 vectors.
+% The 137 vectors.
 % ===========================================================================
 
 % V01: a complete causal_relation_object is schema- and semantically valid.
@@ -865,21 +867,253 @@ co_v(118) :- co_conduit_rb("native:region_stratum_predict", Bound), co_conduit_r
 co_v(119) :- co_conduit_rb(none, Unbound), co_schema_ok(Unbound, conduit),
     co_conduit_rb("not_a_scheme_qualified_reference", Bad), co_schema_bad(Bad, conduit, "realized_by").
 
-% -- co_run/0: run all 119 vectors, print a report, and fail on any failure.
+% ===========================================================================
+% V120 - V137: the Causalontology 4.0.0 additions (attitude,
+% predicted_occurrence, prediction_error). These mirror the reference runner's
+% v120()-v137() semantics exactly (same objects, same expectations), driving
+% causal_core 1.1.0's new identity rows and Rule 24 semantics.
+% ===========================================================================
+
+% -- co_repeat_char(+Char, +N, -Str): a string of N copies of a one-char string.
+co_repeat_char(Char, N, Str) :-
+    length(L, N), maplist(=(Char), L), atomic_list_concat(L, A), atom_string(A, Str).
+
+% -- co_predictor(-PredictorId): a forecasting agent's token-individual id.
+co_predictor(PredictorId) :-
+    co_cnt("forecasting_mind", C),
+    co_individual(C.id, "predictor_p", none, Ind),
+    get_dict(id, Ind, PredictorId).
+
+% -- co_believer(+Designator, -HolderId): a believing agent's token-individual id.
+co_believer(Designator, HolderId) :-
+    co_cnt("believing_mind", C),
+    co_individual(C.id, Designator, none, Ind),
+    get_dict(id, Ind, HolderId).
+
+% -- co_attitude(+Holder, +Type, +Content, -Out): an attitude record with its id.
+co_attitude(Holder, Type, Content, Out) :-
+    co_mk(_{type:"attitude", holder:Holder, attitude_type:Type, content:Content}, Out).
+
+% -- co_predicted(+Instantiates, +Interval, +Predictor, -Out): a strength-free prediction.
+co_predicted(Instantiates, Interval, Predictor, Out) :-
+    co_mk(_{type:"predicted_occurrence", instantiates:Instantiates,
+            interval:Interval, predictor:Predictor}, Out).
+
+% -- co_predicted_s(+Instantiates, +Interval, +Predictor, +Strength, -Out): a prediction carrying its predicted probability.
+co_predicted_s(Instantiates, Interval, Predictor, Strength, Out) :-
+    co_mk(_{type:"predicted_occurrence", instantiates:Instantiates,
+            interval:Interval, predictor:Predictor, strength:Strength}, Out).
+
+% -- co_prediction_error(+Predicted, +Discrepancy, -Out): a prediction error with no observed occurrence.
+co_prediction_error(Predicted, Discrepancy, Out) :-
+    co_mk(_{type:"prediction_error", predicted:Predicted, discrepancy:Discrepancy}, Out).
+
+% -- co_prediction_error(+Predicted, +Discrepancy, +Observed, -Out): a prediction error naming the token occurrence that answered it.
+co_prediction_error(Predicted, Discrepancy, Observed, Out) :-
+    co_mk(_{type:"prediction_error", predicted:Predicted,
+            discrepancy:Discrepancy, observed:Observed}, Out).
+
+% -- co_prediction_pairing_mismatch(+Err, +Predicted, +Observed, -Bool): Rule 24
+% pairing check - true iff the observed token does not instantiate the occurrent
+% the prediction instantiates. An absent observed is never a mismatch.
+co_prediction_pairing_mismatch(Err, _Predicted, Observed, false) :-
+    ( \+ get_dict(observed, Err, _) ; Observed == none ), !.
+co_prediction_pairing_mismatch(_Err, Predicted, Observed, Bool) :-
+    get_dict(instantiates, Observed, OInst),
+    get_dict(instantiates, Predicted, PInst),
+    ( OInst == PInst -> Bool = false ; Bool = true ).
+
+% -- co_unbound_conduit(-Out): the V118 unbound conduit, re-pinned under 4.0.0,
+% built exactly as the reference _conduit_realized() (port:1x64, port:2x64, occurrent:3x64).
+co_unbound_conduit(Out) :-
+    co_repeat_char("1", 64, Ones),   string_concat("port:", Ones, Frm),
+    co_repeat_char("2", 64, Twos),   string_concat("port:", Twos, To),
+    co_repeat_char("3", 64, Threes), string_concat("occurrent:", Threes, X),
+    co_mk(_{type:"conduit", label:"conn", from:Frm, to:To, carries:[X]}, Out).
+
+% V120: a tick-windowed prediction is schema- and semantically valid, and a forecast is not a report.
+co_v(120) :-
+    co_occ("rainfall_begins", none, O),
+    co_predictor(Pr),
+    co_predicted(O.id, _{start_tick:3, end_tick:8}, Pr, P),
+    co_schema_ok(P, predicted_occurrence), co_sem_ok(P, predicted_occurrence),
+    get_dict(id, P, Pid), string_concat("predicted_occurrence:", _, Pid),
+    causal_core_identify(_{type:"token_occurrence", instantiates:O.id,
+                           interval:_{start_tick:3, end_tick:8}}, token_occurrence, Report),
+    Pid \== Report, string_concat("token_occurrence:", _, Report).
+% V121: a wall-clock prediction is valid; the optional strength is identity-bearing.
+co_v(121) :-
+    co_occ("rainfall_begins", none, O),
+    co_predictor(Pr),
+    Wall = _{start:"2026-07-23T00:00:00Z", end:"2026-07-24T00:00:00Z"},
+    co_predicted_s(O.id, Wall, Pr, 0.8, WithS),
+    co_predicted(O.id, Wall, Pr, Without),
+    co_schema_ok(WithS, predicted_occurrence), co_sem_ok(WithS, predicted_occurrence),
+    co_schema_ok(Without, predicted_occurrence), co_sem_ok(Without, predicted_occurrence),
+    get_dict(id, WithS, IdW), get_dict(id, Without, IdWo), IdW \== IdWo.
+% V122: a prediction missing its predictor is schema-invalid.
+co_v(122) :-
+    co_occ("rainfall_begins", none, O),
+    co_mk(_{type:"predicted_occurrence", instantiates:O.id, interval:_{start_tick:3}}, Bad),
+    co_schema_bad(Bad, predicted_occurrence, "predictor").
+% V123: a prediction carrying BOTH temporal dimensions is schema-valid but semantically invalid (dimension_conflict).
+co_v(123) :-
+    co_occ("rainfall_begins", none, O),
+    co_predictor(Pr),
+    co_predicted(O.id, _{start:"2026-07-23T00:00:00Z", start_tick:3}, Pr, Both),
+    co_schema_ok(Both, predicted_occurrence),
+    co_sem_bad(Both, predicted_occurrence, "dimension_conflict").
+% V124: a fulfilled prediction error is valid and does not surface a pairing mismatch.
+co_v(124) :-
+    co_occ("rainfall_begins", none, O),
+    co_predictor(Pr),
+    co_predicted(O.id, _{start:"2026-07-23T00:00:00Z"}, Pr, P),
+    co_token(O.id, _{start:"2026-07-23T06:00:00Z"}, none, none, T),
+    co_prediction_error(P.id, 0.0, T.id, Err),
+    co_schema_ok(Err, prediction_error), co_sem_ok(Err, prediction_error),
+    co_prediction_pairing_mismatch(Err, P, T, false).
+% V125: an unfulfilled prediction error with an absent observed is valid, and never a mismatch.
+co_v(125) :-
+    co_occ("rainfall_begins", none, O),
+    co_predictor(Pr),
+    co_predicted(O.id, _{start:"2026-07-23T00:00:00Z"}, Pr, P),
+    co_prediction_error(P.id, -1.0, Err),
+    co_schema_ok(Err, prediction_error), co_sem_ok(Err, prediction_error),
+    \+ get_dict(observed, Err, _),
+    co_prediction_pairing_mismatch(Err, P, none, false).
+% V126: a prediction error missing its discrepancy is schema-invalid.
+co_v(126) :-
+    co_occ("rainfall_begins", none, O),
+    co_predictor(Pr),
+    co_predicted(O.id, _{start_tick:0}, Pr, P),
+    co_mk(_{type:"prediction_error", predicted:P.id}, Bad),
+    co_schema_bad(Bad, prediction_error, "discrepancy").
+% V127: an observed token instantiating a DIFFERENT occurrent surfaces a pairing mismatch.
+co_v(127) :-
+    co_occ("rainfall_begins", none, O),
+    co_occ("snowfall_begins", none, Other),
+    co_predictor(Pr),
+    co_predicted(O.id, _{start:"2026-07-23T00:00:00Z"}, Pr, P),
+    co_token(Other.id, _{start:"2026-07-23T06:00:00Z"}, none, none, T),
+    co_prediction_error(P.id, 1.0, T.id, Err),
+    co_schema_ok(Err, prediction_error),
+    co_prediction_pairing_mismatch(Err, P, T, true).
+% V128: a belief attitude toward a state assertion is schema- and semantically valid.
+co_v(128) :-
+    co_state_fixture("quantity", _{quantity:15.0, unit:"ug/dL"}, "ug/dL", St, _),
+    co_believer("holder_h", Holder),
+    co_attitude(Holder, "believes", St.id, Att),
+    co_schema_ok(Att, attitude), co_sem_ok(Att, attitude).
+% V129: a FALSE belief is valid and quarantined - Rule 25 raises NO conflict even though the claims contradict.
+co_v(129) :-
+    co_occ("switch_pressed", none, A),
+    co_occ("light_on", none, B),
+    co_cro([A.id], [B.id], [modality-"sufficient"], Actual),
+    co_cro([A.id], [B.id], [modality-"preventive"], Believed),
+    causal_core_conflicts(Believed, Actual),
+    co_believer("holder_h", Holder),
+    co_attitude(Holder, "believes", Believed.id, Att),
+    co_schema_ok(Att, attitude), co_sem_ok(Att, attitude),
+    co_store_reset(true),
+    co_put(A, _), co_put(B, _), co_put(Actual, _), co_put(Att, _),
+    co_gaps(conflict, Gaps), Gaps == [].
+% V130: a desire attitude is valid.
+co_v(130) :-
+    co_occ("rainfall_begins", none, O),
+    co_believer("holder_h", Holder),
+    co_attitude(Holder, "desires", O.id, Att),
+    co_schema_ok(Att, attitude), co_sem_ok(Att, attitude).
+% V131: an intention attitude is valid.
+co_v(131) :-
+    co_occ("press_button", none, O),
+    co_believer("holder_h", Holder),
+    co_attitude(Holder, "intends", O.id, Att),
+    co_schema_ok(Att, attitude), co_sem_ok(Att, attitude).
+% V132: a nested attitude (content = another attitude id) is valid and distinct from its inner attitude.
+co_v(132) :-
+    co_state_fixture("boolean", _{boolean:true}, none, St, _),
+    co_believer("holder_b", HolderB),
+    co_attitude(HolderB, "believes", St.id, Inner),
+    co_believer("holder_a", HolderA),
+    co_attitude(HolderA, "believes", Inner.id, Outer),
+    co_schema_ok(Inner, attitude), co_sem_ok(Inner, attitude),
+    co_schema_ok(Outer, attitude), co_sem_ok(Outer, attitude),
+    get_dict(id, Outer, OId), get_dict(id, Inner, IId),
+    OId \== IId, get_dict(content, Outer, OContent), OContent == IId.
+% V133: an unknown attitude_type is schema-rejected (the enumeration is CLOSED).
+co_v(133) :-
+    co_occ("rainfall_begins", none, O),
+    co_believer("holder_h", Holder),
+    co_mk(_{type:"attitude", holder:Holder, attitude_type:"suspects", content:O.id}, Bad),
+    co_schema_bad(Bad, attitude, "attitude_type").
+% V134: an attitude carrying a strength is schema-rejected (Principle P4: an attitude bears no strength).
+co_v(134) :-
+    co_occ("rainfall_begins", none, O),
+    co_believer("holder_h", Holder),
+    co_mk(_{type:"attitude", holder:Holder, attitude_type:"believes",
+            content:O.id, strength:0.9}, Bad),
+    co_schema_bad(Bad, attitude, "strength").
+% V135: an attitude is assertable through the provenance layer - the HOLDER (a modeled agent) and the SOURCE (a signing key) differ.
+co_v(135) :-
+    co_occ("rainfall_begins", none, O),
+    co_believer("holder_h", Holder),
+    co_attitude(Holder, "expects", O.id, Att),
+    co_signed(assertion, _{about:Att.id, evidence_type:"observation", confidence:0.9}, "signer", 0, A),
+    co_schema_ok(A, assertion),
+    co_verify_record(A, assertion),
+    get_dict(holder, Att, HolderV), string_concat("token_individual:", _, HolderV),
+    get_dict(source, A, SourceV), string_concat("ed25519:", _, SourceV),
+    HolderV \== SourceV.
+% V136: the frozen 4.0.0 identifiers are re-pinned exactly (the wall-clock cro and the unbound conduit).
+co_v(136) :-
+    co_sym("occurrent:a", A), co_sym("occurrent:b", B),
+    Secs = _{type:"causal_relation_object", causes:[A], effects:[B], modality:"sufficient",
+             temporal:_{minimum_delay:0, maximum_delay:1, unit:"seconds"}},
+    causal_core_identify(Secs, causal_relation_object, SId),
+    SId == "causal_relation_object:d8daf899daa3ee03caa6b1425cc6d4d33cef20d951e1203ffd35df29857aa43c",
+    co_unbound_conduit(Unbound),
+    get_dict(id, Unbound, UId),
+    UId == "conduit:dc4af3b1a24f0560d5ebcee488779f06ab3c78301cfb9d0c7edff80bc62e27a6".
+% V137: abbreviated identity schemes are rejected; only the whole-word schemes are accepted.
+co_v(137) :-
+    co_repeat_char("0", 64, Hex),
+    string_concat("token_individual:", Hex, Holder),
+    string_concat("state_assertion:", Hex, Content),
+    string_concat("occurrent:", Hex, OccId),
+    string_concat("predicted_occurrence:", Hex, PredId),
+    string_concat("att:", Hex, AttAbbr),
+    BadAtt = _{type:"attitude", id:AttAbbr, holder:Holder,
+               attitude_type:"believes", content:Content},
+    \+ co_schema_ok(BadAtt, attitude),
+    string_concat("prd:", Hex, PrdAbbr),
+    BadPrd = _{type:"predicted_occurrence", id:PrdAbbr, instantiates:OccId,
+               interval:_{start_tick:0}, predictor:Holder},
+    \+ co_schema_ok(BadPrd, predicted_occurrence),
+    string_concat("err:", Hex, ErrAbbr),
+    BadErr = _{type:"prediction_error", id:ErrAbbr, predicted:PredId, discrepancy:0.0},
+    \+ co_schema_ok(BadErr, prediction_error),
+    string_concat("attitude:", Hex, WholeAttId),
+    co_schema_ok(BadAtt.put(id, WholeAttId), attitude),
+    string_concat("predicted_occurrence:", Hex, WholePrdId),
+    co_schema_ok(BadPrd.put(id, WholePrdId), predicted_occurrence),
+    string_concat("prediction_error:", Hex, WholeErrId),
+    co_schema_ok(BadErr.put(id, WholeErrId), prediction_error).
+
+% -- co_run/0: run all 137 vectors, print a report, and fail on any failure.
 co_run :- co_run(_).
 % -- co_run(-Failures): run all vectors and unify Failures with the failed ids.
 co_run(Failures) :-
     co_vectors_commit(Commit),
-    format("PrologAI Causalontology 3.0.0 conformance run~n"),
+    format("PrologAI Causalontology 4.0.0 conformance run~n"),
     format("vectors pinned at causalontology commit ~w~n", [Commit]),
     ( co_internal_checks -> format("internal checks (RFC 8785, unit constants, vocab-pack drive) ... ok~n")
     ; ( format("internal checks FAILED~n"), fail ) ),
-    findall(N-Res, ( between(1, 119, N), co_run_one(N, Res) ), Results),
+    findall(N-Res, ( between(1, 137, N), co_run_one(N, Res) ), Results),
     findall(Nm, ( member(N-fail, Results), co_vec_name(N, Nm) ), Failures),
     aggregate_all(count, member(_-pass, Results), Pass),
     format("~`-t~60|~n"),
-    format("~w/119 vectors passed~n", [Pass]),
-    ( Failures == [] -> format("PrologAI is CONFORMANT to the suite (vectors frozen at specification 3.0.0).~n")
+    format("~w/137 vectors passed~n", [Pass]),
+    ( Failures == [] -> format("PrologAI is CONFORMANT to the suite (vectors frozen at specification 4.0.0).~n")
     ; format("FAILED: ~w~n", [Failures]) ).
 
 % -- co_run_one(+N, -Result): run one vector, printing PASS/FAIL, never throwing.

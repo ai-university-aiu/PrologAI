@@ -31,27 +31,30 @@ word); it is a deliberate exception to the prose-persistence allowance above.
 ## Alignment with the Causalontology standard
 
 The `causal_core`, `noun_backbone`, and `realizable_hinge` packs implement the
-Causalontology vocabulary. Its eighteen object kinds are whole words —
+Causalontology vocabulary. Its twenty-one object kinds are whole words —
 `occurrent`, `continuant`, `realizable`, `causal_relation_object`, `quality`,
 `stratum`, `bridge`, `cross_stratal_seam`, `port`, `conduit` (type tier); `token_individual`,
 `token_occurrence`, `state_assertion`, `token_causal_claim` (token tier);
-`assertion`, `enrichment`, `retraction`, `succession` (provenance). The full
+`assertion`, `enrichment`, `retraction`, `succession` (provenance);
+`attitude`, `predicted_occurrence`, `prediction_error` (the 4.0.0 mental-life
+kinds — whole-word identifier schemes, with the abbreviated `att:`, `prd:`, and
+`err:` schemes rejected by vector V137). The full
 mapping and the field renames (`dmin` → `minimum_delay`, `dmax` →
 `maximum_delay`) live in the standard's own
 [NAMING.md](https://github.com/ai-university-aiu/causalontology/blob/main/NAMING.md).
 
-## Conformance to Causalontology specification 3.0.0
+## Conformance to Causalontology specification 4.0.0
 
-**PrologAI implements Causalontology specification 3.0.0 and passes all 119
-conformance vectors (V01–V119).** The standard's own conformance rule is that
+**PrologAI implements Causalontology specification 4.0.0 and passes all 137
+conformance vectors (V01–V137).** The standard's own conformance rule is that
 an implementation is conformant if and only if it passes every vector for the
-version it declares; PrologAI declares 3.0.0 and passes 119/119.
+version it declares; PrologAI declares 4.0.0 and passes 137/137.
 
 The vectors are vendored under
 [`tests/causalontology_conformance/vectors/`](tests/causalontology_conformance/vectors/),
-copied from the causalontology repository at its 3.0.0 release (tag `v3.0.0`,
-the eighteen-kind edition), with
-the eighteen JSON schemas under
+copied from the causalontology repository at its 4.0.0 release (tag `v4.0.0`,
+commit `64b1d1a105f91b5fb45df98d0b6583a5ab9e8769`, the twenty-one-kind edition),
+with the twenty-one JSON schemas under
 [`tests/causalontology_conformance/schema/`](tests/causalontology_conformance/schema/).
 The harness (`tests/causalontology_conformance/run_conformance.pl`) drives the
 `causal_core`, `noun_backbone`, and `realizable_hinge` vocabulary packs across
@@ -59,9 +62,11 @@ every vector, exercising:
 
 - **canonicalization** — RFC 8785 (JSON Canonicalization Scheme);
 - **content identity** — SHA-256 over the identity-bearing bytes of each kind;
-- **schema validity** — for all eighteen kinds, against the vendored schemas;
+- **schema validity** — for all twenty-one kinds, against the vendored schemas;
 - **local semantic rules** — acyclicity, temporal admissibility, refinement,
-  the conflict test, and the enrichment field table;
+  the conflict test, the enrichment field table, and the 4.0.0 rules (the
+  single-dimension predicted interval; the attitude quarantine, under which a
+  false belief raises no conflict);
 - **the six normative algorithms** (Section 12) — bridge closure, bridged
   reachability (the amended Rule 7), stratal classification, the skip decision,
   unit normalization, and cross-stratal seam well-formedness;
@@ -69,11 +74,12 @@ every vector, exercising:
   retraction lineage, and succession, implemented in pure Prolog.
 
 The conformance engine (canonicalization, identity, semantics, and the six
-algorithms) lives in the `causal_core` vocabulary pack; schema interpretation,
-signing, and the in-memory store are additive harness layers that import none of
-the ARC grid/ILP/sequence packs. Nothing pending: the full suite passes.
+algorithms) lives in the `causal_core` vocabulary pack (version 1.1.0); schema
+interpretation, signing, and the in-memory store are additive harness layers
+that import none of the ARC grid/ILP/sequence packs. Nothing pending: the full
+suite passes.
 
-Run it with `bin/run_causalontology_conformance.sh` (exit 0 iff 119/119).
+Run it with `bin/run_causalontology_conformance.sh` (exit 0 iff 137/137).
 
 ## Exempt external proper names
 

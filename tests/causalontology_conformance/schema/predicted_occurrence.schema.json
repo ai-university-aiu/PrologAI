@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://causalontology.org/schema/predicted_occurrence.schema.json",
+  "title": "Predicted Occurrence",
+  "description": "4.0.0. A first-class record of an EXPECTATION: an occurrent type predicted, by a stated predictor, to occur over a stated window. A prediction is NOT an assertion that the thing happened - it is the sibling of the token_occurrence that has not (yet) happened, and it satisfies no rule that requires a token_occurrence (Rule 24). Its interval MUST carry exactly ONE temporal dimension: a wall-clock start (with optional end) or an ordinal start_tick (with optional end_tick), never both and never neither. The optional strength is the predicted probability - part of the PREDICTED CONTENT itself, identity-bearing when present, not a provenance evaluation (the narrow, deliberate 4.0.0 extension of Principle P4).",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "instantiates",
+    "interval",
+    "predictor"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^predicted_occurrence:[0-9a-f]{64}$"
+    },
+    "type": {
+      "const": "predicted_occurrence"
+    },
+    "instantiates": {
+      "type": "string",
+      "pattern": "^occurrent:[0-9a-f]{64}$",
+      "description": "the occurrent TYPE predicted to occur; MANDATORY (P1)"
+    },
+    "interval": {
+      "$ref": "#/$defs/predicted_interval"
+    },
+    "predictor": {
+      "type": "string",
+      "pattern": "^(continuant|token_individual):[0-9a-f]{64}$",
+      "description": "the predicting source - a MODELED agent or construct inside the ontology (a continuant type or a particular token individual), never a cryptographic key"
+    },
+    "strength": {
+      "type": "number",
+      "description": "OPTIONAL, identity-bearing when present: the predicted probability, part of the predicted content itself, NOT a provenance evaluation (4.0.0 Locked Decision extension of Principle P4)"
+    }
+  },
+  "$defs": {
+    "predicted_interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "description": "RFC 3339, UTC, mandatory Z suffix - the wall-clock dimension"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "start_tick": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "the ordinal dimension: a discrete tick with NO wall-clock mapping (Rule 23)"
+        },
+        "end_tick": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "description": "the predicted window. Rule 24 enforces exactly ONE temporal dimension: start (wall-clock, optional end) or start_tick (ordinal, optional end_tick), never both (dimension_conflict, HARD) and never neither (missing_dimension, HARD)"
+    }
+  }
+}
