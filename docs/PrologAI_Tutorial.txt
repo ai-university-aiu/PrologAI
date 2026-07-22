@@ -27150,20 +27150,20 @@ draws analogies, forms concepts, regulates its behaviours, and learns the lesson
 of its own history. What began as a process-first causal ontology that could play
 an interactive game is now a broad, honest, glass-box cognitive architecture - a
 new synthetic-mind substrate, built in PrologAI.
-Chapter 358: Proving It - Causalontology 2.0.0 Conformance
+Chapter 358: Proving It - Causalontology 3.0.0 Conformance
 
 A standard is only as real as the test that a system either passes or fails. The
-Causalontology standard ships a conformance suite: 107 vectors, V01 through V107,
+Causalontology standard ships a conformance suite: 119 vectors, V01 through V119,
 each a small, frozen fact about how a conformant implementation must behave. The
 standard's own rule is blunt - an implementation is conformant if and only if it
 passes every vector for the version it declares. That single rule is what lets a
 Prolog implementation and a Python implementation agree without sharing a line of
 code.
 
-PrologAI declares Causalontology specification 2.0.0 and passes all 107 vectors.
-The vectors and the seventeen JSON schemas are vendored under
-tests/causalontology_conformance/ from the causalontology repository at a pinned
-commit (8991c8b, the whole-word 2.0.0 baseline), so the test data is the
+PrologAI declares Causalontology specification 3.0.0 and passes all 119 vectors.
+The vectors and the eighteen JSON schemas are vendored under
+tests/causalontology_conformance/ from the causalontology repository at its
+3.0.0 tag (the eighteen-kind edition), so the test data is the
 standard's own, not a re-typing of it. A harness,
 tests/causalontology_conformance/run_conformance.pl, drives the three
 Causalontology vocabulary packs - causal_core, noun_backbone, and
@@ -27172,20 +27172,20 @@ realizable_hinge - across every vector.
 What is actually checked spans the whole standard. Canonicalization follows RFC
 8785, the JSON Canonicalization Scheme, so two encodings of the same object
 produce the same bytes. Content identity is the SHA-256 of those bytes, computed
-the same way for all seventeen kinds, so identity is a function of meaning rather
+the same way for all eighteen kinds, so identity is a function of meaning rather
 than of who wrote the object down. Schema validity is checked against the vendored
 schemas. The local semantic rules - acyclicity, the temporal window, refinement,
 the conflict test, the enrichment field table - are checked as the standard
-states them. And the five normative algorithms of Section 12 are implemented
+states them. And the six normative algorithms of Section 12 are implemented
 exactly: bridge closure, bridged reachability (the amended Rule 7, which the
 negative vector V58 exists specifically to catch), stratal classification, the
-skip decision with its deliberate asymmetry, and unit normalization with its fixed
-mean-Gregorian constants. Provenance is exercised too: Ed25519 record signing and
+skip decision with its deliberate asymmetry, unit normalization with its fixed
+mean-Gregorian constants, and cross-stratal seam well-formedness. Provenance is exercised too: Ed25519 record signing and
 verification per RFC 8032, retraction lineage, and succession - all written in
 pure Prolog, because a conformance proof that shelled out to someone else's
 crypto would prove the wrong thing.
 
-The reusable engine - canonicalization, identity, the semantic rules, and the five
+The reusable engine - canonicalization, identity, the semantic rules, and the six
 algorithms - lives inside the causal_core vocabulary pack, so it is part of the
 platform, not a throwaway test script. The JSON-schema interpreter, the signing
 layer, and the in-memory conformant store are additive harness layers that import
@@ -27193,7 +27193,7 @@ none of the ARC grid, Inductive Logic Programming, or sequence packs. That
 separation is not cosmetic: it is what guarantees this work could never move the
 ARC-AGI-1 or ARC-AGI-2 score, and both were run before and after to confirm it
 (400/400 and 120/120, unchanged). Run the suite yourself with
-bin/run_causalontology_conformance.sh; it exits zero only when all 107 pass, and a
+bin/run_causalontology_conformance.sh; it exits zero only when all 119 pass, and a
 GitHub Actions workflow runs it on every push so conformance can never silently
 rot.
 
