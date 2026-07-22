@@ -6,6 +6,12 @@
 # which exercises the acceptance: a member passes, the abstention passes, a
 # non-member is refused, an unguarded predicate is unaffected, and the arbiter's
 # guard is re-expressible by declaration. Additive; it alters no existing gate.
+#
+# The suite's Wave 10 Stage 2 section (WP-431, the context-aware accessor form
+# closing AMYGDALA-1) imports library(affective_state), a sibling pack — so the
+# library path must span EVERY pack, the same loop the sibling workflows use,
+# not the one-pack path this job began with (which failed that import in CI
+# while the suite stayed green locally).
 name: membership-contract
 
 # Run on pushes and pull requests to any branch.
@@ -31,8 +37,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y swi-prolog
       # Run the membership-contract construct's PLUnit suite; a non-zero exit fails the job.
+      # The library path spans every pack (the sibling-workflow loop), because the
+      # suite's Stage 2 tests import library(affective_state) from a sibling pack.
       - name: Run the membership contract test suite
         run: |
-          swipl -p library=packs/membership_contract/prolog \
-            -g "run_tests, halt" -t "halt(1)" \
-            packs/membership_contract/test/test_membership_contract.pl
+          LIB=""
+          for d in packs/*/prolog; do LIB="$LIB -p library=$d"; done
+          swipl $LIB -g "run_tests, halt" -t "halt(1)" packs/membership_contract/test/test_membership_contract.pl
