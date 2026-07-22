@@ -44,6 +44,9 @@ co_content_kind(quality).         co_content_kind(token_individual).
 co_content_kind(token_occurrence).
 co_content_kind(state_assertion).
 co_content_kind(token_causal_claim).
+% The three Causalontology 4.0.0 content kinds.
+co_content_kind(attitude).        co_content_kind(predicted_occurrence).
+co_content_kind(prediction_error).
 % The provenance record kinds accepted by put_record.
 co_record_kind(assertion).  co_record_kind(enrichment).
 co_record_kind(retraction). co_record_kind(succession).

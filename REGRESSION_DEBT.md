@@ -69,3 +69,4 @@ Each wave appends one row so the debt's size and age stay visible.
 |------|-------------|------|
 | mini-harness introduced | ARC-AGI-1 40/40, ARC-AGI-2 12/12 (10 percent spot-check; full regression deferred) | 2026-07-17 |
 | Wave 10 (Stages 1–9, Ledger closed) | mini ARC-AGI-1 40/40, ARC-AGI-2 12/12 each stage; **FULL ARC-AGI-1 400/400 and ARC-AGI-2 120/120 at wave end** — debt discharged | 2026-07-19 |
+| Causalontology 4.0.0 adoption (causal_core 1.1.0; conformance 137/137) | mini regression green: ARC-AGI-1 40/40, ARC-AGI-2 12/12 (10 percent spot-check; full regression deferred) — debt open again for this change | 2026-07-22 |

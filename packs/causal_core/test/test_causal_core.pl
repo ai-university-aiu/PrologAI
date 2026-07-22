@@ -265,3 +265,138 @@ test(cross_layer_acceptance, [nondet]) :-
     Effect == light(red, on).
 
 :- end_tests(co_core_hierarchy).
+
+% ===========================================================================
+% CAUSALONTOLOGY 4.0.0 — the three new kinds (attitude, predicted_occurrence,
+% prediction_error). These exercise causal_core 1.1.0's additive identity rows
+% (causal_core_identity_fields/2) and Rule 24 semantics; the eighteen 3.0.0
+% kinds and their thirteen tests above are untouched.
+% ===========================================================================
+
+:- begin_tests(co_core_causalontology_4_0_0).
+
+% A 64-character lowercase-hex digest stand-in for the id-bearing references.
+test_co_hex64("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef").
+
+% An attitude identifies under the attitude scheme (id prefix correct).
+test(attitude_identify_roundtrip) :-
+    % The digest used for the holder and content references.
+    test_co_hex64(H),
+    % A believing agent's attitude toward a state assertion.
+    atom_concat('token_individual:', H, Holder),
+    % The believed content, a state assertion by identity.
+    atom_concat('state_assertion:', H, Content),
+    % Build the attitude dict with its explicit type field.
+    Att = _{type:"attitude", holder:Holder, attitude_type:"believes", content:Content},
+    % Identify it under its inferred kind.
+    causal_core_identify(Att, _, Id),
+    % The identifier is minted under the whole-word attitude scheme.
+    atom_string(IdA, Id),
+    % The prefix is exactly the attitude scheme.
+    sub_atom(IdA, 0, _, _, 'attitude:').
+
+% A predicted_occurrence identifies under the predicted_occurrence scheme.
+test(predicted_occurrence_identify_roundtrip) :-
+    % The digest used for the instantiated occurrent and the predictor.
+    test_co_hex64(H),
+    % The occurrent type predicted to occur.
+    atom_concat('occurrent:', H, Occ),
+    % The predicting agent.
+    atom_concat('token_individual:', H, Predictor),
+    % A tick-windowed prediction.
+    P = _{type:"predicted_occurrence", instantiates:Occ,
+          interval:_{start_tick:3, end_tick:8}, predictor:Predictor},
+    % Identify it under its inferred kind.
+    causal_core_identify(P, _, Id),
+    % The identifier is minted under the whole-word predicted_occurrence scheme.
+    atom_string(IdA, Id),
+    % The prefix is exactly the predicted_occurrence scheme.
+    sub_atom(IdA, 0, _, _, 'predicted_occurrence:').
+
+% A prediction_error identifies under the prediction_error scheme.
+test(prediction_error_identify_roundtrip) :-
+    % The digest used for the graded prediction reference.
+    test_co_hex64(H),
+    % The prediction this error grades.
+    atom_concat('predicted_occurrence:', H, Pred),
+    % An unfulfilled prediction: a negative discrepancy, no observed occurrence.
+    Err = _{type:"prediction_error", predicted:Pred, discrepancy:(-1.0)},
+    % Identify it under its inferred kind.
+    causal_core_identify(Err, _, Id),
+    % The identifier is minted under the whole-word prediction_error scheme.
+    atom_string(IdA, Id),
+    % The prefix is exactly the prediction_error scheme.
+    sub_atom(IdA, 0, _, _, 'prediction_error:').
+
+% The optional strength is identity-bearing: present versus absent differ.
+test(predicted_occurrence_strength_identity_bearing) :-
+    % The digest used for the references.
+    test_co_hex64(H),
+    % The occurrent type predicted to occur.
+    atom_concat('occurrent:', H, Occ),
+    % The predicting agent.
+    atom_concat('token_individual:', H, Predictor),
+    % A wall-clock window shared by both predictions.
+    Window = _{start:"2026-07-23T00:00:00Z", end:"2026-07-24T00:00:00Z"},
+    % One prediction carrying an explicit strength.
+    WithStrength = _{type:"predicted_occurrence", instantiates:Occ,
+                     interval:Window, predictor:Predictor, strength:0.8},
+    % One prediction omitting the strength entirely.
+    Without = _{type:"predicted_occurrence", instantiates:Occ,
+                interval:Window, predictor:Predictor},
+    % Identify each.
+    causal_core_identify(WithStrength, _, IdWith),
+    % And the strength-free sibling.
+    causal_core_identify(Without, _, IdWithout),
+    % The strength changes the identity, so the two ids differ.
+    IdWith \== IdWithout.
+
+% A nested attitude (content = another attitude id) identifies and differs.
+test(nested_attitude_identifies) :-
+    % The digest used for the references.
+    test_co_hex64(H),
+    % A believing agent for the inner attitude.
+    atom_concat('token_individual:', H, HolderB),
+    % A believing agent for the outer attitude.
+    atom_concat('continuant:', H, HolderA),
+    % The inner attitude's content, a state assertion.
+    atom_concat('state_assertion:', H, Content),
+    % The inner attitude: B believes a state assertion.
+    Inner = _{type:"attitude", holder:HolderB, attitude_type:"believes", content:Content},
+    % Identify the inner attitude.
+    causal_core_identify(Inner, _, InnerId),
+    % The outer attitude's content is the inner attitude id (nesting).
+    Outer = _{type:"attitude", holder:HolderA, attitude_type:"believes", content:InnerId},
+    % Identify the outer attitude.
+    causal_core_identify(Outer, _, OuterId),
+    % The outer identifier is minted under the attitude scheme.
+    atom_string(OuterA, OuterId),
+    % Its prefix is exactly the attitude scheme.
+    sub_atom(OuterA, 0, _, _, 'attitude:'),
+    % The nested attitudes have distinct identities.
+    OuterId \== InnerId.
+
+% Rule 24: an interval carrying BOTH dimensions raises dimension_conflict.
+test(predicted_occurrence_dimension_conflict_raises) :-
+    % The digest used for the references.
+    test_co_hex64(H),
+    % The occurrent type predicted to occur.
+    atom_concat('occurrent:', H, Occ),
+    % The predicting agent.
+    atom_concat('token_individual:', H, Predictor),
+    % An interval that illegally carries a wall-clock start AND an ordinal start_tick.
+    Bad = _{type:"predicted_occurrence", instantiates:Occ,
+            interval:_{start:"2026-07-23T00:00:00Z", start_tick:3}, predictor:Predictor},
+    % Validate the local semantics for the predicted_occurrence kind.
+    causal_core_validate_semantics(Bad, predicted_occurrence, Reasons),
+    % Some reason names the dimension conflict (once: a single witness suffices).
+    once((
+        % Some reason string mentions the conflict.
+        member(R, Reasons),
+        % Cast the reason to a string for the substring test.
+        ( string(R) -> RS = R ; atom_string(R, RS) ),
+        % The dimension_conflict wording is present.
+        sub_string(RS, _, _, _, "dimension_conflict")
+    )).
+
+:- end_tests(co_core_causalontology_4_0_0).

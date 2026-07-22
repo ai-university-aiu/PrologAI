@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# run_causalontology_conformance.sh — run the 119 Causalontology 3.0.0
-# conformance vectors (V01-V119) against PrologAI's vocabulary packs
+# run_causalontology_conformance.sh — run the 137 Causalontology 4.0.0
+# conformance vectors (V01-V137) against PrologAI's vocabulary packs
 # (causal_core, noun_backbone, realizable_hinge) plus the additive conformance
-# harness. Exit 0 iff 119/119 pass. This gates Causalontology conformance in CI.
+# harness. Exit 0 iff 137/137 pass. This gates Causalontology conformance in CI.
 #
 # The vectors are vendored under tests/causalontology_conformance/vectors/ from
 # the causalontology repository at commit
-# 98ebb332d1a529e676c0e1f20ec432f864728e19 (specification 3.0.0
-# baseline). This runner does NOT load the ARC grid/ILP/sequence packs.
+# 64b1d1a105f91b5fb45df98d0b6583a5ab9e8769 (specification 4.0.0, tag
+# v4.0.0). This runner does NOT load the ARC grid/ILP/sequence packs.
 set -u
 # Resolve the repository root from this script's location.
 cd "$(dirname "$0")/.." || exit 2

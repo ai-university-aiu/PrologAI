@@ -1,0 +1,51 @@
+Chapter 372: What a Mind Expects - Causalontology 4.0.0 and Its Three New Kinds
+
+Causalontology 4.0.0 gives the standard its first records of a MENTAL life, and
+PrologAI now declares and passes it: 137 of 137 conformance vectors (V01-V137,
+twenty-one schemas), vendored from the causalontology repository at its v4.0.0
+tag and run by bin/run_causalontology_conformance.sh. Three new kinds arrive,
+and each is a simple idea made first-class.
+
+Plain-language idea. Until now the ontology could record what happens and what
+causes what. It could not record what an agent BELIEVES, what an agent EXPECTS,
+or how wrong an expectation turned out to be. The three new kinds are exactly
+those three records.
+
+A belief attitude (the attitude kind) records what someone's mind contains,
+never what is true. It names WHO holds it (a modeled agent inside the ontology,
+never a cryptographic signing key - the signer of a statement ABOUT an attitude
+is a different thing from its holder), WHICH attitude it is (a closed list:
+believes, desires, intends, knows, expects, fears), and WHAT it is about, named
+by identity. The content may be flat wrong: a false belief is stored without
+raising any conflict, because the mismatch between a mind and the world IS the
+interesting fact - that quarantine is what makes a false belief first-class and
+shareable. Content may even be another attitude, so "A believes that B believes
+X" nests naturally. An attitude carries no strength of its own; how sure we are
+OF the attitude is said through the ordinary provenance layer, like any other
+claim.
+
+A predicted occurrence (the predicted_occurrence kind) is a forecast. Someone
+(the predictor) says an event of some type will happen inside a window,
+expressed in exactly ONE notion of time - a calendar (wall-clock) window or an
+ordinal tick window, never both and never neither - optionally with a strength
+(a confidence for the forecast, identity-bearing when present). A forecast is
+deliberately NOT the same record as a report: predicting rain tomorrow and
+reporting rain yesterday are different kinds with different identities.
+
+A prediction error (the prediction_error kind) is the grade the world hands
+back. It names WHICH prediction is being graded, what was actually OBSERVED
+(nothing at all, if the prediction went unfulfilled), and a SIGNED discrepancy -
+how far off, and in which direction. An observed event must actually be of the
+type the prediction named, or the pairing is flagged. This is the raw material
+of learning from surprise: a mind that keeps its forecasts and its errors can
+get better.
+
+On the PrologAI side the change is additive and small. The causal_core
+vocabulary pack (bumped to 1.1.0) registers the identity-bearing fields of the
+three kinds, mints their whole-word identifiers (attitude:, predicted_occurrence:,
+prediction_error: - abbreviated schemes are rejected), and enforces the
+single-dimension rule on predicted intervals. Nothing about the eighteen earlier
+kinds changed, and the frozen identifiers re-pin byte-for-byte, so everything
+already stored keeps its identity. Gate: conformance 137/137; pack tests and the
+naming gate green; mini regression green: ARC-AGI-1 40/40, ARC-AGI-2 12/12
+(10 percent spot-check; full regression deferred).
