@@ -46,11 +46,14 @@ All public benchmark claims rest on this run and this run alone:
 - **ARC-AGI-1: 400/400 = 100.00%**
 - **ARC-AGI-2: 120/120 = 100.00%**
 - **Date last run (full):** ARC-AGI-1 genuine 400/400 and ARC-AGI-2 genuine 120/120
-  re-run 2026-07-19 at the conclusion of Wave 10 (the nine-stage Requirements-Ledger
-  program), with no regression. Every task was attempted through the same solving core
-  the benchmark uses (full manifests of all 400 and all 120 task ids). This run
-  discharges the debt for the Wave 10 additive changes — the debt is CLEAR as of this
-  date. (Prior full run: both genuine, re-verified 2026-07-15.)
+  re-run 2026-07-22, after the Causalontology 4.0.0 adoption (causal_core 1.1.0; the
+  137-vector conformance re-baseline), with no regression. Every task was attempted
+  through the same solving core the benchmark uses: the full manifest of all 400
+  ARC-AGI-1 ids and all 120 ARC-AGI-2 ids fed through the mini-regression driver (the
+  documented full-run method — the driver loads the SAME solving core and task facts
+  the mini gate uses). This run discharges the debt for the causal_core 1.1.0 change —
+  the debt is CLEAR as of this date. (Prior full run: genuine 400/400 and 120/120
+  re-run 2026-07-19 at the conclusion of Wave 10; before that, 2026-07-15.)
 
 ## When the FULL regression is MANDATORY
 
@@ -70,3 +73,4 @@ Each wave appends one row so the debt's size and age stay visible.
 | mini-harness introduced | ARC-AGI-1 40/40, ARC-AGI-2 12/12 (10 percent spot-check; full regression deferred) | 2026-07-17 |
 | Wave 10 (Stages 1–9, Ledger closed) | mini ARC-AGI-1 40/40, ARC-AGI-2 12/12 each stage; **FULL ARC-AGI-1 400/400 and ARC-AGI-2 120/120 at wave end** — debt discharged | 2026-07-19 |
 | Causalontology 4.0.0 adoption (causal_core 1.1.0; conformance 137/137) | mini regression green: ARC-AGI-1 40/40, ARC-AGI-2 12/12 (10 percent spot-check; full regression deferred) — debt open again for this change | 2026-07-22 |
+| Causalontology 4.0.0 finishing pass (full regression run) | **FULL ARC-AGI-1 400/400 and ARC-AGI-2 120/120** (all 400 and all 120 task ids through the same solving core) — debt discharged for causal_core 1.1.0 | 2026-07-22 |
